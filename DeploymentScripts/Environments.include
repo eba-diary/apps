@@ -15,7 +15,7 @@
     -->
     
       <if test="${TargetEnv=='Test'}">
-        <property name="DeployLocations" value="\\SHO-T-SHDWEB-20\Web$\Data"/>
+        <property name="DeployLocations" value="\\SHO-T-SHDWEB-20\Web$\DataTest"/>
         <property name="envDashSiteEnvId" value="2403" />
         <property name="createSeerOutage" value="false"/>
       </if>
