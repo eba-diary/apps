@@ -1,0 +1,126 @@
+﻿@model SearchModel
+
+@section Documentation {
+<h4>Attribute-Based Routing</h4>
+<p>
+    This same page is accessed using two different URLs - one for "Search Results" and
+    one for "Browse Listings".  This is done by multiple routes attributes on the
+    SearchController.SearchResults() method.
+</p>
+<h4>Javascript Organization</h4>
+<p>
+    Pages simply call a single Javascript initialization function in the .vbhtml file.
+    This initialization function is the opportunity to pass values from Razor into Javascript.
+    The function is defined in an area-specific .js file in the "js" directory
+    in the solution. Everything in the .js file is bundled together by a directive in the
+    App_Start\BundleConfig.vb
+</p>
+<h4>Asynchronous Loading</h4>
+<p>
+    The .js file for this page is Search.js.  In its Init() method, it shows the spinner, and then
+    asynchronously loads the search results onto the page.  If you have the need for any global
+    Javascript functions, those should go in the _Shared.js file.
+</p>
+<div class="text-right"><a href="#" id="next">Next <i class="fa fa-angle-right"></i></a></div>
+}
+
+@* Display different page header and title depending on how the page was accessed*@
+<div class="page-header">
+    @if (String.IsNullOrEmpty(Model.SearchText))
+    {
+        <h1>Browse Listings</h1>
+        ViewData["Title"] = "Browse Listings";
+    }
+    else
+    {
+        <h1>Search Results for @Model.SearchText</h1>
+        ViewData["Title"] = "Search Results";
+    }
+</div>
+
+@* Show category breadcrumbs if a SearchCategory has been provided*@
+@if (Model.SearchCategory.HasValue)
+{
+<ol class="breadcrumb">
+    <li>@Html.ActionLink("Home", "SearchResults", "Search", new SearchModel {SearchText = Model.SearchText, SearchState = Model.SearchState}, new Object())</li>
+    @CategoryBreadcrumb(Model.Category)
+</ol>
+}
+
+@* Helper method for walking the category model backwards for breadcrumbs*@
+@helper CategoryBreadcrumb(FullCategoryModel cat )
+{    
+if (cat.ParentCategory != null)
+{
+        @CategoryBreadcrumb(cat.ParentCategory)
+}
+<li>@Html.ActionLink(cat.Name, "SearchResults", "Search", new SearchModel {SearchText = Model.SearchText, SearchState = Model.SearchState, SearchCategory = cat.Id}, new Object())</li>
+}
+
+@* Left sidebar *@
+<div class="col-sm-3">
+
+    <div class="panel panel-info">
+        <div class="panel-heading clickable" data-toggle="collapse" data-target="#categories">@Model.Category.Name Categories</div>
+        <div class="panel-body collapse collapse-sm" id="categories">
+            <ul class="list-unstyled">
+                @foreach (FullCategoryModel c in Model.Category.SubCategories)
+                {
+                <li>
+                    @Html.ActionLink(c.Name, "SearchResults", "Search", new SearchModel {SearchCategory = c.Id}, new Object())
+                </li>
+                }
+            </ul>
+        </div>
+    </div>
+
+    <div class="panel panel-info">
+        <div class="panel-heading clickable" data-toggle="collapse" data-target="#statuses">Filter by Status</div>
+        <div class="panel-body collapse collapse-sm" id="statuses">
+            <ul class="list-unstyled">
+                @foreach (AssetStateModel e in AssetStateModel.GetAssetStateList())
+                {
+                if ((int)Model.SearchState == e.Id)
+                {
+                <li><strong>@e.Name</strong></li>
+                }
+                else
+                {
+                <li>
+                    @Html.ActionLink(e.Name, "SearchResults",
+                                     new SearchModel {SearchText = Model.SearchText, SearchState = (Sentry.data.Core.AssetState)e.Id},
+                                     new Object())
+                </li>
+                }
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+@* Main content - for search results *@
+<div class="col-sm-9">
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div id="SearchResults">
+                @*Search results will be loaded here*@
+            </div>
+            <ul class="pager">
+                <li class="previous"><a href="#" id="PagerPrevious">Previous</a></li>
+                <li class="next"><a href="#" id="PagerNext">Next</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script>
+        $(function () {
+            data.Search.Init({
+                SearchText:"@Model.SearchText",
+                SearchCategory:"@Model.SearchCategory",
+                SearchState:"@Model.SearchState",
+                SearchPage:@Model.SearchPage})
+        });
+</script>
+}

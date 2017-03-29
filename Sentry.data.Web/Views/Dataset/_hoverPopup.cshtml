@@ -1,0 +1,13 @@
+﻿@model BaseDatasetModel
+
+@* @Html.AntiForgeryToken() *@
+
+<div class="dataset-hover-popup">
+    @* Show the hover popup display *@
+    <p>
+        @Html.DisplayFor((model) => model.DatasetName)
+    </p>
+    <p>
+        @Html.DisplayFor((model) => model.S3Key)
+    </p>
+</div>

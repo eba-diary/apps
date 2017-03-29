@@ -1,0 +1,42 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DoddleReport.Web</name>
+    </assembly>
+    <members>
+        <member name="M:DoddleReport.Web.RouteExtensions.MapReportingRoute(System.Web.Mvc.AreaRegistrationContext)">
+            <summary>
+            Register the ReportingRoute within an MVC Area. This Route allows ReportResult Actions to be accessed via a file extension in the URL, for example http://localhost/MyController/MyActionResult.html to get an HTML Report
+            </summary>
+        </member>
+        <member name="M:DoddleReport.Web.RouteExtensions.MapReportingRoute(System.Web.Mvc.AreaRegistrationContext,System.String,System.String)">
+            <summary>
+            Register the ReportingRoute within an MVC Area. This Route allows ReportResult Actions to be accessed via a file extension in the URL, for example http://localhost/MyController/MyActionResult.html to get an HTML Report
+            </summary>
+        </member>
+        <member name="M:DoddleReport.Web.RouteExtensions.MapReportingRoute(System.Web.Routing.RouteCollection)">
+            <summary>
+            Register the ReportingRoute. This Route allows ReportResult Actions to be accessed via a file extension in the URL, for example http://localhost/MyController/MyActionResult.html to get an HTML Report
+            </summary>
+        </member>
+        <member name="M:DoddleReport.Web.RouteExtensions.MapReportingRoute(System.Web.Routing.RouteCollection,System.String,System.String)">
+            <summary>
+            Register the ReportingRoute. This Route allows ReportResult Actions to be accessed via a file extension in the URL, for example http://localhost/MyController/MyActionResult.html to get an HTML Report
+            </summary>
+        </member>
+        <member name="P:DoddleReport.Web.ReportResult.FileName">
+            <summary>
+            This property is optional. 
+            If you don't specify a FileName then the name of the ActionResult being executed will be used. 
+            If you do specify a FileName, you may omit the file extension. If the file extension is omitted then DoddleReport will attempt to get the extension from the URL being requested
+            </summary>
+        </member>
+        <member name="P:DoddleReport.Web.WebReport.FileName">
+            <summary>
+            The FileName to use for the downloaded report. 
+            You may omit the file extension. 
+            If the file extension is omitted then DoddleReport will attempt to get the correct extension for the requested ReportWriter from web.config
+            </summary>
+        </member>
+    </members>
+</doc>

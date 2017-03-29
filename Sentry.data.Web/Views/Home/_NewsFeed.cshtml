@@ -1,0 +1,10 @@
+﻿@model IEnumerable<DataFeedItemModel>
+<table class="table">
+    @foreach (DataFeedItemModel dfm in Model)
+    {
+        <tr>
+            @Html.Partial("_DataFeedItemList", dfm)
+        </tr>
+    }
+</table>
+@Html.ActionLink("View More...", "SearchResults", "Search")

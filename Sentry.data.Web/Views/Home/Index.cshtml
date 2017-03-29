@@ -1,0 +1,54 @@
+﻿@model HomeModel
+@* ###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific *@
+@{
+    ViewData["Title"] = "data.sentry.com - Your home for Sentry Data Assets";
+}
+
+<div class="row HomePageTable">
+    <table class="HomePageTable">
+        <tr class="HomePageTable">
+            <td class="AssetOverview">
+                    <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                Asset Overview
+                            </div>
+                        <table>
+                            <div class="panel-body" id="overview-list">
+
+                            </div>
+
+                        </table>
+                    </div>
+            </td>
+            <td class="DataFeed">
+                    <div class="panel panel-success">
+                        <div class="panel-heading">
+                            Hot Topics
+                        </div>
+                        <div class="panel-body" id="hot-topics-list">
+
+                        </div>
+                    </div>
+            </td>
+            <td class="DataFeed">
+                    <div class="panel panel-success">
+                        <div class="panel-heading">
+                            News Feed
+                        </div>
+                        <div class="panel-body" id="news-feed-list">
+
+                        </div>
+                    </div>
+            </td>
+        </tr>
+    </table>
+</div>
+@* ###  END Sentry.Data  ### - Code above is Sentry.Data-specific *@
+
+@section Scripts {
+    <script>
+            $(function () {
+                data.Home.Init();
+            });
+    </script>
+}

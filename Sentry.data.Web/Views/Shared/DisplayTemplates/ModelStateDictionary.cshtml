@@ -1,0 +1,29 @@
+﻿@model ModelStateDictionary
+
+@{
+    //Determine if we have any validation errors that should be shown in the validation summary (if the key is blank)
+    IEnumerable<ModelError> validationSummaryErrors = Model.Where(((e) => e.Key.Equals(String.Empty))).SelectMany(((keyValuePair) => keyValuePair.Value.Errors));
+}
+
+@{if(validationSummaryErrors.Count() > 0) {
+    <div class="validation-summary-errors panel panel-danger" data-valmsg-summary="true">
+        <div class="panel-heading">
+            <span class="glyphicon glyphicon-warning-sign text-danger"></span> Please correct the following errors.
+        </div>
+        <div class="panel-body">
+            <ul>
+                @{foreach (ModelError modelError in Model.Where(((e) => e.Key.Equals(String.Empty))).SelectMany(((keyValuePair) => keyValuePair.Value.Errors)))
+                    {
+                        <li class="text-danger">@modelError.ErrorMessage</li>
+                        } }
+            </ul>
+        </div>
+    </div>
+}
+else
+{
+    <div class="validation-summary-valid alert alert-danger @(Model.IsValid ? "collapse" : "")" data-valmsg-summary="true">
+        <span class="glyphicon glyphicon-warning-sign text-danger"></span> Please correct the highlighted fields below.
+    </div>
+}
+}

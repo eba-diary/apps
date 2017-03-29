@@ -1,0 +1,15 @@
+﻿@model Double?
+@{
+    var htmlAttributes = AnonymousTypeUtils.GetDictionaryFromAnonymousType<Object>(ViewData["htmlAttributes"]);
+}
+<div class="input-group">
+    <span class="input-group-addon">$</span>
+    @if (!Model.HasValue)
+    {
+    @Html.TextBoxFor((model) => model, " ", htmlAttributes)
+    }
+    else
+    {
+    @Html.TextBoxFor((model) => model, htmlAttributes)
+    }
+</div>

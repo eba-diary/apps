@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DoddleReport.OpenXml</name>
+    </assembly>
+    <members>
+        <!-- Badly formed XML comment ignored for member "F:DoddleReport.OpenXml.ExcelReportWriter.OpenXmlDataFormatStringMap" -->
+        <member name="P:DoddleReport.OpenXml.ExcelReportWriter.ReportsToAppend">
+            <summary>
+            Gets the reports to append.
+            </summary>
+        </member>
+        <member name="M:DoddleReport.OpenXml.ExcelReportWriter.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:DoddleReport.OpenXml.ExcelReportWriter"/> class.
+            </summary>
+        </member>
+        <member name="M:DoddleReport.OpenXml.ExcelReportWriter.WriteReport(DoddleReport.Report,System.IO.Stream)">
+            <summary>
+            Writes the report.
+            </summary>
+            <param name="report">The report.</param>
+            <param name="destination">The destination.</param>
+        </member>
+        <member name="M:DoddleReport.OpenXml.ExcelReportWriter.AppendReport(DoddleReport.Report,DoddleReport.Report)">
+            <summary>
+            Appends the report.
+            </summary>
+            <param name="source">The report source.</param>
+            <param name="destination">The report destination.</param>
+        </member>
+        <member name="M:DoddleReport.OpenXml.ExcelReportWriter.RenderHeader(ClosedXML.Excel.IXLWorksheet,System.Int32,DoddleReport.ReportTextFieldCollection,DoddleReport.RenderHintsCollection)">
+            <summary>
+            Renders the header.
+            </summary>
+            <param name="worksheet">The worksheet.</param>
+            <param name="fieldsCount">The fields count.</param>
+            <param name="textFields">The report text field collection.</param>
+            <param name="renderHints">The render hints collection.</param>
+            <returns>The last row the header was written on.</returns>
+        </member>
+        <member name="M:DoddleReport.OpenXml.ExcelReportWriter.RenderTextItem(ClosedXML.Excel.IXLWorksheet,System.Int32,System.String,System.Int32,DoddleReport.ReportStyle)">
+            <summary>
+            Renders the text item.
+            </summary>
+            <param name="worksheet">The worksheet.</param>
+            <param name="fieldsCount">The fields count.</param>
+            <param name="itemText">The item text.</param>
+            <param name="currentRow">The current row.</param>
+            <param name="reportStyle">The report style.</param>
+            <returns>The row it last wrote on.</returns>
+        </member>
+        <member name="M:DoddleReport.OpenXml.ExcelReportWriter.RenderRow(System.Int32,DoddleReport.ReportRow,ClosedXML.Excel.IXLRow)">
+            <summary>
+            Renders the row.
+            </summary>
+            <param name="rowCount">The row count.</param>
+            <param name="reportRow">The row.</param>
+            <param name="dataRow">The data row.</param>
+        </member>
+        <member name="M:DoddleReport.OpenXml.ExcelReportWriter.RenderFooter(ClosedXML.Excel.IXLWorksheet,System.Int32,DoddleReport.ReportTextFieldCollection,DoddleReport.RenderHintsCollection,System.Int32)">
+            <summary>
+            Renders the footer.
+            </summary>
+            <param name="worksheet">The worksheet.</param>
+            <param name="fieldsCount">The fields count.</param>
+            <param name="textFields">The text fields.</param>
+            <param name="renderHintsCollection">The render hints collection.</param>
+            <param name="currentRow">The current row.</param>
+            <returns>The last row it wrote on.</returns>
+        </member>
+        <member name="M:DoddleReport.OpenXml.ExcelReportWriter.GetDefaultTitleStyle">
+            <summary>
+            Gets the default title style.
+            </summary>
+            <returns>The default title style.</returns>
+        </member>
+        <member name="M:DoddleReport.OpenXml.ExcelReportWriter.GetDefaultSubTitleStyle">
+            <summary>
+            Gets the default sub title style.
+            </summary>
+            <returns>The default sub title style.</returns>
+        </member>
+        <member name="M:DoddleReport.OpenXml.ExcelReportWriter.GetDefaultHeaderStyle">
+            <summary>
+            Gets the default header style.
+            </summary>
+            <returns>The default header style.</returns>
+        </member>
+        <member name="M:DoddleReport.OpenXml.ExcelReportWriter.GetDefaultFooterStyle">
+            <summary>
+            Gets the default footer style.
+            </summary>
+            <returns>The default footer style.</returns>
+        </member>
+        <member name="M:DoddleReport.OpenXml.ExcelReportWriter.WriteReport(DoddleReport.Report,ClosedXML.Excel.XLWorkbook)">
+            <summary>
+            Writes the report.
+            </summary>
+            <param name="report">The report.</param>
+            <param name="workbook">The workbook.</param>
+        </member>
+        <member name="M:DoddleReport.OpenXml.Extensions.CopyToXlStyle(DoddleReport.ReportStyle,ClosedXML.Excel.IXLStyle)">
+            <summary>
+            Copies the report style to an XL Style.
+            </summary>
+            <param name="reportStyle">The report style.</param>
+            <param name="xlStyle">The xl style.</param>
+        </member>
+        <member name="M:DoddleReport.OpenXml.Extensions.PixelsToUnits(System.Int32,ClosedXML.Excel.IXLFont)">
+            <summary>
+            Pixels to point.
+            </summary>
+            <param name="pixels">The pixels.</param>
+            <param name="xlFont">The font.</param>
+            <returns>
+            The value in points.
+            </returns>
+            <remarks>
+            The formula is documented there: http://msdn.microsoft.com/en-us/library/documentformat.openxml.spreadsheet.column.aspx
+            </remarks>
+        </member>
+    </members>
+</doc>

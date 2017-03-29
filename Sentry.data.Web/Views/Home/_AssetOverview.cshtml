@@ -1,0 +1,9 @@
+﻿@model IEnumerable<BaseAssetModel>
+<table class="table">
+    @foreach (BaseAssetModel asset in Model) 
+    {
+        <tr>
+            @Html.Partial("_AssetList", asset)
+        </tr>
+    }
+</table>

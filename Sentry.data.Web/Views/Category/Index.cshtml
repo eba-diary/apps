@@ -1,0 +1,42 @@
+﻿@model IEnumerable<FullCategoryModel>
+@{
+    ViewData["Title"] = "Manage Categories";
+}
+
+@section Documentation {
+<h4>Modals</h4>
+<p>
+    This page shows modal dialog boxes when the "Add Subcategory" and "Edit" buttons are clicked.
+    These modals load their content asynchronously.  There are helper methods in the Sentry.Common.js
+    file included in the template that makes working with modals from Javascript a cinch.
+    Check out the AddCategory() function in the Category.js file to see how this is accomplished.
+</p>
+<div class="text-right"><a href="/Admin/ManageUsers" id="next">Next <i class="fa fa-angle-right"></i></a></div>
+}
+
+<div class="page-header">
+    <h1>Manage Categories</h1>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+
+        <div class="col-md-6">
+            <p>
+                <a href="#" id="AddRootCategory"><span class="text-success small glyphicon glyphicon-plus"></span>Add New Root Category</a>
+            </p>
+            <ul class="list-no-decoration list-unstyled list-group">
+                @Html.Partial("_CategoryTreeNode", new FullCategoryModel {Id = 0, Name = "", SubCategories = Model.ToList()})
+            </ul>
+        </div>
+
+    </div>
+</div>
+
+@section Scripts {
+<script>
+        $(function () {
+            data.Category.Init();
+        });
+</script>
+}

@@ -1,0 +1,28 @@
+﻿@* Keep in mind that ALL errors encountered bubble up into here!  This includes any "normal" page's error as well as an ajax
+    call (used by modal dialogs).  When ajax calls get into here, the exception is logged, and then the ajax's error method
+    is called, and typically shows the user a simply JS alert saying there was an error. *@
+
+@Model System.Web.Mvc.HandleErrorInfo
+
+@{
+    Layout = "~/Views/Shared/_GenericLayout.cshtml";
+    ViewData["Title"] = "Error";
+    Response.TrySkipIisCustomErrors =true;
+
+@*Log the exception*@
+    LoggerHelper.LogWebException(ViewData.Model.Exception, System.Web.HttpContext.Current);
+}
+
+<div class="error-container">
+    <br /><br />
+    <i class="fa fa-exclamation-triangle fa-3x text-danger"></i><br />
+    <span class="error-code">ERROR 500</span>
+    <br /><br />
+    <span class="error-title">Oops!</span><br />
+    <span class="error-title-descr">(server error)</span>
+    <br /><br /><br />
+    Something went terribly wrong!<br />
+    We apologize for the inconvenience.<br />
+    If you need assistance,
+    please contact the <a href="mailto:supportcenter@sentry.com">Support Center</a>.
+</div>

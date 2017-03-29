@@ -1,0 +1,29 @@
+﻿@model IEnumerable<BaseAssetModel>
+<div id="item-carousel" class="carousel slide" data-ride="carousel">
+    <!-- Indicators -->
+    <ol class="carousel-indicators">
+        <li data-target="#item-carousel" data-slide-to="0" class="active"></li>
+        <li data-target="#item-carousel" data-slide-to="1"></li>
+        <li data-target="#item-carousel" data-slide-to="2"></li>
+    </ol>
+
+    <!-- Wrapper for slides -->
+    <div class="carousel-inner">
+        @for (int i = 0; i < (Model.Count()); i++)
+        {
+        <div class="item @(i == 0 ? "active" : "") text-center">
+            <a href="@Url.Action("Details", "Asset", new {id = Model.ElementAt(i).Id})">
+                <h4 class="home-carousel-name">@(Model.ElementAt(i).Name)</h4>
+            </a>
+        </div>
+        }
+    </div>
+
+    <!-- Controls -->
+    <a class="left carousel-control" href="#item-carousel" role="button" data-slide="prev">
+        <span class="glyphicon glyphicon-chevron-left"></span>
+    </a>
+    <a class="right carousel-control" href="#item-carousel" role="button" data-slide="next">
+        <span class="glyphicon glyphicon-chevron-right"></span>
+    </a>
+</div>

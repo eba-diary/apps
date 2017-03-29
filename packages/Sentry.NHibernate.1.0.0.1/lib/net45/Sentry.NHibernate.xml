@@ -1,0 +1,88 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+Sentry.NHibernate
+</name>
+</assembly>
+<members>
+<member name="P:Sentry.NHibernate.My.Resources.Resources.ResourceManager">
+	<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member><member name="P:Sentry.NHibernate.My.Resources.Resources.Culture">
+	<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member><member name="T:Sentry.NHibernate.My.Resources.Resources">
+	<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member><member name="T:Sentry.NHibernate.ValidationInterceptor">
+	<summary>
+ An NHibernate interceptor that works with the <see cref="T:Sentry.Core.IValidatable"/> interface
+ to automatically trigger validation when NHibernate is saving or deleting your entities.
+ </summary>
+	<example>
+ Wire this interceptor up in your NHibernate Bootstrap logic.
+ <code>
+ Dim config As New NHibernate.Cfg.Configuration
+ config.SetInterceptor(New Sentry.NHibernate.ValidationInterceptor)
+ </code>
+	</example>
+</member><member name="M:Sentry.NHibernate.NHQueryableExtensionProvider.RegisterQueryableExtensionsProvider``1">
+	<summary>
+ Registers this provider as the <see cref="T:Sentry.Core.IQueryableExtensionProvider"/> for
+ all the IQueryable properties in type <typeparamref name="T"/>
+	</summary>
+	<typeparam name="T">The DomainContext class that uses NHibernate</typeparam>
+</member><member name="T:Sentry.NHibernate.NHQueryableExtensionProvider">
+	<summary>
+ This class is responsible for translating the <see cref="T:Sentry.Core.IQueryableExtensionProvider"/> 
+ eager-fetching functions into the appropriate NHibernate methods.  When you call the 
+ <see cref="M:Sentry.NHibernate.NHQueryableExtensionProvider.RegisterQueryableExtensionsProvider``1"/> method,
+ this class registers itself as the provider for all the IQueryable properties in the type provided.
+ </summary>
+	<example>
+ In each of your Infrastructure DomainContext classes that uses NHibernate, register this provider
+ to allow Queryable extensions to interact with NHibernate.
+ <code>
+ Public Sub New(session As ISession)
+     MyBase.New(session)
+     NHQueryableExtensionProvider.RegisterQueryableExtensionsProvider(Of DefaultContext)()
+ End Sub
+ </code>
+	</example>
+	<remarks></remarks>
+</member><member name="T:Sentry.NHibernate.NhFetchRequest`2">
+	<summary>
+ This class is an adapter around the INhFetchRequest to make it look like our own IFetchRequest to the outside.
+ </summary>
+</member><member name="T:Sentry.NHibernate.NHWritableStatelessDomainContext">
+	<summary>
+ An abstract NHibernate class for all stateless read/write domain contexts (domain contexts that do NOT track entities).  
+ This class includes methods to insert, update, and delete aggregate roots, and manage transactions
+ </summary>
+</member><member name="T:Sentry.NHibernate.NHWritableDomainContext">
+	<summary>
+ An abstract NHibernate class for all stateful read/write domain contexts (domain contexts that track entities).  
+ This class includes methods
+ to add and remove aggregate roots, save changes for tracked aggregate roots, and 
+ attach/detach/merge aggregate roots.
+ </summary>
+</member><member name="T:Sentry.NHibernate.NHReadableStatelessDomainContext">
+	<summary>
+ An abstract NHibernate class for stateless domain contexts (domain contexts that do NOT track entities).
+ If your domain context is only needed for reading data, then inherit from this class.
+ </summary>
+</member><member name="M:Sentry.NHibernate.NHReadableDomainContext.GetReferenceById``1(System.Object)">
+	<remarks>http://ayende.com/blog/3988/nhibernate-the-difference-between-get-load-and-querying-by-id</remarks>
+</member><member name="T:Sentry.NHibernate.NHReadableDomainContext">
+	<summary>
+ An abstract NHibernate class for stateful domain contexts (domain contexts that track entities).
+ If your domain context is only needed for reading data, then inherit from this class.
+ </summary>
+</member>
+</members>
+</doc>

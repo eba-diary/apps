@@ -1,0 +1,13 @@
+﻿@model BaseAssetModel
+
+<td>
+    <div class="AssetDisplay @{ switch (Model.State) {
+                case Sentry.data.Core.AssetState.Up: <text>AssetStateUp</text>; break;
+                case Sentry.data.Core.AssetState.Down: <text>AssetStateDown</text>; break;
+                case Sentry.data.Core.AssetState.Waiting: <text>AssetStateWaiting</text>; break;
+                default: <text>AssetStateUnknown</text>; break;
+            } } ">
+        <h3>@Html.ActionLink(Model.Name, "Details", "Asset", new { id = Model.Id }, new Object())</h3>
+        <p>Last Refreshed:<br />@Html.DisplayFor((m) => m.LastRefreshDateDisplay)</p>
+    </div>
+</td>

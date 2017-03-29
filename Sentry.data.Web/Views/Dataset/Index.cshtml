@@ -1,0 +1,82 @@
+﻿@model IList<Sentry.data.Web.BaseDatasetModel>
+
+@{
+    ViewBag.Title = "Datasets";
+}
+
+<center>
+    <h1>Datasets</h1>
+    Search from @Model.Count() datasets.
+    @{
+        var htmlAttrsObj = new { @class = "navbar-form navbar-center", @id = "DatasetSearch" };
+        var htmlAttributes = HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttrsObj);
+        using (Html.BeginForm("List", "Dataset", FormMethod.Get, htmlAttributes))
+        {
+            <div class="input-group dataset-search">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
+                <input type="text" id="SearchText" name="searchPhrase" class="form-control" placeholder="Enter dataset search term(s)" />
+            </div>
+        }
+    }
+    <p> &nbsp; </p>
+    <div class="upload-row">
+        <h4>
+            Upload a New Dataset
+        </h4>
+        <button type="button" class="btn btn-default btn-sm dataset-operation-button" id="UploadDataset">
+            <span class="glyphicon glyphicon-cloud-upload text-primary"></span> Upload...
+        </button>
+    </div>
+    <p> &nbsp; </p>
+    <div class="browse-category">
+        <h4>
+            Or Browse Dataset Categories...
+        </h4>
+        <div class="index-card-table-div">
+            <table class="index-card-table">
+                @{
+                    /* rudimentary logic to establish a grid of category "cards" */
+                    var category = Model.Select(m => m.Category).Distinct().OrderBy(cat => cat).ToList();
+                    var itemsPerRow = 2;
+                    if (category.Count() >= 20)
+                    {
+                        itemsPerRow = 5;
+                    }
+                    else if (category.Count() >= 12)
+                    {
+                        itemsPerRow = 4;
+                    }
+                    else if (category.Count() >= 6)
+                    {
+                        itemsPerRow = 3;
+                    }
+                    for (var i = 0; i < category.Count; i += itemsPerRow)
+                    {
+                        <tr>
+                            @for (var j = 0; j < itemsPerRow; j++)
+                            {
+                                if (i + j < category.Count)
+                                {
+                                    <td>
+                                        <div class="browse-category-card" id="category_@category[i + j]" data-category="@category[i + j]">
+                                            <p><img src="~/Images/Category/@{@category[i + j]}.png" /></p>
+                                            <p>@category[i + j]</p>
+                                        </div>
+                                    </td>
+                                }
+                            }
+                        </tr>
+                    }
+                }
+            </table>
+        </div>
+    </div>
+</center>
+
+@section Scripts {
+    <script>
+        $(function () {
+            data.Dataset.IndexInit();
+        });
+    </script>
+}

@@ -1,0 +1,19 @@
+﻿@model SearchModel
+@if (Model.Assets == null || Model.Assets.Count() == 0)
+{
+    <div>0 assets found</div>
+}
+else
+{
+    <div>
+        Displaying results <span id="StartRecordNumber">@Model.StartRecordNumber</span> - <span id="EndRecordNumber">@Model.EndRecordNumber</span> of <span id="TotalRecordCount">@Model.AssetCount</span>
+    </div>
+    <table class="table">
+        @foreach (BaseAssetModel asset in Model.Assets)
+        {
+            <tr>
+                @Html.Partial("_AssetList", asset)
+            </tr>
+        }
+    </table>
+}

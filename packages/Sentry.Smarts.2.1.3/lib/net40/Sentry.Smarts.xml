@@ -1,0 +1,2039 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+Sentry.Smarts
+</name>
+</assembly>
+<members>
+<member name="T:Sentry.Smarts.Configuration.SmartsConfiguration">
+<summary>
+SMARTS is a library and supporting ecosystem that allows applications to report on their own health.  See http://sharepoint.sentry.com/IT/AppSvcs/architecture/DeveloperWiki/Wiki%20Pages/Sentry.Smarts.aspx for more info.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SmartsConfiguration.SmartsConfigurationSectionName">
+<summary>
+The XML name of the SmartsConfiguration Configuration Section.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsConfiguration.Instance">
+<summary>
+Gets the SmartsConfiguration instance.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SmartsConfiguration.XmlnsPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.SmartsConfiguration.Xmlns"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsConfiguration.Xmlns">
+<summary>
+Gets the XML namespace of this Configuration Section.
+</summary>
+<remarks>
+This property makes sure that if the configuration file contains the XML namespace,
+the parser doesn't throw an exception because it encounters the unknown "xmlns" attribute.
+</remarks>
+</member>
+<member name="M:Sentry.Smarts.Configuration.SmartsConfiguration.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SmartsConfiguration.ServiceNamePropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.SmartsConfiguration.ServiceName"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsConfiguration.ServiceName">
+<summary>
+Gets or sets the display name for the service/site to be monitored.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SmartsConfiguration.RefreshIntervalPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.SmartsConfiguration.RefreshInterval"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsConfiguration.RefreshInterval">
+<summary>
+Gets or sets the minimum amount of time (in seconds) to wait before allowing the refresh/re-query of resources.  Default: 60 seconds
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SmartsConfiguration.CacheExpirationPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.SmartsConfiguration.CacheExpiration"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsConfiguration.CacheExpiration">
+<summary>
+Gets or sets the amount of time (in seconds) for clients of your SMARTS page to cache the response received from your SMARTS page.  This is done by setting the appropriate cache-control headers.  Default: none
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SmartsConfiguration.DatabasesPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.SmartsConfiguration.Databases"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsConfiguration.Databases">
+<summary>
+Gets or sets database resources attempt to establish a connection to the configured database and optionally execute a query against it.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SmartsConfiguration.WebServicesPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.SmartsConfiguration.WebServices"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsConfiguration.WebServices">
+<summary>
+Gets or sets web Service resources attempt to make a HTTP connection to the specified URL and simply look for a status code 200 returned.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SmartsConfiguration.SmartsServicesPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.SmartsConfiguration.SmartsServices"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsConfiguration.SmartsServices">
+<summary>
+Gets or sets sMARTS Service resources are just like web service resource except they should be pointed at another system’s SMARTS URL and go the extra step of checking the response body to verify the target service’s SMARTS page reports it as up.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SmartsConfiguration.WindowsServicesPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.SmartsConfiguration.WindowsServices"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsConfiguration.WindowsServices">
+<summary>
+Gets or sets windows Service resources monitor the status of Windows service processes running on the local machine.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SmartsConfiguration.FileNotExistsPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.SmartsConfiguration.FileNotExists"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsConfiguration.FileNotExists">
+<summary>
+Gets or sets the File Not Exists resource is available to be used as a quick mechanism to manually force a service to report as down.  Creating an empty file by the specified (or default) name will cause that resource to be considered down.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SmartsConfiguration.FileExistsPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.SmartsConfiguration.FileExists"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsConfiguration.FileExists">
+<summary>
+Gets or sets the File Exists resource is available to be used as a mechanism to manually force a service to report as down.  A file with the specified (or default) name must exist for the resource to be considered up.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SmartsConfiguration.CommandsPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.SmartsConfiguration.Commands"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsConfiguration.Commands">
+<summary>
+Gets or sets command resources allow you to invoke an arbitrary external command and use the exit code of that process to indicate whether or not the resource is up or down.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SmartsConfiguration.CustomResourcesPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.SmartsConfiguration.CustomResources"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsConfiguration.CustomResources">
+<summary>
+Gets or sets custom resources allow you to specify your own class to implement whatever specific needs you may have.  Class instances will be loaded dynamically during initialization and must implement the IResource interface.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SmartsConfiguration.EventingQueuesPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.SmartsConfiguration.EventingQueues"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsConfiguration.EventingQueues">
+<summary>
+Gets or sets eventing Queue resources attempt to connect to the configured Sentry.Eventing (>=1.0) message queue system to determine if it is available.  For .Net, it requires that Sentry.Eventing.dll and Sentry.Eventing.RabbitAMQPProvider.dll be present in the bin directory, as these will be loaded dynamically at runtime.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SmartsConfiguration.RabbitMQsPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.SmartsConfiguration.RabbitMQs"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsConfiguration.RabbitMQs">
+<summary>
+Gets or sets rabbitMQ resources attempt to connect to a RabbitMQ queueing system via the AMQP protocol.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SmartsConfiguration.RedisServicesPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.SmartsConfiguration.RedisServices"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsConfiguration.RedisServices">
+<summary>
+Gets or sets redisServices resources attempt to connect to the Redis server(s) specified.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.FileExistenceResource">
+<summary>
+The FileExistenceResource Configuration Element.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.FileExistenceResource.IsHiddenPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.FileExistenceResource.IsHidden"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.FileExistenceResource.IsHidden">
+<summary>
+Gets or sets the IsHidden.
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.FileExistenceResource.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.FileExistenceResource.FilePropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.FileExistenceResource.File"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.FileExistenceResource.File">
+<summary>
+Gets or sets the name of the file to monitor (can be a relative path, which is relative to the root of your web application).  Defaults to smarts_up.txt for a FileExists resource, and smarts_down.txt for a FileNotExists resource
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.DatabaseResourceCollection">
+<summary>
+A collection of DatabaseResource instances.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.DatabaseResourceCollection.DatabaseResourcePropertyName">
+<summary>
+The XML name of the individual <see cref="T:Sentry.Smarts.Configuration.DatabaseResource"/> instances in this collection.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.DatabaseResourceCollection.CollectionType">
+<summary>
+Gets the type of the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<returns>The <see cref="T:System.Configuration.ConfigurationElementCollectionType"/> of this collection.</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.DatabaseResourceCollection.ElementName">
+<summary>
+Gets the name used to identify this collection of elements
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.DatabaseResourceCollection.IsElementName(System.String)">
+<summary>
+Indicates whether the specified <see cref="T:System.Configuration.ConfigurationElement"/> exists in the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="elementName">The name of the element to verify.</param>
+<returns>
+<see langword="true"/> if the element exists in the collection; otherwise, <see langword="false"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.DatabaseResourceCollection.GetElementKey(System.Configuration.ConfigurationElement)">
+<summary>
+Gets the element key for the specified configuration element.
+</summary>
+<param name="element">The <see cref="T:System.Configuration.ConfigurationElement"/> to return the key for.</param>
+<returns>
+An <see cref="T:System.Object"/> that acts as the key for the specified <see cref="T:System.Configuration.ConfigurationElement"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.DatabaseResourceCollection.CreateNewElement">
+<summary>
+Creates a new <see cref="T:Sentry.Smarts.Configuration.DatabaseResource"/>.
+</summary>
+<returns>
+A new <see cref="T:Sentry.Smarts.Configuration.DatabaseResource"/>.
+</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.DatabaseResourceCollection.Item(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.DatabaseResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.DatabaseResource"/> to retrieve.</param>
+</member>
+<member name="P:Sentry.Smarts.Configuration.DatabaseResourceCollection.Item(System.Object)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.DatabaseResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.DatabaseResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.DatabaseResourceCollection.Add(Sentry.Smarts.Configuration.DatabaseResource)">
+<summary>
+Adds the specified <see cref="T:Sentry.Smarts.Configuration.DatabaseResource"/> to the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="databaseResource">The <see cref="T:Sentry.Smarts.Configuration.DatabaseResource"/> to add.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.DatabaseResourceCollection.Remove(Sentry.Smarts.Configuration.DatabaseResource)">
+<summary>
+Removes the specified <see cref="T:Sentry.Smarts.Configuration.DatabaseResource"/> from the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="databaseResource">The <see cref="T:Sentry.Smarts.Configuration.DatabaseResource"/> to remove.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.DatabaseResourceCollection.GetItemAt(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.DatabaseResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.DatabaseResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.DatabaseResourceCollection.GetItemByKey(System.String)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.DatabaseResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.DatabaseResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.DatabaseResourceCollection.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.Resource">
+<summary>
+The Resource Configuration Element.
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.Resource.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.Resource.NamePropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.Resource.Name"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.Resource.Name">
+<summary>
+Gets or sets the display name for this resource.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.Resource.IsRequiredPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.Resource.IsRequired"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.Resource.IsRequired">
+<summary>
+Gets or sets if required, the resource being down causes the whole service to be considered down, otherwise the service is considered “degraded”.  Default: true
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.Resource.RefreshIntervalPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.Resource.RefreshInterval"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.Resource.RefreshInterval">
+<summary>
+Gets or sets the minimum amount of time to wait before refreshing this resource.  If left unset the global refreshInterval setting is used (which has a default of 5 seconds).
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.Resource.IsHiddenPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.Resource.IsHidden"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.Resource.IsHidden">
+<summary>
+Gets or sets if the resource is marked as hidden, whenever its status is up it will not be shown in the list of resources.  Default: false
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.Resource.TimeoutPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.Resource.Timeout"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.Resource.Timeout">
+<summary>
+Gets or sets the maximum amount of time to wait for the resource to respond, in seconds.  It will default to 5 seconds if unspecified.  However, the framework will always timeout a resource once the the refresh interval minus one second has passed (to prevent potential overlapping resource requests).  If a resource times out, then it is treated as being "DOWN".  This setting is only honored by these resources: command, database, smarts, web service, and HornetQ.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.Resource.CheckedByLoadBalancerPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.Resource.CheckedByLoadBalancer"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.Resource.CheckedByLoadBalancer">
+<summary>
+Gets or sets if marked true, then this resource is included when calculating the composite resource status when the ?mode=LB query string is passed to SMARTS.  This would then cause your application to be pulled out of the load balancer if the resource is down.  Default: false
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.Resource.IgnoreDegradedPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.Resource.IgnoreDegraded"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.Resource.IgnoreDegraded">
+<summary>
+Gets or sets the IgnoreDegraded.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.Resource.TagsPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.Resource.Tags"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.Resource.Tags">
+<summary>
+Gets or sets the Tags.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.Resource.SLAImpactPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.Resource.SLAImpact"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.Resource.SLAImpact">
+<summary>
+Gets or sets the SLAImpact.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.Resource.SLACustomerImpactDetailPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.Resource.SLACustomerImpactDetail"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.Resource.SLACustomerImpactDetail">
+<summary>
+Gets or sets the SLACustomerImpactDetail.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.Resource.SLADescriptionPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.Resource.SLADescription"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.Resource.SLADescription">
+<summary>
+Gets or sets the SLADescription.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.DatabaseResource">
+<summary>
+The DatabaseResource Configuration Element.
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.DatabaseResource.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.DatabaseResource.ConnectionStringPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.DatabaseResource.ConnectionString"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.DatabaseResource.ConnectionString">
+<summary>
+Gets or sets a raw connection string defining the database to check.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.DatabaseResource.ConnectionStringKeyPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.DatabaseResource.ConnectionStringKey"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.DatabaseResource.ConnectionStringKey">
+<summary>
+Gets or sets the Sentry Configuration key for the connection string to use.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.DatabaseResource.QueryPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.DatabaseResource.Query"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.DatabaseResource.Query">
+<summary>
+Gets or sets an optional query to perform on the database after connecting.  The first row of the returned result set will be checked using the queryResult attributes.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.DatabaseResource.QueryResultColumnPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.DatabaseResource.QueryResultColumn"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.DatabaseResource.QueryResultColumn">
+<summary>
+Gets or sets the column from the query result set whose value will be checked.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.DatabaseResource.QueryResultValuePropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.DatabaseResource.QueryResultValue"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.DatabaseResource.QueryResultValue">
+<summary>
+Gets or sets the expected value in the specified column of the first row of the query result set.  If the values do not match, the resource will be considered down.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.DatabaseResource.ProviderPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.DatabaseResource.Provider"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.DatabaseResource.Provider">
+<summary>
+Gets or sets the Provider.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.CustomResource">
+<summary>
+The CustomResource Configuration Element.
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.CustomResource.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.CustomResource.TargetTypePropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.CustomResource.TargetType"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.CustomResource.TargetType">
+<summary>
+Gets or sets the fully qualified type name of a class that implements the IResource interface to be instantiated and used.  Can include a comma separated assembly name as well.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.CustomResource.ArgsPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.CustomResource.Args"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.CustomResource.Args">
+<summary>
+Gets or sets (Optional) Arguments to provide to the CustomResource class
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.CustomResource.ArgsKeyPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.CustomResource.ArgsKey"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.CustomResource.ArgsKey">
+<summary>
+Gets or sets (Optional) Configuration key for the arguments to provide to the CustomResource class
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.CustomResourceCollection">
+<summary>
+A collection of CustomResource instances.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.CustomResourceCollection.CustomResourcePropertyName">
+<summary>
+The XML name of the individual <see cref="T:Sentry.Smarts.Configuration.CustomResource"/> instances in this collection.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.CustomResourceCollection.CollectionType">
+<summary>
+Gets the type of the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<returns>The <see cref="T:System.Configuration.ConfigurationElementCollectionType"/> of this collection.</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.CustomResourceCollection.ElementName">
+<summary>
+Gets the name used to identify this collection of elements
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.CustomResourceCollection.IsElementName(System.String)">
+<summary>
+Indicates whether the specified <see cref="T:System.Configuration.ConfigurationElement"/> exists in the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="elementName">The name of the element to verify.</param>
+<returns>
+<see langword="true"/> if the element exists in the collection; otherwise, <see langword="false"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.CustomResourceCollection.GetElementKey(System.Configuration.ConfigurationElement)">
+<summary>
+Gets the element key for the specified configuration element.
+</summary>
+<param name="element">The <see cref="T:System.Configuration.ConfigurationElement"/> to return the key for.</param>
+<returns>
+An <see cref="T:System.Object"/> that acts as the key for the specified <see cref="T:System.Configuration.ConfigurationElement"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.CustomResourceCollection.CreateNewElement">
+<summary>
+Creates a new <see cref="T:Sentry.Smarts.Configuration.CustomResource"/>.
+</summary>
+<returns>
+A new <see cref="T:Sentry.Smarts.Configuration.CustomResource"/>.
+</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.CustomResourceCollection.Item(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.CustomResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.CustomResource"/> to retrieve.</param>
+</member>
+<member name="P:Sentry.Smarts.Configuration.CustomResourceCollection.Item(System.Object)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.CustomResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.CustomResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.CustomResourceCollection.Add(Sentry.Smarts.Configuration.CustomResource)">
+<summary>
+Adds the specified <see cref="T:Sentry.Smarts.Configuration.CustomResource"/> to the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="customResource">The <see cref="T:Sentry.Smarts.Configuration.CustomResource"/> to add.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.CustomResourceCollection.Remove(Sentry.Smarts.Configuration.CustomResource)">
+<summary>
+Removes the specified <see cref="T:Sentry.Smarts.Configuration.CustomResource"/> from the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="customResource">The <see cref="T:Sentry.Smarts.Configuration.CustomResource"/> to remove.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.CustomResourceCollection.GetItemAt(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.CustomResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.CustomResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.CustomResourceCollection.GetItemByKey(System.String)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.CustomResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.CustomResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.CustomResourceCollection.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.WebServiceResource">
+<summary>
+The WebServiceResource Configuration Element.
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.WebServiceResource.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.WebServiceResource.UrlPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.WebServiceResource.Url"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.WebServiceResource.Url">
+<summary>
+Gets or sets the URL of the web service to check.  Be sure to include any protocol (http, https) and ports in your URL.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.WebServiceResource.UrlKeyPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.WebServiceResource.UrlKey"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.WebServiceResource.UrlKey">
+<summary>
+Gets or sets the configuration key for the web service URL.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.WebServiceResource.UserNameKeyPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.WebServiceResource.UserNameKey"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.WebServiceResource.UserNameKey">
+<summary>
+Gets or sets an optional configuration key for the username to be supplied as credentials.  If set, passwordKey is also required. 
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.WebServiceResource.PasswordKeyPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.WebServiceResource.PasswordKey"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.WebServiceResource.PasswordKey">
+<summary>
+Gets or sets an optional configuration key for the password to be supplied as credentials.  If set requires userNameKey to be set.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.WebServiceResourceCollection">
+<summary>
+A collection of WebServiceResource instances.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.WebServiceResourceCollection.WebServiceResourcePropertyName">
+<summary>
+The XML name of the individual <see cref="T:Sentry.Smarts.Configuration.WebServiceResource"/> instances in this collection.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.WebServiceResourceCollection.CollectionType">
+<summary>
+Gets the type of the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<returns>The <see cref="T:System.Configuration.ConfigurationElementCollectionType"/> of this collection.</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.WebServiceResourceCollection.ElementName">
+<summary>
+Gets the name used to identify this collection of elements
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.WebServiceResourceCollection.IsElementName(System.String)">
+<summary>
+Indicates whether the specified <see cref="T:System.Configuration.ConfigurationElement"/> exists in the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="elementName">The name of the element to verify.</param>
+<returns>
+<see langword="true"/> if the element exists in the collection; otherwise, <see langword="false"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.WebServiceResourceCollection.GetElementKey(System.Configuration.ConfigurationElement)">
+<summary>
+Gets the element key for the specified configuration element.
+</summary>
+<param name="element">The <see cref="T:System.Configuration.ConfigurationElement"/> to return the key for.</param>
+<returns>
+An <see cref="T:System.Object"/> that acts as the key for the specified <see cref="T:System.Configuration.ConfigurationElement"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.WebServiceResourceCollection.CreateNewElement">
+<summary>
+Creates a new <see cref="T:Sentry.Smarts.Configuration.WebServiceResource"/>.
+</summary>
+<returns>
+A new <see cref="T:Sentry.Smarts.Configuration.WebServiceResource"/>.
+</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.WebServiceResourceCollection.Item(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.WebServiceResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.WebServiceResource"/> to retrieve.</param>
+</member>
+<member name="P:Sentry.Smarts.Configuration.WebServiceResourceCollection.Item(System.Object)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.WebServiceResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.WebServiceResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.WebServiceResourceCollection.Add(Sentry.Smarts.Configuration.WebServiceResource)">
+<summary>
+Adds the specified <see cref="T:Sentry.Smarts.Configuration.WebServiceResource"/> to the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="webServiceResource">The <see cref="T:Sentry.Smarts.Configuration.WebServiceResource"/> to add.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.WebServiceResourceCollection.Remove(Sentry.Smarts.Configuration.WebServiceResource)">
+<summary>
+Removes the specified <see cref="T:Sentry.Smarts.Configuration.WebServiceResource"/> from the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="webServiceResource">The <see cref="T:Sentry.Smarts.Configuration.WebServiceResource"/> to remove.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.WebServiceResourceCollection.GetItemAt(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.WebServiceResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.WebServiceResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.WebServiceResourceCollection.GetItemByKey(System.String)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.WebServiceResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.WebServiceResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.WebServiceResourceCollection.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.SmartsServiceResource">
+<summary>
+The SmartsServiceResource Configuration Element.
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.SmartsServiceResource.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SmartsServiceResource.SmartsPagePropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.SmartsServiceResource.SmartsPage"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsServiceResource.SmartsPage">
+<summary>
+Gets or sets a relative URL to the target SMARTS page that will be appended to the host from the configured URL.  This is mainly useful for when you use the urlKey property to pull in a URL for a web service from your Sentry.Configuration settings.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.SmartsServiceResourceCollection">
+<summary>
+A collection of SmartsServiceResource instances.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SmartsServiceResourceCollection.SmartsServiceResourcePropertyName">
+<summary>
+The XML name of the individual <see cref="T:Sentry.Smarts.Configuration.SmartsServiceResource"/> instances in this collection.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsServiceResourceCollection.CollectionType">
+<summary>
+Gets the type of the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<returns>The <see cref="T:System.Configuration.ConfigurationElementCollectionType"/> of this collection.</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsServiceResourceCollection.ElementName">
+<summary>
+Gets the name used to identify this collection of elements
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.SmartsServiceResourceCollection.IsElementName(System.String)">
+<summary>
+Indicates whether the specified <see cref="T:System.Configuration.ConfigurationElement"/> exists in the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="elementName">The name of the element to verify.</param>
+<returns>
+<see langword="true"/> if the element exists in the collection; otherwise, <see langword="false"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.SmartsServiceResourceCollection.GetElementKey(System.Configuration.ConfigurationElement)">
+<summary>
+Gets the element key for the specified configuration element.
+</summary>
+<param name="element">The <see cref="T:System.Configuration.ConfigurationElement"/> to return the key for.</param>
+<returns>
+An <see cref="T:System.Object"/> that acts as the key for the specified <see cref="T:System.Configuration.ConfigurationElement"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.SmartsServiceResourceCollection.CreateNewElement">
+<summary>
+Creates a new <see cref="T:Sentry.Smarts.Configuration.SmartsServiceResource"/>.
+</summary>
+<returns>
+A new <see cref="T:Sentry.Smarts.Configuration.SmartsServiceResource"/>.
+</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsServiceResourceCollection.Item(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.SmartsServiceResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.SmartsServiceResource"/> to retrieve.</param>
+</member>
+<member name="P:Sentry.Smarts.Configuration.SmartsServiceResourceCollection.Item(System.Object)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.SmartsServiceResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.SmartsServiceResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.SmartsServiceResourceCollection.Add(Sentry.Smarts.Configuration.SmartsServiceResource)">
+<summary>
+Adds the specified <see cref="T:Sentry.Smarts.Configuration.SmartsServiceResource"/> to the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="smartsServiceResource">The <see cref="T:Sentry.Smarts.Configuration.SmartsServiceResource"/> to add.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.SmartsServiceResourceCollection.Remove(Sentry.Smarts.Configuration.SmartsServiceResource)">
+<summary>
+Removes the specified <see cref="T:Sentry.Smarts.Configuration.SmartsServiceResource"/> from the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="smartsServiceResource">The <see cref="T:Sentry.Smarts.Configuration.SmartsServiceResource"/> to remove.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.SmartsServiceResourceCollection.GetItemAt(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.SmartsServiceResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.SmartsServiceResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.SmartsServiceResourceCollection.GetItemByKey(System.String)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.SmartsServiceResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.SmartsServiceResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.SmartsServiceResourceCollection.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.WindowsServiceResource">
+<summary>
+The WindowsServiceResource Configuration Element.
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.WindowsServiceResource.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.WindowsServiceResource.ServiceNamePropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.WindowsServiceResource.ServiceName"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.WindowsServiceResource.ServiceName">
+<summary>
+Gets or sets the name of the service to monitor.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.WindowsServiceResource.ServiceNameKeyPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.WindowsServiceResource.ServiceNameKey"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.WindowsServiceResource.ServiceNameKey">
+<summary>
+Gets or sets the configuration key for the service name.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.WindowsServiceResource.ServerNamePropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.WindowsServiceResource.ServerName"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.WindowsServiceResource.ServerName">
+<summary>
+Gets or sets the ServerName.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.WindowsServiceResource.ServerNameKeyPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.WindowsServiceResource.ServerNameKey"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.WindowsServiceResource.ServerNameKey">
+<summary>
+Gets or sets the ServerNameKey.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.WindowsServiceResourceCollection">
+<summary>
+A collection of WindowsServiceResource instances.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.WindowsServiceResourceCollection.WindowsServiceResourcePropertyName">
+<summary>
+The XML name of the individual <see cref="T:Sentry.Smarts.Configuration.WindowsServiceResource"/> instances in this collection.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.WindowsServiceResourceCollection.CollectionType">
+<summary>
+Gets the type of the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<returns>The <see cref="T:System.Configuration.ConfigurationElementCollectionType"/> of this collection.</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.WindowsServiceResourceCollection.ElementName">
+<summary>
+Gets the name used to identify this collection of elements
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.WindowsServiceResourceCollection.IsElementName(System.String)">
+<summary>
+Indicates whether the specified <see cref="T:System.Configuration.ConfigurationElement"/> exists in the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="elementName">The name of the element to verify.</param>
+<returns>
+<see langword="true"/> if the element exists in the collection; otherwise, <see langword="false"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.WindowsServiceResourceCollection.GetElementKey(System.Configuration.ConfigurationElement)">
+<summary>
+Gets the element key for the specified configuration element.
+</summary>
+<param name="element">The <see cref="T:System.Configuration.ConfigurationElement"/> to return the key for.</param>
+<returns>
+An <see cref="T:System.Object"/> that acts as the key for the specified <see cref="T:System.Configuration.ConfigurationElement"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.WindowsServiceResourceCollection.CreateNewElement">
+<summary>
+Creates a new <see cref="T:Sentry.Smarts.Configuration.WindowsServiceResource"/>.
+</summary>
+<returns>
+A new <see cref="T:Sentry.Smarts.Configuration.WindowsServiceResource"/>.
+</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.WindowsServiceResourceCollection.Item(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.WindowsServiceResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.WindowsServiceResource"/> to retrieve.</param>
+</member>
+<member name="P:Sentry.Smarts.Configuration.WindowsServiceResourceCollection.Item(System.Object)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.WindowsServiceResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.WindowsServiceResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.WindowsServiceResourceCollection.Add(Sentry.Smarts.Configuration.WindowsServiceResource)">
+<summary>
+Adds the specified <see cref="T:Sentry.Smarts.Configuration.WindowsServiceResource"/> to the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="windowsServiceResource">The <see cref="T:Sentry.Smarts.Configuration.WindowsServiceResource"/> to add.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.WindowsServiceResourceCollection.Remove(Sentry.Smarts.Configuration.WindowsServiceResource)">
+<summary>
+Removes the specified <see cref="T:Sentry.Smarts.Configuration.WindowsServiceResource"/> from the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="windowsServiceResource">The <see cref="T:Sentry.Smarts.Configuration.WindowsServiceResource"/> to remove.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.WindowsServiceResourceCollection.GetItemAt(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.WindowsServiceResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.WindowsServiceResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.WindowsServiceResourceCollection.GetItemByKey(System.String)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.WindowsServiceResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.WindowsServiceResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.WindowsServiceResourceCollection.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.FileNotExistsResource">
+<summary>
+The FileNotExistsResource Configuration Element.
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.FileNotExistsResource.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.FileNotExistsResourceCollection">
+<summary>
+A collection of FileNotExistsResource instances.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.FileNotExistsResourceCollection.FileNotExistsResourcePropertyName">
+<summary>
+The XML name of the individual <see cref="T:Sentry.Smarts.Configuration.FileNotExistsResource"/> instances in this collection.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.FileNotExistsResourceCollection.CollectionType">
+<summary>
+Gets the type of the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<returns>The <see cref="T:System.Configuration.ConfigurationElementCollectionType"/> of this collection.</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.FileNotExistsResourceCollection.ElementName">
+<summary>
+Gets the name used to identify this collection of elements
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.FileNotExistsResourceCollection.IsElementName(System.String)">
+<summary>
+Indicates whether the specified <see cref="T:System.Configuration.ConfigurationElement"/> exists in the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="elementName">The name of the element to verify.</param>
+<returns>
+<see langword="true"/> if the element exists in the collection; otherwise, <see langword="false"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.FileNotExistsResourceCollection.GetElementKey(System.Configuration.ConfigurationElement)">
+<summary>
+Gets the element key for the specified configuration element.
+</summary>
+<param name="element">The <see cref="T:System.Configuration.ConfigurationElement"/> to return the key for.</param>
+<returns>
+An <see cref="T:System.Object"/> that acts as the key for the specified <see cref="T:System.Configuration.ConfigurationElement"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.FileNotExistsResourceCollection.CreateNewElement">
+<summary>
+Creates a new <see cref="T:Sentry.Smarts.Configuration.FileNotExistsResource"/>.
+</summary>
+<returns>
+A new <see cref="T:Sentry.Smarts.Configuration.FileNotExistsResource"/>.
+</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.FileNotExistsResourceCollection.Item(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.FileNotExistsResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.FileNotExistsResource"/> to retrieve.</param>
+</member>
+<member name="P:Sentry.Smarts.Configuration.FileNotExistsResourceCollection.Item(System.Object)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.FileNotExistsResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.FileNotExistsResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.FileNotExistsResourceCollection.Add(Sentry.Smarts.Configuration.FileNotExistsResource)">
+<summary>
+Adds the specified <see cref="T:Sentry.Smarts.Configuration.FileNotExistsResource"/> to the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="fileNotExistsResource">The <see cref="T:Sentry.Smarts.Configuration.FileNotExistsResource"/> to add.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.FileNotExistsResourceCollection.Remove(Sentry.Smarts.Configuration.FileNotExistsResource)">
+<summary>
+Removes the specified <see cref="T:Sentry.Smarts.Configuration.FileNotExistsResource"/> from the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="fileNotExistsResource">The <see cref="T:Sentry.Smarts.Configuration.FileNotExistsResource"/> to remove.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.FileNotExistsResourceCollection.GetItemAt(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.FileNotExistsResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.FileNotExistsResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.FileNotExistsResourceCollection.GetItemByKey(System.String)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.FileNotExistsResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.FileNotExistsResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.FileNotExistsResourceCollection.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.FileExistsResource">
+<summary>
+The FileExistsResource Configuration Element.
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.FileExistsResource.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.FileExistsResourceCollection">
+<summary>
+A collection of FileExistsResource instances.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.FileExistsResourceCollection.FileExistsResourcePropertyName">
+<summary>
+The XML name of the individual <see cref="T:Sentry.Smarts.Configuration.FileExistsResource"/> instances in this collection.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.FileExistsResourceCollection.CollectionType">
+<summary>
+Gets the type of the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<returns>The <see cref="T:System.Configuration.ConfigurationElementCollectionType"/> of this collection.</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.FileExistsResourceCollection.ElementName">
+<summary>
+Gets the name used to identify this collection of elements
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.FileExistsResourceCollection.IsElementName(System.String)">
+<summary>
+Indicates whether the specified <see cref="T:System.Configuration.ConfigurationElement"/> exists in the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="elementName">The name of the element to verify.</param>
+<returns>
+<see langword="true"/> if the element exists in the collection; otherwise, <see langword="false"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.FileExistsResourceCollection.GetElementKey(System.Configuration.ConfigurationElement)">
+<summary>
+Gets the element key for the specified configuration element.
+</summary>
+<param name="element">The <see cref="T:System.Configuration.ConfigurationElement"/> to return the key for.</param>
+<returns>
+An <see cref="T:System.Object"/> that acts as the key for the specified <see cref="T:System.Configuration.ConfigurationElement"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.FileExistsResourceCollection.CreateNewElement">
+<summary>
+Creates a new <see cref="T:Sentry.Smarts.Configuration.FileExistsResource"/>.
+</summary>
+<returns>
+A new <see cref="T:Sentry.Smarts.Configuration.FileExistsResource"/>.
+</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.FileExistsResourceCollection.Item(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.FileExistsResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.FileExistsResource"/> to retrieve.</param>
+</member>
+<member name="P:Sentry.Smarts.Configuration.FileExistsResourceCollection.Item(System.Object)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.FileExistsResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.FileExistsResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.FileExistsResourceCollection.Add(Sentry.Smarts.Configuration.FileExistsResource)">
+<summary>
+Adds the specified <see cref="T:Sentry.Smarts.Configuration.FileExistsResource"/> to the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="fileExistsResource">The <see cref="T:Sentry.Smarts.Configuration.FileExistsResource"/> to add.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.FileExistsResourceCollection.Remove(Sentry.Smarts.Configuration.FileExistsResource)">
+<summary>
+Removes the specified <see cref="T:Sentry.Smarts.Configuration.FileExistsResource"/> from the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="fileExistsResource">The <see cref="T:Sentry.Smarts.Configuration.FileExistsResource"/> to remove.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.FileExistsResourceCollection.GetItemAt(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.FileExistsResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.FileExistsResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.FileExistsResourceCollection.GetItemByKey(System.String)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.FileExistsResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.FileExistsResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.FileExistsResourceCollection.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.CommandResource">
+<summary>
+The CommandResource Configuration Element.
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.CommandResource.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.CommandResource.CommandPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.CommandResource.Command"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.CommandResource.Command">
+<summary>
+Gets or sets the command to execute.  This should be an absolute path unless the command is in the system PATH.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.CommandResource.ArgumentsPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.CommandResource.Arguments"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.CommandResource.Arguments">
+<summary>
+Gets or sets the command line arguments to be passed to the command.  Note if you need to use double-quotes in an XML attribute use ". 
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.CommandResource.SuccessCodesPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.CommandResource.SuccessCodes"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.CommandResource.SuccessCodes">
+<summary>
+Gets or sets the declaration of what exit codes constitutes the resource being up.   Typically you should only specify either successCodes or failureCodes.  Accepts a syntax of comma-separated integers or integer ranges denoted by "..".  Valid examples include: "0", "0,1", "0..10", and "0..10,15".  
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.CommandResource.FailureCodesPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.CommandResource.FailureCodes"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.CommandResource.FailureCodes">
+<summary>
+Gets or sets the declaration of what exit codes constitutes the resource being down.   Typically you should only specify either successCodes or failureCodes.  Accepts a syntax of comma-separated integers or integer ranges denoted by "..".  Valid examples include: "0", "0,1", "0..10", and "0..10,15".  
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.CommandResource.ArgumentsKeyPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.CommandResource.ArgumentsKey"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.CommandResource.ArgumentsKey">
+<summary>
+Gets or sets an optional configuration key for the command line arguments.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.CommandResource.CommandKeyPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.CommandResource.CommandKey"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.CommandResource.CommandKey">
+<summary>
+Gets or sets an optional configuration key for the command line executable
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.CommandResourceCollection">
+<summary>
+A collection of CommandResource instances.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.CommandResourceCollection.CommandResourcePropertyName">
+<summary>
+The XML name of the individual <see cref="T:Sentry.Smarts.Configuration.CommandResource"/> instances in this collection.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.CommandResourceCollection.CollectionType">
+<summary>
+Gets the type of the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<returns>The <see cref="T:System.Configuration.ConfigurationElementCollectionType"/> of this collection.</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.CommandResourceCollection.ElementName">
+<summary>
+Gets the name used to identify this collection of elements
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.CommandResourceCollection.IsElementName(System.String)">
+<summary>
+Indicates whether the specified <see cref="T:System.Configuration.ConfigurationElement"/> exists in the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="elementName">The name of the element to verify.</param>
+<returns>
+<see langword="true"/> if the element exists in the collection; otherwise, <see langword="false"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.CommandResourceCollection.GetElementKey(System.Configuration.ConfigurationElement)">
+<summary>
+Gets the element key for the specified configuration element.
+</summary>
+<param name="element">The <see cref="T:System.Configuration.ConfigurationElement"/> to return the key for.</param>
+<returns>
+An <see cref="T:System.Object"/> that acts as the key for the specified <see cref="T:System.Configuration.ConfigurationElement"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.CommandResourceCollection.CreateNewElement">
+<summary>
+Creates a new <see cref="T:Sentry.Smarts.Configuration.CommandResource"/>.
+</summary>
+<returns>
+A new <see cref="T:Sentry.Smarts.Configuration.CommandResource"/>.
+</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.CommandResourceCollection.Item(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.CommandResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.CommandResource"/> to retrieve.</param>
+</member>
+<member name="P:Sentry.Smarts.Configuration.CommandResourceCollection.Item(System.Object)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.CommandResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.CommandResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.CommandResourceCollection.Add(Sentry.Smarts.Configuration.CommandResource)">
+<summary>
+Adds the specified <see cref="T:Sentry.Smarts.Configuration.CommandResource"/> to the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="commandResource">The <see cref="T:Sentry.Smarts.Configuration.CommandResource"/> to add.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.CommandResourceCollection.Remove(Sentry.Smarts.Configuration.CommandResource)">
+<summary>
+Removes the specified <see cref="T:Sentry.Smarts.Configuration.CommandResource"/> from the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="commandResource">The <see cref="T:Sentry.Smarts.Configuration.CommandResource"/> to remove.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.CommandResourceCollection.GetItemAt(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.CommandResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.CommandResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.CommandResourceCollection.GetItemByKey(System.String)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.CommandResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.CommandResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.CommandResourceCollection.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.HostedSmartsResource">
+<summary>
+The HostedSmartsResource Configuration Element.
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.HostedSmartsResource.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.HostedSmartsResourceCollection">
+<summary>
+A collection of HostedSmartsResource instances.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.HostedSmartsResourceCollection.HostedSmartsResourcePropertyName">
+<summary>
+The XML name of the individual <see cref="T:Sentry.Smarts.Configuration.HostedSmartsResource"/> instances in this collection.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.HostedSmartsResourceCollection.CollectionType">
+<summary>
+Gets the type of the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<returns>The <see cref="T:System.Configuration.ConfigurationElementCollectionType"/> of this collection.</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.HostedSmartsResourceCollection.ElementName">
+<summary>
+Gets the name used to identify this collection of elements
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.HostedSmartsResourceCollection.IsElementName(System.String)">
+<summary>
+Indicates whether the specified <see cref="T:System.Configuration.ConfigurationElement"/> exists in the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="elementName">The name of the element to verify.</param>
+<returns>
+<see langword="true"/> if the element exists in the collection; otherwise, <see langword="false"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.HostedSmartsResourceCollection.GetElementKey(System.Configuration.ConfigurationElement)">
+<summary>
+Gets the element key for the specified configuration element.
+</summary>
+<param name="element">The <see cref="T:System.Configuration.ConfigurationElement"/> to return the key for.</param>
+<returns>
+An <see cref="T:System.Object"/> that acts as the key for the specified <see cref="T:System.Configuration.ConfigurationElement"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.HostedSmartsResourceCollection.CreateNewElement">
+<summary>
+Creates a new <see cref="T:Sentry.Smarts.Configuration.HostedSmartsResource"/>.
+</summary>
+<returns>
+A new <see cref="T:Sentry.Smarts.Configuration.HostedSmartsResource"/>.
+</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.HostedSmartsResourceCollection.Item(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.HostedSmartsResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.HostedSmartsResource"/> to retrieve.</param>
+</member>
+<member name="P:Sentry.Smarts.Configuration.HostedSmartsResourceCollection.Item(System.Object)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.HostedSmartsResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.HostedSmartsResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.HostedSmartsResourceCollection.Add(Sentry.Smarts.Configuration.HostedSmartsResource)">
+<summary>
+Adds the specified <see cref="T:Sentry.Smarts.Configuration.HostedSmartsResource"/> to the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="hostedSmartsResource">The <see cref="T:Sentry.Smarts.Configuration.HostedSmartsResource"/> to add.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.HostedSmartsResourceCollection.Remove(Sentry.Smarts.Configuration.HostedSmartsResource)">
+<summary>
+Removes the specified <see cref="T:Sentry.Smarts.Configuration.HostedSmartsResource"/> from the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="hostedSmartsResource">The <see cref="T:Sentry.Smarts.Configuration.HostedSmartsResource"/> to remove.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.HostedSmartsResourceCollection.GetItemAt(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.HostedSmartsResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.HostedSmartsResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.HostedSmartsResourceCollection.GetItemByKey(System.String)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.HostedSmartsResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.HostedSmartsResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.HostedSmartsResourceCollection.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.EventingQueueResource">
+<summary>
+The EventingQueueResource Configuration Element.
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.EventingQueueResource.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.EventingQueueResource.EventingConfigTypePropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.EventingQueueResource.EventingConfigType"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.EventingQueueResource.EventingConfigType">
+<summary>
+Gets or sets which Sentry.Eventing config section does the EventingConfigName setting refer to: Consumer or Publisher?
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.EventingQueueResource.EventingConfigNamePropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.EventingQueueResource.EventingConfigName"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.EventingQueueResource.EventingConfigName">
+<summary>
+Gets or sets the name of the Sentry.Eventing consumer or publisher to connect to
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.EventingQueueResourceCollection">
+<summary>
+A collection of EventingQueueResource instances.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.EventingQueueResourceCollection.EventingQueueResourcePropertyName">
+<summary>
+The XML name of the individual <see cref="T:Sentry.Smarts.Configuration.EventingQueueResource"/> instances in this collection.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.EventingQueueResourceCollection.CollectionType">
+<summary>
+Gets the type of the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<returns>The <see cref="T:System.Configuration.ConfigurationElementCollectionType"/> of this collection.</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.EventingQueueResourceCollection.ElementName">
+<summary>
+Gets the name used to identify this collection of elements
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.EventingQueueResourceCollection.IsElementName(System.String)">
+<summary>
+Indicates whether the specified <see cref="T:System.Configuration.ConfigurationElement"/> exists in the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="elementName">The name of the element to verify.</param>
+<returns>
+<see langword="true"/> if the element exists in the collection; otherwise, <see langword="false"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.EventingQueueResourceCollection.GetElementKey(System.Configuration.ConfigurationElement)">
+<summary>
+Gets the element key for the specified configuration element.
+</summary>
+<param name="element">The <see cref="T:System.Configuration.ConfigurationElement"/> to return the key for.</param>
+<returns>
+An <see cref="T:System.Object"/> that acts as the key for the specified <see cref="T:System.Configuration.ConfigurationElement"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.EventingQueueResourceCollection.CreateNewElement">
+<summary>
+Creates a new <see cref="T:Sentry.Smarts.Configuration.EventingQueueResource"/>.
+</summary>
+<returns>
+A new <see cref="T:Sentry.Smarts.Configuration.EventingQueueResource"/>.
+</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.EventingQueueResourceCollection.Item(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.EventingQueueResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.EventingQueueResource"/> to retrieve.</param>
+</member>
+<member name="P:Sentry.Smarts.Configuration.EventingQueueResourceCollection.Item(System.Object)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.EventingQueueResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.EventingQueueResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.EventingQueueResourceCollection.Add(Sentry.Smarts.Configuration.EventingQueueResource)">
+<summary>
+Adds the specified <see cref="T:Sentry.Smarts.Configuration.EventingQueueResource"/> to the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="eventingQueueResource">The <see cref="T:Sentry.Smarts.Configuration.EventingQueueResource"/> to add.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.EventingQueueResourceCollection.Remove(Sentry.Smarts.Configuration.EventingQueueResource)">
+<summary>
+Removes the specified <see cref="T:Sentry.Smarts.Configuration.EventingQueueResource"/> from the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="eventingQueueResource">The <see cref="T:Sentry.Smarts.Configuration.EventingQueueResource"/> to remove.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.EventingQueueResourceCollection.GetItemAt(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.EventingQueueResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.EventingQueueResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.EventingQueueResourceCollection.GetItemByKey(System.String)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.EventingQueueResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.EventingQueueResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.EventingQueueResourceCollection.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.RabbitMQResourceCollection">
+<summary>
+A collection of RabbitMQResource instances.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.RabbitMQResourceCollection.RabbitMQResourcePropertyName">
+<summary>
+The XML name of the individual <see cref="T:Sentry.Smarts.Configuration.RabbitMQResource"/> instances in this collection.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.RabbitMQResourceCollection.CollectionType">
+<summary>
+Gets the type of the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<returns>The <see cref="T:System.Configuration.ConfigurationElementCollectionType"/> of this collection.</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.RabbitMQResourceCollection.ElementName">
+<summary>
+Gets the name used to identify this collection of elements
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.RabbitMQResourceCollection.IsElementName(System.String)">
+<summary>
+Indicates whether the specified <see cref="T:System.Configuration.ConfigurationElement"/> exists in the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="elementName">The name of the element to verify.</param>
+<returns>
+<see langword="true"/> if the element exists in the collection; otherwise, <see langword="false"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.RabbitMQResourceCollection.GetElementKey(System.Configuration.ConfigurationElement)">
+<summary>
+Gets the element key for the specified configuration element.
+</summary>
+<param name="element">The <see cref="T:System.Configuration.ConfigurationElement"/> to return the key for.</param>
+<returns>
+An <see cref="T:System.Object"/> that acts as the key for the specified <see cref="T:System.Configuration.ConfigurationElement"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.RabbitMQResourceCollection.CreateNewElement">
+<summary>
+Creates a new <see cref="T:Sentry.Smarts.Configuration.RabbitMQResource"/>.
+</summary>
+<returns>
+A new <see cref="T:Sentry.Smarts.Configuration.RabbitMQResource"/>.
+</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.RabbitMQResourceCollection.Item(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.RabbitMQResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.RabbitMQResource"/> to retrieve.</param>
+</member>
+<member name="P:Sentry.Smarts.Configuration.RabbitMQResourceCollection.Item(System.Object)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.RabbitMQResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.RabbitMQResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.RabbitMQResourceCollection.Add(Sentry.Smarts.Configuration.RabbitMQResource)">
+<summary>
+Adds the specified <see cref="T:Sentry.Smarts.Configuration.RabbitMQResource"/> to the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="rabbitMQResource">The <see cref="T:Sentry.Smarts.Configuration.RabbitMQResource"/> to add.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.RabbitMQResourceCollection.Remove(Sentry.Smarts.Configuration.RabbitMQResource)">
+<summary>
+Removes the specified <see cref="T:Sentry.Smarts.Configuration.RabbitMQResource"/> from the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="rabbitMQResource">The <see cref="T:Sentry.Smarts.Configuration.RabbitMQResource"/> to remove.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.RabbitMQResourceCollection.GetItemAt(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.RabbitMQResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.RabbitMQResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.RabbitMQResourceCollection.GetItemByKey(System.String)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.RabbitMQResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.RabbitMQResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.RabbitMQResourceCollection.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.RabbitMQResource">
+<summary>
+The RabbitMQResource Configuration Element.
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.RabbitMQResource.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.RabbitMQResource.ConnectionURIPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.RabbitMQResource.ConnectionURI"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.RabbitMQResource.ConnectionURI">
+<summary>
+Gets or sets an AMQP connection URI, such as "amqps://username:password@queueserver.sentry.com/vhost".  See https://www.rabbitmq.com/uri-spec.html for more info.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.RabbitMQResource.ConnectionURIKeyPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.RabbitMQResource.ConnectionURIKey"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.RabbitMQResource.ConnectionURIKey">
+<summary>
+Gets or sets the Sentry Configuration key for the AMQP Connection URI to use.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.RedisServicesResourceCollection">
+<summary>
+A collection of RedisServicesResource instances.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.RedisServicesResourceCollection.RedisServicesResourcePropertyName">
+<summary>
+The XML name of the individual <see cref="T:Sentry.Smarts.Configuration.RedisServicesResource"/> instances in this collection.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.RedisServicesResourceCollection.CollectionType">
+<summary>
+Gets the type of the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<returns>The <see cref="T:System.Configuration.ConfigurationElementCollectionType"/> of this collection.</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.RedisServicesResourceCollection.ElementName">
+<summary>
+Gets the name used to identify this collection of elements
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.RedisServicesResourceCollection.IsElementName(System.String)">
+<summary>
+Indicates whether the specified <see cref="T:System.Configuration.ConfigurationElement"/> exists in the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="elementName">The name of the element to verify.</param>
+<returns>
+<see langword="true"/> if the element exists in the collection; otherwise, <see langword="false"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.RedisServicesResourceCollection.GetElementKey(System.Configuration.ConfigurationElement)">
+<summary>
+Gets the element key for the specified configuration element.
+</summary>
+<param name="element">The <see cref="T:System.Configuration.ConfigurationElement"/> to return the key for.</param>
+<returns>
+An <see cref="T:System.Object"/> that acts as the key for the specified <see cref="T:System.Configuration.ConfigurationElement"/>.
+</returns>
+</member>
+<member name="M:Sentry.Smarts.Configuration.RedisServicesResourceCollection.CreateNewElement">
+<summary>
+Creates a new <see cref="T:Sentry.Smarts.Configuration.RedisServicesResource"/>.
+</summary>
+<returns>
+A new <see cref="T:Sentry.Smarts.Configuration.RedisServicesResource"/>.
+</returns>
+</member>
+<member name="P:Sentry.Smarts.Configuration.RedisServicesResourceCollection.Item(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.RedisServicesResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.RedisServicesResource"/> to retrieve.</param>
+</member>
+<member name="P:Sentry.Smarts.Configuration.RedisServicesResourceCollection.Item(System.Object)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.RedisServicesResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.RedisServicesResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.RedisServicesResourceCollection.Add(Sentry.Smarts.Configuration.RedisServicesResource)">
+<summary>
+Adds the specified <see cref="T:Sentry.Smarts.Configuration.RedisServicesResource"/> to the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="redisServicesResource">The <see cref="T:Sentry.Smarts.Configuration.RedisServicesResource"/> to add.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.RedisServicesResourceCollection.Remove(Sentry.Smarts.Configuration.RedisServicesResource)">
+<summary>
+Removes the specified <see cref="T:Sentry.Smarts.Configuration.RedisServicesResource"/> from the <see cref="T:System.Configuration.ConfigurationElementCollection"/>.
+</summary>
+<param name="redisServicesResource">The <see cref="T:Sentry.Smarts.Configuration.RedisServicesResource"/> to remove.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.RedisServicesResourceCollection.GetItemAt(System.Int32)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.RedisServicesResource"/> at the specified index.
+</summary>
+<param name="index">The index of the <see cref="T:Sentry.Smarts.Configuration.RedisServicesResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.RedisServicesResourceCollection.GetItemByKey(System.String)">
+<summary>
+Gets the <see cref="T:Sentry.Smarts.Configuration.RedisServicesResource"/> with the specified key.
+</summary>
+<param name="name">The key of the <see cref="T:Sentry.Smarts.Configuration.RedisServicesResource"/> to retrieve.</param>
+</member>
+<member name="M:Sentry.Smarts.Configuration.RedisServicesResourceCollection.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.RedisServicesResource">
+<summary>
+The RedisServicesResource Configuration Element.
+</summary>
+</member>
+<member name="M:Sentry.Smarts.Configuration.RedisServicesResource.IsReadOnly">
+<summary>
+Gets a value indicating whether the element is read-only.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.RedisServicesResource.ConnectionStringPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.RedisServicesResource.ConnectionString"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.RedisServicesResource.ConnectionString">
+<summary>
+Gets or sets a raw connection string defining the Redis server(s) to check.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.RedisServicesResource.ConnectionStringKeyPropertyName">
+<summary>
+The XML name of the <see cref="P:Sentry.Smarts.Configuration.RedisServicesResource.ConnectionStringKey"/> property.
+</summary>
+</member>
+<member name="P:Sentry.Smarts.Configuration.RedisServicesResource.ConnectionStringKey">
+<summary>
+Gets or sets the Sentry Configuration key for the connection string to use.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.EventingQueueConfigType">
+<summary>
+EventingQueueConfigType.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.EventingQueueConfigType.Consumer">
+<summary>
+Consumer.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.EventingQueueConfigType.Publisher">
+<summary>
+Publisher.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Configuration.SLAImpactType">
+<summary>
+SLAImpactType.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SLAImpactType.FullOutage">
+<summary>
+FullOutage.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SLAImpactType.PartialOutage">
+<summary>
+PartialOutage.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SLAImpactType.InformationalOnly">
+<summary>
+InformationalOnly.
+</summary>
+</member>
+<member name="F:Sentry.Smarts.Configuration.SLAImpactType.NotSet">
+<summary>
+NotSet.
+</summary>
+</member>
+<member name="T:Sentry.Smarts.Resource.BaseResource">
+ <summary>
+ Abstract base class for all Resources.
+ </summary>
+</member>
+<member name="M:Sentry.Smarts.Resource.CompositeResource.RequestResourceStatus(Conversation)">
+ <summary>
+ <seealso cref="M:Sentry.Smarts.Resource.IResource.RequestResourceStatus(Conversation)" />
+ </summary>
+</member>
+<member name="M:Sentry.Smarts.Resource.CompositeResource.InitializeFromXml(Sentry.Smarts.Configuration.Resource)">
+ <summary>
+ <seealso cref="M:Sentry.Smarts.Resource.IResource.InitializeFromXml(Sentry.Smarts.Configuration.Resource)" />
+ </summary>
+</member>
+<member name="M:Sentry.Smarts.Resource.CustomResource.InitializeFromXml(Sentry.Smarts.Configuration.Resource)">
+ <summary>
+ <seealso cref="M:Sentry.Smarts.Resource.IResource.InitializeFromXml(Sentry.Smarts.Configuration.Resource)" />
+ </summary>
+</member>
+<member name="T:Sentry.Smarts.Resource.NullResource">
+ <summary>
+ This is the resource that is put in place of a Custom Resource if the
+ Custom Resource can't be initialized for some reason.
+ </summary>
+ <remarks></remarks>
+</member>
+<member name="T:Sentry.Smarts.Resource.DatabaseResource">
+ <summary>
+ Represents Smarts Database Resource
+ </summary>
+</member>
+<member name="M:Sentry.Smarts.Resource.DatabaseResource.RequestResourceStatus(Conversation)">
+ <summary>
+ <seealso cref="M:Sentry.Smarts.Resource.IResource.RequestResourceStatus(Conversation)"/>
+ </summary>
+</member>
+<member name="M:Sentry.Smarts.Resource.DatabaseResource.InitializeFromXml(Sentry.Smarts.Configuration.Resource)">
+ <summary>
+ <seealso cref="M:Sentry.Smarts.Resource.IResource.InitializeFromXml(Sentry.Smarts.Configuration.Resource)" />
+ </summary>
+</member>
+<member name="T:Sentry.Smarts.Resource.IResource">
+ <summary>
+ Interface for all Resource objects.
+ </summary>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Smarts.Resource.IResource.RequestResourceStatus(Conversation)">
+ <summary>
+ Asks the resource to retrieve and update its status.
+ </summary>
+</member>
+<member name="M:Sentry.Smarts.Resource.IResource.InitializeFromXml(Sentry.Smarts.Configuration.Resource)">
+ <summary>
+ Initializes resource properties from serialized XML object.
+ </summary>
+ <param name="config">XML object to initialize from</param>
+</member>
+<member name="M:Sentry.Smarts.Resource.IResource.GetMetadata">
+ <summary>
+ Gets the metadata for this resource, for return via the
+ "metadata xml" endpoint.
+ </summary>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="T:Sentry.Smarts.Resource.WebServiceResource">
+ <summary>
+ Represents Smarts Web Service Resource
+ </summary>
+</member>
+<member name="M:Sentry.Smarts.Resource.WebServiceResource.RequestResourceStatus(Conversation)">
+ <summary>
+ <seealso cref="M:Sentry.Smarts.Resource.IResource.RequestResourceStatus(Conversation)"/>
+ </summary>
+</member>
+<member name="M:Sentry.Smarts.Resource.WebServiceResource.InitializeFromXml(Sentry.Smarts.Configuration.Resource)">
+ <summary>
+ <seealso cref="M:Sentry.Smarts.Resource.IResource.InitializeFromXml(Sentry.Smarts.Configuration.Resource)" />
+ </summary>
+</member>
+<member name="T:Sentry.Smarts.Resource.WindowsServiceResource">
+ <summary>
+ Represents Smarts Windows Service Resource
+ </summary>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Smarts.Resource.WindowsServiceResource.RequestResourceStatus(Conversation)">
+ <summary>
+ <seealso cref="M:Sentry.Smarts.Resource.IResource.RequestResourceStatus(Conversation)"/>
+ </summary>
+</member>
+<member name="M:Sentry.Smarts.Resource.WindowsServiceResource.InitializeFromXml(Sentry.Smarts.Configuration.Resource)">
+ <summary>
+ <seealso cref="M:Sentry.Smarts.Resource.IResource.InitializeFromXml(Sentry.Smarts.Configuration.Resource)" />
+ </summary>
+</member>
+<member name="T:Sentry.Smarts.Service.ISmartsService">
+ <summary>
+ Interface for the SMARTS Service.
+ </summary>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Smarts.Service.ISmartsService.Resources">
+ <summary>
+ The collection of resource monitored by this SMARTS Service.
+ </summary>
+</member>
+<member name="M:Sentry.Smarts.Service.ISmartsService.CalculateCompositeResourceFor(System.Collections.Generic.IEnumerable{Sentry.Smarts.Resource.IResource})">
+ <summary>
+ The resource that represents the combined status of all the other resources.
+ </summary>
+</member>
+<member name="M:Sentry.Smarts.Service.ISmartsService.CalculateCompositeResourceForAll">
+ <summary>
+ The resource that represents the combined status of all the other resources.
+ </summary>
+</member>
+<member name="P:Sentry.Smarts.Service.ISmartsService.CacheExpiration">
+ <summary>
+ The number of seconds that this SMARTS page will use when setting the HTTP cache expiration headers.  
+ </summary>
+</member>
+<member name="M:Sentry.Smarts.Service.ISmartsService.Initialize(System.String,Sentry.Smarts.Configuration.SmartsConfiguration)">
+ <summary>
+ Loads all resources and initializes the SMARTS service.
+ </summary>
+ <param name="machineName">The name of the server we're running on</param>
+</member>
+<member name="M:Sentry.Smarts.Service.ISmartsService.GetResourcesView(Sentry.Smarts.Web.SmartsRequest,Conversation)">
+ <summary>
+ Returns a SmartsViewModel object wrapping the current status of the SmartsService.
+ If the given query-string parameters specify the 'force' switch, each resource will
+ be refreshed.
+ </summary>
+ <param name="request">Specifies if and how the resources should be refreshed.</param>
+ <returns>A SmartsViewModel wrapping the resources.</returns>
+</member>
+<member name="T:Sentry.Smarts.Service.SmartsService">
+ <summary>
+ Central Service for SMARTS functionality.  Provides methods for loading resources, parsing param flags
+ and retrieving resource status
+ </summary>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Smarts.Service.SmartsService.Resources">
+ <summary>
+ <seealso cref="P:Sentry.Smarts.Service.ISmartsService.Resources" />
+ </summary>
+</member>
+<member name="P:Sentry.Smarts.Service.SmartsService.CacheExpiration">
+ <summary>
+ <seealso cref="P:Sentry.Smarts.Service.ISmartsService.CacheExpiration" />
+ </summary>
+</member>
+<member name="M:Sentry.Smarts.Service.SmartsService.Initialize(System.String,Sentry.Smarts.Configuration.SmartsConfiguration)">
+ <summary>
+ <seealso cref="M:Sentry.Smarts.Service.ISmartsService.Initialize(System.String,Sentry.Smarts.Configuration.SmartsConfiguration)" />
+ </summary>
+</member>
+<member name="M:Sentry.Smarts.Service.SmartsService.GetResourcesView(Sentry.Smarts.Web.SmartsRequest,Conversation)">
+ <summary>
+ <seealso cref="M:Sentry.Smarts.Service.ISmartsService.GetResourcesView(Sentry.Smarts.Web.SmartsRequest,Conversation)" />
+ </summary>
+</member>
+<member name="T:My.Resources.Resources">
+<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member>
+<member name="P:My.Resources.Resources.ResourceManager">
+<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member>
+<member name="P:My.Resources.Resources.Culture">
+<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member>
+<member name="T:Conversation">
+ <summary>
+ Represents all the details about one SMARTS conversation, which is a series of SMARTS-to-SMARTS 
+ interactions that result from some client asking a SMARTS page for a status.
+ </summary>
+ <remarks></remarks>
+</member>
+</members>
+</doc>

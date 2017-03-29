@@ -1,0 +1,16 @@
+﻿@model IEnumerable<BaseAssetModel>
+@foreach (BaseAssetModel asset in Model)
+{
+    <tr>
+        <td>
+            <div class="col-md-4 AssetDisplay @{ switch (asset.State) {
+                case Sentry.data.Core.AssetState.Up: <text>AssetStateUp</text>; break;
+                case Sentry.data.Core.AssetState.Down: <text>AssetStateDown</text>; break;
+                case Sentry.data.Core.AssetState.Waiting: <text>AssetStateWaiting</text>; break;
+                default: <text>AssetStateUnknown</text>; break;
+            } } ">
+                @Html.Partial("_AssetList", asset)
+            </div>
+        </td>
+    </tr>
+}

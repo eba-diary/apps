@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<configuration xmlns:xdt="http://schemas.microsoft.com/XML-Document-Transform">
+  <configSections xdt:Transform="InsertIfMissing" >
+    <sectionGroup name="sentrySettings" xdt:Transform="InsertIfMissing" xdt:Locator="Match(name)">
+      <section name="SmartsSettings" type="Sentry.Smarts.Configuration.SmartsConfiguration,Sentry.Smarts" xdt:Transform="InsertIfMissing" xdt:Locator="Match(name)"/>
+    </sectionGroup>
+  </configSections>
+  <sentrySettings xdt:Transform="InsertIfMissing">
+    <!-- NOTE: Use Ctrl+K Ctrl+D to reformat your config file to make the following readable -->
+    <SmartsSettings serviceName="My Service" 
+                    xmlns="urn:Sentry.Smarts.Configuration"
+                    xdt:Transform="InsertIfMissing">
+      <!-- TODO: Change these SmartsSettings to suit your needs.  Refer to the documentation for a complete list of options. -->
+      <!--
+      <databases>
+        <add name="SQL Database" connectionStringKey="DatabaseConfigKey"/>
+      </databases>
+      <smartsServices>
+        <add name="Web Service" urlKey="ServiceUrlConfigKey" smartsPage="/_status/smarts.aspx"/>
+      </smartsServices>
+      -->
+    </SmartsSettings>
+  </sentrySettings>
+</configuration>

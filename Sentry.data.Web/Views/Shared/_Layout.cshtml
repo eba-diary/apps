@@ -1,0 +1,74 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    @Styles.Render("~/bundles/css/main")
+    @RenderSection("styles", false)
+    @Styles.Render("~/bundles/css/site")
+
+</head>
+<body class="prevent-animation">
+    <!-- BEGIN SENTRY COMMON HEADER -->
+    @Html.Action("GetHeader", "Layout")
+    <!-- END SENTRY COMMON HEADER -->
+    @*used for ajax $.ajaxSetup() in _Shared.js*@
+    <form id="__AjaxAntiForgeryForm" action="#" method="post">@Html.AntiForgeryToken()</form>
+
+    <div class="container body-content">
+        @* ###BEGIN SENTRYBAY### - Code below is SentryBay-specific *@
+        @if (IsSectionDefined("Documentation"))
+        {
+        <div class="row bs-callout bs-callout-info alert alert-dismissible " role="alert">
+            <button type="button" class="close" data-dismiss="alert" title="Close Documentation"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+            @RenderSection("Documentation", false)
+        </div>
+        }
+        @* ###END SENTRYBAY### - Code above is SentryBay-specific *@
+        @RenderBody()
+    </div>
+
+    @Html.Action("GetFooter", "Layout")
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/bundles/js")    
+
+    <script src="~/js/ProgressBarHelper.js" type="text/javascript"></script>
+    <script src="~/Scripts/jquery.signalR-2.2.1.min.js" type="text/javascript"></script>
+    <script src="/signalr/hubs"></script>
+
+    <script>
+        $(function () {
+
+            //// Reference the auto-generated proxy for the hub.
+            //var progress = $.connection.progressHub;
+            //console.log(progress);
+
+            //// Create a function that the hub can call back to display messages.
+            //progress.client.AddProgress = function (message, percentage) {
+            //    ProgressBarModal("show", message + " " + percentage);
+            //    $('#ProgressMessage').width(percentage);
+            //    if (percentage == "100%") {
+            //        data.ProgressBarModal();
+            //    }
+            //};
+
+            //$.connection.hub.start().done(function () {
+            //    var connectionId = $.connection.hub.id;
+            //    console.log(connectionId);
+            //});
+
+            data._Layout.Init();
+        });
+    </script>
+
+    @RenderSection("Scripts", false)
+
+    @StackExchange.Profiling.MiniProfiler.RenderIncludes()
+
+</body>
+
+</html>

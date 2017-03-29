@@ -1,0 +1,86 @@
+﻿@model ListDatasetModel
+
+@{
+    ViewBag.Title = "Datasets";
+}
+
+<h1>Datasets</h1>
+@{
+    var htmlAttrsObj2 = new { @class = "navbar-form navbar-center", @id = "DatasetListSearch" };
+    var htmlAttributes2 = HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttrsObj2);
+    using (Html.BeginForm("List", "Dataset", FormMethod.Get, htmlAttributes2))
+    {
+        <div class="input-group dataset-search" id="DatasetListSearch">
+            <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
+            <input type="text" id="SearchKeywords" name="searchPhrase" class="form-control" placeholder="Enter dataset search term(s)" value="@{@Request.QueryString["searchPhrase"]}" />
+            <input type="hidden" id="SearchCategory" name="Category" class="form-control" value="@{@Request.QueryString["Category"]}" />
+        </div>
+    }
+}
+<p> &nbsp; </p>
+
+<div>
+    <div class="dataset-list-filters">
+        <div class="dataset-list-filter-header">
+            <h4>
+                Filters...
+            </h4>
+        </div>
+        <div class="dataset-list-filter-category">
+            <div class="dataset-filter-subset-label">
+                Category:
+            </div>
+            <ul class="list-unstyled ul-filter-list">
+                @{
+                    var categories = Model.CategoryList.OrderBy(cat => cat).ToList();
+                    var reqCatFilterString = Request.QueryString["category"];
+                    string[] filterCats = { "" };
+                    if (reqCatFilterString != null)
+                    {
+                        filterCats = Request.QueryString["category"].Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                    }
+                    foreach (var cat in categories)
+                    {
+                        if (filterCats.Contains(cat))
+                        {
+                            <li class="list-unstyled li-filter-enabled" id="li-filter-enabled_@cat" data-cat="@cat">
+                                @cat
+                                <span class="filter-enabled-glyph glyphicon glyphicon-remove"></span>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="list-unstyled li-filter-disabled" id="li-filter-disabled_@cat" data-cat="@cat">
+                                @cat
+                                <span class="filter-disabled-glyph glyphicon glyphicon-plus"></span>
+                            </li>
+                        }
+                    }
+                }
+            </ul>
+        </div>
+    </div>
+    <div id="DatasetItemList" class="dataset-list">
+        <div class="browse-category">
+            <h4>
+                Found @Model.DatasetList.Count() Dataset(s)...
+            </h4>
+        </div>
+        <ul class="list-unstyled">
+            @foreach (var item in Model.DatasetList)
+            {
+                <li class="ul-dataset-list-item">
+                    @Html.Partial("_ListItem", item)
+                </li>
+            }
+        </ul>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            data.Dataset.ListInit();
+        });
+    </script>
+}

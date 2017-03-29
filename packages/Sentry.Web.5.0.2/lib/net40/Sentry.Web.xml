@@ -1,0 +1,2885 @@
+﻿<?xml version="1.0"?>
+<doc>
+<assembly>
+<name>
+Sentry.Web
+</name>
+</assembly>
+<members>
+<member name="T:Sentry.Web.My.Resources.Resources">
+<summary>
+  A strongly-typed resource class, for looking up localized strings, etc.
+</summary>
+</member>
+<member name="P:Sentry.Web.My.Resources.Resources.ResourceManager">
+<summary>
+  Returns the cached ResourceManager instance used by this class.
+</summary>
+</member>
+<member name="P:Sentry.Web.My.Resources.Resources.Culture">
+<summary>
+  Overrides the current thread's CurrentUICulture property for all
+  resource lookups using this strongly typed resource class.
+</summary>
+</member>
+<member name="T:Sentry.Web.CachedObsidianUserProvider.IObsidianUserProvider">
+ <summary>
+ Provides methods for retrieving information from Obsidian that is cached for performance reasons
+ </summary>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Logging.Logger.LoggingFrameworkAdapter">
+ <summary>
+ Overrides the default logging behavior of this library.  
+ 
+ By default, this library will use the LoggingFrameworkAdapter set in the Sentry.Common.Logging class,
+ and look for a logger configured in that framework (log4net) that matches the beginning
+ of this library's full class name.
+ 
+ Set this property to a different LoggingFrameworkAdapter, providing the name of the logger to use, to
+ override this behavior.  This is required if you want to use a Sentry.Configuration value to control where
+ this library logs to based on the environment that the application is running in.
+ </summary>
+</member>
+<member name="T:Sentry.Web.Security.SentryLoginRedirectLoopException">
+ <summary>
+ Thrown when a redirect loop exists in sentry login.
+ </summary>
+ <remarks></remarks>
+</member>
+<member name="T:Sentry.Web.Security.SentryLoginModule">
+ <summary>
+ SentryLoginModule handles authenticating to a Sentry login token and 
+ redirects to the login application if not authenticated.  Also, it will upgrade the
+ request's user to a SentryPrincipal if it can.
+ </summary>
+ <remarks></remarks>
+</member>
+<member name="T:Sentry.Web.Security.SentryLoginModule.TokenKeyedIdentity">
+ <summary>
+ TokenKeyedIdentity subclass to help us with keying an SSO SentryLogin
+ token to a forms auth id
+ </summary>
+ <remarks></remarks>
+</member>
+<member name="T:Sentry.Web.Security.SentryLoginModule.DatedAuthenticationProfile">
+ <summary>
+ AuthenticationProfileKey subclass to help with a multi-part key for authentication profiles
+ </summary>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginModule.SentryAuthProfileLookup">
+ <summary>
+ Authentication Profile information (cookie names, realms, etc), keyed by profile name
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginModule.SentryAuthProfileLookupLock">
+ <summary>
+ An object to synclock on
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginModule.ConfigSettings">
+ <summary>
+ Confing Settings from SentryLoginConfigurationSection
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginModule.PersistAuthenticationTicket">
+ <summary>
+ Do we wish to persist the authentication ticket across sessions?
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginModule.ApplicationAuthenticationMode">
+ <summary>
+ What mode is the application using for authentication?
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginModule.FormsAuthenticationTicketTimeout">
+ <summary>
+ How long can the forms auth ticket live?
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks>Why is this not public readonly, Microsoft?</remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginModule.SentryAuthenticationProfile">
+ <summary>
+ The AuthenticationProfile used for this instance
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginModule.SuppressLoginRedirectForAjaxRequests">
+ <summary>
+ Suppress Login redirects when the request looks like it was an AJAX request.
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginModule.ForceMSOfficeBrowserReload">
+ <summary>
+ Force MS Office Browser Reload when the users agent contains word, excel, powerpoint, or ms-office
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginModule.AuthenticationServiceUrl">
+ <summary>
+ URL to auth and validate tokens against
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginModule.AuthenticationServiceProfileName">
+ <summary>
+ Name of authentincation profile to pass to service
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginModule.LoginRedirectUrl">
+ <summary>
+ The url to call for a login form.
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginModule.RegisterUrl">
+ <summary>
+ The url to pass to the login form for registering new users.
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks>If not specified, the login form will not show a register link.</remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginModule.AdditionalQueryString">
+ <summary>
+ Additional query string parameters
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks>It is assumed that this value is already urlencoded.</remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginModule.SSOCookieDomain">
+ <summary>
+ SSO cookie domain
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginModule.ProfileUrl">
+ <summary>
+ Profile Url
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginModule.ProfileCredentialsUserName">
+ <summary>
+ Profile Url credentials user name
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginModule.ProfileCredentialsPassword">
+ <summary>
+ Profile Url credentials password
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginModule.RequestingApplication">
+ <summary>
+ Profile Url credentials password
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.Dispose">
+ <summary>
+ Cleanup
+ </summary>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.Init(System.Web.HttpApplication)">
+ <summary>
+ Initialization of class
+ </summary>
+ <param name="context"></param>
+ <remarks>This fires once on Application startup.</remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.ConfigureModule">
+ <summary>
+ read the config information for the module
+ </summary>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.RetrieveConfigSetting(System.String,System.String)">
+ <summary>
+ Get a config setting when it can be stored directly or as a keyed value into Sentry.Configuration
+ </summary>
+ <param name="directSetting"></param>
+ <param name="keyedSetting"></param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.BeginRequestHandler(System.Object,System.EventArgs)">
+ <summary>
+ Handle Begin Request
+ </summary>
+ <param name="sender"></param>
+ <param name="e"></param>
+ <remarks>An issue surfaced after the rollout of office 365, when the user clicks on a link from an ms office file, it doesn't open to right page.
+ The workaround is to check the user agent and tell the browser to refresh.
+ </remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.AuthenticateRequestHandler(System.Object,System.EventArgs)">
+ <summary>
+ Handle authentication.
+ </summary>
+ <param name="sender"></param>
+ <param name="e"></param>
+ <remarks>Uses the FormsAuthenticationTicket Cookie to store userId to avoid performance hit of calling
+ authentication service on each request.</remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.EndRequestHandler(System.Object,System.EventArgs)">
+ <summary>
+ Handle the end request event.  (redirect to login on a 401)
+ </summary>
+ <param name="sender"></param>
+ <param name="e"></param>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.PostAuthorizeRequestHandler(System.Object,System.EventArgs)">
+ <summary>
+ On PostAuthorizeRequest, check to see if the request was for the "friendly" login route and handle it appropriately
+ </summary>
+ <param name="sender"></param>
+ <param name="e"></param>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.RetrieveAuthenticationProfileFromService">
+ <summary>
+ Call the authentication web service and get back a list of acceptable cookie names.
+ </summary>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.GetAuthenticationService">
+ <summary>
+ Get the Authentication Service
+ </summary>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.RetrieveIdentityFromService(System.Web.HttpApplication,System.Collections.Generic.IList{System.Web.HttpCookie})">
+ <summary>
+ Retrieve an identity from the service
+ </summary>
+ <param name="tokenList"></param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.AuthTicketHashMatchFound(System.Web.Security.FormsAuthenticationTicket,System.Web.HttpApplication)">
+ <summary>
+ Verify that the auth ticket has in its user data a value that is supported by the 
+ current Sentry login cookie collection.  If not present, we had an elsewhere sign-out.
+ </summary>
+ <param name="ticket"></param>
+ <param name="application"></param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.UserIsAuthenticated(System.Web.HttpApplication)">
+ <summary>
+ Test if the user is authenticated
+ </summary>
+ <param name="application"></param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.TryToUpgradeToSentryPrincipalFromCacheStorage(System.Web.HttpApplication)">
+ <summary>
+ Try to upgrade the principal to a Sentry Principal, and make use of session storage.
+ </summary>
+ <param name="application"></param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.TryToUpgradeToSentryPrincipal(System.Security.Principal.IPrincipal)">
+ <summary>
+ Attempt to upgrade the Context user to a sentry principal.
+ </summary>
+ <param name="user"></param>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.GetSentryProfileServiceClient">
+ <summary>
+ Get a wcf client to use for sentry profile services.
+ </summary>
+ <returns></returns>
+ <remarks>Remember to close the client when done!  
+ Using WCF because the profile service returns strongly typed SOAP faults that other clients will want to consume.  </remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.GetSessionStorageKey(System.Web.HttpApplication)">
+ <summary>
+ Get the key that will be used to store a principal to session
+ </summary>
+ <param name="application"></param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.ShouldSuppressLoginRedirect(System.Web.HttpApplication)">
+ <summary>
+ Test to see if a login redirect should be suppressed.
+ </summary>
+ <param name="application"></param>
+ <returns></returns>
+ <remarks>true if login redirect should be suppressed, false otherwise.</remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.RedirectToLogin(System.Web.HttpApplication)">
+ <summary>
+ Redirect the user to the login page
+ </summary>
+ <param name="application"></param>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.BuildFriendlyLoginUrl(System.String,System.String,System.String,System.String,System.String,Sentry.Web.Security.SentryLoginModule)">
+ <summary>
+ Build a "Friendly" Login url. Uses the Friendly Login Redirect Url if enabled in configuration and running in a web context.
+ </summary>
+ <param name="continueToUrl">The url to redirect back to on a successful login.</param>
+ <param name="overrideLoginRedirectUrl">Optional. Override the configuration settings and specify the login url to direct the user to.</param>
+ <param name="overrideAuthenticationServiceProfileName">Optional. Override the configuration settings and specify the authentication service profile name</param>
+ <param name="overrideAdditionalQueryString">Optional. Override the configuration settings and specify the Additional query string values</param>
+ <param name="overrideRegisterUrl">Optional. Override the configuration settings and specify the Register new user url</param>
+ <param name="loginModuleInstance">Optional. Can specify an already instantiated instance of Sentry Login to pull non-override settings from.</param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.BuildLoginUrl(System.Web.HttpRequest)">
+ <summary>
+ Build a login url
+ </summary>
+ <param name="request"></param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.GetSentryLoginCookies(System.Web.HttpApplication)">
+ <summary>
+ Get the cookie representing the token from the request.
+ </summary>
+ <param name="application"></param>
+ <returns></returns>
+ <remarks>If there are multiple cookies that could qualify (e.g. CTINTERNAL and CTEXTERNAL), this will get them 
+ in order based on the authentication profile realm </remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.GetFormsAuthenticationTicket(System.Web.HttpApplication,System.Web.HttpCookieCollection)">
+ <summary>
+ Get the ticket of the authorized user (if it exists)
+ </summary>
+ <param name="application"></param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.RequestWasAjaxy(System.Web.HttpRequest)">
+ <summary>
+ Did the request appear to come from an ajax XMLHttpRequest?
+ </summary>
+ <param name="request"></param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.GetAuthenticationProfile(System.String)">
+ <summary>
+ Get an authentication profile
+ </summary>
+ <param name="profileName"></param>
+ <returns></returns>
+ <remarks></remarks>;
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.AddUpdateLastVisitedSentryLoginCookie(System.Web.HttpApplication)">
+ <summary>
+ Add or update the cookie for the last time sentry login was redirected to.
+ </summary>
+ <param name="app"></param>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.RemoveLastVistedSentryLoginCookie(System.Web.HttpApplication)">
+ <summary>
+ Remove the cookie for the last time sentry login was redirected to.
+ </summary>
+ <param name="app"></param>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.UpdateTokenCookies(Sentry.Web.Security.SentryAuthenticationService.Identity,System.Web.HttpApplication)">
+ <summary>
+ Updates the tokens .
+ </summary>
+ <param name="userId">The user id.</param>
+ <param name="application">The application.</param>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.LogoutFromThisApplication">
+ <summary>
+ Abandon the user's session and terminate their application 
+ authentication ticket to effectively log the user out of this application.
+ </summary>
+ <remarks>SSO for Sentry Login is still enforced, so you will need to redirect 
+ to a site that is not using the SentryLoginModule if you want this to have any noticable effect.</remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.ForceLogoutFromAllSentrySites">
+ <summary>
+ Abandon the user's session, terminate their authenication ticket, and destroy any and all cookies including sso cookies.
+ </summary>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.GetSentryLoginModuleInstance">
+ <summary>
+ Get an instance of the SentryLoginModule (for access to public properties, etc.)
+ </summary>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.CreateNewProfileUser(Sentry.Web.SentryProfileServices.CreateUserRequest)">
+ <summary>
+ Create a new user
+ </summary>
+ <param name="request"></param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.FindAllSecurityQuestions(Sentry.Web.SentryProfileServices.FindAllSecurityQuestionsRequest)">
+ <summary>
+ Find all security questions
+ </summary>
+ <param name="request"></param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.FindUserByShadowId(Sentry.Web.SentryProfileServices.FindUserByShadowAccountNameRequest)">
+ <summary>
+ Get user information by id
+ </summary>
+ <param name="request"></param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.ChangePassword(Sentry.Web.SentryProfileServices.ChangePasswordRequest)">
+ <summary>
+ Change a password
+ </summary>
+ <param name="request"></param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.ResetPassword(Sentry.Web.SentryProfileServices.PasswordResetRequest)">
+ <summary>
+ Change a password
+ </summary>
+ <param name="request"></param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.UpdateAccountName(Sentry.Web.SentryProfileServices.UpdateAccountNameRequest)">
+ <summary>
+ Update user name (aka email address)
+ </summary>
+ <param name="request"></param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginModule.UpdateUserSecurityQuestions(Sentry.Web.SentryProfileServices.UpdateUserSecurityQuestionsRequest)">
+ <summary>
+ Update a user's security questions and answers
+ </summary>
+ <param name="request"></param>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.ObsidianAdService">
+<summary>
+
+</summary>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.#ctor">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.Obsidian.ObsidianAdService.GetUsersByGroupCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.Obsidian.ObsidianAdService.GetAdditionalUserInfoCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.Obsidian.ObsidianAdService.GetUsersByOtherCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.Obsidian.ObsidianAdService.GetUserInfoCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.Obsidian.ObsidianAdService.GetGroupListCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.Obsidian.ObsidianAdService.GetLogicalDomainsCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.Obsidian.ObsidianAdService.GetUserMustChangePasswordStatusCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.Obsidian.ObsidianAdService.SetUserPasswordCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.Obsidian.ObsidianAdService.ResetUserPasswordCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.Obsidian.ObsidianAdService.AddUserCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.Obsidian.ObsidianAdService.AddUserToGroupCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.Obsidian.ObsidianAdService.RemoveUserFromGroupCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.Obsidian.ObsidianAdService.DeleteUserCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.Obsidian.ObsidianAdService.ChangeUserPropertiesCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.Obsidian.ObsidianAdService.GetPasswordExpirationInfoCompleted">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetUsersByGroup(Sentry.Web.Security.Obsidian.cdtGetUsersByGroupRequest)">
+<summary>
+
+</summary>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetUsersByGroupAsync(Sentry.Web.Security.Obsidian.cdtGetUsersByGroupRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetUsersByGroupAsync(Sentry.Web.Security.Obsidian.cdtGetUsersByGroupRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetAdditionalUserInfo(Sentry.Web.Security.Obsidian.cdtGetAdditionalUserInfoRequest)">
+<summary>
+
+</summary>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetAdditionalUserInfoAsync(Sentry.Web.Security.Obsidian.cdtGetAdditionalUserInfoRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetAdditionalUserInfoAsync(Sentry.Web.Security.Obsidian.cdtGetAdditionalUserInfoRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetUsersByOther(Sentry.Web.Security.Obsidian.cdtGetUsersByOtherRequest)">
+<summary>
+
+</summary>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetUsersByOtherAsync(Sentry.Web.Security.Obsidian.cdtGetUsersByOtherRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetUsersByOtherAsync(Sentry.Web.Security.Obsidian.cdtGetUsersByOtherRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetUserInfo(Sentry.Web.Security.Obsidian.cdtGetUserInfoRequest)">
+<summary>
+
+</summary>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetUserInfoAsync(Sentry.Web.Security.Obsidian.cdtGetUserInfoRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetUserInfoAsync(Sentry.Web.Security.Obsidian.cdtGetUserInfoRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetGroupList(Sentry.Web.Security.Obsidian.cdtGetGroupListRequest)">
+<summary>
+
+</summary>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetGroupListAsync(Sentry.Web.Security.Obsidian.cdtGetGroupListRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetGroupListAsync(Sentry.Web.Security.Obsidian.cdtGetGroupListRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetLogicalDomains(Sentry.Web.Security.Obsidian.cdtGetLogicalDomainsRequest)">
+<summary>
+
+</summary>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetLogicalDomainsAsync(Sentry.Web.Security.Obsidian.cdtGetLogicalDomainsRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetLogicalDomainsAsync(Sentry.Web.Security.Obsidian.cdtGetLogicalDomainsRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetUserMustChangePasswordStatus(Sentry.Web.Security.Obsidian.cdtGetUserMustChangePasswordStatusRequest)">
+<summary>
+
+</summary>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetUserMustChangePasswordStatusAsync(Sentry.Web.Security.Obsidian.cdtGetUserMustChangePasswordStatusRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetUserMustChangePasswordStatusAsync(Sentry.Web.Security.Obsidian.cdtGetUserMustChangePasswordStatusRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.SetUserPassword(Sentry.Web.Security.Obsidian.cdtSetUserPasswordRequest)">
+<summary>
+
+</summary>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.SetUserPasswordAsync(Sentry.Web.Security.Obsidian.cdtSetUserPasswordRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.SetUserPasswordAsync(Sentry.Web.Security.Obsidian.cdtSetUserPasswordRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.ResetUserPassword(Sentry.Web.Security.Obsidian.cdtResetUserPasswordRequest)">
+<summary>
+
+</summary>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.ResetUserPasswordAsync(Sentry.Web.Security.Obsidian.cdtResetUserPasswordRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.ResetUserPasswordAsync(Sentry.Web.Security.Obsidian.cdtResetUserPasswordRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.AddUser(Sentry.Web.Security.Obsidian.cdtAddUserRequest)">
+<summary>
+
+</summary>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.AddUserAsync(Sentry.Web.Security.Obsidian.cdtAddUserRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.AddUserAsync(Sentry.Web.Security.Obsidian.cdtAddUserRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.AddUserToGroup(Sentry.Web.Security.Obsidian.cdtAddUserToGroupRequest)">
+<summary>
+
+</summary>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.AddUserToGroupAsync(Sentry.Web.Security.Obsidian.cdtAddUserToGroupRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.AddUserToGroupAsync(Sentry.Web.Security.Obsidian.cdtAddUserToGroupRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.RemoveUserFromGroup(Sentry.Web.Security.Obsidian.cdtRemoveUserFromGroupRequest)">
+<summary>
+
+</summary>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.RemoveUserFromGroupAsync(Sentry.Web.Security.Obsidian.cdtRemoveUserFromGroupRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.RemoveUserFromGroupAsync(Sentry.Web.Security.Obsidian.cdtRemoveUserFromGroupRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.DeleteUser(Sentry.Web.Security.Obsidian.cdtDeleteUserRequest)">
+<summary>
+
+</summary>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.DeleteUserAsync(Sentry.Web.Security.Obsidian.cdtDeleteUserRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.DeleteUserAsync(Sentry.Web.Security.Obsidian.cdtDeleteUserRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.ChangeUserProperties(Sentry.Web.Security.Obsidian.cdtChangeUserPropertiesRequest)">
+<summary>
+
+</summary>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.ChangeUserPropertiesAsync(Sentry.Web.Security.Obsidian.cdtChangeUserPropertiesRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.ChangeUserPropertiesAsync(Sentry.Web.Security.Obsidian.cdtChangeUserPropertiesRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetPasswordExpirationInfo(Sentry.Web.Security.Obsidian.cdtGetPasswordExpirationInfoRequest)">
+<summary>
+
+</summary>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetPasswordExpirationInfoAsync(Sentry.Web.Security.Obsidian.cdtGetPasswordExpirationInfoRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.GetPasswordExpirationInfoAsync(Sentry.Web.Security.Obsidian.cdtGetPasswordExpirationInfoRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Obsidian.ObsidianAdService.CancelAsync(System.Object)">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtGetUsersByGroupRequest">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetUsersByGroupRequest._logicalDomainName">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetUsersByGroupRequest._groupNameQuery">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtGetPasswordExpirationInfoResponse">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetPasswordExpirationInfoResponse._passwordExpirationStatus">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetPasswordExpirationInfoResponse._passwordExpirationDte">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.enumPasswordExpirationStatus">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumPasswordExpirationStatus.Incorrect">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumPasswordExpirationStatus.NeverExpires">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumPasswordExpirationStatus.ActiveButExpires">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumPasswordExpirationStatus.Expired">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumPasswordExpirationStatus.MustChangeAtNextLogon">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtGetPasswordExpirationInfoRequest">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetPasswordExpirationInfoRequest._logicalDomainNme">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetPasswordExpirationInfoRequest._userLoginID">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetPasswordExpirationInfoRequest._userPassword">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtChangeUserPropertiesReponse">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtChangeUserPropertiesReponse._result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.enumChangeUserPropertiesResult">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumChangeUserPropertiesResult.Success">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumChangeUserPropertiesResult.UsernameDoesNotExist">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumChangeUserPropertiesResult.BadPropertyName">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumChangeUserPropertiesResult.BadPropertyValue">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumChangeUserPropertiesResult.ObjectClassContraintsViolated">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtChangeUserPropertiesRequest">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtChangeUserPropertiesRequest._logicalDomainName">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtChangeUserPropertiesRequest._userLoginId">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtChangeUserPropertiesRequest._accountEnabled">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtChangeUserPropertiesRequest._accountEnabledSpecified">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtChangeUserPropertiesRequest._mustChangePasswordAtNextLogon">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtChangeUserPropertiesRequest._mustChangePasswordAtNextLogonSpecified">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtChangeUserPropertiesRequest._passwordNeverExpires">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtChangeUserPropertiesRequest._passwordNeverExpiresSpecified">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtChangeUserPropertiesRequest._userPropertyList">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtPropertyNameValuePair">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtPropertyNameValuePair._propertyName">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtPropertyNameValuePair._propertyValue">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtDeleteUserResponse">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtDeleteUserResponse._result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.enumDeleteUserResult">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumDeleteUserResult.Success">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumDeleteUserResult.UsernameDoesNotExist">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtDeleteUserRequest">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtDeleteUserRequest._logicalDomainName">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtDeleteUserRequest._userId">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtRemoveUserFromGroupResponse">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtRemoveUserFromGroupResponse._result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.enumRemoveUserFromGroupResult">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumRemoveUserFromGroupResult.Success">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumRemoveUserFromGroupResult.UsernameDoesNotExist">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumRemoveUserFromGroupResult.GroupDoesNotExist">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumRemoveUserFromGroupResult.UserNotInGroup">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtRemoveUserFromGroupRequest">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtRemoveUserFromGroupRequest._logicalDomainName">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtRemoveUserFromGroupRequest._userId">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtRemoveUserFromGroupRequest._groupName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtAddUserToGroupResponse">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtAddUserToGroupResponse._result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.enumAddUserToGroupResult">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumAddUserToGroupResult.Success">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumAddUserToGroupResult.UsernameDoesNotExist">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumAddUserToGroupResult.GroupDoesNotExist">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumAddUserToGroupResult.UserAlreadyInGroup">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtAddUserToGroupRequest">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtAddUserToGroupRequest._logicalDomainName">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtAddUserToGroupRequest._userId">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtAddUserToGroupRequest._groupName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtAddUserResponse">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtAddUserResponse._result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.enumAddUserResult">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumAddUserResult.Success">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumAddUserResult.UsernameAlreadyExists">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumAddUserResult.CommonNameAlreadyExists">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumAddUserResult.GroupDoesNotExist">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumAddUserResult.BadPropertyName">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumAddUserResult.BadPropertyValue">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumAddUserResult.BadPassword">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumAddUserResult.ObjectClassContraintsViolated">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtAddUserRequest">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtAddUserRequest._logicalDomainName">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtAddUserRequest._userLoginId">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtAddUserRequest._userPassword">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtAddUserRequest._commonName">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtAddUserRequest._objectClass">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtAddUserRequest._accountEnabled">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtAddUserRequest._mustChangePasswordAtNextLogon">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtAddUserRequest._passwordNeverExpires">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtAddUserRequest._userPropertyList">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtAddUserRequest._groupList">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtResetUserPasswordResponse">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtResetUserPasswordResponse._result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.enumSetUserPasswordResult">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumSetUserPasswordResult.Success">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumSetUserPasswordResult.UsernameDoesNotExist">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumSetUserPasswordResult.IncorrectOldPassword">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.enumSetUserPasswordResult.InvalidNewPassword">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtResetUserPasswordRequest">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtResetUserPasswordRequest._logicalDomainNme">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtResetUserPasswordRequest._userLoginID">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtResetUserPasswordRequest._userNewPassword">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtSetUserPasswordResponse">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtSetUserPasswordResponse._result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtSetUserPasswordRequest">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtSetUserPasswordRequest._logicalDomainNme">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtSetUserPasswordRequest._userLoginID">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtSetUserPasswordRequest._userOldPassword">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtSetUserPasswordRequest._userNewPassword">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtGetUserMustChangePasswordStatusResponse">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetUserMustChangePasswordStatusResponse._userMustChangePasswordStatus">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtGetUserMustChangePasswordStatusRequest">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetUserMustChangePasswordStatusRequest._logicalDomainNme">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetUserMustChangePasswordStatusRequest._userLoginID">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetUserMustChangePasswordStatusRequest._userPassword">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtLogicalDomain">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtLogicalDomain._name">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtLogicalDomain._description">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtLogicalDomain._domainController">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtLogicalDomain._orgPath">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtLogicalDomain._userOrgUnit">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtLogicalDomain._groupOrgUnit">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtGetLogicalDomainsResponse">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetLogicalDomainsResponse._logicalDomainList">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtGetLogicalDomainsRequest">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtGetGroupListResponse">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetGroupListResponse._groupNames">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtGetGroupListRequest">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetGroupListRequest._logicalDomainName">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetGroupListRequest._groupNameQuery">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtGetUserInfoResponse">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetUserInfoResponse._user">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtLDAPUser">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtLDAPUser._userFullName">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtLDAPUser._userGroups">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtLDAPUser._userTelephone">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtLDAPUser._userOfficeLocation">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtLDAPUser._userEmployeeId">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtLDAPUser._userEmailAddress">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtLDAPUser._userSamAccountName">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtLDAPUser._userPropertyList">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtGetUserInfoRequest">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetUserInfoRequest._logicalDomainName">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetUserInfoRequest._userId">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtGetUsersByOtherResponse">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetUsersByOtherResponse._userList">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtGetUsersByOtherRequest">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetUsersByOtherRequest._logicalDomainName">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetUsersByOtherRequest._searchFilter">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtGetAdditionalUserInfoResponse">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetAdditionalUserInfoResponse._user">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtGetAdditionalUserInfoRequest">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetAdditionalUserInfoRequest._logicalDomainName">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetAdditionalUserInfoRequest._userId">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetAdditionalUserInfoRequest._propertyNameList">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.cdtGetUsersByGroupResponse">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.Security.Obsidian.cdtGetUsersByGroupResponse._userList">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.GetUsersByGroupCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.GetUsersByGroupCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Obsidian.GetUsersByGroupCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.GetAdditionalUserInfoCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.GetAdditionalUserInfoCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Obsidian.GetAdditionalUserInfoCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.GetUsersByOtherCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.GetUsersByOtherCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Obsidian.GetUsersByOtherCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.GetUserInfoCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.GetUserInfoCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Obsidian.GetUserInfoCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.GetGroupListCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.GetGroupListCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Obsidian.GetGroupListCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.GetLogicalDomainsCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.GetLogicalDomainsCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Obsidian.GetLogicalDomainsCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.GetUserMustChangePasswordStatusCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.GetUserMustChangePasswordStatusCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Obsidian.GetUserMustChangePasswordStatusCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.SetUserPasswordCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.SetUserPasswordCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Obsidian.SetUserPasswordCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.ResetUserPasswordCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.ResetUserPasswordCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Obsidian.ResetUserPasswordCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.AddUserCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.AddUserCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Obsidian.AddUserCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.AddUserToGroupCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.AddUserToGroupCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Obsidian.AddUserToGroupCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.RemoveUserFromGroupCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.RemoveUserFromGroupCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Obsidian.RemoveUserFromGroupCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.DeleteUserCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.DeleteUserCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Obsidian.DeleteUserCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.ChangeUserPropertiesCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.ChangeUserPropertiesCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Obsidian.ChangeUserPropertiesCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.GetPasswordExpirationInfoCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Obsidian.GetPasswordExpirationInfoCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Obsidian.GetPasswordExpirationInfoCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryLoginIdentity">
+ <summary>
+ An Identity implementation based off of a SentryLogin token
+ </summary>
+ <remarks></remarks>
+</member>
+<member name="M:Sentry.Web.Security.SentryLoginIdentity.#ctor(System.String)">
+ <summary>
+ Constructor
+ </summary>
+ <param name="name"></param>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginIdentity.AuthenticationType">
+ <summary>
+ The authentication type
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="T:Sentry.Web.Security.SentryLoginConfigurationSection">
+ <summary>
+ SentryLoginConfigurationSection contains the configuration information needed to configure the SentryLoginModule
+ </summary>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.RegistrationUrlKey">
+ <summary>
+ Gets or sets the RegistrationUrlKey.
+ </summary>
+ <remarks>
+ An EnvironmentSettings section must be included in the config in order to use this configuration property.  This value is used to reference the appropriate setting in the EnvironmentSettings section.
+ 
+ When both a RegistrationUrlKey value and RegistrationUrl values are present the RegistrationUrl value will be used.
+ </remarks>
+ <value>The RegistrationUrlKey string.</value>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.RegistrationUrl">
+ <summary>
+ Gets or sets the RegistrationUrl value.  This is the url to call to log in.
+ </summary>
+ <remarks>
+ When both a RegistrationUrlKey value and RegistrationUrl values are present the RegistrationUrl value will be used.
+ </remarks>
+ <value>The RegistrationUrl string.</value>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.LoginUrlKey">
+ <summary>
+ Gets or sets the LoginUrlKey.
+ </summary>
+ <remarks>
+ An EnvironmentSettings section must be included in the config in order to use this configuration property.  This value is used to reference the appropriate setting in the EnvironmentSettings section.
+ 
+ When both a LoginUrlKey value and LoginUrl values are present the LoginUrl value will be used.
+ </remarks>
+ <value>The LoginUrlKey string.</value>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.LoginUrl">
+ <summary>
+ Gets or sets the LoginUrl value.  This is the url to call to log in via a GET.
+ </summary>
+ <remarks>
+ When both a LoginUrlKey value and LoginUrl values are present the LoginUrl value will be used.
+ </remarks>
+ <value>The LoginUrl string.</value>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.AdditionalQueryStringParams">
+ <summary>
+ Gets or sets the AdditionalQueryStringParams value.  This can be used for application specific additions to the querystring for login.
+ </summary>
+ <remarks>
+ When both a LoginUrlKeyAdditionalQueryStringParamsKey value and AdditionalQueryStringParams values are present the AdditionalQueryStringParams value will be used.
+ </remarks>
+ <value>The AdditionalQueryStringParams string.</value>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.AdditionalQueryStringParamsKey">
+ <summary>
+ Gets or sets the AdditionalQueryStringParamsKey value to go against a SentrySetting.  This can be used for application specific additions to the querystring for login.
+ </summary>
+ <remarks>
+ When both a LoginUrlKeyAdditionalQueryStringParamsKey value and AdditionalQueryStringParams values are present the AdditionalQueryStringParams value will be used.
+ </remarks>
+ <value>The AdditionalQueryStringParams string.</value>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.AuthenticationServiceProfileKey">
+ <summary>
+ Gets or sets the AuthenticationServiceProfileKey value to go against a SentrySetting.
+ </summary>
+ <remarks>When both a AuthenticationServiceProfileKey value and AuthenticationServiceProfile values are present the AuthenticationServiceProfile value will be used. 
+ </remarks>
+ <value>The AuthenticationServiceProfileKey string.</value>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.AuthenticationServiceProfile">
+ <summary>
+ Gets or sets the AuthenticationServiceProfile.
+ </summary>
+ <remarks>When both a AuthenticationServiceProfileKey value and AuthenticationServiceProfile values are present the AuthenticationServiceProfile value will be used. 
+ </remarks>
+ <value>The AuthenticationServiceProfile string.</value>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.AuthenticationServiceUrlKey">
+ <summary>
+ Gets or sets the AuthenticationServiceUrlKey.  This is expected to be a space delimited string of the dns entries to call to perform Authentication of a token via AccessManager.
+ </summary>
+ <remarks>
+ </remarks>
+ <value>The AuthenticationServiceUrl string.</value>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.AuthenticationServiceUrl">
+ <summary>
+ Gets or sets the AuthenticationServiceUrl.  This is expected to be a space delimited string of the dns entries to call to perform Authentication of a token via AccessManager.
+ </summary>
+ <remarks>
+ </remarks>
+ <value>The AuthenticationServiceUrl string.</value>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.SupressLoginRedirectsForAjaxCalls">
+ <summary>
+ Gets or sets the SupressLoginRedirectsForAjaxCalls.  This will allow for better handling of Ajax calls.
+ </summary>
+ <remarks>
+ </remarks>
+ <value>The ShouldSupressAjaxLoginRedirect boolean.</value>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.ForceMSOfficeBrowserReload">
+ <summary>
+ Gets or sets the ForceMSOfficeBrowserReload.  This will allow IE to open links that are within a MS office file.
+ </summary>
+ <remarks>
+ </remarks>
+ <value>The ForceMSOfficeBrowserReload boolean.</value>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.SSOCookieMustRemainToStayLoggedIn">
+ <summary>
+ Gets or sets the SSOCookieMustRemainToStayLoggedIn.  This will allow for Single Sign Out, or conversely a way to persist a session.
+ </summary>
+ <remarks>
+ </remarks>
+ <value>The SSOCookieMustRemainToStayLoggedIn boolean.</value>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.SSOCookieDomain">
+ <summary>
+ Gets or sets the SSOCookieDomainKey value.  This value is used when trying to find the SSO cookie (default is .sentry.com)
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.SSOCookieDomainKey">
+ <summary>
+ Gets or sets the SSOCookieDomainKey value.  This value is used when trying to find the SSO cookie (default is .sentry.com)
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.ProfileUrl">
+ <summary>
+ Gets or sets the ProfileUrlKey value.  This value is used when trying to get Sentry profile information
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.ProfileUrlKey">
+ <summary>
+ Gets or sets the ProfileUrlKey value.  This value is used when trying to get Sentry profile information
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.ProfileCredentialsUserName">
+ <summary>
+ Gets or sets the ProfileUserName value.  This value is used when trying to get Sentry profile information
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.ProfileCredentialsUserNameKey">
+ <summary>
+ Gets or sets the ProfileUserNameKey value.  This value is used when trying to get Sentry profile information
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.ProfileCredentialsPassword">
+ <summary>
+ Gets or sets the ProfileUserName value.  This value is used when trying to get Sentry profile information
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.ProfileCredentialsPasswordKey">
+ <summary>
+ Gets or sets the ProfileUserNameKey value.  This value is used when trying to get Sentry profile information
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.RequestingApplication">
+ <summary>
+ Gets or sets the RequestingApplication value.  This value is used when calling methods like CreateUser
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.RequestingApplicationKey">
+ <summary>
+ Gets or sets the RequestingApplicationKey value.  This value is used when calling methods like CreateUser
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.UseFriendlyLoginRedirectUrls">
+ <summary>
+ Boolean value to determine whether the login urls should use a friendly redirect route.
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.AuthCookieName">
+ <summary>
+ Name of the Authentication cookie to use for forms auth validation.  If not set, defaults to value in forms authentication config.
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.VirtualPathName">
+ <summary>
+ Name of virtual path application is running under.  DO NOT set this unless you know what you are doing.
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginConfigurationSection.PerformUpgradeToSentryPrincipal">
+ <summary>
+ Boolean value to determine whether the login module should perform the upgrade to a Sentry Principal.
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryLoginUserProfileInfo.CellPhoneNumber">
+ <summary>
+ If the user has a cellphone number associated, it will return, otherwise null.
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks></remarks>
+</member>
+<member name="T:Sentry.Web.Security.Services.AdsService">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.AdsService.#ctor">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Services.SentryUserDataListResponse">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.SentryUserDataListResponse.UserInfoList">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Services.SentryGetUsersByPermissionRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.SentryGetUsersByPermissionRequest.PermissionName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.SentryGetUsersByPermissionRequest.ExcludeGroupsFromUsers">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.SentryGetUsersByPermissionRequest.ApplicationName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.SentryGetUsersByPermissionRequest.AdditionalSearchPropertyNames">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.SentryGetUsersByPermissionRequest.LogicalDomainNames">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.SentryGetUsersByPermissionRequest.EnvironmentName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Services.GroupAndPermissions">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.GroupAndPermissions.GroupName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.GroupAndPermissions.PermissionNames">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Services.GroupsAndPermissionsResponse">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.GroupsAndPermissionsResponse.GroupsAndPermissions">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Services.LdapUserDTO">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.LdapUserDTO.UserFullName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.LdapUserDTO.UserGroups">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.LdapUserDTO.UserTelephone">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.LdapUserDTO.UserOfficeLocation">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.LdapUserDTO.UserEmployeeID">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.LdapUserDTO.UserEmailAddress">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.LdapUserDTO.UserSamAccountName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.LdapUserDTO.UserProperties">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Services.PermissionRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.PermissionRequest.ApplicationName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.PermissionRequest.GroupNames">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.PermissionRequest.EnvironmentName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Services.PermissionResponse">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.PermissionResponse.Permissions">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Services.SearchAttribute">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.SearchAttribute.Name">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.SearchAttribute.Value">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Services.SecurityPermissionService">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.SecurityPermissionService.#ctor">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.Services.SecurityPermissionService.GetPermissionsCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.Services.SecurityPermissionService.GetGroupsAndPermissionsCompleted">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.SecurityPermissionService.GetPermissions(Sentry.Web.Security.Services.PermissionRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.SecurityPermissionService.BeginGetPermissions(Sentry.Web.Security.Services.PermissionRequest,System.AsyncCallback,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.SecurityPermissionService.EndGetPermissions(System.IAsyncResult)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.SecurityPermissionService.GetPermissionsAsync(Sentry.Web.Security.Services.PermissionRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.SecurityPermissionService.GetPermissionsAsync(Sentry.Web.Security.Services.PermissionRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.SecurityPermissionService.GetGroupsAndPermissions(Sentry.Web.Security.Services.PermissionRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.SecurityPermissionService.BeginGetGroupsAndPermissions(Sentry.Web.Security.Services.PermissionRequest,System.AsyncCallback,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.SecurityPermissionService.EndGetGroupsAndPermissions(System.IAsyncResult)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.SecurityPermissionService.GetGroupsAndPermissionsAsync(Sentry.Web.Security.Services.PermissionRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.SecurityPermissionService.GetGroupsAndPermissionsAsync(Sentry.Web.Security.Services.PermissionRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.SecurityPermissionService.CancelAsync(System.Object)">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Services.GetPermissionsCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Services.GetPermissionsCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.GetPermissionsCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Services.GetGroupsAndPermissionsCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Services.GetGroupsAndPermissionsCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.GetGroupsAndPermissionsCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Services.SentryAdSecurityService">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.SentryAdSecurityService.#ctor">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.Services.SentryAdSecurityService.GetUserInfoCompleted">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.SentryAdSecurityService.GetUserInfo(Sentry.Web.Security.Services.SentryUserDataRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.SentryAdSecurityService.BeginGetUserInfo(Sentry.Web.Security.Services.SentryUserDataRequest,System.AsyncCallback,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.SentryAdSecurityService.EndGetUserInfo(System.IAsyncResult)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.SentryAdSecurityService.GetUserInfoAsync(Sentry.Web.Security.Services.SentryUserDataRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.SentryAdSecurityService.GetUserInfoAsync(Sentry.Web.Security.Services.SentryUserDataRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.SentryAdSecurityService.CancelAsync(System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.Services.SentryAdSecurityService.GetUsersByPermission(Sentry.Web.Security.Services.SentryGetUsersByPermissionRequest)">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Services.GetUserInfoCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Services.GetUserInfoCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.GetUserInfoCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Services.SentryUserDataRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.SentryUserDataRequest.UserId">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.SentryUserDataRequest.ApplicationName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.SentryUserDataRequest.AdditionalSearchPropertyNames">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.SentryUserDataRequest.LogicalDomainNames">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.SentryUserDataRequest.EnvironmentName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Services.SentryUserDataResponse">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.SentryUserDataResponse.UserInfo">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.SentryUserDataResponse.UserPermissions">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Services.UserProfileInfo">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.UserProfileInfo.UserFullName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.UserProfileInfo.UserGroups">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.UserProfileInfo.UserTelephone">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.UserProfileInfo.UserOfficeLocation">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.UserProfileInfo.UserEmployeeID">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.UserProfileInfo.UserEmailAddress">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.UserProfileInfo.UserSamAccountName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.UserProfileInfo.UserProperties">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.Services.UserProfileInfoWire">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.UserProfileInfoWire.UserFullName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.UserProfileInfoWire.UserGroups">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.UserProfileInfoWire.UserTelephone">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.UserProfileInfoWire.UserOfficeLocation">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.UserProfileInfoWire.UserEmployeeID">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.UserProfileInfoWire.UserEmailAddress">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.UserProfileInfoWire.UserSamAccountName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.Services.UserProfileInfoWire.UserProperties">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryPrincipal.#ctor(System.Security.Principal.IIdentity)">
+ <summary>
+ Initializes a new instance of the <see cref="T:SentryPrincipal" /> class.
+ </summary>
+ <remarks>
+ This constructor relies on the SentryPrincipal config section being located in the sentrySettings section group.
+ </remarks>
+ <param name="identity">The identity to base the principal on.</param>
+</member>
+<member name="M:Sentry.Web.Security.SentryPrincipal.#ctor(System.Security.Principal.IIdentity,System.Net.ICredentials)">
+ <summary>
+ Initializes a new instance of the <see cref="T:SentryPrincipal" /> class.
+ </summary>
+ <remarks>
+ This constructor relies on the SentryPrincipal config section being located in the sentrySettings section group.
+ </remarks>
+ <param name="identity">The identity to base the principal on.</param>
+</member>
+<member name="M:Sentry.Web.Security.SentryPrincipal.#ctor(System.Security.Principal.IIdentity,System.String,System.String,System.String)">
+ <summary>
+ Initializes a new instance of the <see cref="T:SentryPrincipal" /> class.
+ </summary>
+ <param name="identity">The identity to base the principal on.</param>
+ <param name="applicationName">Name of the application.</param>
+ <param name="adSecUrl">The URL to use to access the AdSec webservice.</param>
+</member>
+<member name="M:Sentry.Web.Security.SentryPrincipal.#ctor(System.Security.Principal.IIdentity,System.String,Sentry.Web.Security.Services.ISentryAdSecurityService,System.String)">
+ <summary>
+ Initializes a new instance of the <see cref="T:SentryPrincipal" /> class.
+ </summary>
+ <param name="identity">The identity to base the principal on.</param>
+ <param name="applicationName">Name of the application.</param>
+ <param name="adSecProxy">An instance of ISentryAdSecurityService</param>
+</member>
+<member name="M:Sentry.Web.Security.SentryPrincipal.#ctor(System.Security.Principal.IIdentity,System.String,System.String,System.String[],System.String)">
+ <summary>
+ Initializes a new instance of the <see cref="T:SentryPrincipal" /> class.
+ </summary>
+ <param name="identity">The identity to base the principal on.</param>
+ <param name="applicationName">Name of the application.</param>
+ <param name="adSecUrl">The URL to use to access the AdSec webservice.</param>
+ <param name="logicalDomainNames">A list of logical domain names to search, in priority order</param>
+</member>
+<member name="M:Sentry.Web.Security.SentryPrincipal.#ctor(System.Security.Principal.IIdentity,System.String,Sentry.Web.Security.Services.ISentryAdSecurityService,System.String[],System.String)">
+ <summary>
+ Initializes a new instance of the <see cref="T:SentryPrincipal" /> class.
+ </summary>
+ <param name="identity">The identity to base the principal on.</param>
+ <param name="applicationName">Name of the application.</param>
+ <param name="adSecProxy">An instance of ISentryAdSecurityService</param>
+ <param name="logicalDomainNames">A list of logical domain names to search, in priority order</param>
+</member>
+<member name="P:Sentry.Web.Security.SentryPrincipal.ApplicationName">
+ <summary>
+ Gets or sets the name of the application the current principal is accessing.
+ </summary>
+ <value>The name of the application.  I.E. APP_MRS</value>
+</member>
+<member name="P:Sentry.Web.Security.SentryPrincipal.Identity">
+ <doc>
+ <summary>Gets the identity of the current principal.</summary>
+ <returns>The <see cref="T:System.Security.Principal.IIdentity"></see> object associated with the current principal.</returns>
+ </doc>
+</member>
+<member name="M:Sentry.Web.Security.SentryPrincipal.IsInRole(System.String)">
+ <doc>
+ <summary>Determines whether the current principal belongs to the specified role.</summary>
+ <returns>true if the current principal is a member of the specified role; otherwise, false.</returns>
+ <param name="role">The name of the role for which to check membership. </param>
+ </doc>
+</member>
+<member name="M:Sentry.Web.Security.SentryPrincipal.HasPermission(System.String)">
+ <summary>
+ Determines whether the current principal has permission for the specified application.
+ </summary>
+ <param name="permission">The name of the permission for which to check for membership.</param>
+ <returns>
+ <c>true</c> if the current principal has permission; otherwise, <c>false</c>.
+ </returns>
+</member>
+<member name="P:Sentry.Web.Security.SentryPrincipalSectionHandler.ApplicationName">
+ <summary>
+ Gets or sets the name of the application.
+ </summary>
+ <value>The name of the application.</value>
+</member>
+<member name="P:Sentry.Web.Security.SentryPrincipalSectionHandler.AdSecUrlKey">
+ <summary>
+ Gets or sets the AdSecUrlKey
+ </summary>
+ <remarks>
+ An EnvironmentSettings section must be included in the config in order to use this configuration property.  This value is used to reference the appropriate setting in the EnvironmentSettings section.
+ 
+ When both a AdSecUrlKey value and AdSecUrl values are present the AdSecUrl value will be used.
+ </remarks>
+ <value>The AdSecUrl string.</value>
+</member>
+<member name="P:Sentry.Web.Security.SentryPrincipalSectionHandler.AdSecUrl">
+ <summary>
+ Gets or sets the AdSecUrl value.
+ </summary>
+ <remarks>
+ When both a AdSecUrlKey value and AdSecUrl values are present the AdSecUrl value will be used.
+ </remarks>
+ <value>The AdSecUrl string.</value>
+</member>
+<member name="P:Sentry.Web.Security.SentryPrincipalSectionHandler.LogicalDomains">
+ <summary>
+ Gets or sets the LogicalDomains.  This contains a comma separated string of the Logical Domains for Obsidian to use when creating a SentryPrincipal.
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks>When both a LogicalDomains and LogicalDomainsKey values are present, the LogicalDomains value will be used</remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryPrincipalSectionHandler.LogicalDomainsKey">
+ <summary>
+ Gets or sets the LogicalDomains.  This contains a comma separated string of the Logical Domains for Obsidian to use when creating a SentryPrincipal.
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks>When both a LogicalDomains and LogicalDomainsKey values are present, the LogicalDomains value will be used</remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryPrincipalSectionHandler.EnvironmentName">
+ <summary>
+ Gets or sets the EnvironmentName.  This contains the name of a permission environment for Obsidian to use when creating a SentryPrincipal.
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks>When both a EnvironmentName and EnvironmentNameKey values are present, the EnvironmentName value will be used.
+ If neither value is set, it will revert to the default behavior</remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryPrincipalSectionHandler.EnvironmentNameKey">
+ <summary>
+ Gets or sets the EnvironmentNameKey.  This contains the name of a permission environment for Obsidian to use when creating a SentryPrincipal.
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks>When both a EnvironmentName and EnvironmentNameKey values are present, the EnvironmentName value will be used.
+ If neither value is set, it will revert to the default behavior</remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryPrincipalSectionHandler.IncludeProfileFromSentryLogin">
+ <summary>
+ Gets or sets whether you want to use profile information from Sentry Login.
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks>If true, then a SentryLoginSettings section is required.</remarks>
+</member>
+<member name="P:Sentry.Web.Security.SentryPrincipalSectionHandler.IncludeProfileFromSentryLoginKey">
+ <summary>
+ Gets or sets whether you want to use profile information from Sentry Login.
+ </summary>
+ <value></value>
+ <returns></returns>
+ <remarks>If true, then a SentryLoginSettings section is required.</remarks>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.#ctor">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.authenticateCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.authenticateInProfileCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.findAllAuthenticationProfilesCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.findAuthenticationProfileCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.isAliveCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.validateTokenCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.validateTokensCompleted">
+<remarks/>
+</member>
+<member name="E:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.validateTokensInProfileCompleted">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.authenticate(Sentry.Web.Security.SentryAuthenticationService.AuthenticateRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.authenticateAsync(Sentry.Web.Security.SentryAuthenticationService.AuthenticateRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.authenticateAsync(Sentry.Web.Security.SentryAuthenticationService.AuthenticateRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.authenticateInProfile(Sentry.Web.Security.SentryAuthenticationService.AuthenticateInProfileRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.authenticateInProfileAsync(Sentry.Web.Security.SentryAuthenticationService.AuthenticateInProfileRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.authenticateInProfileAsync(Sentry.Web.Security.SentryAuthenticationService.AuthenticateInProfileRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.findAllAuthenticationProfiles(Sentry.Web.Security.SentryAuthenticationService.FindAllAuthenticationProfilesRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.findAllAuthenticationProfilesAsync(Sentry.Web.Security.SentryAuthenticationService.FindAllAuthenticationProfilesRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.findAllAuthenticationProfilesAsync(Sentry.Web.Security.SentryAuthenticationService.FindAllAuthenticationProfilesRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.findAuthenticationProfile(Sentry.Web.Security.SentryAuthenticationService.FindAuthenticationProfileRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.findAuthenticationProfileAsync(Sentry.Web.Security.SentryAuthenticationService.FindAuthenticationProfileRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.findAuthenticationProfileAsync(Sentry.Web.Security.SentryAuthenticationService.FindAuthenticationProfileRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.isAlive(Sentry.Web.Security.SentryAuthenticationService.IsAliveRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.isAliveAsync(Sentry.Web.Security.SentryAuthenticationService.IsAliveRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.isAliveAsync(Sentry.Web.Security.SentryAuthenticationService.IsAliveRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.validateToken(Sentry.Web.Security.SentryAuthenticationService.ValidateTokenRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.validateTokenAsync(Sentry.Web.Security.SentryAuthenticationService.ValidateTokenRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.validateTokenAsync(Sentry.Web.Security.SentryAuthenticationService.ValidateTokenRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.validateTokens(Sentry.Web.Security.SentryAuthenticationService.ValidateTokensRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.validateTokensAsync(Sentry.Web.Security.SentryAuthenticationService.ValidateTokensRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.validateTokensAsync(Sentry.Web.Security.SentryAuthenticationService.ValidateTokensRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.validateTokensInProfile(Sentry.Web.Security.SentryAuthenticationService.ValidateTokensInProfileRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.validateTokensInProfileAsync(Sentry.Web.Security.SentryAuthenticationService.ValidateTokensInProfileRequest)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.validateTokensInProfileAsync(Sentry.Web.Security.SentryAuthenticationService.ValidateTokensInProfileRequest,System.Object)">
+<remarks/>
+</member>
+<member name="M:Sentry.Web.Security.SentryAuthenticationService.AuthenticationService.CancelAsync(System.Object)">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.AuthenticateRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.AuthenticateRequest.authenticationProfileName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.AuthenticateRequest.credential">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.AuthenticateRequest.environmentName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.BasicCredential">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.BasicCredential.userName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.BasicCredential.password">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.ValidateTokensInProfileRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.ValidateTokensInProfileRequest.authenticationProfileName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.ValidateTokensInProfileRequest.environmentName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.ValidateTokensInProfileRequest.tokens">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.Token">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.Token.tokenName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.Token.tokenValue">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.Token.secureTransportRequired">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.ValidateTokensRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.ValidateTokensRequest.authenticationProfileName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.ValidateTokensRequest.environmentName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.ValidateTokensRequest.tokens">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.ValidateTokenRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.ValidateTokenRequest.authenticationProfileName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.ValidateTokenRequest.environmentName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.ValidateTokenRequest.token">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.IsAliveResponse">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.IsAliveResponse.alive">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.IsAliveResponse.systemConditionDescriptions">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.IsAliveRequest">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.FindAuthenticationProfileResponse">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.FindAuthenticationProfileResponse.authenticationProfile">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.FindAuthenticationProfileResponse.environmentName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.AuthenticationProfile">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.AuthenticationProfile.name">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.AuthenticationProfile.description">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.AuthenticationProfile.realms">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.AuthenticationProfile.shouldProvisioningBeAttemptedUrl">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.Realm">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.Realm.authenticationDomainName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.Realm.name">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.Realm.description">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.Realm.tokenName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.FindAuthenticationProfileRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.FindAuthenticationProfileRequest.authenticationProfileName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.FindAuthenticationProfileRequest.environmentName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.FindAllAuthenticationProfilesResponse">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.FindAllAuthenticationProfilesResponse.authenticationProfiles">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.FindAllAuthenticationProfilesResponse.environmentName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.FindAllAuthenticationProfilesRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.FindAllAuthenticationProfilesRequest.environmentName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.ProvisioningStatus">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.ProvisioningStatus.shouldProvisioningBeAttempted">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.ProvisioningStatus.provisioningUrl">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.ProvisioningStatus.honorFormSessionRestore">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.Identity">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.Identity.userName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.Identity.tokens">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.AuthenticateResponse">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.AuthenticateResponse.authenticationProfile">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.AuthenticateResponse.realm">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.AuthenticateResponse.userIdentity">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.AuthenticateResponse.provisioningStatus">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.AuthenticateInProfileResponse">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.AuthenticateInProfileRequest">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.authenticateCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.authenticateCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.authenticateCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.authenticateInProfileCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.authenticateInProfileCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.authenticateInProfileCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.findAllAuthenticationProfilesCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.findAllAuthenticationProfilesCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.findAllAuthenticationProfilesCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.findAuthenticationProfileCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.findAuthenticationProfileCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.findAuthenticationProfileCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.isAliveCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.isAliveCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.isAliveCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.validateTokenCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.validateTokenCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.validateTokenCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.validateTokensCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.validateTokensCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.validateTokensCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.validateTokensInProfileCompletedEventHandler">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.Security.SentryAuthenticationService.validateTokensInProfileCompletedEventArgs">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.Security.SentryAuthenticationService.validateTokensInProfileCompletedEventArgs.Result">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.SentryLoginUserServiceFault">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.BaseFault">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.BaseFault.faultDescription">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.CreateUserResponse">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.CreateUserResponse.sentryLoginUser">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.CreateUserResponse.confirmationURL">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.SentryLoginUser">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.SentryLoginUser.accountName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.SentryLoginUser.emailAddress">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.SentryLoginUser.password">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.SentryLoginUser.firstName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.SentryLoginUser.lastName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.SentryLoginUser.primaryShadowAccountName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.SentryLoginUser.userStatus">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.SentryLoginUser.userSecurityQuestions">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.SentryLoginUser.phoneContacts">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.SentryLoginUser.shadowAccounts">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.SentryLoginUser.authenticated">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.SentryLoginUser.lastUpdated">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.SentryLoginUser.lastUpdatedSpecified">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.SentryLoginUser.created">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.SentryLoginUser.createdSpecified">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.UserStatus">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.SentryProfileServices.UserStatus.ACTIVE">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.SentryProfileServices.UserStatus.REVOKED">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.SentryProfileServices.UserStatus.INACTIVE">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.SentryProfileServices.UserStatus.LOCKED">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.SentryProfileServices.UserStatus.PENDING">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.SentryProfileServices.UserStatus.PENDING_PW">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.SentryProfileServices.UserStatus.RESET">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.UserSecurityQuestion">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.UserSecurityQuestion.questionId">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.UserSecurityQuestion.questionText">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.UserSecurityQuestion.questionAnswer">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.PhoneContact">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.PhoneContact.phoneNumber">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.PhoneContact.receiveAlerts">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.PhoneContact.phoneType">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.PhoneType">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.SentryProfileServices.PhoneType.MOBILE">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.SentryProfileServices.PhoneType.HOME">
+<remarks/>
+</member>
+<member name="F:Sentry.Web.SentryProfileServices.PhoneType.FAX">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.ShadowAccount">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.ShadowAccount.shadowAccountName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.ShadowAccount.accountContexts">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.AccountContext">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.AccountContext.contextName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.AccountContext.logicalDomain">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.AccountContext.realmName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.CreateUserRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.CreateUserRequest.requestingApplication">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.CreateUserRequest.sentryLoginUser">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.CreateUserRequest.confirmationRedirectURL">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.CreateUserRequest.sendConfirmationEmail">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.SentryLoginConfirmationFault">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.SentryLoginUserNotActiveFault">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.SentryLoginInvalidPasswordFault">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.SentryLoginValidationFault">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.SentryLoginUserNotPartiallyProvisionedFault">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.SentryLoginUserNotFoundFault">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.SentryLoginExistingUserFault">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.UnauthorizedAccessFault">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.InvalidRequestFault">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.PartiallyProvisionUserRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.PartiallyProvisionUserRequest.legacyId">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.PartiallyProvisionUserRequest.password">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.PartiallyProvisionUserRequest.authenticationDomainNames">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.PartiallyProvisionUserResponse">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.PartiallyProvisionUserResponse.sentryLoginUser">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.RollbackPartiallyProvisionedUserRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.RollbackPartiallyProvisionedUserRequest.shadowAccountName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.RollbackPartiallyProvisionedUserResponse">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.PasswordResetRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.PasswordResetRequest.requestingApplication">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.PasswordResetRequest.shadowAccountName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.PasswordResetRequest.continueURL">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.PasswordResetResponse">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.ResendConfirmationRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.ResendConfirmationRequest.requestingApplication">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.ResendConfirmationRequest.shadowAccountName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.ResendConfirmationResponse">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.GetConfirmationURLRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.GetConfirmationURLRequest.requestingApplication">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.GetConfirmationURLRequest.shadowAccountName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.GetConfirmationURLResponse">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.GetConfirmationURLResponse.confirmationURL">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.ConfirmUserRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.ConfirmUserRequest.shadowAccountName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.ConfirmUserRequest.password">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.ConfirmUserRequest.userSecurityQuestions">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.ConfirmUserRequest.phoneContacts">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.ConfirmUserResponse">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.ConfirmUserResponse.sentryLoginUser">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.AddShadowAccountRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.AddShadowAccountRequest.accountName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.AddShadowAccountRequest.shadowAccountName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.AddShadowAccountRequest.contextName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.AddShadowAccountRequest.password">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.AddShadowAccountResponse">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.AddAccountContextRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.AddAccountContextRequest.shadowAccountName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.AddAccountContextRequest.contextName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.RemoveShadowAccountRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.RemoveShadowAccountRequest.accountName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.RemoveShadowAccountRequest.shadowAccountName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.RemoveShadowAccountRequest.contextName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.RemoveShadowAccountResponse">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.FindUserByShadowAccountNameRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.FindUserByShadowAccountNameRequest.shadowAccountName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.FindUserByShadowAccountNameResponse">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.FindUserByShadowAccountNameResponse.sentryLoginUser">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.FindUserRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.FindUserRequest.sentryLoginUser">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.FindUserResponse">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.FindUserResponse.sentryLoginUser">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.UpdateAccountNameRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.UpdateAccountNameRequest.requestingApplication">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.UpdateAccountNameRequest.shadowAccountName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.UpdateAccountNameRequest.newAccountName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.UpdateAccountNameRequest.sendEmail">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.UpdateAccountNameResponse">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.UpdatePersonalInformationRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.UpdatePersonalInformationRequest.requestingApplication">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.UpdatePersonalInformationRequest.sentryLoginUser">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.UpdatePersonalInformationRequest.sendEmail">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.UpdatePersonalInformationResponse">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.ChangePasswordRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.ChangePasswordRequest.requestingApplication">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.ChangePasswordRequest.shadowAccountName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.ChangePasswordRequest.newPassword">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.ChangePasswordRequest.sendEmail">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.ChangePasswordResponse">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.UpdateUserSecurityQuestionsRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.UpdateUserSecurityQuestionsRequest.requestingApplication">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.UpdateUserSecurityQuestionsRequest.shadowAccountName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.UpdateUserSecurityQuestionsRequest.userSecurityQuestions">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.UpdateUserSecurityQuestionsResponse">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.FindAllSecurityQuestionsRequest">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.SecurityQuestion">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.SecurityQuestion.question">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.SecurityQuestion.questionId">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.FindUserAuthenticationProfileRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.FindUserAuthenticationProfileRequest.userName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.FindUserAuthenticationProfileResponse">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.FindUserAuthenticationProfileResponse.primaryUserName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.FindUserAuthenticationProfileResponse.primaryShadowAccountName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.FindUserAuthenticationProfileResponse.userAuthenticationProfileShadowAccounts">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.UserAuthenticationProfileShadowAccount">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.UserAuthenticationProfileShadowAccount.shadowAccountName">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.UserAuthenticationProfileShadowAccount.authenticationDomain">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.CanConvertToSentryLoginRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.CanConvertToSentryLoginRequest.accountName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.CanConvertToSentryLoginResponse">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.CanConvertToSentryLoginResponse.canConvert">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.RemoveUserRequest">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.RemoveUserRequest.requestingApplication">
+<remarks/>
+</member>
+<member name="P:Sentry.Web.SentryProfileServices.RemoveUserRequest.shadowAccountName">
+<remarks/>
+</member>
+<member name="T:Sentry.Web.SentryProfileServices.RemoveUserResponse">
+<remarks/>
+</member>
+</members>
+</doc>

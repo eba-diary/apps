@@ -1,0 +1,16 @@
+﻿@model DataFeedItemModel
+
+@*<td>
+    @if (!String.IsNullOrEmpty(Model.ImageUrl))
+    {
+        <a href="@Url.Action("Details", "Asset", new { id = Model.Id })">
+            <img src="@Model.ImageUrl" class="img-responsive item-list-image center-block" border="0" />
+        </a>
+    }
+</td>*@
+<td>
+    <div>
+        <h4><a href="@Model.URL" target="_blank">@Model.ShortDescription</a></h4>
+        <p>(@Html.DisplayFor((m) => m.DisplayPublishDate))</p>
+    </div>
+</td>

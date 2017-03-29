@@ -1,0 +1,347 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DoddleReport</name>
+    </assembly>
+    <members>
+        <member name="T:DoddleReport.DynamicReportSource">
+            <summary>
+            Generate a Report for a collection of dynamic ExpandoObjects
+            </summary>
+        </member>
+        <member name="T:DoddleReport.ReportSources.EnumerableReportSource">
+            <summary>
+            Generate a Report from any IEnumerable
+            </summary>
+        </member>
+        <member name="M:DoddleReport.ReportSources.EnumerableReportSource.SetReportFieldProperties(System.Type,System.Reflection.PropertyInfo,DoddleReport.ReportField)">
+            <summary>
+            Sets the report field properties based on the item type attributes (data annotations).
+            </summary>
+            <param name="itemType">Type of the item.</param>
+            <param name="propInfo">The prop info.</param>
+            <param name="reportField">The report field.</param>
+            <returns>The order number for the field.</returns>
+        </member>
+        <member name="M:DoddleReport.ReflectionExtensions.IsNumericType(System.Type)">
+            <summary> 
+            Determines if a type is numeric.  Nullable numeric types are considered numeric. 
+            </summary> 
+            <remarks> 
+            Boolean is not considered numeric. 
+            </remarks> 
+        </member>
+        <member name="M:DoddleReport.StringExtensions.ParseEnum``1(System.String)">
+            <summary>
+            Parse a string into an enumeration
+            </summary>
+            <typeparam name="TEnum">The Enumeration type to cast to</typeparam>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DoddleReport.StringExtensions.SplitUpperCaseToString(System.String)">
+            <summary>
+            Parses a camel cased or pascal cased string and returns a new 
+            string with spaces between the words in the string.
+            </summary>
+            <example>
+            The string "PascalCasing" will return an array with two 
+            elements, "Pascal" and "Casing".
+            </example>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DoddleReport.StringExtensions.SplitUpperCase(System.String)">
+            <summary>
+            Parses a camel cased or pascal cased string and returns an array 
+            of the words within the string.
+            </summary>
+            <example>
+            The string "PascalCasing" will return an array with two 
+            elements, "Pascal" and "Casing".
+            </example>
+            <param name="source"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DoddleReport.IReportSource.GetFields">
+            <summary>
+            The fields
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DoddleReport.IReportSource.GetItems">
+            <summary>
+            The data items that will be rendered to the report as rows
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DoddleReport.IReportSource.GetFieldValue(System.Object,System.String)">
+            <summary>
+            Extract the field data from a dataItem
+            </summary>
+            <param name="dataItem"></param>
+            <param name="fieldName"></param>
+            <returns></returns>
+        </member>
+        <member name="T:DoddleReport.RenderHintsCollection">
+            <summary>
+            Render hints are passed to each report writer to alter their rendering behavior. Not all render hints are supported in every writer
+            </summary>
+        </member>
+        <member name="P:DoddleReport.RenderHintsCollection.Margins">
+            <summary>
+            Rendering Margins. Specified in Pixels, but may be interpreted different based on the IReportWriter
+            </summary>
+        </member>
+        <member name="P:DoddleReport.RenderHintsCollection.PageSize">
+            <summary>
+            Page Size of the document. Use .Width and .Height to specify the Page Size.  
+            For PDFs, the unit of measure is in points (72 points = 1 inch), but may be interpreted differently based on the IReportWriter.
+            <example>Example: to set 8.5in x 11in PageSize: report.RenderHints.PageSize = new SizeF(8.5f * 72f, 11f * 72f);</example>
+            </summary>
+        </member>
+        <member name="P:DoddleReport.RenderHintsCollection.BooleansAsYesNo">
+            <summary>
+            Boolean fields will render as Yes/No instead of true/false on the reports
+            </summary>
+        </member>
+        <member name="P:DoddleReport.RenderHintsCollection.BooleanCheckboxes">
+            <summary>
+            Boolean fields will render as Checkboxes in certain report writers
+            </summary>
+        </member>
+        <member name="P:DoddleReport.RenderHintsCollection.IncludePageNumbers">
+            <summary>
+            Page numbers will be rendered onto the footer in certain report writers
+            </summary>
+        </member>
+        <member name="P:DoddleReport.RenderHintsCollection.Orientation">
+            <summary>
+            Toggle the orientation if the report writer supports it
+            </summary>
+        </member>
+        <member name="P:DoddleReport.RenderHintsCollection.FreezePanes">
+            <summary>
+            Indicates if Freeze Panes is enabled based on current settings of FreezeRows and FreezeColumns
+            </summary>
+        </member>
+        <member name="P:DoddleReport.RenderHintsCollection.FreezeRows">
+            <summary>
+            Freeze rows
+            </summary>
+        </member>
+        <member name="P:DoddleReport.RenderHintsCollection.FreezeColumns">
+            <summary>
+            Freeze columns
+            </summary>
+        </member>
+        <member name="P:DoddleReport.RenderHintsCollection.Item(System.String)">
+            <summary>
+            Use this to pass arbitrary render hints to a specific report writer
+            </summary>
+            <param name="hint">The name of the render hint. The Report Writer must be looking for this hint by name to have any affect</param>
+        </member>
+        <member name="T:DoddleReport.Report">
+            <summary>
+            A report consists of the ReportSource, TextFields, RenderHints that are used by an IReportWriter to render the report
+            </summary>
+        </member>
+        <member name="M:DoddleReport.Report.#ctor(DoddleReport.IReportSource)">
+            <summary>
+            Create a new report by using a specific report source
+            </summary>
+            <param name="source">The data for the report</param>
+        </member>
+        <member name="M:DoddleReport.Report.#ctor(DoddleReport.IReportSource,DoddleReport.IReportWriter)">
+            <summary>
+            Create a new report by using a specific report source and report writer
+            </summary>
+            <param name="source">The data for the report</param>
+            <param name="writer">The type of writer used to render the report</param>
+        </member>
+        <member name="P:DoddleReport.Report.Source">
+            <summary>
+            The data for the report
+            </summary>
+        </member>
+        <member name="P:DoddleReport.Report.Writer">
+            <summary>
+            The writer that should be used to render the report.
+            </summary>
+        </member>
+        <member name="P:DoddleReport.Report.DataFields">
+            <summary>
+            The columns of data returned from the report source. They may be customized by using the indexer of this property.
+            </summary>
+        </member>
+        <member name="E:DoddleReport.Report.RenderingRow">
+            <summary>
+            This event is fired before a row is rendered, allowing some customization of the data
+            </summary>
+        </member>
+        <member name="P:DoddleReport.Report.TextFields">
+            <summary>
+            Text fields are passed to the report writers to render the data as they see fit
+            </summary>
+        </member>
+        <member name="P:DoddleReport.Report.RenderHints">
+            <summary>
+            Render hints are passed to each report writer to alter their rendering behavior. Not all render hints are supported in every writer
+            </summary>
+        </member>
+        <member name="M:DoddleReport.Report.WriteReport(System.IO.Stream)">
+            <summary>
+            Write the report to a stream using the specified report writer
+            </summary>
+            <param name="destination"></param>
+        </member>
+        <member name="M:DoddleReport.Report.AppendReport(DoddleReport.Report)">
+            <summary>
+            Append a report to another. This only works for certain report writers and both reports must be using the same report writer.
+            </summary>
+            <param name="report"></param>
+        </member>
+        <member name="T:DoddleReport.ReportField">
+            <summary>
+            Represents a data field within a Report
+            </summary>
+        </member>
+        <member name="P:DoddleReport.ReportField.Name">
+            <summary>
+            Gets the name of the field
+            </summary>
+        </member>
+        <member name="P:DoddleReport.ReportField.DataType">
+            <summary>
+            The type of data contained within this field
+            </summary>
+        </member>
+        <member name="P:DoddleReport.ReportField.Hidden">
+            <summary>
+            If true, the field will not be displayed on the report
+            </summary>
+        </member>
+        <member name="P:DoddleReport.ReportField.HeaderText">
+            <summary>
+            The header displayed for this field of data
+            </summary>
+        </member>
+        <member name="P:DoddleReport.ReportField.FooterText">
+            <summary>
+            The footer displayed for this field of data
+            </summary>
+        </member>
+        <member name="P:DoddleReport.ReportField.ShowTotals">
+            <summary>
+            If true, in some cases (like numeric fields), we can automatically total up the data and render it in the footer of the column
+            </summary>
+        </member>
+        <member name="P:DoddleReport.ReportField.DataFormatString">
+            <summary>
+            A format string to customize how the data is displayed. For example, use "{0:c}" for currency. This property cannot be used in conjunction with the FormatDataAs method.
+            </summary>
+        </member>
+        <member name="P:DoddleReport.ReportField.DataStyle">
+            <summary>
+            Customize how the data for this field is rendered
+            </summary>
+        </member>
+        <member name="P:DoddleReport.ReportField.HeaderStyle">
+            <summary>
+            Customize how the header for this field is rendered
+            </summary>
+        </member>
+        <member name="P:DoddleReport.ReportField.FooterStyle">
+            <summary>
+            Customize how the footer for this field is rendered
+            </summary>
+        </member>
+        <member name="M:DoddleReport.ReportField.FormatAs``1(System.Func{``0,System.String})">
+            <summary>
+            Use this method for advanced formatting of this field using a callback. This method cannot be used in conjunction with DataFormatString
+            </summary>
+            <typeparam name="T">The type of data contained within this field</typeparam>
+            <param name="formatAsDelegate">A callback used to take the data item allowing you to specify how to render it as a string</param>
+        </member>
+        <member name="M:DoddleReport.ReportField.Url``1(System.Func{``0,System.String})">
+            <summary>
+            A delegate to generate a uri/url to be used as the href attribute for a link in the given field.
+            </summary>
+            <typeparam name="T">The type of the DataItem of the current row</typeparam>
+            <param name="hrefLambda">A function that consumes the curent DataItem to create a string representation of a url</param>
+        </member>
+        <member name="T:DoddleReport.ReportFieldCollection">
+            <summary>
+            Represents the fields that will be generated onto the report. 
+            The text to render in the field can be overriden by using the indexer provided.
+            </summary>
+        </member>
+        <member name="P:DoddleReport.ReportRowEventArgs.Row">
+            <summary>
+            The row being rendered
+            </summary>
+        </member>
+        <member name="T:DoddleReport.ReportTextFieldCollection">
+            <summary>
+            Text fields are passed to the report writers to render the data as they see fit
+            </summary>
+        </member>
+        <member name="P:DoddleReport.ReportTextFieldCollection.Title">
+            <summary>
+            The primary title of the report. Typically rendered in a large centered font at the top of every page
+            </summary>
+        </member>
+        <member name="P:DoddleReport.ReportTextFieldCollection.SubTitle">
+            <summary>
+            A subtitle to further clarity the report. Typically rendered just below the Title
+            </summary>
+        </member>
+        <member name="P:DoddleReport.ReportTextFieldCollection.Header">
+            <summary>
+            Commonly used as a multi-line block of text to describe what this report is showing. 
+            </summary>
+        </member>
+        <member name="P:DoddleReport.ReportTextFieldCollection.Footer">
+            <summary>
+            The footer that may be displayed on every page, depending on the report writer
+            </summary>
+        </member>
+        <member name="P:DoddleReport.ReportTextFieldCollection.Item(System.String)">
+            <summary>
+            Use this to pass arbitrary text fields to a specific report writer
+            </summary>
+            <param name="field">The name of the text field. The Report Writer must be looking for this text field by name to have any affect</param>
+        </member>
+        <member name="P:DoddleReport.RowField.ReportField">
+            <summary>
+            The ReportField that this row field is based on
+            </summary>
+        </member>
+        <member name="P:DoddleReport.RowField.Name">
+            <summary>
+            Gets the name of the field
+            </summary>
+        </member>
+        <member name="T:DoddleReport.RowFieldCollection">
+            <summary>
+            Represents the fields that will be generated onto the report. 
+            The text to render in the field can be overriden by using the indexer provided.
+            </summary>
+        </member>
+        <member name="F:DoddleReport.Writers.DelimitedTextReportWriter.DefaultDelimiter">
+            <summary>
+            Override this property to change the default delimiter for all delimited-text reports
+            </summary>
+        </member>
+        <member name="F:DoddleReport.Writers.DelimitedTextReportWriter.GetHeaderText">
+            <summary>
+            Use this delegate to customize the way headers are formatted on the report. The default is to remove spaces and make upper case
+            </summary>
+        </member>
+        <member name="P:DoddleReport.Writers.HtmlReportWriter.DefaultStyle">
+            <summary>
+            This CSS style will be applied to the top of every report. You may override this property to customize the default CSS that gets rendered on all HTML reports
+            </summary>
+        </member>
+    </members>
+</doc>

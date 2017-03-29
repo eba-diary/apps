@@ -1,0 +1,17 @@
+﻿@model DateTime
+@{
+    var htmlAttributes = AnonymousTypeUtils.GetDictionaryFromAnonymousType<Object>(ViewData["htmlAttributes"]);
+    htmlAttributes["data-provide"] = "datepicker";
+    if (!htmlAttributes.ContainsKey("data-date-format"))
+    {
+        htmlAttributes["data-date-format"] = "mm/dd/yyyy";
+    }
+}
+@if (Model == DateTime.MinValue)
+{
+    @Html.TextBoxFor((model) => model, " ", htmlAttributes)
+}
+else
+{
+    @Html.TextBoxFor((model) => model, String.Format("{0:D}", Model), htmlAttributes)
+}

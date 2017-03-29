@@ -1,0 +1,112 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{EA9EE762-CE32-4410-B2B6-367A0985645B}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Sentry.data.Core</RootNamespace>
+    <AssemblyName>Sentry.data.Core</AssemblyName>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Sentry.Common, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sentry.Common.1.3.9\lib\net35\Sentry.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Sentry.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\Sentry.Core.1.0.0.1\lib\net451\Sentry.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="StructureMap, Version=4.3.0.449, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\StructureMap.4.4.0\lib\net45\StructureMap.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DomainServices\AssetDynamicDetailsService.cs" />
+    <Compile Include="DomainServices\DatasetService.cs" />
+    <Compile Include="DomainServices\UserService.cs" />
+    <Compile Include="Entities\AssetDynamicDetails.cs" />
+    <Compile Include="Entities\Category.cs" />
+    <Compile Include="Entities\DataFeedItem.cs" />
+    <Compile Include="Entities\DatasetLogicalFile.cs" />
+    <Compile Include="Entities\Dataset.cs" />
+    <Compile Include="Entities\DatasetMetadata.cs" />
+    <Compile Include="Entities\DomainUser.cs" />
+    <Compile Include="Entities\Asset.cs" />
+    <Compile Include="Entities\AssetState.cs" />
+    <Compile Include="Entities\DatasetFolder.cs" />
+    <Compile Include="Interfaces\IApplicationUser.cs" />
+    <Compile Include="Interfaces\IAssetDynamicDetailsProvider.cs" />
+    <Compile Include="Interfaces\ICurrentUserIdProvider.cs" />
+    <Compile Include="Interfaces\IDatasetContext.cs" />
+    <Compile Include="Interfaces\IDataFeedContext.cs" />
+    <Compile Include="Interfaces\IEmailService.cs" />
+    <Compile Include="Interfaces\IExtendedUserInfo.cs" />
+    <Compile Include="Interfaces\IExtendedUserInfoProvider.cs" />
+    <Compile Include="Interfaces\IDataAssetContext.cs" />
+    <Compile Include="Interfaces\ICloudDataService.cs" />
+    <Compile Include="Interfaces\IDatasetService.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Queries\DatasetFolderQueries.cs" />
+    <Compile Include="Queries\CategoryQueries.cs" />
+    <Compile Include="Queries\AssetQueries.cs" />
+    <Compile Include="User\ApplicationUser.cs" />
+    <Compile Include="User\ImpersonatedApplicationUser.cs" />
+    <Compile Include="User\PermissionNames.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

@@ -1,0 +1,541 @@
+﻿/***********************************/
+/* Canned Sentry Template Settings */
+/***********************************/
+.item-list-image {
+    max-height: 150px;
+}
+
+ul.list-no-decoration {
+    list-style-type: none;
+}
+
+ul.list-group-indented {
+    padding-left: 20px;
+    margin-bottom: 0;
+}
+
+.home-carousel-img {
+    border:0;
+    height:300px;
+    max-height:300px;
+    width:auto;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+@media (min-width: 768px) {
+    .collapse-sm {
+        display: block;
+    }
+}
+
+.extra-top-padding {
+    padding-top: 20px !important;
+}
+
+.main-page-area {
+    width: 80%;
+}
+
+/*****************************/
+/* Custom Settings Start Here*/
+/*****************************/
+/* Width of search buttons, all over. */
+.input-group-addon {
+    width: 30px;
+}
+
+/* The following navbar adjustments get the "Search" bar to be wider than usual, in the header */
+.navbar-right {
+    width: 50%;
+}
+.navbar-form .input-group {
+    width: 100%;
+}
+.navbar-form .input-group .form-control {
+    width: 100%;
+}
+.navbar-form .input-group .input-group-addon,
+.navbar-form .input-group .input-group-btn {
+    width: 20px;
+}
+.navbar-form .input-group > .form-control {
+    width: 100%;
+}
+
+/* Main Page: adjust "Asset Overview" and "Data Feed" to desired sizes */
+.HomePageTable {
+  width: 100%;
+}
+
+.AssetOverview {
+    width: 22%;
+}
+
+.DataFeed {
+  width: 78%;
+  float: left;
+  padding: 0px 0px 0px 20px;
+  margin: 0px;
+}
+
+/* edit dataset page */
+.edit-dataset-row {
+    width: 80%;
+}
+
+/**********************/
+/* Dataset Index page */
+/**********************/
+.dataset-search {
+    width: 50% !important;
+}
+
+/*.dataset-search-submit-button {
+    vertical-align: middle;
+}*/
+
+.browse-category {
+    width: 50%;
+}
+
+.index-card-table {
+    border-color: #8792A4; 
+    border-width: 1px 1px 1px 1px;
+    border-style: solid;
+    margin: 1px
+}
+
+.browse-category-card {
+    align-items: center;
+    text-align: center;
+    padding: 10px 20px 10px 20px;
+    height: 150px;
+    border-color: #8792A4;
+    border-width: 1px 1px 1px 1px;
+    border-style: solid;
+}
+
+.browse-category-card:hover {
+    font-size: larger;
+    font-weight: bolder;
+    cursor: pointer;
+    background-color: aliceblue;
+}
+
+/*********************************************/
+/* Dataset List page, e.g. search results... */
+/*********************************************/
+.dataset-list-filters {
+    vertical-align: top;
+    display: inline-block;
+    width: 150px;
+    margin-right: 10px;
+}
+
+.dataset-filter-subset-label {
+    font-weight: bolder;
+}
+
+.ul-filter-list:hover {
+    cursor: pointer;
+}
+
+.li-filter-enabled {
+    padding: 2px 2px 2px 2px;
+    background-color: #A6A6A6;
+    vertical-align: middle;
+    /*border-top-right-radius: 2px;
+    border-bottom-right-radius: 2px;*/
+}
+.li-filter-enabled:hover {
+    color: #FFFFFF;
+}
+.filter-enabled-glyph {
+    display: block;
+    float: right;
+    vertical-align: middle;
+    margin-top:2px;
+    height: 17px;
+    width: 17px;
+}
+/* filter-enabled-glyph:after -- gives the tiny pointer to the right of an enabled filter... */ 
+.filter-enabled-glyph:after {
+	left: 100%;
+	top: 50%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+	border-left-color: #A6A6A6;
+	border-width: 12px 7px; /* first number basically gives us the height; second basically gives the width of the arrow */
+	margin-top: -13.5px; /* use this to position the arrow top-to-bottom; fractions of a pixel are OK here */
+    margin-left: 2px; /* us this to position the arrow left-to-right; fractions of a pixel are OK here */
+}
+
+.li-filter-disabled {
+    width: 100%;
+    padding: 2px 2px 2px 2px;
+    background-color: #F6F6F6;
+}
+.filter-disabled-glyph {
+    display: none;
+    float: right;
+    vertical-align: middle;
+    margin-top:1px;
+    height: 17px;
+    width: 17px;
+}
+
+.li-filter-disabled:hover {
+    background-color: #DDDDDD;
+}
+
+.dataset-list {
+    display: inline-block;
+    min-width: 400px;
+    width: 650px;
+}
+
+.ul-dataset-list-item {
+    width: 100%;
+    border-color: #8792A4;
+    border-width: 0px;
+    border-style: hidden;
+    border-radius: 5px;
+    position: relative;
+    padding-top: 0px;
+    margin-top: 0px;
+    padding-bottom: 5px;
+}
+
+.ul-dataset-list-item:nth-child(even) {
+    background-color: #FFFFFF;
+}
+
+.ul-dataset-list-item:nth-child(odd) {
+    background-color: #F7F8FF;
+}
+
+.dataset-list-content {
+    width: 90%;
+    margin-left: 3px;
+}
+
+/* wrap the upper-right of each row in the list */
+.category-type-wrap {
+    display: block;
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    overflow: hidden;
+    height: 100px;
+    width: 100px;
+}
+
+.category-type {
+    transform: rotate(45deg);
+    transform-origin: top left;
+    position: absolute;
+    height: 26px;
+    width: 100px;
+    line-height: 26px;
+    text-align: center;
+    top: -19px;
+    right: -47px;
+    font-size: 12px;
+    font-weight: bold;
+    font-family: Lato, Arial, sans-serif;
+}
+
+.category-claim {
+    background-color: #71999F;
+    color: #FFFFFF;
+}
+
+.category-geographic {
+    background-color: #84BD00;
+    color: #FFFFFF;
+}
+
+.category-government {
+    background-color: #EAAA00;
+    color: #FFFFFF;
+}
+
+.category-industry {
+    background-color: #003DA5;
+    color: #FFFFFF;
+}
+
+/*.dataset-list-download-link {
+    color: #FFFFFF;
+    background-color: #DDBB64;
+    border: 0px hidden #003DA5;
+    border-radius: 5px;
+}*/
+
+/*.dataset-list-download-link:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}*/
+
+/* dataset-name-hover-popup -- when hovering over dataset name in the list */
+.dataset-name-hover-popup {
+    display: none;
+    position: absolute;
+    margin-left: 5px;
+    border: 1px solid #003DA5;
+    border-radius: 5px;
+    color: #FFFFFF;
+    background-color: #000000;
+    z-index: 1000;
+}
+/* dataset-name-hover-popup:before -- gives the little pointer to the left of the hover popup */
+/*
+.dataset-name-hover-popup:before {
+    content: " ";
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    margin-top: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: transparent black transparent transparent;
+}
+*/
+.dataset-list-dataset-name {
+    font-size: larger;
+    font-weight: bolder;
+    color: #003DA5;
+}
+
+.dataset-list-dataset-name:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.dataset-list-search-hits {
+    font-size: smaller
+}
+
+/* Dataset Detail... */
+.dataset-detail-content {
+    width: 100%;
+    vertical-align: top;
+}
+
+.dataset-detail-content-row {
+    width: 100%;
+    padding-top: 0px;
+    margin-top: 0px;
+    border-top-left-radius: 5px;
+    vertical-align: top;
+}
+
+
+
+
+/* Dataset Management Screen... */
+/*.dataset-list {
+    width: 100%;
+}
+
+.dataset-group {
+    width: 100%;
+}*/
+
+    /*#F8F5E1 = color of a manila folder*/ 
+/*.dataset-folder-item {
+    background-color: #F8F5E1;
+    cursor: pointer;
+    display: block;
+    border-top-left-radius: 8px !important;
+}*/
+
+/*this is the first row in the dataset nested listing; it contains the search box*/ 
+/*.fname {  
+    border-top-left-radius: 0px !important;
+    background-color: #c0c0c0;
+    margin: 0px 0px 0px 0px !important;
+    padding: 0px 0px 0px 0px !important;
+    height: 47px;
+}
+
+.dataset-file-group {
+    background-color: rgb(137, 171, 227);
+    padding: 2px 2px 2px 5px;
+    display: block;
+    border-bottom-left-radius: 8px !important;
+}
+
+.dataset-file-item {
+    padding: 2px 2px 2px 5px;
+    display: block;
+}*/
+
+/*  just fyi....
+
+    sentry blue dark:  #003da5
+    sentry blue light: #00a3e0
+
+*/
+
+.collapsibleListOpen:before {
+    content:"\e252";
+    font-family: "Glyphicons Halflings";
+    font-size: 12px;
+    float: left;
+    margin-top: 4px;
+    margin-left: -20px;
+    color: #CCCCCC;
+}
+
+.collapsibleListClosed:before {
+    /*Using a Bootstrap glyphicon as the bullet point*/
+    content:"\e250";
+    font-family: "Glyphicons Halflings";
+    font-size: 12px;
+    float: left;
+    margin-top: 4px;
+    margin-left: -20px;
+    color: #CCCCCC;
+}
+
+.dataset-file-item:before {
+    /*Using a Bootstrap glyphicon as the bullet point*/
+    /*content:"\2a";*/
+    content:"\e022";
+    font-family: "Glyphicons Halflings";
+    font-size: 12px;
+    float: left;
+    margin-top: 4px;
+    margin-left: -20px;
+    color: #00a3e0;
+}
+
+/*.dataset-hover-popup {
+  display: none;
+  position: fixed;
+  padding: 0px;
+  border: 2px;
+  border-color: #003DA5;
+  border-radius: 0 0 2px 2px;
+  background-color :#FFFFFF;
+  z-index: 1000;
+}*/
+  /*top:22px;
+  left:10px;*/
+
+.dataset-hover-popup {
+  display: none;
+  position: initial;
+  color: #003DA5 !important;
+  background-color: #FFFFFF;
+  border: 2px solid #003DA5;
+  border-radius: 6px;
+  padding: 3px;
+  /*font-size: small;*/
+  font-family: Arial;
+  /*transition: all 2s ease-in;*/
+  z-index: 1000;
+  cursor: auto;
+}
+
+/* Asset State image display... */
+.AssetDisplay {
+  width: 100%;
+  float: left;
+  margin: 0px 0px 0px 0px;
+  padding: 0px 0px 0px 0px;
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position-x: right;
+  vertical-align: central;
+  position: relative;
+  border-style: solid;
+  border-color: #003DA5;
+  border-width: 1px;
+  /*
+  border-width: 1px;
+  border-top-width: 1px;
+  border-left-width: 1px;
+  border-bottom-width: 0px;
+  border-right-width: 0px;
+  border-collapse: collapse;
+  background-color: lightblue;
+  */
+}
+
+  /*
+.AssetDisplay + .AssetDisplay {
+  margin-top: -1px;
+  margin-left: -1px;
+  border-right: 1px solid transparent;
+  border-bottom: 1px solid transparent;
+  outline: 1px solid;
+}
+  */
+
+/*.AssetDisplay:nth-last-column(1) {
+  border-bottom-width: 1px;
+  border-right-width: 1px;
+}*/
+
+/*.AssetDisplay:first-child {
+  border-bottom-width: 1px;
+  border-right-width: 1px;
+}*/
+
+.AssetStateUp {
+  background-image: url("../Images/status/simpleSpaz1.png");
+  background-size: contain;
+  /*
+  background-image: url("../Images/status/beer1.png");
+  background-image: url("../Images/status/battery1.png");
+  background-image: url("../Images/status/circle1.png");
+  background-image: url("../Images/status/circleBasic1.png");
+  background-image: url("../Images/status/default1.png");
+  background-image: url("../Images/status/funkyLight1.png");
+  background-image: url("../Images/status/simpleSpaz1.png");
+  */
+}
+
+.AssetStateDown {
+  background-image: url("../Images/status/simpleSpaz2.png");
+  /*
+  background-image: url("../Images/status/beer2.png");
+  background-image: url("../Images/status/battery2.png");
+  background-image: url("../Images/status/circle2.png");
+  background-image: url("../Images/status/circleBasic2.png");
+  background-image: url("../Images/status/default2.png");
+  background-image: url("../Images/status/funkyLight2.png");
+  background-image: url("../Images/status/simpleSpaz2.png");
+  */
+}
+
+.AssetStateWaiting {
+  background-image: url("../Images/status/simpleSpaz3.png");
+  /*
+  background-image: url("../Images/status/beer3.png");
+  background-image: url("../Images/status/battery3.png");
+  background-image: url("../Images/status/circle3.png");
+  background-image: url("../Images/status/circleBasic3.png");
+  background-image: url("../Images/status/default3.png");
+  background-image: url("../Images/status/funkyLight3.png");
+  background-image: url("../Images/status/simpleSpaz3.png");
+  */
+}
+
+.AssetStateUnknown {
+    background-image: url("../Images/status/default4.png");
+    /*
+  background-image: url("../Images/status/beer4.png");
+  background-image: url("../Images/status/circle4.png");
+  background-image: url("../Images/status/default4.png");
+  */
+}

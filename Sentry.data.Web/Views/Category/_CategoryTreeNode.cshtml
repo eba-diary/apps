@@ -1,0 +1,45 @@
+﻿@model FullCategoryModel
+@helper TreeView(FullCategoryModel cat)
+{
+<li id="category-@cat.Id">
+    @if (cat.Id > 0)
+    {
+        <div class="list-group-item list-inline">
+        @cat.Name &nbsp;&nbsp;&nbsp;&nbsp;
+        <button type="button" class="btn btn-default btn-sm" id="EditCategory_@cat.Id" data-id="@cat.Id">
+            <span class="glyphicon glyphicon-edit text-primary"></span> Edit
+        </button>
+        @if (cat.IsLeaf)
+        {
+            Int32 parentCategoryId;
+            if (cat.ParentCategory == null)
+            {
+                parentCategoryId = 0;
+            }
+            else
+            {
+                parentCategoryId = cat.ParentCategory.Id;
+            }
+            <button type="button" class="btn btn-default btn-sm" id="DeleteCategory_@cat.Id" data-id="@cat.Id" data-parent-id="@parentCategoryId">
+                <span class="glyphicon glyphicon-remove text-danger"></span> Delete
+            </button>
+        }
+
+        <button type="button" class="btn btn-default btn-sm" id="AddSubcategory_@cat.Id" data-id="@cat.Id">
+            <span class="glyphicon glyphicon-plus text-success"></span> Add Subcategory
+        </button>
+    </div>
+    }
+    @if (cat.SubCategories != null && cat.SubCategories.Count() > 0)
+    {
+        <ul class="list-no-decoration list-group list-group-indented">
+        @foreach (var subcat in cat.SubCategories)
+        {
+            @TreeView(subcat);
+        }
+    </ul>
+    }
+</li>
+}
+
+@TreeView(Model)
