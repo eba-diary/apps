@@ -15,16 +15,16 @@
     -->
     
       <if test="${TargetEnv=='Test'}">
-        <property name="DeployLocations" value="\\SHO-T-APPWEB-20\Web$\MyApp"/>
-        <property name="envDashSiteEnvId" value="999" />
+        <property name="DeployLocations" value="\\SHO-T-SHDWEB-20\Web$\Data"/>
+        <property name="envDashSiteEnvId" value="2403" />
         <property name="createSeerOutage" value="false"/>
       </if>
 
-      <if test="${TargetEnv=='Qual'}">
+      <!--<if test="${TargetEnv=='Qual'}">
         <property name="DeployLocations" value="\\DIX-Q-APPWEB-20\Web$\MyApp;\\SHO-Q-APPWEB-20\Web$\MyApp"/>
         <property name="envDashSiteEnvId" value="999" />
         <property name="createSeerOutage" value="true"/>
-        <!--comma-delimited lists of servers and applications to create a SEER outage for-->
+        --><!--comma-delimited lists of servers and applications to create a SEER outage for--><!--
         <property name="seerOutageServers" value="DIX-Q-APPWEB-20,SHO-Q-APPWEB-20"/>
         <property name="seerOutageApplications" value="MyAppQual"/>
       </if>
@@ -33,10 +33,10 @@
         <property name="DeployLocations" value="\\DIX-P-APPWEB-20\Web$\MyApp;\\SHO-P-APPWEB-20\Web$\MyApp"/>
         <property name="envDashSiteEnvId" value="999" />
         <property name="createSeerOutage" value="true"/>
-        <!--comma-delimited lists of servers and applications to create a SEER outage for-->
+        --><!--comma-delimited lists of servers and applications to create a SEER outage for--><!--
         <property name="seerOutageServers" value="DIX-P-APPWEB-20,SHO-P-APPWEB-20"/>
         <property name="seerOutageApplications" value="MyApp"/>
-      </if>
+      </if>-->
     
     <!--
     </if>

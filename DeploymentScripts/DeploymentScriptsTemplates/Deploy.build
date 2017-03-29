@@ -6,14 +6,14 @@
   <!-- ////////////////////////////////////////////////////////////////// -->
   
   <!-- Set the name of the web project -->
-  <property name="PublishedWebSiteName" value="Sentry.MyApp.Web"/>
+  <property name="PublishedWebSiteName" value="Sentry.data.Web"/>
   
   <!-- The list of steps in deploying your app -->
   <target name="deploy" depends="environmentSettings, addOutage, deployApp, deleteOutage, envDashRecordDeploy" />
 
   <!-- Environment Dashboard Settings -->
-  <property name="envDashSysId" value="999"/>
-  <property name="envDashBuildTypId" value="999"/>
+  <property name="envDashSysId" value="278"/>
+  <property name="envDashBuildTypId" value="387"/>
 
   <!-- SEER Outage Settings -->
   <property name="seerOutageSystemName" value="My App"/>
