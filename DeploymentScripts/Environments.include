@@ -21,8 +21,8 @@
       </if>
     
       <if test="${TargetEnv=='Qual'}">
-        <property name="DeployLocations" value="\\SHO-Q-SHDWEB-20\Web$\DataTest"/>
-        <property name="DeployLocations" value="\\DIX-Q-SHDWEB-20\Web$\DataTest"/>
+        <property name="DeployLocations" value="\\SHO-Q-SHDWEB-20\Web$\DataQual"/>
+        <property name="DeployLocations" value="\\DIX-Q-SHDWEB-20\Web$\DataQual"/>
         <property name="envDashSiteEnvId" value="2404" />
         <property name="createSeerOutage" value="false"/>
       </if>
