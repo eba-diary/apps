@@ -61,6 +61,8 @@ namespace Sentry.data.Infrastructure
                 Key = uniqueKey,
                 Expires = DateTime.Now.AddMinutes(2)
             };
+            //setting content-disposition to attachment vs. inline (into browser) to force "save as" dialog box for all doc types.
+            req.ResponseHeaderOverrides.ContentDisposition = "attachment";
             string url = S3Client.GetPreSignedURL(req);
             return url;
         }
