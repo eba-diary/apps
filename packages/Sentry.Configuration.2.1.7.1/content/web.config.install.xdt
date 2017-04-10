@@ -9,8 +9,7 @@
   <!-- Transform below for those with a sentrySettings\EnvironmentSettings sections -->
   <sentrySettings xdt:Transform="InsertIfMissing">
     <!-- NOTE: Use Ctrl+K Ctrl+D to reformat your config file to make the following readable -->
-    <EnvironmentSettings defaultDomain="sentry.com" xmlns="urn:Sentry.Configuration"
-      xdt:Transform="InsertIfMissing">
+    <EnvironmentSettings defaultDomain="sentry.com" xdt:Transform="InsertIfMissing">
       <defaultEnvironmentList>
         <env name="Dev">
           <webHost name="localhost"/>

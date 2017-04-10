@@ -75,7 +75,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Sentry.Configuration, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.Configuration.2.1.6.0\lib\net35\Sentry.Configuration.dll</HintPath>
+      <HintPath>..\packages\Sentry.Configuration.2.1.7.1\lib\net40\Sentry.Configuration.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Sentry.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -140,6 +140,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

@@ -1,3 +1,23 @@
+Sentry.Configuration 20160426 2.1.7.0 (CLR version 2.0.5.0)
+=========================================
+Bug fix:
+    - Fixed a threading issue where when multiple threads are loading config settings,
+	  a NullReferenceException or a DuplicateKeyException can be thrown.
+
+*** NOTE: As of this release, .Net framework 4.0 is required ***
+
+Sentry.Configuration 20150422 2.1.6.0 (CLR version 2.0.5.0)
+=========================================
+New features:
+    - Added an implementation of the Sentry.Common.IApplicationEnvironmentName interface, 
+	  so that the SEL Logger can get the environment name from it.  See the documentation
+	  for SEL for more information.
+
+Sentry.Configuration 20151130 2.1.5.0 (CLR version 2.0.5.0)
+=========================================
+New features:
+    - External settings files are now cached by Sentry.Configuration to increase performance.
+
 Sentry.Configuration 20151102 2.1.4.0 (CLR version 2.0.5.0)
 =========================================
 Bug fix:
