@@ -32,6 +32,7 @@ namespace Sentry.data.Web
             this.FileSize = ds.FileSize;
             this.RecordCount = ds.RecordCount;
             this.S3Key = ds.S3Key;
+            this.IsSensitive = ds.IsSensitive;
             this.RawMetadata = new List<_DatasetMetadataModel>();
             foreach (DatasetMetadata dsm in ds.RawMetadata)
             {
@@ -83,6 +84,8 @@ namespace Sentry.data.Web
 
         public string S3Key { get; set; }
 
+        public Boolean IsSensitive { get; set; }
+
         public IList<_DatasetMetadataModel> RawMetadata { get; set; }
 
         public IList<_DatasetMetadataModel> Columns
@@ -109,6 +112,7 @@ namespace Sentry.data.Web
 
         public List<String> SearchHitList;
 
+        public Boolean CanDwnldSenstive { get; set; }
         //public IList<String> CategoryList { get; set; }
 
         ///// <summary>

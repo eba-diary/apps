@@ -17,5 +17,6 @@ namespace Sentry.data.Web
 
         public IList<BaseDatasetModel> DatasetList { get; set; }
 
+        public Boolean CanDwnldSenstive { get; set; }
     }
 }

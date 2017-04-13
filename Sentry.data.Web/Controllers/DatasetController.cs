@@ -62,6 +62,7 @@ namespace Sentry.data.Web.Controllers
                     {
                         BaseDatasetModel dsModel = new BaseDatasetModel(ds);
                         dsmList.Add(dsModel);
+                        dsModel.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
                     }
                     _dsModelList = dsmList;
                 }
@@ -208,7 +209,7 @@ namespace Sentry.data.Web.Controllers
         public ActionResult List(string category, string searchPhrase)
         {
             ListDatasetModel rspModel = new ListDatasetModel();
-
+            
             // get all unique categories (regardless of earch category)
             rspModel.CategoryList = GetDatasetModelList().Select(x => x.Category).Distinct().ToList();
 
@@ -298,6 +299,7 @@ namespace Sentry.data.Web.Controllers
             Dataset ds = _datasetContext.GetById(id);
             // IList<String> catList = _datasetContext.GetCategoryList();
             BaseDatasetModel bdm = new BaseDatasetModel(ds);
+            bdm.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
             return View(bdm);
         }
 
@@ -349,6 +351,7 @@ namespace Sentry.data.Web.Controllers
                     dsfi.Length,
                     udm.RecordCount,
                     udm.Category + "/" + dsfi.Name,
+                    udm.IsSensitive,
                     null);
 
                 //foreach (_DatasetMetadataModel dsmdmi in udm.RawMetadata)

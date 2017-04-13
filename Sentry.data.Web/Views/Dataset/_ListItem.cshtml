@@ -79,9 +79,15 @@
         @*<span class="dataset-list-download-link" id="DownloadDataset_@Model.Id" data-id="@Model.EIdTag">
             &nbsp; @Model.Extension.ToUpper() &nbsp;
         </span>*@
-        <button type="button" class="btn btn-default btn-sm dataset-operation-button" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId">
-            <span class="glyphicon glyphicon-cloud-download text-primary"></span> @Model.FileExtension.ToUpper()
-        </button>
+        @{
+            if (Model.IsSensitive.Equals(false) || Model.CanDwnldSenstive)
+            {
+                <button type="button" class="btn btn-default btn-sm dataset-operation-button" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId">
+                    <span class="glyphicon glyphicon-cloud-download text-primary"></span> @Model.FileExtension.ToUpper()
+                </button>
+            }
+
+        }
     </div>
     <div class="dataset-list-content-value">
         &nbsp;

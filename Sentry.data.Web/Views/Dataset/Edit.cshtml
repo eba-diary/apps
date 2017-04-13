@@ -141,20 +141,27 @@
         </div>
 
         @*<div class="form-group">
-            @Html.LabelFor(model => model.md_Columns, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorForMany(model => model.md_Columns, x => x.DatasetId.ToString(), false)
-                @Html.ValidationMessageFor(model => model.md_Columns, "", new { @class = "text-danger" })
-            </div>
+        @Html.LabelFor(model => model.IsSensitive, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-1">
+            @Html.CheckBoxFor(model => model.IsSensitive, new { @class = "edit-dataset-row" })
         </div>
+    </div>*@
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.md_Metadata, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorForMany(model => model.md_Metadata, x => x.DatasetId.ToString(), false)
-                @Html.ValidationMessageFor(model => model.md_Metadata, "", new { @class = "text-danger" })
-            </div>
-        </div>*@
+    @*<div class="form-group">
+        @Html.LabelFor(model => model.md_Columns, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorForMany(model => model.md_Columns, x => x.DatasetId.ToString(), false)
+            @Html.ValidationMessageFor(model => model.md_Columns, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.md_Metadata, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.EditorForMany(model => model.md_Metadata, x => x.DatasetId.ToString(), false)
+            @Html.ValidationMessageFor(model => model.md_Metadata, "", new { @class = "text-danger" })
+        </div>
+    </div>*@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">

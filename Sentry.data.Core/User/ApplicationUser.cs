@@ -37,6 +37,39 @@ namespace Sentry.data.Core
             }
         }
 
+        public virtual Boolean CanDwnldSenstive
+        {
+            get
+            {
+                //return true;
+                return _extendedUserInfo.Permissions.Contains(PermissionNames.DwnldSensitve);
+            }
+        }
+
+        public virtual Boolean CanEditDataset
+        {
+            get
+            {
+                return _extendedUserInfo.Permissions.Contains(PermissionNames.DatasetEdit);
+            }
+        }
+
+        public virtual Boolean CanUpload
+        {
+            get
+            {
+                return _extendedUserInfo.Permissions.Contains(PermissionNames.Upload);
+            }
+        }
+
+        public virtual Boolean CanDwnldNonSensitive
+        {
+            get
+            {
+                return _extendedUserInfo.Permissions.Contains(PermissionNames.DwnldNonSensitive);
+            }
+        }
+
         //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
 
         public virtual Boolean CanUseApp

@@ -23,9 +23,14 @@
         @*@Html.ActionLink("Edit", "Edit", new { UniqueKey = Model.UniqueKey }) |
             @Html.ActionLink("Detail", "Detail", new { UniqueKey = Model.UniqueKey }) |
             @Html.ActionLink("Delete", "Delete", new { UniqueKey = Model.UniqueKey }) |*@
-        <button type="button" class="btn btn-default btn-sm dataset-operation-button" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId">
-            <span class="glyphicon glyphicon-cloud-download text-primary"></span> Download @Model.FileExtension.ToUpper()
-        </button> | 
+        @{
+            if (Model.IsSensitive.Equals(false) || Model.CanDwnldSenstive)
+            {
+                <button type="button" class="btn btn-default btn-sm dataset-operation-button" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId">
+                    <span class="glyphicon glyphicon-cloud-download text-primary"></span> Download @Model.FileExtension.ToUpper()
+                </button>
+            }
+        }
         <button type="button" class="btn btn-default btn-sm dataset-operation-button" id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId">
             <span class="glyphicon glyphicon-edit text-primary"></span> Edit Details
         </button>

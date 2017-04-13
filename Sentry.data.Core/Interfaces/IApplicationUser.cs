@@ -24,6 +24,10 @@ namespace Sentry.data.Core
         //Security/Permission checks
         //###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific
         Boolean CanApproveItems { get; }
+        Boolean CanDwnldSenstive { get; }
+        Boolean CanDwnldNonSensitive { get; }
+        Boolean CanEditDataset { get; }
+        Boolean CanUpload { get; }
         //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
         Boolean CanUseApp { get; }
         Boolean CanUserSwitch { get; }

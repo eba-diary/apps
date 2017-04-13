@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="fdc60ad2-3341-4157-b7e4-37620e109fd8" ChangeDateTime="04/12/2017 02:42:28">
+    <Property Name="ElementName" Value="[dbo].[Dataset].[IsSensitive]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Dataset]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="IsSensitive_IND" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="49eed937-b157-4af1-a2da-f8052001bc13" ChangeDateTime="04/12/2017 02:44:42">
+    <Property Name="ElementName" Value="[dbo].[Dataset].[IsSensitive_IND]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Dataset]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="_IND" />
+  </Operation>
+</Operations>

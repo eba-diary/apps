@@ -29,6 +29,7 @@ namespace Sentry.data.Web
             this.SentryOwnerName = "";
             this.UploadDtm = DateTime.MinValue;
             this.UploadUserName = "";
+            this.IsSensitive = true;
 
         }
 

@@ -32,6 +32,7 @@ namespace Sentry.data.Core
         private long _fileSize;
         private long _recordCount;
         private string _s3key;
+        private Boolean _IsSensitive;
         IList<DatasetMetadata> _rawMetadata;
         //private IDictionary<string, string> _columns;
         //private IDictionary<string, string> _metadata;
@@ -59,6 +60,7 @@ namespace Sentry.data.Core
                        long fileSize,
                        long recordCount,
                        string s3key,
+                       Boolean IsSensitive,
                        IList<DatasetMetadata> rawMetadata)
         {
             this._datasetId = datasetId;
@@ -80,7 +82,20 @@ namespace Sentry.data.Core
             this._fileSize = fileSize;
             this._recordCount = recordCount;
             this._s3key = s3key;
+            this._IsSensitive = IsSensitive;
             this._rawMetadata = rawMetadata;
+        }
+
+        public virtual Boolean IsSensitive
+        {
+            get
+            {
+                return _IsSensitive;
+            }
+            set
+            {
+                _IsSensitive = value;
+            }
         }
 
         public virtual int DatasetId
