@@ -113,6 +113,7 @@ namespace Sentry.data.Web
         public List<String> SearchHitList;
 
         public Boolean CanDwnldSenstive { get; set; }
+        public Boolean CanEditDataset { get; set; }
         //public IList<String> CategoryList { get; set; }
 
         ///// <summary>

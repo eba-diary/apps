@@ -24,6 +24,13 @@
             @Html.ActionLink("Detail", "Detail", new { UniqueKey = Model.UniqueKey }) |
             @Html.ActionLink("Delete", "Delete", new { UniqueKey = Model.UniqueKey }) |*@
         @{
+            if (Model.IsSensitive)
+            {
+                <i class="glyphicon glyphicon-lock text-primary"></i>
+            }
+        }
+
+        @{
             if (Model.IsSensitive.Equals(false) || Model.CanDwnldSenstive)
             {
                 <button type="button" class="btn btn-default btn-sm dataset-operation-button" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId">
@@ -31,9 +38,15 @@
                 </button>
             }
         }
-        <button type="button" class="btn btn-default btn-sm dataset-operation-button" id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId">
-            <span class="glyphicon glyphicon-edit text-primary"></span> Edit Details
-        </button>
+        @{
+            if (Model.CanEditDataset)
+            {
+                <button type="button" class="btn btn-default btn-sm dataset-operation-button" id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId">
+                    <span class="glyphicon glyphicon-edit text-primary"></span> Edit Details
+                </button>
+            }
+        }     
+        
         @*<button type="button" class="btn btn-default btn-sm dataset-operation-button" id="DeleteDataset_@Model.Id" data-id="@Model.Id">
             <span class="glyphicon glyphicon-remove text-danger"></span> | Delete Dataset
         </button>*@

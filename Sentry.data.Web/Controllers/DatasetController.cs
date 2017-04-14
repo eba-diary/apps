@@ -63,6 +63,7 @@ namespace Sentry.data.Web.Controllers
                         BaseDatasetModel dsModel = new BaseDatasetModel(ds);
                         dsmList.Add(dsModel);
                         dsModel.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
+                        dsModel.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
                     }
                     _dsModelList = dsmList;
                 }
@@ -300,6 +301,7 @@ namespace Sentry.data.Web.Controllers
             // IList<String> catList = _datasetContext.GetCategoryList();
             BaseDatasetModel bdm = new BaseDatasetModel(ds);
             bdm.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
+            bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
             return View(bdm);
         }
 

@@ -80,6 +80,13 @@
             &nbsp; @Model.Extension.ToUpper() &nbsp;
         </span>*@
         @{
+            if (Model.IsSensitive)
+            {
+                <i class="glyphicon glyphicon-lock text-primary"></i>
+            }
+        }
+        
+        @{
             if (Model.IsSensitive.Equals(false) || Model.CanDwnldSenstive)
             {
                 <button type="button" class="btn btn-default btn-sm dataset-operation-button" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId">
