@@ -126,7 +126,6 @@ namespace Sentry.data.Web.Controllers
         [HttpPost()]
         public void DeleteUser(int id)
         {
-            // TODO:  implement security check & referential integrity check
             _domainContext.RemoveById<DomainUser>(id);
             _domainContext.SaveChanges();
         }

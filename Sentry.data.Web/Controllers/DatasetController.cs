@@ -20,6 +20,7 @@ namespace Sentry.data.Web.Controllers
         private IDatasetService _s3Service;
         private static Amazon.S3.IAmazonS3 _s3client = null;
 
+        // JCG TODO: Revisit, Could this be push down into the Infrastructure\Core layer? 
         private Amazon.S3.IAmazonS3 S3Client
         {
             get
@@ -46,6 +47,7 @@ namespace Sentry.data.Web.Controllers
 
         private List<BaseDatasetModel> _dsModelList = null;
 
+        // JCG TODO: Add unit test for dsModelList getter
         private List<BaseDatasetModel> dsModelList
         {
             get
@@ -190,6 +192,7 @@ namespace Sentry.data.Web.Controllers
             return ds;
         }
 
+        // JCG TODO: Add unit tests for [GET]GetDownloadURL
         [HttpGet()]
         public JsonResult GetDownloadURL(int id)
         {
@@ -206,6 +209,7 @@ namespace Sentry.data.Web.Controllers
             return View(dsList);
         }
 
+        // JCG TODO: Add unit tests for List()
         // GET: Dataset/List/searchParms
         public ActionResult List(string category, string searchPhrase)
         {
@@ -305,6 +309,7 @@ namespace Sentry.data.Web.Controllers
             return View(bdm);
         }
 
+        // JCG TODO: Add additional permissions check around CanUpload
         // GET: Dataset/Upload
         [HttpGet]
         public ActionResult Upload()
@@ -313,6 +318,9 @@ namespace Sentry.data.Web.Controllers
             return View(udm);
         }
 
+        // JCG TODO: Add unit tests for [Post]Upload
+        // JCG TODO: Add additional permissions check around CanUpload
+        // JCG TODO: Revist moving S3.Transfer.TransferUtility logic to Infrastructure\Core layer
         // POST: Dataset/Upload
         [HttpPost]
         public ActionResult Upload(UploadDatasetModel udm)
@@ -474,8 +482,9 @@ namespace Sentry.data.Web.Controllers
         //    i.AllCategories = GetCategorySelectListItems(); //re-populate the category list for re-display
         //    return View(i);
         //}
-
+        
         // GET: DatasetFileVersion/Edit/5
+        // JCG TODO: Add additional permissions check around CanEditDataset
         [HttpGet()]
         public ActionResult Edit(int id)
         {
@@ -485,6 +494,8 @@ namespace Sentry.data.Web.Controllers
             return View(item);
         }
 
+        // JCG TODO: Add unit tests for [Post]Edit
+        // JCG TODO: Add additional permissions check around CanEditDataset
         // POST: Dataset/Edit/5
         [HttpPost()]
         public ActionResult Edit(int id, EditDatasetModel i)
@@ -556,6 +567,7 @@ namespace Sentry.data.Web.Controllers
         //    return i;
         //}
 
+        // JCG TODO: Add unit tests for AddDatasetFromModel()
         private void AddDatasetFromModel(Dataset ds, EditDatasetModel eds)
         {
             DateTime now = DateTime.Now;
@@ -596,7 +608,8 @@ namespace Sentry.data.Web.Controllers
                 ds.RawMetadata.Add(new DatasetMetadata(dsm.DatasetMetadataId, dsm.DatasetId, dsm.IsColumn, dsm.Name, dsm.Value, ds));
             }
         }
-
+        
+        // JCG TODO: Add unit tests for UpdateDatasetFromModel()
         /// <summary>
         /// Allowed updates:
         ///  - Sentry Owner

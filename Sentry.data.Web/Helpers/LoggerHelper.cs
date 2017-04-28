@@ -18,7 +18,7 @@ namespace Sentry.data.Web
                 new Sentry.Common.Logging.Adapters.Log4netAdapter(Config.GetHostSetting("SentryWebLogger"));
             Sentry.Smarts.Logging.Logger.LoggingFrameworkAdapter =
                 new Sentry.Common.Logging.Adapters.Log4netAdapter(Config.GetHostSetting("SmartsLogger"));
-        //TODO: If you are using any other Sentry components (like Sentry.Eventing, etc.) you can wire up their loggers here also
+        // JCG NOTES: If you are using any other Sentry components (like Sentry.Eventing, etc.) you can wire up their loggers here also
         }
 
         /// <summary>

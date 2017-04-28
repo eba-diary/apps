@@ -3,7 +3,6 @@
     //Represents permission names from Obsidian
     public class PermissionNames
     {
-        //TODO: Put string constants in this file that match the permissions from Obsidian
         public const string UseApp = "App_DataMgmt_UseApp";
         //###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific
         public const string ApproveItems = "App_SentryBay_ApproveItems";
