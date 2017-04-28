@@ -401,6 +401,10 @@ namespace Sentry.data.Core
             {
                 vr.Add(ValidationErrors.uploadDateIsOld, "The Dataset Upload Date is required");
             }
+            if (string.IsNullOrWhiteSpace(DatasetDesc))
+            {
+                vr.Add(ValidationErrors.datasetDescIsBlank, "The Dataset description is required");
+            }
             return vr;
         }
 
@@ -414,6 +418,7 @@ namespace Sentry.data.Core
             public const string uploadUserNameIsBlank = "uploadUserNameIsBlank";
             public const string datasetDateIsOld = "datasetDateIsOld";
             public const string uploadDateIsOld = "uploadDateIsOld";
+            public const string datasetDescIsBlank = "descIsBlank";
         }
     }
 }
