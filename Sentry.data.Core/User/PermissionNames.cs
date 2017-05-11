@@ -5,13 +5,16 @@
     {
         public const string UseApp = "App_DataMgmt_UseApp";
         //###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific
-        public const string ApproveItems = "App_SentryBay_ApproveItems";
-        public const string AddItems = "App_SentryBay_AddItems";
+        // JCG TODO: Revisit removing unused App_DataMgmt_ApproveItem
+        public const string ApproveItems = "App_DataMgmt_ApproveItems";
+        // JCG TODO: Revisit removing unused App_DataMgmt_AddItems
+        public const string AddItems = "App_DataMgmt_AddItems";
         public const string DwnldSensitve = "App_DataMgmt_SensDwnld";
         public const string DwnldNonSensitive = "App_DataMgmt_NonSensDwnld";
         public const string Upload = "App_DataMgmt_Upload";
         public const string DatasetEdit = "App_DataMgmt_Edit";
         //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
-        public const string UserSwitch = "App_SentryBay_UserSwitch";
+        // JCG TODO: Revisit removing unused App_DataMgmt_UserSwitch
+        public const string UserSwitch = "App_DataMgmt_UserSwitch";
     }
 }
