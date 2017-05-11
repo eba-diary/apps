@@ -27,6 +27,7 @@ namespace Sentry.data.Web.Controllers
             //###END SENTRYBAY### - Code above is SentryBay-specific
             headerModel.CanUseApp = SharedContext.CurrentUser.CanUseApp;
             headerModel.EnvironmentName = Sentry.Configuration.Config.GetHostSetting("EnvironmentName");
+            headerModel.AssociatePhotoUrl = "http://sentryphoto.sentry.com/associate/" + SharedContext.CurrentUser.AssociateId + "/height/25px";
             
 
             return PartialView("_Header", headerModel);

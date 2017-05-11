@@ -9,6 +9,7 @@ namespace Sentry.data.Web
         public string CurrentUserName { get; set; }
         public Boolean IsImpersonating { get; set; }
         public string RealUserName { get; set; }
+        public string AssociatePhotoUrl { get; set; }
         public string EnvironmentName { get; set; }
         //###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific
         public Boolean CanApproveAssets { get; set; }
