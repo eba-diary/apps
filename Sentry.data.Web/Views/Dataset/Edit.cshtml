@@ -17,158 +17,174 @@
     <div class="form-horizontal">
         <h4>Dataset</h4>
         <hr />
-        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-        @Html.HiddenFor(model => model.DatasetId)
+        @*Show the custom validation summary*@
+        @Html.DisplayFor((model) => ViewData.ModelState)
+       
+        @Html.HiddenFor(model => model.Category)
+        @Html.HiddenFor(model => model.S3Key)
+        @Html.HiddenFor(model => model.UploadUserName)
+        @Html.HiddenFor(model => model.ChangedDtm)
+        @Html.HiddenFor(model => model.UploadDtm)
+        @Html.HiddenFor(model => model.FileSize)
+        @Html.HiddenFor(model => model.RecordCount)
+
 
         <div class="form-group">
-            @Html.LabelFor(model => model.Category, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.Category, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })
-                @*@Html.ValidationMessageFor(model => model.Category, "", new { @class = "text-danger" })*@
+                @Html.LabelFor(model => model.Category, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <p class="form-control-static">@Html.DisplayFor(model => model.Category)</p>
+                    @*@Html.TextBoxFor(model => model.Category, new { @readonly = "readonly", @class = "edit-dataset-row" })*@
+                    @*@Html.ValidationMessageFor(model => model.Category, "", new { @class = "text-danger" })*@
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.S3Key, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.S3Key, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })
-                @*@Html.ValidationMessageFor(model => model.S3Key, "", new { @class = "text-danger" })*@
+            <div class="form-group">
+                @Html.LabelFor(model => model.S3Key, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <p class="form-control-static">@Html.DisplayFor(model => model.S3Key)</p>
+                    @*@Html.TextBoxFor(model => model.S3Key, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })*@
+                    @*@Html.ValidationMessageFor(model => model.S3Key, "", new { @class = "text-danger" })*@
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.DatasetName, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.DatasetName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                @Html.ValidationMessageFor(model => model.DatasetName, "", new { @class = "text-danger" })
-                @*@Html.TextBoxFor(model => model.DatasetName, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })*@
-                @*@Html.ValidationMessageFor(model => model.DatasetName, "", new { @class = "text-danger" })*@
+            <div class="form-group">
+                @Html.LabelFor(model => model.DatasetName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.DatasetName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                    @Html.ValidationMessageFor(model => model.DatasetName, "", new { @class = "text-danger" })
+                    @*@Html.TextBoxFor(model => model.DatasetName, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })*@
+                    @*@Html.ValidationMessageFor(model => model.DatasetName, "", new { @class = "text-danger" })*@
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.DatasetDesc, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.DatasetDesc, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                @Html.ValidationMessageFor(model => model.DatasetDesc, "", new { @class = "text-danger" })
+            <div class="form-group">
+                @Html.LabelFor(model => model.DatasetDesc, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.DatasetDesc, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                    @Html.ValidationMessageFor(model => model.DatasetDesc, "", new { @class = "text-danger" })
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.CreationUserName, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.CreationUserName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                @Html.ValidationMessageFor(model => model.CreationUserName, "", new { @class = "text-danger" })
-                @*@Html.TextBoxFor(model => model.CreationUserName, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })*@
-                @*@Html.ValidationMessageFor(model => model.CreationUserName, "", new { @class = "text-danger" })*@
+            <div class="form-group">
+                @Html.LabelFor(model => model.CreationUserName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.CreationUserName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                    @Html.ValidationMessageFor(model => model.CreationUserName, "", new { @class = "text-danger" })
+                    @*@Html.TextBoxFor(model => model.CreationUserName, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })*@
+                    @*@Html.ValidationMessageFor(model => model.CreationUserName, "", new { @class = "text-danger" })*@
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.SentryOwnerName, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.SentryOwnerName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                @Html.ValidationMessageFor(model => model.SentryOwnerName, "", new { @class = "text-danger" })
+            <div class="form-group">
+                @Html.LabelFor(model => model.SentryOwnerName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.SentryOwnerName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                    @Html.ValidationMessageFor(model => model.SentryOwnerName, "", new { @class = "text-danger" })
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.UploadUserName, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.UploadUserName, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })
-                @*@Html.ValidationMessageFor(model => model.UploadUserName, "", new { @class = "text-danger" })*@
+            <div class="form-group">
+                @Html.LabelFor(model => model.UploadUserName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <p class="form-control-static">@Html.DisplayFor((model) => model.UploadUserName)</p>
+                    @*@Html.TextBoxFor(model => model.UploadUserName, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })*@
+                    @*@Html.ValidationMessageFor(model => model.UploadUserName, "", new { @class = "text-danger" })*@
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.OriginationCode, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.OriginationCode, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                @Html.ValidationMessageFor(model => model.OriginationCode, "", new { @class = "text-danger" })
-                @*@Html.TextBoxFor(model => model.OriginationCode, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })*@
-                @*@Html.ValidationMessageFor(model => model.OriginationCode, "", new { @class = "text-danger" })*@
+            <div class="form-group">
+                @Html.LabelFor(model => model.OriginationCode, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.OriginationCode, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                    @Html.ValidationMessageFor(model => model.OriginationCode, "", new { @class = "text-danger" })
+                    @*@Html.TextBoxFor(model => model.OriginationCode, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })*@
+                    @*@Html.ValidationMessageFor(model => model.OriginationCode, "", new { @class = "text-danger" })*@
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.DatasetDtm, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.DatasetDtm, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                @Html.ValidationMessageFor(model => model.DatasetDtm, "", new { @class = "text-danger" })
+            <div class="form-group">
+                @Html.LabelFor(model => model.DatasetDtm, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.DatasetDtm, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                    @Html.ValidationMessageFor(model => model.DatasetDtm, "", new { @class = "text-danger" })
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.ChangedDtm, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.ChangedDtm, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })
-                @*@Html.ValidationMessageFor(model => model.ChangedDtm, "", new { @class = "text-danger" })*@
+            <div class="form-group">
+                @Html.LabelFor(model => model.ChangedDtm, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <p class="form-control-static">@Html.DisplayFor((model) => model.ChangedDtm)</p>
+                    @*@Html.TextBoxFor(model => model.ChangedDtm, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })*@
+                    @*@Html.ValidationMessageFor(model => model.ChangedDtm, "", new { @class = "text-danger" })*@
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.UploadDtm, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.UploadDtm, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })
-                @*@Html.ValidationMessageFor(model => model.UploadDtm, "", new { @class = "text-danger" })*@
+            <div class="form-group">
+                @Html.LabelFor(model => model.UploadDtm, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <p class="form-control-static">@Html.DisplayFor((model) => model.UploadDtm)</p>
+                    @*@Html.TextBoxFor(model => model.UploadDtm, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })*@
+                    @*@Html.ValidationMessageFor(model => model.UploadDtm, "", new { @class = "text-danger" })*@
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.CreationFreqDesc, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.CreationFreqDesc, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                @Html.ValidationMessageFor(model => model.CreationFreqDesc, "", new { @class = "text-danger" })
-                @*@Html.TextBoxFor(model => model.CreationFreqDesc, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })*@
-                @*@Html.ValidationMessageFor(model => model.CreationFreqDesc, "", new { @class = "text-danger" })*@
+            <div class="form-group">
+                @Html.LabelFor(model => model.CreationFreqDesc, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.CreationFreqDesc, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                    @Html.ValidationMessageFor(model => model.CreationFreqDesc, "", new { @class = "text-danger" })
+                    @*@Html.TextBoxFor(model => model.CreationFreqDesc, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })*@
+                    @*@Html.ValidationMessageFor(model => model.CreationFreqDesc, "", new { @class = "text-danger" })*@
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.FileSize, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.FileSize, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })
-                @*@Html.ValidationMessageFor(model => model.FileSize, "", new { @class = "text-danger" })*@
+            <div class="form-group">
+                @Html.LabelFor(model => model.FileSize, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <p class="form-control-static">@Html.DisplayFor((model) => model.FileSize)</p>
+                    @*@Html.TextBoxFor(model => model.FileSize, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })*@
+                    @*@Html.ValidationMessageFor(model => model.FileSize, "", new { @class = "text-danger" })*@
+                </div>
             </div>
-        </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.RecordCount, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.RecordCount, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })
-                @*@Html.ValidationMessageFor(model => model.RecordCount, "", new { @class = "text-danger" })*@
+            <div class="form-group">
+                @Html.LabelFor(model => model.RecordCount, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <p class="form-control-static">@Html.DisplayFor((model) => model.RecordCount)</p>
+                    @*@Html.TextBoxFor(model => model.RecordCount, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })*@
+                    @*@Html.ValidationMessageFor(model => model.RecordCount, "", new { @class = "text-danger" })*@
+                </div>
             </div>
-        </div>
 
-        @*<div class="form-group">
-        @Html.LabelFor(model => model.IsSensitive, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-1">
-            @Html.CheckBoxFor(model => model.IsSensitive, new { @class = "edit-dataset-row" })
-        </div>
-    </div>*@
+            @*<div class="form-group">
+                @Html.LabelFor(model => model.IsSensitive, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-1">
+                    @Html.CheckBoxFor(model => model.IsSensitive, new { @class = "edit-dataset-row" })
+                </div>
+            </div>*@
 
-    @*<div class="form-group">
-        @Html.LabelFor(model => model.md_Columns, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorForMany(model => model.md_Columns, x => x.DatasetId.ToString(), false)
-            @Html.ValidationMessageFor(model => model.md_Columns, "", new { @class = "text-danger" })
-        </div>
-    </div>
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.md_Metadata, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.EditorForMany(model => model.md_Metadata, x => x.DatasetId.ToString(), false)
-            @Html.ValidationMessageFor(model => model.md_Metadata, "", new { @class = "text-danger" })
-        </div>
-    </div>*@
-
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Save" class="btn btn-default" />
+            @*<div class="form-group">
+                @Html.LabelFor(model => model.md_Columns, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorForMany(model => model.md_Columns, x => x.DatasetId.ToString(), false)
+                    @Html.ValidationMessageFor(model => model.md_Columns, "", new { @class = "text-danger" })
+                </div>
             </div>
-        </div>
-    </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.md_Metadata, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorForMany(model => model.md_Metadata, x => x.DatasetId.ToString(), false)
+                    @Html.ValidationMessageFor(model => model.md_Metadata, "", new { @class = "text-danger" })
+                </div>
+            </div>*@
+
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Save" class="btn btn-default" />
+                </div>
+            </div>
+</div>
 }
 
 <div>

@@ -81,9 +81,9 @@ ul.list-group-indented {
   margin: 0px;
 }
 
-/* edit dataset page */
-.edit-dataset-row {
-    width: 80%;
+
+.file-load {
+    width: 100%
 }
 
 /**********************/

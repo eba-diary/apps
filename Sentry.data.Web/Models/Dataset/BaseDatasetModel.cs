@@ -4,6 +4,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Sentry.data.Core;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 
 namespace Sentry.data.Web
 {
@@ -54,36 +56,71 @@ namespace Sentry.data.Web
 
         public int DatasetId { get; set; }
 
+        [Required()]
+        [MaxLength(64)]
+        [DisplayName("Category")]
         public string Category { get; set; }
 
+        [Required()]
+        [MaxLength(1024)]
+        [DisplayName("Dataset Name")]
         public string DatasetName { get; set; }
 
+        [MaxLength(4096)]
+        [DisplayName("Description")]
         public string DatasetDesc { get; set; }
 
+        [Required]
+        [MaxLength(128)]
+        [DisplayName("Originating Creator")]
         public string CreationUserName { get; set; }
 
+        [MaxLength(128)]
+        [DisplayName("Sentry Owner")]
         public string SentryOwnerName { get; set; }
 
+        [Required]
+        [MaxLength(128)]
+        [DisplayName("Upload User")]
         public string UploadUserName { get; set; }
 
+        [MaxLength(16)]
+        [DisplayName("Origination Code")]
         public string OriginationCode { get; set; }
 
+        [MaxLength(16)]
+        [DisplayName("File Extension")]
         public string FileExtension { get; set; }
 
+        [Required]
+        [DisplayName("Original Creation Date")]
         public DateTime DatasetDtm { get; set; }
 
+        [DisplayName("File Change Date")]
         public DateTime ChangedDtm { get; set; }
 
+        [Required]
+        [DisplayName("Upload Date")]
         public DateTime UploadDtm { get; set; }
 
+        [Required]
+        [MaxLength(10)]
+        [DisplayName("Creation Frequency")]
         public string CreationFreqDesc { get; set; }
 
+        [Required]
+        [DisplayName("File Size")]
         public long FileSize { get; set; }
 
+        [DisplayName("Record Count")]
         public long RecordCount { get; set; }
 
+        [Required]
+        [MaxLength(1024)]
+        [DisplayName("S3 Key")]
         public string S3Key { get; set; }
 
+        [DisplayName("Sensitive")]
         public Boolean IsSensitive { get; set; }
 
         public IList<_DatasetMetadataModel> RawMetadata { get; set; }

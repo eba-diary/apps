@@ -325,56 +325,56 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public ActionResult Upload(UploadDatasetModel udm)
         {
-            if (ModelState.IsValid)
-            {
-                // 1. upload dataset
-                Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
+                if (ModelState.IsValid)
+                {
+                    // 1. upload dataset
+                    Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
 
-                Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
-                //s3tuReq.AutoCloseStream = true;
-                s3tuReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
-                //s3tuReq.InputStream = new FileStream(udm.DatasetName, FileMode.Open, FileAccess.Read);
-                s3tuReq.FilePath = udm.DatasetName;
-                FileInfo dsfi = new FileInfo(udm.DatasetName);
-                s3tuReq.Key = udm.Category + "/" + dsfi.Name;
-                s3tuReq.UploadProgressEvent += new EventHandler<Amazon.S3.Transfer.UploadProgressArgs>(uploadRequest_UploadPartProgressEvent);
-                s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
-                s3tuReq.AutoCloseStream = true;
-                s3tu.Upload(s3tuReq);
+                    Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
+                    //s3tuReq.AutoCloseStream = true;
+                    s3tuReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
+                    //s3tuReq.InputStream = new FileStream(udm.DatasetName, FileMode.Open, FileAccess.Read);
+                    s3tuReq.FilePath = udm.DatasetName;
+                    FileInfo dsfi = new FileInfo(udm.DatasetName);
+                    s3tuReq.Key = udm.Category + "/" + dsfi.Name;
+                    s3tuReq.UploadProgressEvent += new EventHandler<Amazon.S3.Transfer.UploadProgressArgs>(uploadRequest_UploadPartProgressEvent);
+                    s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
+                    s3tuReq.AutoCloseStream = true;
+                    s3tu.Upload(s3tuReq);
 
-                // 2. create dataset metadata
-                List<DatasetMetadata> dsmd = new List<DatasetMetadata>();
-                DateTime dateTimeNow = DateTime.Now;
-                Dataset ds = new Dataset(
-                    0, // adding new dataset; ID is disregarded
-                    udm.Category,
-                    dsfi.Name,
-                    udm.DatasetDesc,
-                    udm.CreationUserName,
-                    udm.SentryOwnerName,
-                    _userService.GetCurrentUser().DisplayName,
-                    udm.OriginationCode,
-                    udm.DatasetDtm,
-                    dateTimeNow,
-                    dateTimeNow,
-                    udm.CreationFreqDesc,
-                    dsfi.Length,
-                    udm.RecordCount,
-                    udm.Category + "/" + dsfi.Name,
-                    udm.IsSensitive,
-                    null);
+                    // 2. create dataset metadata
+                    List<DatasetMetadata> dsmd = new List<DatasetMetadata>();
+                    DateTime dateTimeNow = DateTime.Now;
+                    Dataset ds = new Dataset(
+                        0, // adding new dataset; ID is disregarded
+                        udm.Category,
+                        dsfi.Name,
+                        udm.DatasetDesc,
+                        udm.CreationUserName,
+                        udm.SentryOwnerName,
+                        _userService.GetCurrentUser().DisplayName,
+                        udm.OriginationCode,
+                        udm.DatasetDtm,
+                        dateTimeNow,
+                        dateTimeNow,
+                        udm.CreationFreqDesc,
+                        dsfi.Length,
+                        udm.RecordCount,
+                        udm.Category + "/" + dsfi.Name,
+                        udm.IsSensitive,
+                        null);
 
-                //foreach (_DatasetMetadataModel dsmdmi in udm.RawMetadata)
-                //{
-                //    DatasetMetadata dsmdi = new DatasetMetadata(dsmdmi.Id, dsmdmi.DatasetId, dsmdmi.IsColumn, dsmdmi.Name, dsmdmi.Value, ds);
-                //    ds.RawMetadata.Add(dsmdi);
-                //}
+                    //foreach (_DatasetMetadataModel dsmdmi in udm.RawMetadata)
+                    //{
+                    //    DatasetMetadata dsmdi = new DatasetMetadata(dsmdmi.Id, dsmdmi.DatasetId, dsmdmi.IsColumn, dsmdmi.Name, dsmdmi.Value, ds);
+                    //    ds.RawMetadata.Add(dsmdi);
+                    //}
 
-                _datasetContext.Merge<Dataset>(ds);
-                _datasetContext.SaveChanges();
-                int maxId = _datasetContext.GetMaxId();
-                return RedirectToAction("Detail", new { id = maxId });
-            }
+                    _datasetContext.Merge<Dataset>(ds);
+                    _datasetContext.SaveChanges();
+                    int maxId = _datasetContext.GetMaxId();
+                    return RedirectToAction("Detail", new { id = maxId });
+                }
             else
             {
                 _datasetContext.Clear();
@@ -502,11 +502,10 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
+                Dataset item = _datasetContext.GetById<Dataset>(id);
                 if (ModelState.IsValid)
                 {
-                    Dataset item = _datasetContext.GetById(id);
                     UpdateDatasetFromModel(item, i);
-                    _datasetContext.Merge<Dataset>(item);
                     _datasetContext.SaveChanges();
                     return RedirectToAction("Detail", new { id = id });
                     
