@@ -48,13 +48,22 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        //public IQueryable<DatasetMetadata> DatasetMetadata
-        //{
-        //    get
-        //    {
-        //        return Query<DatasetMetadata>().Cacheable(QueryCacheRegion.MediumTerm);
-        //    }
-        //}
+        public IQueryable<Category> Categories
+        {
+            get
+            {
+                return Query<Category>().Cacheable(QueryCacheRegion.MediumTerm);
+            }
+
+        }
+
+        public IQueryable<DatasetMetadata> DatasetMetadata
+        {
+            get
+            {
+                return Query<DatasetMetadata>().Cacheable(QueryCacheRegion.MediumTerm);
+            }
+        }
 
         public int GetMaxId()
         {

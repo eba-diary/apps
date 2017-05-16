@@ -90,8 +90,8 @@
     <Compile Include="Interfaces\ICloudDataService.cs" />
     <Compile Include="Interfaces\IDatasetService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Queries\DatasetFolderQueries.cs" />
     <Compile Include="Queries\CategoryQueries.cs" />
+    <Compile Include="Queries\DatasetFolderQueries.cs" />
     <Compile Include="Queries\AssetQueries.cs" />
     <Compile Include="User\ApplicationUser.cs" />
     <Compile Include="User\ImpersonatedApplicationUser.cs" />

@@ -95,6 +95,8 @@ namespace Sentry.data.Web
         /// </summary>
         public IEnumerable<SelectListItem> AllCategories { get; set; }
 
-
+        [DisplayName("Categories")]
+        //[Required]
+        public int CategoryIDs { get; set; }
     }
 }

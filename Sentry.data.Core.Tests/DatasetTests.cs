@@ -28,8 +28,7 @@ namespace Sentry.data.Core.Tests
         public void Can_prevent_dataset_with_matched_catetory_and_s3Key()
         {
             Dataset dataset1 = CreateDataset();
-            dataset1.Category = "Category";
-            dataset1.S3Key = "Category/s3/key";
+            dataset1.S3Key = "Claim/s3/key";
             var vr = dataset1.ValidateForSave();
             Assert.IsFalse(vr.Contains(Dataset.ValidationErrors.s3KeyCategoryMismatch));
         }
@@ -39,7 +38,6 @@ namespace Sentry.data.Core.Tests
         public void Can_prevent_dataset_with_mismatched_catetory_and_s3Key()
         {
             Dataset dataset1 = CreateDataset();
-            dataset1.Category = "Category";
             dataset1.S3Key = "s3/key";
             var vr = dataset1.ValidateForSave();
             Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.s3KeyCategoryMismatch));

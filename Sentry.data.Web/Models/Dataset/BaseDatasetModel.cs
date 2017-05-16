@@ -56,7 +56,7 @@ namespace Sentry.data.Web
 
         public int DatasetId { get; set; }
 
-        [Required()]
+        //[Required()]
         [MaxLength(64)]
         [DisplayName("Category")]
         public string Category { get; set; }
@@ -79,7 +79,7 @@ namespace Sentry.data.Web
         [DisplayName("Sentry Owner")]
         public string SentryOwnerName { get; set; }
 
-        [Required]
+        //[Required]
         [MaxLength(128)]
         [DisplayName("Upload User")]
         public string UploadUserName { get; set; }
@@ -115,7 +115,7 @@ namespace Sentry.data.Web
         [DisplayName("Record Count")]
         public long RecordCount { get; set; }
 
-        [Required]
+        //[Required]
         [MaxLength(1024)]
         [DisplayName("S3 Key")]
         public string S3Key { get; set; }

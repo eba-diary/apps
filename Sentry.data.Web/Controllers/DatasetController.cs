@@ -9,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.SessionState;
+using System.Linq.Dynamic;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -315,6 +316,7 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Upload()
         {
             UploadDatasetModel udm = new UploadDatasetModel();
+            udm.AllCategories = GetCategorySelectListItems();
             return View(udm);
         }
 
@@ -327,6 +329,8 @@ namespace Sentry.data.Web.Controllers
         {
                 if (ModelState.IsValid)
                 {
+                    String category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs).Name;
+                    
                     // 1. upload dataset
                     Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
 
@@ -336,7 +340,7 @@ namespace Sentry.data.Web.Controllers
                     //s3tuReq.InputStream = new FileStream(udm.DatasetName, FileMode.Open, FileAccess.Read);
                     s3tuReq.FilePath = udm.DatasetName;
                     FileInfo dsfi = new FileInfo(udm.DatasetName);
-                    s3tuReq.Key = udm.Category + "/" + dsfi.Name;
+                    s3tuReq.Key = category + "/" + dsfi.Name;
                     s3tuReq.UploadProgressEvent += new EventHandler<Amazon.S3.Transfer.UploadProgressArgs>(uploadRequest_UploadPartProgressEvent);
                     s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                     s3tuReq.AutoCloseStream = true;
@@ -344,10 +348,10 @@ namespace Sentry.data.Web.Controllers
 
                     // 2. create dataset metadata
                     List<DatasetMetadata> dsmd = new List<DatasetMetadata>();
-                    DateTime dateTimeNow = DateTime.Now;
+                    DateTime dateTimeNow = DateTime.Now;                
                     Dataset ds = new Dataset(
                         0, // adding new dataset; ID is disregarded
-                        udm.Category,
+                        category,
                         dsfi.Name,
                         udm.DatasetDesc,
                         udm.CreationUserName,
@@ -360,9 +364,9 @@ namespace Sentry.data.Web.Controllers
                         udm.CreationFreqDesc,
                         dsfi.Length,
                         udm.RecordCount,
-                        udm.Category + "/" + dsfi.Name,
+                        category + "/" + dsfi.Name,
                         udm.IsSensitive,
-                        null);
+                        null);               
 
                     //foreach (_DatasetMetadataModel dsmdmi in udm.RawMetadata)
                     //{
@@ -378,6 +382,7 @@ namespace Sentry.data.Web.Controllers
             else
             {
                 _datasetContext.Clear();
+                udm.AllCategories = GetCategorySelectListItems();
             }
             return View(udm);
         }
@@ -522,8 +527,9 @@ namespace Sentry.data.Web.Controllers
 
         private IEnumerable<SelectListItem> GetCategorySelectListItems()
         {
-            throw new NotImplementedException();
-            //return _dataSetService.Categories.OrderByHierarchy().Select((c) => new SelectListItem { Text = c.FullName, Value = c.Id.ToString() });
+           IEnumerable<SelectListItem> var = _datasetContext.Categories.OrderByHierarchy().Select((c) => new SelectListItem { Text = c.FullName, Value = c.Id.ToString() });
+
+           return var;
         }
 
         protected override void AddCoreValidationExceptionsToModel(Sentry.Core.ValidationException ex)

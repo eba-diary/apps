@@ -17,6 +17,8 @@ namespace Sentry.data.Core
 
         IEnumerable<String> GetCategoryList();
 
+        IQueryable<Category> Categories { get; }
+
         void DeleteAllData();
         //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
     }
