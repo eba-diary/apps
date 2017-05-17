@@ -10,7 +10,7 @@
 	[Dataset_DTM] [datetime] NOT NULL,
 	[FileChanged_DTM] [datetime] NULL,
 	[FileUploaded_DTM] [datetime] NOT NULL,
-	[CreationFreq_DSC] [varchar](10) NULL,
+	[CreationFreq_DSC] [varchar](11) NULL,
 	[FileSize_CNT] [int] NOT NULL,
 	[Row_CNT] [int] NULL,
 	[S3_KEY] [varchar](1024) NOT NULL,
