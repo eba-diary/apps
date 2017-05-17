@@ -19,6 +19,8 @@ namespace Sentry.data.Core
 
         IQueryable<Category> Categories { get; }
 
+        IEnumerable<DatasetFrequency> GetDatasetFrequencies();
+        
         void DeleteAllData();
         //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
     }

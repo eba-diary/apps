@@ -70,5 +70,10 @@ namespace Sentry.data.Web
         /// AllCategories holds the sorted list of all possible categories.
         /// </summary>
         public IEnumerable<SelectListItem> AllCategories { get; set; }
+
+        public IEnumerable<SelectListItem> AllFrequencies { get; set; }
+        
+        [DisplayName("Frequency")]
+        public int FreqencyID { get; set; }
     }
 }

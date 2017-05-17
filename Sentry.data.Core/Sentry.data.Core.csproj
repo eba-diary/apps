@@ -65,6 +65,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\DatasetFrequency.cs" />
     <Compile Include="DomainServices\AssetDynamicDetailsService.cs" />
     <Compile Include="DomainServices\DatasetService.cs" />
     <Compile Include="DomainServices\UserService.cs" />

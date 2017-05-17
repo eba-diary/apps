@@ -103,8 +103,6 @@ namespace Sentry.data.Web
         [DisplayName("Upload Date")]
         public DateTime UploadDtm { get; set; }
 
-        [Required]
-        [MaxLength(10)]
         [DisplayName("Creation Frequency")]
         public string CreationFreqDesc { get; set; }
 

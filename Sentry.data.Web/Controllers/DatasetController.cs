@@ -316,7 +316,9 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Upload()
         {
             UploadDatasetModel udm = new UploadDatasetModel();
-            udm.AllCategories = GetCategorySelectListItems();
+            udm.AllCategories = GetCategorySelectListItems(); //load all values for dropdown
+            udm.AllFrequencies = GetDatasetFrequencyListItems();  //load all values for dropdown
+            udm.FreqencyID = 6; // preselected NonSchedule
             return View(udm);
         }
 
@@ -330,9 +332,10 @@ namespace Sentry.data.Web.Controllers
                 if (ModelState.IsValid)
                 {
                     String category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs).Name;
-                    
-                    // 1. upload dataset
-                    Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
+                    String frequency = ((DatasetFrequency)udm.FreqencyID).ToString();
+
+                // 1. upload dataset
+                Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
 
                     Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
                     //s3tuReq.AutoCloseStream = true;
@@ -361,7 +364,7 @@ namespace Sentry.data.Web.Controllers
                         udm.DatasetDtm,
                         dateTimeNow,
                         dateTimeNow,
-                        udm.CreationFreqDesc,
+                        frequency,
                         dsfi.Length,
                         udm.RecordCount,
                         category + "/" + dsfi.Name,
@@ -382,7 +385,9 @@ namespace Sentry.data.Web.Controllers
             else
             {
                 _datasetContext.Clear();
-                udm.AllCategories = GetCategorySelectListItems();
+                udm.AllCategories = GetCategorySelectListItems();  //Reload dropdown value list
+                udm.AllFrequencies = GetDatasetFrequencyListItems();  //Reload dropdown value list
+                udm.FreqencyID = 6; // preselected NonSchedule
             }
             return View(udm);
         }
@@ -494,8 +499,9 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Edit(int id)
         {
             Dataset ds = _datasetContext.GetById<Dataset>(id);
-            //IEnumerable<String> catList = _datasetContext.GetCategoryList();
             EditDatasetModel item = new EditDatasetModel(ds);
+            item.AllFrequencies = GetDatasetFrequencyListItems();  // Load dropdown value list
+            item.FreqencyID = (int)(Enum.Parse(typeof(DatasetFrequency), ds.CreationFreqDesc));  //Preselect current value
             return View(item);
         }
 
@@ -530,6 +536,13 @@ namespace Sentry.data.Web.Controllers
            IEnumerable<SelectListItem> var = _datasetContext.Categories.OrderByHierarchy().Select((c) => new SelectListItem { Text = c.FullName, Value = c.Id.ToString() });
 
            return var;
+        }
+
+        private IEnumerable<SelectListItem> GetDatasetFrequencyListItems()
+        {
+            List<SelectListItem> items = Enum.GetValues(typeof(DatasetFrequency)).Cast<DatasetFrequency>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+
+            return items;
         }
 
         protected override void AddCoreValidationExceptionsToModel(Sentry.Core.ValidationException ex)
@@ -628,9 +641,11 @@ namespace Sentry.data.Web.Controllers
         {
             DateTime now = DateTime.Now;
 
+            String frequency = ((DatasetFrequency)eds.FreqencyID).ToString();
+
             ds.ChangedDtm = now;
             if (null != eds.Category && eds.Category.Length > 0) ds.Category = eds.Category;
-            if (null != eds.CreationFreqDesc && eds.CreationFreqDesc.Length > 0) ds.CreationFreqDesc = eds.CreationFreqDesc;
+            ds.CreationFreqDesc = frequency;
             if (null != eds.CreationUserName && eds.CreationUserName.Length > 0) ds.CreationUserName = eds.CreationUserName;
             if (null != eds.DatasetDesc && eds.DatasetDesc.Length > 0) ds.DatasetDesc = eds.DatasetDesc;
             if (null != eds.DatasetDtm && eds.DatasetDtm > DateTime.MinValue) ds.DatasetDtm = eds.DatasetDtm;

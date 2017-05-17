@@ -16,7 +16,7 @@ namespace Sentry.data.Web
             this.Category = "";
             //this.CategoryList = new List<string>();
             this.ChangedDtm = DateTime.MinValue;
-            this.CreationFreqDesc = "";
+            this.CreationFreqDesc = DatasetFrequency.NonSchedule.ToString();  // Default to NonScheduled
             this.DatasetDesc = "";
             this.DatasetDtm = DateTime.MinValue;
             this.DatasetName = "";
@@ -95,8 +95,12 @@ namespace Sentry.data.Web
         /// </summary>
         public IEnumerable<SelectListItem> AllCategories { get; set; }
 
+        public IEnumerable<SelectListItem> AllFrequencies { get; set; }
+
         [DisplayName("Categories")]
-        //[Required]
         public int CategoryIDs { get; set; }
+
+        [DisplayName("Frequency")]
+        public int FreqencyID { get; set; }
     }
 }

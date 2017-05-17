@@ -87,6 +87,13 @@ namespace Sentry.data.Infrastructure
         {
             DemoDataService.DeleteAllDemoData(this.Session);
         }
+
+        public IEnumerable<DatasetFrequency> GetDatasetFrequencies()
+        {
+            IEnumerable<DatasetFrequency> values = Enum.GetValues(typeof(DatasetFrequency)).Cast<DatasetFrequency>();
+            return values;
+        }
+
         //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
     }
 }
