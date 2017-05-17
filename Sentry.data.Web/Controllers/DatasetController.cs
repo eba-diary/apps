@@ -341,8 +341,8 @@ namespace Sentry.data.Web.Controllers
                     //s3tuReq.AutoCloseStream = true;
                     s3tuReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
                     //s3tuReq.InputStream = new FileStream(udm.DatasetName, FileMode.Open, FileAccess.Read);
-                    s3tuReq.FilePath = udm.DatasetName;
-                    FileInfo dsfi = new FileInfo(udm.DatasetName);
+                    s3tuReq.FilePath = udm.DatasetFileName;
+                    FileInfo dsfi = new FileInfo(udm.DatasetFileName);
                     s3tuReq.Key = category + "/" + dsfi.Name;
                     s3tuReq.UploadProgressEvent += new EventHandler<Amazon.S3.Transfer.UploadProgressArgs>(uploadRequest_UploadPartProgressEvent);
                     s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
@@ -355,7 +355,7 @@ namespace Sentry.data.Web.Controllers
                     Dataset ds = new Dataset(
                         0, // adding new dataset; ID is disregarded
                         category,
-                        dsfi.Name,
+                        udm.DatasetName,
                         udm.DatasetDesc,
                         udm.CreationUserName,
                         udm.SentryOwnerName,

@@ -70,6 +70,7 @@ namespace Sentry.data.Web
         //    //}
         //}
 
+        [DisplayName("File Upload")]
         public HttpPostedFile f { get; set; }
 
         //[DisplayName("Column Metadata")]
@@ -102,5 +103,8 @@ namespace Sentry.data.Web
 
         [DisplayName("Frequency")]
         public int FreqencyID { get; set; }
+
+        [DisplayName("Dataset File")]
+        public String DatasetFileName { get; set; }
     }
 }
