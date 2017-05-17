@@ -106,11 +106,8 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
-    <Build Include="Tables\Asset.sql" />
-    <Build Include="Tables\CategorizedAsset.sql" />
     <Build Include="Tables\Dataset.sql" />
     <Build Include="Tables\DatasetMetadata.sql" />
-    <Build Include="Tables\User.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />
