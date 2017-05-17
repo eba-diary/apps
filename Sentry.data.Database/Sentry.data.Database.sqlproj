@@ -112,6 +112,7 @@
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />
     <None Include="Sentry.data.Database.sqlproj.user" />
+    <None Include="Sentry_1.data.Database.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Sentry.data.Database.refactorlog" />
