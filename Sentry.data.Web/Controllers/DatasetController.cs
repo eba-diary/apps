@@ -329,21 +329,25 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public ActionResult Upload(UploadDatasetModel udm)
         {
+            Sentry.Common.Logging.Logger.Debug("Entered HttpPost <Upload>");
                 if (ModelState.IsValid)
                 {
                     String category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs).Name;
                     String frequency = ((DatasetFrequency)udm.FreqencyID).ToString();
 
-                // 1. upload dataset
-                Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
-
+                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");
+                    // 1. upload dataset
+                    Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
                     Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
                     //s3tuReq.AutoCloseStream = true;
                     s3tuReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
+                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + s3tuReq.BucketName);
                     //s3tuReq.InputStream = new FileStream(udm.DatasetName, FileMode.Open, FileAccess.Read);
                     s3tuReq.FilePath = udm.DatasetFileName;
+                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set FilePath: " + s3tuReq.FilePath);
                     FileInfo dsfi = new FileInfo(udm.DatasetFileName);
                     s3tuReq.Key = category + "/" + dsfi.Name;
+                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + s3tuReq.Key);
                     s3tuReq.UploadProgressEvent += new EventHandler<Amazon.S3.Transfer.UploadProgressArgs>(uploadRequest_UploadPartProgressEvent);
                     s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                     s3tuReq.AutoCloseStream = true;
