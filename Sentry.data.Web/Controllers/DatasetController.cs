@@ -343,7 +343,8 @@ namespace Sentry.data.Web.Controllers
                     s3tuReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
                     Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + s3tuReq.BucketName);
                     //s3tuReq.InputStream = new FileStream(udm.DatasetName, FileMode.Open, FileAccess.Read);
-                    s3tuReq.FilePath = udm.DatasetFileName;
+                    s3tuReq.InputStream = new FileStream(udm.DatasetFileName, FileMode.Open, FileAccess.Read);
+                    //s3tuReq.FilePath = udm.DatasetFileName;
                     Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set FilePath: " + s3tuReq.FilePath);
                     FileInfo dsfi = new FileInfo(udm.DatasetFileName);
                     s3tuReq.Key = category + "/" + dsfi.Name;
