@@ -333,14 +333,30 @@ namespace Sentry.data.Web.Controllers
             Sentry.Common.Logging.Logger.Debug("Entered HttpPost <Upload>");
                 if (ModelState.IsValid)
                 {
-                    //BinaryReader b = new BinaryReader(DatasetFile.InputStream);
-                    //byte[] binData = b.ReadBytes(DatasetFile.ContentLength);
+                //BinaryReader b = new BinaryReader(DatasetFile.InputStream);
+                //byte[] binData = b.ReadBytes(DatasetFile.ContentLength);
 
-                    //Stream stream = new MemoryStream(binData);
+                //Stream stream = new MemoryStream(binData);
+                Sentry.Common.Logging.Logger.Debug("Sending file contents to string variable");
+                try
+                {
+                    String vartest = new StreamReader(new FileStream(DatasetFile.FileName, FileMode.Open, FileAccess.Read)).ReadToEnd();
+                    Sentry.Common.Logging.Logger.Debug("File Contents: " + vartest);
+                }
+                catch (Exception e)
+                {
+                    Sentry.Common.Logging.Logger.Error("Error Streaming contents to string varaible", e);
+                }
+                
+
+                
 
                     String category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs).Name;
                     String frequency = ((DatasetFrequency)udm.FreqencyID).ToString();
-                    
+                    string dsfi = System.IO.Path.GetFileName(DatasetFile.FileName);
+
+                try
+                    {
                     Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");
                     // 1. upload dataset
                     Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
@@ -350,23 +366,30 @@ namespace Sentry.data.Web.Controllers
                     Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + s3tuReq.BucketName);
                     Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Setting FilePath: " + DatasetFile.FileName);
                     //s3tuReq.InputStream = new FileStream(udm.DatasetName, FileMode.Open, FileAccess.Read);
-                    //s3tuReq.InputStream = new FileStream(DatasetFile.FileName, FileMode.Open, FileAccess.Read);
+                    s3tuReq.InputStream = new FileStream(DatasetFile.FileName, FileMode.Open, FileAccess.Read);
                     //s3tuReq.InputStream = DatasetFile.InputStream;
-                    s3tuReq.FilePath = DatasetFile.FileName;
-                    string dsfi = System.IO.Path.GetFileName(DatasetFile.FileName);
+                    //s3tuReq.FilePath = DatasetFile.FileName;
                     //FileInfo dsfi = new FileInfo(DatasetFile.FileName);
                     s3tuReq.Key = category + "/" + dsfi;
                     Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + s3tuReq.Key);
                     s3tuReq.UploadProgressEvent += new EventHandler<Amazon.S3.Transfer.UploadProgressArgs>(uploadRequest_UploadPartProgressEvent);
                     s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                     s3tuReq.AutoCloseStream = true;
-                    try
-                    {
-                        s3tu.Upload(s3tuReq);
+
+                    s3tu.Upload(s3tuReq);
+
                     }
-                    catch (AmazonS3Exception e)
+                    catch (Exception e)
                     {
-                        Sentry.Common.Logging.Logger.Error("S3 Upload Error", e);
+                        if (e is AmazonS3Exception)
+                        {
+                            Sentry.Common.Logging.Logger.Error("S3 Upload Error", e);
+                        }
+                        else
+                        {
+                            Sentry.Common.Logging.Logger.Error("Error", e);
+                        }
+                        throw;
                         //Sentry.Common.Logging.Logger.Error("An Error, number {0}, occurred when creating a bucket with the message '{1}", e.ErrorCode, e.Message);
                 }
                     
