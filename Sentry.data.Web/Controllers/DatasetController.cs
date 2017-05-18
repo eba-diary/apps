@@ -333,10 +333,10 @@ namespace Sentry.data.Web.Controllers
             Sentry.Common.Logging.Logger.Debug("Entered HttpPost <Upload>");
                 if (ModelState.IsValid)
                 {
-                    BinaryReader b = new BinaryReader(DatasetFile.InputStream);
-                    byte[] binData = b.ReadBytes(DatasetFile.ContentLength);
+                    //BinaryReader b = new BinaryReader(DatasetFile.InputStream);
+                    //byte[] binData = b.ReadBytes(DatasetFile.ContentLength);
 
-                    Stream stream = new MemoryStream(binData);
+                    //Stream stream = new MemoryStream(binData);
 
                     String category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs).Name;
                     String frequency = ((DatasetFrequency)udm.FreqencyID).ToString();
@@ -352,8 +352,7 @@ namespace Sentry.data.Web.Controllers
                     //s3tuReq.InputStream = new FileStream(udm.DatasetName, FileMode.Open, FileAccess.Read);
                     //s3tuReq.InputStream = new FileStream(DatasetFile.FileName, FileMode.Open, FileAccess.Read);
                     //s3tuReq.InputStream = DatasetFile.InputStream;
-                    s3tuReq.InputStream = stream;
-                    //s3tuReq.FilePath = udm.DatasetFileName;
+                    s3tuReq.FilePath = DatasetFile.FileName;
                     string dsfi = System.IO.Path.GetFileName(DatasetFile.FileName);
                     //FileInfo dsfi = new FileInfo(DatasetFile.FileName);
                     s3tuReq.Key = category + "/" + dsfi;
