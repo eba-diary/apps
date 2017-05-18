@@ -365,10 +365,11 @@ namespace Sentry.data.Web.Controllers
                     {
                         s3tu.Upload(s3tuReq);
                     }
-                    catch (Exception e)
+                    catch (AmazonS3Exception e)
                     {
                         Sentry.Common.Logging.Logger.Error("S3 Upload Error", e);
-                    }
+                        //Sentry.Common.Logging.Logger.Error("An Error, number {0}, occurred when creating a bucket with the message '{1}", e.ErrorCode, e.Message);
+                }
                     
 
                     // 2. create dataset metadata
