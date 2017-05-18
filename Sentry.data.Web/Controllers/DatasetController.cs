@@ -333,9 +333,14 @@ namespace Sentry.data.Web.Controllers
             Sentry.Common.Logging.Logger.Debug("Entered HttpPost <Upload>");
                 if (ModelState.IsValid)
                 {
+                    BinaryReader b = new BinaryReader(DatasetFile.InputStream);
+                    byte[] binData = b.ReadBytes(DatasetFile.ContentLength);
+
+                    Stream stream = new MemoryStream(binData);
+
                     String category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs).Name;
                     String frequency = ((DatasetFrequency)udm.FreqencyID).ToString();
-
+                    
                     Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");
                     // 1. upload dataset
                     Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
@@ -346,7 +351,8 @@ namespace Sentry.data.Web.Controllers
                     Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Setting FilePath: " + DatasetFile.FileName);
                     //s3tuReq.InputStream = new FileStream(udm.DatasetName, FileMode.Open, FileAccess.Read);
                     //s3tuReq.InputStream = new FileStream(DatasetFile.FileName, FileMode.Open, FileAccess.Read);
-                    s3tuReq.InputStream = DatasetFile.InputStream;
+                    //s3tuReq.InputStream = DatasetFile.InputStream;
+                    s3tuReq.InputStream = stream;
                     //s3tuReq.FilePath = udm.DatasetFileName;
                     string dsfi = System.IO.Path.GetFileName(DatasetFile.FileName);
                     //FileInfo dsfi = new FileInfo(DatasetFile.FileName);
