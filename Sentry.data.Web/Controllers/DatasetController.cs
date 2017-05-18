@@ -345,7 +345,8 @@ namespace Sentry.data.Web.Controllers
                     Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + s3tuReq.BucketName);
                     Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Setting FilePath: " + DatasetFile.FileName);
                     //s3tuReq.InputStream = new FileStream(udm.DatasetName, FileMode.Open, FileAccess.Read);
-                    s3tuReq.InputStream = new FileStream(DatasetFile.FileName, FileMode.Open, FileAccess.Read);
+                    //s3tuReq.InputStream = new FileStream(DatasetFile.FileName, FileMode.Open, FileAccess.Read);
+                    s3tuReq.InputStream = DatasetFile.InputStream;
                     //s3tuReq.FilePath = udm.DatasetFileName;
                     FileInfo dsfi = new FileInfo(DatasetFile.FileName);
                     s3tuReq.Key = category + "/" + dsfi.Name;
@@ -353,7 +354,15 @@ namespace Sentry.data.Web.Controllers
                     s3tuReq.UploadProgressEvent += new EventHandler<Amazon.S3.Transfer.UploadProgressArgs>(uploadRequest_UploadPartProgressEvent);
                     s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                     s3tuReq.AutoCloseStream = true;
-                    s3tu.Upload(s3tuReq);
+                    try
+                    {
+                        s3tu.Upload(s3tuReq);
+                    }
+                    catch (Exception e)
+                    {
+                        Sentry.Common.Logging.Logger.Error("S3 Upload Error", e);
+                    }
+                    
 
                     // 2. create dataset metadata
                     List<DatasetMetadata> dsmd = new List<DatasetMetadata>();
