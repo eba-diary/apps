@@ -340,8 +340,13 @@ namespace Sentry.data.Web.Controllers
                 Sentry.Common.Logging.Logger.Debug("Sending file contents to string variable");
                 try
                 {
-                    String vartest = new StreamReader(new FileStream(DatasetFile.FileName, FileMode.Open, FileAccess.Read)).ReadToEnd();
+                    Sentry.Common.Logging.Logger.Debug("Using the following for FileName: " + Path.Combine(Server.MapPath("~"), DatasetFile.FileName));
+                    String vartest = new StreamReader(new FileStream(Path.Combine(Server.MapPath("~"), DatasetFile.FileName), FileMode.Open, FileAccess.Read)).ReadToEnd();
                     Sentry.Common.Logging.Logger.Debug("File Contents: " + vartest);
+
+                    Sentry.Common.Logging.Logger.Debug("Using the following for FileName: " + DatasetFile.FileName);
+                    String vartest1 = new StreamReader(new FileStream(DatasetFile.FileName, FileMode.Open, FileAccess.Read)).ReadToEnd();
+                    Sentry.Common.Logging.Logger.Debug("File Contents: " + vartest1);
                 }
                 catch (Exception e)
                 {
