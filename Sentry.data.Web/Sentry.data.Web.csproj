@@ -289,7 +289,6 @@
     <Compile Include="Models\Category\BaseCategoryModel.cs" />
     <Compile Include="Models\Category\EditCategoryModel.cs" />
     <Compile Include="Models\Category\FullCategoryModel.cs" />
-    <Compile Include="Models\Dataset\DatasetFrequencyModel.cs" />
     <Compile Include="Models\Dataset\UploadDatasetModel.cs" />
     <Compile Include="Models\Dataset\ListDatasetModel.cs" />
     <Compile Include="Models\Dataset\_DatasetMetadataModel.cs" />
