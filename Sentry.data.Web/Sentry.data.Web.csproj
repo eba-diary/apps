@@ -139,7 +139,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Sentry.Configuration, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.Configuration.2.1.6.0\lib\net35\Sentry.Configuration.dll</HintPath>
+      <HintPath>..\packages\Sentry.Configuration.2.1.7.1\lib\net40\Sentry.Configuration.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Sentry.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -289,6 +289,7 @@
     <Compile Include="Models\Category\BaseCategoryModel.cs" />
     <Compile Include="Models\Category\EditCategoryModel.cs" />
     <Compile Include="Models\Category\FullCategoryModel.cs" />
+    <Compile Include="Models\Dataset\DatasetFrequencyModel.cs" />
     <Compile Include="Models\Dataset\UploadDatasetModel.cs" />
     <Compile Include="Models\Dataset\ListDatasetModel.cs" />
     <Compile Include="Models\Dataset\_DatasetMetadataModel.cs" />
@@ -578,6 +579,9 @@
     <Content Include="fonts\KievitSlab\f97502b0-75c7-466d-a881-34c6fbcb058b.woff2" />
     <Content Include="fonts\KievitSlab\fe3422cf-d329-4791-9b81-c0439903d07f.ttf" />
     <Content Include="fonts\fontawesome-webfont.woff2" />
+    <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Scripts\jquery-3.1.0-vsdoc.js" />
     <Content Include="Images\Category\claim.png" />
     <Content Include="Images\Category\geographic.png" />
@@ -648,9 +652,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <SubType>Designer</SubType>
     </Content>
-    <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="ConfigSchemas\SmartsConfigurationSection.csd.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -898,7 +899,6 @@
     <Content Include="Views\_ViewStart.cshtml" />
     <Content Include="Views\Shared\Error.cshtml" />
     <Content Include="Views\Shared\_Layout.cshtml" />
-    <Content Include="_status\Web.config" />
     <Content Include="Views\Error\Forbidden.cshtml" />
     <Content Include="Views\Error\Index.cshtml" />
     <Content Include="Views\Error\NotFound.cshtml" />
@@ -946,6 +946,7 @@
     <Folder Include="Views\Admin\DisplayTemplates\" />
     <Folder Include="Views\DatasetController2\" />
     <Folder Include="Views\Defect\" />
+    <Folder Include="_status\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
@@ -985,6 +986,8 @@
           <DevelopmentServerPort>2457</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
           <IISUrl>http://localhost:2457/</IISUrl>
+          <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
+          <IISAppRootUrl>http://localhost.sentry.com:2457/</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

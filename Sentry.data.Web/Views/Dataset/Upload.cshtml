@@ -10,7 +10,7 @@
 
 <h2>Upload Dataset</h2>
 
-@using (Html.BeginForm())
+@using (Html.BeginForm( null, null, FormMethod.Post, new { enctype="multipart/form-data"}))
 {
     @Html.AntiForgeryToken()
 
@@ -42,7 +42,7 @@
             <div class="form-group">
                 @Html.LabelFor(model => model.DatasetFileName, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    <input type="file" class="edit-dataset-row file-load" name="DatasetFileName" />
+                    <input type="file" class="edit-dataset-row file-load" name="DatasetFile" />
                     @Html.HiddenFor(model => model.f)
                     @*@Html.TextBoxFor(model => model.DatasetName, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })*@
                     @*@Html.ValidationMessageFor(model => model.DatasetName, "", new { @class = "text-danger" })*@
@@ -132,7 +132,8 @@
         <div class="form-group">
             @Html.LabelFor((model) => model.FreqencyID, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.DropDownListFor(model => model.FreqencyID, Model.AllFrequencies, new { @class = "form-control edit-dataset-row"})
+                @Html.DropDownListFor(model => model.FreqencyID, Model.AllFrequencies, new { @class = "form-control edit-dataset-row" })
+                @*@Html.ValidationMessageFor(model => model.FreqencyID, "", new { @class = "text-danger" })*@
             </div>
         </div>
 

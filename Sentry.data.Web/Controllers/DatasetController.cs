@@ -10,6 +10,7 @@ using System.Linq;
 using System.Web.Mvc;
 using System.Web.SessionState;
 using System.Linq.Dynamic;
+using System.Web;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -327,7 +328,7 @@ namespace Sentry.data.Web.Controllers
         // JCG TODO: Revist moving S3.Transfer.TransferUtility logic to Infrastructure\Core layer
         // POST: Dataset/Upload
         [HttpPost]
-        public ActionResult Upload(UploadDatasetModel udm)
+        public ActionResult Upload(UploadDatasetModel udm, HttpPostedFileBase DatasetFile)
         {
             Sentry.Common.Logging.Logger.Debug("Entered HttpPost <Upload>");
                 if (ModelState.IsValid)
@@ -342,11 +343,11 @@ namespace Sentry.data.Web.Controllers
                     //s3tuReq.AutoCloseStream = true;
                     s3tuReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
                     Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + s3tuReq.BucketName);
-                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Setting FilePath: " + udm.DatasetFileName);
+                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Setting FilePath: " + DatasetFile.FileName);
                     //s3tuReq.InputStream = new FileStream(udm.DatasetName, FileMode.Open, FileAccess.Read);
-                    s3tuReq.InputStream = new FileStream(udm.DatasetFileName, FileMode.Open, FileAccess.Read);
+                    s3tuReq.InputStream = new FileStream(DatasetFile.FileName, FileMode.Open, FileAccess.Read);
                     //s3tuReq.FilePath = udm.DatasetFileName;
-                    FileInfo dsfi = new FileInfo(udm.DatasetFileName);
+                    FileInfo dsfi = new FileInfo(DatasetFile.FileName);
                     s3tuReq.Key = category + "/" + dsfi.Name;
                     Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + s3tuReq.Key);
                     s3tuReq.UploadProgressEvent += new EventHandler<Amazon.S3.Transfer.UploadProgressArgs>(uploadRequest_UploadPartProgressEvent);
