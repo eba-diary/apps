@@ -331,102 +331,105 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Upload(UploadDatasetModel udm, HttpPostedFileBase DatasetFile)
         {
             Sentry.Common.Logging.Logger.Debug("Entered HttpPost <Upload>");
-                if (ModelState.IsValid)
-                {
+            if (ModelState.IsValid)
+            {
                 //BinaryReader b = new BinaryReader(DatasetFile.InputStream);
                 //byte[] binData = b.ReadBytes(DatasetFile.ContentLength);
 
                 //Stream stream = new MemoryStream(binData);
-                Sentry.Common.Logging.Logger.Debug("Sending file contents to string variable");
+
+                string category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs).Name;
+                string frequency = ((DatasetFrequency)udm.FreqencyID).ToString();
+                string dsfi = System.IO.Path.GetFileName(DatasetFile.FileName);
+                
                 try
                 {
-                    String vartest1 = new StreamReader(DatasetFile.InputStream).ReadToEnd();
-                    Sentry.Common.Logging.Logger.Debug("File Contents: " + vartest1);
-                }
-                catch (Exception e)
-                {
-                    Sentry.Common.Logging.Logger.Error("Error Streaming contents to string varaible", e);
-                }
-                
+                Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");
+                // 1. upload dataset
+                Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
+                Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
+                //s3tuReq.AutoCloseStream = true;
+                s3tuReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
+                Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + s3tuReq.BucketName);
+                Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Setting FilePath: " + DatasetFile.FileName);
+                //s3tuReq.InputStream = new FileStream(udm.DatasetName, FileMode.Open, FileAccess.Read);
+                //s3tuReq.InputStream = new FileStream(DatasetFile.FileName, FileMode.Open, FileAccess.Read);
+                ////s3tuReq.InputStream = DatasetFile.InputStream;
+                //s3tuReq.InputStream = DatasetFile.InputStream;
+                //s3tuReq.FilePath = DatasetFile.FileName;
+                //FileInfo dsfi = new FileInfo(DatasetFile.FileName);
+                s3tuReq.Key = category + "/" + dsfi;
+                Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + s3tuReq.Key);
+                s3tuReq.UploadProgressEvent += new EventHandler<Amazon.S3.Transfer.UploadProgressArgs>(uploadRequest_UploadPartProgressEvent);
+                s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
+                s3tuReq.AutoCloseStream = true;
 
-                
-
-                    String category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs).Name;
-                    String frequency = ((DatasetFrequency)udm.FreqencyID).ToString();
-                    string dsfi = System.IO.Path.GetFileName(DatasetFile.FileName);
-
-                try
+                    Sentry.Common.Logging.Logger.Debug("Sending file contents to string variable");
+                    try
                     {
-                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");
-                    // 1. upload dataset
-                    Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
-                    Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
-                    //s3tuReq.AutoCloseStream = true;
-                    s3tuReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
-                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + s3tuReq.BucketName);
-                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Setting FilePath: " + DatasetFile.FileName);
-                    //s3tuReq.InputStream = new FileStream(udm.DatasetName, FileMode.Open, FileAccess.Read);
-                    s3tuReq.InputStream = new FileStream(DatasetFile.FileName, FileMode.Open, FileAccess.Read);
-                    //s3tuReq.InputStream = DatasetFile.InputStream;
-                    //s3tuReq.FilePath = DatasetFile.FileName;
-                    //FileInfo dsfi = new FileInfo(DatasetFile.FileName);
-                    s3tuReq.Key = category + "/" + dsfi;
-                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + s3tuReq.Key);
-                    s3tuReq.UploadProgressEvent += new EventHandler<Amazon.S3.Transfer.UploadProgressArgs>(uploadRequest_UploadPartProgressEvent);
-                    s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
-                    s3tuReq.AutoCloseStream = true;
-
-                    s3tu.Upload(s3tuReq);
-
+                        String vartest1 = new StreamReader(DatasetFile.InputStream).ReadToEnd();
+                        Sentry.Common.Logging.Logger.Debug("File Contents: " + vartest1);
                     }
                     catch (Exception e)
                     {
-                        if (e is AmazonS3Exception)
-                        {
-                            Sentry.Common.Logging.Logger.Error("S3 Upload Error", e);
-                        }
-                        else
-                        {
-                            Sentry.Common.Logging.Logger.Error("Error", e);
-                        }
-                        throw;
-                        //Sentry.Common.Logging.Logger.Error("An Error, number {0}, occurred when creating a bucket with the message '{1}", e.ErrorCode, e.Message);
+                        Sentry.Common.Logging.Logger.Error("Error Streaming contents to string varaible", e);
+                    }
+
+                Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Resetting File stream postiion to 0");
+                DatasetFile.InputStream.Position = 0;
+
+                Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Starting Upload " + s3tuReq.Key);
+                s3tu.Upload(s3tuReq);
+
                 }
+                catch (Exception e)
+                {
+                    if (e is AmazonS3Exception)
+                    {
+                        Sentry.Common.Logging.Logger.Error("S3 Upload Error", e);
+                    }
+                    else
+                    {
+                        Sentry.Common.Logging.Logger.Error("Error", e);
+                    }
+                    throw;
+                    //Sentry.Common.Logging.Logger.Error("An Error, number {0}, occurred when creating a bucket with the message '{1}", e.ErrorCode, e.Message);
+            }
                     
 
-                    // 2. create dataset metadata
-                    List<DatasetMetadata> dsmd = new List<DatasetMetadata>();
-                    DateTime dateTimeNow = DateTime.Now;                
-                    Dataset ds = new Dataset(
-                        0, // adding new dataset; ID is disregarded
-                        category,
-                        udm.DatasetName,
-                        udm.DatasetDesc,
-                        udm.CreationUserName,
-                        udm.SentryOwnerName,
-                        _userService.GetCurrentUser().DisplayName,
-                        udm.OriginationCode,
-                        udm.DatasetDtm,
-                        dateTimeNow,
-                        dateTimeNow,
-                        frequency,
-                        DatasetFile.ContentLength,
-                        udm.RecordCount,
-                        category + "/" + dsfi,
-                        udm.IsSensitive,
-                        null);               
+                // 2. create dataset metadata
+                List<DatasetMetadata> dsmd = new List<DatasetMetadata>();
+                DateTime dateTimeNow = DateTime.Now;                
+                Dataset ds = new Dataset(
+                    0, // adding new dataset; ID is disregarded
+                    category,
+                    udm.DatasetName,
+                    udm.DatasetDesc,
+                    udm.CreationUserName,
+                    udm.SentryOwnerName,
+                    _userService.GetCurrentUser().DisplayName,
+                    udm.OriginationCode,
+                    udm.DatasetDtm,
+                    dateTimeNow,
+                    dateTimeNow,
+                    frequency,
+                    DatasetFile.ContentLength,
+                    udm.RecordCount,
+                    category + "/" + dsfi,
+                    udm.IsSensitive,
+                    null);               
 
-                    //foreach (_DatasetMetadataModel dsmdmi in udm.RawMetadata)
-                    //{
-                    //    DatasetMetadata dsmdi = new DatasetMetadata(dsmdmi.Id, dsmdmi.DatasetId, dsmdmi.IsColumn, dsmdmi.Name, dsmdmi.Value, ds);
-                    //    ds.RawMetadata.Add(dsmdi);
-                    //}
+                //foreach (_DatasetMetadataModel dsmdmi in udm.RawMetadata)
+                //{
+                //    DatasetMetadata dsmdi = new DatasetMetadata(dsmdmi.Id, dsmdmi.DatasetId, dsmdmi.IsColumn, dsmdmi.Name, dsmdmi.Value, ds);
+                //    ds.RawMetadata.Add(dsmdi);
+                //}
 
-                    _datasetContext.Merge<Dataset>(ds);
-                    _datasetContext.SaveChanges();
-                    int maxId = _datasetContext.GetMaxId();
-                    return RedirectToAction("Detail", new { id = maxId });
-                }
+                _datasetContext.Merge<Dataset>(ds);
+                _datasetContext.SaveChanges();
+                int maxId = _datasetContext.GetMaxId();
+                return RedirectToAction("Detail", new { id = maxId });
+            }
             else
             {
                 _datasetContext.Clear();
