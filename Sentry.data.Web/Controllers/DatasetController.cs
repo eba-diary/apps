@@ -368,8 +368,11 @@ namespace Sentry.data.Web.Controllers
                 s3tuReq.InputStream = stream;
                 s3tu.Upload(s3tuReq);
 
-                //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Resetting File stream postiion to 0");
-                //DatasetFile.InputStream.Position = 0;
+
+                    //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Resetting File stream postiion to 0");
+                    //DatasetFile.InputStream.Position = 0;
+                    
+
                 
                 Sentry.Common.Logging.Logger.Debug("Sending file contents to string variable");
                 try
@@ -450,6 +453,7 @@ namespace Sentry.data.Web.Controllers
         static void uploadRequest_UploadPartProgressEvent(object sender, Amazon.S3.Transfer.UploadProgressArgs e)
         {
             Sentry.data.Web.Helpers.ProgressUpdater.SendProgress(e.FilePath, e.PercentDone);
+            Sentry.Common.Logging.Logger.Debug("DatasetUpload-S3Event: " + e.FilePath + ": " + e.PercentDone);
         }
 
         //// GET: Dataset/Edit/5
