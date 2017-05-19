@@ -354,7 +354,7 @@ namespace Sentry.data.Web.Controllers
                 Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Setting FilePath: " + DatasetFile.FileName);
                 //s3tuReq.InputStream = new FileStream(udm.DatasetName, FileMode.Open, FileAccess.Read);
                 //s3tuReq.InputStream = new FileStream(DatasetFile.FileName, FileMode.Open, FileAccess.Read);
-                ////s3tuReq.InputStream = DatasetFile.InputStream;
+                
                 //s3tuReq.InputStream = DatasetFile.InputStream;
                 //s3tuReq.FilePath = DatasetFile.FileName;
                 //FileInfo dsfi = new FileInfo(DatasetFile.FileName);
@@ -379,6 +379,7 @@ namespace Sentry.data.Web.Controllers
                 DatasetFile.InputStream.Position = 0;
 
                 Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Starting Upload " + s3tuReq.Key);
+                s3tuReq.InputStream = DatasetFile.InputStream;
                 s3tu.Upload(s3tuReq);
 
                 }
