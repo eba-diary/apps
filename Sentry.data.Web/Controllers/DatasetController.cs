@@ -333,10 +333,9 @@ namespace Sentry.data.Web.Controllers
             Sentry.Common.Logging.Logger.Debug("Entered HttpPost <Upload>");
             if (ModelState.IsValid)
             {
-                //BinaryReader b = new BinaryReader(DatasetFile.InputStream);
-                //byte[] binData = b.ReadBytes(DatasetFile.ContentLength);
-
-                //Stream stream = new MemoryStream(binData);
+                BinaryReader b = new BinaryReader(DatasetFile.InputStream);
+                byte[] binData = b.ReadBytes(DatasetFile.ContentLength);
+                Stream stream = new MemoryStream(binData);
 
                 string category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs).Name;
                 string frequency = ((DatasetFrequency)udm.FreqencyID).ToString();
@@ -363,24 +362,25 @@ namespace Sentry.data.Web.Controllers
                 s3tuReq.UploadProgressEvent += new EventHandler<Amazon.S3.Transfer.UploadProgressArgs>(uploadRequest_UploadPartProgressEvent);
                 s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                 s3tuReq.AutoCloseStream = true;
-
-                    Sentry.Common.Logging.Logger.Debug("Sending file contents to string variable");
-                    try
-                    {
-                        String vartest1 = new StreamReader(DatasetFile.InputStream).ReadToEnd();
-                        Sentry.Common.Logging.Logger.Debug("File Contents: " + vartest1);
-                    }
-                    catch (Exception e)
-                    {
-                        Sentry.Common.Logging.Logger.Error("Error Streaming contents to string varaible", e);
-                    }
-
-                Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Resetting File stream postiion to 0");
-                DatasetFile.InputStream.Position = 0;
-
+                    
                 Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Starting Upload " + s3tuReq.Key);
-                s3tuReq.InputStream = DatasetFile.InputStream;
+                //s3tuReq.InputStream = DatasetFile.InputStream;
+                s3tuReq.InputStream = stream;
                 s3tu.Upload(s3tuReq);
+
+                //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Resetting File stream postiion to 0");
+                //DatasetFile.InputStream.Position = 0;
+                
+                Sentry.Common.Logging.Logger.Debug("Sending file contents to string variable");
+                try
+                {
+                    String vartest1 = new StreamReader(DatasetFile.InputStream).ReadToEnd();
+                    Sentry.Common.Logging.Logger.Debug("File Contents: " + vartest1);
+                }
+                catch (Exception e)
+                {
+                    Sentry.Common.Logging.Logger.Error("Error Streaming contents to string varaible", e);
+                }
 
                 }
                 catch (Exception e)
