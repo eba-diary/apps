@@ -364,26 +364,32 @@ namespace Sentry.data.Web.Controllers
                 s3tuReq.AutoCloseStream = true;
                     
                 Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Starting Upload " + s3tuReq.Key);
-                //s3tuReq.InputStream = DatasetFile.InputStream;
-                s3tuReq.InputStream = stream;
-                s3tu.Upload(s3tuReq);
+                    //s3tuReq.InputStream = DatasetFile.InputStream;
+                    
 
+
+                    s3tuReq.InputStream = stream;
+
+                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: InputStream Length (Before) " + s3tuReq.InputStream.Length);
+                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: InputStream Position (Before) " + s3tuReq.InputStream.Position);
+
+                   s3tu.Upload(s3tuReq);
 
                     //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Resetting File stream postiion to 0");
                     //DatasetFile.InputStream.Position = 0;
-                    
 
-                
-                Sentry.Common.Logging.Logger.Debug("Sending file contents to string variable");
-                try
-                {
-                    String vartest1 = new StreamReader(DatasetFile.InputStream).ReadToEnd();
-                    Sentry.Common.Logging.Logger.Debug("File Contents: " + vartest1);
-                }
-                catch (Exception e)
-                {
-                    Sentry.Common.Logging.Logger.Error("Error Streaming contents to string varaible", e);
-                }
+
+
+                    Sentry.Common.Logging.Logger.Debug("Sending file contents to string variable");
+                    try
+                    {
+                        String vartest1 = new StreamReader(DatasetFile.InputStream).ReadToEnd();
+                        Sentry.Common.Logging.Logger.Debug("File Contents: " + vartest1);
+                    }
+                    catch (Exception e)
+                    {
+                        Sentry.Common.Logging.Logger.Error("Error Streaming contents to string varaible", e);
+                    }
 
                 }
                 catch (Exception e)
