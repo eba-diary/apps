@@ -36,8 +36,8 @@ namespace Sentry.data.Web.Controllers
                     // s3config.RegionEndpoint = RegionEndpoint.GetBySystemName("us-east-1");
                     s3config.RegionEndpoint = RegionEndpoint.GetBySystemName(Configuration.Config.GetSetting("AWSRegion"));
                     //s3config.UseHttp = true;
-                    s3config.ProxyHost = Configuration.Config.GetSetting("SentryWebProxyHost");
-                    s3config.ProxyPort = int.Parse(Configuration.Config.GetSetting("SentryWebProxyPort"));
+                    s3config.ProxyHost = Configuration.Config.GetSetting("SentryS3ProxyHost");
+                    s3config.ProxyPort = int.Parse(Configuration.Config.GetSetting("SentryS3ProxyPort"));
                     s3config.ProxyCredentials = System.Net.CredentialCache.DefaultNetworkCredentials;
                     string awsAccessKey = Configuration.Config.GetSetting("AWSAccessKey");
                     string awsSecretKey = Configuration.Config.GetSetting("AWSSecretKey");
@@ -333,9 +333,9 @@ namespace Sentry.data.Web.Controllers
             Sentry.Common.Logging.Logger.Debug("Entered HttpPost <Upload>");
             if (ModelState.IsValid)
             {
-                BinaryReader b = new BinaryReader(DatasetFile.InputStream);
-                byte[] binData = b.ReadBytes(DatasetFile.ContentLength);
-                Stream stream = new MemoryStream(binData);
+                //BinaryReader b = new BinaryReader(DatasetFile.InputStream);
+                //byte[] binData = b.ReadBytes(DatasetFile.ContentLength);
+                //Stream stream = new MemoryStream(binData);
 
                 string category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs).Name;
                 string frequency = ((DatasetFrequency)udm.FreqencyID).ToString();
@@ -343,37 +343,37 @@ namespace Sentry.data.Web.Controllers
                 
                 try
                 {
-                Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");
-                // 1. upload dataset
-                Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
-                Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
-                //s3tuReq.AutoCloseStream = true;
-                s3tuReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
-                Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + s3tuReq.BucketName);
-                Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Setting FilePath: " + DatasetFile.FileName);
-                //s3tuReq.InputStream = new FileStream(udm.DatasetName, FileMode.Open, FileAccess.Read);
-                //s3tuReq.InputStream = new FileStream(DatasetFile.FileName, FileMode.Open, FileAccess.Read);
-                
-                //s3tuReq.InputStream = DatasetFile.InputStream;
-                //s3tuReq.FilePath = DatasetFile.FileName;
-                //FileInfo dsfi = new FileInfo(DatasetFile.FileName);
-                s3tuReq.Key = category + "/" + dsfi;
-                Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + s3tuReq.Key);
-                s3tuReq.UploadProgressEvent += new EventHandler<Amazon.S3.Transfer.UploadProgressArgs>(uploadRequest_UploadPartProgressEvent);
-                s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
-                s3tuReq.AutoCloseStream = true;
-                    
-                Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Starting Upload " + s3tuReq.Key);
+                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");
+                    // 1. upload dataset
+                    Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
+                    Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
+                    //s3tuReq.AutoCloseStream = true;
+                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + Configuration.Config.GetSetting("AWSRootBucket"));
+                    s3tuReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
+                    //s3tuReq.InputStream = new FileStream(udm.DatasetName, FileMode.Open, FileAccess.Read);
+                    //s3tuReq.InputStream = new FileStream(DatasetFile.FileName, FileMode.Open, FileAccess.Read);
+
+                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - InputStream");
+                    s3tuReq.InputStream = DatasetFile.InputStream;
+                    //s3tuReq.FilePath = DatasetFile.FileName;
+                    //FileInfo dsfi = new FileInfo(DatasetFile.FileName);
+                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + category + "/" + dsfi);
+                    s3tuReq.Key = category + "/" + dsfi;
+                    s3tuReq.UploadProgressEvent += new EventHandler<Amazon.S3.Transfer.UploadProgressArgs>(uploadRequest_UploadPartProgressEvent);
+                    s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
+                    s3tuReq.AutoCloseStream = true;
+
+
                     //s3tuReq.InputStream = DatasetFile.InputStream;
-                    
 
 
-                    s3tuReq.InputStream = stream;
 
-                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: InputStream Length (Before) " + s3tuReq.InputStream.Length);
-                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: InputStream Position (Before) " + s3tuReq.InputStream.Position);
+                    //s3tuReq.InputStream = stream;
 
-                   s3tu.Upload(s3tuReq);
+                    //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: InputStream Length (Before) " + s3tuReq.InputStream.Length);
+                    //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: InputStream Position (Before) " + s3tuReq.InputStream.Position);
+                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Starting Upload " + s3tuReq.Key);
+                    s3tu.Upload(s3tuReq);
 
                     //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Resetting File stream postiion to 0");
                     //DatasetFile.InputStream.Position = 0;
@@ -402,7 +402,7 @@ namespace Sentry.data.Web.Controllers
                     {
                         Sentry.Common.Logging.Logger.Error("Error", e);
                     }
-                    throw;
+                    //throw;
                     //Sentry.Common.Logging.Logger.Error("An Error, number {0}, occurred when creating a bucket with the message '{1}", e.ErrorCode, e.Message);
             }
                     
