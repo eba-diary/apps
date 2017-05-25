@@ -939,13 +939,13 @@
     <Content Include="Views\Dataset\List.cshtml" />
     <Content Include="Views\Dataset\Detail.cshtml" />
     <Content Include="Views\Dataset\Edit.cshtml" />
+    <Content Include="_status\web.config" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Views\Admin\DisplayTemplates\" />
     <Folder Include="Views\DatasetController2\" />
     <Folder Include="Views\Defect\" />
-    <Folder Include="_status\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />
