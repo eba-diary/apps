@@ -586,6 +586,9 @@
     <Content Include="Images\Category\geographic.png" />
     <Content Include="Images\Category\government.png" />
     <Content Include="Images\Category\industry.png" />
+    <Content Include="Images\sas_logo.png" />
+    <Content Include="Images\sas_logo_min.png" />
+    <Content Include="Images\sas_logo_rectangle.png" />
     <Content Include="Images\status\battery1.png" />
     <Content Include="Images\status\battery2.png" />
     <Content Include="Images\status\battery3.png" />
@@ -614,6 +617,8 @@
     <Content Include="Images\status\simpleSpaz2.png" />
     <Content Include="Images\status\simpleSpaz3.png" />
     <Content Include="Images\status\simpleSpaz4.png" />
+    <Content Include="Images\tableau-icon.png" />
+    <Content Include="Images\tableau-icon_min.png" />
     <Content Include="js\Dataset.js" />
     <Content Include="js\ProgressBarHelper.js" />
     <Content Include="js\_CollapsibleList.js" />

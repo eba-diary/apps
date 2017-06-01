@@ -82,18 +82,30 @@
         @{
             if (Model.IsSensitive)
             {
-                <i class="glyphicon glyphicon-lock text-primary"></i>
+                <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure"></i>
             }
         }
         
         @{
             if (Model.IsSensitive.Equals(false) || Model.CanDwnldSenstive)
             {
-                <button type="button" class="btn btn-default btn-sm dataset-operation-button" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId">
+                <button type="button" class="btn btn-default btn-sm dataset-operation-button" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Download">
                     <span class="glyphicon glyphicon-cloud-download text-primary"></span> @Model.FileExtension.ToUpper()
                 </button>
             }
 
+        }
+
+        @{
+            <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="PushtoSAS_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to SAS">
+                <img src="~/Images/sas_logo_min.png" class="img-responsive"/>
+            </button>
+        }
+
+        @{
+            <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="PushtoSAS_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to Tableau" disabled>
+                <img src="~/Images/tableau-icon_min.png" class="img-responsive" />
+            </button>
         }
     </div>
     <div class="dataset-list-content-value">

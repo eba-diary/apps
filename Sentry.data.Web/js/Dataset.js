@@ -74,6 +74,11 @@ data.Dataset = {
             e.preventDefault();
             data.Dataset.DownloadDataset($(this).data("id"))
         });
+
+        $("[id^='PushToSAS_']").off('click').on('click', function (e) {
+            e.preventDefault();
+            data.Dataset.PushToSAS($(this).data("id"))
+        });
     },
 
     UploadInit: function () {
@@ -113,6 +118,12 @@ data.Dataset = {
             var jrUrl = result;
             window.open(jrUrl, "_blank");
         });
+    },
+
+    PushToSAS: function (id) {
+        /// <summary>
+        /// Download dataset from S3 and push to SAS file share
+        /// </summary>
     },
 
     DisplayCategory: function (category) {

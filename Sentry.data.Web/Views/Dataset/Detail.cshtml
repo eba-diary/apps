@@ -26,7 +26,7 @@
         @{
             if (Model.IsSensitive)
             {
-                <i class="glyphicon glyphicon-lock text-primary"></i>
+                <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure"></i>
             }
         }
 
@@ -45,8 +45,8 @@
                     <span class="glyphicon glyphicon-edit text-primary"></span> Edit Details
                 </button>
             }
-        }     
-        
+        }
+                
         @*<button type="button" class="btn btn-default btn-sm dataset-operation-button" id="DeleteDataset_@Model.Id" data-id="@Model.Id">
             <span class="glyphicon glyphicon-remove text-danger"></span> | Delete Dataset
         </button>*@
@@ -54,6 +54,31 @@
             @* ...spacer... *@
             &nbsp; &nbsp;
         </div>
+    </section>
+
+    <section class="dataset-detail-content" id="Dataset-Detail-PushTo-Options">
+
+        <div class="dataset-detail-content-row" id="Dataset-Detail-PushTo-Value">
+            @{
+                <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="PushtoSAS_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to SAS">
+                    @*<img src="~/Images/sas_logo_rectangle.png" class="img-responsive" width="150" height="100" />*@
+                    <img src="~/Images/sas_logo_rectangle.png"/>
+                </button>
+            }
+
+            @{
+                <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="PushtoTableau_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to Tableau" disabled>
+                    @*<img src="~/Images/tableau-icon.png" class="img-responsive" width="500" height="100" />*@
+                    <img src="~/Images/tableau-icon.png"/>
+                </button>
+            }
+        </div>
+
+        <div>
+            @* ...spacer... *@
+            &nbsp; &nbsp;
+        </div>
+
     </section>
 
     <section class="dataset-detail-content" id="Dataset-Detail-Description">
