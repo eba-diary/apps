@@ -59,6 +59,16 @@ data.Dataset = {
             data.Dataset.DisplayCategory(null);
         });
 
+        $("[id^='PushtoSAS_']").off('click').on('click', function (e) {
+            e.preventDefault();
+            data.Dataset.PushToSAS($(this).data("id"))
+        });
+
+        $("[id^='Pushtofilename_']").off('click').on('click', function (e) {
+            e.preventDefault();
+            data.Dataset.PushToFilename($(this).data("id"))
+        });
+
     },
 
     DetailInit: function () {
@@ -75,7 +85,7 @@ data.Dataset = {
             data.Dataset.DownloadDataset($(this).data("id"))
         });
 
-        $("[id^='PushToSAS_']").off('click').on('click', function (e) {
+        $("[id^='PushtoSAS_']").off('click').on('click', function (e) {
             e.preventDefault();
             data.Dataset.PushToSAS($(this).data("id"))
         });
@@ -124,6 +134,18 @@ data.Dataset = {
         /// <summary>
         /// Download dataset from S3 and push to SAS file share
         /// </summary>
+        var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(id);
+        data.Dataset.ProgressModalStatus();
+        $.post(controllerURL);
+    },
+
+    PushToFilename: function (id) {
+        /// <summary>
+        /// Download dataset from S3 and push to SAS file share
+        /// </summary>
+        //var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(id);
+
+        data.Dataset.FileNameModal();
     },
 
     DisplayCategory: function (category) {
@@ -171,6 +193,34 @@ data.Dataset = {
         if (!results) return null;
         if (!results[2]) return '';
         return decodeURIComponent(results[2].replace(/\+/g, " "));
+    },
+
+    ProgressModalStatus: function () {
+        // --- progress bar stuff : start ---
+        // Reference the auto-generated proxy for the hub.
+        var progress = $.connection.progressHub;
+        console.log(progress);
+
+        // Create a function that the hub can call back to display messages.
+        progress.client.AddProgress = function (message, percentage) {
+            ProgressBarModal("show", message, "Progress: " + percentage);
+            $('#ProgressMessage').width(percentage);
+            if (percentage == "100%") {
+                ProgressBarModal();
+            }
+        };
+
+        $.connection.hub.start().done(function () {
+            var connectionId = $.connection.hub.id;
+            console.log(connectionId);
+        });
+
+        // --- progress bar stuff : end ---
+
+    },
+
+    FileNameModal: function () {
+        $('#myModal').modal('show');
     }
     
 }

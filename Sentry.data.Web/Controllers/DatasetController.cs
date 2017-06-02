@@ -41,7 +41,7 @@ namespace Sentry.data.Web.Controllers
                     s3config.ProxyCredentials = System.Net.CredentialCache.DefaultNetworkCredentials;
                     string awsAccessKey = Configuration.Config.GetSetting("AWSAccessKey");
                     string awsSecretKey = Configuration.Config.GetSetting("AWSSecretKey");
-                    _s3client = new AmazonS3Client(awsAccessKey, awsSecretKey, s3config);
+                    _s3client = new AmazonS3Client(awsAccessKey, awsSecretKey, s3config);                    
                 }
                 return _s3client;
             }
@@ -355,7 +355,7 @@ namespace Sentry.data.Web.Controllers
                     s3tuReq.AutoCloseStream = true;
                     Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Starting Upload " + s3tuReq.Key);
                     s3tu.Upload(s3tuReq);
-                    
+
                 }
                 catch (Exception e)
                 {
@@ -424,7 +424,7 @@ namespace Sentry.data.Web.Controllers
             Sentry.data.Web.Helpers.ProgressUpdater.SendProgress(e.FilePath, e.PercentDone);
             Sentry.Common.Logging.Logger.Debug("DatasetUpload-S3Event: " + e.FilePath + ": " + e.PercentDone);
         }
-
+        
         //// GET: Dataset/Edit/5
         //public ActionResult Edit(int id)
         //{
@@ -687,5 +687,62 @@ namespace Sentry.data.Web.Controllers
             //    ds.RawMetadata = newRawData;
             //}
         }
+
+        [HttpPost]
+        public void PushToSAS(int id)
+        {
+            Dataset ds = _datasetContext.GetById(id);
+            string filename = System.IO.Path.GetFileName(ds.S3Key);
+            string BaseTargetPath = Configuration.Config.GetHostSetting("PushToSASTargetPath");
+
+            try
+            {
+                Sentry.Common.Logging.Logger.Debug("Started S3 TransferUtility Setup for Download");
+                Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
+                Amazon.S3.Transfer.TransferUtilityDownloadRequest s3tuDwnldReq = new Amazon.S3.Transfer.TransferUtilityDownloadRequest();
+                Sentry.Common.Logging.Logger.Debug("TransferUtility - Set AWS BucketName: " + Configuration.Config.GetSetting("AWSRootBucket"));
+                s3tuDwnldReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
+                Sentry.Common.Logging.Logger.Debug("TransferUtility - Set FilePath: " + BaseTargetPath + ds.Category + @"\" + filename);
+                s3tuDwnldReq.FilePath = BaseTargetPath + ds.Category + @"\" + filename;
+
+                //creates category directory if does not exist, otherwise does nothing.
+                System.IO.Directory.CreateDirectory(BaseTargetPath + ds.Category);
+
+                s3tuDwnldReq.Key = ds.S3Key;
+
+                s3tuDwnldReq.WriteObjectProgressEvent += new EventHandler<WriteObjectProgressArgs>(downloadRequest_DownloadPartProgressEvent);
+                
+                s3tu.Download(s3tuDwnldReq);
+            }
+            catch (Exception e)
+            {
+                if (e is AmazonS3Exception)
+                {
+                    Sentry.Common.Logging.Logger.Error("S3 Download Error", e);
+                }
+                else
+                {
+                    Sentry.Common.Logging.Logger.Error("Error", e);
+                }
+
+
+            }
+            
+        }
+
+        /// <summary>
+        /// Callback handler for S3 uploads... Amazon calls this to communicate progress; from here we communicate
+        /// that progress back to the client for their progress bar...
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void downloadRequest_DownloadPartProgressEvent(object sender, WriteObjectProgressArgs e)
+        {
+
+            Sentry.data.Web.Helpers.ProgressUpdater.SendProgress(e.FilePath, e.PercentDone);
+            //Sentry.data.Web.Helpers.ProgressUpdater.SendProgress(e., e.TotalNumberOfBytesForCurrentFile, e.TransferredBytesForCurrentFile);
+            Sentry.Common.Logging.Logger.Debug("DatasetDownload-S3Event: " + e.FilePath + ": " + e.PercentDone);
+        }
+
     }
 }
