@@ -41,7 +41,7 @@ namespace Sentry.data.Web.Controllers
                     s3config.ProxyCredentials = System.Net.CredentialCache.DefaultNetworkCredentials;
                     string awsAccessKey = Configuration.Config.GetSetting("AWSAccessKey");
                     string awsSecretKey = Configuration.Config.GetSetting("AWSSecretKey");
-                    _s3client = new AmazonS3Client(awsAccessKey, awsSecretKey, s3config);                    
+                    _s3client = new AmazonS3Client(awsAccessKey, awsSecretKey, s3config);
                 }
                 return _s3client;
             }
@@ -216,7 +216,7 @@ namespace Sentry.data.Web.Controllers
         public ActionResult List(string category, string searchPhrase)
         {
             ListDatasetModel rspModel = new ListDatasetModel();
-            
+
             // get all unique categories (regardless of earch category)
             rspModel.CategoryList = GetDatasetModelList().Select(x => x.Category).Distinct().ToList();
 
@@ -237,16 +237,16 @@ namespace Sentry.data.Web.Controllers
 
                 // split search terms (delivered as a string) into a list
                 IList<string> searchWords = searchPhrase.Trim().ToLower().Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
-                
+
                 List<BaseDatasetModel> rspList =
                     dsList.Where(x =>
                         ((x.Category.ToLower() + " " +
                           x.DatasetDesc.ToLower() + " " +
                           x.DatasetName.ToLower() + " " +
                           x.SentryOwnerName.ToLower() + " ") +
-                          ((x.Columns != null && x.Columns.Count > 0) ? 
+                          ((x.Columns != null && x.Columns.Count > 0) ?
                               x.Columns.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " ") +
-                          ((x.Metadata != null && x.Metadata.Count > 0) ? 
+                          ((x.Metadata != null && x.Metadata.Count > 0) ?
                               x.Metadata.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " "))
                         .Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)
                         .Any(xi => searchWords.Where(s => xi.Contains(s)).Count() > 0)
@@ -274,9 +274,9 @@ namespace Sentry.data.Web.Controllers
                         ds.DatasetDesc.ToLower() + " " +
                         ds.DatasetName.ToLower() + " " +
                         ds.SentryOwnerName.ToLower() + " " +
-                        ds.Columns != null && ds.Columns.Count > 0 ? 
+                        ds.Columns != null && ds.Columns.Count > 0 ?
                             ds.Columns.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " " +
-                        ds.Metadata != null && ds.Metadata.Count > 0 ? 
+                        ds.Metadata != null && ds.Metadata.Count > 0 ?
                             ds.Metadata.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " ")
                         .Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)
                         .Where(x => x.Any(xi => searchWords.Where(s => x.Contains(s)).Count() > 0))
@@ -337,7 +337,7 @@ namespace Sentry.data.Web.Controllers
                 string category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs).Name;
                 string frequency = ((DatasetFrequency)udm.FreqencyID).ToString();
                 string dsfi = System.IO.Path.GetFileName(DatasetFile.FileName);
-                
+
                 try
                 {
                     Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");
@@ -367,12 +367,12 @@ namespace Sentry.data.Web.Controllers
                     {
                         Sentry.Common.Logging.Logger.Error("Error", e);
                     }
-            }
-                    
+                }
+
 
                 // 2. create dataset metadata
                 List<DatasetMetadata> dsmd = new List<DatasetMetadata>();
-                DateTime dateTimeNow = DateTime.Now;                
+                DateTime dateTimeNow = DateTime.Now;
                 Dataset ds = new Dataset(
                     0, // adding new dataset; ID is disregarded
                     category,
@@ -390,7 +390,7 @@ namespace Sentry.data.Web.Controllers
                     udm.RecordCount,
                     category + "/" + dsfi,
                     udm.IsSensitive,
-                    null);               
+                    null);
 
                 //foreach (_DatasetMetadataModel dsmdmi in udm.RawMetadata)
                 //{
@@ -424,7 +424,7 @@ namespace Sentry.data.Web.Controllers
             Sentry.data.Web.Helpers.ProgressUpdater.SendProgress(e.FilePath, e.PercentDone);
             Sentry.Common.Logging.Logger.Debug("DatasetUpload-S3Event: " + e.FilePath + ": " + e.PercentDone);
         }
-        
+
         //// GET: Dataset/Edit/5
         //public ActionResult Edit(int id)
         //{
@@ -514,7 +514,7 @@ namespace Sentry.data.Web.Controllers
         //    i.AllCategories = GetCategorySelectListItems(); //re-populate the category list for re-display
         //    return View(i);
         //}
-        
+
         // GET: DatasetFileVersion/Edit/5
         // JCG TODO: Add additional permissions check around CanEditDataset
         [HttpGet()]
@@ -541,7 +541,7 @@ namespace Sentry.data.Web.Controllers
                     UpdateDatasetFromModel(item, i);
                     _datasetContext.SaveChanges();
                     return RedirectToAction("Detail", new { id = id });
-                    
+
                 }
                 return View(i);
             }
@@ -555,9 +555,9 @@ namespace Sentry.data.Web.Controllers
 
         private IEnumerable<SelectListItem> GetCategorySelectListItems()
         {
-           IEnumerable<SelectListItem> var = _datasetContext.Categories.OrderByHierarchy().Select((c) => new SelectListItem { Text = c.FullName, Value = c.Id.ToString() });
+            IEnumerable<SelectListItem> var = _datasetContext.Categories.OrderByHierarchy().Select((c) => new SelectListItem { Text = c.FullName, Value = c.Id.ToString() });
 
-           return var;
+            return var;
         }
 
         private IEnumerable<SelectListItem> GetDatasetFrequencyListItems()
@@ -648,7 +648,7 @@ namespace Sentry.data.Web.Controllers
                 ds.RawMetadata.Add(new DatasetMetadata(dsm.DatasetMetadataId, dsm.DatasetId, dsm.IsColumn, dsm.Name, dsm.Value, ds));
             }
         }
-        
+
         // JCG TODO: Add unit tests for UpdateDatasetFromModel()
         /// <summary>
         /// Allowed updates:
@@ -689,10 +689,29 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public void PushToSAS(int id)
+        public void PushToSAS(PushToDatasetModel PushToModel)
         {
-            Dataset ds = _datasetContext.GetById(id);
-            string filename = System.IO.Path.GetFileName(ds.S3Key);
+            Dataset ds = _datasetContext.GetById(PushToModel.DatasetId);
+            string filename = null;
+
+            //Test for an override name; if empty or null, use current value on dataset model
+            if (!String.IsNullOrWhiteSpace(PushToModel.FileNameOverride))
+            {
+                //Test if override name includes an extension; if exists, replace with current value in dataset model
+                if (Path.HasExtension(PushToModel.FileNameOverride))
+                {
+                    filename = PushToModel.FileNameOverride.Replace(System.IO.Path.GetExtension(PushToModel.FileNameOverride), ds.FileExtension);
+                }
+                else
+                {
+                    filename = PushToModel.FileNameOverride + ds.FileExtension;
+                }
+            }
+            else
+            {
+                filename = System.IO.Path.GetFileName(ds.S3Key);
+            }
+
             string BaseTargetPath = Configuration.Config.GetHostSetting("PushToSASTargetPath");
 
             try
@@ -711,7 +730,7 @@ namespace Sentry.data.Web.Controllers
                 s3tuDwnldReq.Key = ds.S3Key;
 
                 s3tuDwnldReq.WriteObjectProgressEvent += new EventHandler<WriteObjectProgressArgs>(downloadRequest_DownloadPartProgressEvent);
-                
+
                 s3tu.Download(s3tuDwnldReq);
             }
             catch (Exception e)
@@ -727,7 +746,7 @@ namespace Sentry.data.Web.Controllers
 
 
             }
-            
+
         }
 
         /// <summary>
@@ -743,6 +762,20 @@ namespace Sentry.data.Web.Controllers
             //Sentry.data.Web.Helpers.ProgressUpdater.SendProgress(e., e.TotalNumberOfBytesForCurrentFile, e.TransferredBytesForCurrentFile);
             Sentry.Common.Logging.Logger.Debug("DatasetDownload-S3Event: " + e.FilePath + ": " + e.PercentDone);
         }
+
+        [HttpGet()]
+        public PartialViewResult PushToFileNameOverride(int id)
+        {
+            PushToDatasetModel model = new PushToDatasetModel();
+
+            Dataset dataset = _datasetContext.GetById<Dataset>(id);
+            model.DatasetId = dataset.DatasetId;
+            model.DatasetFileName = System.IO.Path.GetFileName(dataset.S3Key);
+
+            return PartialView("_PushToFilenameOverride", model);
+
+        }
+
 
     }
 }

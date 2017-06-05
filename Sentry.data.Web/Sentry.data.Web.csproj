@@ -289,6 +289,7 @@
     <Compile Include="Models\Category\BaseCategoryModel.cs" />
     <Compile Include="Models\Category\EditCategoryModel.cs" />
     <Compile Include="Models\Category\FullCategoryModel.cs" />
+    <Compile Include="Models\Dataset\PushToDatasetModel.cs" />
     <Compile Include="Models\Dataset\UploadDatasetModel.cs" />
     <Compile Include="Models\Dataset\ListDatasetModel.cs" />
     <Compile Include="Models\Dataset\_DatasetMetadataModel.cs" />
@@ -945,6 +946,7 @@
     <Content Include="Views\Dataset\Detail.cshtml" />
     <Content Include="Views\Dataset\Edit.cshtml" />
     <Content Include="_status\web.config" />
+    <Content Include="Views\Dataset\_PushToFilenameOverride.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

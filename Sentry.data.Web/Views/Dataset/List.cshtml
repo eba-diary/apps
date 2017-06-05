@@ -108,66 +108,6 @@
 </div>
 <!-- /.modal -->
 
-@*PUSH TO FILENAME MODAL*@
-<div class="modal fade in" id="mod-pushto-filename" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                Specify File Name
-            </div>
-            <div class="modal-body">
-                <div class="text-center">
-                    <div class="i-circle warning"><i class="fa fa-info"></i></div>
-                    <div id="result" style="font-size: 1.1em; padding-bottom: 5px">
-                        <p id="progressBarParagraph"></p>
-                        <p id="progressBarPercentage"></p>
-                    </div>
-                    <div style="width: 30%; margin: 0 auto; display:none;">
-                        <div id="progressbar" style="width: 300px; height: 15px"></div>
-                        <br />
-                    </div>
-                    <div id="ProgressStripe" class="progress progress-striped active" style="position:relative; top:10px; width:100%;">
-                        <div id="ProgressMessage" class="progress-bar progress-bar-info" style="width: 100%; border:none;"></div>
-                    </div>
-                    <br />
-                </div>
-            </div>
-        </div>
-        <!-- /.modal-content -->
-    </div>
-    <!-- /.modal-dialog -->
-</div>
-<!-- /.modal -->
-
-
-<div class="modal fade" id="myModal">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-                <h4 class="modal-title">
-                    FileName Override
-                </h4>
-            </div>
-            <div class="modal-body">
-                <div class="form-horizontal">
-                    <div class="form-group">
-                        @Html.Label("Filename Override")
-                        <div class="col-md-10">
-                            @Html.Editor("filename")
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary">Continue</button>
-                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 
 @section Scripts {

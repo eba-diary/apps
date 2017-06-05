@@ -59,14 +59,18 @@ data.Dataset = {
             data.Dataset.DisplayCategory(null);
         });
 
-        $("[id^='PushtoSAS_']").off('click').on('click', function (e) {
-            e.preventDefault();
-            data.Dataset.PushToSAS($(this).data("id"))
-        });
 
         $("[id^='Pushtofilename_']").off('click').on('click', function (e) {
             e.preventDefault();
-            data.Dataset.PushToFilename($(this).data("id"))
+            data.Dataset.FileNameModal($(this).data("id"))
+        });
+
+        $(document).on('show.bs.modal', '.modal', function (event) {
+            var zIndex = 1040 + (10 * $('.modal:visible').length);
+            $(this).css('z-index', zIndex);
+            setTimeout(function () {
+                $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+            }, 0);
         });
 
     },
@@ -130,22 +134,26 @@ data.Dataset = {
         });
     },
 
-    PushToSAS: function (id) {
+   PushToSAS_Filename: function (filename) {
         /// <summary>
         /// Download dataset from S3 and push to SAS file share
         /// </summary>
-        var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(id);
+        var val = document.getElementById('FileNameOverride').value
+        var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(id) + "&filename=" + encodeURI(val);
         data.Dataset.ProgressModalStatus();
         $.post(controllerURL);
     },
 
-    PushToFilename: function (id) {
-        /// <summary>
-        /// Download dataset from S3 and push to SAS file share
-        /// </summary>
-        //var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(id);
+    PushToOverrideInit: function() {
+        ///<summary>
+        ///Initialize the PushToFilenameOverride partial view
+        ///</summary>
+        $("PushToForm").validateBootstrap(true);
 
-        data.Dataset.FileNameModal();
+        //$("[id^='FilenameOverride']").off('click').on('click', function (e) {
+        //    e.preventDefault();
+        //    data.Dataset.PushToSAS_Filename($(this).data("filename"))
+        //});
     },
 
     DisplayCategory: function (category) {
@@ -165,6 +173,29 @@ data.Dataset = {
             }
         }
         window.location = url;
+    },
+
+    AjaxSuccess: function () {
+        /// <summary>
+        /// Event handlers for a successful AJAX post from the Add or
+        /// Edit category modal dialogs
+        /// </summary>
+        /// <param name="data">Response from the Ajax post</param>
+        /// <param name="parentCategory">The parent category ID, that we now need to reload</param>
+        //if (Sentry.WasAjaxSuccessful(data)) {
+            Sentry.HideAllModals();
+            //var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(datasetID) + "&Override=" + encodeURI(filenameOverride);
+            //data.Dataset.ProgressModalStatus();
+            //$.post(controllerURL);
+            //dataMySentryBayTestApp.Category.ReloadCategory(parentCategory);
+        //}
+    },
+
+    AjaxFailure: function () {
+        /// <summary>
+        /// Called when there was a non-200 response
+        /// </summary>
+        Sentry.ShowModalAlert("An error occurred.  Please try again.");
     },
 
     ViewEdit: function (id) {
@@ -196,7 +227,7 @@ data.Dataset = {
     },
 
     ProgressModalStatus: function () {
-        // --- progress bar stuff : start ---
+// --- progress bar stuff : start ---
         // Reference the auto-generated proxy for the hub.
         var progress = $.connection.progressHub;
         console.log(progress);
@@ -219,8 +250,13 @@ data.Dataset = {
 
     },
 
-    FileNameModal: function () {
-        $('#myModal').modal('show');
+    FileNameModal: function (id) {
+        var modal = Sentry.ShowModalWithSpinner("File Name Override");
+
+        $.get("/Dataset/PushToFileNameOverride/" + id, function (result) {
+            modal.ReplaceModalBody(result);
+            modal.SetFocus("#FileNameOverride");
+        });
     }
     
 }
