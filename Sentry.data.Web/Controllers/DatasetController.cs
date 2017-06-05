@@ -694,23 +694,30 @@ namespace Sentry.data.Web.Controllers
             Dataset ds = _datasetContext.GetById(PushToModel.DatasetId);
             string filename = null;
 
+            Sentry.Common.Logging.Logger.Debug("<PushToSAS>: File Name Override Value: " + PushToModel.FileNameOverride);
+
             //Test for an override name; if empty or null, use current value on dataset model
             if (!String.IsNullOrWhiteSpace(PushToModel.FileNameOverride))
             {
                 //Test if override name includes an extension; if exists, replace with current value in dataset model
                 if (Path.HasExtension(PushToModel.FileNameOverride))
                 {
+                    Sentry.Common.Logging.Logger.Debug("<PushToSAS>: Has File Extension: " + System.IO.Path.GetExtension(PushToModel.FileNameOverride));
                     filename = PushToModel.FileNameOverride.Replace(System.IO.Path.GetExtension(PushToModel.FileNameOverride), ds.FileExtension);
                 }
                 else
                 {
+                    Sentry.Common.Logging.Logger.Debug("<PushToSAS>: Has No File Extension");
                     filename = PushToModel.FileNameOverride + ds.FileExtension;
                 }
             }
             else
             {
+                Sentry.Common.Logging.Logger.Debug("<PushToSAS>: No Override Value");
                 filename = System.IO.Path.GetFileName(ds.S3Key);
             }
+
+            Sentry.Common.Logging.Logger.Debug("<PushToSAS>: filename Value: " + filename);
 
             string BaseTargetPath = Configuration.Config.GetHostSetting("PushToSASTargetPath");
 
