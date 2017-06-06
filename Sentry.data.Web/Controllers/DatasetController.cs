@@ -694,6 +694,7 @@ namespace Sentry.data.Web.Controllers
             Dataset ds = _datasetContext.GetById(PushToModel.DatasetId);
             string filename = null;
 
+            Sentry.Common.Logging.Logger.Debug("<PushToSAS>: DatasetId: " + PushToModel.DatasetId);
             Sentry.Common.Logging.Logger.Debug("<PushToSAS>: File Name Override Value: " + PushToModel.FileNameOverride);
 
             //Test for an override name; if empty or null, use current value on dataset model
