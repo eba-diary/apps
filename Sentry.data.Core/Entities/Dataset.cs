@@ -234,19 +234,11 @@ namespace Sentry.data.Core
         {
             get
             {
-                if (this.DatasetName.IndexOf(".") > 3)
-                {
-                    return this.DatasetName.Substring(this.DatasetName.LastIndexOf("."));
-                }
-                else
-                {
-                    return "";
-                }
+                var extension = System.IO.Path.GetExtension(this.S3Key);
+
+                return extension;
             }
-            //set
-            //{
-            //    _fileExtension = value;
-            //}
+
         }
 
         public virtual DateTime DatasetDtm
