@@ -58,8 +58,7 @@ data.Dataset = {
             e.preventDefault();
             data.Dataset.DisplayCategory(null);
         });
-
-
+        
         $("[id^='Pushtofilename_']").off('click').on('click', function (e) {
             e.preventDefault();
             data.Dataset.FileNameModal($(this).data("id"))
@@ -92,6 +91,19 @@ data.Dataset = {
         $("[id^='PushtoSAS_']").off('click').on('click', function (e) {
             e.preventDefault();
             data.Dataset.PushToSAS($(this).data("id"))
+        });
+
+        $("[id^='Pushtofilename_']").off('click').on('click', function (e) {
+            e.preventDefault();
+            data.Dataset.FileNameModal($(this).data("id"))
+        });
+
+        $(document).on('show.bs.modal', '.modal', function (event) {
+            var zIndex = 1040 + (10 * $('.modal:visible').length);
+            $(this).css('z-index', zIndex);
+            setTimeout(function () {
+                $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+            }, 0);
         });
     },
 

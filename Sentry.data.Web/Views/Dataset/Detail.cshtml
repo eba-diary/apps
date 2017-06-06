@@ -34,7 +34,7 @@
             if (Model.IsSensitive.Equals(false) || Model.CanDwnldSenstive)
             {
                 <button type="button" class="btn btn-default btn-sm dataset-operation-button" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId">
-                    <span class="glyphicon glyphicon-cloud-download text-primary"></span> Download @Model.FileExtension.ToUpper()
+                    <span class="glyphicon glyphicon-cloud-download text-primary"></span> Download
                 </button>
             }
         }
@@ -60,14 +60,14 @@
 
         <div class="dataset-detail-content-row" id="Dataset-Detail-PushTo-Value">
             @{
-                <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="PushtoSAS_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to SAS">
+                <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to SAS">
                     @*<img src="~/Images/sas_logo_rectangle.png" class="img-responsive" width="150" height="100" />*@
                     <img src="~/Images/sas_logo_rectangle.png"/>
                 </button>
             }
 
             @{
-                <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="PushtoTableau_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to Tableau" disabled>
+                <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to Tableau" disabled>
                     @*<img src="~/Images/tableau-icon.png" class="img-responsive" width="500" height="100" />*@
                     <img src="~/Images/tableau-icon.png"/>
                 </button>
