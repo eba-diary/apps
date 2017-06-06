@@ -703,17 +703,20 @@ namespace Sentry.data.Web.Controllers
                 if (Path.HasExtension(PushToModel.FileNameOverride))
                 {
                     Sentry.Common.Logging.Logger.Debug("<PushToSAS>: Has File Extension: " + System.IO.Path.GetExtension(PushToModel.FileNameOverride));
+                    Sentry.Common.Logging.Logger.Debug("<PushToSAS>: Dataset Model Extension: " + ds.FileExtension);
                     filename = PushToModel.FileNameOverride.Replace(System.IO.Path.GetExtension(PushToModel.FileNameOverride), ds.FileExtension);
                 }
                 else
                 {
                     Sentry.Common.Logging.Logger.Debug("<PushToSAS>: Has No File Extension");
-                    filename = PushToModel.FileNameOverride + ds.FileExtension;
+                    Sentry.Common.Logging.Logger.Debug("<PushToSAS>: Dataset Model Extension: " + ds.FileExtension);
+                    filename = (PushToModel.FileNameOverride + ds.FileExtension);
                 }
             }
             else
             {
                 Sentry.Common.Logging.Logger.Debug("<PushToSAS>: No Override Value");
+                Sentry.Common.Logging.Logger.Debug("<PushToSAS>: Dataset Model S3Key: " + System.IO.Path.GetFileName(ds.S3Key));
                 filename = System.IO.Path.GetFileName(ds.S3Key);
             }
 
