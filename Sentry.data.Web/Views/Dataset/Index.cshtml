@@ -37,7 +37,7 @@
                 @{
                     /* rudimentary logic to establish a grid of category "cards" */
                     var category = Model.Select(m => m.Category).Distinct().OrderBy(cat => cat).ToList();
-                    var itemsPerRow = 2;
+                    var itemsPerRow = 3;
                     if (category.Count() >= 20)
                     {
                         itemsPerRow = 5;
