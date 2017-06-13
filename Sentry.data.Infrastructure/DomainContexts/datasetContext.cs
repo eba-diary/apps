@@ -83,6 +83,12 @@ namespace Sentry.data.Infrastructure
             //return catList;
         }
 
+        public IEnumerable<String> GetSentryOwnerList()
+        {
+            IEnumerable<string> list = Query<Dataset>().Select((x) => x.SentryOwnerName).Distinct().AsEnumerable();
+            return list;
+        }
+
         public void DeleteAllData()
         {
             DemoDataService.DeleteAllDemoData(this.Session);

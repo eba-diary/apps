@@ -1,6 +1,8 @@
 ﻿/***********************************/
 /* Canned Sentry Template Settings */
 /***********************************/
+/*body {background-color: #eff0f2;}*/
+
 .item-list-image {
     max-height: 150px;
 }
@@ -104,7 +106,7 @@ ul.list-group-indented {
 .index-card-table {
     border-color: #8792A4; 
     border-width: 1px 1px 1px 1px;
-    border-style: solid;
+    border-style: none;
     margin: 1px
 }
 
@@ -116,6 +118,8 @@ ul.list-group-indented {
     border-color: #8792A4;
     border-width: 1px 1px 1px 1px;
     border-style: solid;
+    background-color: white;
+    margin: 1px 1px 1px 1px;
 }
 
 .browse-category-card:hover {
@@ -131,8 +135,14 @@ ul.list-group-indented {
 .dataset-list-filters {
     vertical-align: top;
     display: inline-block;
-    width: 150px;
+    width: 90%;
     margin-right: 10px;
+    box-shadow: 0 0 8px gray;
+    margin-bottom: 0px;
+}
+
+.dataset-list-filter-category {
+    padding: 0;
 }
 
 .dataset-filter-subset-label {
@@ -180,7 +190,7 @@ ul.list-group-indented {
 .li-filter-disabled {
     width: 100%;
     padding: 2px 2px 2px 2px;
-    background-color: #F6F6F6;
+    /*background-color: #F6F6F6;*/
 }
 .filter-disabled-glyph {
     display: none;
@@ -209,8 +219,9 @@ ul.list-group-indented {
     border-radius: 5px;
     position: relative;
     padding-top: 0px;
-    margin-top: 0px;
+    margin-top: 10px;
     padding-bottom: 5px;
+    /*background-color: white;*/
 }
 
 .ul-dataset-list-item:nth-child(even) {

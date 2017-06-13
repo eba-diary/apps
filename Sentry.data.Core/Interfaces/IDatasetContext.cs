@@ -17,6 +17,8 @@ namespace Sentry.data.Core
 
         IEnumerable<String> GetCategoryList();
 
+        IEnumerable<String> GetSentryOwnerList();
+
         IQueryable<Category> Categories { get; }
 
         IEnumerable<DatasetFrequency> GetDatasetFrequencies();

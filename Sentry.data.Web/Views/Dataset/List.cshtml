@@ -6,114 +6,134 @@
 
 <h1>Datasets</h1>
 @{
-    var htmlAttrsObj2 = new { @class = "navbar-form navbar-center", @id = "DatasetListSearch" };
-    var htmlAttributes2 = HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttrsObj2);
-    using (Html.BeginForm("List", "Dataset", FormMethod.Get, htmlAttributes2))
+                using (Html.BeginForm("List", "Dataset", FormMethod.Get, new { @class = "navbar-form navbar-center", @id = "DatasetListSearch" })
+            )
     {
         <div class="input-group dataset-search" id="DatasetListSearch">
             <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
             <input type="text" id="SearchKeywords" name="searchPhrase" class="form-control" placeholder="Enter dataset search term(s)" value="@{@Request.QueryString["searchPhrase"]}" />
             <input type="hidden" id="SearchCategory" name="Category" class="form-control" value="@{@Request.QueryString["Category"]}" />
+            @Html.HiddenFor(model => model.SearchCategory)
         </div>
-    }
-}
+
+
+
+
+@*<div class="input-group dataset-search" id="DatasetListSearch2">
+    <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
+    @Html.TextAreaFor(m => Model.SearchText, new { @class = "form-control", @placeholder = "Enter dataset search term(s)", @id = "SearchKeywords2" })
+    @Html.HiddenFor(model => model.SearchCategory)
+</div>*@
 <p> &nbsp; </p>
 
-<div>
-    <div class="dataset-list-filters">
-        <div class="dataset-list-filter-header">
-            <h4>
-                Filters...
-            </h4>
-        </div>
-        <div class="dataset-list-filter-category">
-            <div class="dataset-filter-subset-label">
-                Category:
-            </div>
+@* Left sidebar *@
+<div class="col-sm-3">
+@{ 
+int i = 0, j = 0;
+foreach (var category in Model.SearchFilters)
+{
+    <div class="panel panel-info dataset-list-filters">
+        <div class="panel-heading">@category.FilterType</div>
+        <div class="dataset-list-filter-category panel-body">
             <ul class="list-unstyled ul-filter-list">
-                @{
-                    var categories = Model.CategoryList.OrderBy(cat => cat).ToList();
-                    var reqCatFilterString = Request.QueryString["category"];
-                    string[] filterCats = { "" };
-                    if (reqCatFilterString != null)
-                    {
-                        filterCats = Request.QueryString["category"].Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries);
+                @{ 
+                foreach (var filter in category.FilterNameList)
+                {
+                    <li class="list-unstyled li-filter-disabled" id="li-filter-disabled_@filter.id">
+                        @Html.CheckBoxFor(m =>m.SearchFilters[i].FilterNameList[j].isChecked, new { @id = @category.FilterType + "_" + @filter.id, @oncheckedchange = "" })
+                        @Html.HiddenFor(m => m.SearchFilters[i].FilterType)
+                        @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[j].id)
+                        @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[j].value)
+                        @Html.DisplayFor(m => m.SearchFilters[i].FilterNameList[j].value) 
+                        ( @filter.count )
+                    </li> 
+
+                        j++;
                     }
-                    foreach (var cat in categories)
-                    {
-                        if (filterCats.Contains(cat))
-                        {
-                            <li class="list-unstyled li-filter-enabled" id="li-filter-enabled_@cat" data-cat="@cat">
-                                @cat
-                                <span class="filter-enabled-glyph glyphicon glyphicon-remove"></span>
-                            </li>
-                        }
-                        else
-                        {
-                            <li class="list-unstyled li-filter-disabled" id="li-filter-disabled_@cat" data-cat="@cat">
-                                @cat
-                                <span class="filter-disabled-glyph glyphicon glyphicon-plus"></span>
-                            </li>
-                        }
-                    }
+                    j = 0;
+                    i++;
                 }
             </ul>
-        </div>
-    </div>
-    <div id="DatasetItemList" class="dataset-list">
-        <div class="browse-category">
-            <h4>
-                Found @Model.DatasetList.Count() Dataset(s)...
-            </h4>
-        </div>
-        <ul class="list-unstyled">
-            @foreach (var item in Model.DatasetList)
-            {
-                <li class="ul-dataset-list-item">
-                    @Html.Partial("_ListItem", item)
-                </li>
-            }
-        </ul>
-    </div>
-</div>
-
-@*PROGRESS BAR MODAL*@
-<div class="modal fade in" id="mod-progress" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                File Progress
-            </div>
-            <div class="modal-body">
-                <div class="text-center">
-                    <div class="i-circle warning"><i class="fa fa-info"></i></div>
-                    <div id="result" style="font-size: 1.1em; padding-bottom: 5px">
-                        <p id="progressBarParagraph"></p>
-                        <p id="progressBarPercentage"></p>
-                    </div>
-                    <div style="width: 30%; margin: 0 auto; display:none;">
-                        <div id="progressbar" style="width: 300px; height: 15px"></div>
-                        <br />
-                    </div>
-                    <div id="ProgressStripe" class="progress progress-striped active" style="position:relative; top:10px; width:100%;">
-                        <div id="ProgressMessage" class="progress-bar progress-bar-info" style="width: 100%; border:none;"></div>
-                    </div>
-                    <br />
-                </div>
+            <div>
+                <input type="submit" name="btn_@category.FilterType"  class="button" value="List" id="btnApply_@category.FilterType" hidden />
             </div>
         </div>
-        <!-- /.modal-content -->
     </div>
-    <!-- /.modal-dialog -->
-</div>
-<!-- /.modal -->
-
-
-
-@section Scripts {
-    <script>
-        $(function () {
-            data.Dataset.ListInit();
-        });
-    </script>
+                    }
 }
+</div>
+
+@* Main Content *@
+        <div class="col-sm-9">
+            <div id="DatasetItemList" class="dataset-list">
+                <div class="browse-category">
+                    <h4>
+                        Found @Model.DatasetList.Count() Dataset(s)...
+                    </h4>
+                </div>
+                <ul class="list-unstyled">
+                    @foreach (var item in Model.DatasetList)
+                    {
+                        <li class="ul-dataset-list-item">
+                            @Html.Partial("_ListItem", item)
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+        }
+        }
+
+        @*PROGRESS BAR MODAL*@
+        <div class="modal fade in" id="mod-progress" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        File Progress
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center">
+                            <div class="i-circle warning"><i class="fa fa-info"></i></div>
+                            <div id="result" style="font-size: 1.1em; padding-bottom: 5px">
+                                <p id="progressBarParagraph"></p>
+                                <p id="progressBarPercentage"></p>
+                            </div>
+                            <div style="width: 30%; margin: 0 auto; display:none;">
+                                <div id="progressbar" style="width: 300px; height: 15px"></div>
+                                <br />
+                            </div>
+                            <div id="ProgressStripe" class="progress progress-striped active" style="position:relative; top:10px; width:100%;">
+                                <div id="ProgressMessage" class="progress-bar progress-bar-info" style="width: 100%; border:none;"></div>
+                            </div>
+                            <br />
+                        </div>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- /.modal -->
+
+
+
+        @section Scripts {
+            <script>
+                $(function () {
+                    data.Dataset.ListInit();
+
+                    $("[id^=btnApply_]").click(function (e) {
+                        var $btn = $("[id^=btnApply_]")
+                        $btn.attr('hidden', 'hidden')
+
+                    });
+
+                });
+
+            </script>
+
+            <script>
+
+            </script>
+        }

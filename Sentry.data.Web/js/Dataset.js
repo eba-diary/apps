@@ -3,7 +3,7 @@
  ******************************************************************************************/
 
 data.Dataset = {
-    
+
     IndexInit: function () {
         /// <summary>
         /// Initialize the Index page for data assets (with the categories)
@@ -23,45 +23,46 @@ data.Dataset = {
         /// <summary>
         /// Initialize the List results page for data assets
         /// </summary>
+
         $("[id^='datasetViewDetails_']").off('click').on('click', function (e) {
             e.preventDefault();
-            data.Dataset.ViewDetails($(this).data("id"))
+            data.Dataset.ViewDetails($(this).data("id"));
         });
 
         $("[id^='DownloadDataset_']").off('click').on('click', function (e) {
             e.preventDefault();
-            data.Dataset.DownloadDataset($(this).data("id"))
+            data.Dataset.DownloadDataset($(this).data("id"));
         });
-/*
-        $("[id^='datasetViewDetails_']").mouseenter(function (e) {
-            e.preventDefault();
-            $("[id=datasetViewDetailsHover_" + $(this).data("id") + "]").fadeIn();
-        });
-
-        $("[id^='datasetViewDetails_']").mouseleave(function (e) {
-            e.preventDefault();
-            $("[id=datasetViewDetailsHover_" + $(this).data("id") + "]").fadeOut(0);
-        });
-*/
-        $("[id^='li-filter-disabled_']").hover(function (e) {
-            $(this).children('span.filter-disabled-glyph').css({ 'display': 'inline-block' })
-        }, function (e) {
-            $(this).children('span.filter-disabled-glyph').css({ 'display': 'none' })
-        });
-
-        $("[id^='li-filter-disabled_']").click(function (e) {
-            e.preventDefault();
-            data.Dataset.DisplayCategory($(this).data("cat"));
-        });
-
-        $("[id^='li-filter-enabled_']").click(function (e) {
-            e.preventDefault();
-            data.Dataset.DisplayCategory(null);
-        });
+        /*
+                $("[id^='datasetViewDetails_']").mouseenter(function (e) {
+                    e.preventDefault();
+                    $("[id=datasetViewDetailsHover_" + $(this).data("id") + "]").fadeIn();
+                });
         
+                $("[id^='datasetViewDetails_']").mouseleave(function (e) {
+                    e.preventDefault();
+                    $("[id=datasetViewDetailsHover_" + $(this).data("id") + "]").fadeOut(0);
+                });
+        */
+        $("[id^='li-filter-disabled_']").hover(function (e) {
+            $(this).children('span.filter-disabled-glyph').css({ 'display': 'inline-block' });
+        }, function (e) {
+            $(this).children('span.filter-disabled-glyph').css({ 'display': 'none' });
+        });
+
+        //$("[id^='li-filter-disabled_']").click(function (e) {
+        //    e.preventDefault();
+        //    data.Dataset.DisplayCategory($(this).data("cat"));
+        //});
+
+        //$("[id^='li-filter-enabled_']").click(function (e) {
+        //    e.preventDefault();
+        //    data.Dataset.DisplayCategory(null);
+        //});
+
         $("[id^='Pushtofilename_']").off('click').on('click', function (e) {
             e.preventDefault();
-            data.Dataset.FileNameModal($(this).data("id"))
+            data.Dataset.FileNameModal($(this).data("id"));
         });
 
         $(document).on('show.bs.modal', '.modal', function (event) {
@@ -72,6 +73,46 @@ data.Dataset = {
             }, 0);
         });
 
+        //Testing Functionality
+        $("[id^='li-filter-disabled_Test_']").click(function (e) {
+            e.preventDefault();
+            data.Dataset.DisplayCategory_test($(this).data("filter-type"), $(this).data("value"));
+        });
+
+        $("[id^='Category_']").click(function (e) {
+            var $btn = $("[id^=btnApply_Category]");
+            $btn.removeAttr('hidden');
+        });
+
+        $("[id^='Frequency_']").click(function (e) {
+            var $btn = $("[id^=btnApply_Frequency]");
+            $btn.removeAttr('hidden');
+        });
+
+        $("[id^='Sentry Owner_']").click(function (e) {
+            var $btn = $("[id^=btnApply_Sentry]");
+            $btn.removeAttr('hidden');
+        });
+
+
+        //$(function () {
+        //    var $btn = $("[id^=btnApply_]");
+        //    var $chk = $("[id^='frequency_']");
+        //    // check on page load
+        //    checkChecked($chk);
+        //    $chk.click(function () {
+        //        checkChecked($chk);
+        //    });
+        //    function checkChecked(chkBox) {
+        //        if ($chk.is(':checked')) {
+        //            $btn.removeAttr('hidden');
+        //        }
+        //        else {
+        //            $btn.attr('hidden', 'hidden')
+        //        }
+        //    }
+        //});
+
     },
 
     DetailInit: function () {
@@ -80,22 +121,22 @@ data.Dataset = {
         /// </summary>
         $("[id^='EditDataset_']").off('click').on('click', function (e) {
             e.preventDefault();
-            data.Dataset.ViewEdit($(this).data("id"))
+            data.Dataset.ViewEdit($(this).data("id"));
         });
 
         $("[id^='DownloadDataset_']").off('click').on('click', function (e) {
             e.preventDefault();
-            data.Dataset.DownloadDataset($(this).data("id"))
+            data.Dataset.DownloadDataset($(this).data("id"));
         });
 
         $("[id^='PushtoSAS_']").off('click').on('click', function (e) {
             e.preventDefault();
-            data.Dataset.PushToSAS($(this).data("id"))
+            data.Dataset.PushToSAS($(this).data("id"));
         });
 
         $("[id^='Pushtofilename_']").off('click').on('click', function (e) {
             e.preventDefault();
-            data.Dataset.FileNameModal($(this).data("id"))
+            data.Dataset.FileNameModal($(this).data("id"));
         });
 
         $(document).on('show.bs.modal', '.modal', function (event) {
@@ -146,17 +187,17 @@ data.Dataset = {
         });
     },
 
-   PushToSAS_Filename: function (filename) {
+    PushToSAS_Filename: function (filename) {
         /// <summary>
         /// Download dataset from S3 and push to SAS file share
         /// </summary>
-        var val = document.getElementById('FileNameOverride').value
+        var val = document.getElementById('FileNameOverride').value;
         var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(id) + "&filename=" + encodeURI(val);
         data.Dataset.ProgressModalStatus();
         $.post(controllerURL);
     },
 
-    PushToOverrideInit: function() {
+    PushToOverrideInit: function () {
         ///<summary>
         ///Initialize the PushToFilenameOverride partial view
         ///</summary>
@@ -172,8 +213,8 @@ data.Dataset = {
         /// <summary>
         /// Load a dataset Listing for a given category
         /// </summary>
-        searchPhrase = data.Dataset.getParameterByName("searchPhrase")
-        url = "/Dataset/List"
+        searchPhrase = data.Dataset.getParameterByName("searchPhrase");
+        url = "/Dataset/List/Index";
         if (searchPhrase != null && searchPhrase != "") {
             url = url + "?searchPhrase=" + encodeURI(searchPhrase);
         }
@@ -187,6 +228,25 @@ data.Dataset = {
         window.location = url;
     },
 
+    DisplayCategory_test: function (type, value) {
+        /// <summary>
+        /// Load a dataset Listing for a given category
+        /// </summary>
+        searchPhrase = data.Dataset.getParameterByName("searchPhrase");
+        url = "/Dataset/List";
+        if (searchPhrase != null && searchPhrase != "") {
+            url = url + "?searchPhrase=" + encodeURI(searchPhrase);
+        }
+        if (value != null && value != "") {
+            if (searchPhrase != null && searchPhrase != "") {
+                url = url + "&filtertype=" + encodeURI(type) + "&filtervalue=" + encodeURI(value);
+            } else {
+                url = url + "?filtertype=" + encodeURI(type) + "&filtervalue=" + encodeURI(value);
+            }
+        }
+        window.location = url;
+    },
+
     AjaxSuccess: function () {
         /// <summary>
         /// Event handlers for a successful AJAX post from the Add or
@@ -195,11 +255,11 @@ data.Dataset = {
         /// <param name="data">Response from the Ajax post</param>
         /// <param name="parentCategory">The parent category ID, that we now need to reload</param>
         //if (Sentry.WasAjaxSuccessful(data)) {
-            Sentry.HideAllModals();
-            //var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(datasetID) + "&Override=" + encodeURI(filenameOverride);
-            //data.Dataset.ProgressModalStatus();
-            //$.post(controllerURL);
-            //dataMySentryBayTestApp.Category.ReloadCategory(parentCategory);
+        Sentry.HideAllModals();
+        //var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(datasetID) + "&Override=" + encodeURI(filenameOverride);
+        //data.Dataset.ProgressModalStatus();
+        //$.post(controllerURL);
+        //dataMySentryBayTestApp.Category.ReloadCategory(parentCategory);
         //}
     },
 
@@ -239,7 +299,7 @@ data.Dataset = {
     },
 
     ProgressModalStatus: function () {
-// --- progress bar stuff : start ---
+        // --- progress bar stuff : start ---
         // Reference the auto-generated proxy for the hub.
         var progress = $.connection.progressHub;
         console.log(progress);
@@ -270,6 +330,6 @@ data.Dataset = {
             modal.SetFocus("#FileNameOverride");
         });
     }
-    
-}
+
+};
 

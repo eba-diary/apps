@@ -11,6 +11,7 @@ using System.Web.Mvc;
 using System.Web.SessionState;
 using System.Linq.Dynamic;
 using System.Web;
+using Sentry.data.Web.Helpers;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -211,14 +212,232 @@ namespace Sentry.data.Web.Controllers
             return View(dsList);
         }
 
+        [Route("Dataset/List")]
+        public ActionResult List(ListDatasetModel ldm)
+        {
+            ldm.CategoryList = GetDatasetModelList().Select(x => x.Category).Distinct().ToList();
+            ldm.SentryOwnerList = GetSentryOwnerList();
+            
+                                    
+            IList<FilterNameModel> checkedFrequencies = ldm.SearchFilters.Where(f => f.FilterType == "Frequency").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).ToList();
+            IList<FilterNameModel> checkedCategories = ldm.SearchFilters.Where(f => f.FilterType == "Category").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).ToList();
+            IList<FilterNameModel> checkedOwners = ldm.SearchFilters.Where(f => f.FilterType == "Sentry Owner").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).ToList();
+
+
+            List<BaseDatasetModel> freqencyDsList = new List<BaseDatasetModel>();
+
+            foreach (var cf in checkedFrequencies)
+            {
+                string var = cf.value;
+                List<BaseDatasetModel> tempList = new List<BaseDatasetModel>();
+
+                tempList = GetDatasetModelList().Where(x => x.CreationFreqDesc == cf.value).ToList();
+
+                freqencyDsList = freqencyDsList.Union(tempList).ToList();                    
+            }
+
+
+            List<BaseDatasetModel> categoryDsList = new List<BaseDatasetModel>();
+
+            foreach (var cc in checkedCategories)
+            {
+                string var = cc.value;
+                List<BaseDatasetModel> tempList = new List<BaseDatasetModel>();
+
+                tempList = GetDatasetModelList().Where(x => x.Category == cc.value).ToList();
+
+                categoryDsList = categoryDsList.Union(tempList).ToList();               
+            }
+
+
+            List<BaseDatasetModel> ownerDsList = new List<BaseDatasetModel>();
+
+            foreach (var co in checkedOwners)
+            {
+                string var = co.value;
+                List<BaseDatasetModel> tempList = new List<BaseDatasetModel>();
+
+                tempList = GetDatasetModelList().Where(x => x.SentryOwnerName == co.value).ToList();
+
+                ownerDsList = ownerDsList.Union(tempList).ToList();                    
+            }
+
+            IList<BaseDatasetModel> dsList = Utility.IntersectAllIfEmpty(freqencyDsList, categoryDsList, ownerDsList);
+
+
+            if (dsList.Count == 0 && checkedCategories.Count == 0 && checkedFrequencies.Count == 0 && checkedOwners.Count == 0)
+            {
+                dsList = GetDatasetModelList().ToList();
+            }
+
+            ldm.DatasetList = dsList;
+            ldm.SearchFilters = GetDatasetFilters(ldm, null);
+            
+            return View(ldm);
+        }
+
+        private IList<FilterModel> GetDatasetFilters(ListDatasetModel ldm, string cat)
+        {
+            //get current list of datasets
+            List<BaseDatasetModel> baseDsList = GetDatasetModelList().ToList();
+
+            //create FilterModel list object to return
+            IList<FilterModel> FilterList = new List<FilterModel>();
+            IList<FilterNameModel> FilterNames = new List<FilterNameModel>();
+
+            //Generate Frequency Filters
+            FilterModel Filter = new FilterModel();
+            Filter.FilterType = "Frequency";
+
+            IDictionary<int, string> enumList = EnumToDictionary(typeof(DatasetFrequency));
+            IList<FilterNameModel> fList = new List<FilterNameModel>();
+            foreach (var item in enumList)
+            {
+                FilterNameModel nf = new FilterNameModel();
+                nf.id = item.Key;
+                nf.value = item.Value;
+
+                //Match isChecked status to status on input model
+                if (ldm.SearchFilters.Count() > 0)
+                {
+                    if (ldm.SearchFilters.Where(f => f.FilterType == "Frequency").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).Count() > 0)
+                    {
+                        if (ldm.SearchFilters.Where(f => f.FilterType == "Frequency").SelectMany(fi => fi.FilterNameList).Where(fil => fil.value == item.Value && fil.isChecked == true).Count() > 0)
+                        {
+                            nf.isChecked = true;
+                        }
+                    }
+                }
+
+                //Count of all datasets equal to this filter
+                nf.count = ldm.DatasetList.Where(f => f.CreationFreqDesc == nf.value).Count();
+
+                fList.Add(nf);
+            }
+            Filter.FilterNameList = fList;
+            FilterList.Add(Filter);
+
+            //Generate Category Filers
+            Filter = new FilterModel();
+            Filter.FilterType = "Category";
+
+            fList = new List<FilterNameModel>();
+
+            int i = 0;
+            
+            //foreach (string category in baseDsList.Select(x => x.Category).Distinct().ToList())
+            foreach (string category in _datasetContext.Categories.Select(x => x.Name).ToList())
+                {
+                FilterNameModel nf = new FilterNameModel();
+                nf.id = i;
+                nf.value = category;
+
+                //Match isChecked status to status on input model
+                if (ldm.SearchFilters.Count() > 0)
+                {
+                    if (ldm.SearchFilters.Where(f => f.FilterType == "Category").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).Count() > 0)
+                    {
+                        if (ldm.SearchFilters.Where(f => f.FilterType == "Category").SelectMany(fi => fi.FilterNameList).Where(fil => fil.value == category && fil.isChecked == true).Count() > 0)
+                        {
+                            nf.isChecked = true;
+                        }
+                    }
+                }
+                else
+                {
+                    if (category == cat)
+                    {
+                        nf.isChecked = true;
+                    }
+                }
+
+                //Count of all datasets equal to this filter
+                nf.count = ldm.DatasetList.Where(f => f.Category == nf.value).Count();
+
+                fList.Add(nf);
+                i++;
+            }
+            Filter.FilterNameList = fList;
+            FilterList.Add(Filter);
+
+
+            //Generate SentryOwner Filers
+            Filter = new FilterModel();
+            Filter.FilterType = "Sentry Owner";
+
+            fList = new List<FilterNameModel>();
+
+            i = 0;
+
+            //foreach (string category in baseDsList.Select(x => x.Category).Distinct().ToList())
+            foreach (string category in _datasetContext.Datasets.Select(x => x.SentryOwnerName).Distinct().ToList())
+            {
+                FilterNameModel nf = new FilterNameModel();
+                nf.id = i;
+                nf.value = category;
+
+                //Match isChecked status to status on input model
+                if (ldm.SearchFilters.Count() > 0)
+                {
+                    if (ldm.SearchFilters.Where(f => f.FilterType == "Sentry Owner").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).Count() > 0)
+                    {
+                        if (ldm.SearchFilters.Where(f => f.FilterType == "Sentry Owner").SelectMany(fi => fi.FilterNameList).Where(fil => fil.value == category && fil.isChecked == true).Count() > 0)
+                        {
+                            nf.isChecked = true;
+                        }
+                    }
+                }
+
+                //Count of all datasets equal to this filter
+                nf.count = ldm.DatasetList.Where(f => f.SentryOwnerName == nf.value).Count();
+
+                fList.Add(nf);
+                i++;
+            }
+            Filter.FilterNameList = fList;
+            FilterList.Add(Filter);
+
+            return FilterList;
+        }
+
+        private IDictionary<int, string> EnumToDictionary<T>(){
+
+            return EnumToDictionary(GetType());
+        }
+
+        private IDictionary<int, string> EnumToDictionary(Type e)
+        {
+            if (!(e.IsEnum)) {
+                throw new InvalidOperationException("Enum list view model must have Enum generic type constraint");
+            }
+
+            Dictionary<int, string> kvp = new Dictionary<int, string>();
+
+            string[] namedValues = System.Enum.GetNames(e);
+
+            foreach (var nv in namedValues)
+            {
+                int castValue = (int)(Enum.Parse(e, nv));
+                var enumVal = System.Enum.Parse(e, nv);
+                if (!(kvp.ContainsKey(castValue) && castValue > 0)) {
+                    kvp.Add(castValue, enumVal.ToString());
+                }
+            }
+
+            return kvp;
+            
+        }
+
         // JCG TODO: Add unit tests for List()
         // GET: Dataset/List/searchParms
+        [Route("Dataset/List/Index")]
         public ActionResult List(string category, string searchPhrase)
         {
             ListDatasetModel rspModel = new ListDatasetModel();
 
             // get all unique categories (regardless of earch category)
-            rspModel.CategoryList = GetDatasetModelList().Select(x => x.Category).Distinct().ToList();
+            //rspModel.CategoryList = GetDatasetModelList().Select(x => x.Category).Distinct().ToList();
+            //rspModel.SentryOwnerList = GetSentryOwnerList();
 
             List<BaseDatasetModel> dsList = null;
 
@@ -289,7 +508,17 @@ namespace Sentry.data.Web.Controllers
             {
                 rspModel.DatasetList = dsList;
             }
+
+            rspModel.SearchFilters = GetDatasetFilters(rspModel, category);
+            //(rspModel.SearchFilters.SelectMany(x => x.FilterNameList).Where(i => i.value == category).Select(c => c.isChecked)) = true;
+
             return View(rspModel);
+        }
+
+        private IList<string> GetSentryOwnerList()
+        {
+            IList<string> var = _datasetContext.GetSentryOwnerList().ToList();
+            return var;
         }
 
         // GET: Dataset/Detail/key
@@ -317,7 +546,7 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Upload()
         {
             UploadDatasetModel udm = new UploadDatasetModel();
-            udm.AllCategories = GetCategorySelectListItems(); //load all values for dropdown
+            udm.AllCategories = GetCategoryList();
             udm.AllFrequencies = GetDatasetFrequencyListItems();  //load all values for dropdown
             udm.FreqencyID = 6; // preselected NonSchedule
             return View(udm);
@@ -406,7 +635,7 @@ namespace Sentry.data.Web.Controllers
             else
             {
                 _datasetContext.Clear();
-                udm.AllCategories = GetCategorySelectListItems();  //Reload dropdown value list
+                udm.AllCategories = GetCategoryList().Select(x => new SelectListItem() { Text = x.ToString() });  //Reload dropdown value list
                 udm.AllFrequencies = GetDatasetFrequencyListItems();  //Reload dropdown value list
                 udm.FreqencyID = 6; // preselected NonSchedule
             }
@@ -486,7 +715,7 @@ namespace Sentry.data.Web.Controllers
         //public ActionResult Create()
         //{
         //    EditDatasetModel item = new EditDatasetModel { LastSchemaChangeDate = DateTime.Now, LastDataRefreshDate = DateTime.Now };
-        //    item.AllCategories = GetCategorySelectListItems();
+        //    item.AllCategories = GetCategoryList();
         //    return View(item);
         //}
 
@@ -511,7 +740,7 @@ namespace Sentry.data.Web.Controllers
         //        _dataAssetContext.Clear();
         //    }
 
-        //    i.AllCategories = GetCategorySelectListItems(); //re-populate the category list for re-display
+        //    i.AllCategories = GetCategoryList(); //re-populate the category list for re-display
         //    return View(i);
         //}
 
@@ -553,7 +782,7 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        private IEnumerable<SelectListItem> GetCategorySelectListItems()
+        private IEnumerable<SelectListItem> GetCategoryList()
         {
             IEnumerable<SelectListItem> var = _datasetContext.Categories.OrderByHierarchy().Select((c) => new SelectListItem { Text = c.FullName, Value = c.Id.ToString() });
 

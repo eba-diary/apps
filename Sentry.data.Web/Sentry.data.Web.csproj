@@ -259,6 +259,7 @@
     <Compile Include="Controllers\LayoutController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Helpers\Utility.cs" />
     <Compile Include="DependencyResolution\ControllerConvention.cs" />
     <Compile Include="DependencyResolution\StructureMapMvcDependencyResolver.cs" />
     <Compile Include="DependencyResolution\StructureMapWebApiDependencyResolver.cs" />
@@ -295,6 +296,7 @@
     <Compile Include="Models\Dataset\_DatasetMetadataModel.cs" />
     <Compile Include="Models\Defect\BaseDefectModel.cs" />
     <Compile Include="Models\Feed\DataFeedItemModel.cs" />
+    <Compile Include="Models\FilterModel.cs" />
     <Compile Include="Models\HomeModel.cs" />
     <Compile Include="Models\Asset\BaseAssetModel.cs" />
     <Compile Include="Models\Asset\AssetStateModel.cs" />
@@ -304,6 +306,7 @@
     <Compile Include="Models\Dataset\BaseDatasetModel.cs" />
     <Compile Include="Models\Dataset\EditDatasetModel.cs" />
     <Compile Include="Models\Dataset\ViewDatasetModel.cs" />
+    <Compile Include="Models\FilterNameModel.cs" />
     <Compile Include="Models\SearchModel.cs" />
     <Compile Include="Models\SharedContextModel.cs" />
     <Compile Include="Models\User\UserGridModel.cs" />
@@ -587,6 +590,7 @@
     <Content Include="Images\Category\geographic.png" />
     <Content Include="Images\Category\government.png" />
     <Content Include="Images\Category\industry.png" />
+    <Content Include="Images\Category\weather.png" />
     <Content Include="Images\sas_logo.png" />
     <Content Include="Images\sas_logo_min.png" />
     <Content Include="Images\sas_logo_rectangle.png" />
