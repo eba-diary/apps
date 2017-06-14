@@ -24,6 +24,8 @@ namespace Sentry.data.Core
         IEnumerable<DatasetFrequency> GetDatasetFrequencies();
         
         void DeleteAllData();
+
+        Boolean s3KeyDuplicate(string s3key);
         //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
     }
 

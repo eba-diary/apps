@@ -77,6 +77,17 @@ namespace Sentry.data.Infrastructure
             return ds;
         }
 
+        public Boolean s3KeyDuplicate(string s3key)
+        {
+            if (Query<Dataset>().Where(x => x.S3Key == s3key).Count() == 0){
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
         public IEnumerable<String> GetCategoryList()
         {
             return Query<Dataset>().Select(s => s.Category).Distinct().AsEnumerable();
