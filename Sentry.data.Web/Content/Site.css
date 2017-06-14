@@ -141,6 +141,11 @@ ul.list-group-indented {
     margin-bottom: 0px;
 }
 
+.btn-filter-apply {
+    margin-bottom: 2px;
+    margin-left: 2px;
+}
+
 .dataset-list-filter-category {
     padding: 0;
 }
@@ -264,22 +269,27 @@ ul.list-group-indented {
 }
 
 .category-claim {
-    background-color: #71999F;
+    background-color: #005844;
     color: #FFFFFF;
 }
 
 .category-geographic {
-    background-color: #84BD00;
+    background-color: #74531C;
     color: #FFFFFF;
 }
 
 .category-government {
-    background-color: #EAAA00;
+    background-color: #72246C;
     color: #FFFFFF;
 }
 
 .category-industry {
-    background-color: #003DA5;
+    background-color: #683431;
+    color: #FFFFFF;
+}
+
+.category-weather {
+    background-color: #285780;
     color: #FFFFFF;
 }
 
