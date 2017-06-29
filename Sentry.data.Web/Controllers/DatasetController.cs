@@ -12,6 +12,9 @@ using System.Web.SessionState;
 using System.Linq.Dynamic;
 using System.Web;
 using Sentry.data.Web.Helpers;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using RestSharp;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -22,6 +25,8 @@ namespace Sentry.data.Web.Controllers
         private UserService _userService;
         private IDatasetService _s3Service;
         private static Amazon.S3.IAmazonS3 _s3client = null;
+        //private IApiClient _apiClient;
+        //private IWeatherDataProvider _weatherDataProvider;
 
         // JCG TODO: Revisit, Could this be push down into the Infrastructure\Core layer? 
         private Amazon.S3.IAmazonS3 S3Client
@@ -81,6 +86,7 @@ namespace Sentry.data.Web.Controllers
             _datasetContext = dsCtxt;
             _s3Service = dsSvc;
             _userService = userService;
+            //_weatherDataProvider = weatherDataProvider;
         }
 
         //private static List<BaseDatasetModel> _demoDatasetData;
@@ -285,43 +291,12 @@ namespace Sentry.data.Web.Controllers
             IList<FilterModel> FilterList = new List<FilterModel>();
             IList<FilterNameModel> FilterNames = new List<FilterNameModel>();
 
-            //Generate Frequency Filters
+            //Generate Category Filers
             FilterModel Filter = new FilterModel();
-            Filter.FilterType = "Frequency";
+            Filter.FilterType = "Category";
 
             IDictionary<int, string> enumList = EnumToDictionary(typeof(DatasetFrequency));
             IList<FilterNameModel> fList = new List<FilterNameModel>();
-            foreach (var item in enumList)
-            {
-                FilterNameModel nf = new FilterNameModel();
-                nf.id = item.Key;
-                nf.value = item.Value;
-
-                //Match isChecked status to status on input model
-                if (ldm.SearchFilters.Count() > 0)
-                {
-                    if (ldm.SearchFilters.Where(f => f.FilterType == "Frequency").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).Count() > 0)
-                    {
-                        if (ldm.SearchFilters.Where(f => f.FilterType == "Frequency").SelectMany(fi => fi.FilterNameList).Where(fil => fil.value == item.Value && fil.isChecked == true).Count() > 0)
-                        {
-                            nf.isChecked = true;
-                        }
-                    }
-                }
-
-                //Count of all datasets equal to this filter
-                nf.count = ldm.DatasetList.Where(f => f.CreationFreqDesc == nf.value).Count();
-
-                fList.Add(nf);
-            }
-            Filter.FilterNameList = fList;
-            FilterList.Add(Filter);
-
-            //Generate Category Filers
-            Filter = new FilterModel();
-            Filter.FilterType = "Category";
-
-            fList = new List<FilterNameModel>();
 
             int i = 0;
             
@@ -393,6 +368,39 @@ namespace Sentry.data.Web.Controllers
 
                 fList.Add(nf);
                 i++;
+            }
+            Filter.FilterNameList = fList;
+            FilterList.Add(Filter);
+
+
+            //Generate Frequency Filters
+            Filter = new FilterModel();
+            Filter.FilterType = "Frequency";
+
+            fList = new List<FilterNameModel>();
+
+            foreach (var item in enumList)
+            {
+                FilterNameModel nf = new FilterNameModel();
+                nf.id = item.Key;
+                nf.value = item.Value;
+
+                //Match isChecked status to status on input model
+                if (ldm.SearchFilters.Count() > 0)
+                {
+                    if (ldm.SearchFilters.Where(f => f.FilterType == "Frequency").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).Count() > 0)
+                    {
+                        if (ldm.SearchFilters.Where(f => f.FilterType == "Frequency").SelectMany(fi => fi.FilterNameList).Where(fil => fil.value == item.Value && fil.isChecked == true).Count() > 0)
+                        {
+                            nf.isChecked = true;
+                        }
+                    }
+                }
+
+                //Count of all datasets equal to this filter
+                nf.count = ldm.DatasetList.Where(f => f.CreationFreqDesc == nf.value).Count();
+
+                fList.Add(nf);
             }
             Filter.FilterNameList = fList;
             FilterList.Add(Filter);
@@ -548,6 +556,7 @@ namespace Sentry.data.Web.Controllers
             UploadDatasetModel udm = new UploadDatasetModel();
             udm.AllCategories = GetCategoryList();
             udm.AllFrequencies = GetDatasetFrequencyListItems();  //load all values for dropdown
+            udm.AllOriginationCodes = GetDatasetOriginationListItems(); //load all values for dropdown
             udm.FreqencyID = 6; // preselected NonSchedule
             return View(udm);
         }
@@ -561,53 +570,47 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
+
+                if (_datasetContext.Datasets.Any(m => m.DatasetName == udm.DatasetName))
+                {
+                    throw new ValidationException("Dataset name already exists");
+                }
+
+                if (DatasetFile == null)
+                {
+                    throw new ValidationException("Please select file to be uploaded");
+                }
+
                 string category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs).Name;
                 string frequency = ((DatasetFrequency)udm.FreqencyID).ToString();
+                string originationcode = ((DatasetOriginationCode)udm.OriginationID).ToString();
                 string dsfi = System.IO.Path.GetFileName(DatasetFile.FileName);
                 string s3key = category + "/" + dsfi;
 
                 if (_datasetContext.s3KeyDuplicate(s3key))
                 {
-                    throw new ValidationException("File already exsits on S3");
+                    throw new ValidationException("File already exists on S3");
                 }
-                if (_datasetContext.Datasets.Any(m => m.DatasetName == udm.DatasetName))
-                {
-                    throw new ValidationException("Dataset name already exsists");
-                }
+
 
                 Sentry.Common.Logging.Logger.Debug("Entered HttpPost <Upload>");
                 if (ModelState.IsValid)
                 {
-                    try
-                    {
-                        Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");
-                        // 1. upload dataset
-                        Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
-                        Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
-                        Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + Configuration.Config.GetSetting("AWSRootBucket"));
-                        s3tuReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
-                        Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - InputStream");
-                        s3tuReq.InputStream = DatasetFile.InputStream;
-                        Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + category + "/" + dsfi);
-                        s3tuReq.Key = category + "/" + dsfi;
-                        s3tuReq.UploadProgressEvent += new EventHandler<Amazon.S3.Transfer.UploadProgressArgs>(uploadRequest_UploadPartProgressEvent);
-                        s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
-                        s3tuReq.AutoCloseStream = true;
-                        Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Starting Upload " + s3tuReq.Key);
-                        s3tu.Upload(s3tuReq);
-
-                    }
-                    catch (Exception e)
-                    {
-                        if (e is AmazonS3Exception)
-                        {
-                            Sentry.Common.Logging.Logger.Error("S3 Upload Error", e);
-                        }
-                        else
-                        {
-                            Sentry.Common.Logging.Logger.Error("Error", e);
-                        }
-                    }
+                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");
+                    // 1. upload dataset
+                    Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
+                    Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
+                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + Configuration.Config.GetSetting("AWSRootBucket"));
+                    s3tuReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
+                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - InputStream");
+                    s3tuReq.InputStream = DatasetFile.InputStream;
+                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + category + "/" + dsfi);
+                    s3tuReq.Key = category + "/" + dsfi;
+                    s3tuReq.UploadProgressEvent += new EventHandler<Amazon.S3.Transfer.UploadProgressArgs>(uploadRequest_UploadPartProgressEvent);
+                    s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
+                    s3tuReq.AutoCloseStream = true;
+                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Starting Upload " + s3tuReq.Key);
+                    s3tu.Upload(s3tuReq);
 
 
                     // 2. create dataset metadata
@@ -621,7 +624,7 @@ namespace Sentry.data.Web.Controllers
                         udm.CreationUserName,
                         udm.SentryOwnerName,
                         _userService.GetCurrentUser().DisplayName,
-                        udm.OriginationCode,
+                        originationcode,
                         udm.DatasetDtm,
                         dateTimeNow,
                         dateTimeNow,
@@ -645,16 +648,38 @@ namespace Sentry.data.Web.Controllers
                 }
 
             }
-            catch (Sentry.Core.ValidationException ex)
+            catch (Exception ex)
             {
-                AddCoreValidationExceptionsToModel(ex);
+                if (ex is ValidationException)
+                {
+                    AddCoreValidationExceptionsToModel(ex as ValidationException);
+                    Sentry.Common.Logging.Logger.Error("Error", ex);
+                    
+                }
+                else
+                {
+                    if (ex is AmazonS3Exception)
+                    {
+                        Sentry.Common.Logging.Logger.Error("S3 Upload Error", ex);
+                        ModelState.AddModelError("Upload", ex);
+                    }
+
+                    Sentry.Common.Logging.Logger.Error("Error", ex);
+                }
+                
+            }
+            finally
+            {
                 _datasetContext.Clear();
                 udm.AllCategories = GetCategoryList();  //Reload dropdown value list
                 udm.AllFrequencies = GetDatasetFrequencyListItems();  //Reload dropdown value list
+                udm.AllOriginationCodes = GetDatasetOriginationListItems(); //Reload dropdown value list
                 udm.FreqencyID = 6; // preselected NonSchedule
+                udm.OriginationID = 1; // preselected Internal
+                
             }
-
             return View(udm);
+
         }
 
         /// <summary>
@@ -768,6 +793,8 @@ namespace Sentry.data.Web.Controllers
             EditDatasetModel item = new EditDatasetModel(ds);
             item.AllFrequencies = GetDatasetFrequencyListItems();  // Load dropdown value list
             item.FreqencyID = (int)(Enum.Parse(typeof(DatasetFrequency), ds.CreationFreqDesc));  //Preselect current value
+            item.AllOriginationCodes = GetDatasetOriginationListItems();
+            item.OriginationID = (int)(Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode));  //Preselect current value
             return View(item);
         }
 
@@ -807,6 +834,13 @@ namespace Sentry.data.Web.Controllers
         private IEnumerable<SelectListItem> GetDatasetFrequencyListItems()
         {
             List<SelectListItem> items = Enum.GetValues(typeof(DatasetFrequency)).Cast<DatasetFrequency>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+
+            return items;
+        }
+
+        private IEnumerable<SelectListItem> GetDatasetOriginationListItems()
+        {
+            List<SelectListItem> items = Enum.GetValues(typeof(DatasetOriginationCode)).Cast<DatasetOriginationCode>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
 
             return items;
         }
@@ -907,7 +941,8 @@ namespace Sentry.data.Web.Controllers
         {
             DateTime now = DateTime.Now;
 
-            String frequency = ((DatasetFrequency)eds.FreqencyID).ToString();
+            string frequency = ((DatasetFrequency)eds.FreqencyID).ToString();
+            string originationcode = ((DatasetOriginationCode)eds.OriginationID).ToString();
 
             ds.ChangedDtm = now;
             if (null != eds.Category && eds.Category.Length > 0) ds.Category = eds.Category;
@@ -916,7 +951,7 @@ namespace Sentry.data.Web.Controllers
             if (null != eds.DatasetDesc && eds.DatasetDesc.Length > 0) ds.DatasetDesc = eds.DatasetDesc;
             if (null != eds.DatasetDtm && eds.DatasetDtm > DateTime.MinValue) ds.DatasetDtm = eds.DatasetDtm;
             if (null != eds.DatasetName && eds.DatasetName.Length > 0) ds.DatasetName = eds.DatasetName;
-            if (null != eds.OriginationCode && eds.OriginationCode.Length > 0) ds.OriginationCode = eds.OriginationCode;
+            ds.OriginationCode = originationcode;
             if (null != eds.SentryOwnerName && eds.SentryOwnerName.Length > 0) ds.SentryOwnerName = eds.SentryOwnerName;
             if (eds.RecordCount > 0) ds.RecordCount = eds.RecordCount;
 
@@ -1031,6 +1066,78 @@ namespace Sentry.data.Web.Controllers
 
         }
 
+
+        //[HttpGet()]
+        //public void GetWeatherData(string zip)
+        //{
+        //    System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\" + zip + ".xml", _weatherDataProvider.GetWeather("xml"));
+        //    System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\" + zip + ".json", _weatherDataProvider.GetWeather("json"));
+
+
+        //    //request.AddParameter("name", "value"); // adds to POST or URL querystring based on Method
+        //    //request.AddUrlSegment("id", "123"); // replaces matching token in request.Resource
+
+        //    //// easily add HTTP Headers
+        //    ////request.AddHeader("header", "value");
+
+        //    //// add files to upload (works with compatible verbs)
+        //    ////request.AddFile(path);
+
+        //    //// execute the request         
+
+        //    //// or automatically deserialize result
+        //    //// return content type is sniffed but can be explicitly set via RestClient.AddHandler();
+        //    //RestResponse<Person> response2 = client.Execute<Person>(request);
+        //    //var name = response2.Data.Name;
+
+        //    //// easy async support
+        //    //client.ExecuteAsync(request, response => {
+        //    //    Console.WriteLine(response.Content);
+        //    //});
+
+        //    //// async with deserialization
+        //    //var asyncHandle = client.ExecuteAsync<Person>(request, response => {
+        //    //    Console.WriteLine(response.Data.Name);
+        //    //});
+
+        //    //// abort the request on demand
+        //    //asyncHandle.Abort();
+        //}
+
+
+        //[HttpGet()]
+        //public void GetWeather(string zip)
+        //{
+
+        //    JsonResult jr = new JsonResult();
+        //    jr.Data = GetWeatherByZip(zip);
+        //    string json = JsonConvert.SerializeObject(jr.Data);
+
+
+        //    System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\54481.txt", json);
+        //    //return jr;
+        //}
+
+        //public async Task<ActionResult> GetWeatherByZip(string zip)
+        //{
+        //    string relativePath = zip + "/" + zip + ".json";
+        //    return await this.ApiGet(relativePath);
+        //}
+
+        //protected async Task<ActionResult> ApiGet(string relativePath)
+        //{
+        //    ApiResponse response = await this.ApiClient.GetAsync(relativePath);
+        //    ActionResult result = response.IsSuccessful ? new ContentResult { Content = response.Data, ContentType = "application/json" } as ActionResult : new JsonResult();
+        //    return result;
+        //}
+
+        //protected IApiClient ApiClient
+        //{
+        //    get
+        //    {
+        //        return this._apiClient;
+        //    }
+        //}
 
     }
 }
