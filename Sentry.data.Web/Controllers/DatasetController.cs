@@ -14,7 +14,6 @@ using System.Web;
 using Sentry.data.Web.Helpers;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using RestSharp;
 
 namespace Sentry.data.Web.Controllers
 {
