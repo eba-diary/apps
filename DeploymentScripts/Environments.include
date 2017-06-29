@@ -23,7 +23,15 @@
       <if test="${TargetEnv=='Qual'}">
         <property name="DeployLocations" value="\\SHO-Q-SHDWEB-20\Web$\DataQual;\\DIX-Q-SHDWEB-20\Web$\DataQual"/>
         <property name="envDashSiteEnvId" value="2404" />
-        <property name="createSeerOutage" value="false"/>
+        <property name="createSeerOutage" value="true"/>
+        <property name="seerOutageApplications" value="dataqual"/>
+      </if>
+
+      <if test="${TargetEnv=='Prod'}">
+        <property name="DeployLocations" value="\\SHO-P-SHDWEB-20\Web$\Data;\\DIX-P-SHDWEB-20\Web$\Data"/>
+        <property name="envDashSiteEnvId" value="2405" />
+        <property name="createSeerOutage" value="true"/>
+        <property name="seerOutageApplications" value="data"/>
       </if>
     
       <!--<if test="${TargetEnv=='Qual'}">

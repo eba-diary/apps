@@ -66,6 +66,7 @@ namespace Sentry.data.Web
         [DisplayName("Dataset Name")]
         public string DatasetName { get; set; }
 
+        [Required()]
         [MaxLength(4096)]
         [DisplayName("Description")]
         public string DatasetDesc { get; set; }
@@ -75,6 +76,7 @@ namespace Sentry.data.Web
         [DisplayName("Originating Creator")]
         public string CreationUserName { get; set; }
 
+        [Required]
         [MaxLength(128)]
         [DisplayName("Sentry Owner")]
         public string SentryOwnerName { get; set; }
@@ -84,6 +86,7 @@ namespace Sentry.data.Web
         [DisplayName("Upload User")]
         public string UploadUserName { get; set; }
 
+        //[Required]
         [MaxLength(16)]
         [DisplayName("Origination Code")]
         public string OriginationCode { get; set; }
@@ -94,6 +97,7 @@ namespace Sentry.data.Web
 
         [Required]
         [DisplayName("Original Creation Date")]
+        [DataType(System.ComponentModel.DataAnnotations.DataType.Date)]
         public DateTime DatasetDtm { get; set; }
 
         [DisplayName("File Change Date")]

@@ -72,8 +72,13 @@ namespace Sentry.data.Web
         public IEnumerable<SelectListItem> AllCategories { get; set; }
 
         public IEnumerable<SelectListItem> AllFrequencies { get; set; }
-        
+
+        public IEnumerable<SelectListItem> AllOriginationCodes { get; set; }
+
         [DisplayName("Frequency")]
         public int FreqencyID { get; set; }
+
+        [DisplayName("Origination Code")]
+        public int OriginationID { get; set; }
     }
 }

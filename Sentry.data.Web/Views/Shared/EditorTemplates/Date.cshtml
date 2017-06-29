@@ -11,7 +11,7 @@
     <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
     @if (Model == DateTime.MinValue)
     {
-    @Html.TextBoxFor((model) => model, " ", htmlAttributes)
+    @Html.TextBoxFor((model) => model, "", htmlAttributes)
     }
     else
     {

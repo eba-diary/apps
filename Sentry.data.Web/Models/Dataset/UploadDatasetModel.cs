@@ -18,7 +18,7 @@ namespace Sentry.data.Web
             this.ChangedDtm = DateTime.MinValue;
             this.CreationFreqDesc = DatasetFrequency.NonSchedule.ToString();  // Default to NonScheduled
             this.DatasetDesc = "";
-            this.DatasetDtm = DateTime.MinValue;
+            //this.DatasetDtm = DateTime.MinValue;
             this.DatasetName = "";
             this.FileExtension = "";
             this.FileSize = 0;
@@ -98,11 +98,19 @@ namespace Sentry.data.Web
 
         public IEnumerable<SelectListItem> AllFrequencies { get; set; }
 
+        public IEnumerable<SelectListItem> AllOriginationCodes { get; set; }
+
+        [Required]
         [DisplayName("Categories")]
         public int CategoryIDs { get; set; }
 
+        [Required]
         [DisplayName("Frequency")]
         public int FreqencyID { get; set; }
+
+        [Required]
+        [DisplayName("Origination Code")]
+        public int OriginationID { get; set; }
 
         [DisplayName("Dataset File")]
         public String DatasetFileName { get; set; }
