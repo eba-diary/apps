@@ -77,8 +77,7 @@ namespace Sentry.data.Web
         public string CreationUserName { get; set; }
 
         [Required]
-        [MinLength(6)]
-        [MaxLength(6)]
+        [RegularExpression("(^[0-9]{6,6}$)", ErrorMessage ="Please enter a Sentry ID")]
         [DisplayName("Sentry Owner")]
         public string SentryOwnerName { get; set; }
 

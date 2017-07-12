@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Sentry.Core;
 using Sentry.Common;
 using static Sentry.Common.SystemClock;
+using System.Text.RegularExpressions;
 
 namespace Sentry.data.Core
 {
@@ -387,9 +388,9 @@ namespace Sentry.data.Core
             {
                 vr.Add(ValidationErrors.uploadUserNameIsBlank, "The Dataset UPload User Name is required");
             }
-            if (!int.TryParse(SentryOwnerName, out result))
+            if (!Regex.IsMatch(SentryOwnerName, "(^[0-9]{6,6}$)"))
             {
-                vr.Add(ValidationErrors.sentryOwnerIsNotNumeric, "The Sentry Owner should contain the Sentry ID of the owner");
+                vr.Add(ValidationErrors.sentryOwnerIsNotNumeric, "The Sentry Owner ID should contain owners Sentry ID");
             }
             if (DatasetDtm < new DateTime(1800, 1, 1)) // null dates are ancient; this suffices to check for null dates
             {
