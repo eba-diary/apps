@@ -34,9 +34,9 @@ namespace Sentry.data.Infrastructure
                     AmazonS3Config s3config = new AmazonS3Config();
                     // s3config.RegionEndpoint = RegionEndpoint.GetBySystemName("us-east-1");
                     s3config.RegionEndpoint = RegionEndpoint.GetBySystemName(Configuration.Config.GetSetting("AWSRegion"));
-                    s3config.UseHttp = true;
-                    s3config.ProxyHost = "webproxy.sentry.com";
-                    s3config.ProxyPort = 80;
+                    //s3config.UseHttp = true;
+                    s3config.ProxyHost = Configuration.Config.GetSetting("SentryS3ProxyHost");
+                    s3config.ProxyPort = int.Parse(Configuration.Config.GetSetting("SentryS3ProxyPort"));
                     s3config.ProxyCredentials = System.Net.CredentialCache.DefaultNetworkCredentials;
                     string awsAccessKey = Configuration.Config.GetSetting("AWSAccessKey");
                     string awsSecretKey = Configuration.Config.GetSetting("AWSSecretKey");

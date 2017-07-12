@@ -77,7 +77,8 @@ namespace Sentry.data.Web
         public string CreationUserName { get; set; }
 
         [Required]
-        [MaxLength(128)]
+        [MinLength(6)]
+        [MaxLength(6)]
         [DisplayName("Sentry Owner")]
         public string SentryOwnerName { get; set; }
 

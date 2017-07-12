@@ -361,6 +361,8 @@ namespace Sentry.data.Core
         public virtual ValidationResults ValidateForSave()
         {
             ValidationResults vr = new ValidationResults();
+            int result = -1;
+
             if (string.IsNullOrWhiteSpace(S3Key))
             {
                 vr.Add(ValidationErrors.s3keyIsBlank, "The Dataset S3 Key is required");
@@ -384,6 +386,10 @@ namespace Sentry.data.Core
             if (string.IsNullOrWhiteSpace(UploadUserName))
             {
                 vr.Add(ValidationErrors.uploadUserNameIsBlank, "The Dataset UPload User Name is required");
+            }
+            if (!int.TryParse(SentryOwnerName, out result))
+            {
+                vr.Add(ValidationErrors.sentryOwnerIsNotNumeric, "The Sentry Owner should contain the Sentry ID of the owner");
             }
             if (DatasetDtm < new DateTime(1800, 1, 1)) // null dates are ancient; this suffices to check for null dates
             {
@@ -411,6 +417,7 @@ namespace Sentry.data.Core
             public const string datasetDateIsOld = "datasetDateIsOld";
             public const string uploadDateIsOld = "uploadDateIsOld";
             public const string datasetDescIsBlank = "descIsBlank";
+            public const string sentryOwnerIsNotNumeric = "sentryOwnerIsNotNumeric";
         }
     }
 }
