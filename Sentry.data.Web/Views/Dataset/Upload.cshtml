@@ -20,6 +20,7 @@
         <hr />        
         @Html.HiddenFor(model => model.DatasetId)
         @Html.HiddenFor(model => model.ProgressConnectionId)
+        @Html.HiddenFor(model => model.SentryOwnerName)
 
         @*Show the custom validation summary*@
         @Html.DisplayFor((model) => ViewData.ModelState)
@@ -29,7 +30,7 @@
         </div> 
 
         <div class="form-group">
-            <span class="text-muted col-md-10 col-md-offset-2"><em>** Files larger than 100MB, please contact <a href="mailto:DataArchitecture@Sentry.com?Subject=Dataset%20Management%20-%20Large%20File%20Upload">Data Architecture</a> team</em></span>
+            <span class="text-muted col-md-10 col-md-offset-2"><em>** Files larger than 100MB, please contact <a href="mailto:DataArchitecture@Sentry.com?Subject=Dataset%20Management%20-%20Large%20File%20Upload&Body=**Please%20do%20not%20attach%20file**">Data Architecture</a> team</em></span>
         </div>
 
         <div class="form-group">
@@ -83,12 +84,21 @@
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.SentryOwnerName, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.SentryOwnerName, htmlAttributes: new { @class = "control-label col-md-2"})
             <div class="col-md-10">
-                @Html.EditorFor(model => model.SentryOwnerName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                @Html.ValidationMessageFor(model => model.SentryOwnerName, "", new { @class = "text-danger" })
+                @*@Html.EditorFor(model => model.SentryOwnerName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Sentry ID (i.e. 072984)" } })*@
+                @Html.Editor("OwnerID", new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Sentry ID (i.e. 072984)" } })
+                @*@Html.ValidationMessageFor(model => model.SentryOwnerName, "", new { @class = "text-danger" })*@
             </div>
         </div>
+
+        @*<div class="form-group">
+            @Html.LabelFor(model => model.SentryOwnerName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.SentryOwnerName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Sentry ID (i.e. 072984)" } })
+                @Html.ValidationMessageFor(model => model.SentryOwnerName, "", new { @class = "text-danger" })
+            </div>
+        </div>*@
 
         @*<div class="form-group">
             @Html.LabelFor(model => model.UploadUserName, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -185,18 +195,12 @@
                     @Html.ValidationMessageFor(model => model.md_Metadata, "", new { @class = "text-danger" })
                 </div>
             </div>*@
-            
-        @*<div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="button" value="Gen_Weather" class="btn btn-default" id="GenWeather" />
-            </div>
-        </div>*@
 
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Upload" class="btn btn-default" />
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" value="Upload" class="btn btn-default" />
+                </div>
             </div>
-        </div>
     </div>
 }
 

@@ -146,6 +146,7 @@ data.Dataset = {
                 $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
             }, 0);
         });
+
     },
 
     UploadInit: function () {
@@ -155,6 +156,27 @@ data.Dataset = {
         //$("#CategoryIDs").select2({
         //    placeholder: "Click here to choose one or more categories"
         //});
+        $("[id^='GenWeather']").off('click').on('click', function (e) {
+            e.preventDefault();
+            data.Dataset.GenWeather();
+        });
+
+
+
+        //Set Secure HREmp service URL for associate picker
+        $.assocSetup({ url: "https://hrempsecurequal.sentry.com/api/associates" });
+
+        var picker = $("#OwnerID");
+
+        picker.assocAutocomplete({
+            associateSelected: function (associate) {
+                $('#SentryOwnerName').val(associate.Id);
+            },
+            close: function () {
+                picker.assocAutocomplete("clear");
+
+            }
+        });
     },
 
     EditInit: function () {
@@ -165,6 +187,30 @@ data.Dataset = {
         //$("#CategoryIDs").select2({
         //    placeholder: "Click here to choose one or more categories"
         //});
+
+        var n1 = document.getElementById('SentryOwnerName');
+        var n2 = document.getElementById('OwnerID');
+
+        n2.value = n1.value;
+
+        //Set Secure HREmp service URL for associate picker
+        //var url = ConfigurationManager.AppSettings["HrApiUrl"] + "api/associates"
+        //$.assocSetup({ url: System.Configuration.ConfigurationManager.AppSettings("HrApiUrl") })
+        $.assocSetup({ url: "https://hrempsecurequal.sentry.com/api/associates" });
+
+        var picker = $("#OwnerID");
+
+        picker.assocAutocomplete({
+            associateSelected: function (associate) {
+                $('#SentryOwnerName').val(associate.Id);
+            },
+            close: function () {
+                picker.assocAutocomplete("clear");
+
+            }
+        });
+        
+        //$("#OwnerID").val($("SentryOwnerName").val);
     },
 
     ViewDetails: function (id) {
@@ -329,6 +375,29 @@ data.Dataset = {
             modal.ReplaceModalBody(result);
             modal.SetFocus("#FileNameOverride");
         });
+    },
+
+    GenWeather: function () {
+        //(function ($) {
+            $.ajax({
+                url: "http://api.wunderground.com/api/219e771595b60ca7/geolookup/conditions/q/54481/54481.json",
+                dataType: "jsonp",
+                success: function (parsed_json) {
+                    var location = parsed_json['location']['city'];
+                    var temp_f = parsed_json['current_observation']['temp_f'];
+                    alert("Current temperature in " + location + " is: " + temp_f);
+                }
+            });
+
+            //$.get("/Dataset/GetWeather?" + "zip=" + encodeURI(54481));
+            $.get("/Dataset/GetWeatherData?zip=54481");
+        
+        //});
+
+        //$.get("/Dataset/GetWeather", function (result) {
+        //    var jrUrl = result;
+        //    window.open(jrUrl, "_blank");
+        //});
     }
 
 };
