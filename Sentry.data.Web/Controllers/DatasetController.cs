@@ -270,10 +270,7 @@ namespace Sentry.data.Web.Controllers
             
             IList<BaseDatasetModel> dsList = Utility.IntersectAllIfEmpty(freqencyDsList, categoryDsList, ownerDsList);
 
-
             
-            
-
             if (dsList.Count == 0 && checkedCategories.Count == 0 && checkedFrequencies.Count == 0 && checkedOwners.Count == 0)
             {
                 ////Apply searchtext if not null
@@ -281,14 +278,17 @@ namespace Sentry.data.Web.Controllers
                 {
                     dsList = FilterDatasetBySearchPhrase(ldm.SearchText, GetDatasetModelList().ToList());
                 }
-                //else
-                //{
-                //    dsList = GetDatasetModelList().ToList();
-                //}
+                else
+                {
+                    dsList = GetDatasetModelList().ToList();
+                }
             }
             else
             {
-                dsList = FilterDatasetBySearchPhrase(ldm.SearchText, dsList.ToList());
+                if (ldm.SearchText != null && ldm.SearchText.Trim().Length > 0)
+                {
+                    dsList = FilterDatasetBySearchPhrase(ldm.SearchText, dsList.ToList());
+                }
                 //    dsList = GetDatasetModelList().ToList();
                 //}
 

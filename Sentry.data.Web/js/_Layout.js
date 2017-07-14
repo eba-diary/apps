@@ -23,11 +23,11 @@ data._Layout = {
 
         //###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific
         //retrieve badges
-        $.getJSON("/Admin/GetBadges", function (data) {
-            if (data.approvalCount > 0) $("#approveBadge").html(data.approvalCount);
-            if (data.completedCount > 0) $("#completeBadge").html(data.completedCount);
-            if (data.approvalCount > 0 || data.completedCount > 0) $("#adminBadge").html(data.approvalCount + data.completedCount);
-        });
+        //$.getJSON("/Admin/GetBadges", function (data) {
+        //    if (data.approvalCount > 0) $("#approveBadge").html(data.approvalCount);
+        //    if (data.completedCount > 0) $("#completeBadge").html(data.completedCount);
+        //    if (data.approvalCount > 0 || data.completedCount > 0) $("#adminBadge").html(data.approvalCount + data.completedCount);
+        //});
         //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
 
         $("body").removeClass("prevent-animation");

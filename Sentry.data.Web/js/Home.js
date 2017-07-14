@@ -13,15 +13,15 @@ data.Home = {
         //Sentry.InjectSpinner($("#overview-list"), 300);
         //Sentry.InjectSpinner($("#datafeed-list"), 500);
 
-        $.get('/Home/AssetOverview', function (html) {
-            $("#overview-list").html(html);
-        });
-        $.get('/Home/HotTopicsFeed', function (html) {
-            $("#hot-topics-list").html(html);
-        });
-        $.get('/Home/NewsFeed', function (html) {
-            $("#news-feed-list").html(html);
-        });
+        //$.get('/Home/AssetOverview', function (html) {
+        //    $("#overview-list").html(html);
+        //});
+        //$.get('/Home/HotTopicsFeed', function (html) {
+        //    $("#hot-topics-list").html(html);
+        //});
+        //$.get('/Home/NewsFeed', function (html) {
+        //    $("#news-feed-list").html(html);
+        //});
 
         //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
     },
@@ -30,9 +30,9 @@ data.Home = {
         /// <summary>
         /// This will run for a periodic refresh
         /// </summary>
-        $.get('/Home/AssetOverview', function (html) {
-            $("#overview-list").html(html);
-        });
+        //$.get('/Home/AssetOverview', function (html) {
+        //    $("#overview-list").html(html);
+        //});
     }
 
 }
