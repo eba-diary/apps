@@ -506,7 +506,8 @@ namespace Sentry.data.Web.Controllers
                     ((x.Category.ToLower() + " " +
                       x.DatasetDesc.ToLower() + " " +
                       x.DatasetName.ToLower() + " " +
-                      x.SentryOwnerName.ToLower() + " ") +
+                      x.SentryOwnerName.ToLower() + " " +
+                      x.CreationFreqDesc.ToLower() + " ") +
                       ((x.Columns != null && x.Columns.Count > 0) ?
                           x.Columns.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " ") +
                       ((x.Metadata != null && x.Metadata.Count > 0) ?
@@ -537,6 +538,7 @@ namespace Sentry.data.Web.Controllers
                     ds.DatasetDesc.ToLower() + " " +
                     ds.DatasetName.ToLower() + " " +
                     ds.SentryOwnerName.ToLower() + " " +
+                    ds.CreationFreqDesc.ToLower() + " " +
                     ds.Columns != null && ds.Columns.Count > 0 ?
                         ds.Columns.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " " +
                     ds.Metadata != null && ds.Metadata.Count > 0 ?
