@@ -6,17 +6,21 @@
 
 <h1>Datasets</h1>
 @{
-                using (Html.BeginForm("List", "Dataset", FormMethod.Get, new { @class = "navbar-form navbar-center", @id = "DatasetListSearch" })
+                using (Html.BeginForm(@"List", "Dataset", FormMethod.Get, new { @class = "navbar-form navbar-center", @id = "DatasetListSearch" })
             )
     {
-        <div class="input-group dataset-search" id="DatasetListSearch">
+        @*<div class="input-group dataset-search" id="DatasetListSearch">
             <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
             <input type="text" id="SearchKeywords" name="searchPhrase" class="form-control" placeholder="Enter dataset search term(s)" value="@{@Request.QueryString["searchPhrase"]}" />
             <input type="hidden" id="SearchCategory" name="Category" class="form-control" value="@{@Request.QueryString["Category"]}" />
             @Html.HiddenFor(model => model.SearchCategory)
+        </div>*@
+
+        <div class="input-group">
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.SearchText, new { htmlAttributes = new { @class = "form-control" } })
+            </div>
         </div>
-
-
 
 
 @*<div class="input-group dataset-search" id="DatasetListSearch2">

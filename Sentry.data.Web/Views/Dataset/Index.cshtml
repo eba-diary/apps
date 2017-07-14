@@ -10,7 +10,7 @@
     @{
         var htmlAttrsObj = new { @class = "navbar-form navbar-center", @id = "DatasetSearch" };
         var htmlAttributes = HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttrsObj);
-        using (Html.BeginForm("List", "Dataset", FormMethod.Get, htmlAttributes))
+        using (Html.BeginForm(@"List\SearchPhrase", "Dataset", FormMethod.Get, htmlAttributes))
         {
             <div class="input-group dataset-search">
                 <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
@@ -58,7 +58,7 @@
                                 if (i + j < category.Count)
                                 {
                                     <td>
-                                        <div class="browse-category-card" id="category_@category[i + j]" data-category="@category[i + j]">
+                                        <div class="browse-category-card" id="category_@category[i + j].ToLower()" data-category="@category[i + j]">
                                             <p><img src="~/Images/Category/@{@category[i + j]}.png" /></p>
                                             <p>@category[i + j]</p>
                                         </div>

@@ -14,6 +14,7 @@ using System.Web;
 using Sentry.data.Web.Helpers;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using System.Net;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -266,13 +267,33 @@ namespace Sentry.data.Web.Controllers
 
                 ownerDsList = ownerDsList.Union(tempList).ToList();                    
             }
-
+            
             IList<BaseDatasetModel> dsList = Utility.IntersectAllIfEmpty(freqencyDsList, categoryDsList, ownerDsList);
 
 
+            
+            
+
             if (dsList.Count == 0 && checkedCategories.Count == 0 && checkedFrequencies.Count == 0 && checkedOwners.Count == 0)
             {
-                dsList = GetDatasetModelList().ToList();
+                ////Apply searchtext if not null
+                if (ldm.SearchText != null && ldm.SearchText.Trim().Length > 0)
+                {
+                    dsList = FilterDatasetBySearchPhrase(ldm.SearchText, GetDatasetModelList().ToList());
+                }
+                //else
+                //{
+                //    dsList = GetDatasetModelList().ToList();
+                //}
+            }
+            else
+            {
+                dsList = FilterDatasetBySearchPhrase(ldm.SearchText, dsList.ToList());
+                //    dsList = GetDatasetModelList().ToList();
+                //}
+
+                //if (dsList.Count == 0 && checkedCategories.Count == 0 && checkedFrequencies.Count == 0 && checkedOwners.Count == 0)
+                //{
             }
 
             ldm.DatasetList = dsList;
@@ -438,6 +459,7 @@ namespace Sentry.data.Web.Controllers
         // JCG TODO: Add unit tests for List()
         // GET: Dataset/List/searchParms
         [Route("Dataset/List/Index")]
+        [Route("Dataset/List/SearchPhrase")]
         public ActionResult List(string category, string searchPhrase)
         {
             ListDatasetModel rspModel = new ListDatasetModel();
@@ -459,57 +481,9 @@ namespace Sentry.data.Web.Controllers
 
             if (searchPhrase != null && searchPhrase.Trim().Length > 0)
             {
-                // filter on search terms.
-
-                // split search terms (delivered as a string) into a list
-                IList<string> searchWords = searchPhrase.Trim().ToLower().Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
-
-                List<BaseDatasetModel> rspList =
-                    dsList.Where(x =>
-                        ((x.Category.ToLower() + " " +
-                          x.DatasetDesc.ToLower() + " " +
-                          x.DatasetName.ToLower() + " " +
-                          x.SentryOwnerName.ToLower() + " ") +
-                          ((x.Columns != null && x.Columns.Count > 0) ?
-                              x.Columns.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " ") +
-                          ((x.Metadata != null && x.Metadata.Count > 0) ?
-                              x.Metadata.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " "))
-                        .Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)
-                        .Any(xi => searchWords.Where(s => xi.Contains(s)).Count() > 0)
-                    ).ToList();
-
-                // DEBUGGING: use "dsList" to look at every dataset
-                // foreach (BaseDatasetModel ds in dsList)
-                foreach (BaseDatasetModel ds in rspList)
-                {
-                    // DEBUGGING: uncomment this to look at the list of match terms generated for this dataset... 
-                    //List<String> dsHitList = (
-                    //    ds.Category.ToLower() + " " +
-                    //    ds.DatasetDesc.ToLower() + " " +
-                    //    ds.DatasetName.ToLower() + " " +
-                    //    ds.SentryOwnerName.ToLower() + " " +
-                    //    ((ds.Columns != null && ds.Columns.Count > 0) ?
-                    //        ds.Columns.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " ") +
-                    //    ((ds.Metadata != null && ds.Metadata.Count > 0) ?
-                    //        ds.Metadata.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " "))
-                    //    .Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)
-                    //    .ToList();
-
-                    ds.SearchHitList = (
-                        ds.Category.ToLower() + " " +
-                        ds.DatasetDesc.ToLower() + " " +
-                        ds.DatasetName.ToLower() + " " +
-                        ds.SentryOwnerName.ToLower() + " " +
-                        ds.Columns != null && ds.Columns.Count > 0 ?
-                            ds.Columns.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " " +
-                        ds.Metadata != null && ds.Metadata.Count > 0 ?
-                            ds.Metadata.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " ")
-                        .Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries)
-                        .Where(x => x.Any(xi => searchWords.Where(s => x.Contains(s)).Count() > 0))
-                        .ToList();
-                }
-
-                rspModel.DatasetList = rspList.OrderByDescending(x => x.SearchHitList.Count()).ToList();
+                rspModel.DatasetList = FilterDatasetBySearchPhrase(searchPhrase, dsList).OrderByDescending(x => x.SearchHitList.Count()).ToList();
+                //rspModel.DatasetList = rspList.OrderByDescending(x => x.SearchHitList.Count()).ToList();
+                rspModel.SearchText = searchPhrase;
             }
             else
             {
@@ -520,6 +494,59 @@ namespace Sentry.data.Web.Controllers
             //(rspModel.SearchFilters.SelectMany(x => x.FilterNameList).Where(i => i.value == category).Select(c => c.isChecked)) = true;
 
             return View(rspModel);
+        }
+
+        private List<BaseDatasetModel> FilterDatasetBySearchPhrase(string searchPhrase, List<BaseDatasetModel> dsList)
+        {
+
+            IList<string> searchWords = searchPhrase.Trim().ToLower().Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            List<BaseDatasetModel> rspList =
+                dsList.Where(x =>
+                    ((x.Category.ToLower() + " " +
+                      x.DatasetDesc.ToLower() + " " +
+                      x.DatasetName.ToLower() + " " +
+                      x.SentryOwnerName.ToLower() + " ") +
+                      ((x.Columns != null && x.Columns.Count > 0) ?
+                          x.Columns.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " ") +
+                      ((x.Metadata != null && x.Metadata.Count > 0) ?
+                          x.Metadata.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " "))
+                    .Split(new Char[] { ' ', '_' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Any(xi => searchWords.Where(s => xi.Contains(s)).Count() > 0)
+                ).ToList();
+
+            // DEBUGGING: use "dsList" to look at every dataset
+            // foreach (BaseDatasetModel ds in dsList)
+            foreach (BaseDatasetModel ds in rspList)
+            {
+                // DEBUGGING: uncomment this to look at the list of match terms generated for this dataset... 
+                //List<string> dsHitList = (
+                //    ds.Category.ToLower() + " " +
+                //    ds.DatasetDesc.ToLower() + " " +
+                //    ds.DatasetName.ToLower() + " " +
+                //    ds.SentryOwnerName.ToLower() + " " +
+                //    ((ds.Columns != null && ds.Columns.Count > 0) ?
+                //        ds.Columns.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " ") +
+                //    ((ds.Metadata != null && ds.Metadata.Count > 0) ?
+                //        ds.Metadata.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " "))
+                //    .Split(new Char[] { ' ', '_' }, StringSplitOptions.RemoveEmptyEntries)
+                //    .ToList();
+
+                ds.SearchHitList = (
+                    ds.Category.ToLower() + " " +
+                    ds.DatasetDesc.ToLower() + " " +
+                    ds.DatasetName.ToLower() + " " +
+                    ds.SentryOwnerName.ToLower() + " " +
+                    ds.Columns != null && ds.Columns.Count > 0 ?
+                        ds.Columns.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " " +
+                    ds.Metadata != null && ds.Metadata.Count > 0 ?
+                        ds.Metadata.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " ")
+                    .Split(new Char [] {' ', '_' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Where(x => x.Any(xi => searchWords.Where(s => x.Contains(s)).Count() > 0))
+                    .ToList();
+            }
+
+            return rspList;
         }
 
         private IList<string> GetSentryOwnerList()
@@ -588,9 +615,12 @@ namespace Sentry.data.Web.Controllers
 
                 if (_datasetContext.s3KeyDuplicate(s3key))
                 {
-                    throw new ValidationException("File already exists on S3");
+                    throw new ValidationException("File already exsits on S3");
                 }
-
+                if (_datasetContext.Datasets.Any(m => m.DatasetName == udm.DatasetName))
+                {
+                    throw new ValidationException("Dataset name already exsists");
+                }
 
                 Sentry.Common.Logging.Logger.Debug("Entered HttpPost <Upload>");
                 if (ModelState.IsValid)
@@ -622,7 +652,7 @@ namespace Sentry.data.Web.Controllers
                         udm.DatasetDesc,
                         udm.CreationUserName,
                         udm.SentryOwnerName,
-                        _userService.GetCurrentUser().DisplayName,
+                        _userService.GetCurrentUser().AssociateId,
                         originationcode,
                         udm.DatasetDtm,
                         dateTimeNow,
@@ -813,14 +843,19 @@ namespace Sentry.data.Web.Controllers
                     return RedirectToAction("Detail", new { id = id });
 
                 }
-                return View(i);
             }
             catch (Sentry.Core.ValidationException ex)
             {
                 AddCoreValidationExceptionsToModel(ex);
-                _datasetContext.Clear();
-                return View(i);
             }
+            finally
+            {
+                _datasetContext.Clear();
+                i.AllFrequencies = GetDatasetFrequencyListItems();  //Reload dropdown value list
+                i.AllOriginationCodes = GetDatasetOriginationListItems(); //Reload dropdown value list
+            }
+
+            return View(i);
         }
 
         private IEnumerable<SelectListItem> GetCategoryList()
@@ -1033,10 +1068,23 @@ namespace Sentry.data.Web.Controllers
                     Sentry.Common.Logging.Logger.Error("Error", e);
                 }
 
-
+            
             }
 
+            //string url =  @"https://executionsasmidtierqual.sentry.com/SASStoredProcess/do?_program=%2FUser+Folders%2FJered+Gosse%2FMy+Folder%2FSTP_PushToSAS_CSV_Final" + "&FILE_NAME=" + "2015.annual.singlefile.csv" + "&CATEGORY=" + "Government";
+           
+            //WebResponse response = SendGetRequest(url);
+
         }
+
+        //public static WebResponse SendGetRequest(string url)
+        //{
+
+        //    HttpWebRequest httpRequest = WebRequest.CreateHttp(url);
+        //    httpRequest.Method = "GET";
+
+        //    return httpRequest.GetResponse();
+        //}
 
         /// <summary>
         /// Callback handler for S3 uploads... Amazon calls this to communicate progress; from here we communicate
@@ -1063,6 +1111,44 @@ namespace Sentry.data.Web.Controllers
 
             return PartialView("_PushToFilenameOverride", model);
 
+        }
+
+
+        [HttpGet()]
+        public void GetWeatherData(string zip)
+        {
+            //System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\" + zip + ".xml", _weatherDataProvider.GetWeather("xml"));
+            //System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\" + zip + ".json", _weatherDataProvider.GetWeather("json"));
+
+
+            //request.AddParameter("name", "value"); // adds to POST or URL querystring based on Method
+            //request.AddUrlSegment("id", "123"); // replaces matching token in request.Resource
+
+            //// easily add HTTP Headers
+            ////request.AddHeader("header", "value");
+
+            //// add files to upload (works with compatible verbs)
+            ////request.AddFile(path);
+
+            //// execute the request         
+
+            //// or automatically deserialize result
+            //// return content type is sniffed but can be explicitly set via RestClient.AddHandler();
+            //RestResponse<Person> response2 = client.Execute<Person>(request);
+            //var name = response2.Data.Name;
+
+            //// easy async support
+            //client.ExecuteAsync(request, response => {
+            //    Console.WriteLine(response.Content);
+            //});
+
+            //// async with deserialization
+            //var asyncHandle = client.ExecuteAsync<Person>(request, response => {
+            //    Console.WriteLine(response.Data.Name);
+            //});
+
+            //// abort the request on demand
+            //asyncHandle.Abort();
         }
 
 
