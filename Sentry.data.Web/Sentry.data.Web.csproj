@@ -261,7 +261,6 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\AssetController.cs" />
     <Compile Include="Controllers\LayoutController.cs" />
-    <Compile Include="Controllers\MyController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Helpers\Utility.cs" />
