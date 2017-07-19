@@ -9,6 +9,8 @@ using Amazon.S3.Model;
 using Sentry.data.Core;
 using Sentry.NHibernate;
 using NHibernate;
+using System.IO;
+using Amazon.S3.Transfer;
 
 namespace Sentry.data.Infrastructure
 {
@@ -20,8 +22,11 @@ namespace Sentry.data.Infrastructure
 
         }
 
+
         private static Amazon.S3.IAmazonS3 _s3client = null;
 
+        public event EventHandler<TransferProgressEventArgs> OnTransferProgressEvent;
+        
         private Amazon.S3.IAmazonS3 S3Client
         {
             get
@@ -89,6 +94,84 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public void TransferUtlityUploadStream(string folder, string fileName, Stream stream)
+        {
+            Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");
+            try
+            {
+                Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
+                Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
+                //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + Configuration.Config.GetSetting("AWSRootBucket"));
+                s3tuReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
+                //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - InputStream");
+                s3tuReq.InputStream = stream;
+                //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + category + "/" + dsfi);
+                s3tuReq.Key = folder + "/" + fileName;
+                s3tuReq.UploadProgressEvent += new EventHandler<UploadProgressArgs>(a_TransferProgressEvent);
+                s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
+                s3tuReq.AutoCloseStream = true;
+                //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Starting Upload " + s3tuReq.Key);
+                s3tu.Upload(s3tuReq);
+            }
+            catch (AmazonS3Exception e)
+            {
+                throw new Exception("Error attempting to transfer fileto S3.", e);
+            }
+
+        }
+
+        public void TransferUtilityDownload(string baseTargetPath, string folder, string filename, string s3Key)
+        {
+            try
+            {
+                Sentry.Common.Logging.Logger.Debug("Started S3 TransferUtility Setup for Download");
+                Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
+                Amazon.S3.Transfer.TransferUtilityDownloadRequest s3tuDwnldReq = new Amazon.S3.Transfer.TransferUtilityDownloadRequest();
+                Sentry.Common.Logging.Logger.Debug("TransferUtility - Set AWS BucketName: " + Configuration.Config.GetSetting("AWSRootBucket"));
+                s3tuDwnldReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
+                Sentry.Common.Logging.Logger.Debug("TransferUtility - Set FilePath: " + baseTargetPath + folder + @"\" + filename);
+                s3tuDwnldReq.FilePath = baseTargetPath + folder + @"\" + filename;
+
+                s3tuDwnldReq.Key = s3Key;
+
+                s3tuDwnldReq.WriteObjectProgressEvent += new EventHandler<WriteObjectProgressArgs>(a_TransferProgressEvent);
+                //s3tuDwnldReq.WriteObjectProgressEvent += new EventHandler<WriteObjectProgressArgs>(downloadRequest_DownloadPartProgressEvent);
+
+                s3tu.Download(s3tuDwnldReq);
+            }
+            catch (AmazonS3Exception e)
+            {
+                throw new Exception("Error attempting to download file from S3.", e);
+            }
+        }
+
+        protected virtual void a_TransferProgressEvent(object sender, WriteObjectProgressArgs e)
+        {
+            //OnTransferProgressEvent(this, new TransferProgressEventArgs(e.FilePath, e.PercentDone));
+            EventHandler<TransferProgressEventArgs> handler = OnTransferProgressEvent;
+            if (handler != null)
+            {
+                handler(this, new TransferProgressEventArgs(e.FilePath, e.PercentDone));
+            }
+            
+            //if (handler != null)
+            //{
+            //    handler(this, e);
+            //}
+        }
+
+        protected virtual void a_TransferProgressEvent(object sender, UploadProgressArgs e)
+        {
+            //TransferProgressEventArgs args = new TransferProgressEventArgs(e.FilePath, e.PercentDone);
+            //OnTransferProgressEvent(args);
+            OnTransferProgressEvent(this, new TransferProgressEventArgs(e.FilePath, e.PercentDone));
+            //EventHandler<WriteObjectProgressArgs> handler = OnTransferProgressEvent;
+            //if (handler != null)
+            //{
+            //    handler(this, e);
+            //}
+        }
+        
         public string StartUpload(string uniqueKey)
         {
             InitiateMultipartUploadRequest mReq = new InitiateMultipartUploadRequest();
@@ -177,7 +260,7 @@ namespace Sentry.data.Infrastructure
         //    if (detailDesc == null || detailDesc.Length == 0) detailDesc = "<none>";
         //    String categoryName = uniqueKey.Substring(0, uniqueKey.IndexOf("/"));
         //    Dataset rspDS = new Dataset(
-        //        999, 
+        //        999,
         //        categoryName,
         //        fileName,
         //        summaryDesc,
@@ -214,7 +297,7 @@ namespace Sentry.data.Infrastructure
         /// <param name="parentDir"></param>
         /// <param name="includeSubDirectories"></param>
         /// <returns></returns>
-        public IDictionary<string, string> GetDatasetList(string parentDir = "sentry-dataset-allaccess-poc", bool includeSubDirectories = true)
+        public IDictionary<string, string> GetDatasetList(string parentDir = "sentry-dataset-management", bool includeSubDirectories = true)
         {
             // this will include folders in addition to data sets...
             if (parentDir == null)

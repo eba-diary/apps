@@ -302,6 +302,7 @@ data.Dataset = {
         /// <param name="parentCategory">The parent category ID, that we now need to reload</param>
         //if (Sentry.WasAjaxSuccessful(data)) {
         Sentry.HideAllModals();
+        //Sentry.ShowModalAlert("File has been pushed to SAS Successfully.");
         //var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(datasetID) + "&Override=" + encodeURI(filenameOverride);
         //data.Dataset.ProgressModalStatus();
         //$.post(controllerURL);

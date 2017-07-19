@@ -130,6 +130,10 @@
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.105.2.3\lib\net451\RestSharp.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Sentry.Associates, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Associates.1.3.0\lib\net35\Sentry.Associates.dll</HintPath>
       <Private>True</Private>
@@ -257,6 +261,7 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\AssetController.cs" />
     <Compile Include="Controllers\LayoutController.cs" />
+    <Compile Include="Controllers\MyController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Helpers\Utility.cs" />
@@ -586,11 +591,15 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Scripts\jquery-3.1.0-vsdoc.js" />
-    <Content Include="Images\Category\claim.png" />
+    <Content Include="Images\Category\claim.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\Category\geographic.png" />
     <Content Include="Images\Category\government.png" />
     <Content Include="Images\Category\industry.png" />
-    <Content Include="Images\Category\weather.png" />
+    <Content Include="Images\Category\weather.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\sas_logo.png" />
     <Content Include="Images\sas_logo_min.png" />
     <Content Include="Images\sas_logo_rectangle.png" />
@@ -681,7 +690,9 @@
     <Content Include="fonts\SourceSansPro-Regular.woff" />
     <Content Include="fonts\SourceSerifPro-Bold.woff" />
     <Content Include="fonts\SourceSerifPro-Regular.woff" />
-    <Content Include="packages.config" />
+    <Content Include="packages.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Scripts\DataTables\autoFill.bootstrap.js" />
     <Content Include="Scripts\DataTables\autoFill.bootstrap.min.js" />
     <Content Include="Scripts\DataTables\autoFill.foundation.js" />

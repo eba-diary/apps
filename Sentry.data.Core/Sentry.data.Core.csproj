@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\DatasetOriginationCode.cs" />
+    <Compile Include="Entities\ApiResponse.cs" />
     <Compile Include="Entities\DatasetFrequency.cs" />
     <Compile Include="DomainServices\AssetDynamicDetailsService.cs" />
     <Compile Include="DomainServices\DatasetService.cs" />
@@ -80,6 +81,8 @@
     <Compile Include="Entities\Asset.cs" />
     <Compile Include="Entities\AssetState.cs" />
     <Compile Include="Entities\DatasetFolder.cs" />
+    <Compile Include="Entities\TransferProgressEventArgs.cs" />
+    <Compile Include="Interfaces\IApiClient.cs" />
     <Compile Include="Interfaces\IApplicationUser.cs" />
     <Compile Include="Interfaces\IAssetDynamicDetailsProvider.cs" />
     <Compile Include="Interfaces\ICurrentUserIdProvider.cs" />
@@ -91,6 +94,7 @@
     <Compile Include="Interfaces\IDataAssetContext.cs" />
     <Compile Include="Interfaces\ICloudDataService.cs" />
     <Compile Include="Interfaces\IDatasetService.cs" />
+    <Compile Include="Interfaces\IWeatherDataProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\CategoryQueries.cs" />
     <Compile Include="Queries\DatasetFolderQueries.cs" />

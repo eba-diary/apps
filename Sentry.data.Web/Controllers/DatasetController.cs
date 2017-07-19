@@ -15,6 +15,8 @@ using Sentry.data.Web.Helpers;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using System.Net;
+using System.Text;
+using Sentry.data.Infrastructure;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -39,7 +41,6 @@ namespace Sentry.data.Web.Controllers
                     // TODO: move this all to the config(s)...
                     AWSConfigsS3.UseSignatureVersion4 = true;
                     AmazonS3Config s3config = new AmazonS3Config();
-                    // s3config.RegionEndpoint = RegionEndpoint.GetBySystemName("us-east-1");
                     s3config.RegionEndpoint = RegionEndpoint.GetBySystemName(Configuration.Config.GetSetting("AWSRegion"));
                     //s3config.UseHttp = true;
                     s3config.ProxyHost = Configuration.Config.GetHostSetting("SentryS3ProxyHost");
@@ -598,7 +599,7 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
-
+                
                 if (_datasetContext.Datasets.Any(m => m.DatasetName == udm.DatasetName))
                 {
                     throw new ValidationException("Dataset name already exists");
@@ -628,20 +629,26 @@ namespace Sentry.data.Web.Controllers
                 if (ModelState.IsValid)
                 {
                     Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");
-                    // 1. upload dataset
-                    Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
-                    Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
-                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + Configuration.Config.GetSetting("AWSRootBucket"));
-                    s3tuReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
-                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - InputStream");
-                    s3tuReq.InputStream = DatasetFile.InputStream;
-                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + category + "/" + dsfi);
-                    s3tuReq.Key = category + "/" + dsfi;
-                    s3tuReq.UploadProgressEvent += new EventHandler<Amazon.S3.Transfer.UploadProgressArgs>(uploadRequest_UploadPartProgressEvent);
-                    s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
-                    s3tuReq.AutoCloseStream = true;
-                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Starting Upload " + s3tuReq.Key);
-                    s3tu.Upload(s3tuReq);
+
+                    _s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(uploadRequest_UploadPartProgressEvent);
+                    _s3Service.TransferUtlityUploadStream(category, dsfi, DatasetFile.InputStream);
+
+
+                    //// 1. upload dataset
+                    //Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
+                    ////Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(_s3Service.clie);
+                    //Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
+                    ////Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + Configuration.Config.GetSetting("AWSRootBucket"));
+                    //s3tuReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
+                    ////Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - InputStream");
+                    //s3tuReq.InputStream = DatasetFile.InputStream;
+                    ////Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + category + "/" + dsfi);
+                    //s3tuReq.Key = category + "/" + dsfi;
+                    //s3tuReq.UploadProgressEvent += new EventHandler<Amazon.S3.Transfer.UploadProgressArgs>(uploadRequest_UploadPartProgressEvent);
+                    //s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
+                    //s3tuReq.AutoCloseStream = true;
+                    ////Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Starting Upload " + s3tuReq.Key);
+                    //s3tu.Upload(s3tuReq);
 
 
                     // 2. create dataset metadata
@@ -719,7 +726,7 @@ namespace Sentry.data.Web.Controllers
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void uploadRequest_UploadPartProgressEvent(object sender, Amazon.S3.Transfer.UploadProgressArgs e)
+        static void uploadRequest_UploadPartProgressEvent(object sender, TransferProgressEventArgs e)
         {
             Sentry.data.Web.Helpers.ProgressUpdater.SendProgress(e.FilePath, e.PercentDone);
             Sentry.Common.Logging.Logger.Debug("DatasetUpload-S3Event: " + e.FilePath + ": " + e.PercentDone);
@@ -1040,42 +1047,43 @@ namespace Sentry.data.Web.Controllers
 
             string BaseTargetPath = Configuration.Config.GetHostSetting("PushToSASTargetPath");
 
+            //creates category directory if does not exist, otherwise does nothing.
+            System.IO.Directory.CreateDirectory(BaseTargetPath + ds.Category);
+
+
             try
             {
-                Sentry.Common.Logging.Logger.Debug("Started S3 TransferUtility Setup for Download");
-                Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
-                Amazon.S3.Transfer.TransferUtilityDownloadRequest s3tuDwnldReq = new Amazon.S3.Transfer.TransferUtilityDownloadRequest();
-                Sentry.Common.Logging.Logger.Debug("TransferUtility - Set AWS BucketName: " + Configuration.Config.GetSetting("AWSRootBucket"));
-                s3tuDwnldReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
-                Sentry.Common.Logging.Logger.Debug("TransferUtility - Set FilePath: " + BaseTargetPath + ds.Category + @"\" + filename);
-                s3tuDwnldReq.FilePath = BaseTargetPath + ds.Category + @"\" + filename;
-
-                //creates category directory if does not exist, otherwise does nothing.
-                System.IO.Directory.CreateDirectory(BaseTargetPath + ds.Category);
-
-                s3tuDwnldReq.Key = ds.S3Key;
-
-                s3tuDwnldReq.WriteObjectProgressEvent += new EventHandler<WriteObjectProgressArgs>(downloadRequest_DownloadPartProgressEvent);
-
-                s3tu.Download(s3tuDwnldReq);
+                _s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(uploadRequest_UploadPartProgressEvent);
+                _s3Service.TransferUtilityDownload(BaseTargetPath, ds.Category, filename, ds.S3Key);
+                
             }
             catch (Exception e)
             {
-                if (e is AmazonS3Exception)
-                {
-                    Sentry.Common.Logging.Logger.Error("S3 Download Error", e);
-                }
-                else
-                {
-                    Sentry.Common.Logging.Logger.Error("Error", e);
-                }
-
-            
+                Sentry.Common.Logging.Logger.Error("S3 Download Error", e);
+                //return Json(new {Success = false});
             }
 
+
+            //string content = string.Empty;
+
+            
+            //Uri uri = new Uri(@"https://executionsasmidtierqual.sentry.com/SASStoredProcess/do?_program=%2FUser+Folders%2FJered+Gosse%2FMy+Folder%2FSTP_PushToSAS_CSV_Final" + "&FILE_NAME=" + "2015.annual.singlefile.csv" + "&CATEGORY=" + "Government" + "&_username=RA072984" + "&_password={SAS002}CFEE423D534550431C426CC70746FBFA0EEE11BE07E73FA1");
+            //WebRequest webRequest = WebRequest.Create(uri);
+            ////webRequest.Proxy = new IWebProxy("webproxy.sentry.com", 80);
+            //webRequest.Proxy.Credentials = System.Net.CredentialCache.DefaultNetworkCredentials;
+            //WebResponse webResponse = webRequest.GetResponse();
+            //var stream = webResponse.GetResponseStream();
+
+            //using (var reader = new StreamReader(stream ?? new MemoryStream(), Encoding.UTF8))
+            //    content = reader.ReadToEnd();
+
+            //Sentry.Common.Logging.Logger.Debug(content);
+
             //string url =  @"https://executionsasmidtierqual.sentry.com/SASStoredProcess/do?_program=%2FUser+Folders%2FJered+Gosse%2FMy+Folder%2FSTP_PushToSAS_CSV_Final" + "&FILE_NAME=" + "2015.annual.singlefile.csv" + "&CATEGORY=" + "Government";
-           
+
             //WebResponse response = SendGetRequest(url);
+
+            //return AjaxSuccessJson();
 
         }
 
@@ -1087,26 +1095,27 @@ namespace Sentry.data.Web.Controllers
 
         //    return httpRequest.GetResponse();
         //}
-
+        
         /// <summary>
         /// Callback handler for S3 uploads... Amazon calls this to communicate progress; from here we communicate
         /// that progress back to the client for their progress bar...
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void downloadRequest_DownloadPartProgressEvent(object sender, WriteObjectProgressArgs e)
-        {
-
-            Sentry.data.Web.Helpers.ProgressUpdater.SendProgress(e.FilePath, e.PercentDone);
-            //Sentry.data.Web.Helpers.ProgressUpdater.SendProgress(e., e.TotalNumberOfBytesForCurrentFile, e.TransferredBytesForCurrentFile);
-            Sentry.Common.Logging.Logger.Debug("DatasetDownload-S3Event: " + e.FilePath + ": " + e.PercentDone);
-        }
+        //static void downloadRequest_DownloadPartProgressEvent(object sender, WriteObjectProgressArgs e)
+        //{
+            
+        //    Sentry.data.Web.Helpers.ProgressUpdater.SendProgress(e.FilePath, e.PercentDone);
+        //    //Sentry.data.Web.Helpers.ProgressUpdater.SendProgress(e., e.TotalNumberOfBytesForCurrentFile, e.TransferredBytesForCurrentFile);
+        //    Sentry.Common.Logging.Logger.Debug("DatasetDownload-S3Event: " + e.FilePath + ": " + e.PercentDone);
+        //}
 
         [HttpGet()]
         public PartialViewResult PushToFileNameOverride(int id)
         {
             PushToDatasetModel model = new PushToDatasetModel();
 
+            
             Dataset dataset = _datasetContext.GetById<Dataset>(id);
             model.DatasetId = dataset.DatasetId;
             model.DatasetFileName = System.IO.Path.GetFileName(dataset.S3Key);
@@ -1116,42 +1125,44 @@ namespace Sentry.data.Web.Controllers
         }
 
 
-        [HttpGet()]
-        public void GetWeatherData(string zip)
-        {
-            //System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\" + zip + ".xml", _weatherDataProvider.GetWeather("xml"));
-            //System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\" + zip + ".json", _weatherDataProvider.GetWeather("json"));
+        //[HttpGet()]
+        //public void GetWeatherData(string zip)
+        //{
+        //    //System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\" + zip + ".xml", _weatherDataProvider.GetWeather("xml"));
+        //    //System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\" + zip + ".json", _weatherDataProvider.GetWeather("json"));
 
 
-            //request.AddParameter("name", "value"); // adds to POST or URL querystring based on Method
-            //request.AddUrlSegment("id", "123"); // replaces matching token in request.Resource
+        //    request.AddParameter("name", "value"); // adds to POST or URL querystring based on Method
+        //    request.AddUrlSegment("id", "123"); // replaces matching token in request.Resource
 
-            //// easily add HTTP Headers
-            ////request.AddHeader("header", "value");
+        //    // easily add HTTP Headers
+        //    //request.AddHeader("header", "value");
 
-            //// add files to upload (works with compatible verbs)
-            ////request.AddFile(path);
+        //    // add files to upload (works with compatible verbs)
+        //    //request.AddFile(path);
 
-            //// execute the request         
+        //    // execute the request         
 
-            //// or automatically deserialize result
-            //// return content type is sniffed but can be explicitly set via RestClient.AddHandler();
-            //RestResponse<Person> response2 = client.Execute<Person>(request);
-            //var name = response2.Data.Name;
+        //    // or automatically deserialize result
+        //    // return content type is sniffed but can be explicitly set via RestClient.AddHandler();
+        //    RestResponse<Person> response2 = client.Execute<Person>(request);
+        //    var name = response2.Data.Name;
 
-            //// easy async support
-            //client.ExecuteAsync(request, response => {
-            //    Console.WriteLine(response.Content);
-            //});
+        //    // easy async support
+        //    client.ExecuteAsync(request, response =>
+        //    {
+        //        Console.WriteLine(response.Content);
+        //    });
 
-            //// async with deserialization
-            //var asyncHandle = client.ExecuteAsync<Person>(request, response => {
-            //    Console.WriteLine(response.Data.Name);
-            //});
+        //    // async with deserialization
+        //    var asyncHandle = client.ExecuteAsync<Person>(request, response =>
+        //    {
+        //        Console.WriteLine(response.Data.Name);
+        //    });
 
-            //// abort the request on demand
-            //asyncHandle.Abort();
-        }
+        //    // abort the request on demand
+        //    asyncHandle.Abort();
+        //}
 
 
         //[HttpGet()]
@@ -1225,6 +1236,10 @@ namespace Sentry.data.Web.Controllers
         //        return this._apiClient;
         //    }
         //}
-
+        
+        //public JsonResult AjaxSuccessJson()
+        //{
+        //    return Json(new { Success = true });
+        //}
     }
 }
