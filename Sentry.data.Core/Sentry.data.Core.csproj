@@ -66,7 +66,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Entities\DatasetOriginationCode.cs" />
-    <Compile Include="Entities\ApiResponse.cs" />
     <Compile Include="Entities\DatasetFrequency.cs" />
     <Compile Include="DomainServices\AssetDynamicDetailsService.cs" />
     <Compile Include="DomainServices\DatasetService.cs" />
