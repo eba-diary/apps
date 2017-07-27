@@ -92,6 +92,7 @@
     <Compile Include="Interfaces\IDataAssetContext.cs" />
     <Compile Include="Interfaces\ICloudDataService.cs" />
     <Compile Include="Interfaces\IDatasetService.cs" />
+    <Compile Include="Interfaces\ISASService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\CategoryQueries.cs" />
     <Compile Include="Queries\DatasetFolderQueries.cs" />

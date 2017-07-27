@@ -153,6 +153,7 @@
     <Compile Include="ServiceImplementations\MockObsidianUser.cs" />
     <Compile Include="ServiceImplementations\MockObsidianUserProvider.cs" />
     <Compile Include="ServiceImplementations\S3ServiceProvider.cs" />
+    <Compile Include="ServiceImplementations\SASServiceProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">

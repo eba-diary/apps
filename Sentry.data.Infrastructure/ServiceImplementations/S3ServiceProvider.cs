@@ -43,8 +43,8 @@ namespace Sentry.data.Infrastructure
                     s3config.ProxyHost = Configuration.Config.GetHostSetting("SentryS3ProxyHost");
                     s3config.ProxyPort = int.Parse(Configuration.Config.GetSetting("SentryS3ProxyPort"));
                     s3config.ProxyCredentials = System.Net.CredentialCache.DefaultNetworkCredentials;
-                    string awsAccessKey = Configuration.Config.GetSetting("AWSAccessKey");
-                    string awsSecretKey = Configuration.Config.GetSetting("AWSSecretKey");
+                    string awsAccessKey = Configuration.Config.GetHostSetting("AWSAccessKey");
+                    string awsSecretKey = Configuration.Config.GetHostSetting("AWSSecretKey");
                     _s3client = new AmazonS3Client(awsAccessKey, awsSecretKey, s3config);
                 }
                 return _s3client;

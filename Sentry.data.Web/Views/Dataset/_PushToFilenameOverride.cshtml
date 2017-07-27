@@ -1,16 +1,16 @@
 ﻿@model Sentry.data.Web.PushToDatasetModel
 @{using (Ajax.BeginForm("PushToSAS", new { controller = "Dataset" },
-                                                              new AjaxOptions
-                                                              {
-                                                                OnBegin = "data.Dataset.ProgressModalStatus",
-                                                                //OnSuccess = "data.Dataset.AjaxSuccess(data,'" + Model.DatasetId + "','" + Model.FileNameOverride + "')",
-                                                                OnSuccess = "data.Dataset.AjaxSuccess",
-                                                                OnFailure = "data.Dataset.AjaxFailure",
-                                                                InsertionMode = InsertionMode.ReplaceWith,
-                                                                UpdateTargetId = "PushToForm",
-                                                                OnComplete = "$('.modal-backdrop').remove();"
-                                                              },
-                                                              new { id = "PushToForm" }))
+                                                                  new AjaxOptions
+                                                                  {
+                                                                      OnBegin = "data.Dataset.ProgressModalStatus",
+                                                                    //OnSuccess = "data.Dataset.AjaxSuccess(data,'" + Model.DatasetId + "','" + Model.FileNameOverride + "')",
+                                                                    OnSuccess = "data.Dataset.AjaxSuccess",
+                                                                      OnFailure = "data.Dataset.AjaxFailure",
+                                                                      InsertionMode = InsertionMode.ReplaceWith,
+                                                                      UpdateTargetId = "PushToForm",
+                                                                      OnComplete = "$('.modal-backdrop').remove();"
+                                                                  },
+                                                                  new { id = "PushToForm" }))
     {
         @Html.AntiForgeryToken()
         <div class="form-horizontal">

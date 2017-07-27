@@ -26,6 +26,7 @@ namespace Sentry.data.Web.Controllers
         private IDatasetContext _datasetContext;
         private UserService _userService;
         private IDatasetService _s3Service;
+        private ISASService _sasService;
         private static Amazon.S3.IAmazonS3 _s3client = null;
         //private IApiClient _apiClient;
         //private IWeatherDataProvider _weatherDataProvider;
@@ -82,11 +83,12 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        public DatasetController(IDatasetContext dsCtxt, IDatasetService dsSvc, UserService userService)
+        public DatasetController(IDatasetContext dsCtxt, IDatasetService dsSvc, UserService userService, ISASService sasService)
         {
             _datasetContext = dsCtxt;
             _s3Service = dsSvc;
             _userService = userService;
+            _sasService = sasService;
             //_weatherDataProvider = weatherDataProvider;
         }
 
@@ -729,7 +731,12 @@ namespace Sentry.data.Web.Controllers
         static void uploadRequest_UploadPartProgressEvent(object sender, TransferProgressEventArgs e)
         {
             Sentry.data.Web.Helpers.ProgressUpdater.SendProgress(e.FilePath, e.PercentDone);
-            Sentry.Common.Logging.Logger.Debug("DatasetUpload-S3Event: " + e.FilePath + ": " + e.PercentDone);
+
+            if(e.PercentDone % 10 == 0)
+            {
+                Sentry.Common.Logging.Logger.Debug("DatasetUpload-S3Event: " + e.FilePath + ": " + e.PercentDone);
+            }
+            
         }
 
         //// GET: Dataset/Edit/5
@@ -1011,13 +1018,14 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        public void PushToSAS(PushToDatasetModel PushToModel)
+        public ActionResult PushToSAS(PushToDatasetModel PushToModel)
         {
             Dataset ds = _datasetContext.GetById(PushToModel.DatasetId);
             string filename = null;
+            string filename_orig = null;
 
             Sentry.Common.Logging.Logger.Debug("<PushToSAS>: DatasetId: " + PushToModel.DatasetId);
-            Sentry.Common.Logging.Logger.Debug("<PushToSAS>: File Name Override Value: " + PushToModel.FileNameOverride);
+            Sentry.Common.Logging.Logger.Debug("File Name Override Value: " + PushToModel.FileNameOverride);
 
             //Test for an override name; if empty or null, use current value on dataset model
             if (!String.IsNullOrWhiteSpace(PushToModel.FileNameOverride))
@@ -1025,25 +1033,30 @@ namespace Sentry.data.Web.Controllers
                 //Test if override name includes an extension; if exists, replace with current value in dataset model
                 if (Path.HasExtension(PushToModel.FileNameOverride))
                 {
-                    Sentry.Common.Logging.Logger.Debug("<PushToSAS>: Has File Extension: " + System.IO.Path.GetExtension(PushToModel.FileNameOverride));
-                    Sentry.Common.Logging.Logger.Debug("<PushToSAS>: Dataset Model Extension: " + ds.FileExtension);
+                    Sentry.Common.Logging.Logger.Debug("Has File Extension: " + System.IO.Path.GetExtension(PushToModel.FileNameOverride));
+                    Sentry.Common.Logging.Logger.Debug("Dataset Model Extension: " + ds.FileExtension);
                     filename = PushToModel.FileNameOverride.Replace(System.IO.Path.GetExtension(PushToModel.FileNameOverride), ds.FileExtension);
                 }
                 else
                 {
-                    Sentry.Common.Logging.Logger.Debug("<PushToSAS>: Has No File Extension");
-                    Sentry.Common.Logging.Logger.Debug("<PushToSAS>: Dataset Model Extension: " + ds.FileExtension);
+                    Sentry.Common.Logging.Logger.Debug("Has No File Extension");
+                    Sentry.Common.Logging.Logger.Debug("Dataset Model Extension: " + ds.FileExtension);
                     filename = (PushToModel.FileNameOverride + ds.FileExtension);
                 }
             }
             else
             {
-                Sentry.Common.Logging.Logger.Debug("<PushToSAS>: No Override Value");
-                Sentry.Common.Logging.Logger.Debug("<PushToSAS>: Dataset Model S3Key: " + System.IO.Path.GetFileName(ds.S3Key));
+                Sentry.Common.Logging.Logger.Debug(" No Override Value");
+                Sentry.Common.Logging.Logger.Debug("Dataset Model S3Key: " + System.IO.Path.GetFileName(ds.S3Key));
                 filename = System.IO.Path.GetFileName(ds.S3Key);
             }
 
-            Sentry.Common.Logging.Logger.Debug("<PushToSAS>: filename Value: " + filename);
+            filename_orig = filename;
+
+            //Gerenate SAS friendly file name.
+            filename = _sasService.GenerateSASFileName(filename);
+
+            Sentry.Common.Logging.Logger.Debug($"File Name Translation: Original({filename_orig} SASFriendly({filename})");
 
             string BaseTargetPath = Configuration.Config.GetHostSetting("PushToSASTargetPath");
 
@@ -1055,7 +1068,7 @@ namespace Sentry.data.Web.Controllers
             {
                 _s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(uploadRequest_UploadPartProgressEvent);
                 _s3Service.TransferUtilityDownload(BaseTargetPath, ds.Category, filename, ds.S3Key);
-                
+
             }
             catch (Exception e)
             {
@@ -1065,8 +1078,23 @@ namespace Sentry.data.Web.Controllers
 
 
             //string content = string.Empty;
+            //Converting file to .sas7bdat format
+            try
+            {
 
-            
+                _sasService.ConvertToSASFormat(filename, ds.Category);
+
+            }
+            catch (WebException we)
+            {
+                Sentry.Common.Logging.Logger.Error("Web Error Calling SAS Stored Process", we);
+            }
+            catch (Exception e)
+            {
+                Sentry.Common.Logging.Logger.Error("Error calling SAS Stored Process", e);
+            }
+
+
             //Uri uri = new Uri(@"https://executionsasmidtierqual.sentry.com/SASStoredProcess/do?_program=%2FUser+Folders%2FJered+Gosse%2FMy+Folder%2FSTP_PushToSAS_CSV_Final" + "&FILE_NAME=" + "2015.annual.singlefile.csv" + "&CATEGORY=" + "Government" + "&_username=RA072984" + "&_password={SAS002}CFEE423D534550431C426CC70746FBFA0EEE11BE07E73FA1");
             //WebRequest webRequest = WebRequest.Create(uri);
             ////webRequest.Proxy = new IWebProxy("webproxy.sentry.com", 80);
@@ -1083,7 +1111,11 @@ namespace Sentry.data.Web.Controllers
 
             //WebResponse response = SendGetRequest(url);
 
-            //return AjaxSuccessJson();
+            //throw new Exception("Error");
+
+            //return new HttpStatusCodeResult(401, "Custom Error Message");
+
+            return AjaxSuccessJson();
 
         }
 

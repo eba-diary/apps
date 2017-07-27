@@ -237,6 +237,8 @@ data.Dataset = {
         /// <summary>
         /// Download dataset from S3 and push to SAS file share
         /// </summary>
+
+        //alert("PushToSAS_Filename fuction alert");
         var val = document.getElementById('FileNameOverride').value;
         var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(id) + "&filename=" + encodeURI(val);
         data.Dataset.ProgressModalStatus();
@@ -300,6 +302,8 @@ data.Dataset = {
         /// </summary>
         /// <param name="data">Response from the Ajax post</param>
         /// <param name="parentCategory">The parent category ID, that we now need to reload</param>
+
+        //alert("AjaxSuccess Function");
         //if (Sentry.WasAjaxSuccessful(data)) {
         Sentry.HideAllModals();
         //Sentry.ShowModalAlert("File has been pushed to SAS Successfully.");
@@ -314,7 +318,9 @@ data.Dataset = {
         /// <summary>
         /// Called when there was a non-200 response
         /// </summary>
-        Sentry.ShowModalAlert("An error occurred.  Please try again.");
+
+        //alert(data.responseText);
+        Sentry.ShowModalAlert("Error Processing your request, please try again!");
     },
 
     ViewEdit: function (id) {
@@ -348,6 +354,9 @@ data.Dataset = {
     ProgressModalStatus: function () {
         // --- progress bar stuff : start ---
         // Reference the auto-generated proxy for the hub.
+
+        //alert("ProgressModalStatus");
+
         var progress = $.connection.progressHub;
         console.log(progress);
 
@@ -370,6 +379,9 @@ data.Dataset = {
     },
 
     FileNameModal: function (id) {
+
+        //alert("fileNameModal");
+
         var modal = Sentry.ShowModalWithSpinner("File Name Override");
 
         $.get("/Dataset/PushToFileNameOverride/" + id, function (result) {

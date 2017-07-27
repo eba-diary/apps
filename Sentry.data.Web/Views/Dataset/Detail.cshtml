@@ -60,10 +60,21 @@
 
         <div class="dataset-detail-content-row" id="Dataset-Detail-PushTo-Value">
             @{
-                <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to SAS">
-                    @*<img src="~/Images/sas_logo_rectangle.png" class="img-responsive" width="150" height="100" />*@
-                    <img src="~/Images/sas_logo_rectangle.png"/>
-                </button>
+                if (Model.IsPushToSASCompatible == true)
+                {
+                    <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to SAS">
+                        @*<img src="~/Images/sas_logo_rectangle.png" class="img-responsive" width="150" height="100" />*@
+                        <img src="~/Images/sas_logo_rectangle.png" />
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to SAS" disabled>
+                        @*<img src="~/Images/sas_logo_rectangle.png" class="img-responsive" width="150" height="100" />*@
+                        <img src="~/Images/sas_logo_rectangle.png" />
+                    </button>
+                }
+
             }
 
             @{

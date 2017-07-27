@@ -52,6 +52,13 @@ namespace Sentry.data.Web
             //}
             this.SearchHitList = new List<string>();
 
+            if (ds.FileExtension == ".csv")
+                { this.IsPushToSASCompatible = true; }
+            else
+                { this.IsPushToSASCompatible = false; }
+
+            this.IsPushToTableauCompatible = false;
+
         }
 
         public int DatasetId { get; set; }
@@ -153,6 +160,10 @@ namespace Sentry.data.Web
 
         public Boolean CanDwnldSenstive { get; set; }
         public Boolean CanEditDataset { get; set; }
+
+        public Boolean IsPushToSASCompatible { get; set; }
+
+        public Boolean IsPushToTableauCompatible { get; set; }
         //public IList<String> CategoryList { get; set; }
 
         ///// <summary>
