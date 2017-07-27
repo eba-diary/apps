@@ -40,7 +40,7 @@ namespace Sentry.data.Infrastructure
             url.Append(Uri.EscapeUriString("&_program="));
             if(Path.GetExtension(filename) == ".csv")
             {
-                url.Append(Uri.EscapeUriString(Configuration.Config.GetHostSetting("SASCsvStpFolder")));
+                url.Append(Configuration.Config.GetHostSetting("SASCsvStpFolder"));
                 url.Append(Uri.EscapeUriString(Configuration.Config.GetHostSetting("SASCsvStpName")));
             }            
             url.Append(Uri.EscapeUriString("&FILE_NAME="));
