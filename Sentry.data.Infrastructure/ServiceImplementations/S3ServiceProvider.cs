@@ -62,7 +62,7 @@ namespace Sentry.data.Infrastructure
 
             GetPreSignedUrlRequest req = new GetPreSignedUrlRequest()
             {
-                BucketName = Configuration.Config.GetSetting("AWSRootBucket"),
+                BucketName = Configuration.Config.GetHostSetting("AWSRootBucket"),
                 Key = uniqueKey,
                 Expires = DateTime.Now.AddMinutes(2)
             };
@@ -102,7 +102,7 @@ namespace Sentry.data.Infrastructure
                 Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
                 Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
                 //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + Configuration.Config.GetSetting("AWSRootBucket"));
-                s3tuReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
+                s3tuReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
                 //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - InputStream");
                 s3tuReq.InputStream = stream;
                 //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + category + "/" + dsfi);
@@ -127,8 +127,8 @@ namespace Sentry.data.Infrastructure
                 Sentry.Common.Logging.Logger.Debug("Started S3 TransferUtility Setup for Download");
                 Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
                 Amazon.S3.Transfer.TransferUtilityDownloadRequest s3tuDwnldReq = new Amazon.S3.Transfer.TransferUtilityDownloadRequest();
-                Sentry.Common.Logging.Logger.Debug("TransferUtility - Set AWS BucketName: " + Configuration.Config.GetSetting("AWSRootBucket"));
-                s3tuDwnldReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
+                Sentry.Common.Logging.Logger.Debug("TransferUtility - Set AWS BucketName: " + Configuration.Config.GetHostSetting("AWSRootBucket"));
+                s3tuDwnldReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
                 Sentry.Common.Logging.Logger.Debug("TransferUtility - Set FilePath: " + baseTargetPath + folder + @"\" + filename);
                 s3tuDwnldReq.FilePath = baseTargetPath + folder + @"\" + filename;
 
@@ -175,7 +175,7 @@ namespace Sentry.data.Infrastructure
         public string StartUpload(string uniqueKey)
         {
             InitiateMultipartUploadRequest mReq = new InitiateMultipartUploadRequest();
-            mReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
+            mReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
             mReq.Key = uniqueKey;
             InitiateMultipartUploadResponse mRsp = S3Client.InitiateMultipartUpload(mReq);
             return mRsp.UploadId;
@@ -184,7 +184,7 @@ namespace Sentry.data.Infrastructure
         public void UploadPart(string uniqueKey, string sourceFilePath, long filePosition, long partSize, int partNumber, bool isLastPart)
         {
             UploadPartRequest uReq = new UploadPartRequest();
-            uReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
+            uReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
             uReq.Key = uniqueKey;
             //uReq.FilePath = sourceFilePath;
             uReq.FilePosition = filePosition;
@@ -208,7 +208,7 @@ namespace Sentry.data.Infrastructure
         public string StopUpload(string uniqueKey, string uploadId)
         {
             CompleteMultipartUploadRequest cReq = new CompleteMultipartUploadRequest();
-            cReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
+            cReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
             cReq.Key = uniqueKey;
             cReq.UploadId = uploadId;
             CompleteMultipartUploadResponse mRsp = S3Client.CompleteMultipartUpload(cReq);
@@ -222,7 +222,7 @@ namespace Sentry.data.Infrastructure
         public void DeleteDataset(string uniqueKey)
         {
             DeleteObjectRequest doReq = new DeleteObjectRequest();
-            doReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
+            doReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
             doReq.Key = uniqueKey;
             DeleteObjectResponse doRsp = S3Client.DeleteObject(doReq);
             if (doRsp.HttpStatusCode != System.Net.HttpStatusCode.OK)
@@ -302,7 +302,7 @@ namespace Sentry.data.Infrastructure
             // this will include folders in addition to data sets...
             if (parentDir == null)
             {
-                parentDir = Configuration.Config.GetSetting("AWSRootBucket");
+                parentDir = Configuration.Config.GetHostSetting("AWSRootBucket");
             }
             Dictionary<string, string> dsList = new Dictionary<string, string>();
             ListObjectsRequest lbReq = new ListObjectsRequest();
