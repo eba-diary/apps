@@ -293,6 +293,11 @@ ul.list-group-indented {
     color: #FFFFFF;
 }
 
+.category-sentry {
+    background-color: #003DA5;
+    color: #FFFFFF;
+}
+
 /*.dataset-list-download-link {
     color: #FFFFFF;
     background-color: #DDBB64;
