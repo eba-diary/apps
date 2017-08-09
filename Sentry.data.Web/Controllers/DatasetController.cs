@@ -1017,31 +1017,124 @@ namespace Sentry.data.Web.Controllers
             //}
         }
 
+        //[HttpPost]
+        //public ActionResult PushToSAS(PushToDatasetModel PushToModel)
+        //{
+        //    Dataset ds = _datasetContext.GetById(PushToModel.DatasetId);
+        //    string filename = null;
+        //    string filename_orig = null;
+
+        //    Sentry.Common.Logging.Logger.Debug("DatasetId: " + PushToModel.DatasetId);
+        //    Sentry.Common.Logging.Logger.Debug("File Name Override Value: " + PushToModel.FileNameOverride);
+
+        //    //Test for an override name; if empty or null, use current value on dataset model
+        //    if (!String.IsNullOrWhiteSpace(PushToModel.FileNameOverride))
+        //    {
+        //        //Test if override name includes an extension; if exists, replace with current value in dataset model
+        //        if (Path.HasExtension(PushToModel.FileNameOverride))
+        //        {
+        //            Sentry.Common.Logging.Logger.Debug("Has File Extension: " + System.IO.Path.GetExtension(PushToModel.FileNameOverride));
+        //            Sentry.Common.Logging.Logger.Debug("Dataset Model Extension: " + ds.FileExtension);
+        //            filename = PushToModel.FileNameOverride.Replace(System.IO.Path.GetExtension(PushToModel.FileNameOverride), ds.FileExtension);
+        //        }
+        //        else
+        //        {
+        //            Sentry.Common.Logging.Logger.Debug("Has No File Extension");
+        //            Sentry.Common.Logging.Logger.Debug("Dataset Model Extension: " + ds.FileExtension);
+        //            filename = (PushToModel.FileNameOverride + ds.FileExtension);
+        //        }
+        //    }
+        //    else
+        //    {
+        //        Sentry.Common.Logging.Logger.Debug(" No Override Value");
+        //        Sentry.Common.Logging.Logger.Debug("Dataset Model S3Key: " + System.IO.Path.GetFileName(ds.S3Key));
+        //        filename = System.IO.Path.GetFileName(ds.S3Key);
+        //    }
+
+        //    filename_orig = filename;
+
+        //    //Gerenate SAS friendly file name.
+        //    filename = _sasService.GenerateSASFileName(filename);
+
+        //    Sentry.Common.Logging.Logger.Debug($"File Name Translation: Original({filename_orig} SASFriendly({filename})");
+
+        //    string BaseTargetPath = Configuration.Config.GetHostSetting("PushToSASTargetPath");
+
+        //    //creates category directory if does not exist, otherwise does nothing.
+        //    System.IO.Directory.CreateDirectory(BaseTargetPath + ds.Category);
+
+
+        //    try
+        //    {
+        //        _s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(uploadRequest_UploadPartProgressEvent);
+        //        _s3Service.TransferUtilityDownload(BaseTargetPath, ds.Category, filename, ds.S3Key);
+
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Sentry.Common.Logging.Logger.Error("S3 Download Error", e);
+        //        //return Json(new {Success = false});
+        //    }
+
+
+        //    //string content = string.Empty;
+        //    //Converting file to .sas7bdat format
+        //    try
+        //    {
+
+        //        _sasService.ConvertToSASFormat(filename, ds.Category);
+
+        //    }
+        //    catch (WebException we)
+        //    {
+        //        Sentry.Common.Logging.Logger.Error("Web Error Calling SAS Stored Process", we);
+        //    }
+        //    catch (Exception e)
+        //    {
+        //        Sentry.Common.Logging.Logger.Error("Error calling SAS Stored Process", e);
+        //    }
+
+
+
+
+        //    //throw new Exception("Error");
+
+        //    //return new HttpStatusCodeResult(401, "Custom Error Message");
+
+        //    SuccessModel success = new SuccessModel();
+        //    success.Message = "Successfully Pushed File to SAS";
+
+        //    return PartialView("_Success", success);
+
+        //    //return AjaxSuccessJson();
+
+        //}
+
         [HttpPost]
-        public ActionResult PushToSAS(PushToDatasetModel PushToModel)
+        public ActionResult PushToSAS(int id, string fileOverride)
         {
-            Dataset ds = _datasetContext.GetById(PushToModel.DatasetId);
+            Dataset ds = _datasetContext.GetById(id);
             string filename = null;
             string filename_orig = null;
 
-            Sentry.Common.Logging.Logger.Debug("<PushToSAS>: DatasetId: " + PushToModel.DatasetId);
-            Sentry.Common.Logging.Logger.Debug("File Name Override Value: " + PushToModel.FileNameOverride);
+            Sentry.Common.Logging.Logger.Debug("DatasetId: " + id);
+            Sentry.Common.Logging.Logger.Debug("File Name Override Value: " + fileOverride);
 
             //Test for an override name; if empty or null, use current value on dataset model
-            if (!String.IsNullOrWhiteSpace(PushToModel.FileNameOverride))
+            if (!String.IsNullOrWhiteSpace(fileOverride))
             {
                 //Test if override name includes an extension; if exists, replace with current value in dataset model
-                if (Path.HasExtension(PushToModel.FileNameOverride))
+                if (Path.HasExtension(fileOverride))
                 {
-                    Sentry.Common.Logging.Logger.Debug("Has File Extension: " + System.IO.Path.GetExtension(PushToModel.FileNameOverride));
+                    Sentry.Common.Logging.Logger.Debug("Has File Extension: " + System.IO.Path.GetExtension(fileOverride));
                     Sentry.Common.Logging.Logger.Debug("Dataset Model Extension: " + ds.FileExtension);
-                    filename = PushToModel.FileNameOverride.Replace(System.IO.Path.GetExtension(PushToModel.FileNameOverride), ds.FileExtension);
+                    filename = fileOverride.Replace(System.IO.Path.GetExtension(fileOverride), ds.FileExtension);
                 }
                 else
                 {
                     Sentry.Common.Logging.Logger.Debug("Has No File Extension");
                     Sentry.Common.Logging.Logger.Debug("Dataset Model Extension: " + ds.FileExtension);
-                    filename = (PushToModel.FileNameOverride + ds.FileExtension);
+                    filename = (fileOverride + ds.FileExtension);
                 }
             }
             else
@@ -1064,20 +1157,21 @@ namespace Sentry.data.Web.Controllers
             System.IO.Directory.CreateDirectory(BaseTargetPath + ds.Category);
 
 
+            _s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(uploadRequest_UploadPartProgressEvent);
+
             try
             {
-                _s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(uploadRequest_UploadPartProgressEvent);
+                
                 _s3Service.TransferUtilityDownload(BaseTargetPath, ds.Category, filename, ds.S3Key);
 
             }
             catch (Exception e)
             {
                 Sentry.Common.Logging.Logger.Error("S3 Download Error", e);
-                //return Json(new {Success = false});
+                return PartialView("_Success", new SuccessModel("Push to SAS Error", e.Message, false));
             }
 
 
-            //string content = string.Empty;
             //Converting file to .sas7bdat format
             try
             {
@@ -1088,36 +1182,19 @@ namespace Sentry.data.Web.Controllers
             catch (WebException we)
             {
                 Sentry.Common.Logging.Logger.Error("Web Error Calling SAS Stored Process", we);
+                return PartialView("_Success", new SuccessModel("Push to SAS Error", we.Message, false));
             }
             catch (Exception e)
             {
                 Sentry.Common.Logging.Logger.Error("Error calling SAS Stored Process", e);
+                return PartialView("_Success", new SuccessModel("Push to SAS Error", e.Message, false));
             }
 
-
-            //Uri uri = new Uri(@"https://executionsasmidtierqual.sentry.com/SASStoredProcess/do?_program=%2FUser+Folders%2FJered+Gosse%2FMy+Folder%2FSTP_PushToSAS_CSV_Final" + "&FILE_NAME=" + "2015.annual.singlefile.csv" + "&CATEGORY=" + "Government" + "&_username=RA072984" + "&_password={SAS002}CFEE423D534550431C426CC70746FBFA0EEE11BE07E73FA1");
-            //WebRequest webRequest = WebRequest.Create(uri);
-            ////webRequest.Proxy = new IWebProxy("webproxy.sentry.com", 80);
-            //webRequest.Proxy.Credentials = System.Net.CredentialCache.DefaultNetworkCredentials;
-            //WebResponse webResponse = webRequest.GetResponse();
-            //var stream = webResponse.GetResponseStream();
-
-            //using (var reader = new StreamReader(stream ?? new MemoryStream(), Encoding.UTF8))
-            //    content = reader.ReadToEnd();
-
-            //Sentry.Common.Logging.Logger.Debug(content);
-
-            //string url =  @"https://executionsasmidtierqual.sentry.com/SASStoredProcess/do?_program=%2FUser+Folders%2FJered+Gosse%2FMy+Folder%2FSTP_PushToSAS_CSV_Final" + "&FILE_NAME=" + "2015.annual.singlefile.csv" + "&CATEGORY=" + "Government";
-
-            //WebResponse response = SendGetRequest(url);
-
-            //throw new Exception("Error");
-
-            //return new HttpStatusCodeResult(401, "Custom Error Message");
-
-            return AjaxSuccessJson();
+            
+            return PartialView("_Success", new SuccessModel("Successfully Pushed File to SAS", $"Dataset file {filename_orig} has been converted to {filename}.", true));
 
         }
+
 
         //public static WebResponse SendGetRequest(string url)
         //{
@@ -1127,7 +1204,7 @@ namespace Sentry.data.Web.Controllers
 
         //    return httpRequest.GetResponse();
         //}
-        
+
         /// <summary>
         /// Callback handler for S3 uploads... Amazon calls this to communicate progress; from here we communicate
         /// that progress back to the client for their progress bar...
@@ -1136,7 +1213,7 @@ namespace Sentry.data.Web.Controllers
         /// <param name="e"></param>
         //static void downloadRequest_DownloadPartProgressEvent(object sender, WriteObjectProgressArgs e)
         //{
-            
+
         //    Sentry.data.Web.Helpers.ProgressUpdater.SendProgress(e.FilePath, e.PercentDone);
         //    //Sentry.data.Web.Helpers.ProgressUpdater.SendProgress(e., e.TotalNumberOfBytesForCurrentFile, e.TransferredBytesForCurrentFile);
         //    Sentry.Common.Logging.Logger.Debug("DatasetDownload-S3Event: " + e.FilePath + ": " + e.PercentDone);
@@ -1152,7 +1229,7 @@ namespace Sentry.data.Web.Controllers
             model.DatasetId = dataset.DatasetId;
             model.DatasetFileName = System.IO.Path.GetFileName(dataset.S3Key);
 
-            return PartialView("_PushToFilenameOverride", model);
+            return PartialView("_PushToFilenameOverride_new", model);
 
         }
 

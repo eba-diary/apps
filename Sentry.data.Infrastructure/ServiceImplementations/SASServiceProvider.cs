@@ -65,7 +65,7 @@ namespace Sentry.data.Infrastructure
                 responsecontent = reader.ReadToEnd();
                 if (!(String.IsNullOrEmpty(responsecontent)))
                 {
-                    throw new WebException("SAS Error", new Exception(responsecontent));
+                    throw new WebException("Error Executing SAS Conversion", new Exception(responsecontent));
                 }
             }
         }
@@ -90,5 +90,6 @@ namespace Sentry.data.Infrastructure
 
             return fn;
         }
+
     }
 }

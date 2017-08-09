@@ -313,6 +313,7 @@
     <Compile Include="Models\FilterNameModel.cs" />
     <Compile Include="Models\SearchModel.cs" />
     <Compile Include="Models\SharedContextModel.cs" />
+    <Compile Include="Models\Shared\SuccessModel.cs" />
     <Compile Include="Models\User\UserGridModel.cs" />
     <Compile Include="Models\User\UserModel.cs" />
     <Compile Include="Models\User\UserSwitchModel.cs" />
@@ -961,6 +962,8 @@
     <Content Include="Views\Dataset\Edit.cshtml" />
     <Content Include="_status\web.config" />
     <Content Include="Views\Dataset\_PushToFilenameOverride.cshtml" />
+    <Content Include="Views\Dataset\_Success.cshtml" />
+    <Content Include="Views\Dataset\_PushToFilenameOverride_new.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
