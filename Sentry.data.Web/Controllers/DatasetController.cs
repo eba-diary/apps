@@ -1115,7 +1115,7 @@ namespace Sentry.data.Web.Controllers
         {
             Dataset ds = _datasetContext.GetById(id);
             string filename = null;
-            string filename_orig = null;
+            //string filename_orig = null;
 
             Sentry.Common.Logging.Logger.Debug("DatasetId: " + id);
             Sentry.Common.Logging.Logger.Debug("File Name Override Value: " + fileOverride);
@@ -1144,12 +1144,12 @@ namespace Sentry.data.Web.Controllers
                 filename = System.IO.Path.GetFileName(ds.S3Key);
             }
 
-            filename_orig = filename;
+            //filename_orig = filename;
 
             //Gerenate SAS friendly file name.
-            filename = _sasService.GenerateSASFileName(filename);
+            //filename = _sasService.GenerateSASFileName(filename);
 
-            Sentry.Common.Logging.Logger.Debug($"File Name Translation: Original({filename_orig} SASFriendly({filename})");
+            //Sentry.Common.Logging.Logger.Debug($"File Name Translation: Original({filename_orig} SASFriendly({filename})");
 
             string BaseTargetPath = Configuration.Config.GetHostSetting("PushToSASTargetPath");
 
@@ -1162,7 +1162,7 @@ namespace Sentry.data.Web.Controllers
             try
             {
                 
-                _s3Service.TransferUtilityDownload(BaseTargetPath, ds.Category, filename, ds.S3Key);
+                //_s3Service.TransferUtilityDownload(BaseTargetPath, ds.Category, filename, ds.S3Key);
 
             }
             catch (Exception e)
@@ -1191,7 +1191,7 @@ namespace Sentry.data.Web.Controllers
             }
 
             
-            return PartialView("_Success", new SuccessModel("Successfully Pushed File to SAS", $"Dataset file {filename_orig} has been converted to {filename}.", true));
+            return PartialView("_Success", new SuccessModel("Successfully Pushed File to SAS", $"Dataset file {filename} has been converted to {filename.Replace(Path.GetExtension(filename),".sas7bdat")}. The file can be found at {BaseTargetPath.Replace("\\sentry.com\appfs_nonprod","S: ")}.", true));
 
         }
 

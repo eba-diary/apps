@@ -8,6 +8,7 @@ using Sentry.data.Core;
 using System.Web;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Threading;
 
 namespace Sentry.data.Infrastructure
 {
@@ -31,27 +32,15 @@ namespace Sentry.data.Infrastructure
 
         public void ConvertToSASFormat(string filename, string category)
         {
-            StringBuilder url = new StringBuilder();
-            url.Append(Configuration.Config.GetHostSetting("PushToSASUrl"));
-            url.Append(Uri.EscapeUriString("&_username="));
-            url.Append(Uri.EscapeUriString(Configuration.Config.GetHostSetting("PushToSASUser")));
-            url.Append(Uri.EscapeUriString("&_password="));
-            url.Append(Uri.EscapeUriString(Configuration.Config.GetHostSetting("PushToSASPass")));
-            url.Append(Uri.EscapeUriString("&_program="));
-            if(Path.GetExtension(filename) == ".csv")
-            {
-                url.Append(Configuration.Config.GetHostSetting("SASCsvStpFolder"));
-                url.Append(Uri.EscapeUriString(Configuration.Config.GetHostSetting("SASCsvStpName")));
-            }            
-            url.Append(Uri.EscapeUriString("&FILE_NAME="));
-            url.Append(Uri.EscapeUriString(Path.GetFileNameWithoutExtension(filename)));
-            url.Append(Uri.EscapeUriString("&FILE_EXT="));
-            url.Append(Uri.EscapeUriString(Path.GetExtension(filename)));
-            url.Append(Uri.EscapeUriString("&CATEGORY="));
-            url.Append(Uri.EscapeUriString(category));
+            StringBuilder url = GernerateSASURL(filename, category);
+            //CallSASConvertSTP(url);
 
-            Sentry.Common.Logging.Logger.Debug($"URL: {url.ToString()}");
+            //JCG TODO: Revisit after SAS fixes issue around initial logon attempt fails, additional attempts succeed.
+            Retry.Do(() => CallSASConvertSTP(url), TimeSpan.FromSeconds(15), 2);
+        }
 
+        private void CallSASConvertSTP(StringBuilder url)
+        {
             HttpWebRequest httpRequest = WebRequest.Create(url.ToString()) as HttpWebRequest;
 
             httpRequest.CookieContainer = cookies;
@@ -68,6 +57,31 @@ namespace Sentry.data.Infrastructure
                     throw new WebException("Error Executing SAS Conversion", new Exception(responsecontent));
                 }
             }
+        }
+
+        private static StringBuilder GernerateSASURL(string filename, string category)
+        {
+            StringBuilder url = new StringBuilder();
+            url.Append(Configuration.Config.GetHostSetting("PushToSASUrl"));
+            url.Append(Uri.EscapeUriString("&_username="));
+            url.Append(Uri.EscapeUriString(Configuration.Config.GetHostSetting("PushToSASUser")));
+            url.Append(Uri.EscapeUriString("&_password="));
+            url.Append(Uri.EscapeUriString(Configuration.Config.GetHostSetting("PushToSASPass")));
+            url.Append(Uri.EscapeUriString("&_program="));
+            if (Path.GetExtension(filename) == ".csv")
+            {
+                url.Append(Configuration.Config.GetHostSetting("SASCsvStpFolder"));
+                url.Append(Uri.EscapeUriString(Configuration.Config.GetHostSetting("SASCsvStpName")));
+            }
+            url.Append(Uri.EscapeUriString("&FILE_NAME="));
+            url.Append(Uri.EscapeUriString(Path.GetFileNameWithoutExtension(filename)));
+            url.Append(Uri.EscapeUriString("&FILE_EXT="));
+            url.Append(Uri.EscapeUriString(Path.GetExtension(filename)));
+            url.Append(Uri.EscapeUriString("&CATEGORY="));
+            url.Append(Uri.EscapeUriString(category));
+
+            Sentry.Common.Logging.Logger.Debug($"URL: {url.ToString()}");
+            return url;
         }
 
         /// <summary>
@@ -89,6 +103,50 @@ namespace Sentry.data.Infrastructure
             fn = fn + Path.GetExtension(filename);
 
             return fn;
+        }
+
+
+        public static class Retry
+        {
+            public static void Do(
+                Action action,
+                TimeSpan retryInterval,
+                int retryCount = 3)
+            {
+                Do<object>(() =>
+                {
+                    action();
+                    return null;
+                }, retryInterval, retryCount);
+            }
+
+            public static T Do<T>(
+                Func<T> action,
+                TimeSpan retryInterval,
+                int retryCount = 3)
+            {
+                var exceptions = new Exception();
+
+                for (int retry = 0; retry < retryCount; retry++)
+                {
+                    try
+                    {
+                        if (retry > 0)
+                            Thread.Sleep(retryInterval);
+                        return action();
+                    }
+                    catch (Exception ex)
+                    {
+                        if (retry == 0)
+                        {
+                            //exceptions.Add(ex);
+                            exceptions = ex;
+                        }                        
+                    }
+                }
+
+                throw new WebException(exceptions.Message, new Exception(exceptions.InnerException.ToString()));
+            }
         }
 
     }
