@@ -91,54 +91,51 @@
 
     </section>
 
-    <section class="dataset-detail-content" id="Dataset-Detail-Description">
-        <div class="dataset-detail-content-row">
-            @Html.Label("Description:")
+    <div class="form-group">
+        @Html.LabelFor(model => model.DatasetDesc, htmlAttributes: new { @class = "control-label col-md-3"})
+        <div class="col-md-9">
+            <p>@Html.DisplayTextFor(model => model.DatasetDesc)</p>
         </div>
-        <div class="dataset-detail-content-row">
-            @Html.DisplayFor(m => m.DatasetDesc)
-        </div>
-    </section>
+    </div>
 
-    <section class="dataset-detail-content" id="Dataset-Detail-Owner">
-        <div class="dataset-detail-content-row">
-            @Html.Label("Sentry Owner:")
+    <div class="form-group">
+        @Html.LabelFor(model => model.SentryOwnerName, htmlAttributes: new { @class = "control-label col-md-3" })
+        <div class="col-md-9">
+            <p>@Html.DisplayTextFor(model => model.SentryOwnerName)</p>
         </div>
-        <div class="dataset-detail-content-row">
-            @Html.DisplayFor(m => m.SentryOwnerName)
-        </div>
-    </section>
+    </div>
 
-    <section class="dataset-detail-content" id="Dataset-Detail-Date">
-        <div class="dataset-detail-content-row">
-            @Html.Label("Date:")
+    <div class="form-group">
+        @Html.LabelFor(model => model.UploadDtm, htmlAttributes: new { @class = "control-label col-md-3" })
+        <div class="col-md-9">
+            <p>@Html.DisplayTextFor(model => model.UploadDtm)</p>
         </div>
-        <div class="dataset-detail-content-row">
-            @Html.DisplayFor(m => m.DatasetDtm)
-        </div>
-    </section>
+    </div>
 
-    <section class="dataset-detail-content" id="Dataset-Detail-Category">
-        <div class="dataset-detail-content-row">
-            @Html.Label("Category:")
+    <div class="form-group">
+        @Html.LabelFor(model => model.ChangedDtm, htmlAttributes: new { @class = "control-label col-md-3" })
+        <div class="col-md-9">
+            <p>@Html.DisplayTextFor(model => model.ChangedDtm)</p>
         </div>
-        <div class="dataset-detail-content-row">
-            @Html.DisplayFor(m => m.Category)
-        </div>
-    </section>
+    </div>
 
-    <section class="dataset-detail-content" id="Dataset-Detail-Unique-Key">
-        <div class="dataset-detail-content-row">
-            @Html.Label("S3 Key:")
+    <div class="form-group">
+        @Html.LabelFor(model => model.Category, htmlAttributes: new { @class = "control-label col-md-3" })
+        <div class="col-md-9">
+            <p>@Html.DisplayTextFor(model => model.Category)</p>
         </div>
-        <div class="dataset-detail-content-row">
-            @Html.DisplayFor(m => m.S3Key)
-        </div>
-    </section>
+    </div>
 
-    <section class="dataset-detail-content" id="Dataset-Detail-Metadata">
+    <div class="form-group">
+        @Html.LabelFor(model => model.S3Key, htmlAttributes: new { @class = "control-label col-md-3" })
+        <div class="col-md-9">
+            <p>@Html.DisplayTextFor(model => model.S3Key)</p>
+        </div>
+    </div>
+
+    @*<section class="dataset-detail-content" id="Dataset-Detail-Metadata">
         <div class="dataset-detail-content-row">
-            @* ...spacer... *@
+            
             &nbsp; &nbsp;
         </div>
     </section>
@@ -197,7 +194,7 @@
                 <p><i>No Metadata Available.</i></p>
             }
         </div>
-    </section>
+    </section>*@
 
 </div>
 
