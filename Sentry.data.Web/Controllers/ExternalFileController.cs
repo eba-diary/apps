@@ -24,6 +24,9 @@ namespace Sentry.data.Web.Controllers
             string filenameAndPath = Path.Combine(Config.GetHostSetting("DataModelPath"), dataModelName, filename);
             string mimeType = MimeMapping.GetMimeMapping(filename);
 
+            Sentry.Common.Logging.Logger.Debug($"filenameAndPath: {filenameAndPath}");
+            Sentry.Common.Logging.Logger.Debug($"mimeType: {mimeType}");
+
             if (System.IO.File.Exists(filenameAndPath))
             {
                 return new FilePathResult(filenameAndPath, mimeType);
