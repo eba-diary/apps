@@ -61,6 +61,12 @@ namespace Sentry.data.Web
 
         }
 
+        public string FileExtensionDisplay()
+        {
+            string fe = FileExtension.TrimStart('.');
+            return fe;
+        }
+
         public int DatasetId { get; set; }
 
         //[Required()]

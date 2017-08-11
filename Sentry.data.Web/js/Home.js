@@ -3,20 +3,40 @@
  ******************************************************************************************/
 
 data.Home = {
-    Init: function () {
-        $("#feed").bind('scroll', data.Home.ScrollBottom);
-        $("#sentryFeed").bind('scroll', data.Home.ScrollBottom);
-        $("#chbx").change(data.Home.ChangeFeeds);
-    },
-
-    SentrySkipTotal: 10,
+    SentrySkipTotal: 0,
     AllSkipTotal: 10,
     AjaxStatus: true,
+
+    Init: function () {
+        if (data.Home.AjaxStatus)
+        {
+            data.Home.AjaxStatus = false;
+
+            $.ajax({
+                url: '/Home/GetFeed',
+                dataType: 'html',
+                success: function (html) {
+                    $("#feed").append(html);
+                    data.Home.SentrySkipTotal += 10;
+                    data.Home.AjaxStatus = true;
+                },
+                error: function (e) {
+                    data.Home.AjaxStatus = true;
+                    $("#feed").append("<div class='feedItem'>Feed could not be loaded at this time.</div>");
+                }
+            });
+        }
+
+        $("#feed").bind('scroll', data.Home.ScrollBottom);
+        //$("#sentryFeed").bind('scroll', data.Home.ScrollBottom);
+        //$("#chbx").change(data.Home.ChangeFeeds);
+    },
 
     ScrollBottom: function (e) {
         var elem = $(e.currentTarget);
         var startLoadHt = elem.outerHeight() + 400;
-        var isSentryFeed = $("#chbx").is(':checked');
+        //var isSentryFeed = $("#chbx").is(':checked');
+        var isSentryFeed = false;
 
         if (elem[0].scrollHeight - elem[0].scrollTop <= startLoadHt && data.Home.AjaxStatus)
         {

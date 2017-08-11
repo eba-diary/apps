@@ -23,18 +23,7 @@ namespace Sentry.data.Web.Controllers
         {
             string filenameAndPath = Path.Combine(Config.GetHostSetting("DataModelPath"), dataModelName, filename);
             string mimeType = MimeMapping.GetMimeMapping(filename);
-
-            Sentry.Common.Logging.Logger.Debug($"filenameAndPath: {filenameAndPath}");
-            Sentry.Common.Logging.Logger.Debug($"mimeType: {mimeType}");
-
-            if (System.IO.File.Exists(filenameAndPath))
-            {
-                return new FilePathResult(filenameAndPath, mimeType);
-            }
-            else
-            {
-                return RedirectToAction("Forbidden", "Error");
-            }
+            return new FilePathResult(filenameAndPath, mimeType);
         }
 
         public ActionResult ODCFile(ComponentElement ce)
@@ -43,18 +32,5 @@ namespace Sentry.data.Web.Controllers
 
             return File(Encoding.UTF8.GetBytes(xml), "text/xml", string.Format("{0}.odc", "xml"));
         }
-
-        //public ActionResult ArchDiagram(string link)
-        //{
-        //    https://forums.asp.net/t/1122054.aspx?Checking+if+a+URL+Exists
-        //    if ()
-        //    {
-        //        return Redirect("http://www.website.com");
-        //    }
-        //    else
-        //    {
-        //        return RedirectToAction("Forbidden", "Error");
-        //    }
-        //}
     }
 }

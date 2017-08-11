@@ -635,6 +635,26 @@ ul.list-group-indented {
     padding-top: 20px;
 }
 
+.extension
+{
+    color: white;
+    display: inline-block;
+    padding: 1px 5px;
+    text-align: center;
+    border-radius: 5px;
+    margin-right: 0.5em;
+}
+
+.bg_gray { background-color: gray;}
+.ext_txt { background-color: dodgerblue;}
+.ext_csv { background-color: orange;}
+.ext_xlsx, .ext_xls { background-color: green;}
+.ext_pdf { background-color: red;}
+.ext_sas7bdat { background-color: #285780;}
+.ext_prn { background-color: #72246C; }
+
+
+
 .borderSide_blue 
 {
     border: 1.5px solid #00A3E0;

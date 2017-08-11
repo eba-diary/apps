@@ -32,11 +32,9 @@ namespace Sentry.data.Web.Controllers
             _dataAssetProvider = dap;
             _feedContext = feedContext;
             das = new List<DataAsset>(_dataAssetProvider.GetDataAssets());
-            //dfisAll = new List<DataFeedItem>(_feedContext.GetAllFeedItems());
-            //dfisSentry = new List<DataFeedItem>(_feedContext.GetSentryFeedItems());
             cache = new CachingService();
             dfisAll = cache.GetOrAdd("feedAll", () => _feedContext.GetAllFeedItems().ToList());
-            dfisSentry = cache.GetOrAdd("feedSentry", () => _feedContext.GetSentryFeedItems().ToList());
+            //dfisSentry = cache.GetOrAdd("feedSentry", () => _feedContext.GetSentryFeedItems().ToList());
         }
 
         public ActionResult Index()
@@ -51,14 +49,13 @@ namespace Sentry.data.Web.Controllers
             ViewData["color"] = colors[r1];
             ViewData["color2"] = colors[r2];
             ViewData["fluid"] = true;
-            //ViewBag.DataAssets = das;
 
             return View(das);
         }
 
         public ActionResult GetFeed()
         {
-            dfisAll = cache.GetOrAdd("feedAll", () => _feedContext.GetAllFeedItems().ToList());
+            //dfisAll = cache.GetOrAdd("feedAll", () => _feedContext.GetAllFeedItems().ToList());
             ViewData["color2"] = colors[r2];
 
             return PartialView("_Feed", dfisAll.Take(10).ToList());
@@ -66,7 +63,7 @@ namespace Sentry.data.Web.Controllers
         
         public ActionResult GetSentryFeed()
         {
-            dfisSentry = cache.GetOrAdd("feedSentry", () => _feedContext.GetSentryFeedItems().ToList());
+            //dfisSentry = cache.GetOrAdd("feedSentry", () => _feedContext.GetSentryFeedItems().ToList());
             ViewData["color2"] = colors[r2];
 
             return PartialView("_Feed", dfisSentry.Take(10).ToList());

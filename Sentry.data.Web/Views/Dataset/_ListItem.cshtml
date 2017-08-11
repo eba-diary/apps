@@ -40,10 +40,11 @@
 
     @* dataset name / search hits *@
     <div class="dataset-list-content">
+        <div class="extension bg_gray ext_@Model.FileExtensionDisplay()">@Model.FileExtensionDisplay()</div>
         <span class="dataset-list-dataset-name" id="datasetViewDetails_@Model.DatasetId" data-id="@Model.DatasetId">
             @Model.DatasetName
         </span>
-        <span class="dataset-name-hover-popup" id="datasetViewDetailsHover_@Model.DatasetId" data-id="@Model.DatasetId">
+        @*<span class="dataset-name-hover-popup" id="datasetViewDetailsHover_@Model.DatasetId" data-id="@Model.DatasetId">
             &nbsp; View Details &nbsp;
         </span>
         <span class="dataset-list-search-hits">
@@ -75,7 +76,7 @@
                         {
                             <span>&nbsp;</span>
                         }
-        </span>
+        </span>*@
     </div>
 
     <div class="dataset-list-content">
