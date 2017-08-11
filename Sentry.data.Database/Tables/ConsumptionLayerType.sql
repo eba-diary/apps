@@ -5,5 +5,6 @@
     [Child_DSC] VARCHAR(50) NOT NULL, 
     [CLType_CDE] VARCHAR(50) NOT NULL, 
     [Tool_URL] VARCHAR(1024) NULL, 
-    [Color_NME] VARCHAR(50) NOT NULL
+    [Color_NME] VARCHAR(50) NOT NULL, 
+    [Tool_DSC] VARCHAR(50) NULL
 )

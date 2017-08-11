@@ -134,13 +134,13 @@
             @{
                 if (Model.IsPushToSASCompatible == true)
                 {
-                    <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to SAS">
+                    <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="right" title="Push to SAS">
                         <img src="~/Images/sas_logo_min.png" class="img-responsive" />
                     </button>
                 }
                 else
                 {
-                    <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to SAS" disabled>
+                    <button type="button" class="btn btn-default btn-sm dataset-pushto-button disabled" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="right" title="Not available for this file type" >
                         <img src="~/Images/sas_logo_min.png" class="img-responsive" />
                     </button>
                 }

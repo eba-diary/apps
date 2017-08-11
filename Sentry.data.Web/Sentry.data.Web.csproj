@@ -599,21 +599,24 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="Scripts\jquery-3.1.0-vsdoc.js" />
-    <Content Include="Images\Category\claim.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Images\Category\claim.png" />
+    <Content Include="Images\Category\claim.svg" />
     <Content Include="Images\Category\geographic.png" />
+    <Content Include="Images\Category\geographic.svg" />
     <Content Include="Images\Category\government.png" />
+    <Content Include="Images\Category\government.svg" />
     <Content Include="Images\Category\industry.png" />
-    <Content Include="Images\Category\weather.png">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    <Content Include="Images\Category\industry.svg" />
+    <Content Include="Images\Category\Sentry.png" />
+    <Content Include="Images\Category\Sentry.svg" />
+    <Content Include="Images\Category\Sentry2.png" />
+    <Content Include="Images\Category\weather.png" />
+    <Content Include="Images\Category\weather.svg" />
     <Content Include="Images\Icons\DatasetsBlue.png" />
     <Content Include="Images\Icons\DatasetsBlue.svg" />
     <Content Include="Images\sas_logo.png" />
     <Content Include="Images\sas_logo_min.png" />
     <Content Include="Images\sas_logo_rectangle.png" />
-    <Content Include="Images\Category\Sentry.png" />
     <Content Include="Images\Icons\DataAssetsBlue.png" />
     <Content Include="Images\Icons\DataAssetsBlue.svg" />
     <Content Include="Images\Icons\Blogs.png" />
