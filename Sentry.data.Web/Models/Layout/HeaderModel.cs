@@ -13,6 +13,7 @@ namespace Sentry.data.Web
         public string EnvironmentName { get; set; }
         //###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific
         public Boolean CanApproveAssets { get; set; }
+        //public bool HasMenu { get; set; }
         //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
     }
 }

@@ -6,6 +6,8 @@ using Sentry.NHibernate;
 using System.ServiceModel.Syndication;
 using System.Xml;
 using System.Collections.Generic;
+using NHibernate.Linq;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
@@ -16,63 +18,128 @@ namespace Sentry.data.Infrastructure
             NHQueryableExtensionProvider.RegisterQueryableExtensionsProvider<DataFeedProvider>();
         }
 
-        public IQueryable<DataFeedItem> HotTopicsFeed
+        public IList<DataFeed> GetDataFeeds()
         {
-            get
+            return Query<DataFeed>().Cacheable().ToList();
+        }
+
+        public IList<DataFeedItem> GetAllFeedItems()
+        {
+            List<DataFeed> dataFeeds = GetDataFeeds().ToList();
+            return GoGetItems(dataFeeds);
+        }
+
+        public IList<DataFeed> GetSentryDataFeeds()
+        {
+            return Query<DataFeed>().Where(w => w.Type == "TAB").Cacheable().ToList();
+        }
+
+        public IList<DataFeedItem> GetSentryFeedItems()
+        {
+            List<DataFeed> dataFeeds = GetSentryDataFeeds().ToList();
+            return GoGetItems(dataFeeds);
+        }
+
+        public IList<DataFeedItem> GoGetItems(List<DataFeed> dataFeeds)
+        {
+            List<DataFeedItem> items = new List<DataFeedItem>();
+
+            object sync = new object();
+
+            Parallel.ForEach(dataFeeds, feed =>
             {
-                List<DataFeedItem> dataFeed = new List<DataFeedItem>();
-                try
+                List<DataFeedItem> list = GetFeedItems(feed).ToList();
+                lock (sync)
                 {
-                    string url = "http://www.sas.com/content/sascom/en_us/resource-center/rss/_jcr_content/par/rssfeed_c3da.rss.xml";
-                    XmlReader reader = XmlReader.Create(url);
-                    SyndicationFeed feed = SyndicationFeed.Load(reader);
-                    reader.Close();
-                    foreach (SyndicationItem item in feed.Items)
-                    {
-                        dataFeed.Add(new DataFeedItem(
-                            item.PublishDate.DateTime,
-                            item.Id,
-                            item.Title.Text,
-                            item.Summary.Text));
-                    }
-                    return dataFeed.AsQueryable();
-                    //return DataFeedService.GetHotTopics().AsQueryable();
+                    items.AddRange(list);
                 }
-                catch
+            });
+
+            return items.OrderByDescending(o => o.PublishDate).Take(100).ToList();
+        }
+
+        public IList<DataFeedItem> GetFeedItems(DataFeed feed)
+        {
+            List<DataFeedItem> dataFeed = new List<DataFeedItem>();
+            try
+            {
+                XmlReader reader = XmlReader.Create(feed.Url);
+                SyndicationFeed sf = SyndicationFeed.Load(reader);
+                reader.Close();
+                foreach (SyndicationItem item in sf.Items)
                 {
-                    return dataFeed.AsQueryable();
+                    dataFeed.Add(new DataFeedItem(
+                        item.PublishDate.DateTime,
+                        item.Id,
+                        item.Title.Text,
+                        item.Summary.Text,
+                        feed));
                 }
+
+                return dataFeed.ToList();
+            }
+            catch
+            {
+                return dataFeed.ToList();
             }
         }
 
-        public IQueryable<DataFeedItem> NewsFeed
-        {
-            get
-            {
-                List<DataFeedItem> dataFeed = new List<DataFeedItem>();
-                try
-                {
-                    string url = "https://community.tableau.com/groups/feeds/popularthreads?socialGroup=1061";
-                    XmlReader reader = XmlReader.Create(url);
-                    SyndicationFeed feed = SyndicationFeed.Load(reader);
-                    reader.Close();
-                    foreach (SyndicationItem item in feed.Items)
-                    {
-                        dataFeed.Add(new DataFeedItem(
-                            item.PublishDate.DateTime,
-                            item.Id,
-                            item.Title.Text,
-                            item.Summary.Text));
-                    }
-                    return dataFeed.AsQueryable();
-                }
-                catch
-                {
-                    return dataFeed.AsQueryable();
-                }
-                //return DataFeedService.GetNewsFeed().AsQueryable();
-            }
-        }
+        //public IQueryable<DataFeedItem> HotTopicsFeed
+        //{
+        //    get
+        //    {
+        //        List<DataFeedItem> dataFeed = new List<DataFeedItem>();
+        //        try
+        //        {
+        //            string url = "http://www.sas.com/content/sascom/en_us/resource-center/rss/_jcr_content/par/rssfeed_c3da.rss.xml";
+        //            XmlReader reader = XmlReader.Create(url);
+        //            SyndicationFeed feed = SyndicationFeed.Load(reader);
+        //            reader.Close();
+        //            foreach (SyndicationItem item in feed.Items)
+        //            {
+        //                dataFeed.Add(new DataFeedItem(
+        //                    item.PublishDate.DateTime,
+        //                    item.Id,
+        //                    item.Title.Text,
+        //                    item.Summary.Text));
+        //            }
+        //            return dataFeed.AsQueryable();
+        //            //return DataFeedService.GetHotTopics().AsQueryable();
+        //        }
+        //        catch
+        //        {
+        //            return dataFeed.AsQueryable();
+        //        }
+        //    }
+        //}
 
+        //public IQueryable<DataFeedItem> NewsFeed
+        //{
+        //    get
+        //    {
+        //        List<DataFeedItem> dataFeed = new List<DataFeedItem>();
+        //        try
+        //        {
+        //            string url = "https://community.tableau.com/groups/feeds/popularthreads?socialGroup=1061";
+        //            XmlReader reader = XmlReader.Create(url);
+        //            SyndicationFeed feed = SyndicationFeed.Load(reader);
+        //            reader.Close();
+        //            foreach (SyndicationItem item in feed.Items)
+        //            {
+        //                dataFeed.Add(new DataFeedItem(
+        //                    item.PublishDate.DateTime,
+        //                    item.Id,
+        //                    item.Title.Text,
+        //                    item.Summary.Text));
+        //            }
+        //            return dataFeed.AsQueryable();
+        //        }
+        //        catch
+        //        {
+        //            return dataFeed.AsQueryable();
+        //        }
+        //        //return DataFeedService.GetNewsFeed().AsQueryable();
+        //    }
+        //}
     }
 }

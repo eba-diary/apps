@@ -8,7 +8,7 @@
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Sentry.data.Infrastructure</RootNamespace>
-    <AssemblyName>Sentry.data.Infastructure</AssemblyName>
+    <AssemblyName>Sentry.data.Infrastructure</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -131,6 +131,11 @@
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="DomainContexts\datasetContext.cs" />
     <Compile Include="DomainContexts\dataAssetContext.cs" />
+    <Compile Include="Mappings\Primary\ComponentElementMapping.cs" />
+    <Compile Include="Mappings\Primary\ConsumptionLayerComponentMapping.cs" />
+    <Compile Include="Mappings\Primary\ConsumptionLayerTypeMapping.cs" />
+    <Compile Include="Mappings\Primary\DataAssetMapping.cs" />
+    <Compile Include="Mappings\Primary\DataFeedMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetMetadataMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetMapping.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -138,6 +143,12 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="ServiceImplementations\CubeProvider.cs" />
+    <Compile Include="ServiceImplementations\ODCFileProvider.cs" />
+    <Compile Include="ServiceImplementations\TableauProvider.cs" />
+    <Compile Include="ServiceImplementations\BOProvider.cs" />
+    <Compile Include="ServiceImplementations\CLPFactory.cs" />
+    <Compile Include="ServiceImplementations\DataAssetProvider.cs" />
     <Compile Include="ServiceImplementations\DataFeedProvider.cs" />
     <Compile Include="Interfaces\IAssociateInfoProvider.cs" />
     <Compile Include="Mappings\Primary\CategoryMapping.cs" />
@@ -153,6 +164,7 @@
     <Compile Include="ServiceImplementations\MockObsidianUser.cs" />
     <Compile Include="ServiceImplementations\MockObsidianUserProvider.cs" />
     <Compile Include="ServiceImplementations\S3ServiceProvider.cs" />
+    <Compile Include="ServiceImplementations\SASProvider.cs" />
     <Compile Include="ServiceImplementations\SASServiceProvider.cs" />
   </ItemGroup>
   <ItemGroup>

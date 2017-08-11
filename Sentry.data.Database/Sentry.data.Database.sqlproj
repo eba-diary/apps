@@ -108,6 +108,11 @@
     <Build Include="Tables\Category.sql" />
     <Build Include="Tables\Dataset.sql" />
     <Build Include="Tables\DatasetMetadata.sql" />
+    <Build Include="Tables\DataAsset.sql" />
+    <Build Include="Tables\ConsumptionLayerComponent.sql" />
+    <Build Include="Tables\ComponentElement.sql" />
+    <Build Include="Tables\ConsumptionLayerType.sql" />
+    <Build Include="Tables\DataFeed.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

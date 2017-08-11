@@ -1,14 +1,25 @@
 ﻿using System.Web.Mvc;
 using System.Web.SessionState;
 using Sentry.data.Core;
+using Sentry.data.Infrastructure;
+using System.Collections.Generic;
 
 namespace Sentry.data.Web.Controllers
 {
     [SessionState(SessionStateBehavior.ReadOnly)]
     public class LayoutController : BaseController
     {
+        private IDataAssetProvider _dataAssetProvider;
+        private List<DataAsset> das;
+
+        public LayoutController(IDataAssetProvider dap)
+        {
+            _dataAssetProvider = dap;
+            das = new List<DataAsset>(_dataAssetProvider.GetDataAssets());
+        }
+
         [ChildActionOnly()]
-        public ActionResult GetHeader()
+        public ActionResult GetHeader(/*bool hasMenu*/)
         {
             HeaderModel headerModel = new HeaderModel();
             headerModel.CanUserSwitch = (SharedContext.CurrentUser.CanUserSwitch && Configuration.Config.GetHostSetting("ShowUserChoice").ToLower() == "true");
@@ -22,13 +33,13 @@ namespace Sentry.data.Web.Controllers
             {
                 headerModel.IsImpersonating = false;
             }
-            //###BEGIN SENTRYBAY### - Code below is SentryBay-specific
 
-            //###END SENTRYBAY### - Code above is SentryBay-specific
             headerModel.CanUseApp = SharedContext.CurrentUser.CanUseApp;
             headerModel.EnvironmentName = Sentry.Configuration.Config.GetHostSetting("EnvironmentName");
             headerModel.AssociatePhotoUrl = "http://sentryphoto.sentry.com/associate/" + SharedContext.CurrentUser.AssociateId + "/height/25px";
-            
+
+            //headerModel.HasMenu = hasMenu;
+            ViewBag.DataAssets = das;
 
             return PartialView("_Header", headerModel);
         }

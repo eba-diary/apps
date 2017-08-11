@@ -14,4 +14,158 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="_IND" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="a78c84fb-3c8f-47a8-a595-5b47ddb34cef" ChangeDateTime="06/21/2017 20:01:03">
+    <Property Name="ElementName" Value="[dbo].[DataAsset].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataAsset]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DataAsset_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6c140000-3fef-4997-8b34-54a4d2a23a52" ChangeDateTime="06/22/2017 16:22:59">
+    <Property Name="ElementName" Value="[dbo].[DataAsset].[ArchDiagram]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataAsset]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ArchDiagram_URL" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="5a4890f6-5b43-4ff3-9ad1-824521bc546a" ChangeDateTime="06/22/2017 20:43:02">
+    <Property Name="ElementName" Value="[dbo].[ConsumptionLayerComponent].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ConsumptionLayerComponent]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CLC_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="39bd7533-8b08-489e-b3d3-1165c58ab801" ChangeDateTime="06/22/2017 20:47:29">
+    <Property Name="ElementName" Value="[dbo].[ConsumptionLayerComponent].[Type]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ConsumptionLayerComponent]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Type_NME" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="5be56c98-507f-4a5e-9206-5d691899ad4f" ChangeDateTime="06/23/2017 16:07:27">
+    <Property Name="ElementName" Value="[dbo].[ComponentElement].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ComponentElement]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Element_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c9e34e59-dcd0-4e26-a787-3f235d3e4214" ChangeDateTime="06/23/2017 18:49:46">
+    <Property Name="ElementName" Value="[dbo].[ConsumptionLayerType].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ConsumptionLayerType]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Type_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="44784619-9d1c-4564-b32c-a410b678dd3a" ChangeDateTime="06/23/2017 19:02:27">
+    <Property Name="ElementName" Value="[dbo].[ConsumptionLayerComponent].[Type_NME]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ConsumptionLayerComponent]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Type_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="cef0448c-91c7-4b68-b8f4-2bc0a627db8e" ChangeDateTime="06/23/2017 19:27:17">
+    <Property Name="ElementName" Value="[dbo].[ConsumptionLayerComponent].[Type_ID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ConsumptionLayerComponent]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Type_NME" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="4126e489-e003-4996-9949-83d7f6153d9b" ChangeDateTime="06/26/2017 15:14:27">
+    <Property Name="ElementName" Value="[dbo].[CLCConnections].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[CLCConnections]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Connection_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="08928f6c-f523-4c3e-a34f-b45e3c22526b" ChangeDateTime="06/26/2017 15:31:40">
+    <Property Name="ElementName" Value="[dbo].[ComponentElement].[CLC_ID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ComponentElement]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Conenction_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="b3bf9d54-5e74-4f12-8a95-3a5807ceba08" ChangeDateTime="06/26/2017 15:31:49">
+    <Property Name="ElementName" Value="[dbo].[ComponentElement].[Conenction_ID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ComponentElement]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Connection_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="8942d25a-490f-4ef4-8248-d4a40da728c9" ChangeDateTime="06/26/2017 17:18:14">
+    <Property Name="ElementName" Value="[dbo].[ConsumptionLayerComponent].[Type_NME]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ConsumptionLayerComponent]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Type_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="ef089923-bf03-4413-ae0c-1405b1c0b66e" ChangeDateTime="06/26/2017 17:20:38">
+    <Property Name="ElementName" Value="[dbo].[ConsumptionLayerType].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ConsumptionLayerType]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Type_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="5f3dbb94-4a78-4111-9056-bc7fb824856f" ChangeDateTime="06/26/2017 17:22:44">
+    <Property Name="ElementName" Value="[dbo].[FK_ComponentElement_CLCConnections]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[ComponentElement]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_ComponentElement_ConsumptionLayerComponent]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="1963740d-eaa4-43e0-b728-b803dd3dd8f5" ChangeDateTime="06/27/2017 18:53:07">
+    <Property Name="ElementName" Value="[dbo].[ConsumptionLayerType].[Type_ID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ConsumptionLayerType]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CLCType_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c0dc7501-4c8b-4f08-9839-0bf9699dc833" ChangeDateTime="06/27/2017 18:53:18">
+    <Property Name="ElementName" Value="[dbo].[ConsumptionLayerType].[Type_NME]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ConsumptionLayerType]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CLC_NME" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6dd20ed2-32c5-453e-901d-bc7036d26c88" ChangeDateTime="06/27/2017 18:53:21">
+    <Property Name="ElementName" Value="[dbo].[ConsumptionLayerType].[CLCType_ID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ConsumptionLayerType]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CLType_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="5ac5f3b5-38b6-4a50-abf0-c1a06cc8ad73" ChangeDateTime="06/27/2017 18:53:29">
+    <Property Name="ElementName" Value="[dbo].[ConsumptionLayerType].[Type_CDE]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ConsumptionLayerType]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CLType_CDE" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="0d6b7368-8b00-443f-a00b-5d4b09ba8712" ChangeDateTime="06/27/2017 18:54:28">
+    <Property Name="ElementName" Value="[dbo].[ConsumptionLayerComponent].[Type_ID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ConsumptionLayerComponent]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CLType_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="19242131-7f36-40e3-8355-d4698736edf0" ChangeDateTime="06/27/2017 18:55:43">
+    <Property Name="ElementName" Value="[dbo].[ConsumptionLayerType].[CLC_NME]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ConsumptionLayerType]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CLType_NME" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="88f0f8d1-61a4-4435-989a-52c97ee7e414" ChangeDateTime="07/25/2017 15:49:42">
+    <Property Name="ElementName" Value="[dbo].[DataFeed].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataFeed]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Feed_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="835d539c-02c8-4150-a741-9f45a2cfc46f" ChangeDateTime="07/25/2017 15:52:00">
+    <Property Name="ElementName" Value="[dbo].[DataFeed].[Feed_TYPE]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataFeed]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FeedType_CDE" />
+  </Operation>
 </Operations>

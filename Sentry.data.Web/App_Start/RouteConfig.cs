@@ -17,11 +17,36 @@ namespace Sentry.data.Web
             routes.MapMvcAttributeRoutes();
 
             routes.MapRoute(
+                name: "DataAssetIndex",
+                url: "DataAsset/Index",
+                defaults: new { controller = "DataAsset", action = "Index", id = 0 }            
+            );
+
+            routes.MapRoute(
+                name: "DataAssetName",
+                url: "DataAsset/{assetName}",
+                defaults: new { controller = "DataAsset", action = "DataAsset" }
+            );
+
+            routes.MapRoute(
+                name: "DataModel",
+                url: "DataModel/{dataModelName}/{*filename}",
+                defaults: new { controller = "ExternalFile", action = "DataModel" }
+            );
+
+            routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
-                defaults: new { controller = "Dataset", action = "Index", id = UrlParameter.Optional }
-                //defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }            
+                //defaults: new { controller = "DataAsset", action = "Index", id = 1 }
+                //defaults: new { controller = "Dataset", action = "Index", id = UrlParameter.Optional }
+                defaults: new { controller = "Home", action = "Index", id = UrlParameter.Optional }            
+            );
+
+            routes.MapRoute(
+                name: "ODCFile",
+                url: "DataAsset/ODCFile/{assetId}/{cubeName}",
+                defaults: new { controller = "ExternalFile", action = "ODCFile" }
             );
         }
-    }
+    } 
 }

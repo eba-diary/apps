@@ -1,0 +1,221 @@
+﻿@model Sentry.data.Core.DataAsset
+
+@{
+    ViewBag.Title = Model.DisplayName;
+    List<Sentry.data.Core.DataAsset> assets = ViewBag.DataAssets;
+    string disabled;
+    string arch = "http://sharepoint.sentry.com/it/DataArch/_layouts/15/VisioWebAccess/VisioWebAccess.aspx?id=/it/DataArch/Shared%20Documents/Data%20Services%20Architecture%20Diagrams/" + Model.ArchLink;
+    string guide = "http://sharepoint.sentry.com/it/DataArch/Consumer%20Guides/Pages/" + Model.GuideLink;
+
+    Model.Components = Model.Components.OrderBy(x => x.Type.Name).ToList();
+}
+
+<div class="smlMarg">
+    <!-- Data Asset Header -->
+    <div class="row page-header indexHeader">
+        <div class="row">
+            <img src="~/Images/Icons/DataAssetsBlue.svg" class="assetImg leftFloat hidden-xs" />
+            <div class="indexName">
+                <h1 class="daName">@Model.DisplayName</h1>
+                @*<a href="#" class="btn btn-primary dropdown-toggle daDD" data-toggle="dropdown" aria-expanded="false"><span class="glyphicon glyphicon-chevron-down daArrow"></span></a>*@
+                @*<ul class="dropdown-menu">
+                    @foreach (Sentry.data.Core.DataAsset da in assets)
+                    {
+                        string active = (da.DisplayName.Equals(Model.DisplayName)) ? "active" : "";
+                        <li class="@active"><a href="@Url.Action("Index", "DataAsset", new { id = da.Id })">@da.DisplayName</a></li>
+                    }
+                </ul>*@
+            </div>
+
+            <!-- Removed Status and Last Updated goes here -->
+
+            <div class="visible-xs">
+                <button type="button" class="btn btn-lg btn-default daHamburger" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                    <span class="glyphicon glyphicon-menu-hamburger"></span>
+                </button>
+            </div>
+
+            <div class="daNav row">
+                <ul class="nav nav-pills hidden-xs">
+                    @{ disabled = (Model.ArchLink != null) ? "" : "disabled"; }
+                    <li class="@disabled"><a href="@arch" target="_blank">Arch Diagrams</a></li>
+
+                    @{ disabled = (Model.DataModelLink != null) ? "" : "disabled"; }
+                    <li class="@disabled"><a href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = Model.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
+
+                    @{ disabled = (Model.GuideLink != null) ? "" : "disabled"; }
+                    <li class="@disabled"><a href="@guide" target="_blank">Consumer Guide</a></li>
+
+                    @{ disabled = (Model.Contact != null) ? "" : "disabled"; }
+                    <li class="@disabled"><a href="mailto:@Model.Contact">Contact Us</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="visible-xs daCollapse">
+            <div class="navbar-collapse collapse navbar-responsive-collapse">
+                <ul class="nav navbar-nav">
+                    @{ disabled = (Model.ArchLink != null) ? "" : "disabled"; }
+                    <li class="@disabled"><a href="@arch" target="_blank">Arch Diagrams</a></li>
+
+                    @{ disabled = (Model.DataModelLink != null) ? "" : "disabled"; }
+                    <li class="@disabled"><a href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = Model.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
+
+                    @{ disabled = (Model.GuideLink != null) ? "" : "disabled"; }
+                    <li class="@disabled"><a href="@guide" target="_blank">Consumer Guide</a></li>
+
+                    @{ disabled = (Model.Contact != null) ? "" : "disabled"; }
+                    <li class="@disabled"><a href="mailto:@Model.Contact">Contact Us</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.Description != null)
+    {
+        <p class="desc hidden-xs">@Model.Description</p>
+    }
+
+    <!-- Consumption Layer Components -->
+    @{
+        int c = Model.Components.Count;
+        if (c == 1)
+        {
+            <div class="row">
+                <div class="col-sm-3"></div>
+                <div class="col-sm-6 clcCardWide border_@Model.Components[0].Type.Color">
+                    @Html.Partial("_ConsumptionLayerComponent", Model.Components[0])
+                </div>
+            </div>
+        }
+        else if (c == 2)
+        {
+            <div class="row">
+                <div class="col-sm-6 clcCardWide border_@Model.Components[0].Type.Color">
+                    @Html.Partial("_ConsumptionLayerComponent", Model.Components[0])
+                </div>
+                <div class="col-sm-6 clcCardWide border_@Model.Components[1].Type.Color">
+                    @Html.Partial("_ConsumptionLayerComponent", Model.Components[1])
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="hidden-sm">
+                @for (int i = 0; i < c; i++)
+                {
+                    <div class="row">
+                        <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[i].Type.Color">
+                            @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
+                        </div>
+                        <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                            @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
+                        </div>
+                        <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                            @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        @if (i + 1 == c - 1)
+                        {
+                            <div class="col-md-4"></div>
+                            <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                                @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
+                            </div>
+                        }
+                        @if (i + 2 == c - 1)
+                        {
+                            <div class="col-md-2"></div>
+                            <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                                @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
+                            </div>
+                            <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                                @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <div class="visible-sm">
+                @for (int i = 0; i < c; i++)
+                {
+                    <div class="row">
+                        <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[i].Type.Color">
+                            @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
+                        </div>
+                        <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                            @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
+                        </div>
+                    </div>
+
+                    if (i + 1 == c - 1)
+                    {
+                        <div class="row">
+                            <div class="col-sm-3"></div>
+                            <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                                @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
+                            </div>
+                        </div>
+                    }
+                }
+            </div>
+        }
+    }
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            @foreach (Sentry.data.Core.ConsumptionLayerComponent dc in Model.Components)
+            {
+                string dName = dc.Type.Name.Split(' ').First();
+                @:$(".more_@dName").click(function ()
+                @:{
+                    @:var name = "@dName";
+                    @:data.DataAsset.ViewMore(name);
+                @:});
+
+                foreach (Sentry.data.Core.ComponentElement ce in dc.ComponentElements)
+                {
+                    if(ce.Elements.Count > 0)
+                    {
+                        string ceName = ce.Name.Split(' ').First();
+                        @:$(".row_@ceName").click(function()
+                        @:{
+                            @:var name = "@ceName";
+                            @:data.DataAsset.ViewLowerLevel(name);
+                        @:});
+                    }
+                }
+            }
+        });
+    </script>
+}
+
+<!-- TODO: Disabled Last Updated -->
+@*<h2 class="col-xs-9 col-sm-5 text-right text-xs-left indexUpdate">Last Updated: @Model.LastUpdated.ToShortDateString()</h2>
+
+    <!-- TODO: Disabled Status -->
+    @switch (Model.Status)
+    {
+        case 0:
+            break;
+        case 1:
+            <div class="progress progress-bar-vertical-index" data-toggle="tooltip" data-placement="right" title="" data-original-title="Up and running.">
+                <div class="progress-bar progress-bar-success upBar progressBar"><div></div></div>
+            </div>
+            break;
+        case 2:
+            <div class="progress progress-bar-vertical-index" data-toggle="tooltip" data-placement="right" title="" data-original-title="Asset is down.">
+                <div class="progress-bar progress-bar-danger downBar progressBar"><div></div></div>
+            </div>
+            break;
+        case 3:
+            <div class="progress progress-bar-vertical-index" data-toggle="tooltip" data-placement="right" title="" data-original-title="There may be an issue.">
+                <div class="progress-bar progress-bar-warning warningBar progressBar"><div></div></div>
+            </div>
+            break;
+    }*@
+

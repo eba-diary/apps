@@ -103,6 +103,16 @@ ul.list-group-indented {
     width: 50%;
 }
 
+.partialSearch
+{
+    width: 500px;
+}
+
+#DatasetSearch { 
+    padding: 0;
+    margin: 0;
+}
+
 .index-card-table {
     border-color: #8792A4; 
     border-width: 1px 1px 1px 1px;
@@ -110,7 +120,7 @@ ul.list-group-indented {
     margin: 1px
 }
 
-.browse-category-card {
+/*.browse-category-card {
     align-items: center;
     text-align: center;
     padding: 10px 20px 10px 20px;
@@ -118,16 +128,36 @@ ul.list-group-indented {
     border-color: #8792A4;
     border-width: 1px 1px 1px 1px;
     border-style: solid;
+}*/
+
+.browse-category-card {
+    width: 150px;
+    height: 150px;
     background-color: white;
-    margin: 1px 1px 1px 1px;
+    margin: 10px;
+    box-shadow: 2px 6px 10px #888888;
+    display: block;
 }
 
 .browse-category-card:hover {
+    cursor: pointer;
+    box-shadow: 3px 10px 16px #888888;
+}
+
+.browse-category-card:hover .catTitle {
+    font-size: 20px;
+}
+
+.browse-category-card:active {
+    box-shadow: 1px 1px 3px #888888;
+}
+
+/*.browse-category-card:hover {
     font-size: larger;
     font-weight: bolder;
     cursor: pointer;
     background-color: aliceblue;
-}
+}*/
 
 /*********************************************/
 /* Dataset List page, e.g. search results... */
@@ -221,11 +251,12 @@ ul.list-group-indented {
     border-color: #8792A4;
     border-width: 0px;
     border-style: hidden;
-    border-radius: 5px;
     position: relative;
-    padding-top: 0px;
     margin-top: 10px;
-    padding-bottom: 5px;
+    padding: 0.5em;
+    /*border-radius: 5px;*/
+    /*padding-top: 0px;*/
+    /*padding-bottom: 5px;*/
     /*background-color: white;*/
 }
 
@@ -240,6 +271,7 @@ ul.list-group-indented {
 .dataset-list-content {
     width: 90%;
     margin-left: 3px;
+    padding: 2px 0;
 }
 
 /* wrap the upper-right of each row in the list */
@@ -565,3 +597,859 @@ ul.list-group-indented {
   background-image: url("../Images/status/default4.png");
   */
 }
+
+/*#DatasetListSearch { clear: both; }*/
+.found { margin-top: 0; }
+
+.datasetImg
+{
+    height: 50px;
+    width: 50px;
+    margin: 0.5em 1em 2em 0;
+}
+
+.searchBoxDS
+{
+    height: 45px;
+    box-shadow: 2px 6px 10px #888888;
+    width: 650px !important;
+    margin-bottom: 3em;
+    margin-top: 0.5em;
+}
+
+.searchTextDS
+{
+    height: inherit;
+    width: 600px !important;
+    float: left;
+}
+
+.setList
+{
+    height: 860px;
+    overflow-y: auto;
+}
+
+.detailHeader
+{
+    padding-top: 20px;
+}
+
+.borderSide_blue 
+{
+    border: 1.5px solid #00A3E0;
+    border-left: 6px solid #00A3E0;
+}
+
+.borderSide_orange
+{
+    border: 1.5px solid #E57200;
+	border-left: 6px solid #E57200;
+}
+
+.borderSide_plum
+{
+    border: 1.5px solid #BB85AB;
+	border-left: 6px solid #BB85AB;
+}
+
+.borderSide_green
+{
+    border: 1.5px solid #84BD00;
+	border-left: 6px solid #84BD00;
+}
+
+.borderSide_gold
+{
+    border: 1.5px solid #EAAA00;
+	border-left: 6px solid #EAAA00;
+}
+
+.borderSide_clcDkBlue
+{
+    border: 1.5px solid #003DA5;
+	border-left: 6px solid #003DA5;
+}
+
+.borderSide_blueGray
+{
+    border: 1.5px solid #89ABE3;
+	border-left: 6px solid #89ABE3;
+}
+
+/**********************/
+/* DataAsset Index page */
+/**********************/
+
+@media (max-width: 767px) /* xs */
+{
+    .text-xs-left { text-align: left; }
+    .smlMarg { margin: 1em; }
+}
+
+@media (min-width: 768px) /* sm */
+{
+    .clcCard, .clcCardWide
+    {
+        width: 47%;
+        margin-right: 1.5%;
+        margin-left: 1.5%;
+    }
+
+    .text-sm-right { text-align: right; }
+}
+
+@media (min-width: 992px) /* md and up */
+{
+    .clcCard
+    {
+        width: 31.33%;
+        margin-right: 1%;
+	    margin-left: 1%;
+    }
+
+    .text-md-right { text-align: right; }
+}
+
+.clcCard, .clcCardWide
+{
+	margin-bottom: 20px;
+	box-shadow: 2px 6px 10px #888888;
+	padding: 1em;
+    background-color: white;
+}
+
+.indexHeader 
+{ 
+    border-bottom: 2px solid #003DA5;
+    padding-bottom: 1em;
+    margin-bottom: 1em;
+}
+
+.indexName
+{
+    position: relative;
+    float: left;
+    margin-left: 0.75em;
+}
+
+.daName
+{
+    float: left;
+    margin-right: 0.5em;
+}
+
+.assetImg 
+{ 
+    width: 50px;
+    height: 50px;
+    margin-left: 1em;
+    margin-top: 0.5em;
+}
+
+.daArrow { padding-top: 0.5em; }
+
+.daDD { margin-top: 1em; }
+
+.daHamburger 
+{ 
+    margin-top: 0.5em;
+    float: right;
+    margin-right: 0.75em;
+}
+
+.daCollapse { text-align: right; }
+
+.daNav 
+{ 
+    font-size: larger;
+    margin-top: 0.75em;
+    float: right;
+    margin-right: 0.75em;
+}
+
+.desc 
+{ 
+    font-size: larger;
+    text-align: center;
+    padding: 0 3em 1em 3em;
+}
+
+.dummyRow { height: 50px; }
+
+.dummyBtn 
+{ 
+    height: 35px;
+    margin-top: 1em;
+}
+
+.dummyTableHeader { height: 25px; }
+
+.clcName 
+{ 
+    margin-bottom: 1em;
+    height: 32px;
+}
+
+.element { margin-left: 0.5em; }
+
+.clcTool 
+{ 
+    height: 0.5em;
+    margin-left: 0.25em;
+}
+
+.tableHeader
+{
+    margin: 0;
+    height: 25px;
+}
+
+.tableRow
+{
+    border-bottom: 1px solid lightgrey;
+    margin: 0 1em;
+    padding: 1em 0;
+    height: 50px;
+}
+
+.parentRow 
+{ 
+    float: left; 
+    margin-right: 1em;
+}
+
+.indent
+{
+    width: 92.5%;
+    margin-left: 7.5%;
+}
+
+.viewMoreBtn
+{
+    width: 100%;
+	text-align: center;
+    height: 35px;
+    margin-top: 1em;
+}
+
+[class^="hidden_"], [class^="hiddenLayer_"] { display: none; }
+
+/*[class^="row_"]:hover,*/ .rowLink:hover { background-color: #eff0f2; }
+
+.noHover:hover { text-decoration: none; }
+
+.row_blue { border-bottom: 2px solid #003DA5 !important; }
+
+.row_orange { border-bottom: 2px solid #683431 !important; }
+
+.row_plum { border-bottom: 2px solid #72246C !important; }
+
+.row_green { border-bottom: 2px solid #005844 !important; }
+
+.row_gold { border-bottom: 2px solid #74531C !important; }
+
+.row_ltBlue { border-bottom: 2px solid #00A3E0 !important; }
+
+.row_blueGray { border-bottom: 2px solid #285780 !important; }
+
+.white { color: white }
+
+.blue{ color: #003DA5; }
+
+.orange { color: #683431; }
+
+.plum { color: #72246C; }
+
+.green { color: #005844; }
+
+.gold { color: #74531C; }
+
+.blueGray { color: #285780; }
+
+.ltBlue { color: #00A3E0; }
+
+.dk_blue{ color: #00A3E0; } /* this is actually the light blue and is supposed to be like that */
+
+.dk_orange { color: #683431; }
+
+.dk_plum { color: #72246C; }
+
+.dk_green { color: #005844; }
+
+.dk_gold { color: #74531C; }
+
+.dk_blueGray { color: #285780; }
+
+.lt_blue{ color: #00A3E0; }
+
+.lt_orange { color: #E57200; }
+
+.lt_plum { color: #BB85AB; }
+
+.lt_green { color: #84BD00; }
+
+.lt_gold { color: #EAAA00; }
+
+.lt_blueGray { color: #89ABE3; }
+
+.BG_blue { background-color: #003DA5; }
+
+.BG_orange { background-color: #E57200; }
+
+.BG_plum { background-color: #BB85AB; }
+
+.BG_green { background-color: #84BD00; }
+
+.BG_gold { background-color: #EAAA00; }
+
+.BG_ltBlue { background-color: #00A3E0; }
+
+.BG_blueGray { background-color: #89ABE3; }
+
+.border_blue 
+{
+    border: 1.5px solid #00A3E0;
+    border-top: 6px solid #00A3E0;
+}
+
+.border_orange
+{
+    border: 1.5px solid #E57200;
+	border-top: 6px solid #E57200;
+}
+
+.border_plum
+{
+    border: 1.5px solid #BB85AB;
+	border-top: 6px solid #BB85AB;
+}
+
+.border_green
+{
+    border: 1.5px solid #84BD00;
+	border-top: 6px solid #84BD00;
+}
+
+.border_gold
+{
+    border: 1.5px solid #EAAA00;
+	border-top: 6px solid #EAAA00;
+}
+
+.border_clcDkBlue
+{
+    border: 1.5px solid #003DA5;
+	border-top: 6px solid #003DA5;
+}
+
+.border_blueGray
+{
+    border: 1.5px solid #89ABE3;
+	border-top: 6px solid #89ABE3;
+}
+
+body { background-color: #f8f8f8; }
+
+/* CSS for Data Asset with Status and Last Updated 
+
+
+.indexUpdate
+{
+    margin-top: 1.25em;
+}
+
+.clcName
+{
+    padding-left: 1.5em;
+}
+
+.tableRow
+{
+    height: 1em;
+    margin: 0 1em 0 1em;
+    padding-bottom: 2.5em;
+    border-bottom: 1px solid lightgrey;
+}
+
+.element, .layerArrow
+{
+    padding-top: 0.5em;
+}
+
+.progress-bar-vertical 
+{
+    width: 20px;
+    min-height: 6.5em;
+    display: flex;
+    align-items: flex-end;
+}
+
+.progress-bar-vertical-index 
+{
+    width: 40px;
+    min-height: 5em;
+    display: flex;
+    align-items: flex-end;
+    float: left;
+    margin-left: 1.5em;
+    background-color: white;
+    box-shadow: 0px 4px 10px #888888;
+}
+
+.progress-bar-vertical-element 
+{
+    width: 20px;
+    min-height: 2em;
+    display: flex;
+    align-items: flex-end;
+    margin: 0 1em 0 auto;
+}
+
+.progress-bar-vertical-index .progressBar, 
+.progress-bar-vertical .progressBar, 
+.progress-bar-vertical-element .progressBar
+{
+    width: 100%;
+    height: 0;
+}
+
+@-webkit-keyframes statusUp
+{
+    0% { height: 0; }
+    100% { height: 100%; }
+}
+
+@-moz-keyframes statusUp
+{
+    0% { height: 0; }
+    100% { height: 100%; }
+}
+
+@keyframes statusUp
+{
+    0% { height: 0; }
+    100% { height: 100%; }
+}
+
+.upBar
+{
+    -webkit-animation: statusUp 1s;
+    -moz-animation: statusUp 1s;
+    animation: statusUp 1s;
+    height: 100% !important;
+}
+
+@-webkit-keyframes statusDown
+{
+    0% { height: 0; }
+    100% { height: 20%; }
+}
+
+@-moz-keyframes statusDown
+{
+    0% { height: 0; }
+    100% { height: 20%; }
+}
+
+@keyframes statusDown
+{
+    0% { height: 0; }
+    100% { height: 20%; }
+}
+
+.downBar
+{
+    -webkit-animation: statusDown 0.5s;
+    -moz-animation: statusDown 0.5s;
+    animation: statusDown 0.5s;
+    height: 20% !important;
+}
+
+@-webkit-keyframes statusWarning
+{
+    0% { height: 0; }
+    100% { height: 50%; }
+}
+
+@-moz-keyframes statusWarning
+{
+    0% { height: 0; }
+    100% { height: 50%; }
+}
+
+@keyframes statusWarning
+{
+    0% { height: 0; }
+    100% { height: 50%; }
+}
+
+.warningBar
+{
+    -webkit-animation: statusWarning 0.75s;
+    -moz-animation: statusWarning 0.75s;
+    animation: statusWarning 0.75s;
+    height: 50% !important;
+}
+
+*/
+
+/**********************/
+/* Home Page */
+/**********************/
+
+.dataHeader
+{
+    padding-bottom: 5px;
+    border-bottom: 2px solid #00A3E0;
+}
+
+.searchBox
+{
+    height: 45px;
+    box-shadow: 2px 6px 10px #888888;
+    display: inline-block;
+    width: 95%;
+    margin-bottom: 10px;
+    /*margin-top: 1em;*/
+}
+
+.searchText
+{
+    height: inherit;
+    width: 85%;
+    float: left;
+}
+
+#search
+{
+    height: inherit;
+    width: 270px;
+    float: left;
+}
+
+.searchBtn
+{
+    width: 15%;
+    height: inherit;
+}
+
+.outside 
+{ 
+    text-align: center;
+    margin-top: 1em;
+}
+
+.inside 
+{ 
+    display: inline-block;
+    vertical-align: top;
+}
+
+.gridArea
+{
+    width: 680px;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.all 
+{ 
+    margin: 10px;
+    float: left;
+    box-shadow: 2px 6px 10px #888888;
+}
+
+.all:hover { box-shadow: 4px 12px 20px #888888; }
+
+.all:hover .btnTitle { font-size: 22px;}
+
+.all:active {  box-shadow: 1px 4px 8px #888888; }
+
+.blueBox, .ltBlueBox
+{
+    height: 320px;
+    width: 150px;
+}
+
+.orangeBox, .goldBox
+{
+    height: 150px;
+    width: 150px;
+}
+
+.grayBox, .greenBox, .plumBox
+{
+    height: 150px;
+    width: 320px;
+}
+
+.ltBlueBox { float: right; }
+
+.gridArea-sm
+{
+    width: 340px;
+    display: inline-block;
+    vertical-align: top;
+}
+
+.assetDD
+{
+    display: inline-block;
+    width: 20%;
+    vertical-align: top;
+    margin-left: 10px;
+    box-shadow: 2px 6px 10px #888888;
+}
+
+.asset 
+{ 
+    margin-right: 3em;
+    width: 155px;
+    padding: 1em;
+}
+
+.feed 
+{ 
+    margin-left: 3em; 
+    width: 20%;
+    min-width: 235px;
+    padding: 1em 0 1em 1em;
+}
+
+.feed, .asset
+{
+    text-align: left;
+    display: inline-block;
+    vertical-align: top;
+    background-color: white;
+    box-shadow: 2px 6px 10px #888888;
+    height: 530px;
+}
+
+.feedBox 
+{
+    height: 460px;
+    overflow-y: auto;
+}
+
+.assetBox 
+{
+    height: 460px;
+    overflow-y: auto;
+}
+
+.assetBox div:hover { background-color: #eff0f2; }
+.assetBox a:hover { text-decoration: none; }
+
+.assetHeader { margin: 0; }
+
+.feedHeader
+{
+    margin: 0;
+    margin-right: 1em;
+}
+
+.topFeed
+{
+    display:  inherit;
+    width: calc(100% - 1em);
+}
+
+.feedCheckbox label { display: block; }
+
+.feedCheckbox input 
+{ 
+    margin: 0;
+    vertical-align: middle; 
+    margin-right: 5px; 
+    height: 17px;
+    width: 17px;
+}
+
+ .feedCheckbox label span { vertical-align: middle; }
+
+.assetItem, .feedItem
+{
+    margin: 0;
+    padding: 0.8em 0.5em;
+    border-bottom: 1px solid lightgrey;
+}
+
+.feedItem { margin-right: 0.5em; }
+
+.feedImg
+{
+    float: left;
+    margin-right: 0.75em;
+}
+
+.feedName { font-size: larger; }
+
+.btnImg
+{
+    display: block;
+    margin: 1em auto;
+    height: 50px;
+    width: 50px;
+}
+
+.catImg { margin-bottom: 0.25em; }
+
+.catTitle 
+{ 
+    margin: 0; 
+    margin-bottom: 0.25em;
+}
+
+/*.catTitle
+{
+    position: absolute;
+    bottom: 1em;
+    width: 150px;
+    text-align: center;
+}*/
+
+.btnTitle
+{
+    margin: 0;
+    text-align: center;
+    padding-bottom: 5px;
+}
+
+.vertCenter
+{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    height: 150px;
+}
+
+.btnDesc { padding: 1em; }
+
+.vertCenterTall
+{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    height: 320px;
+}
+
+.btnAssetList { padding: 0; }
+
+.btnAssetList li
+{
+    list-style-type: none;
+    color: #005844;
+}
+
+.menu { background-color: white; }
+
+.insideDataset
+{
+    display: inline-block;
+    width: 100%;
+}
+
+.gridArea a:hover, .gridArea-sm a:hover { text-decoration: none; }
+
+.gridArea a:focus, .gridArea-sm a:hover { text-decoration: none;}
+
+.leftFloat {float: left;}
+.rightFloat {float: right;}
+.clearFloat {clear: both;}
+.see { border: 1px solid black; }
+.inlineBlock { display: inline-block; vertical-align: top; }
+.textCenter { text-align: center; }
+
+
+@media (min-width: 768px) /* sm */
+{
+    .searchBox 
+    { 
+        width: 525px; 
+        padding: 0;
+        margin-bottom: 1.5em;
+    }
+
+    #search { width: 610px; }
+    .searchText { width: 475px !important; }
+    .searchBtn { width: 50px; }
+    
+    .about 
+    { 
+        width: auto;
+        margin-right: 0;
+    }
+    
+    /*.partialSearch
+    {
+        width: 500px;
+    }*/
+
+    .insideDataset
+    {
+        width: 525px;
+    }
+
+    .browse-category-card {
+        margin: 15px 0;
+    }
+
+    .browse-category-card:hover .catImg {
+        margin-bottom: 1.5em;
+    }
+
+    .catImg { margin-bottom: 1em; }
+
+    .catTitle
+    {
+        position: absolute;
+        bottom: 1.5em;
+        width: 150px;
+        text-align: center;
+    }
+}
+
+@media (min-width: 992px) /* md */
+{
+    /*.searchBox 
+    { 
+        width: 850px; 
+        margin-top: 2em;
+        margin-bottom: 3em;
+    }
+
+    #search { width: 800px; }
+    #SearchText { width: 800px; }*/
+
+    .feed 
+    {  
+        width: 20%; 
+        height: 545px;
+    }
+}
+
+@media (min-width: 1200px) /* lg and up */
+{
+    .asset, .feed 
+    { 
+        margin-top: 2em;
+        height: 545px; 
+    }
+}
+
+/* Sentry approved colors
+    #003DA5 - dark blue
+    #00A3E0 - blue
+    #72246C - dark plum
+    #BB85AB - plum
+    #683431 - dark orange
+    #E57200 - orange
+    #005844 - dark green
+    #84BD00 - green
+    #74531C - dark gold
+    #EAAA00 - gold
+    #285780 - dark blue-gray
+    #89ABE3 - blue-gray
+*/

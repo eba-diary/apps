@@ -226,8 +226,8 @@ namespace Sentry.data.Web.Controllers
         {
             ldm.CategoryList = GetDatasetModelList().Select(x => x.Category).Distinct().ToList();
             ldm.SentryOwnerList = GetSentryOwnerList();
-            
-                                    
+
+
             IList<FilterNameModel> checkedFrequencies = ldm.SearchFilters.Where(f => f.FilterType == "Frequency").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).ToList();
             IList<FilterNameModel> checkedCategories = ldm.SearchFilters.Where(f => f.FilterType == "Category").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).ToList();
             IList<FilterNameModel> checkedOwners = ldm.SearchFilters.Where(f => f.FilterType == "Sentry Owner").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).ToList();
@@ -242,7 +242,7 @@ namespace Sentry.data.Web.Controllers
 
                 tempList = GetDatasetModelList().Where(x => x.CreationFreqDesc == cf.value).ToList();
 
-                freqencyDsList = freqencyDsList.Union(tempList).ToList();                    
+                freqencyDsList = freqencyDsList.Union(tempList).ToList();
             }
 
 
@@ -255,7 +255,7 @@ namespace Sentry.data.Web.Controllers
 
                 tempList = GetDatasetModelList().Where(x => x.Category == cc.value).ToList();
 
-                categoryDsList = categoryDsList.Union(tempList).ToList();               
+                categoryDsList = categoryDsList.Union(tempList).ToList();
             }
 
 
@@ -268,12 +268,12 @@ namespace Sentry.data.Web.Controllers
 
                 tempList = GetDatasetModelList().Where(x => x.SentryOwnerName == co.value).ToList();
 
-                ownerDsList = ownerDsList.Union(tempList).ToList();                    
+                ownerDsList = ownerDsList.Union(tempList).ToList();
             }
-            
+
             IList<BaseDatasetModel> dsList = Utility.IntersectAllIfEmpty(freqencyDsList, categoryDsList, ownerDsList);
 
-            
+
             if (dsList.Count == 0 && checkedCategories.Count == 0 && checkedFrequencies.Count == 0 && checkedOwners.Count == 0)
             {
                 ////Apply searchtext if not null
@@ -301,8 +301,14 @@ namespace Sentry.data.Web.Controllers
 
             ldm.DatasetList = dsList;
             ldm.SearchFilters = GetDatasetFilters(ldm, null);
-            
+
             return View(ldm);
+        }
+
+        public ActionResult HomeDataset()
+        {
+            List<BaseDatasetModel> dsList = GetDatasetModelList();
+            return PartialView("_HomeDataset", dsList);
         }
 
         private IList<FilterModel> GetDatasetFilters(ListDatasetModel ldm, string cat)
@@ -322,10 +328,10 @@ namespace Sentry.data.Web.Controllers
             IList<FilterNameModel> fList = new List<FilterNameModel>();
 
             int i = 0;
-            
+
             //foreach (string category in baseDsList.Select(x => x.Category).Distinct().ToList())
             foreach (string category in _datasetContext.Categories.Select(x => x.Name).ToList())
-                {
+            {
                 FilterNameModel nf = new FilterNameModel();
                 nf.id = i;
                 nf.value = category;
@@ -431,14 +437,16 @@ namespace Sentry.data.Web.Controllers
             return FilterList;
         }
 
-        private IDictionary<int, string> EnumToDictionary<T>(){
+        private IDictionary<int, string> EnumToDictionary<T>()
+        {
 
             return EnumToDictionary(GetType());
         }
 
         private IDictionary<int, string> EnumToDictionary(Type e)
         {
-            if (!(e.IsEnum)) {
+            if (!(e.IsEnum))
+            {
                 throw new InvalidOperationException("Enum list view model must have Enum generic type constraint");
             }
 
@@ -450,13 +458,14 @@ namespace Sentry.data.Web.Controllers
             {
                 int castValue = (int)(Enum.Parse(e, nv));
                 var enumVal = System.Enum.Parse(e, nv);
-                if (!(kvp.ContainsKey(castValue) && castValue > 0)) {
+                if (!(kvp.ContainsKey(castValue) && castValue > 0))
+                {
                     kvp.Add(castValue, enumVal.ToString());
                 }
             }
 
             return kvp;
-            
+
         }
 
         // JCG TODO: Add unit tests for List()
@@ -546,7 +555,7 @@ namespace Sentry.data.Web.Controllers
                         ds.Columns.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " " +
                     ds.Metadata != null && ds.Metadata.Count > 0 ?
                         ds.Metadata.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " ")
-                    .Split(new Char [] {' ', '_' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Split(new Char[] { ' ', '_' }, StringSplitOptions.RemoveEmptyEntries)
                     .Where(x => x.Any(xi => searchWords.Where(s => x.Contains(s)).Count() > 0))
                     .ToList();
             }
@@ -601,7 +610,7 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
-                
+
                 if (_datasetContext.Datasets.Any(m => m.DatasetName == udm.DatasetName))
                 {
                     throw new ValidationException("Dataset name already exists");
@@ -694,7 +703,7 @@ namespace Sentry.data.Web.Controllers
                 {
                     AddCoreValidationExceptionsToModel(ex as ValidationException);
                     Sentry.Common.Logging.Logger.Error("Error", ex);
-                    
+
                 }
                 else
                 {
@@ -706,7 +715,7 @@ namespace Sentry.data.Web.Controllers
 
                     Sentry.Common.Logging.Logger.Error("Error", ex);
                 }
-                
+
             }
             finally
             {
@@ -716,7 +725,7 @@ namespace Sentry.data.Web.Controllers
                 udm.AllOriginationCodes = GetDatasetOriginationListItems(); //Reload dropdown value list
                 udm.FreqencyID = 6; // preselected NonSchedule
                 udm.OriginationID = 1; // preselected Internal
-                
+
             }
             return View(udm);
 
@@ -732,11 +741,11 @@ namespace Sentry.data.Web.Controllers
         {
             Sentry.data.Web.Helpers.ProgressUpdater.SendProgress(e.FilePath, e.PercentDone);
 
-            if(e.PercentDone % 10 == 0)
+            if (e.PercentDone % 10 == 0)
             {
                 Sentry.Common.Logging.Logger.Debug("DatasetUpload-S3Event: " + e.FilePath + ": " + e.PercentDone);
             }
-            
+
         }
 
         //// GET: Dataset/Edit/5
@@ -1161,8 +1170,8 @@ namespace Sentry.data.Web.Controllers
 
             try
             {
-                
-                //_s3Service.TransferUtilityDownload(BaseTargetPath, ds.Category, filename, ds.S3Key);
+
+                _s3Service.TransferUtilityDownload(BaseTargetPath, ds.Category, filename, ds.S3Key);
 
             }
             catch (Exception e)
@@ -1190,8 +1199,8 @@ namespace Sentry.data.Web.Controllers
                 return PartialView("_Success", new SuccessModel("Push to SAS Error", e.Message, false));
             }
 
-            
-            return PartialView("_Success", new SuccessModel("Successfully Pushed File to SAS", $"Dataset file {filename} has been converted to {filename.Replace(Path.GetExtension(filename),".sas7bdat")}. The file can be found at {BaseTargetPath.Replace("\\sentry.com\appfs_nonprod","S: ")}.", true));
+
+            return PartialView("_Success", new SuccessModel("Successfully Pushed File to SAS", $"Dataset file {filename} has been converted to {filename.Replace(Path.GetExtension(filename), ".sas7bdat")}. The file can be found at {BaseTargetPath.Replace("\\sentry.com\appfs_nonprod", "S: ")}.", true));
 
         }
 
@@ -1224,7 +1233,7 @@ namespace Sentry.data.Web.Controllers
         {
             PushToDatasetModel model = new PushToDatasetModel();
 
-            
+
             Dataset dataset = _datasetContext.GetById<Dataset>(id);
             model.DatasetId = dataset.DatasetId;
             model.DatasetFileName = System.IO.Path.GetFileName(dataset.S3Key);
@@ -1345,7 +1354,7 @@ namespace Sentry.data.Web.Controllers
         //        return this._apiClient;
         //    }
         //}
-        
+
         //public JsonResult AjaxSuccessJson()
         //{
         //    return Json(new { Success = true });

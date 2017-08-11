@@ -6,9 +6,10 @@
 
 <div class="main-page-area">
 
-    <h2>View Dataset Details</h2>
+    <img src="~/Images/Icons/DatasetsBlue.svg" class="datasetImg leftFloat" />
+    <h2 class="detailHeader">View Dataset Details</h2>
 
-    <section class="dataset-detail-content" id="Dataset-Detail-Name">
+    <section class="dataset-detail-content clearFloat" id="Dataset-Detail-Name">
         @*<div class="dataset-detail-content-row" id="Dataset-Detail-Content-Label">
                 @Html.Label("Name:")
             </div>*@
@@ -77,11 +78,12 @@
 
             }
 
-            @*@{
+            @{
                 <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to Tableau" disabled>
+                    @*<img src="~/Images/tableau-icon.png" class="img-responsive" width="500" height="100" />*@
                     <img src="~/Images/tableau-icon.png"/>
                 </button>
-            }*@
+            }
         </div>
 
         <div>

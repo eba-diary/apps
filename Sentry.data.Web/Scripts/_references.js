@@ -5,6 +5,7 @@
 /// <reference path="../js/admin.js" />
 /// <reference path="../js/asset.js" />
 /// <reference path="../js/category.js" />
+/// <reference path="../js/dataasset.js" />
 /// <reference path="../js/dataset.js" />
 /// <reference path="../js/home.js" />
 /// <reference path="../js/manageusers.js" />

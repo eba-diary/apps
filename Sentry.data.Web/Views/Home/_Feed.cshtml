@@ -1,0 +1,26 @@
+﻿@model List<Sentry.data.Core.DataFeedItem>
+
+@{ 
+    string color = ViewData["color2"].ToString();    
+}
+
+@foreach(Sentry.data.Core.DataFeedItem item in Model)
+{
+    <div class="feedItem">
+        <img src="@item.Img" class="feedImg" />
+        <div class="feedName lt_@color">@item.Feed.Name</div>
+
+        @if (item.Title.Length > 50)
+        {
+            <h5 class="@color" data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle()</h5>
+        }
+        else
+        {
+            <h5 class="@color">@item.DisplayTitle()</h5>
+        }
+
+        <a href="@item.Url" target="_blank" class="pointer">Read More</a>
+        <p class="rightFloat">@item.PublishDate.ToShortDateString()</p>
+    </div>
+}
+

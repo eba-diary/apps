@@ -1,0 +1,125 @@
+﻿@model Sentry.data.Core.ConsumptionLayerComponent
+
+@{
+    Sentry.data.Core.ConsumptionLayerComponent d = Model;
+    string dName = d.Type.Name.Split(' ').First();
+    string color = Model.Type.Color;
+    int visibleNum = 3;
+    int dummyHt = (50*visibleNum) + 106;
+    string height = dummyHt + "px";
+
+    <!-- Removed Status and Last Updated goes here -->
+
+    <div class="row">
+        <h2 class="@color col-xs-12 clcName text-center">
+            @d.Type.Name
+
+            @if (d.Type.Tool != null)
+            {
+                <span class="clcTool">
+                    <a href="@d.Type.Tool" target="_blank" class="glyphicon glyphicon-new-window" data-toggle="tooltip" data-placement="top" title="" data-original-title="Link to @d.Type.ToolDescription"></a>
+                </span>
+            }
+        </h2>
+    </div>
+
+    if (d.ComponentElements.Count > 0)
+    {
+        Model.ComponentElements = Model.ComponentElements.OrderBy(x => x.Name).ToList();
+
+        <div class="row tableHeader row_@color">
+            <div class="element @color">@d.Type.ChildDescription</div>
+        </div>
+    }
+    else
+    {
+        <div class="row tableHeader row_@color hidden-xs">
+            <div></div>
+        </div>
+    }
+
+    <div class="row tableContent">
+        @for (int i = 0; i < visibleNum; i++)
+        {
+            if (i < d.ComponentElements.Count)
+            {
+                string cName = d.ComponentElements[i].Name;
+                @Html.Partial("_ComponentTableRow", d.ComponentElements[i], new ViewDataDictionary() { { "clcType", Model.Type.Code }, { "color", Model.Type.Color} })
+            }
+            else
+            { <div class="hidden-xs dummyRow"></div> }
+        }
+
+        <div class="hidden_@dName">
+            @for (int i = visibleNum; i < d.ComponentElements.Count; i++)
+            {
+                string cName = d.ComponentElements[i].Name;
+                @Html.Partial("_ComponentTableRow", d.ComponentElements[i], new ViewDataDictionary() { { "clcType", Model.Type.Code }, { "color", Model.Type.Color } })
+            }
+        </div>
+    </div>
+
+    if (d.ComponentElements.Count > visibleNum)
+    {
+        <button type="button" class="btn btn-link viewMoreBtn @color more_@dName">
+            View More
+        </button>
+    }
+    else
+    { <div class="hidden-xs dummyBtn"></div> }
+}
+
+
+
+
+
+                <!-- TODO: Disabled Status and Last Updated-->
+                @*<div class="row">
+                        <div class="col-xs-10 clcName">
+                            <h2 class="@color">@d.Name</h2>
+
+                            @if (d.LastUpdated.ToShortDateString() != "1/1/0001")
+                            {
+                                <h3 class="@color">Last Updated: @d.LastUpdated.ToShortDateString()</h3>
+                            }
+                            else
+                            { <h3 class="hidden-xs"><br /></h3> }
+                        </div>
+
+                        <div class="col-xs-2">
+                            @switch (d.Status)
+                            {
+                                case 0:
+                                    break;
+                                case 1:
+                                    <div class="progress progress-bar-vertical" data-toggle="tooltip" data-placement="right" title="" data-original-title="Up and running.">
+                                        <div class="progress-bar progress-bar-success upBar progressBar"><div></div></div>
+                                    </div>
+                                    break;
+                                case 2:
+                                    <div class="progress progress-bar-vertical" data-toggle="tooltip" data-placement="right" title="" data-original-title="Component is down.">
+                                        <div class="progress-bar progress-bar-danger downBar progressBar"><div></div></div>
+                                    </div>
+                                    break;
+                                case 3:
+                                    <div class="progress progress-bar-vertical" data-toggle="tooltip" data-placement="right" title="" data-original-title="There may be an issue.">
+                                        <div class="progress-bar progress-bar-warning warningBar progressBar"><div></div></div>
+                                    </div>
+                                    break;
+                            }
+                        </div>
+                    </div>
+
+                    <div class="row tableHeader row_@color">
+                        @if (d.ComponentElements[0].Status == 0)
+                        {
+                            <div class="col-xs-5">Elements</div>
+                        }
+                        else
+                        { <div class="col-xs-4">Elements</div> }
+
+                        @if (d.ComponentElements[0].LastUpdated.ToShortDateString() != "1/1/0001")
+                        {
+                            <div class="col-xs-7">Last Updated</div>
+                        }
+                    </div>*@

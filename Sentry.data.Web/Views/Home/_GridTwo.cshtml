@@ -1,0 +1,52 @@
+﻿@model List<Sentry.data.Core.DataAsset>
+
+@{
+    string color = ViewData["color"].ToString();
+    string color2 = ViewData["color2"].ToString();
+}
+
+<div class="hidden-xs hidden-sm asset border_@color">
+    <h2 class="sideHeader @color row_@color">Data Assets</h2>
+    <div class="assetBox">
+        @foreach (Sentry.data.Core.DataAsset da in Model)
+            {
+                <a href="/DataAsset/@da.Name">
+                    <div class="item">@da.DisplayName</div>
+                </a>
+            }
+    </div>
+</div>
+
+<div class="gridArea-sm">
+    <a class="all greenBox BG_green" href="/DataAsset/Index">
+        <div class="vertCenter">
+            <img src="~/Images/Category/government.png" class="btnImg" />
+            <h3 class="btnTitle green">Data Assets</h3>
+        </div>
+    </a>
+
+    <a class="all grayBox BG_blueGray" href="/Dataset/Index">
+        <div class="vertCenter">
+            <img src="~/Images/Category/claim.png" class="btnImg" />
+            <h3 class="btnTitle blueGray">Datasets</h3>
+        </div>
+    </a>
+
+    @*<a class="all grayBox row BG_blueGray" href="#">
+        <div class="col-xs-6 vertCenter">
+            <img src="~/Images/Category/claim.png" class="btnImg" />
+            <h3 class="btnTitle blueGray">Datasets</h3>
+        </div>
+
+        <div class="col-xs-6">
+            <p class="blueGray vertCenter">Information about other information. So kind of like a shipping ship that ships shipping ships.</p>
+        </div>
+    </a>*@
+</div>
+
+<div class="feed hidden-xs border_@color2">
+    <h2 class="feedHeader @color2 row_@color2">Feed</h2>
+    <div class="feedBox">
+        @Html.Action("GetFeed", "Home")
+    </div>
+</div>

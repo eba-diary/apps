@@ -1,114 +1,149 @@
 ﻿@model Sentry.data.Web.BaseDatasetModel
 
-@* the "category wrap" is the little tag printed diagonally in the upper right of each entry *@
-<div class="category-type-wrap">
-    <div class="category-type category-@{@Model.Category.ToLower()}">
-        @Model.Category
-    </div>
-</div>
+@{ 
+    string color = "";
+    switch (Model.Category)
+    {
+        case "Claim":
+            color = "green";
+            break;
 
-@* dataset name / search hits *@
-<div class="dataset-list-content">
-    <span class="dataset-list-dataset-name" id="datasetViewDetails_@Model.DatasetId" data-id="@Model.DatasetId">
-        @Model.DatasetName
-    </span>
-    <span class="dataset-name-hover-popup" id="datasetViewDetailsHover_@Model.DatasetId" data-id="@Model.DatasetId">
-        &nbsp; View Details &nbsp;
-    </span>
-    <span class="dataset-list-search-hits">
-        @if (Model.SearchHitList.Count() > 0)
-        {
-            <span>
-                [
-                @{
-                    var i = 0; var bar = "|";
-                    foreach (string searchHit in @Model.SearchHitList)
-                    {
-                        if (i > 0)
+        case "Geographic":
+            color = "gold";
+            break;
+
+        case "Industry":
+            color = "orange";
+            break;
+
+        case "Government":
+            color = "plum";
+            break;
+
+        case "Weather":
+            color = "blueGray";
+            break;
+
+        case "Sentry":
+            color = "blue";
+            break;
+    }
+}
+
+<li class="ul-dataset-list-item borderSide_@color">
+    @* the "category wrap" is the little tag printed diagonally in the upper right of each entry *@
+    <div class="category-type-wrap">
+        <div class="category-type category-@{@Model.Category.ToLower()}">
+            @Model.Category
+        </div>
+    </div>
+
+    @* dataset name / search hits *@
+    <div class="dataset-list-content">
+        <span class="dataset-list-dataset-name" id="datasetViewDetails_@Model.DatasetId" data-id="@Model.DatasetId">
+            @Model.DatasetName
+        </span>
+        <span class="dataset-name-hover-popup" id="datasetViewDetailsHover_@Model.DatasetId" data-id="@Model.DatasetId">
+            &nbsp; View Details &nbsp;
+        </span>
+        <span class="dataset-list-search-hits">
+            @if (Model.SearchHitList.Count() > 0)
+            {
+                <span>
+                    [
+                    @{
+                        var i = 0; var bar = "|";
+                        foreach (string searchHit in @Model.SearchHitList)
                         {
-                            @bar;
+                            if (i > 0)
+                            {
+                                @bar;
+                            }
+                            else
+                            {
+                                i += 1;
+                            }
+                            <i>
+                                @searchHit.Trim()
+                            </i>
+                        }
+                    }
+                    ]
+                </span>
                         }
                         else
                         {
-                            i += 1;
+                            <span>&nbsp;</span>
                         }
-                        <i>
-                            @searchHit.Trim()
-                        </i>
-                    }
+        </span>
+    </div>
+
+    <div class="dataset-list-content">
+        @*<div class="dataset-list-content-label">
+                @Html.Label("Description:")
+            </div>*@<div class="dataset-list-content-label">
+        </div>
+        @*<div class="dataset-list-content-value">*@<div class="dataset-list-content-value">
+            @{
+                if (Model.DatasetDesc != null && Model.DatasetDesc.Trim().Length > 0)
+                {
+                    @Html.DisplayFor(m => m.DatasetDesc)
                 }
-                ]
-            </span>
-                    }
-                    else
-                    {
-                        <span>&nbsp;</span>
-                    }
-    </span>
-</div>
-
-<div class="dataset-list-content">
-    @*<div class="dataset-list-content-label">
-        @Html.Label("Description:")
-    </div>*@
-    @*<div class="dataset-list-content-value">*@
-        @{
-            if (Model.DatasetDesc != null && Model.DatasetDesc.Trim().Length > 0)
-            {
-                @Html.DisplayFor(m => m.DatasetDesc)
+                else
+                {
+                    <div>
+                        (<i>No description found.</i>)
+                    </div>
+                }
             }
-            else
-            {
-                <div>
-                    (<i>No description found.</i>)
-                </div>
-            }
-        }
-    @*</div>*@
-</div>
+            @*</div>*@
+        </div>
+    </div>
 
-<div class="dataset-list-content">
-</div>
+    <div class="dataset-list-content">
+    </div>
 
-<div class="dataset-list-content">
-    <span class="custom-glyphiconz" aria-hidden="true" />
-    <div class="dataset-list-content-label">
-        @*<span class="download-link" id="DownloadDataset_@Model.UniqueKey" data-id="@Model.Id">
+    <div class="dataset-list-content">
+        <span class="custom-glyphiconz" aria-hidden="true" />
+        <div class="dataset-list-content-label">
+            @*<span class="download-link" id="DownloadDataset_@Model.UniqueKey" data-id="@Model.Id">
             &nbsp; @Html.ActionLink(Model.Extension.ToUpper(), "GetDownloadURL", new { UniqueKey = Model.UniqueKey }) &nbsp;
-        </span>*@
-        @*<span class="dataset-list-download-link" id="DownloadDataset_@Model.Id" data-id="@Model.EIdTag">
-            &nbsp; @Model.Extension.ToUpper() &nbsp;
-        </span>*@
-        @{
-            if (Model.IsSensitive)
-            {
-                <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure"></i>
-            }
-        }
-        
-        @{
-            if (Model.IsSensitive.Equals(false) || Model.CanDwnldSenstive)
-            {
-                <button type="button" class="btn btn-default btn-sm dataset-operation-button" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Download">
-                    <span class="glyphicon glyphicon-cloud-download text-primary"></span> 
-                </button>
+                </span><span class="download-link" id="DownloadDataset_@Model.UniqueKey" data-id="@Model.Id">
+            </span>*@
+                    @*<span class="dataset-list-download-link" id="DownloadDataset_@Model.Id" data-id="@Model.EIdTag">
+                    &nbsp; @Model.Extension.ToUpper() &nbsp;
+                </span><span class="dataset-list-download-link" id="DownloadDataset_@Model.Id" data-id="@Model.EIdTag">
+            </span>*@
+            @{
+                if (Model.IsSensitive)
+                {
+                    <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure"></i>
+                }
             }
 
-        }
-        
-        @{
-            if (Model.IsPushToSASCompatible == true)
-            {
-                <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to SAS">
-                    <img src="~/Images/sas_logo_min.png" class="img-responsive" />
-                </button>
+            @{
+                if (Model.IsSensitive.Equals(false) || Model.CanDwnldSenstive)
+                {
+                    <button type="button" class="btn btn-default btn-sm dataset-operation-button" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Download">
+                        <span class="glyphicon glyphicon-cloud-download text-primary"></span>
+                    </button>
+                }
+
             }
-            else
-            {
-                <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to SAS" disabled>
-                    <img src="~/Images/sas_logo_min.png" class="img-responsive" />
-                </button>
-            }
+
+            @{
+                if (Model.IsPushToSASCompatible == true)
+                {
+                    <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to SAS">
+                        <img src="~/Images/sas_logo_min.png" class="img-responsive" />
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to SAS" disabled>
+                        <img src="~/Images/sas_logo_min.png" class="img-responsive" />
+                    </button>
+                }
 
         }
 
@@ -119,6 +154,6 @@
         }*@
     </div>
     <div class="dataset-list-content-value">
-        &nbsp;
+        
     </div>
 </div>

@@ -1,0 +1,142 @@
+﻿@model IList<Sentry.data.Web.BaseDatasetModel>
+
+@{
+    ViewBag.Title = "Datasets";
+}
+
+<center>
+    @{
+        var htmlAttrsObj = new { @class = "navbar-form navbar-center", @id = "DatasetSearch" };
+        var htmlAttributes = HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttrsObj);
+        using (Html.BeginForm(@"List\SearchPhrase", "Dataset", FormMethod.Get, htmlAttributes))
+        {
+                <div class="searchBox">
+                    <input type="text" class="form-control searchText" id="SearchText" name="searchPhrase" placeholder="Search from @Model.Count() Datasets">
+                    <button type="submit" class="btn btn-primary searchBtn"><span class="glyphicon glyphicon-search"></span></button>
+                </div>
+        }
+    }
+
+    <div class="upload-row">
+        <h4>
+            Upload a New Dataset
+        </h4>
+        <button type="button" class="btn btn-default btn-sm dataset-operation-button" id="UploadDataset">
+            <span class="glyphicon glyphicon-cloud-upload text-primary"></span> Upload...
+        </button>
+    </div>
+    <p> &nbsp; </p>
+    <div class="partialCategory">
+        <h4>
+            Or Browse Dataset Categories...
+        </h4>
+        <div class="index-card-table-div">
+        @{
+            var category = Model.Select(m => m.Category).Distinct().OrderBy(cat => cat).ToList();
+            int c = category.Count();
+            string[] colors = new string[] { "blue", "green", "gold", "orange", "plum", "blueGray" };
+
+            if (c == 1)
+            {
+                <div class="row">
+                    <div class="col-xs-3"></div>
+                    <div class="col-xs-6">
+                        <div class="browse-category-card vertCenter BG_@colors[0]" id="category_@category[0]" data-category="@category[0]">
+                            <img src="~/Images/Category/@{@category[0]}.png" class="catImg" />
+                            <h5 class="dk_@colors[0] catTitle">@category[0]</h5>
+                        </div>
+                    </div>
+                </div>
+            }
+            else if (c == 2)
+            {
+                <div class="row">
+                    <div class="col-xs-6">
+                        <div class="browse-category-card vertCenter BG_@colors[0]" id="category_@category[0]" data-category="@category[0]">
+                            <img src="~/Images/Category/@{@category[0]}.png" class="catImg" />
+                            <h5 class="dk_@colors[0] catTitle">@category[0]</h5>
+                        </div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div class="browse-category-card vertCenter BG_@colors[1]" id="category_@category[1]" data-category="@category[1]">
+                            <img src="~/Images/Category/@{@category[1]}.png" class="catImg" />
+                            <h5 class="dk_@colors[1] catTitle">@category[1]</h5>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="hidden-xs">
+                    @for (int i = 0; i < c; i++)
+                    {
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <div class="browse-category-card vertCenter BG_@colors[(i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
+                                    <img src="~/Images/Category/@{@category[i]}.png" class="catImg" />
+                                    <h5 class="dk_@colors[i] catTitle">@category[i]</h5>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="browse-category-card vertCenter BG_@colors[(++i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
+                                    <img src="~/Images/Category/@{@category[i]}.png" class="catImg" />
+                                    <h5 class="dk_@colors[i] catTitle">@category[i]</h5>
+                                </div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="browse-category-card vertCenter BG_@colors[(++i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
+                                    <img src="~/Images/Category/@{@category[i]}.png" class="catImg" />
+                                    <h5 class="dk_@colors[i] catTitle">@category[i]</h5>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            @if (i + 1 == c - 1)
+                            {
+                                <div class="col-sm-4"></div>
+                                <div class="col-sm-4">
+                                    <div class="browse-category-card vertCenter BG_@colors[(++i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
+                                        <img src="~/Images/Category/@{@category[i]}.png" class="catImg" />
+                                        <h5 class="dk_@colors[i] catTitle">@category[i]</h5>
+                                    </div>
+                                </div>
+                            }
+                            @if (i + 2 == c - 1)
+                            {
+                                <div class="col-md-2"></div>
+                                <div class="col-sm-4">
+                                    <div class="browse-category-card vertCenter BG_@colors[(++i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
+                                        <img src="~/Images/Category/@{@category[i]}.png" class="catImg" />
+                                        <h5 class="dk_@colors[i] catTitle">@category[i]</h5>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="browse-category-card vertCenter BG_@colors[(++i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
+                                        <img src="~/Images/Category/@{@category[i]}.png" class="catImg" />
+                                        <h5 class="dk_@colors[i] catTitle">@category[i]</h5>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                     }
+                </div>
+
+                <div class="outside">
+                    <div class="visible-xs">
+                        @for (int i = 0; i < c; i++)
+                        {
+                            <div class="inside">
+                                <div class="browse-category-card vertCenter BG_@colors[(i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
+                                    <p><img src="~/Images/Category/@{@category[i]}.png" class="catImg" /></p>
+                                    <h5 class="dk_@colors[i] catTitle">@category[i]</h5>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        }
+        </div>
+    </div>
+</center>

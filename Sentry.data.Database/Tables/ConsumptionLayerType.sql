@@ -1,0 +1,9 @@
+﻿CREATE TABLE [dbo].[ConsumptionLayerType]
+(
+	[CLType_ID] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [CLType_NME] VARCHAR(50) NOT NULL, 
+    [Child_DSC] VARCHAR(50) NOT NULL, 
+    [CLType_CDE] VARCHAR(50) NOT NULL, 
+    [Tool_URL] VARCHAR(1024) NULL, 
+    [Color_NME] VARCHAR(50) NOT NULL
+)

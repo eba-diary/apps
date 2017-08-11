@@ -1,0 +1,136 @@
+﻿@model Sentry.data.Core.ComponentElement
+
+@{ 
+    string name = Model.Name.Split(' ').First();
+    string topLevelRow = "";
+    if(Model.Elements.Count > 0)
+    {
+        topLevelRow = "row_" + name;
+        Model.Elements = Model.Elements.OrderBy(x => x.Name).ToList();
+    }
+}
+
+<div class="@topLevelRow">
+    @RecursiveRow(Model)
+</div>
+
+<div class="hiddenLayer_@name">
+    @foreach (Sentry.data.Core.ComponentElement comp in Model.Elements)
+    {
+        <div class="indent">
+            @RecursiveRow(comp)
+        </div>
+    }
+</div>
+
+@helper RecursiveRow(Sentry.data.Core.ComponentElement ce)
+{
+    string ceName = Model.Name.Split(' ').First();
+    string color = ViewData["color"].ToString();
+    string clcType = ViewData["clcType"].ToString();
+    string link = (ce.Link != null) ? "rowLink" : "";
+    
+    if (ce.Elements.Count > 0)
+    {
+        <div class="row tableRow @link">
+            <span class="glyphicon glyphicon-chevron-down layerArrow_@ceName element @color parentRow"></span>
+            <div class="@color">@ce.Name</div>
+        </div>
+    }
+    else if (ce.Link == null)
+    {
+        <div class="row tableRow @link">
+            <div class="element @color">@ce.Name</div>
+        </div>
+    }
+    else if (clcType == "CUBE")
+    {
+        <a href="@Url.Action("ODCFile", "ExternalFile", Model)" class="noHover" data-toggle="tooltip" data-placement="top" title="" data-original-title="Open @ce.Name ODC file">
+            <div class="row tableRow @link">
+                <div class="element">@ce.Name</div>
+            </div>
+        </a>
+    }
+    else
+    {
+        <a href="@ce.Link" class="noHover">
+            <div class="row tableRow @link">
+                <div class="element">@ce.Name</div>
+            </div>
+        </a>
+    }
+}
+
+
+
+
+    <!-- TODO: Disabled Status and Last Updated -->
+    @*<div class="row tableRow">
+        @if (ce.LastUpdated.ToShortDateString() != "1/1/0001" && ce.Status == 0)
+        {
+            <div class="col-xs-5 element">
+                <a href="#">
+                    @if (ce.Elements.Count > 0)
+                    {
+                        <span class="glyphicon glyphicon-chevron-down layerArrow_@ceName"></span>
+                    }
+                    @ce.Name
+                </a>
+            </div>
+
+            <div class="col-xs-7 element">@ce.LastUpdated</div>
+        }
+        else if (ce.LastUpdated.ToShortDateString() != "1/1/0001" && ce.Status > 0)
+        {
+            <div class="col-xs-4 element">
+                <a href="#">
+                    @if (ce.Elements.Count > 0)
+                    {
+                        <span class="glyphicon glyphicon-chevron-down layerArrow_@ceName"></span>
+                    }
+                    @ce.Name
+                </a>
+            </div>
+
+            <div class="col-xs-7 element">@ce.LastUpdated</div>
+        }
+        else
+        {
+            <div class="col-xs-10 element">
+                <a href="#">
+                    @if (ce.Elements.Count > 0)
+                    {
+                        <span class="glyphicon glyphicon-chevron-down layerArrow_@ceName"></span>
+                    }
+                    @ce.Name
+                </a>
+            </div>
+        }
+
+        @switch (ce.Status)
+        {
+            case 0:
+            break;
+
+            case 1:
+                <div class="progress progress-bar-vertical-element" data-toggle="tooltip" data-placement="right" title="" data-original-title="Up and running.">
+                    <div class="progress-bar progress-bar-success upBar progressBar"><div></div></div>
+                </div>
+                break;
+
+            case 2:
+                <div class="progress progress-bar-vertical-element" data-toggle="tooltip" data-placement="right" title="" data-original-title="Server/Service is down.">
+                    <div class="progress-bar progress-bar-danger downBar progressBar" style="height: 90%;"><div></div></div>
+                </div>
+                break;
+
+            case 3:
+                <div class="progress progress-bar-vertical-element" data-toggle="tooltip" data-placement="right" title="" data-original-title="There may be an issue.">
+                    <div class="progress-bar progress-bar-warning warningBar progressBar"><div></div></div>
+                </div>
+                break;
+        }
+    </div>*@
+
+
+
