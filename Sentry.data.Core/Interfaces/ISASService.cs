@@ -13,5 +13,7 @@ namespace Sentry.data.Core
 
         string GenerateSASFileName(string filename);
 
+        event EventHandler<TransferProgressEventArgs> OnPushToProgressEvent;
+
     }
 }

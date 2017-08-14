@@ -65,13 +65,13 @@ data.Dataset = {
             data.Dataset.FileNameModal($(this).data("id"));
         });
 
-        $(document).on('show.bs.modal', '.modal', function (event) {
-            var zIndex = 1040 + (10 * $('.modal:visible').length);
-            $(this).css('z-index', zIndex);
-            setTimeout(function () {
-                $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
-            }, 0);
-        });
+        //$(document).on('show.bs.modal', '.modal', function (event) {
+        //    var zIndex = 1040 + (10 * $('.modal:visible').length);
+        //    $(this).css('z-index', zIndex);
+        //    setTimeout(function () {
+        //        $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+        //    }, 0);
+        //});
 
         //Testing Functionality
         $("[id^='li-filter-disabled_Test_']").click(function (e) {
@@ -139,13 +139,13 @@ data.Dataset = {
             data.Dataset.FileNameModal($(this).data("id"));
         });
 
-        $(document).on('show.bs.modal', '.modal', function (event) {
-            var zIndex = 1040 + (10 * $('.modal:visible').length);
-            $(this).css('z-index', zIndex);
-            setTimeout(function () {
-                $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
-            }, 0);
-        });
+        //$(document).on('show.bs.modal', '.modal', function (event) {
+        //    var zIndex = 1040 + (10 * $('.modal:visible').length);
+        //    $(this).css('z-index', zIndex);
+        //    setTimeout(function () {
+        //        $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
+        //    }, 0);
+        //});
 
     },
 

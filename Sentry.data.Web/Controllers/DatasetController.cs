@@ -748,6 +748,48 @@ namespace Sentry.data.Web.Controllers
 
         }
 
+
+        /// <summary>
+        /// Callback handler for S3 uploads... Amazon calls this to communicate progress; from here we communicate
+        /// that progress back to the client for their progress bar...
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void PushToSAS_ProgressEvent(object sender, TransferProgressEventArgs e)
+        {
+            int percent = 0;
+
+            object x = e.GetType();
+
+            if (e.Type == "Downloading")
+            {
+                percent = Convert.ToInt32(Convert.ToDouble(e.PercentDone) * 0.9);
+
+                if (percent % 10 == 0)
+                {
+                    Sentry.Common.Logging.Logger.Debug("PushToSAS_ProgressEvent: " + e.Type + ":" + e.FilePath + ": " + percent);
+                }
+            }
+
+            if (e.Type == "Converting")
+            {
+                percent = Convert.ToInt32(Convert.ToDouble(e.PercentDone) * 0.1) + 90;
+
+                if (percent % 10 == 0)
+                {
+                    Sentry.Common.Logging.Logger.Debug("PushToSAS_ProgressEvent: " + e.Type + ":" + e.FilePath + ": " + percent);
+                }
+            }
+
+            Sentry.data.Web.Helpers.ProgressUpdater.SendProgress(e.FilePath, percent);
+
+            //if (percent % 10 == 0)
+            //{
+            //    Sentry.Common.Logging.Logger.Debug("PushToSAS_ProgressEvent: " + e.Type + ":" + e.FilePath + ": " + percent);
+            //}
+
+        }
+
         //// GET: Dataset/Edit/5
         //public ActionResult Edit(int id)
         //{
@@ -1166,7 +1208,8 @@ namespace Sentry.data.Web.Controllers
             System.IO.Directory.CreateDirectory(BaseTargetPath + ds.Category);
 
 
-            _s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(uploadRequest_UploadPartProgressEvent);
+            _s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(PushToSAS_ProgressEvent);
+            _sasService.OnPushToProgressEvent += new EventHandler<TransferProgressEventArgs>(PushToSAS_ProgressEvent);
 
             try
             {
@@ -1178,6 +1221,10 @@ namespace Sentry.data.Web.Controllers
             {
                 Sentry.Common.Logging.Logger.Error("S3 Download Error", e);
                 return PartialView("_Success", new SuccessModel("Push to SAS Error", e.Message, false));
+            }
+            finally
+            {
+                _s3Service.OnTransferProgressEvent -= new EventHandler<TransferProgressEventArgs>(PushToSAS_ProgressEvent);
             }
 
 
@@ -1197,6 +1244,10 @@ namespace Sentry.data.Web.Controllers
             {
                 Sentry.Common.Logging.Logger.Error("Error calling SAS Stored Process", e);
                 return PartialView("_Success", new SuccessModel("Push to SAS Error", e.Message, false));
+            }
+            finally
+            {
+                _sasService.OnPushToProgressEvent -= new EventHandler<TransferProgressEventArgs>(PushToSAS_ProgressEvent);
             }
 
 

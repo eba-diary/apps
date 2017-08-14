@@ -30,13 +30,30 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public event EventHandler<TransferProgressEventArgs> OnPushToProgressEvent;
+
         public void ConvertToSASFormat(string filename, string category)
         {
-            StringBuilder url = GernerateSASURL(filename, category);
-            //CallSASConvertSTP(url);
+            try
+            {
+                OnPushToProgress(new TransferProgressEventArgs(filename, 0, "Converting"));
 
-            //JCG TODO: Revisit after SAS fixes issue around initial logon attempt fails, additional attempts succeed.
-            Retry.Do(() => CallSASConvertSTP(url), TimeSpan.FromSeconds(15), 2);
+                StringBuilder url = GernerateSASURL(filename, category);
+
+                OnPushToProgress(new TransferProgressEventArgs(filename, 50, "Converting"));
+
+                //JCG TODO: Revisit after SAS fixes issue around initial logon attempt fails, additional attempts succeed.
+                Retry.Do(() => CallSASConvertSTP(url), TimeSpan.FromSeconds(15), 2);
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.InnerException.Message);
+            }
+            finally
+            {
+                OnPushToProgress(new TransferProgressEventArgs(filename, 100, "Converting"));
+            }
+
         }
 
         private void CallSASConvertSTP(StringBuilder url)
@@ -148,6 +165,17 @@ namespace Sentry.data.Infrastructure
                 throw new WebException(exceptions.Message, new Exception(exceptions.InnerException.ToString()));
             }
         }
+
+
+        protected virtual void OnPushToProgress(TransferProgressEventArgs e)
+        {
+            EventHandler<TransferProgressEventArgs> handler = OnPushToProgressEvent;
+            if (handler != null)
+            {
+                handler(this, e);
+            }
+        }
+
 
     }
 }

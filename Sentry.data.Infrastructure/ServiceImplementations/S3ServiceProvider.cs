@@ -151,7 +151,7 @@ namespace Sentry.data.Infrastructure
             EventHandler<TransferProgressEventArgs> handler = OnTransferProgressEvent;
             if (handler != null)
             {
-                handler(this, new TransferProgressEventArgs(e.FilePath, e.PercentDone));
+                handler(this, new TransferProgressEventArgs(Path.GetFileName(e.FilePath), e.PercentDone, "Downloading"));
             }
             
             //if (handler != null)
@@ -164,7 +164,7 @@ namespace Sentry.data.Infrastructure
         {
             //TransferProgressEventArgs args = new TransferProgressEventArgs(e.FilePath, e.PercentDone);
             //OnTransferProgressEvent(args);
-            OnTransferProgressEvent(this, new TransferProgressEventArgs(e.FilePath, e.PercentDone));
+            OnTransferProgressEvent(this, new TransferProgressEventArgs(Path.GetFileName(e.FilePath), e.PercentDone, "Uploading"));
             //EventHandler<WriteObjectProgressArgs> handler = OnTransferProgressEvent;
             //if (handler != null)
             //{
