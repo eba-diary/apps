@@ -28,6 +28,7 @@
     string ceName = Model.Name.Split(' ').First();
     string color = ViewData["color"].ToString();
     string clcType = ViewData["clcType"].ToString();
+    string clcTool = (ViewData["clcTool"] == null) ? "" : ViewData["clcTool"].ToString();
     string link = (ce.Link != null) ? "rowLink" : "";
     
     if (ce.Elements.Count > 0)
@@ -51,9 +52,17 @@
             </div>
         </a>
     }
+    else if (clcTool != "")
+    {
+        <a href="@ce.Link" target="_blank" class="noHover" data-toggle="tooltip" data-placement="top" title="" data-original-title="Go to @clcTool">
+            <div class="row tableRow @link">
+                <div class="element">@ce.Name</div>
+            </div>
+        </a>
+    }
     else
     {
-        <a href="@ce.Link" class="noHover">
+        <a href="@ce.Link" target="_blank" class="noHover">
             <div class="row tableRow @link">
                 <div class="element">@ce.Name</div>
             </div>

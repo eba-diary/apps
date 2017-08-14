@@ -14,12 +14,12 @@
         <h2 class="@color col-xs-12 clcName text-center">
             @d.Type.Name
 
-            @if (d.Type.Tool != null)
+            @*@if (d.Type.Tool != null)
             {
                 <span class="clcTool">
                     <a href="@d.Type.Tool" target="_blank" class="glyphicon glyphicon-new-window" data-toggle="tooltip" data-placement="top" title="" data-original-title="Link to @d.Type.ToolDescription"></a>
                 </span>
-            }
+            }*@
         </h2>
     </div>
 
@@ -44,7 +44,7 @@
             if (i < d.ComponentElements.Count)
             {
                 string cName = d.ComponentElements[i].Name;
-                @Html.Partial("_ComponentTableRow", d.ComponentElements[i], new ViewDataDictionary() { { "clcType", Model.Type.Code }, { "color", Model.Type.Color} })
+                @Html.Partial("_ComponentTableRow", d.ComponentElements[i], new ViewDataDictionary() { { "clcType", Model.Type.Code }, { "color", Model.Type.Color}, {"clcTool", Model.Type.ToolDescription} })
             }
             else
             { <div class="hidden-xs dummyRow"></div> }

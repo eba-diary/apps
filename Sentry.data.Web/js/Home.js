@@ -22,11 +22,11 @@ data.Home = {
                 },
                 error: function (e) {
                     data.Home.AjaxStatus = true;
-                    $("#feed").append("<div class='feedItem'>Feed could not be loaded at this time.</div>");
                 }
             });
         }
 
+        $("body").tooltip({ selector: '[data-toggle=tooltip]' });
         $("#feed").bind('scroll', data.Home.ScrollBottom);
         //$("#sentryFeed").bind('scroll', data.Home.ScrollBottom);
         //$("#chbx").change(data.Home.ChangeFeeds);
