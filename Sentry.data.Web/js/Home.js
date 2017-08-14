@@ -16,6 +16,7 @@ data.Home = {
                 url: '/Home/GetFeed',
                 dataType: 'html',
                 success: function (html) {
+                    $("#feedSpinner").hide();
                     $("#feed").append(html);
                     data.Home.SentrySkipTotal += 10;
                     data.Home.AjaxStatus = true;

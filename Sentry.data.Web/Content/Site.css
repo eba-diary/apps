@@ -1306,6 +1306,21 @@ body { background-color: #f8f8f8; }
 
 .feedName { font-size: larger; }
 
+.noFeedIcon
+{
+    font-size: 35px;
+}
+
+#feedSpinner 
+{
+    width: calc(20% - 0.5em);
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    height: inherit;
+}
+
 .btnImg
 {
     display: block;
