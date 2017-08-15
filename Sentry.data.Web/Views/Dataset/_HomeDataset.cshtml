@@ -114,7 +114,7 @@
                                 <div class="col-sm-4">
                                     <div class="browse-category-card vertCenter BG_@colors[(++i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
                                         <img src="~/Images/Category/@{@category[i]}.svg" class="catImg" />
-                                        <h5 class="dk_@colors[i] catTitle">@category[i]</h5>
+                                        <h5 class="@colors[i] catTitle">@category[i]</h5>
                                     </div>
                                 </div>
                             }
@@ -129,7 +129,7 @@
                             <div class="inside">
                                 <div class="browse-category-card vertCenter BG_@colors[(i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
                                     <p><img src="~/Images/Category/@{@category[i]}.svg" class="catImg" /></p>
-                                    <h5 class="dk_@colors[i] catTitle">@category[i]</h5>
+                                    <h5 class="@colors[i] catTitle">@category[i]</h5>
                                 </div>
                             </div>
                         }

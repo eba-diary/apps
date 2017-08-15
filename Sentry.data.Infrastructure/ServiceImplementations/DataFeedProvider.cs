@@ -79,8 +79,7 @@ namespace Sentry.data.Infrastructure
 
                 MemoryStream ms = new MemoryStream(wc.DownloadData(feed.Url));
                 XmlTextReader reader = new XmlTextReader(ms);
-
-                //XmlReader reader = XmlReader.Create(feed.Url);
+                
                 SyndicationFeed sf = SyndicationFeed.Load(reader);
                 reader.Close();
                 foreach (SyndicationItem item in sf.Items)
