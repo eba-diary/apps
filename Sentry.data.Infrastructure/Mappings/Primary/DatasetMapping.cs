@@ -45,6 +45,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Inverse(true);
                 m.Table("DatasetMetadata");
                 m.Cascade(Cascade.All);
+                m.Cache(c => c.Usage(CacheUsage.ReadWrite));
                 //m.Access(Accessor.Field);
                 //m.Key((k) => k.Column("Dataset_ID"));
                 m.Key((k) =>

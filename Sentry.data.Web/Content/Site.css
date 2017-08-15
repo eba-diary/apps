@@ -624,12 +624,6 @@ ul.list-group-indented {
     float: left;
 }
 
-.setList
-{
-    height: 860px;
-    overflow-y: auto;
-}
-
 .detailHeader
 {
     padding-top: 20px;
@@ -652,8 +646,6 @@ ul.list-group-indented {
 .ext_pdf { background-color: red;}
 .ext_sas7bdat { background-color: #285780;}
 .ext_prn { background-color: #72246C; }
-
-
 
 .borderSide_blue 
 {
@@ -889,18 +881,6 @@ ul.list-group-indented {
 
 .ltBlue { color: #00A3E0; }
 
-.dk_blue{ color: #00A3E0; } /* this is actually the light blue and is supposed to be like that */
-
-.dk_orange { color: #683431; }
-
-.dk_plum { color: #72246C; }
-
-.dk_green { color: #005844; }
-
-.dk_gold { color: #74531C; }
-
-.dk_blueGray { color: #285780; }
-
 .lt_blue{ color: #00A3E0; }
 
 .lt_orange { color: #E57200; }
@@ -913,7 +893,7 @@ ul.list-group-indented {
 
 .lt_blueGray { color: #89ABE3; }
 
-.BG_blue { background-color: #003DA5; }
+.BG_blue { background-color: #00A3E0; }
 
 .BG_orange { background-color: #E57200; }
 
@@ -924,6 +904,8 @@ ul.list-group-indented {
 .BG_gold { background-color: #EAAA00; }
 
 .BG_ltBlue { background-color: #00A3E0; }
+
+.BG_dkBlue { background-color: #003DA5; }
 
 .BG_blueGray { background-color: #89ABE3; }
 
@@ -1306,15 +1288,37 @@ body { background-color: #f8f8f8; }
 
 .feedName { font-size: larger; }
 
-.noFeedIcon
+.noFeedBox
 {
-    font-size: 35px;
+    margin-right: 1em;
 }
 
-#feedSpinner 
+.noFeedIcon
 {
-    width: calc(20% - 0.5em);
+    font-size: 50px;
+    color: #EAAA00;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.noFeedMessage
+{
+    clear: both;
+    text-align: center;
+}
+
+.feedCenter
+{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    height: inherit;
+}
+
+.feedSpinner 
+{
     margin: 0 auto;
+    margin-right: 1em;
     display: flex;
     justify-content: center;
     flex-direction: column;

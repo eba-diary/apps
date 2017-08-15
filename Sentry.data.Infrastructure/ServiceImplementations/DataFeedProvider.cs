@@ -8,6 +8,9 @@ using System.Xml;
 using System.Collections.Generic;
 using NHibernate.Linq;
 using System.Threading.Tasks;
+using System.Net;
+using System.Configuration;
+using System.IO;
 
 namespace Sentry.data.Infrastructure
 {
@@ -65,7 +68,18 @@ namespace Sentry.data.Infrastructure
             try
             {
                 Sentry.Common.Logging.Logger.Debug($"Feed Url: {feed.Url}");
-                XmlReader reader = XmlReader.Create(feed.Url);
+
+                string uri = Configuration.Config.GetSetting("SentryWebProxyHost");
+
+                //https://stackoverflow.com/questions/124932/xmldocument-loadurl-through-a-proxy
+                WebProxy wp = new WebProxy(uri);
+                WebClient wc = new WebClient();
+                wc.Proxy = wp;
+
+                MemoryStream ms = new MemoryStream(wc.DownloadData(feed.Url));
+                XmlTextReader reader = new XmlTextReader(ms);
+
+                //XmlReader reader = XmlReader.Create(feed.Url);
                 SyndicationFeed sf = SyndicationFeed.Load(reader);
                 reader.Close();
                 foreach (SyndicationItem item in sf.Items)
@@ -83,7 +97,6 @@ namespace Sentry.data.Infrastructure
             catch (Exception e)
             {                
                 Sentry.Common.Logging.Logger.Debug(e.Message);
-                //Sentry.Common.Logging.Logger.Debug(e.InnerException.Message);
                 return dataFeed.ToList();
             }
         }
