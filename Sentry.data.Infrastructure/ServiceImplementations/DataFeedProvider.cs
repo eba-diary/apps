@@ -80,10 +80,9 @@ namespace Sentry.data.Infrastructure
                 return dataFeed.ToList();
             }
             catch (Exception e)
-            {
-                
+            {                
                 Sentry.Common.Logging.Logger.Debug(e.Message);
-                Sentry.Common.Logging.Logger.Debug(e.InnerException.Message);
+                //Sentry.Common.Logging.Logger.Debug(e.InnerException.Message);
                 return dataFeed.ToList();
             }
         }
