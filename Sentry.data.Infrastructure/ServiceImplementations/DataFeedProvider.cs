@@ -83,6 +83,7 @@ namespace Sentry.data.Infrastructure
             {
                 
                 Sentry.Common.Logging.Logger.Debug(e.Message);
+                Sentry.Common.Logging.Logger.Debug(e.InnerException.Message);
                 return dataFeed.ToList();
             }
         }
