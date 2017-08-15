@@ -20,7 +20,8 @@ namespace Sentry.data.Infrastructure
 
         public IList<DataFeed> GetDataFeeds()
         {
-            return Query<DataFeed>().Cacheable().ToList();
+            //return Query<DataFeed>().Cacheable().ToList();
+            return Query<DataFeed>().ToList();
         }
 
         public IList<DataFeedItem> GetAllFeedItems()
