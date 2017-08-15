@@ -63,7 +63,7 @@ namespace Sentry.data.Infrastructure
             List<DataFeedItem> dataFeed = new List<DataFeedItem>();
             try
             {
-                
+                Sentry.Common.Logging.Logger.Debug($"Feed Url: {feed.Url}");
                 XmlReader reader = XmlReader.Create(feed.Url);
                 SyndicationFeed sf = SyndicationFeed.Load(reader);
                 reader.Close();
