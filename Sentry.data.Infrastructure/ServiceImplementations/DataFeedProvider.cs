@@ -63,6 +63,7 @@ namespace Sentry.data.Infrastructure
             List<DataFeedItem> dataFeed = new List<DataFeedItem>();
             try
             {
+                
                 XmlReader reader = XmlReader.Create(feed.Url);
                 SyndicationFeed sf = SyndicationFeed.Load(reader);
                 reader.Close();
@@ -78,8 +79,10 @@ namespace Sentry.data.Infrastructure
 
                 return dataFeed.ToList();
             }
-            catch
+            catch (Exception e)
             {
+                
+                Sentry.Common.Logging.Logger.Debug(e.Message);
                 return dataFeed.ToList();
             }
         }
