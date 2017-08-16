@@ -113,6 +113,38 @@ data.Dataset = {
         //    }
         //});
 
+        var stickySidebar = $('.outsideFilters').offset().top;
+        var el = $('.menu');
+        var bottom = el.position().top + el.outerHeight(true) + 10;
+
+        $(window).scroll(function () {
+            console.log(bottom + " : " + (stickySidebar - $(window).scrollTop()));
+
+            if (bottom >= (stickySidebar - $(window).scrollTop())) {
+                $('.outsideFilters').addClass('fixedScroll');
+            }
+            else {
+                $('.outsideFilters').removeClass('fixedScroll');
+            }
+        });
+
+        $("[id^='filterType_']").click(function (e) {
+            e.preventDefault();
+            var id = $(this).attr("id");
+            var category = "#hide_" + id
+            var icon = "#icon_" + id;
+            $(category).slideToggle();
+            $(icon).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
+        });
+
+        $("[id^='filterMore_']").click(function (e) {
+            e.preventDefault();
+            var id = $(this).attr("id");
+            var show = "#hidden_" + id
+            var icon = "#icon_" + id;
+            $(show).slideToggle();
+            $(icon).toggleClass("glyphicon-plus-sign glyphicon-minus-sign");
+        });
     },
 
     DetailInit: function () {

@@ -40,60 +40,103 @@
         @*<p> &nbsp; </p>*@
 
         @* Left sidebar *@
-        <div class="col-sm-3 clearFloat">
-            @{ 
-                int i = 0, j = 0;
-                foreach (var category in Model.SearchFilters)
-                {
-                    <div class="panel panel-info dataset-list-filters">
-                        <div class="panel-heading BG_blue">@category.FilterType</div>
-                        <div class="dataset-list-filter-category panel-body">
-                            <ul class="list-unstyled ul-filter-list">
-                                @{ 
-                                    foreach (var filter in category.FilterNameList)
-                                    {
-                                        <li class="list-unstyled li-filter-disabled" id="li-filter-disabled_@filter.id">
-                                            @Html.CheckBoxFor(m => m.SearchFilters[i].FilterNameList[j].isChecked, new { @id = @category.FilterType + "_" + @filter.id, @oncheckedchange = "" })
-                                            @Html.HiddenFor(m => m.SearchFilters[i].FilterType)
-                                            @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[j].id)
-                                            @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[j].value)
-                                            @Html.DisplayFor(m => m.SearchFilters[i].FilterNameList[j].value) 
-                                            ( @filter.count )
-                                        </li> 
-
-                                        j++;
-                                    }
-                                    j = 0;
-                                    i++;
-                                }
-                            </ul>
-                            <div>
-                                <input type="submit" name="btn_@category.FilterType"  class="button btn-xs btn-primary btn-filter-apply" value="Apply" id="btnApply_@category.FilterType" hidden />
-                            </div>
-                        </div>
-                    </div>
-                                    }
-            }
-        </div>
-
-        @* Main Content *@
-        <div class="col-sm-9">
-            <div id="DatasetItemList" class="dataset-list">
-                <div class="browse-category">
-                    <h4 class="found">
-                        Found @Model.DatasetList.Count() Dataset(s)...
-                    </h4>
-                </div>
-                <ul class="list-unstyled">
+        @*<div class="row">*@
+            <div class="col-sm-3 clearFloat">
+                <div class="outsideFilters">
                     @{
-                        foreach (var item in Model.DatasetList)
+                        int visibleNum = 4;
+                        int i = 0, j = 0;
+                        foreach (var category in Model.SearchFilters)
                         {
-                            @Html.Partial("_ListItem", item)
+                            string catName = category.FilterType.Split(' ').First();
+                            <div class="panel panel-info dataset-list-filters boxShadow">
+                                <div class="panel-heading" id="filterType_@catName">@category.FilterType <span class="glyphicon glyphicon-chevron-up rightFloat filterViewIcon" id="icon_filterType_@catName"></span></div>
+                                <div class="dataset-list-filter-category panel-body" id="hide_filterType_@catName">
+                                    <ul class="list-unstyled ul-filter-list">
+                                        @{
+                                            @*foreach (var filter in category.FilterNameList)
+                                            {
+                                                <li class="list-unstyled li-filter-disabled" id="li-filter-disabled_@filter.id">
+                                                    @Html.CheckBoxFor(m => m.SearchFilters[i].FilterNameList[j].isChecked, new { @id = @category.FilterType + "_" + @filter.id, @oncheckedchange = "" })
+                                                    @Html.HiddenFor(m => m.SearchFilters[i].FilterType)
+                                                    @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[j].id)
+                                                    @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[j].value)
+                                                    @Html.DisplayFor(m => m.SearchFilters[i].FilterNameList[j].value)
+                                                    ( @filter.count )
+                                                </li>
+
+                                                j++;
+                                            }
+                                            j = 0;
+                                            i++;*@
+
+                                            for(int t = 0; t < visibleNum; t++)
+                                            {
+                                                if (t < category.FilterNameList.Count)
+                                                {
+                                                    FilterNameModel filter = @category.FilterNameList[t];
+                                                    <li class="list-unstyled li-filter-disabled" id="li-filter-disabled_@filter.id">
+                                                        @Html.CheckBoxFor(m => m.SearchFilters[i].FilterNameList[t].isChecked, new { @id = @category.FilterType + "_" + @filter.id, @oncheckedchange = "" })
+                                                        @Html.HiddenFor(m => m.SearchFilters[i].FilterType)
+                                                        @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].id)
+                                                        @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].value)
+                                                        @Html.DisplayFor(m => m.SearchFilters[i].FilterNameList[t].value)
+                                                        ( @filter.count )
+                                                    </li>
+                                                }
+                                            }
+                                            <li id="hidden_filterMore_@catName">
+                                                <ul class="notNested">
+                                                    @for (int t = visibleNum; t < category.FilterNameList.Count; t++)
+                                                    {
+                                                        FilterNameModel filter = @category.FilterNameList[t];
+                                                        <li class="list-unstyled li-filter-disabled" id="li-filter-disabled_@filter.id">
+                                                            @Html.CheckBoxFor(m => m.SearchFilters[i].FilterNameList[t].isChecked, new { @id = @category.FilterType + "_" + @filter.id, @oncheckedchange = "" })
+                                                            @Html.HiddenFor(m => m.SearchFilters[i].FilterType)
+                                                            @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].id)
+                                                            @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].value)
+                                                            @Html.DisplayFor(m => m.SearchFilters[i].FilterNameList[t].value)
+                                                            ( @filter.count )
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </li>
+                                            i++;
+                                        }
+                                    </ul>
+                                    <a href="#" class="filterMore" id="filterMore_@catName">
+                                        <span class="glyphicon glyphicon-plus-sign inlineBlock moreIcon" id="icon_filterMore_@catName"></span>
+                                        Show More
+                                    </a>
+                                    <div class="inlineBlock rightFloat">
+                                        <input type="submit" name="btn_@category.FilterType" class="button btn-xs btn-primary btn-filter-apply" value="Apply" id="btnApply_@category.FilterType" hidden />
+                                    </div>
+                                </div>
+                            </div>
                         }
                     }
-                </ul>
+                </div>
             </div>
-        </div>
+
+            @* Main Content *@
+            <div class="col-sm-9">
+                <div id="DatasetItemList" class="dataset-list">
+                    <div class="browse-category">
+                        <h4 class="found">
+                            Found @Model.DatasetList.Count() Dataset(s)...
+                        </h4>
+                    </div>
+                    <ul class="list-unstyled">
+                        @{
+                            foreach (var item in Model.DatasetList)
+                            {
+                                @Html.Partial("_ListItem", item)
+                            }
+                        }
+                    </ul>
+                </div>
+            </div>
+        @*</div>*@
 
     }
 }
