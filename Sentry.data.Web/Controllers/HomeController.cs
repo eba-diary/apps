@@ -19,9 +19,10 @@ namespace Sentry.data.Web.Controllers
         private IDataAssetProvider _dataAssetProvider;
         private IAppCache cache;
         private List<DataAsset> das;
-        private List<DataFeedItem> dfisAll = new List<DataFeedItem>();
+        private List<DataFeedItem> dfisAll;
         private List<DataFeedItem> dfisSentry;
         static int r1, r2;
+        static int test = 0;
         
         private string[] colors = new string[] { "blue", "green", "gold", "plum", "orange", "blueGray" };
 
@@ -53,11 +54,26 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult GetFeed()
         {
-            Sentry.Common.Logging.Logger.Debug($"Feed list count before cache: {dfisAll.Count}");
-            dfisAll = cache.GetOrAdd("feedAll", () => _feedContext.GetAllFeedItems().ToList());
-            Sentry.Common.Logging.Logger.Debug($"Feed list count after cache: {dfisAll.Count}");
-            ViewData["color2"] = colors[r2];
+            List<DataFeedItem> temp = cache.Get<List<DataFeedItem>>("feedAll");
 
+            try { Sentry.Common.Logging.Logger.Debug($"Feed list count before cache: {temp.Count}"); }
+            catch { Sentry.Common.Logging.Logger.Debug($"Feed list count before cache: null"); }
+
+            if (temp == null || temp.Count == 0)
+            {
+                Sentry.Common.Logging.Logger.Debug($"Feed list count was null or 0");
+                dfisAll = _feedContext.GetAllFeedItems().ToList();
+                cache.Add("feedAll", dfisAll);
+            }
+            else
+            {
+                dfisAll = cache.GetOrAdd("feedAll", () => _feedContext.GetAllFeedItems().ToList());
+            }
+
+            Sentry.Common.Logging.Logger.Debug($"Feed list count after cache: {dfisAll.Count}");
+
+            ViewData["color2"] = colors[r2];
+            
             return PartialView("_Feed", dfisAll.Take(10).ToList());
         }
         
