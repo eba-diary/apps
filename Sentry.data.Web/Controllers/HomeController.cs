@@ -30,6 +30,7 @@ namespace Sentry.data.Web.Controllers
 
         public HomeController(IDataAssetProvider dap, IDataFeedContext feedContext)
         {
+            Sentry.Common.Logging.Logger.Debug($"HomeController constructor called");
             _dataAssetProvider = dap;
             _feedContext = feedContext;
             das = new List<DataAsset>(_dataAssetProvider.GetDataAssets());
@@ -54,6 +55,7 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult GetFeed()
         {
+            Sentry.Common.Logging.Logger.Debug($"Color before retrieval: {colors[r2]}");
             List<DataFeedItem> temp = cache.Get<List<DataFeedItem>>("feedAll");
 
             try { Sentry.Common.Logging.Logger.Debug($"Feed list count before cache: {temp.Count}"); }
@@ -72,7 +74,7 @@ namespace Sentry.data.Web.Controllers
             }
 
             Sentry.Common.Logging.Logger.Debug($"Feed list count after cache: {dfisAll.Count}");
-            Sentry.Common.Logging.Logger.Debug($"Feed list count after cache: {colors[r2]}");
+            Sentry.Common.Logging.Logger.Debug($"Color after retrieval: {colors[r2]}");
 
             ViewData["color2"] = colors[r2];
             
