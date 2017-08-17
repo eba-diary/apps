@@ -22,7 +22,6 @@ namespace Sentry.data.Web.Controllers
         private List<DataFeedItem> dfisAll;
         private List<DataFeedItem> dfisSentry;
         static int r1, r2;
-        static int test = 0;
         
         private string[] colors = new string[] { "blue", "green", "gold", "plum", "orange", "blueGray" };
 
