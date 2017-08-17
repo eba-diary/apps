@@ -15,7 +15,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
         {
             this.Table("DataFeed");
 
-            //this.Cache(c => c.Usage(CacheUsage.ReadOnly));
+            this.Cache(c => c.Usage(CacheUsage.ReadOnly));
 
             this.Id(x => x.Id, m =>
             {

@@ -23,12 +23,13 @@ namespace Sentry.data.Infrastructure
 
         public IList<DataFeed> GetDataFeeds()
         {
-            //return Query<DataFeed>().Cacheable().ToList();
-            return Query<DataFeed>().ToList();
+            return Query<DataFeed>().Cacheable().ToList();
+            //return Query<DataFeed>().ToList();
         }
 
         public IList<DataFeedItem> GetAllFeedItems()
         {
+            Sentry.Common.Logging.Logger.Debug($"Going to database for feed URLs");
             List<DataFeed> dataFeeds = GetDataFeeds().ToList();
             return GoGetItems(dataFeeds);
         }

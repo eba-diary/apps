@@ -19,7 +19,7 @@ namespace Sentry.data.Web.Controllers
         private IDataAssetProvider _dataAssetProvider;
         private IAppCache cache;
         private List<DataAsset> das;
-        private List<DataFeedItem> dfisAll;
+        private List<DataFeedItem> dfisAll = new List<DataFeedItem>();
         private List<DataFeedItem> dfisSentry;
         static int r1, r2;
         
@@ -53,7 +53,9 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult GetFeed()
         {
+            Sentry.Common.Logging.Logger.Debug($"Feed list count before cache: {dfisAll.Count}");
             dfisAll = cache.GetOrAdd("feedAll", () => _feedContext.GetAllFeedItems().ToList());
+            Sentry.Common.Logging.Logger.Debug($"Feed list count after cache: {dfisAll.Count}");
             ViewData["color2"] = colors[r2];
 
             return PartialView("_Feed", dfisAll.Take(10).ToList());
