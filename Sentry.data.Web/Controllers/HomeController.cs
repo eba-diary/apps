@@ -41,7 +41,6 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult GetFeed()
         {
-            Sentry.Common.Logging.Logger.Debug($"Color before retrieval: {colors[r2]}");
             List<DataFeedItem> temp = cache.Get<List<DataFeedItem>>("feedAll");
 
             try { Sentry.Common.Logging.Logger.Debug($"Feed list count before cache: {temp.Count}"); }
