@@ -59,6 +59,7 @@ namespace Sentry.data.Web.Controllers
             try { Sentry.Common.Logging.Logger.Debug($"Feed list count before cache: {temp.Count}"); }
             catch { Sentry.Common.Logging.Logger.Debug($"Feed list count before cache: null"); }
 
+            //force to get feed items if failed to retrieve items previously due to storing a list of count 0 in failed try
             if (temp == null || temp.Count == 0)
             {
                 Sentry.Common.Logging.Logger.Debug($"Feed list count was null or 0");
@@ -71,6 +72,7 @@ namespace Sentry.data.Web.Controllers
             }
 
             Sentry.Common.Logging.Logger.Debug($"Feed list count after cache: {dfisAll.Count}");
+            Sentry.Common.Logging.Logger.Debug($"Feed list count after cache: {colors[r2]}");
 
             ViewData["color2"] = colors[r2];
             
