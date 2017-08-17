@@ -167,12 +167,74 @@ ul.list-group-indented {
     /*box-shadow: 0 0 8px gray;*/
     margin-bottom: 0px;
     display: inline-block;
-    width: 90%;
+    width: 100%;
 }
+
+.filterHead { font-size: 18px; }
+
+.filterBorder_blue { border: 1px solid #003DA5; }
+
+.filterBorder_green { border: 1px solid #005844; }
+
+.filterBorder_gold { border: 1px solid #74531C; }
+
+.filterBorder_plum { border: 1px solid #72246C; }
+
+.filterBorder_orange { border: 1px solid #683431; }
+
+.filterBorder_blueGray { border: 1px solid #285780; }
+
+.filterHead_blue
+{ 
+    border-bottom: 1px solid #003DA5 !important;
+    background-color: #00A3E0 !important;
+}
+
+.filterHead_green
+{ 
+    border-bottom: 1px solid #005844 !important;
+    background-color: #84BD00 !important;
+}
+
+.filterHead_gold
+{ 
+    border-bottom: 1px solid #74531C !important;
+    background-color: #EAAA00 !important;
+}
+
+.filterHead_plum 
+{ 
+    border-bottom: 1px solid #72246C !important;
+    background-color: #BB85AB !important;
+}
+
+.filterHead_orange
+{ 
+    border-bottom: 1px solid #683431 !important;
+    background-color: #E57200 !important;
+}
+
+.filterHead_blueGray
+{ 
+    border-bottom: 1px solid #285780 !important;
+    background-color: #89ABE3 !important;
+}
+
+.hover_btn_blue:hover { background-color: #003DA5 !important; }
+
+.hover_btn_green:hover { background-color: #005844 !important; }
+
+.hover_btn_gold:hover { background-color: #74531C !important; }
+
+.hover_btn_plum:hover { background-color: #72246C !important; }
+
+.hover_btn_orange:hover { background-color: #683431 !important; }
+
+.hover_btn_blueGray:hover { background-color: #285780 !important; }
 
 .outsideFilters
 {
-    width: 215px;
+    width: 205px;
 }
 
 .fixedScroll
@@ -181,15 +243,25 @@ ul.list-group-indented {
     top: 135px;
 }
 
-.filterMore
+.txt_filterMore
 {
-    margin-left: 0.5em;
+    font-size: 17px;
+    margin-top: 5px;
 }
 
 .moreIcon
 {
     padding-top: 2px;
-    margin-bottom: 1.5em;
+    margin: 5px 4px 1.5em 15px;
+    font-size: 17px;
+}
+
+.filterList { font-size: 16px; }
+
+.filterChbx
+{
+    width: 18px;
+    height: 18px;
 }
 
 .filterViewIcon
@@ -211,6 +283,8 @@ div[id*="filterType_"]:hover
     margin: 1em;
     margin-top: 0;
     float: right;
+    border: none;
+    font-size: 17px;
 }
 
 .dataset-list-filter-category {
@@ -223,8 +297,7 @@ div[id*="filterType_"]:hover
 
 .ul-filter-list
 {
-    padding: 0.5em;
-    padding-bottom: 0;
+    padding: 0.5em 0 0 1em;
 }
 
 .ul-filter-list:hover {
@@ -658,6 +731,7 @@ div[id*="filterType_"]:hover
     width: 650px !important;
     margin-bottom: 3em;
     margin-top: 0.5em;
+    margin-left: 7px;
 }
 
 .searchTextDS
@@ -912,7 +986,7 @@ div[id*="filterType_"]:hover
 
 .row_blueGray { border-bottom: 2px solid #285780 !important; }
 
-.white { color: white }
+.white { color: white !important; }
 
 .blue{ color: #003DA5; }
 
@@ -948,7 +1022,7 @@ div[id*="filterType_"]:hover
 
 .BG_green { background-color: #84BD00; }
 
-.BG_gold { background-color: #EAAA00; }
+.BG_gold { background-color: #EAAA00 !important; }
 
 .BG_ltBlue { background-color: #00A3E0; }
 
@@ -1542,7 +1616,7 @@ body { background-color: #f8f8f8; }
         height: 545px; 
     }
 
-    .outsideFilters { width: 275px; }
+    .outsideFilters { width: 255px; }
 }
 
 /* Sentry approved colors

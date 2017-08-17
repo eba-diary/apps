@@ -21,9 +21,6 @@ namespace Sentry.data.Web.Controllers
         private List<DataAsset> das;
         private List<DataFeedItem> dfisAll;
         private List<DataFeedItem> dfisSentry;
-        static int r1, r2;
-        
-        private string[] colors = new string[] { "blue", "green", "gold", "plum", "orange", "blueGray" };
 
         public HomeController() { }
 
@@ -38,17 +35,7 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult Index()
         {
-            do
-            {
-                r1 = new Random().Next(0, 6);
-                r2 = new Random().Next(0, 6);
-            }
-            while (r1 == r2);
-
-            ViewData["color"] = colors[r1];
-            ViewData["color2"] = colors[r2];
             ViewData["fluid"] = true;
-
             return View(das);
         }
 
@@ -73,9 +60,6 @@ namespace Sentry.data.Web.Controllers
             }
 
             Sentry.Common.Logging.Logger.Debug($"Feed list count after cache: {dfisAll.Count}");
-            Sentry.Common.Logging.Logger.Debug($"Color after retrieval: {colors[r2]}");
-
-            ViewData["color2"] = colors[r2];
             
             return PartialView("_Feed", dfisAll.Take(10).ToList());
         }
@@ -83,22 +67,18 @@ namespace Sentry.data.Web.Controllers
         public ActionResult GetSentryFeed()
         {
             dfisSentry = cache.GetOrAdd("feedSentry", () => _feedContext.GetSentryFeedItems().ToList());
-            ViewData["color2"] = colors[r2];
-
             return PartialView("_Feed", dfisSentry.Take(10).ToList());
         }
 
         public ActionResult GetMoreFeeds(int skip)
         {
             List<DataFeedItem> tempList = cache.GetOrAdd("feedAll", () => _feedContext.GetAllFeedItems().ToList()).Skip(skip).Take(5).ToList();
-            ViewData["color2"] = colors[r2];
             return PartialView("_Feed", tempList);
         }
 
         public ActionResult GetMoreSentryFeeds(int skip)
         {
             List<DataFeedItem> tempList = cache.GetOrAdd("feedSentry", () => _feedContext.GetSentryFeedItems().ToList()).Skip(skip).Take(5).ToList();
-            ViewData["color2"] = colors[r2];
             return PartialView("_Feed", tempList);
         }
     }
