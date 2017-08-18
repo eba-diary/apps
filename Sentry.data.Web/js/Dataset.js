@@ -24,10 +24,10 @@ data.Dataset = {
         /// Initialize the List results page for data assets
         /// </summary>
 
-        $("[id^='datasetViewDetails_']").off('click').on('click', function (e) {
-            e.preventDefault();
-            data.Dataset.ViewDetails($(this).data("id"));
-        });
+        //$("[id^='datasetViewDetails_']").off('click').on('click', function (e) {
+        //    e.preventDefault();
+        //    data.Dataset.ViewDetails($(this).data("id"));
+        //});
 
         $("[id^='DownloadDataset_']").off('click').on('click', function (e) {
             e.preventDefault();
@@ -257,13 +257,13 @@ data.Dataset = {
         //$("#OwnerID").val($("SentryOwnerName").val);
     },
 
-    ViewDetails: function (id) {
-        /// <summary>
-        /// Load the Dataset Details page
-        /// </summary>
-        var url = "/Dataset/Detail/?id=" + encodeURI(id);
-        window.location = url;
-    },
+    //ViewDetails: function (id) {
+    //    /// <summary>
+    //    /// Load the Dataset Details page
+    //    /// </summary>
+    //    var url = "/Dataset/Detail/?id=" + encodeURI(id);
+    //    window.location = url;
+    //},
 
     DownloadDataset: function (id) {
         /// <summary>

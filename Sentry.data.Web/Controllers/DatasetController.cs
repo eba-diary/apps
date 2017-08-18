@@ -578,13 +578,14 @@ namespace Sentry.data.Web.Controllers
 
         // GET: Dataset/Detail/5
         [HttpGet]
-        public ActionResult Detail(int id)
+        public ActionResult Detail(int id/*, ListDatasetModel ldm*/)
         {
             Dataset ds = _datasetContext.GetById(id);
             // IList<String> catList = _datasetContext.GetCategoryList();
             BaseDatasetModel bdm = new BaseDatasetModel(ds);
             bdm.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
             bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
+            //ViewData["listModel"] = ldm;
             return View(bdm);
         }
 

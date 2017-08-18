@@ -2,9 +2,11 @@
 
 @{
     ViewBag.Title = "View Dataset Details";
+    //ListDatasetModel listModel = (ListDatasetModel)ViewData["listModel"];
 }
 
 <div class="main-page-area">
+    @*<a href="@Url.Action("List", "Dataset", new { ldm = @list })" target="_blank">Data Model</a>*@
 
     <img src="~/Images/Icons/DatasetsBlue.svg" class="datasetImg leftFloat" />
     <h2 class="detailHeader">View Dataset Details</h2>

@@ -1,6 +1,8 @@
 ﻿@model Sentry.data.Web.BaseDatasetModel
 
 @{ 
+    //ListDatasetModel listModel = (ListDatasetModel)ViewData["listModel"];
+
     string color = "";
     switch (Model.Category)
     {
@@ -41,9 +43,12 @@
     @* dataset name / search hits *@
     <div class="dataset-list-content">
         <div class="extension bg_gray ext_@Model.FileExtensionDisplay()">@Model.FileExtensionDisplay()</div>
-        <span class="dataset-list-dataset-name" id="datasetViewDetails_@Model.DatasetId" data-id="@Model.DatasetId">
+        @*<span class="dataset-list-dataset-name" id="datasetViewDetails_@Model.DatasetId" data-id="@Model.DatasetId">
             @Model.DatasetName
-        </span>
+        </span>*@
+        <a href="@Url.Action("Detail", "Dataset", new { id = Model.DatasetId@*, ldm = listModel*@ })" class="dataset-list-dataset-name" id="datasetViewDetails_@Model.DatasetId" data-id="@Model.DatasetId">
+            @Model.DatasetName
+        </a>
         @*<span class="dataset-name-hover-popup" id="datasetViewDetailsHover_@Model.DatasetId" data-id="@Model.DatasetId">
             &nbsp; View Details &nbsp;
         </span>
@@ -84,7 +89,7 @@
                 @Html.Label("Description:")
             </div>*@<div class="dataset-list-content-label">
         </div>
-        @*<div class="dataset-list-content-value">*@<div class="dataset-list-content-value">
+        <div class="dataset-list-content-value listDesc">
             @{
                 if (Model.DatasetDesc != null && Model.DatasetDesc.Trim().Length > 0)
                 {
@@ -97,11 +102,7 @@
                     </div>
                 }
             }
-            @*</div>*@
         </div>
-    </div>
-
-    <div class="dataset-list-content">
     </div>
 
     <div class="dataset-list-content">
@@ -146,15 +147,18 @@
                     </button>
                 }
 
-        }
+            }
 
-        @*@{
-            <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to Tableau" disabled>
-                <img src="~/Images/tableau-icon_min.png" class="img-responsive" />
-            </button>
-        }*@
+            @*@{
+                <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to Tableau" disabled>
+                    <img src="~/Images/tableau-icon_min.png" class="img-responsive" />
+                </button>
+            }*@
+
+            <div class="rightFloat ownerDate">
+                <span class="@color textBold">Sentry Owner:&nbsp;</span>@Model.SentryOwnerName
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <span class="@color textBold">File Change Date:&nbsp;</span>@Model.ChangedDtm.ToShortDateString()
+            </div>
+        </div>
     </div>
-    <div class="dataset-list-content-value">
-        
-    </div>
-</div>

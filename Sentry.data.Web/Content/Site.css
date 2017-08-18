@@ -170,7 +170,7 @@ ul.list-group-indented {
     width: 100%;
 }
 
-.filterHead { font-size: 18px; }
+.filterHead { font-size: 17px; }
 
 .filterBorder_blue { border: 1px solid #003DA5; }
 
@@ -245,18 +245,18 @@ ul.list-group-indented {
 
 .txt_filterMore
 {
-    font-size: 17px;
+    font-size: 16px;
     margin-top: 5px;
 }
 
 .moreIcon
 {
     padding-top: 2px;
-    margin: 5px 4px 1.5em 15px;
-    font-size: 17px;
+    margin: 5px 4px 1.5em 10px;
+    font-size: 16px;
 }
 
-.filterList { font-size: 16px; }
+.filterList { font-size: 15px; }
 
 .filterChbx
 {
@@ -284,7 +284,7 @@ div[id*="filterType_"]:hover
     margin-top: 0;
     float: right;
     border: none;
-    font-size: 17px;
+    font-size: 16px;
 }
 
 .dataset-list-filter-category {
@@ -297,7 +297,7 @@ div[id*="filterType_"]:hover
 
 .ul-filter-list
 {
-    padding: 0.5em 0 0 1em;
+    padding: 0.5em 0.5em 0 0.5em;
 }
 
 .ul-filter-list:hover {
@@ -388,6 +388,16 @@ div[id*="filterType_"]:hover
     width: 90%;
     margin-left: 3px;
     padding: 2px 0;
+}
+
+.ownerDate { padding: 4px 0; }
+
+.spacer { width: 25px; }
+
+.listDesc 
+{ 
+    padding-top: 5px; 
+    padding-bottom: 6px;
 }
 
 /* wrap the upper-right of each row in the list */
@@ -1532,6 +1542,7 @@ body { background-color: #f8f8f8; }
 .see { border: 1px solid black; }
 .inlineBlock { display: inline-block; vertical-align: top; }
 .textCenter { text-align: center; }
+.textBold { font-weight: bold; }
 
 
 @media (min-width: 768px) /* sm */

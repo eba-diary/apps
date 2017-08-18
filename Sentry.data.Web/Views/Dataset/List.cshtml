@@ -142,7 +142,7 @@
                         @{
                             foreach (var item in Model.DatasetList)
                             {
-                                @Html.Partial("_ListItem", item)
+                                @Html.Partial("_ListItem", item@*, new ViewDataDictionary { { "listModel", Model } }*@)
                             }
                         }
                     </ul>
