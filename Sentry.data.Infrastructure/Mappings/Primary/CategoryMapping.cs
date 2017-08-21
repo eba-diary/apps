@@ -20,6 +20,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             });
 
             this.Property((x) => x.Name);
+            this.Property(x => x.Color);
 
             this.ManyToOne((x) => x.ParentCategory, (m) => {
                 m.Access(Accessor.Field);

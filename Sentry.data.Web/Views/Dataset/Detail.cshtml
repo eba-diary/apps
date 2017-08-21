@@ -2,14 +2,14 @@
 
 @{
     ViewBag.Title = "View Dataset Details";
-    //ListDatasetModel listModel = (ListDatasetModel)ViewData["listModel"];
 }
 
 <div class="main-page-area">
-    @*<a href="@Url.Action("List", "Dataset", new { ldm = @list })" target="_blank">Data Model</a>*@
 
     <img src="~/Images/Icons/DatasetsBlue.svg" class="datasetImg leftFloat" />
     <h2 class="detailHeader">View Dataset Details</h2>
+
+    <a href="@Url.Action("List", "Dataset", new { ldm = new ListDatasetModel() })" class="clearFloat leftFloat backToList"><span class="glyphicon glyphicon-chevron-left"></span> Back to list</a>
 
     <section class="dataset-detail-content clearFloat" id="Dataset-Detail-Name">
         @*<div class="dataset-detail-content-row" id="Dataset-Detail-Content-Label">

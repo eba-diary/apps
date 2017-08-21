@@ -1,7 +1,8 @@
-﻿@model IList<Sentry.data.Web.BaseDatasetModel>
+﻿@model List<Sentry.data.Core.Category>
 
 @{
     ViewBag.Title = "Datasets";
+    int dsCount = (int)ViewData["dsCount"];
 }
 
 <center>
@@ -11,7 +12,7 @@
         using (Html.BeginForm(@"List\SearchPhrase", "Dataset", FormMethod.Get, htmlAttributes))
         {
                 <div class="searchBox">
-                    <input type="text" class="form-control searchText" id="SearchText" name="searchPhrase" placeholder="Search from @Model.Count() Datasets">
+                    <input type="text" class="form-control searchText" id="SearchText" name="searchPhrase" placeholder="Search from @dsCount Datasets">
                     <button type="submit" class="btn btn-primary searchBtn"><span class="glyphicon glyphicon-search"></span></button>
                 </div>
         }
@@ -32,18 +33,17 @@
         </h4>
         <div class="index-card-table-div">
         @{
-            var category = Model.Select(m => m.Category).Distinct().OrderBy(cat => cat).ToList();
-            int c = category.Count();
-            string[] colors = new string[] { "blue", "green", "gold", "orange", "plum", "blueGray" };
+            int c = Model.Count();
+            //string[] colors = new string[] { "blueGray", "green", "gold", "orange", "plum", "blue" };
 
             if (c == 1)
             {
                 <div class="row">
                     <div class="col-xs-3"></div>
                     <div class="col-xs-6">
-                        <div class="browse-category-card vertCenter BG_@colors[0]" id="category_@category[0]" data-category="@category[0]">
-                            <img src="~/Images/Category/@{@category[0]}.svg" class="catImg" />
-                            <h5 class="@colors[0] catTitle">@category[0]</h5>
+                        <div class="browse-category-card vertCenter BG_@Model[0].Color" id="category_@Model[0].Name" data-category="@Model[0].Name">
+                            <img src="~/Images/Category/@{@Model[0].Name}.svg" class="catImg" />
+                            <h5 class="@Model[0].Color catTitle">@Model[0].Name</h5>
                         </div>
                     </div>
                 </div>
@@ -52,15 +52,15 @@
             {
                 <div class="row">
                     <div class="col-xs-6">
-                        <div class="browse-category-card vertCenter BG_@colors[0]" id="category_@category[0]" data-category="@category[0]">
-                            <img src="~/Images/Category/@{@category[0]}.svg" class="catImg" />
-                            <h5 class="@colors[0] catTitle">@category[0]</h5>
+                        <div class="browse-category-card vertCenter BG_@Model[0].Color" id="category_@Model[0].Name" data-category="@Model[0].Name">
+                            <img src="~/Images/Category/@{@Model[0].Name}.svg" class="catImg" />
+                            <h5 class="@Model[0].Color catTitle">@Model[0].Name</h5>
                         </div>
                     </div>
                     <div class="col-xs-6">
-                        <div class="browse-category-card vertCenter BG_@colors[1]" id="category_@category[1]" data-category="@category[1]">
-                            <img src="~/Images/Category/@{@category[1]}.svg" class="catImg" />
-                            <h5 class="@colors[1] catTitle">@category[1]</h5>
+                        <div class="browse-category-card vertCenter BG_@Model[1].Color" id="category_@Model[1].Name" data-category="@Model[1].Name">
+                            <img src="~/Images/Category/@{@Model[1].Name}.svg" class="catImg" />
+                            <h5 class="@Model[1].Color catTitle">@Model[1].Name</h5>
                         </div>
                     </div>
                 </div>
@@ -72,21 +72,21 @@
                     {
                         <div class="row">
                             <div class="col-sm-4">
-                                <div class="browse-category-card vertCenter BG_@colors[(i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
-                                    <img src="~/Images/Category/@{@category[i]}.svg" class="catImg" />
-                                    <h5 class="@colors[i] catTitle">@category[i]</h5>
+                                <div class="browse-category-card vertCenter BG_@Model[i].Color" id="category_@Model[i].Name" data-category="@Model[i].Name">
+                                    <img src="~/Images/Category/@{@Model[i].Name}.svg" class="catImg" />
+                                    <h5 class="@Model[i].Color catTitle">@Model[i].Name</h5>
                                 </div>
                             </div>
                             <div class="col-sm-4">
-                                <div class="browse-category-card vertCenter BG_@colors[(++i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
-                                    <img src="~/Images/Category/@{@category[i]}.svg" class="catImg" />
-                                    <h5 class="@colors[i] catTitle">@category[i]</h5>
+                                <div class="browse-category-card vertCenter BG_@Model[++i].Color" id="category_@Model[i].Name" data-category="@Model[i].Name">
+                                    <img src="~/Images/Category/@{@Model[i].Name}.svg" class="catImg" />
+                                    <h5 class="@Model[i].Color catTitle">@Model[i].Name</h5>
                                 </div>
                             </div>
                             <div class="col-sm-4">
-                                <div class="browse-category-card vertCenter BG_@colors[(++i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
-                                    <img src="~/Images/Category/@{@category[i]}.svg" class="catImg" />
-                                    <h5 class="@colors[i] catTitle">@category[i]</h5>
+                                <div class="browse-category-card vertCenter BG_@Model[++i].Color" id="category_@Model[i].Name" data-category="@Model[i].Name">
+                                    <img src="~/Images/Category/@{@Model[i].Name}.svg" class="catImg" />
+                                    <h5 class="@Model[i].Color catTitle">@Model[i].Name</h5>
                                 </div>
                             </div>
                         </div>
@@ -96,9 +96,9 @@
                             {
                                 <div class="col-sm-4"></div>
                                 <div class="col-sm-4">
-                                    <div class="browse-category-card vertCenter BG_@colors[(++i < 6) ? i : i % 6] text-center" id="category_@category[i]" data-category="@category[i]">
-                                        <img src="~/Images/Category/@{@category[i]}.svg" class="catImg" />
-                                        <h5 class="@colors[i] catTitle">@category[i]</h5>
+                                    <div class="browse-category-card vertCenter BG_@Model[++i].Color" id="category_@Model[i].Name" data-category="@Model[i].Name">
+                                        <img src="~/Images/Category/@{@Model[i].Name}.svg" class="catImg" />
+                                        <h5 class="@Model[i].Color catTitle">@Model[i].Name</h5>
                                     </div>
                                 </div>
                             }
@@ -106,15 +106,15 @@
                             {
                                 <div class="col-md-2"></div>
                                 <div class="col-sm-4">
-                                    <div class="browse-category-card vertCenter BG_@colors[(++i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
-                                        <img src="~/Images/Category/@{@category[i]}.svg" class="catImg" />
-                                        <h5 class="@colors[i] catTitle">@category[i]</h5>
+                                    <div class="browse-category-card vertCenter BG_@Model[++i].Color" id="category_@Model[i].Name" data-category="@Model[i].Name">
+                                        <img src="~/Images/Category/@{@Model[i].Name}.svg" class="catImg" />
+                                        <h5 class="@Model[i].Color catTitle">@Model[i].Name</h5>
                                     </div>
                                 </div>
                                 <div class="col-sm-4">
-                                    <div class="browse-category-card vertCenter BG_@colors[(++i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
-                                        <img src="~/Images/Category/@{@category[i]}.svg" class="catImg" />
-                                        <h5 class="@colors[i] catTitle">@category[i]</h5>
+                                    <div class="browse-category-card vertCenter BG_@Model[++i].Color" id="category_@Model[i].Name" data-category="@Model[i].Name">
+                                        <img src="~/Images/Category/@{@Model[i].Name}.svg" class="catImg" />
+                                        <h5 class="@Model[i].Color catTitle">@Model[i].Name</h5>
                                     </div>
                                 </div>
                             }
@@ -127,9 +127,9 @@
                         @for (int i = 0; i < c; i++)
                         {
                             <div class="inside">
-                                <div class="browse-category-card vertCenter BG_@colors[(i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
-                                    <p><img src="~/Images/Category/@{@category[i]}.svg" class="catImg" /></p>
-                                    <h5 class="@colors[i] catTitle">@category[i]</h5>
+                                <div class="browse-category-card vertCenter BG_@Model[i].Color" id="category_@Model[i].Name" data-category="@Model[i].Name">
+                                    <img src="~/Images/Category/@{@Model[i].Name}.svg" class="catImg" />
+                                    <h5 class="@Model[i].Color catTitle">@Model[i].Name</h5>
                                 </div>
                             </div>
                         }

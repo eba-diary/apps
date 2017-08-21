@@ -1,17 +1,15 @@
 ﻿@model Sentry.data.Web.BaseDatasetModel
 
 @{ 
-    //ListDatasetModel listModel = (ListDatasetModel)ViewData["listModel"];
-
     string color = "";
     switch (Model.Category)
     {
         case "Claim":
-            color = "green";
+            color = "blueGray";
             break;
 
         case "Geographic":
-            color = "gold";
+            color = "green";
             break;
 
         case "Industry":
@@ -19,11 +17,11 @@
             break;
 
         case "Government":
-            color = "plum";
+            color = "gold";
             break;
 
         case "Weather":
-            color = "blueGray";
+            color = "plum";
             break;
 
         case "Sentry":
@@ -35,7 +33,7 @@
 <li class="ul-dataset-list-item borderSide_@color boxShadowSm">
     @* the "category wrap" is the little tag printed diagonally in the upper right of each entry *@
     <div class="category-type-wrap">
-        <div class="category-type category-@{@Model.Category.ToLower()}">
+        <div class="category-type category-@color">
             @Model.Category
         </div>
     </div>
@@ -46,7 +44,7 @@
         @*<span class="dataset-list-dataset-name" id="datasetViewDetails_@Model.DatasetId" data-id="@Model.DatasetId">
             @Model.DatasetName
         </span>*@
-        <a href="@Url.Action("Detail", "Dataset", new { id = Model.DatasetId@*, ldm = listModel*@ })" class="dataset-list-dataset-name" id="datasetViewDetails_@Model.DatasetId" data-id="@Model.DatasetId">
+        <a href="@Url.Action("Detail", "Dataset", new { id = Model.DatasetId })" class="dataset-list-dataset-name" id="datasetViewDetails_@Model.DatasetId" data-id="@Model.DatasetId">
             @Model.DatasetName
         </a>
         @*<span class="dataset-name-hover-popup" id="datasetViewDetailsHover_@Model.DatasetId" data-id="@Model.DatasetId">

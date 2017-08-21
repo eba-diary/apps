@@ -8,6 +8,7 @@ namespace Sentry.data.Core
         private int _id;
 #pragma warning restore CS0649
         private string _name;
+        private string _color;
         private Category _parentCategory;
         private IList<Category> _subCategories = new List<Category>();
 
@@ -77,6 +78,19 @@ namespace Sentry.data.Core
             get
             {
                 return this.ToString();
+            }
+        }
+
+        public virtual string Color
+        {
+            get
+            {
+                return _color;
+            }
+
+            set
+            {
+                _color = value;
             }
         }
 

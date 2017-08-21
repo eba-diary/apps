@@ -426,7 +426,37 @@ div[id*="filterType_"]:hover
     font-family: Lato, Arial, sans-serif;
 }
 
-.category-claim {
+.category-green {
+    background-color: #005844;
+    color: #FFFFFF;
+}
+
+.category-gold {
+    background-color: #74531C;
+    color: #FFFFFF;
+}
+
+.category-plum {
+    background-color: #72246C;
+    color: #FFFFFF;
+}
+
+.category-orange {
+    background-color: #683431;
+    color: #FFFFFF;
+}
+
+.category-blueGray {
+    background-color: #285780;
+    color: #FFFFFF;
+}
+
+.category-blue {
+    background-color: #003DA5;
+    color: #FFFFFF;
+}
+
+/*.category-claim {
     background-color: #005844;
     color: #FFFFFF;
 }
@@ -454,7 +484,7 @@ div[id*="filterType_"]:hover
 .category-sentry {
     background-color: #003DA5;
     color: #FFFFFF;
-}
+}*/
 
 /*.dataset-list-download-link {
     color: #FFFFFF;
@@ -521,7 +551,7 @@ div[id*="filterType_"]:hover
     vertical-align: top;
 }
 
-
+.backToList { margin-bottom: 1em; }
 
 
 /* Dataset Management Screen... */

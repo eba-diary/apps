@@ -31,6 +31,8 @@ namespace Sentry.data.Web.Controllers
         //private IApiClient _apiClient;
         //private IWeatherDataProvider _weatherDataProvider;
 
+        private static ListDatasetModel testList;
+
         // JCG TODO: Revisit, Could this be push down into the Infrastructure\Core layer? 
         private Amazon.S3.IAmazonS3 S3Client
         {
@@ -224,6 +226,11 @@ namespace Sentry.data.Web.Controllers
         [Route("Dataset/List")]
         public ActionResult List(ListDatasetModel ldm)
         {
+            if(ldm == null)
+            {
+                ldm = testList;
+            }
+
             ldm.CategoryList = GetDatasetModelList().Select(x => x.Category).Distinct().ToList();
             ldm.SentryOwnerList = GetSentryOwnerList();
 
@@ -302,13 +309,16 @@ namespace Sentry.data.Web.Controllers
             ldm.DatasetList = dsList;
             ldm.SearchFilters = GetDatasetFilters(ldm, null);
 
+            testList = ldm;
+
             return View(ldm);
         }
 
         public ActionResult HomeDataset()
         {
-            List<BaseDatasetModel> dsList = GetDatasetModelList();
-            return PartialView("_HomeDataset", dsList);
+            List<Category> categories = _datasetContext.Categories.OrderBy(o => o.Name).ToList();
+            ViewData["dsCount"] = GetDatasetModelList().Count;
+            return PartialView("_HomeDataset", categories);
         }
 
         private IList<FilterModel> GetDatasetFilters(ListDatasetModel ldm, string cat)
@@ -505,6 +515,8 @@ namespace Sentry.data.Web.Controllers
             rspModel.SearchFilters = GetDatasetFilters(rspModel, category);
             //(rspModel.SearchFilters.SelectMany(x => x.FilterNameList).Where(i => i.value == category).Select(c => c.isChecked)) = true;
 
+            testList = rspModel;
+
             return View(rspModel);
         }
 
@@ -578,14 +590,13 @@ namespace Sentry.data.Web.Controllers
 
         // GET: Dataset/Detail/5
         [HttpGet]
-        public ActionResult Detail(int id/*, ListDatasetModel ldm*/)
+        public ActionResult Detail(int id)
         {
             Dataset ds = _datasetContext.GetById(id);
             // IList<String> catList = _datasetContext.GetCategoryList();
             BaseDatasetModel bdm = new BaseDatasetModel(ds);
             bdm.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
             bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
-            //ViewData["listModel"] = ldm;
             return View(bdm);
         }
 

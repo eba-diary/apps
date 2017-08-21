@@ -52,7 +52,7 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                return Query<Category>().Cacheable(QueryCacheRegion.MediumTerm);
+                return Query<Category>()/*.OrderBy(o => o.Name)*/.Cacheable(QueryCacheRegion.MediumTerm);
             }
 
         }
