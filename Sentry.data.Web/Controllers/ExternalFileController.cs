@@ -29,8 +29,8 @@ namespace Sentry.data.Web.Controllers
         public ActionResult ODCFile(ComponentElement ce)
         {
             string xml = _odcFileProvider.GetXMLString(ce);
-
-            return File(Encoding.UTF8.GetBytes(xml), "text/xml", string.Format("{0}.odc", "xml"));
+            string file = ce.Name.Replace(" ", "_");
+            return File(Encoding.UTF8.GetBytes(xml), "text/xml", string.Format("{0}.odc", file));
         }
     }
 }
