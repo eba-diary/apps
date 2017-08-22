@@ -47,7 +47,7 @@ namespace Sentry.data.Infrastructure
             }
             catch (Exception e)
             {
-                throw new Exception(e.InnerException.Message);
+                throw new Exception(e.Message);
             }
             finally
             {
@@ -81,9 +81,11 @@ namespace Sentry.data.Infrastructure
             StringBuilder url = new StringBuilder();
             url.Append(Configuration.Config.GetHostSetting("PushToSASUrl"));
             url.Append(Uri.EscapeUriString("&_username="));
-            url.Append(Uri.EscapeUriString(Configuration.Config.GetHostSetting("ServiceAccountID")));
+            //url.Append(Uri.EscapeUriString(Configuration.Config.GetHostSetting("ServiceAccountID")));
+            url.Append(Uri.EscapeUriString(Configuration.Config.GetHostSetting("PushToSASUser")));
             url.Append(Uri.EscapeUriString("&_password="));
-            url.Append("{sas001}" + System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(Configuration.Config.GetHostSetting("ServiceAccountPass"))));
+            //url.Append("{sas001}" + System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(Configuration.Config.GetHostSetting("ServiceAccountPass"))));
+            url.Append("{sas001}" + System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(Configuration.Config.GetHostSetting("PushToSASPass"))));
             url.Append(Uri.EscapeUriString("&_program="));
             if (Path.GetExtension(filename) == ".csv")
             {
