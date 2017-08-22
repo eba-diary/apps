@@ -426,32 +426,37 @@ div[id*="filterType_"]:hover
     font-family: Lato, Arial, sans-serif;
 }
 
-.category-green {
+[class^="categoryBanner-"] {
+    background-color: grey;
+    color: #FFFFFF;
+}
+
+.categoryBanner-green {
     background-color: #005844;
     color: #FFFFFF;
 }
 
-.category-gold {
+.categoryBanner-gold {
     background-color: #74531C;
     color: #FFFFFF;
 }
 
-.category-plum {
+.categoryBanner-plum {
     background-color: #72246C;
     color: #FFFFFF;
 }
 
-.category-orange {
+.categoryBanner-orange {
     background-color: #683431;
     color: #FFFFFF;
 }
 
-.category-blueGray {
+.categoryBanner-blueGray {
     background-color: #285780;
     color: #FFFFFF;
 }
 
-.category-blue {
+.categoryBanner-blue {
     background-color: #003DA5;
     color: #FFFFFF;
 }
@@ -796,13 +801,19 @@ div[id*="filterType_"]:hover
     margin-right: 0.5em;
 }
 
-.bg_gray { background-color: gray;}
+.bg_gray { background-color: lightgray;}
 .ext_txt { background-color: dodgerblue;}
 .ext_csv { background-color: orange;}
 .ext_xlsx, .ext_xls { background-color: green;}
 .ext_pdf { background-color: red;}
 .ext_sas7bdat { background-color: #285780;}
 .ext_prn { background-color: #72246C; }
+
+.borderSide_gray 
+{
+    border: 1.5px solid lightgrey;
+    border-left: 6px solid lightgrey;
+}
 
 .borderSide_blue 
 {
@@ -1027,6 +1038,8 @@ div[id*="filterType_"]:hover
 .row_blueGray { border-bottom: 2px solid #285780 !important; }
 
 .white { color: white !important; }
+
+.gray { color: gray; }
 
 .blue{ color: #003DA5; }
 
