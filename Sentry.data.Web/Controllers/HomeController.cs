@@ -26,7 +26,6 @@ namespace Sentry.data.Web.Controllers
 
         public HomeController(IDataAssetProvider dap, IDataFeedContext feedContext)
         {
-            Sentry.Common.Logging.Logger.Debug($"HomeController constructor called");
             _dataAssetProvider = dap;
             _feedContext = feedContext;
             das = new List<DataAsset>(_dataAssetProvider.GetDataAssets());
@@ -43,13 +42,9 @@ namespace Sentry.data.Web.Controllers
         {
             List<DataFeedItem> temp = cache.Get<List<DataFeedItem>>("feedAll");
 
-            try { Sentry.Common.Logging.Logger.Debug($"Feed list count before cache: {temp.Count}"); }
-            catch { Sentry.Common.Logging.Logger.Debug($"Feed list count before cache: null"); }
-
             //force to get feed items if failed to retrieve items previously due to storing a list of count 0 in failed try
             if (temp == null || temp.Count == 0)
             {
-                Sentry.Common.Logging.Logger.Debug($"Feed list count was null or 0");
                 dfisAll = _feedContext.GetAllFeedItems().ToList();
                 cache.Add("feedAll", dfisAll);
             }
@@ -57,8 +52,6 @@ namespace Sentry.data.Web.Controllers
             {
                 dfisAll = cache.GetOrAdd("feedAll", () => _feedContext.GetAllFeedItems().ToList());
             }
-
-            Sentry.Common.Logging.Logger.Debug($"Feed list count after cache: {dfisAll.Count}");
             
             return PartialView("_Feed", dfisAll.Take(10).ToList());
         }

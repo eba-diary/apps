@@ -408,7 +408,7 @@ div[id*="filterType_"]:hover
     right: 0px;
     overflow: hidden;
     height: 100px;
-    width: 100px;
+    width: 140px;
 }
 
 .category-type {
@@ -416,11 +416,11 @@ div[id*="filterType_"]:hover
     transform-origin: top left;
     position: absolute;
     height: 26px;
-    width: 100px;
+    width: 120px;
     line-height: 26px;
     text-align: center;
-    top: -19px;
-    right: -47px;
+    top: -18px;
+    right: -55px;
     font-size: 12px;
     font-weight: bold;
     font-family: Lato, Arial, sans-serif;

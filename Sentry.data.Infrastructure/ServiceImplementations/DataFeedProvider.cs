@@ -29,7 +29,6 @@ namespace Sentry.data.Infrastructure
 
         public IList<DataFeedItem> GetAllFeedItems()
         {
-            Sentry.Common.Logging.Logger.Debug($"Going to database for feed URLs");
             List<DataFeed> dataFeeds = GetDataFeeds().ToList();
             return GoGetItems(dataFeeds);
         }

@@ -31,7 +31,7 @@ namespace Sentry.data.Web.Controllers
         //private IApiClient _apiClient;
         //private IWeatherDataProvider _weatherDataProvider;
 
-        private static ListDatasetModel testList;
+        private static ListDatasetModel backList;
 
         // JCG TODO: Revisit, Could this be push down into the Infrastructure\Core layer? 
         private Amazon.S3.IAmazonS3 S3Client
@@ -228,7 +228,7 @@ namespace Sentry.data.Web.Controllers
         {
             if(ldm == null)
             {
-                ldm = testList;
+                ldm = backList;
             }
 
             ldm.CategoryList = GetDatasetModelList().Select(x => x.Category).Distinct().ToList();
@@ -309,7 +309,7 @@ namespace Sentry.data.Web.Controllers
             ldm.DatasetList = dsList;
             ldm.SearchFilters = GetDatasetFilters(ldm, null);
 
-            testList = ldm;
+            backList = ldm;
 
             return View(ldm);
         }
@@ -515,7 +515,7 @@ namespace Sentry.data.Web.Controllers
             rspModel.SearchFilters = GetDatasetFilters(rspModel, category);
             //(rspModel.SearchFilters.SelectMany(x => x.FilterNameList).Where(i => i.value == category).Select(c => c.isChecked)) = true;
 
-            testList = rspModel;
+            backList = rspModel;
 
             return View(rspModel);
         }
