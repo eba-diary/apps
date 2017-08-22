@@ -39,45 +39,48 @@ data.Home = {
         //var isSentryFeed = $("#chbx").is(':checked');
         var isSentryFeed = false;
 
-        if (elem[0].scrollHeight - elem[0].scrollTop <= startLoadHt && data.Home.AjaxStatus)
+        if(data.Home.AllSkipTotal < 100 && data.Home.SentrySkipTotal < 100)
         {
-            data.Home.AjaxStatus = false;
-
-            if (isSentryFeed)
+            if (elem[0].scrollHeight - elem[0].scrollTop <= startLoadHt && data.Home.AjaxStatus)
             {
-                var skipThese = data.Home.SentrySkipTotal;
+                data.Home.AjaxStatus = false;
+
+                if (isSentryFeed)
+                {
+                    var skipThese = data.Home.SentrySkipTotal;
                 
-                $.ajax({
-                    url: '/Home/GetMoreSentryFeeds',
-                    dataType: 'html',
-                    data: { skip: skipThese },
-                    success: function (html) {
-                        $("#sentryFeed").append(html);
-                        data.Home.SentrySkipTotal += 5;
-                        data.Home.AjaxStatus = true;
-                    },
-                    error: function (e) {
-                        data.Home.AjaxStatus = true;
-                    }
-                });
-            }
-            else
-            {
-                var skipThese = data.Home.AllSkipTotal;
+                    $.ajax({
+                        url: '/Home/GetMoreSentryFeeds',
+                        dataType: 'html',
+                        data: { skip: skipThese },
+                        success: function (html) {
+                            $("#sentryFeed").append(html);
+                            data.Home.SentrySkipTotal += 5;
+                            data.Home.AjaxStatus = true;
+                        },
+                        error: function (e) {
+                            data.Home.AjaxStatus = true;
+                        }
+                    });
+                }
+                else
+                {
+                    var skipThese = data.Home.AllSkipTotal;
 
-                $.ajax({
-                    url: '/Home/GetMoreFeeds',
-                    dataType: 'html',
-                    data: { skip: skipThese },
-                    success: function (html) {
-                        $("#feed").append(html);
-                        data.Home.AllSkipTotal += 5;
-                        data.Home.AjaxStatus = true;
-                    },
-                    error: function (e) {
-                        data.Home.AjaxStatus = true;
-                    }
-                });
+                    $.ajax({
+                        url: '/Home/GetMoreFeeds',
+                        dataType: 'html',
+                        data: { skip: skipThese },
+                        success: function (html) {
+                            $("#feed").append(html);
+                            data.Home.AllSkipTotal += 5;
+                            data.Home.AjaxStatus = true;
+                        },
+                        error: function (e) {
+                            data.Home.AjaxStatus = true;
+                        }
+                    });
+                }
             }
         }
 
