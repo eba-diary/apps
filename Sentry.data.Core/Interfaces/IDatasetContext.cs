@@ -13,6 +13,10 @@ namespace Sentry.data.Core
 
         Dataset GetById(int id);
 
+        int GetDatasetCount();
+
+        int GetCategoryDatasetCount(Category cat);
+
         int GetMaxId();
 
         IEnumerable<String> GetCategoryList();

@@ -39,6 +39,13 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.S3Key, (m) => m.Column("S3_KEY"));
             this.Property((x) => x.IsSensitive, (m) => m.Column("IsSensitive_IND"));
 
+            this.ManyToOne(x => x.DatasetCategory, m =>
+            {
+                m.Column("Category_ID");
+                m.ForeignKey("FK_Dataset_Category");
+                m.Class(typeof(Category));
+            });
+
             this.Bag((x) => x.RawMetadata, (m) =>
             {
                 //m.Lazy(CollectionLazy.Lazy);

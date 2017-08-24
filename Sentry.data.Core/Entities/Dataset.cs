@@ -35,6 +35,7 @@ namespace Sentry.data.Core
         private string _s3key;
         private Boolean _IsSensitive;
         IList<DatasetMetadata> _rawMetadata;
+        private Category _datasetCategory;
         //private IDictionary<string, string> _columns;
         //private IDictionary<string, string> _metadata;
 
@@ -43,7 +44,7 @@ namespace Sentry.data.Core
         }
 
         public Dataset(int datasetId,
-                       string category,
+                       string category, 
                        string datasetName,
                        string datasetDesc,
                        //string creationUserId,
@@ -62,7 +63,8 @@ namespace Sentry.data.Core
                        long recordCount,
                        string s3key,
                        Boolean IsSensitive,
-                       IList<DatasetMetadata> rawMetadata)
+                       IList<DatasetMetadata> rawMetadata,
+                       Category cat)
         {
             this._datasetId = datasetId;
             this._category = category;
@@ -85,6 +87,7 @@ namespace Sentry.data.Core
             this._s3key = s3key;
             this._IsSensitive = IsSensitive;
             this._rawMetadata = rawMetadata;
+            this._datasetCategory = cat;
         }
 
         public virtual Boolean IsSensitive
@@ -351,6 +354,19 @@ namespace Sentry.data.Core
             get
             {
                 return _rawMetadata.Where((x) => x.IsColumn == true).ToList();
+            }
+        }
+
+        public virtual Category DatasetCategory
+        {
+            get
+            {
+                return _datasetCategory;
+            }
+
+            set
+            {
+                _datasetCategory = value;
             }
         }
 

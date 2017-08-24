@@ -31,8 +31,6 @@ namespace Sentry.data.Web.Controllers
         //private IApiClient _apiClient;
         //private IWeatherDataProvider _weatherDataProvider;
 
-        private static ListDatasetModel backList;
-
         // JCG TODO: Revisit, Could this be push down into the Infrastructure\Core layer? 
         private Amazon.S3.IAmazonS3 S3Client
         {
@@ -226,11 +224,6 @@ namespace Sentry.data.Web.Controllers
         [Route("Dataset/List")]
         public ActionResult List(ListDatasetModel ldm)
         {
-            if(ldm == null)
-            {
-                ldm = backList;
-            }
-
             ldm.CategoryList = GetDatasetModelList().Select(x => x.Category).Distinct().ToList();
             ldm.SentryOwnerList = GetSentryOwnerList();
 
@@ -308,17 +301,21 @@ namespace Sentry.data.Web.Controllers
 
             ldm.DatasetList = dsList;
             ldm.SearchFilters = GetDatasetFilters(ldm, null);
-
-            backList = ldm;
-
+            
             return View(ldm);
         }
 
         public ActionResult HomeDataset()
         {
-            List<Category> categories = _datasetContext.Categories.OrderBy(o => o.Name).ToList();
-            ViewData["dsCount"] = GetDatasetModelList().Count;
-            return PartialView("_HomeDataset", categories);
+            List<Category> categories = _datasetContext.Categories.ToList();
+            ViewData["dsCount"] = _datasetContext.GetDatasetCount();
+
+            foreach (Category c in categories) //parallel?
+            {
+                ViewData[c.Name + "Count"] = _datasetContext.GetCategoryDatasetCount(c);
+            }
+
+            return PartialView("_HomeDataset", categories.OrderBy(o => o.Name).ToList());
         }
 
         private IList<FilterModel> GetDatasetFilters(ListDatasetModel ldm, string cat)
@@ -514,9 +511,7 @@ namespace Sentry.data.Web.Controllers
 
             rspModel.SearchFilters = GetDatasetFilters(rspModel, category);
             //(rspModel.SearchFilters.SelectMany(x => x.FilterNameList).Where(i => i.value == category).Select(c => c.isChecked)) = true;
-
-            backList = rspModel;
-
+            
             return View(rspModel);
         }
 
@@ -633,11 +628,12 @@ namespace Sentry.data.Web.Controllers
                     throw new ValidationException("Please select file to be uploaded");
                 }
 
-                string category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs).Name;
+                //string category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs).Name; 
+                Category category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs); /*Caden a change here for the Category reference*/
                 string frequency = ((DatasetFrequency)udm.FreqencyID).ToString();
                 string originationcode = ((DatasetOriginationCode)udm.OriginationID).ToString();
                 string dsfi = System.IO.Path.GetFileName(DatasetFile.FileName);
-                string s3key = category + "/" + dsfi;
+                string s3key = category.Name + "/" + dsfi; 
 
                 if (_datasetContext.s3KeyDuplicate(s3key))
                 {
@@ -654,7 +650,7 @@ namespace Sentry.data.Web.Controllers
                     Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");
 
                     _s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(uploadRequest_UploadPartProgressEvent);
-                    _s3Service.TransferUtlityUploadStream(category, dsfi, DatasetFile.InputStream);
+                    _s3Service.TransferUtlityUploadStream(category.Name, dsfi, DatasetFile.InputStream); 
 
 
                     //// 1. upload dataset
@@ -679,7 +675,7 @@ namespace Sentry.data.Web.Controllers
                     DateTime dateTimeNow = DateTime.Now;
                     Dataset ds = new Dataset(
                         0, // adding new dataset; ID is disregarded
-                        category,
+                        category.Name, 
                         udm.DatasetName,
                         udm.DatasetDesc,
                         udm.CreationUserName,
@@ -692,9 +688,10 @@ namespace Sentry.data.Web.Controllers
                         frequency,
                         DatasetFile.ContentLength,
                         udm.RecordCount,
-                        category + "/" + dsfi,
+                        s3key, /*Caden a change here for the Category reference*/
                         udm.IsSensitive,
-                        null);
+                        null,
+                        category /*Caden a change here for the Category reference*/);
 
                     //foreach (_DatasetMetadataModel dsmdmi in udm.RawMetadata)
                     //{

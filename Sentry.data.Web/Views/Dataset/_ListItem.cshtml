@@ -1,33 +1,7 @@
 ﻿@model Sentry.data.Web.BaseDatasetModel
 
 @{ 
-    string color = "";
-    switch (Model.Category)
-    {
-        case "Claim":
-            color = "blueGray";
-            break;
-
-        case "Geographic":
-            color = "green";
-            break;
-
-        case "Industry":
-            color = "orange";
-            break;
-
-        case "Government":
-            color = "gold";
-            break;
-
-        case "Weather":
-            color = "plum";
-            break;
-
-        case "Sentry":
-            color = "blue";
-            break;
-    }
+    string color = Model.DatasetCategory.Color;
 }
 
 <li class="ul-dataset-list-item borderSide_gray borderSide_@color boxShadowSm">
@@ -124,7 +98,7 @@
             @{
                 if (Model.IsSensitive.Equals(false) || Model.CanDwnldSenstive)
                 {
-                    <button type="button" class="btn btn-default btn-sm dataset-operation-button" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Download">
+                    <button type="button" class="btn btn-default btn-sm listItemButton" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Download">
                         <span class="glyphicon glyphicon-cloud-download text-primary"></span>
                     </button>
                 }
@@ -134,13 +108,13 @@
             @{
                 if (Model.IsPushToSASCompatible == true)
                 {
-                    <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="right" title="Push to SAS">
+                    <button type="button" class="btn btn-default btn-sm listItemButton" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="right" title="Push to SAS">
                         <img src="~/Images/sas_logo_min.png" class="img-responsive" />
                     </button>
                 }
                 else
                 {
-                    <button type="button" class="btn btn-default btn-sm dataset-pushto-button disabled" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="right" title="Not available for this file type" >
+                    <button type="button" class="btn btn-default btn-sm disabled listItemButton" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="right" title="Not available for this file type" >
                         <img src="~/Images/sas_logo_min.png" class="img-responsive" />
                     </button>
                 }
@@ -156,7 +130,7 @@
             <div class="rightFloat ownerDate">
                 <span class="@color textBold">Sentry Owner:&nbsp;</span>@Model.SentryOwnerName
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <span class="@color textBold">File Change Date:&nbsp;</span>@Model.ChangedDtm.ToShortDateString()
+                <span class="@color textBold">File Changed:&nbsp;</span>@Sentry.data.Web.Helpers.Utility.TimeDisplay(Model.ChangedDtm)
             </div>
         </div>
     </div>

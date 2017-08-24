@@ -12,7 +12,7 @@
     </div>
 }
 
-@foreach(Sentry.data.Core.DataFeedItem item in Model)
+@foreach (Sentry.data.Core.DataFeedItem item in Model)
 {
     <div class="feedItem">
         <img src="@item.Img" class="feedImg" />
@@ -28,7 +28,7 @@
         }
 
         <a href="@item.Url" target="_blank" class="pointer">Read More</a>
-        <p class="rightFloat">@item.PublishDate.ToShortDateString()</p>
+        <p class="rightFloat">@Sentry.data.Web.Helpers.Utility.TimeDisplay(item.PublishDate)</p>
     </div>
 }
 

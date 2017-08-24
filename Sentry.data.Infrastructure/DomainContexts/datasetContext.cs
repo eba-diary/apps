@@ -52,7 +52,7 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                return Query<Category>()/*.OrderBy(o => o.Name)*/.Cacheable(QueryCacheRegion.MediumTerm);
+                return Query<Category>().Cacheable(QueryCacheRegion.MediumTerm);
             }
 
         }
@@ -63,6 +63,16 @@ namespace Sentry.data.Infrastructure
             {
                 return Query<DatasetMetadata>().Cacheable(QueryCacheRegion.MediumTerm);
             }
+        }
+
+        public int GetDatasetCount()
+        {
+            return Query<Dataset>().Cacheable().Count();
+        }
+
+        public int GetCategoryDatasetCount(Category cat)
+        {
+            return Query<Dataset>().Cacheable().Where(w => w.DatasetCategory.Id == cat.Id).Count();
         }
 
         public int GetMaxId()

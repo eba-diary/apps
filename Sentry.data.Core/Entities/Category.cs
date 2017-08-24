@@ -12,10 +12,7 @@ namespace Sentry.data.Core
         private Category _parentCategory;
         private IList<Category> _subCategories = new List<Category>();
 
-        protected Category()
-        {
-
-        }
+        protected Category() { }
 
         public Category(string name, Category parentCategory = null)
         {

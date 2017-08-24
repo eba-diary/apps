@@ -419,11 +419,18 @@ div[id*="filterType_"]:hover
     width: 120px;
     line-height: 26px;
     text-align: center;
-    top: -18px;
-    right: -55px;
+    top: -21px;
+    right: -56px;
     font-size: 12px;
     font-weight: bold;
     font-family: Lato, Arial, sans-serif;
+}
+
+.listItemButton
+{
+    height: 35px;
+    width: 35px;
+    margin-left: 5px;
 }
 
 [class^="categoryBanner-"] {
@@ -548,6 +555,25 @@ div[id*="filterType_"]:hover
     vertical-align: top;
 }
 
+.listHeadGroup
+{
+    height: 40px;
+    display: inline-block;
+    margin-top: 15px;
+}
+
+.datasetImg
+{
+    width: 40px;
+    margin-right: 5px;
+}
+
+.datasetHeader
+{
+    margin: 0;
+    padding-left: 5px;
+}
+
 .dataset-detail-content-row {
     width: 100%;
     padding-top: 0px;
@@ -556,8 +582,172 @@ div[id*="filterType_"]:hover
     vertical-align: top;
 }
 
-.backToList { margin-bottom: 1em; }
+.backToList 
+{ 
+    display: block;
+    padding-top: 1em;
+    height: 30px;
+    margin-bottom: 1em;
+}
 
+.detailHeadGroup
+{
+    height: 35px;
+    margin-bottom: 1em;
+}
+
+.datasetDetailImg
+{
+    width: 35px;
+}
+
+.detailHeader
+{
+    padding-left: 8px;
+}
+
+.detailName
+{
+    margin: 0;
+    padding-left: 2.25em;
+    margin-top: 10px;
+}
+
+.relative { position: relative; }
+
+.category-type-wrap-detail {
+    display: inline-block;
+    /*position: relative;*/
+    overflow: hidden;
+    height: 80px;
+    width: 100%;
+}
+
+.no-overflow
+{
+    position: absolute;
+    width: 100%;
+}
+
+.category-type-detail {
+    transform: rotate(-45deg);
+    transform-origin: bottom;
+    position: relative;
+    height: 26px;
+    width: 120px;
+    line-height: 26px;
+    text-align: center;
+    top: 15px;
+    right: 18px;
+    font-size: 12px;
+    font-weight: bold;
+    font-family: Lato, Arial, sans-serif;
+}
+
+.lockIcon
+{
+    font-size: 15px;
+}
+
+.detailExt
+{
+    margin-left: 8px;
+    margin-top: 12px;
+    border: 1px solid black;
+}
+
+.dataset-operation-button
+{
+    font-size: 15px;
+    margin-right: 10px;
+}
+
+.dataset-operation-button:first-of-type
+{
+    margin-right: 2em;
+}
+
+.detailDesc
+{
+    padding: 1em;
+}
+
+.dataset-pushto-button
+{
+    margin: 1em;
+    height: 60px;
+    width: 215px;
+}
+
+.detailTable
+{
+    width: 65%;
+    margin: 1em;
+}
+
+.borderdk_gray  { border: 1px solid gray; }
+
+.borderdk_blue { border: 1px solid #003DA5; }
+
+.borderdk_orange { border: 1px solid #683431; }
+
+.borderdk_plum { border: 1px solid #72246C; }
+
+.borderdk_green { border: 1px solid #005844; }
+
+.borderdk_gold { border: 1px solid #74531C; }
+
+.borderdk_blueGray { border: 1px solid #285780; }
+
+.borderMeta_gray 
+{
+    border-top: 1px solid gray !important;
+    border-bottom: 1px solid gray !important;
+}
+
+.borderMeta_blue 
+{
+    border-top: 1px solid #003DA5 !important;
+    border-bottom: 1px solid #003DA5 !important;
+}
+
+.borderMeta_orange
+{
+    border-top: 1px solid #683431 !important;
+    border-bottom: 1px solid #683431 !important;
+}
+
+.borderMeta_plum
+{
+    border-top: 1px solid #72246C !important;
+    border-bottom: 1px solid #72246C !important;
+}
+
+.borderMeta_green
+{
+    border-top: 1px solid #005844 !important;
+    border-bottom: 1px solid #005844 !important;
+}
+
+.borderMeta_gold
+{
+    border-top: 1px solid #74531C !important;
+    border-bottom: 1px solid #74531C !important;
+}
+
+.borderMeta_blueGray
+{
+    border-top: 1px solid #285780 !important;
+    border-bottom: 1px solid #285780 !important;
+}
+
+.htCenter
+{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    height: inherit;
+}
 
 /* Dataset Management Screen... */
 /*.dataset-list {
@@ -762,13 +952,6 @@ div[id*="filterType_"]:hover
 /*#DatasetListSearch { clear: both; }*/
 .found { margin-top: 0; }
 
-.datasetImg
-{
-    height: 50px;
-    width: 50px;
-    margin: 0.5em 1em 2em 0;
-}
-
 .searchBoxDS
 {
     height: 45px;
@@ -784,11 +967,6 @@ div[id*="filterType_"]:hover
     height: inherit;
     width: 600px !important;
     float: left;
-}
-
-.detailHeader
-{
-    padding-top: 20px;
 }
 
 .extension
@@ -1111,12 +1289,6 @@ div[id*="filterType_"]:hover
 {
     border: 1.5px solid #EAAA00;
 	border-top: 6px solid #EAAA00;
-}
-
-.border_clcDkBlue
-{
-    border: 1.5px solid #003DA5;
-	border-top: 6px solid #003DA5;
 }
 
 .border_blueGray
