@@ -584,10 +584,10 @@ div[id*="filterType_"]:hover
 
 .backToList 
 { 
-    display: block;
+    display: inline-block;
     padding-top: 1em;
     height: 30px;
-    margin-bottom: 1em;
+    margin-bottom: 5px;
 }
 
 .detailHeadGroup
@@ -611,6 +611,25 @@ div[id*="filterType_"]:hover
     margin: 0;
     padding-left: 2.25em;
     margin-top: 10px;
+}
+
+.detailNameSml
+{
+    margin: 0;
+    padding: 10px;
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+.categoryBannerSml
+{
+    font-size: 12px;
+    font-weight: bold;
+    font-family: Lato, Arial, sans-serif;
+    width: auto;
+    display: inline-block;
+    margin-top: 1em;
+    padding: 5px 8px;
 }
 
 .relative { position: relative; }
@@ -649,6 +668,18 @@ div[id*="filterType_"]:hover
     font-size: 15px;
 }
 
+.lockIconSml
+{
+    font-size: 15px;
+    margin-top: 5px;
+    margin-left: 8px;
+}
+
+.iconExt
+{
+    margin-top: 7px;
+}
+
 .detailExt
 {
     margin-left: 8px;
@@ -656,20 +687,21 @@ div[id*="filterType_"]:hover
     border: 1px solid black;
 }
 
+.detailExtSml
+{
+    margin-left: 8px;
+    border: 1px solid black;
+}
+
 .dataset-operation-button
 {
     font-size: 15px;
-    margin-right: 10px;
-}
-
-.dataset-operation-button:first-of-type
-{
-    margin-right: 2em;
+    margin-left: 10px;
 }
 
 .detailDesc
 {
-    padding: 1em;
+    padding: 0.5em 1em;
 }
 
 .dataset-pushto-button
@@ -681,8 +713,15 @@ div[id*="filterType_"]:hover
 
 .detailTable
 {
-    width: 65%;
+    width: auto;
+    max-width: calc(100% - 2em);
+    min-width: 50%;
     margin: 1em;
+}
+
+.colOneMeta
+{
+    width: 150px;
 }
 
 .borderdk_gray  { border: 1px solid gray; }
@@ -1832,6 +1871,22 @@ body { background-color: #f8f8f8; }
         width: 20%; 
         height: 545px;
     }
+
+    .dataset-operation-button:first-of-type
+    {
+        margin-right: 2em;
+    }
+
+    .detailDesc
+    {
+        padding: 1em;
+    }
+
+    .backToList 
+    { 
+        margin-bottom: 10px;
+    }
+
 }
 
 @media (min-width: 1200px) /* lg and up */

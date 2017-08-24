@@ -7,19 +7,13 @@
 
 <div>
     <a href="@Url.Action("List", "Dataset")" class="backToList"><span class="glyphicon glyphicon-chevron-left"></span>Back to list</a>
+    <div class="categoryBanner-@color categoryBannerSml rightFloat hidden-md hidden-lg">@Model.DatasetCategory.Name</div>
 
-    @*<div class="detailHeadGroup">
-        <img src="~/Images/Icons/DatasetsBlue.svg" class="datasetDetailImg leftFloat" />
-        <h3 class="detailHeader htCenter">Dataset Details</h3>
-    </div>*@
-
-    <div class="relative">
+    <div class="relative hidden-sm hidden-xs">
         <div class="category-type-wrap-detail bg_gray BG_@color">
             <div class="category-type-detail categoryBanner-@color">
                 @Model.DatasetCategory.Name
             </div>
-
-            
 
             <div class="no-overflow">
                 <h1 class="detailName leftFloat @color">
@@ -32,25 +26,51 @@
                 </h1>
 
                 <div class="extension detailExt bg_gray htCenter ext_@Model.FileExtensionDisplay()">@Model.FileExtensionDisplay()</div>
-
+                
                 @if (Model.IsSensitive.Equals(false) || Model.CanDwnldSenstive)
-                {
-                    <button type="button" class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download">
-                        <span class="glyphicon glyphicon-cloud-download @color"></span>
-                    </button>
-                }
-
-                @if (Model.CanEditDataset)
                 {
                     <button type="button" class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color" id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit">
                         <span class="glyphicon glyphicon-edit @color"></span>
                     </button>
                 }
+
+                @if (Model.CanEditDataset)
+                {
+                    <button type="button" class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download">
+                        <span class="glyphicon glyphicon-cloud-download @color"></span>
+                    </button>
+                }
             </div>
         </div>
     </div>
+    
+    <div class="hidden-md hidden-lg">
+        <h1 class="detailNameSml leftFloat @color BG_@color text-center">@Model.DatasetName</h1>
 
-    <div class="detailDesc">
+        <div class="clearFloat leftFloat iconExt">
+            @if (Model.IsSensitive)
+            {
+                <div class="glyphicon glyphicon-lock lockIconSml leftFloat" data-toggle="tooltip" data-placement="top" title="Secure"></div>
+            }
+            <div class="extension detailExtSml bg_gray htCenter ext_@Model.FileExtensionDisplay()">@Model.FileExtensionDisplay()</div>
+        </div>
+
+        @if (Model.IsSensitive.Equals(false) || Model.CanDwnldSenstive)
+        {
+            <button type="button" class="btn btn-default btn dataset-operation-button borderdk_gray borderdk_@color rightFloat" id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit">
+                <span class="glyphicon glyphicon-edit @color"></span>
+            </button>
+        }
+
+        @if (Model.CanEditDataset)
+        {
+            <button type="button" class="btn btn-default btn dataset-operation-button borderdk_gray borderdk_@color rightFloat" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download">
+                <span class="glyphicon glyphicon-cloud-download @color"></span>
+            </button>
+        }
+    </div>
+
+    <div class="detailDesc clearFloat">
         @Model.DatasetDesc
     </div>
 
@@ -81,23 +101,23 @@
         <table class="table table-striped table-hover detailTable">
             <tbody>
                 <tr class="borderMeta_@color">
-                    <td class="borderMeta_@color">Sentry Owner</td>
+                    <td class="borderMeta_@color colOneMeta">Sentry Owner</td>
                     <td class="borderMeta_@color">@Model.SentryOwnerName</td>
                 </tr>
                 <tr>
-                    <td class="borderMeta_@color">Upload Date</td>
+                    <td class="borderMeta_@color colOneMeta">Upload Date</td>
                     <td class="borderMeta_@color">@Model.UploadDtm</td>
                 </tr>
                 <tr>
-                    <td class="borderMeta_@color">File Change Date</td>
+                    <td class="borderMeta_@color colOneMeta">File Change Date</td>
                     <td class="borderMeta_@color">@Model.ChangedDtm</td>
                 </tr>
                 <tr>
-                    <td class="borderMeta_@color">Category</td>
+                    <td class="borderMeta_@color colOneMeta">Category</td>
                     <td class="borderMeta_@color">@Model.DatasetCategory.Name</td>
                 </tr>
                 <tr>
-                    <td class="borderMeta_@color">S3 Key</td>
+                    <td class="borderMeta_@color colOneMeta">S3 Key</td>
                     <td class="borderMeta_@color">@Model.S3Key</td>
                 </tr>
             </tbody>
