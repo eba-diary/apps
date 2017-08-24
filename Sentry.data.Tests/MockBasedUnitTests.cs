@@ -72,6 +72,7 @@ namespace Sentry.data.Tests
                                           100,
                                           "S3 key",
                                           true,
+                                          null,
                                           null);
             List<Dataset> datasetsInList = new List<Dataset>();
             datasetsInList.Add(dataset);
