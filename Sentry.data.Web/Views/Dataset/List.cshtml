@@ -2,139 +2,69 @@
 
 @{
     ViewBag.Title = "Datasets";
-    string[] colors = new string[] { "blue", "green", "gold", "plum", "orange", "blueGray" };
 }
 
-<div class="col-sm-3 textCenter">
-    <div class="listHeadGroup">
-        <img src="~/Images/Icons/DatasetsBlue.svg" class="datasetImg leftFloat" />
-        <h1 class="htCenter datasetHeader">Datasets</h1>
-    </div>
-</div>
-
-@{
-    using (Html.BeginForm(@"List", "Dataset", FormMethod.Get, new { @class = "navbar-form navbar-center", @id = "DatasetListSearch" }))
+@*This would be to put the filters in a side menu that is off the page and would be used on smaller screens*@
+@*<div id="mySidenav" class="sidenav">
+    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+    @using (Html.BeginForm(@"List", "Dataset", FormMethod.Get, new { @class = "navbar-form navbar-center", @id = "DatasetListSearch" }))
     {
-        @*<div class="input-group dataset-search" id="DatasetListSearch">
-            <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
-            <input type="text" id="SearchKeywords" name="searchPhrase" class="form-control" placeholder="Enter dataset search term(s)" value="@{@Request.QueryString["searchPhrase"]}" />
-            <input type="hidden" id="SearchCategory" name="Category" class="form-control" value="@{@Request.QueryString["Category"]}" />
-            @Html.HiddenFor(model => model.SearchCategory)
-        </div>*@
+        @Html.Partial("_SearchFilters", Model)
+    }
+</div>*@
 
-        @*<div class="input-group">
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.SearchText, new { htmlAttributes = new { @class = "form-control " } })
-            </div>
-        </div>*@
+<!-- Use any element to open the sidenav -->
+@*<span onclick="openNav()">open</span>*@
 
-        <div class="col-sm-9">
-            <div class="searchBoxDS">
-                @Html.EditorFor(model => model.SearchText, new { htmlAttributes = new { @class = "form-control searchTextDS", @placeholder = "Search Datasets"} })
-                <button type="submit" class="btn btn-primary searchBtn"><span class="glyphicon glyphicon-search"></span></button>
-            </div>
+<div id="main">
+    <div class="col-md-3 textCenter">
+        <div class="listHeadGroup">
+            <img src="~/Images/Icons/DatasetsBlue.svg" class="datasetImg leftFloat" />
+            <h1 class="htCenter datasetHeader">Datasets</h1>
         </div>
+    </div>
 
-        @*<div class="input-group dataset-search" id="DatasetListSearch2">
-            <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
-            @Html.TextAreaFor(m => Model.SearchText, new { @class = "form-control", @placeholder = "Enter dataset search term(s)", @id = "SearchKeywords2" })
-            @Html.HiddenFor(model => model.SearchCategory)
-        </div>*@
-        @*<p> &nbsp; </p>*@
+    @{
+        using (Html.BeginForm(@"List", "Dataset", FormMethod.Get, new { @class = "navbar-form navbar-center", @id = "DatasetListSearch" }))
+        {
+            @*<div class="input-group dataset-search" id="DatasetListSearch">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
+                    <input type="text" id="SearchKeywords" name="searchPhrase" class="form-control" placeholder="Enter dataset search term(s)" value="@{@Request.QueryString["searchPhrase"]}" />
+                    <input type="hidden" id="SearchCategory" name="Category" class="form-control" value="@{@Request.QueryString["Category"]}" />
+                    @Html.HiddenFor(model => model.SearchCategory)
+                </div>*@
 
-        @* Left sidebar *@
-        @*<div class="row">*@
-            <div class="col-sm-3 clearFloat no-padding">
+            @*<div class="input-group">
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.SearchText, new { htmlAttributes = new { @class = "form-control " } })
+                    </div>
+                </div>*@
+
+            <div class="col-md-9 textCenter">
+                <div class="searchBoxDS">
+                    @Html.EditorFor(model => model.SearchText, new { htmlAttributes = new { @class = "form-control searchTextDS", @placeholder = "Search " + Model.DatasetList.Count() + " Datasets" } })
+                    <button type="submit" class="btn btn-primary searchBtn"><span class="glyphicon glyphicon-search"></span></button>
+                </div>
+            </div>
+
+            @*<div class="input-group dataset-search" id="DatasetListSearch2">
+                    <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
+                    @Html.TextAreaFor(m => Model.SearchText, new { @class = "form-control", @placeholder = "Enter dataset search term(s)", @id = "SearchKeywords2" })
+                    @Html.HiddenFor(model => model.SearchCategory)
+                </div>*@
+            @*<p> &nbsp; </p>*@
+
+            @* Left sidebar *@
+            @*<div class="row">*@
+            <div class="col-sm-3 clearFloat no-padding hidden-sm hidden-xs">
                 <div class="outsideFilters">
-                    @{
-                        int visibleNum = 6; //controls number of filter options are visible to start
-                        int i = 0, j = 0;
-
-                        foreach (var category in Model.SearchFilters)
-                        {
-                            string catName = category.FilterType.Split(' ').First();
-                            string color = colors[(i < 6) ? i : i % 6];
-
-                            <div class="panel panel-default dataset-list-filters boxShadow filterBorder_@color">
-                                <div class="panel-heading filterHead_@color filterHead white" id="filterType_@catName">@category.FilterType 
-                                    <span class="glyphicon glyphicon-chevron-up rightFloat filterViewIcon @color" id="icon_filterType_@catName"></span>
-                                </div>
-                                <div class="dataset-list-filter-category panel-body" id="hide_filterType_@catName">
-                                    <ul class="list-unstyled ul-filter-list">
-                                        @{
-                                            @*foreach (var filter in category.FilterNameList)
-                                            {
-                                                <li class="list-unstyled li-filter-disabled" id="li-filter-disabled_@filter.id">
-                                                    @Html.CheckBoxFor(m => m.SearchFilters[i].FilterNameList[j].isChecked, new { @id = @category.FilterType + "_" + @filter.id, @oncheckedchange = "" })
-                                                    @Html.HiddenFor(m => m.SearchFilters[i].FilterType)
-                                                    @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[j].id)
-                                                    @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[j].value)
-                                                    @Html.DisplayFor(m => m.SearchFilters[i].FilterNameList[j].value)
-                                                    ( @filter.count )
-                                                </li>
-
-                                                j++;
-                                            }
-                                            j = 0;
-                                            i++;*@
-
-                                            for(int t = 0; t < visibleNum; t++)
-                                            {
-                                                if (t < category.FilterNameList.Count)
-                                                {
-                                                    FilterNameModel filter = @category.FilterNameList[t];
-                                                    <li class="list-unstyled li-filter-disabled filterList" id="li-filter-disabled_@filter.id">
-                                                        @Html.CheckBoxFor(m => m.SearchFilters[i].FilterNameList[t].isChecked, new { @id = @category.FilterType + "_" + @filter.id, @oncheckedchange = "", @class = "filterChbx" })
-                                                        @Html.HiddenFor(m => m.SearchFilters[i].FilterType)
-                                                        @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].id)
-                                                        @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].value)
-                                                        @Html.DisplayFor(m => m.SearchFilters[i].FilterNameList[t].value)
-                                                        ( @filter.count )
-                                                    </li>
-                                                }
-                                            }
-
-                                            <li id="hidden_filterMore_@catName">
-                                                <ul class="notNested">
-                                                    @for (int t = visibleNum; t < category.FilterNameList.Count; t++)
-                                                    {
-                                                        FilterNameModel filter = @category.FilterNameList[t];
-                                                        <li class="list-unstyled li-filter-disabled filterList" id="li-filter-disabled_@filter.id">
-                                                            @Html.CheckBoxFor(m => m.SearchFilters[i].FilterNameList[t].isChecked, new { @id = @category.FilterType + "_" + @filter.id, @oncheckedchange = "", @class = "filterChbx" })
-                                                            @Html.HiddenFor(m => m.SearchFilters[i].FilterType)
-                                                            @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].id)
-                                                            @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].value)
-                                                            @Html.DisplayFor(m => m.SearchFilters[i].FilterNameList[t].value)
-                                                            ( @filter.count )
-                                                        </li>
-                                                    }
-                                                </ul>
-                                            </li>
-                                            i++;
-                                        }
-                                    </ul>
-
-                                    @if (visibleNum < category.FilterNameList.Count)
-                                    {
-                                        <a href="#" class="filterMore" id="filterMore_@catName">
-                                            <div class="glyphicon glyphicon-plus-sign inlineBlock moreIcon leftFloat" id="icon_filterMore_@catName"></div>
-                                            <div class="leftFloat txt_filterMore" id="txt_filterMore_@catName">Show More</div>
-                                        </a>
-                                    }
-
-                                    <div class="inlineBlock rightFloat">
-                                        <input type="submit" name="btn_@category.FilterType" class="button btn-sm btn-filter-apply BG_@color white hover_btn_@color" value="Apply" id="btnApply_@category.FilterType" hidden />
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    }
+                    @Html.Partial("_SearchFilters", Model)
                 </div>
             </div>
 
             @* Main Content *@
-            <div class="col-sm-9">
-                <div id="DatasetItemList" class="dataset-list">
+            <div class="col-md-9 textCenter">
+                <div id="DatasetItemList" class="dataset-list inlineBlock text-left">
                     <div class="browse-category">
                         <h4 class="found">
                             Found @Model.DatasetList.Count() Dataset(s)...
@@ -150,41 +80,42 @@
                     </ul>
                 </div>
             </div>
-        @*</div>*@
+            @*</div>*@
 
+        }
     }
-}
 
-@*PROGRESS BAR MODAL*@
-<div class="modal fade in" id="mod-progress" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                File Progress
-            </div>
-            <div class="modal-body">
-                <div class="text-center">
-                    <div class="i-circle warning"><i class="fa fa-info"></i></div>
-                    <div id="result" style="font-size: 1.1em; padding-bottom: 5px">
-                        <p id="progressBarParagraph"></p>
-                        <p id="progressBarPercentage"></p>
-                    </div>
-                    <div style="width: 30%; margin: 0 auto; display:none;">
-                        <div id="progressbar" style="width: 300px; height: 15px"></div>
+    @*PROGRESS BAR MODAL*@
+    <div class="modal fade in" id="mod-progress" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    File Progress
+                </div>
+                <div class="modal-body">
+                    <div class="text-center">
+                        <div class="i-circle warning"><i class="fa fa-info"></i></div>
+                        <div id="result" style="font-size: 1.1em; padding-bottom: 5px">
+                            <p id="progressBarParagraph"></p>
+                            <p id="progressBarPercentage"></p>
+                        </div>
+                        <div style="width: 30%; margin: 0 auto; display:none;">
+                            <div id="progressbar" style="width: 300px; height: 15px"></div>
+                            <br />
+                        </div>
+                        <div id="ProgressStripe" class="progress progress-striped active" style="position:relative; top:10px; width:100%;">
+                            <div id="ProgressMessage" class="progress-bar progress-bar-info" style="width: 100%; border:none;"></div>
+                        </div>
                         <br />
                     </div>
-                    <div id="ProgressStripe" class="progress progress-striped active" style="position:relative; top:10px; width:100%;">
-                        <div id="ProgressMessage" class="progress-bar progress-bar-info" style="width: 100%; border:none;"></div>
-                    </div>
-                    <br />
                 </div>
             </div>
+            <!-- /.modal-content -->
         </div>
-        <!-- /.modal-content -->
+        <!-- /.modal-dialog -->
     </div>
-    <!-- /.modal-dialog -->
+    <!-- /.modal -->
 </div>
-<!-- /.modal -->
 
 @section Scripts {
     <script>
@@ -196,8 +127,21 @@
                 $btn.attr('hidden', 'hidden')
 
             });
-
+            
+           
         });
 
+        //JS for using the navbar that is off the window
+        ///* Set the width of the side navigation to 250px and the left margin of the page content to 250px */
+        //function openNav() {
+        //    document.getElementById("mySidenav").style.width = "250px";
+        //    document.getElementById("main").style.marginLeft = "250px";
+        //}
+
+        ///* Set the width of the side navigation to 0 and the left margin of the page content to 0 */
+        //function closeNav() {
+        //    document.getElementById("mySidenav").style.width = "0";
+        //    document.getElementById("main").style.marginLeft = "0";
+        //}
     </script>
 }

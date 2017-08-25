@@ -1,0 +1,87 @@
+﻿@model ListDatasetModel
+
+@{
+    string[] colors = new string[] { "blue", "green", "gold", "plum", "orange", "blueGray" };
+    int visibleNum = 6; //controls number of filter options are visible to start
+    int i = 0, j = 0;
+
+    foreach (var category in Model.SearchFilters)
+    {
+        string catName = category.FilterType.Split(' ').First();
+        string color = colors[(i < 6) ? i : i % 6];
+
+        <div class="panel panel-default dataset-list-filters boxShadow filterBorder_@color">
+            <div class="panel-heading filterHead_@color filterHead white" id="filterType_@catName">
+                @category.FilterType
+                <span class="glyphicon glyphicon-chevron-up rightFloat filterViewIcon @color" id="icon_filterType_@catName"></span>
+            </div>
+            <div class="dataset-list-filter-category panel-body" id="hide_filterType_@catName">
+                <ul class="list-unstyled ul-filter-list">
+                    @{
+                        @*foreach (var filter in category.FilterNameList)
+                            {
+                                <li class="list-unstyled li-filter-disabled" id="li-filter-disabled_@filter.id">
+                                    @Html.CheckBoxFor(m => m.SearchFilters[i].FilterNameList[j].isChecked, new { @id = @category.FilterType + "_" + @filter.id, @oncheckedchange = "" })
+                                    @Html.HiddenFor(m => m.SearchFilters[i].FilterType)
+                                    @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[j].id)
+                                    @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[j].value)
+                                    @Html.DisplayFor(m => m.SearchFilters[i].FilterNameList[j].value)
+                                    ( @filter.count )
+                                </li>
+
+                                j++;
+                            }
+                            j = 0;
+                            i++;*@
+
+                    for (int t = 0; t < visibleNum; t++)
+                    {
+                        if (t < category.FilterNameList.Count)
+                        {
+                            FilterNameModel filter = @category.FilterNameList[t];
+                            <li class="list-unstyled li-filter-disabled filterList" id="li-filter-disabled_@filter.id">
+                                @Html.CheckBoxFor(m => m.SearchFilters[i].FilterNameList[t].isChecked, new { @id = @category.FilterType + "_" + @filter.id, @oncheckedchange = "", @class = "filterChbx" })
+                                @Html.HiddenFor(m => m.SearchFilters[i].FilterType)
+                                @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].id)
+                                @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].value)
+                                @Html.DisplayFor(m => m.SearchFilters[i].FilterNameList[t].value)
+                                ( @filter.count )
+                            </li>
+                        }
+                    }
+
+                    <li id="hidden_filterMore_@catName">
+                        <ul class="notNested">
+                            @for (int t = visibleNum; t < category.FilterNameList.Count; t++)
+                            {
+                                FilterNameModel filter = @category.FilterNameList[t];
+                                <li class="list-unstyled li-filter-disabled filterList" id="li-filter-disabled_@filter.id">
+                                    @Html.CheckBoxFor(m => m.SearchFilters[i].FilterNameList[t].isChecked, new { @id = @category.FilterType + "_" + @filter.id, @oncheckedchange = "", @class = "filterChbx" })
+                                    @Html.HiddenFor(m => m.SearchFilters[i].FilterType)
+                                    @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].id)
+                                    @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].value)
+                                    @Html.DisplayFor(m => m.SearchFilters[i].FilterNameList[t].value)
+                                    ( @filter.count )
+                                </li>
+                            }
+                        </ul>
+                    </li>
+                        i++;
+                    }
+                </ul>
+
+                @if (visibleNum < category.FilterNameList.Count)
+                {
+                    <a href="#" class="filterMore" id="filterMore_@catName">
+                        <div class="glyphicon glyphicon-plus-sign inlineBlock moreIcon leftFloat" id="icon_filterMore_@catName"></div>
+                        <div class="leftFloat txt_filterMore" id="txt_filterMore_@catName">Show More</div>
+                    </a>
+                }
+
+                <div class="inlineBlock rightFloat">
+                    <input type="submit" name="btn_@category.FilterType" class="button btn-sm btn-filter-apply BG_@color white hover_btn_@color" value="Apply" id="btnApply_@category.FilterType" hidden />
+                </div>
+            </div>
+        </div>
+                        }
+}
