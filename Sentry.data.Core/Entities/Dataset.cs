@@ -34,6 +34,7 @@ namespace Sentry.data.Core
         private long _recordCount;
         private string _s3key;
         private Boolean _IsSensitive;
+        private Boolean _canDisplay;
         IList<DatasetMetadata> _rawMetadata;
         private Category _datasetCategory;
         //private IDictionary<string, string> _columns;
@@ -63,6 +64,7 @@ namespace Sentry.data.Core
                        long recordCount,
                        string s3key,
                        Boolean IsSensitive,
+                       Boolean CanDisplay,
                        IList<DatasetMetadata> rawMetadata,
                        Category cat)
         {
@@ -86,6 +88,7 @@ namespace Sentry.data.Core
             this._recordCount = recordCount;
             this._s3key = s3key;
             this._IsSensitive = IsSensitive;
+            this._canDisplay = CanDisplay;
             this._rawMetadata = rawMetadata;
             this._datasetCategory = cat;
         }
@@ -326,6 +329,18 @@ namespace Sentry.data.Core
             set
             {
                 _recordCount = value;
+            }
+        }
+
+        public virtual Boolean CanDisplay
+        {
+            get
+            {
+                return _canDisplay;
+            }
+            set
+            {
+                _canDisplay = value;
             }
         }
 

@@ -35,6 +35,7 @@ namespace Sentry.data.Web
             this.RecordCount = ds.RecordCount;
             this.S3Key = ds.S3Key;
             this.IsSensitive = ds.IsSensitive;
+            this.CanDisplay = ds.CanDisplay;
             this.RawMetadata = new List<_DatasetMetadataModel>();
             foreach (DatasetMetadata dsm in ds.RawMetadata)
             {
@@ -137,6 +138,8 @@ namespace Sentry.data.Web
 
         [DisplayName("Sensitive")]
         public Boolean IsSensitive { get; set; }
+
+        public Boolean CanDisplay { get; set; }
 
         public IList<_DatasetMetadataModel> RawMetadata { get; set; }
 

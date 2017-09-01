@@ -38,6 +38,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.RecordCount, (m) => m.Column("Row_CNT"));
             this.Property((x) => x.S3Key, (m) => m.Column("S3_KEY"));
             this.Property((x) => x.IsSensitive, (m) => m.Column("IsSensitive_IND"));
+            this.Property((x) => x.CanDisplay, (m) => m.Column("Display_IND"));
 
             this.ManyToOne(x => x.DatasetCategory, m =>
             {

@@ -30,7 +30,7 @@ namespace Sentry.data.Web
             this.UploadDtm = DateTime.MinValue;
             this.UploadUserName = "";
             this.IsSensitive = false;
-
+            this.CanDisplay = true;
         }
 
         //public UploadDatasetModel(Dataset ds, IList<String> catList) : base(ds)

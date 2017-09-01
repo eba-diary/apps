@@ -142,6 +142,7 @@ namespace Sentry.data.Core.Tests
                                             9999,
                                             "Claim/S3/Key",
                                             true,
+                                            true,
                                             null,
                                             null);
             return dataset1;

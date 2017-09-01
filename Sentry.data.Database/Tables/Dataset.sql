@@ -16,6 +16,7 @@
 	[S3_KEY] [varchar](1024) NOT NULL,
     [IsSensitive_IND] BIT NOT NULL, 
     [Category_ID] INT NOT NULL, 
+    [Display_IND] BIT NOT NULL, 
     PRIMARY KEY CLUSTERED 
 (
 	[Dataset_ID] ASC

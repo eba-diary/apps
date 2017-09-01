@@ -13,6 +13,7 @@ namespace Sentry.data.Core
         Monthly = 3,
         Weekly = 4,
         Daily = 5,
-        NonSchedule = 6
+        Transactional = 6,
+        NonSchedule = 7
     }
 }

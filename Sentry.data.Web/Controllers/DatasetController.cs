@@ -336,7 +336,6 @@ namespace Sentry.data.Web.Controllers
 
             int i = 0;
 
-            //foreach (string category in baseDsList.Select(x => x.Category).Distinct().ToList())
             foreach (string category in _datasetContext.Categories.Select(x => x.Name).ToList())
             {
                 FilterNameModel nf = new FilterNameModel();
@@ -380,8 +379,7 @@ namespace Sentry.data.Web.Controllers
 
             i = 0;
 
-            //foreach (string category in baseDsList.Select(x => x.Category).Distinct().ToList())
-            foreach (string category in _datasetContext.Datasets.Select(x => x.SentryOwnerName).Distinct().ToList())
+            foreach (string category in _datasetContext.GetSentryOwnerList().ToList())
             {
                 FilterNameModel nf = new FilterNameModel();
                 nf.id = i;
@@ -690,6 +688,7 @@ namespace Sentry.data.Web.Controllers
                         udm.RecordCount,
                         s3key, /*Caden a change here for the Category reference*/
                         udm.IsSensitive,
+                        udm.CanDisplay,
                         null,
                         category /*Caden a change here for the Category reference*/);
 

@@ -29,7 +29,7 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                IQueryable<Dataset> qResult = Query<Dataset>().Cacheable(QueryCacheRegion.MediumTerm);
+                IQueryable<Dataset> qResult = Query<Dataset>().Where(x => x.CanDisplay).Cacheable(QueryCacheRegion.MediumTerm);
                 //if (qResult != null && qResult.Count() > 0)
                 //{
                 //    foreach (Dataset qRow in qResult)
@@ -67,12 +67,12 @@ namespace Sentry.data.Infrastructure
 
         public int GetDatasetCount()
         {
-            return Query<Dataset>().Cacheable().Count();
+            return Query<Dataset>().Where(x => x.CanDisplay).Cacheable().Count();
         }
 
         public int GetCategoryDatasetCount(Category cat)
         {
-            return Query<Dataset>().Cacheable().Where(w => w.DatasetCategory.Id == cat.Id).Count();
+            return Query<Dataset>().Cacheable().Where(w => w.DatasetCategory.Id == cat.Id && w.CanDisplay).Count();
         }
 
         public int GetMaxId()
@@ -83,7 +83,7 @@ namespace Sentry.data.Infrastructure
 
         public Dataset GetById(int id)
         {
-            Dataset ds = Query<Dataset>().Where((x) => x.DatasetId == id).FirstOrDefault();
+            Dataset ds = Query<Dataset>().Where((x) => x.DatasetId == id && x.CanDisplay).FirstOrDefault();
             return ds;
         }
 
@@ -106,7 +106,7 @@ namespace Sentry.data.Infrastructure
 
         public IEnumerable<String> GetSentryOwnerList()
         {
-            IEnumerable<string> list = Query<Dataset>().Select((x) => x.SentryOwnerName).Distinct().AsEnumerable();
+            IEnumerable<string> list = Query<Dataset>().Where(x => x.CanDisplay).Select((x) => x.SentryOwnerName).Distinct().AsEnumerable();
             return list;
         }
 
