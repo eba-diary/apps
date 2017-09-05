@@ -1,9 +1,23 @@
 ﻿@model Sentry.data.Web.PushToDatasetModel
 @{
 
-        @Html.AntiForgeryToken()
+    @Html.AntiForgeryToken()
+
+    @*Show the custom validation summary*@
+    @Html.DisplayFor((model) => ViewData.ModelState)
+
         <div class="form-horizontal">
-            <fieldset>
+            <fieldset>                
+                <div class="form-group">
+                    <div class="col-sm-12">
+                        <p>The following <a href="https://support.sas.com/documentation/cdl/en/lrcon/69852/HTML/default/viewer.htm#p18cdcs4v5wd2dn1q0x296d3qek6.htm" target="_blank">SAS naming conventions</a> are applied to all file names to ensure proper retrieval within SAS tools:</p>
+                        <ul style="list-style-type:square">
+                            <li>Replace all characters, except digits and upper\lower case letters, with an underscore</li>
+                            <li>Prefix with an underscore</li>
+                            <li>Retain first 32 characters</li>
+                        </ul>
+                    </div>
+                </div>
                 <div class="form-group">
                     @Html.LabelFor(model => model.DatasetFileName, new { @class = "control-label col-sm-4"})
                     <div class="col-sm-8">
@@ -15,6 +29,7 @@
                     @Html.LabelFor(model => model.FileNameOverride, new { @class = "control-label col-sm-4" })
                     <div class="col-sm-8">
                         @Html.EditorFor(model => model.FileNameOverride, new { htmlAttributes = new { @class = "form-control" } })
+                        @Html.ValidationMessageFor((model) => model.FileNameOverride, "", new { @class = "text-danger" })
                         @*Add Validation*@
                     </div>
                 </div>

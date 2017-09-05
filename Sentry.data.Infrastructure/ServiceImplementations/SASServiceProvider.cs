@@ -117,6 +117,9 @@ namespace Sentry.data.Infrastructure
             //Prefix the file name with an underscore
             fn = "_" + fn;
 
+            //Substring to 32 characters if over
+            fn = fn.Substring(0, 32);
+
             fn = fn + Path.GetExtension(filename);
 
             return fn;
