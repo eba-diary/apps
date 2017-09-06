@@ -616,7 +616,7 @@ namespace Sentry.data.Web.Controllers
             try
             {
 
-                if (_datasetContext.Datasets.Any(m => m.DatasetName == udm.DatasetName))
+                if (_datasetContext.isDatasetNameDuplicate(udm.DatasetName))
                 {
                     throw new ValidationException("Dataset name already exists");
                 }
@@ -636,10 +636,6 @@ namespace Sentry.data.Web.Controllers
                 if (_datasetContext.s3KeyDuplicate(s3key))
                 {
                     throw new ValidationException("File already exsits on S3");
-                }
-                if (_datasetContext.Datasets.Any(m => m.DatasetName == udm.DatasetName))
-                {
-                    throw new ValidationException("Dataset name already exsists");
                 }
 
                 Sentry.Common.Logging.Logger.Debug("Entered HttpPost <Upload>");

@@ -30,6 +30,8 @@ namespace Sentry.data.Core
         void DeleteAllData();
 
         Boolean s3KeyDuplicate(string s3key);
+
+        Boolean isDatasetNameDuplicate(string name);
         //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
     }
 

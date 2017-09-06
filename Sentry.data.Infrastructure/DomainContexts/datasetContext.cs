@@ -98,6 +98,18 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public Boolean isDatasetNameDuplicate(string name)
+        {
+            if (Query<Dataset>().Where(x => x.DatasetName == name).Count() == 0)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
         public IEnumerable<String> GetCategoryList()
         {
             return Query<Dataset>().Select(s => s.Category).Distinct().AsEnumerable();
