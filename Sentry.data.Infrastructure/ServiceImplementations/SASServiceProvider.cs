@@ -115,7 +115,9 @@ namespace Sentry.data.Infrastructure
             fn = Regex.Replace(fn, @"[^0-9a-zA-Z]+", "_");
 
             //Prefix the file name with an underscore
-            fn = "_" + fn;
+            if (!(Regex.IsMatch(fn, @"^([A-Za-z]|_)"))){
+                fn = "_" + fn;
+            }            
 
             //Substring to 32 characters if over
             if (fn.Length > 32)
