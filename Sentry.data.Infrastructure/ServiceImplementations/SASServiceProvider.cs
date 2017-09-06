@@ -118,7 +118,10 @@ namespace Sentry.data.Infrastructure
             fn = "_" + fn;
 
             //Substring to 32 characters if over
-            fn = fn.Substring(0, 32);
+            if (fn.Length > 32)
+            {
+                fn = fn.Substring(0, 32);
+            }
 
             fn = fn + Path.GetExtension(filename);
 
