@@ -97,7 +97,7 @@ namespace Sentry.data.Infrastructure
             url.Append(Uri.EscapeUriString("&CATEGORY="));
             url.Append(Uri.EscapeUriString(category));
 
-            Sentry.Common.Logging.Logger.Debug($"URL: {url.ToString()}");
+            Sentry.Common.Logging.Logger.Info($"URL: {url.ToString()}");
             return url;
         }
 
