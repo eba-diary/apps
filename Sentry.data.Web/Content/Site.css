@@ -1070,6 +1070,7 @@ div[id*="filterType_"]:hover
 .ext_pdf { background-color: red;}
 .ext_sas7bdat { background-color: #285780;}
 .ext_prn { background-color: #72246C; }
+.ext_json {background-color: #74531C;}
 
 .borderSide_gray 
 {

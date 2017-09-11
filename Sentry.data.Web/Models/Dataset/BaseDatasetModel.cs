@@ -58,7 +58,7 @@ namespace Sentry.data.Web
             else
                 { this.IsPushToSASCompatible = false; }
 
-            if (ds.FileExtension == ".csv" || ds.FileExtension == ".txt")
+            if (ds.FileExtension == ".csv" || ds.FileExtension == ".txt" || ds.FileExtension == ".json")
             { this.IsPreviewCompatible = true; }
             else
             { this.IsPreviewCompatible = false; }
