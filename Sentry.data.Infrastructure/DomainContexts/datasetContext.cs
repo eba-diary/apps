@@ -133,6 +133,19 @@ namespace Sentry.data.Infrastructure
             return values;
         }
 
+        public string GetPreviewKey(int id)
+        {
+            string key = Query<Dataset>().Where(x => x.DatasetId == id).Select(s => s.S3Key).FirstOrDefault();
+            if (String.IsNullOrEmpty(Configuration.Config.GetSetting("S3LiveDataPrefix")))
+            {
+                return Configuration.Config.GetSetting("S3PreviewPrefix") + key;
+            }
+            else
+            {
+                return key.Replace(Configuration.Config.GetSetting("S3LiveDataPrefix"), Configuration.Config.GetSetting("S3PreviewPrefix"));
+            }
+        }
+
         //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
     }
 }

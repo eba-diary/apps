@@ -32,6 +32,8 @@ namespace Sentry.data.Core
         Boolean s3KeyDuplicate(string s3key);
 
         Boolean isDatasetNameDuplicate(string name);
+
+        string GetPreviewKey(int id);
         //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
     }
 

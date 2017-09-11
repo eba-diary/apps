@@ -1297,6 +1297,18 @@ namespace Sentry.data.Web.Controllers
 
         }
 
+        [HttpGet()]
+        public PartialViewResult PreviewData(int id)
+        {
+            PreviewDataModel model = new PreviewDataModel();
+
+            Dataset dataset = _datasetContext.GetById<Dataset>(id);
+            string previewKey = _datasetContext.GetPreviewKey(id);
+            model.PreviewData = _s3Service.GetObjectPreview(previewKey);
+
+            return PartialView("_PreviewData", model);
+        }
+
 
         //[HttpGet()]
         //public void GetWeatherData(string zip)

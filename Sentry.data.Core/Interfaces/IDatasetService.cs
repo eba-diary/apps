@@ -16,6 +16,8 @@ namespace Sentry.data.Core
 
         void UploadDataset(string sourceFilePath, Dataset ds);
 
+        string GetObjectPreview(string key);
+
         void DeleteDataset(string uniqueKey);
 
         void TransferUtlityUploadStream(string category, string filename, Stream stream);

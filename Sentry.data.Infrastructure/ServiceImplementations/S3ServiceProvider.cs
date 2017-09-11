@@ -94,6 +94,32 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public string GetObjectPreview(string key)
+        {
+            string contents = null;
+
+            GetObjectRequest getReq = new GetObjectRequest();
+            getReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+            getReq.Key = key;
+
+            GetObjectResponse getRsp = S3Client.GetObject(getReq);
+            if (getRsp.HttpStatusCode != System.Net.HttpStatusCode.OK)
+            {
+                throw new Exception("Error attempting to perform get object on S3: " + getRsp.HttpStatusCode);
+            }
+
+            using (Stream stream = getRsp.ResponseStream)
+            {
+                long length = stream.Length;
+                byte[] bytes = new byte[length];
+                stream.Read(bytes,0,(int)length);
+                contents = Encoding.UTF8.GetString(bytes);
+            }
+
+            return contents;
+
+        }
+
         public void TransferUtlityUploadStream(string folder, string fileName, Stream stream)
         {
             Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");

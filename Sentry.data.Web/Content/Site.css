@@ -1984,3 +1984,16 @@ body { background-color: #f8f8f8; }
     #285780 - dark blue-gray
     #89ABE3 - blue-gray
 */
+
+/********************
+    Preview Datasets
+******************/
+.dataset_pre {
+    height: auto;
+    max-height: 400px;
+    overflow: auto;
+    background-color: #eeeeee;
+    word-break: normal !important;
+    word-wrap: normal !important;
+    white-space: pre !important;
+}

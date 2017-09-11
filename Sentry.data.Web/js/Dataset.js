@@ -94,6 +94,11 @@ data.Dataset = {
             $btn.removeAttr('hidden');
         });
 
+        $("[id^='PreviewData']").off('click').on('click', function (e) {
+            e.preventDefault();
+            data.Dataset.PreviewDataModal($(this).data("id"));
+        });
+
 
         //$(function () {
         //    var $btn = $("[id^=btnApply_]");
@@ -183,6 +188,11 @@ data.Dataset = {
             data.Dataset.FileNameModal($(this).data("id"));
         });
 
+        $("[id^='PreviewData']").off('click').on('click', function (e) {
+            e.preventDefault();
+            data.Dataset.PreviewDataModal($(this).data("id"));
+        });
+
         //$(document).on('show.bs.modal', '.modal', function (event) {
         //    var zIndex = 1040 + (10 * $('.modal:visible').length);
         //    $(this).css('z-index', zIndex);
@@ -255,6 +265,14 @@ data.Dataset = {
         });
         
         //$("#OwnerID").val($("SentryOwnerName").val);
+    },
+
+    PreviewInit: function () {
+        $("[id^='CopyToClipboard']").off('click').on('click', function (e) {
+            alert('Entered CopyToClipboard button event');
+            e.preventDefault();
+            data.Dataset.CopyToClipboard("PreviewText");
+        });
     },
 
     //ViewDetails: function (id) {
@@ -445,6 +463,15 @@ data.Dataset = {
         });
     },
 
+    PreviewDataModal: function (id) {
+
+        var modal = Sentry.ShowModalWithSpinner("Preview Data");
+
+        $.get("/Dataset/PreviewData/" + id, function (result){
+            modal.ReplaceModalBody(result);
+        })
+    },
+
     GenWeather: function () {
         //(function ($) {
             $.ajax({
@@ -466,6 +493,23 @@ data.Dataset = {
         //    var jrUrl = result;
         //    window.open(jrUrl, "_blank");
         //});
+    },
+
+    CopyToClipboard: function (containerid) {
+        if (document.selection) {
+            var range = document.body.createTextRange();
+            range.moveToElementText(document.getElementById(containerid));
+            range.select().createTextRange();
+            document.execCommand("Copy");
+            alert("Text Copied to Clipboard");
+
+        } else if (window.getSelection) {
+            var range = document.createRange();
+            range.selectNode(document.getElementById(containerid));
+            window.getSelection().addRange(range);
+            document.execCommand("Copy");
+            alert("Text Copied to Clipboard");
+        }
     }
 
 };

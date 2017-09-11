@@ -40,6 +40,13 @@
                         <span class="glyphicon glyphicon-cloud-download @color"></span>
                     </button>
                 }
+
+                @if (Model.IsPreviewCompatible)
+                {
+                    <button type="button" class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color" id="PreviewData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Preview Dataset">
+                        <span class="glyphicon glyphicon-search @color"></span>
+                    </button>
+                }
             </div>
         </div>
     </div>
@@ -68,6 +75,14 @@
                 <span class="glyphicon glyphicon-cloud-download @color"></span>
             </button>
         }
+
+        @if (Model.IsPreviewCompatible)
+        {
+            <button type="button" class="btn btn-default dataset-operation-button borderdk_gray borderdk_@color rightFloat" id="PreviewData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Preview Dataset">
+                <span class="glyphicon glyphicon-search @color"></span>
+            </button>
+        }
+
     </div>
 
     <div class="detailDesc clearFloat">

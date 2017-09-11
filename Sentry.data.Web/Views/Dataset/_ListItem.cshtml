@@ -121,6 +121,21 @@
 
             }
 
+            @{
+                if (Model.IsPreviewCompatible == true)
+                {
+                    <button type="button" class="btn btn-default btn-sm listItemButton" id="PreviewData" data-id="@Model.DatasetId">
+                        <span class="glyphicon glyphicon-search text-primary"></span>
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-default btn-sm disabled listItemButton" id="PreviewData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="right" title="Not available for this file type">
+                        <span class="glyphicon glyphicon-search text-primary"></span>
+                    </button>
+                }
+
+            }
             @*@{
                 <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to Tableau" disabled>
                     <img src="~/Images/tableau-icon_min.png" class="img-responsive" />

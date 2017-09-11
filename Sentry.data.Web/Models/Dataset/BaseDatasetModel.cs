@@ -58,6 +58,11 @@ namespace Sentry.data.Web
             else
                 { this.IsPushToSASCompatible = false; }
 
+            if (ds.FileExtension == ".csv" || ds.FileExtension == ".txt")
+            { this.IsPreviewCompatible = true; }
+            else
+            { this.IsPreviewCompatible = false; }
+
             this.IsPushToTableauCompatible = false;
             DatasetCategory = ds.DatasetCategory; /*Caden a change here for the Category reference*/
         }
@@ -173,6 +178,9 @@ namespace Sentry.data.Web
         public Boolean IsPushToSASCompatible { get; set; }
 
         public Boolean IsPushToTableauCompatible { get; set; }
+
+        public Boolean IsPreviewCompatible { get; set; }
+
         public Category DatasetCategory { get; set; } /* Caden made a change here for the Category reference */ 
         //public IList<String> CategoryList { get; set; }
 
