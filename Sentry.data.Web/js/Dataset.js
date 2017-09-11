@@ -269,7 +269,6 @@ data.Dataset = {
 
     PreviewInit: function () {
         $("[id^='CopyToClipboard']").off('click').on('click', function (e) {
-            alert('Entered CopyToClipboard button event');
             e.preventDefault();
             data.Dataset.CopyToClipboard("PreviewText");
         });
