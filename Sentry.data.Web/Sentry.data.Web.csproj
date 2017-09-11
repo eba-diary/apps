@@ -327,7 +327,7 @@
     <Compile Include="Models\User\UserModel.cs" />
     <Compile Include="Models\User\UserSwitchModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <None Include="Views\Dataset\_PreviewData.cshtml" />
+    <Content Include="Views\Dataset\_PreviewData.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap-datepicker.css" />
