@@ -108,13 +108,13 @@
             @{
                 if (Model.IsPushToSASCompatible == true)
                 {
-                    <button type="button" class="btn btn-default btn-sm listItemButton" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="right" title="Push to SAS">
+                    <button type="button" class="btn btn-default btn-sm listItemButton" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to SAS">
                         <img src="~/Images/sas_logo_min.png" class="img-responsive" />
                     </button>
                 }
                 else
                 {
-                    <button type="button" class="btn btn-default btn-sm disabled listItemButton" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="right" title="Not available for this file type" >
+                    <button type="button" class="btn btn-default btn-sm disabled listItemButton" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Not available for this file type" >
                         <img src="~/Images/sas_logo_min.png" class="img-responsive" />
                     </button>
                 }
@@ -124,13 +124,13 @@
             @{
                 if (Model.IsPreviewCompatible == true)
                 {
-                    <button type="button" class="btn btn-default btn-sm listItemButton" id="PreviewData" data-id="@Model.DatasetId">
+                    <button type="button" class="btn btn-default btn-sm listItemButton" id="PreviewData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Preview Dataset">
                         <span class="glyphicon glyphicon-search text-primary"></span>
                     </button>
                 }
                 else
                 {
-                    <button type="button" class="btn btn-default btn-sm disabled listItemButton" id="PreviewData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="right" title="Not available for this file type">
+                    <button type="button" class="btn btn-default btn-sm disabled listItemButton" id="PreviewData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Not available for this file type">
                         <span class="glyphicon glyphicon-search text-primary"></span>
                     </button>
                 }
