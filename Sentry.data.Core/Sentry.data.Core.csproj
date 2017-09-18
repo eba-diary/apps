@@ -104,7 +104,6 @@
     <Compile Include="Interfaces\IDataAssetProvider.cs" />
     <Compile Include="Interfaces\IDatasetContext.cs" />
     <Compile Include="Interfaces\IDataFeedContext.cs" />
-    <Compile Include="Interfaces\IDatasetRequestContext.cs" />
     <Compile Include="Interfaces\IEmailService.cs" />
     <Compile Include="Interfaces\IExtendedUserInfo.cs" />
     <Compile Include="Interfaces\IExtendedUserInfoProvider.cs" />
