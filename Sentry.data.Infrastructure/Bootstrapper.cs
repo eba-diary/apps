@@ -82,6 +82,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IAssetDynamicDetailsProvider>().Use(() => new AssetDynamicDetailsProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IDataAssetProvider>().Use(() => new DataAssetProvider(_defaultSessionFactory.OpenSession()));
             registry.For<IODCFileProvider>().Use(() => new ODCFileProvider(_defaultSessionFactory.OpenSession()));
+            registry.For<IRequestContext>().Use(() => new requestContext(_defaultSessionFactory.OpenSession()));
 
             //Register other services
             Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider obsidianUserProvider = new Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider();
@@ -90,6 +91,8 @@ namespace Sentry.data.Infrastructure
             registry.For<IAssociateInfoProvider>().Singleton().Use<AssociateInfoProvider>();
             registry.For<IExtendedUserInfoProvider>().Singleton().Use<ExtendedUserInfoProvider>();
             registry.For<ISASService>().Singleton().Use<SASServiceProvider>();
+            registry.For<IWeatherDataProvider>().Singleton().Use<WeatherDataProvider>();
+            registry.For<IFtpProvider>().Singleton().Use<FTPProvider>();
 
             //Create the StructureMap container
             _container = new StructureMap.Container(registry);

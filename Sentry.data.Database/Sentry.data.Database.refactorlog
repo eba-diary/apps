@@ -175,4 +175,53 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Color" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="5ba77b94-c8e5-4ace-a0e7-f671930abc0a" ChangeDateTime="08/16/2017 20:48:11">
+    <Property Name="ElementName" Value="[dbo].[FK_RT_APIParameters_RT_Source_Type]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[RT_APIParameters]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_RT_APIParameter_RT_Source_Type]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="894e7d79-931b-446a-adc8-fd345e20784e" ChangeDateTime="08/21/2017 15:40:12">
+    <Property Name="ElementName" Value="[dbo].[RT_Request].[Type]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[RT_Request]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Type_NME" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="938575d8-a018-4b2c-92b2-55a083212ca7" ChangeDateTime="09/01/2017 21:14:45">
+    <Property Name="ElementName" Value="[dbo].[RT_Source_Types].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[RT_Source_Types]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SourceType_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2ec9d122-d1af-4bf3-8515-1c7e69042dec" ChangeDateTime="09/01/2017 21:15:20">
+    <Property Name="ElementName" Value="[dbo].[RT_API_Endpoints].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[RT_API_Endpoints]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Endpoint_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="32542be7-1469-4ee9-b5ec-a41cb386b8aa" ChangeDateTime="09/01/2017 21:16:03">
+    <Property Name="ElementName" Value="[dbo].[RT_API_Parameters].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[RT_API_Parameters]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="APIParameter_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d0ab2d03-bbd5-4d4b-bed8-dab1da774377" ChangeDateTime="09/01/2017 21:16:24">
+    <Property Name="ElementName" Value="[dbo].[RT_Request].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[RT_Request]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Request_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d1a2467b-8e4c-4787-b730-c702709b80ef" ChangeDateTime="09/01/2017 21:16:38">
+    <Property Name="ElementName" Value="[dbo].[RT_Request_Parameters].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[RT_Request_Parameters]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="RequestParameter_Id" />
+  </Operation>
 </Operations>

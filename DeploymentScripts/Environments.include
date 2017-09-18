@@ -13,7 +13,7 @@
     <!--
     <if test="${WhatToDeploy=='Web'}">
     -->
-    
+    <!--
       <if test="${TargetEnv=='Test'}">
         <property name="DeployLocations" value="\\SHO-T-SHDWEB-20\Web$\DataTest"/>
         <property name="envDashSiteEnvId" value="2403" />
@@ -36,11 +36,12 @@
         <property name="seerOutageApplications" value="data"/>
       </if>
     
-      <!--<if test="${TargetEnv=='Qual'}">
+      <if test="${TargetEnv=='Qual'}">
         <property name="DeployLocations" value="\\DIX-Q-APPWEB-20\Web$\MyApp;\\SHO-Q-APPWEB-20\Web$\MyApp"/>
         <property name="envDashSiteEnvId" value="999" />
         <property name="createSeerOutage" value="true"/>
-        --><!--comma-delimited lists of servers and applications to create a SEER outage for--><!--
+        -->
+    <!--comma-delimited lists of servers and applications to create a SEER outage for--><!--
         <property name="seerOutageServers" value="DIX-Q-APPWEB-20,SHO-Q-APPWEB-20"/>
         <property name="seerOutageApplications" value="MyAppQual"/>
       </if>
@@ -63,28 +64,28 @@
     If you have ConsoleApps to deploy in addition to a Web app, 
     uncomment the if test above, and uncomment the following section 
     -->
-    <!--
+    
     <if test="${WhatToDeploy=='ConsoleApp'}">
         
 		  <if test="${TargetEnv=='Test'}">
-        <property name="DeployLocations" value="\\SHO-T-APPCON-10\MyApp"/>
-        <property name="envDashSiteEnvId" value="999" />
+        <property name="DeployLocations" value="\\SHO-T-SHDCON-20\ConsoleApps$\DatasetRetrieverTest"/>
+        <property name="envDashSiteEnvId" value="2403" />
         <property name="createSeerOutage" value="false"/>
 		  </if>
     
       <if test="${TargetEnv=='Qual'}">
-        <property name="DeployLocations" value="\\DIX-Q-APPCON-10\MyApp;\\SHO-Q-APPCON-10\MyApp"/>
-        <property name="envDashSiteEnvId" value="999" />
+        <property name="DeployLocations" value="\\SHO-Q-SHDCON-20\ConsoleApps$\DatasetRetrieverQual;\\DIX-Q-SHDCON-20\ConsoleApps$\DatasetRetrieverQual"/>
+        <property name="envDashSiteEnvId" value="2404" />
         <property name="createSeerOutage" value="false"/>
       </if>   
         
       <if test="${TargetEnv=='Prod'}">
-        <property name="DeployLocations" value="\\DIX-P-APPCON-10\MyApp;\\SHO-P-APPCON-10\MyApp"/>
-        <property name="envDashSiteEnvId" value="999" />
+        <property name="DeployLocations" value="\\SHO-P-SHDCON-20\ConsoleApps$\DatasetRetriever;\\DIX-P-SHDCON-20\ConsoleApps$\DatasetRetriever"/>
+        <property name="envDashSiteEnvId" value="2405" />
         <property name="createSeerOutage" value="false"/>
       </if>
     </if>
-    -->
+    
     
     <echo message="DeployLocations: ${DeployLocations}"/>
 	</target>

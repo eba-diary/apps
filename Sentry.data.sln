@@ -28,6 +28,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.data.Infrastructure.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.data.Web.Tests", "Sentry.data.Web.Tests\Sentry.data.Web.Tests.csproj", "{BA84F274-4EDA-4C2E-8440-5F9762A2892C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.data.DatasetRetriever", "Sentry.data.DatasetRetriever\Sentry.data.DatasetRetriever.csproj", "{DBF186B1-6CED-449C-91BB-1D25888DE83D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,12 +71,16 @@ Global
 		{BA84F274-4EDA-4C2E-8440-5F9762A2892C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA84F274-4EDA-4C2E-8440-5F9762A2892C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA84F274-4EDA-4C2E-8440-5F9762A2892C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DBF186B1-6CED-449C-91BB-1D25888DE83D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DBF186B1-6CED-449C-91BB-1D25888DE83D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DBF186B1-6CED-449C-91BB-1D25888DE83D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DBF186B1-6CED-449C-91BB-1D25888DE83D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 10
+		SccNumberOfProjects = 11
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = http://tfs.sentry.com/tfsversioncontrol
 		SccLocalPath0 = .
@@ -105,5 +111,8 @@ Global
 		SccProjectUniqueName9 = Sentry.data.Web.Tests\\Sentry.data.Web.Tests.csproj
 		SccProjectName9 = Sentry.data.Web.Tests
 		SccLocalPath9 = Sentry.data.Web.Tests
+		SccProjectUniqueName10 = Sentry.data.DatasetRetriever\\Sentry.data.DatasetRetriever.csproj
+		SccProjectName10 = Sentry.data.DatasetRetriever
+		SccLocalPath10 = Sentry.data.DatasetRetriever
 	EndGlobalSection
 EndGlobal
