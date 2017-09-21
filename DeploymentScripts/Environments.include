@@ -13,14 +13,14 @@
     <!--
     <if test="${WhatToDeploy=='Web'}">
     -->
-    <!--
+ 
       <if test="${TargetEnv=='Test'}">
         <property name="DeployLocations" value="\\SHO-T-SHDWEB-20\Web$\DataTest"/>
         <property name="envDashSiteEnvId" value="2403" />
         <property name="createSeerOutage" value="false"/>
       </if>
-    
-      <if test="${TargetEnv=='Qual'}">
+
+    <if test="${TargetEnv=='Qual'}">
         <property name="DeployLocations" value="\\SHO-Q-SHDWEB-20\Web$\DataQual;\\DIX-Q-SHDWEB-20\Web$\DataQual"/>
         <property name="envDashSiteEnvId" value="2404" />
         <property name="createSeerOutage" value="true"/>
@@ -35,36 +35,13 @@
         <property name="seerOutageServers" value=""/>
         <property name="seerOutageApplications" value="data"/>
       </if>
-    
-      <if test="${TargetEnv=='Qual'}">
-        <property name="DeployLocations" value="\\DIX-Q-APPWEB-20\Web$\MyApp;\\SHO-Q-APPWEB-20\Web$\MyApp"/>
-        <property name="envDashSiteEnvId" value="999" />
-        <property name="createSeerOutage" value="true"/>
-        -->
-    <!--comma-delimited lists of servers and applications to create a SEER outage for--><!--
-        <property name="seerOutageServers" value="DIX-Q-APPWEB-20,SHO-Q-APPWEB-20"/>
-        <property name="seerOutageApplications" value="MyAppQual"/>
-      </if>
-
-      <if test="${TargetEnv=='Prod'}">
-        <property name="DeployLocations" value="\\DIX-P-APPWEB-20\Web$\MyApp;\\SHO-P-APPWEB-20\Web$\MyApp"/>
-        <property name="envDashSiteEnvId" value="999" />
-        <property name="createSeerOutage" value="true"/>
-        --><!--comma-delimited lists of servers and applications to create a SEER outage for--><!--
-        <property name="seerOutageServers" value="DIX-P-APPWEB-20,SHO-P-APPWEB-20"/>
-        <property name="seerOutageApplications" value="MyApp"/>
-      </if>-->
-    
-    <!--
-    </if>
-    -->
 
 
     <!-- 
     If you have ConsoleApps to deploy in addition to a Web app, 
     uncomment the if test above, and uncomment the following section 
     -->
-    
+    <!--
     <if test="${WhatToDeploy=='ConsoleApp'}">
         
 		  <if test="${TargetEnv=='Test'}">
@@ -85,7 +62,7 @@
         <property name="createSeerOutage" value="false"/>
       </if>
     </if>
-    
+    -->
     
     <echo message="DeployLocations: ${DeployLocations}"/>
 	</target>

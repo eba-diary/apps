@@ -13,10 +13,10 @@
 
   <!-- Environment Dashboard Settings -->
   <property name="envDashSysId" value="278"/>
-  <property name="envDashBuildTypId" value="393"/>
+  <property name="envDashBuildTypId" value="387"/>
 
   <!-- SEER Outage Settings -->
-  <property name="seerOutageSystemName" value="DatasetRetriever"/>
+  <property name="seerOutageSystemName" value="DatasetManagement"/>
   <property name="seerOutageLengthMinutes" value="60"/>
 
 
@@ -28,7 +28,7 @@
   <include buildfile="Environments.include" />
   
   <!-- Determine the environment -->
-  <regex pattern="\\(?'TargetEnv'\w+)\\(?'WhatToDeploy'\w+)\\DatasetRetriever\\Artifacts\\DeploymentScripts" input="${project::get-base-directory()}"/>
+  <regex pattern="\\(?'TargetEnv'\w+)\\(?'WhatToDeploy'\w+)\\Artifacts\\DeploymentScripts" input="${project::get-base-directory()}"/>
   <echo message="${TargetEnv}"/>
   <echo message="${WhatToDeploy}"/>
 
