@@ -14,10 +14,7 @@
   <!--<target name="deploy" depends="environmentSettings, addOutage, deployWebSite, envDashRecordDeploy, deployRetrieverApp, envDashRecordDeploy, deleteOutage"/>-->
   <target name="deployWeb" depends="environmentSettings, addOutage, deployWebSite, envDashRecordDeploy, deleteOutage"/>
   <target name="deployConsoleApps" depends="environmentSettings, addOutage, deployRetrieverApp, envDashRecordDeploy, deleteOutage"/>
-  <!--<target name="deployLoader" depends="environmentSettings, addOutage, deployLoaderApp, envDashRecordDeploy, deleteOutage"/>-->
   
-  <!--<target name="deploy" depends="environmentSettings, addOutage, deployWebSite, deployLoaderApp, deployRetrieverApp, deleteOutage, envDashRecordDeploy"/>-->
-
   <!-- Environment Dashboard Settings -->
   <property name="envDashSysId" value="278"/>
   <!--<property name="envDashBuildTypId" value="387"/>-->
@@ -53,7 +50,7 @@
   </target>
 
   <target name="deployWebSite">
-    <property name="envDashBuildTypId" value="387"/>
+    <!--<property name="envDashBuildTypId" value="387"/>-->
     <!-- for each deployment location in semicolon-delimited list in DeployLocations_Web -->
     <foreach item="String" in="${DeployLocations_Web}" delim=";" property="copytodir">
       <echo message="Location = ${copytodir}"/>
@@ -121,7 +118,7 @@
   </target>
 
   <target name="deployLoaderApp">
-    <property name="envDashBuildTypId" value="392"/>
+    <!--<property name="envDashBuildTypId" value="392"/>-->
     <!-- for each deployment location in semicolon-delimited list in DeployLocations_Console -->
     <foreach item="String" in="${DeployLocations_Loader}" delim=";" property="copytodir">
       <echo message="Location = ${copytodir}" />
@@ -151,7 +148,7 @@
   </target>
 
   <target name="deployRetrieverApp">
-    <property name="envDashBuildTypId" value="393"/>
+    <!--<property name="envDashBuildTypId" value="393"/>-->
     <!-- for each deployment location in semicolon-delimited list in DeployLocations_Console -->
     <foreach item="String" in="${DeployLocations_Retriever}" delim=";" property="copytodir">
       <echo message="Location = ${copytodir}" />
@@ -179,108 +176,6 @@
 
     </foreach>
   </target>
-  
-  
-  <!-- Deploy the Web or ConsoleApp -->
-  <!--<target name="deployApp">
-
-    <if test="${WhatToDeploy=='Web'}">
-      --><!-- for each deployment location in semicolon-delimited list in DeployLocations_Web --><!--
-        <foreach item="String" in="${DeployLocations}" delim=";" property="copytodir">
-          <echo message="Location = ${copytodir}"/>
-
-          --><!-- Copy App_Offline.htm to base directory to block traffic during deployment--><!--
-          <copy file="App_Offline.htm" tofile="${copytodir}\App_Offline.htm" overwrite="true" />
-
-          --><!-- Replace web.config with temporary web.config to prevent app domain restart --><!--
-          <copy file="Web.config" tofile="${copytodir}\Web.config" overwrite="true" />
-
-          <sleep seconds="15"/>
-          <echo message="Deleting existing web site deployment." />
-
-          --><!-- use three separate delete steps to try to avoid file contention --><!--
-          <delete verbose="true">
-            <fileset basedir="${copytodir}">
-              <include name="*.*"/>
-              <exclude name="App_Offline.htm"/>
-              <exclude name="Web.config"/>
-            </fileset>
-          </delete>
-          --><!-- Delete everything except the _status and aspnet_client directories and App_Offline.htm and Web.config
-           also save bin for separate deletion, since we sometimes get hung up on that --><!--
-          <delete verbose="true">
-            <fileset basedir="${copytodir}">
-              <include name="**/*" />
-              <exclude name="aspnet_client/**" />
-              <exclude name="App_Offline.htm" />
-              <exclude name="Web.config"/>
-              <exclude name="bin/**"/>
-            </fileset>
-          </delete>
-          --><!-- delete bin folder IIS sometimes hangs on to these files --><!--
-          <delete verbose="true">
-            <fileset basedir="${path::combine(copytodir, 'bin')}">
-              <include name="**/*"/>
-            </fileset>
-          </delete>
-
-
-          --><!-- Deploy web site code, except for Web.config --><!--
-          <echo message="Deploying web site." />
-          <property name="copyfromdir" value="..\_PublishedWebsites\${PublishedWebSiteName}"/>
-          <property name="copyfromdiralt" value="..\${PublishedWebSiteName}\_PublishedWebsites\${PublishedWebSiteName}"/>
-          <if test="${directory::exists(copyfromdiralt)}" verbose="true">
-            <property name="copyfromdir" value="${copyfromdiralt}"/>
-          </if>
-          <copy todir="${copytodir}">
-            <fileset basedir="${copyfromdir}">
-              <include name="**/*"/>
-              <exclude name="aspnet_client/**" />
-              <exclude name="Web.config"/>
-            </fileset>
-          </copy>
-
-          --><!-- Once all other files are deployed, copy the real web.config, allowing app domain recycle --><!--
-          <copy file="${copyfromdir}\Web.config" tofile="${copytodir}\Web.config" overwrite="true" />
-
-          --><!-- Delete App_Offline.htm to allow traffic back into the site --><!--
-          <delete file="${copytodir}\App_Offline.htm" />
-
-          <sleep seconds="10"/>
-
-        </foreach>
-    </if>
-
-
-    <if test="${WhatToDeploy=='ConsoleApp'}">
-      --><!-- for each deployment location in semicolon-delimited list in DeployLocations_Console --><!--
-      <foreach item="String" in="${DeployLocations}" delim=";" property="copytodir">
-          <echo message="Location = ${copytodir}" />
-
-          <echo message="Deleting existing console app deployment." />
-          <delete verbose="true">
-            <fileset basedir="${copytodir}">
-              <include name="**/*" />
-              <exclude name="backup/**" />
-            </fileset>
-          </delete>
-
-          <echo message="Deploying console apps." />
-          <copy todir="${copytodir}">
-            <fileset basedir="..\">
-              <include name="**/*"/>
-              <exclude name="_PublishedWebsites/**" />
-              <exclude name="${PublishedWebSiteName}/**" />
-              <exclude name="DeploymentScripts/**" />
-              <exclude name="logs/**" />
-              <exclude name="version.txt" />
-              <exclude name="*Tests.*"/>
-            </fileset>
-          </copy>
-
-        </foreach>
-    </if> --><!--<if test="${WhatToDeploy=='ConsoleApp'}">--><!--
-  </target>-->
 
   <property name="VersionTag" value="" />
   <target name="GetVersion">
