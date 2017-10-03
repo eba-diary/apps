@@ -10,7 +10,7 @@
   
   <!-- The list of steps in deploying your app -->
   <!--<target name="deploy" depends="environmentSettings, deployApp, addOutage, deployApp, deleteOutage, envDashRecordDeploy" />-->
-  <target name="deploy" depends="environmentSettings, addOutage, deployWebSite, envDashRecordDeploy, deleteOutage"/>
+  <!--<target name="deploy" depends="environmentSettings, addOutage, deployWebSite, envDashRecordDeploy, deleteOutage"/>-->
   <target name="deploy" depends="environmentSettings, addOutage, deployWebSite, envDashRecordDeploy, deployRetrieverApp, envDashRecordDeploy, deleteOutage"/>
   <!--<target name="deploy" depends="environmentSettings, addOutage, deployWebSite, deployLoaderApp, deployRetrieverApp, deleteOutage, envDashRecordDeploy"/>-->
 
