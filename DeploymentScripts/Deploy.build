@@ -31,7 +31,7 @@
   
   <!-- Determine the environment -->
   <!--<regex pattern="\\(?'TargetEnv'\w+)\\(?'WhatToDeploy'\w+)\\Artifacts\\DeploymentScripts" input="${project::get-base-directory()}"/>-->
-  <regex pattern="\\(?'TargetEnv'\w+)\\(?'WhatToDeploy'\w+)\\Artifacts\\DeploymentScripts" input="${project::get-base-directory()}"/>
+  <regex pattern="\\(?'TargetEnv'\w+)\\Artifacts\\DeploymentScripts" input="${project::get-base-directory()}"/>
   <echo message="${TargetEnv}"/>
   <!--<echo message="${WhatToDeploy}"/>-->
 
