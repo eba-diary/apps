@@ -304,6 +304,8 @@
   <!-- the target Environment Dashboard web service will use the current date/time. -->
   <target name="envDashRecordDeploy" depends="environmentSettings, GetVersion" description="Task to record a deployment in the Environment Dashboard application.">
     <echo message="Calling Environment Dashboard web service to record deployment..."/>
+    <echo message="SourceSystemID: ${envDashSysId}"/>
+    <echo message="envDashSiteEnvId: ${envDashSiteEnvId}"/>
     <recordDeployment
 			webSvcUrl='https://EnvironmentDashboard.sentry.com/WebService/DashboardService.asmx'
 			sourceSystemId='${envDashSysId}'
