@@ -19,6 +19,8 @@ namespace Sentry.data.Core
 
         int GetMaxId();
 
+        Dataset GetByS3Key(string S3key);
+
         IEnumerable<String> GetCategoryList();
 
         IEnumerable<String> GetSentryOwnerList();
@@ -35,6 +37,8 @@ namespace Sentry.data.Core
 
         string GetPreviewKey(int id);
         //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
+
+        Category GetCategoryByName(string name);
     }
 
 }

@@ -81,12 +81,12 @@ namespace Sentry.data.Infrastructure
         {
             PutObjectRequest poReq = new PutObjectRequest();
             poReq.FilePath = sourceFilePath;
-            //poReq.BucketName = dataSet.Bucket;
+            poReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
             poReq.Key = dataSet.S3Key;
             System.IO.FileInfo fInfo = new System.IO.FileInfo(sourceFilePath);
             poReq.Metadata.Add("FileName", fInfo.Name);
             poReq.Metadata.Add("Description", dataSet.DatasetDesc);
-            //poReq.Metadata.Add("DetailDesc", dataSet.DetailDescription);
+            poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
             PutObjectResponse poRsp = S3Client.PutObject(poReq);
             if (poRsp.HttpStatusCode != System.Net.HttpStatusCode.OK)
             {
@@ -145,6 +145,32 @@ namespace Sentry.data.Infrastructure
             }
 
         }
+
+        //public void TransferUtlityUploadStream(string folder, string fileName, Stream stream)
+        //{
+        //    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");
+        //    try
+        //    {
+        //        Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
+        //        Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
+        //        //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + Configuration.Config.GetSetting("AWSRootBucket"));
+        //        s3tuReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+        //        //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - InputStream");
+        //        s3tuReq.InputStream = stream;
+        //        //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + category + "/" + dsfi);
+        //        s3tuReq.Key = folder + "/" + fileName;
+        //        s3tuReq.UploadProgressEvent += new EventHandler<UploadProgressArgs>(a_TransferProgressEvent);
+        //        s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
+        //        s3tuReq.AutoCloseStream = true;
+        //        //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Starting Upload " + s3tuReq.Key);
+        //        s3tu.Upload(s3tuReq);
+        //    }
+        //    catch (AmazonS3Exception e)
+        //    {
+        //        throw new Exception("Error attempting to transfer fileto S3.", e);
+        //    }
+
+        //}
 
         public void TransferUtilityDownload(string baseTargetPath, string folder, string filename, string s3Key)
         {

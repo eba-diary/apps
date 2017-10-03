@@ -98,6 +98,11 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public Category GetCategoryByName(string name)
+        {
+            return Query<Category>().Where(x => x.Name == name).FirstOrDefault();
+        }
+
         public Boolean isDatasetNameDuplicate(string name)
         {
             if (Query<Dataset>().Where(x => x.DatasetName == name).Count() == 0)
@@ -144,6 +149,11 @@ namespace Sentry.data.Infrastructure
             {
                 return key.Replace(Configuration.Config.GetSetting("S3LiveDataPrefix"), Configuration.Config.GetSetting("S3PreviewPrefix"));
             }
+        }
+
+        public Dataset GetByS3Key(string s3Key)
+        {
+            return Query<Dataset>().Where(s => s.S3Key == s3Key).FirstOrDefault();
         }
 
         //###  END Sentry.Data  ### - Code above is Sentry.Data-specific

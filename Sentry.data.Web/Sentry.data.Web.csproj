@@ -616,6 +616,11 @@
     <Content Include="Images\Category\weather.svg" />
     <Content Include="Images\Icons\DatasetsBlue.png" />
     <Content Include="Images\Icons\DatasetsBlue.svg" />
+    <Content Include="Images\Category\Sentry.png" />
+    <Content Include="Images\Category\weather.png" />
+    <Content Include="Images\Category\weather.svg" />
+    <Content Include="Images\Icons\DatasetsBlue.png" />
+    <Content Include="Images\Icons\DatasetsBlue.svg" />
     <Content Include="Images\sas_logo.png" />
     <Content Include="Images\sas_logo_min.png" />
     <Content Include="Images\sas_logo_rectangle.png" />

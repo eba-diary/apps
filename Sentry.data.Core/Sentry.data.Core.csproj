@@ -89,12 +89,14 @@
     <Compile Include="Entities\Asset.cs" />
     <Compile Include="Entities\AssetState.cs" />
     <Compile Include="Entities\DatasetFolder.cs" />
+    <Compile Include="Entities\LoaderFileConfig.cs" />
+    <Compile Include="Entities\LoaderSystemConfig.cs" />
+    <Compile Include="Entities\TransferProgressEventArgs.cs" />
     <Compile Include="Entities\RTAPIEndpoints.cs" />
     <Compile Include="Entities\RTAPIParameters.cs" />
     <Compile Include="Entities\RTRequest.cs" />
     <Compile Include="Entities\RTRequestParameters.cs" />
     <Compile Include="Entities\RTSourceTypes.cs" />
-    <Compile Include="Entities\TransferProgressEventArgs.cs" />
     <Compile Include="Interfaces\IAPIProvider.cs" />
     <Compile Include="Interfaces\IApplicationUser.cs" />
     <Compile Include="Interfaces\IAssetDynamicDetailsProvider.cs" />
@@ -112,9 +114,9 @@
     <Compile Include="Interfaces\IDatasetService.cs" />
     <Compile Include="Interfaces\IFtpProvider.cs" />
     <Compile Include="Interfaces\IRequestContext.cs" />
+    <Compile Include="Interfaces\IWeatherDataProvider.cs" />
     <Compile Include="Interfaces\ISASService.cs" />
     <Compile Include="Interfaces\IODCFileProvider.cs" />
-    <Compile Include="Interfaces\IWeatherDataProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\CategoryQueries.cs" />
     <Compile Include="Queries\DatasetFolderQueries.cs" />

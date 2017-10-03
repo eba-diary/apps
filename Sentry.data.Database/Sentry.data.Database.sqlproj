@@ -113,6 +113,14 @@
     <Build Include="Tables\ComponentElement.sql" />
     <Build Include="Tables\ConsumptionLayerType.sql" />
     <Build Include="Tables\DataFeed.sql" />
+    <Build Include="Tables\Loader_System_Config.sql" />
+    <Build Include="Tables\Loader_File_Config.sql" />
+    <Build Include="Tables\Loader_Dataset_Metadata.sql" />
+    <Build Include="Tables\DataAsset.sql" />
+    <Build Include="Tables\ConsumptionLayerComponent.sql" />
+    <Build Include="Tables\ComponentElement.sql" />
+    <Build Include="Tables\ConsumptionLayerType.sql" />
+    <Build Include="Tables\DataFeed.sql" />
     <Build Include="Tables\RT_Source_Types.sql" />
     <Build Include="Tables\RT_API_Endpoints.sql" />
     <Build Include="Tables\RT_API_Parameters.sql" />
