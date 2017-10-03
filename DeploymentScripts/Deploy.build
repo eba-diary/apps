@@ -13,7 +13,7 @@
   <!--<target name="deploy" depends="environmentSettings, addOutage, deployWebSite, envDashRecordDeploy, deleteOutage"/>-->
   <!--<target name="deploy" depends="environmentSettings, addOutage, deployWebSite, envDashRecordDeploy, deployRetrieverApp, envDashRecordDeploy, deleteOutage"/>-->
   <target name="deployWeb" depends="environmentSettings, addOutage, deployWebSite, envDashRecordDeploy, deleteOutage"/>
-  <target name="deployConsoleApps" depends="environmentSettings, addOutage, deployRetrieverApp, envDashRecordDeploy, deleteOutage"/>
+  <target name="deployConsoleApps" depends="environmentSettings, addOutage, deployRetrieverApp, deployLoaderApp, envDashRecordDeploy, deleteOutage"/>
   
   <!-- Environment Dashboard Settings -->
   <property name="envDashSysId" value="278"/>
