@@ -11,7 +11,11 @@
   <!-- The list of steps in deploying your app -->
   <!--<target name="deploy" depends="environmentSettings, deployApp, addOutage, deployApp, deleteOutage, envDashRecordDeploy" />-->
   <!--<target name="deploy" depends="environmentSettings, addOutage, deployWebSite, envDashRecordDeploy, deleteOutage"/>-->
-  <target name="deploy" depends="environmentSettings, addOutage, deployWebSite, envDashRecordDeploy, deployRetrieverApp, envDashRecordDeploy, deleteOutage"/>
+  <!--<target name="deploy" depends="environmentSettings, addOutage, deployWebSite, envDashRecordDeploy, deployRetrieverApp, envDashRecordDeploy, deleteOutage"/>-->
+  <target name="deployWeb" depends="environmentSettings, addOutage, deployWebSite, envDashRecordDeploy, deleteOutage"/>
+  <target name="deployConsoleApps" depends="environmentSettings, addOutage, deployRetrieverApp, envDashRecordDeploy, deleteOutage"/>
+  <!--<target name="deployLoader" depends="environmentSettings, addOutage, deployLoaderApp, envDashRecordDeploy, deleteOutage"/>-->
+  
   <!--<target name="deploy" depends="environmentSettings, addOutage, deployWebSite, deployLoaderApp, deployRetrieverApp, deleteOutage, envDashRecordDeploy"/>-->
 
   <!-- Environment Dashboard Settings -->
@@ -149,7 +153,7 @@
   <target name="deployRetrieverApp">
     <property name="envDashBuildTypId" value="393"/>
     <!-- for each deployment location in semicolon-delimited list in DeployLocations_Console -->
-    <foreach item="String" in="${DeployLocations_Loader}" delim=";" property="copytodir">
+    <foreach item="String" in="${DeployLocations_Retriever}" delim=";" property="copytodir">
       <echo message="Location = ${copytodir}" />
 
       <echo message="Deleting existing console app deployment." />

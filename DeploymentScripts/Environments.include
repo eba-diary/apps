@@ -18,6 +18,7 @@
         <!--<property name="DeployLocations" value="\\SHO-T-SHDWEB-20\Web$\DataTest"/>-->
         <property name="DeployLocations_Web" value="\\SHO-T-SHDWEB-20\Web$\DataTest"/>
         <property name="DeployLocations_Loader" value="\\SHO-T-SHDCON-20\ConsoleApps$\DatasetLoaderTest"/>
+        <property name="DeployLocations_Retriever" value="\\SHO-T-SHDCON-20\ConsoleApps$\DatasetRetrieverTest"/>
         <property name="envDashSiteEnvId" value="2403" />
         <property name="createSeerOutage" value="false"/>
       </if>
