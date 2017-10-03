@@ -10,12 +10,13 @@
   
   <!-- The list of steps in deploying your app -->
   <!--<target name="deploy" depends="environmentSettings, deployApp, addOutage, deployApp, deleteOutage, envDashRecordDeploy" />-->
-  <target name="deploy" depends="environmentSettings, addOutage, deployWebSite, deleteOutage, envDashRecordDeploy"/>
+  <target name="deploy" depends="environmentSettings, addOutage, deployWebSite, envDashRecordDeploy, deleteOutage"/>
+  <target name="deploy" depends="environmentSettings, addOutage, deployWebSite, envDashRecordDeploy, deployRetrieverApp, envDashRecordDeploy, deleteOutage"/>
   <!--<target name="deploy" depends="environmentSettings, addOutage, deployWebSite, deployLoaderApp, deployRetrieverApp, deleteOutage, envDashRecordDeploy"/>-->
 
   <!-- Environment Dashboard Settings -->
   <property name="envDashSysId" value="278"/>
-  <property name="envDashBuildTypId" value="387"/>
+  <!--<property name="envDashBuildTypId" value="387"/>-->
 
   <!-- SEER Outage Settings -->
   <property name="seerOutageSystemName" value="DatasetManagement"/>
@@ -48,6 +49,7 @@
   </target>
 
   <target name="deployWebSite">
+    <property name="envDashBuildTypId" value="387"/>
     <!-- for each deployment location in semicolon-delimited list in DeployLocations_Web -->
     <foreach item="String" in="${DeployLocations_Web}" delim=";" property="copytodir">
       <echo message="Location = ${copytodir}"/>
@@ -115,6 +117,7 @@
   </target>
 
   <target name="deployLoaderApp">
+    <property name="envDashBuildTypId" value="392"/>
     <!-- for each deployment location in semicolon-delimited list in DeployLocations_Console -->
     <foreach item="String" in="${DeployLocations_Loader}" delim=";" property="copytodir">
       <echo message="Location = ${copytodir}" />
@@ -144,6 +147,7 @@
   </target>
 
   <target name="deployRetrieverApp">
+    <property name="envDashBuildTypId" value="393"/>
     <!-- for each deployment location in semicolon-delimited list in DeployLocations_Console -->
     <foreach item="String" in="${DeployLocations_Loader}" delim=";" property="copytodir">
       <echo message="Location = ${copytodir}" />
