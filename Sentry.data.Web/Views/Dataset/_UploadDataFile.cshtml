@@ -1,0 +1,63 @@
+﻿@model Sentry.data.Web.CreateDataFileModel
+@{
+    ViewBag.Title = "Upload Datafile";
+}
+
+@*@using (Html.BeginForm("CreateNewDataFile", "Dataset", FormMethod.Post, new { enctype = "multipart/form-data" }))*@
+@*@using (Ajax.BeginForm("CreatenewDataFile", "Dataset", new AjaxOptions { HttpMethod = 'Post', Ons}))*@
+@*{*@
+
+@Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+    @{
+        if (Model.dsID == 0)
+        {
+            <div class="form-group">
+                @Html.LabelFor(m => m.CategoryIDs, htmlAttributes: new { @class = "control-lable col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor((model) => model.CategoryIDs, new SelectList(ViewBag.Categories as
+             System.Collections.IEnumerable, "Value", "Text"), new { id = "categoryList" })
+                </div>
+
+            </div>
+                <p>
+                    <div class="form-group">
+                        @Html.LabelFor(m => m.dsID, htmlAttributes: new { @class = "control-lable col-md-2" })
+                        <div class="col-md-10">
+                            @Html.DropDownListFor((model) => model.dsID, new
+         SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"), new { id = "datasetList" })
+                        </div>
+                    </div>
+                </p>
+        }
+        else
+        {
+            <div class="form-group">
+                @Html.LabelFor(m => m.CategoryIDs, htmlAttributes: new { @class = "control-lable col-md-2" })
+                <div class="col-md-10">
+                    <p class="form-control-static">@Html.DisplayFor(model => model.DatasetCategory.Name)</p>
+                </div>
+            </div>
+                <div>
+                    @Html.LabelFor(m => m.dsID, htmlAttributes: new { @class = "control-lable col-md-2" })
+                    <div class="col-md-10">
+                        <p class="form-control-static">@Html.DisplayFor(model => model.DatasetName)</p>
+                    </div>
+                </div>
+        }
+    }
+    <div class="form-group">
+        @Html.LabelFor(model => model.f, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            <input type="file" class="edit-dataset-row file-load" id="DatasetFileUpload" />
+            @*@Html.HiddenFor(model => model.f)*@
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-primary" id="UploadFile" data-id="0">Upload Data File</button>
+    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+</div>
+@*}*@

@@ -88,6 +88,14 @@ namespace Sentry.data.Core
             }
         }
 
+        public virtual Boolean CanManageConfigs
+        {
+            get
+            {
+                return _extendedUserInfo.Permissions.Contains(PermissionNames.ManageDataFileConfigs);
+            }
+        }
+
         public DomainUser DomainUser
         {
             get

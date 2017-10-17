@@ -138,6 +138,8 @@
     <Compile Include="DomainContexts\datasetContext.cs" />
     <Compile Include="DomainContexts\dataAssetContext.cs" />
     <Compile Include="DomainContexts\RequestContext.cs" />
+    <Compile Include="Mappings\Primary\DatasetFileConfigsMapping.cs" />
+    <Compile Include="Mappings\Primary\DatasetFileMapping.cs" />
     <Compile Include="Mappings\Primary\ComponentElementMapping.cs" />
     <Compile Include="Mappings\Primary\ConsumptionLayerComponentMapping.cs" />
     <Compile Include="Mappings\Primary\ConsumptionLayerTypeMapping.cs" />
@@ -145,6 +147,7 @@
     <Compile Include="Mappings\Primary\DataFeedMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetMetadataMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetMapping.cs" />
+    <Compile Include="Mappings\Primary\DatasetScopeTypeMapping.cs" />
     <Compile Include="Mappings\Primary\RTAPIParametersMapping.cs" />
     <Compile Include="Mappings\Primary\RTRequestMapping.cs" />
     <Compile Include="Mappings\Primary\RTRequestParametersMapping.cs" />

@@ -55,6 +55,9 @@ namespace Sentry.data.Tests
             assetsInList.Add(asset);
             mockDataAssetContext.Stub(x => x.Assets).Return(assetsInList.AsQueryable());
 
+            Category cat = new Category("Claim", null);
+            DatasetScopeType dScope = new DatasetScopeType("Transactional", "Transactional Data", true);
+
             Dataset dataset = new Dataset(999999,
                                           "Some Category",
                                           "Some dataset",
@@ -66,13 +69,15 @@ namespace Sentry.data.Tests
                                           //"txt", 
                                           System.DateTime.Now.AddDays(-3),
                                           System.DateTime.Now.AddDays(-2),
-                                          System.DateTime.Now.AddDays(-1),
                                           "Yearly",
-                                          1000,
-                                          100,
                                           "S3 key",
                                           true,
                                           true,
+                                          null,
+                                          cat,
+                                          null,
+                                          dScope,
+                                          0,
                                           null,
                                           null);
             List<Dataset> datasetsInList = new List<Dataset>();

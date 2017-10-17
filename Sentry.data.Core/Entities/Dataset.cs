@@ -27,20 +27,22 @@ namespace Sentry.data.Core
         //private string _fileExtension;
         private DateTime _datasetDtm;
         private DateTime _changedDtm;
-        private DateTime _uploadDtm;
         //private string _creationFreqCode;
         private string _creationFreqDesc;
-        private long _fileSize;
-        private long _recordCount;
         private string _s3key;
         private Boolean _IsSensitive;
         private Boolean _canDisplay;
         IList<DatasetMetadata> _rawMetadata;
         private Category _datasetCategory;
+        private IList<DatasetFile> _datasetFile;
+        private DatasetScopeType _datasetScopeType;
+        private int _datafilesToKeep;
+        private IList<DatasetFileConfig> _datasetFileConfigs;
         //private IDictionary<string, string> _columns;
         //private IDictionary<string, string> _metadata;
+        private string _dropLocation;
 
-        protected Dataset()
+        public Dataset()
         {
         }
 
@@ -57,16 +59,18 @@ namespace Sentry.data.Core
                        //string fileExtension,
                        DateTime datasetDtm,
                        DateTime changedDtm,
-                       DateTime uploadDtm,
                        //string creationFreqCode,
                        string creationFreqDesc,
-                       long fileSize,
-                       long recordCount,
                        string s3key,
                        Boolean IsSensitive,
                        Boolean CanDisplay,
                        IList<DatasetMetadata> rawMetadata,
-                       Category cat)
+                       Category cat,
+                       IList<DatasetFile> datasetFile,
+                       DatasetScopeType datasetscopetype,
+                       int datafilesToKeep,
+                       IList<DatasetFileConfig> datasetFileConfigs,
+                       string dropLocation)
         {
             this._datasetId = datasetId;
             this._category = category;
@@ -81,16 +85,18 @@ namespace Sentry.data.Core
             //this._fileExtension = fileExtension;
             this._datasetDtm = datasetDtm;
             this._changedDtm = changedDtm;
-            this._uploadDtm = uploadDtm;
             //this._creationFreqCode = creationFreqCode;
             this._creationFreqDesc = creationFreqDesc;
-            this._fileSize = fileSize;
-            this._recordCount = recordCount;
             this._s3key = s3key;
             this._IsSensitive = IsSensitive;
             this._canDisplay = CanDisplay;
             this._rawMetadata = rawMetadata;
             this._datasetCategory = cat;
+            this._datasetFile = datasetFile;
+            this._datasetScopeType = datasetscopetype;
+            this._datafilesToKeep = datafilesToKeep;
+            this._datasetFileConfigs = datasetFileConfigs;
+            this._dropLocation = dropLocation;
         }
 
         public virtual Boolean IsSensitive
@@ -165,18 +171,6 @@ namespace Sentry.data.Core
             }
         }
 
-        //public virtual string CreationUserId
-        //{
-        //    get
-        //    {
-        //        return _creationUserId;
-        //    }
-        //    set
-        //    {
-        //        _creationUserId = value;
-        //    }
-        //}
-
         public virtual string CreationUserName
         {
             get
@@ -188,18 +182,6 @@ namespace Sentry.data.Core
                 _creationUserName = value;
             }
         }
-
-        //public virtual string SentryOwnerId
-        //{
-        //    get
-        //    {
-        //        return _sentryOwnerId;
-        //    }
-        //    set
-        //    {
-        //        _sentryOwnerId = value;
-        //    }
-        //}
 
         public virtual string SentryOwnerName
         {
@@ -272,30 +254,6 @@ namespace Sentry.data.Core
             }
         }
 
-        public virtual DateTime UploadDtm
-        {
-            get
-            {
-                return _uploadDtm;
-            }
-            set
-            {
-                _uploadDtm = value;
-            }
-        }
-
-        //public virtual string CreationFreqCode
-        //{
-        //    get
-        //    {
-        //        return _creationFreqCode;
-        //    }
-        //    set
-        //    {
-        //        _creationFreqCode = value;
-        //    }
-        //}
-
         public virtual string CreationFreqDesc
         {
             get
@@ -305,30 +263,6 @@ namespace Sentry.data.Core
             set
             {
                 _creationFreqDesc = value;
-            }
-        }
-
-        public virtual long FileSize
-        {
-            get
-            {
-                return _fileSize;
-            }
-            set
-            {
-                _fileSize = value;
-            }
-        }
-
-        public virtual long RecordCount
-        {
-            get
-            {
-                return _recordCount;
-            }
-            set
-            {
-                _recordCount = value;
             }
         }
 
@@ -385,6 +319,59 @@ namespace Sentry.data.Core
             }
         }
 
+        public virtual IList<DatasetFile> DatasetFiles
+        {
+            get
+            {
+                return _datasetFile;
+            }
+            set
+            {
+                _datasetFile = value;
+            }
+        }
+        public virtual DatasetScopeType DatasetScopeType
+        {
+            get
+            {
+                return _datasetScopeType;
+            }
+            set
+            {
+                _datasetScopeType = value;
+            }
+        }
+        public virtual int DatafilesToKeep
+        {
+            get
+            {
+                return _datafilesToKeep;
+            }
+            set
+            {
+                _datafilesToKeep = value;
+            }
+        }
+
+        public virtual IList<DatasetFileConfig> DatasetFileConfigs
+        {
+            get
+            {
+                return _datasetFileConfigs;
+            }
+            set
+            {
+                _datasetFileConfigs = value;
+            }
+        }
+
+        public virtual string DropLocation
+        {
+            get { return _dropLocation; }
+            set { _dropLocation = value; }
+        }
+
+
         public virtual ValidationResults ValidateForDelete()
         {
             return new ValidationResults();
@@ -393,7 +380,6 @@ namespace Sentry.data.Core
         public virtual ValidationResults ValidateForSave()
         {
             ValidationResults vr = new ValidationResults();
-            int result = -1;
 
             if (string.IsNullOrWhiteSpace(S3Key))
             {
@@ -403,10 +389,10 @@ namespace Sentry.data.Core
             {
                 vr.Add(ValidationErrors.categoryIsBlank, "The Dataset Category is required");
             }
-            if (!string.IsNullOrWhiteSpace(S3Key) && !string.IsNullOrWhiteSpace(Category) && Category != S3Key.Substring(0,S3Key.IndexOf("/")).Replace("/",""))
-            {
-                vr.Add(ValidationErrors.s3KeyCategoryMismatch, "The Dataset Category does not match first portion of S3 Key");
-            }
+            //if (!string.IsNullOrWhiteSpace(S3Key) && !string.IsNullOrWhiteSpace(Category) && Category != S3Key.Substring(0,S3Key.IndexOf("/")).Replace("/",""))
+            //{
+            //    vr.Add(ValidationErrors.s3KeyCategoryMismatch, "The Dataset Category does not match first portion of S3 Key");
+            //}
             if (string.IsNullOrWhiteSpace(DatasetName))
             {
                 vr.Add(ValidationErrors.nameIsBlank, "The Dataset Name is required");
@@ -427,13 +413,13 @@ namespace Sentry.data.Core
             {
                 vr.Add(ValidationErrors.datasetDateIsOld, "The Dataset Date is required");
             }
-            if (UploadDtm < new DateTime(1800, 1, 1)) // null dates are ancient; this suffices to check for null dates
-            {
-                vr.Add(ValidationErrors.uploadDateIsOld, "The Dataset Upload Date is required");
-            }
             if (string.IsNullOrWhiteSpace(DatasetDesc))
             {
                 vr.Add(ValidationErrors.datasetDescIsBlank, "The Dataset description is required");
+            }
+            if (DatafilesToKeep < 0)
+            {
+                vr.Add(ValidationErrors.numberOfFilesIsNegative, "Number of Files to Keep cannot be negative");
             }
             return vr;
         }
@@ -442,14 +428,14 @@ namespace Sentry.data.Core
         {
             public const string s3keyIsBlank = "keyIsBlank";
             public const string categoryIsBlank = "categoryIsBlank";
-            public const string s3KeyCategoryMismatch = "s3KeyCategoryMismatch";
+            //public const string s3KeyCategoryMismatch = "s3KeyCategoryMismatch";
             public const string nameIsBlank = "nameIsBlank";
             public const string creationUserNameIsBlank = "creationUserNameIsBlank";
             public const string uploadUserNameIsBlank = "uploadUserNameIsBlank";
             public const string datasetDateIsOld = "datasetDateIsOld";
-            public const string uploadDateIsOld = "uploadDateIsOld";
             public const string datasetDescIsBlank = "descIsBlank";
             public const string sentryOwnerIsNotNumeric = "sentryOwnerIsNotNumeric";
+            public const string numberOfFilesIsNegative = "numberOfFilesIsNegative";
         }
     }
 }

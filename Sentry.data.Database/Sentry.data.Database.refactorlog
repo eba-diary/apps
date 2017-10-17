@@ -224,4 +224,74 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="RequestParameter_Id" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="6255256f-4a5a-4d65-9fdd-38d64a94d637" ChangeDateTime="09/25/2017 20:16:02">
+    <Property Name="ElementName" Value="[dbo].[DatasetFile].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetFile]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DatasetFile_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d40fb5e7-2825-4944-ba03-7c752569ee44" ChangeDateTime="10/02/2017 14:49:26">
+    <Property Name="ElementName" Value="[dbo].[Dataset].[DataReference_TYP]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Dataset]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DataScope_TYP" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d32fae7c-e157-441a-b5f7-e0b7c7063fa5" ChangeDateTime="10/02/2017 15:33:49">
+    <Property Name="ElementName" Value="[dbo].[Dataset].[DatafileScope]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Dataset]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DatafileScopeType_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="aabaf99a-0b0f-4fa5-9c4f-527884a2f5e9" ChangeDateTime="10/02/2017 16:09:19">
+    <Property Name="ElementName" Value="[dbo].[DatasetScopeTypes].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetScopeTypes]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ScopeType_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="56637c48-b0aa-4324-9fb3-05ac922b50a1" ChangeDateTime="10/02/2017 16:12:10">
+    <Property Name="ElementName" Value="[dbo].[Dataset].[DatafileScopeType_ID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Dataset]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DatasetScopeType_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c9d72f6e-2fb6-4679-b065-46791e33cee4" ChangeDateTime="10/02/2017 17:23:00">
+    <Property Name="ElementName" Value="[dbo].[Dataset].[OverwriteOnUpdate_IND]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Dataset]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="OverwriteOnUpload_IND" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="46cade38-9e7d-477f-804c-b9aa49c245d3" ChangeDateTime="10/02/2017 17:27:43">
+    <Property Name="ElementName" Value="[dbo].[Dataset].[OverwriteOnUpload_IND]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Dataset]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DatafilesToKeep_NBR" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="2c9fb932-9b5a-46fe-a56c-ca6d227f1c60" ChangeDateTime="10/04/2017 19:50:40">
+    <Property Name="ElementName" Value="[dbo].[DatasetFileConfigs].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetFileConfigs]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Config_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="76bc9407-ae9f-42b1-b971-0921b8618d5a" ChangeDateTime="10/06/2017 17:10:59">
+    <Property Name="ElementName" Value="[dbo].[DatasetFileConfigs].[Name]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetFileConfigs]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Config_NME" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="b35b4686-1be6-4594-b57d-fe83eb8bacdf" ChangeDateTime="10/06/2017 17:11:06">
+    <Property Name="ElementName" Value="[dbo].[DatasetFileConfigs].[Description]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetFileConfigs]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Config_DSC" />
+  </Operation>
 </Operations>

@@ -72,6 +72,21 @@ namespace Sentry.data.Infrastructure
             return url;
         }
 
+        public string GetDatasetDownloadURL(string key, string versionId)
+        {
+            GetPreSignedUrlRequest req = new GetPreSignedUrlRequest()
+            {
+                BucketName = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                Key = key,
+                VersionId = versionId,
+                Expires = DateTime.Now.AddMinutes(2)
+            };
+            //setting content-disposition to attachment vs. inline (into browser) to force "save as" dialog box for all doc types.
+            req.ResponseHeaderOverrides.ContentDisposition = "attachment";
+            string url = S3Client.GetPreSignedURL(req);
+            return url;
+        }
+
         /// <summary>
         /// Upload a dataset to S3, pulling directly from the given source file path
         /// </summary>
@@ -94,6 +109,49 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Returns S3 VersionID
+        /// </summary>
+        /// <param name="sourceFilePath"></param>
+        /// <param name="targetKey"></param>
+        /// <returns>Returns S3 Version ID</returns>
+        public string UploadDataset_v2(string sourceFilePath, string targetKey)
+        {
+            string versionId = null;
+            //IAmazonS3 client = null;
+            //using (client = S3Client)
+            //{
+            try
+            {
+                PutObjectRequest poReq = new PutObjectRequest();
+                poReq.FilePath = sourceFilePath;
+                poReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+                poReq.Key = targetKey;
+                System.IO.FileInfo fInfo = new System.IO.FileInfo(sourceFilePath);
+                //poReq.Metadata.Add("FileName", fInfo.Name);
+                //poReq.Metadata.Add("Description", dataSet.DatasetDesc);
+                poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
+                PutObjectResponse poRsp = S3Client.PutObject(poReq);
+                versionId = poRsp.VersionId;
+            }
+            catch (AmazonS3Exception amazonS3Exception)
+            {
+                if (amazonS3Exception.ErrorCode != null &&
+                    (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId")
+                    ||
+                    amazonS3Exception.ErrorCode.Equals("InvalidSecurity")))
+                {
+                    throw new Exception("Error attempting to upload dataset to S3: Check the provided AWS Credentials.");
+                }
+                else
+                {
+                    throw new Exception("Error attempting to upload dataset to S3: " + amazonS3Exception.Message);
+                }
+            }
+            //}
+            return versionId;
+        }
+
         public string GetObjectPreview(string key)
         {
             string contents = null;
@@ -101,6 +159,7 @@ namespace Sentry.data.Infrastructure
             GetObjectRequest getReq = new GetObjectRequest();
             getReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
             getReq.Key = key;
+            
 
             GetObjectResponse getRsp = S3Client.GetObject(getReq);
             if (getRsp.HttpStatusCode != System.Net.HttpStatusCode.OK)
@@ -132,7 +191,33 @@ namespace Sentry.data.Infrastructure
                 //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - InputStream");
                 s3tuReq.InputStream = stream;
                 //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + category + "/" + dsfi);
-                s3tuReq.Key = folder + "/" + fileName;
+                s3tuReq.Key = folder + fileName;
+                s3tuReq.UploadProgressEvent += new EventHandler<UploadProgressArgs>(a_TransferProgressEvent);
+                s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
+                s3tuReq.AutoCloseStream = true;
+                //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Starting Upload " + s3tuReq.Key);
+                s3tu.Upload(s3tuReq);
+            }
+            catch (AmazonS3Exception e)
+            {
+                throw new Exception("Error attempting to transfer fileto S3.", e);
+            }
+
+        }
+
+        public void TransferUtlityUploadStream(string key, Stream stream)
+        {
+            Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");
+            try
+            {
+                Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
+                Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
+                //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + Configuration.Config.GetSetting("AWSRootBucket"));
+                s3tuReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+                //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - InputStream");
+                s3tuReq.InputStream = stream;
+                //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + category + "/" + dsfi);
+                s3tuReq.Key = key;
                 s3tuReq.UploadProgressEvent += new EventHandler<UploadProgressArgs>(a_TransferProgressEvent);
                 s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                 s3tuReq.AutoCloseStream = true;
@@ -281,6 +366,25 @@ namespace Sentry.data.Infrastructure
             {
                 throw new Exception("Error attempting to delete dataset from S3: " + doRsp.HttpStatusCode);
             }
+        }
+
+        public void DeleteS3key(string key)
+        {
+            //IAmazonS3 client = null;
+            //using(client = S3Client)
+            //{
+                try
+                {
+                    DeleteObjectRequest doReq = new DeleteObjectRequest();
+                    doReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+                    doReq.Key = key;
+                    DeleteObjectResponse doRsp = S3Client.DeleteObject(doReq);
+                }
+                catch (AmazonS3Exception s3Exception)
+                {
+                    throw new Exception("Error attempting to delete S3 key: " + s3Exception.InnerException);
+                }
+            //}
         }
 
         ///// <summary>

@@ -721,7 +721,7 @@ div[id*="filterType_"]:hover
 
 .colOneMeta
 {
-    width: 150px;
+    width: 200px;
 }
 
 .borderdk_gray  { border: 1px solid gray; }
@@ -1997,4 +1997,27 @@ body { background-color: #f8f8f8; }
     word-break: normal !important;
     word-wrap: normal !important;
     white-space: pre !important;
+}
+
+td.details-control {
+    background: url('../Images/Icons/details_open.png') no-repeat center center;
+    width: 30px;
+    cursor: pointer;
+}
+tr.shown td.details-control {
+    background: url('../Images/Icons/details_close.png') no-repeat center center;
+}
+
+.detailSection{
+    margin-top: 40px;
+}
+
+.datasetversionmodal {
+    width: 800px;
+}
+
+.detailSectionHeader
+{ 
+    float: left; 
+    margin-right: 1em;
 }

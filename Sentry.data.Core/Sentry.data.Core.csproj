@@ -69,6 +69,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Entities\DatasetFile.cs" />
+    <Compile Include="Entities\DatasetFileConfig.cs" />
     <Compile Include="Entities\DatasetOriginationCode.cs" />
     <Compile Include="Entities\ComponentElement.cs" />
     <Compile Include="Entities\ConsumptionLayerComponent.cs" />
@@ -85,6 +87,7 @@
     <Compile Include="Entities\DatasetLogicalFile.cs" />
     <Compile Include="Entities\Dataset.cs" />
     <Compile Include="Entities\DatasetMetadata.cs" />
+    <Compile Include="Entities\DatasetScopeTypes.cs" />
     <Compile Include="Entities\DomainUser.cs" />
     <Compile Include="Entities\Asset.cs" />
     <Compile Include="Entities\AssetState.cs" />

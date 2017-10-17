@@ -98,14 +98,26 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public Boolean s3KeyDuplicate(int datasetId, string s3key)
+        {
+            if (Query<DatasetFile>().Where(x => x.Dataset.DatasetId == datasetId && x.FileLocation == s3key).Count() == 0)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
         public Category GetCategoryByName(string name)
         {
             return Query<Category>().Where(x => x.Name == name).FirstOrDefault();
         }
 
-        public Boolean isDatasetNameDuplicate(string name)
+        public Boolean isDatasetNameDuplicate(string datasetName, string category)
         {
-            if (Query<Dataset>().Where(x => x.DatasetName == name).Count() == 0)
+            if (Query<Dataset>().Where(x => x.DatasetName == datasetName && x.Category == category).Count() == 0)
             {
                 return false;
             }
@@ -140,15 +152,74 @@ namespace Sentry.data.Infrastructure
 
         public string GetPreviewKey(int id)
         {
-            string key = Query<Dataset>().Where(x => x.DatasetId == id).Select(s => s.S3Key).FirstOrDefault();
-            if (String.IsNullOrEmpty(Configuration.Config.GetSetting("S3LiveDataPrefix")))
-            {
-                return Configuration.Config.GetSetting("S3PreviewPrefix") + key;
-            }
-            else
-            {
-                return key.Replace(Configuration.Config.GetSetting("S3LiveDataPrefix"), Configuration.Config.GetSetting("S3PreviewPrefix"));
-            }
+            string key = Query<DatasetFile>().Where(x => x.DatasetFileId == id).FirstOrDefault().FileLocation;
+            return Configuration.Config.GetSetting("S3PreviewPrefix") + key;
+        }
+        /// <summary>
+        /// Returns all datasetfiles for dataset
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public IEnumerable<DatasetFile> GetDatasetFilesForDataset(int id)
+        {
+            IEnumerable<DatasetFile> list = Query<DatasetFile>().Where(x => x.Dataset.DatasetId == id && x.ParentDatasetFileId == null).AsEnumerable();
+
+            return list;
+        }
+
+        /// <summary>
+        /// Returns all versions of a datasetfile, including current.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public IEnumerable<DatasetFile> GetDatasetFilesVersions(int datasetId, int dataFileConfigId, string filename)
+        {
+            IEnumerable<DatasetFile> list = Query<DatasetFile>().Where(x => x.Dataset.DatasetId == datasetId && x.DatasetFileConfig.DataFileConfigId == dataFileConfigId && x.FileName == filename).AsEnumerable();
+
+            return list;
+        }
+
+        public IEnumerable<DatasetFile> GetAllDatasetFiles()
+        {
+            IEnumerable<DatasetFile> list = Query<DatasetFile>().Where(x => x.ParentDatasetFileId == null).AsEnumerable();
+
+            return list;
+        }
+
+        public DatasetFile GetDatasetFile(int id)
+        {
+            DatasetFile df = Query<DatasetFile>().Where(x => x.DatasetFileId == id).FirstOrDefault();
+            return df;
+        }
+
+        public int GetLatestDatasetFileIdForDataset(int id)
+        {
+            int d = Query<DatasetFile>().Where(w => w.Dataset.DatasetId == id).GroupBy(x => x.Dataset.DatasetId).ToList().Select(s => s.OrderByDescending(g => g.CreateDTM).Take(1)).Select(i => i.First().DatasetFileId).FirstOrDefault();
+            //DatasetFile df = Query<DatasetFile>().GroupBy(x => x.DatasetId).SelectMany(s => s.OrderByDescending(g => g.CreateDTM).Take(1)).FirstOrDefault();
+            //Query<DatasetFile>().Where(d => d.DatasetId == id).GroupBy(x => x.DatasetId).Select(s => s.Select(i => i.CreateDTM).Max());
+            ////DatasetFile df = Query<DatasetFile>().Where(x => x.DatasetId == id && x.DatasetFileId == Query<DatasetFile>().Max(m => m.DatasetFileId)).fir;
+            //return df.DatasetFileId;
+            return d;
+        }
+
+        public IEnumerable<Dataset> GetDatasetByCategoryID(int id)
+        {
+            return Query<Dataset>().Where(w => w.DatasetCategory.Id == id).AsEnumerable();
+        }
+
+        public Category GetCategoryById(int id)
+        {
+            return Query<Category>().Where(w => w.Id == id).FirstOrDefault();
+        }
+
+        public IEnumerable<DatasetScopeType> GetAllDatasetScopeTypes()
+        {
+            return Query<DatasetScopeType>().AsEnumerable();
+        }
+
+        public DatasetScopeType GetDatasetScopeById(int id)
+        {
+            return Query<DatasetScopeType>().Where(w => w.ScopeTypeId == id).FirstOrDefault();
         }
 
         public Dataset GetByS3Key(string s3Key)
@@ -156,6 +227,30 @@ namespace Sentry.data.Infrastructure
             return Query<Dataset>().Where(s => s.S3Key == s3Key).FirstOrDefault();
         }
 
+        public IEnumerable<DatasetFileConfig> getAllDatasetFileConfigs()
+        {
+            IEnumerable<DatasetFileConfig> dfcList = Query<DatasetFileConfig>().AsEnumerable();
+            return dfcList;
+        }
+
+        public int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId)
+        {
+            int dfId = Query<DatasetFile>().Where(w => w.Dataset.DatasetId == datasetId && w.DatasetFileConfig.DataFileConfigId == dataFileConfigId && w.ParentDatasetFileId == null).GroupBy(x => x.Dataset.DatasetId).ToList().Select(s => s.OrderByDescending(g => g.CreateDTM).Take(1)).Select(i => i.First().DatasetFileId).FirstOrDefault();
+
+            return dfId;
+        }
+
+        public int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId, string targetFileName)
+        {
+            int dfId = Query<DatasetFile>().Where(w => w.Dataset.DatasetId == datasetId && w.ParentDatasetFileId == null && w.DatasetFileConfig.DataFileConfigId == dataFileConfigId && w.FileName == targetFileName).GroupBy(x => x.Dataset.DatasetId).ToList().Select(s => s.OrderByDescending(g => g.CreateDTM).Take(1)).Select(i => i.First().DatasetFileId).FirstOrDefault();
+
+            return dfId;
+        }
+
+        public DatasetFileConfig getDatasetFileConfigs(int configId)
+        {
+            return Query<DatasetFileConfig>().Where(w => w.ConfigId == configId).FirstOrDefault();
+        }
         //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
     }
 }

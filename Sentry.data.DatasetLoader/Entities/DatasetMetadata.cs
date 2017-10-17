@@ -8,6 +8,7 @@ namespace Sentry.data.DatasetLoader.Entities
 {
     class DatasetMetadata
     {
+        public int datasetId { get; set; }
         public string datasetName { get; set; }
         public string category { get; set; }
         public string datasetNamePrefix { get; set; }

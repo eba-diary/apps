@@ -46,7 +46,11 @@ namespace Sentry.data.Web
                     Include(dataTablesScriptsDirectory + "/dataTables.colVis.js").
                     Include(dataTablesScriptsDirectory + "/dataTables.columnFilter.js").
                     Include(dataTablesScriptsDirectory + "/dataTables.responsive.js").
-                    Include(dataTablesScriptsDirectory + "/jquery.dataTables.odata.js"));
+                    Include(dataTablesScriptsDirectory + "/jquery.dataTables.odata.js").
+                    Include(dataTablesScriptsDirectory + "/moment-with-locales.js").
+                    Include(dataTablesScriptsDirectory + "/moment-with-locales.min.js").
+                    Include(dataTablesScriptsDirectory + "/moment.js").
+                    Include(dataTablesScriptsDirectory + "/moment.min.js"));
 
         //This bundle contains styles that are used commonly across the site, including bootstrap and jquery plugins
         bundles.Add(new StyleBundle("~/bundles/css/main").

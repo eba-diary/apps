@@ -37,6 +37,7 @@ namespace Sentry.data.Web.Controllers
             headerModel.CanUseApp = SharedContext.CurrentUser.CanUseApp;
             headerModel.EnvironmentName = Sentry.Configuration.Config.GetHostSetting("EnvironmentName");
             headerModel.AssociatePhotoUrl = "http://sentryphoto.sentry.com/associate/" + SharedContext.CurrentUser.AssociateId + "/height/25px";
+            headerModel.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
 
             //headerModel.HasMenu = hasMenu;
             ViewBag.DataAssets = das;

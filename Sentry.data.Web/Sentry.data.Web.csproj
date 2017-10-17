@@ -302,9 +302,15 @@
     <Compile Include="Models\Category\BaseCategoryModel.cs" />
     <Compile Include="Models\Category\EditCategoryModel.cs" />
     <Compile Include="Models\Category\FullCategoryModel.cs" />
+    <Compile Include="Models\Dataset\BaseDatasetFileModel.cs" />
+    <Compile Include="Models\Dataset\CreateDataFileModel.cs" />
+    <Compile Include="Models\Dataset\DatasetFileConfigsModel.cs" />
+    <Compile Include="Models\Dataset\DatasetFileGridModel.cs" />
+    <Compile Include="Models\Dataset\DatasetFileVersionsModel.cs" />
+    <Compile Include="Models\Dataset\EditDatasetFileConfigModel.cs" />
     <Compile Include="Models\Dataset\PreviewDataModel.cs" />
     <Compile Include="Models\Dataset\PushToDatasetModel.cs" />
-    <Compile Include="Models\Dataset\UploadDatasetModel.cs" />
+    <Compile Include="Models\Dataset\CreateDatasetModel.cs" />
     <Compile Include="Models\Dataset\ListDatasetModel.cs" />
     <Compile Include="Models\Dataset\_DatasetMetadataModel.cs" />
     <Compile Include="Models\Defect\BaseDefectModel.cs" />
@@ -327,6 +333,15 @@
     <Compile Include="Models\User\UserModel.cs" />
     <Compile Include="Models\User\UserSwitchModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Content Include="Images\Icons\bundle.png" />
+    <Content Include="Images\Icons\details_close.png" />
+    <Content Include="Images\Icons\details_open.png" />
+    <Content Include="js\DatasetDetail.js" />
+    <Content Include="js\ManageConfigs.js" />
+    <Content Include="Scripts\DataTables\moment-with-locales.js" />
+    <Content Include="Scripts\DataTables\moment-with-locales.min.js" />
+    <Content Include="Scripts\DataTables\moment.js" />
+    <Content Include="Scripts\DataTables\moment.min.js" />
     <Content Include="Views\Dataset\_PreviewData.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -992,7 +1007,7 @@
     <Content Include="Views\Search\_SearchResultsList.cshtml" />
     <Content Include="Views\Home\_NewsFeed.cshtml" />
     <Content Include="Views\Shared\_AssetList.cshtml" />
-    <Content Include="Views\Dataset\Upload.cshtml" />
+    <Content Include="Views\Dataset\Create.cshtml" />
     <Content Include="Views\Dataset\Index.cshtml" />
     <Content Include="Views\Home\_AssetOverview - Copy.cshtml" />
     <Content Include="Views\Dataset\_hoverPopup.cshtml" />
@@ -1012,6 +1027,11 @@
     <Content Include="Views\Home\_Feed.cshtml" />
     <Content Include="Views\Dataset\_HomeDataset.cshtml" />
     <Content Include="Views\Dataset\_SearchFilters.cshtml" />
+    <Content Include="Views\Dataset\_ListDatasetFile.cshtml" />
+    <Content Include="Views\Dataset\_UploadDataFile.cshtml" />
+    <Content Include="Views\Dataset\_DatasetFileVersions.cshtml" />
+    <Content Include="Views\Dataset\EditDataFileConfig.cshtml" />
+    <Content Include="Views\Dataset\_EditConfigFile.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1030,6 +1050,10 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Sentry.data.Common\Sentry.data.Common.csproj">
+      <Project>{30fbadfb-e6ed-4859-b15e-67bbcdceae17}</Project>
+      <Name>Sentry.data.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
       <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
       <Name>Sentry.data.Core</Name>

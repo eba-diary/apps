@@ -14,7 +14,12 @@
 
     @* dataset name / search hits *@
     <div class="dataset-list-content">
-        <div class="extension bg_gray ext_@Model.FileExtensionDisplay()">@Model.FileExtensionDisplay()</div>
+        @{
+            foreach (string item in Model.DistinctFileExtensions())
+            {
+                <div class="extension bg_gray ext_@item">@item</div>
+            }
+        }
         @*<span class="dataset-list-dataset-name" id="datasetViewDetails_@Model.DatasetId" data-id="@Model.DatasetId">
             @Model.DatasetName
         </span>*@
@@ -143,7 +148,7 @@
             }*@
 
             <div class="ownerDate">
-                <span class="@color textBold">Sentry Owner:&nbsp;</span>@Model.SentryOwnerName
+                <span class="@color textBold">Sentry Owner:&nbsp;</span>@Model.SentryOwner.FullName
                 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                 @*<span class="@color textBold">File Changed:&nbsp;</span>@Sentry.data.Web.Helpers.Utility.TimeDisplay(Model.ChangedDtm)*@
                 <span class="@color textBold">File Change Date:&nbsp;</span>@Model.ChangedDtm.ToShortDateString()

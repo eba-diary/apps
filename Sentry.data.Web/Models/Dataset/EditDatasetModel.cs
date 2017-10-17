@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Sentry.data.Core;
+using Sentry.data.Infrastructure;
 
 namespace Sentry.data.Web
 {
@@ -15,7 +16,7 @@ namespace Sentry.data.Web
         {
         }
 
-        public EditDatasetModel(Dataset ds) : base(ds)
+        public EditDatasetModel(Dataset ds, IAssociateInfoProvider associateService) : base(ds, associateService)
         {
             //if (null != catList)
             //{
@@ -75,10 +76,15 @@ namespace Sentry.data.Web
 
         public IEnumerable<SelectListItem> AllOriginationCodes { get; set; }
 
+        public IEnumerable<SelectListItem> AllDatasetScopeTypes { get; set; }
+
         [DisplayName("Frequency")]
         public int FreqencyID { get; set; }
 
         [DisplayName("Origination Code")]
         public int OriginationID { get; set; }
+
+        [DisplayName("Dataset Scope Type")]
+        public int DatasetScopeTypeID { get; set; }
     }
 }

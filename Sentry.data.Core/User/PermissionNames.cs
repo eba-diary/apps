@@ -16,5 +16,6 @@
         //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
         // JCG TODO: Revisit removing unused App_DataMgmt_UserSwitch
         public const string UserSwitch = "App_DataMgmt_UserSwitch";
+        public const string ManageDataFileConfigs = "App_DataMgmt_MngConfig";
     }
 }

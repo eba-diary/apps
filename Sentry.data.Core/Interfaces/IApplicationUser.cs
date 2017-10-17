@@ -32,6 +32,7 @@ namespace Sentry.data.Core
         Boolean CanUseApp { get; }
         Boolean CanUserSwitch { get; }
         IEnumerable<string> Permissions { get; }
+        Boolean CanManageConfigs { get; }
 
         //Calculated values - may come from external data sources and/or our domain User object
         string DisplayName { get; }

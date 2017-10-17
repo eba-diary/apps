@@ -32,6 +32,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.data.DatasetRetrieve
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.data.DatasetLoader", "Sentry.data.DatasetLoader\Sentry.data.DatasetLoader.csproj", "{83E5FFA2-F1A7-454B-90A7-EC61B3406591}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.data.Common", "Sentry.data.Common\Sentry.data.Common.csproj", "{30FBADFB-E6ED-4859-B15E-67BBCDCEAE17}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.data.Common.Tests", "Sentry.data.Common.Tests\Sentry.data.Common.Tests.csproj", "{722BE010-7E60-46CB-8C87-9A41CF1F2BED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,12 +85,20 @@ Global
 		{83E5FFA2-F1A7-454B-90A7-EC61B3406591}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83E5FFA2-F1A7-454B-90A7-EC61B3406591}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83E5FFA2-F1A7-454B-90A7-EC61B3406591}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30FBADFB-E6ED-4859-B15E-67BBCDCEAE17}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30FBADFB-E6ED-4859-B15E-67BBCDCEAE17}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30FBADFB-E6ED-4859-B15E-67BBCDCEAE17}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30FBADFB-E6ED-4859-B15E-67BBCDCEAE17}.Release|Any CPU.Build.0 = Release|Any CPU
+		{722BE010-7E60-46CB-8C87-9A41CF1F2BED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{722BE010-7E60-46CB-8C87-9A41CF1F2BED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{722BE010-7E60-46CB-8C87-9A41CF1F2BED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{722BE010-7E60-46CB-8C87-9A41CF1F2BED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 12
+		SccNumberOfProjects = 14
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = http://tfs.sentry.com/tfsversioncontrol
 		SccLocalPath0 = .
@@ -123,5 +135,11 @@ Global
 		SccProjectUniqueName11 = Sentry.data.Web.Tests\\Sentry.data.Web.Tests.csproj
 		SccProjectName11 = Sentry.data.Web.Tests
 		SccLocalPath11 = Sentry.data.Web.Tests
+		SccProjectUniqueName12 = Sentry.data.Common\\Sentry.data.Common.csproj
+		SccProjectName12 = Sentry.data.Common
+		SccLocalPath12 = Sentry.data.Common
+		SccProjectUniqueName13 = Sentry.data.Common.Tests\\Sentry.data.Common.Tests.csproj
+		SccProjectName13 = Sentry.data.Common.Tests
+		SccLocalPath13 = Sentry.data.Common.Tests
 	EndGlobalSection
 EndGlobal

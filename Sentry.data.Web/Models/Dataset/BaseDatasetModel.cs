@@ -6,6 +6,9 @@ using System.Web.Mvc;
 using Sentry.data.Core;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
+using Sentry.data.Infrastructure;
+using Sentry.Associates;
+using Sentry.data.Common;
 
 namespace Sentry.data.Web
 {
@@ -16,8 +19,10 @@ namespace Sentry.data.Web
 
         }
 
-        public BaseDatasetModel(Dataset ds)
+        public BaseDatasetModel(Dataset ds, IAssociateInfoProvider associateInfoService)
         {
+            this.SentryOwner = associateInfoService.GetAssociateInfo(ds.SentryOwnerName);
+            this.SentryOwnerName = ds.SentryOwnerName;
             this.DatasetId = ds.DatasetId;
             this.Category = ds.Category;
             this.DatasetName = ds.DatasetName;
@@ -29,10 +34,7 @@ namespace Sentry.data.Web
             this.FileExtension = ds.FileExtension;
             this.DatasetDtm = ds.DatasetDtm;
             this.ChangedDtm = ds.ChangedDtm;
-            this.UploadDtm = ds.UploadDtm;
             this.CreationFreqDesc = ds.CreationFreqDesc;
-            this.FileSize = ds.FileSize;
-            this.RecordCount = ds.RecordCount;
             this.S3Key = ds.S3Key;
             this.IsSensitive = ds.IsSensitive;
             this.CanDisplay = ds.CanDisplay;
@@ -52,25 +54,51 @@ namespace Sentry.data.Web
             //    this.Metadata.Add(new _DatasetMetadataModel(dsm));
             //}
             this.SearchHitList = new List<string>();
-
-            if (ds.FileExtension == ".csv")
-                { this.IsPushToSASCompatible = true; }
+            this.IsPushToTableauCompatible = false;
+            this.DatasetCategory = ds.DatasetCategory; /*Caden a change here for the Category reference*/
+            this.DatasetFiles = new List<BaseDatasetFileModel>();
+            foreach (DatasetFile df in ds.DatasetFiles.OrderByDescending(x => x.CreateDTM))
+            {
+                this.DatasetFiles.Add(new BaseDatasetFileModel(df));
+            }
+            this.DatasetScopeType = ds.DatasetScopeType;
+            this.DatafilesFilesToKeep = ds.DatafilesToKeep;
+            this.DatasetFileConfigs = new List<DatasetFileConfigsModel>();
+            foreach (DatasetFileConfig dfc in ds.DatasetFileConfigs)
+            {
+                this.DatasetFileConfigs.Add(new DatasetFileConfigsModel(dfc));
+            }
+            this.DropLocation = ds.DropLocation;
+            if (this.DistinctFileExtensions().Where(w => w.ToString() == "csv").Count() > 0)
+            { this.IsPushToSASCompatible = true; }
             else
-                { this.IsPushToSASCompatible = false; }
+            { this.IsPushToSASCompatible = false; }
 
-            if (ds.FileExtension == ".csv" || ds.FileExtension == ".txt" || ds.FileExtension == ".json")
+            //if (ds.FileExtension == ".csv")
+            //{ this.IsPushToSASCompatible = true; }
+            //else
+            //{ this.IsPushToSASCompatible = false; }
+            if (this.DistinctFileExtensions().Where(w => w.ToString() == "csv" || w.ToString() == "txt" || w.ToString() == "json").Count() > 0)
+            //if (ds.FileExtension == ".csv" || ds.FileExtension == ".txt" || ds.FileExtension == ".json")
             { this.IsPreviewCompatible = true; }
             else
             { this.IsPreviewCompatible = false; }
-
-            this.IsPushToTableauCompatible = false;
-            DatasetCategory = ds.DatasetCategory; /*Caden a change here for the Category reference*/
         }
 
         public string FileExtensionDisplay()
         {
             string fe = FileExtension.TrimStart('.');
             return fe;
+        }
+
+        public List<string> DistinctFileExtensions()
+        {
+            List<string> extensions = new List<string>();
+            foreach (BaseDatasetFileModel item in this.DatasetFiles)
+            {
+                extensions.Add(Utilities.GetFileExtension(item.FileName));
+            }
+            return extensions.Distinct().ToList();
         }
 
         public int DatasetId { get; set; }
@@ -129,16 +157,9 @@ namespace Sentry.data.Web
         [DisplayName("Creation Frequency")]
         public string CreationFreqDesc { get; set; }
 
-        [Required]
-        [DisplayName("File Size")]
-        public long FileSize { get; set; }
-
-        [DisplayName("Record Count")]
-        public long RecordCount { get; set; }
-
         //[Required]
         [MaxLength(1024)]
-        [DisplayName("S3 Key")]
+        [DisplayName("S3 Location")]
         public string S3Key { get; set; }
 
         [DisplayName("Sensitive")]
@@ -181,6 +202,8 @@ namespace Sentry.data.Web
 
         public Boolean IsPreviewCompatible { get; set; }
 
+        public Boolean CanManageConfigs { get; set; }
+
         public Category DatasetCategory { get; set; } /* Caden made a change here for the Category reference */ 
         //public IList<String> CategoryList { get; set; }
 
@@ -188,6 +211,22 @@ namespace Sentry.data.Web
         ///// AllCategories holds the sorted list of all possible categories.
         ///// </summary>
         //public IEnumerable<SelectListItem> AllCategories { get; set; }
+
+        public IList<BaseDatasetFileModel> DatasetFiles { get; set; }
+
+        [DisplayName("Dataset Scope")]
+        public DatasetScopeType DatasetScopeType { get; set; }
+
+        [RegularExpression(@"^\d+$", ErrorMessage = "Must be non-negative number")] //Only allow digits
+        [DisplayName("Number of Files Keep")]
+        public int DatafilesFilesToKeep { get; set; }
+
+        public Associate SentryOwner { get; set; }
+
+        public IList<DatasetFileConfigsModel> DatasetFileConfigs { get; set; }
+
+        [DisplayName("Drop Location")]
+        public string DropLocation { get; set; }
 
     }
 }

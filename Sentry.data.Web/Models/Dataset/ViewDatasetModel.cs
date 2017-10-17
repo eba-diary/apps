@@ -1,4 +1,5 @@
 ﻿using Sentry.data.Core;
+using Sentry.data.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -13,7 +14,7 @@ namespace Sentry.data.Web
         {
         }
 
-        public ViewDatasetModel(Dataset ds, UserService userService) : base(ds)
+        public ViewDatasetModel(Dataset ds, IAssociateInfoProvider associateService) : base(ds, associateService)
         {
         }
 
