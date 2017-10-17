@@ -69,12 +69,12 @@ namespace Sentry.data.Common.Tests
             var result = Utilities.FormatDatasetName("Data_SeT_BlAH");
             Assert.AreEqual("data_set_blah", result);
         }
-        [TestMethod]
-        public void GenerateLocationKey_Returns_Correct_Format()
-        {
-            var result = Utilities.GenerateLocationKey("Yearly", "Claim", "Dataset");
-            Assert.AreEqual("data/claim/dataset/yrly/", result);
-        }
+        //[TestMethod]
+        //public void GenerateLocationKey_Returns_Correct_Format()
+        //{
+        //    var result = Utilities.GenerateLocationKey("Yearly", "Claim", "Dataset");
+        //    Assert.AreEqual("data/claim/dataset/yrly/", result);
+        //}
         private Dataset GetMockDatasetData()
         {
 
