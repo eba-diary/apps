@@ -4,6 +4,8 @@
 
 data.Dataset = {
 
+    DatasetFilesTable: {},
+
     IndexInit: function () {
         /// <summary>
         /// Initialize the Index page for data assets (with the categories)
@@ -13,11 +15,39 @@ data.Dataset = {
             data.Dataset.DisplayCategory($(this).data("category"));
         });
 
-        $("[id^='UploadDataset']").click(function (e) {
+        $("[id^='CreateDataset']").click(function (e) {
             e.preventDefault();
             data.Dataset.ViewUpload();
         });
+
+        $("[id^='UploadDatafile']").click(function (e) {
+            e.preventDefault();
+            //data.Dataset.ViewCreateIndex();
+            //data.DatasetDetail.ProgressModalStatus();
+            data.DatasetDetail.UploadFileModal(0);
+        });
     },
+
+    //CreateInit: function () {
+    //    $("#categoryList").change(function () {
+    //        var cID = $(this).val();
+    //        var controllerURL = "/Dataset/LoadDatasetList/?id=" + encodeURI(cID);
+    //        $.get(controllerURL, function (result) {
+    //            var select = $("#datasetList");
+    //            select.empty();
+    //            select.append($('<option/>', {
+    //                value: 0,
+    //                text: "Select Dataset"
+    //            }));
+    //            $.each(result, function (index, itemData) {
+    //                select.append($('<option/>', {
+    //                    value: itemData.Value,
+    //                    text: itemData.Text
+    //                }));
+    //            });
+    //        });
+    //    })
+    //},
 
     ListInit: function () {
         /// <summary>
@@ -162,6 +192,25 @@ data.Dataset = {
                 $(txt).text("Show Less");
             }
         });
+
+        //var progress = $.connection.progressHub;
+
+        //// Create a function that the hub can call back to display messages.
+        //progress.client.AddProgress = function (message, percentage) {
+        //    ProgressBarModal("show", message, "Progress: " + percentage);
+        //    $('#ProgressMessage').width(percentage);
+        //    if (percentage == "100%") {
+        //        ProgressBarModal();
+        //    }
+        //};
+
+        //$.connection.hub.start()
+        //    .done(function () {
+        //        var connectionId = $.connection.hub.id;
+        //        console.log('Now connected, connection ID = ' + connectionId)
+        //    })
+        //    .fail(function () { console.log('Failed to connect') });
+
     },
 
     DetailInit: function () {
@@ -193,6 +242,10 @@ data.Dataset = {
             data.Dataset.PreviewDataModal($(this).data("id"));
         });
 
+        $(".DatasetFile_ID").click(function () {
+            alert("DatasetFile_ID function")
+        })
+
         //$(document).on('show.bs.modal', '.modal', function (event) {
         //    var zIndex = 1040 + (10 * $('.modal:visible').length);
         //    $(this).css('z-index', zIndex);
@@ -201,21 +254,113 @@ data.Dataset = {
         //    }, 0);
         //});
 
-    },
-
-    UploadInit: function () {
-        /// <summary>
-        /// Initialize the Create Asset view
-        /// </summary>
-        //$("#CategoryIDs").select2({
-        //    placeholder: "Click here to choose one or more categories"
-        //});
-        $("[id^='GenWeather']").off('click').on('click', function (e) {
-            e.preventDefault();
-            data.Dataset.GenWeather();
+        //data.Dataset.DatasetFilesTable = $("#datasetFilesTable").DataTable({
+         $("#datasetFilesTable").DataTable({
+            autoWidth: false,
+            serverSide: true,
+            processing: true,
+            searching: false,
+            paging: true,
+            ajax: {
+                url: "/Dataset/GetDatasetFileInfoForGrid/?Id=" + Id,
+                type: "POST"
+            },
+            columns: [
+                        {
+                            data: "Id",
+                            width: "20%",
+                            type: "num",
+                            className: "DatasetFile_ID"
+                        },
+                        { data: "Name", width: "50%", className: "Name" },
+                        { data: "UploadUserName", className: "UploadUserName" }
+                        //,{ data: "Id", render: data.Dataset.make_upload_links}
+            ],
+            order: [1, 'asc']
+            //stateSave: true,
+            //stateDuration: -1  // indicates session storage, not local storage
         });
 
+        $("#datasetFilesTable").dataTable().columnFilter({
+            sPlaceHolder: "head:after",
+            aoColumns: [
+                    { type: "number-range" },
+                    { type: "text" },
+                    { type: "text" }
+                    //, null
+            ]
+        });
 
+        //$("#datasetFilesTable").dataTable().columns('.filter-row').every(function () {
+        //    var that = this;
+
+        //    // Create the select list and search operation
+        //    var select = $('<select />')
+        //        .appendTo(
+        //            this.footer()
+        //        )
+        //        .on('change', function () {
+        //            that
+        //                .search($(this).val())
+        //                .draw();
+        //        });
+
+        //    // Get the search data for the first column and add to the select list
+        //    this
+        //        .cache('search')
+        //        .sort()
+        //        .unique()
+        //        .each(function (d) {
+        //            select.append($('<option value="' + d + '">' + d + '</option>'));
+        //        });
+        //});
+
+        //// Setup - add a text input to each footer cell
+        //$('#datasetFilesTable tfoot th').each(function () {
+        //    alert("This Function");
+        //    var title = $('#datasetFilesTable thead th').eq($(this).index()).text();
+        //    $(this).html('<input type="text" placeholder="Search ' + title + '" />');
+        //});
+
+        // DataTable
+        var table = $('#datasetFilesTable').DataTable();
+
+        // Apply the filter
+        table.columns().every(function () {
+            var column = this;
+
+            $('input', this.footer()).on('keyup change', function () {
+                column
+                    .search(this.value)
+                    .draw();
+            });
+        });
+
+        $("#userTable_wrapper .dt-toolbar").html($("#userToolbar"));
+
+        $("#exportToExcel").click(function () {
+            alert("exportToExcel Function");
+        });
+
+    },
+
+    make_upload_links: function (cellData, type, rowData) {
+        return String.format($("#userTableRowIcons").html(), rowData.Id);
+    },
+
+    showConfirmDeleteModal: function (cell) {
+        alert("showConfirmDeleteModal");
+        alert(cell);
+        //var data = data.Dataset.DatasetFilesTable.row($(cell).closest("tr")).data();
+
+        //alert(data.Id);
+        //alert(data.Name);
+    },
+
+    CreateInit: function () {
+        /// <summary>
+        /// Initialize the Create Dataset view
+        /// </summary>
 
         //Set Secure HREmp service URL for associate picker
         $.assocSetup({ url: "https://hrempsecurequal.sentry.com/api/associates" });
@@ -263,7 +408,7 @@ data.Dataset = {
 
             }
         });
-        
+
         //$("#OwnerID").val($("SentryOwnerName").val);
     },
 
@@ -294,6 +439,24 @@ data.Dataset = {
         });
     },
 
+    DownloadDatasetFile: function (id) {
+        alert(id);
+
+        var data = data.Dataset.DatasetFilesTable.row($(id).closest("tr")).data();
+
+        alert(data.Id);
+        /// <summary>
+        /// Send temp URL (containing the dataset, from S3) to a new window
+        /// This will initiate the download process
+        /// </summary>
+
+        //var controllerURL = "/Dataset/GetDatasetFileDownloadURL/?id=" + encodeURI(id);
+        //$.get(controllerURL, function (result) {
+        //    var jrUrl = result;
+        //    window.open(jrUrl, "_blank");
+        //});
+    },
+
     PushToSAS_Filename: function (id, filename) {
         /// <summary>
         /// Download dataset from S3 and push to SAS file share
@@ -301,14 +464,14 @@ data.Dataset = {
 
         //var val = document.getElementById('FileNameOverride').value;
         //var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(id) + "&fileOverride='" + encodeURI(filename) + "'";
-        
-        var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(id) + "&fileOverride=" + encodeURI(filename) + "";
-        data.Dataset.ProgressModalStatus();
+        var cnx = data.Dataset.ProgressModalStatus();
+        alert("Connection: " + cnx);
+        var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(id) + "&fileOverride=" + encodeURI(filename) + "&connectionString=" + cnx;
         $.post(controllerURL, function (result) {
             Sentry.ShowModalAlert(result);
             //modal.ReplaceModalBody(result);
             //var modal = Sentry.ShowModalCustom("Push To SAS", result);
-        });
+        });  
     },
 
     PushToOverrideInit: function () {
@@ -408,7 +571,15 @@ data.Dataset = {
         /// <summary>
         /// Load the Edit Asset view
         /// </summary>
-        url = "/Dataset/Upload";
+        url = "/Dataset/Create";
+        window.location = url;
+    },
+
+    ViewCreateIndex: function () {
+        /// <summary>
+        /// Load the Edit Asset view
+        /// </summary>
+        url = "/Dataset/Create/?datasetId=0";
         window.location = url;
     },
 
@@ -432,8 +603,9 @@ data.Dataset = {
     ProgressModalStatus: function () {
         // --- progress bar stuff : start ---
         // Reference the auto-generated proxy for the hub.
-
+        
         var progress = $.connection.progressHub;
+        var connectionId
 
         // Create a function that the hub can call back to display messages.
         progress.client.AddProgress = function (message, percentage) {
@@ -444,9 +616,18 @@ data.Dataset = {
             }
         };
 
-        $.connection.hub.start().done(function () {
-            var connectionId = $.connection.hub.id;
-        });
+        connectionId = $.connection.hub.start()
+            .done(function () {
+                var connectionId = $.connection.hub.id;
+                alert(".done: " + connectionId);
+                console.log('Now connected, connection ID = ' + connectionId);
+                return connectionId;
+            })
+            .fail(function () { console.log('Failed to connect') });
+        
+        alert("ProgressModalStatus: " + connectionId);
+
+        return(connectionId)
 
         // --- progress bar stuff : end ---
 

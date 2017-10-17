@@ -17,12 +17,17 @@ using Newtonsoft.Json;
 using System.Net;
 using System.Text;
 using Sentry.data.Infrastructure;
+using Sentry.DataTables.Shared;
+using Sentry.DataTables.Mvc;
+using Sentry.DataTables.QueryableAdapter;
+using Sentry.data.Common;
 
 namespace Sentry.data.Web.Controllers
 {
     [SessionState(SessionStateBehavior.ReadOnly)]
     public class DatasetController : BaseController
     {
+        private IAssociateInfoProvider _associateInfoProvider;
         private IDatasetContext _datasetContext;
         private UserService _userService;
         private IDatasetService _s3Service;
@@ -72,10 +77,11 @@ namespace Sentry.data.Web.Controllers
                     //List<String> catList = dsList.Select(s => s.Category).Distinct().ToList();
                     foreach (Dataset ds in dsList)
                     {
-                        BaseDatasetModel dsModel = new BaseDatasetModel(ds);
+                        BaseDatasetModel dsModel = new BaseDatasetModel(ds, _associateInfoProvider);
                         dsmList.Add(dsModel);
                         dsModel.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
                         dsModel.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
+                        dsModel.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
                     }
                     _dsModelList = dsmList;
                 }
@@ -83,12 +89,13 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        public DatasetController(IDatasetContext dsCtxt, IDatasetService dsSvc, UserService userService, ISASService sasService)
+        public DatasetController(IDatasetContext dsCtxt, IDatasetService dsSvc, UserService userService, ISASService sasService, IAssociateInfoProvider associateInfoService)
         {
             _datasetContext = dsCtxt;
             _s3Service = dsSvc;
             _userService = userService;
             _sasService = sasService;
+            _associateInfoProvider = associateInfoService;
             //_weatherDataProvider = weatherDataProvider;
         }
 
@@ -214,6 +221,23 @@ namespace Sentry.data.Web.Controllers
             jr.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
             return jr;
         }
+
+        [HttpGet()]
+        [AuthorizeByPermission(PermissionNames.DwnldNonSensitive)]
+        public JsonResult GetDatasetFileDownloadURL(int id)
+        {
+            //Dataset ds = _datasetContext.GetById(id);
+            //JsonResult jr = new JsonResult();
+            //jr.Data = _s3Service.GetDatasetDownloadURL(ds.S3Key);
+            //jr.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
+
+            DatasetFile df = _datasetContext.GetDatasetFile(id);
+            JsonResult jr = new JsonResult();
+            jr.Data = _s3Service.GetDatasetDownloadURL(df.FileLocation, df.VersionId);
+            jr.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
+
+            return jr;
+        }
         // GET: Dataset
         public ActionResult Index()
         {
@@ -266,7 +290,7 @@ namespace Sentry.data.Web.Controllers
                 string var = co.value;
                 List<BaseDatasetModel> tempList = new List<BaseDatasetModel>();
 
-                tempList = GetDatasetModelList().Where(x => x.SentryOwnerName == co.value).ToList();
+                tempList = GetDatasetModelList().Where(x => x.SentryOwner.FullName == co.value).ToList();
 
                 ownerDsList = ownerDsList.Union(tempList).ToList();
             }
@@ -320,8 +344,8 @@ namespace Sentry.data.Web.Controllers
 
         private IList<FilterModel> GetDatasetFilters(ListDatasetModel ldm, string cat)
         {
-            //get current list of datasets
-            List<BaseDatasetModel> baseDsList = GetDatasetModelList().ToList();
+            ////get current list of datasets
+            //List<BaseDatasetModel> baseDsList = GetDatasetModelList().ToList();
 
             //create FilterModel list object to return
             IList<FilterModel> FilterList = new List<FilterModel>();
@@ -364,7 +388,11 @@ namespace Sentry.data.Web.Controllers
                 //Count of all datasets equal to this filter
                 nf.count = ldm.DatasetList.Where(f => f.Category == nf.value).Count();
 
-                fList.Add(nf);
+                // Only add filter if there are datasets associated based on filtering 
+                //if (nf.count > 0)
+                //{
+                    fList.Add(nf);
+                //}                
                 i++;
             }
             Filter.FilterNameList = fList;
@@ -379,18 +407,18 @@ namespace Sentry.data.Web.Controllers
 
             i = 0;
 
-            foreach (string category in _datasetContext.GetSentryOwnerList().ToList())
+            foreach (string owner in _datasetContext.GetSentryOwnerList().ToList())
             {
                 FilterNameModel nf = new FilterNameModel();
                 nf.id = i;
-                nf.value = category;
+                nf.value = _associateInfoProvider.GetAssociateInfo(owner).FullName;
 
                 //Match isChecked status to status on input model
                 if (ldm.SearchFilters.Count() > 0)
                 {
                     if (ldm.SearchFilters.Where(f => f.FilterType == "Sentry Owner").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).Count() > 0)
                     {
-                        if (ldm.SearchFilters.Where(f => f.FilterType == "Sentry Owner").SelectMany(fi => fi.FilterNameList).Where(fil => fil.value == category && fil.isChecked == true).Count() > 0)
+                        if (ldm.SearchFilters.Where(f => f.FilterType == "Sentry Owner").SelectMany(fi => fi.FilterNameList).Where(fil => fil.value == owner && fil.isChecked == true).Count() > 0)
                         {
                             nf.isChecked = true;
                         }
@@ -398,9 +426,14 @@ namespace Sentry.data.Web.Controllers
                 }
 
                 //Count of all datasets equal to this filter
-                nf.count = ldm.DatasetList.Where(f => f.SentryOwnerName == nf.value).Count();
+                nf.count = ldm.DatasetList.Where(f => f.SentryOwner.FullName == nf.value).Count();
 
-                fList.Add(nf);
+                // Only add filter if there are datasets associated based on filtering 
+                //if (nf.count > 0)
+                //{
+                    fList.Add(nf);
+                //}
+                
                 i++;
             }
             Filter.FilterNameList = fList;
@@ -434,7 +467,11 @@ namespace Sentry.data.Web.Controllers
                 //Count of all datasets equal to this filter
                 nf.count = ldm.DatasetList.Where(f => f.CreationFreqDesc == nf.value).Count();
 
-                fList.Add(nf);
+                // Only add filter if there are datasets associated based on filtering 
+                //if (nf.count > 0)
+                //{
+                    fList.Add(nf);
+                //}
             }
             Filter.FilterNameList = fList;
             FilterList.Add(Filter);
@@ -587,153 +624,316 @@ namespace Sentry.data.Web.Controllers
         {
             Dataset ds = _datasetContext.GetById(id);
             // IList<String> catList = _datasetContext.GetCategoryList();
-            BaseDatasetModel bdm = new BaseDatasetModel(ds);
+            BaseDatasetModel bdm = new BaseDatasetModel(ds, _associateInfoProvider);
             bdm.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
             bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
+            bdm.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
             return View(bdm);
         }
 
         // JCG TODO: Add additional permissions check around CanUpload
         // GET: Dataset/Upload
         [HttpGet]
-        public ActionResult Upload()
+        public ActionResult Create()
         {
-            UploadDatasetModel udm = new UploadDatasetModel();
+            CreateDatasetModel udm = new CreateDatasetModel();
             udm.AllCategories = GetCategoryList();
             udm.AllFrequencies = GetDatasetFrequencyListItems();  //load all values for dropdown
             udm.AllOriginationCodes = GetDatasetOriginationListItems(); //load all values for dropdown
-            udm.FreqencyID = 6; // preselected NonSchedule
+            udm.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
+            udm.FreqencyID = 6; // preselected NonSchedule            
             return View(udm);
         }
 
-        // JCG TODO: Add unit tests for [Post]Upload
-        // JCG TODO: Add additional permissions check around CanUpload
-        // JCG TODO: Revist moving S3.Transfer.TransferUtility logic to Infrastructure\Core layer
-        // POST: Dataset/Upload
-        [HttpPost]
-        public ActionResult Upload(UploadDatasetModel udm, HttpPostedFileBase DatasetFile)
+        [HttpGet]
+        public ActionResult EditDataFileConfig()
         {
+            DatasetFileConfigsModel edfc = new DatasetFileConfigsModel();
+            return View(edfc);
+        }
+
+        [HttpPost]
+        public ActionResult Create(CreateDatasetModel cdm)
+        {
+            
+            if (_datasetContext.isDatasetNameDuplicate(cdm.DatasetName, _datasetContext.GetCategoryById(cdm.CategoryIDs).Name))
+            {
+                AddCoreValidationExceptionsToModel(new ValidationException("Dataset name already exists within category"));
+            }
             try
             {
-
-                if (_datasetContext.isDatasetNameDuplicate(udm.DatasetName))
-                {
-                    throw new ValidationException("Dataset name already exists");
-                }
-
-                if (DatasetFile == null)
-                {
-                    throw new ValidationException("Please select file to be uploaded");
-                }
-
-                //string category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs).Name; 
-                Category category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs); /*Caden a change here for the Category reference*/
-                string frequency = ((DatasetFrequency)udm.FreqencyID).ToString();
-                string originationcode = ((DatasetOriginationCode)udm.OriginationID).ToString();
-                string dsfi = System.IO.Path.GetFileName(DatasetFile.FileName);
-                string s3key = category.Name + "/" + dsfi; 
-
-                if (_datasetContext.s3KeyDuplicate(s3key))
-                {
-                    throw new ValidationException("File already exsits on S3");
-                }
-
-                Sentry.Common.Logging.Logger.Debug("Entered HttpPost <Upload>");
                 if (ModelState.IsValid)
                 {
-                    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");
+                    Dataset ds = CreateDatasetFromModel(cdm);
 
-                    _s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(uploadRequest_UploadPartProgressEvent);
-                    _s3Service.TransferUtlityUploadStream(category.Name, dsfi, DatasetFile.InputStream); 
-
-
-                    //// 1. upload dataset
-                    //Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
-                    ////Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(_s3Service.clie);
-                    //Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
-                    ////Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + Configuration.Config.GetSetting("AWSRootBucket"));
-                    //s3tuReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
-                    ////Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - InputStream");
-                    //s3tuReq.InputStream = DatasetFile.InputStream;
-                    ////Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + category + "/" + dsfi);
-                    //s3tuReq.Key = category + "/" + dsfi;
-                    //s3tuReq.UploadProgressEvent += new EventHandler<Amazon.S3.Transfer.UploadProgressArgs>(uploadRequest_UploadPartProgressEvent);
-                    //s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
-                    //s3tuReq.AutoCloseStream = true;
-                    ////Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Starting Upload " + s3tuReq.Key);
-                    //s3tu.Upload(s3tuReq);
-
-
-                    // 2. create dataset metadata
-                    List<DatasetMetadata> dsmd = new List<DatasetMetadata>();
-                    DateTime dateTimeNow = DateTime.Now;
-                    Dataset ds = new Dataset(
-                        0, // adding new dataset; ID is disregarded
-                        category.Name, 
-                        udm.DatasetName,
-                        udm.DatasetDesc,
-                        udm.CreationUserName,
-                        udm.SentryOwnerName,
-                        _userService.GetCurrentUser().AssociateId,
-                        originationcode,
-                        udm.DatasetDtm,
-                        dateTimeNow,
-                        dateTimeNow,
-                        frequency,
-                        DatasetFile.ContentLength,
-                        udm.RecordCount,
-                        s3key, /*Caden a change here for the Category reference*/
-                        udm.IsSensitive,
-                        udm.CanDisplay,
-                        null,
-                        category /*Caden a change here for the Category reference*/);
-
-                    //foreach (_DatasetMetadataModel dsmdmi in udm.RawMetadata)
-                    //{
-                    //    DatasetMetadata dsmdi = new DatasetMetadata(dsmdmi.Id, dsmdmi.DatasetId, dsmdmi.IsColumn, dsmdmi.Name, dsmdmi.Value, ds);
-                    //    ds.RawMetadata.Add(dsmdi);
-                    //}
+                    //IApplicationUser user = _userService.GetCurrentUser();
+                    //DateTime CreateTime = DateTime.Now;
 
                     _datasetContext.Merge<Dataset>(ds);
                     _datasetContext.SaveChanges();
+
+                    
+
+                    //Create Generic Data File Config for Dataset
+                    DatasetFileConfig dfc = new DatasetFileConfig(
+                        0,
+                        "Default",
+                        "Default Config for Dataset.  Uploaded files that do not match any configs will default to this config",
+                        1,
+                        _datasetContext.GetByS3Key(ds.S3Key).DatasetId,
+                        "*.*",
+                        "DFS",
+                        ds.DropLocation,
+                        true,
+                        true,
+                        0,
+                        1,
+                        true
+                        );
+
+                    _datasetContext.Merge<DatasetFileConfig>(dfc);
+                    _datasetContext.SaveChanges();
+
+                    try
+                    {
+                        if (!System.IO.Directory.Exists(ds.DropLocation))
+                        {
+                            System.IO.Directory.CreateDirectory(ds.DropLocation);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+
+                        StringBuilder errmsg = new StringBuilder();
+                        errmsg.AppendLine("Failed to Create Drop Location:");
+                        errmsg.AppendLine($"DatasetId: {ds.DatasetId}");
+                        errmsg.AppendLine($"DatasetName: {ds.DatasetName}");
+                        errmsg.AppendLine($"DropLocation: {ds.DropLocation}");
+
+                        Sentry.Common.Logging.Logger.Error(errmsg.ToString(), e);
+                    }
+
                     int maxId = _datasetContext.GetMaxId();
                     return RedirectToAction("Detail", new { id = maxId });
                 }
-
             }
-            catch (Exception ex)
+            catch (Sentry.Core.ValidationException ex)
             {
-                if (ex is ValidationException)
-                {
-                    AddCoreValidationExceptionsToModel(ex as ValidationException);
-                    Sentry.Common.Logging.Logger.Error("Error", ex);
-
-                }
-                else
-                {
-                    if (ex is AmazonS3Exception)
-                    {
-                        Sentry.Common.Logging.Logger.Error("S3 Upload Error", ex);
-                        ModelState.AddModelError("Upload", ex);
-                    }
-
-                    Sentry.Common.Logging.Logger.Error("Error", ex);
-                }
-
+                AddCoreValidationExceptionsToModel(ex);
             }
             finally
             {
                 _datasetContext.Clear();
-                udm.AllCategories = GetCategoryList();  //Reload dropdown value list
-                udm.AllFrequencies = GetDatasetFrequencyListItems();  //Reload dropdown value list
-                udm.AllOriginationCodes = GetDatasetOriginationListItems(); //Reload dropdown value list
-                udm.FreqencyID = 6; // preselected NonSchedule
-                udm.OriginationID = 1; // preselected Internal
-
+                cdm.AllCategories = GetCategoryList();  //Reload dropdown value list
+                cdm.AllFrequencies = GetDatasetFrequencyListItems();  //Reload dropdown value list
+                cdm.AllOriginationCodes = GetDatasetOriginationListItems(); //Reload dropdown value list
+                cdm.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
+                cdm.FreqencyID = 6; // preselected NonSchedule
+                cdm.OriginationID = 1; // preselected Internal
             }
-            return View(udm);
 
+            return View(cdm);
+       }
+
+        ////[HttpPost]
+        ////public ActionResult CreateNewDataFile(CreateDataFileModel cdm, HttpPostedFileBase DatasetFile)
+        ////{
+        ////    if (DatasetFile == null)
+        ////    {
+        ////        throw new ValidationException("Please select file to be uploaded");
+        ////    }
+
+        ////    string dsfi = System.IO.Path.GetFileName(DatasetFile.FileName);
+        ////    IApplicationUser user = _userService.GetCurrentUser();
+
+        ////    Dataset ds = _datasetContext.GetById(cdm.dsID);
+
+        ////    DateTime uploadTime = DateTime.Now;
+
+        ////    DatasetFile df = new DatasetFile(
+        ////        0,
+        ////        dsfi,
+        ////        ds,
+        ////        _userService.GetCurrentUser().AssociateId,
+        ////        GenerateDatasetFileLocation(ds, uploadTime),
+        ////        uploadTime,
+        ////        uploadTime
+        ////        );
+
+
+        ////    Sentry.Common.Logging.Logger.Debug("Initializing Event Handlers");
+
+        ////    _s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(uploadRequest_UploadPartProgressEvent);
+        ////    _s3Service.TransferUtlityUploadStream(df.S3Key, DatasetFile.InputStream);
+
+
+        ////    _datasetContext.Merge<DatasetFile>(df);
+        ////    _datasetContext.SaveChanges();
+        ////    return RedirectToAction("Detail", new { id = ds.DatasetId });
+
+        ////}
+
+
+        private Dataset CreateDatasetFromModel(CreateDatasetModel cdm)
+        {
+            DateTime CreateTime = DateTime.Now;
+            string cat = _datasetContext.GetCategoryById(cdm.CategoryIDs).Name;
+            string freqName = Enum.GetName(typeof(DatasetFrequency), cdm.FreqencyID);
+            IApplicationUser user = _userService.GetCurrentUser();
+            Dataset ds = new Dataset(
+                0,
+                cat,
+                cdm.DatasetName,
+                cdm.DatasetDesc,
+                cdm.CreationUserName,
+                cdm.SentryOwnerName,
+                user.AssociateId,
+                Enum.GetName(typeof(DatasetOriginationCode), cdm.OriginationID),
+                CreateTime,
+                CreateTime,
+                freqName,
+                Utilities.GenerateDatasetStorageLocation(freqName, cat, cdm.DatasetName),
+                false,
+                true,
+                null,
+                _datasetContext.GetCategoryById(cdm.CategoryIDs),
+                null,
+                _datasetContext.GetDatasetScopeById(cdm.DatasetScopeTypeID),
+                cdm.DatafilesFilesToKeep,
+                null,
+                Utilities.GenerateDatasetDropLocation(freqName, cat, cdm.DatasetName));
+
+            return ds;
         }
+        
+
+        //// JCG TODO: Add unit tests for [Post]Upload
+        //// JCG TODO: Add additional permissions check around CanUpload
+        //// JCG TODO: Revist moving S3.Transfer.TransferUtility logic to Infrastructure\Core layer
+        //// POST: Dataset/Upload
+        //[HttpPost]
+        //public ActionResult Upload(CreateDatasetModel udm, HttpPostedFileBase DatasetFile)
+        //{
+        //    try
+        //    {
+
+        //        if (_datasetContext.isDatasetNameDuplicate(udm.DatasetName))
+        //        {
+        //            throw new ValidationException("Dataset name already exists");
+        //        }
+
+        //        if (DatasetFile == null)
+        //        {
+        //            throw new ValidationException("Please select file to be uploaded");
+        //        }
+
+        //        //string category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs).Name; 
+        //        Category category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs); /*Caden a change here for the Category reference*/
+        //        string frequency = ((DatasetFrequency)udm.FreqencyID).ToString();
+        //        string originationcode = ((DatasetOriginationCode)udm.OriginationID).ToString();
+        //        string dsfi = System.IO.Path.GetFileName(DatasetFile.FileName);
+        //        string s3key = category.Name + "/" + dsfi; 
+
+        //        if (_datasetContext.s3KeyDuplicate(s3key))
+        //        {
+        //            throw new ValidationException("File already exsits on S3");
+        //        }
+
+        //        Sentry.Common.Logging.Logger.Debug("Entered HttpPost <Upload>");
+        //        if (ModelState.IsValid)
+        //        {
+        //            Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");
+
+        //            _s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(uploadRequest_UploadPartProgressEvent);
+        //            _s3Service.TransferUtlityUploadStream(category.Name, dsfi, DatasetFile.InputStream); 
+
+
+        //            //// 1. upload dataset
+        //            //Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
+        //            ////Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(_s3Service.clie);
+        //            //Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
+        //            ////Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + Configuration.Config.GetSetting("AWSRootBucket"));
+        //            //s3tuReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
+        //            ////Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - InputStream");
+        //            //s3tuReq.InputStream = DatasetFile.InputStream;
+        //            ////Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + category + "/" + dsfi);
+        //            //s3tuReq.Key = category + "/" + dsfi;
+        //            //s3tuReq.UploadProgressEvent += new EventHandler<Amazon.S3.Transfer.UploadProgressArgs>(uploadRequest_UploadPartProgressEvent);
+        //            //s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
+        //            //s3tuReq.AutoCloseStream = true;
+        //            ////Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Starting Upload " + s3tuReq.Key);
+        //            //s3tu.Upload(s3tuReq);
+
+
+        //            // 2. create dataset metadata
+        //            List<DatasetMetadata> dsmd = new List<DatasetMetadata>();
+        //            DateTime dateTimeNow = DateTime.Now;
+        //            Dataset ds = new Dataset(
+        //                0, // adding new dataset; ID is disregarded
+        //                category.Name, 
+        //                udm.DatasetName,
+        //                udm.DatasetDesc,
+        //                udm.CreationUserName,
+        //                udm.SentryOwnerName,
+        //                _userService.GetCurrentUser().AssociateId,
+        //                originationcode,
+        //                udm.DatasetDtm,
+        //                dateTimeNow,
+        //                dateTimeNow,
+        //                frequency,
+        //                s3key, /*Caden a change here for the Category reference*/
+        //                udm.IsSensitive,
+        //                udm.CanDisplay,
+        //                null,
+        //                category /*Caden a change here for the Category reference*/,
+        //                null);
+
+        //            //foreach (_DatasetMetadataModel dsmdmi in udm.RawMetadata)
+        //            //{
+        //            //    DatasetMetadata dsmdi = new DatasetMetadata(dsmdmi.Id, dsmdmi.DatasetId, dsmdmi.IsColumn, dsmdmi.Name, dsmdmi.Value, ds);
+        //            //    ds.RawMetadata.Add(dsmdi);
+        //            //}
+
+        //            _datasetContext.Merge<Dataset>(ds);
+        //            _datasetContext.SaveChanges();
+        //            int maxId = _datasetContext.GetMaxId();
+        //            return RedirectToAction("Detail", new { id = maxId });
+        //        }
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        if (ex is ValidationException)
+        //        {
+        //            AddCoreValidationExceptionsToModel(ex as ValidationException);
+        //            Sentry.Common.Logging.Logger.Error("Error", ex);
+
+        //        }
+        //        else
+        //        {
+        //            if (ex is AmazonS3Exception)
+        //            {
+        //                Sentry.Common.Logging.Logger.Error("S3 Upload Error", ex);
+        //                ModelState.AddModelError("Upload", ex);
+        //            }
+
+        //            Sentry.Common.Logging.Logger.Error("Error", ex);
+        //        }
+
+        //    }
+        //    finally
+        //    {
+        //        _datasetContext.Clear();
+        //        udm.AllCategories = GetCategoryList();  //Reload dropdown value list
+        //        udm.AllFrequencies = GetDatasetFrequencyListItems();  //Reload dropdown value list
+        //        udm.AllOriginationCodes = GetDatasetOriginationListItems(); //Reload dropdown value list
+        //        udm.FreqencyID = 6; // preselected NonSchedule
+        //        udm.OriginationID = 1; // preselected Internal
+
+        //    }
+        //    return View(udm);
+
+        //}
 
         /// <summary>
         /// Callback handler for S3 uploads... Amazon calls this to communicate progress; from here we communicate
@@ -890,11 +1090,13 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Edit(int id)
         {
             Dataset ds = _datasetContext.GetById<Dataset>(id);
-            EditDatasetModel item = new EditDatasetModel(ds);
+            EditDatasetModel item = new EditDatasetModel(ds, _associateInfoProvider);
             item.AllFrequencies = GetDatasetFrequencyListItems();  // Load dropdown value list
             item.FreqencyID = (int)(Enum.Parse(typeof(DatasetFrequency), ds.CreationFreqDesc));  //Preselect current value
             item.AllOriginationCodes = GetDatasetOriginationListItems();
             item.OriginationID = (int)(Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode));  //Preselect current value
+            item.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
+            item.DatasetScopeTypeID = ds.DatasetScopeType.ScopeTypeId;
             return View(item);
         }
 
@@ -904,8 +1106,18 @@ namespace Sentry.data.Web.Controllers
         [HttpPost()]
         public ActionResult Edit(int id, EditDatasetModel i)
         {
-            try
-            {
+            //if (_datasetContext.IsDupliceDataset(i.DatasetName)
+                //        {
+                //            throw new ValidationException("Dataset name already exists");
+                //        }
+
+                //        if (DatasetFile == null)
+                //        {
+                //            throw new ValidationException("Please select file to be uploaded");
+                //        }
+
+                try
+                {
                 Dataset item = _datasetContext.GetById<Dataset>(id);
                 if (ModelState.IsValid)
                 {
@@ -924,6 +1136,7 @@ namespace Sentry.data.Web.Controllers
                 _datasetContext.Clear();
                 i.AllFrequencies = GetDatasetFrequencyListItems();  //Reload dropdown value list
                 i.AllOriginationCodes = GetDatasetOriginationListItems(); //Reload dropdown value list
+                i.AllDatasetScopeTypes = GetDatasetScopeTypesListItems(); //Reload dropdown value list
             }
 
             return View(i);
@@ -935,6 +1148,13 @@ namespace Sentry.data.Web.Controllers
 
             return var;
         }
+
+        private IEnumerable<Dataset> GetDatasetByCategoryId(int id)
+        {
+            IEnumerable<Dataset> dsQ = _datasetContext.GetDatasetByCategoryID(id);
+            return dsQ;
+        }
+
 
         private IEnumerable<SelectListItem> GetDatasetFrequencyListItems()
         {
@@ -948,6 +1168,14 @@ namespace Sentry.data.Web.Controllers
             List<SelectListItem> items = Enum.GetValues(typeof(DatasetOriginationCode)).Cast<DatasetOriginationCode>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
 
             return items;
+        }
+
+        private IEnumerable<SelectListItem> GetDatasetScopeTypesListItems()
+        {
+            IEnumerable<SelectListItem> dScopeTypes = _datasetContext.GetAllDatasetScopeTypes().Select((c) => new SelectListItem { Text = c.Name, Value = c.ScopeTypeId.ToString() });
+
+
+            return dScopeTypes;
         }
 
         protected override void AddCoreValidationExceptionsToModel(Sentry.Core.ValidationException ex)
@@ -964,9 +1192,6 @@ namespace Sentry.data.Web.Controllers
                         break;
                     case Dataset.ValidationErrors.creationUserNameIsBlank:
                         ModelState.AddModelError("CreationUserName", vr.Description);
-                        break;
-                    case Dataset.ValidationErrors.uploadDateIsOld:
-                        ModelState.AddModelError("UploadDate", vr.Description);
                         break;
                     case Dataset.ValidationErrors.datasetDateIsOld:
                         ModelState.AddModelError("DatasetDate", vr.Description);
@@ -1010,8 +1235,8 @@ namespace Sentry.data.Web.Controllers
             ds.ChangedDtm = now;
             //string creationFreqCode;
             ds.CreationFreqDesc = eds.CreationFreqDesc;
-            ds.FileSize = eds.FileSize;
-            ds.RecordCount = eds.RecordCount;
+            ////ds.FileSize = eds.FileSize;
+            ////ds.RecordCount = eds.RecordCount;
             //ds.S3key;
             IList<_DatasetMetadataModel> dsmList = new List<_DatasetMetadataModel>();
             if (null != eds.Columns && null != eds.Metadata)
@@ -1058,18 +1283,9 @@ namespace Sentry.data.Web.Controllers
             if (null != eds.DatasetName && eds.DatasetName.Length > 0) ds.DatasetName = eds.DatasetName;
             ds.OriginationCode = originationcode;
             if (null != eds.SentryOwnerName && eds.SentryOwnerName.Length > 0) ds.SentryOwnerName = eds.SentryOwnerName;
-            if (eds.RecordCount > 0) ds.RecordCount = eds.RecordCount;
-
-            //if (eds.md_Metadata != null)
-            //{
-            //    IList<DatasetMetadata> newRawData = new List<DatasetMetadata>(ds.Columns);
-            //    foreach (_DatasetMetadataModel dsmm in eds.md_Metadata)
-            //    {
-            //        DatasetMetadata dsm = new DatasetMetadata(dsmm.Id, dsmm.DatasetId, dsmm.IsColumn, dsmm.Name, dsmm.Value, ds);
-            //        newRawData.Add(dsm);
-            //    }
-            //    ds.RawMetadata = newRawData;
-            //}
+            ds.DatafilesToKeep = eds.DatafilesFilesToKeep;
+            if (eds.DatasetScopeTypeID != ds.DatasetScopeType.ScopeTypeId) { ds.DatasetScopeType = _datasetContext.GetDatasetScopeById(eds.DatasetScopeTypeID); }                        
+            ds.S3Key = Utilities.GenerateDatasetStorageLocation(ds.CreationFreqDesc, ds.Category, ds.DatasetName);
         }
 
         //[HttpPost]
@@ -1166,7 +1382,7 @@ namespace Sentry.data.Web.Controllers
         //}
 
         [HttpPost]
-        public ActionResult PushToSAS(int id, string fileOverride)
+        public ActionResult PushToSAS(int id, string fileOverride, string connectionId)
         {
             Dataset ds = _datasetContext.GetById(id);
             string filename = null;
@@ -1298,15 +1514,259 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet()]
-        public PartialViewResult PreviewData(int id)
+        public PartialViewResult PreviewDatafile(int id)
         {
             PreviewDataModel model = new PreviewDataModel();
 
-            Dataset dataset = _datasetContext.GetById<Dataset>(id);
+            //Dataset dataset = _datasetContext.GetById<Dataset>(id);
             string previewKey = _datasetContext.GetPreviewKey(id);
             model.PreviewData = _s3Service.GetObjectPreview(previewKey);
 
             return PartialView("_PreviewData", model);
+        }
+
+        [HttpGet()]
+        public PartialViewResult PreviewLatestDatafile(int id)
+        {
+            PreviewDataModel model = new PreviewDataModel();
+
+            int latestDatafile = GetLatestDatasetFileIdForDataset(id);
+            string previewKey = _datasetContext.GetPreviewKey(latestDatafile);
+            model.PreviewData = _s3Service.GetObjectPreview(previewKey);
+
+            return PartialView("_PreviewData", model);
+        }
+
+        [HttpGet()]
+        public PartialViewResult GetDatasetFileVersions(int id)
+        {
+            DatasetFileVersionsModel model = new DatasetFileVersionsModel();
+
+            model.DatasetFileId = id;
+
+            return PartialView("_DatasetFileVersions", model);
+            
+        }
+
+        public JsonResult GetDatasetFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
+        {
+            //IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
+            IEnumerable<DatasetFileGridModel> files = _datasetContext.GetDatasetFilesForDataset(Id).ToList().
+                Select((f) => new DatasetFileGridModel(f)
+                );
+
+            DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
+            return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
+
+        }
+
+        public JsonResult GetVersionsOfDatasetFileForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
+        {
+            DatasetFile df = _datasetContext.GetDatasetFile(Id);
+
+            IEnumerable<DatasetFileGridModel> files = _datasetContext.GetDatasetFilesVersions(df.Dataset.DatasetId, df.DatasetFileConfig.DataFileConfigId, df.FileName).ToList().
+                Select((f) => new DatasetFileGridModel(f));
+
+            DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
+            return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
+        }
+
+        public JsonResult GetAllDatasetFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
+        {
+            IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
+                Select((f) => new DatasetFileGridModel(f)
+                );
+
+            DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
+            return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
+
+        }
+
+        public JsonResult GetDatasetFileConfigInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
+        {
+            IEnumerable<DatasetFileConfigsModel> files = null;
+            if (Id > 0)
+            {
+                files = _datasetContext.GetById(Id).DatasetFileConfigs.Select((f) => new DatasetFileConfigsModel(f));
+            }
+            else
+            {
+                files = _datasetContext.getAllDatasetFileConfigs().Select((f) => new DatasetFileConfigsModel(f));
+            }
+            //= _datasetContext.Datasets.Where(w => w.DatasetId == Id).FirstOrDefault().DatasetFileConfigs.ToList().
+            //        Select((f) => new DatasetFileConfigsModel(f));
+
+            DataTablesQueryableAdapter<DatasetFileConfigsModel> dtqa = new DataTablesQueryableAdapter<DatasetFileConfigsModel>(files.AsQueryable(), dtRequest);
+            return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet()]
+        public int GetLatestDatasetFileIdForDataset(int id)
+        {
+            int dfid = _datasetContext.GetLatestDatasetFileIdForDataset(id);
+            return dfid;
+        }
+
+        //public ActionResult Create()
+        //{
+        //    CreateDataFileModel cd = new CreateDataFileModel();
+        //    ViewBag.Categories  = GetCategoryList();
+
+        //    return View(cd);
+        //}
+
+        [HttpPost]
+        public ActionResult UploadDatafile(int id)
+        {
+            if (Request.Files.Count > 0 && id != 0)
+            {
+                try
+                {
+                    HttpFileCollectionBase files = Request.Files;
+                    for (int i = 0; i < files.Count; i++)
+                    {
+                        HttpPostedFileBase file = files[i];
+
+                        string dsfi;
+                        dsfi = System.IO.Path.GetFileName(file.FileName);
+                        ////Checking for Internet Explorer
+                        //if (Request.Browser.Browser.ToUpper() == "IE" || Request.Browser.Browser.ToUpper() == "INTERNETEXPLORER")
+                        //{
+                        //    string[] testfiles = file.FileName.Split(new char[] { '\\' });
+                        //    dsfi = testfiles[testfiles.Length - 1];
+                        //}
+                        //else
+                        //{
+                        //    dsfi = file.FileName;
+                        //}
+
+
+                        IApplicationUser user = _userService.GetCurrentUser();
+                        Dataset ds = _datasetContext.GetById(id);
+
+                        //Get DataFileConfigs associated with dataset
+
+
+                        DateTime uploadTime = DateTime.Now;
+
+                        DatasetFile df = new DatasetFile(
+                            0,
+                            dsfi,
+                            ds,
+                            null,
+                            _userService.GetCurrentUser().AssociateId,
+                            Utilities.GenerateDatasetStorageLocation(ds.CreationFreqDesc, ds.DatasetCategory.Name, ds.DatasetName),
+                            //Utility.GenerateDatafileKey(ds, uploadTime, dsfi),
+                            uploadTime,
+                            uploadTime,
+                            null,
+                            null
+                            );
+
+                        Sentry.Common.Logging.Logger.Debug("Initializing Event Handlers");
+
+                        _s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(uploadRequest_UploadPartProgressEvent);
+                        _s3Service.TransferUtlityUploadStream(df.FileLocation, df.FileName, file.InputStream);
+
+                        _datasetContext.Merge<DatasetFile>(df);
+                        _datasetContext.SaveChanges();
+                       
+                    }
+                    return Json("File Uploaded Successfully!");
+                }
+                catch (Exception e)
+                {
+                    return Json("Error occurred: " + e.Message);
+                }                
+            }
+            else
+            {
+                if (id == 0)
+                {
+                    return Json("No Dataset Selected");
+                }
+                else
+                {
+                    return Json("No files selected");
+                }                
+            }
+        }
+
+        [HttpGet()]
+        //[Route("Dataset/Create/Datafile")]
+        public ActionResult GetDatasetUploadPartialView(int datasetId)
+        {
+            CreateDataFileModel cd = new CreateDataFileModel();
+            //If a value was passed, load appropriate information
+            if (datasetId != 0)
+            {
+                cd = new CreateDataFileModel(_datasetContext.GetById(datasetId), _associateInfoProvider);
+            }
+            
+            ViewBag.Categories = GetCategoryList();
+
+            return PartialView("_UploadDataFile", cd);
+        }
+
+        [HttpGet()]
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        public ActionResult GetEditConfigPartialView(int configId)
+        {
+            DatasetFileConfig dfc = _datasetContext.getDatasetFileConfigs(configId);
+            EditDatasetFileConfigModel edfc = new EditDatasetFileConfigModel(dfc);
+
+            ViewBag.ModifyType = "Edit";
+
+            return PartialView("_EditConfigFile", edfc);
+        }
+
+        [HttpPost()]
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        public ActionResult ModifyConfigFile(EditDatasetFileConfigModel edfc)
+        {
+            DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(edfc.ConfigId);
+
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    dfc = UpdateDatasetFileConfigFromModel(dfc, edfc);
+                    _datasetContext.SaveChanges();
+                    return AjaxSuccessJson();
+                }
+            }
+            catch (Sentry.Core.ValidationException ex)
+            {
+                AddCoreValidationExceptionsToModel(ex);
+                _datasetContext.Clear();
+            }
+
+            //Return partial view when there are errors
+            return GetEditConfigPartialView(edfc.ConfigId);
+        }
+
+        private DatasetFileConfig UpdateDatasetFileConfigFromModel(DatasetFileConfig dfc, EditDatasetFileConfigModel edfc)
+        {
+            if (dfc.SearchCriteria != edfc.SearchCriteria) { dfc.SearchCriteria = edfc.SearchCriteria; }
+            if (dfc.TargetFileName != edfc.TargetFileName) { dfc.TargetFileName = edfc.TargetFileName; }
+            if (dfc.IsRegexSearch != edfc.IsRegexSearch) { dfc.IsRegexSearch = edfc.IsRegexSearch; }
+            if (dfc.OverwriteDatafile != edfc.OverwriteDatasetFile) { dfc.OverwriteDatafile = edfc.OverwriteDatasetFile; }
+            if (dfc.VersionsToKeep != edfc.VersionsToKeep) { dfc.VersionsToKeep = edfc.VersionsToKeep; }
+
+            return dfc;
+        }
+
+        public JsonResult LoadDatasetList(int id)
+        {
+            IEnumerable<Dataset> dfList = GetDatasetByCategoryId(id);
+
+            IEnumerable<SelectListItem> sList = dfList.Select(m => new SelectListItem()
+            {
+                Text = m.DatasetName,
+                Value = m.DatasetId.ToString()
+            });
+
+            return Json(sList, JsonRequestBehavior.AllowGet);
         }
 
 

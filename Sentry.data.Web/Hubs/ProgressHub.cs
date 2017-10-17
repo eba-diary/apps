@@ -8,5 +8,9 @@ namespace Sentry.data.Web.Hubs
 {
     public class ProgressHub : Hub
     {
+        public void Send(string userId, string message)
+        {
+            Clients.User(userId).send(message);
+        }
     }
 }
