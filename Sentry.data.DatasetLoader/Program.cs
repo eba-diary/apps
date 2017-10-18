@@ -113,12 +113,17 @@ namespace Sentry.data.DatasetLoader
                 upload = container.GetInstance<IDatasetService>();
                 dscontext = container.GetInstance<IDatasetContext>();
 
+                Logger.Debug($"SystemDir: {SystemDir}");
+                Logger.Debug($"SystemName: {SystemName}");
+
                 List<SystemConfig> systemMetaFiles = new List<SystemConfig>();
                 List<DatasetFileConfig> fileConfigs = new List<DatasetFileConfig>();
                 try
                 {
                     fileConfigs = Utilities.LoadDatasetFileConfigsByDir(SystemDir, dscontext);
                     // systemMetaFiles = LoadSystemConfigFiles(SystemDir);
+
+                    Logger.Debug($"Count of fileConfigs Loaded: {fileConfigs.Count()}");
 
                     SingleFileProcessor(fileConfigs, path, upload, dscontext);
                    // SingleFileProcessor(systemMetaFiles, path, upload, dscontext);
@@ -244,6 +249,9 @@ namespace Sentry.data.DatasetLoader
 
             foreach (DatasetFileConfig fc in fcList.Where(w => w.IsGeneric == false))
             {
+
+                Logger.Debug($"Found non-generic DatasetFileConfig: ID-{fc.ConfigId}, Name-{fc.Name}");
+
                 Dataset ds = dscontext.GetById(fc.DatasetId);
 
                 DatasetFile df = Utilities.ProcessInputFile(ds, fc, upload, dscontext, fi, Utilities.GetFileOwner(fi));
@@ -283,9 +291,13 @@ namespace Sentry.data.DatasetLoader
             if (configMatch == 0)
             {
                 DatasetFileConfig fc = systemMetaFiles.Where(w => w.IsGeneric == true).FirstOrDefault();
+                Logger.Debug($"Using generic DatasetFileConfig: ID-{fc.ConfigId}, Name-{fc.Name}");
+                Logger.Debug($"Retrieving Dataset associated with DatasetFileConfig: ID-{fc.DatasetId}");
                 Dataset ds = dscontext.GetById(fc.DatasetId);
+                Logger.Debug("Processing DatasetFile");
                 DatasetFile df = Utilities.ProcessInputFile(ds, fc, upload, dscontext, fi, Utilities.GetFileOwner(fi));
 
+                Logger.Debug("Removing successful processed file");
                 Utilities.RemoveProcessedFile(df, new FileInfo(_path));
 
                 //ProcessGeneralFile(upload, dscontext, new FileInfo(_path));
