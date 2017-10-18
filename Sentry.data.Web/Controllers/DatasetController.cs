@@ -1618,15 +1618,22 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public ActionResult UploadDatafile(int id)
         {
+            //Get DataFileConfigs associated with dataset
+            DatasetFileConfig fc = null;
+
             if (Request.Files.Count > 0 && id != 0)
             {
+                Dataset ds = _datasetContext.GetById<Dataset>(id);
+                List<DatasetFileConfig> fcList = Utilities.LoadDatasetFileConfigsByDatasetID(id, _datasetContext);
+                IApplicationUser user = _userService.GetCurrentUser();
+
                 try
                 {
                     HttpFileCollectionBase files = Request.Files;
                     for (int i = 0; i < files.Count; i++)
                     {
                         HttpPostedFileBase file = files[i];
-
+                        
                         string dsfi;
                         dsfi = System.IO.Path.GetFileName(file.FileName);
                         ////Checking for Internet Explorer
@@ -1641,38 +1648,69 @@ namespace Sentry.data.Web.Controllers
                         //}
 
 
-                        IApplicationUser user = _userService.GetCurrentUser();
-                        Dataset ds = _datasetContext.GetById(id);
+                        //Get Matching DataFileConfigs for file path
+                        List<DatasetFileConfig> fcMatches = Utilities.GetMatchingDatasetFileConfigs(fcList, file.FileName);
 
-                        //Get DataFileConfigs associated with dataset
+                                                
+                        using (Stream sfile = file.InputStream)
+                        using (Stream fileStream = new FileStream(ds.DropLocation + dsfi, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
+                        {
+                            sfile.CopyTo(fileStream);
+                        }
 
 
-                        DateTime uploadTime = DateTime.Now;
+                        ////Pick the first non-generic match
+                        ////If non-generic matches then pick the generic file config
+                        //if (fcMatches.Count == 1)
+                        //{
+                        //    fc = fcMatches.First();
+                        //}
+                        //else
+                        //{
+                        //    int configMatch = 0;
+                        //    foreach (DatasetFileConfig fcobject in fcMatches.Where(w => w.IsGeneric == false))
+                        //    {
+                        //        fc = fcobject;
+                        //        configMatch++;
+                        //        break;
+                        //    }
+                        //    if (configMatch == 0)
+                        //    {
+                        //        fc = fcMatches.Where(w => w.IsGeneric == false).First();
+                        //    }
+                        //}
 
-                        DatasetFile df = new DatasetFile(
-                            0,
-                            dsfi,
-                            ds,
-                            null,
-                            _userService.GetCurrentUser().AssociateId,
-                            Utilities.GenerateDatasetStorageLocation(ds.CreationFreqDesc, ds.DatasetCategory.Name, ds.DatasetName),
-                            //Utility.GenerateDatafileKey(ds, uploadTime, dsfi),
-                            uploadTime,
-                            uploadTime,
-                            null,
-                            null
-                            );
+                        //DateTime uploadTime = DateTime.Now;
 
-                        Sentry.Common.Logging.Logger.Debug("Initializing Event Handlers");
+                        //Sentry.Common.Logging.Logger.Debug("Initializing Event Handlers");
+                        //_s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(uploadRequest_UploadPartProgressEvent);
+                        //Utilities.ProcessInputFile(ds, fc, _s3Service, _datasetContext, file, user.AssociateId);
 
-                        _s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(uploadRequest_UploadPartProgressEvent);
-                        _s3Service.TransferUtlityUploadStream(df.FileLocation, df.FileName, file.InputStream);
+                        //DatasetFile df = new DatasetFile(
+                        //    0,
+                        //    dsfi,
+                        //    ds,
+                        //    fc,
+                        //    _userService.GetCurrentUser().AssociateId,
+                        //    Utilities.GenerateDatafileKey(ds, uploadTime, dsfi),
+                        //    //Utilities.GenerateDatasetStorageLocation(ds.CreationFreqDesc, ds.DatasetCategory.Name, ds.DatasetName),
+                        //    //Utility.GenerateDatafileKey(ds, uploadTime, dsfi),
+                        //    uploadTime,
+                        //    uploadTime,
+                        //    null,
+                        //    null
+                        //    );
 
-                        _datasetContext.Merge<DatasetFile>(df);
-                        _datasetContext.SaveChanges();
-                       
+                        //Sentry.Common.Logging.Logger.Debug("Initializing Event Handlers");
+
+                        
+                        //_s3Service.TransferUtlityUploadStream(df.FileLocation, df.FileName, file.InputStream);
+
+                        //_datasetContext.Merge<DatasetFile>(df);
+                        //_datasetContext.SaveChanges();
+
                     }
-                    return Json("File Uploaded Successfully!");
+                    return Json("File Successfully Sent to DatasetLoader!");
                 }
                 catch (Exception e)
                 {

@@ -200,6 +200,7 @@ namespace Sentry.data.Infrastructure
             }
             catch (AmazonS3Exception e)
             {
+                
                 throw new Exception("Error attempting to transfer fileto S3.", e);
             }
 

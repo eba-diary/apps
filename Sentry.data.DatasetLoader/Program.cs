@@ -16,6 +16,7 @@ using System.Text.RegularExpressions;
 using System.Security.Principal;
 using Sentry.data.Web.Helpers;
 using Sentry.data.Common;
+using System.Web;
 
 namespace Sentry.data.DatasetLoader
 {
@@ -116,8 +117,8 @@ namespace Sentry.data.DatasetLoader
                 List<DatasetFileConfig> fileConfigs = new List<DatasetFileConfig>();
                 try
                 {
-                    fileConfigs = LoadDatasetFileConfigs(SystemDir);
-                   // systemMetaFiles = LoadSystemConfigFiles(SystemDir);
+                    fileConfigs = Utilities.LoadDatasetFileConfigsByDir(SystemDir, dscontext);
+                    // systemMetaFiles = LoadSystemConfigFiles(SystemDir);
 
                     SingleFileProcessor(fileConfigs, path, upload, dscontext);
                    // SingleFileProcessor(systemMetaFiles, path, upload, dscontext);
@@ -237,36 +238,55 @@ namespace Sentry.data.DatasetLoader
             //foreach (SystemConfig sc in systemMetaFiles)
             //{
 
-            foreach (DatasetFileConfig fc in systemMetaFiles.Where(w => w.IsGeneric == false))
+            List<DatasetFileConfig> fcList = Utilities.GetMatchingDatasetFileConfigs(systemMetaFiles, _path);
+
+            FileInfo fi = new FileInfo(_path);
+
+            foreach (DatasetFileConfig fc in fcList.Where(w => w.IsGeneric == false))
             {
-                //if (!(String.IsNullOrEmpty(fc.fileSearch.fileName)))
-                if (!(fc.IsRegexSearch))
-                {
-                    //if (Regex.IsMatch(_path, fc.fileSearch.fileName)) { configMatch++; }
-                    if (Path.GetFileName(_path) == fc.SearchCriteria) { configMatch++; }
-                }
-                else
-                {
-                    if (Regex.IsMatch(Path.GetFileName(_path), fc.SearchCriteria)) { configMatch++; }
-                }
+                Dataset ds = dscontext.GetById(fc.DatasetId);
 
-                if (configMatch > 0)
-                {
-                    Dataset ds = dscontext.GetById(fc.DatasetId);
+                DatasetFile df = Utilities.ProcessInputFile(ds, fc, upload, dscontext, fi, Utilities.GetFileOwner(fi));
 
-                    //ProcessFile(ds, fc.datasetMetadata, upload, dscontext, new FileInfo(_path));
-                    ProcessFile_v2(ds, fc, upload, dscontext, new FileInfo(_path));
-                    //ProcessFile(ds, fc, upload, dscontext, new FileInfo(_path));
+                Utilities.RemoveProcessedFile(df, new FileInfo(_path));
+
+                configMatch++;
+
                 break;
-                }
             }
+
+            //foreach (DatasetFileConfig fc in systemMetaFiles.Where(w => w.IsGeneric == false))
+            //{
+            //    //if (!(String.IsNullOrEmpty(fc.fileSearch.fileName)))
+            //    if (!(fc.IsRegexSearch))
+            //    {
+            //        //if (Regex.IsMatch(_path, fc.fileSearch.fileName)) { configMatch++; }
+            //        if (Path.GetFileName(_path) == fc.SearchCriteria) { configMatch++; }
+            //    }
+            //    else
+            //    {
+            //        if (Regex.IsMatch(Path.GetFileName(_path), fc.SearchCriteria)) { configMatch++; }
+            //    }
+
+            //    if (configMatch > 0)
+            //    {
+            //        Dataset ds = dscontext.GetById(fc.DatasetId);
+
+            //        //ProcessFile(ds, fc.datasetMetadata, upload, dscontext, new FileInfo(_path));
+            //        ProcessFile_v2(ds, fc, upload, dscontext, new FileInfo(_path));
+            //        //ProcessFile(ds, fc, upload, dscontext, new FileInfo(_path));
+            //    break;
+            //    }
+            //}
 
 
             if (configMatch == 0)
             {
                 DatasetFileConfig fc = systemMetaFiles.Where(w => w.IsGeneric == true).FirstOrDefault();
                 Dataset ds = dscontext.GetById(fc.DatasetId);
-                ProcessFile_v2(ds, fc, upload, dscontext, new FileInfo(_path));
+                DatasetFile df = Utilities.ProcessInputFile(ds, fc, upload, dscontext, fi, Utilities.GetFileOwner(fi));
+
+                Utilities.RemoveProcessedFile(df, new FileInfo(_path));
 
                 //ProcessGeneralFile(upload, dscontext, new FileInfo(_path));
                 //StringBuilder message = new StringBuilder();
@@ -1410,24 +1430,6 @@ namespace Sentry.data.DatasetLoader
                 throw new Exception("Error during establishing upload process", e);
                 //return (int)ExitCodes.Failure;
             }
-        }
-
-        private static List<DatasetFileConfig> LoadDatasetFileConfigs(string dirPath)
-        {
-            // Exclude General Intake DatasetFileConfig
-            List<DatasetFileConfig> filelist = dscontext.getAllDatasetFileConfigs().Where(w => w.DropPath == dirPath).ToList();
-            //List<DatasetFileConfig> outlist = new List<DatasetFileConfig>();
-
-            //foreach (DatasetFileConfig file in filelist)
-            //{
-            //    if (dirPath.Contains(file.DropPath))
-            //    {
-            //        outlist.Add(file);
-            //    }
-            //}
-
-            return filelist;
-
         }
 
         private static List<SystemConfig> LoadSystemConfigFiles(string metaDir)
