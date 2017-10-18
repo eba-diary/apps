@@ -9,7 +9,7 @@
 	[Origination_CDE] [varchar](16) NULL,
 	[Dataset_DTM] [datetime] NOT NULL,
 	[FileChanged_DTM] [datetime] NOT NULL,
-	[FileUploaded_DTM] [datetime] NOT NULL,
+	[FileUploaded_DTM] [datetime] NULL,
 	[CreationFreq_DSC] [varchar](11) NULL,
 	[S3_KEY] [varchar](1024) NOT NULL,
     [IsSensitive_IND] BIT NOT NULL, 
