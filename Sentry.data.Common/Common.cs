@@ -189,7 +189,7 @@ namespace Sentry.data.Common
         /// <returns></returns>
         public static List<DatasetFileConfig> LoadDatasetFileConfigsByDir(string SystemDir, IDatasetContext dscontext)
         {
-            List<DatasetFileConfig> filelist = dscontext.getAllDatasetFileConfigs().Where(w => w.DropPath == SystemDir).ToList();
+            List<DatasetFileConfig> filelist = dscontext.getAllDatasetFileConfigs().Where(w => w.DropPath.ToLower() == SystemDir.ToLower()).ToList();
             return filelist;
         }
         /// <summary>

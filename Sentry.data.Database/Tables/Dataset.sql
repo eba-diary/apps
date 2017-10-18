@@ -8,7 +8,7 @@
 	[UploadedBy_NME] [varchar](128) NOT NULL,
 	[Origination_CDE] [varchar](16) NULL,
 	[Dataset_DTM] [datetime] NOT NULL,
-	[FileChanged_DTM] [datetime] NULL,
+	[FileChanged_DTM] [datetime] NOT NULL,
 	[FileUploaded_DTM] [datetime] NOT NULL,
 	[CreationFreq_DSC] [varchar](11) NULL,
 	[S3_KEY] [varchar](1024) NOT NULL,
