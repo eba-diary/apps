@@ -20,6 +20,9 @@ namespace Sentry.data.Core
 
         private DateTime _lastUpdated;
         private int _status;
+        private List<DataAssetHealth> _assetHealth;
+        private Boolean _subSystemHealth;
+        //private List<AssetAlert> _assetAlerts;
 
         //private IList<string> _links;
 
@@ -170,5 +173,77 @@ namespace Sentry.data.Core
                 _description = value;
             }
         }
+        public virtual List<DataAssetHealth> AssetHealth
+        {
+            get
+            {
+                if (_assetHealth == null)
+                {
+                    _assetHealth = MetadataRepositoryService.GetByAssetName(_displayName).OrderBy(o => o.SourceSystem).ToList();
+                    return _assetHealth;
+                }
+                else
+                {
+                    return _assetHealth;
+                }
+                
+            }
+        }
+        public virtual Boolean HealthIncludesSourceSystems {
+            get
+            {                
+                //if (this._assetHealth != null)
+                //{
+                    if (this.AssetHealth.Count() > 1)
+                    {
+                        return true;
+                    }
+                    else if (this.AssetHealth.FirstOrDefault().DataAssetName != "")
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                //}
+                //else
+                //{
+                //    return false;
+                //}               
+            }
+        }
+        public virtual DateTime MaxProcessTime {
+            get
+            {
+                if (this.AssetHealth != null || this.AssetHealth.Count() > 0)
+                {
+                    if (this.AssetHealth.Count == 1)
+                    {
+                        return this.AssetHealth[0].AssetUpdtDTM;
+                    }
+                    else
+                    {
+                        return this.AssetHealth.Max(m => m.AssetUpdtDTM);
+                    }                    
+                }
+                else
+                {
+                    return DateTime.MinValue;
+                }
+            }
+        }
+        //public virtual List<AssetAlert> AssetAlerts
+        //{
+        //    get
+        //    {
+        //        return _assetAlerts;
+        //    }
+        //    set
+        //    {
+        //        _assetAlerts = value;
+        //    }
+        //}
+
     }
 }

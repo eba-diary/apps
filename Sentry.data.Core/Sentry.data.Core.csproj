@@ -69,6 +69,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DomainServices\MetadataRepositoryService.cs" />
+    <Compile Include="Entities\DataAssetHealth.cs" />
     <Compile Include="Entities\DatasetFile.cs" />
     <Compile Include="Entities\DatasetFileConfig.cs" />
     <Compile Include="Entities\DatasetOriginationCode.cs" />
@@ -116,6 +118,7 @@
     <Compile Include="Interfaces\ICloudDataService.cs" />
     <Compile Include="Interfaces\IDatasetService.cs" />
     <Compile Include="Interfaces\IFtpProvider.cs" />
+    <Compile Include="Interfaces\IMetadataRepositoryProvider.cs" />
     <Compile Include="Interfaces\IRequestContext.cs" />
     <Compile Include="Interfaces\IWeatherDataProvider.cs" />
     <Compile Include="Interfaces\ISASService.cs" />

@@ -2,16 +2,38 @@
 
 @{
     ViewBag.Title = Model.DisplayName;
+    string color = "plum";
     List<Sentry.data.Core.DataAsset> assets = ViewBag.DataAssets;
     string disabled;
     string arch = "http://sharepoint.sentry.com/it/DataArch/_layouts/15/VisioWebAccess/VisioWebAccess.aspx?id=/it/DataArch/Shared%20Documents/Data%20Services%20Architecture%20Diagrams/" + Model.ArchLink;
     string guide = "http://sharepoint.sentry.com/it/DataArch/Consumer%20Guides/Pages/" + Model.GuideLink;
+    
 
     Model.Components = Model.Components.OrderBy(x => x.Type.Name).ToList();
 }
 
-<div class="smlMarg">
+<div class="outside">
     <!-- Data Asset Header -->
+    <div class="alert alert-dismissable alert-danger">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <h4>Danger!</h4> There are major issues with this asset.
+    </div>
+    <div class="alert alert-dismissable alert-warning">
+        <button type="button" class="close" data-dismiss="alert">x</button>
+        <p><strong>Warning!</strong> Hey, we are aware of an issue, fix has been identified and being applied. Hey, we are aware of an issue, fix has been identified and being applied. Hey, we are aware of an issue, fix has been identified and being applied</p>
+    </div>
+
+
+    @*<div class="assetAlerts">
+        Asset Alerts (Div Level)
+        <div class="assetAlertRows">
+            <ul>
+                <li class="assetAlertItem">Alert 1</li>
+                <li class="assetAlertItem">Alert 2</li>
+            </ul>
+        </div>
+        
+    </div>*@
     <div class="row page-header indexHeader">
         <div class="row">
             <img src="~/Images/Icons/DataAssetsBlue.svg" class="assetImg leftFloat hidden-xs" />
@@ -28,6 +50,15 @@
             </div>
 
             <!-- Removed Status and Last Updated goes here -->
+            @{
+                if (!Model.HealthIncludesSourceSystems)
+                {
+                    <div>
+                        <h2 class="col-xs-8 col-sm-4 text-left text-xs-left indexUpdate @color" title="@Model.AssetHealth[0].AssetUpdtDTM">Last Updated: @Sentry.data.Web.Helpers.Utility.TimeDisplay(Model.AssetHealth[0].AssetUpdtDTM)</h2>
+                    </div>
+                }
+            }
+         
 
             <div class="visible-xs">
                 <button type="button" class="btn btn-lg btn-default daHamburger" data-toggle="collapse" data-target=".navbar-responsive-collapse">
@@ -71,98 +102,165 @@
         </div>
     </div>
 
-    @if (Model.Description != null)
-    {
-        <p class="desc hidden-xs">@Model.Description</p>
-    }
-
-    <!-- Consumption Layer Components -->
-    @{
-        int c = Model.Components.Count;
-        if (c == 1)
+    @*<div class="desc_container hidden-xs">*@
+        @if (Model.Description != null)
         {
-            <div class="row">
-                <div class="col-sm-3"></div>
-                <div class="col-sm-6 clcCardWide border_@Model.Components[0].Type.Color">
-                    @Html.Partial("_ConsumptionLayerComponent", Model.Components[0])
-                </div>
-            </div>
+            <p class="desc">@Model.Description</p>
         }
-        else if (c == 2)
-        {
-            <div class="row">
-                <div class="col-sm-6 clcCardWide border_@Model.Components[0].Type.Color">
-                    @Html.Partial("_ConsumptionLayerComponent", Model.Components[0])
-                </div>
-                <div class="col-sm-6 clcCardWide border_@Model.Components[1].Type.Color">
-                    @Html.Partial("_ConsumptionLayerComponent", Model.Components[1])
-                </div>
-            </div>
-        }
-        else
-        {
-            <div class="hidden-sm">
-                @for (int i = 0; i < c; i++)
+    @*</div>*@
+    <div class="assetlastUpdt border_@color">
+        <div class="row">
+            <h2 class="@color text-center">Last Updated : @Sentry.data.Web.Helpers.Utility.TimeDisplay(Model.MaxProcessTime)</h2>
+        </div>
+        <div class="row tableHeader row_@color hidden-xs">
+            <div></div>
+        </div>
+        <div class="assetlastUpdtBox">
+            @{ if (Model.HealthIncludesSourceSystems)
                 {
-                    <div class="row">
-                        <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[i].Type.Color">
-                            @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
-                        </div>
-                        <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
-                            @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
-                        </div>
-                        <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
-                            @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        @if (i + 1 == c - 1)
-                        {
-                            <div class="col-md-4"></div>
-                            <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
-                                @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
-                            </div>
-                        }
-                        @if (i + 2 == c - 1)
-                        {
-                            <div class="col-md-2"></div>
-                            <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
-                                @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
-                            </div>
-                            <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
-                                @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
-                            </div>
-                        }
+                    <div id="assetHealthContents">
+                        <table class="assethealthtable hidden-xs">
+                            @{
+                                var ItemCount = Model.AssetHealth.Count();
+                                var numColumns = 3;
+                                var numItems = ItemCount / numColumns;
+                                var j = 0;
+                                var index = 0;
+                                for (int i = numItems * j; i < ItemCount-1; i = i + numColumns)
+                                {
+                                    <tr class="assethealthrow">
+                                    @if (ItemCount - i < numColumns) { numColumns = ItemCount - i; }
+                                    @for (j = 0; j < numColumns; j = j + 1)
+                                    {
+                                        index = i + j;
+                                        <td class="assethealthitem"><b>@Model.AssetHealth[index].SourceSystem</b>:<br /> @Sentry.data.Web.Helpers.Utility.TimeDisplay(Model.AssetHealth[index].AssetUpdtDTM)</td>
+                                    }
+                                    </tr>
+                                }
+                              }
+                        </table>
+                        <table class="assethealthtable visible-xs">
+                            @{
+                                ItemCount = Model.AssetHealth.Count();
+                                numColumns = 2;
+                                numItems = ItemCount / numColumns;
+                                j = 0;
+                                index = 0;
+                                for (int i = numItems * j; i < ItemCount - 1; i = i + numColumns)
+                                {
+                                    <tr class="assethealthrow">
+                                        @if (ItemCount - i < numColumns) { numColumns = ItemCount - i; }
+                                        @for (j = 0; j < numColumns; j = j + 1)
+                                        {
+                                            index = i + j;
+                                            <td class="assethealthitem"><b>@Model.AssetHealth[index].SourceSystem</b>:<br /> @Sentry.data.Web.Helpers.Utility.TimeDisplay(Model.AssetHealth[index].AssetUpdtDTM)</td>
+                                        }
+                                    </tr>
+                                }
+                            }
+                        </table>                        
                     </div>
                 }
-            </div>
-
-            <div class="visible-sm">
-                @for (int i = 0; i < c; i++)
+                else
                 {
-                    <div class="row">
-                        <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[i].Type.Color">
-                            @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
-                        </div>
-                        <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
-                            @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
-                        </div>
-                    </div>
+                    <div class="assetItem">No Source Systems Details</div>
+                }
 
-                    if (i + 1 == c - 1)
-                    {
+
+            }
+                    
+        </div>
+    </div>
+
+    @*<div class="assetcomsumption">*@
+        <!-- Consumption Layer Components -->
+        @{
+            int c = Model.Components.Count;
+            if (c == 1)
+            {
+                <div class="row">
+                    <div class="col-sm-3"></div>
+                    <div class="col-sm-6 clcCardWide border_@Model.Components[0].Type.Color">
+                        @Html.Partial("_ConsumptionLayerComponent", Model.Components[0])
+                    </div>
+                </div>
+            }
+            else if (c == 2)
+            {
+                <div class="row">
+                    <div class="col-sm-6 clcCardWide border_@Model.Components[0].Type.Color">
+                        @Html.Partial("_ConsumptionLayerComponent", Model.Components[0])
+                    </div>
+                    <div class="col-sm-6 clcCardWide border_@Model.Components[1].Type.Color">
+                        @Html.Partial("_ConsumptionLayerComponent", Model.Components[1])
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="hidden-sm">
+                    @for (int i = 0; i < c; i++)
+                {
                         <div class="row">
-                            <div class="col-sm-3"></div>
+                            <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[i].Type.Color">
+                                @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
+                            </div>
                             <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
                                 @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
                             </div>
+                            <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                                @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            @if (i + 1 == c - 1)
+                            {
+                                <div class="col-md-4"></div>
+                                <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                                    @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
+                                </div>
+                            }
+                            @if (i + 2 == c - 1)
+                            {
+                                <div class="col-md-2"></div>
+                                <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                                    @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
+                                </div>
+                                <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                                    @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
+                                </div>
+                            }
                         </div>
                     }
-                }
-            </div>
+                </div>
+
+                <div class="visible-sm">
+                    @for (int i = 0; i < c; i++)
+                {
+                        <div class="row">
+                            <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[i].Type.Color">
+                                @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
+                            </div>
+                            <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                                @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
+                            </div>
+                        </div>
+
+                        if (i + 1 == c - 1)
+                        {
+                            <div class="row">
+                                <div class="col-sm-3"></div>
+                                <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[++i].Type.Color">
+                                    @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            }
         }
-    }
+    @*</div>*@
 </div>
 
 @section Scripts {

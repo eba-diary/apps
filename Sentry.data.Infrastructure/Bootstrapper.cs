@@ -69,6 +69,8 @@ namespace Sentry.data.Infrastructure
                 scanner.AssemblyContainingType<IDataFeedContext>();
                 scanner.AssemblyContainingType<AssetDynamicDetailsProvider>();
                 scanner.AssemblyContainingType<IAssetDynamicDetailsProvider>();
+                scanner.AssemblyContainingType<MetadataRepositoryProvider>();
+                scanner.AssemblyContainingType<IMetadataRepositoryProvider>();
                 scanner.AssemblyContainingType<DataAssetProvider>();
                 scanner.AssemblyContainingType<IDataAssetProvider>();
                 scanner.WithDefaultConventions();
@@ -80,6 +82,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IDatasetService>().Use(() => new S3ServiceProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IDataFeedContext>().Use(() => new DataFeedProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IAssetDynamicDetailsProvider>().Use(() => new AssetDynamicDetailsProvider(_defaultSessionFactory.OpenStatelessSession()));
+            registry.For<IMetadataRepositoryProvider>().Use(() => new MetadataRepositoryProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IDataAssetProvider>().Use(() => new DataAssetProvider(_defaultSessionFactory.OpenSession()));
             registry.For<IODCFileProvider>().Use(() => new ODCFileProvider(_defaultSessionFactory.OpenSession()));
             registry.For<IRequestContext>().Use(() => new requestContext(_defaultSessionFactory.OpenSession()));

@@ -11,11 +11,13 @@ namespace Sentry.data.Web.Controllers
     public class DataAssetController : Controller
     {
         private IDataAssetProvider _dataAssetProvider;
+        private MetadataRepositoryService _metadataRepositoryService;
         private List<DataAsset> das;
 
-        public DataAssetController(IDataAssetProvider dap)
+        public DataAssetController(IDataAssetProvider dap, MetadataRepositoryService metadataRepositoryService)
         {
             _dataAssetProvider = dap;
+            _metadataRepositoryService = metadataRepositoryService;
             das = new List<DataAsset>(_dataAssetProvider.GetDataAssets());
         }
         
@@ -24,7 +26,10 @@ namespace Sentry.data.Web.Controllers
             id = (id == 0) ? das[0].Id : id;
 
             DataAsset da = _dataAssetProvider.GetDataAsset(id);
+            da.LastUpdated = DateTime.Now;
+            da.Status = 1;
             ViewBag.DataAssets = das;
+            //ViewData["fluid"] = true;
 
             if (da != null) { return View(da); }
             else { return RedirectToAction("NotFound", "Error"); }
@@ -35,7 +40,10 @@ namespace Sentry.data.Web.Controllers
             assetName = (assetName == null) ? das[0].Name : assetName;
 
             DataAsset da = _dataAssetProvider.GetDataAsset(assetName);
+            da.LastUpdated = DateTime.Now;
+            da.Status = 1;
             ViewBag.DataAssets = das;
+            //ViewData["fluid"] = true;
 
             if (da != null) { return View("Index", da); }
             else { return RedirectToAction("NotFound", "Error"); }

@@ -14,6 +14,8 @@ namespace Sentry.data.Infrastructure
     {
         //ICLPFactory factory = new CLPFactory();
         //IConsumptionLayerProvider clp;
+        
+        
 
         public DataAssetProvider(ISession session) : base(session)
         {
@@ -23,7 +25,7 @@ namespace Sentry.data.Infrastructure
         public DataAsset GetDataAsset(int id)
         {
             DataAsset da = Query<DataAsset>().Cacheable().Where(x => x.Id == id).FetchMany(x => x.Components).ToList().FirstOrDefault();
-
+            
             return da;
         }
 

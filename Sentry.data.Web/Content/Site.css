@@ -1384,13 +1384,13 @@ div[id*="filterType_"]:hover
 
 body { background-color: #f8f8f8; }
 
-/* CSS for Data Asset with Status and Last Updated 
-
+ CSS for Data Asset with Status and Last Updated 
 
 .indexUpdate
 {
     margin-top: 1.25em;
 }
+/*
 
 .clcName
 {
@@ -1666,7 +1666,7 @@ body { background-color: #f8f8f8; }
     overflow-y: auto;
 }
 
-.assetBox 
+.assetBox .assetlastUpdtBox
 {
     height: 460px;
     overflow-y: auto;
@@ -1676,6 +1676,9 @@ body { background-color: #f8f8f8; }
 .assetBox a:hover { text-decoration: none; }
 
 .assetHeader { margin: 0; }
+
+.assetlastUpdtBox div:hover { background-color: #eff0f2; }
+.assetlastUpdtBox a:hover { text-decoration: none; }
 
 .feedHeader
 {
@@ -1962,10 +1965,13 @@ body { background-color: #f8f8f8; }
 
 @media (min-width: 1200px) /* lg and up */
 {
-    .asset, .feed 
+    .asset, .feed
     { 
         margin-top: 2em;
         height: 545px; 
+    }
+    .assetlastUpdt{
+        margin-top: 2em;
     }
 
     .outsideFilters { width: 255px; }
@@ -2020,4 +2026,74 @@ tr.shown td.details-control {
 { 
     float: left; 
     margin-right: 1em;
+}
+
+.assetcomsumption
+{
+    text-align: left;
+    display: inline-block;
+    vertical-align: top;
+    /*background-color: white;*/
+    /*box-shadow: 2px 6px 10px #888888;*/
+    /*height: 530px;*/
+    width: 50%;
+    margin-top: 2em;
+}
+
+.assetlastUpdt
+{
+    /*text-align: left;*/
+    /*display: inline-block;*/
+    vertical-align: top;
+    background-color: white;
+    box-shadow: 2px 6px 10px #888888;
+    /*margin-right: 5em;*/
+    margin: auto;
+    margin-top: 2em;
+    margin-bottom: 3em;
+    /*width: auto;*/
+    /*max-width: 50%;*/
+    padding: 1em;
+}
+
+
+.assetlastUpdtHeader { 
+    margin: 0; 
+    margin-bottom: 1em;
+}
+
+.assethealthtable{
+    width: 100%;
+}
+
+.assethealthrow{
+    /*border-bottom: 1px solid lightgrey;*/
+    /*width: 100%;*/
+}
+
+.assethealthitem
+{
+    margin: 0;
+    padding: 0.8em 0.5em;
+    /*border-bottom: 1px solid lightgrey;*/
+    /*width: 50%;*/
+    font-size: larger;
+}
+
+.desc_container{
+    margin:auto;
+    width: 75%;
+}
+
+.assetAlerts 
+{ 
+    /*border-bottom: 2px solid #003DA5;*/
+    padding-bottom: 1em;
+    margin-bottom: 1em;
+    width: 75%;
+    margin: auto;
+}
+
+.assetAlertItem{
+    display:block;
 }

@@ -89,10 +89,11 @@ namespace Sentry.data.Web.Tests
             daList.Add(da);
 
             var mockDataAssetProvider = MockRepository.GenerateStub<IDataAssetProvider>();
+            var mockMetadataRepositoryService = MockRepository.GenerateStub<MetadataRepositoryService>();
             mockDataAssetProvider.Stub(x => x.GetDataAsset(da.Id)).Return(da);
             mockDataAssetProvider.Stub(x => x.GetDataAssets()).Return(daList);
 
-            var dac = new DataAssetController(mockDataAssetProvider);
+            var dac = new DataAssetController(mockDataAssetProvider, mockMetadataRepositoryService);
 
             return dac;
         }
@@ -103,10 +104,11 @@ namespace Sentry.data.Web.Tests
             daList.Add(da);
 
             var mockDataAssetProvider = MockRepository.GenerateStub<IDataAssetProvider>();
+            var mockMetadataRepositoryService = MockRepository.GenerateStub<MetadataRepositoryService>();
             mockDataAssetProvider.Stub(x => x.GetDataAsset(da.Name)).Return(da);
             mockDataAssetProvider.Stub(x => x.GetDataAssets()).Return(daList);
 
-            var dac = new DataAssetController(mockDataAssetProvider);
+            var dac = new DataAssetController(mockDataAssetProvider, mockMetadataRepositoryService);
 
             return dac;
         }

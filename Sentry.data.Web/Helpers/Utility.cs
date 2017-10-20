@@ -38,23 +38,25 @@ namespace Sentry.data.Web.Helpers
             string result;
             TimeSpan span = DateTime.Now - dt;
 
-            if (span.Days > 365)
+            //if (span.Days > 365)
+            //{
+            //    int years = (span.Days / 365);
+            //    result = string.Format("{0} {1} ago", years, years == 1 ? "year" : "years");
+            //}
+            //else if (span.Days > 30)
+            //{
+            //    int months = (span.Days / 30);
+            //    result = string.Format("{0} {1} ago", months, months == 1 ? "month" : "months");
+            //}
+            //else if (span.Days > 0)
+            //{
+            //    result = string.Format("{0} {1} ago", span.Days, span.Days == 1 ? "day" : "days");
+            //} else
+            if (span.Hours > 0)
             {
-                int years = (span.Days / 365);
-                result = string.Format("{0} {1} ago", years, years == 1 ? "year" : "years");
-            }
-            else if (span.Days > 30)
-            {
-                int months = (span.Days / 30);
-                result = string.Format("{0} {1} ago", months, months == 1 ? "month" : "months");
-            }
-            else if (span.Days > 0)
-            {
-                result = string.Format("{0} {1} ago", span.Days, span.Days == 1 ? "day" : "days");
-            }
-            else if (span.Hours > 0)
-            {
-                result = string.Format("{0} {1} ago", span.Hours, span.Hours == 1 ? "hour" : "hours");
+                //result = dt.ToString("MM/dd/yyyy HH:mm:ss"); //24hr format
+                result = dt.ToString("MM/dd/yyyy hh:mm:ss tt"); //12hr AM/PM
+                //result = string.Format("{0} {1} ago", span.Hours, span.Hours == 1 ? "hour" : "hours");
             }
             else if (span.Minutes > 0)
             {
