@@ -2097,3 +2097,7 @@ tr.shown td.details-control {
 .assetAlertItem{
     display:block;
 }
+
+.alertHeading{
+    font-size: 125%;
+}

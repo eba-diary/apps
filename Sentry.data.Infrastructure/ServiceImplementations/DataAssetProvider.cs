@@ -40,5 +40,18 @@ namespace Sentry.data.Infrastructure
         {
             return Query<DataAsset>().Cacheable().OrderBy(x => x.Name).ToList();
         }
+
+        public List<AssetNotifications> GetNotificationsByDataAssetId(int id)
+        {
+            return Query<AssetNotifications>().Where(w => w.DataAssetId == id).ToList();
+        }
+        public IEnumerable<AssetNotifications> GetAllNotifications()
+        {
+            return Query<AssetNotifications>().ToList();
+        }
+        public AssetNotifications GetNotificationByID(int id)
+        {
+            return Query<AssetNotifications>().Where(w => w.NotificationId == id).First();
+        }
     }
 }

@@ -251,6 +251,18 @@ namespace Sentry.data.Infrastructure
         {
             return Query<DatasetFileConfig>().Where(w => w.ConfigId == configId).FirstOrDefault();
         }
-        //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
+
+        public IEnumerable<AssetNotifications> GetAssetNotificationsByDataAssetId(int id)
+        {
+            return Query<AssetNotifications>().Where(w => w.DataAssetId == id).ToList();
+        }
+        public IEnumerable<AssetNotifications> GetAllAssetNotifications()
+        {
+            return Query<AssetNotifications>().ToList();
+        }
+        public AssetNotifications GetAssetNotificationByID(int id)
+        {
+            return Query<AssetNotifications>().Where(w => w.NotificationId == id).First();
+        }
     }
 }

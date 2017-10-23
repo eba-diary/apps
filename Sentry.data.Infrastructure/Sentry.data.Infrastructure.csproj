@@ -138,6 +138,8 @@
     <Compile Include="DomainContexts\datasetContext.cs" />
     <Compile Include="DomainContexts\dataAssetContext.cs" />
     <Compile Include="DomainContexts\RequestContext.cs" />
+    <Compile Include="Mappings\Primary\AssetNotificationMapping.cs" />
+    <Compile Include="Mappings\Primary\AssetSourceMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetFileConfigsMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetFileMapping.cs" />
     <Compile Include="Mappings\Primary\ComponentElementMapping.cs" />

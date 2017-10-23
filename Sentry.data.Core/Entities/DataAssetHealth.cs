@@ -76,6 +76,5 @@ namespace Sentry.data.Core
             get { return _dataAssetName; }
             set { _dataAssetName = value; }
         }
-
     }
 }

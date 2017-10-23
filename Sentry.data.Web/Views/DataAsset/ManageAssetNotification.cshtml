@@ -1,0 +1,43 @@
+﻿@model Sentry.data.Web.BaseAssetNotificationModel
+@{
+    ViewBag.Title = "Manage Asset Notifications";
+}
+
+
+<div>
+    <div id="detailSectionHeader_AssetNotification">
+        <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_AssetNotification"></span>
+        <h2 class="detailSection ">Asset Notifications</h2>
+    </div>
+    <div id="hide_detailSectionHeader_AssetNotification">
+        <table class="table table-striped table-bordered " id="assetnotificationTable" width="90%">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Edit</th>
+                    @*<th>Notification Id</th>
+                    <th>Asset Id</th>*@
+                    <th>Create User</th>
+                    <th>Start Time</th>
+                    <th>Expiration Time</th>
+                    <th>Message Severity</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts{
+
+    @*@Scripts.Render("~/bundles/jquery")*@
+    @Scripts.Render("~/bundles/dataTables")
+
+    <script>
+    $(function () {
+        data.ManageAssetAlert.Init();
+    });
+    </script>
+
+}

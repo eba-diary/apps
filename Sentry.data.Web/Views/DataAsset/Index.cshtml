@@ -14,14 +14,29 @@
 
 <div class="outside">
     <!-- Data Asset Header -->
-    <div class="alert alert-dismissable alert-danger">
+    @{
+        foreach (var item in Model.AssetNotifications)
+        {
+            <div class="alert alert-dismissable alert-@item.MessageSeverityTag">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                @Html.Raw(@item.DisplayMessage)
+                @*@switch (@item.MessageSeverityTag)
+                {
+                    case "danger":
+
+                        break;
+                }*@
+            </div>
+             }
+     }
+    @*<div class="alert alert-dismissable alert-danger">
         <button type="button" class="close" data-dismiss="alert">×</button>
         <h4>Danger!</h4> There are major issues with this asset.
     </div>
     <div class="alert alert-dismissable alert-warning">
         <button type="button" class="close" data-dismiss="alert">x</button>
         <p><strong>Warning!</strong> Hey, we are aware of an issue, fix has been identified and being applied. Hey, we are aware of an issue, fix has been identified and being applied. Hey, we are aware of an issue, fix has been identified and being applied</p>
-    </div>
+    </div>*@
 
 
     @*<div class="assetAlerts">
@@ -42,22 +57,22 @@
                 @*<a href="#" class="btn btn-primary dropdown-toggle daDD" data-toggle="dropdown" aria-expanded="false"><span class="glyphicon glyphicon-chevron-down daArrow"></span></a>*@
                 @*<ul class="dropdown-menu">
                     @foreach (Sentry.data.Core.DataAsset da in assets)
-                    {
-                        string active = (da.DisplayName.Equals(Model.DisplayName)) ? "active" : "";
+                        {
+                            string active = (da.DisplayName.Equals(Model.DisplayName)) ? "active" : "";
                         <li class="@active"><a href="@Url.Action("Index", "DataAsset", new { id = da.Id })">@da.DisplayName</a></li>
                     }
                 </ul>*@
             </div>
 
             <!-- Removed Status and Last Updated goes here -->
-            @{
+            @*@{
                 if (!Model.HealthIncludesSourceSystems)
                 {
                     <div>
-                        <h2 class="col-xs-8 col-sm-4 text-left text-xs-left indexUpdate @color" title="@Model.AssetHealth[0].AssetUpdtDTM">Last Updated: @Sentry.data.Web.Helpers.Utility.TimeDisplay(Model.AssetHealth[0].AssetUpdtDTM)</h2>
+                        <h2 class="col-xs-8 col-sm-4 text-left text-xs-left indexUpdate @color" title="@Model.MaxProcessTime">Last Updated: @Sentry.data.Web.Helpers.Utility.TimeDisplay(Model.MaxProcessTime)</h2>
                     </div>
                 }
-            }
+            }*@
          
 
             <div class="visible-xs">
@@ -126,7 +141,7 @@
                                 var numItems = ItemCount / numColumns;
                                 var j = 0;
                                 var index = 0;
-                                for (int i = numItems * j; i < ItemCount-1; i = i + numColumns)
+                                for (int i = numItems * j; i < ItemCount; i = i + numColumns)
                                 {
                                     <tr class="assethealthrow">
                                     @if (ItemCount - i < numColumns) { numColumns = ItemCount - i; }
@@ -146,7 +161,7 @@
                                 numItems = ItemCount / numColumns;
                                 j = 0;
                                 index = 0;
-                                for (int i = numItems * j; i < ItemCount - 1; i = i + numColumns)
+                                for (int i = numItems * j; i < ItemCount; i = i + numColumns)
                                 {
                                     <tr class="assethealthrow">
                                         @if (ItemCount - i < numColumns) { numColumns = ItemCount - i; }
@@ -161,10 +176,10 @@
                         </table>                        
                     </div>
                 }
-                else
+                @*else
                 {
                     <div class="assetItem">No Source Systems Details</div>
-                }
+                }*@
 
 
             }

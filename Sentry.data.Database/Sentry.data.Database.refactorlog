@@ -294,4 +294,39 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Config_DSC" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="a41e2aeb-7400-4bda-aa8f-293abeea0412" ChangeDateTime="10/20/2017 18:24:56">
+    <Property Name="ElementName" Value="[dbo].[AssetSource].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AssetSource]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Source_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="74968522-0ef6-4fea-ac0b-ddf388cb636d" ChangeDateTime="10/20/2017 18:29:34">
+    <Property Name="ElementName" Value="[dbo].[AssetSource].[Source_NME]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AssetSource]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SourceDisplay_NME" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="fc8be246-a0ba-4700-89ea-d6345902a590" ChangeDateTime="10/20/2017 19:08:57">
+    <Property Name="ElementName" Value="[dbo].[AssetSource].[Source_Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AssetSource]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Source_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="5d434afe-e60e-499d-981e-5f5fde59de95" ChangeDateTime="10/20/2017 19:11:21">
+    <Property Name="ElementName" Value="[dbo].[AssetSource].[Display_IND]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AssetSource]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="IsVisible_IND" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f7932cd1-51ff-4eb5-a592-2e8b6415e975" ChangeDateTime="10/20/2017 21:06:38">
+    <Property Name="ElementName" Value="[dbo].[AssetNotifications].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AssetNotifications]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Notification_ID" />
+  </Operation>
 </Operations>

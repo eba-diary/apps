@@ -74,6 +74,9 @@ namespace Sentry.data.Core
         int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId, string targetFileName);
 
         DatasetFileConfig getDatasetFileConfigs(int configId);
+        IEnumerable<AssetNotifications> GetAssetNotificationsByDataAssetId(int id);
+        IEnumerable<AssetNotifications> GetAllAssetNotifications();
+        AssetNotifications GetAssetNotificationByID(int id);
     }
 
 }

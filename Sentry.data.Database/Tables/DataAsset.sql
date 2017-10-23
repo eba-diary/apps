@@ -7,5 +7,6 @@
     [DataModel_URL] VARCHAR(1024) NULL, 
     [Guide_URL] VARCHAR(1024) NULL, 
     [Contact_EML] VARCHAR(128) NULL, 
-    [DataAsset_DSC] VARCHAR(MAX) NULL 
+    [DataAsset_DSC] VARCHAR(MAX) NULL, 
+    [MetadataRepositoryAsset_NME] VARCHAR(50) NULL 
 )

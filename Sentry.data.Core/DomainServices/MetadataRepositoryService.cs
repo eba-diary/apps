@@ -15,9 +15,20 @@ namespace Sentry.data.Core
             _metadataRespositoryProvider = metadataRepositoryProvider;
         }
 
-        public static List<DataAssetHealth> GetByAssetName(string assetName)
+        public static List<DataAssetHealth> GetByAssetName(string assetName, IList<AssetSource> assetSource)
         {
-            return _metadataRespositoryProvider.GetByAssetName(assetName);
+            List<DataAssetHealth> dahList = _metadataRespositoryProvider.GetByAssetName(assetName);
+            List<DataAssetHealth> outList = new List<DataAssetHealth>();
+
+            foreach(DataAssetHealth dah in dahList)
+            {
+                if (assetSource.Where(w => w.IsVisiable && w.MetadataRepositorySrcSysName.ToLower() == dah.SourceSystem.ToLower()).Count() > 0)
+                {
+                    outList.Add(dah);
+                }
+            }
+
+            return outList;
         }
     }
 }

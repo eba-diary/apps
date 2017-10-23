@@ -22,13 +22,15 @@ namespace Sentry.data.Core
         private int _status;
         private List<DataAssetHealth> _assetHealth;
         private Boolean _subSystemHealth;
-        //private List<AssetAlert> _assetAlerts;
+        private IList<AssetSource> _assetSource;
+        private IList<AssetNotifications> _assetNotifications;
 
         //private IList<string> _links;
 
         public DataAsset()
         {
             Components = new List<ConsumptionLayerComponent>();
+            //AssetSource = new IList<>();
         }
 
         public virtual int Id
@@ -43,7 +45,6 @@ namespace Sentry.data.Core
                 id = value;
             }
         }
-
         public virtual string Name
         {
             get
@@ -56,7 +57,6 @@ namespace Sentry.data.Core
                 _name = value;
             }
         }
-
         public virtual string DisplayName
         {
             get
@@ -69,7 +69,6 @@ namespace Sentry.data.Core
                 _displayName = value;
             }
         }
-
         public virtual DateTime LastUpdated
         {
             get
@@ -82,7 +81,6 @@ namespace Sentry.data.Core
                 _lastUpdated = value;
             }
         }
-
         public virtual int Status
         {
             get
@@ -95,7 +93,6 @@ namespace Sentry.data.Core
                 _status = value;
             }
         }
-
         public virtual IList<ConsumptionLayerComponent> Components
         {
             get
@@ -108,7 +105,6 @@ namespace Sentry.data.Core
                 _components = value;
             }
         }
-
         public virtual string ArchLink
         {
             get
@@ -121,7 +117,6 @@ namespace Sentry.data.Core
                 _archLink = value;
             }
         }
-
         public virtual string GuideLink
         {
             get
@@ -134,7 +129,6 @@ namespace Sentry.data.Core
                 _guideLink = value;
             }
         }
-
         public virtual string DataModelLink
         {
             get
@@ -147,7 +141,6 @@ namespace Sentry.data.Core
                 _dataModelLink = value;
             }
         }
-
         public virtual string Contact
         {
             get
@@ -160,7 +153,6 @@ namespace Sentry.data.Core
                 _contact = value;
             }
         }
-
         public virtual string Description
         {
             get
@@ -173,13 +165,24 @@ namespace Sentry.data.Core
                 _description = value;
             }
         }
+        public virtual IList<AssetSource> AssetSource
+        {
+            get
+            {
+                return _assetSource;
+            }
+            set
+            {
+                _assetSource = value;
+            }
+        }
         public virtual List<DataAssetHealth> AssetHealth
         {
             get
             {
                 if (_assetHealth == null)
                 {
-                    _assetHealth = MetadataRepositoryService.GetByAssetName(_displayName).OrderBy(o => o.SourceSystem).ToList();
+                    _assetHealth = MetadataRepositoryService.GetByAssetName(_displayName, _assetSource).OrderBy(o => o.SourceSystem).ToList();
                     return _assetHealth;
                 }
                 else
@@ -198,7 +201,7 @@ namespace Sentry.data.Core
                     {
                         return true;
                     }
-                    else if (this.AssetHealth.FirstOrDefault().DataAssetName != "")
+                    else if (this.AssetHealth.Count() == 1 && this.AssetHealth.FirstOrDefault().DataAssetName != "")
                     {
                         return true;
                     }
@@ -216,7 +219,7 @@ namespace Sentry.data.Core
         public virtual DateTime MaxProcessTime {
             get
             {
-                if (this.AssetHealth != null || this.AssetHealth.Count() > 0)
+                if (this.AssetHealth.Count() > 0)
                 {
                     if (this.AssetHealth.Count == 1)
                     {
@@ -233,17 +236,16 @@ namespace Sentry.data.Core
                 }
             }
         }
-        //public virtual List<AssetAlert> AssetAlerts
-        //{
-        //    get
-        //    {
-        //        return _assetAlerts;
-        //    }
-        //    set
-        //    {
-        //        _assetAlerts = value;
-        //    }
-        //}
-
+        public virtual IList<AssetNotifications> AssetNotifications
+        {
+            get
+            {
+                return _assetNotifications;
+            }
+            set
+            {
+                _assetNotifications = value;
+            }
+        }
     }
 }

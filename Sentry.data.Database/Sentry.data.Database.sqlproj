@@ -126,6 +126,8 @@
     <Build Include="Tables\DatasetFile.sql" />
     <Build Include="Tables\DatasetScopeTypes.sql" />
     <Build Include="Tables\DatasetFileConfigs.sql" />
+    <Build Include="Tables\AssetSource.sql" />
+    <Build Include="Tables\AssetNotifications.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

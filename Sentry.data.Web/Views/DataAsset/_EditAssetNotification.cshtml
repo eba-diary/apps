@@ -1,0 +1,134 @@
+﻿
+@model Sentry.data.Web.EditAssetNotificationModel
+@{
+    ViewBag.Title = "Edit Asset Notification";
+}
+
+@{using (Ajax.BeginForm("EditAssetNotification", "DataAsset",
+                          new AjaxOptions
+                          {
+                              OnSuccess = "data.ManageAssetAlert.UpdateSuccess",
+                              OnFailure = "data.ManageAssetAlert.UpdateFailure"
+                          },
+                          new { id = "EditAssetNotificationForm" }))
+    {
+        @Html.AntiForgeryToken()
+
+        <div class="form-horizontal">
+            @Html.DisplayFor((model) => ViewData.ModelState)
+            
+            @Html.HiddenFor(model => model.NotificationId)        
+    @*@Html.DisplayFor((model) => ViewData.ModelState)*@
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.CreateUser, htmlAttributes: new { @class = "control-lable col-sm-3" })
+                <div class="col-sm-4">
+                    @Html.DisplayFor(m => m.CreateUser, new { htmlAttributes = new { @class = "from-control-static" } })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.StartTime, htmlAttributes: new { @class = "control-lable col-sm-3" })
+                <div class="col-sm-4">
+                    @Html.DisplayFor(m => m.StartTime, new { htmlAttributes = new { @class = "from-control-static" } })
+                </div>
+            </div>
+            @*<div class="form-group">
+                @Html.LabelFor(m => m.ExpirationTime, htmlAttributes: new { @class = "control-lable col-sm-3" })
+                <div class="col-sm-4">
+                    @Html.EditorFor(m => m.ExpirationTime, new { htmlAttributes = new { @class = "from-control" } })
+                </div>
+            </div>*@
+            <div class="form-group">
+                @Html.LabelFor(m => m.ExpirationTime, htmlAttributes: new { @class = "control-lable col-sm-3" })
+                <div class="col-sm-4 input-group date">
+                    @Html.TextBoxFor(m => m.ExpirationTime, new { htmlAttributes = new { @class = "from-control" } })
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.DisplayCreateUser, htmlAttributes: new { @class = "control-lable col-sm-3" })
+                <div class="col-sm-4">
+                    @Html.DisplayFor(m => m.DisplayCreateUser.FullName, new { htmlAttributes = new { @class = "from-control-static" } })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor((model) => model.SeverityID, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.SeverityID, Model.AllSeverities, new { @class = "form-control" })
+                </div>
+            </div>
+            @*<div class="form-group">
+        @Html.LabelFor(m => m.ConfigFileName, htmlAttributes: new { @class = "control-lable col-sm-3" })
+        <div class="col-sm-4">
+            @Html.DisplayFor(m => m.ConfigFileName, new { htmlAttributes = new { @class = "from-control-static" } })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.ConfigFileDesc, htmlAttributes: new { @class = "control-lable col-sm-3" })
+        <div class="col-sm-4">
+            @Html.TextAreaFor(m => m.ConfigFileDesc, new { hmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.SearchCriteria, htmlAttributes: new { @class = "control-lable col-sm-3" })
+        <div class="col-sm-9">
+            @Html.EditorFor(m => m.SearchCriteria, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.SearchCriteria, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DropLocationType, htmlAttributes: new { @class = "control-lable col-sm-3" })
+        <div class="col-sm-9">
+            @Html.EditorFor(m => m.DropLocationType, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.DropLocationType, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.DropPath, htmlAttributes: new { @class = "control-lable col-sm-3" })
+        <div class="col-sm-9">
+            @Html.EditorFor(m => m.DropPath, new { htmlAttributes = new { @class = "form-control" } })
+            @Html.ValidationMessageFor(model => model.DropPath, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.TargetFileName, htmlAttributes: new { @class = "control-lable col-sm-3" })
+        <div class="col-sm-4">
+            @Html.EditorFor(m => m.TargetFileName, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.IsRegexSearch, htmlAttributes: new { @class = "control-lable col-sm-3" })
+        <div class="col-sm-4">
+            @Html.CheckBoxFor(m => m.IsRegexSearch)
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.OverwriteDatasetFile, htmlAttributes: new { @class = "control-lable col-sm-3" })
+        <div class="col-sm-4">
+            @Html.CheckBoxFor(m => m.OverwriteDatasetFile)
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.VersionsToKeep, htmlAttributes: new { @class = "control-lable col-sm-3" })
+        <div class="col-sm-4">
+            @Html.EditorFor(m => m.VersionsToKeep, new { htmlAttributes = new { @class = "form-control" } })
+        </div>
+    </div>*@
+    <div class="form-group">
+        <div class="col-sm-offset-4 col-sm-8">
+            <input type="submit" value="Update Notification" class="btn btn-primary" />
+        </div>
+    </div>
+        </div>
+                }
+}
+
+@*@section Scripts {
+    <script>
+        $(function () {
+            data.ManageAssetAlert.EditConfigInit();
+        });
+    </script>
+}*@

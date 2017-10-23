@@ -7,6 +7,8 @@ namespace Sentry.data.Web
         // For more information on bundling, visit http://go.microsoft.com/fwlink/?LinkId=301862
         public static void RegisterBundles(BundleCollection bundles)
         {
+            string dataTablesScriptsDirectory = "~/Scripts/DataTables";
+
             //This bundle contains basic jquery stuff and some common plugins
             bundles.Add(new ScriptBundle("~/bundles/jquery").
                         Include("~/Scripts/jquery-{version}.js").
@@ -25,7 +27,10 @@ namespace Sentry.data.Web
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").
                         Include("~/Scripts/bootstrap.js").
                         Include("~/Scripts/respond.js").
+                        Include(dataTablesScriptsDirectory + "/moment.js").
                         Include("~/Scripts/bootstrap-datepicker.js").
+                        Include("~/Scripts/bootstrap-datetimepicker.js").
+                        Include("~/Scripts/bootstrap-datetimepicker.min.js").
                         Include("~/Scripts/bootstrap-submenu.js").
                         Include("~/Scripts/typeahead.bundle.js").
                         Include("~/Scripts/sentry.associates.js").
@@ -36,8 +41,7 @@ namespace Sentry.data.Web
             bundles.Add(new ScriptBundle("~/bundles/js").
                         Include("~/js/_Shared.js").
                         IncludeDirectory("~/js", "*.js", true));
-
-            string dataTablesScriptsDirectory = "~/Scripts/DataTables";
+            
 
         //This bundle contains scripts needed for DataTables and related plugins
         bundles.Add(new ScriptBundle("~/bundles/dataTables").

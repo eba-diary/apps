@@ -96,6 +96,15 @@ namespace Sentry.data.Core
             }
         }
 
+        public virtual Boolean CanManageAssetAlerts
+        {
+            get
+            {
+                return true;
+                //return _extendedUserInfo.Permissions.Contains(Permissions.ManageAssetNotifications);
+            }
+        }
+
         public DomainUser DomainUser
         {
             get

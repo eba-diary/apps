@@ -42,6 +42,30 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                     k.ForeignKey("FK_ConsumptionLayerComponent_DataAsset");
                 });
             }, map => map.OneToMany(a => a.Class(typeof(ConsumptionLayerComponent))));
+            this.Bag(x => x.AssetSource, m =>
+            {
+                m.Cache(c => c.Usage(CacheUsage.ReadOnly));
+                m.Inverse(true);
+                m.Table("AssetSource");
+                m.Cascade(Cascade.All);
+                m.Key(k =>
+                {
+                    k.Column("DataAsset_ID");
+                    k.ForeignKey("FK_AssetSource_DataAsset");
+                });
+            }, map => map.OneToMany(a => a.Class(typeof(AssetSource))));
+            this.Bag(x => x.AssetNotifications, m =>
+            {
+                m.Cache(c => c.Usage(CacheUsage.ReadOnly));
+                m.Inverse(true);
+                m.Table("AssetNotifications");
+                m.Cascade(Cascade.All);
+                m.Key(k =>
+                {
+                    k.Column("DataAsset_ID");
+                    k.ForeignKey("FK_AssetNotifications_DataAsset");
+                });
+            }, map => map.OneToMany(a => a.Class(typeof(AssetNotifications))));
         }
     }
 }

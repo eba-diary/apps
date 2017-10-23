@@ -70,6 +70,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DomainServices\MetadataRepositoryService.cs" />
+    <Compile Include="Entities\AssetNotifications.cs" />
+    <Compile Include="Entities\AssetSource.cs" />
     <Compile Include="Entities\DataAssetHealth.cs" />
     <Compile Include="Entities\DatasetFile.cs" />
     <Compile Include="Entities\DatasetFileConfig.cs" />
@@ -96,6 +98,7 @@
     <Compile Include="Entities\DatasetFolder.cs" />
     <Compile Include="Entities\LoaderFileConfig.cs" />
     <Compile Include="Entities\LoaderSystemConfig.cs" />
+    <Compile Include="Entities\NotificationSeverity.cs" />
     <Compile Include="Entities\TransferProgressEventArgs.cs" />
     <Compile Include="Entities\RTAPIEndpoints.cs" />
     <Compile Include="Entities\RTAPIParameters.cs" />
