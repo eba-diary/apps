@@ -182,7 +182,7 @@ namespace Sentry.data.Core
             {
                 if (_assetHealth == null)
                 {
-                    _assetHealth = MetadataRepositoryService.GetByAssetName(_displayName, _assetSource).OrderBy(o => o.SourceSystem).ToList();
+                    _assetHealth = MetadataRepositoryService.GetByAssetName(_displayName, _assetSource.Where(w => w.IsVisiable).ToList()).OrderBy(o => o.SourceSystem).ToList();
                     return _assetHealth;
                 }
                 else

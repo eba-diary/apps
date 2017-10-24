@@ -43,7 +43,7 @@ namespace Sentry.data.Infrastructure
 
         public List<AssetNotifications> GetNotificationsByDataAssetId(int id)
         {
-            return Query<AssetNotifications>().Where(w => w.DataAssetId == id).ToList();
+            return Query<AssetNotifications>().Where(w => w.ParentDataAsset.Id == id).ToList();
         }
         public IEnumerable<AssetNotifications> GetAllNotifications()
         {

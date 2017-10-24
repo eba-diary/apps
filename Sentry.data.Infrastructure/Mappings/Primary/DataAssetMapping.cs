@@ -56,7 +56,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             }, map => map.OneToMany(a => a.Class(typeof(AssetSource))));
             this.Bag(x => x.AssetNotifications, m =>
             {
-                m.Cache(c => c.Usage(CacheUsage.ReadOnly));
+                m.Cache(c => c.Usage(CacheUsage.ReadWrite));
+                m.Lazy(CollectionLazy.Lazy);
                 m.Inverse(true);
                 m.Table("AssetNotifications");
                 m.Cascade(Cascade.All);

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Sentry.data.Core
-{
+{    
     public class AssetNotifications : IValidatable
     {
         private int _notificationId;
@@ -14,20 +14,21 @@ namespace Sentry.data.Core
         private string _createUser;
         private DateTime _startTime;
         private DateTime _expirationTime;
-        private int _dataAssetId;
+        //private int _dataAssetId;
         private int _messageSeverity;
         private string _messageSeverityTag;
+        private DataAsset _parentDataAsset;
 
         public virtual int MessageSeverity
         {
             get { return _messageSeverity; }
             set { _messageSeverity = value; }
         }
-        public virtual int DataAssetId
-        {
-            get { return _dataAssetId; }
-            set { _dataAssetId = value; }
-        }
+        //public virtual int DataAssetId
+        //{
+        //    get { return _dataAssetId; }
+        //    set { _dataAssetId = value; }
+        //}
         public virtual DateTime ExpirationTime
         {
             get { return _expirationTime; }
@@ -82,11 +83,15 @@ namespace Sentry.data.Core
                 else
                 {
                     return _messageSeverityTag;
-                }
-                
+                }                
             }
         }
-        public ValidationResults ValidateForSave()
+        public virtual DataAsset ParentDataAsset
+        {
+            get { return _parentDataAsset; }
+            set { _parentDataAsset = value; }
+        }
+        public virtual ValidationResults ValidateForSave()
         {
             ValidationResults vr = new ValidationResults();
             if (string.IsNullOrWhiteSpace(CreateUser))
@@ -105,7 +110,7 @@ namespace Sentry.data.Core
             return vr;
         }
 
-        public ValidationResults ValidateForDelete()
+        public virtual ValidationResults ValidateForDelete()
         {
             return new ValidationResults();
         }

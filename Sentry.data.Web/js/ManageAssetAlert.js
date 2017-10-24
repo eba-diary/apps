@@ -7,31 +7,49 @@ data.ManageAssetAlert = {
     Init: function () {
         data.ManageAssetAlert.AssetNotificationTableInit();
     },
+
     EditNotificationInit: function () {
         $("#EditAssetNotificationForm").validateBootstrap(true);
         $("#ExpirationTime").datetimepicker();
-        //$("#ExpirationTime").datetimepicker();
-        /// <summary>
-        /// Initialize the Create Dataset view
-        /// </summary>
-
-        //Set Secure HREmp service URL for associate picker
-        //$.assocSetup({ url: "https://hrempsecurequal.sentry.com/api/associates" });
-
-        //var picker = $("#ExpireDTM");
-
-        //picker.datetimepicker({ format: 'YYYY-MM-DD HH:mm:ss' });
-
-        //picker.assocAutocomplete({
-        //    associateSelected: function (associate) {
-        //        $('#SentryOwnerName').val(associate.Id);
-        //    },
-        //    close: function () {
-        //        picker.assocAutocomplete("clear");
-
-        //    }
-        //});
     },
+
+    CreatetNotificationInit: function () {
+        $("#CreateAssetNotificationForm").validateBootstrap(true);
+        $("#StartTime").datetimepicker();
+        $("#ExpirationTime").datetimepicker();
+    },
+
+    UpdateSuccess: function (data) {
+        if (Sentry.WasAjaxSuccessful(data)) {
+            Sentry.HideAllModals();
+
+            $('#assetnotificationTable').DataTable().ajax.reload();
+
+            //data.ManageConfigs.ReloadEditConfig();
+            Sentry.ShowModalAlert("Alert Updated Successfully!");
+        }
+    },
+
+    UpdateFailure: function () {
+        Sentry.ShowModalAlert("Error while updating Alert!")
+        Sentry.HideAllModals();
+    },
+
+    CreateSuccess: function (data) {
+        if (Sentry.WasAjaxSuccessful(data)) {
+            Sentry.HideAllModals();
+
+            $('#assetnotificationTable').DataTable().ajax.reload();
+
+            Sentry.ShowModalAlert("Alert Successfully Created!");
+        }
+    },
+
+    CreateFailure: function () {
+        Sentry.ShowModalAlert("Error During Creation of Alert!")
+        Sentry.HideAllModals();
+    },
+
     EditNotification: function (id) {
         var modal = Sentry.ShowModalWithSpinner("Edit Alert");
         var editConfigFileUrl = "/DataAsset/GetEditAssetNotificationPartialView/?notificationId=" + id;
@@ -41,6 +59,17 @@ data.ManageAssetAlert = {
             data.ManageAssetAlert.EditNotificationInit();
         })
     },
+
+    CreateNotification: function() {
+        var modal = Sentry.ShowModalWithSpinner("Create Alert");
+        var createConfigFileUrl = "/DataAsset/CreateAssetNotification";
+
+        $.get(createConfigFileUrl, function (e) {
+            modal.ReplaceModalBody(e);
+            data.ManageAssetAlert.CreatetNotificationInit();
+        })
+    },
+
     AssetNotificationTableInit: function () {
         $('#assetnotificationTable tbody').on('click', 'td.details-control', function () {
             var tr = $(this).closest('tr');
@@ -71,15 +100,16 @@ data.ManageAssetAlert = {
             columns: [
                         { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px" },
                         { data: "EditHref", className: "editConfig", width: "20px" },
+                        { data: "IsActive", className: "isActive", render: function (data, type, row) { return (data == true) ? '<span class="glyphicon glyphicon-ok"> </span>' : '<span class="glyphicon glyphicon-remove"></span>'; } },
                         //{ data: "NotificationId", className: "notificationId" },
-                        //{ data: "DataAssetId", className: "dataAssetId" },
-                        { data: "DisplayCreateUser.FullName", className: "displayCreateUser" },
+                        { data: "ParentDataAssetName", className: "parentDataAssetName" },
+                        //{ data: "DisplayCreateUser.FullName", className: "displayCreateUser" },
                         { data: "StartTime", className: "startTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
                         { data: "ExpirationTime", className: "expirationTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
                         { data: "MessageSeverityTag", className: "messageSeverityTag" },
                         { data: "Message", className: "message" }
             ],
-            order: [5, 'desc']
+            order: [[2, 'desc'],[4, 'desc']]
             //stateSave: true,
             //stateDuration: -1  // indicates session storage, not local storage
         });
@@ -128,9 +158,10 @@ data.ManageAssetAlert = {
 
         //$("#userTable_wrapper .dt-toolbar").html($("#userToolbar"));
 
-        //$("#exportToExcel").click(function () {
-        //    alert("exportToExcel Function");
-        //});
+        $("#Add_Notification").click(function () {
+            alert("Add Notification Function");
+            data.ManageAssetAlert.CreateNotification();
+        });
     },
 
     formatAssetNotificationTableDetails: function (d) {
@@ -141,8 +172,8 @@ data.ManageAssetAlert = {
                 '<td>' + d.NotificationId + '</td>' +
             '</tr>' +
             '<tr>' +
-                '<td><b>Data Asset Id</b>: </td>' +
-                '<td>' + d.DataAssetId + '</td>' +
+                '<td><b>Creator</b>: </td>' +
+                '<td>' + d.DisplayCreateUser.FullName + '</td>' +
             '</tr>' +
         '</table>';
     }

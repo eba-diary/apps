@@ -254,7 +254,7 @@ namespace Sentry.data.Infrastructure
 
         public IEnumerable<AssetNotifications> GetAssetNotificationsByDataAssetId(int id)
         {
-            return Query<AssetNotifications>().Where(w => w.DataAssetId == id).ToList();
+            return Query<AssetNotifications>().Where(w => w.ParentDataAsset.Id == id).ToList();
         }
         public IEnumerable<AssetNotifications> GetAllAssetNotifications()
         {
@@ -263,6 +263,24 @@ namespace Sentry.data.Infrastructure
         public AssetNotifications GetAssetNotificationByID(int id)
         {
             return Query<AssetNotifications>().Where(w => w.NotificationId == id).First();
+        }
+        public IList<DataAsset> GetDataAssets()
+        {
+            return Query<DataAsset>().Cacheable().OrderBy(x => x.Name).ToList();
+        }
+        public DataAsset GetDataAsset(int id)
+        {
+            //DataAsset da = Query<DataAsset>().Cacheable().Where(x => x.Id == id).FetchMany(x => x.Components).ToList().FirstOrDefault();
+            DataAsset da = Query<DataAsset>().Cacheable().Where(x => x.Id == id).ToList().FirstOrDefault();
+            return da;
+        }
+
+        public DataAsset GetDataAsset(string assetName)
+        {
+            //DataAsset da = Query<DataAsset>().Cacheable().Where(x => x.Name == assetName).FetchMany(x => x.Components).ToList().FirstOrDefault();
+            DataAsset da = Query<DataAsset>().Cacheable().Where(x => x.Name == assetName).ToList().FirstOrDefault();
+
+            return da;
         }
     }
 }

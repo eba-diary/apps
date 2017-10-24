@@ -77,6 +77,9 @@ namespace Sentry.data.Core
         IEnumerable<AssetNotifications> GetAssetNotificationsByDataAssetId(int id);
         IEnumerable<AssetNotifications> GetAllAssetNotifications();
         AssetNotifications GetAssetNotificationByID(int id);
+        IList<DataAsset> GetDataAssets();
+        DataAsset GetDataAsset(int id);
+        DataAsset GetDataAsset(string assetname);
     }
 
 }

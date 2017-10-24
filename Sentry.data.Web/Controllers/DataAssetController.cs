@@ -18,25 +18,27 @@ namespace Sentry.data.Web.Controllers
         private MetadataRepositoryService _metadataRepositoryService;
         private IDatasetContext _dsContext;
         private IAssociateInfoProvider _associateInfoService;
+        private UserService _userService;
         private List<DataAsset> das;
 
-        public DataAssetController(IDataAssetProvider dap, MetadataRepositoryService metadataRepositoryService, IDatasetContext dsContext, IAssociateInfoProvider associateInfoService)
+        public DataAssetController(IDataAssetProvider dap, MetadataRepositoryService metadataRepositoryService, IDatasetContext dsContext, IAssociateInfoProvider associateInfoService, UserService userService)
         {
             _dataAssetProvider = dap;
             _metadataRepositoryService = metadataRepositoryService;
             _dsContext = dsContext;
             _associateInfoService = associateInfoService;
+            _userService = userService;
         }
         
         public ActionResult Index(int id)
         {
             id = (id == 0) ? das[0].Id : id;
 
-            DataAsset da = _dataAssetProvider.GetDataAsset(id);
+            DataAsset da = _dsContext.GetDataAsset(id);
             da.AssetNotifications = _dsContext.GetAssetNotificationsByDataAssetId(da.Id).Where(w => w.StartTime < DateTime.Now && w.ExpirationTime > DateTime.Now).ToList();
             da.LastUpdated = DateTime.Now;
             da.Status = 1;
-            das = new List<DataAsset>(_dataAssetProvider.GetDataAssets());
+            das = new List<DataAsset>(_dsContext.GetDataAssets());
             ViewBag.DataAssets = das;
             //ViewData["fluid"] = true;
 
@@ -48,12 +50,12 @@ namespace Sentry.data.Web.Controllers
         {
             assetName = (assetName == null) ? das[0].Name : assetName;
 
-            DataAsset da = _dataAssetProvider.GetDataAsset(assetName);
+            DataAsset da = _dsContext.GetDataAsset(assetName);
             da.AssetNotifications = _dsContext.GetAssetNotificationsByDataAssetId(da.Id).Where(w => w.StartTime < DateTime.Now && w.ExpirationTime > DateTime.Now).ToList();
 
             da.LastUpdated = DateTime.Now;
             da.Status = 1;
-            das = new List<DataAsset>(_dataAssetProvider.GetDataAssets());
+            das = new List<DataAsset>(_dsContext.GetDataAssets());
             ViewBag.DataAssets = das;            
             //ViewData["fluid"] = true;
 
@@ -70,6 +72,44 @@ namespace Sentry.data.Web.Controllers
         {
             BaseAssetNotificationModel banm = new BaseAssetNotificationModel();
             return View(banm);
+        }
+
+        [HttpGet]
+        public ActionResult CreateAssetNotification()
+        {
+            IApplicationUser user = _userService.GetCurrentUser();
+
+            CreateAssetNotificationModel canm = new CreateAssetNotificationModel();
+            canm.AllDataAssets = GetDataAssetsList();
+            canm.AllSeverities = GetNotificationSeverities();
+            canm.CreateUser = user.AssociateId;
+            canm.DisplayCreateUser = _associateInfoService.GetAssociateInfo(user.AssociateId);
+            canm.StartTime = DateTime.Now; //preset Start Time
+            canm.ExpirationTime = DateTime.Now.AddHours(1);
+            return PartialView("_CreateAssetNotification",canm);
+        }
+
+        [HttpPost]
+        public ActionResult CreateAssetNotification(CreateAssetNotificationModel canm)
+        {
+            AssetNotifications an = new AssetNotifications();
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    an = UpdateAssetNotificationFromModel(an, canm);
+                    _dsContext.Merge<AssetNotifications>(an);
+                    _dsContext.SaveChanges();
+                    return AjaxSuccessJson();
+                }
+            }
+            catch (Sentry.Core.ValidationException ex)
+            {
+                AddCoreValidationExceptionsToModel(ex);
+                _dsContext.Clear();
+            }
+                        
+            return CreateAssetNotification();
         }
 
         //[AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
@@ -144,11 +184,30 @@ namespace Sentry.data.Web.Controllers
             return an;
         }
 
+        private AssetNotifications UpdateAssetNotificationFromModel(AssetNotifications an, CreateAssetNotificationModel can)
+        {
+            an.Message = can.Message;
+            an.CreateUser = can.CreateUser;
+            an.StartTime = can.StartTime;
+            an.ExpirationTime = can.ExpirationTime;
+            an.MessageSeverity = can.SeverityID;
+            an.ParentDataAsset = _dsContext.GetDataAsset(can.DataAssetID);
+            
+            return an;
+        }
+
         private IEnumerable<SelectListItem> GetNotificationSeverities()
         {
             List<SelectListItem> items = Enum.GetValues(typeof(NotificationSeverity)).Cast<NotificationSeverity>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
 
             return items;
+        }
+
+        private IEnumerable<SelectListItem> GetDataAssetsList()
+        {
+            List<SelectListItem> assets = _dsContext.GetDataAssets().Select(v => new SelectListItem { Text = v.DisplayName, Value = ((int)v.Id).ToString() }).ToList();
+
+            return assets;
         }
     }
 }

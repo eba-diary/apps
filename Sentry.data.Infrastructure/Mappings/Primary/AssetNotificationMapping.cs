@@ -20,14 +20,21 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Id(x => x.NotificationId, m =>
             {
                 m.Column("Notification_ID");
+                m.Generator(Generators.Identity);
             });
 
             this.Property(x => x.Message, m => m.Column("Message_DSC"));
             this.Property(x => x.CreateUser, m => m.Column("CreateUser"));
             this.Property(x => x.StartTime, m => m.Column("Start_DTM"));
             this.Property(x => x.ExpirationTime, m => m.Column("Expire_DTM"));
-            this.Property(x => x.DataAssetId, m => m.Column("DataAsset_ID"));
+            //this.Property(x => x.DataAssetId, m => m.Column("DataAsset_ID"));
             this.Property(x => x.MessageSeverity, m => m.Column("Severity_TYP"));
+            this.ManyToOne((x) => x.ParentDataAsset, (m) => {   
+                m.Column("DataAsset_ID");
+                m.ForeignKey("FK_AssetNotifications_DataAsset");
+                m.Class(typeof(DataAsset));
+            });
+
         }
     }
 }

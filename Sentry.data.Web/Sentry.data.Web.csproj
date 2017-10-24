@@ -303,6 +303,7 @@
     <Compile Include="Models\Category\EditCategoryModel.cs" />
     <Compile Include="Models\Category\FullCategoryModel.cs" />
     <Compile Include="Models\DataAsset\BaseAssetNotificationModel.cs" />
+    <Compile Include="Models\DataAsset\CreateAssetNotificationModel.cs" />
     <Compile Include="Models\DataAsset\EditAssetNotificationModel.cs" />
     <Compile Include="Models\Dataset\BaseDatasetFileModel.cs" />
     <Compile Include="Models\Dataset\CreateDataFileModel.cs" />
@@ -1117,6 +1118,7 @@
     <Content Include="Views\Dataset\_EditConfigFile.cshtml" />
     <Content Include="Views\DataAsset\ManageAssetNotification.cshtml" />
     <Content Include="Views\DataAsset\_EditAssetNotification.cshtml" />
+    <Content Include="Views\DataAsset\_CreateAssetNotification.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
