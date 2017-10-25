@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using NHibernate;
 using NHibernate.Linq;
-using Sentry.Core;
+//using Sentry.Core;
 using Sentry.NHibernate;
 using Sentry.data.Core;
 
@@ -29,7 +29,7 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                IQueryable<Dataset> qResult = Query<Dataset>().Where(x => x.CanDisplay).Cacheable(QueryCacheRegion.MediumTerm);
+                IQueryable<Dataset> qResult = Query<Dataset>().Cacheable().Where(x => x.CanDisplay); //QueryCacheRegion.MediumTerm
                 //if (qResult != null && qResult.Count() > 0)
                 //{
                 //    foreach (Dataset qRow in qResult)
@@ -52,7 +52,7 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                return Query<Category>().Cacheable(QueryCacheRegion.MediumTerm);
+                return Query<Category>().Cacheable();  //QueryCacheRegion.MediumTerm
             }
 
         }
@@ -61,7 +61,7 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                return Query<DatasetMetadata>().Cacheable(QueryCacheRegion.MediumTerm);
+                return Query<DatasetMetadata>().Cacheable(); //QueryCacheRegion.MediumTerm
             }
         }
 
