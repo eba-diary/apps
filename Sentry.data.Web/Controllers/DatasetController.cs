@@ -681,7 +681,7 @@ namespace Sentry.data.Web.Controllers
                         "Default Config for Dataset.  Uploaded files that do not match any configs will default to this config",
                         1,
                         _datasetContext.GetByS3Key(ds.S3Key).DatasetId,
-                        "\.",
+                        "\\.",
                         "DFS",
                         ds.DropLocation,
                         true,
