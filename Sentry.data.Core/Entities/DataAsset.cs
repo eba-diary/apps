@@ -201,7 +201,7 @@ namespace Sentry.data.Core
                     {
                         return true;
                     }
-                    else if (this.AssetHealth.Count() == 1 && this.AssetHealth.FirstOrDefault().DataAssetName != "")
+                    else if (this.AssetHealth.Count() == 1 && this.AssetHealth.FirstOrDefault().SourceSystem != "")
                     {
                         return true;
                     }
