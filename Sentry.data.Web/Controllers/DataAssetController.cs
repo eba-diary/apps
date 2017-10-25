@@ -32,14 +32,20 @@ namespace Sentry.data.Web.Controllers
         
         public ActionResult Index(int id)
         {
+            das = new List<DataAsset>(_dsContext.GetDataAssets());
+            ViewBag.DataAssets = das;
+
             id = (id == 0) ? das[0].Id : id;
 
             DataAsset da = _dsContext.GetDataAsset(id);
-            da.AssetNotifications = _dsContext.GetAssetNotificationsByDataAssetId(da.Id).Where(w => w.StartTime < DateTime.Now && w.ExpirationTime > DateTime.Now).ToList();
-            da.LastUpdated = DateTime.Now;
-            da.Status = 1;
-            das = new List<DataAsset>(_dsContext.GetDataAssets());
-            ViewBag.DataAssets = das;
+
+            if (da != null)
+            {
+                da.AssetNotifications = _dsContext.GetAssetNotificationsByDataAssetId(da.Id).Where(w => w.StartTime < DateTime.Now && w.ExpirationTime > DateTime.Now).ToList();
+                da.LastUpdated = DateTime.Now;
+                da.Status = 1;
+            }
+
             //ViewData["fluid"] = true;
 
             if (da != null) { return View(da); }
@@ -48,15 +54,19 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult DataAsset(string assetName)
         {
+            das = new List<DataAsset>(_dsContext.GetDataAssets());
+            ViewBag.DataAssets = das;
+
             assetName = (assetName == null) ? das[0].Name : assetName;
 
             DataAsset da = _dsContext.GetDataAsset(assetName);
-            da.AssetNotifications = _dsContext.GetAssetNotificationsByDataAssetId(da.Id).Where(w => w.StartTime < DateTime.Now && w.ExpirationTime > DateTime.Now).ToList();
+            if (da != null)
+            {
+                da.AssetNotifications = _dsContext.GetAssetNotificationsByDataAssetId(da.Id).Where(w => w.StartTime < DateTime.Now && w.ExpirationTime > DateTime.Now).ToList();
+                da.LastUpdated = DateTime.Now;
+                da.Status = 1;
+            }
 
-            da.LastUpdated = DateTime.Now;
-            da.Status = 1;
-            das = new List<DataAsset>(_dsContext.GetDataAssets());
-            ViewBag.DataAssets = das;            
             //ViewData["fluid"] = true;
 
             if (da != null) { return View("Index", da); }

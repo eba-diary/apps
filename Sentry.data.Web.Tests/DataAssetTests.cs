@@ -5,6 +5,7 @@ using Rhino.Mocks;
 using System.Web.Mvc;
 using System.Collections.Generic;
 using Sentry.data.Infrastructure;
+using System;
 
 namespace Sentry.data.Web.Tests
 {
@@ -81,7 +82,24 @@ namespace Sentry.data.Web.Tests
             da.DisplayName = "Mock Asset";
             da.Description = "This is a description";
 
+            List<AssetNotifications> anList = new List<AssetNotifications>();
+            anList.Add(GetMockData(da));
+
+            da.AssetNotifications = anList;
+            
             return da;
+        }
+
+        public AssetNotifications GetMockData(DataAsset da)
+        {
+            AssetNotifications an = new AssetNotifications();
+            an.NotificationId = 1;
+            an.ParentDataAsset = da;
+            an.Message = "Alert Message";
+            an.StartTime = DateTime.Now.AddDays(-1);
+            an.ExpirationTime = DateTime.Now.AddDays(1);
+
+            return an;
         }
 
         public DataAssetController GetMockProviderForIndex(DataAsset da)
@@ -90,13 +108,21 @@ namespace Sentry.data.Web.Tests
             daList.Add(da);
 
             var mockDataAssetProvider = MockRepository.GenerateStub<IDataAssetProvider>();
-            var mockMetadataRepositoryService = MockRepository.GenerateStub<MetadataRepositoryService>();
             var mockDatasetContext = MockRepository.GenerateStub<IDatasetContext>();
             var mockAssociateService = MockRepository.GenerateStub<IAssociateInfoProvider>();
-            mockDataAssetProvider.Stub(x => x.GetDataAsset(da.Id)).Return(da);
-            mockDataAssetProvider.Stub(x => x.GetDataAssets()).Return(daList);
+            var mockExtendedUserInfoProvider = MockRepository.GenerateStub<IExtendedUserInfoProvider>();
+            var mockCurrentUserIdProvider = MockRepository.GenerateStub<ICurrentUserIdProvider>();
+            var mockMetadataRepositoryProvider = MockRepository.GenerateStub<IMetadataRepositoryProvider>();
+            var mockDataAssetContext = MockRepository.GenerateStub<IDataAssetContext>();
 
-            var dac = new DataAssetController(mockDataAssetProvider, mockMetadataRepositoryService, mockDatasetContext, mockAssociateService);
+            var mockMetadataRepositoryService = MockRepository.GenerateStub<MetadataRepositoryService>(mockMetadataRepositoryProvider);
+            var mockUserService = MockRepository.GenerateStub<UserService>(mockDataAssetContext, mockExtendedUserInfoProvider, mockCurrentUserIdProvider);
+
+            mockDatasetContext.Stub(x => x.GetDataAsset(da.Id)).Return(da);
+            mockDatasetContext.Stub(x => x.GetDataAssets()).Return(daList);
+            mockDatasetContext.Stub(x => x.GetAssetNotificationsByDataAssetId(da.Id)).Return(da.AssetNotifications);
+
+            var dac = new DataAssetController(mockDataAssetProvider, mockMetadataRepositoryService, mockDatasetContext, mockAssociateService, mockUserService);
 
             return dac;
         }
@@ -104,16 +130,25 @@ namespace Sentry.data.Web.Tests
         public DataAssetController GetMockProviderForName(DataAsset da)
         {
             List<DataAsset> daList = new List<DataAsset>();
+            List<AssetNotifications> anList = new List<AssetNotifications>();
             daList.Add(da);
 
             var mockDataAssetProvider = MockRepository.GenerateStub<IDataAssetProvider>();
-            var mockMetadataRepositoryService = MockRepository.GenerateStub<MetadataRepositoryService>();
             var mockDatasetContext = MockRepository.GenerateStub<IDatasetContext>();
             var mockAssociateService = MockRepository.GenerateStub<IAssociateInfoProvider>();
-            mockDataAssetProvider.Stub(x => x.GetDataAsset(da.Name)).Return(da);
-            mockDataAssetProvider.Stub(x => x.GetDataAssets()).Return(daList);
+            var mockExtendedUserInfoProvider = MockRepository.GenerateStub<IExtendedUserInfoProvider>();
+            var mockCurrentUserIdProvider = MockRepository.GenerateStub<ICurrentUserIdProvider>();
+            var mockMetadataRepositoryProvider = MockRepository.GenerateStub<IMetadataRepositoryProvider>();
+            var mockDataAssetContext = MockRepository.GenerateStub<IDataAssetContext>();
 
-            var dac = new DataAssetController(mockDataAssetProvider, mockMetadataRepositoryService, mockDatasetContext, mockAssociateService);
+            var mockMetadataRepositoryService = MockRepository.GenerateStub<MetadataRepositoryService>(mockMetadataRepositoryProvider);
+            var mockUserService = MockRepository.GenerateStub<UserService>(mockDataAssetContext, mockExtendedUserInfoProvider, mockCurrentUserIdProvider);
+
+            mockDatasetContext.Stub(x => x.GetDataAsset(da.Name)).Return(da);
+            mockDatasetContext.Stub(x => x.GetDataAssets()).Return(daList);
+            mockDatasetContext.Stub(x => x.GetAssetNotificationsByDataAssetId(da.Id)).Return(da.AssetNotifications);
+
+            var dac = new DataAssetController(mockDataAssetProvider, mockMetadataRepositoryService, mockDatasetContext, mockAssociateService, mockUserService);
 
             return dac;
         }
