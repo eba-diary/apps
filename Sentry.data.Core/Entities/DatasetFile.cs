@@ -22,6 +22,7 @@ namespace Sentry.data.Core
         private string _s3Key;
         private int? _parentDatasetFileId;
         private string _versionId;
+        private Boolean _isSensitive;
 
         protected DatasetFile()
         {
@@ -196,7 +197,13 @@ namespace Sentry.data.Core
                 _s3Key = this._fileLocation + this.FileName;
             }
         }
-
+        public virtual Boolean IsSensitive
+        {
+            get
+            {
+                return _dataset.IsSensitive;
+            }
+        }
     }
 
 }

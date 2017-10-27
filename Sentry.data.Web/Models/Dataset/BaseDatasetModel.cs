@@ -38,6 +38,7 @@ namespace Sentry.data.Web
             this.S3Key = ds.S3Key;
             this.IsSensitive = ds.IsSensitive;
             this.CanDisplay = ds.CanDisplay;
+            
             this.RawMetadata = new List<_DatasetMetadataModel>();
             foreach (DatasetMetadata dsm in ds.RawMetadata)
             {
@@ -69,7 +70,7 @@ namespace Sentry.data.Web
                 this.DatasetFileConfigs.Add(new DatasetFileConfigsModel(dfc));
             }
             this.DropLocation = ds.DropLocation;
-            if (this.DistinctFileExtensions().Where(w => w.ToString() == "csv").Count() > 0)
+            if (this.DistinctFileExtensions().Where(w => Utilities.IsExtentionPushToSAScompatible(w)).Count() > 0)
             { this.IsPushToSASCompatible = true; }
             else
             { this.IsPushToSASCompatible = false; }
@@ -78,7 +79,7 @@ namespace Sentry.data.Web
             //{ this.IsPushToSASCompatible = true; }
             //else
             //{ this.IsPushToSASCompatible = false; }
-            if (this.DistinctFileExtensions().Where(w => w.ToString() == "csv" || w.ToString() == "txt" || w.ToString() == "json").Count() > 0)
+            if (this.DistinctFileExtensions().Where(w => Utilities.IsExtentionPreviewCompatible(w)).Count() > 0)
             //if (ds.FileExtension == ".csv" || ds.FileExtension == ".txt" || ds.FileExtension == ".json")
             { this.IsPreviewCompatible = true; }
             else
@@ -195,15 +196,12 @@ namespace Sentry.data.Web
 
         public Boolean CanDwnldSenstive { get; set; }
         public Boolean CanEditDataset { get; set; }
-
-        public Boolean IsPushToSASCompatible { get; set; }
-
-        public Boolean IsPushToTableauCompatible { get; set; }
-
-        public Boolean IsPreviewCompatible { get; set; }
-
         public Boolean CanManageConfigs { get; set; }
-
+        public Boolean CanUpload { get; set; }
+        public Boolean CanDwnldNonSensitive { get; set; }
+        public Boolean IsPushToSASCompatible { get; set; }
+        public Boolean IsPushToTableauCompatible { get; set; }
+        public Boolean IsPreviewCompatible { get; set; }
         public Category DatasetCategory { get; set; } /* Caden made a change here for the Category reference */ 
         //public IList<String> CategoryList { get; set; }
 
@@ -227,6 +225,8 @@ namespace Sentry.data.Web
 
         [DisplayName("Drop Location")]
         public string DropLocation { get; set; }
+
+
 
     }
 }

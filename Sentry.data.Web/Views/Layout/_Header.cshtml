@@ -32,21 +32,24 @@
                 }
                 <span class="sentry-user-name">@Model.CurrentUserName</span>
             </div>
-           <!-- <ul class="dropdown-menu pull-right" role="menu">
-                @{if (Model.IsImpersonating)
-                    {
-                        <li role="presentation"><a role="menuitem" tabindex="-1" id="restoreUser" href="#">Switch back to @Model.RealUserName</a></li>
+            @if (Model.IsImpersonating || Model.CanUserSwitch)
+            {
+                <ul class="dropdown-menu pull-right" role="menu">
+                    @{if (Model.IsImpersonating)
+                        {
+                            <li role="presentation"><a role="menuitem" tabindex="-1" id="restoreUser" href="#">Switch back to @Model.RealUserName</a></li>
+                        }
                     }
-                }
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Profile</a></li>
-                @{if (Model.CanUserSwitch)
-                    {
-                        <li role="presentation"><a role="menuitem" tabindex="-1" href="@Url.Action("Switch", "User")">User Switch</a></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Profile</a></li>
+                    @{if (Model.CanUserSwitch)
+                        {
+                            <li role="presentation"><a role="menuitem" tabindex="-1" href="@Url.Action("Switch", "User")">User Switch</a></li>
+                        }
                     }
-                }
-                <li role="presentation" class="divider"></li>
-                <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Logout</a></li>
-            </ul> -->
+                    <li role="presentation" class="divider"></li>
+                    <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Logout</a></li>
+                </ul>
+            }
         </div>
     </header>
 
@@ -64,47 +67,62 @@
             </div>
             <div class="navbar-collapse collapse" id="navbar-main">
                 <ul class="nav navbar-nav text-right">
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Assets <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li class="dropdown-submenu">
-                                <a data-toggle="dropdown">Assets </a>
-                                <ul class="dropdown-menu">
-                                    @foreach (Sentry.data.Core.DataAsset da in ViewBag.DataAssets)
-                                    {
-                                        <li class="text-right"><a href="/DataAsset/@da.Name">@da.DisplayName</a></li>
-                                    }
-                                </ul>
-                            </li>
-                            @if (Model.CanManageAssetAlerts)
-                            {
-                                <li class="divider"></li>
-                                <li class="dropdown-header">Asset Administration</li>
-                                if (Model.CanManageAssetAlerts)
-                                {
-                                    <li><a href="/DataAsset/ManageAssetNotification">Manage Alerts</a></li>
-                                }
-                            }
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Datasets<b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                                <li><a href="#" onclick="data.Dataset.ViewUpload()">Create Dataset</a></li>
-                            <li><a href="#" onclick="data.DatasetDetail.UploadFileModal(0)">Upload Data File</a></li>
-                            @{
-                                if (Model.CanManageConfigs)
+                    @if (Model.CanViewDataAsset)
+                    {
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Assets <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li class="dropdown-submenu">
+                                    <a data-toggle="dropdown">Assets </a>
+                                    <ul class="dropdown-menu">
+                                        @foreach (Sentry.data.Core.DataAsset da in ViewBag.DataAssets)
+                                        {
+                                            <li class="text-right"><a href="/DataAsset/@da.Name">@da.DisplayName</a></li>
+                                        }
+                                    </ul>
+                                </li>
+                                @if (Model.CanManageAssetAlerts)
                                 {
                                     <li class="divider"></li>
-                                    <li class="dropdown-header">Dataset Administration</li>
-                                    if (Model.CanManageConfigs)
+                                    <li class="dropdown-header">Asset Administration</li>
+                                    if (Model.CanManageAssetAlerts)
                                     {
-                                        <li><a href="/Dataset/EditDataFileConfig">Manage Configs</a></li>
+                                        <li><a href="/DataAsset/ManageAssetNotification">Manage Alerts</a></li>
                                     }
                                 }
-                            }
-                        </ul>
-                    </li>
+                            </ul>
+                        </li>
+                    }
+                    
+                    @if (Model.CanManageConfigs || Model.CanEditDataset || Model.CanUpload)
+                    {
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Datasets<b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                @if (Model.CanEditDataset)
+                                {
+                                    <li><a href="#" onclick="data.Dataset.ViewUpload()">Create Dataset</a></li>
+                                }
+                                @if (Model.CanUpload)
+                                {
+                                    <li><a href="#" onclick="data.DatasetDetail.UploadFileModal(0)">Upload Data File</a></li>
+                                }
+                                
+                                @{
+                                    if (Model.CanManageConfigs)
+                                    {
+                                        <li class="divider"></li>
+                                        <li class="dropdown-header">Dataset Administration</li>
+                                        if (Model.CanManageConfigs)
+                                        {
+                                            <li><a href="/Dataset/EditDataFileConfig">Manage Configs</a></li>
+                                        }
+                                    }
+                                }
+                            </ul>
+                        </li>
+                    }
+                    
                     <li class="visible-xs"><a href="#">About</a></li>
                 </ul>
                 @*<ul class="nav navbar-nav navbar-right text-right about hidden-xs">

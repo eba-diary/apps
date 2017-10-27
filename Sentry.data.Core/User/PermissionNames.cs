@@ -3,20 +3,22 @@
     //Represents permission names from Obsidian
     public class PermissionNames
     {
-        public const string UseApp = "App_DataMgmt_UseApp";
+        public const string UseApp = "UseApp";
         //###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific
         // JCG TODO: Revisit removing unused App_DataMgmt_ApproveItem
+        public const string DatasetView = "DatasetView";
+        public const string DatasetAsset = "DatasetAsset";
         public const string ApproveItems = "App_DataMgmt_ApproveItems";
         // JCG TODO: Revisit removing unused App_DataMgmt_AddItems
         public const string AddItems = "App_DataMgmt_AddItems";
-        public const string DwnldSensitve = "App_DataMgmt_SensDwnld";
-        public const string DwnldNonSensitive = "App_DataMgmt_NonSensDwnld";
-        public const string Upload = "App_DataMgmt_Upload";
-        public const string DatasetEdit = "App_DataMgmt_Edit";
+        public const string DwnldSensitve = "DatasetSensDwnld";
+        public const string DwnldNonSensitive = "DatasetNonSensDwnld";
+        public const string Upload = "DatasetUpload";
+        public const string DatasetEdit = "DatasetModify";
         //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
         // JCG TODO: Revisit removing unused App_DataMgmt_UserSwitch
-        public const string UserSwitch = "App_DataMgmt_UserSwitch";
-        public const string ManageDataFileConfigs = "App_DataMgmt_MngConfig";
-        public const string ManageAssetNotifications = "App_DataMgmt_MgAlert";
+        public const string UserSwitch = "UserSwitch";
+        public const string ManageDataFileConfigs = "DatasetMngConfig";
+        public const string ManageAssetNotifications = "DataAssetMngAlert";
     }
 }

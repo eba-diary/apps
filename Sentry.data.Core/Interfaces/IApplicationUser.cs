@@ -34,10 +34,10 @@ namespace Sentry.data.Core
         IEnumerable<string> Permissions { get; }
         Boolean CanManageConfigs { get; }
         Boolean CanManageAssetAlerts { get; }
-
+        Boolean CanViewDataset { get; }
+        Boolean CanViewDataAsset { get; }
         //Calculated values - may come from external data sources and/or our domain User object
         string DisplayName { get; }
-
         DomainUser DomainUser { get; }
     }
 }

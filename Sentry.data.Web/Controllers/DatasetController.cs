@@ -82,6 +82,8 @@ namespace Sentry.data.Web.Controllers
                         dsModel.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
                         dsModel.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
                         dsModel.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
+                        dsModel.CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
+                        dsModel.CanUpload = SharedContext.CurrentUser.CanUpload;
                     }
                     _dsModelList = dsmList;
                 }
@@ -212,6 +214,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         // JCG TODO: Add unit tests for [GET]GetDownloadURL
+        [AuthorizeByPermission(PermissionNames.DwnldSensitve, PermissionNames.DwnldNonSensitive)]
         [HttpGet()]
         public JsonResult GetDownloadURL(int id)
         {
@@ -329,10 +332,20 @@ namespace Sentry.data.Web.Controllers
             return View(ldm);
         }
 
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult HomeDataset()
         {
             List<Category> categories = _datasetContext.Categories.ToList();
             ViewData["dsCount"] = _datasetContext.GetDatasetCount();
+            ViewData["CanEditDataset"] = SharedContext.CurrentUser.CanEditDataset;
+            ViewData["CanUpload"] = SharedContext.CurrentUser.CanUpload;
+
+            //if (SharedContext.CurrentUser.GetType() == typeof(ImpersonatedApplicationUser))
+            //{
+            //    ViewData["CanViewOnly"] = SharedContext.CurrentRealUser.CanViewOnly;
+            //    ViewData["CanEditDataset"] = SharedContext.CurrentRealUser.CanEditDataset;
+            //    ViewData["CanUpload"] = SharedContext.CurrentRealUser.CanUpload;
+            //}
 
             foreach (Category c in categories) //parallel?
             {
@@ -510,10 +523,13 @@ namespace Sentry.data.Web.Controllers
 
         }
 
+
+
         // JCG TODO: Add unit tests for List()
         // GET: Dataset/List/searchParms
         [Route("Dataset/List/Index")]
         [Route("Dataset/List/SearchPhrase")]
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult List(string category, string searchPhrase)
         {
             ListDatasetModel rspModel = new ListDatasetModel();
@@ -620,6 +636,7 @@ namespace Sentry.data.Web.Controllers
 
         // GET: Dataset/Detail/5
         [HttpGet]
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult Detail(int id)
         {
             Dataset ds = _datasetContext.GetById(id);
@@ -628,12 +645,14 @@ namespace Sentry.data.Web.Controllers
             bdm.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
             bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
             bdm.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
+            bdm.CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
+            bdm.CanUpload = SharedContext.CurrentUser.CanUpload;
             return View(bdm);
         }
 
-        // JCG TODO: Add additional permissions check around CanUpload
-        // GET: Dataset/Upload
+
         [HttpGet]
+        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
         public ActionResult Create()
         {
             CreateDatasetModel udm = new CreateDatasetModel();
@@ -646,6 +665,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
         public ActionResult EditDataFileConfig()
         {
             DatasetFileConfigsModel edfc = new DatasetFileConfigsModel();
@@ -653,6 +673,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
+        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
         public ActionResult Create(CreateDatasetModel cdm)
         {
             
@@ -1017,10 +1038,10 @@ namespace Sentry.data.Web.Controllers
         //}
 
         // GET: Dataset/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
+        //public ActionResult Delete(int id)
+        //{
+        //    return View();
+        //}
 
         //// POST: Dataset/Delete/5
         //[HttpPost]
@@ -1086,7 +1107,9 @@ namespace Sentry.data.Web.Controllers
 
         // GET: DatasetFileVersion/Edit/5
         // JCG TODO: Add additional permissions check around CanEditDataset
+
         [HttpGet()]
+        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
         public ActionResult Edit(int id)
         {
             Dataset ds = _datasetContext.GetById<Dataset>(id);
@@ -1104,6 +1127,7 @@ namespace Sentry.data.Web.Controllers
         // JCG TODO: Add additional permissions check around CanEditDataset
         // POST: Dataset/Edit/5
         [HttpPost()]
+        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
         public ActionResult Edit(int id, EditDatasetModel i)
         {
             //if (_datasetContext.IsDupliceDataset(i.DatasetName)
@@ -1548,29 +1572,56 @@ namespace Sentry.data.Web.Controllers
             
         }
 
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public JsonResult GetDatasetFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
             //IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
-            IEnumerable<DatasetFileGridModel> files = _datasetContext.GetDatasetFilesForDataset(Id).ToList().
-                Select((f) => new DatasetFileGridModel(f)
-                );
+            List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
+            Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
+            Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
+
+            foreach (DatasetFile df in _datasetContext.GetDatasetFilesForDataset(Id).ToList())
+            {
+                DatasetFileGridModel dfgm = new DatasetFileGridModel(df);
+                dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
+                dfgm.CanDwnldSenstive = CanDwnldNonSensitive;
+                files.Add(dfgm);
+            }
+
+            //IEnumerable<DatasetFileGridModel> files = _datasetContext.GetDatasetFilesForDataset(Id).ToList().
+            //    Select((f) => new DatasetFileGridModel(f)
+            //    );
 
             DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
 
         }
 
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public JsonResult GetVersionsOfDatasetFileForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
             DatasetFile df = _datasetContext.GetDatasetFile(Id);
 
-            IEnumerable<DatasetFileGridModel> files = _datasetContext.GetDatasetFilesVersions(df.Dataset.DatasetId, df.DatasetFileConfig.DataFileConfigId, df.FileName).ToList().
-                Select((f) => new DatasetFileGridModel(f));
+            List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
+            Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
+            Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
+
+            foreach (DatasetFile dfversion in _datasetContext.GetDatasetFilesVersions(df.Dataset.DatasetId, df.DatasetFileConfig.DataFileConfigId, df.FileName).ToList())
+            {
+                DatasetFileGridModel dfgm = new DatasetFileGridModel(dfversion);
+                dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
+                dfgm.CanDwnldSenstive = CanDwnldNonSensitive;
+                files.Add(dfgm);
+            }
+
+            //IEnumerable<DatasetFileGridModel> files = _datasetContext.GetDatasetFilesVersions(df.Dataset.DatasetId, df.DatasetFileConfig.DataFileConfigId, df.FileName).ToList().
+            //    Select((f) => new DatasetFileGridModel(f));
 
             DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
         }
 
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public JsonResult GetAllDatasetFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
             IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
@@ -1582,6 +1633,7 @@ namespace Sentry.data.Web.Controllers
 
         }
 
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
         public JsonResult GetDatasetFileConfigInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
             IEnumerable<DatasetFileConfigsModel> files = null;
@@ -1616,6 +1668,7 @@ namespace Sentry.data.Web.Controllers
         //}
 
         [HttpPost]
+        [AuthorizeByPermission(PermissionNames.Upload)]
         public ActionResult UploadDatafile(int id)
         {
             //Get DataFileConfigs associated with dataset
@@ -1731,6 +1784,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet()]
+        [AuthorizeByPermission(PermissionNames.Upload)]
         //[Route("Dataset/Create/Datafile")]
         public ActionResult GetDatasetUploadPartialView(int datasetId)
         {
@@ -1794,6 +1848,7 @@ namespace Sentry.data.Web.Controllers
             return dfc;
         }
 
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public JsonResult LoadDatasetList(int id)
         {
             IEnumerable<Dataset> dfList = GetDatasetByCategoryId(id);

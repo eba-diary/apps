@@ -100,8 +100,7 @@ namespace Sentry.data.Core
         {
             get
             {
-                return true;
-                //return _extendedUserInfo.Permissions.Contains(Permissions.ManageAssetNotifications);
+                return _extendedUserInfo.Permissions.Contains(PermissionNames.ManageAssetNotifications);
             }
         }
 
@@ -141,6 +140,21 @@ namespace Sentry.data.Core
             get
             {
                 return _extendedUserInfo.Permissions;
+            }
+        }
+        public virtual Boolean CanViewDataset
+        {
+            get
+            {
+                return _extendedUserInfo.Permissions.Contains(PermissionNames.DatasetView);
+            }
+        }
+
+        public virtual Boolean CanViewDataAsset
+        {
+            get
+            {
+                return _extendedUserInfo.Permissions.Contains(PermissionNames.DatasetView);
             }
         }
 

@@ -24,6 +24,14 @@ namespace Sentry.data.Web.Controllers
             HeaderModel headerModel = new HeaderModel();
             headerModel.CanUserSwitch = (SharedContext.CurrentUser.CanUserSwitch && Configuration.Config.GetHostSetting("ShowUserChoice").ToLower() == "true");
             headerModel.CurrentUserName = SharedContext.CurrentUser.DisplayName;
+            headerModel.CanUseApp = SharedContext.CurrentUser.CanUseApp;
+            headerModel.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
+            headerModel.CanManageAssetAlerts = SharedContext.CurrentUser.CanManageAssetAlerts;
+            headerModel.CanViewDataset = SharedContext.CurrentUser.CanViewDataset;
+            headerModel.CanViewDataAsset = SharedContext.CurrentUser.CanViewDataAsset;
+            headerModel.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
+            headerModel.CanUpload = SharedContext.CurrentUser.CanUpload;
+
             if (SharedContext.CurrentUser.GetType() == typeof(ImpersonatedApplicationUser))
             {
                 headerModel.IsImpersonating = true;
@@ -33,13 +41,10 @@ namespace Sentry.data.Web.Controllers
             {
                 headerModel.IsImpersonating = false;
             }
-
-            headerModel.CanUseApp = SharedContext.CurrentUser.CanUseApp;
+                        
             headerModel.EnvironmentName = Sentry.Configuration.Config.GetHostSetting("EnvironmentName");
             headerModel.AssociatePhotoUrl = "http://sentryphoto.sentry.com/associate/" + SharedContext.CurrentUser.AssociateId + "/height/25px";
-            headerModel.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
-            headerModel.CanManageAssetAlerts = SharedContext.CurrentUser.CanManageAssetAlerts;
-
+            
             //headerModel.HasMenu = hasMenu;
             ViewBag.DataAssets = das;
 

@@ -494,6 +494,35 @@ namespace Sentry.data.Common
                 Sentry.Common.Logging.Logger.Error(builder.ToString(), e);
             }
 
-        }        
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="extension"></param>
+        /// <returns></returns>
+        public static Boolean IsExtentionPreviewCompatible(string extension)
+        {
+            switch (extension)
+            {
+                case "csv":
+                    return true;
+                case "txt":
+                    return true;
+                case "json":
+                    return true;
+                default:
+                    return false;
+            }
+        }
+        public static Boolean IsExtentionPushToSAScompatible(string extension)
+        {
+            switch (extension)
+            {
+                case "csv":
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 }

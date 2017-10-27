@@ -90,8 +90,8 @@ data.DatasetDetail = {
             },
             columns: [
                         { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px" },
-                        { data: "DownloadHref", className: "downloadFile", width: "20px" },
-                        { data: "PreviewHref", className: "previewFile", width: "20px" },
+                        { data: "ActionLinks", className: "downloadFile", width: "auto" },
+                        //{ data: "PreviewHref", className: "previewFile", width: "20px" },
                         //{ data: "Id", width: "40px", type: "num", className: "datasetfileid" },
                         { data: "Name", width: "40%", className: "Name" },
                         { data: "ConfigFileName", className: "configFileName" },
@@ -99,7 +99,7 @@ data.DatasetDetail = {
                         { data: "CreateDTM", className: "createdtm", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null;}},
                         { data: "ModifiedDTM", type: "date", className: "modifieddtm", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null;}}
             ],
-            order: [7, 'desc']
+            order: [6, 'desc']
             //stateSave: true,
             //stateDuration: -1  // indicates session storage, not local storage
         });
@@ -341,16 +341,13 @@ data.DatasetDetail = {
             },
             columns: [
                         { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px" },
-                        { data: "DownloadHref", className: "downloadFile", width: "20px" },
-                        { data: "PreviewHref", className: "previewFile", width: "20px" },
-                        //{ data: "Id", width: "40px", type: "num", className: "datasetfileid" },
+                        { data: "ActionLinks", className: "downloadFile", width: "auto" },
                         { data: "NameHref", width: "40%", className: "Name" },
-                        //{ data: "ConfigFileName", className: "configFileName" },
                         { data: "UploadUserName", className: "UploadUserName" },
-                        { data: "CreateDTM", className: "createdtm", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null;}},
-                        { data: "ModifiedDTM", type: "date", className: "modifieddtm", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null;}}
+                        { data: "CreateDTM", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null;}},
+                        { data: "ModifiedDTM", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } }
             ],
-            order: [6, 'desc']
+            order: [5, 'desc']
             //stateSave: true,
             //stateDuration: -1  // indicates session storage, not local storage
         });
