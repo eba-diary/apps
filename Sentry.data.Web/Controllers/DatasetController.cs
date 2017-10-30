@@ -669,6 +669,7 @@ namespace Sentry.data.Web.Controllers
         public ActionResult EditDataFileConfig()
         {
             DatasetFileConfigsModel edfc = new DatasetFileConfigsModel();
+
             return View(edfc);
         }
 
@@ -709,7 +710,8 @@ namespace Sentry.data.Web.Controllers
                         true,
                         0,
                         1,
-                        true
+                        true,
+                        ds
                         );
 
                     _datasetContext.Merge<DatasetFileConfig>(dfc);

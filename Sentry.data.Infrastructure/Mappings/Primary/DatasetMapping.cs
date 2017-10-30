@@ -75,8 +75,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Table("DatasetFile");
                 m.Cascade(Cascade.All);
                 m.Cache(c => c.Usage(CacheUsage.ReadWrite));
-                //m.Access(Accessor.Field);
-                //m.Key((k) => k.Column("Dataset_ID"));
                 m.Key((k) =>
                 {
                     k.Column("Dataset_ID");
@@ -86,13 +84,11 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             this.Bag((x) => x.DatasetFileConfigs, (m) =>
             {
-                //m.Lazy(CollectionLazy.Lazy);
+                m.Lazy(CollectionLazy.Lazy);
                 m.Inverse(true);
                 m.Table("DatasetFileConfigs");
                 m.Cascade(Cascade.All);
                 m.Cache(c => c.Usage(CacheUsage.ReadWrite));
-                //m.Access(Accessor.Field);
-                //m.Key((k) => k.Column("Dataset_ID"));
                 m.Key((k) =>
                 {
                     k.Column("Dataset_ID");

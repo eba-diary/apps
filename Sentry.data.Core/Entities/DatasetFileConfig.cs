@@ -24,6 +24,7 @@ namespace Sentry.data.Core
         private int _versionsToKeep;
         private int _fileTypeId;
         private Boolean _isGeneric;
+        private Dataset _parentDataset;
 
         public DatasetFileConfig() { }
 
@@ -40,7 +41,8 @@ namespace Sentry.data.Core
             Boolean overwriteDatafile,
             int versionsToKeep,
             int fileTypeId,
-            Boolean isGeneric)
+            Boolean isGeneric,
+            Dataset parentDataset)
         {
             this._configId = configId;
             this._name = name;
@@ -55,6 +57,7 @@ namespace Sentry.data.Core
             this._versionsToKeep = versionsToKeep;
             this._fileTypeId = fileTypeId;
             this._isGeneric = isGeneric;
+            this._parentDataset = parentDataset;
         }
         
         public virtual int ConfigId
@@ -210,6 +213,17 @@ namespace Sentry.data.Core
             set
             {
                 _isGeneric = value;
+            }
+        }
+        public virtual Dataset ParentDataset
+        {
+            get
+            {
+                return _parentDataset;
+            }
+            set
+            {
+                _parentDataset = value;
             }
         }
     }

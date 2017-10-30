@@ -25,7 +25,8 @@ namespace Sentry.data.Web
             this.FileTypeId = dsfc.FileTypeId;
             this.ConfigFileName = dsfc.Name;
             this.ConfigFileDesc = dsfc.Description;
-            this.DatasetId = dsfc.DatasetId;         
+            this.DatasetId = dsfc.DatasetId;
+            this.ParentDatasetName = dsfc.ParentDataset.DatasetName;         
         }
         
         public int ConfigId { get; set; }
@@ -54,5 +55,6 @@ namespace Sentry.data.Web
                 return href;
             }
         }
+        public string ParentDatasetName { get; set; }
     }
 }

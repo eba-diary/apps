@@ -15,6 +15,7 @@ data.ManageConfigs = {
             /// Initialize the EditConfigFile partial view
             /// </summary>
         $("#EditConfigForm").validateBootstrap(true);
+
     },
 
     DatasetFileConfigsTableInit: function (Id) {
@@ -47,6 +48,7 @@ data.ManageConfigs = {
             columns: [
                         { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px" },
                         { data: "EditHref", className: "editConfig", width: "20px" },
+                        { data: "ParentDatasetName", className: "parentDatasetName", width: "auto"},
                         { data: "ConfigFileName", className: "configFileName" },
                         { data: "SearchCriteria", className: "searchCriteria" },
                         { data: "TargetFileName", className: "targetFileName" },
@@ -59,7 +61,7 @@ data.ManageConfigs = {
                 style: "os",
                 selector: "td:first-child"
             },
-            order: [1, 'asc']
+            order: [2, 'asc']
             //stateSave: true,
             //stateDuration: -1  // indicates session storage, not local storage
         });

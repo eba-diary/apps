@@ -36,6 +36,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.Name, (m) => m.Column("Config_NME"));
             this.Property((x) => x.Description, (m) => m.Column("Config_DSC"));
             this.Property((x) => x.IsGeneric, (m) => m.Column("IsGeneric"));
+            this.ManyToOne(x => x.ParentDataset, m =>
+            {
+                m.Column("Dataset_ID");
+                m.ForeignKey("FK_DatasetFileConfigs_Dataset");
+                m.Class(typeof(Dataset));
+            });
         }
     }
 }
