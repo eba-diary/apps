@@ -3,25 +3,6 @@
     ViewData["Title"] = "User Switch";
 }
 
-@* ###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific *@
-@section Documentation {
-<h4>Global UserSwitch</h4>
-<p>
-    Besides having UserSwitch support already built for you, the template also supports global userswitch -
-    where you can userswitch in one application and continue to be that switched user in another application,
-    if allowed.
-</p>
-<h4>Questions?</h4>
-<p>
-    This brings us to the end of the guided tour.  We've touched on just a few of the key features in the new template.  If you have additional
-    questions, please refer to
-    <a href="http://sharepoint.sentry.com/projects/DeveloperWiki/Wiki%20Pages/DotNet%20Internal%20Web%20Template.aspx" target="_blank">the wiki</a>,
-    or contact technical architecture.
-</p>
-<div class="text-right">@*<a href="/User/Switch" id="next">Next <i class="fa fa-angle-right"></i></a>*@The End</div>
-}
-@* ###  END Sentry.Data  ### - Code above is Sentry.Data-specific *@
-
 <div class="page-header">
     <h1>User Switch</h1>
 </div>
@@ -58,39 +39,6 @@
             <input type="submit" value="Switch to User" class="btn btn-primary" />
             @Html.ActionLink("Undo User Switch", "Restore", null, new { @class = "btn btn-default" })
         </fieldset>
-
-        <h3>Sample Users</h3>
-        <table class="table table-striped table-bordered table-condensed">
-            <thead>
-                <tr>
-                    <th>Id</th>
-                    <th>Name</th>
-                    <th>Role</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>@Html.ActionLink("069508", "RequestSwitch", new { Id = "069508" })</td>
-                    <td>Andrew Konkol</td>
-                    <td>Admin</td>
-                </tr>
-                <tr>
-                    <td>@Html.ActionLink("067664", "RequestSwitch", new { Id = "067664" })</td>
-                    <td>Andrew Miller</td>
-                    <td>Admin</td>
-                </tr>
-                <tr>
-                    <td>@Html.ActionLink("057961", "RequestSwitch", new { Id = "057961" })</td>
-                    <td>Cinda Mijal</td>
-                    <td>Normal User</td>
-                </tr>
-                <tr>
-                    <td>@Html.ActionLink("078821", "RequestSwitch", new { Id = "078821" })</td>
-                    <td>Christy Worzalla</td>
-                    <td>User with no permission</td>
-                </tr>
-            </tbody>
-        </table>
 
     </div>
 }
