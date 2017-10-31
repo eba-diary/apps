@@ -24,7 +24,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             });
 
             this.Property((x) => x.DataFileConfigId, (m) => m.Column("DataFileConfig_ID"));
-            this.Property((x) => x.DatasetId, (m) => m.Column("Dataset_ID"));
+            //this.Property((x) => x.DatasetId, (m) => m.Column("Dataset_ID"));
             this.Property((x) => x.SearchCriteria, (m) => m.Column("SearchCriteria"));
             this.Property((x) => x.TargetFileName, (m) => m.Column("TargetFile_NME"));
             this.Property((x) => x.DropLocationType, (m) => m.Column("DropLocationType"));
@@ -40,6 +40,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             {
                 m.Column("Dataset_ID");
                 m.ForeignKey("FK_DatasetFileConfigs_Dataset");
+                m.Cascade(Cascade.All);
                 m.Class(typeof(Dataset));
             });
         }

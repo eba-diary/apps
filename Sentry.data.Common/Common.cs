@@ -200,7 +200,7 @@ namespace Sentry.data.Common
         /// <returns></returns>
         public static List<DatasetFileConfig> LoadDatasetFileConfigsByDatasetID(int datasetId, IDatasetContext dscontext)
         {
-            List<DatasetFileConfig> filelist = dscontext.getAllDatasetFileConfigs().Where(w => w.DatasetId == datasetId).ToList();
+            List<DatasetFileConfig> filelist = dscontext.getAllDatasetFileConfigs().Where(w => w.ParentDataset.DatasetId == datasetId).ToList();
             return filelist;
         }
         /// <summary>
@@ -273,11 +273,11 @@ namespace Sentry.data.Common
                 // RegexSearch requires passing targetFileName to esnure we get the correct related data file.
                 if (dfc.IsRegexSearch)
                 {
-                    df_id = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.DatasetId, dfc.DataFileConfigId, targetFileName);
+                    df_id = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.DataFileConfigId, targetFileName);
                 }
                 else
                 {
-                    df_id = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.DatasetId, dfc.DataFileConfigId);
+                    df_id = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.DataFileConfigId);
                 }
 
 
@@ -363,7 +363,7 @@ namespace Sentry.data.Common
                     try
                     {
                         //Version the Old Parent DatasetFile
-                        int df_newParentId = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.DatasetId, dfc.DataFileConfigId);
+                        int df_newParentId = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.DataFileConfigId);
                         df_Orig.ParentDatasetFileId = df_newParentId;
 
                         //Write dataset to database

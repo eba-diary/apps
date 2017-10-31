@@ -14,7 +14,7 @@ namespace Sentry.data.Core
         private string _name;
         private string _description;
         private int _dataFileConfigId;
-        private int _datasetId;
+        //private int _datasetId;
         private string _searchCriteria;
         private string _targetFileName;
         private string _dropLocationType;
@@ -33,7 +33,7 @@ namespace Sentry.data.Core
             string name,
             string description,
             int dataFileConfigId,
-            int datasetId,
+            //int datasetId,
             string searchCriteria,
             string dropLocationType,
             string dropPath,
@@ -48,7 +48,7 @@ namespace Sentry.data.Core
             this._name = name;
             this._description = description;
             this._dataFileConfigId = dataFileConfigId;
-            this._datasetId = datasetId;
+            //this._datasetId = datasetId;
             this._searchCriteria = searchCriteria;
             this._dropLocationType = dropLocationType;
             this._dropPath = dropPath;
@@ -104,17 +104,17 @@ namespace Sentry.data.Core
                 _dataFileConfigId = value;
             }
         }
-        public virtual int DatasetId
-        {
-            get
-            {
-                return _datasetId;
-            }
-            set
-            {
-                _datasetId = value;
-            }
-        }
+        //public virtual int DatasetId
+        //{
+        //    get
+        //    {
+        //        return _datasetId;
+        //    }
+        //    set
+        //    {
+        //        _datasetId = value;
+        //    }
+        //}
         public virtual string SearchCriteria
         {
             get

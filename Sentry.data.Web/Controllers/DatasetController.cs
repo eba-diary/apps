@@ -691,18 +691,15 @@ namespace Sentry.data.Web.Controllers
                     //IApplicationUser user = _userService.GetCurrentUser();
                     //DateTime CreateTime = DateTime.Now;
 
-                    _datasetContext.Merge<Dataset>(ds);
-                    _datasetContext.SaveChanges();
+                    ds = _datasetContext.Merge<Dataset>(ds);
 
-                    
-
-                    //Create Generic Data File Config for Dataset
+                    List<DatasetFileConfig> dfcList = new List<DatasetFileConfig>();
+                    //Create Generic Data File Config for Dataset                    
                     DatasetFileConfig dfc = new DatasetFileConfig(
                         0,
                         "Default",
                         "Default Config for Dataset.  Uploaded files that do not match any configs will default to this config",
                         1,
-                        _datasetContext.GetByS3Key(ds.S3Key).DatasetId,
                         "\\.",
                         "DFS",
                         ds.DropLocation,
@@ -714,7 +711,7 @@ namespace Sentry.data.Web.Controllers
                         ds
                         );
 
-                    _datasetContext.Merge<DatasetFileConfig>(dfc);
+                    _datasetContext.Merge(dfc);
                     _datasetContext.SaveChanges();
 
                     try
