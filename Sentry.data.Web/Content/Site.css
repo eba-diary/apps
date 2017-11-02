@@ -2009,12 +2009,12 @@ body { background-color: #f8f8f8; }
 }
 
 td.details-control {
-    background: url('../Images/Icons/details_open.png') no-repeat center center;
+    background: url('../../Images/Icons/details_open.png') no-repeat center center;
     width: 30px;
     cursor: pointer;
 }
 tr.shown td.details-control {
-    background: url('../Images/Icons/details_close.png') no-repeat center center;
+    background: url('../../Images/Icons/details_close.png') no-repeat center center;
 }
 
 .detailSection{
