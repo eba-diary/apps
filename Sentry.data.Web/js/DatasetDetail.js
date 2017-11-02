@@ -54,8 +54,7 @@ data.DatasetDetail = {
 
         data.DatasetDetail.DatasetFileTableInit(Id);
 
-        data.DatasetDetail.DatasetFileConfigsTableInit(Id)
-
+        data.DatasetDetail.DatasetFileConfigsTableInit(Id);
     },
 
     VersionsModalInit: function (Id) {
@@ -145,12 +144,18 @@ data.DatasetDetail = {
         // Initialize SignalR Hub
         //data.DatasetDetail.ProgressModalStatus();
 
-        if (id != 0) {
-            $("[id^='UploadFile']").attr('data-id', id);
-        }
-        
+        if (id != 0 || id != 1) {
+            $("[id^='btnUploadFile']").attr('data-id', id);
+            $("[id^='btnUploadFile']").prop("disabled", true);
 
-        $("[id^='UploadFile']").off('click').on('click', function () {
+            $("#btnCreateDatasetAtUpload").prop("disabled", true);
+            $("#btnCreateDatasetAtUpload").hide();
+
+            $("#DatasetFileUpload").prop("disabled", true);
+            $("#DatasetFileUpload").parent().parent().hide();
+        }
+
+        $("[id^='btnUploadFile']").off('click').on('click', function () {
 
             var modal = Sentry.ShowModalWithSpinner("Upload Results", {
                     Confirm: {
@@ -203,6 +208,12 @@ data.DatasetDetail = {
                     value: 0,
                     text: "Select Dataset"
                 }));
+
+                select.append($('<option/>', {
+                    value: 1,
+                    text: "{Create New Dataset}"
+                }));
+
                 $.each(result, function (index, itemData) {
                     select.append($('<option/>', {
                         value: itemData.Value,
@@ -210,12 +221,88 @@ data.DatasetDetail = {
                     }));
                 });
             });
+
+            //Simple Field Validation 
+            //  Enables the button if both fields are picked.
+            //  If Create New Dataset is Picked, a different button will be shown to the user.
+            var fileUpload = $("#DatasetFileUpload").get(0);
+            var files = fileUpload.files;
+
+            if (files.length > 0) {
+
+                if (cID != 0 && cID != 1 && files[0].name != null) {
+                    $("[id^='btnUploadFile']").prop("disabled", false);
+                } else if (cID == 1) {
+                    $("#btnCreateDatasetAtUpload").prop("disabled", false);
+                    $("#btnCreateDatasetAtUpload").show();
+                }
+            }
+        });
+
+        $("#btnCreateDatasetAtUpload").click(function (e) {
+            e.preventDefault();
+            console.log("fired");
+            url = "/Dataset/Create";
+            window.location = url;
+        });
+
+
+        $("#DatasetFileUpload").change(function () {
+            var dID = $(this).val();
+            $("[id^='btnUploadFile']").attr('data-id', dID);
+
+            var fileUpload = $("#DatasetFileUpload").get(0);
+            var files = fileUpload.files;
+
+            if (files.length > 0) {
+
+                if (dID != 0 && dID != 1 && files[0].name != null) {
+                    $("[id^='btnUploadFile']").prop("disabled", false);
+                }
+            }   
         });
 
 
         $("#datasetList").change(function () {
             var dID = $(this).val();
-            $("[id^='UploadFile']").attr('data-id', dID);
+            $("[id^='btnUploadFile']").attr('data-id', dID);
+
+            if (dID == 0)
+            {
+                $("[id^='btnUploadFile']").prop("disabled", true);
+
+                $("#btnCreateDatasetAtUpload").prop("disabled", true);
+                $("#btnCreateDatasetAtUpload").hide();
+
+                $("#DatasetFileUpload").prop("disabled", true);
+                $("#DatasetFileUpload").parent().parent().hide();
+            }
+            else if (dID == 1)
+            {
+                $("#btnCreateDatasetAtUpload").prop("disabled", false);
+                $("#btnCreateDatasetAtUpload").show();
+                $("[id^='btnUploadFile']").prop("disabled", true);
+                $("#DatasetFileUpload").prop("disabled", true);
+                $("#DatasetFileUpload").parent().parent().hide();
+            }
+            else
+            {
+                $("#DatasetFileUpload").prop("disabled", false);
+                $("#DatasetFileUpload").parent().parent().show();
+                $("#btnCreateDatasetAtUpload").prop("disabled", true);
+                $("#btnCreateDatasetAtUpload").hide();
+
+
+                var fileUpload = $("#DatasetFileUpload").get(0);
+                var files = fileUpload.files;
+
+                if (files.length > 0) {
+
+                    if (dID != 0 && dID != 1 && files[0].name != null) {
+                        $("[id^='btnUploadFile']").prop("disabled", false);
+                    }
+                }
+            }
         });
 
     },

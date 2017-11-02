@@ -7,6 +7,28 @@
 
 <div>
     <a href="@Url.Action("List", "Dataset")" class="backToList"><span class="glyphicon glyphicon-chevron-left"></span>Back to list</a>
+    
+
+    @if (@Model.DatasetFiles.Count == 0)
+    {
+    <div id = "alertInfoBanner" class="alert alert-dismissable alert-info">
+        <button type = "button" class="close" data-dismiss="alert">×</button>
+        <div>
+            @if (Model.CanUpload)
+            {
+                <strong class="alertHeading">Info: </strong>
+                <span>This dataset has no files attached to it yet.  Please click the flashing upload button to upload your first file.</span>
+            }
+            else
+            {
+                <strong class="alertHeading">Info: </strong>
+                <span>This dataset has no files attached to it yet.  Please contact the Sentry Owner: @Model.SentryOwner.FullName.</span>
+            }
+        </div>
+       </div>
+
+    }
+
     <div class="categoryBanner-@color categoryBannerSml rightFloat hidden-md hidden-lg">@Model.DatasetCategory.Name</div>
 
     <div class="relative hidden-sm hidden-xs">
@@ -20,7 +42,7 @@
                     @Model.DatasetName
 
                     @if (Model.IsSensitive)
-                    {
+        {
                         <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
                     }
                 </h1>
@@ -29,7 +51,7 @@
                     foreach (string item in Model.DistinctFileExtensions())
                     {
                         <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
-                    }
+    }
                 }
                 @*<div class="extension detailExt bg_gray htCenter ext_@Model.FileExtensionDisplay()">@Model.FileExtensionDisplay()</div>*@
 
@@ -47,7 +69,7 @@
                     </button>
                 }
 
-                @if ((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive))
+                @if (((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive)) && Model.DatasetFiles.Count != 0)
                 {
                     <button type="button" class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color" id="DownloadLatest" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download Latest">
                         <span class="glyphicon glyphicon-cloud-download @color"></span>
@@ -102,7 +124,7 @@
         @Model.DatasetDesc
     </div>
 
-    @if ((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive))
+    @if (((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive)) && Model.DatasetFiles.Count != 0)
     {
         <div>
             <div id="detailSectionHeader_PushTo">
@@ -483,6 +505,10 @@
         var Id = @Model.DatasetId;
         $(function () {
             data.DatasetDetail.Init();
+
+            if (@Model.DatasetFiles.Count == 0) {
+                $("#UploadModal").css({ "animation": "blink 2s ease-in infinite" });
+            }
         });
     </script>
 }
