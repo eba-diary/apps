@@ -144,6 +144,12 @@ data.DatasetDetail = {
         // Initialize SignalR Hub
         //data.DatasetDetail.ProgressModalStatus();
 
+        $("#categoryList").append($("<option />").val(0).html("-- Select a Category --"));
+
+        $("#categoryList").each(function (i) {
+            $(this).val(i);
+        })
+
         if (id != 0 || id != 1) {
             $("[id^='btnUploadFile']").attr('data-id', id);
             $("[id^='btnUploadFile']").prop("disabled", true);
@@ -153,6 +159,8 @@ data.DatasetDetail = {
 
             $("#DatasetFileUpload").prop("disabled", true);
             $("#DatasetFileUpload").parent().parent().hide();
+
+            $("#datasetList").parent().parent().hide();
         }
 
         $("[id^='btnUploadFile']").off('click').on('click', function () {
@@ -200,41 +208,55 @@ data.DatasetDetail = {
         // https://www.codeproject.com/Questions/696829/MVC-Dropdown-onchange-load-another-dropdown
         $("#categoryList").change(function () {
             var cID = $(this).val();
-            var controllerURL = "/Dataset/LoadDatasetList/?id=" + encodeURI(cID);
-            $.get(controllerURL, function (result) {
-                var select = $("#datasetList");
-                select.empty();
-                select.append($('<option/>', {
-                    value: 0,
-                    text: "Select Dataset"
-                }));
 
-                select.append($('<option/>', {
-                    value: 1,
-                    text: "{Create New Dataset}"
-                }));
-
-                $.each(result, function (index, itemData) {
+            if (cID > 0) {
+                var controllerURL = "/Dataset/LoadDatasetList/?id=" + encodeURI(cID);
+                $.get(controllerURL, function (result) {
+                    var select = $("#datasetList");
+                    select.empty();
                     select.append($('<option/>', {
-                        value: itemData.Value,
-                        text: itemData.Text
+                        value: 0,
+                        text: "Select Dataset"
                     }));
+
+                    select.append($('<option/>', {
+                        value: 1,
+                        text: "{Create New Dataset}"
+                    }));
+
+                    $.each(result, function (index, itemData) {
+                        select.append($('<option/>', {
+                            value: itemData.Value,
+                            text: itemData.Text
+                        }));
+                    });
                 });
-            });
+            }
 
             //Simple Field Validation 
             //  Enables the button if both fields are picked.
             //  If Create New Dataset is Picked, a different button will be shown to the user.
-            var fileUpload = $("#DatasetFileUpload").get(0);
-            var files = fileUpload.files;
 
-            if (files.length > 0) {
+            if (cID == 0) {
+                $("#datasetList").parent().parent().hide();
 
-                if (cID != 0 && cID != 1 && files[0].name != null) {
-                    $("[id^='btnUploadFile']").prop("disabled", false);
-                } else if (cID == 1) {
-                    $("#btnCreateDatasetAtUpload").prop("disabled", false);
-                    $("#btnCreateDatasetAtUpload").show();
+                $("#DatasetFileUpload").prop("disabled", true);
+                $("#DatasetFileUpload").parent().parent().hide();
+            }
+            else {
+                $("#datasetList").parent().parent().show();
+
+                var fileUpload = $("#DatasetFileUpload").get(0);
+                var files = fileUpload.files;
+
+                if (files.length > 0) {
+
+                    if (cID != 0 && cID != 1 && files[0].name != null) {
+                        $("[id^='btnUploadFile']").prop("disabled", false);
+                    } else if (cID == 1) {
+                        $("#btnCreateDatasetAtUpload").prop("disabled", false);
+                        $("#btnCreateDatasetAtUpload").show();
+                    }
                 }
             }
         });

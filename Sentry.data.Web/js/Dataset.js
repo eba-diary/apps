@@ -59,6 +59,8 @@ data.Dataset = {
         //    data.Dataset.ViewDetails($(this).data("id"));
         //});
 
+        console.log(window.location.href);
+
         $("[id^='DownloadDataset_']").off('click').on('click', function (e) {
             e.preventDefault();
             data.Dataset.DownloadDataset($(this).data("id"));

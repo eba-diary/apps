@@ -18,21 +18,6 @@
             <div class="dataset-list-filter-category panel-body" id="hide_filterType_@catName">
                 <ul class="list-unstyled ul-filter-list">
                     @{
-                        @*foreach (var filter in category.FilterNameList)
-                            {
-                                <li class="list-unstyled li-filter-disabled" id="li-filter-disabled_@filter.id">
-                                    @Html.CheckBoxFor(m => m.SearchFilters[i].FilterNameList[j].isChecked, new { @id = @category.FilterType + "_" + @filter.id, @oncheckedchange = "" })
-                                    @Html.HiddenFor(m => m.SearchFilters[i].FilterType)
-                                    @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[j].id)
-                                    @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[j].value)
-                                    @Html.DisplayFor(m => m.SearchFilters[i].FilterNameList[j].value)
-                                    ( @filter.count )
-                                </li>
-
-                                j++;
-                            }
-                            j = 0;
-                            i++;*@
 
                     for (int t = 0; t < visibleNum; t++)
                     {

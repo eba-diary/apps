@@ -21,14 +21,15 @@ using Sentry.DataTables.Shared;
 using Sentry.DataTables.Mvc;
 using Sentry.DataTables.QueryableAdapter;
 using Sentry.data.Common;
+using System.Diagnostics;
 
 namespace Sentry.data.Web.Controllers
 {
     [SessionState(SessionStateBehavior.ReadOnly)]
     public class DatasetController : BaseController
     {
-        private IAssociateInfoProvider _associateInfoProvider;
-        private IDatasetContext _datasetContext;
+        public IAssociateInfoProvider _associateInfoProvider;
+        public IDatasetContext _datasetContext;
         private UserService _userService;
         private IDatasetService _s3Service;
         private ISASService _sasService;
@@ -251,85 +252,11 @@ namespace Sentry.data.Web.Controllers
         [Route("Dataset/List")]
         public ActionResult List(ListDatasetModel ldm)
         {
-            ldm.CategoryList = GetDatasetModelList().Select(x => x.Category).Distinct().ToList();
-            ldm.SentryOwnerList = GetSentryOwnerList();
+            Helpers.Search searchHelper = new Helpers.Search();
 
+            Debug.WriteLine(Request.Url.AbsoluteUri);
 
-            IList<FilterNameModel> checkedFrequencies = ldm.SearchFilters.Where(f => f.FilterType == "Frequency").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).ToList();
-            IList<FilterNameModel> checkedCategories = ldm.SearchFilters.Where(f => f.FilterType == "Category").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).ToList();
-            IList<FilterNameModel> checkedOwners = ldm.SearchFilters.Where(f => f.FilterType == "Sentry Owner").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).ToList();
-
-
-            List<BaseDatasetModel> freqencyDsList = new List<BaseDatasetModel>();
-
-            foreach (var cf in checkedFrequencies)
-            {
-                string var = cf.value;
-                List<BaseDatasetModel> tempList = new List<BaseDatasetModel>();
-
-                tempList = GetDatasetModelList().Where(x => x.CreationFreqDesc == cf.value).ToList();
-
-                freqencyDsList = freqencyDsList.Union(tempList).ToList();
-            }
-
-
-            List<BaseDatasetModel> categoryDsList = new List<BaseDatasetModel>();
-
-            foreach (var cc in checkedCategories)
-            {
-                string var = cc.value;
-                List<BaseDatasetModel> tempList = new List<BaseDatasetModel>();
-
-                tempList = GetDatasetModelList().Where(x => x.Category == cc.value).ToList();
-
-                categoryDsList = categoryDsList.Union(tempList).ToList();
-            }
-
-
-            List<BaseDatasetModel> ownerDsList = new List<BaseDatasetModel>();
-
-            foreach (var co in checkedOwners)
-            {
-                string var = co.value;
-                List<BaseDatasetModel> tempList = new List<BaseDatasetModel>();
-
-                tempList = GetDatasetModelList().Where(x => x.SentryOwner.FullName == co.value).ToList();
-
-                ownerDsList = ownerDsList.Union(tempList).ToList();
-            }
-
-            IList<BaseDatasetModel> dsList = Utility.IntersectAllIfEmpty(freqencyDsList, categoryDsList, ownerDsList);
-
-
-            if (dsList.Count == 0 && checkedCategories.Count == 0 && checkedFrequencies.Count == 0 && checkedOwners.Count == 0)
-            {
-                ////Apply searchtext if not null
-                if (ldm.SearchText != null && ldm.SearchText.Trim().Length > 0)
-                {
-                    dsList = FilterDatasetBySearchPhrase(ldm.SearchText, GetDatasetModelList().ToList());
-                }
-                else
-                {
-                    dsList = GetDatasetModelList().ToList();
-                }
-            }
-            else
-            {
-                if (ldm.SearchText != null && ldm.SearchText.Trim().Length > 0)
-                {
-                    dsList = FilterDatasetBySearchPhrase(ldm.SearchText, dsList.ToList());
-                }
-                //    dsList = GetDatasetModelList().ToList();
-                //}
-
-                //if (dsList.Count == 0 && checkedCategories.Count == 0 && checkedFrequencies.Count == 0 && checkedOwners.Count == 0)
-                //{
-            }
-
-            ldm.DatasetList = dsList;
-            ldm.SearchFilters = GetDatasetFilters(ldm, null);
-            
-            return View(ldm);
+            return View("List", searchHelper.List(this, null));
         }
 
         [AuthorizeByPermission(PermissionNames.DatasetView)]
@@ -408,7 +335,7 @@ namespace Sentry.data.Web.Controllers
                 //}                
                 i++;
             }
-            Filter.FilterNameList = fList;
+            Filter.FilterNameList = fList.OrderByDescending(x => x.count).ToList();
             FilterList.Add(Filter);
 
 
@@ -449,7 +376,7 @@ namespace Sentry.data.Web.Controllers
                 
                 i++;
             }
-            Filter.FilterNameList = fList;
+            Filter.FilterNameList = fList.OrderByDescending(x => x.count).ThenBy(x => x.value).ToList();
             FilterList.Add(Filter);
 
 
@@ -486,7 +413,7 @@ namespace Sentry.data.Web.Controllers
                     fList.Add(nf);
                 //}
             }
-            Filter.FilterNameList = fList;
+            Filter.FilterNameList = fList.OrderByDescending(x => x.count).ToList();
             FilterList.Add(Filter);
 
             return FilterList;
@@ -525,45 +452,15 @@ namespace Sentry.data.Web.Controllers
 
 
 
-        // JCG TODO: Add unit tests for List()
         // GET: Dataset/List/searchParms
         [Route("Dataset/List/Index")]
         [Route("Dataset/List/SearchPhrase")]
         [AuthorizeByPermission(PermissionNames.DatasetView)]
-        public ActionResult List(string category, string searchPhrase)
+        public ActionResult List(string category, string searchPhrase, string ids)
         {
-            ListDatasetModel rspModel = new ListDatasetModel();
+            Helpers.Search searchHelper = new Helpers.Search();
 
-            // get all unique categories (regardless of earch category)
-            //rspModel.CategoryList = GetDatasetModelList().Select(x => x.Category).Distinct().ToList();
-            //rspModel.SentryOwnerList = GetSentryOwnerList();
-
-            List<BaseDatasetModel> dsList = null;
-
-            if (category != null && category.Length > 0)
-            {   // get list filtered on category
-                dsList = GetDatasetModelList().Where(x => x.Category == category).ToList();
-            }
-            else
-            {   // get full list
-                dsList = GetDatasetModelList().ToList();
-            }
-
-            if (searchPhrase != null && searchPhrase.Trim().Length > 0)
-            {
-                rspModel.DatasetList = FilterDatasetBySearchPhrase(searchPhrase, dsList).OrderByDescending(x => x.SearchHitList.Count()).ToList();
-                //rspModel.DatasetList = rspList.OrderByDescending(x => x.SearchHitList.Count()).ToList();
-                rspModel.SearchText = searchPhrase;
-            }
-            else
-            {
-                rspModel.DatasetList = dsList;
-            }
-
-            rspModel.SearchFilters = GetDatasetFilters(rspModel, category);
-            //(rspModel.SearchFilters.SelectMany(x => x.FilterNameList).Where(i => i.value == category).Select(c => c.isChecked)) = true;
-            
-            return View(rspModel);
+            return View(searchHelper.List(this, null, searchPhrase, category, ids));
         }
 
         private List<BaseDatasetModel> FilterDatasetBySearchPhrase(string searchPhrase, List<BaseDatasetModel> dsList)
@@ -626,13 +523,6 @@ namespace Sentry.data.Web.Controllers
             IList<string> var = _datasetContext.GetSentryOwnerList().ToList();
             return var;
         }
-
-        // GET: Dataset/Detail/key
-        //public ActionResult Detail(string UniqueKey)
-        //{
-        //    BaseDatasetModel ds = GetDatasetModel(UniqueKey);
-        //    return View(ds);
-        //}
 
         // GET: Dataset/Detail/5
         [HttpGet]

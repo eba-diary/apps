@@ -25,59 +25,195 @@
     </div>
 
     @{
-        using (Html.BeginForm(@"List", "Dataset", FormMethod.Get, new { @class = "navbar-form navbar-center", @id = "DatasetListSearch" }))
+        using (Html.BeginForm(@"List", "Dataset", FormMethod.Post, new { @class = "navbar-form navbar-center", @id = "DatasetListSearch" }))
         {
-            @*<div class="input-group dataset-search" id="DatasetListSearch">
-                    <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
-                    <input type="text" id="SearchKeywords" name="searchPhrase" class="form-control" placeholder="Enter dataset search term(s)" value="@{@Request.QueryString["searchPhrase"]}" />
-                    <input type="hidden" id="SearchCategory" name="Category" class="form-control" value="@{@Request.QueryString["Category"]}" />
-                    @Html.HiddenFor(model => model.SearchCategory)
-                </div>*@
-
-            @*<div class="input-group">
-                    <div class="col-md-10">
-                        @Html.EditorFor(model => model.SearchText, new { htmlAttributes = new { @class = "form-control " } })
-                    </div>
-                </div>*@
+            @Html.AntiForgeryToken()
 
             <div class="col-md-9 textCenter">
                 <div class="searchBoxDS">
-                    @Html.EditorFor(model => model.SearchText, new { htmlAttributes = new { @class = "form-control searchTextDS", @placeholder = "Search " + Model.DatasetList.Count() + " Datasets" } })
-                    <button type="submit" class="btn btn-primary searchBtn"><span class="glyphicon glyphicon-search"></span></button>
+                    @Html.EditorFor(model => model.SearchText, new { htmlAttributes = new { @class = "form-control searchTextDS",
+                        @placeholder = "Search " + Model.DatasetList.Count() + " Datasets" } })
+                    <button class="btn btn-primary searchBtn" onclick="return false;"><span class="glyphicon glyphicon-search"></span></button>
                 </div>
             </div>
 
-            @*<div class="input-group dataset-search" id="DatasetListSearch2">
-                    <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
-                    @Html.TextAreaFor(m => Model.SearchText, new { @class = "form-control", @placeholder = "Enter dataset search term(s)", @id = "SearchKeywords2" })
-                    @Html.HiddenFor(model => model.SearchCategory)
-                </div>*@
-            @*<p> &nbsp; </p>*@
-
-            @* Left sidebar *@
-            @*<div class="row">*@
             <div class="col-sm-3 clearFloat no-padding hidden-sm hidden-xs">
                 <div class="outsideFilters">
-                    @Html.Partial("_SearchFilters", Model)
+                    @{
+                        string[] colors = new string[] { "blue", "green", "gold", "plum", "orange", "blueGray" };
+                        int visibleNum = 6; //controls number of filter options are visible to start
+                        int i = 0;
+
+                        foreach (var category in Model.SearchFilters)
+                        {
+                            string catName = category.FilterType.Split(' ').First();
+                            string color = colors[(i < 6) ? i : i % 6];
+
+                            <div class="panel panel-default dataset-list-filters boxShadow filterBorder_@color">
+                                <div class="panel-heading filterHead_@color filterHead white" id="filterType_@catName">
+                                    @category.FilterType
+                                    <span class="glyphicon glyphicon-chevron-up rightFloat filterViewIcon @color" id="icon_filterType_@catName"></span>
+                                </div>
+                                <div class="dataset-list-filter-category panel-body" id="hide_filterType_@catName">
+                                    <ul class="list-unstyled ul-filter-list">
+                                        @{
+                                            if(category.FilterType != "Category")
+                                            {
+                                                category.FilterNameList = category.FilterNameList.OrderByDescending(x => x.count).ToList();
+                                            }
+
+                                            for (int t = 0; t < visibleNum; t++)
+                                            {
+                                                if (t < category.FilterNameList.Count)
+                                                {
+                                                    FilterNameModel filter = @category.FilterNameList[t];
+                                                    <li class="list-unstyled li-filter-disabled filterList" id="li-filter-disabled_@filter.id">
+                                                        @Html.CheckBoxFor(m => m.SearchFilters[i].FilterNameList[t].isChecked, new { @id = @i + "_" + @Model.SearchFilters[i].FilterNameList[t].id, @oncheckedchange = "", @class = "filterChbx" })
+                                                        @Html.HiddenFor(m => m.SearchFilters[i].FilterType)
+                                                        @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].id)
+                                                        @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].value)
+                                                        @Html.DisplayFor(m => m.SearchFilters[i].FilterNameList[t].value)
+
+                                                        @if (filter.isChecked)
+                                                {
+                                                    if (@filter.count > 0)
+                                                    {
+                                                                <span class="badge badge-info filterHead_@color"> @filter.count</span>
+                                            }
+                                                            else
+                                                            {
+                                                               <span class="badge"> @filter.count</span>
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            if (@filter.count > 0)
+                                                            {
+                                                                <span class="badge badge-info filterHead_@color"> @filter.count</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                <span class="badge"> @filter.count</span>
+                                                            }
+                                                        }
+                                                    </li>
+                                                }
+                                            }
+
+                                            <li id="hidden_filterMore_@catName">
+                                                <ul class="notNested">
+                                                    @for (int t = visibleNum; t < category.FilterNameList.Count; t++)
+                                                    {
+                                                        FilterNameModel filter = @category.FilterNameList[t];
+                                                        <li class="list-unstyled li-filter-disabled filterList" id="li-filter-disabled_@filter.id">
+                                                            @Html.CheckBoxFor(m => m.SearchFilters[i].FilterNameList[t].isChecked, new { @id = @i + "_" + @Model.SearchFilters[i].FilterNameList[t].id, @oncheckedchange = "", @class = "filterChbx" })
+                                                            @Html.HiddenFor(m => m.SearchFilters[i].FilterType)
+                                                            @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].id)
+                                                            @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].value)
+                                                            @Html.DisplayFor(m => m.SearchFilters[i].FilterNameList[t].value)
+
+                                                            @if (filter.isChecked)
+                                                            {
+                                                                if (@filter.count > 0)
+                                                                {
+                                                                    <span class="badge badge-info filterHead_@color"> @filter.count</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span class="badge"> @filter.count</span>
+                                                                }
+                                                            }
+                                                            else
+                                                            {
+                                                                if (@filter.count > 0)
+                                                                {
+                                                                    <span class="badge badge-info filterHead_@color"> @filter.count</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span class="badge"> @filter.count</span>
+                                                                }
+                                                            }
+                                                        </li>
+                                                    }
+                                                </ul>
+                                            </li>
+                                            i++;
+                                        }
+                                    </ul>
+
+                                    @if (visibleNum < category.FilterNameList.Count)
+                                    {
+                                        <a href="#" class="filterMore" id="filterMore_@catName">
+                                            <div class="glyphicon glyphicon-plus-sign inlineBlock moreIcon leftFloat" id="icon_filterMore_@catName"></div>
+                                            <div class="leftFloat txt_filterMore" id="txt_filterMore_@catName">Show More</div>
+                                        </a>
+                                    }
+
+                                    <div class="inlineBlock rightFloat">
+                                        <input type="submit" name="btn_@category.FilterType" class="button btn-sm btn-filter-apply BG_@color white hover_btn_@color" value="Apply" id="btnApply_@category.FilterType" hidden />
+                                    </div>
+                                </div>
+                            </div>
+                                            }
+                    }
                 </div>
             </div>
 
             @* Main Content *@
             <div class="col-md-9 textCenter">
                 <div id="DatasetItemList" class="dataset-list inlineBlock text-left">
-                    <div class="browse-category">
+                    <div>
                         <h4 class="found">
-                            Found @Model.DatasetList.Count() Dataset(s)...
+                            Active Filters:
+                            <button type="button" class="btn btn-sm btn-info" id="btnClearFilters">Clear Filters</button>
                         </h4>
+                        <select multiple="" class="form-control select2-hidden-accessible"
+                                id="filterSelector" name="filterSelector" tabindex="-1" aria-hidden="true">
+                            @{
+                                i = 0;
+                                foreach (var category in Model.SearchFilters)
+                                {
+                                    string catName = category.FilterType.Split(' ').First();
+                                    <optgroup label="@Model.SearchFilters[i].FilterType">
+                                        @{
+                                            for (int t = 0; t < category.FilterNameList.Count; t++)
+                                            {
+                                                string val = @i + "_" + @Model.SearchFilters[i].FilterNameList[t].id;
+                                                FilterNameModel filter = @category.FilterNameList[t];
+                                                <option value="@val">@Model.SearchFilters[i].FilterNameList[t].value</option>
+
+
+                                            }
+                                        }
+                                    </optgroup>
+                                    i++;
+                                }
+                            }
+                        </select>
                     </div>
-                    <ul class="list-unstyled">
                         @{
-                            foreach (var item in Model.DatasetList)
+                            if (Model.DatasetList.Any())
                             {
-                                @Html.Partial("_ListItem", item)
+                                <ul class="list-unstyled">
+                                    @{                                     
+                                        foreach (var item in Model.DatasetList)
+                                        {
+                                            @Html.Partial("_ListItem", item);
+                                        }
+                                     }
+                                </ul>
+                            }
+                            else
+                            {
+                                <hr>
+                                <div>
+                                    <h4>
+                                        No datasets were found given the active filters and/or search text.  Please refine your search parameters.
+                                    </h4>
+                                </div>          
                             }
                         }
-                    </ul>
                 </div>
             </div>
             @*</div>*@
@@ -122,13 +258,262 @@
         $(function () {
             data.Dataset.ListInit();
 
+            //Code for Startup
+            var $selector = $("#filterSelector").select2({
+                selectOnClose: true,
+                placeholder: "There are no active filters.  Pick an option to the left or click here to begin filtering.",
+            });
+            $selector.select2({
+                selectOnClose: true,
+                placeholder: "There are no active filters.  Pick an option to the left or click here to begin filtering.",
+            });
+
+            $('.select2-container--default').css('width', '100%');
+
+            //Check the checkboxes that are saved in the local storage.
+            var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
+
+            if (storedNames != null) {
+                $selector.val(storedNames).trigger("change");
+
+                for (i = 0; i < storedNames.length; i++) {
+                    $('#' + storedNames[i]).prop('checked', true);
+                }
+            }
+
+            //Add the search text to the text box if it exists.
+            var searchText = JSON.parse(localStorage.getItem("searchText"));
+
+            if (searchText != null) {
+                $('#SearchText')[0].value = searchText;
+            }
+
+            //If there is a checkbox that is checked but has not been added to the Local Storage Add it
+            //Happens when coming from the initial landing page.
+            var checkedBoxes = $('.filterChbx:checkbox:checked');
+
+            for (i = 0; i < checkedBoxes.length; i++)
+            {
+                storedNames = JSON.parse(localStorage.getItem("filteredIds"));
+
+                if (storedNames != null) {
+                    if (storedNames.indexOf(checkedBoxes[i].id) == -1)
+                    {
+                        storedNames[storedNames.length] = checkedBoxes[i].id;
+                    }
+                }
+                else {
+                    var storedNames = [];
+                    storedNames[0] = checkedBoxes[i].id;
+                }
+
+                localStorage.setItem("filteredIds", JSON.stringify(storedNames));
+            }
+            $selector.val(storedNames).trigger("change");
+
             $("[id^=btnApply_]").click(function (e) {
                 var $btn = $("[id^=btnApply_]")
                 $btn.attr('hidden', 'hidden')
 
             });
-            
-           
+
+            $(".filterList").click(function (e) {
+                var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
+                var data = $($(e.currentTarget.children[0])[0]);
+
+                if (data.prop('checked') === true) {
+                    data.prop('checked', false);
+
+                    if (storedNames != null) {
+                        storedNames.splice(storedNames.indexOf($(data).attr('id')), 1);
+                    }
+
+                    localStorage.setItem("filteredIds", JSON.stringify(storedNames));
+                    $selector.val(storedNames).trigger("change");
+                }
+                else {
+                    data.prop('checked', true);
+
+                    if (storedNames != null) {
+                        storedNames[storedNames.length] = $(data).attr('id');
+                    }
+                    else {
+                        var storedNames = [];
+                        storedNames[0] = $(data).attr('id');
+                    }
+
+                    localStorage.setItem("filteredIds", JSON.stringify(storedNames));
+                    $selector.val(storedNames).trigger("change");
+                }
+
+                changeWindow();
+            });
+
+            function changeWindow()
+            {
+                var returnUrl = "/Dataset/List/SearchPhrase";
+
+                var text = JSON.parse(localStorage.getItem("searchText"));
+                var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
+
+                if (text) {
+                    returnUrl += "?searchPhrase=" + text;
+
+                    if (storedNames) {
+                        returnUrl += "&ids=";
+
+                        for (i = 0; i < storedNames.length; i++) {
+                            returnUrl += storedNames[i] + ',';
+                        }
+                        returnUrl = returnUrl.replace(/,\s*$/, "");
+                    }
+                }
+                else if (storedNames) {
+                    returnUrl += "?ids=";
+
+                    for (i = 0; i < storedNames.length; i++) {
+                        returnUrl += storedNames[i] + ',';
+                    }
+                    returnUrl = returnUrl.replace(/,\s*$/, "");
+                }
+
+
+                window.location.href = returnUrl;
+
+                return false;
+            }
+
+            $("#btnClearFilters").click(function (e) {
+                var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
+
+                if (storedNames != null) {
+                    for (i = 0; i < storedNames.length; i++) {
+                        $('#' + storedNames[i]).prop('checked', false);
+                    }
+
+                    localStorage.removeItem("filteredIds");
+                }
+
+                localStorage.removeItem("searchText");
+                $selector.val(null).trigger('change');
+                $('#SearchText')[0].value = "";
+                
+                changeWindow();
+            });
+
+            $('.searchBtn').click(function (e) {          
+                localStorage.setItem("searchText", JSON.stringify($('#SearchText')[0].value));
+
+                changeWindow();
+            });
+
+            $(".filterChbx").click(function (e) {
+                var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
+
+                var data = $(e.currentTarget);
+
+                if (data.prop('checked') === true) {
+                    data.prop('checked', false);
+                }
+                else {
+                    data.prop('checked', true);
+                }                
+            });
+
+            $('#filterSelector').on('select2:select', function (e) {
+                // Do something
+                var data = e.params.data;
+                $('#' + data.id).prop('checked', true);
+
+                var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
+
+                if (storedNames != null) {
+                    storedNames[storedNames.length] = data.id;
+                }
+                else {
+                    var storedNames = [];
+                    storedNames[0] = data.id;
+                }
+
+                localStorage.setItem("filteredIds", JSON.stringify(storedNames));
+
+                $('#filterSelector').select2("close");
+
+                changeWindow();
+
+            });
+
+            $('#filterSelector').on('select2:unselect', function (e) {
+                // Do something
+                var data = e.params.data;
+
+                $('#' + data.id).prop('checked', false);
+
+                var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
+
+                if (storedNames != null) {
+                    storedNames.splice(storedNames.indexOf(data.id), 1);
+                }
+
+                localStorage.setItem("filteredIds", JSON.stringify(storedNames));
+
+                $('#filterSelector').select2("close");
+
+                changeWindow();
+            });
+
+                        /**
+            //If we want to have the left hand filter boxes to be collapsed when there is nothing yet selected.
+            //Turned off because I don't like the animation feature
+            //  - Andrew Quaschnick
+             
+            var catExists = false;
+            var ownerExists = false;
+            var freqExists = false;
+            for (i = 0; i < storedNames.length; i++) {
+                if ($('#' + storedNames[i]).parents('.filterBorder_blue')) {
+                    catExists = true;
+                }
+                else if ($('#' + storedNames[i]).parents('.filterBorder_green')) {
+                    ownerExists = true;
+                }
+                else if ($('#' + storedNames[i]).parents('.filterBorder_gold')) {
+                    freqExists = true;
+                }
+            }
+            if (!catExists) {
+                var id = 'filterType_Category';
+                var category = "#hide_" + id
+                var icon = "#icon_" + id;
+
+              //  $(category).css('display', 'none');
+               // $(icon).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
+            }
+
+            if (!ownerExists) {
+                var id = 'filterType_Sentry';
+                var category = "#hide_" + id
+                var icon = "#icon_" + id;
+
+               // $(category).css('display', 'none');
+               // $(icon).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
+            }
+
+            if (!freqExists) {
+                var id = 'filterType_Frequency';
+                var category = "#hide_" + id
+                var icon = "#icon_" + id;
+
+               // $(category).css('display', 'none');
+               // $(icon).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
+            }
+
+            **/
+
+        });
+
+        $(document).ready(function () {
+           // $("#filterSelector").select2();
         });
 
         //JS for using the navbar that is off the window

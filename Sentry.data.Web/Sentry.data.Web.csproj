@@ -271,6 +271,7 @@
     <Compile Include="Controllers\LayoutController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Helpers\Search.cs" />
     <Compile Include="Helpers\Utility.cs" />
     <Compile Include="DependencyResolution\ControllerConvention.cs" />
     <Compile Include="DependencyResolution\StructureMapMvcDependencyResolver.cs" />

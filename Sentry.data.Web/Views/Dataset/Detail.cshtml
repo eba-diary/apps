@@ -6,7 +6,8 @@
 }
 
 <div>
-    <a href="@Url.Action("List", "Dataset")" class="backToList"><span class="glyphicon glyphicon-chevron-left"></span>Back to list</a>
+
+    <a href="@Url.Action("List", "Dataset")" class="backToList" id="linkReturnToList"><span class="glyphicon glyphicon-chevron-left"></span>Back to list</a>
     
 
     @if (@Model.DatasetFiles.Count == 0)
@@ -509,6 +510,35 @@
             if (@Model.DatasetFiles.Count == 0) {
                 $("#UploadModal").css({ "animation": "blink 2s ease-in infinite" });
             }
+
+            var returnUrl = "/Dataset/List/SearchPhrase";
+
+            var text = JSON.parse(localStorage.getItem("searchText"));
+            var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
+
+            if (text) {
+                returnUrl += "?searchPhrase=" + text;
+
+                if (storedNames) {
+                    returnUrl += "&ids=";
+
+                    for (i = 0; i < storedNames.length; i++) {
+                        returnUrl += storedNames[i] + ',';
+                    }
+                    returnUrl = returnUrl.replace(/,\s*$/, "");
+                }
+            }
+            else if (storedNames) {
+                returnUrl += "?ids=";
+
+                for (i = 0; i < storedNames.length; i++) {
+                    returnUrl += storedNames[i] + ',';
+                }
+                returnUrl = returnUrl.replace(/,\s*$/, "");
+            }
+
+            $('#linkReturnToList').attr('href', returnUrl);
+
         });
     </script>
 }

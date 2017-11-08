@@ -59,10 +59,32 @@
 
 @section Scripts {
     <script>
-            $(function () {
+        $(function () {
                 data.Home.Init();
                 data.Dataset.IndexInit();
-            });
+
+                $('.browse-category-card').click(function (e) {
+                    var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
+
+                    if (storedNames != null) {
+                        for (i = 0; i < storedNames.length; i++) {
+                            $('#' + storedNames[i]).prop('checked', false);
+                        }
+
+                        localStorage.removeItem("filteredIds");
+                    }
+
+                    localStorage.removeItem("searchText");
+                });
+
+                $('.searchBtn').click(function (e) {
+                    localStorage.removeItem("filteredIds");
+
+                    localStorage.removeItem("searchText");
+
+                    localStorage.setItem("searchText", JSON.stringify($('#SearchText')[0].value));
+                });
+        });
     </script>
 }
 
