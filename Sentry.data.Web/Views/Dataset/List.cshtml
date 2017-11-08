@@ -61,6 +61,18 @@
                                             {
                                                 category.FilterNameList = category.FilterNameList.OrderByDescending(x => x.count).ToList();
                                             }
+                                            else
+                                            {
+                                                category.FilterNameList = category.FilterNameList.OrderBy(x => x.value).ToList();
+                                            }
+                                            if (category.FilterType == "Frequency")
+                                            {
+                                                visibleNum = 7;
+                                            }
+                                            else
+                                            {
+                                                visibleNum = 6;
+                                            }
 
                                             for (int t = 0; t < visibleNum; t++)
                                             {
@@ -82,7 +94,7 @@
                                             }
                                                             else
                                                             {
-                                                               <span class="badge"> @filter.count</span>
+                                                                <span class="badge"> @filter.count</span>
                                                             }
                                                         }
                                                         else

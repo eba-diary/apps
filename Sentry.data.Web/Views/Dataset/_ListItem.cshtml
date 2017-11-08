@@ -102,6 +102,7 @@
                 }
 
                 @{
+                    /**
                     if ((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive))
                     {
                         <button type="button" class="btn btn-default btn-sm listItemButton" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Download">
@@ -135,6 +136,7 @@
                             </button>
                         }
                     }
+                    **/
                 }
                 @*@{
                 <button type="button" class="btn btn-default btn-sm dataset-pushto-button" id="Pushtofilename_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="bottom" title="Push to Tableau" disabled>

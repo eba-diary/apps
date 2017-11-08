@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Web.Controllers;
 
@@ -105,6 +106,19 @@ namespace Sentry.data.Web.Helpers
                 ).ToList();
             }
 
+            var ext = ldm.SearchFilters.Where(f => f.FilterType == "Extension").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).ToList();
+            if (ext.Any())
+            {
+                filteredList =
+                (
+                    from item in filteredList
+                    from file in item.DistinctFileExtensions()
+                    join e in ext on file equals e.value
+                    select item
+                ).ToList();
+            }
+
+
             ldm.DatasetList = filteredList;
             ldm.SearchFilters = GetDatasetFilters(dsc, ldm, category);
 
@@ -138,13 +152,12 @@ namespace Sentry.data.Web.Helpers
         private IList<FilterModel> GetDatasetFilters(DatasetController dsc, ListDatasetModel ldm, string cat = null, string[] ids = null)
         {
             IList<FilterModel> FilterList = new List<FilterModel>();
-            IList<FilterNameModel> FilterNames = new List<FilterNameModel>();
 
             //Generate Category Filers
             FilterModel Filter = new FilterModel();
             Filter.FilterType = "Category";
 
-            IDictionary<int, string> enumList = EnumToDictionary(typeof(DatasetFrequency));
+            IDictionary<int, string> datasetFrequencyList = EnumToDictionary(typeof(DatasetFrequency));
             IList<FilterNameModel> fList = new List<FilterNameModel>();
 
             int filterIndex = 0;
@@ -264,7 +277,7 @@ namespace Sentry.data.Web.Helpers
 
             fList = new List<FilterNameModel>();
 
-            foreach (var item in enumList)
+            foreach (var item in datasetFrequencyList)
             {
                 FilterNameModel nf = new FilterNameModel();
                 nf.id = item.Key;
@@ -315,6 +328,80 @@ namespace Sentry.data.Web.Helpers
             }
             Filter.FilterNameList = fList.ToList();
             FilterList.Add(Filter);
+
+            //Generate Frequency Filters
+            Filter = new FilterModel();
+            Filter.FilterType = "Extension";
+
+            fList = new List<FilterNameModel>();
+
+            // Utilities.GetFileExtension(item.FileName)
+            List<string> fileExtensionList = new List<string>();
+
+            foreach (var a in dsc._datasetContext.Datasets)
+            {
+                foreach(var b in a.DatasetFiles)
+                {
+                    fileExtensionList.Add(Utilities.GetFileExtension(b.FileName));
+                }
+            }
+            fileExtensionList = fileExtensionList.Distinct().ToList();
+
+            int i = 0;
+
+            foreach (var item in fileExtensionList)
+            {
+                FilterNameModel nf = new FilterNameModel();
+                nf.id = i;
+                nf.value = item;
+
+                Boolean hasCategoryID = false;
+
+                if (ids != null)
+                {
+                    foreach (string id in ids)
+                    {
+                        if (id.StartsWith("3") && id.EndsWith(nf.id.ToString()))
+                        {
+                            hasCategoryID = true;
+                        }
+                    }
+                }
+
+
+
+
+
+                if (
+                    (
+                        ldm.SearchFilters.Any()
+                        &&
+                        ldm.SearchFilters.
+                            Where(f => f.FilterType == "Extension").
+                            SelectMany(fi => fi.FilterNameList).
+                            Any(fil => fil.isChecked == true)
+                        &&
+                        ldm.SearchFilters.
+                            Where(f => f.FilterType == "Extension").
+                            SelectMany(fi => fi.FilterNameList).
+                            Any(fil => fil.value == item && fil.isChecked == true)
+                    )
+                    ||
+                        hasCategoryID
+                    )
+                {
+                    nf.isChecked = true;
+                }
+
+                //Count of all datasets equal to this filter
+                nf.count = ldm.DatasetList.Where(f => f.DistinctFileExtensions().Contains(nf.value)).Count();
+
+                fList.Add(nf);
+                i++;
+            }
+            Filter.FilterNameList = fList.ToList();
+            FilterList.Add(Filter);
+
 
             return FilterList;
         }
