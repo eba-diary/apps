@@ -150,7 +150,7 @@ data.DatasetDetail = {
             $(this).val(i);
         })
 
-        if (id != 0 || id != 1) {
+        if (id == 0 || id == 1) {
             $("[id^='btnUploadFile']").attr('data-id', id);
             $("[id^='btnUploadFile']").prop("disabled", true);
 
@@ -161,6 +161,15 @@ data.DatasetDetail = {
             $("#DatasetFileUpload").parent().parent().hide();
 
             $("#datasetList").parent().parent().hide();
+        }
+        else {
+
+            $("#btnCreateDatasetAtUpload").prop("disabled", true);
+            $("#btnCreateDatasetAtUpload").hide();
+
+            $("[id^='btnUploadFile']").attr('data-id', id);
+            $("[id^='btnUploadFile']").prop("disabled", true);
+
         }
 
         $("[id^='btnUploadFile']").off('click').on('click', function () {
@@ -263,7 +272,6 @@ data.DatasetDetail = {
 
         $("#btnCreateDatasetAtUpload").click(function (e) {
             e.preventDefault();
-            console.log("fired");
             url = "/Dataset/Create";
             window.location = url;
         });
