@@ -18,6 +18,7 @@ namespace Sentry.data.Core
         private string _category;
         private string _datasetName;
         private string _datasetDesc;
+        private string _datasetInformation;
         //private string _creationUserId;
         private string _creationUserName;
         //private string _sentryOwnerId;
@@ -50,6 +51,7 @@ namespace Sentry.data.Core
                        string category, 
                        string datasetName,
                        string datasetDesc,
+                       string datasetInformation,
                        //string creationUserId,
                        string creationUserName,
                        //string sentryOwnerId,
@@ -76,6 +78,7 @@ namespace Sentry.data.Core
             this._category = category;
             this._datasetName = datasetName;
             this._datasetDesc = datasetDesc;
+            this._datasetInformation = datasetInformation;
             //this._creationUserId = creationUserId;
             this._creationUserName = creationUserName;
             //this._sentryOwnerId = sentryOwnerId;
@@ -168,6 +171,18 @@ namespace Sentry.data.Core
             set
             {
                 _datasetDesc = value;
+            }
+        }
+
+        public virtual string DatasetInformation
+        {
+            get
+            {
+                return _datasetInformation;
+            }
+            set
+            {
+                _datasetInformation = value;
             }
         }
 

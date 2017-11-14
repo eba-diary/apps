@@ -160,9 +160,15 @@ namespace Sentry.data.Infrastructure
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public IEnumerable<DatasetFile> GetDatasetFilesForDataset(int id)
+        public IEnumerable<DatasetFile> GetDatasetFilesForDataset(int id, Func<DatasetFile, bool> where)
         {
-            IEnumerable<DatasetFile> list = Query<DatasetFile>().Where(x => x.Dataset.DatasetId == id && x.ParentDatasetFileId == null).AsEnumerable();
+            IEnumerable<DatasetFile> list = 
+                Query<DatasetFile>().Where
+                (
+                    x => x.Dataset.DatasetId == id && 
+                    x.ParentDatasetFileId == null
+                ).Where(where)
+                .AsEnumerable();
 
             return list;
         }

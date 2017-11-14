@@ -21,6 +21,7 @@ data.DatasetDetail = {
         });
 
         $("[id^='PushtoSAS_']").off('click').on('click', function (e) {
+            console.log(e);
             e.preventDefault();
             data.Dataset.PushToSAS($(this).data("id"));
         });
@@ -52,9 +53,92 @@ data.DatasetDetail = {
             $(icon).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
         });
 
+
         data.DatasetDetail.DatasetFileTableInit(Id);
 
         data.DatasetDetail.DatasetFileConfigsTableInit(Id);
+
+        localStorage.setItem("listOfFilesToBundle", JSON.stringify([]));
+
+        $("#bundle_selected").click(function (e) {
+            e.preventDefault();
+
+            var datasetID = window.location.pathname.substr(window.location.pathname.lastIndexOf('/') + 1);
+            var listOfFilesToBundle = JSON.parse(localStorage.getItem("listOfFilesToBundle"));
+
+            for (i = 0; i < listOfFilesToBundle.length; i++) {
+               // console.log(listOfFilesToBundle[i]);
+            }
+            console.log(listOfFilesToBundle);
+            data.DatasetDetail.PushToBundler(datasetID, listOfFilesToBundle);
+            //Send them to the bundler
+        });
+
+        $("#bundle_allFiltered").click(function (e) {
+            e.preventDefault();
+
+            var datasetID = window.location.pathname.substr(window.location.pathname.lastIndexOf('/') + 1);
+
+            var params = Sentry.GetDataTableParamsForExport($('#datasetFilesTable').DataTable());
+
+            var request = $.ajax({
+                url: "/Dataset/GetDatasetFileInfoForGrid/?Id=" + datasetID + "&bundle=" + true,
+                method: "POST",
+                data:  params,
+                dataType: 'json',
+                success: function (obj) {
+                    console.log('success');
+                    console.log(obj);
+
+                    var listOfFilesToBundle = [];
+
+                    for (i = 0; i < obj.data.length; i++)
+                    {
+                        listOfFilesToBundle.push(obj.data[i].Id);
+                    }
+                    console.log(listOfFilesToBundle);
+                    //Send them to the bundler
+                    data.DatasetDetail.PushToBundler(datasetID, listOfFilesToBundle);
+                },
+                failure: function (obj) {
+                    console.log('failed');
+                    console.log(obj);
+                },
+                error: function (obj)
+                {
+                    console.log('error');
+                    console.log(obj);
+                }
+            });        
+        });
+    },
+
+    PushToBundler: function (dataSetID, listOfFilesToBundle) {
+        for (i = 0; i < listOfFilesToBundle.length; i++) {
+            console.log("Bundle " + i + " : " + listOfFilesToBundle[i]);
+        }
+
+        var modal = Sentry.ShowModalWithSpinner("Upload Results", {
+            Confirm: {
+                label: 'Confirm',
+                className: 'btn-success'
+            }
+        });
+
+        var request = $.ajax({
+            url: "/Dataset/BundleFiles/?listOfIds=" + listOfFilesToBundle,
+            method: "POST",
+            success: function (obj) {
+                modal.ReplaceModalBody(obj.Message);
+            },
+            failure: function (obj) {
+                console.log(obj);
+            },
+            error: function (xhr, e) {
+                console.log(e);
+                console.log(xhr);
+            }
+        });        
     },
 
     VersionsModalInit: function (Id) {
@@ -350,6 +434,14 @@ data.DatasetDetail = {
         });
     },
 
+    PushToSAS: function (caller, id, filename) {
+       // console.log($(caller).parent().next().text());
+       // console.log(id);
+       // console.log(filename);
+        data.Dataset.FileNameModal(filename);
+        data.Dataset.PushToSAS_Filename(filename, $(caller).parent().next().text());
+    },
+
     DownloadLatestDatasetFile: function (id) {
         /// <summary>
         /// Send temp URL (containing the dataset, from S3) to a new window
@@ -445,82 +537,188 @@ data.DatasetDetail = {
             }
         });
         
-        //data.Dataset.DatasetFilesTable = $("#datasetFilesTable").DataTable({
-        $("#datasetFilesTable").DataTable({
-            autoWidth: true,
+        data.Dataset.DatasetFilesTable = $("#datasetFilesTable").DataTable({
+            //$("#datasetFilesTable").dataTable({
+            width: "100%",
             serverSide: true,
+            //responsive: true,
             processing: true,
-            searching: false,
+            searching: true,
             paging: true,
+            rowId: 'Id',
             ajax: {
-                url: "/Dataset/GetDatasetFileInfoForGrid/?Id=" + Id,
+                url: "/Dataset/GetDatasetFileInfoForGrid/?Id=" + Id + "&bundle=" + false,
                 type: "POST"
             },
-            columns: [
-                        { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px" },
-                        { data: "ActionLinks", className: "downloadFile", width: "auto" },
-                        { data: "NameHref", width: "40%", className: "Name" },
-                        { data: "UploadUserName", className: "UploadUserName" },
-                        { data: "CreateDTM", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null;}},
-                        { data: "ModifiedDTM", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } }
+            iDisplayLength: 10,
+            aLengthMenu: [
+                [10, 25, 50, 100, 200, -1],
+                [10, 25, 50, 100, 200, "All"]
             ],
-            order: [5, 'desc']
-            //stateSave: true,
+            columns: [
+                { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px", searchable: false },
+                { data: "ActionLinks", className: "downloadFile", width: "100px", searchable: false },
+                {
+                    data: "Name", width: "40%", className: "Name", render: function (data, type, row)
+                    {
+                        return "<a href = \"#\" onclick=\"data.DatasetDetail.GetDatasetFileVersions(" + row.Id
+                            + ")\" title=\"View File Versions\">" + row.Name
+                            + "</a>"
+                    }
+                },
+                { data: "UploadUserName", className: "UploadUserName" },
+                { data: "CreateDTM", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
+                { data: "ModifiedDTM", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
+                { data: "ConfigFileName", className: "ConfigFileName" }
+            ],
+            language: {
+                search: "<div class='input-group'><span class='input-group-addon'><i class='glyphicon glyphicon-search'></i></span>_INPUT_</div>",
+                searchPlaceholder: "Search",
+                processing: ""
+            },
+            order: [5, 'desc'],
+            stateSave: true,
             //stateDuration: -1  // indicates session storage, not local storage
         });
 
         $("#datasetFilesTable").dataTable().columnFilter({
             sPlaceHolder: "head:after",
             aoColumns: [
-                    null,
-                    null,
-                    null,
-                    //{ type: "number-range" },
-                    { type: "text" },
-                    { type: "text" },
-                    { type: "text" },
-                    { type: "text"}
-            ]
+                null,
+                null,
+                { type: "text" },
+                { type: "text" },
+                { type: "date-range" },
+                { type: "date-range" },
+                { type: "text" }
+            ],
         });
 
-        var DataFilesTable = $('#datasetFilesTable').dataTable();
+        $("#bundledDatasetFilesTable").DataTable({
+            //$("#datasetFilesTable").dataTable({
+            autoWidth: true,
+            serverSide: true,
+            //responsive: true,
+            processing: true,
+            searching: true,
+            paging: true,
+            ajax: {
+                url: "/Dataset/GetBundledFileInfoForGrid/?Id=" + Id,
+                type: "POST"
+            },
+            columns: [
+                { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px", searchable: false },
+                { data: "ActionLinks", className: "downloadFile", width: "auto", searchable: false },
+                {
+                    data: "Name", width: "40%", className: "Name", render: function (data, type, row) {
+                        return "<a href = \"#\" onclick=\"data.DatasetDetail.GetDatasetFileVersions(" + row.Id
+                            + ")\" title=\"View File Versions\">" + row.Name
+                            + "</a>"
+                    }
+                },
+                { data: "UploadUserName", className: "UploadUserName" },
+                { data: "CreateDTM", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
+                { data: "ModifiedDTM", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
+                { data: "ConfigFileName", className: "ConfigFileName"}
+            ],
+            language: {
+                search: "<div class='input-group'><span class='input-group-addon'><i class='glyphicon glyphicon-search'></i></span>_INPUT_</div>",
+                searchPlaceholder: "Search",
+                processing: ""
+            },
+            order: [5, 'desc'],
+            stateSave: true,
+            //stateDuration: -1  // indicates session storage, not local storage
+        });
+
+        $("#bundledDatasetFilesTable").dataTable().columnFilter({
+            sPlaceHolder: "head:after",
+            aoColumns: [
+                null,
+                null,
+                { type: "text" },
+                { type: "text" },
+                { type: "date-range" },
+                { type: "date-range" },
+                { type: "text"}
+            ],
+        });
+
+        $(".dataTables_filter").parent().addClass("text-right");
+
+        $(".dataTables_filter").parent().css("right", "3px");
+
+
+        //var DataFilesTable = $('#datasetFilesTable').dataTable();
 
         // DataTable
         var table = $('#datasetFilesTable').DataTable();
 
-
         $('#datasetFilesTable tbody').on('click', 'tr', function () {
             if ($(this).hasClass('active')) {
                 $(this).removeClass('active');
+
+                var listOfFilesToBundle = JSON.parse(localStorage.getItem("listOfFilesToBundle"));
+
+                if (listOfFilesToBundle != null) {
+                    listOfFilesToBundle.splice(listOfFilesToBundle.indexOf(this.id), 1);
+                }
+
+                localStorage.setItem("listOfFilesToBundle", JSON.stringify(listOfFilesToBundle));
+
+                $('#bundleCountSelected').html(parseInt($('#bundleCountSelected').html(), 10) - 1);
             }
             else {
                 //table.$('tr.active').removeClass('active');
                 $(this).addClass('active');
+
+                var listOfFilesToBundle = JSON.parse(localStorage.getItem("listOfFilesToBundle"));
+
+                if (listOfFilesToBundle != null) {
+                    listOfFilesToBundle[listOfFilesToBundle.length] = this.id;
+                }
+                else {
+                    var listOfFilesToBundle = [];
+                    listOfFilesToBundle[0] = this.id;
+                }
+
+                localStorage.setItem("listOfFilesToBundle", JSON.stringify(listOfFilesToBundle));
+
+                $('#bundleCountSelected').html(parseInt($('#bundleCountSelected').html(), 10) + 1);
             }
+        });
+
+        $('#datasetFilesTable').on('draw.dt', function () {
+            $('#bundleCountFiltered').html(data.Dataset.DatasetFilesTable.page.info().recordsDisplay);
+            $('#bundleCountSelected').html(0);
         });
 
 
         // Apply the filter
-        table.columns().every(function () {
-            var column = this;
+        //table.columns().every(function () {
+        //    var column = this;
 
-            $('input', this.footer()).on('keyup change', function () {
-                column
-                    .search(this.value)
-                    .draw();
-            });
-        });
+        //    $('input', this.footer()).on('keyup change', function () {
+        //        column
+        //            .search(this.value)
+        //            .draw();
+        //    });
+        //});
 
-        $("#userTable_wrapper .dt-toolbar").html($("#userToolbar"));
+        //$("#userTable_wrapper .dt-toolbar").html($("#userToolbar"));
 
-        $("#exportToExcel").click(function () {
-            alert("exportToExcel Function");
-        });
+        //$("#exportToExcel").click(function () {
+        //    alert("exportToExcel Function");
+        //});
     },
     
     formatDatasetFileDetails: function (d) {
         // `d` is the original data object for the row
         return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
+            '<tr>' +
+                '<td><b>File ID</b>: </td>' +
+                '<td>' + d.Id + '</td>' +
+            '</tr>' +
             '<tr>' +
                 '<td><b>S3 Location</b>:</td>' +
                 '<td>' + d.s3Key + '</td>' +
@@ -565,6 +763,7 @@ data.DatasetDetail = {
             },
             columns: [
                         { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px" },
+                        { data: "EditHref", className: "editConfig", width: "20px" },
                         { data: "ConfigFileName", className: "configFileName" },
                         { data: "SearchCriteria", className: "searchCriteria"},
                         { data: "TargetFileName", className: "targetFileName" },

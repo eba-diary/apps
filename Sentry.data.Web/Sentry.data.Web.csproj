@@ -1124,6 +1124,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Images\Home\" />
+    <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Views\Admin\DisplayTemplates\" />
     <Folder Include="Views\DataModel\" />
     <Folder Include="Views\DatasetController2\" />

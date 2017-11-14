@@ -7,7 +7,7 @@ using System.Web;
 
 namespace Sentry.data.Web
 {
-    public class PushToDatasetModel : BaseDatasetModel
+    public class PushToDatasetModel : BaseDatasetFileModel
     {
         public PushToDatasetModel()
         {

@@ -23,6 +23,7 @@ namespace Sentry.data.Core
         private int? _parentDatasetFileId;
         private string _versionId;
         private Boolean _isSensitive;
+        private Boolean _isBundled;
 
         protected DatasetFile()
         {
@@ -37,7 +38,8 @@ namespace Sentry.data.Core
             DateTime createDTM,
             DateTime modifiedDTM,
             int? parentDatasetFileId,
-            string versionId)
+            string versionId,
+            Boolean isBundled)
         {
             this._datasetFileId = datasetFileId;
             this._fileName = fileName;
@@ -49,6 +51,7 @@ namespace Sentry.data.Core
             this._modifiedDTM = modifiedDTM;
             this._parentDatasetFileId = parentDatasetFileId;
             this._versionId = versionId;
+            this._isBundled = isBundled;
         }
 
         public virtual int DatasetFileId
@@ -202,6 +205,14 @@ namespace Sentry.data.Core
             get
             {
                 return _dataset.IsSensitive;
+            }
+        }
+
+        public virtual Boolean IsBundled
+        {
+            get
+            {
+                return this._isBundled;
             }
         }
     }

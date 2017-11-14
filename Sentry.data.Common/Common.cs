@@ -455,8 +455,8 @@ namespace Sentry.data.Common
                         processTime,
                         processTime,
                         null,
-                        null
-                        );
+                        null,
+                        false);
 
 
             return out_df;
@@ -530,6 +530,7 @@ namespace Sentry.data.Common
             switch (extension)
             {
                 case "csv":
+                case ".csv":
                     return true;
                 default:
                     return false;

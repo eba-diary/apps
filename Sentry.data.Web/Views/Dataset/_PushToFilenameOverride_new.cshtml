@@ -34,11 +34,11 @@
                     </div>
                 </div>
 
-                @Html.HiddenFor(model => model.DatasetId)
+                @Html.HiddenFor(model => model.DatasetFileId)
 
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" id="FilenameOverride" data-id="@Model.DatasetId" data-name="@Model.FileNameOverride" data-toggle="tooltip" data-placement="bottom" title="Push to SAS">Submit</button>
+                    <button type="button" class="btn btn-primary" id="FilenameOverride" data-id="@Model.DatasetFileId" data-name="@Model.FileNameOverride" data-toggle="tooltip" data-placement="bottom" title="Push to SAS">Submit</button>
                     @*<input type="submit" value="Continue" class="btn btn-primary"/>*@ 
                     @*<button type="submit" class="btn btn-primary" value="Continue">Continue</button>*@
                     @*<button type="button" class="btn btn-primary" id="FilenameOverride" data-id="@Model.DatasetId" data-filename="@Model.DatasetFileName">Continue</button>*@

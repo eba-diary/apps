@@ -45,7 +45,7 @@ namespace Sentry.data.Core
 
         string GetPreviewKey(int id);
 
-        IEnumerable<DatasetFile> GetDatasetFilesForDataset(int id);
+        IEnumerable<DatasetFile> GetDatasetFilesForDataset(int id, Func<DatasetFile, bool> where);
 
         IEnumerable<DatasetFile> GetDatasetFilesVersions(int datasetId, int dataFileConfigId, string filename);
 

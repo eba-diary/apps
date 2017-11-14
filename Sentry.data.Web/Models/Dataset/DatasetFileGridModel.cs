@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using Sentry.data.Common;
+using System.IO;
 
 namespace Sentry.data.Web
 {
@@ -20,19 +22,11 @@ namespace Sentry.data.Web
             this.ConfigFileDesc = f.DatasetFileConfig.Description;
             this.VersionId = f.VersionId;
             this.IsSensitive = f.IsSensitive;
-
+            this.ParentDataSetID = f.Dataset.DatasetId;
+            this.IsBundled = f.IsBundled;
         }
         public int Id { get; set; }
         public string Name { get; set; }
-        public string NameHref
-        {
-            get
-            {
-                string href = null;
-                href = $"<a href = \"#\" onclick=\"data.DatasetDetail.GetDatasetFileVersions({ Id })\" title=\"View File Versions\">{Name}</a>";
-                return href;
-            }
-        }
         public string UploadUserName { get; set; }        
         public DateTime ModifiedDTM { get; set; }
         public DateTime CreateDTM { get; set; }
@@ -46,10 +40,19 @@ namespace Sentry.data.Web
                 href = "<a href = \"#\" onclick=\"data.DatasetDetail.PreviewDatafileModal(" + Id + ")\" class=\"table-row-icon row-filepreview-icon\" title=\"Preview file\"><i class='glyphicon glyphicon-search text-primary'></i></a>";
                 //}
 
-                 if ((IsSensitive && CanDwnldSenstive) || (!IsSensitive && CanDwnldNonSensitive))
+                if ((IsSensitive && CanDwnldSenstive) || (!IsSensitive && CanDwnldNonSensitive))
                 {
                     href += "<a href = \"#\" onclick=\"data.DatasetDetail.DownloadDatasetFile(" + Id + ")\" class=\"table-row-icon row-filedownload-icon\" title=\"Download File\"><i class='glyphicon glyphicon-cloud-download text-primary'></i></a>";
-                } 
+                }
+
+                if ((IsSensitive && CanDwnldSenstive && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(Name))) || (!IsSensitive && CanDwnldNonSensitive && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(Name))))
+                {
+                    href += "<a href = \"#\" onclick=\"data.Dataset.FileNameModal(" + Id + ")\" title=\"Push to SAS\">" +
+                        "<img src=\"../../Images/sas_logo_min.png\" style=\" height: 15px; margin-bottom: 4px; margin-left: 5px;\"/>" +
+                        "</a>";
+
+                }
+
 
                 return href;
             }
@@ -63,5 +66,8 @@ namespace Sentry.data.Web
         public Boolean CanDwnldSenstive { get; set; }
         public Boolean CanDwnldNonSensitive { get; set; }
         public Boolean IsSensitive { get; set; }
+        public int ParentDataSetID { get; set; }
+        public Boolean IsBundled { get; set; }
+
     }
 }

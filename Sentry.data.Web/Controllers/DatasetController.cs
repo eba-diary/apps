@@ -695,6 +695,7 @@ namespace Sentry.data.Web.Controllers
                 cat,
                 cdm.DatasetName,
                 cdm.DatasetDesc,
+                "This is a test Information line.",
                 cdm.CreationUserName,
                 cdm.SentryOwnerName,
                 user.AssociateId,
@@ -1295,9 +1296,9 @@ namespace Sentry.data.Web.Controllers
         //}
 
         [HttpPost]
-        public ActionResult PushToSAS(int id, string fileOverride, string connectionId)
+        public ActionResult PushToSAS(int id, string fileOverride)
         {
-            Dataset ds = _datasetContext.GetById(id);
+            DatasetFile ds = _datasetContext.GetById<DatasetFile>(id);
             string filename = null;
             string filename_orig = null;
 
@@ -1311,21 +1312,21 @@ namespace Sentry.data.Web.Controllers
                 if (Path.HasExtension(fileOverride))
                 {
                     Sentry.Common.Logging.Logger.Debug("Has File Extension: " + System.IO.Path.GetExtension(fileOverride));
-                    Sentry.Common.Logging.Logger.Debug("Dataset Model Extension: " + ds.FileExtension);
-                    filename = fileOverride.Replace(System.IO.Path.GetExtension(fileOverride), ds.FileExtension);
+                    Sentry.Common.Logging.Logger.Debug("Dataset Model Extension: " + System.IO.Path.GetExtension(ds.FileName));
+                    filename = fileOverride.Replace(System.IO.Path.GetExtension(fileOverride), System.IO.Path.GetExtension(ds.FileName));
                 }
                 else
                 {
                     Sentry.Common.Logging.Logger.Debug("Has No File Extension");
-                    Sentry.Common.Logging.Logger.Debug("Dataset Model Extension: " + ds.FileExtension);
-                    filename = (fileOverride + ds.FileExtension);
+                    Sentry.Common.Logging.Logger.Debug("Dataset Model Extension: " + System.IO.Path.GetExtension(ds.FileName));
+                    filename = (fileOverride + System.IO.Path.GetExtension(ds.FileName));
                 }
             }
             else
             {
                 Sentry.Common.Logging.Logger.Debug(" No Override Value");
-                Sentry.Common.Logging.Logger.Debug("Dataset Model S3Key: " + System.IO.Path.GetFileName(ds.S3Key));
-                filename = System.IO.Path.GetFileName(ds.S3Key);
+                Sentry.Common.Logging.Logger.Debug("Dataset Model S3Key: " + System.IO.Path.GetFileName(ds.FileLocation));
+                filename = System.IO.Path.GetFileName(ds.FileLocation);
             }
 
             filename_orig = filename;
@@ -1338,7 +1339,7 @@ namespace Sentry.data.Web.Controllers
             string BaseTargetPath = Configuration.Config.GetHostSetting("PushToSASTargetPath");
 
             //creates category directory if does not exist, otherwise does nothing.
-            System.IO.Directory.CreateDirectory(BaseTargetPath + ds.Category);
+            System.IO.Directory.CreateDirectory(BaseTargetPath + ds.Dataset.Category);
 
 
             _s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(PushToSAS_ProgressEvent);
@@ -1347,7 +1348,7 @@ namespace Sentry.data.Web.Controllers
             try
             {
 
-                _s3Service.TransferUtilityDownload(BaseTargetPath, ds.Category, filename, ds.S3Key);
+                _s3Service.TransferUtilityDownload(BaseTargetPath, ds.Dataset.Category, filename, ds.FileLocation);
 
             }
             catch (Exception e)
@@ -1365,7 +1366,7 @@ namespace Sentry.data.Web.Controllers
             try
             {
 
-                _sasService.ConvertToSASFormat(filename, ds.Category);
+                _sasService.ConvertToSASFormat(filename, ds.Dataset.Category);
 
             }
             catch (WebException we)
@@ -1417,10 +1418,10 @@ namespace Sentry.data.Web.Controllers
         {
             PushToDatasetModel model = new PushToDatasetModel();
 
-
-            Dataset dataset = _datasetContext.GetById<Dataset>(id);
-            model.DatasetId = dataset.DatasetId;
-            model.DatasetFileName = System.IO.Path.GetFileName(dataset.S3Key);
+            
+            DatasetFile datafile = _datasetContext.GetById<DatasetFile>(id);
+            model.DatasetFileId = datafile.DatasetFileId;
+            model.DatasetFileName = datafile.FileName;
 
             return PartialView("_PushToFilenameOverride_new", model);
 
@@ -1462,26 +1463,57 @@ namespace Sentry.data.Web.Controllers
         }
 
         [AuthorizeByPermission(PermissionNames.DatasetView)]
-        public JsonResult GetDatasetFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
+        public JsonResult GetDatasetFileInfoForGrid(int Id, Boolean bundle, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
             //IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
             List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
             Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
             Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
 
-            foreach (DatasetFile df in _datasetContext.GetDatasetFilesForDataset(Id).ToList())
+            //Query the Dataset for the following information:
+            foreach (DatasetFile df in _datasetContext.GetDatasetFilesForDataset(Id, x => !x.IsBundled).ToList())
             {
                 DatasetFileGridModel dfgm = new DatasetFileGridModel(df);
                 dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
-                dfgm.CanDwnldSenstive = CanDwnldNonSensitive;
+                dfgm.CanDwnldSenstive = CanDwnldSenstive;
+
                 files.Add(dfgm);
             }
 
-            //IEnumerable<DatasetFileGridModel> files = _datasetContext.GetDatasetFilesForDataset(Id).ToList().
-            //    Select((f) => new DatasetFileGridModel(f)
-            //    );
+            DataTablesQueryableAdapter <DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
+            int a  = dtqa.GetDataTablesResponse().data.Count();
+
+            Debug.WriteLine(a);
+
+            if (bundle)
+            {
+                return Json(dtqa.GetDataTablesResponse(true), JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        public JsonResult GetBundledFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
+        {
+            //IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
+            List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
+            Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
+            Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
+
+            foreach (DatasetFile df in _datasetContext.GetDatasetFilesForDataset(Id, x => x.IsBundled).ToList())
+            {
+                DatasetFileGridModel dfgm = new DatasetFileGridModel(df);
+                dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
+                dfgm.CanDwnldSenstive = CanDwnldSenstive;
+
+                files.Add(dfgm);
+            }
 
             DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
+
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
 
         }
@@ -1499,7 +1531,7 @@ namespace Sentry.data.Web.Controllers
             {
                 DatasetFileGridModel dfgm = new DatasetFileGridModel(dfversion);
                 dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
-                dfgm.CanDwnldSenstive = CanDwnldNonSensitive;
+                dfgm.CanDwnldSenstive = CanDwnldSenstive;
                 files.Add(dfgm);
             }
 
@@ -1540,6 +1572,63 @@ namespace Sentry.data.Web.Controllers
             DataTablesQueryableAdapter<DatasetFileConfigsModel> dtqa = new DataTablesQueryableAdapter<DatasetFileConfigsModel>(files.AsQueryable(), dtRequest);
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
         }
+
+        [HttpPost]
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        public ActionResult BundleFiles(string listOfIds)
+        {
+            string[] ids = listOfIds.Split(',');
+
+            List<DatasetFile> files = (from file in _datasetContext.GetAllDatasetFiles()
+                                       from id in ids
+                                       where file.DatasetFileId.ToString() == id
+                                       select file).ToList();
+
+            var extension = Path.GetExtension(files[0].FileName);
+
+            //Do all the files included in the list have the same exact extension.
+            Boolean sameExtension = files.All(x => Path.GetExtension(x.FileName) == extension) ? true : false;
+
+            //Get the users permissions
+            Boolean errorsFound = false;
+            string errorString = "";
+            Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
+            Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
+
+            Boolean bundlingSensitive = files.Any(x => x.IsSensitive);
+
+            if ((bundlingSensitive && !CanDwnldSenstive) || (!bundlingSensitive && !CanDwnldNonSensitive))
+            {
+                errorsFound = true;
+                errorString += "You do not have permission to download or bundle these files.\n";
+            }
+
+            if(!sameExtension)
+            {
+                errorsFound = true;
+                errorString += "The files did not have the same file extension. Bundling requires that all files have the same extension.\n";
+            }
+
+            try
+            {
+                if (!errorsFound)
+                {
+                    //Pass the list of files off to the File Bundler in S3.
+                    return Json(new { Success = true, Message = "Success" });
+                }
+                else
+                {
+                    //Return an error to the user in the Client UI.
+                    return Json(new { Success = false, Message = errorString });
+                }
+            }
+            catch(Exception ex)
+            {
+                return Json(new { Success = false, Message = "An error occurred, please try later! : " + ex.Message });
+            }
+        }
+
+
 
         [HttpGet()]
         public int GetLatestDatasetFileIdForDataset(int id)

@@ -467,17 +467,11 @@ data.Dataset = {
         /// <summary>
         /// Download dataset from S3 and push to SAS file share
         /// </summary>
-
-        //var val = document.getElementById('FileNameOverride').value;
-        //var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(id) + "&fileOverride='" + encodeURI(filename) + "'";
-        var cnx = data.Dataset.ProgressModalStatus();
-        alert("Connection: " + cnx);
-        var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(id) + "&fileOverride=" + encodeURI(filename) + "&connectionString=" + cnx;
+        var modal = Sentry.ShowModalWithSpinner("PushToMessage");
+        var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(id) + "&fileOverride=" + encodeURI(filename);
         $.post(controllerURL, function (result) {
-            Sentry.ShowModalAlert(result);
-            //modal.ReplaceModalBody(result);
-            //var modal = Sentry.ShowModalCustom("Push To SAS", result);
-        });  
+            modal.ReplaceModalBody(result);
+        });
     },
 
     PushToOverrideInit: function () {
