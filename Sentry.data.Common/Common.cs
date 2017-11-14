@@ -243,20 +243,22 @@ namespace Sentry.data.Common
         {
             return ProcessFile(dataset, dfConfig, dsService, dscontext, file, null, uploadUserName, file.Name);
         }
-        /// <summary>
-        /// Processes filestream and return DatasetFile object. Transfer events are pushed to OnTransferProgressEvent.
-        /// </summary>
-        /// <param name="dataset"></param>
-        /// <param name="dfConfig"></param>
-        /// <param name="dsService"></param>
-        /// <param name="dscontext"></param>
-        /// <param name="file"></param>
-        /// <param name="uploadUserName"></param>
-        /// <returns></returns>
-        public static DatasetFile ProcessInputFile(Dataset dataset, DatasetFileConfig dfConfig, IDatasetService dsService, IDatasetContext dscontext, HttpPostedFileBase file, string uploadUserName)
-        {
-            return ProcessFile(dataset, dfConfig, dsService, dscontext, null, file, uploadUserName, System.IO.Path.GetFileName(file.FileName));
-        }
+        ///// <summary>
+        ///// Processes filestream and return DatasetFile object. Transfer events are pushed to OnTransferProgressEvent.
+        ///// </summary>
+        ///// <param name="dataset"></param>
+        ///// <param name="dfConfig"></param>
+        ///// <param name="dsService"></param>
+        ///// <param name="dscontext"></param>
+        ///// <param name="file"></param>
+        ///// <param name="uploadUserName"></param>
+        ///// <returns></returns>
+        //public static DatasetFile ProcessInputFile(Dataset dataset, DatasetFileConfig dfConfig, IDatasetService dsService, IDatasetContext dscontext, HttpPostedFileBase file, string uploadUserName)
+        //{
+        //    return ProcessFile(dataset, dfConfig, dsService, dscontext, null, file, uploadUserName, System.IO.Path.GetFileName(file.FileName));
+        //}
+
+
         private static DatasetFile ProcessFile(Dataset ds, DatasetFileConfig dfc, IDatasetService upload, IDatasetContext dscontext, FileInfo fileInfo, HttpPostedFileBase filestream, string uploadUserName, string filename)
         {
             DatasetFile df_Orig = null;
@@ -300,10 +302,14 @@ namespace Sentry.data.Common
                 {
                     if (filestream == null)
                     {
-                        df_newParent.VersionId = upload.UploadDataset_v2(fileInfo.FullName, df_newParent.FileLocation);
+                        df_newParent.VersionId = upload.UploadDataFile(fileInfo.FullName, df_newParent.FileLocation);
+                        //df_newParent.VersionId = upload.MultiPartUpload(fileInfo.FullName, df_newParent.FileLocation);
+                        //df_newParent.VersionId = upload.UploadDataset_v2(fileInfo.FullName, df_newParent.FileLocation);
+
                     }
                     else
-                    {    
+                    {
+                        //upload.MultiPartUpload(fi.FullName, df.FileLocation);
                         upload.TransferUtlityUploadStream(df_newParent.FileLocation, df_newParent.FileName, filestream.InputStream);
                     }                    
                 }
@@ -514,6 +520,11 @@ namespace Sentry.data.Common
                     return false;
             }
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="extension"></param>
+        /// <returns></returns>
         public static Boolean IsExtentionPushToSAScompatible(string extension)
         {
             switch (extension)

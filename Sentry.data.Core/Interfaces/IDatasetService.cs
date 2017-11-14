@@ -14,9 +14,15 @@ namespace Sentry.data.Core
 
         string GetDatasetDownloadURL(string uniqueKey);
 
-        void UploadDataset(string sourceFilePath, Dataset ds);
+        /// <summary>
+        /// Upload a dataset to S3, pulling directly from the given source file path.  Files size less than
+        /// 5MB will use PutObject, larger than 5MB will utilize MultiPartUpload.
+        /// </summary>
+        /// <param name="sourceFilePath"></param>
+        /// <param name="dataSet"></param>
+        string UploadDataFile(string sourceFilePath, string targetKey);
 
-        string UploadDataset_v2(string sourceFilePath, string targetKey);
+        //string UploadDataset_v2(string sourceFilePath, string targetKey);
 
         string GetObjectPreview(string key);
 
@@ -37,6 +43,8 @@ namespace Sentry.data.Core
         //DatasetFolder GetFolderByUniqueKey(string uniqueKey);
 
         event EventHandler<TransferProgressEventArgs> OnTransferProgressEvent;
+
+        string MultiPartUpload(string sourceFilePath, string targetKey);
 
         string GetDatasetDownloadURL(string key, string versionId);
     }

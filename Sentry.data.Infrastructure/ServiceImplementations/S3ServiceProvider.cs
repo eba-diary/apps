@@ -88,67 +88,26 @@ namespace Sentry.data.Infrastructure
         }
 
         /// <summary>
-        /// Upload a dataset to S3, pulling directly from the given source file path
+        /// Upload a dataset to S3, pulling directly from the given source file path.  Files size less than
+        /// 5MB will use PutObject, larger than 5MB will utilize MultiPartUpload.
         /// </summary>
         /// <param name="sourceFilePath"></param>
         /// <param name="dataSet"></param>
-        public void UploadDataset(string sourceFilePath, Dataset dataSet)
-        {
-            PutObjectRequest poReq = new PutObjectRequest();
-            poReq.FilePath = sourceFilePath;
-            poReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
-            poReq.Key = dataSet.S3Key;
-            System.IO.FileInfo fInfo = new System.IO.FileInfo(sourceFilePath);
-            poReq.Metadata.Add("FileName", fInfo.Name);
-            poReq.Metadata.Add("Description", dataSet.DatasetDesc);
-            poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
-            PutObjectResponse poRsp = S3Client.PutObject(poReq);
-            if (poRsp.HttpStatusCode != System.Net.HttpStatusCode.OK)
-            {
-                throw new Exception("Error attempting to upload dataset to S3: " + poRsp.HttpStatusCode);
-            }
-        }
-
-        /// <summary>
-        /// Returns S3 VersionID
-        /// </summary>
-        /// <param name="sourceFilePath"></param>
-        /// <param name="targetKey"></param>
-        /// <returns>Returns S3 Version ID</returns>
-        public string UploadDataset_v2(string sourceFilePath, string targetKey)
+        public string UploadDataFile(string sourceFilePath, string targetKey)
         {
             string versionId = null;
-            //IAmazonS3 client = null;
-            //using (client = S3Client)
-            //{
-            try
+
+            System.IO.FileInfo fInfo = new System.IO.FileInfo(sourceFilePath);
+            
+            if (fInfo.Length > 5 * (long)Math.Pow(2, 20))
             {
-                PutObjectRequest poReq = new PutObjectRequest();
-                poReq.FilePath = sourceFilePath;
-                poReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
-                poReq.Key = targetKey;
-                System.IO.FileInfo fInfo = new System.IO.FileInfo(sourceFilePath);
-                //poReq.Metadata.Add("FileName", fInfo.Name);
-                //poReq.Metadata.Add("Description", dataSet.DatasetDesc);
-                poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
-                PutObjectResponse poRsp = S3Client.PutObject(poReq);
-                versionId = poRsp.VersionId;
+                versionId = MultiPartUpload(sourceFilePath, targetKey);
             }
-            catch (AmazonS3Exception amazonS3Exception)
+            else
             {
-                if (amazonS3Exception.ErrorCode != null &&
-                    (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId")
-                    ||
-                    amazonS3Exception.ErrorCode.Equals("InvalidSecurity")))
-                {
-                    throw new Exception("Error attempting to upload dataset to S3: Check the provided AWS Credentials.");
-                }
-                else
-                {
-                    throw new Exception("Error attempting to upload dataset to S3: " + amazonS3Exception.Message);
-                }
+                versionId = PutObject(sourceFilePath, targetKey);
             }
-            //}
+
             return versionId;
         }
 
@@ -232,32 +191,6 @@ namespace Sentry.data.Infrastructure
 
         }
 
-        //public void TransferUtlityUploadStream(string folder, string fileName, Stream stream)
-        //{
-        //    Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");
-        //    try
-        //    {
-        //        Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
-        //        Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
-        //        //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + Configuration.Config.GetSetting("AWSRootBucket"));
-        //        s3tuReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
-        //        //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - InputStream");
-        //        s3tuReq.InputStream = stream;
-        //        //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + category + "/" + dsfi);
-        //        s3tuReq.Key = folder + "/" + fileName;
-        //        s3tuReq.UploadProgressEvent += new EventHandler<UploadProgressArgs>(a_TransferProgressEvent);
-        //        s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
-        //        s3tuReq.AutoCloseStream = true;
-        //        //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Starting Upload " + s3tuReq.Key);
-        //        s3tu.Upload(s3tuReq);
-        //    }
-        //    catch (AmazonS3Exception e)
-        //    {
-        //        throw new Exception("Error attempting to transfer fileto S3.", e);
-        //    }
-
-        //}
-
         public void TransferUtilityDownload(string baseTargetPath, string folder, string filename, string s3Key)
         {
             try
@@ -309,50 +242,171 @@ namespace Sentry.data.Infrastructure
             //    handler(this, e);
             //}
         }
-        
-        public string StartUpload(string uniqueKey)
+
+        #region MultiPartUpload
+
+        public string MultiPartUpload(string sourceFilePath, string targetKey)
+        {
+            List<UploadPartResponse> uploadResponses = new List<UploadPartResponse>();
+            string versionId = null;
+            
+            string uploadId = StartUpload(targetKey);
+
+            long contentLength = new FileInfo(sourceFilePath).Length;
+            long partSize = 5 * (long)Math.Pow(2, 20); // 5 MB
+
+            try
+            {
+                long filePositiion = 0;
+                for (int i = 1; filePositiion < contentLength; i++)
+                {
+                    //Adding responses to list as returned ETags are needed to close Multipart upload
+                    UploadPartResponse resp = UploadPart(targetKey, sourceFilePath, filePositiion, partSize, i, uploadId);
+
+                    Sentry.Common.Logging.Logger.Debug($"UploadID: {uploadId}: Processed part #{i} (source file position: {filePositiion}), and recieved response status {resp.HttpStatusCode} with ETag ({resp.ETag})");
+
+                    uploadResponses.Add(resp);
+
+                    filePositiion += partSize;
+                }
+
+                //Complete successful Multipart Upload so we do not continue to get chared for upload storage
+                versionId = StopUpload(targetKey, uploadId, uploadResponses);
+
+            }
+            catch (Exception ex)
+            {
+                Sentry.Common.Logging.Logger.Error("Error Processing MultiPartUpload", ex);
+                AbortMultipartUploadRequest abortMPURequest = new AbortMultipartUploadRequest
+                {
+                    BucketName = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                    Key = targetKey,
+                    UploadId = uploadId
+                };
+
+                Sentry.Common.Logging.Logger.Debug($"Aborting MultipartUpload UploadID: {uploadId}");
+                S3Client.AbortMultipartUpload(abortMPURequest);
+
+                throw new Exception("Error attempting to upload dataset to S3: " + ex.Message);
+            }
+
+            return versionId;
+        }
+
+        /// <summary>
+        /// Initiate Multipart Upload Request and return UploadID used for each part upload
+        /// </summary>
+        /// <param name="uniqueKey"></param>
+        /// <returns></returns>
+        private string StartUpload(string uniqueKey)
         {
             InitiateMultipartUploadRequest mReq = new InitiateMultipartUploadRequest();
             mReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
             mReq.Key = uniqueKey;
+            mReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
             InitiateMultipartUploadResponse mRsp = S3Client.InitiateMultipartUpload(mReq);
+
+            Sentry.Common.Logging.Logger.Debug($"Initiated MultipartUpload UploadID: {mRsp.UploadId}");
+
             return mRsp.UploadId;
         }
 
-        public void UploadPart(string uniqueKey, string sourceFilePath, long filePosition, long partSize, int partNumber, bool isLastPart)
+        private UploadPartResponse UploadPart(string uniqueKey, string sourceFilePath, long filePosition, long partSize, int partNumber, string uploadId)
         {
             UploadPartRequest uReq = new UploadPartRequest();
             uReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
             uReq.Key = uniqueKey;
-            //uReq.FilePath = sourceFilePath;
+            uReq.FilePath = sourceFilePath;
             uReq.FilePosition = filePosition;
             uReq.PartSize = partSize;
             uReq.PartNumber = partNumber;
-            uReq.IsLastPart = isLastPart;
-            uReq.InputStream = new System.IO.FileStream(sourceFilePath, System.IO.FileMode.Open, System.IO.FileAccess.Read);
-            uReq.StreamTransferProgress = new EventHandler<Amazon.Runtime.StreamTransferProgressArgs>(UploadProgressEventCallbackHandler);
+            uReq.UploadId = uploadId;            
+            uReq.StreamTransferProgress += new EventHandler<Amazon.Runtime.StreamTransferProgressArgs>(UploadProgressEventCallbackHandler);
             UploadPartResponse uRsp = S3Client.UploadPart(uReq);
             if (uRsp.HttpStatusCode != System.Net.HttpStatusCode.OK)
             {
                 throw new Exception("Error attempting to upload dataset to S3: " + uRsp.HttpStatusCode);
             }
+            return uRsp;
         }
 
-        public static void UploadProgressEventCallbackHandler(object sender, Amazon.Runtime.StreamTransferProgressArgs e)
-        {
-            
-        }
-
-        public string StopUpload(string uniqueKey, string uploadId)
+        /// <summary>
+        /// Complete Multipart upload and return version ID
+        /// </summary>
+        /// <param name="uniqueKey"></param>
+        /// <param name="uploadId"></param>
+        /// <returns></returns>
+        private string StopUpload(string uniqueKey, string uploadId, List<UploadPartResponse> responses)
         {
             CompleteMultipartUploadRequest cReq = new CompleteMultipartUploadRequest();
             cReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
             cReq.Key = uniqueKey;
             cReq.UploadId = uploadId;
+            cReq.AddPartETags(responses);
+
+
             CompleteMultipartUploadResponse mRsp = S3Client.CompleteMultipartUpload(cReq);
-            return mRsp.ETag;
+
+            Sentry.Common.Logging.Logger.Debug($"Completed MultipartUpload UploadID: {uploadId}, with response status {mRsp.HttpStatusCode}");
+
+            //return mRsp.ETag;
+            return mRsp.VersionId;
         }
 
+        private static void UploadProgressEventCallbackHandler(object sender, Amazon.Runtime.StreamTransferProgressArgs e)
+        {
+            int percent = Convert.ToInt32(Convert.ToDouble(e.PercentDone));
+
+            //Only log every 10%
+            if (percent % 10 == 0)
+            {
+                Sentry.Common.Logging.Logger.Debug($"Percent Done: {percent}, TransferredBytes: {e.TransferredBytes}, TotalBytes: {e.TotalBytes}");
+            }
+        }
+
+        #endregion
+
+        #region PutObject
+
+        private string PutObject(string sourceFilePath, string targetKey)
+        {
+            string versionId = null;
+            try
+            {
+                PutObjectRequest poReq = new PutObjectRequest();
+                poReq.FilePath = sourceFilePath;
+                poReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+                poReq.Key = targetKey;
+                System.IO.FileInfo fInfo = new System.IO.FileInfo(sourceFilePath);
+                poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
+
+                Sentry.Common.Logging.Logger.Debug($"Initialized PutObject Request: Bucket:{poReq.BucketName}, File:{poReq.FilePath}, Key:{targetKey}");
+
+                PutObjectResponse poRsp = S3Client.PutObject(poReq);
+
+                Sentry.Common.Logging.Logger.Debug($"Completed PutObject Request: Key: {targetKey}, Version_ID:{poRsp.VersionId}, ETag:{poRsp.ETag}, Lenght(bytes):{poRsp.ContentLength}");
+
+                versionId = poRsp.VersionId;
+            }
+            catch (AmazonS3Exception amazonS3Exception)
+            {
+                if (amazonS3Exception.ErrorCode != null &&
+                    (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId")
+                    ||
+                    amazonS3Exception.ErrorCode.Equals("InvalidSecurity")))
+                {
+                    throw new Exception("Error attempting to upload dataset to S3: Check the provided AWS Credentials.");
+                }
+                else
+                {
+                    throw new Exception("Error attempting to upload dataset to S3: " + amazonS3Exception.Message);
+                }
+            }
+            return versionId;
+        }
+
+        #endregion
+        
         /// <summary>
         /// Delete a dataset from S3
         /// </summary>
@@ -386,67 +440,7 @@ namespace Sentry.data.Infrastructure
                     throw new Exception("Error attempting to delete S3 key: " + s3Exception.InnerException);
                 }
             //}
-        }
-
-        ///// <summary>
-        ///// Retrieve dataset details from S3 using its Etag (not to be confused with its S3 Key).
-        ///// </summary>
-        ///// <param name="uniqueKey"></param>
-        ///// <returns></returns>
-        //public Dataset GetDatasetDetails(string uniqueKey)
-        //{
-        //    GetObjectMetadataRequest s3req = new GetObjectMetadataRequest();
-        //    s3req.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
-        //    s3req.Key = uniqueKey;
-        //    //s3req.EtagToMatch = tagKey;
-        //    GetObjectMetadataResponse s3rsp = S3Client.GetObjectMetadata(s3req);
-        //    List<DatasetMetadata> md = new Dictionary<string, string>();
-        //    md.Add("S3 - ETag", s3rsp.ETag);
-        //    md.Add("S3 - Size", s3rsp.ContentLength.ToString());
-        //    md.Add("S3 - Last Modified", s3rsp.LastModified.ToShortDateString() + " " + s3rsp.LastModified.ToShortTimeString());
-        //    foreach (string mdKey in s3rsp.Metadata.Keys)
-        //    {
-        //        md.Add(mdKey.Replace("x-amz-meta-", ""), s3rsp.Metadata[mdKey]);
-        //    }
-        //    string fileName = s3req.Key.Substring(s3req.Key.LastIndexOf("/")).Replace("/", "");
-        //    string summaryDesc = "";
-        //    string detailDesc = "";
-        //    s3rsp.ResponseMetadata.Metadata.TryGetValue("SummaryDesc", out summaryDesc);
-        //    s3rsp.ResponseMetadata.Metadata.TryGetValue("x-amz-meta-desc", out detailDesc);
-        //    if (summaryDesc == null || summaryDesc.Length == 0) summaryDesc = "<none>";
-        //    if (detailDesc == null || detailDesc.Length == 0) detailDesc = "<none>";
-        //    String categoryName = uniqueKey.Substring(0, uniqueKey.IndexOf("/"));
-        //    Dataset rspDS = new Dataset(
-        //        999,
-        //        categoryName,
-        //        fileName,
-        //        summaryDesc,
-        //        "John Schneider",
-        //        "John Schneider",
-        //        "John Schneider",
-        //        "E",
-        //        //".txt",
-        //        DateTime.Now.AddDays(-2),
-        //        s3rsp.LastModified,
-        //        DateTime.Now,
-        //        "Weekly",
-        //        (int)s3rsp.ContentLength,
-        //        1,
-        //        uniqueKey,
-        //        md
-        //    );
-        //    //    s3rsp.ETag,
-        //    //    uniqueKey, 
-        //    //    s3req.BucketName, 
-        //    //    fileName,
-        //    //    s3rsp.LastModified,
-        //    //    summaryDesc,
-        //    //    detailDesc,
-        //    //    s3req.BucketName + "/" + uniqueKey,
-        //    //    categoryName,
-        //    //    md);
-        //    return rspDS;
-        //}
+        }        
 
         /// <summary>
         /// Get list of datasets currently on S3, within the given parentDir
@@ -488,194 +482,6 @@ namespace Sentry.data.Infrastructure
 
             return dsList;
         }
-
-        ///// <summary>
-        ///// Retrieve dataset details from S3 using its Etag (not to be confused with its S3 Key).
-        ///// </summary>
-        ///// <param name="uniqueKey"></param>
-        ///// <returns></returns>
-        //public DatasetFolder GetFolderByUniqueKey(string uniqueKey)
-        //{
-        //    ListObjectsRequest s3req = new ListObjectsRequest();
-        //    s3req.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
-        //    s3req.Prefix = uniqueKey;
-        //    ListObjectsResponse s3rsp = S3Client.ListObjects(s3req);
-
-        //    //GetObjectMetadataRequest s3req = new GetObjectMetadataRequest();
-        //    //s3req.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
-        //    //s3req.Key = uniqueKey;
-        //    //GetObjectMetadataResponse s3rsp = S3Client.GetObjectMetadata(s3req);
-        //    //string fileName = s3req.Key.Substring(s3req.Key.LastIndexOf("/")).Replace("/", "");
-        //    //string datasetDecription = "";
-        //    //s3rsp.ResponseMetadata.Metadata.TryGetValue("x-amz-meta-desc", out datasetDecription);
-        //    //if (datasetDecription == null) datasetDecription = "";
-        //    //DatasetFileVersion rspDS = new DatasetFileVersion(s3rsp.ETag, uniqueKey, s3req.BucketName, fileName, summaryDesc, detailDesc, s3req.BucketName + "/" + uniqueKey);
-
-        //    S3Object thisFolderObj = s3rsp.S3Objects.Where(s => s.Key == uniqueKey).FirstOrDefault();
-        //    // add this folder to parent
-        //    string nameStub = thisFolderObj.Key.TrimEnd("/".ToCharArray());
-        //    DatasetFolder dsf = new DatasetFolder(
-        //        thisFolderObj.BucketName,
-        //        thisFolderObj.Key,
-        //        thisFolderObj.ETag,
-        //        nameStub.Contains("/") ?
-        //            nameStub.Substring(nameStub.LastIndexOf("/")).Replace("/", "") : nameStub,
-        //        null);
-
-        //    // populate files...
-        //    S3ObjectToDatasetFolder(s3rsp.S3Objects, dsf);
-
-        //    // add metadata
-        //    Dictionary<string, string> md = new Dictionary<string, string>();
-        //    foreach (string mdKey in s3rsp.ResponseMetadata.Metadata.Keys)
-        //    {
-        //        if (mdKey == "x-amz-meta-desc")
-        //        {
-        //            string datasetDecription = "";
-        //            s3rsp.ResponseMetadata.Metadata.TryGetValue("x-amz-meta-desc", out datasetDecription);
-        //            if (datasetDecription == null) datasetDecription = "";
-        //            dsf.Description = datasetDecription;
-        //        } else
-        //        {
-        //            md.Add(mdKey.Replace("x-amz-meta-", ""), s3rsp.ResponseMetadata.Metadata[mdKey]);
-        //        }
-        //    }
-        //    dsf.Metadata = md;
-
-        //    return dsf;
-        //}
-
-        ///// <summary>
-        ///// Retrieve files from S3 in a file heirarchy struture
-        ///// </summary>
-        ///// <param name="parentFolder"></param>
-        ///// <param name="includeSubDirectories"></param>
-        ///// <returns></returns>
-        //public DatasetFolder GetSubFolderStructure(DatasetFolder parentFolder = null, bool includeSubDirectories = true)
-        //{
-        //    DatasetFolder currentFolder = parentFolder;
-        //    if (null == currentFolder) {
-        //        currentFolder = new DatasetFolder("", "root", "", null);
-        //    }
-
-        //    ListObjectsResponse rsp = null;
-        //    if (null == parentFolder) {
-        //        string rootBucket = Configuration.Config.GetSetting("AWSRootBucket");
-        //        rsp = S3Client.ListObjects(rootBucket);
-        //    } else {
-        //        rsp = S3Client.ListObjects(parentFolder.FullName);
-        //    }
-
-        //    // this will recurseively populate all subfolders and children...
-        //    S3ObjectToDatasetFolder(rsp.S3Objects, currentFolder);
-
-        //    return currentFolder;
-        //}
-
-        ///// <summary>
-        ///// Get dataset meta-info for datasets logically residing in the given folder name
-        ///// </summary>
-        ///// <param name="folderName"></param>
-        ///// <returns></returns>
-        //public IQueryable<Dataset> GetDatasetsByFolderName(string folderName = null)
-        //{
-        //    // this will include data sets in addition to folders...
-        //    List<Dataset> dsList = new List<Dataset>();
-        //    ListObjectsResponse rsp = S3Client.ListObjects(folderName);
-        //    foreach (S3Object s3o in rsp.S3Objects) {
-        //        // if s3o key appears anywhere else in the output, then s3o is a DatasetFolder
-        //        IEnumerable<S3Object> keysContainingThisKey = rsp.S3Objects.Where(s3oChild => s3oChild.Key.Contains(s3o.Key + "/"));
-        //        if (keysContainingThisKey.Count() > 0) {
-        //            // this is a folder... ignore it
-
-        //        } else {   // this is a dataset...
-        //            Dataset ds = GetByUniqueKey(s3o.Key);
-        //            dsList.Add(ds);
-        //        }
-        //    }
-        //    return dsList.AsQueryable();
-        //}
-
-        ///// <summary>
-        ///// (private) recursively convert a list of S3Objects to a heirarchical DatasetFolder (with populated subfolders)
-        ///// </summary>
-        ///// <param name="s3oList"></param>
-        ///// <param name="parentFolder"></param>
-        //private void S3ObjectToDatasetFolder(List<S3Object> s3oList, DatasetFolder parentFolder)
-        //{
-        //    // get all top-level folders under the current folder...
-        //    // these will end with a backslash "/" and, if we remove the parentFolder from consideration,
-        //    // they should only have one "/" so first and last index thereof should be the same...
-        //    List<S3Object> topLevelSubFolders;
-        //    if (null == parentFolder.Key || parentFolder.Key.Length == 0) {
-        //        topLevelSubFolders = s3oList.Where(s => s.Key.EndsWith("/") && s.Key.IndexOf("/") == s.Key.LastIndexOf("/")).ToList();
-        //    } else {
-        //        topLevelSubFolders = s3oList.Where(s => s.Key != parentFolder.Key && s.Key.EndsWith("/") &&
-        //                                                s.Key.Replace(parentFolder.Key, " ").IndexOf("/") ==
-        //                                                s.Key.Replace(parentFolder.Key, " ").LastIndexOf("/")).ToList();
-        //    }
-        //    foreach (S3Object tlsf in topLevelSubFolders) {
-
-        //        // add this folder to parent
-        //        string nameStub = tlsf.Key.TrimEnd("/".ToCharArray());
-        //        DatasetFolder dsf = new DatasetFolder(
-        //            tlsf.BucketName, 
-        //            tlsf.Key,
-        //            tlsf.ETag,
-        //            nameStub.Contains("/") ?
-        //                nameStub.Substring(nameStub.LastIndexOf("/")).Replace("/", "") : nameStub,
-        //            parentFolder);
-
-        //        //parentFolder.SubFolders.Add(dsf);
-        //        // process this folder...
-        //        List<S3Object> children = s3oList.Where(s => s.Key.StartsWith(tlsf.Key)).ToList();
-        //        S3ObjectToDatasetFolder(children, dsf);
-        //    }
-
-        //    // get all non-folder children at specifically this level...
-        //    // these should not end in "/", and should not contain any intermediate "/" either
-        //    List<S3Object> childrenHere;
-        //    if (null == parentFolder.Key || parentFolder.Key.Length == 0) {
-        //        childrenHere = s3oList.Where(s => (!s.Key.EndsWith("/")) &&
-        //                                          (!s.Key.Contains("/"))).ToList();
-        //    } else {
-        //        childrenHere = s3oList.Where(s => (!s.Key.EndsWith("/")) &&
-        //                                          (!s.Key.Replace(parentFolder.Key, "").Contains("/"))).ToList();
-        //    }
-
-        //    foreach (S3Object c in childrenHere) {
-        //        String categoryName = c.Key.Substring(0, c.Key.IndexOf("/"));
-        //        Dictionary<string, string> md = GetObjectMetadata(c);
-        //        Dataset ds = new Dataset(
-        //            c.ETag.Replace("\"",""),
-        //            c.Key,
-        //            c.BucketName, 
-        //            c.Key.Substring(c.Key.LastIndexOf("/")).Replace("/",""),
-        //            c.LastModified,
-        //            null,
-        //            md.ContainsKey("desc") ? md["desc"] : null,
-        //            null, 
-        //            categoryName,
-        //            md);
-        //        parentFolder.Datasets.Add(ds);
-        //    }
-        //}
-
-        //private Dictionary<string, string> GetObjectMetadata(S3Object s3Obj)
-        //{
-        //    GetObjectMetadataRequest req = new GetObjectMetadataRequest();
-        //    req.BucketName = s3Obj.BucketName;
-        //    req.Key = s3Obj.Key;
-        //    GetObjectMetadataResponse rsp = S3Client.GetObjectMetadata(req);
-        //    Dictionary<string, string> md = new Dictionary<string, string>();
-        //    md.Add("S3 - ETag", s3Obj.ETag);
-        //    md.Add("S3 - Size", s3Obj.Size.ToString());
-        //    md.Add("S3 - Last Modified", s3Obj.LastModified.ToShortDateString() + " " + s3Obj.LastModified.ToShortTimeString());
-        //    foreach (string mdKey in rsp.Metadata.Keys)
-        //    {
-        //        md.Add(mdKey.Replace("x-amz-meta-", ""), rsp.Metadata[mdKey]);
-        //    }
-        //    return md;
-        //}
+                
     }
 }

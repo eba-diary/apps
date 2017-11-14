@@ -312,136 +312,136 @@ namespace Sentry.data.DatasetLoader
 
         }
 
-        private static void ProcessGeneralFile(IDatasetService upload, IDatasetContext dscontext, FileInfo fileInfo)
-        {
-            DatasetFile df_Orig = null;
-            DatasetFile df_newParent = null;
-            string targetFileName = null;
-            int df_id = 0;
+        //private static void ProcessGeneralFile(IDatasetService upload, IDatasetContext dscontext, FileInfo fileInfo)
+        //{
+        //    DatasetFile df_Orig = null;
+        //    DatasetFile df_newParent = null;
+        //    string targetFileName = null;
+        //    int df_id = 0;
 
-            //Get config for general_intake dataset
-            DatasetFileConfig dfc = dscontext.getAllDatasetFileConfigs().Where(w => w.ParentDataset.DatasetId == 133).FirstOrDefault();
+        //    //Get config for general_intake dataset
+        //    DatasetFileConfig dfc = dscontext.getAllDatasetFileConfigs().Where(w => w.ParentDataset.DatasetId == 133).FirstOrDefault();
 
-            // Get General_Intake dataset
-            Dataset ds = dscontext.GetById(dfc.ParentDataset.DatasetId);
+        //    // Get General_Intake dataset
+        //    Dataset ds = dscontext.GetById(dfc.ParentDataset.DatasetId);
 
-            // Determine target file name
-            targetFileName = GetTargetFileName(dfc, fileInfo);
+        //    // Determine target file name
+        //    targetFileName = GetTargetFileName(dfc, fileInfo);
 
-            if (dfc.OverwriteDatafile)
-            {
-                // RegexSearch requires passing targetFileName to esnure we get the correct related data file.
-                if (dfc.IsRegexSearch)
-                {
-                    df_id = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.DataFileConfigId, targetFileName);
-                }
-                else
-                {
-                    df_id = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.DataFileConfigId);
-                }
-
-
-                //If datafiles exist for this DatasetFileConfig
-                if (df_id != 0)
-                {
-                    df_Orig = dscontext.GetDatasetFile(df_id);
-                    df_newParent = CreateParentDatasetFile(ds, dfc, fileInfo, targetFileName, df_Orig);
-                    //df_updated = updateOverwrittenDatasetFile(ds, df_Orig, fileInfo);
-                }
-                //If there are no datafiles for this DatasetFileConfig
-                else
-                {
-                    df_newParent = CreateParentDatasetFile(ds, dfc, fileInfo, targetFileName, null);
-                }
-
-                DateTime startUploadTime = DateTime.Now;
-                // Upload new key 
-                try
-                {
-                    df_newParent.VersionId = upload.UploadDataset_v2(fileInfo.FullName, df_newParent.FileLocation);
-                }
-                catch (AmazonS3Exception eS3)
-                {
-                    Logger.Error("S3 Upload Error", eS3);
-                    //SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Upload Error", df_newParent.FileLocation);
-                    throw new Exception("S3 Upload Error", eS3);
-                    //return (int)ExitCodes.S3UploadError;
-                }
-                catch (Exception e)
-                {
-                    Logger.Error("Error during establishing upload process", e);
-                    //SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing upload process", df_newParent.FileLocation);
-                    throw new Exception("Error during establishing upload process", e);
-                    //return (int)ExitCodes.Failure;
-                }
-
-                //PushFileToStorage(ds, datasetMetadata, upload, dscontext, fileInfo);
-                var diffInSeconds = (DateTime.Now - startUploadTime).TotalSeconds;
-                Logger.Info($"TransferTime: {diffInSeconds} | DatasetName: {ds.DatasetName}");
+        //    if (dfc.OverwriteDatafile)
+        //    {
+        //        // RegexSearch requires passing targetFileName to esnure we get the correct related data file.
+        //        if (dfc.IsRegexSearch)
+        //        {
+        //            df_id = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.DataFileConfigId, targetFileName);
+        //        }
+        //        else
+        //        {
+        //            df_id = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.DataFileConfigId);
+        //        }
 
 
-                //Register new Parent DatasetFile
-                try
-                {
-                    //Write dataset to database
-                    dscontext.Merge(df_newParent);
-                    dscontext.SaveChanges();
-                }
-                catch (Exception e)
-                {
+        //        //If datafiles exist for this DatasetFileConfig
+        //        if (df_id != 0)
+        //        {
+        //            df_Orig = dscontext.GetDatasetFile(df_id);
+        //            df_newParent = CreateParentDatasetFile(ds, dfc, fileInfo, targetFileName, df_Orig);
+        //            //df_updated = updateOverwrittenDatasetFile(ds, df_Orig, fileInfo);
+        //        }
+        //        //If there are no datafiles for this DatasetFileConfig
+        //        else
+        //        {
+        //            df_newParent = CreateParentDatasetFile(ds, dfc, fileInfo, targetFileName, null);
+        //        }
 
-                    StringBuilder builder = new StringBuilder();
-                    builder.Append("Failed to record new Parent DatasetFile to Dataset Management.");
-                    builder.Append($"File_NME: {df_newParent.FileName}");
-                    builder.Append($"Dataset_ID: {df_newParent.Dataset.DatasetId}");
-                    builder.Append($"UploadUser_NME: {df_newParent.UploadUserName}");
-                    builder.Append($"Create_DTM: {df_newParent.CreateDTM}");
-                    builder.Append($"Modified_DTM: {df_newParent.ModifiedDTM}");
-                    builder.Append($"FileLocation: {df_newParent.FileLocation}");
-                    builder.Append($"DataFileConfig_ID: {df_newParent.DatasetFileConfig.DataFileConfigId}");
-                    builder.Append($"ParentDatasetFile_ID: {df_newParent.ParentDatasetFileId}");
-                    builder.Append($"Version_ID: {df_newParent.VersionId}");
+        //        DateTime startUploadTime = DateTime.Now;
+        //        // Upload new key 
+        //        try
+        //        {
+        //            df_newParent.VersionId = upload.UploadDataset_v2(fileInfo.FullName, df_newParent.FileLocation);
+        //        }
+        //        catch (AmazonS3Exception eS3)
+        //        {
+        //            Logger.Error("S3 Upload Error", eS3);
+        //            //SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Upload Error", df_newParent.FileLocation);
+        //            throw new Exception("S3 Upload Error", eS3);
+        //            //return (int)ExitCodes.S3UploadError;
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            Logger.Error("Error during establishing upload process", e);
+        //            //SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing upload process", df_newParent.FileLocation);
+        //            throw new Exception("Error during establishing upload process", e);
+        //            //return (int)ExitCodes.Failure;
+        //        }
 
-                    Logger.Error(builder.ToString(), e);
-
-                    //SendNotification(datasetMetadata, (int)ExitCodes.DatabaseError, 0, "Error saving dataset to database", df_newParent.FileLocation);
-                    throw new Exception("Error saving dataset to database", e);
-                    //return (int)ExitCodes.DatabaseError;
-                }
-
-                // If there were existing datasetfiles set parentdatasetFile_ID on old parent
-                if (df_id != 0)
-                {
-                    try
-                    {
-                        //Version the Old Parent DatasetFile
-                        int df_newParentId = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.DataFileConfigId);
-                        df_Orig.ParentDatasetFileId = df_newParentId;
-
-                        //Write dataset to database
-                        dscontext.Merge(df_Orig);
-                        dscontext.SaveChanges();
-
-                    }
-                    catch (Exception e)
-                    {
-                        StringBuilder builder = new StringBuilder();
-                        builder.Append("Failed to set ParentDatasetFile_ID on Original Parent in Dataset Management.");
-                        builder.Append($"DatasetFile_ID: {df_Orig.DatasetFileId}");
-                        builder.Append($"File_NME: {df_Orig.FileName}");
-                        builder.Append($"ParentDatasetFile_ID: {df_Orig.ParentDatasetFileId}");
-
-                    }
-                }
+        //        //PushFileToStorage(ds, datasetMetadata, upload, dscontext, fileInfo);
+        //        var diffInSeconds = (DateTime.Now - startUploadTime).TotalSeconds;
+        //        Logger.Info($"TransferTime: {diffInSeconds} | DatasetName: {ds.DatasetName}");
 
 
-                RemoveProcessedFile(df_newParent, fileInfo);
+        //        //Register new Parent DatasetFile
+        //        try
+        //        {
+        //            //Write dataset to database
+        //            dscontext.Merge(df_newParent);
+        //            dscontext.SaveChanges();
+        //        }
+        //        catch (Exception e)
+        //        {
 
-                //RemoveProcessedFile(datasetMetadata, fileInfo);
+        //            StringBuilder builder = new StringBuilder();
+        //            builder.Append("Failed to record new Parent DatasetFile to Dataset Management.");
+        //            builder.Append($"File_NME: {df_newParent.FileName}");
+        //            builder.Append($"Dataset_ID: {df_newParent.Dataset.DatasetId}");
+        //            builder.Append($"UploadUser_NME: {df_newParent.UploadUserName}");
+        //            builder.Append($"Create_DTM: {df_newParent.CreateDTM}");
+        //            builder.Append($"Modified_DTM: {df_newParent.ModifiedDTM}");
+        //            builder.Append($"FileLocation: {df_newParent.FileLocation}");
+        //            builder.Append($"DataFileConfig_ID: {df_newParent.DatasetFileConfig.DataFileConfigId}");
+        //            builder.Append($"ParentDatasetFile_ID: {df_newParent.ParentDatasetFileId}");
+        //            builder.Append($"Version_ID: {df_newParent.VersionId}");
 
-                //SendNotification(datasetMetadata, (int)ExitCodes.Success, ds.DatasetId, string.Empty, string.Empty);
-            }
-        }
+        //            Logger.Error(builder.ToString(), e);
+
+        //            //SendNotification(datasetMetadata, (int)ExitCodes.DatabaseError, 0, "Error saving dataset to database", df_newParent.FileLocation);
+        //            throw new Exception("Error saving dataset to database", e);
+        //            //return (int)ExitCodes.DatabaseError;
+        //        }
+
+        //        // If there were existing datasetfiles set parentdatasetFile_ID on old parent
+        //        if (df_id != 0)
+        //        {
+        //            try
+        //            {
+        //                //Version the Old Parent DatasetFile
+        //                int df_newParentId = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.DataFileConfigId);
+        //                df_Orig.ParentDatasetFileId = df_newParentId;
+
+        //                //Write dataset to database
+        //                dscontext.Merge(df_Orig);
+        //                dscontext.SaveChanges();
+
+        //            }
+        //            catch (Exception e)
+        //            {
+        //                StringBuilder builder = new StringBuilder();
+        //                builder.Append("Failed to set ParentDatasetFile_ID on Original Parent in Dataset Management.");
+        //                builder.Append($"DatasetFile_ID: {df_Orig.DatasetFileId}");
+        //                builder.Append($"File_NME: {df_Orig.FileName}");
+        //                builder.Append($"ParentDatasetFile_ID: {df_Orig.ParentDatasetFileId}");
+
+        //            }
+        //        }
+
+
+        //        RemoveProcessedFile(df_newParent, fileInfo);
+
+        //        //RemoveProcessedFile(datasetMetadata, fileInfo);
+
+        //        //SendNotification(datasetMetadata, (int)ExitCodes.Success, ds.DatasetId, string.Empty, string.Empty);
+        //    }
+        //}
 
         //private static void SingleFileProcessor(List<SystemConfig> systemMetaFiles, string _path, IDatasetService upload, IDatasetContext dscontext)
         //{
@@ -486,431 +486,431 @@ namespace Sentry.data.DatasetLoader
 
         //}
 
-        private static void ProcessFile(Dataset ds, DatasetFileConfig dfc, Entities.DatasetMetadata datasetMetadata, IDatasetService upload, IDatasetContext dscontext, FileInfo fileInfo)
-        //private static void ProcessFile(Dataset ds, DatasetFileConfig datasetMetadata, IDatasetService upload, IDatasetContext dscontext, FileInfo fileInfo)
-        {
-            DatasetFile df = null;
-            DatasetFile df_updated = null;
+        //private static void ProcessFile(Dataset ds, DatasetFileConfig dfc, Entities.DatasetMetadata datasetMetadata, IDatasetService upload, IDatasetContext dscontext, FileInfo fileInfo)
+        ////private static void ProcessFile(Dataset ds, DatasetFileConfig datasetMetadata, IDatasetService upload, IDatasetContext dscontext, FileInfo fileInfo)
+        //{
+        //    DatasetFile df = null;
+        //    DatasetFile df_updated = null;
 
-            // Criteria to Keep all Datafiles
-            if (0 == 0)
-            {
-                df_updated = CreateDatasetFile(ds, fileInfo);
+        //    // Criteria to Keep all Datafiles
+        //    if (0 == 0)
+        //    {
+        //        df_updated = CreateDatasetFile(ds, fileInfo);
 
-                // If DatasetFiles exist for Dataset, ensure unique S3 key
-                if (ds.DatasetFiles.Count() > 0)
-                {                    
-                    if (dscontext.s3KeyDuplicate(ds.DatasetId, df_updated.FileLocation))
-                    {
-                        //Generate unique file name
-                        var filename = Guid.NewGuid().ToString("N") + "__" + df_updated.FileName;
-                        df_updated = CreateDatasetFile(ds, fileInfo, filename);
-                    }
-                }
+        //        // If DatasetFiles exist for Dataset, ensure unique S3 key
+        //        if (ds.DatasetFiles.Count() > 0)
+        //        {                    
+        //            if (dscontext.s3KeyDuplicate(ds.DatasetId, df_updated.FileLocation))
+        //            {
+        //                //Generate unique file name
+        //                var filename = Guid.NewGuid().ToString("N") + "__" + df_updated.FileName;
+        //                df_updated = CreateDatasetFile(ds, fileInfo, filename);
+        //            }
+        //        }
 
-                DateTime startUploadTime = DateTime.Now;
-                // Upload new key 
-                try
-                {
-                    upload.UploadDataset_v2(fileInfo.FullName, df_updated.FileLocation);
-                }
-                catch (AmazonS3Exception eS3)
-                {
-                    Logger.Error("S3 Upload Error", eS3);
-                    SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Upload Error", df_updated.FileLocation);
-                    throw new Exception("S3 Upload Error", eS3);
-                    //return (int)ExitCodes.S3UploadError;
-                }
-                catch (Exception e)
-                {
-                    Logger.Error("Error during establishing upload process", e);
-                    SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing upload process", df_updated.FileLocation);
-                    throw new Exception("Error during establishing upload process", e);
-                    //return (int)ExitCodes.Failure;
-                }
+        //        DateTime startUploadTime = DateTime.Now;
+        //        // Upload new key 
+        //        try
+        //        {
+        //            upload.UploadDataset_v2(fileInfo.FullName, df_updated.FileLocation);
+        //        }
+        //        catch (AmazonS3Exception eS3)
+        //        {
+        //            Logger.Error("S3 Upload Error", eS3);
+        //            SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Upload Error", df_updated.FileLocation);
+        //            throw new Exception("S3 Upload Error", eS3);
+        //            //return (int)ExitCodes.S3UploadError;
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            Logger.Error("Error during establishing upload process", e);
+        //            SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing upload process", df_updated.FileLocation);
+        //            throw new Exception("Error during establishing upload process", e);
+        //            //return (int)ExitCodes.Failure;
+        //        }
 
-                //PushFileToStorage(ds, datasetMetadata, upload, dscontext, fileInfo);
-                var diffInSeconds = (DateTime.Now - startUploadTime).TotalSeconds;
-                Logger.Info($"TransferTime: {diffInSeconds} | DatasetName: {ds.DatasetName}");
+        //        //PushFileToStorage(ds, datasetMetadata, upload, dscontext, fileInfo);
+        //        var diffInSeconds = (DateTime.Now - startUploadTime).TotalSeconds;
+        //        Logger.Info($"TransferTime: {diffInSeconds} | DatasetName: {ds.DatasetName}");
 
-                //Register DatasetFile
-                //RegisterWithDatasetMgmt(ds, datasetMetadata, dscontext, fileInfo);
-                try
-                {
-                    //Write dataset to database
-                    dscontext.Merge(df_updated);
-                    dscontext.SaveChanges();
-                }
-                catch (Exception e)
-                {
+        //        //Register DatasetFile
+        //        //RegisterWithDatasetMgmt(ds, datasetMetadata, dscontext, fileInfo);
+        //        try
+        //        {
+        //            //Write dataset to database
+        //            dscontext.Merge(df_updated);
+        //            dscontext.SaveChanges();
+        //        }
+        //        catch (Exception e)
+        //        {
 
-                    StringBuilder builder = new StringBuilder();
-                    builder.Append("Failed to record metadata to Dataset Management.");
-                    builder.Append($"DatasetName: {datasetMetadata.datasetName}");
-                    builder.Append($"Category: {datasetMetadata.category}");
-                    builder.Append($"Description: {datasetMetadata.description}");
-                    builder.Append($"CreateUser: {datasetMetadata.createUser}");
-                    builder.Append($"Owner: {datasetMetadata.owner}");
-                    builder.Append($"Frequency: {datasetMetadata.frequency}");
+        //            StringBuilder builder = new StringBuilder();
+        //            builder.Append("Failed to record metadata to Dataset Management.");
+        //            builder.Append($"DatasetName: {datasetMetadata.datasetName}");
+        //            builder.Append($"Category: {datasetMetadata.category}");
+        //            builder.Append($"Description: {datasetMetadata.description}");
+        //            builder.Append($"CreateUser: {datasetMetadata.createUser}");
+        //            builder.Append($"Owner: {datasetMetadata.owner}");
+        //            builder.Append($"Frequency: {datasetMetadata.frequency}");
 
-                    Logger.Error(builder.ToString(), e);
+        //            Logger.Error(builder.ToString(), e);
 
-                    SendNotification(datasetMetadata, (int)ExitCodes.DatabaseError, 0, "Error saving dataset to database", df_updated.FileLocation);
-                    throw new Exception("Error saving dataset to database", e);
-                    //return (int)ExitCodes.DatabaseError;
-                }
+        //            SendNotification(datasetMetadata, (int)ExitCodes.DatabaseError, 0, "Error saving dataset to database", df_updated.FileLocation);
+        //            throw new Exception("Error saving dataset to database", e);
+        //            //return (int)ExitCodes.DatabaseError;
+        //        }
 
-                RemoveProcessedFile(datasetMetadata, fileInfo);
+        //        RemoveProcessedFile(datasetMetadata, fileInfo);
 
-                SendNotification(datasetMetadata, (int)ExitCodes.Success, ds.DatasetId, string.Empty, string.Empty);
-            }
-            // Criteria to Overwrite existing data file
-            else if (ds.DatafilesToKeep == 1)
-            {
-                //Determine if there existing datasetfiles for the specific dataset
-                if (ds.DatasetFiles.Count() > 0)
-                {
-                    int df_id = dscontext.GetLatestDatasetFileIdForDataset(ds.DatasetId);
-                    df = dscontext.GetDatasetFile(df_id);
+        //        SendNotification(datasetMetadata, (int)ExitCodes.Success, ds.DatasetId, string.Empty, string.Empty);
+        //    }
+        //    // Criteria to Overwrite existing data file
+        //    else if (ds.DatafilesToKeep == 1)
+        //    {
+        //        //Determine if there existing datasetfiles for the specific dataset
+        //        if (ds.DatasetFiles.Count() > 0)
+        //        {
+        //            int df_id = dscontext.GetLatestDatasetFileIdForDataset(ds.DatasetId);
+        //            df = dscontext.GetDatasetFile(df_id);
 
-                    df_updated = updateOverwrittenDatasetFile(ds, df, fileInfo);
+        //            df_updated = updateOverwrittenDatasetFile(ds, df, fileInfo);
 
-                }
-                else
-                {
-                    df_updated = CreateDatasetFile(ds, fileInfo);
-                }
+        //        }
+        //        else
+        //        {
+        //            df_updated = CreateDatasetFile(ds, fileInfo);
+        //        }
 
-                // Get latest DatasetFile to use the S3Key as the target key for upload
+        //        // Get latest DatasetFile to use the S3Key as the target key for upload
                 
 
-                // Generate updated DatasetFile object
+        //        // Generate updated DatasetFile object
                 
 
 
-                // Remove old S3 Key if new key is different
-                if (ds.DatasetFiles.Count() > 0 && df.FileLocation != df_updated.FileLocation)
-                {
-                    DateTime startDeleteTime = DateTime.Now;
-                    try
-                    {
-                        upload.DeleteS3key(df.FileLocation);
-                    }
-                    catch (AmazonS3Exception eS3)
-                    {
-                        Logger.Error("S3 Delete Object Error", eS3);
-                        SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Delete Object Error", fileInfo.Name);
-                        throw new Exception("S3 Delete Object Error", eS3);
-                        //return (int)ExitCodes.S3UploadError;
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error("Error during establishing delete process", e);
-                        SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing delete process", fileInfo.Name);
-                        throw new Exception("Error during establishing delete process", e);
-                        //return (int)ExitCodes.Failure;
-                    }
+        //        // Remove old S3 Key if new key is different
+        //        if (ds.DatasetFiles.Count() > 0 && df.FileLocation != df_updated.FileLocation)
+        //        {
+        //            DateTime startDeleteTime = DateTime.Now;
+        //            try
+        //            {
+        //                upload.DeleteS3key(df.FileLocation);
+        //            }
+        //            catch (AmazonS3Exception eS3)
+        //            {
+        //                Logger.Error("S3 Delete Object Error", eS3);
+        //                SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Delete Object Error", fileInfo.Name);
+        //                throw new Exception("S3 Delete Object Error", eS3);
+        //                //return (int)ExitCodes.S3UploadError;
+        //            }
+        //            catch (Exception e)
+        //            {
+        //                Logger.Error("Error during establishing delete process", e);
+        //                SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing delete process", fileInfo.Name);
+        //                throw new Exception("Error during establishing delete process", e);
+        //                //return (int)ExitCodes.Failure;
+        //            }
                                         
-                    Logger.Info($"DeleteKeyTime: {(DateTime.Now - startDeleteTime).TotalSeconds} | DatasetName: {ds.DatasetName} | key: {df.FileLocation}");
-                }
+        //            Logger.Info($"DeleteKeyTime: {(DateTime.Now - startDeleteTime).TotalSeconds} | DatasetName: {ds.DatasetName} | key: {df.FileLocation}");
+        //        }
 
-                DateTime startUploadTime = DateTime.Now;
-                // Upload new key 
-                try
-                {
-                    upload.UploadDataset_v2(fileInfo.FullName, df_updated.FileLocation);
-                }
-                catch (AmazonS3Exception eS3)
-                {
-                    Logger.Error("S3 Upload Error", eS3);
-                    SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Upload Error", fileInfo.Name);
-                    throw new Exception("S3 Upload Error", eS3);
-                    //return (int)ExitCodes.S3UploadError;
-                }
-                catch (Exception e)
-                {
-                    Logger.Error("Error during establishing upload process", e);
-                    SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing upload process", fileInfo.Name);
-                    throw new Exception("Error during establishing upload process", e);
-                    //return (int)ExitCodes.Failure;
-                }
+        //        DateTime startUploadTime = DateTime.Now;
+        //        // Upload new key 
+        //        try
+        //        {
+        //            upload.UploadDataset_v2(fileInfo.FullName, df_updated.FileLocation);
+        //        }
+        //        catch (AmazonS3Exception eS3)
+        //        {
+        //            Logger.Error("S3 Upload Error", eS3);
+        //            SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Upload Error", fileInfo.Name);
+        //            throw new Exception("S3 Upload Error", eS3);
+        //            //return (int)ExitCodes.S3UploadError;
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            Logger.Error("Error during establishing upload process", e);
+        //            SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing upload process", fileInfo.Name);
+        //            throw new Exception("Error during establishing upload process", e);
+        //            //return (int)ExitCodes.Failure;
+        //        }
 
-                //PushFileToStorage(ds, datasetMetadata, upload, dscontext, fileInfo);
-                var diffInSeconds = (DateTime.Now - startUploadTime).TotalSeconds;
-                Logger.Info($"TransferTime: {diffInSeconds} | DatasetName: {ds.DatasetName}");
-
-
-                //Register DatasetFile
-                //RegisterWithDatasetMgmt(ds, datasetMetadata, dscontext, fileInfo);
-                try
-                {
-                    //Write dataset to database
-                    dscontext.Merge(df_updated);
-                    dscontext.SaveChanges();
-                }
-                catch (Exception e)
-                {
-
-                    StringBuilder builder = new StringBuilder();
-                    builder.Append("Failed to record metadata to Dataset Management.");
-                    builder.Append($"DatasetName: {datasetMetadata.datasetName}");
-                    builder.Append($"Category: {datasetMetadata.category}");
-                    builder.Append($"Description: {datasetMetadata.description}");
-                    builder.Append($"CreateUser: {datasetMetadata.createUser}");
-                    builder.Append($"Owner: {datasetMetadata.owner}");
-                    builder.Append($"Frequency: {datasetMetadata.frequency}");
-
-                    Logger.Error(builder.ToString(), e);
-
-                    SendNotification(datasetMetadata, (int)ExitCodes.DatabaseError, 0, "Error saving dataset to database", fileInfo.Name);
-                    throw new Exception("Error saving dataset to database", e);
-                    //return (int)ExitCodes.DatabaseError;
-                }
-
-                RemoveProcessedFile(datasetMetadata, fileInfo);
-
-                SendNotification(datasetMetadata, (int)ExitCodes.Success, dscontext.GetByS3Key(ds.S3Key).DatasetId, string.Empty, string.Empty);
-            }        
+        //        //PushFileToStorage(ds, datasetMetadata, upload, dscontext, fileInfo);
+        //        var diffInSeconds = (DateTime.Now - startUploadTime).TotalSeconds;
+        //        Logger.Info($"TransferTime: {diffInSeconds} | DatasetName: {ds.DatasetName}");
 
 
-        }
+        //        //Register DatasetFile
+        //        //RegisterWithDatasetMgmt(ds, datasetMetadata, dscontext, fileInfo);
+        //        try
+        //        {
+        //            //Write dataset to database
+        //            dscontext.Merge(df_updated);
+        //            dscontext.SaveChanges();
+        //        }
+        //        catch (Exception e)
+        //        {
+
+        //            StringBuilder builder = new StringBuilder();
+        //            builder.Append("Failed to record metadata to Dataset Management.");
+        //            builder.Append($"DatasetName: {datasetMetadata.datasetName}");
+        //            builder.Append($"Category: {datasetMetadata.category}");
+        //            builder.Append($"Description: {datasetMetadata.description}");
+        //            builder.Append($"CreateUser: {datasetMetadata.createUser}");
+        //            builder.Append($"Owner: {datasetMetadata.owner}");
+        //            builder.Append($"Frequency: {datasetMetadata.frequency}");
+
+        //            Logger.Error(builder.ToString(), e);
+
+        //            SendNotification(datasetMetadata, (int)ExitCodes.DatabaseError, 0, "Error saving dataset to database", fileInfo.Name);
+        //            throw new Exception("Error saving dataset to database", e);
+        //            //return (int)ExitCodes.DatabaseError;
+        //        }
+
+        //        RemoveProcessedFile(datasetMetadata, fileInfo);
+
+        //        SendNotification(datasetMetadata, (int)ExitCodes.Success, dscontext.GetByS3Key(ds.S3Key).DatasetId, string.Empty, string.Empty);
+        //    }        
 
 
-        private static void ProcessFile_v2(Dataset ds, DatasetFileConfig dfc, IDatasetService upload, IDatasetContext dscontext, FileInfo fileInfo)
-        //private static void ProcessFile(Dataset ds, DatasetFileConfig datasetMetadata, IDatasetService upload, IDatasetContext dscontext, FileInfo fileInfo)
-        {
-            DatasetFile df_Orig = null;
-            DatasetFile df_newParent = null;
-            string targetFileName = null;
-            int df_id = 0;
+        //}
 
 
-            // Determine target file name
-            targetFileName = GetTargetFileName(dfc, fileInfo);
+        //private static void ProcessFile_v2(Dataset ds, DatasetFileConfig dfc, IDatasetService upload, IDatasetContext dscontext, FileInfo fileInfo)
+        ////private static void ProcessFile(Dataset ds, DatasetFileConfig datasetMetadata, IDatasetService upload, IDatasetContext dscontext, FileInfo fileInfo)
+        //{
+        //    DatasetFile df_Orig = null;
+        //    DatasetFile df_newParent = null;
+        //    string targetFileName = null;
+        //    int df_id = 0;
 
-            if (dfc.OverwriteDatafile)
-            {
-                // RegexSearch requires passing targetFileName to esnure we get the correct related data file.
-                if (dfc.IsRegexSearch)
-                {
-                    df_id = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.DataFileConfigId, targetFileName);
-                }
-                else
-                {
-                    df_id = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.DataFileConfigId);
-                }
+
+        //    // Determine target file name
+        //    targetFileName = GetTargetFileName(dfc, fileInfo);
+
+        //    if (dfc.OverwriteDatafile)
+        //    {
+        //        // RegexSearch requires passing targetFileName to esnure we get the correct related data file.
+        //        if (dfc.IsRegexSearch)
+        //        {
+        //            df_id = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.DataFileConfigId, targetFileName);
+        //        }
+        //        else
+        //        {
+        //            df_id = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.DataFileConfigId);
+        //        }
                 
 
-                //If datafiles exist for this DatasetFileConfig
-                if (df_id != 0)
-                {
-                    df_Orig = dscontext.GetDatasetFile(df_id);
-                    df_newParent = CreateParentDatasetFile(ds, dfc, fileInfo, targetFileName, df_Orig);
-                    //df_updated = updateOverwrittenDatasetFile(ds, df_Orig, fileInfo);
-                }
-                //If there are no datafiles for this DatasetFileConfig
-                else
-                {
-                    df_newParent = CreateParentDatasetFile(ds, dfc, fileInfo, targetFileName, null);
-                }                
+        //        //If datafiles exist for this DatasetFileConfig
+        //        if (df_id != 0)
+        //        {
+        //            df_Orig = dscontext.GetDatasetFile(df_id);
+        //            df_newParent = CreateParentDatasetFile(ds, dfc, fileInfo, targetFileName, df_Orig);
+        //            //df_updated = updateOverwrittenDatasetFile(ds, df_Orig, fileInfo);
+        //        }
+        //        //If there are no datafiles for this DatasetFileConfig
+        //        else
+        //        {
+        //            df_newParent = CreateParentDatasetFile(ds, dfc, fileInfo, targetFileName, null);
+        //        }                
 
-                DateTime startUploadTime = DateTime.Now;
-                // Upload new key 
-                try
-                {
-                    df_newParent.VersionId = upload.UploadDataset_v2(fileInfo.FullName, df_newParent.FileLocation);
-                }
-                catch (AmazonS3Exception eS3)
-                {
-                    Logger.Error("S3 Upload Error", eS3);
-                    //SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Upload Error", df_newParent.FileLocation);
-                    throw new Exception("S3 Upload Error", eS3);
-                    //return (int)ExitCodes.S3UploadError;
-                }
-                catch (Exception e)
-                {
-                    Logger.Error("Error during establishing upload process", e);
-                    //SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing upload process", df_newParent.FileLocation);
-                    throw new Exception("Error during establishing upload process", e);
-                    //return (int)ExitCodes.Failure;
-                }
+        //        DateTime startUploadTime = DateTime.Now;
+        //        // Upload new key 
+        //        try
+        //        {
+        //            df_newParent.VersionId = upload.UploadDataset_v2(fileInfo.FullName, df_newParent.FileLocation);
+        //        }
+        //        catch (AmazonS3Exception eS3)
+        //        {
+        //            Logger.Error("S3 Upload Error", eS3);
+        //            //SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Upload Error", df_newParent.FileLocation);
+        //            throw new Exception("S3 Upload Error", eS3);
+        //            //return (int)ExitCodes.S3UploadError;
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            Logger.Error("Error during establishing upload process", e);
+        //            //SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing upload process", df_newParent.FileLocation);
+        //            throw new Exception("Error during establishing upload process", e);
+        //            //return (int)ExitCodes.Failure;
+        //        }
 
-                //PushFileToStorage(ds, datasetMetadata, upload, dscontext, fileInfo);
-                var diffInSeconds = (DateTime.Now - startUploadTime).TotalSeconds;
-                Logger.Info($"TransferTime: {diffInSeconds} | DatasetName: {ds.DatasetName}");
+        //        //PushFileToStorage(ds, datasetMetadata, upload, dscontext, fileInfo);
+        //        var diffInSeconds = (DateTime.Now - startUploadTime).TotalSeconds;
+        //        Logger.Info($"TransferTime: {diffInSeconds} | DatasetName: {ds.DatasetName}");
 
 
-                //Register new Parent DatasetFile
-                try
-                {
-                    //Write dataset to database
-                    dscontext.Merge(df_newParent);
-                    dscontext.SaveChanges();
-                }
-                catch (Exception e)
-                {
+        //        //Register new Parent DatasetFile
+        //        try
+        //        {
+        //            //Write dataset to database
+        //            dscontext.Merge(df_newParent);
+        //            dscontext.SaveChanges();
+        //        }
+        //        catch (Exception e)
+        //        {
 
-                    StringBuilder builder = new StringBuilder();
-                    builder.Append("Failed to record new Parent DatasetFile to Dataset Management.");
-                    builder.Append($"File_NME: {df_newParent.FileName}");
-                    builder.Append($"Dataset_ID: {df_newParent.Dataset.DatasetId}");
-                    builder.Append($"UploadUser_NME: {df_newParent.UploadUserName}");
-                    builder.Append($"Create_DTM: {df_newParent.CreateDTM}");
-                    builder.Append($"Modified_DTM: {df_newParent.ModifiedDTM}");
-                    builder.Append($"FileLocation: {df_newParent.FileLocation}");
-                    builder.Append($"DataFileConfig_ID: {df_newParent.DatasetFileConfig.DataFileConfigId}");
-                    builder.Append($"ParentDatasetFile_ID: {df_newParent.ParentDatasetFileId}");
-                    builder.Append($"Version_ID: {df_newParent.VersionId}");
+        //            StringBuilder builder = new StringBuilder();
+        //            builder.Append("Failed to record new Parent DatasetFile to Dataset Management.");
+        //            builder.Append($"File_NME: {df_newParent.FileName}");
+        //            builder.Append($"Dataset_ID: {df_newParent.Dataset.DatasetId}");
+        //            builder.Append($"UploadUser_NME: {df_newParent.UploadUserName}");
+        //            builder.Append($"Create_DTM: {df_newParent.CreateDTM}");
+        //            builder.Append($"Modified_DTM: {df_newParent.ModifiedDTM}");
+        //            builder.Append($"FileLocation: {df_newParent.FileLocation}");
+        //            builder.Append($"DataFileConfig_ID: {df_newParent.DatasetFileConfig.DataFileConfigId}");
+        //            builder.Append($"ParentDatasetFile_ID: {df_newParent.ParentDatasetFileId}");
+        //            builder.Append($"Version_ID: {df_newParent.VersionId}");
 
-                    Logger.Error(builder.ToString(), e);
+        //            Logger.Error(builder.ToString(), e);
 
-                    //SendNotification(datasetMetadata, (int)ExitCodes.DatabaseError, 0, "Error saving dataset to database", df_newParent.FileLocation);
-                    throw new Exception("Error saving dataset to database", e);
-                    //return (int)ExitCodes.DatabaseError;
-                }
+        //            //SendNotification(datasetMetadata, (int)ExitCodes.DatabaseError, 0, "Error saving dataset to database", df_newParent.FileLocation);
+        //            throw new Exception("Error saving dataset to database", e);
+        //            //return (int)ExitCodes.DatabaseError;
+        //        }
 
-                // If there were existing datasetfiles set parentdatasetFile_ID on old parent
-                if (df_id != 0)
-                {
-                    try
-                    {
-                        //Version the Old Parent DatasetFile
-                        int df_newParentId = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.DataFileConfigId);
-                        df_Orig.ParentDatasetFileId = df_newParentId;
+        //        // If there were existing datasetfiles set parentdatasetFile_ID on old parent
+        //        if (df_id != 0)
+        //        {
+        //            try
+        //            {
+        //                //Version the Old Parent DatasetFile
+        //                int df_newParentId = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.DataFileConfigId);
+        //                df_Orig.ParentDatasetFileId = df_newParentId;
 
-                        //Write dataset to database
-                        dscontext.Merge(df_Orig);
-                        dscontext.SaveChanges();
+        //                //Write dataset to database
+        //                dscontext.Merge(df_Orig);
+        //                dscontext.SaveChanges();
 
-                    }
-                    catch (Exception e)
-                    {
-                        StringBuilder builder = new StringBuilder();
-                        builder.Append("Failed to set ParentDatasetFile_ID on Original Parent in Dataset Management.");
-                        builder.Append($"DatasetFile_ID: {df_Orig.DatasetFileId}");
-                        builder.Append($"File_NME: {df_Orig.FileName}");
-                        builder.Append($"ParentDatasetFile_ID: {df_Orig.ParentDatasetFileId}");
+        //            }
+        //            catch (Exception e)
+        //            {
+        //                StringBuilder builder = new StringBuilder();
+        //                builder.Append("Failed to set ParentDatasetFile_ID on Original Parent in Dataset Management.");
+        //                builder.Append($"DatasetFile_ID: {df_Orig.DatasetFileId}");
+        //                builder.Append($"File_NME: {df_Orig.FileName}");
+        //                builder.Append($"ParentDatasetFile_ID: {df_Orig.ParentDatasetFileId}");
 
-                    }
-                }
+        //            }
+        //        }
                 
 
-                RemoveProcessedFile(df_newParent, fileInfo);
+        //        RemoveProcessedFile(df_newParent, fileInfo);
 
-                //RemoveProcessedFile(datasetMetadata, fileInfo);
+        //        //RemoveProcessedFile(datasetMetadata, fileInfo);
 
-                //SendNotification(datasetMetadata, (int)ExitCodes.Success, ds.DatasetId, string.Empty, string.Empty);
-            }
-            // Criteria to Overwrite existing data file
-            //else if (ds.DatafilesToKeep == 1)
-            //{
-            //    //Determine if there existing datasetfiles for the specific dataset
-            //    if (ds.DatasetFiles.Count() > 0)
-            //    {
-            //        int df_id = dscontext.GetLatestDatasetFileIdForDataset(ds.DatasetId);
-            //        df_Orig = dscontext.GetDatasetFile(df_id);
+        //        //SendNotification(datasetMetadata, (int)ExitCodes.Success, ds.DatasetId, string.Empty, string.Empty);
+        //    }
+        //    // Criteria to Overwrite existing data file
+        //    //else if (ds.DatafilesToKeep == 1)
+        //    //{
+        //    //    //Determine if there existing datasetfiles for the specific dataset
+        //    //    if (ds.DatasetFiles.Count() > 0)
+        //    //    {
+        //    //        int df_id = dscontext.GetLatestDatasetFileIdForDataset(ds.DatasetId);
+        //    //        df_Orig = dscontext.GetDatasetFile(df_id);
 
-            //        df_updated = updateOverwrittenDatasetFile(ds, df_Orig, fileInfo);
+        //    //        df_updated = updateOverwrittenDatasetFile(ds, df_Orig, fileInfo);
 
-            //    }
-            //    else
-            //    {
-            //        df_updated = CreateDatasetFile(ds, fileInfo);
-            //    }
+        //    //    }
+        //    //    else
+        //    //    {
+        //    //        df_updated = CreateDatasetFile(ds, fileInfo);
+        //    //    }
 
-            //    // Get latest DatasetFile to use the S3Key as the target key for upload
-
-
-            //    // Generate updated DatasetFile object
+        //    //    // Get latest DatasetFile to use the S3Key as the target key for upload
 
 
-
-            //    // Remove old S3 Key if new key is different
-            //    if (ds.DatasetFiles.Count() > 0 && df_Orig.FileLocation != df_updated.FileLocation)
-            //    {
-            //        DateTime startDeleteTime = DateTime.Now;
-            //        try
-            //        {
-            //            upload.DeleteS3key(df_Orig.FileLocation);
-            //        }
-            //        catch (AmazonS3Exception eS3)
-            //        {
-            //            Logger.Error("S3 Delete Object Error", eS3);
-            //            SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Delete Object Error", fileInfo.Name);
-            //            throw new Exception("S3 Delete Object Error", eS3);
-            //            //return (int)ExitCodes.S3UploadError;
-            //        }
-            //        catch (Exception e)
-            //        {
-            //            Logger.Error("Error during establishing delete process", e);
-            //            SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing delete process", fileInfo.Name);
-            //            throw new Exception("Error during establishing delete process", e);
-            //            //return (int)ExitCodes.Failure;
-            //        }
-
-            //        Logger.Info($"DeleteKeyTime: {(DateTime.Now - startDeleteTime).TotalSeconds} | DatasetName: {ds.DatasetName} | key: {df_Orig.FileLocation}");
-            //    }
-
-            //    DateTime startUploadTime = DateTime.Now;
-            //    // Upload new key 
-            //    try
-            //    {
-            //        upload.UploadDataset_v2(fileInfo.FullName, df_updated.FileLocation);
-            //    }
-            //    catch (AmazonS3Exception eS3)
-            //    {
-            //        Logger.Error("S3 Upload Error", eS3);
-            //        SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Upload Error", fileInfo.Name);
-            //        throw new Exception("S3 Upload Error", eS3);
-            //        //return (int)ExitCodes.S3UploadError;
-            //    }
-            //    catch (Exception e)
-            //    {
-            //        Logger.Error("Error during establishing upload process", e);
-            //        SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing upload process", fileInfo.Name);
-            //        throw new Exception("Error during establishing upload process", e);
-            //        //return (int)ExitCodes.Failure;
-            //    }
-
-            //    //PushFileToStorage(ds, datasetMetadata, upload, dscontext, fileInfo);
-            //    var diffInSeconds = (DateTime.Now - startUploadTime).TotalSeconds;
-            //    Logger.Info($"TransferTime: {diffInSeconds} | DatasetName: {ds.DatasetName}");
+        //    //    // Generate updated DatasetFile object
 
 
-            //    //Register DatasetFile
-            //    //RegisterWithDatasetMgmt(ds, datasetMetadata, dscontext, fileInfo);
-            //    try
-            //    {
-            //        //Write dataset to database
-            //        dscontext.Merge(df_updated);
-            //        dscontext.SaveChanges();
-            //    }
-            //    catch (Exception e)
-            //    {
 
-            //        StringBuilder builder = new StringBuilder();
-            //        builder.Append("Failed to record metadata to Dataset Management.");
-            //        builder.Append($"DatasetName: {datasetMetadata.datasetName}");
-            //        builder.Append($"Category: {datasetMetadata.category}");
-            //        builder.Append($"Description: {datasetMetadata.description}");
-            //        builder.Append($"CreateUser: {datasetMetadata.createUser}");
-            //        builder.Append($"Owner: {datasetMetadata.owner}");
-            //        builder.Append($"Frequency: {datasetMetadata.frequency}");
+        //    //    // Remove old S3 Key if new key is different
+        //    //    if (ds.DatasetFiles.Count() > 0 && df_Orig.FileLocation != df_updated.FileLocation)
+        //    //    {
+        //    //        DateTime startDeleteTime = DateTime.Now;
+        //    //        try
+        //    //        {
+        //    //            upload.DeleteS3key(df_Orig.FileLocation);
+        //    //        }
+        //    //        catch (AmazonS3Exception eS3)
+        //    //        {
+        //    //            Logger.Error("S3 Delete Object Error", eS3);
+        //    //            SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Delete Object Error", fileInfo.Name);
+        //    //            throw new Exception("S3 Delete Object Error", eS3);
+        //    //            //return (int)ExitCodes.S3UploadError;
+        //    //        }
+        //    //        catch (Exception e)
+        //    //        {
+        //    //            Logger.Error("Error during establishing delete process", e);
+        //    //            SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing delete process", fileInfo.Name);
+        //    //            throw new Exception("Error during establishing delete process", e);
+        //    //            //return (int)ExitCodes.Failure;
+        //    //        }
 
-            //        Logger.Error(builder.ToString(), e);
+        //    //        Logger.Info($"DeleteKeyTime: {(DateTime.Now - startDeleteTime).TotalSeconds} | DatasetName: {ds.DatasetName} | key: {df_Orig.FileLocation}");
+        //    //    }
 
-            //        SendNotification(datasetMetadata, (int)ExitCodes.DatabaseError, 0, "Error saving dataset to database", fileInfo.Name);
-            //        throw new Exception("Error saving dataset to database", e);
-            //        //return (int)ExitCodes.DatabaseError;
-            //    }
+        //    //    DateTime startUploadTime = DateTime.Now;
+        //    //    // Upload new key 
+        //    //    try
+        //    //    {
+        //    //        upload.UploadDataset_v2(fileInfo.FullName, df_updated.FileLocation);
+        //    //    }
+        //    //    catch (AmazonS3Exception eS3)
+        //    //    {
+        //    //        Logger.Error("S3 Upload Error", eS3);
+        //    //        SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Upload Error", fileInfo.Name);
+        //    //        throw new Exception("S3 Upload Error", eS3);
+        //    //        //return (int)ExitCodes.S3UploadError;
+        //    //    }
+        //    //    catch (Exception e)
+        //    //    {
+        //    //        Logger.Error("Error during establishing upload process", e);
+        //    //        SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing upload process", fileInfo.Name);
+        //    //        throw new Exception("Error during establishing upload process", e);
+        //    //        //return (int)ExitCodes.Failure;
+        //    //    }
 
-            //    RemoveProcessedFile(datasetMetadata, fileInfo);
+        //    //    //PushFileToStorage(ds, datasetMetadata, upload, dscontext, fileInfo);
+        //    //    var diffInSeconds = (DateTime.Now - startUploadTime).TotalSeconds;
+        //    //    Logger.Info($"TransferTime: {diffInSeconds} | DatasetName: {ds.DatasetName}");
 
-            //    SendNotification(datasetMetadata, (int)ExitCodes.Success, dscontext.GetByS3Key(ds.S3Key).DatasetId, string.Empty, string.Empty);
-            //}
+
+        //    //    //Register DatasetFile
+        //    //    //RegisterWithDatasetMgmt(ds, datasetMetadata, dscontext, fileInfo);
+        //    //    try
+        //    //    {
+        //    //        //Write dataset to database
+        //    //        dscontext.Merge(df_updated);
+        //    //        dscontext.SaveChanges();
+        //    //    }
+        //    //    catch (Exception e)
+        //    //    {
+
+        //    //        StringBuilder builder = new StringBuilder();
+        //    //        builder.Append("Failed to record metadata to Dataset Management.");
+        //    //        builder.Append($"DatasetName: {datasetMetadata.datasetName}");
+        //    //        builder.Append($"Category: {datasetMetadata.category}");
+        //    //        builder.Append($"Description: {datasetMetadata.description}");
+        //    //        builder.Append($"CreateUser: {datasetMetadata.createUser}");
+        //    //        builder.Append($"Owner: {datasetMetadata.owner}");
+        //    //        builder.Append($"Frequency: {datasetMetadata.frequency}");
+
+        //    //        Logger.Error(builder.ToString(), e);
+
+        //    //        SendNotification(datasetMetadata, (int)ExitCodes.DatabaseError, 0, "Error saving dataset to database", fileInfo.Name);
+        //    //        throw new Exception("Error saving dataset to database", e);
+        //    //        //return (int)ExitCodes.DatabaseError;
+        //    //    }
+
+        //    //    RemoveProcessedFile(datasetMetadata, fileInfo);
+
+        //    //    SendNotification(datasetMetadata, (int)ExitCodes.Success, dscontext.GetByS3Key(ds.S3Key).DatasetId, string.Empty, string.Empty);
+        //    //}
 
 
-        }
+        //}
 
         private static string GetTargetFileName(DatasetFileConfig dfc, FileInfo fileInfo)
         {
@@ -1115,101 +1115,80 @@ namespace Sentry.data.DatasetLoader
             return out_df;
         }
 
-        //private static void ProcessFile_v2(Dataset dataset, IDatasetService upload, IDatasetContext dscontext, FileInfo fileInfo)
+        //private static void BatchProcessInDir(string inputDir, IDatasetService upload, IDatasetContext dscontext, List<SystemConfig> systemMetaFiles)
         //{
-        //    //try
-        //    //{
-        //    DateTime startTime = DateTime.Now;
-        //    PushFileToStorage_v2(datasetMetadata, upload, dscontext, fileInfo);
-        //    var diffInSeconds = (DateTime.Now - startTime).TotalSeconds;
-        //    Logger.Info($"TransferTime: {diffInSeconds} | DatasetName: {datasetMetadata.datasetName}");
+        //    Dataset ds = null;
+        //    foreach (SystemConfig sc in systemMetaFiles)
+        //    {
+        //        foreach (FileConfig fc in sc.fileConfigs)
+        //        {
+        //            string searchPattern = null;
+        //            string[] infiles = null;
 
-        //    Dataset ds = RegisterWithDatasetMgmt(datasetMetadata, dscontext, fileInfo);
-
-        //    RemoveProcessedFile(datasetMetadata, fileInfo);
-        //    //}
-        //    //catch
-        //    //{ 
-
-        //    //}
-
-        //    SendNotification(datasetMetadata, (int)ExitCodes.Success, dscontext.GetByS3Key(ds.S3Key).DatasetId, string.Empty, string.Empty);
-        //}
-
-        private static void BatchProcessInDir(string inputDir, IDatasetService upload, IDatasetContext dscontext, List<SystemConfig> systemMetaFiles)
-        {
-            Dataset ds = null;
-            foreach (SystemConfig sc in systemMetaFiles)
-            {
-                foreach (FileConfig fc in sc.fileConfigs)
-                {
-                    string searchPattern = null;
-                    string[] infiles = null;
-
-                    if (!(String.IsNullOrEmpty(fc.fileSearch.fileName)))
-                    {
-                        searchPattern = fc.fileSearch.fileName;
-                        infiles = System.IO.Directory.GetFiles(inputDir + $"{sc.systemName}\\", searchPattern, SearchOption.TopDirectoryOnly).ToArray();
-                    }
-                    else
-                    {
-                        Regex reg = new Regex(fc.fileSearch.regex);
-                        infiles = System.IO.Directory.GetFiles(inputDir + $"{sc.systemName}\\", ".", SearchOption.TopDirectoryOnly).Where(x => reg.IsMatch(x)).ToArray();                        
-                    }
+        //            if (!(String.IsNullOrEmpty(fc.fileSearch.fileName)))
+        //            {
+        //                searchPattern = fc.fileSearch.fileName;
+        //                infiles = System.IO.Directory.GetFiles(inputDir + $"{sc.systemName}\\", searchPattern, SearchOption.TopDirectoryOnly).ToArray();
+        //            }
+        //            else
+        //            {
+        //                Regex reg = new Regex(fc.fileSearch.regex);
+        //                infiles = System.IO.Directory.GetFiles(inputDir + $"{sc.systemName}\\", ".", SearchOption.TopDirectoryOnly).Where(x => reg.IsMatch(x)).ToArray();                        
+        //            }
                     
 
-                    //string[] infiles = System.IO.Directory.GetFiles(inputDir, searchPattern, SearchOption.TopDirectoryOnly).ToArray();
+        //            //string[] infiles = System.IO.Directory.GetFiles(inputDir, searchPattern, SearchOption.TopDirectoryOnly).ToArray();
 
-                    if (infiles != null)
-                    {
-                        foreach (string file in infiles)
-                        {
-                            System.IO.FileInfo fi = null;
+        //            if (infiles != null)
+        //            {
+        //                foreach (string file in infiles)
+        //                {
+        //                    System.IO.FileInfo fi = null;
 
-                            fi = new System.IO.FileInfo(file);
-                            try
-                            {
-                                PushFileToStorage(ds, fc.datasetMetadata, upload, dscontext, fi);
-                            }
-                            catch
-                            {
-                                break;
-                            }
+        //                    fi = new System.IO.FileInfo(file);
+        //                    try
+        //                    {
+        //                        PushFileToStorage(ds, fc.datasetMetadata, upload, dscontext, fi);
+        //                    }
+        //                    catch
+        //                    {
+        //                        break;
+        //                    }
 
-                            try
-                            {
-                                RegisterWithDatasetMgmt(ds, fc.datasetMetadata, dscontext, fi);
-                            }
-                            catch
-                            {
-                                break; 
-                            }
-                            finally
-                            {
-                                //cleanup successful S3 upload
-                            }
+        //                    try
+        //                    {
+        //                        RegisterWithDatasetMgmt(ds, fc.datasetMetadata, dscontext, fi);
+        //                    }
+        //                    catch
+        //                    {
+        //                        break; 
+        //                    }
+        //                    finally
+        //                    {
+        //                        //cleanup successful S3 upload
+        //                    }
 
-                            try
-                            {
-                                RemoveProcessedFile(fc.datasetMetadata, fi);
-                            }
-                            catch
-                            {
-                                break;
-                            }
-                            finally
-                            {
-                                //cleanup successful S3 upload
-                                //cleanup successful DB entry 
-                            }                            
+        //                    try
+        //                    {
+        //                        RemoveProcessedFile(fc.datasetMetadata, fi);
+        //                    }
+        //                    catch
+        //                    {
+        //                        break;
+        //                    }
+        //                    finally
+        //                    {
+        //                        //cleanup successful S3 upload
+        //                        //cleanup successful DB entry 
+        //                    }                            
 
-                            SendNotification(fc.datasetMetadata, (int)ExitCodes.Success, dscontext.GetMaxId(), string.Empty, string.Empty);
-                        }
-                    }
-                }
+        //                    SendNotification(fc.datasetMetadata, (int)ExitCodes.Success, dscontext.GetMaxId(), string.Empty, string.Empty);
+        //                }
+        //            }
+        //        }
 
-            }
-        }
+        //    }
+        //}
 
         private static void RemoveProcessedFile(Entities.DatasetMetadata datasetMetadata, FileInfo fi)
         {
@@ -1304,145 +1283,83 @@ namespace Sentry.data.DatasetLoader
                         
         }
 
-        private static void PushFileToStorage(Dataset ds, Entities.DatasetMetadata datasetMetadata, IDatasetService upload, IDatasetContext dscontext, FileInfo fi)
-        {
-            //Dataset ds = CreateDataset(datasetMetadata, fi);       
+        //private static void PushFileToStorage(Dataset ds, Entities.DatasetMetadata datasetMetadata, IDatasetService upload, IDatasetContext dscontext, FileInfo fi)
+        //{
+        //    //Dataset ds = CreateDataset(datasetMetadata, fi);       
 
-            // 0 = Keep all files
-            if (ds.DatafilesToKeep == 0)
-            {
+        //    // 0 = Keep all files
+        //    if (ds.DatafilesToKeep == 0)
+        //    {
 
-            }
-            // 1 = Overwrite existing file
-            else if (ds.DatafilesToKeep == 1)
-            {
-                // Get latest DatasetFile to use the S3Key as the target key for upload
-                int df_id = dscontext.GetLatestDatasetFileIdForDataset(ds.DatasetId);
-                DatasetFile df = dscontext.GetDatasetFile(df_id);
+        //    }
+        //    // 1 = Overwrite existing file
+        //    else if (ds.DatafilesToKeep == 1)
+        //    {
+        //        // Get latest DatasetFile to use the S3Key as the target key for upload
+        //        int df_id = dscontext.GetLatestDatasetFileIdForDataset(ds.DatasetId);
+        //        DatasetFile df = dscontext.GetDatasetFile(df_id);
 
-                try
-                {
-                    upload.UploadDataset_v2(fi.FullName, df.FileLocation);
-                }
-                catch (AmazonS3Exception eS3)
-                {
-                    Logger.Error("S3 Upload Error", eS3);
-                    SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Upload Error", fi.Name);
-                    throw new Exception("S3 Upload Error", eS3);
-                    //return (int)ExitCodes.S3UploadError;
-                }
-                catch (Exception e)
-                {
-                    Logger.Error("Error during establishing upload process", e);
-                    SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing upload process", fi.Name);
-                    throw new Exception("Error during establishing upload process", e);
-                    //return (int)ExitCodes.Failure;
-                }
-            }
-            else if (ds.DatafilesToKeep > 1)
-            {
+        //        try
+        //        {
+        //            upload.UploadDataset_v2(fi.FullName, df.FileLocation);
+        //        }
+        //        catch (AmazonS3Exception eS3)
+        //        {
+        //            Logger.Error("S3 Upload Error", eS3);
+        //            SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Upload Error", fi.Name);
+        //            throw new Exception("S3 Upload Error", eS3);
+        //            //return (int)ExitCodes.S3UploadError;
+        //        }
+        //        catch (Exception e)
+        //        {
+        //            Logger.Error("Error during establishing upload process", e);
+        //            SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing upload process", fi.Name);
+        //            throw new Exception("Error during establishing upload process", e);
+        //            //return (int)ExitCodes.Failure;
+        //        }
+        //    }
+        //    else if (ds.DatafilesToKeep > 1)
+        //    {
 
-            }
+        //    }
 
 
 
-            //if (datasetMetadata.overwrite == false && dscontext.s3KeyDuplicate(ds.S3Key))
-            //{
-            //    StringBuilder message = new StringBuilder();
-            //    message.AppendLine("Overwrite property is set to FALSE and file already exists on S3");
-            //    message.AppendLine($"File: {datasetMetadata.datasetName}");
+        //    //if (datasetMetadata.overwrite == false && dscontext.s3KeyDuplicate(ds.S3Key))
+        //    //{
+        //    //    StringBuilder message = new StringBuilder();
+        //    //    message.AppendLine("Overwrite property is set to FALSE and file already exists on S3");
+        //    //    message.AppendLine($"File: {datasetMetadata.datasetName}");
 
-            //    Logger.Error(message.ToString());
-            //    SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, message.ToString(), fi.Name);
-            //    //throw new Exception("Config Overwrite property is set to FALSE and file already exists on S3");
-            //}
+        //    //    Logger.Error(message.ToString());
+        //    //    SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, message.ToString(), fi.Name);
+        //    //    //throw new Exception("Config Overwrite property is set to FALSE and file already exists on S3");
+        //    //}
             
             
 
-            ////upload file to S3
-            //try
-            //{
-            //    //upload.UploadDataset(fi.FullName, ds);
-            //    upload.UploadDataset_v2(fi.FullName, df.s3Key);
+        //    ////upload file to S3
+        //    //try
+        //    //{
+        //    //    //upload.UploadDataset(fi.FullName, ds);
+        //    //    upload.UploadDataset_v2(fi.FullName, df.s3Key);
 
-            //}
-            //catch (AmazonS3Exception eS3)
-            //{
-            //    Logger.Error("S3 Upload Error", eS3);
-            //    SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Upload Error", fi.Name);
-            //    throw new Exception("S3 Upload Error", eS3);
-            //    //return (int)ExitCodes.S3UploadError;
-            //}
-            //catch (Exception e)
-            //{
-            //    Logger.Error("Error during establishing upload process", e);
-            //    SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing upload process", fi.Name);
-            //    throw new Exception("Error during establishing upload process", e);
-            //    //return (int)ExitCodes.Failure;
-            //}
-        }
-
-        private static void PushFileToStorage_v2(Dataset ds, Entities.DatasetMetadata datasetMetadata, IDatasetService upload, IDatasetContext dscontext, FileInfo fi)
-        {
-            if(ds.DatafilesToKeep == 1)
-            {
-                int df_id = dscontext.GetLatestDatasetFileIdForDataset(ds.DatasetId);
-                DatasetFile df = dscontext.GetDatasetFile(df_id);
-
-                try
-                {
-                    upload.UploadDataset_v2(fi.FullName, df.FileLocation);
-                }
-                catch (AmazonS3Exception eS3)
-                {
-                    Logger.Error("S3 Upload Error", eS3);
-                    SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Upload Error", fi.Name);
-                    throw new Exception("S3 Upload Error", eS3);
-                    //return (int)ExitCodes.S3UploadError;
-                }
-                catch (Exception e)
-                {
-                    Logger.Error("Error during establishing upload process", e);
-                    SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing upload process", fi.Name);
-                    throw new Exception("Error during establishing upload process", e);
-                    //return (int)ExitCodes.Failure;
-                }
-            }
-
-
-            if (datasetMetadata.overwrite == false && dscontext.s3KeyDuplicate(ds.S3Key))
-            {
-                StringBuilder message = new StringBuilder();
-                message.AppendLine("Overwrite property is set to FALSE and file already exists on S3");
-                message.AppendLine($"File: {datasetMetadata.datasetName}");
-
-                Logger.Error(message.ToString());
-                SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, message.ToString(), fi.Name);
-                //throw new Exception("Config Overwrite property is set to FALSE and file already exists on S3");
-            }
-
-
-
-            //upload file to S3
-            try
-            {
-                upload.UploadDataset(fi.FullName, ds);
-            }
-            catch (AmazonS3Exception eS3)
-            {
-                Logger.Error("S3 Upload Error", eS3);
-                SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Upload Error", fi.Name);
-                throw new Exception("S3 Upload Error", eS3);
-                //return (int)ExitCodes.S3UploadError;
-            }
-            catch (Exception e)
-            {
-                Logger.Error("Error during establishing upload process", e);
-                SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing upload process", fi.Name);
-                throw new Exception("Error during establishing upload process", e);
-                //return (int)ExitCodes.Failure;
-            }
-        }
+        //    //}
+        //    //catch (AmazonS3Exception eS3)
+        //    //{
+        //    //    Logger.Error("S3 Upload Error", eS3);
+        //    //    SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Upload Error", fi.Name);
+        //    //    throw new Exception("S3 Upload Error", eS3);
+        //    //    //return (int)ExitCodes.S3UploadError;
+        //    //}
+        //    //catch (Exception e)
+        //    //{
+        //    //    Logger.Error("Error during establishing upload process", e);
+        //    //    SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing upload process", fi.Name);
+        //    //    throw new Exception("Error during establishing upload process", e);
+        //    //    //return (int)ExitCodes.Failure;
+        //    //}
+        //}
 
         private static List<SystemConfig> LoadSystemConfigFiles(string metaDir)
         {
