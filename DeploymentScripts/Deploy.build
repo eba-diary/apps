@@ -14,6 +14,7 @@
   <!--<target name="deploy" depends="environmentSettings, addOutage, deployWebSite, envDashRecordDeploy, deployRetrieverApp, envDashRecordDeploy, deleteOutage"/>-->
   <target name="deployWeb" depends="environmentSettings, addOutage, deployWebSite, envDashRecordDeploy, deleteOutage"/>
   <target name="deployConsoleApps" depends="environmentSettings, addOutage, deployRetrieverApp, deployLoaderApp, envDashRecordDeploy, deleteOutage"/>
+  <target name="deployServices" depends="environmentSettings, addOutage, deployGoldenEye, envDashRecordDeploy, deleteOutage"/>
   
   <!-- Environment Dashboard Settings -->
   <property name="envDashSysId" value="278"/>
@@ -162,6 +163,36 @@
       </delete>
 
       <echo message="Deploying console apps." />
+      <copy todir="${copytodir}">
+        <fileset basedir="..\">
+          <include name="**/*"/>
+          <exclude name="_PublishedWebsites/**" />
+          <exclude name="${PublishedWebSiteName}/**" />
+          <exclude name="DeploymentScripts/**" />
+          <exclude name="logs/**" />
+          <exclude name="version.txt" />
+          <exclude name="*Tests.*"/>
+        </fileset>
+      </copy>
+
+    </foreach>
+  </target>
+
+  <target name="deployGoldenEye">
+    <!--<property name="envDashBuildTypId" value="393"/>-->
+    <!-- for each deployment location in semicolon-delimited list in DeployLocations_Console -->
+    <foreach item="String" in="${DeployLocations_GoldenEye}" delim=";" property="copytodir">
+      <echo message="Location = ${copytodir}" />
+
+      <echo message="Deleting existing windows service deployment." />
+      <delete verbose="true">
+        <fileset basedir="${copytodir}">
+          <include name="**/*" />
+          <exclude name="backup/**" />
+        </fileset>
+      </delete>
+
+      <echo message="Deploying GoldenEye." />
       <copy todir="${copytodir}">
         <fileset basedir="..\">
           <include name="**/*"/>
