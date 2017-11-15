@@ -277,8 +277,18 @@ data.DatasetDetail = {
 
                 fileData.append(files[0].name, files[0]);
 
+                var datasetID = "";
+
+                if (window.location.pathname.indexOf("/Dataset/Detail/") === 0) {
+
+                    datasetID = window.location.pathname.substr(window.location.pathname.lastIndexOf('/') + 1);
+                }
+                else {
+                    datasetID = $(this).data('id')
+                }                
+
                 $.ajax({
-                    url: '/Dataset/UploadDatafile/?id=' + encodeURI($(this).data('id')),
+                    url: '/Dataset/UploadDatafile/?id=' + encodeURI(datasetID),
                     type: "Post",
                     contentType: false, // Not to set any content header
                     processData: false, // Not to process data
@@ -362,7 +372,7 @@ data.DatasetDetail = {
 
 
         $("#DatasetFileUpload").change(function () {
-            var dID = $(this).val();
+            var dID = $('#btnUploadFile').data('id');
             $("[id^='btnUploadFile']").attr('data-id', dID);
 
             var fileUpload = $("#DatasetFileUpload").get(0);

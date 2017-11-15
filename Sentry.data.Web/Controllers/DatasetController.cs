@@ -1822,6 +1822,8 @@ namespace Sentry.data.Web.Controllers
             if (dfc.IsRegexSearch != edfc.IsRegexSearch) { dfc.IsRegexSearch = edfc.IsRegexSearch; }
             if (dfc.OverwriteDatafile != edfc.OverwriteDatasetFile) { dfc.OverwriteDatafile = edfc.OverwriteDatasetFile; }
             if (dfc.VersionsToKeep != edfc.VersionsToKeep) { dfc.VersionsToKeep = edfc.VersionsToKeep; }
+            if (dfc.DropPath != edfc.DropPath) { dfc.DropPath = edfc.DropPath; }
+            if (dfc.Description != edfc.ConfigFileDesc) { dfc.Description = edfc.ConfigFileDesc; }
 
             return dfc;
         }

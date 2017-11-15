@@ -136,6 +136,7 @@ namespace Sentry.data.Core.Tests
                                             "Claim",
                                             "Claim Dataset",
                                             "Test Claim Datasaet",
+                                            "Specific Information regarding datasetfile consumption",
                                             "Creater_User",
                                             "072984",
                                             "Upload_User",

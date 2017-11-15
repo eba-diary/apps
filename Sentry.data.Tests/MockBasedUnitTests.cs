@@ -62,6 +62,7 @@ namespace Sentry.data.Tests
                                           "Some Category",
                                           "Some dataset",
                                           "A really cool dataset",
+                                          "This is how you use this dataset",
                                           "Creator Name",
                                           "SentryOwner Name",
                                           "UploadUser Name",

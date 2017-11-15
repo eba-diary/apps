@@ -119,7 +119,7 @@ namespace Sentry.data.Web.Helpers
             }
 
 
-            ldm.DatasetList = filteredList;
+            ldm.DatasetList = filteredList.GroupBy(x => x.DatasetId).Select(x => x.First()).ToList();
             ldm.SearchFilters = GetDatasetFilters(dsc, ldm, category);
 
             return ldm;

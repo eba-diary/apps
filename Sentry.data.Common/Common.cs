@@ -39,7 +39,7 @@ namespace Sentry.data.Common
         public static string GenerateDatasetDropLocation(string creationFrequency, string categoryName, string datasetName)
         {
             string filep = Path.Combine(Configuration.Config.GetHostSetting("DatasetLoaderBaseLocation"), categoryName.ToLower());
-            filep = Path.Combine(filep, datasetName.Replace(' ', '_').ToLower());
+            filep = Path.Combine(filep, datasetName.Replace(' ', '_').ToLower()) + @"\";
             //filep = Path.Combine(filep, creationFrequency.Replace(' ', '_').ToLower());
             return filep.ToString();
         }
