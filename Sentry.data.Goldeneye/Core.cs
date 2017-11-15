@@ -43,7 +43,6 @@ namespace Sentry.data.Goldeneye
             do
             {
                 Thread.Sleep(TimeSpan.FromSeconds(5));
-                Console.WriteLine("Every 5 Seconds");
                 Watch.Run();
 
             } while (!_token.IsCancellationRequested);
