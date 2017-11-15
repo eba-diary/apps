@@ -3,7 +3,7 @@ using Sentry.Common.Logging;
 using Sentry.Configuration;
 using System.Threading.Tasks;
 using System;
-
+using Sentry.data.Infrastructure;
 
 namespace Sentry.data.Goldeneye
 {
@@ -38,22 +38,13 @@ namespace Sentry.data.Goldeneye
         {
             Logger.Info("Worker task started.");
 
-            //call your bootstrapper to initialize your application
-            //Bootstrapper.Init();
+            Watch.OnStart();
 
             do
             {
                 Thread.Sleep(TimeSpan.FromSeconds(5));
-
-                //create an IOC (structuremap) container to wrap this transaction
-                //using (container = Bootstrapper.Container.GetNestedContainer)
-                //{
-                //    var service = container.GetInstance<MyService>();
-                //    var result = service.DoWork();
-                //    container.GetInstance<ISentry.data.GoldeneyeContext>.SaveChanges();
-                //
-                //    Logger.Info(result & " records processed.");
-                //}
+                Console.WriteLine("Every 5 Seconds");
+                Watch.Run();
 
             } while (!_token.IsCancellationRequested);
             Logger.Info("Worker task stopped.");
