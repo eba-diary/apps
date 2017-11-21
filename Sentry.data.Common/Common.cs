@@ -36,7 +36,7 @@ namespace Sentry.data.Common
         /// <param name="categoryName"></param>
         /// <param name="datasetName"></param>
         /// <returns></returns>
-        public static string GenerateDatasetDropLocation(string creationFrequency, string categoryName, string datasetName)
+        public static string GenerateDatasetDropLocation(string categoryName, string datasetName)
         {
             string filep = Path.Combine(Configuration.Config.GetHostSetting("DatasetLoaderBaseLocation"), categoryName.ToLower());
             filep = Path.Combine(filep, datasetName.Replace(' ', '_').ToLower()) + @"\";
@@ -52,7 +52,7 @@ namespace Sentry.data.Common
         /// <returns></returns>
         public static string GenerateDatasetStorageLocation(Dataset ds)
         {
-            return GenerateLocationKey(ds.CreationFreqDesc, ds.DatasetCategory.Name, ds.DatasetName);
+            return GenerateLocationKey(ds.DatasetCategory.Name, ds.DatasetName);
         }
         /// <summary>
         /// Generate storage location path.  <i>Specify all parameters</i>
@@ -61,9 +61,9 @@ namespace Sentry.data.Common
         /// <param name="categoryName"></param>
         /// <param name="datasetName"></param>
         /// <returns></returns>
-        public static string GenerateDatasetStorageLocation(string creationFrequency, string categoryName, string datasetName)
+        public static string GenerateDatasetStorageLocation(string categoryName, string datasetName)
         {
-            return GenerateLocationKey(creationFrequency, categoryName, datasetName);
+            return GenerateLocationKey(categoryName, datasetName);
         }
         /// <summary>
         /// Generate storage key for datafile
@@ -93,7 +93,7 @@ namespace Sentry.data.Common
         /// <param name="category"></param>
         /// <param name="datasetName"></param>
         /// <returns></returns>
-        public static string GenerateLocationKey(string creationFreqDesc, string category, string datasetName)
+        public static string GenerateLocationKey(string category, string datasetName)
         {
             StringBuilder location = new StringBuilder();
             location.Append(Configuration.Config.GetHostSetting("S3DataPrefix"));
@@ -101,8 +101,7 @@ namespace Sentry.data.Common
             location.Append('/');
             location.Append(FormatDatasetName(datasetName));
             location.Append('/');
-            location.Append(GenerateDatasetFrequencyLocationName(creationFreqDesc));
-            location.Append('/');
+
 
             return location.ToString();
         }

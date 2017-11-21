@@ -12,7 +12,7 @@ namespace Sentry.data.Infrastructure
 {
     class APIProvider : IAPIProvider
     {
-        private string _baseurl;
+        //private string _baseurl;
         private RestClient _client;
         private RestRequest _request;
 
@@ -22,12 +22,6 @@ namespace Sentry.data.Infrastructure
             //CreateClient(_baseurl);
             //CreateReuqest();
         }
-
-        //public WeatherDataProvider(string url)
-        //{
-        //    CreateClient(url);
-        //    CreateReuqest();
-        //}
 
         public RestClient CreateClient(string baseurl)
         {

@@ -33,6 +33,10 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.FileLocation, (m) => m.Column("FileLocation"));
             this.Property((x) => x.ParentDatasetFileId, (m) => m.Column("ParentDatasetFile_ID"));
             this.Property((x) => x.VersionId, (m) => m.Column("Version_ID"));
+            this.Property((x) => x.IsUsable, (m) => m.Column("isUsable_IND"));
+            this.Property((x) => x.IsBundled, (m) => m.Column("isBundled_IND"));
+            this.Property((x) => x.Information, (m) => m.Column("Information_DSC"));
+
             this.ManyToOne(x => x.Dataset, m =>
             {
                 m.Column("Dataset_ID");
@@ -45,6 +49,9 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.ForeignKey("FK_DatasetFile_DatasetFileConfigs");
                 m.Class(typeof(DatasetFileConfig));
             });
+
+
+
             
         }
 

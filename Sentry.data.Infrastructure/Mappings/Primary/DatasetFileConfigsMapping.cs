@@ -43,6 +43,14 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Cascade(Cascade.All);
                 m.Class(typeof(Dataset));
             });
+
+            this.ManyToOne(x => x.DatasetScopeType, m =>
+            {
+                m.Column("DatasetScopeType_ID");
+                m.ForeignKey("FK_DatasetFileConfigs_DatasetScopeTypes");
+                m.Class(typeof(DatasetScopeType));
+            });
+            this.Property((x) => x.CreationFreqDesc, (m) => m.Column("CreationFreq_DSC"));
         }
     }
 }

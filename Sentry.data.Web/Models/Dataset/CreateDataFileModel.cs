@@ -14,29 +14,13 @@ namespace Sentry.data.Web
     {
         public CreateDataFileModel()
         {
-            //this.Category = "";
-            //this.ChangedDtm = DateTime.MinValue;
-            //this.CreationFreqDesc = DatasetFrequency.NonSchedule.ToString();  // Default to NonScheduled
-            //this.DatasetDesc = "";
-            ////this.DatasetDtm = DateTime.MinValue;
-            //this.DatasetName = "";
-            //this.FileExtension = "";
-            //this.FileSize = 0;
-            //this.DatasetId = 0;
-            //this.OriginationCode = "";
-            //this.RecordCount = 0;
-            //this.S3Key = "";
-            //this.SentryOwnerName = "";
-            //this.UploadDtm = DateTime.MinValue;
-            //this.UploadUserName = "";
-            //this.IsSensitive = false;
-            //this.CanDisplay = true;
+
         }
 
         public CreateDataFileModel(Dataset ds, IAssociateInfoProvider associateService) : base(ds, associateService)
         {
             this.CategoryIDs = ds.DatasetCategory.Id;
-            this.FreqencyID = (int)Enum.Parse(typeof(DatasetFrequency), ds.CreationFreqDesc);
+           // this.FreqencyID = (int)Enum.Parse(typeof(DatasetFrequency), ds.CreationFreqDesc);
             this.OriginationID = (int)Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode);
             this.dsID = ds.DatasetId;
         }

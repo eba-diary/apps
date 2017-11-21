@@ -9,6 +9,7 @@ using System;
 using System.Xml;
 using System.ServiceModel.Syndication;
 using LazyCache;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -40,18 +41,18 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult GetFeed()
         {
-            List<DataFeedItem> temp = cache.Get<List<DataFeedItem>>("feedAll");
+           // List<DataFeedItem> temp = cache.Get<List<DataFeedItem>>("feedAll");
 
             //force to get feed items if failed to retrieve items previously due to storing a list of count 0 in failed try
-            if (temp == null || temp.Count == 0)
-            {
-                dfisAll = _feedContext.GetAllFeedItems().ToList();
-                cache.Add("feedAll", dfisAll);
-            }
-            else
-            {
+           // if (temp == null || temp.Count == 0)
+           // {
+           //     dfisAll = _feedContext.GetAllFeedItems().ToList();
+           //     cache.Add("feedAll", dfisAll);
+          //  }
+          //  else
+           // {
                 dfisAll = cache.GetOrAdd("feedAll", () => _feedContext.GetAllFeedItems().ToList());
-            }
+          //  }
             
             return PartialView("_Feed", dfisAll.Take(10).ToList());
         }

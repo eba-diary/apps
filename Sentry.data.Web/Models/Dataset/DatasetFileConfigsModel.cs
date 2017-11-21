@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using Sentry.data.Core;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 
 namespace Sentry.data.Web
 {
@@ -26,7 +27,9 @@ namespace Sentry.data.Web
             this.ConfigFileName = dsfc.Name;
             this.ConfigFileDesc = dsfc.Description;
             //this.DatasetId = dsfc.DatasetId;
-            this.ParentDatasetName = dsfc.ParentDataset.DatasetName;         
+            this.ParentDatasetName = dsfc.ParentDataset.DatasetName;
+            this.CreationFreq = dsfc.CreationFreqDesc;
+            this.DatasetScopeTypeID = dsfc.DatasetScopeTypeID;
         }
         
         public int ConfigId { get; set; }
@@ -51,10 +54,15 @@ namespace Sentry.data.Web
             get
             {
                 string href = null;
-                href = $"<a href=\"#\" onclick=\"data.ManageConfigs.EditConfig({ConfigId})\">Edit</a>";
+                href = $"<a href = \"#\" onclick=\"data.ManageConfigs.EditConfig({ConfigId})\" class=\"table-row-icon\" title=\"Edit Config File\"><i class='glyphicon glyphicon-edit text-primary'></i></a>";
                 return href;
             }
         }
         public string ParentDatasetName { get; set; }
+
+        public string CreationFreq { get; set; }
+        public int DatasetScopeTypeID { get; set; }
+        public IEnumerable<SelectListItem> AllDatasetScopeTypes { get; set; }
+        public IEnumerable<SelectListItem> AllFrequencies { get; set; }
     }
 }

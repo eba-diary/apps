@@ -30,6 +30,7 @@
                         </div>
                     </div>
                 </p>
+
         }
         else
         {
@@ -46,6 +47,7 @@
                     </div>
                 </div>
         }
+
     }
     <div class="form-group">
         @Html.LabelFor(model => model.f, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -53,6 +55,17 @@
             <input type="file" class="edit-dataset-row file-load" id="DatasetFileUpload" />
             @*@Html.HiddenFor(model => model.f)*@
         </div>
+    </div>
+
+    <div class="form-group">
+        @Html.Label("Configuration", htmlAttributes: new { @class = "control-lable col-md-2" })
+        <div class="col-md-10">
+            <select id="configList" />
+        </div>
+    </div>
+
+    <div>
+        <span id="configDescription" />
     </div>
 </div>
 

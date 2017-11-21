@@ -35,7 +35,7 @@
             </div>
             <div class="form-group">
                 @Html.LabelFor(m => m.ConfigFileDesc, htmlAttributes: new { @class = "control-lable col-sm-3" })
-                <div class="col-sm-4">
+                <div class="col-sm-9">
                     @Html.TextAreaFor(m => m.ConfigFileDesc, new { @class = "form-control ConfigFileDesc" })
                 </div>
             </div>
@@ -56,7 +56,7 @@
             <div class="form-group">
                 @Html.LabelFor(m => m.DropPath, htmlAttributes: new { @class = "control-lable col-sm-3" })
                 <div class="col-sm-9">
-                    @Html.EditorFor(m => m.DropPath, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.EditorFor(model => model.DropPath, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
                     @Html.ValidationMessageFor(model => model.DropPath, "", new { @class = "text-danger" })
                 </div>
             </div>
@@ -82,6 +82,21 @@
                 @Html.LabelFor(m => m.VersionsToKeep, htmlAttributes: new { @class = "control-lable col-sm-3" })
                 <div class="col-sm-4">
                     @Html.EditorFor(m => m.VersionsToKeep, new { htmlAttributes = new { @class = "form-control" } })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.CreationFreq, htmlAttributes: new { @class = "control-lable col-sm-3" })
+                <div class="col-sm-4">
+                    @Html.DropDownListFor(model => model.CreationFreq, 
+                   new SelectList(Model.AllFrequencies, "Value", "Text", Model.CreationFreq), new { @class = "form-control " })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor((model) => model.DatasetScopeTypeID, htmlAttributes: new { @class = "control-lable col-sm-3" })
+                <div class="col-sm-4">
+                    @Html.DropDownListFor(model => model.DatasetScopeTypeID, 
+                   new SelectList(Model.AllDatasetScopeTypes, "Value", "Text", Model.DatasetScopeTypeID), new { @class = "form-control" })
                 </div>
             </div>
             <div class="form-group">

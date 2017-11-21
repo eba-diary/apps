@@ -38,31 +38,24 @@ namespace Sentry.data.Web
             this.S3Key = ds.S3Key;
             this.IsSensitive = ds.IsSensitive;
             this.CanDisplay = ds.CanDisplay;
+            this.DatasetInformation = ds.DatasetInformation;
             
             this.RawMetadata = new List<_DatasetMetadataModel>();
             foreach (DatasetMetadata dsm in ds.RawMetadata)
             {
                 this.RawMetadata.Add(new _DatasetMetadataModel(dsm));
             }
-            //this.Columns = new List<_DatasetMetadataModel>();
-            //foreach (DatasetMetadata dsm in ds.Columns)
-            //{
-            //    this.Columns.Add(new _DatasetMetadataModel(dsm));
-            //}
-            //this.Metadata = new List<_DatasetMetadataModel>();
-            //foreach (DatasetMetadata dsm in ds.Metadata)
-            //{
-            //    this.Metadata.Add(new _DatasetMetadataModel(dsm));
-            //}
-            this.SearchHitList = new List<string>();
+
             this.IsPushToTableauCompatible = false;
-            this.DatasetCategory = ds.DatasetCategory; /*Caden a change here for the Category reference*/
+            this.DatasetCategory = ds.DatasetCategory; 
             this.DatasetFiles = new List<BaseDatasetFileModel>();
             foreach (DatasetFile df in ds.DatasetFiles.OrderByDescending(x => x.CreateDTM))
             {
                 this.DatasetFiles.Add(new BaseDatasetFileModel(df));
             }
+
             this.DatasetScopeType = ds.DatasetScopeType;
+
             this.DatafilesFilesToKeep = ds.DatafilesToKeep;
             this.DatasetFileConfigs = new List<DatasetFileConfigsModel>();
             foreach (DatasetFileConfig dfc in ds.DatasetFileConfigs)
@@ -119,6 +112,11 @@ namespace Sentry.data.Web
         [DisplayName("Description")]
         public string DatasetDesc { get; set; }
 
+        [MaxLength(4096)]
+        [DisplayName("Usage Information")]
+        public string DatasetInformation { get; set; }
+
+
         [Required]
         [MaxLength(128)]
         [DisplayName("Originating Creator")]
@@ -144,19 +142,15 @@ namespace Sentry.data.Web
         public string FileExtension { get; set; }
 
         [Required]
-        [DisplayName("Original Creation Date")]
+        [DisplayName("Creation Date")]
         [DataType(System.ComponentModel.DataAnnotations.DataType.Date)]
         public DateTime DatasetDtm { get; set; }
 
-        [DisplayName("File Change Date")]
+        [DisplayName("Last Modified")]
         public DateTime ChangedDtm { get; set; }
 
-        [Required]
-        [DisplayName("Upload Date")]
-        public DateTime UploadDtm { get; set; }
-
         [DisplayName("Creation Frequency")]
-        public string CreationFreqDesc { get; set; }
+        public List<string> CreationFreqDesc { get; set; }
 
         //[Required]
         [MaxLength(1024)]
@@ -192,8 +186,6 @@ namespace Sentry.data.Web
             }
         }
 
-        public List<String> SearchHitList;
-
         public Boolean CanDwnldSenstive { get; set; }
         public Boolean CanEditDataset { get; set; }
         public Boolean CanManageConfigs { get; set; }
@@ -213,7 +205,7 @@ namespace Sentry.data.Web
         public IList<BaseDatasetFileModel> DatasetFiles { get; set; }
 
         [DisplayName("Dataset Scope")]
-        public DatasetScopeType DatasetScopeType { get; set; }
+        public List<DatasetScopeType> DatasetScopeType { get; set; }
 
         [RegularExpression(@"^\d+$", ErrorMessage = "Must be non-negative number")] //Only allow digits
         [DisplayName("Number of Files Keep")]

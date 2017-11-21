@@ -36,6 +36,17 @@ data.DatasetDetail = {
             data.DatasetDetail.PreviewLatestDatafileModal($(this).data("id"));
         });
 
+        $("#btnCreateDirectory").off('click').on('click', function (e) {
+            var request = $.ajax({
+                url: "/Dataset/CreateFilePath/?filePath=" + $($(this).parent().parent().children()[1]).text(),
+                method: "POST",
+               // data: $($(this).parent().parent().children()[1]).text(),
+                dataType: 'json',
+                success: function (obj) {
+                }
+            });
+        });
+
         $("[id^='UploadModal']").click(function (e) {
             e.preventDefault();
             //data.DatasetDetail.ProgressModalStatus();
@@ -55,6 +66,7 @@ data.DatasetDetail = {
 
 
         data.DatasetDetail.DatasetFileTableInit(Id);
+        data.DatasetDetail.DatasetBundingFileTableInit(Id);
 
         data.DatasetDetail.DatasetFileConfigsTableInit(Id);
 
@@ -141,6 +153,18 @@ data.DatasetDetail = {
         });        
     },
 
+    PushToBundleInit: function () {
+        ///<summary>
+        ///Initialize the PushToFilenameOverride partial view
+        ///</summary>
+        // $("PushToForm").validateBootstrap(true);
+
+        $("[id^='BundleFilename']").off('click').on('click', function (e) {
+            e.preventDefault();
+            data.Dataset.PushToSAS_Filename($(this).data("id"), $("#BundleFilename").val());
+        });
+    },
+
     VersionsModalInit: function (Id) {
         $('.modal-dialog').css('width','900px');
         //m.addClass('datasetversionmodal');
@@ -182,9 +206,16 @@ data.DatasetDetail = {
                         { data: "CreateDTM", className: "createdtm", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null;}},
                         { data: "ModifiedDTM", type: "date", className: "modifieddtm", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null;}}
             ],
-            order: [6, 'desc']
+            order: [6, 'desc'],
             //stateSave: true,
             //stateDuration: -1  // indicates session storage, not local storage
+            "createdRow": function (row, data, dataIndex) {
+                if (data["IsUsable"] == false)
+                {
+                    $(row).css('background-color', '#ffd1d1');
+                }
+            }
+            
         });
 
         $("#datasetFilesVersionsTable").dataTable().columnFilter({
@@ -197,7 +228,7 @@ data.DatasetDetail = {
                     { type: "text" },
                     { type: "text" },
                     { type: "text" },
-                    { type: "text"}
+                    { type: "text" }
             ]
         });
 
@@ -228,35 +259,71 @@ data.DatasetDetail = {
         // Initialize SignalR Hub
         //data.DatasetDetail.ProgressModalStatus();
 
-        $("#categoryList").append($("<option />").val(0).html("-- Select a Category --"));
+        var configs;
+
+        $("#categoryList").prepend($("<option />").val(0).html("-- Select a Category --"));
 
         $("#categoryList").each(function (i) {
             $(this).val(i);
         })
 
         if (id == 0 || id == 1) {
+
+            //Hide Upload Button
             $("[id^='btnUploadFile']").attr('data-id', id);
             $("[id^='btnUploadFile']").prop("disabled", true);
 
+            //Hide Create Button
             $("#btnCreateDatasetAtUpload").prop("disabled", true);
             $("#btnCreateDatasetAtUpload").hide();
 
+            //Hide File Upload
             $("#DatasetFileUpload").prop("disabled", true);
             $("#DatasetFileUpload").parent().parent().hide();
 
+            //Hide Dataset List
             $("#datasetList").parent().parent().hide();
+
+            //Hide Configuration List
+            $('#configList').parent().parent().hide();
+            $("#configDescription").hide();
         }
         else {
-
+            //Hide Create Button
             $("#btnCreateDatasetAtUpload").prop("disabled", true);
             $("#btnCreateDatasetAtUpload").hide();
 
+            //Hide Upload Button
             $("[id^='btnUploadFile']").attr('data-id', id);
             $("[id^='btnUploadFile']").prop("disabled", true);
 
+
+            $('#configList').parent().parent().show();
+            $("#configDescription").show();
+
+            if (id > 0) {
+                var controllerURL = "/Dataset/GetDatasetFileConfigInfo/?id=" + encodeURI(id);
+                $.get(controllerURL, function (result) {
+                    configs = result;
+                    var select = $("#configList");
+
+                    select.empty();
+
+                    $.each(result, function (index, itemData) {
+                        select.append($('<option/>', {
+                            value: itemData.ConfigId,
+                            text: itemData.ConfigFileName
+                        }));
+                    });
+                    $("#configDescription").html(configs[0].ConfigFileDesc);
+                    
+                });
+            }
         }
 
         $("[id^='btnUploadFile']").off('click').on('click', function () {
+            $('#btnUploadFile').closest('.bootbox').hide();
+            $('.modal-backdrop').remove();
 
             var modal = Sentry.ShowModalWithSpinner("Upload Results", {
                     Confirm: {
@@ -264,11 +331,12 @@ data.DatasetDetail = {
                         className: 'btn-success'
                     }
             });
-
+            $('.modal-footer button').prop("disabled", true);
 
             // This approach is from the following site:
             // http://www.c-sharpcorner.com/UploadFile/manas1/upload-files-through-jquery-ajax-in-Asp-Net-mvc/
             if (window.FormData !== undefined) {
+                console.log('File Upload Process Started');
                 var fileUpload = $("#DatasetFileUpload").get(0);
                 var files = fileUpload.files;
 
@@ -277,31 +345,61 @@ data.DatasetDetail = {
 
                 fileData.append(files[0].name, files[0]);
 
-                var datasetID = "";
+                if ((files[0].size / 1000000) > 100) {
 
-                if (window.location.pathname.indexOf("/Dataset/Detail/") === 0) {
+                    var configID = $("#configList").find(":selected").val();
+                    var dropLocation 
 
-                    datasetID = window.location.pathname.substr(window.location.pathname.lastIndexOf('/') + 1);
+                    for (i = 0; i < configs.length; i++) {
+                        if (configs[i].ConfigId == configID) {
+                            dropLocation = configs[i].DropPath;
+                            break;
+                        }
+                    }
+
+
+                    modal.ReplaceModalBody('<h3> The file you are attempting to upload to is too large to upload through the browser. </h3>' +
+                        '<p>Please use the following location to drop files for this dataset. </p>' +
+                        '<br />' + 
+                        '<p>' + dropLocation + '</p>' +
+                        '<br />' + 
+                        '<p>If you don\'t have access to this drop location please contact <a href="mailto:BIPortalAdmin@Sentry.com"> Data.sentry.com Administration </a> for further assistance </p>'
+                        );
+
+                    $('.modal-footer button').prop("disabled", false);
                 }
                 else {
-                    datasetID = $(this).data('id')
-                }                
+                    var datasetID = window.location.pathname.substr(window.location.pathname.lastIndexOf('/') + 1);
 
-                $.ajax({
-                    url: '/Dataset/UploadDatafile/?id=' + encodeURI(datasetID),
-                    type: "Post",
-                    contentType: false, // Not to set any content header
-                    processData: false, // Not to process data
-                    data: fileData,
-                    success: function (result) {
-                        modal.ReplaceModalBody(result);
-                        //Sentry.ShowModalConfirmation(result);
-                    },
-                    error: function (err) {
-                        modal.ReplaceModalBody(result);
-                        //Sentry.ShowModalAlert(err.statusText);
+                    if (datasetID == "" || datasetID == null || datasetID == undefined) {
+                        datasetID = $("[id^='btnUploadFile']").attr('data-id');
                     }
-                });
+
+                    var configID = $("#configList").val();
+
+                    var token = $('input[name="__RequestVerificationToken"]').val();
+
+                    var xhr = new XMLHttpRequest();
+                    (xhr.upload || xhr).addEventListener('progress', function (e) {
+                        var done = e.position || e.loaded
+                        var total = e.totalSize || e.total;
+
+                        modal.ReplaceModalBody('<p> Large files may take a long time to upload through the browser. </p>' +
+                            '<p>Please do not close the window as your file is uploading. </p>' +
+                            '<p> Progress: (' + Math.round(done / 1024) + ' KB / ' + Math.round(total / 1024) + ' KB)</p><h3><b>' + Math.round(done / total * 100) + ' % </b></h3> ');
+                        $('.modal-footer button').prop("disabled", true);
+                    });
+                    xhr.addEventListener('load', function (e) {
+                        $('.modal-footer button').prop("disabled", false);
+                        modal.ReplaceModalBody(e.currentTarget.response);
+                        console.log(e);
+                    });
+                    var url = '/Dataset/UploadDatafile/?id=' + encodeURI(datasetID) + "&configId=" + encodeURI(configID);
+                    xhr.open('post', url, true);
+                    xhr.setRequestHeader('__RequestVerificationToken', token);
+                    xhr.send(fileData);
+                }
+
             } else {
                 alert("FormData is not supported");
             }
@@ -341,12 +439,46 @@ data.DatasetDetail = {
             //  If Create New Dataset is Picked, a different button will be shown to the user.
 
             if (cID == 0) {
-                $("#datasetList").parent().parent().hide();
+                //Hide Upload Button
+                $("[id^='btnUploadFile']").prop("disabled", true);
 
+                //Hide Create Button
+                $("#btnCreateDatasetAtUpload").prop("disabled", true);
+                $("#btnCreateDatasetAtUpload").hide();
+
+                //Hide File Upload
                 $("#DatasetFileUpload").prop("disabled", true);
                 $("#DatasetFileUpload").parent().parent().hide();
+
+                //Hide Dataset List
+                $("#datasetList").parent().parent().hide();
+
+                //Hide Configuration List
+                $('#configList').parent().parent().hide();
+                $("#configDescription").hide();
+            }
+            else if ($("#datasetList option:selected").text("Select Dataset"))
+            {
+                //Hide Upload Button
+                $("[id^='btnUploadFile']").prop("disabled", true);
+
+                //Hide Create Button
+                $("#btnCreateDatasetAtUpload").prop("disabled", true);
+                $("#btnCreateDatasetAtUpload").hide();
+
+                //Hide File Upload
+                $("#DatasetFileUpload").prop("disabled", true);
+                $("#DatasetFileUpload").parent().parent().hide();
+
+                //Hide Configuration List
+                $('#configList').parent().parent().hide();
+                $("#configDescription").hide();
+
+                //Show Dataset List
+                $("#datasetList").parent().parent().show();
             }
             else {
+                //Show Dataset List
                 $("#datasetList").parent().parent().show();
 
                 var fileUpload = $("#DatasetFileUpload").get(0);
@@ -372,20 +504,73 @@ data.DatasetDetail = {
 
 
         $("#DatasetFileUpload").change(function () {
-            var dID = $('#btnUploadFile').data('id');
+            var dID = $(this).val();
             $("[id^='btnUploadFile']").attr('data-id', dID);
+
+            //Hide Configuration List
+            $('#configList').parent().parent().show();
+            $("#configDescription").show();
 
             var fileUpload = $("#DatasetFileUpload").get(0);
             var files = fileUpload.files;
 
             if (files.length > 0) {
-
                 if (dID != 0 && dID != 1 && files[0].name != null) {
                     $("[id^='btnUploadFile']").prop("disabled", false);
                 }
-            }   
-        });
 
+                var select = $("#configList");
+
+                select.empty();
+
+                if (files.length > 0) {
+                    var matchFound = false;
+                    var matchIndex;
+                    for (i = 1; i < configs.length; i++) {
+                        if (configs[i].IsRegexSearch && files[0].name.match(configs[i].SearchCriteria)) {
+                            select.append($('<option/>', {
+                                value: configs[i].ConfigId,
+                                text: configs[i].ConfigFileName
+                            }));
+
+                            if (i != 0) {
+                                matchFound = true;
+                                matchIndex = i;
+                            }
+                        }
+                        else if (!configs[i].IsRegexSearch && files[0].name === configs[i].SearchCriteria) {
+                            select.append($('<option/>', {
+                                value: configs[i].ConfigId,
+                                text: configs[i].ConfigFileName
+                            }));
+
+                            if (i != 0) {
+                                matchFound = true;
+                                matchIndex = i;
+                            }
+                        }
+                    }
+
+                    if (matchFound) {
+                        $("#configDescription").html(configs[matchIndex].ConfigFileDesc);
+                    }
+                    else {
+                        select.append($('<option/>', {
+                            value: configs[0].ConfigId,
+                            text: configs[0].ConfigFileName
+                        }));
+                        $("#configDescription").html(configs[0].ConfigFileDesc);
+                    }
+                }
+            }   
+            else
+            {
+                $("[id^='btnUploadFile']").prop("disabled", true);
+                //Hide Configuration List
+                $('#configList').parent().parent().hide();
+                $("#configDescription").hide();
+            }
+        });
 
         $("#datasetList").change(function () {
             var dID = $(this).val();
@@ -393,29 +578,65 @@ data.DatasetDetail = {
 
             if (dID == 0)
             {
+                //Hide Upload Button
                 $("[id^='btnUploadFile']").prop("disabled", true);
 
+                //Hide Create Button
                 $("#btnCreateDatasetAtUpload").prop("disabled", true);
                 $("#btnCreateDatasetAtUpload").hide();
 
+                //Hide File Upload
                 $("#DatasetFileUpload").prop("disabled", true);
                 $("#DatasetFileUpload").parent().parent().hide();
+
+                //Hide Configuration List
+                $('#configList').parent().parent().hide();
+                $("#configDescription").hide();
             }
             else if (dID == 1)
             {
+                //Hide Upload Button
+                $("[id^='btnUploadFile']").prop("disabled", true);
+
+                //Show Create Button
                 $("#btnCreateDatasetAtUpload").prop("disabled", false);
                 $("#btnCreateDatasetAtUpload").show();
-                $("[id^='btnUploadFile']").prop("disabled", true);
+
+                //Hide File Upload
                 $("#DatasetFileUpload").prop("disabled", true);
                 $("#DatasetFileUpload").parent().parent().hide();
+
+                //Hide Configuration List
+                $('#configList').parent().parent().hide();
+                $("#configDescription").hide();
             }
             else
             {
-                $("#DatasetFileUpload").prop("disabled", false);
-                $("#DatasetFileUpload").parent().parent().show();
+                //Show Upload Button
+                //$("[id^='btnUploadFile']").prop("disabled", false);
+
+                //Hide Create Button
                 $("#btnCreateDatasetAtUpload").prop("disabled", true);
                 $("#btnCreateDatasetAtUpload").hide();
 
+                //Show File Upload
+                $("#DatasetFileUpload").prop("disabled", false);
+                $("#DatasetFileUpload").parent().parent().show();
+
+
+                var fileUpload = $("#DatasetFileUpload").get(0);
+                var files = fileUpload.files;
+
+                if (files.length > 0) {
+                    //Show Configuration List
+                    $('#configList').parent().parent().show();
+                    $("#configDescription").show();
+                }
+                else {
+                    //Hide Configuration List
+                    $('#configList').parent().parent().hide();
+                    $("#configDescription").hide();
+                }
 
                 var fileUpload = $("#DatasetFileUpload").get(0);
                 var files = fileUpload.files;
@@ -426,9 +647,75 @@ data.DatasetDetail = {
                         $("[id^='btnUploadFile']").prop("disabled", false);
                     }
                 }
+
+                if (dID > 0) {
+                    var controllerURL = "/Dataset/GetDatasetFileConfigInfo/?id=" + encodeURI(dID);
+                    $.get(controllerURL, function (result) {
+                        configs = result;
+                        var select = $("#configList");
+
+                        select.empty();
+
+                        var fileUpload = $("#DatasetFileUpload").get(0);
+                        var files = fileUpload.files;
+
+                        if (files.length > 0) {
+                            var matchFound = false;
+                            var matchIndex;
+                            for (i = 1; i < configs.length; i++) {
+                                if (configs[i].IsRegexSearch && files[0].name.match(configs[i].SearchCriteria)) {
+                                    select.append($('<option/>', {
+                                        value: configs[i].ConfigId,
+                                        text: configs[i].ConfigFileName
+                                    }));
+
+                                    if (i != 0) {
+                                        matchFound = true;
+                                        matchIndex = i;
+                                    }
+                                }
+                                else if (!configs[i].IsRegexSearch && files[0].name === configs[i].SearchCriteria) {
+                                    select.append($('<option/>', {
+                                        value: configs[i].ConfigId,
+                                        text: configs[i].ConfigFileName
+                                    }));
+
+                                    if (i != 0) {
+                                        matchFound = true;
+                                        matchIndex = i;
+                                    }
+                                }
+                            }
+
+                            if (matchFound) {
+                                $("#configDescription").html(configs[matchIndex].ConfigFileDesc);
+                            }
+                            else {
+                                select.append($('<option/>', {
+                                    value: configs[0].ConfigId,
+                                    text: configs[0].ConfigFileName
+                                }));
+                                $("#configDescription").html(configs[0].ConfigFileDesc);
+                            }
+                        }
+
+                    });
+                }
             }
         });
 
+        $("#configList").change(function () {
+            var configID = $(this).val();
+
+            for (i = 0; i < configs.length; i++)
+            {
+                if (configs[i].ConfigId == configID)
+                {
+                    $("#configDescription").html(configs[i].ConfigFileDesc);
+                    break;
+                }
+            }
+        });
     },
 
     DownloadDatasetFile: function (id) {
@@ -475,6 +762,15 @@ data.DatasetDetail = {
         $.get("/Dataset/PreviewDatafile/" + id, function (result) {
             modal.ReplaceModalBody(result);
         });
+    },
+
+    EditDataFileInformation: function(id){
+        var modal = Sentry.ShowModalWithSpinner("Edit Data File");   
+
+        $.get("/Dataset/EditDatasetFile/" + id, function (result) {
+            modal.ReplaceModalBody(result);
+           // data.DatasetDetail.VersionsModalInit(id);
+        })
     },
 
     GetDatasetFileVersions: function (id) {
@@ -530,8 +826,97 @@ data.DatasetDetail = {
         // --- progress bar stuff : end ---
     },
 
-    DatasetFileTableInit: function(Id) {
-        $('#datasetFilesTable tbody').on('click', 'td.details-control', function () {
+    DatasetBundingFileTableInit: function (Id) {
+         $("#bundledDatasetFilesTable").DataTable({
+            width: "100%",
+            serverSide: true,
+            //responsive: true,
+            processing: true,
+            searching: true,
+            paging: true,
+            rowId: 'Id',
+            iDisplayLength: 10,
+            aLengthMenu: [
+                [10, 25, 50, 100, 200, -1],
+                [10, 25, 50, 100, 200, "All"]
+            ],
+            select: {
+                selector: 'td:not(:last-child)',
+                selector: 'td:not(:first-child)'
+            },
+            ajax: {
+                url: "/Dataset/GetBundledFileInfoForGrid/?Id=" + Id,
+                type: "POST",
+            },
+            columns: [
+                { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px", searchable: false },
+                { data: "ActionLinks", className: "downloadFile", width: "100px", searchable: false, orderable: false },
+                {
+                    data: "Name", width: "40%", className: "Name", render: function (data, type, row) {
+                        return "<a href = \"#\" onclick=\"data.DatasetDetail.GetDatasetFileVersions(" + row.Id
+                            + ")\" title=\"View File Versions\">" + row.Name
+                            + "</a>"
+                    }
+                },
+                { data: "UploadUserName", className: "UploadUserName" },
+                { data: "CreateDTM", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
+                { data: "ModifiedDTM", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
+                { data: "ConfigFileName", className: "ConfigFileName" },
+                {
+                    data: "IsUsable",
+                    width: "65px",
+                    render: function (data, type, row) {
+                        if (data === true) {
+                            return '<input type=\"checkbox\" disabled checked value="' + data + '">';
+                        } else {
+                            return '<input type=\"checkbox\" disabled value="' + data + '">';
+                        }
+                        //return data;
+                    },
+                    className: "dt-body-center"
+                },
+            ],
+            language: {
+                search: "<div class='input-group'><span class='input-group-addon'><i class='glyphicon glyphicon-search'></i></span>_INPUT_</div>",
+                searchPlaceholder: "Search",
+                processing: ""
+            },
+            order: [5, 'desc'],
+            stateSave: true,
+            //stateDuration: -1  // indicates session storage, not local storage
+            "createdRow": function (row, data, dataIndex) {
+                if (data["IsUsable"] == false) {
+                    $(row).addClass('unUsable');
+                }
+            }
+        });
+
+        var values = [true, false];
+
+        $("#bundledDatasetFilesTable").dataTable().columnFilter({
+            sPlaceHolder: "head:after",
+            aoColumns: [
+                null,
+                null,
+                { type: "text" },
+                { type: "text" },
+                { type: "date-range" },
+                { type: "date-range" },
+                { type: "text" },
+                { type: "select", values: values }
+            ],
+        });
+
+        $('#bundledDatasetFilesTable').on('draw.dt', function () {
+            if ($("#bundledDatasetFilesTable").DataTable().page.info().recordsTotal !== 0) {
+                $("#detailSectionHeader_BundledFiles").show();
+                $("#hide_detailSectionHeader_BundledFiles").show();
+            }
+        });
+
+        var table = $('#bundledDatasetFilesTable').DataTable();
+
+        $('#bundledDatasetFilesTable tbody').on('click', 'td.details-control', function () {
             var tr = $(this).closest('tr');
             var row = table.row(tr);
 
@@ -542,11 +927,16 @@ data.DatasetDetail = {
             }
             else {
                 // Open this row
-                row.child(data.DatasetDetail.formatDatasetFileDetails(row.data())).show();
+                row.child(data.DatasetDetail.formatDatasetBundlingFileDetails(row.data())).show();
                 tr.addClass('shown');
             }
         });
-        
+
+    },
+
+
+    DatasetFileTableInit: function(Id) {
+       
         data.Dataset.DatasetFilesTable = $("#datasetFilesTable").DataTable({
             //$("#datasetFilesTable").dataTable({
             width: "100%",
@@ -565,9 +955,13 @@ data.DatasetDetail = {
                 [10, 25, 50, 100, 200, -1],
                 [10, 25, 50, 100, 200, "All"]
             ],
+            select: {
+                selector: 'td:not(:last-child)',
+                selector: 'td:not(:first-child)'
+            },
             columns: [
                 { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px", searchable: false },
-                { data: "ActionLinks", className: "downloadFile", width: "100px", searchable: false },
+                { data: "ActionLinks", className: "downloadFile", width: "100px", searchable: false, orderable: false },
                 {
                     data: "Name", width: "40%", className: "Name", render: function (data, type, row)
                     {
@@ -579,7 +973,20 @@ data.DatasetDetail = {
                 { data: "UploadUserName", className: "UploadUserName" },
                 { data: "CreateDTM", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
                 { data: "ModifiedDTM", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
-                { data: "ConfigFileName", className: "ConfigFileName" }
+                { data: "ConfigFileName", className: "ConfigFileName" },
+                {
+                    data: "IsUsable",
+                    width: "65px",
+                    render: function (data, type, row) {
+                        if (data === true) {
+                            return '<input type=\"checkbox\" disabled checked value="' + data + '">';
+                        } else {
+                            return '<input type=\"checkbox\" disabled value="' + data + '">';
+                        }
+                        //return data;
+                    },
+                    className: "dt-body-center"
+                },
             ],
             language: {
                 search: "<div class='input-group'><span class='input-group-addon'><i class='glyphicon glyphicon-search'></i></span>_INPUT_</div>",
@@ -589,7 +996,14 @@ data.DatasetDetail = {
             order: [5, 'desc'],
             stateSave: true,
             //stateDuration: -1  // indicates session storage, not local storage
+            "createdRow": function (row, data, dataIndex) {
+                if (data["IsUsable"] == false) {
+                    $(row).addClass('unUsable');
+                }
+            }
         });
+
+        var values = [true, false];
 
         $("#datasetFilesTable").dataTable().columnFilter({
             sPlaceHolder: "head:after",
@@ -600,57 +1014,8 @@ data.DatasetDetail = {
                 { type: "text" },
                 { type: "date-range" },
                 { type: "date-range" },
-                { type: "text" }
-            ],
-        });
-
-        $("#bundledDatasetFilesTable").DataTable({
-            //$("#datasetFilesTable").dataTable({
-            autoWidth: true,
-            serverSide: true,
-            //responsive: true,
-            processing: true,
-            searching: true,
-            paging: true,
-            ajax: {
-                url: "/Dataset/GetBundledFileInfoForGrid/?Id=" + Id,
-                type: "POST"
-            },
-            columns: [
-                { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px", searchable: false },
-                { data: "ActionLinks", className: "downloadFile", width: "auto", searchable: false },
-                {
-                    data: "Name", width: "40%", className: "Name", render: function (data, type, row) {
-                        return "<a href = \"#\" onclick=\"data.DatasetDetail.GetDatasetFileVersions(" + row.Id
-                            + ")\" title=\"View File Versions\">" + row.Name
-                            + "</a>"
-                    }
-                },
-                { data: "UploadUserName", className: "UploadUserName" },
-                { data: "CreateDTM", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
-                { data: "ModifiedDTM", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
-                { data: "ConfigFileName", className: "ConfigFileName"}
-            ],
-            language: {
-                search: "<div class='input-group'><span class='input-group-addon'><i class='glyphicon glyphicon-search'></i></span>_INPUT_</div>",
-                searchPlaceholder: "Search",
-                processing: ""
-            },
-            order: [5, 'desc'],
-            stateSave: true,
-            //stateDuration: -1  // indicates session storage, not local storage
-        });
-
-        $("#bundledDatasetFilesTable").dataTable().columnFilter({
-            sPlaceHolder: "head:after",
-            aoColumns: [
-                null,
-                null,
                 { type: "text" },
-                { type: "text" },
-                { type: "date-range" },
-                { type: "date-range" },
-                { type: "text"}
+                { type: "select", values: values }
             ],
         });
 
@@ -658,73 +1023,109 @@ data.DatasetDetail = {
 
         $(".dataTables_filter").parent().css("right", "3px");
 
-
-        //var DataFilesTable = $('#datasetFilesTable').dataTable();
-
-        // DataTable
         var table = $('#datasetFilesTable').DataTable();
 
-        $('#datasetFilesTable tbody').on('click', 'tr', function () {
-            if ($(this).hasClass('active')) {
-                $(this).removeClass('active');
+        $('#datasetFilesTable tbody').on('click', 'td.details-control', function () {
+            var tr = $(this).closest('tr');
+            var row = table.row(tr);
 
-                var listOfFilesToBundle = JSON.parse(localStorage.getItem("listOfFilesToBundle"));
-
-                if (listOfFilesToBundle != null) {
-                    listOfFilesToBundle.splice(listOfFilesToBundle.indexOf(this.id), 1);
-                }
-
-                localStorage.setItem("listOfFilesToBundle", JSON.stringify(listOfFilesToBundle));
-
-                $('#bundleCountSelected').html(parseInt($('#bundleCountSelected').html(), 10) - 1);
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                row.child.hide();
+                tr.removeClass('shown');
             }
             else {
-                //table.$('tr.active').removeClass('active');
-                $(this).addClass('active');
+                // Open this row
+                row.child(data.DatasetDetail.formatDatasetFileDetails(row.data())).show();
+                tr.addClass('shown');
+            }
+        });
 
-                var listOfFilesToBundle = JSON.parse(localStorage.getItem("listOfFilesToBundle"));
+        $('#datasetFilesTable tbody').on('click', 'tr', function () {
 
-                if (listOfFilesToBundle != null) {
-                    listOfFilesToBundle[listOfFilesToBundle.length] = this.id;
+            if (!$(this).hasClass('unUsable') && ($(this).hasClass('even') || $(this).hasClass('odd'))) {
+                if ($(this).hasClass('active')) {
+                    $(this).removeClass('active');
+
+                    var listOfFilesToBundle = JSON.parse(localStorage.getItem("listOfFilesToBundle"));
+
+                    if (this.id) {
+
+                        if (listOfFilesToBundle != null) {
+                            listOfFilesToBundle.splice(listOfFilesToBundle.indexOf(this.id), 1);
+                        }
+
+                        localStorage.setItem("listOfFilesToBundle", JSON.stringify(listOfFilesToBundle));
+
+                        $('#bundleCountSelected').html(parseInt($('#bundleCountSelected').html(), 10) - 1);
+                    }
                 }
                 else {
-                    var listOfFilesToBundle = [];
-                    listOfFilesToBundle[0] = this.id;
+                    //table.$('tr.active').removeClass('active');
+                    $(this).addClass('active');
+
+                    var listOfFilesToBundle = JSON.parse(localStorage.getItem("listOfFilesToBundle"));
+                    if (this.id) {
+
+                        if (listOfFilesToBundle != null) {
+                            listOfFilesToBundle[listOfFilesToBundle.length] = this.id;
+                        }
+                        else {
+                            var listOfFilesToBundle = [];
+                            listOfFilesToBundle[0] = this.id;
+                        }
+
+                        localStorage.setItem("listOfFilesToBundle", JSON.stringify(listOfFilesToBundle));
+
+                        $('#bundleCountSelected').html(parseInt($('#bundleCountSelected').html(), 10) + 1);
+                    }
                 }
-
-                localStorage.setItem("listOfFilesToBundle", JSON.stringify(listOfFilesToBundle));
-
-                $('#bundleCountSelected').html(parseInt($('#bundleCountSelected').html(), 10) + 1);
+                if (parseInt($('#bundleCountSelected').html(), 10) === 0) {
+                    $('#bundle_selected').attr("disabled", true);
+                }
+                else {
+                    $('#bundle_selected').attr("disabled", false);
+                }
             }
+        
         });
 
         $('#datasetFilesTable').on('draw.dt', function () {
             $('#bundleCountFiltered').html(data.Dataset.DatasetFilesTable.page.info().recordsDisplay);
             $('#bundleCountSelected').html(0);
+
+
+            if (data.Dataset.DatasetFilesTable.page.info().recordsDisplay === 0)
+            {
+                $('#bundle_allFiltered').attr("disabled", true);
+            }
+            else {
+                $('#bundle_allFiltered').attr("disabled", false);
+            }
+
+            if (parseInt($('#bundleCountSelected').html(), 10) === 0)
+            {
+                $('#bundle_selected').attr("disabled", true);
+            }
+            else {
+                $('#bundle_selected').attr("disabled", false);
+            }
         });
-
-
-        // Apply the filter
-        //table.columns().every(function () {
-        //    var column = this;
-
-        //    $('input', this.footer()).on('keyup change', function () {
-        //        column
-        //            .search(this.value)
-        //            .draw();
-        //    });
-        //});
-
-        //$("#userTable_wrapper .dt-toolbar").html($("#userToolbar"));
-
-        //$("#exportToExcel").click(function () {
-        //    alert("exportToExcel Function");
-        //});
     },
     
     formatDatasetFileDetails: function (d) {
         // `d` is the original data object for the row
-        return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
+        var table = '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">';
+
+        if (d.Information !== null) {
+            table +=
+                '<tr>' +
+                    '<td><b>Information</b>: </td>' +
+                    '<td>' + d.Information + '</td>' +
+                '</tr>';
+        }
+
+        table +=
             '<tr>' +
                 '<td><b>File ID</b>: </td>' +
                 '<td>' + d.Id + '</td>' +
@@ -741,7 +1142,43 @@ data.DatasetDetail = {
                 '<td><b>ConfigFileDesc</b>: </td>' +
                 '<td>' + d.ConfigFileDesc + '</td>' +
             '</tr>' +
-        '</table>';
+            '</table>';
+
+        return table;
+    },
+
+    formatDatasetBundlingFileDetails: function (d) {
+        // `d` is the original data object for the row
+        var table = '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">';
+
+        if (d.Information !== null) {
+            table +=
+                '<tr>' +
+                    '<td><b>Information</b>: </td>' +
+                    '<td>' + d.Information + '</td>' +
+                '</tr>';
+        }
+
+        table +=
+            '<tr>' +
+                '<td><b>File ID</b>: </td>' +
+                '<td>' + d.Id + '</td>' +
+            '</tr>' +
+            '<tr>' +
+                '<td><b>S3 Location</b>:</td>' +
+                '<td>' + d.s3Key + '</td>' +
+            '</tr>' +
+            '<tr>' +
+                '<td><b>Version ID</b>: </td>' +
+                '<td>' + d.VersionId + '</td>' +
+            '</tr>' +
+            '<tr>' +
+                '<td><b>ConfigFileDesc</b>: </td>' +
+                '<td>' + d.ConfigFileDesc + '</td>' +
+            '</tr>' +
+            '</table>';
+
+        return table;
     },
 
     DatasetFileConfigsTableInit: function (Id) {
@@ -780,7 +1217,9 @@ data.DatasetDetail = {
                         { data: "IsRegexSearch", className: "isRegexSearch", render: function (data, type, row) { return (data == true) ? '<span class="glyphicon glyphicon-ok"> </span>' : '<span class="glyphicon glyphicon-remove"></span>';} },
                         { data: "OverwriteDatasetFile", type: "date", className: "overwriteDatsetFile", render: function (data, type, row) { return (data == true) ? '<span class="glyphicon glyphicon-ok"> </span>' : '<span class="glyphicon glyphicon-remove"></span>'; } },
                         { data: "VersionsToKeep", type: "date", className: "versionToKeep", },
-                        { data: "FileTypeId", type: "date", className: "fileTypeId", }
+                        { data: "FileTypeId", type: "date", className: "fileTypeId", },
+                        { data: "CreationFreq", className: "CreationFreq" },
+                        { data: "DatasetScopeTypeID", className: "DatasetScopeTypeID"}
             ],
             order: [1, 'asc']
             //stateSave: true,
@@ -856,7 +1295,30 @@ data.DatasetDetail = {
 
     formatDatasetFileVersionDetails: function (d) {
         // `d` is the original data object for the row
-        return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
+        var table = '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">';
+
+        if (d.Information !== null) {
+            table +=
+                '<tr>' +
+                '<td><b>Information</b>: </td>' +
+                '<td>' + d.Information + '</td>' +
+                '</tr>';
+        }
+
+        if (d.IsUsable !== undefined)
+        {
+            table +=
+                '<tr>' +
+                    '<td><b>Usable</b>: </td>' +
+                    '<td>' + d.IsUsable + '</td>' +
+                '</tr>';
+        }
+
+        table +=
+            '<tr>' +
+                '<td><b>File ID</b>: </td>' +
+                '<td>' + d.Id + '</td>' +
+            '</tr>' +
             '<tr>' +
                 '<td><b>S3 Location</b>:</td>' +
                 '<td>' + d.s3Key + '</td>' +
@@ -869,6 +1331,8 @@ data.DatasetDetail = {
                 '<td><b>ConfigFileDesc</b>: </td>' +
                 '<td>' + d.ConfigFileDesc + '</td>' +
             '</tr>' +
-        '</table>';
+            '</table>';
+
+        return table;
     },
 }

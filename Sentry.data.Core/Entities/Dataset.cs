@@ -62,14 +62,14 @@ namespace Sentry.data.Core
                        DateTime datasetDtm,
                        DateTime changedDtm,
                        //string creationFreqCode,
-                       string creationFreqDesc,
+                       //string creationFreqDesc,
                        string s3key,
                        Boolean IsSensitive,
                        Boolean CanDisplay,
                        IList<DatasetMetadata> rawMetadata,
                        Category cat,
                        IList<DatasetFile> datasetFile,
-                       DatasetScopeType datasetscopetype,
+                       //DatasetScopeType datasetscopetype,
                        int datafilesToKeep,
                        IList<DatasetFileConfig> datasetFileConfigs,
                        string dropLocation)
@@ -89,14 +89,14 @@ namespace Sentry.data.Core
             this._datasetDtm = datasetDtm;
             this._changedDtm = changedDtm;
             //this._creationFreqCode = creationFreqCode;
-            this._creationFreqDesc = creationFreqDesc;
+            //this._creationFreqDesc = creationFreqDesc;
             this._s3key = s3key;
             this._IsSensitive = IsSensitive;
             this._canDisplay = CanDisplay;
             this._rawMetadata = rawMetadata;
             this._datasetCategory = cat;
             this._datasetFile = datasetFile;
-            this._datasetScopeType = datasetscopetype;
+            //this._datasetScopeType = datasetscopetype;
             this._datafilesToKeep = datafilesToKeep;
             this._datasetFileConfigs = datasetFileConfigs;
             this._dropLocation = dropLocation;
@@ -269,15 +269,11 @@ namespace Sentry.data.Core
             }
         }
 
-        public virtual string CreationFreqDesc
+        public virtual List<string> CreationFreqDesc
         {
             get
             {
-                return _creationFreqDesc;
-            }
-            set
-            {
-                _creationFreqDesc = value;
+                return DatasetFileConfigs.Select(x => x.CreationFreqDesc).Distinct().ToList();
             }
         }
 
@@ -345,15 +341,11 @@ namespace Sentry.data.Core
                 _datasetFile = value;
             }
         }
-        public virtual DatasetScopeType DatasetScopeType
+        public virtual List<DatasetScopeType> DatasetScopeType
         {
             get
             {
-                return _datasetScopeType;
-            }
-            set
-            {
-                _datasetScopeType = value;
+                return DatasetFileConfigs.Select(x => x.DatasetScopeType).GroupBy(x => x.Name).Select(x => x.First()).ToList();
             }
         }
         public virtual int DatafilesToKeep

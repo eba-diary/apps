@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using LazyCache;
 using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Web.Controllers;
@@ -10,13 +11,18 @@ namespace Sentry.data.Web.Helpers
 {
     public class Search
     {
+        public Search()
+        {
+        }
 
         public ListDatasetModel List(DatasetController dsc, ListDatasetModel ldm = null, string searchPhrase = null, string category = null, string ids = null)
-        {
+        { 
             var list = dsc.GetDatasetModelList();
             var filteredList = list;
 
             List<string> searchWords = new List<string>();
+
+            List<string> ownerList = dsc._datasetContext.GetSentryOwnerList().ToList();
 
             if (searchPhrase != null)
             {
@@ -34,8 +40,7 @@ namespace Sentry.data.Web.Helpers
                         ((x.Category.ToLower() + " " +
                           x.DatasetDesc.ToLower() + " " +
                           x.DatasetName.ToLower() + " " +
-                          x.SentryOwnerName.ToLower() + " " +
-                          x.CreationFreqDesc.ToLower() + " ") +
+                          x.SentryOwnerName.ToLower() + " ") +
                           ((x.Columns != null && x.Columns.Count > 0) ?
                               x.Columns.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " ") +
                           ((x.Metadata != null && x.Metadata.Count > 0) ?
@@ -53,7 +58,7 @@ namespace Sentry.data.Web.Helpers
                 {
                     string[] idsArray = ids.Split(',').ToArray();
 
-                    ldm.SearchFilters = GetDatasetFilters(dsc, ldm, category, idsArray);
+                    ldm.SearchFilters = GetDatasetFilters(dsc, ldm, ownerList, category, idsArray);
                 }
             }
 
@@ -89,7 +94,9 @@ namespace Sentry.data.Web.Helpers
                 filteredList =
                 (
                     from item in filteredList
-                    join f in freq on item.CreationFreqDesc equals f.value
+                    from a in item.CreationFreqDesc
+                    join f in freq 
+                        on a equals f.value
                     select item
                 ).ToList();
             }
@@ -106,7 +113,8 @@ namespace Sentry.data.Web.Helpers
                 ).ToList();
             }
 
-            var ext = ldm.SearchFilters.Where(f => f.FilterType == "Extension").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).ToList();
+            var ext = ldm.SearchFilters.Where(f => f.FilterType == "Extension")
+                .SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).ToList();
             if (ext.Any())
             {
                 filteredList =
@@ -120,49 +128,35 @@ namespace Sentry.data.Web.Helpers
 
 
             ldm.DatasetList = filteredList.GroupBy(x => x.DatasetId).Select(x => x.First()).ToList();
-            ldm.SearchFilters = GetDatasetFilters(dsc, ldm, category);
+            ldm.SearchFilters = GetDatasetFilters(dsc, ldm, ownerList, category);
 
             return ldm;
         }
 
-        private List<BaseDatasetModel> Filter(string searchPhrase, List<BaseDatasetModel> dsList)
-        {
-            IList<string> searchWords = searchPhrase.Trim().ToLower().Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
-
-            List<BaseDatasetModel> rspList =
-
-                dsList.Where(x =>
-                    ((x.Category.ToLower() + " " +
-                      x.DatasetDesc.ToLower() + " " +
-                      x.DatasetName.ToLower() + " " +
-                      x.SentryOwnerName.ToLower() + " " +
-                      x.CreationFreqDesc.ToLower() + " ") +
-                      ((x.Columns != null && x.Columns.Count > 0) ?
-                          x.Columns.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " ") +
-                      ((x.Metadata != null && x.Metadata.Count > 0) ?
-                          x.Metadata.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " "))
-                    .Split(new Char[] { ' ', '_' }, StringSplitOptions.RemoveEmptyEntries)
-                    .Any(xi => searchWords.Where(s => xi.Contains(s)).Count() > 0)
-                ).ToList();
-
-
-            return rspList;
-        }
-
-        private IList<FilterModel> GetDatasetFilters(DatasetController dsc, ListDatasetModel ldm, string cat = null, string[] ids = null)
+        private IList<FilterModel> GetDatasetFilters(DatasetController dsc, ListDatasetModel ldm, List<string> ownerList, string cat = null, string[] ids = null)
         {
             IList<FilterModel> FilterList = new List<FilterModel>();
 
+            FilterList.Add(CategoryFilter(dsc, ldm, ids, 0, cat));
+            FilterList.Add(OwnerFilter(dsc, ldm, ids, 1, ownerList));
+            FilterList.Add(FrequencyFilter(ldm, ids, 2));
+            FilterList.Add(ExtensionFilter(dsc, ldm, ids, 3));
+
+            return FilterList;
+        }
+
+
+        private FilterModel CategoryFilter(DatasetController dsc, ListDatasetModel ldm, string[] ids, int filterID, string cat = null)
+        {
             //Generate Category Filers
             FilterModel Filter = new FilterModel();
             Filter.FilterType = "Category";
 
-            IDictionary<int, string> datasetFrequencyList = EnumToDictionary(typeof(DatasetFrequency));
             IList<FilterNameModel> fList = new List<FilterNameModel>();
 
             int filterIndex = 0;
 
-            foreach(string category in dsc._datasetContext.Categories.Select(x => x.Name).ToList())
+            foreach (string category in dsc._datasetContext.Categories.Select(x => x.Name).ToList())
             {
                 FilterNameModel nf = new FilterNameModel();
                 nf.id = filterIndex;
@@ -174,7 +168,7 @@ namespace Sentry.data.Web.Helpers
                 {
                     foreach (string id in ids)
                     {
-                        if (id.StartsWith("0") && id.EndsWith(nf.id.ToString()))
+                        if (id.StartsWith(filterID.ToString()) && id.Substring(id.IndexOf("_") + 1) == (nf.id.ToString()))
                         {
                             hasCategoryID = true;
                         }
@@ -196,7 +190,7 @@ namespace Sentry.data.Web.Helpers
                 {
                     nf.isChecked = false;
                 }
-                
+
 
                 //Count of all datasets equal to this filter
                 nf.count = ldm.DatasetList.Count(f => f.Category == nf.value);
@@ -207,15 +201,22 @@ namespace Sentry.data.Web.Helpers
             }
 
             Filter.FilterNameList = fList.ToList();
-            FilterList.Add(Filter);
 
+            return Filter;
+        }
+
+
+        private FilterModel OwnerFilter(DatasetController dsc, ListDatasetModel ldm, string[] ids, int filterID, List<string> ownerList)
+        {
             //Generate SentryOwner Filers
-            Filter = new FilterModel();
+            FilterModel Filter = new FilterModel();
             Filter.FilterType = "Sentry Owner";
 
-            fList = new List<FilterNameModel>();
+            List<FilterNameModel> fList = new List<FilterNameModel>();
 
-            foreach (string owner in dsc._datasetContext.GetSentryOwnerList().ToList())
+            int filterIndex = 0;
+
+            foreach (string owner in ownerList)
             {
                 FilterNameModel nf = new FilterNameModel();
                 nf.id = filterIndex;
@@ -227,7 +228,10 @@ namespace Sentry.data.Web.Helpers
                 {
                     foreach (string id in ids)
                     {
-                        if (id.StartsWith("1") && id.EndsWith(nf.id.ToString()))
+                        var a = id.Substring(id.IndexOf("_")+1);
+                        var b = nf.id.ToString();
+
+                        if (id.StartsWith(filterID.ToString()) && id.Substring(id.IndexOf("_")+1) == (nf.id.ToString()))
                         {
                             hasCategoryID = true;
                         }
@@ -260,27 +264,31 @@ namespace Sentry.data.Web.Helpers
                 nf.count = ldm.DatasetList.Where(f => f.SentryOwner.FullName == nf.value).Count();
 
                 // Only add filter if there are datasets associated based on filtering 
-                //if (nf.count > 0)
-                //{
                 fList.Add(nf);
-                //}
 
                 filterIndex++;
             }
             Filter.FilterNameList = fList.ToList();
-            FilterList.Add(Filter);
 
+            return Filter;
+        }
+
+        private FilterModel FrequencyFilter(ListDatasetModel ldm, string[] ids, int filterID)
+        {
+            IDictionary<int, string> datasetFrequencyList = EnumToDictionary(typeof(DatasetFrequency));
 
             //Generate Frequency Filters
-            Filter = new FilterModel();
+            FilterModel Filter = new FilterModel();
             Filter.FilterType = "Frequency";
 
-            fList = new List<FilterNameModel>();
+            int filterIndex = 0;
+
+            List<FilterNameModel> fList = new List<FilterNameModel>();
 
             foreach (var item in datasetFrequencyList)
             {
                 FilterNameModel nf = new FilterNameModel();
-                nf.id = item.Key;
+                nf.id = filterIndex;
                 nf.value = item.Value;
 
                 Boolean hasCategoryID = false;
@@ -289,7 +297,7 @@ namespace Sentry.data.Web.Helpers
                 {
                     foreach (string id in ids)
                     {
-                        if (id.StartsWith("2") && id.EndsWith(nf.id.ToString()))
+                        if (id.StartsWith(filterID.ToString()) && id.Substring(id.IndexOf("_") + 1) == (nf.id.ToString()))
                         {
                             hasCategoryID = true;
                         }
@@ -318,41 +326,53 @@ namespace Sentry.data.Web.Helpers
                 }
 
                 //Count of all datasets equal to this filter
-                nf.count = ldm.DatasetList.Where(f => f.CreationFreqDesc == nf.value).Count();
+
+
+                nf.count = (from a in ldm.DatasetList
+                            from b in a.CreationFreqDesc
+                            where b == nf.value
+                            select a).Count();
+
+                //nf.count = ldm.DatasetList.Where(f => f.CreationFreqDesc == nf.value).Count();
 
                 // Only add filter if there are datasets associated based on filtering 
                 //if (nf.count > 0)
                 //{
                 fList.Add(nf);
                 //}
+                filterIndex++;
             }
             Filter.FilterNameList = fList.ToList();
-            FilterList.Add(Filter);
 
+            return Filter;
+        }
+
+        private FilterModel ExtensionFilter(DatasetController dsc, ListDatasetModel ldm, string[] ids, int filterID)
+        {
             //Generate Frequency Filters
-            Filter = new FilterModel();
+            FilterModel Filter = new FilterModel();
             Filter.FilterType = "Extension";
 
-            fList = new List<FilterNameModel>();
+            List<FilterNameModel> fList = new List<FilterNameModel>();
 
             // Utilities.GetFileExtension(item.FileName)
             List<string> fileExtensionList = new List<string>();
 
             foreach (var a in dsc._datasetContext.Datasets)
             {
-                foreach(var b in a.DatasetFiles)
+                foreach (var b in a.DatasetFiles)
                 {
                     fileExtensionList.Add(Utilities.GetFileExtension(b.FileName));
                 }
             }
             fileExtensionList = fileExtensionList.Distinct().ToList();
 
-            int i = 0;
+            int filterIndex = 0;
 
             foreach (var item in fileExtensionList)
             {
                 FilterNameModel nf = new FilterNameModel();
-                nf.id = i;
+                nf.id = filterIndex;
                 nf.value = item;
 
                 Boolean hasCategoryID = false;
@@ -361,17 +381,12 @@ namespace Sentry.data.Web.Helpers
                 {
                     foreach (string id in ids)
                     {
-                        if (id.StartsWith("3") && id.EndsWith(nf.id.ToString()))
+                        if (id.StartsWith(filterID.ToString()) && id.Substring(id.IndexOf("_") + 1) == (nf.id.ToString()))
                         {
                             hasCategoryID = true;
                         }
                     }
                 }
-
-
-
-
-
                 if (
                     (
                         ldm.SearchFilters.Any()
@@ -397,13 +412,10 @@ namespace Sentry.data.Web.Helpers
                 nf.count = ldm.DatasetList.Where(f => f.DistinctFileExtensions().Contains(nf.value)).Count();
 
                 fList.Add(nf);
-                i++;
+                filterIndex++;
             }
             Filter.FilterNameList = fList.ToList();
-            FilterList.Add(Filter);
-
-
-            return FilterList;
+            return Filter;
         }
 
         private IDictionary<int, string> EnumToDictionary(Type e)

@@ -16,7 +16,7 @@ namespace Sentry.data.Web
             this.Category = "";
             //this.CategoryList = new List<string>();
             this.ChangedDtm = DateTime.MinValue;
-            this.CreationFreqDesc = DatasetFrequency.NonSchedule.ToString();  // Default to NonScheduled
+            //this.CreationFreqDesc = DatasetFrequency.NonSchedule.ToString();  // Default to NonScheduled
             this.DatasetDesc = "";
             //this.DatasetDtm = DateTime.MinValue;
             this.DatasetName = "";
@@ -25,7 +25,6 @@ namespace Sentry.data.Web
             this.OriginationCode = "";
             this.S3Key = "";
             this.SentryOwnerName = "";
-            this.UploadDtm = DateTime.MinValue;
             this.UploadUserName = "";
             this.IsSensitive = false;
             this.CanDisplay = true;

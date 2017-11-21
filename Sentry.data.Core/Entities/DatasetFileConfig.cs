@@ -26,6 +26,10 @@ namespace Sentry.data.Core
         private Boolean _isGeneric;
         private Dataset _parentDataset;
 
+        private string _creationFreqDesc;
+        private DatasetScopeType _datasetScopeType;
+        private int _datasetScopeTypeID;
+
         public DatasetFileConfig() { }
 
         public DatasetFileConfig(
@@ -42,7 +46,9 @@ namespace Sentry.data.Core
             int versionsToKeep,
             int fileTypeId,
             Boolean isGeneric,
-            Dataset parentDataset)
+            Dataset parentDataset,
+            string creationFreqDesc,
+            int datasetScopeTypeID)
         {
             this._configId = configId;
             this._name = name;
@@ -58,6 +64,8 @@ namespace Sentry.data.Core
             this._fileTypeId = fileTypeId;
             this._isGeneric = isGeneric;
             this._parentDataset = parentDataset;
+            this._datasetScopeTypeID = datasetScopeTypeID;
+            this._creationFreqDesc = creationFreqDesc;
         }
         
         public virtual int ConfigId
@@ -224,6 +232,37 @@ namespace Sentry.data.Core
             set
             {
                 _parentDataset = value;
+            }
+        }
+        public virtual string CreationFreqDesc
+        {
+            get
+            {
+                return _creationFreqDesc;
+            }
+            set
+            {
+                _creationFreqDesc = value;
+            }
+        }
+
+        public virtual DatasetScopeType DatasetScopeType
+        {
+            get
+            {
+                return _datasetScopeType;
+            }
+            set
+            {
+                _datasetScopeType = value;
+            }
+        }
+
+        public virtual int DatasetScopeTypeID
+        {
+            get
+            {
+                return _datasetScopeType.ScopeTypeId;
             }
         }
     }

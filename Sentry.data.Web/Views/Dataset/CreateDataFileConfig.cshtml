@@ -1,0 +1,166 @@
+﻿@model DatasetFileConfigsModel
+@{
+    ViewBag.Title = "Create Data File Config";
+}
+
+<h2>Create Data File Config</h2>
+
+
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Dataset File Configuration</h4>
+        <hr />
+        @*Show the custom validation summary
+    @Html.DisplayFor((model) => ViewData.ModelState)
+
+        @Html.HiddenFor(model => model.ConfigFileName)
+        @Html.HiddenFor(model => model.SearchCriteria)
+        @Html.HiddenFor(model => model.TargetFileName)
+        @Html.HiddenFor(model => model.IsRegexSearch)
+        @Html.HiddenFor(model => model.OverwriteDatasetFile)
+        @Html.HiddenFor(model => model.VersionsToKeep)
+        @Html.HiddenFor(model => model.DropPath)
+        @Html.HiddenFor(model => model.DropLocationType)
+        @Html.HiddenFor(model => model.CreationFreq)
+        @Html.HiddenFor(model => model.DatasetScopeTypeID)*@
+
+        @Html.HiddenFor(model => model.ConfigId)
+        @Html.HiddenFor(model => model.DatasetFileConfigID)
+        @Html.HiddenFor(model => model.EditHref)
+        @Html.HiddenFor(model => model.ParentDatasetName)
+        @Html.HiddenFor(model => model.DatasetId)
+        @Html.HiddenFor(model => model.CreationFreq)
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ParentDatasetName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.ParentDatasetName, new { @readonly = "readonly", @disabled = "disabled", @class = "edit-dataset-row" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ConfigFileName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.ConfigFileName, new { @placeholder = "Name : ", @value = "", @class = "edit-dataset-row" })
+                @Html.ValidationMessageFor(model => model.ConfigFileName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ConfigFileDesc, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.ConfigFileDesc, new { @placeholder = "Name : ", @value = "", @class = "edit-dataset-row" })
+                @Html.ValidationMessageFor(model => model.ConfigFileDesc, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.SearchCriteria, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.SearchCriteria, new { @class = "edit-dataset-row" })
+                @Html.ValidationMessageFor(model => model.SearchCriteria, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.TargetFileName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.TargetFileName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                @Html.ValidationMessageFor(model => model.TargetFileName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.IsRegexSearch, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.CheckBoxFor(model => model.IsRegexSearch, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                @Html.ValidationMessageFor(model => model.IsRegexSearch, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.OverwriteDatasetFile, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.CheckBoxFor(model => model.OverwriteDatasetFile, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                @Html.ValidationMessageFor(model => model.OverwriteDatasetFile, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.VersionsToKeep, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.VersionsToKeep, new { @type = "number", htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                @Html.ValidationMessageFor(model => model.VersionsToKeep, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DropLocationType, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.DropLocationType, new { @class = "edit-dataset-row" })
+                @Html.ValidationMessageFor(model => model.DropLocationType, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.DropPath, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.DropPath, new { htmlAttributes = new {  @readonly = "readonly", @class = "form-control edit-dataset-row" } })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CreationFreq, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.CreationFreq, Model.AllFrequencies, new { @class = "form-control edit-dataset-row" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor((model) => model.DatasetScopeTypeID, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.DatasetScopeTypeID, Model.AllDatasetScopeTypes, new { @class = "form-control edit-dataset-row" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to Dataset", "Detail", new { id = Model.DatasetId })
+</div>
+
+@section Scripts {
+    @*@Scripts.Render("~/bundles/jqueryval")*@
+    <script>
+        $(function () {
+            //data.Dataset.EditInit();
+            var dropPathName = $("#DropPath").val() + "\\" ;
+
+            $("#ConfigFileName").keyup(function () {
+                var newName = dropPathName + $("#ConfigFileName").val();
+                $("#DropPath").val(newName);
+
+            });
+        });
+    </script>
+}
+
+
+
+
+
+
+
+
+
+

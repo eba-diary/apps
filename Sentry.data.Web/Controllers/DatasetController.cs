@@ -42,6 +42,7 @@ namespace Sentry.data.Web.Controllers
         {
             get
             {
+                throw new NotImplementedException();
                 if (null == _s3client)
                 {
                     // instantiate a new shared client
@@ -70,21 +71,18 @@ namespace Sentry.data.Web.Controllers
             {
                 if (_dsModelList == null)
                 {
-                    //return DemoDatasetData;
-                    // return _datasetContext.Datasets.Select((c) => new SelectListItem { Text = c.FullName, Value = c.Id.ToString() });
-
                     List<BaseDatasetModel> dsmList = new List<BaseDatasetModel>();
                     IEnumerable<Dataset> dsList = _datasetContext.Datasets.AsEnumerable();
-                    //List<String> catList = dsList.Select(s => s.Category).Distinct().ToList();
+
                     foreach (Dataset ds in dsList)
                     {
                         BaseDatasetModel dsModel = new BaseDatasetModel(ds, _associateInfoProvider);
-                        dsmList.Add(dsModel);
                         dsModel.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
                         dsModel.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
                         dsModel.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
                         dsModel.CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
                         dsModel.CanUpload = SharedContext.CurrentUser.CanUpload;
+                        dsmList.Add(dsModel);
                     }
                     _dsModelList = dsmList;
                 }
@@ -210,7 +208,7 @@ namespace Sentry.data.Web.Controllers
 
         public BaseDatasetModel GetDatasetModel(int id)
         {
-            BaseDatasetModel ds = dsModelList.Where(m => m.DatasetId == id).FirstOrDefault();
+            BaseDatasetModel ds = dsModelList.FirstOrDefault(m => m.DatasetId == id);
             return ds;
         }
 
@@ -230,11 +228,6 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.DwnldNonSensitive)]
         public JsonResult GetDatasetFileDownloadURL(int id)
         {
-            //Dataset ds = _datasetContext.GetById(id);
-            //JsonResult jr = new JsonResult();
-            //jr.Data = _s3Service.GetDatasetDownloadURL(ds.S3Key);
-            //jr.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
-
             DatasetFile df = _datasetContext.GetDatasetFile(id);
             JsonResult jr = new JsonResult();
             jr.Data = _s3Service.GetDatasetDownloadURL(df.FileLocation, df.VersionId);
@@ -267,162 +260,12 @@ namespace Sentry.data.Web.Controllers
             ViewData["CanEditDataset"] = SharedContext.CurrentUser.CanEditDataset;
             ViewData["CanUpload"] = SharedContext.CurrentUser.CanUpload;
 
-            //if (SharedContext.CurrentUser.GetType() == typeof(ImpersonatedApplicationUser))
-            //{
-            //    ViewData["CanViewOnly"] = SharedContext.CurrentRealUser.CanViewOnly;
-            //    ViewData["CanEditDataset"] = SharedContext.CurrentRealUser.CanEditDataset;
-            //    ViewData["CanUpload"] = SharedContext.CurrentRealUser.CanUpload;
-            //}
-
             foreach (Category c in categories) //parallel?
             {
                 ViewData[c.Name + "Count"] = _datasetContext.GetCategoryDatasetCount(c);
             }
 
             return PartialView("_HomeDataset", categories.OrderBy(o => o.Name).ToList());
-        }
-
-        private IList<FilterModel> GetDatasetFilters(ListDatasetModel ldm, string cat)
-        {
-            ////get current list of datasets
-            //List<BaseDatasetModel> baseDsList = GetDatasetModelList().ToList();
-
-            //create FilterModel list object to return
-            IList<FilterModel> FilterList = new List<FilterModel>();
-            IList<FilterNameModel> FilterNames = new List<FilterNameModel>();
-
-            //Generate Category Filers
-            FilterModel Filter = new FilterModel();
-            Filter.FilterType = "Category";
-
-            IDictionary<int, string> enumList = EnumToDictionary(typeof(DatasetFrequency));
-            IList<FilterNameModel> fList = new List<FilterNameModel>();
-
-            int i = 0;
-
-            foreach (string category in _datasetContext.Categories.Select(x => x.Name).ToList())
-            {
-                FilterNameModel nf = new FilterNameModel();
-                nf.id = i;
-                nf.value = category;
-
-                //Match isChecked status to status on input model
-                if (ldm.SearchFilters.Count() > 0)
-                {
-                    if (ldm.SearchFilters.Where(f => f.FilterType == "Category").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).Count() > 0)
-                    {
-                        if (ldm.SearchFilters.Where(f => f.FilterType == "Category").SelectMany(fi => fi.FilterNameList).Where(fil => fil.value == category && fil.isChecked == true).Count() > 0)
-                        {
-                            nf.isChecked = true;
-                        }
-                    }
-                }
-                else
-                {
-                    if (category == cat)
-                    {
-                        nf.isChecked = true;
-                    }
-                }
-
-                //Count of all datasets equal to this filter
-                nf.count = ldm.DatasetList.Where(f => f.Category == nf.value).Count();
-
-                // Only add filter if there are datasets associated based on filtering 
-                //if (nf.count > 0)
-                //{
-                    fList.Add(nf);
-                //}                
-                i++;
-            }
-            Filter.FilterNameList = fList.OrderByDescending(x => x.count).ToList();
-            FilterList.Add(Filter);
-
-
-            //Generate SentryOwner Filers
-            Filter = new FilterModel();
-            Filter.FilterType = "Sentry Owner";
-
-            fList = new List<FilterNameModel>();
-
-            i = 0;
-
-            foreach (string owner in _datasetContext.GetSentryOwnerList().ToList())
-            {
-                FilterNameModel nf = new FilterNameModel();
-                nf.id = i;
-                nf.value = _associateInfoProvider.GetAssociateInfo(owner).FullName;
-
-                //Match isChecked status to status on input model
-                if (ldm.SearchFilters.Count() > 0)
-                {
-                    if (ldm.SearchFilters.Where(f => f.FilterType == "Sentry Owner").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).Count() > 0)
-                    {
-                        if (ldm.SearchFilters.Where(f => f.FilterType == "Sentry Owner").SelectMany(fi => fi.FilterNameList).Where(fil => fil.value == owner && fil.isChecked == true).Count() > 0)
-                        {
-                            nf.isChecked = true;
-                        }
-                    }
-                }
-
-                //Count of all datasets equal to this filter
-                nf.count = ldm.DatasetList.Where(f => f.SentryOwner.FullName == nf.value).Count();
-
-                // Only add filter if there are datasets associated based on filtering 
-                //if (nf.count > 0)
-                //{
-                    fList.Add(nf);
-                //}
-                
-                i++;
-            }
-            Filter.FilterNameList = fList.OrderByDescending(x => x.count).ThenBy(x => x.value).ToList();
-            FilterList.Add(Filter);
-
-
-            //Generate Frequency Filters
-            Filter = new FilterModel();
-            Filter.FilterType = "Frequency";
-
-            fList = new List<FilterNameModel>();
-
-            foreach (var item in enumList)
-            {
-                FilterNameModel nf = new FilterNameModel();
-                nf.id = item.Key;
-                nf.value = item.Value;
-
-                //Match isChecked status to status on input model
-                if (ldm.SearchFilters.Count() > 0)
-                {
-                    if (ldm.SearchFilters.Where(f => f.FilterType == "Frequency").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).Count() > 0)
-                    {
-                        if (ldm.SearchFilters.Where(f => f.FilterType == "Frequency").SelectMany(fi => fi.FilterNameList).Where(fil => fil.value == item.Value && fil.isChecked == true).Count() > 0)
-                        {
-                            nf.isChecked = true;
-                        }
-                    }
-                }
-
-                //Count of all datasets equal to this filter
-                nf.count = ldm.DatasetList.Where(f => f.CreationFreqDesc == nf.value).Count();
-
-                // Only add filter if there are datasets associated based on filtering 
-                //if (nf.count > 0)
-                //{
-                    fList.Add(nf);
-                //}
-            }
-            Filter.FilterNameList = fList.OrderByDescending(x => x.count).ToList();
-            FilterList.Add(Filter);
-
-            return FilterList;
-        }
-
-        private IDictionary<int, string> EnumToDictionary<T>()
-        {
-
-            return EnumToDictionary(GetType());
         }
 
         private IDictionary<int, string> EnumToDictionary(Type e)
@@ -451,7 +294,6 @@ namespace Sentry.data.Web.Controllers
         }
 
 
-
         // GET: Dataset/List/searchParms
         [Route("Dataset/List/Index")]
         [Route("Dataset/List/SearchPhrase")]
@@ -461,67 +303,6 @@ namespace Sentry.data.Web.Controllers
             Helpers.Search searchHelper = new Helpers.Search();
 
             return View(searchHelper.List(this, null, searchPhrase, category, ids));
-        }
-
-        private List<BaseDatasetModel> FilterDatasetBySearchPhrase(string searchPhrase, List<BaseDatasetModel> dsList)
-        {
-
-            IList<string> searchWords = searchPhrase.Trim().ToLower().Split(" ".ToCharArray(), StringSplitOptions.RemoveEmptyEntries).ToList();
-
-            List<BaseDatasetModel> rspList =
-                dsList.Where(x =>
-                    ((x.Category.ToLower() + " " +
-                      x.DatasetDesc.ToLower() + " " +
-                      x.DatasetName.ToLower() + " " +
-                      x.SentryOwnerName.ToLower() + " " +
-                      x.CreationFreqDesc.ToLower() + " ") +
-                      ((x.Columns != null && x.Columns.Count > 0) ?
-                          x.Columns.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " ") +
-                      ((x.Metadata != null && x.Metadata.Count > 0) ?
-                          x.Metadata.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " "))
-                    .Split(new Char[] { ' ', '_' }, StringSplitOptions.RemoveEmptyEntries)
-                    .Any(xi => searchWords.Where(s => xi.Contains(s)).Count() > 0)
-                ).ToList();
-
-            // DEBUGGING: use "dsList" to look at every dataset
-            // foreach (BaseDatasetModel ds in dsList)
-            foreach (BaseDatasetModel ds in rspList)
-            {
-                // DEBUGGING: uncomment this to look at the list of match terms generated for this dataset... 
-                //List<string> dsHitList = (
-                //    ds.Category.ToLower() + " " +
-                //    ds.DatasetDesc.ToLower() + " " +
-                //    ds.DatasetName.ToLower() + " " +
-                //    ds.SentryOwnerName.ToLower() + " " +
-                //    ((ds.Columns != null && ds.Columns.Count > 0) ?
-                //        ds.Columns.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " ") +
-                //    ((ds.Metadata != null && ds.Metadata.Count > 0) ?
-                //        ds.Metadata.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " "))
-                //    .Split(new Char[] { ' ', '_' }, StringSplitOptions.RemoveEmptyEntries)
-                //    .ToList();
-
-                ds.SearchHitList = (
-                    ds.Category.ToLower() + " " +
-                    ds.DatasetDesc.ToLower() + " " +
-                    ds.DatasetName.ToLower() + " " +
-                    ds.SentryOwnerName.ToLower() + " " +
-                    ds.CreationFreqDesc.ToLower() + " " +
-                    ds.Columns != null && ds.Columns.Count > 0 ?
-                        ds.Columns.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " " +
-                    ds.Metadata != null && ds.Metadata.Count > 0 ?
-                        ds.Metadata.Select((m) => m.Name + " " + m.Value).Aggregate((c, n) => c + " " + n) + " " : " ")
-                    .Split(new Char[] { ' ', '_' }, StringSplitOptions.RemoveEmptyEntries)
-                    .Where(x => x.Any(xi => searchWords.Where(s => x.Contains(s)).Count() > 0))
-                    .ToList();
-            }
-
-            return rspList;
-        }
-
-        private IList<string> GetSentryOwnerList()
-        {
-            IList<string> var = _datasetContext.GetSentryOwnerList().ToList();
-            return var;
         }
 
         // GET: Dataset/Detail/5
@@ -553,6 +334,118 @@ namespace Sentry.data.Web.Controllers
             udm.FreqencyID = 6; // preselected NonSchedule            
             return View(udm);
         }
+
+        [HttpGet]
+        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
+        public ActionResult CreateDataFileConfig(int id)
+        {
+            Dataset parent = _datasetContext.GetById<Dataset>(id);
+
+            DatasetFileConfigsModel dfcm = new DatasetFileConfigsModel();
+            dfcm.DatasetId = id;
+            dfcm.ParentDatasetName = parent.DatasetName;
+            
+
+            dfcm.AllFrequencies = GetDatasetFrequencyListItems();  //load all values for dropdown
+            //dfcm.AllOriginationCodes = GetDatasetOriginationListItems(); //load all values for dropdown
+            dfcm.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
+
+            dfcm.DropPath = parent.DropLocation;
+            dfcm.DropLocationType = "DFS";
+
+            dfcm.SearchCriteria = "\\.";
+            dfcm.CreationFreq = DatasetFrequency.NonSchedule.ToString();
+
+            return View(dfcm);
+        }
+
+        [HttpPost]
+        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
+        public ActionResult CreateDataFileConfig(DatasetFileConfigsModel dfcm)
+        {
+
+            Dataset parent = _datasetContext.GetById<Dataset>(dfcm.DatasetId);
+
+            if(parent.DatasetFileConfigs.Any(x => x.Name == dfcm.ConfigFileName))
+            {
+                AddCoreValidationExceptionsToModel(new ValidationException("Dataset config with that name already exists within dataset"));
+            }
+
+
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    List<DatasetFileConfig> dfcList = parent.DatasetFileConfigs.ToList();
+
+                    //Create Generic Data File Config for Dataset                    
+                    DatasetFileConfig dfc = new DatasetFileConfig(
+                        0,
+                        dfcm.ConfigFileName,
+                        dfcm.ConfigFileDesc,
+                        1,
+                        dfcm.SearchCriteria,
+                        dfcm.DropLocationType,
+                        dfcm.DropPath,
+                        dfcm.IsRegexSearch,
+                        dfcm.OverwriteDatasetFile,
+                        dfcm.VersionsToKeep,
+                        dfcm.FileTypeId,
+                        true,
+                        parent,
+                        dfcm.CreationFreq.ToString(),
+                        dfcm.DatasetScopeTypeID
+                        );
+
+                    dfc.DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dfcm.DatasetScopeTypeID);
+
+                    dfcList.Add(dfc);
+                    parent.DatasetFileConfigs = dfcList;
+
+                    _datasetContext.Merge<Dataset>(parent);
+                   // _datasetContext.Merge(dfc);
+                    _datasetContext.SaveChanges();
+
+                    try
+                    {
+                        if (!System.IO.Directory.Exists(dfcm.DropPath))
+                        {
+                            System.IO.Directory.CreateDirectory(dfcm.DropPath);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+
+                        StringBuilder errmsg = new StringBuilder();
+                        errmsg.AppendLine("Failed to Create Drop Location:");
+                        errmsg.AppendLine($"DatasetId: {parent.DatasetId}");
+                        errmsg.AppendLine($"DatasetName: {parent.DatasetName}");
+                        errmsg.AppendLine($"DropLocation: {parent.DropLocation}");
+
+                        Sentry.Common.Logging.Logger.Error(errmsg.ToString(), e);
+                    }
+
+                    return RedirectToAction("Detail", new { id = parent.DatasetId });
+                }
+            }
+            catch (Sentry.Core.ValidationException ex)
+            {
+                AddCoreValidationExceptionsToModel(ex);
+            }
+            finally
+            {
+                _datasetContext.Clear();
+                //dfcm.AllCategories = GetCategoryList();  //Reload dropdown value list
+                dfcm.AllFrequencies = GetDatasetFrequencyListItems();  //Reload dropdown value list
+                //dfcm.AllOriginationCodes = GetDatasetOriginationListItems(); //Reload dropdown value list
+                dfcm.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
+                //dfcm.FreqencyID = 6; // preselected NonSchedule
+                //dfcm.OriginationID = 1; // preselected Internal
+            }
+
+            return View(dfcm);
+        }
+
 
         [HttpGet]
         [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
@@ -598,7 +491,9 @@ namespace Sentry.data.Web.Controllers
                         0,
                         1,
                         true,
-                        ds
+                        ds,
+                        Enum.GetName(typeof(DatasetFrequency), cdm.FreqencyID),
+                        cdm.DatasetScopeTypeID
                         );
 
                     _datasetContext.Merge(dfc);
@@ -645,45 +540,8 @@ namespace Sentry.data.Web.Controllers
             return View(cdm);
        }
 
-        ////[HttpPost]
-        ////public ActionResult CreateNewDataFile(CreateDataFileModel cdm, HttpPostedFileBase DatasetFile)
-        ////{
-        ////    if (DatasetFile == null)
-        ////    {
-        ////        throw new ValidationException("Please select file to be uploaded");
-        ////    }
 
-        ////    string dsfi = System.IO.Path.GetFileName(DatasetFile.FileName);
-        ////    IApplicationUser user = _userService.GetCurrentUser();
-
-        ////    Dataset ds = _datasetContext.GetById(cdm.dsID);
-
-        ////    DateTime uploadTime = DateTime.Now;
-
-        ////    DatasetFile df = new DatasetFile(
-        ////        0,
-        ////        dsfi,
-        ////        ds,
-        ////        _userService.GetCurrentUser().AssociateId,
-        ////        GenerateDatasetFileLocation(ds, uploadTime),
-        ////        uploadTime,
-        ////        uploadTime
-        ////        );
-
-
-        ////    Sentry.Common.Logging.Logger.Debug("Initializing Event Handlers");
-
-        ////    _s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(uploadRequest_UploadPartProgressEvent);
-        ////    _s3Service.TransferUtlityUploadStream(df.S3Key, DatasetFile.InputStream);
-
-
-        ////    _datasetContext.Merge<DatasetFile>(df);
-        ////    _datasetContext.SaveChanges();
-        ////    return RedirectToAction("Detail", new { id = ds.DatasetId });
-
-        ////}
-
-
+        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
         private Dataset CreateDatasetFromModel(CreateDatasetModel cdm)
         {
             DateTime CreateTime = DateTime.Now;
@@ -702,149 +560,20 @@ namespace Sentry.data.Web.Controllers
                 Enum.GetName(typeof(DatasetOriginationCode), cdm.OriginationID),
                 CreateTime,
                 CreateTime,
-                freqName,
-                Utilities.GenerateDatasetStorageLocation(freqName, cat, cdm.DatasetName),
+                //freqName,
+                Utilities.GenerateDatasetStorageLocation(cat, cdm.DatasetName),
                 false,
                 true,
                 null,
                 _datasetContext.GetCategoryById(cdm.CategoryIDs),
                 null,
-                _datasetContext.GetDatasetScopeById(cdm.DatasetScopeTypeID),
+                //_datasetContext.GetDatasetScopeById(cdm.DatasetScopeTypeID),
                 cdm.DatafilesFilesToKeep,
                 null,
-                Utilities.GenerateDatasetDropLocation(freqName, cat, cdm.DatasetName));
+                Utilities.GenerateDatasetDropLocation(cat, cdm.DatasetName));
 
             return ds;
         }
-        
-
-        //// JCG TODO: Add unit tests for [Post]Upload
-        //// JCG TODO: Add additional permissions check around CanUpload
-        //// JCG TODO: Revist moving S3.Transfer.TransferUtility logic to Infrastructure\Core layer
-        //// POST: Dataset/Upload
-        //[HttpPost]
-        //public ActionResult Upload(CreateDatasetModel udm, HttpPostedFileBase DatasetFile)
-        //{
-        //    try
-        //    {
-
-        //        if (_datasetContext.isDatasetNameDuplicate(udm.DatasetName))
-        //        {
-        //            throw new ValidationException("Dataset name already exists");
-        //        }
-
-        //        if (DatasetFile == null)
-        //        {
-        //            throw new ValidationException("Please select file to be uploaded");
-        //        }
-
-        //        //string category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs).Name; 
-        //        Category category = _datasetContext.GetReferenceById<Category>(udm.CategoryIDs); /*Caden a change here for the Category reference*/
-        //        string frequency = ((DatasetFrequency)udm.FreqencyID).ToString();
-        //        string originationcode = ((DatasetOriginationCode)udm.OriginationID).ToString();
-        //        string dsfi = System.IO.Path.GetFileName(DatasetFile.FileName);
-        //        string s3key = category.Name + "/" + dsfi; 
-
-        //        if (_datasetContext.s3KeyDuplicate(s3key))
-        //        {
-        //            throw new ValidationException("File already exsits on S3");
-        //        }
-
-        //        Sentry.Common.Logging.Logger.Debug("Entered HttpPost <Upload>");
-        //        if (ModelState.IsValid)
-        //        {
-        //            Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Started S3 TransferUtility Setup");
-
-        //            _s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(uploadRequest_UploadPartProgressEvent);
-        //            _s3Service.TransferUtlityUploadStream(category.Name, dsfi, DatasetFile.InputStream); 
-
-
-        //            //// 1. upload dataset
-        //            //Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
-        //            ////Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(_s3Service.clie);
-        //            //Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
-        //            ////Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + Configuration.Config.GetSetting("AWSRootBucket"));
-        //            //s3tuReq.BucketName = Configuration.Config.GetSetting("AWSRootBucket");
-        //            ////Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - InputStream");
-        //            //s3tuReq.InputStream = DatasetFile.InputStream;
-        //            ////Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + category + "/" + dsfi);
-        //            //s3tuReq.Key = category + "/" + dsfi;
-        //            //s3tuReq.UploadProgressEvent += new EventHandler<Amazon.S3.Transfer.UploadProgressArgs>(uploadRequest_UploadPartProgressEvent);
-        //            //s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
-        //            //s3tuReq.AutoCloseStream = true;
-        //            ////Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Starting Upload " + s3tuReq.Key);
-        //            //s3tu.Upload(s3tuReq);
-
-
-        //            // 2. create dataset metadata
-        //            List<DatasetMetadata> dsmd = new List<DatasetMetadata>();
-        //            DateTime dateTimeNow = DateTime.Now;
-        //            Dataset ds = new Dataset(
-        //                0, // adding new dataset; ID is disregarded
-        //                category.Name, 
-        //                udm.DatasetName,
-        //                udm.DatasetDesc,
-        //                udm.CreationUserName,
-        //                udm.SentryOwnerName,
-        //                _userService.GetCurrentUser().AssociateId,
-        //                originationcode,
-        //                udm.DatasetDtm,
-        //                dateTimeNow,
-        //                dateTimeNow,
-        //                frequency,
-        //                s3key, /*Caden a change here for the Category reference*/
-        //                udm.IsSensitive,
-        //                udm.CanDisplay,
-        //                null,
-        //                category /*Caden a change here for the Category reference*/,
-        //                null);
-
-        //            //foreach (_DatasetMetadataModel dsmdmi in udm.RawMetadata)
-        //            //{
-        //            //    DatasetMetadata dsmdi = new DatasetMetadata(dsmdmi.Id, dsmdmi.DatasetId, dsmdmi.IsColumn, dsmdmi.Name, dsmdmi.Value, ds);
-        //            //    ds.RawMetadata.Add(dsmdi);
-        //            //}
-
-        //            _datasetContext.Merge<Dataset>(ds);
-        //            _datasetContext.SaveChanges();
-        //            int maxId = _datasetContext.GetMaxId();
-        //            return RedirectToAction("Detail", new { id = maxId });
-        //        }
-
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        if (ex is ValidationException)
-        //        {
-        //            AddCoreValidationExceptionsToModel(ex as ValidationException);
-        //            Sentry.Common.Logging.Logger.Error("Error", ex);
-
-        //        }
-        //        else
-        //        {
-        //            if (ex is AmazonS3Exception)
-        //            {
-        //                Sentry.Common.Logging.Logger.Error("S3 Upload Error", ex);
-        //                ModelState.AddModelError("Upload", ex);
-        //            }
-
-        //            Sentry.Common.Logging.Logger.Error("Error", ex);
-        //        }
-
-        //    }
-        //    finally
-        //    {
-        //        _datasetContext.Clear();
-        //        udm.AllCategories = GetCategoryList();  //Reload dropdown value list
-        //        udm.AllFrequencies = GetDatasetFrequencyListItems();  //Reload dropdown value list
-        //        udm.AllOriginationCodes = GetDatasetOriginationListItems(); //Reload dropdown value list
-        //        udm.FreqencyID = 6; // preselected NonSchedule
-        //        udm.OriginationID = 1; // preselected Internal
-
-        //    }
-        //    return View(udm);
-
-        //}
 
         /// <summary>
         /// Callback handler for S3 uploads... Amazon calls this to communicate progress; from here we communicate
@@ -905,99 +634,7 @@ namespace Sentry.data.Web.Controllers
 
         }
 
-        //// GET: Dataset/Edit/5
-        //public ActionResult Edit(int id)
-        //{
-        //    return View();
-        //}
-
-        // POST: Dataset/Edit/5
-        //[HttpPost]
-        //public ActionResult Edit(int id, FormCollection collection)
-        //{
-        //    try
-        //    {
-        //        // TODO: Add update logic here
-
-        //        return RedirectToAction("Index");
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
-
-        // GET: Dataset/Delete/5
-        //public ActionResult Delete(int id)
-        //{
-        //    return View();
-        //}
-
-        //// POST: Dataset/Delete/5
-        //[HttpPost]
-        //public ActionResult Delete(int id, FormCollection collection)
-        //{
-        //    try
-        //    {
-        //        // TODO: Add delete logic here
-
-        //        return RedirectToAction("Index");
-        //    }
-        //    catch
-        //    {
-        //        return View();
-        //    }
-        //}
-
-        //// GET: Dataset/ViewVersions/5
-        //[HttpGet()]
-        //public JsonResult GetLatestVersion(string uniqueKey)
-        //{   // the uniqueKey here is the key for the logical file (folder) containing physical files (versions)...
-        //    DatasetFolder thisFolder = _dataSetService.GetFolderByUniqueKey(uniqueKey);
-        //    string latestDatasetUniqueKey = thisFolder.Datasets.OrderByDescending(ds => ds.Name).FirstOrDefault().Key;
-        //    JsonResult jr = new JsonResult();
-        //    jr.Data = _dataSetService.GetDatasetDownloadURL(latestDatasetUniqueKey);
-        //    jr.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
-        //    return jr;
-        //}
-
-        //// GET: DatasetFileVersion/Create
-        //[HttpGet()]
-        //public ActionResult Create()
-        //{
-        //    EditDatasetModel item = new EditDatasetModel { LastSchemaChangeDate = DateTime.Now, LastDataRefreshDate = DateTime.Now };
-        //    item.AllCategories = GetCategoryList();
-        //    return View(item);
-        //}
-
-        //// POST: DatasetFileVersion/Create
-        //[HttpPost()]
-        //public ActionResult Create(EditDatasetModel i)
-        //{
-        //    try
-        //    {
-        //        if (ModelState.IsValid)
-        //        {
-        //            DomainUser seller = SharedContext.CurrentUser.DomainUser;
-        //            DatasetFileVersion item = CreateItemFromModel(i);
-        //            _dataAssetContext.Add(item);
-        //            _dataAssetContext.SaveChanges();
-        //            return RedirectToAction("Details", new {id = item.Id});
-        //        }
-        //    }
-        //    catch (Sentry.Core.ValidationException ex)
-        //    {
-        //        AddCoreValidationExceptionsToModel(ex);
-        //        _dataAssetContext.Clear();
-        //    }
-
-        //    i.AllCategories = GetCategoryList(); //re-populate the category list for re-display
-        //    return View(i);
-        //}
-
         // GET: DatasetFileVersion/Edit/5
-        // JCG TODO: Add additional permissions check around CanEditDataset
-
         [HttpGet()]
         [AuthorizeByPermission(PermissionNames.DatasetEdit)]
         public ActionResult Edit(int id)
@@ -1005,16 +642,14 @@ namespace Sentry.data.Web.Controllers
             Dataset ds = _datasetContext.GetById<Dataset>(id);
             EditDatasetModel item = new EditDatasetModel(ds, _associateInfoProvider);
             item.AllFrequencies = GetDatasetFrequencyListItems();  // Load dropdown value list
-            item.FreqencyID = (int)(Enum.Parse(typeof(DatasetFrequency), ds.CreationFreqDesc));  //Preselect current value
+            //item.FreqencyID = (int)(Enum.Parse(typeof(DatasetFrequency), ds.CreationFreqDesc));  //Preselect current value
             item.AllOriginationCodes = GetDatasetOriginationListItems();
             item.OriginationID = (int)(Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode));  //Preselect current value
             item.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
-            item.DatasetScopeTypeID = ds.DatasetScopeType.ScopeTypeId;
+            //item.DatasetScopeTypeID = ds.DatasetScopeType.ScopeTypeId;
             return View(item);
         }
 
-        // JCG TODO: Add unit tests for [Post]Edit
-        // JCG TODO: Add additional permissions check around CanEditDataset
         // POST: Dataset/Edit/5
         [HttpPost()]
         [AuthorizeByPermission(PermissionNames.DatasetEdit)]
@@ -1056,6 +691,33 @@ namespace Sentry.data.Web.Controllers
             return View(i);
         }
 
+        [HttpPost()]
+        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
+        public ActionResult EditDatasetFile(int id, DatasetFileGridModel i)
+        { 
+            try
+            {
+                DatasetFile item = _datasetContext.GetById<DatasetFile>(id);
+                if (ModelState.IsValid)
+                {
+                    UpdateDatasetfileFromModel(item, i);
+                    _datasetContext.SaveChanges();
+                    return RedirectToAction("Detail", new { id = item.Dataset.DatasetId });
+
+                }
+            }
+            catch (Sentry.Core.ValidationException ex)
+            {
+                AddCoreValidationExceptionsToModel(ex);
+            }
+            finally
+            {
+                _datasetContext.Clear();
+            }
+
+            return View();
+        }
+
         private IEnumerable<SelectListItem> GetCategoryList()
         {
             IEnumerable<SelectListItem> var = _datasetContext.Categories.OrderByHierarchy().Select((c) => new SelectListItem { Text = c.FullName, Value = c.Id.ToString() });
@@ -1070,10 +732,22 @@ namespace Sentry.data.Web.Controllers
         }
 
 
-        private IEnumerable<SelectListItem> GetDatasetFrequencyListItems()
+        private IEnumerable<SelectListItem> GetDatasetFrequencyListItems(string freq = null)
         {
-            List<SelectListItem> items = Enum.GetValues(typeof(DatasetFrequency)).Cast<DatasetFrequency>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+            List<SelectListItem> items;
 
+            if (freq == null)
+            {
+                items = Enum.GetValues(typeof(DatasetFrequency)).Cast<DatasetFrequency>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+            }
+            else
+            {
+                items = Enum.GetValues(typeof(DatasetFrequency)).Cast<DatasetFrequency>().Select(v => 
+                    new SelectListItem {
+                        Selected = (v.ToString() == freq),
+                        Text = v.ToString(),
+                        Value = v.ToString() }).ToList();
+            }
             return items;
         }
 
@@ -1084,10 +758,23 @@ namespace Sentry.data.Web.Controllers
             return items;
         }
 
-        private IEnumerable<SelectListItem> GetDatasetScopeTypesListItems()
+        private IEnumerable<SelectListItem> GetDatasetScopeTypesListItems(int id = -1)
         {
-            IEnumerable<SelectListItem> dScopeTypes = _datasetContext.GetAllDatasetScopeTypes().Select((c) => new SelectListItem { Text = c.Name, Value = c.ScopeTypeId.ToString() });
+            IEnumerable<SelectListItem> dScopeTypes;
+            if (id == -1)
+            {
 
+                dScopeTypes = _datasetContext.GetAllDatasetScopeTypes()
+                    .Select((c) => new SelectListItem { Text = c.Name, Value = c.ScopeTypeId.ToString() });
+            }
+            else
+            {
+                dScopeTypes = _datasetContext.GetAllDatasetScopeTypes()
+                    .Select((c) => new SelectListItem {
+                        Selected = (c.ScopeTypeId == id),
+                        Text = c.Name,
+                        Value = c.ScopeTypeId.ToString() });
+            }
 
             return dScopeTypes;
         }
@@ -1117,70 +804,8 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        //private DatasetFileVersion CreateItemFromModel(EditDatasetModel itemModel)
-        //{
-        //    DomainUser seller = SharedContext.CurrentUser.DomainUser;
-        //    DatasetFileVersion i = new DatasetFileVersion(itemModel.Name, itemModel.SummaryDescription, itemModel.DetailDescription);
-        //    i.ImageUrl = itemModel.ImageUrl;
-        //    foreach (int c in itemModel.CategoryIDs)
-        //    {
-        //        i.AddCategory(_dataAssetContext.GetReferenceById<Category>((int)c));
-        //    }
-        //    return i;
-        //}
-
-        // JCG TODO: Add unit tests for AddDatasetFromModel()
-        private void AddDatasetFromModel(Dataset ds, EditDatasetModel eds)
-        {
-            DateTime now = DateTime.Now;
-
-            //ds.Id = eds.Id;
-            ds.Category = eds.Category;
-            ds.DatasetName = eds.DatasetName;
-            ds.DatasetDesc = eds.DatasetDesc;
-            //string creationUserId;
-            ds.CreationUserName = eds.CreationUserName;
-            //string sentryOwnerId;
-            ds.SentryOwnerName = eds.SentryOwnerName;
-            ds.UploadUserName = eds.UploadUserName;
-            ds.OriginationCode = ds.OriginationCode;
-            //string fileExtension;
-            ds.DatasetDtm = eds.DatasetDtm;
-            ds.ChangedDtm = now;
-            //string creationFreqCode;
-            ds.CreationFreqDesc = eds.CreationFreqDesc;
-            ////ds.FileSize = eds.FileSize;
-            ////ds.RecordCount = eds.RecordCount;
-            //ds.S3key;
-            IList<_DatasetMetadataModel> dsmList = new List<_DatasetMetadataModel>();
-            if (null != eds.Columns && null != eds.Metadata)
-            {
-                dsmList = eds.Columns.Union(eds.Metadata).ToList();
-            }
-            else if (null != eds.Metadata)
-            {
-                dsmList = eds.Metadata;
-            }
-            else if (null != eds.Columns)
-            {
-                dsmList = eds.Columns;
-            }
-            foreach (_DatasetMetadataModel dsm in dsmList)
-            {
-                ds.RawMetadata.Add(new DatasetMetadata(dsm.DatasetMetadataId, dsm.DatasetId, dsm.IsColumn, dsm.Name, dsm.Value, ds));
-            }
-        }
-
-        // JCG TODO: Add unit tests for UpdateDatasetFromModel()
-        /// <summary>
-        /// Allowed updates:
-        ///  - Sentry Owner
-        ///  - Creation Frequency
-        ///  - ChangedDtm
-        ///  - User Metadata
-        /// </summary>
-        /// <param name="ds"></param>
-        /// <param name="eds"></param>
+        [HttpPost]
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
         private void UpdateDatasetFromModel(Dataset ds, EditDatasetModel eds)
         {
             DateTime now = DateTime.Now;
@@ -1188,114 +813,44 @@ namespace Sentry.data.Web.Controllers
             string frequency = ((DatasetFrequency)eds.FreqencyID).ToString();
             string originationcode = ((DatasetOriginationCode)eds.OriginationID).ToString();
 
+            if(eds.DatasetInformation != null && eds.DatasetInformation.Length > 0)
+            {
+                ds.DatasetInformation = eds.DatasetInformation;
+            }
+
             ds.ChangedDtm = now;
             if (null != eds.Category && eds.Category.Length > 0) ds.Category = eds.Category;
-            ds.CreationFreqDesc = frequency;
+            //ds.CreationFreqDesc = frequency;
             if (null != eds.CreationUserName && eds.CreationUserName.Length > 0) ds.CreationUserName = eds.CreationUserName;
             if (null != eds.DatasetDesc && eds.DatasetDesc.Length > 0) ds.DatasetDesc = eds.DatasetDesc;
-            if (null != eds.DatasetDtm && eds.DatasetDtm > DateTime.MinValue) ds.DatasetDtm = eds.DatasetDtm;
+            if (eds.DatasetDtm > DateTime.MinValue) ds.DatasetDtm = eds.DatasetDtm;
             if (null != eds.DatasetName && eds.DatasetName.Length > 0) ds.DatasetName = eds.DatasetName;
             ds.OriginationCode = originationcode;
             if (null != eds.SentryOwnerName && eds.SentryOwnerName.Length > 0) ds.SentryOwnerName = eds.SentryOwnerName;
             ds.DatafilesToKeep = eds.DatafilesFilesToKeep;
-            if (eds.DatasetScopeTypeID != ds.DatasetScopeType.ScopeTypeId) { ds.DatasetScopeType = _datasetContext.GetDatasetScopeById(eds.DatasetScopeTypeID); }                        
-            ds.S3Key = Utilities.GenerateDatasetStorageLocation(ds.CreationFreqDesc, ds.Category, ds.DatasetName);
+            //if (eds.DatasetScopeTypeID != ds.DatasetScopeType.ScopeTypeId) { ds.DatasetScopeType = _datasetContext.GetDatasetScopeById(eds.DatasetScopeTypeID); }                        
+            ds.S3Key = Utilities.GenerateDatasetStorageLocation(ds.Category, ds.DatasetName);
         }
 
-        //[HttpPost]
-        //public ActionResult PushToSAS(PushToDatasetModel PushToModel)
-        //{
-        //    Dataset ds = _datasetContext.GetById(PushToModel.DatasetId);
-        //    string filename = null;
-        //    string filename_orig = null;
-
-        //    Sentry.Common.Logging.Logger.Debug("DatasetId: " + PushToModel.DatasetId);
-        //    Sentry.Common.Logging.Logger.Debug("File Name Override Value: " + PushToModel.FileNameOverride);
-
-        //    //Test for an override name; if empty or null, use current value on dataset model
-        //    if (!String.IsNullOrWhiteSpace(PushToModel.FileNameOverride))
-        //    {
-        //        //Test if override name includes an extension; if exists, replace with current value in dataset model
-        //        if (Path.HasExtension(PushToModel.FileNameOverride))
-        //        {
-        //            Sentry.Common.Logging.Logger.Debug("Has File Extension: " + System.IO.Path.GetExtension(PushToModel.FileNameOverride));
-        //            Sentry.Common.Logging.Logger.Debug("Dataset Model Extension: " + ds.FileExtension);
-        //            filename = PushToModel.FileNameOverride.Replace(System.IO.Path.GetExtension(PushToModel.FileNameOverride), ds.FileExtension);
-        //        }
-        //        else
-        //        {
-        //            Sentry.Common.Logging.Logger.Debug("Has No File Extension");
-        //            Sentry.Common.Logging.Logger.Debug("Dataset Model Extension: " + ds.FileExtension);
-        //            filename = (PushToModel.FileNameOverride + ds.FileExtension);
-        //        }
-        //    }
-        //    else
-        //    {
-        //        Sentry.Common.Logging.Logger.Debug(" No Override Value");
-        //        Sentry.Common.Logging.Logger.Debug("Dataset Model S3Key: " + System.IO.Path.GetFileName(ds.S3Key));
-        //        filename = System.IO.Path.GetFileName(ds.S3Key);
-        //    }
-
-        //    filename_orig = filename;
-
-        //    //Gerenate SAS friendly file name.
-        //    filename = _sasService.GenerateSASFileName(filename);
-
-        //    Sentry.Common.Logging.Logger.Debug($"File Name Translation: Original({filename_orig} SASFriendly({filename})");
-
-        //    string BaseTargetPath = Configuration.Config.GetHostSetting("PushToSASTargetPath");
-
-        //    //creates category directory if does not exist, otherwise does nothing.
-        //    System.IO.Directory.CreateDirectory(BaseTargetPath + ds.Category);
+        [HttpPost]
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        private void UpdateDatasetfileFromModel(DatasetFile df, DatasetFileGridModel dfgm)
+        {
+            DateTime now = DateTime.Now;
 
 
-        //    try
-        //    {
-        //        _s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(uploadRequest_UploadPartProgressEvent);
-        //        _s3Service.TransferUtilityDownload(BaseTargetPath, ds.Category, filename, ds.S3Key);
+            if (dfgm.Information != null && dfgm.Information.Length > 0)
+            {
+                df.Information = dfgm.Information;
+            }
 
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Sentry.Common.Logging.Logger.Error("S3 Download Error", e);
-        //        //return Json(new {Success = false});
-        //    }
+            df.IsUsable = dfgm.IsUsable;
 
-
-        //    //string content = string.Empty;
-        //    //Converting file to .sas7bdat format
-        //    try
-        //    {
-
-        //        _sasService.ConvertToSASFormat(filename, ds.Category);
-
-        //    }
-        //    catch (WebException we)
-        //    {
-        //        Sentry.Common.Logging.Logger.Error("Web Error Calling SAS Stored Process", we);
-        //    }
-        //    catch (Exception e)
-        //    {
-        //        Sentry.Common.Logging.Logger.Error("Error calling SAS Stored Process", e);
-        //    }
-
-
-
-
-        //    //throw new Exception("Error");
-
-        //    //return new HttpStatusCodeResult(401, "Custom Error Message");
-
-        //    SuccessModel success = new SuccessModel();
-        //    success.Message = "Successfully Pushed File to SAS";
-
-        //    return PartialView("_Success", success);
-
-        //    //return AjaxSuccessJson();
-
-        //}
+            df.ModifiedDTM = now;
+        }
 
         [HttpPost]
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult PushToSAS(int id, string fileOverride)
         {
             DatasetFile ds = _datasetContext.GetById<DatasetFile>(id);
@@ -1389,31 +944,8 @@ namespace Sentry.data.Web.Controllers
 
         }
 
-
-        //public static WebResponse SendGetRequest(string url)
-        //{
-
-        //    HttpWebRequest httpRequest = WebRequest.CreateHttp(url);
-        //    httpRequest.Method = "GET";
-
-        //    return httpRequest.GetResponse();
-        //}
-
-        /// <summary>
-        /// Callback handler for S3 uploads... Amazon calls this to communicate progress; from here we communicate
-        /// that progress back to the client for their progress bar...
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        //static void downloadRequest_DownloadPartProgressEvent(object sender, WriteObjectProgressArgs e)
-        //{
-
-        //    Sentry.data.Web.Helpers.ProgressUpdater.SendProgress(e.FilePath, e.PercentDone);
-        //    //Sentry.data.Web.Helpers.ProgressUpdater.SendProgress(e., e.TotalNumberOfBytesForCurrentFile, e.TransferredBytesForCurrentFile);
-        //    Sentry.Common.Logging.Logger.Debug("DatasetDownload-S3Event: " + e.FilePath + ": " + e.PercentDone);
-        //}
-
         [HttpGet()]
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public PartialViewResult PushToFileNameOverride(int id)
         {
             PushToDatasetModel model = new PushToDatasetModel();
@@ -1428,6 +960,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet()]
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public PartialViewResult PreviewDatafile(int id)
         {
             PreviewDataModel model = new PreviewDataModel();
@@ -1440,6 +973,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet()]
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public PartialViewResult PreviewLatestDatafile(int id)
         {
             PreviewDataModel model = new PreviewDataModel();
@@ -1452,6 +986,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet()]
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public PartialViewResult GetDatasetFileVersions(int id)
         {
             DatasetFileVersionsModel model = new DatasetFileVersionsModel();
@@ -1462,6 +997,17 @@ namespace Sentry.data.Web.Controllers
             
         }
 
+        [HttpGet()]
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        public PartialViewResult EditDatasetFile(int id)
+        {
+            DatasetFile df = _datasetContext.GetById<DatasetFile>(id);
+            DatasetFileGridModel item = new DatasetFileGridModel(df);
+
+            return PartialView("EditDataFile", item);
+
+        }
+
         [AuthorizeByPermission(PermissionNames.DatasetView)]
         public JsonResult GetDatasetFileInfoForGrid(int Id, Boolean bundle, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
@@ -1469,6 +1015,7 @@ namespace Sentry.data.Web.Controllers
             List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
             Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
             Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
+            Boolean CanEdit = SharedContext.CurrentUser.CanEditDataset;
 
             //Query the Dataset for the following information:
             foreach (DatasetFile df in _datasetContext.GetDatasetFilesForDataset(Id, x => !x.IsBundled).ToList())
@@ -1476,7 +1023,7 @@ namespace Sentry.data.Web.Controllers
                 DatasetFileGridModel dfgm = new DatasetFileGridModel(df);
                 dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
                 dfgm.CanDwnldSenstive = CanDwnldSenstive;
-
+                dfgm.CanEdit = CanEdit;
                 files.Add(dfgm);
             }
 
@@ -1502,13 +1049,14 @@ namespace Sentry.data.Web.Controllers
             List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
             Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
             Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
+            Boolean CanEdit = SharedContext.CurrentUser.CanEditDataset;
 
             foreach (DatasetFile df in _datasetContext.GetDatasetFilesForDataset(Id, x => x.IsBundled).ToList())
             {
                 DatasetFileGridModel dfgm = new DatasetFileGridModel(df);
                 dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
                 dfgm.CanDwnldSenstive = CanDwnldSenstive;
-
+                dfgm.CanEdit = CanEdit;
                 files.Add(dfgm);
             }
 
@@ -1526,12 +1074,14 @@ namespace Sentry.data.Web.Controllers
             List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
             Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
             Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
+            Boolean CanEdit = SharedContext.CurrentUser.CanEditDataset;
 
             foreach (DatasetFile dfversion in _datasetContext.GetDatasetFilesVersions(df.Dataset.DatasetId, df.DatasetFileConfig.DataFileConfigId, df.FileName).ToList())
             {
                 DatasetFileGridModel dfgm = new DatasetFileGridModel(dfversion);
                 dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
                 dfgm.CanDwnldSenstive = CanDwnldSenstive;
+                dfgm.CanEdit = CanEdit;
                 files.Add(dfgm);
             }
 
@@ -1545,13 +1095,30 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.DatasetView)]
         public JsonResult GetAllDatasetFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
-            IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
+            IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().
                 Select((f) => new DatasetFileGridModel(f)
                 );
 
             DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
 
+        }
+
+        [HttpGet]
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        public JsonResult GetDatasetFileConfigInfo(int Id)
+        {
+            IEnumerable<DatasetFileConfigsModel> files = null;
+            if (Id > 0)
+            {
+                files = _datasetContext.GetById(Id).DatasetFileConfigs.Select((f) => new DatasetFileConfigsModel(f));
+            }
+            else
+            {
+                files = _datasetContext.getAllDatasetFileConfigs().Select((f) => new DatasetFileConfigsModel(f));
+            }
+
+            return Json(files, JsonRequestBehavior.AllowGet);
         }
 
         [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
@@ -1596,17 +1163,24 @@ namespace Sentry.data.Web.Controllers
             Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
 
             Boolean bundlingSensitive = files.Any(x => x.IsSensitive);
+            Boolean bundlingUnUsable = files.Any(x => !x.IsUsable);
 
             if ((bundlingSensitive && !CanDwnldSenstive) || (!bundlingSensitive && !CanDwnldNonSensitive))
             {
                 errorsFound = true;
-                errorString += "You do not have permission to download or bundle these files.\n";
+                errorString += "<p>You do not have permission to download or bundle these files.</p>";
             }
 
             if(!sameExtension)
             {
                 errorsFound = true;
-                errorString += "The files did not have the same file extension. Bundling requires that all files have the same extension.\n";
+                errorString += "<p>The files did not have the same file extension. Bundling requires that all files have the same extension.  Please filter by putting the file extension in either the Name Column or the Search Box provided at the top right of the table.</p>";
+            }
+
+            if(bundlingUnUsable)
+            {
+                errorsFound = true;
+                errorString += "<p>The files were not all labeled usable. Bundling requires that all files be labeled usable.  Please filter using the Usable Column.</p>";
             }
 
             try
@@ -1628,8 +1202,6 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-
-
         [HttpGet()]
         public int GetLatestDatasetFileIdForDataset(int id)
         {
@@ -1637,111 +1209,62 @@ namespace Sentry.data.Web.Controllers
             return dfid;
         }
 
-        //public ActionResult Create()
-        //{
-        //    CreateDataFileModel cd = new CreateDataFileModel();
-        //    ViewBag.Categories  = GetCategoryList();
-
-        //    return View(cd);
-        //}
+        [HttpPost]
+        public void CreateFilePath(string filePath)
+        {
+            if (!Directory.Exists(filePath))
+            {
+                Directory.CreateDirectory(filePath);
+            }
+        }
 
         [HttpPost]
         [AuthorizeByPermission(PermissionNames.Upload)]
-        public ActionResult UploadDatafile(int id)
+        public ActionResult UploadDatafile(int id, int configId)
         {
-            //Get DataFileConfigs associated with dataset
-            DatasetFileConfig fc = null;
-
             if (Request.Files.Count > 0 && id != 0)
             {
-                Dataset ds = _datasetContext.GetById<Dataset>(id);
                 List<DatasetFileConfig> fcList = Utilities.LoadDatasetFileConfigsByDatasetID(id, _datasetContext);
                 IApplicationUser user = _userService.GetCurrentUser();
 
                 try
                 {
-                    HttpFileCollectionBase files = Request.Files;
-                    for (int i = 0; i < files.Count; i++)
+                    if (user.CanUpload)
                     {
-                        HttpPostedFileBase file = files[i];
-                        
+                        HttpFileCollectionBase files = Request.Files;
+
+                        HttpPostedFileBase file = files[0];
+
                         string dsfi;
                         dsfi = System.IO.Path.GetFileName(file.FileName);
-                        ////Checking for Internet Explorer
-                        //if (Request.Browser.Browser.ToUpper() == "IE" || Request.Browser.Browser.ToUpper() == "INTERNETEXPLORER")
-                        //{
-                        //    string[] testfiles = file.FileName.Split(new char[] { '\\' });
-                        //    dsfi = testfiles[testfiles.Length - 1];
-                        //}
-                        //else
-                        //{
-                        //    dsfi = file.FileName;
-                        //}
-
 
                         //Get Matching DataFileConfigs for file path
                         List<DatasetFileConfig> fcMatches = Utilities.GetMatchingDatasetFileConfigs(fcList, file.FileName);
 
-                                                
-                        using (Stream sfile = file.InputStream)
-                        using (Stream fileStream = new FileStream(ds.DropLocation + dsfi, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
+                        DatasetFileConfig first = fcMatches.First(x => x.ConfigId == configId);
+
+                        if (first != null)
                         {
-                            sfile.CopyTo(fileStream);
+                            string fileDropLocation = first.DropPath + "\\" + dsfi;
+
+
+                            using (Stream sfile = file.InputStream)
+                            using (Stream fileStream = new FileStream(fileDropLocation, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
+                            {
+                                sfile.CopyTo(fileStream);
+                            }
+
+                            return Json("File Successfully Sent to Dataset Loader with a Path of : " + fileDropLocation);
                         }
-
-
-                        ////Pick the first non-generic match
-                        ////If non-generic matches then pick the generic file config
-                        //if (fcMatches.Count == 1)
-                        //{
-                        //    fc = fcMatches.First();
-                        //}
-                        //else
-                        //{
-                        //    int configMatch = 0;
-                        //    foreach (DatasetFileConfig fcobject in fcMatches.Where(w => w.IsGeneric == false))
-                        //    {
-                        //        fc = fcobject;
-                        //        configMatch++;
-                        //        break;
-                        //    }
-                        //    if (configMatch == 0)
-                        //    {
-                        //        fc = fcMatches.Where(w => w.IsGeneric == false).First();
-                        //    }
-                        //}
-
-                        //DateTime uploadTime = DateTime.Now;
-
-                        //Sentry.Common.Logging.Logger.Debug("Initializing Event Handlers");
-                        //_s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(uploadRequest_UploadPartProgressEvent);
-                        //Utilities.ProcessInputFile(ds, fc, _s3Service, _datasetContext, file, user.AssociateId);
-
-                        //DatasetFile df = new DatasetFile(
-                        //    0,
-                        //    dsfi,
-                        //    ds,
-                        //    fc,
-                        //    _userService.GetCurrentUser().AssociateId,
-                        //    Utilities.GenerateDatafileKey(ds, uploadTime, dsfi),
-                        //    //Utilities.GenerateDatasetStorageLocation(ds.CreationFreqDesc, ds.DatasetCategory.Name, ds.DatasetName),
-                        //    //Utility.GenerateDatafileKey(ds, uploadTime, dsfi),
-                        //    uploadTime,
-                        //    uploadTime,
-                        //    null,
-                        //    null
-                        //    );
-
-                        //Sentry.Common.Logging.Logger.Debug("Initializing Event Handlers");
-
-                        
-                        //_s3Service.TransferUtlityUploadStream(df.FileLocation, df.FileName, file.InputStream);
-
-                        //_datasetContext.Merge<DatasetFile>(df);
-                        //_datasetContext.SaveChanges();
-
+                        else
+                        {
+                            return Json("File did not match a configuration file.");
+                        }
                     }
-                    return Json("File Successfully Sent to DatasetLoader!");
+                    else
+                    {
+                        return Json("You cannot upload files to this dataset.");
+                    }
                 }
                 catch (Exception e)
                 {
@@ -1763,7 +1286,6 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet()]
         [AuthorizeByPermission(PermissionNames.Upload)]
-        //[Route("Dataset/Create/Datafile")]
         public ActionResult GetDatasetUploadPartialView(int datasetId)
         {
             CreateDataFileModel cd = new CreateDataFileModel();
@@ -1784,6 +1306,10 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetFileConfig dfc = _datasetContext.getDatasetFileConfigs(configId);
             EditDatasetFileConfigModel edfc = new EditDatasetFileConfigModel(dfc);
+
+            edfc.AllFrequencies = GetDatasetFrequencyListItems(edfc.CreationFreq);  //load all values for dropdown
+            //dfcm.AllOriginationCodes = GetDatasetOriginationListItems(); //load all values for dropdown
+            edfc.AllDatasetScopeTypes = GetDatasetScopeTypesListItems(edfc.DatasetScopeTypeID);
 
             ViewBag.ModifyType = "Edit";
 
@@ -1815,6 +1341,7 @@ namespace Sentry.data.Web.Controllers
             return GetEditConfigPartialView(edfc.ConfigId);
         }
 
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
         private DatasetFileConfig UpdateDatasetFileConfigFromModel(DatasetFileConfig dfc, EditDatasetFileConfigModel edfc)
         {
             if (dfc.SearchCriteria != edfc.SearchCriteria) { dfc.SearchCriteria = edfc.SearchCriteria; }
@@ -1822,8 +1349,6 @@ namespace Sentry.data.Web.Controllers
             if (dfc.IsRegexSearch != edfc.IsRegexSearch) { dfc.IsRegexSearch = edfc.IsRegexSearch; }
             if (dfc.OverwriteDatafile != edfc.OverwriteDatasetFile) { dfc.OverwriteDatafile = edfc.OverwriteDatasetFile; }
             if (dfc.VersionsToKeep != edfc.VersionsToKeep) { dfc.VersionsToKeep = edfc.VersionsToKeep; }
-            if (dfc.DropPath != edfc.DropPath) { dfc.DropPath = edfc.DropPath; }
-            if (dfc.Description != edfc.ConfigFileDesc) { dfc.Description = edfc.ConfigFileDesc; }
 
             return dfc;
         }
@@ -1841,123 +1366,5 @@ namespace Sentry.data.Web.Controllers
 
             return Json(sList, JsonRequestBehavior.AllowGet);
         }
-
-
-        //[HttpGet()]
-        //public void GetWeatherData(string zip)
-        //{
-        //    //System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\" + zip + ".xml", _weatherDataProvider.GetWeather("xml"));
-        //    //System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\" + zip + ".json", _weatherDataProvider.GetWeather("json"));
-
-
-        //    request.AddParameter("name", "value"); // adds to POST or URL querystring based on Method
-        //    request.AddUrlSegment("id", "123"); // replaces matching token in request.Resource
-
-        //    // easily add HTTP Headers
-        //    //request.AddHeader("header", "value");
-
-        //    // add files to upload (works with compatible verbs)
-        //    //request.AddFile(path);
-
-        //    // execute the request         
-
-        //    // or automatically deserialize result
-        //    // return content type is sniffed but can be explicitly set via RestClient.AddHandler();
-        //    RestResponse<Person> response2 = client.Execute<Person>(request);
-        //    var name = response2.Data.Name;
-
-        //    // easy async support
-        //    client.ExecuteAsync(request, response =>
-        //    {
-        //        Console.WriteLine(response.Content);
-        //    });
-
-        //    // async with deserialization
-        //    var asyncHandle = client.ExecuteAsync<Person>(request, response =>
-        //    {
-        //        Console.WriteLine(response.Data.Name);
-        //    });
-
-        //    // abort the request on demand
-        //    asyncHandle.Abort();
-        //}
-
-
-        //[HttpGet()]
-        //public void GetWeatherData(string zip)
-        //{
-        //    System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\" + zip + ".xml", _weatherDataProvider.GetWeather("xml"));
-        //    System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\" + zip + ".json", _weatherDataProvider.GetWeather("json"));
-
-
-        //    //request.AddParameter("name", "value"); // adds to POST or URL querystring based on Method
-        //    //request.AddUrlSegment("id", "123"); // replaces matching token in request.Resource
-
-        //    //// easily add HTTP Headers
-        //    ////request.AddHeader("header", "value");
-
-        //    //// add files to upload (works with compatible verbs)
-        //    ////request.AddFile(path);
-
-        //    //// execute the request         
-
-        //    //// or automatically deserialize result
-        //    //// return content type is sniffed but can be explicitly set via RestClient.AddHandler();
-        //    //RestResponse<Person> response2 = client.Execute<Person>(request);
-        //    //var name = response2.Data.Name;
-
-        //    //// easy async support
-        //    //client.ExecuteAsync(request, response => {
-        //    //    Console.WriteLine(response.Content);
-        //    //});
-
-        //    //// async with deserialization
-        //    //var asyncHandle = client.ExecuteAsync<Person>(request, response => {
-        //    //    Console.WriteLine(response.Data.Name);
-        //    //});
-
-        //    //// abort the request on demand
-        //    //asyncHandle.Abort();
-        //}
-
-
-        //[HttpGet()]
-        //public void GetWeather(string zip)
-        //{
-
-        //    JsonResult jr = new JsonResult();
-        //    jr.Data = GetWeatherByZip(zip);
-        //    string json = JsonConvert.SerializeObject(jr.Data);
-
-
-        //    System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\54481.txt", json);
-        //    //return jr;
-        //}
-
-        //public async Task<ActionResult> GetWeatherByZip(string zip)
-        //{
-        //    string relativePath = zip + "/" + zip + ".json";
-        //    return await this.ApiGet(relativePath);
-        //}
-
-        //protected async Task<ActionResult> ApiGet(string relativePath)
-        //{
-        //    ApiResponse response = await this.ApiClient.GetAsync(relativePath);
-        //    ActionResult result = response.IsSuccessful ? new ContentResult { Content = response.Data, ContentType = "application/json" } as ActionResult : new JsonResult();
-        //    return result;
-        //}
-
-        //protected IApiClient ApiClient
-        //{
-        //    get
-        //    {
-        //        return this._apiClient;
-        //    }
-        //}
-
-        //public JsonResult AjaxSuccessJson()
-        //{
-        //    return Json(new { Success = true });
-        //}
     }
 }

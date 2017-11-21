@@ -31,12 +31,13 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.OriginationCode, (m) => m.Column("Origination_CDE"));
             this.Property((x) => x.DatasetDtm, (m) => m.Column("Dataset_DTM"));
             this.Property((x) => x.ChangedDtm, (m) => m.Column("FileChanged_DTM"));
-            this.Property((x) => x.CreationFreqDesc, (m) => m.Column("CreationFreq_DSC"));
+            //this.Property((x) => x.CreationFreqDesc, (m) => m.Column("CreationFreq_DSC"));
             this.Property((x) => x.S3Key, (m) => m.Column("S3_KEY"));
             this.Property((x) => x.IsSensitive, (m) => m.Column("IsSensitive_IND"));
             this.Property((x) => x.CanDisplay, (m) => m.Column("Display_IND"));
             this.Property((x) => x.DatafilesToKeep, (m) => m.Column("DatafilesToKeep_NBR"));
             this.Property((x) => x.DropLocation, (m) => m.Column("DropLocation"));
+            this.Property((x) => x.DatasetInformation, (m) => m.Column("Information_DSC"));
 
             this.ManyToOne(x => x.DatasetCategory, m =>
             {
@@ -45,12 +46,14 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Class(typeof(Category));
             });
 
-            this.ManyToOne(x => x.DatasetScopeType, m =>
-            {
-                m.Column("DatasetScopeType_ID");
-                m.ForeignKey("FK_Dataset_DatasetScopeTypes");
-                m.Class(typeof(DatasetScopeType));
-            });
+
+            
+            //this.ManyToOne(x => x.DatasetScopeType, m =>
+            //{
+            //    m.Column("DatasetScopeType_ID");
+            //    m.ForeignKey("FK_Dataset_DatasetScopeTypes");
+            //    m.Class(typeof(DatasetScopeType));
+            //});
 
             this.Bag((x) => x.RawMetadata, (m) =>
             {

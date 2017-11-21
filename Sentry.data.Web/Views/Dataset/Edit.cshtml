@@ -25,7 +25,6 @@
         @Html.HiddenFor(model => model.DatasetName)
         @Html.HiddenFor(model => model.UploadUserName)
         @Html.HiddenFor(model => model.ChangedDtm)
-        @Html.HiddenFor(model => model.UploadDtm)
         @Html.HiddenFor(model => model.FreqencyID)
         @Html.HiddenFor(model => model.SentryOwnerName)
 
@@ -64,6 +63,14 @@
                     @Html.ValidationMessageFor(model => model.DatasetDesc, "", new { @class = "text-danger" })
                 </div>
             </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DatasetInformation, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.DatasetInformation, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                @Html.ValidationMessageFor(model => model.DatasetInformation, "", new { @class = "text-danger" })
+            </div>
+        </div>
 
             <div class="form-group">
                 @Html.LabelFor(model => model.CreationUserName, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -116,14 +123,14 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                @Html.LabelFor(model => model.UploadDtm, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    <p class="form-control-static">@Html.DisplayFor((model) => model.UploadDtm)</p>
-                    @*@Html.TextBoxFor(model => model.UploadDtm, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })*@
-                    @*@Html.ValidationMessageFor(model => model.UploadDtm, "", new { @class = "text-danger" })*@
+            @*<div class="form-group">
+                    @Html.LabelFor(model => model.UploadDtm, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <p class="form-control-static">@Html.DisplayFor((model) => model.UploadDtm)</p>
+                        Html.TextBoxFor(model => model.UploadDtm, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })
+                    @Html.ValidationMessageFor(model => model.UploadDtm, "", new { @class = "text-danger" })
                 </div>
-            </div>
+            </div>*@
 
             <div class="form-group">
                 @Html.LabelFor((model) => model.FreqencyID, htmlAttributes: new { @class = "control-label col-md-2" })

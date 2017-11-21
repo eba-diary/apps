@@ -3,6 +3,8 @@ using System.Web.SessionState;
 using Sentry.data.Core;
 using Sentry.data.Infrastructure;
 using System.Collections.Generic;
+using System;
+using System.Reflection;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -51,13 +53,23 @@ namespace Sentry.data.Web.Controllers
             return PartialView("_Header", headerModel);
         }
 
+        private class AppVersion
+        {
+            private static readonly Version _applicationVersion = Assembly.GetExecutingAssembly().GetName().Version;
+
+            public static Version ApplicationVersion
+            {
+                get { return _applicationVersion; }
+            }
+        }
+
         [ChildActionOnly()]
         public ActionResult GetFooter()
         {
             FooterModel footerModel = new FooterModel();
             
             // Replace the following if necessary to load the correct version number for your app
-            footerModel.AppVersion = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version.ToString();
+            footerModel.AppVersion = AppVersion.ApplicationVersion.ToString();
 
             return PartialView("_Footer", footerModel);
         }

@@ -10,6 +10,9 @@
     [DatasetFileConfig_ID] INT NULL, 
     [ParentDatasetFile_ID] INT NULL, 
     [Version_ID] NVARCHAR(250) NULL, 
+    [isUsable_IND] BIT NOT NULL, 
+    [isBundled_IND] BIT NOT NULL, 
+    [Information_DSC] NVARCHAR(MAX) NULL, 
     CONSTRAINT [FK_DatasetFile_Dataset] FOREIGN KEY (Dataset_ID) REFERENCES Dataset(Dataset_ID), 
     CONSTRAINT [FK_DatasetFile_DatasetFileConfigs] FOREIGN KEY ([DatasetFileConfig_ID]) REFERENCES [DatasetFileConfigs]([Config_ID]) 
 )

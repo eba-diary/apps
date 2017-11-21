@@ -1,0 +1,102 @@
+﻿@model Sentry.data.Web.DatasetFileGridModel
+@{
+    ViewBag.Title = "Edit Data File";
+}
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        @*Show the custom validation summary*@
+        @Html.DisplayFor((model) => ViewData.ModelState)
+
+        @Html.HiddenFor(model => model.s3Key)
+        @Html.HiddenFor(model => model.Name)
+        @Html.HiddenFor(model => model.UploadUserName)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.s3Key, htmlAttributes: new { @class = "control-label col-sm-3" })
+            <div class="col-sm-9">
+                @Html.TextAreaFor(model => model.s3Key, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row", @style="width: 100%" })
+                @*@Html.ValidationMessageFor(model => model.S3Key, "", new { @class = "text-danger" })*@
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-sm-3" })
+            <div class="col-sm-9">
+                <p class="form-control-static">@Html.DisplayFor(model => model.Name)</p>
+                @*@Html.EditorFor(model => model.DatasetName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+            @Html.ValidationMessageFor(model => model.DatasetName, "", new { @class = "text-danger" })*@
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.UploadUserName, htmlAttributes: new { @class = "control-label col-sm-3" })
+            <div class="col-sm-9">
+                @Model.UploadUserName
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Information, htmlAttributes: new { @class = "control-label col-sm-3" })
+            <div class="col-sm-9">
+                @Html.EditorFor(model => model.Information, new { htmlAttributes = new { @placeholder = "Information about this Data File: ",@class = "form-control edit-dataset-row" } })
+                @Html.ValidationMessageFor(model => model.Information, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.IsUsable, htmlAttributes: new { @class = "control-label col-sm-3" })
+            <div class="col-sm-9">
+                @Html.CheckBox("IsUsable", new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.CreateDTM, htmlAttributes: new { @class = "control-label col-sm-3" })
+            <div class="col-sm-9">
+                <p class="form-control-static">@Html.DisplayFor((model) => model.CreateDTM)</p>
+                @*@Html.TextBoxFor(model => model.ChangedDtm, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })*@
+                @*@Html.ValidationMessageFor(model => model.ChangedDtm, "", new { @class = "text-danger" })*@
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ModifiedDTM, htmlAttributes: new { @class = "control-label col-sm-3" })
+            <div class="col-sm-9">
+                <p class="form-control-static">@Html.DisplayFor((model) => model.ModifiedDTM)</p>
+                @*@Html.EditorFor(model => model.ModifiedDTM, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+            @Html.ValidationMessageFor(model => model.ModifiedDTM, "", new { @class = "text-danger" })*@
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to Dataset", "Detail", new { id = Model.ParentDataSetID })
+</div>
+
+
+
+
+@section Scripts{
+
+    @*@Scripts.Render("~/bundles/jquery")*@
+    @Scripts.Render("~/bundles/dataTables")
+
+    <script>
+    $(function () {
+        data.ManageConfigs.Init();
+    });
+    </script>
+
+}

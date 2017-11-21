@@ -26,46 +26,50 @@ namespace Sentry.data.Web.Controllers
         [Route("Asset/")]
         public ActionResult SearchResults(SearchModel s)
         {
-            if (s.SearchCategory.HasValue)
-            {
-                Category cat = _domainContext.GetById<Category>(s.SearchCategory.Value);
-                s.Category = new FullCategoryModel(cat);
-            }
-            else
-            {
-                s.Category = new FullCategoryModel() { Name = "", SubCategories = _domainContext.Categories.WhereIsRoot().Select((c) => new FullCategoryModel(c, true)).ToList() };
-            }
-            return View(s);
+            throw new NotImplementedException();
+
+            //if (s.SearchCategory.HasValue)
+            //{
+            //    Category cat = _domainContext.GetById<Category>(s.SearchCategory.Value);
+            //    s.Category = new FullCategoryModel(cat);
+            //}
+            //else
+            //{
+            //    s.Category = new FullCategoryModel() { Name = "", SubCategories = _domainContext.Categories.WhereIsRoot().Select((c) => new FullCategoryModel(c, true)).ToList() };
+            //}
+            //return View(s);
         }
 
         [HttpGet()]
         [Route("Search/ResultList/{SearchText?}")]
         public ActionResult ResultList(SearchModel s)
         {
-            System.Threading.Thread.Sleep(TimeSpan.FromMilliseconds(500));
+            throw new NotImplementedException();
 
-            s.PageSize = RECORDS_PER_PAGE;
-            s.StartRecordNumber = ((s.SearchPage - 1) * RECORDS_PER_PAGE) + 1;
-            s.EndRecordNumber = s.StartRecordNumber + s.PageSize - 1;
+            //System.Threading.Thread.Sleep(TimeSpan.FromMilliseconds(500));
 
-            IQueryable<Asset> assets = _domainContext.Assets;
-            if (!string.IsNullOrEmpty(s.SearchText))
-            {
-                assets = assets.Where((i) => (i.Name.ToLower().Contains(s.SearchText.ToLower()) || i.Description.ToLower().Contains(s.SearchText.ToLower())));
-            }
-            if (s.SearchCategory.HasValue)
-            {
-                Category cat = _domainContext.GetById<Category>(s.SearchCategory.Value);
-                assets = assets.Where((i) => i.Categories.Contains(cat));
-            }
-            assets = assets.Where((i) => i.DynamicDetails.State == s.SearchState);
+            //s.PageSize = RECORDS_PER_PAGE;
+            //s.StartRecordNumber = ((s.SearchPage - 1) * RECORDS_PER_PAGE) + 1;
+            //s.EndRecordNumber = s.StartRecordNumber + s.PageSize - 1;
 
-            s.AssetCount = assets.Count();
-            s.EndRecordNumber = Math.Min(s.AssetCount, s.EndRecordNumber);
+            //IQueryable<Asset> assets = _domainContext.Assets;
+            //if (!string.IsNullOrEmpty(s.SearchText))
+            //{
+            //    assets = assets.Where((i) => (i.Name.ToLower().Contains(s.SearchText.ToLower()) || i.Description.ToLower().Contains(s.SearchText.ToLower())));
+            //}
+            //if (s.SearchCategory.HasValue)
+            //{
+            //    Category cat = _domainContext.GetById<Category>(s.SearchCategory.Value);
+            //    assets = assets.Where((i) => i.Categories.Contains(cat));
+            //}
+            //assets = assets.Where((i) => i.DynamicDetails.State == s.SearchState);
 
-            assets = assets.Skip(s.StartRecordNumber - 1).Take(RECORDS_PER_PAGE);
-            s.Assets = assets.Select((i) => new BaseAssetModel(i)).ToList();
-            return PartialView("_SearchResultsList", s);
+            //s.AssetCount = assets.Count();
+            //s.EndRecordNumber = Math.Min(s.AssetCount, s.EndRecordNumber);
+
+            //assets = assets.Skip(s.StartRecordNumber - 1).Take(RECORDS_PER_PAGE);
+            //s.Assets = assets.Select((i) => new BaseAssetModel(i)).ToList();
+            //return PartialView("_SearchResultsList", s);
         }
     }
 }

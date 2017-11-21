@@ -90,7 +90,7 @@ namespace Sentry.data.Common.Tests
             ds.OriginationCode = "Internal";
             ds.DatasetDtm = System.DateTime.Now.AddYears(-13);
             ds.ChangedDtm = System.DateTime.Now.AddYears(-13);
-            ds.CreationFreqDesc = "NonSchedule";
+            //ds.CreationFreqDesc = "NonSchedule";
             ds.S3Key = "";
             ds.IsSensitive = false;
             ds.CanDisplay = true;

@@ -18,37 +18,7 @@ namespace Sentry.data.Web
 
         public EditDatasetModel(Dataset ds, IAssociateInfoProvider associateService) : base(ds, associateService)
         {
-            //if (null != catList)
-            //{
-            //    List<SelectListItem> sliCatList = new List<SelectListItem>();
 
-            //    foreach (String cat in catList.AsEnumerable())
-            //    {
-            //        SelectListItem sliCat = new SelectListItem();
-            //        sliCat.Text = cat;
-            //        sliCat.Value = cat;
-            //        sliCatList.Add(sliCat);
-            //    }
-            //    this.AllCategories = sliCatList.AsEnumerable();
-            //}
-
-            //if (null != ds.Columns)
-            //{
-            //    this.md_Columns = new List<_DatasetMetadataModel>();
-            //    foreach (DatasetMetadata dsm in ds.Columns)
-            //    {
-            //        md_Columns.Add(new _DatasetMetadataModel(dsm));
-            //    }
-            //}
-
-            //if (null != ds.Metadata)
-            //{
-            //    this.md_Metadata = new List<_DatasetMetadataModel>();
-            //    foreach (DatasetMetadata dsm in ds.Metadata)
-            //    {
-            //        md_Metadata.Add(new _DatasetMetadataModel(dsm));
-            //    }
-            //}
         }
 
         //[DisplayName("Column Metadata")]

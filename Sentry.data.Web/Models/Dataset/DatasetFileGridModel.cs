@@ -10,6 +10,10 @@ namespace Sentry.data.Web
 {
     public class DatasetFileGridModel
     {
+        public DatasetFileGridModel()
+        {
+        }
+
         public DatasetFileGridModel(DatasetFile f)
         {
             this.Id = f.DatasetFileId;
@@ -24,6 +28,8 @@ namespace Sentry.data.Web
             this.IsSensitive = f.IsSensitive;
             this.ParentDataSetID = f.Dataset.DatasetId;
             this.IsBundled = f.IsBundled;
+            this.Information = f.Information;
+            this.IsUsable = f.IsUsable;
         }
         public int Id { get; set; }
         public string Name { get; set; }
@@ -35,25 +41,37 @@ namespace Sentry.data.Web
             get
             {
                 string href = null;
-                //if (IsPreviewCompatible)
-                //{
-                href = "<a href = \"#\" onclick=\"data.DatasetDetail.PreviewDatafileModal(" + Id + ")\" class=\"table-row-icon row-filepreview-icon\" title=\"Preview file\"><i class='glyphicon glyphicon-search text-primary'></i></a>";
-                //}
 
-                if ((IsSensitive && CanDwnldSenstive) || (!IsSensitive && CanDwnldNonSensitive))
+                if (IsUsable)
                 {
-                    href += "<a href = \"#\" onclick=\"data.DatasetDetail.DownloadDatasetFile(" + Id + ")\" class=\"table-row-icon row-filedownload-icon\" title=\"Download File\"><i class='glyphicon glyphicon-cloud-download text-primary'></i></a>";
+
+                    //if (IsPreviewCompatible)
+                    //{
+                    href = "<a href = \"#\" onclick=\"data.DatasetDetail.PreviewDatafileModal(" + Id + ")\" class=\"table-row-icon row-filepreview-icon\" title=\"Preview file\"><i class='glyphicon glyphicon-search text-primary'></i></a>";
+                    //}
+
+                    if ((IsSensitive && CanDwnldSenstive) || (!IsSensitive && CanDwnldNonSensitive))
+                    {
+                        href += "<a href = \"#\" onclick=\"data.DatasetDetail.DownloadDatasetFile(" + Id + ")\" class=\"table-row-icon row-filedownload-icon\" title=\"Download File\"><i class='glyphicon glyphicon-cloud-download text-primary'></i></a>";
+                    }
+                }
+                if (CanEdit)
+                {
+                    href += "<a href = \"#\" onclick=\"data.DatasetDetail.EditDataFileInformation(" + Id + ")\" class=\"table-row-icon\" title=\"Edit File\"><i class='glyphicon glyphicon-edit text-primary'></i></a>";
                 }
 
-                if ((IsSensitive && CanDwnldSenstive && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(Name))) || (!IsSensitive && CanDwnldNonSensitive && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(Name))))
+                if (IsUsable)
                 {
-                    href += "<a href = \"#\" onclick=\"data.Dataset.FileNameModal(" + Id + ")\" title=\"Push to SAS\">" +
-                        "<img src=\"../../Images/sas_logo_min.png\" style=\" height: 15px; margin-bottom: 4px; margin-left: 5px;\"/>" +
-                        "</a>";
+
+                    if ((IsSensitive && CanDwnldSenstive && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(Name))) || (!IsSensitive && CanDwnldNonSensitive && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(Name))))
+                    {
+                        href += "<a href = \"#\" onclick=\"data.Dataset.FileNameModal(" + Id + ")\" title=\"Push to SAS\">" +
+                            "<img src=\"../../Images/sas_logo_min.png\" style=\" height: 15px; margin-bottom: 4px; margin-left: 5px;\"/>" +
+                            "</a>";
+
+                    }
 
                 }
-
-
                 return href;
             }
         }
@@ -65,9 +83,11 @@ namespace Sentry.data.Web
         public string VersionId { get; set; }
         public Boolean CanDwnldSenstive { get; set; }
         public Boolean CanDwnldNonSensitive { get; set; }
+        public Boolean CanEdit { get; set; }
         public Boolean IsSensitive { get; set; }
         public int ParentDataSetID { get; set; }
         public Boolean IsBundled { get; set; }
-
+        public Boolean IsUsable { get; set; }
+        public string Information { get; set; }
     }
 }

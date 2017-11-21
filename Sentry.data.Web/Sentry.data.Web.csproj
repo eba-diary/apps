@@ -1120,6 +1120,9 @@
     <Content Include="Views\DataAsset\ManageAssetNotification.cshtml" />
     <Content Include="Views\DataAsset\_EditAssetNotification.cshtml" />
     <Content Include="Views\DataAsset\_CreateAssetNotification.cshtml" />
+    <Content Include="Views\Dataset\_BundleFilename.cshtml" />
+    <Content Include="Views\Dataset\EditDataFile.cshtml" />
+    <Content Include="Views\Dataset\CreateDataFileConfig.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

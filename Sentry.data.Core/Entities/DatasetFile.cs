@@ -23,7 +23,10 @@ namespace Sentry.data.Core
         private int? _parentDatasetFileId;
         private string _versionId;
         private Boolean _isSensitive;
+
         private Boolean _isBundled;
+        private Boolean _isUsable;
+        private string _information;
 
         protected DatasetFile()
         {
@@ -213,6 +216,34 @@ namespace Sentry.data.Core
             get
             {
                 return this._isBundled;
+            }
+            set
+            {
+                _isBundled = value;
+            }
+        }
+
+        public virtual Boolean IsUsable
+        {
+            get
+            {
+                return this._isUsable;
+            }
+            set
+            {
+                _isUsable = value;
+            }
+        }
+
+        public virtual string Information
+        {
+            get
+            {
+                return this._information;
+            }
+            set
+            {
+                _information = value;
             }
         }
     }

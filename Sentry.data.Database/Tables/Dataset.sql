@@ -18,6 +18,7 @@
     [DatasetScopeType_ID] INT NOT NULL, 
     [DatafilesToKeep_NBR] INT NOT NULL, 
     [DropLocation] VARCHAR(250) NOT NULL, 
+    [Information_DSC] NVARCHAR(MAX) NULL, 
     PRIMARY KEY CLUSTERED 
 (
 	[Dataset_ID] ASC

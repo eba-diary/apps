@@ -41,6 +41,14 @@ ul.list-group-indented {
     width: 80%;
 }
 
+.modal-backdrop.in{
+    opacity: 0 !important;
+}
+
+.modal-backdrop {
+    background-color: transparent !important;
+}
+
 /*****************************/
 /* Custom Settings Start Here*/
 /*****************************/
@@ -1599,6 +1607,24 @@ body { background-color: #f8f8f8; }
 
 .all:active {  box-shadow: 1px 4px 8px #888888; }
 
+.unUsable {
+    background-color: #ffd1d1 !important;
+}
+
+/* remove extra space before the comma */
+.comma:not(:first-child) {
+    margin-left: -.3em;
+}
+
+/* no need to display empty elements */
+.comma:empty {
+    display: none;
+}
+
+.comma:not(:first-child):before {
+    content: ", ";
+}
+
 .blueBox, .ltBlueBox
 {
     height: 320px;
@@ -2106,8 +2132,8 @@ tr.shown td.details-control {
 }
 
 .ConfigFileDesc {
-    width: auto;
-    /*height: auto;*/
+    width: 100%;
+    max-width: 100%;
 }
 
 

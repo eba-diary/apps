@@ -14,6 +14,9 @@
     [Config_DSC] VARCHAR(250) NULL, 
     [IsGeneric] BIT NOT NULL, 
     [TargetFile_NME] VARCHAR(250) NULL, 
+    [CreationFreq_DSC] NVARCHAR(50) NOT NULL, 
+    [DatasetScopeType_ID] INT NOT NULL, 
     CONSTRAINT [FK_DatasetFileConfigs_Dataset] FOREIGN KEY ([Dataset_ID]) REFERENCES [Dataset]([Dataset_ID]), 
-    CONSTRAINT [PK_DatasetFileConfigs] PRIMARY KEY ([Config_ID]) 
+    CONSTRAINT [PK_DatasetFileConfigs] PRIMARY KEY ([Config_ID]), 
+    CONSTRAINT [FK_DatasetFileConfigs_DatasetScopeTypes] FOREIGN KEY ([DatasetScopeType_ID]) REFERENCES [DatasetScopeTypes]([ScopeType_ID]) 
 )
