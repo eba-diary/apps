@@ -22,14 +22,23 @@ namespace Sentry.data.Web
         public BaseDatasetModel(Dataset ds, IAssociateInfoProvider associateInfoService)
         {
             this.SentryOwner = associateInfoService.GetAssociateInfo(ds.SentryOwnerName);
-            this.SentryOwnerName = ds.SentryOwnerName;
+            this.SentryOwnerName = this.SentryOwner.FullName;
             this.DatasetId = ds.DatasetId;
             this.Category = ds.Category;
             this.DatasetName = ds.DatasetName;
             this.DatasetDesc = ds.DatasetDesc;
             this.CreationUserName = ds.CreationUserName;
-            this.SentryOwnerName = ds.SentryOwnerName;
-            this.UploadUserName = ds.UploadUserName;
+
+            int n;
+            if (!string.IsNullOrEmpty(ds.UploadUserName) && int.TryParse(ds.UploadUserName, out n))
+            {
+                this.UploadUserName = associateInfoService.GetAssociateInfo(ds.UploadUserName).FullName;
+            }
+            else
+            {
+                this.UploadUserName = ds.UploadUserName;
+            }
+
             this.OriginationCode = ds.OriginationCode;
             this.FileExtension = ds.FileExtension;
             this.DatasetDtm = ds.DatasetDtm;
@@ -56,7 +65,7 @@ namespace Sentry.data.Web
 
             this.DatasetScopeType = ds.DatasetScopeType;
 
-            this.DatafilesFilesToKeep = ds.DatafilesToKeep;
+            
             this.DatasetFileConfigs = new List<DatasetFileConfigsModel>();
             foreach (DatasetFileConfig dfc in ds.DatasetFileConfigs)
             {
@@ -123,13 +132,12 @@ namespace Sentry.data.Web
         public string CreationUserName { get; set; }
 
         [Required]
-        [RegularExpression("(^[0-9]{6,6}$)", ErrorMessage ="Please enter a Sentry ID")]
         [DisplayName("Sentry Owner")]
         public string SentryOwnerName { get; set; }
 
         //[Required]
         [MaxLength(128)]
-        [DisplayName("Upload User")]
+        [DisplayName("Creator")]
         public string UploadUserName { get; set; }
 
         //[Required]
@@ -206,10 +214,6 @@ namespace Sentry.data.Web
 
         [DisplayName("Dataset Scope")]
         public List<DatasetScopeType> DatasetScopeType { get; set; }
-
-        [RegularExpression(@"^\d+$", ErrorMessage = "Must be non-negative number")] //Only allow digits
-        [DisplayName("Number of Files Keep")]
-        public int DatafilesFilesToKeep { get; set; }
 
         public Associate SentryOwner { get; set; }
 

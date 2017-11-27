@@ -151,7 +151,7 @@ namespace Sentry.data.Core.Tests
                                             GetMockCategoryData(),
                                             null,
                                            // GetMockDatasetScopeData(),
-                                            0,
+                                            //0,
                                             null,
                                             null);
 

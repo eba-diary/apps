@@ -22,6 +22,7 @@ using Sentry.DataTables.Mvc;
 using Sentry.DataTables.QueryableAdapter;
 using Sentry.data.Common;
 using System.Diagnostics;
+using LazyCache;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -33,9 +34,9 @@ namespace Sentry.data.Web.Controllers
         private UserService _userService;
         private IDatasetService _s3Service;
         private ISASService _sasService;
+        private IAppCache _cache;
+
         private static Amazon.S3.IAmazonS3 _s3client = null;
-        //private IApiClient _apiClient;
-        //private IWeatherDataProvider _weatherDataProvider;
 
         // JCG TODO: Revisit, Could this be push down into the Infrastructure\Core layer? 
         private Amazon.S3.IAmazonS3 S3Client
@@ -92,117 +93,667 @@ namespace Sentry.data.Web.Controllers
 
         public DatasetController(IDatasetContext dsCtxt, IDatasetService dsSvc, UserService userService, ISASService sasService, IAssociateInfoProvider associateInfoService)
         {
+            _cache = new CachingService();
             _datasetContext = dsCtxt;
             _s3Service = dsSvc;
             _userService = userService;
             _sasService = sasService;
             _associateInfoProvider = associateInfoService;
-            //_weatherDataProvider = weatherDataProvider;
         }
 
-        //private static List<BaseDatasetModel> _demoDatasetData;
+        // GET: Dataset
+        public ActionResult Index()
+        {
+            List<BaseDatasetModel> dsList = GetDatasetModelList();
+            return View(dsList);
+        }
 
-        //private static List<BaseDatasetModel> DemoDatasetData
-        //{
-        //    get
-        //    {
-        //        if (_demoDatasetData == null || _demoDatasetData.Count == 0)
-        //        {
-        //            _demoDatasetData = new List<BaseDatasetModel>();
-        //            Random rnd = new Random(1234);
-        //            for (int i = 1; i <= 100; i++)
-        //            {
-        //                BaseDatasetModel dsm = new BaseDatasetModel();
-        //                string ext = "";
-        //                switch (rnd.Next(5))
-        //                {
-        //                    case 0: ext = ".txt"; break;
-        //                    case 1: ext = ".csv"; break;
-        //                    case 2: ext = ".pdf"; break;
-        //                    case 3: ext = ".xlsx"; break;
-        //                    default: ext = ".sas7bdat"; break;
-        //                }
-        //                string cat = "";
-        //                switch (rnd.Next(4))
-        //                {
-        //                    case 0: cat = "claims"; break;
-        //                    case 1: cat = "geographic"; break;
-        //                    case 2: cat = "government"; break;
-        //                    default: cat = "industry"; break;
-        //                }
-        //                string addlTag1 = "";
-        //                switch (rnd.Next(10))
-        //                {
-        //                    case 0: addlTag1 = "weather"; break;
-        //                    case 1: addlTag1 = "crime"; break;
-        //                    case 2: addlTag1 = "population"; break;
-        //                    case 3: addlTag1 = "ratio"; break;
-        //                    case 4: addlTag1 = "energy"; break;
-        //                    case 5: addlTag1 = "wealth"; break;
-        //                    case 6: addlTag1 = "height"; break;
-        //                    case 7: addlTag1 = "weight"; break;
-        //                    case 8: addlTag1 = "age"; break;
-        //                    default: addlTag1 = "salary"; break;
-        //                }
-        //                string addlTag2 = "";
-        //                switch (rnd.Next(10))
-        //                {
-        //                    case 0: addlTag2 = "daily"; break;
-        //                    case 1: addlTag2 = "weekly"; break;
-        //                    case 2: addlTag2 = "monthly"; break;
-        //                    case 3: addlTag2 = "yearly"; break;
-        //                    case 4: addlTag2 = "trend"; break;
-        //                    case 5: addlTag2 = "detail"; break;
-        //                    case 6: addlTag2 = "summary"; break;
-        //                    case 7: addlTag2 = "description"; break;
-        //                    case 8: addlTag2 = "overview"; break;
-        //                    default: addlTag2 = "forecast"; break;
-        //                }
-        //                string owner = "";
-        //                switch (rnd.Next(4))
-        //                {
-        //                    case 0: owner = "John Schneider"; break;
-        //                    case 1: owner = "Cory Woytasik"; break;
-        //                    case 2: owner = "Evan Volm"; break;
-        //                    default: owner = "Aaron Deering"; break;
-        //                }
-        //                dsm.Name = "testFile_" + cat + "_" + i.ToString("D3") + ext;
-        //                dsm.UniqueKey = "testFile_UniqueKey_" + cat + "_" + i.ToString("D3");
-        //                string dsc = "";
-        //                switch (rnd.Next(5))
-        //                {
-        //                    case 0:
-        //                        dsc = "This is an incredibly detailed, or maybe not, description of the file " + dsm.Name + ". " +
-        //                        "Seriously - not even kidding you.. this description goes on for so long that it should wrap around in the " +
-        //                        "browser and give us a look at how well our CSS handles that kind of stuff.  Dontchyaknow..."; break;
-        //                    case 1: dsc = "OK Description: pretty good content here explaining more than just a little. Bot bad, eh?"; break;
-        //                    case 2: dsc = "Less Bad Description: just a little detail here."; break;
-        //                    case 3: dsc = "Bad Desc!"; break;
-        //                    default: dsc = ""; break;
-        //                }
-        //                dsm.Description = dsc;
-        //                dsm.SentryOwner = owner;
-        //                dsm.DatasetDate = DateTime.Now.AddDays(-i).ToString();
-        //                dsm.Category = cat;
-        //                dsm.ETag = System.Guid.NewGuid().ToString().Replace("-","");
-        //                Dictionary<string, string> md = new Dictionary<string, string>();
-        //                //md.Add(Sentry.data.Web.BaseDatasetModel.METADATA_KEY_NAME, dsm.DatasetDate);
-        //                //md.Add(Sentry.data.Web.BaseDatasetModel.METADATA_KEY_DESC, dsm.DatasetDate);
-        //                //md.Add(Sentry.data.Web.BaseDatasetModel.METADATA_KEY_DATASET_DATE, dsm.DatasetDate);
-        //                //md.Add(Sentry.data.Web.BaseDatasetModel.METADATA_KEY_SENTRY_OWNER, dsm.DatasetDate);
-        //                //dsm.Metadata = md;
-        //                dsm.Metadata.Add("addlTag1", addlTag1);
-        //                dsm.Metadata.Add("addlTag2", addlTag2);
-        //                _demoDatasetData.Add(dsm);
-        //            }
-        //        }
-        //        return _demoDatasetData;
-        //    }
-        //}
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        public ActionResult HomeDataset()
+        {
+            List<Category> categories = _datasetContext.Categories.ToList();
+            ViewData["dsCount"] = _datasetContext.GetDatasetCount();
+            ViewData["CanEditDataset"] = SharedContext.CurrentUser.CanEditDataset;
+            ViewData["CanUpload"] = SharedContext.CurrentUser.CanUpload;
+
+            foreach (Category c in categories) //parallel?
+            {
+                ViewData[c.Name + "Count"] = _datasetContext.GetCategoryDatasetCount(c);
+            }
+
+            return PartialView("_HomeDataset", categories.OrderBy(o => o.Name).ToList());
+        }
+
+        #region Search
+        // GET: Dataset/List/searchParms
+        [Route("Dataset/List/Index")]
+        [Route("Dataset/List/SearchPhrase")]
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        public ActionResult List(string category, string searchPhrase, string ids)
+        {
+            Helpers.Search searchHelper = new Helpers.Search(_cache);
+
+            return View(searchHelper.List(this, null, searchPhrase, category, ids));
+        }
+
+        [Route("Dataset/List")]
+        public ActionResult List(ListDatasetModel ldm)
+        {
+            Helpers.Search searchHelper = new Helpers.Search(_cache);
+
+            Debug.WriteLine(Request.Url.AbsoluteUri);
+
+            return View("List", searchHelper.List(this, null));
+        }
+        #endregion
+
+        #region Dataset Modification
+
+        [HttpGet]
+        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
+        public ActionResult Create()
+        {
+            CreateDatasetModel udm = new CreateDatasetModel();
+            udm.AllCategories = GetCategoryList();
+            udm.AllFrequencies = GetDatasetFrequencyListItems();  //load all values for dropdown
+            udm.AllOriginationCodes = GetDatasetOriginationListItems(); //load all values for dropdown
+            udm.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
+            udm.FreqencyID = 6; // preselected NonSchedule            
+            return View(udm);
+        }
+
+        [HttpPost]
+        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
+        public ActionResult Create(CreateDatasetModel cdm)
+        {
+
+            if (_datasetContext.isDatasetNameDuplicate(cdm.DatasetName, _datasetContext.GetCategoryById(cdm.CategoryIDs).Name))
+            {
+                AddCoreValidationExceptionsToModel(new ValidationException("Dataset name already exists within category"));
+            }
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    Dataset ds = CreateDatasetFromModel(cdm);
+
+                    //IApplicationUser user = _userService.GetCurrentUser();
+                    //DateTime CreateTime = DateTime.Now;
+
+                    ds = _datasetContext.Merge<Dataset>(ds);
+
+                    List<DatasetFileConfig> dfcList = new List<DatasetFileConfig>();
+                    //Create Generic Data File Config for Dataset                    
+                    DatasetFileConfig dfc = new DatasetFileConfig(
+                        0,
+                        "Default",
+                        "Default Config for Dataset.  Uploaded files that do not match any configs will default to this config",
+                        1,
+                        "\\.",
+                        "DFS",
+                        ds.DropLocation + "\\Default",
+                        true,
+                        true,
+                        1,
+                        true,
+                        ds,
+                        Enum.GetName(typeof(DatasetFrequency), cdm.FreqencyID),
+                        cdm.DatasetScopeTypeID
+                        );
+
+                    dfc.DatasetScopeType = _datasetContext.GetAllDatasetScopeTypes().Where(x => x.ScopeTypeId == cdm.DatasetScopeTypeID).First();
+
+                    _datasetContext.Merge(dfc);
+                    _datasetContext.SaveChanges();
+
+                    try
+                    {
+                        if (!System.IO.Directory.Exists(dfc.DropPath))
+                        {
+                            System.IO.Directory.CreateDirectory(dfc.DropPath);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+
+                        StringBuilder errmsg = new StringBuilder();
+                        errmsg.AppendLine("Failed to Create Drop Location:");
+                        errmsg.AppendLine($"DatasetId: {ds.DatasetId}");
+                        errmsg.AppendLine($"DatasetName: {ds.DatasetName}");
+                        errmsg.AppendLine($"DropLocation: {dfc.DropPath}");
+
+                        Sentry.Common.Logging.Logger.Error(errmsg.ToString(), e);
+                    }
+
+                    int maxId = _datasetContext.GetMaxId();
+                    return RedirectToAction("Detail", new { id = maxId });
+                }
+            }
+            catch (Sentry.Core.ValidationException ex)
+            {
+                AddCoreValidationExceptionsToModel(ex);
+            }
+            finally
+            {
+                _datasetContext.Clear();
+                cdm.AllCategories = GetCategoryList();  //Reload dropdown value list
+                //cdm.AllFrequencies = GetDatasetFrequencyListItems();  //Reload dropdown value list
+                cdm.AllOriginationCodes = GetDatasetOriginationListItems(); //Reload dropdown value list
+                //cdm.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
+                cdm.AllFrequencies = GetDatasetFrequencyListItems();  //load all values for dropdown
+                cdm.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
+                cdm.OriginationID = 1; // preselected Internal
+            }
+
+            return View(cdm);
+        }
+
+        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
+        private Dataset CreateDatasetFromModel(CreateDatasetModel cdm)
+        {
+            DateTime CreateTime = DateTime.Now;
+            string cat = _datasetContext.GetCategoryById(cdm.CategoryIDs).Name;
+            string freqName = Enum.GetName(typeof(DatasetFrequency), cdm.FreqencyID);
+            IApplicationUser user = _userService.GetCurrentUser();
+            Dataset ds = new Dataset(
+                0,
+                cat,
+                cdm.DatasetName,
+                cdm.DatasetDesc,
+                "This is a test Information line.",
+                cdm.CreationUserName,
+                cdm.SentryOwnerName,
+                user.AssociateId,
+                Enum.GetName(typeof(DatasetOriginationCode), cdm.OriginationID),
+                CreateTime,
+                CreateTime,
+                //freqName,
+                Utilities.GenerateDatasetStorageLocation(cat, cdm.DatasetName),
+                false,
+                true,
+                null,
+                _datasetContext.GetCategoryById(cdm.CategoryIDs),
+                null,
+                //_datasetContext.GetDatasetScopeById(cdm.DatasetScopeTypeID),
+                //cdm.DatafilesFilesToKeep,
+                null,
+                Utilities.GenerateDatasetDropLocation(cat, cdm.DatasetName));
+
+            return ds;
+        }
+
+        // GET: DatasetFileVersion/Edit/5
+        [HttpGet()]
+        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
+        public ActionResult Edit(int id)
+        {
+            Dataset ds = _datasetContext.GetById<Dataset>(id);
+            EditDatasetModel item = new EditDatasetModel(ds, _associateInfoProvider);
+            //item.AllFrequencies = GetDatasetFrequencyListItems();  // Load dropdown value list
+            //item.FreqencyID = (int)(Enum.Parse(typeof(DatasetFrequency), ds.CreationFreqDesc));  //Preselect current value
+            item.AllOriginationCodes = GetDatasetOriginationListItems();
+            item.OriginationID = (int)(Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode));  //Preselect current value
+            //item.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
+            //item.DatasetScopeTypeID = ds.DatasetScopeType.ScopeTypeId;
+            return View(item);
+        }
+
+        // POST: Dataset/Edit/5
+        [HttpPost()]
+        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
+        public ActionResult Edit(int id, EditDatasetModel i)
+        {
+            try
+            {
+                Dataset item = _datasetContext.GetById<Dataset>(id);
+                if (ModelState.IsValid)
+                {
+                    UpdateDatasetFromModel(item, i);
+                    _datasetContext.SaveChanges();
+                    return RedirectToAction("Detail", new { id = id });
+
+                }
+            }
+            catch (Sentry.Core.ValidationException ex)
+            {
+                AddCoreValidationExceptionsToModel(ex);
+            }
+            finally
+            {
+                _datasetContext.Clear();
+                i.AllFrequencies = GetDatasetFrequencyListItems();  //Reload dropdown value list
+                i.AllOriginationCodes = GetDatasetOriginationListItems(); //Reload dropdown value list
+                i.AllDatasetScopeTypes = GetDatasetScopeTypesListItems(); //Reload dropdown value list
+            }
+
+            return View(i);
+        }
+
+        [HttpPost]
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        private void UpdateDatasetFromModel(Dataset ds, EditDatasetModel eds)
+        {
+            DateTime now = DateTime.Now;
+
+            string frequency = ((DatasetFrequency)eds.FreqencyID).ToString();
+            string originationcode = ((DatasetOriginationCode)eds.OriginationID).ToString();
+
+            if (eds.DatasetInformation != null && eds.DatasetInformation.Length > 0)
+            {
+                ds.DatasetInformation = eds.DatasetInformation;
+            }
+
+            ds.ChangedDtm = now;
+            if (null != eds.Category && eds.Category.Length > 0) ds.Category = eds.Category;
+            //ds.CreationFreqDesc = frequency;
+            if (null != eds.CreationUserName && eds.CreationUserName.Length > 0) ds.CreationUserName = eds.CreationUserName;
+            if (null != eds.DatasetDesc && eds.DatasetDesc.Length > 0) ds.DatasetDesc = eds.DatasetDesc;
+            if (eds.DatasetDtm > DateTime.MinValue) ds.DatasetDtm = eds.DatasetDtm;
+            if (null != eds.DatasetName && eds.DatasetName.Length > 0) ds.DatasetName = eds.DatasetName;
+            ds.OriginationCode = originationcode;
+            if (null != eds.SentryOwnerName && eds.SentryOwnerName.Length > 0) ds.SentryOwnerName = eds.SentryOwnerName;
+            //if (eds.DatasetScopeTypeID != ds.DatasetScopeType.ScopeTypeId) { ds.DatasetScopeType = _datasetContext.GetDatasetScopeById(eds.DatasetScopeTypeID); }                        
+            ds.S3Key = Utilities.GenerateDatasetStorageLocation(ds.Category, ds.DatasetName);
+        }
+
+        #endregion
+
+        #region Dataset FILE Modification
+
+        [HttpPost()]
+        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
+        public ActionResult EditDatasetFile(int id, DatasetFileGridModel i)
+        {
+            try
+            {
+                DatasetFile item = _datasetContext.GetById<DatasetFile>(id);
+                if (ModelState.IsValid)
+                {
+                    UpdateDatasetfileFromModel(item, i);
+                    _datasetContext.SaveChanges();
+                    return RedirectToAction("Detail", new { id = item.Dataset.DatasetId });
+
+                }
+            }
+            catch (Sentry.Core.ValidationException ex)
+            {
+                AddCoreValidationExceptionsToModel(ex);
+            }
+            finally
+            {
+                _datasetContext.Clear();
+            }
+
+            return View();
+        }
+
+
+        [HttpPost]
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        private void UpdateDatasetfileFromModel(DatasetFile df, DatasetFileGridModel dfgm)
+        {
+            DateTime now = DateTime.Now;
+
+
+            if (dfgm.Information != null && dfgm.Information.Length > 0)
+            {
+                df.Information = dfgm.Information;
+            }
+
+            df.IsUsable = dfgm.IsUsable;
+
+            df.ModifiedDTM = now;
+        }
+
+        [HttpGet()]
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        public PartialViewResult EditDatasetFile(int id)
+        {
+            DatasetFile df = _datasetContext.GetById<DatasetFile>(id);
+            DatasetFileGridModel item = new DatasetFileGridModel(df, _associateInfoProvider);
+
+            return PartialView("EditDataFile", item);
+
+        }
+
+        #endregion
+
+        #region Detail Page
+
+        [HttpGet]
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        public ActionResult Detail(int id)
+        {
+            Dataset ds = _datasetContext.GetById(id);
+            // IList<String> catList = _datasetContext.GetCategoryList();
+            BaseDatasetModel bdm = new BaseDatasetModel(ds, _associateInfoProvider);
+            bdm.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
+            bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
+            bdm.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
+            bdm.CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
+            bdm.CanUpload = SharedContext.CurrentUser.CanUpload;
+            return View(bdm);
+        }
+
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        public JsonResult GetDatasetFileInfoForGrid(int Id, Boolean bundle, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
+        {
+            //IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
+            List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
+            Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
+            Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
+            Boolean CanEdit = SharedContext.CurrentUser.CanEditDataset;
+
+            //Query the Dataset for the following information:
+            foreach (DatasetFile df in _datasetContext.GetDatasetFilesForDataset(Id, x => !x.IsBundled).ToList())
+            {
+                DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider);
+                dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
+                dfgm.CanDwnldSenstive = CanDwnldSenstive;
+                dfgm.CanEdit = CanEdit;
+                files.Add(dfgm);
+            }
+
+            DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
+            int a = dtqa.GetDataTablesResponse().data.Count();
+
+            Debug.WriteLine(a);
+
+            if (bundle)
+            {
+                return Json(dtqa.GetDataTablesResponse(true), JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
+            }
+        }
+
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        public JsonResult GetBundledFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
+        {
+            //IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
+            List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
+            Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
+            Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
+            Boolean CanEdit = SharedContext.CurrentUser.CanEditDataset;
+
+            foreach (DatasetFile df in _datasetContext.GetDatasetFilesForDataset(Id, x => x.IsBundled).ToList())
+            {
+                DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider);
+                dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
+                dfgm.CanDwnldSenstive = CanDwnldSenstive;
+                dfgm.CanEdit = CanEdit;
+                files.Add(dfgm);
+            }
+
+            DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
+
+            return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
+
+        }
+
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        public JsonResult GetVersionsOfDatasetFileForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
+        {
+            DatasetFile df = _datasetContext.GetDatasetFile(Id);
+
+            List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
+            Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
+            Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
+            Boolean CanEdit = SharedContext.CurrentUser.CanEditDataset;
+
+            foreach (DatasetFile dfversion in _datasetContext.GetDatasetFilesVersions(df.Dataset.DatasetId, df.DatasetFileConfig.DataFileConfigId, df.FileName).ToList())
+            {
+                DatasetFileGridModel dfgm = new DatasetFileGridModel(dfversion, _associateInfoProvider);
+                dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
+                dfgm.CanDwnldSenstive = CanDwnldSenstive;
+                dfgm.CanEdit = CanEdit;
+                files.Add(dfgm);
+            }
+
+            //IEnumerable<DatasetFileGridModel> files = _datasetContext.GetDatasetFilesVersions(df.Dataset.DatasetId, df.DatasetFileConfig.DataFileConfigId, df.FileName).ToList().
+            //    Select((f) => new DatasetFileGridModel(f));
+
+            DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
+            return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
+        }
+
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        public JsonResult GetAllDatasetFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
+        {
+            IEnumerable<DatasetFileGridModel> files = _datasetContext.GetAllDatasetFiles().
+                Select((f) => new DatasetFileGridModel(f, _associateInfoProvider)
+                );
+
+            DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
+            return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
+
+        }
+
+        [HttpGet]
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        public JsonResult GetDatasetFileConfigInfo(int Id)
+        {
+            IEnumerable<DatasetFileConfigsModel> files = null;
+            if (Id > 0)
+            {
+                files = _datasetContext.GetById(Id).DatasetFileConfigs.Select((f) => new DatasetFileConfigsModel(f));
+            }
+            else
+            {
+                files = _datasetContext.getAllDatasetFileConfigs().Select((f) => new DatasetFileConfigsModel(f));
+            }
+
+            return Json(files, JsonRequestBehavior.AllowGet);
+        }
+
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        public JsonResult GetDatasetFileConfigInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
+        {
+            IEnumerable<DatasetFileConfigsModel> files = null;
+            if (Id > 0)
+            {
+                files = _datasetContext.GetById(Id).DatasetFileConfigs.Select((f) => new DatasetFileConfigsModel(f));
+            }
+            else
+            {
+                files = _datasetContext.getAllDatasetFileConfigs().Select((f) => new DatasetFileConfigsModel(f));
+            }
+            //= _datasetContext.Datasets.Where(w => w.DatasetId == Id).FirstOrDefault().DatasetFileConfigs.ToList().
+            //        Select((f) => new DatasetFileConfigsModel(f));
+
+            DataTablesQueryableAdapter<DatasetFileConfigsModel> dtqa = new DataTablesQueryableAdapter<DatasetFileConfigsModel>(files.AsQueryable(), dtRequest);
+            return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
+        }
+
+        #endregion
+
+        #region Create Data File Configuration
+        [HttpGet]
+        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
+        public ActionResult CreateDataFileConfig(int id)
+        {
+            Dataset parent = _datasetContext.GetById<Dataset>(id);
+
+            DatasetFileConfigsModel dfcm = new DatasetFileConfigsModel();
+            dfcm.DatasetId = id;
+            dfcm.ParentDatasetName = parent.DatasetName;
+
+
+            dfcm.AllFrequencies = GetDatasetFrequencyListItems();  //load all values for dropdown
+                                                                    //dfcm.AllOriginationCodes = GetDatasetOriginationListItems(); //load all values for dropdown
+            dfcm.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
+            dfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
+                    => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+
+            dfcm.DropPath = parent.DropLocation;
+            dfcm.DropLocationType = "DFS";
+
+            dfcm.SearchCriteria = "\\.";
+            dfcm.CreationFreq = DatasetFrequency.NonSchedule.ToString();
+            
+
+            return View(dfcm);
+        }
+
+        [HttpPost]
+        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
+        public ActionResult CreateDataFileConfig(DatasetFileConfigsModel dfcm)
+        {
+
+            Dataset parent = _datasetContext.GetById<Dataset>(dfcm.DatasetId);
+
+            if (parent.DatasetFileConfigs.Any(x => x.Name == dfcm.ConfigFileName))
+            {
+                AddCoreValidationExceptionsToModel(new ValidationException("Dataset config with that name already exists within dataset"));
+            }
+
+
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    List<DatasetFileConfig> dfcList = parent.DatasetFileConfigs.ToList();
+
+                    //Create Generic Data File Config for Dataset                    
+                    DatasetFileConfig dfc = new DatasetFileConfig(
+                        0,
+                        dfcm.ConfigFileName,
+                        dfcm.ConfigFileDesc,
+                        1,
+                        dfcm.SearchCriteria,
+                        dfcm.DropLocationType,
+                        dfcm.DropPath,
+                        dfcm.IsRegexSearch,
+                        dfcm.OverwriteDatasetFile,
+                        dfcm.FileTypeId,
+                        true,
+                        parent,
+                        dfcm.CreationFreq.ToString(),
+                        dfcm.DatasetScopeTypeID
+                        );
+
+                    dfc.DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dfcm.DatasetScopeTypeID);
+
+                    dfcList.Add(dfc);
+                    parent.DatasetFileConfigs = dfcList;
+
+                    _datasetContext.Merge<Dataset>(parent);
+                    // _datasetContext.Merge(dfc);
+                    _datasetContext.SaveChanges();
+
+                    try
+                    {
+                        if (!System.IO.Directory.Exists(dfcm.DropPath))
+                        {
+                            System.IO.Directory.CreateDirectory(dfcm.DropPath);
+                        }
+                    }
+                    catch (Exception e)
+                    {
+
+                        StringBuilder errmsg = new StringBuilder();
+                        errmsg.AppendLine("Failed to Create Drop Location:");
+                        errmsg.AppendLine($"DatasetId: {parent.DatasetId}");
+                        errmsg.AppendLine($"DatasetName: {parent.DatasetName}");
+                        errmsg.AppendLine($"DropLocation: {parent.DropLocation}");
+
+                        Sentry.Common.Logging.Logger.Error(errmsg.ToString(), e);
+                    }
+
+                    return RedirectToAction("Detail", new { id = parent.DatasetId });
+                }
+            }
+            catch (Sentry.Core.ValidationException ex)
+            {
+                AddCoreValidationExceptionsToModel(ex);
+            }
+            finally
+            {
+                _datasetContext.Clear();
+                dfcm.AllFrequencies = GetDatasetFrequencyListItems();  //load all values for dropdown
+                                                                       //dfcm.AllOriginationCodes = GetDatasetOriginationListItems(); //load all values for dropdown
+                dfcm.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
+                dfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
+                        => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+            }
+
+            return View(dfcm);
+        }
+
+        [HttpGet]
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        public ActionResult EditDataFileConfig()
+        {
+            DatasetFileConfigsModel edfc = new DatasetFileConfigsModel();
+
+            return View(edfc);
+        }
+
+        [HttpGet()]
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        public ActionResult GetEditConfigPartialView(int configId)
+        {
+            DatasetFileConfig dfc = _datasetContext.getDatasetFileConfigs(configId);
+            EditDatasetFileConfigModel edfc = new EditDatasetFileConfigModel(dfc);
+
+            edfc.AllFrequencies = GetDatasetFrequencyListItems(edfc.CreationFreq);  //load all values for dropdown
+            //dfcm.AllOriginationCodes = GetDatasetOriginationListItems(); //load all values for dropdown
+            edfc.AllDatasetScopeTypes = GetDatasetScopeTypesListItems(edfc.DatasetScopeTypeID);
+            edfc.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
+                => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+
+            ViewBag.ModifyType = "Edit";
+
+            return PartialView("_EditConfigFile", edfc);
+        }
+
+        [HttpPost()]
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        public ActionResult ModifyConfigFile(EditDatasetFileConfigModel edfc)
+        {
+            DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(edfc.ConfigId);
+
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    dfc = UpdateDatasetFileConfigFromModel(dfc, edfc);
+                    _datasetContext.SaveChanges();
+                    return AjaxSuccessJson();
+                }
+            }
+            catch (Sentry.Core.ValidationException ex)
+            {
+                AddCoreValidationExceptionsToModel(ex);
+                _datasetContext.Clear();
+            }
+
+            //Return partial view when there are errors
+            return GetEditConfigPartialView(edfc.ConfigId);
+        }
+
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        private DatasetFileConfig UpdateDatasetFileConfigFromModel(DatasetFileConfig dfc, EditDatasetFileConfigModel edfc)
+        {
+            dfc.SearchCriteria = edfc.SearchCriteria;
+            dfc.TargetFileName = edfc.TargetFileName;
+            dfc.IsRegexSearch = edfc.IsRegexSearch;
+            dfc.OverwriteDatafile = edfc.OverwriteDatasetFile;
+            dfc.CreationFreqDesc = edfc.CreationFreq;
+            dfc.DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(edfc.DatasetScopeTypeID);
+            dfc.FileTypeId = edfc.FileTypeId;
+
+            return dfc;
+        }
+
+        #endregion
+
+        #region Helpers
 
         public List<BaseDatasetModel> GetDatasetModelList()
         {
-            //return DemoDatasetData;
             return dsModelList;
         }
 
@@ -235,345 +786,6 @@ namespace Sentry.data.Web.Controllers
 
             return jr;
         }
-        // GET: Dataset
-        public ActionResult Index()
-        {
-            List<BaseDatasetModel> dsList = GetDatasetModelList();
-            return View(dsList);
-        }
-
-        [Route("Dataset/List")]
-        public ActionResult List(ListDatasetModel ldm)
-        {
-            Helpers.Search searchHelper = new Helpers.Search();
-
-            Debug.WriteLine(Request.Url.AbsoluteUri);
-
-            return View("List", searchHelper.List(this, null));
-        }
-
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
-        public ActionResult HomeDataset()
-        {
-            List<Category> categories = _datasetContext.Categories.ToList();
-            ViewData["dsCount"] = _datasetContext.GetDatasetCount();
-            ViewData["CanEditDataset"] = SharedContext.CurrentUser.CanEditDataset;
-            ViewData["CanUpload"] = SharedContext.CurrentUser.CanUpload;
-
-            foreach (Category c in categories) //parallel?
-            {
-                ViewData[c.Name + "Count"] = _datasetContext.GetCategoryDatasetCount(c);
-            }
-
-            return PartialView("_HomeDataset", categories.OrderBy(o => o.Name).ToList());
-        }
-
-        private IDictionary<int, string> EnumToDictionary(Type e)
-        {
-            if (!(e.IsEnum))
-            {
-                throw new InvalidOperationException("Enum list view model must have Enum generic type constraint");
-            }
-
-            Dictionary<int, string> kvp = new Dictionary<int, string>();
-
-            string[] namedValues = System.Enum.GetNames(e);
-
-            foreach (var nv in namedValues)
-            {
-                int castValue = (int)(Enum.Parse(e, nv));
-                var enumVal = System.Enum.Parse(e, nv);
-                if (!(kvp.ContainsKey(castValue) && castValue > 0))
-                {
-                    kvp.Add(castValue, enumVal.ToString());
-                }
-            }
-
-            return kvp;
-
-        }
-
-
-        // GET: Dataset/List/searchParms
-        [Route("Dataset/List/Index")]
-        [Route("Dataset/List/SearchPhrase")]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
-        public ActionResult List(string category, string searchPhrase, string ids)
-        {
-            Helpers.Search searchHelper = new Helpers.Search();
-
-            return View(searchHelper.List(this, null, searchPhrase, category, ids));
-        }
-
-        // GET: Dataset/Detail/5
-        [HttpGet]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
-        public ActionResult Detail(int id)
-        {
-            Dataset ds = _datasetContext.GetById(id);
-            // IList<String> catList = _datasetContext.GetCategoryList();
-            BaseDatasetModel bdm = new BaseDatasetModel(ds, _associateInfoProvider);
-            bdm.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
-            bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
-            bdm.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
-            bdm.CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
-            bdm.CanUpload = SharedContext.CurrentUser.CanUpload;
-            return View(bdm);
-        }
-
-
-        [HttpGet]
-        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
-        public ActionResult Create()
-        {
-            CreateDatasetModel udm = new CreateDatasetModel();
-            udm.AllCategories = GetCategoryList();
-            udm.AllFrequencies = GetDatasetFrequencyListItems();  //load all values for dropdown
-            udm.AllOriginationCodes = GetDatasetOriginationListItems(); //load all values for dropdown
-            udm.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
-            udm.FreqencyID = 6; // preselected NonSchedule            
-            return View(udm);
-        }
-
-        [HttpGet]
-        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
-        public ActionResult CreateDataFileConfig(int id)
-        {
-            Dataset parent = _datasetContext.GetById<Dataset>(id);
-
-            DatasetFileConfigsModel dfcm = new DatasetFileConfigsModel();
-            dfcm.DatasetId = id;
-            dfcm.ParentDatasetName = parent.DatasetName;
-            
-
-            dfcm.AllFrequencies = GetDatasetFrequencyListItems();  //load all values for dropdown
-            //dfcm.AllOriginationCodes = GetDatasetOriginationListItems(); //load all values for dropdown
-            dfcm.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
-
-            dfcm.DropPath = parent.DropLocation;
-            dfcm.DropLocationType = "DFS";
-
-            dfcm.SearchCriteria = "\\.";
-            dfcm.CreationFreq = DatasetFrequency.NonSchedule.ToString();
-
-            return View(dfcm);
-        }
-
-        [HttpPost]
-        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
-        public ActionResult CreateDataFileConfig(DatasetFileConfigsModel dfcm)
-        {
-
-            Dataset parent = _datasetContext.GetById<Dataset>(dfcm.DatasetId);
-
-            if(parent.DatasetFileConfigs.Any(x => x.Name == dfcm.ConfigFileName))
-            {
-                AddCoreValidationExceptionsToModel(new ValidationException("Dataset config with that name already exists within dataset"));
-            }
-
-
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    List<DatasetFileConfig> dfcList = parent.DatasetFileConfigs.ToList();
-
-                    //Create Generic Data File Config for Dataset                    
-                    DatasetFileConfig dfc = new DatasetFileConfig(
-                        0,
-                        dfcm.ConfigFileName,
-                        dfcm.ConfigFileDesc,
-                        1,
-                        dfcm.SearchCriteria,
-                        dfcm.DropLocationType,
-                        dfcm.DropPath,
-                        dfcm.IsRegexSearch,
-                        dfcm.OverwriteDatasetFile,
-                        dfcm.VersionsToKeep,
-                        dfcm.FileTypeId,
-                        true,
-                        parent,
-                        dfcm.CreationFreq.ToString(),
-                        dfcm.DatasetScopeTypeID
-                        );
-
-                    dfc.DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dfcm.DatasetScopeTypeID);
-
-                    dfcList.Add(dfc);
-                    parent.DatasetFileConfigs = dfcList;
-
-                    _datasetContext.Merge<Dataset>(parent);
-                   // _datasetContext.Merge(dfc);
-                    _datasetContext.SaveChanges();
-
-                    try
-                    {
-                        if (!System.IO.Directory.Exists(dfcm.DropPath))
-                        {
-                            System.IO.Directory.CreateDirectory(dfcm.DropPath);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-
-                        StringBuilder errmsg = new StringBuilder();
-                        errmsg.AppendLine("Failed to Create Drop Location:");
-                        errmsg.AppendLine($"DatasetId: {parent.DatasetId}");
-                        errmsg.AppendLine($"DatasetName: {parent.DatasetName}");
-                        errmsg.AppendLine($"DropLocation: {parent.DropLocation}");
-
-                        Sentry.Common.Logging.Logger.Error(errmsg.ToString(), e);
-                    }
-
-                    return RedirectToAction("Detail", new { id = parent.DatasetId });
-                }
-            }
-            catch (Sentry.Core.ValidationException ex)
-            {
-                AddCoreValidationExceptionsToModel(ex);
-            }
-            finally
-            {
-                _datasetContext.Clear();
-                //dfcm.AllCategories = GetCategoryList();  //Reload dropdown value list
-                dfcm.AllFrequencies = GetDatasetFrequencyListItems();  //Reload dropdown value list
-                //dfcm.AllOriginationCodes = GetDatasetOriginationListItems(); //Reload dropdown value list
-                dfcm.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
-                //dfcm.FreqencyID = 6; // preselected NonSchedule
-                //dfcm.OriginationID = 1; // preselected Internal
-            }
-
-            return View(dfcm);
-        }
-
-
-        [HttpGet]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
-        public ActionResult EditDataFileConfig()
-        {
-            DatasetFileConfigsModel edfc = new DatasetFileConfigsModel();
-
-            return View(edfc);
-        }
-
-        [HttpPost]
-        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
-        public ActionResult Create(CreateDatasetModel cdm)
-        {
-            
-            if (_datasetContext.isDatasetNameDuplicate(cdm.DatasetName, _datasetContext.GetCategoryById(cdm.CategoryIDs).Name))
-            {
-                AddCoreValidationExceptionsToModel(new ValidationException("Dataset name already exists within category"));
-            }
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    Dataset ds = CreateDatasetFromModel(cdm);
-
-                    //IApplicationUser user = _userService.GetCurrentUser();
-                    //DateTime CreateTime = DateTime.Now;
-
-                    ds = _datasetContext.Merge<Dataset>(ds);
-
-                    List<DatasetFileConfig> dfcList = new List<DatasetFileConfig>();
-                    //Create Generic Data File Config for Dataset                    
-                    DatasetFileConfig dfc = new DatasetFileConfig(
-                        0,
-                        "Default",
-                        "Default Config for Dataset.  Uploaded files that do not match any configs will default to this config",
-                        1,
-                        "\\.",
-                        "DFS",
-                        ds.DropLocation,
-                        true,
-                        true,
-                        0,
-                        1,
-                        true,
-                        ds,
-                        Enum.GetName(typeof(DatasetFrequency), cdm.FreqencyID),
-                        cdm.DatasetScopeTypeID
-                        );
-
-                    _datasetContext.Merge(dfc);
-                    _datasetContext.SaveChanges();
-
-                    try
-                    {
-                        if (!System.IO.Directory.Exists(ds.DropLocation))
-                        {
-                            System.IO.Directory.CreateDirectory(ds.DropLocation);
-                        }
-                    }
-                    catch (Exception e)
-                    {
-
-                        StringBuilder errmsg = new StringBuilder();
-                        errmsg.AppendLine("Failed to Create Drop Location:");
-                        errmsg.AppendLine($"DatasetId: {ds.DatasetId}");
-                        errmsg.AppendLine($"DatasetName: {ds.DatasetName}");
-                        errmsg.AppendLine($"DropLocation: {ds.DropLocation}");
-
-                        Sentry.Common.Logging.Logger.Error(errmsg.ToString(), e);
-                    }
-
-                    int maxId = _datasetContext.GetMaxId();
-                    return RedirectToAction("Detail", new { id = maxId });
-                }
-            }
-            catch (Sentry.Core.ValidationException ex)
-            {
-                AddCoreValidationExceptionsToModel(ex);
-            }
-            finally
-            {
-                _datasetContext.Clear();
-                cdm.AllCategories = GetCategoryList();  //Reload dropdown value list
-                cdm.AllFrequencies = GetDatasetFrequencyListItems();  //Reload dropdown value list
-                cdm.AllOriginationCodes = GetDatasetOriginationListItems(); //Reload dropdown value list
-                cdm.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
-                cdm.FreqencyID = 6; // preselected NonSchedule
-                cdm.OriginationID = 1; // preselected Internal
-            }
-
-            return View(cdm);
-       }
-
-
-        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
-        private Dataset CreateDatasetFromModel(CreateDatasetModel cdm)
-        {
-            DateTime CreateTime = DateTime.Now;
-            string cat = _datasetContext.GetCategoryById(cdm.CategoryIDs).Name;
-            string freqName = Enum.GetName(typeof(DatasetFrequency), cdm.FreqencyID);
-            IApplicationUser user = _userService.GetCurrentUser();
-            Dataset ds = new Dataset(
-                0,
-                cat,
-                cdm.DatasetName,
-                cdm.DatasetDesc,
-                "This is a test Information line.",
-                cdm.CreationUserName,
-                cdm.SentryOwnerName,
-                user.AssociateId,
-                Enum.GetName(typeof(DatasetOriginationCode), cdm.OriginationID),
-                CreateTime,
-                CreateTime,
-                //freqName,
-                Utilities.GenerateDatasetStorageLocation(cat, cdm.DatasetName),
-                false,
-                true,
-                null,
-                _datasetContext.GetCategoryById(cdm.CategoryIDs),
-                null,
-                //_datasetContext.GetDatasetScopeById(cdm.DatasetScopeTypeID),
-                cdm.DatafilesFilesToKeep,
-                null,
-                Utilities.GenerateDatasetDropLocation(cat, cdm.DatasetName));
-
-            return ds;
-        }
 
         /// <summary>
         /// Callback handler for S3 uploads... Amazon calls this to communicate progress; from here we communicate
@@ -583,6 +795,7 @@ namespace Sentry.data.Web.Controllers
         /// <param name="e"></param>
         static void uploadRequest_UploadPartProgressEvent(object sender, TransferProgressEventArgs e)
         {
+            throw new NotImplementedException();
             Sentry.data.Web.Helpers.ProgressUpdater.SendProgress(e.FilePath, e.PercentDone);
 
             if (e.PercentDone % 10 == 0)
@@ -601,6 +814,7 @@ namespace Sentry.data.Web.Controllers
         /// <param name="e"></param>
         static void PushToSAS_ProgressEvent(object sender, TransferProgressEventArgs e)
         {
+            throw new NotImplementedException();
             int percent = 0;
 
             object x = e.GetType();
@@ -634,89 +848,6 @@ namespace Sentry.data.Web.Controllers
 
         }
 
-        // GET: DatasetFileVersion/Edit/5
-        [HttpGet()]
-        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
-        public ActionResult Edit(int id)
-        {
-            Dataset ds = _datasetContext.GetById<Dataset>(id);
-            EditDatasetModel item = new EditDatasetModel(ds, _associateInfoProvider);
-            item.AllFrequencies = GetDatasetFrequencyListItems();  // Load dropdown value list
-            //item.FreqencyID = (int)(Enum.Parse(typeof(DatasetFrequency), ds.CreationFreqDesc));  //Preselect current value
-            item.AllOriginationCodes = GetDatasetOriginationListItems();
-            item.OriginationID = (int)(Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode));  //Preselect current value
-            item.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
-            //item.DatasetScopeTypeID = ds.DatasetScopeType.ScopeTypeId;
-            return View(item);
-        }
-
-        // POST: Dataset/Edit/5
-        [HttpPost()]
-        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
-        public ActionResult Edit(int id, EditDatasetModel i)
-        {
-            //if (_datasetContext.IsDupliceDataset(i.DatasetName)
-                //        {
-                //            throw new ValidationException("Dataset name already exists");
-                //        }
-
-                //        if (DatasetFile == null)
-                //        {
-                //            throw new ValidationException("Please select file to be uploaded");
-                //        }
-
-                try
-                {
-                Dataset item = _datasetContext.GetById<Dataset>(id);
-                if (ModelState.IsValid)
-                {
-                    UpdateDatasetFromModel(item, i);
-                    _datasetContext.SaveChanges();
-                    return RedirectToAction("Detail", new { id = id });
-
-                }
-            }
-            catch (Sentry.Core.ValidationException ex)
-            {
-                AddCoreValidationExceptionsToModel(ex);
-            }
-            finally
-            {
-                _datasetContext.Clear();
-                i.AllFrequencies = GetDatasetFrequencyListItems();  //Reload dropdown value list
-                i.AllOriginationCodes = GetDatasetOriginationListItems(); //Reload dropdown value list
-                i.AllDatasetScopeTypes = GetDatasetScopeTypesListItems(); //Reload dropdown value list
-            }
-
-            return View(i);
-        }
-
-        [HttpPost()]
-        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
-        public ActionResult EditDatasetFile(int id, DatasetFileGridModel i)
-        { 
-            try
-            {
-                DatasetFile item = _datasetContext.GetById<DatasetFile>(id);
-                if (ModelState.IsValid)
-                {
-                    UpdateDatasetfileFromModel(item, i);
-                    _datasetContext.SaveChanges();
-                    return RedirectToAction("Detail", new { id = item.Dataset.DatasetId });
-
-                }
-            }
-            catch (Sentry.Core.ValidationException ex)
-            {
-                AddCoreValidationExceptionsToModel(ex);
-            }
-            finally
-            {
-                _datasetContext.Clear();
-            }
-
-            return View();
-        }
 
         private IEnumerable<SelectListItem> GetCategoryList()
         {
@@ -802,51 +933,6 @@ namespace Sentry.data.Web.Controllers
                         break;
                 }
             }
-        }
-
-        [HttpPost]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
-        private void UpdateDatasetFromModel(Dataset ds, EditDatasetModel eds)
-        {
-            DateTime now = DateTime.Now;
-
-            string frequency = ((DatasetFrequency)eds.FreqencyID).ToString();
-            string originationcode = ((DatasetOriginationCode)eds.OriginationID).ToString();
-
-            if(eds.DatasetInformation != null && eds.DatasetInformation.Length > 0)
-            {
-                ds.DatasetInformation = eds.DatasetInformation;
-            }
-
-            ds.ChangedDtm = now;
-            if (null != eds.Category && eds.Category.Length > 0) ds.Category = eds.Category;
-            //ds.CreationFreqDesc = frequency;
-            if (null != eds.CreationUserName && eds.CreationUserName.Length > 0) ds.CreationUserName = eds.CreationUserName;
-            if (null != eds.DatasetDesc && eds.DatasetDesc.Length > 0) ds.DatasetDesc = eds.DatasetDesc;
-            if (eds.DatasetDtm > DateTime.MinValue) ds.DatasetDtm = eds.DatasetDtm;
-            if (null != eds.DatasetName && eds.DatasetName.Length > 0) ds.DatasetName = eds.DatasetName;
-            ds.OriginationCode = originationcode;
-            if (null != eds.SentryOwnerName && eds.SentryOwnerName.Length > 0) ds.SentryOwnerName = eds.SentryOwnerName;
-            ds.DatafilesToKeep = eds.DatafilesFilesToKeep;
-            //if (eds.DatasetScopeTypeID != ds.DatasetScopeType.ScopeTypeId) { ds.DatasetScopeType = _datasetContext.GetDatasetScopeById(eds.DatasetScopeTypeID); }                        
-            ds.S3Key = Utilities.GenerateDatasetStorageLocation(ds.Category, ds.DatasetName);
-        }
-
-        [HttpPost]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
-        private void UpdateDatasetfileFromModel(DatasetFile df, DatasetFileGridModel dfgm)
-        {
-            DateTime now = DateTime.Now;
-
-
-            if (dfgm.Information != null && dfgm.Information.Length > 0)
-            {
-                df.Information = dfgm.Information;
-            }
-
-            df.IsUsable = dfgm.IsUsable;
-
-            df.ModifiedDTM = now;
         }
 
         [HttpPost]
@@ -997,152 +1083,10 @@ namespace Sentry.data.Web.Controllers
             
         }
 
-        [HttpGet()]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
-        public PartialViewResult EditDatasetFile(int id)
-        {
-            DatasetFile df = _datasetContext.GetById<DatasetFile>(id);
-            DatasetFileGridModel item = new DatasetFileGridModel(df);
-
-            return PartialView("EditDataFile", item);
-
-        }
-
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
-        public JsonResult GetDatasetFileInfoForGrid(int Id, Boolean bundle, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
-        {
-            //IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
-            List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
-            Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
-            Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
-            Boolean CanEdit = SharedContext.CurrentUser.CanEditDataset;
-
-            //Query the Dataset for the following information:
-            foreach (DatasetFile df in _datasetContext.GetDatasetFilesForDataset(Id, x => !x.IsBundled).ToList())
-            {
-                DatasetFileGridModel dfgm = new DatasetFileGridModel(df);
-                dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
-                dfgm.CanDwnldSenstive = CanDwnldSenstive;
-                dfgm.CanEdit = CanEdit;
-                files.Add(dfgm);
-            }
-
-            DataTablesQueryableAdapter <DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
-            int a  = dtqa.GetDataTablesResponse().data.Count();
-
-            Debug.WriteLine(a);
-
-            if (bundle)
-            {
-                return Json(dtqa.GetDataTablesResponse(true), JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
-            }
-        }
-
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
-        public JsonResult GetBundledFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
-        {
-            //IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
-            List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
-            Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
-            Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
-            Boolean CanEdit = SharedContext.CurrentUser.CanEditDataset;
-
-            foreach (DatasetFile df in _datasetContext.GetDatasetFilesForDataset(Id, x => x.IsBundled).ToList())
-            {
-                DatasetFileGridModel dfgm = new DatasetFileGridModel(df);
-                dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
-                dfgm.CanDwnldSenstive = CanDwnldSenstive;
-                dfgm.CanEdit = CanEdit;
-                files.Add(dfgm);
-            }
-
-            DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
-
-            return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
-
-        }
-
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
-        public JsonResult GetVersionsOfDatasetFileForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
-        {
-            DatasetFile df = _datasetContext.GetDatasetFile(Id);
-
-            List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
-            Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
-            Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
-            Boolean CanEdit = SharedContext.CurrentUser.CanEditDataset;
-
-            foreach (DatasetFile dfversion in _datasetContext.GetDatasetFilesVersions(df.Dataset.DatasetId, df.DatasetFileConfig.DataFileConfigId, df.FileName).ToList())
-            {
-                DatasetFileGridModel dfgm = new DatasetFileGridModel(dfversion);
-                dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
-                dfgm.CanDwnldSenstive = CanDwnldSenstive;
-                dfgm.CanEdit = CanEdit;
-                files.Add(dfgm);
-            }
-
-            //IEnumerable<DatasetFileGridModel> files = _datasetContext.GetDatasetFilesVersions(df.Dataset.DatasetId, df.DatasetFileConfig.DataFileConfigId, df.FileName).ToList().
-            //    Select((f) => new DatasetFileGridModel(f));
-
-            DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
-            return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
-        }
-
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
-        public JsonResult GetAllDatasetFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
-        {
-            IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().
-                Select((f) => new DatasetFileGridModel(f)
-                );
-
-            DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
-            return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
-
-        }
-
-        [HttpGet]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
-        public JsonResult GetDatasetFileConfigInfo(int Id)
-        {
-            IEnumerable<DatasetFileConfigsModel> files = null;
-            if (Id > 0)
-            {
-                files = _datasetContext.GetById(Id).DatasetFileConfigs.Select((f) => new DatasetFileConfigsModel(f));
-            }
-            else
-            {
-                files = _datasetContext.getAllDatasetFileConfigs().Select((f) => new DatasetFileConfigsModel(f));
-            }
-
-            return Json(files, JsonRequestBehavior.AllowGet);
-        }
-
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
-        public JsonResult GetDatasetFileConfigInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
-        {
-            IEnumerable<DatasetFileConfigsModel> files = null;
-            if (Id > 0)
-            {
-                files = _datasetContext.GetById(Id).DatasetFileConfigs.Select((f) => new DatasetFileConfigsModel(f));
-            }
-            else
-            {
-                files = _datasetContext.getAllDatasetFileConfigs().Select((f) => new DatasetFileConfigsModel(f));
-            }
-            //= _datasetContext.Datasets.Where(w => w.DatasetId == Id).FirstOrDefault().DatasetFileConfigs.ToList().
-            //        Select((f) => new DatasetFileConfigsModel(f));
-
-            DataTablesQueryableAdapter<DatasetFileConfigsModel> dtqa = new DataTablesQueryableAdapter<DatasetFileConfigsModel>(files.AsQueryable(), dtRequest);
-            return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
-        }
-
+       
         [HttpPost]
         [AuthorizeByPermission(PermissionNames.DatasetView)]
-        public ActionResult BundleFiles(string listOfIds)
+        public ActionResult BundleFiles(string listOfIds, string newName, int datasetID)
         {
             string[] ids = listOfIds.Split(',');
 
@@ -1164,6 +1108,23 @@ namespace Sentry.data.Web.Controllers
 
             Boolean bundlingSensitive = files.Any(x => x.IsSensitive);
             Boolean bundlingUnUsable = files.Any(x => !x.IsUsable);
+
+            if(newName == "" || newName == null)
+            {
+                errorsFound = true;
+                errorString += "<p>Please supply a new name to give to your bundled file.</p>";
+            }
+
+            if(files.Count == 1)
+            {
+                errorsFound = true;
+                errorString += "<p>You cannot bundle just one file.</p>";
+            }
+            else if (files.Count == 0)
+            {
+                errorsFound = true;
+                errorString += "<p>You selected no files.</p>";
+            }
 
             if ((bundlingSensitive && !CanDwnldSenstive) || (!bundlingSensitive && !CanDwnldNonSensitive))
             {
@@ -1300,58 +1261,7 @@ namespace Sentry.data.Web.Controllers
             return PartialView("_UploadDataFile", cd);
         }
 
-        [HttpGet()]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
-        public ActionResult GetEditConfigPartialView(int configId)
-        {
-            DatasetFileConfig dfc = _datasetContext.getDatasetFileConfigs(configId);
-            EditDatasetFileConfigModel edfc = new EditDatasetFileConfigModel(dfc);
-
-            edfc.AllFrequencies = GetDatasetFrequencyListItems(edfc.CreationFreq);  //load all values for dropdown
-            //dfcm.AllOriginationCodes = GetDatasetOriginationListItems(); //load all values for dropdown
-            edfc.AllDatasetScopeTypes = GetDatasetScopeTypesListItems(edfc.DatasetScopeTypeID);
-
-            ViewBag.ModifyType = "Edit";
-
-            return PartialView("_EditConfigFile", edfc);
-        }
-
-        [HttpPost()]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
-        public ActionResult ModifyConfigFile(EditDatasetFileConfigModel edfc)
-        {
-            DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(edfc.ConfigId);
-
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    dfc = UpdateDatasetFileConfigFromModel(dfc, edfc);
-                    _datasetContext.SaveChanges();
-                    return AjaxSuccessJson();
-                }
-            }
-            catch (Sentry.Core.ValidationException ex)
-            {
-                AddCoreValidationExceptionsToModel(ex);
-                _datasetContext.Clear();
-            }
-
-            //Return partial view when there are errors
-            return GetEditConfigPartialView(edfc.ConfigId);
-        }
-
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
-        private DatasetFileConfig UpdateDatasetFileConfigFromModel(DatasetFileConfig dfc, EditDatasetFileConfigModel edfc)
-        {
-            if (dfc.SearchCriteria != edfc.SearchCriteria) { dfc.SearchCriteria = edfc.SearchCriteria; }
-            if (dfc.TargetFileName != edfc.TargetFileName) { dfc.TargetFileName = edfc.TargetFileName; }
-            if (dfc.IsRegexSearch != edfc.IsRegexSearch) { dfc.IsRegexSearch = edfc.IsRegexSearch; }
-            if (dfc.OverwriteDatafile != edfc.OverwriteDatasetFile) { dfc.OverwriteDatafile = edfc.OverwriteDatasetFile; }
-            if (dfc.VersionsToKeep != edfc.VersionsToKeep) { dfc.VersionsToKeep = edfc.VersionsToKeep; }
-
-            return dfc;
-        }
+#endregion
 
         [AuthorizeByPermission(PermissionNames.DatasetView)]
         public JsonResult LoadDatasetList(int id)

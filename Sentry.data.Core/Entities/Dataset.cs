@@ -36,8 +36,8 @@ namespace Sentry.data.Core
         IList<DatasetMetadata> _rawMetadata;
         private Category _datasetCategory;
         private IList<DatasetFile> _datasetFile;
-        private DatasetScopeType _datasetScopeType;
-        private int _datafilesToKeep;
+        //private DatasetScopeType _datasetScopeType;
+        //private int _datafilesToKeep;
         private IList<DatasetFileConfig> _datasetFileConfigs;
         //private IDictionary<string, string> _columns;
         //private IDictionary<string, string> _metadata;
@@ -70,7 +70,7 @@ namespace Sentry.data.Core
                        Category cat,
                        IList<DatasetFile> datasetFile,
                        //DatasetScopeType datasetscopetype,
-                       int datafilesToKeep,
+                       //int datafilesToKeep,
                        IList<DatasetFileConfig> datasetFileConfigs,
                        string dropLocation)
         {
@@ -97,7 +97,7 @@ namespace Sentry.data.Core
             this._datasetCategory = cat;
             this._datasetFile = datasetFile;
             //this._datasetScopeType = datasetscopetype;
-            this._datafilesToKeep = datafilesToKeep;
+            //this._datafilesToKeep = datafilesToKeep;
             this._datasetFileConfigs = datasetFileConfigs;
             this._dropLocation = dropLocation;
         }
@@ -348,17 +348,6 @@ namespace Sentry.data.Core
                 return DatasetFileConfigs.Select(x => x.DatasetScopeType).GroupBy(x => x.Name).Select(x => x.First()).ToList();
             }
         }
-        public virtual int DatafilesToKeep
-        {
-            get
-            {
-                return _datafilesToKeep;
-            }
-            set
-            {
-                _datafilesToKeep = value;
-            }
-        }
 
         public virtual IList<DatasetFileConfig> DatasetFileConfigs
         {
@@ -423,10 +412,6 @@ namespace Sentry.data.Core
             if (string.IsNullOrWhiteSpace(DatasetDesc))
             {
                 vr.Add(ValidationErrors.datasetDescIsBlank, "The Dataset description is required");
-            }
-            if (DatafilesToKeep < 0)
-            {
-                vr.Add(ValidationErrors.numberOfFilesIsNegative, "Number of Files to Keep cannot be negative");
             }
             return vr;
         }

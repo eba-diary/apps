@@ -96,6 +96,7 @@
     <Compile Include="Entities\Asset.cs" />
     <Compile Include="Entities\AssetState.cs" />
     <Compile Include="Entities\DatasetFolder.cs" />
+    <Compile Include="Entities\FileType.cs" />
     <Compile Include="Entities\LoaderFileConfig.cs" />
     <Compile Include="Entities\LoaderSystemConfig.cs" />
     <Compile Include="Entities\NotificationSeverity.cs" />

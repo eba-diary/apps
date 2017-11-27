@@ -150,7 +150,12 @@ data.ManageConfigs = {
             $('#datasetFileConfigsTable').DataTable().ajax.reload();
 
             //data.ManageConfigs.ReloadEditConfig();
-            Sentry.ShowModalAlert("Config File Updated Successfully!");
+
+            var modal = Sentry.ShowModalCustom(
+                "Configuration Update",
+                "Config File Updated Successfully",
+                Sentry.ModalButtonsOK(function (result) { location.reload() })
+            );
         }
         //else {
 

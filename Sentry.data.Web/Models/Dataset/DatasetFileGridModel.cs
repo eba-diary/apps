@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using Sentry.data.Common;
 using System.IO;
+using Sentry.data.Infrastructure;
 
 namespace Sentry.data.Web
 {
@@ -14,11 +15,11 @@ namespace Sentry.data.Web
         {
         }
 
-        public DatasetFileGridModel(DatasetFile f)
+        public DatasetFileGridModel(DatasetFile f, IAssociateInfoProvider associateInfoService)
         {
             this.Id = f.DatasetFileId;
             this.Name = f.FileName;
-            this.UploadUserName = f.UploadUserName;
+            this.UploadUserName = associateInfoService.GetAssociateInfo(f.UploadUserName).FullName;
             this.ModifiedDTM = f.ModifiedDTM;
             this.CreateDTM = f.CreateDTM;
             this.s3Key = f.FileLocation;

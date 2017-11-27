@@ -35,7 +35,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.S3Key, (m) => m.Column("S3_KEY"));
             this.Property((x) => x.IsSensitive, (m) => m.Column("IsSensitive_IND"));
             this.Property((x) => x.CanDisplay, (m) => m.Column("Display_IND"));
-            this.Property((x) => x.DatafilesToKeep, (m) => m.Column("DatafilesToKeep_NBR"));
+            //this.Property((x) => x.DatafilesToKeep, (m) => m.Column("DatafilesToKeep_NBR"));
             this.Property((x) => x.DropLocation, (m) => m.Column("DropLocation"));
             this.Property((x) => x.DatasetInformation, (m) => m.Column("Information_DSC"));
 

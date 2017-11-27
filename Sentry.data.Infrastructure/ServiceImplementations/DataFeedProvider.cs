@@ -59,6 +59,12 @@ namespace Sentry.data.Infrastructure
                 }
             });
 
+            //foreach(var feed in dataFeeds)
+            //{
+            //    List<DataFeedItem> list = GetFeedItems(feed).ToList();
+            //    items.AddRange(list);
+            //}
+
             return items.OrderByDescending(o => o.PublishDate).Take(100).ToList();
         }
 
@@ -91,6 +97,9 @@ namespace Sentry.data.Infrastructure
                         item.Summary.Text,
                         feed));
                 }
+
+                wc.Dispose();
+                ms.Dispose();
 
                 return dataFeed.ToList();
             }

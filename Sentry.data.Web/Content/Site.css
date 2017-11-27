@@ -46,7 +46,7 @@ ul.list-group-indented {
 }
 
 .modal-backdrop {
-    background-color: transparent !important;
+    background-color: white !important;
 }
 
 /*****************************/
@@ -2038,9 +2038,11 @@ td.details-control {
     background: url('../../Images/Icons/details_open.png') no-repeat center center;
     width: 30px;
     cursor: pointer;
+    background-color: #ccc;
 }
 tr.shown td.details-control {
     background: url('../../Images/Icons/details_close.png') no-repeat center center;
+    background-color: #ccc;
 }
 
 .detailSection{
@@ -2149,3 +2151,4 @@ tr.shown td.details-control {
         opacity: 0.25
     }
 }
+

@@ -59,7 +59,7 @@
             <div class="form-group">
                 @Html.LabelFor(model => model.DatasetDesc, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.EditorFor(model => model.DatasetDesc, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                    @Html.TextAreaFor(model => model.DatasetDesc, new { htmlAttributes = new { @class = "form-control edit-dataset-row" }, @style = "min-width: 100%; max-width: 100%; width: 100%;" })
                     @Html.ValidationMessageFor(model => model.DatasetDesc, "", new { @class = "text-danger" })
                 </div>
             </div>
@@ -67,7 +67,7 @@
         <div class="form-group">
             @Html.LabelFor(model => model.DatasetInformation, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.DatasetInformation, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                @Html.TextAreaFor(model => model.DatasetInformation, new { htmlAttributes = new { @class = "form-control edit-dataset-row"}, @style = "min-width: 100%; max-width: 100%; width: 100%;" })
                 @Html.ValidationMessageFor(model => model.DatasetInformation, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -85,8 +85,7 @@
             <div class="form-group">
                 @Html.LabelFor(model => model.SentryOwnerName, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.Editor("OwnerID", new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Sentry ID (i.e. 072984)" } })
-                    @*@Html.ValidationMessageFor(model => model.SentryOwnerName, "", new { @class = "text-danger" })*@
+                    @Html.EditorFor(model => model.SentryOwnerName, new { htmlAttributes = new { @id = "OwnerID", @class = "form-control edit-dataset-row", @placeholder = "Sentry ID (i.e. 072984)" } })
                 </div>
             </div>
 
@@ -122,39 +121,6 @@
                     @*@Html.ValidationMessageFor(model => model.ChangedDtm, "", new { @class = "text-danger" })*@
                 </div>
             </div>
-
-            @*<div class="form-group">
-                    @Html.LabelFor(model => model.UploadDtm, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        <p class="form-control-static">@Html.DisplayFor((model) => model.UploadDtm)</p>
-                        Html.TextBoxFor(model => model.UploadDtm, new { disabled = "disabled", @readonly = "readonly", @class = "edit-dataset-row" })
-                    @Html.ValidationMessageFor(model => model.UploadDtm, "", new { @class = "text-danger" })
-                </div>
-            </div>*@
-
-            <div class="form-group">
-                @Html.LabelFor((model) => model.FreqencyID, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    <p class="form-control-static">@Html.DisplayFor(model => model.CreationFreqDesc)</p>
-                    @*@Html.DropDownListFor(model => model.FreqencyID, Model.AllFrequencies, new { @class = "form-control edit-dataset-row" })*@
-                </div>
-            </div>
-
-            <div class="form-group">
-                @Html.LabelFor((model) => model.DatasetScopeTypeID, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.DropDownListFor(model => model.DatasetScopeTypeID, Model.AllDatasetScopeTypes, new { @class = "form-control edit-dataset-row" })
-                </div>
-            </div>
-
-            <div class="form-group">
-                @Html.LabelFor((model) => model.DatafilesFilesToKeep, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.EditorFor(model => model.DatafilesFilesToKeep, new { htmlAttributes = new { @class = "col-md-4 form-control edit-dataset-row", @type = "number", @title = "0=Keep All Files\n1=Keep 1 File (Will overwrite existing file)\nn>1=Keep n Files" } })
-                    @Html.ValidationMessageFor(model => model.DatafilesFilesToKeep, "", new { @class = "text-danger" })
-                </div>
-            </div>
-        <input type="hidden" id="previousDatafilesToKeep" value="@Model.DatafilesFilesToKeep" />
 
             <div class="form-group">
                 <div class="col-md-offset-2 col-md-10">

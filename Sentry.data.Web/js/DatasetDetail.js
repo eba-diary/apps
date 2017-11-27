@@ -78,12 +78,27 @@ data.DatasetDetail = {
             var datasetID = window.location.pathname.substr(window.location.pathname.lastIndexOf('/') + 1);
             var listOfFilesToBundle = JSON.parse(localStorage.getItem("listOfFilesToBundle"));
 
+            var configName = $('#' + listOfFilesToBundle[0]).children('td.ConfigFileName').text();
+            var multipleConfigs = false;
+
             for (i = 0; i < listOfFilesToBundle.length; i++) {
-               // console.log(listOfFilesToBundle[i]);
+                if ($('#' + listOfFilesToBundle[i]).children('td.ConfigFileName').text() != configName) {
+                    multipleConfigs = true;
+                    break;
+                }
             }
-            console.log(listOfFilesToBundle);
-            data.DatasetDetail.PushToBundler(datasetID, listOfFilesToBundle);
-            //Send them to the bundler
+
+            if (multipleConfigs) {
+
+                var modal = Sentry.ShowModalCustom(
+                    "Upload Warning:",
+                    "There are multiple configuration files associated with the set of files you want to bundle.  Do you want to continue?",
+                    Sentry.ModalButtonsOKCancel(function (result) { data.DatasetDetail.PushToBundler(datasetID, listOfFilesToBundle) })
+                );
+            }
+            else {
+                data.DatasetDetail.PushToBundler(datasetID, listOfFilesToBundle);
+            }
         });
 
         $("#bundle_allFiltered").click(function (e) {
@@ -103,14 +118,31 @@ data.DatasetDetail = {
                     console.log(obj);
 
                     var listOfFilesToBundle = [];
+                    var configName = obj.data[0].ConfigFileName;
+                    var multipleConfigs = false;
 
                     for (i = 0; i < obj.data.length; i++)
                     {
                         listOfFilesToBundle.push(obj.data[i].Id);
+
+                        if (obj.data[i].ConfigFileName != configName)
+                        {
+                            multipleConfigs = true;
+                        }
                     }
                     console.log(listOfFilesToBundle);
-                    //Send them to the bundler
-                    data.DatasetDetail.PushToBundler(datasetID, listOfFilesToBundle);
+
+                    if (multipleConfigs) {
+
+                        var modal = Sentry.ShowModalCustom(
+                            "Upload Warning:",
+                            "There are multiple configuration files associated with the set of files you want to bundle.  Do you want to continue?",
+                            Sentry.ModalButtonsOKCancel(function (result) { data.DatasetDetail.PushToBundler(datasetID, listOfFilesToBundle) })
+                        );
+                    }
+                    else {
+                        data.DatasetDetail.PushToBundler(datasetID, listOfFilesToBundle);
+                    }
                 },
                 failure: function (obj) {
                     console.log('failed');
@@ -130,27 +162,53 @@ data.DatasetDetail = {
             console.log("Bundle " + i + " : " + listOfFilesToBundle[i]);
         }
 
-        var modal = Sentry.ShowModalWithSpinner("Upload Results", {
-            Confirm: {
-                label: 'Confirm',
-                className: 'btn-success'
-            }
-        });
+        function DoWork(dataSetID, listOfFilesToBundle, newName) {
+            var request = $.ajax({
+                url: "/Dataset/BundleFiles/?listOfIds=" + encodeURI(listOfFilesToBundle) + "&newName=" + encodeURI(newName) + "&datasetID=" + encodeURI(dataSetID),
+                method: "POST",
+                success: function (obj) {
+                    var modal = Sentry.ShowModalCustom(
+                        "Upload:",
+                        obj.Message, {
+                            Confirm: {
+                                label: "Confirm",
+                                class: "btn-success"
+                            }
+                        }
+                    );
+                },
+                failure: function (obj) {
+                    console.log(obj);
+                },
+                error: function (xhr, e) {
+                    console.log(e);
+                    console.log(xhr);
+                }
+            });        
+        }
 
-        var request = $.ajax({
-            url: "/Dataset/BundleFiles/?listOfIds=" + listOfFilesToBundle,
-            method: "POST",
-            success: function (obj) {
-                modal.ReplaceModalBody(obj.Message);
-            },
-            failure: function (obj) {
-                console.log(obj);
-            },
-            error: function (xhr, e) {
-                console.log(e);
-                console.log(xhr);
+        var modal = Sentry.ShowModalCustom(
+            "Upload Results:",
+            "<div> Please supply the new name of your bundled file: (Please Do NOT include the file extension)</div><div><input id='inputNewName' placeholder='New Name: '/></div>",
+            Sentry.ModalButtonsOKCancel(function (result) { DoWork(dataSetID, listOfFilesToBundle, $('#inputNewName').val()) })
+        );
+
+        $('.btn-primary').prop("disabled", true);
+
+        $('#inputNewName').keyup(function (e) {
+            e.preventDefault();
+
+            console.log($('#inputNewName').val());
+            if ($('#inputNewName').val() != "" && $('#inputNewName').val() != undefined && $('#inputNewName').val() != null)
+            {
+                $('.btn-primary').prop("disabled", false);
             }
-        });        
+            else {
+                $('.btn-primary').prop("disabled", true);
+            }
+
+        });
+        
     },
 
     PushToBundleInit: function () {
@@ -329,9 +387,16 @@ data.DatasetDetail = {
                     Confirm: {
                         label: 'Confirm',
                         className: 'btn-success'
+                },
+                    Cancel:
+                    {
+                        label: 'Cancel',
+                        className: 'btn-cancel'
                     }
             });
-            $('.modal-footer button').prop("disabled", true);
+
+
+            $('.modal-footer btn-success').prop("disabled", true);
 
             // This approach is from the following site:
             // http://www.c-sharpcorner.com/UploadFile/manas1/upload-files-through-jquery-ajax-in-Asp-Net-mvc/
@@ -371,7 +436,7 @@ data.DatasetDetail = {
                 else {
                     var datasetID = window.location.pathname.substr(window.location.pathname.lastIndexOf('/') + 1);
 
-                    if (datasetID == "" || datasetID == null || datasetID == undefined) {
+                    if (datasetID == "" || datasetID == null || datasetID == undefined || isNaN(datasetID)) {
                         datasetID = $("[id^='btnUploadFile']").attr('data-id');
                     }
 
@@ -380,20 +445,42 @@ data.DatasetDetail = {
                     var token = $('input[name="__RequestVerificationToken"]').val();
 
                     var xhr = new XMLHttpRequest();
+
+                    modal.ReplaceModalBody('<p> Large files may take a long time to upload through the browser. </p>' +
+                        '<p>Please do not close the window as your file is uploading. </p>' +
+                        '<p> Progress: <span id=\'progressKB\'/></p>' +
+                        '<h3><b><span id=\'percentTotal\'></span></b ></h3>' +
+                        '<div>' +
+                            '<div class="progress progress-striped active">' +
+                                '<div class="progress-bar" id="progressBar"></div>' +
+                            '</div>' +
+                        '</div>'
+                    );
+
+
                     (xhr.upload || xhr).addEventListener('progress', function (e) {
                         var done = e.position || e.loaded
                         var total = e.totalSize || e.total;
 
-                        modal.ReplaceModalBody('<p> Large files may take a long time to upload through the browser. </p>' +
-                            '<p>Please do not close the window as your file is uploading. </p>' +
-                            '<p> Progress: (' + Math.round(done / 1024) + ' KB / ' + Math.round(total / 1024) + ' KB)</p><h3><b>' + Math.round(done / total * 100) + ' % </b></h3> ');
-                        $('.modal-footer button').prop("disabled", true);
+                        $('#percentTotal').text(Math.round(done / total * 100) + '%');
+                        $('#progressKB').text('(' + Math.round(done / 1024) + ' KB / ' + Math.round(total / 1024) + ' KB)');
+                        $('#progressBar').width(Math.round(done / total * 100) + '%');
+
+                        $('.btn-success').prop("disabled", true);
                     });
                     xhr.addEventListener('load', function (e) {
                         $('.modal-footer button').prop("disabled", false);
                         modal.ReplaceModalBody(e.currentTarget.response);
                         console.log(e);
                     });
+
+                    function cancelUpload() {
+                        xhr.abort();
+                        console.log('The Upload Process was aborted');
+                    }
+
+                    $('.btn-cancel')[0].addEventListener('click', cancelUpload, false);
+                    $('.bootbox-close-button').hide();
                     var url = '/Dataset/UploadDatafile/?id=' + encodeURI(datasetID) + "&configId=" + encodeURI(configID);
                     xhr.open('post', url, true);
                     xhr.setRequestHeader('__RequestVerificationToken', token);
@@ -505,7 +592,6 @@ data.DatasetDetail = {
 
         $("#DatasetFileUpload").change(function () {
             var dID = $(this).val();
-            $("[id^='btnUploadFile']").attr('data-id', dID);
 
             //Hide Configuration List
             $('#configList').parent().parent().show();
@@ -574,6 +660,7 @@ data.DatasetDetail = {
 
         $("#datasetList").change(function () {
             var dID = $(this).val();
+            console.log("DatasetList : " + dID);
             $("[id^='btnUploadFile']").attr('data-id', dID);
 
             if (dID == 0)
@@ -1041,50 +1128,53 @@ data.DatasetDetail = {
             }
         });
 
-        $('#datasetFilesTable tbody').on('click', 'tr', function () {
+        $('#datasetFilesTable tbody').on('click', 'td', function () {
+            var tr = $(this).parent();
 
-            if (!$(this).hasClass('unUsable') && ($(this).hasClass('even') || $(this).hasClass('odd'))) {
-                if ($(this).hasClass('active')) {
-                    $(this).removeClass('active');
+            if (!$(this).hasClass('details-control')) {
+                if (!tr.hasClass('unUsable') && (tr.hasClass('even') || tr.hasClass('odd'))) {
+                    if (tr.hasClass('active')) {
+                        tr.removeClass('active');
 
-                    var listOfFilesToBundle = JSON.parse(localStorage.getItem("listOfFilesToBundle"));
+                        var listOfFilesToBundle = JSON.parse(localStorage.getItem("listOfFilesToBundle"));
 
-                    if (this.id) {
+                        if ($(tr).prop('id')) {
 
-                        if (listOfFilesToBundle != null) {
-                            listOfFilesToBundle.splice(listOfFilesToBundle.indexOf(this.id), 1);
+                            if (listOfFilesToBundle != null) {
+                                listOfFilesToBundle.splice(listOfFilesToBundle.indexOf($(tr).prop('id')), 1);
+                            }
+
+                            localStorage.setItem("listOfFilesToBundle", JSON.stringify(listOfFilesToBundle));
+
+                            $('#bundleCountSelected').html(parseInt($('#bundleCountSelected').html(), 10) - 1);
                         }
-
-                        localStorage.setItem("listOfFilesToBundle", JSON.stringify(listOfFilesToBundle));
-
-                        $('#bundleCountSelected').html(parseInt($('#bundleCountSelected').html(), 10) - 1);
                     }
-                }
-                else {
-                    //table.$('tr.active').removeClass('active');
-                    $(this).addClass('active');
+                    else {
+                        //table.$('tr.active').removeClass('active');
+                        tr.addClass('active');
 
-                    var listOfFilesToBundle = JSON.parse(localStorage.getItem("listOfFilesToBundle"));
-                    if (this.id) {
+                        var listOfFilesToBundle = JSON.parse(localStorage.getItem("listOfFilesToBundle"));
+                        if ($(tr).prop('id')) {
 
-                        if (listOfFilesToBundle != null) {
-                            listOfFilesToBundle[listOfFilesToBundle.length] = this.id;
+                            if (listOfFilesToBundle != null) {
+                                listOfFilesToBundle[listOfFilesToBundle.length] = $(tr).prop('id');
+                            }
+                            else {
+                                var listOfFilesToBundle = [];
+                                listOfFilesToBundle[0] = $(tr).prop('id');
+                            }
+
+                            localStorage.setItem("listOfFilesToBundle", JSON.stringify(listOfFilesToBundle));
+
+                            $('#bundleCountSelected').html(parseInt($('#bundleCountSelected').html(), 10) + 1);
                         }
-                        else {
-                            var listOfFilesToBundle = [];
-                            listOfFilesToBundle[0] = this.id;
-                        }
-
-                        localStorage.setItem("listOfFilesToBundle", JSON.stringify(listOfFilesToBundle));
-
-                        $('#bundleCountSelected').html(parseInt($('#bundleCountSelected').html(), 10) + 1);
                     }
-                }
-                if (parseInt($('#bundleCountSelected').html(), 10) === 0) {
-                    $('#bundle_selected').attr("disabled", true);
-                }
-                else {
-                    $('#bundle_selected').attr("disabled", false);
+                    if (parseInt($('#bundleCountSelected').html(), 10) === 0) {
+                        $('#bundle_selected').attr("disabled", true);
+                    }
+                    else {
+                        $('#bundle_selected').attr("disabled", false);
+                    }
                 }
             }
         
@@ -1093,7 +1183,7 @@ data.DatasetDetail = {
         $('#datasetFilesTable').on('draw.dt', function () {
             $('#bundleCountFiltered').html(data.Dataset.DatasetFilesTable.page.info().recordsDisplay);
             $('#bundleCountSelected').html(0);
-
+            localStorage.setItem("listOfFilesToBundle", JSON.stringify([]));
 
             if (data.Dataset.DatasetFilesTable.page.info().recordsDisplay === 0)
             {
@@ -1216,8 +1306,7 @@ data.DatasetDetail = {
                         { data: "TargetFileName", className: "targetFileName" },
                         { data: "IsRegexSearch", className: "isRegexSearch", render: function (data, type, row) { return (data == true) ? '<span class="glyphicon glyphicon-ok"> </span>' : '<span class="glyphicon glyphicon-remove"></span>';} },
                         { data: "OverwriteDatasetFile", type: "date", className: "overwriteDatsetFile", render: function (data, type, row) { return (data == true) ? '<span class="glyphicon glyphicon-ok"> </span>' : '<span class="glyphicon glyphicon-remove"></span>'; } },
-                        { data: "VersionsToKeep", type: "date", className: "versionToKeep", },
-                        { data: "FileTypeId", type: "date", className: "fileTypeId", },
+                        { data: "FileType", className: "fileType", },
                         { data: "CreationFreq", className: "CreationFreq" },
                         { data: "DatasetScopeTypeID", className: "DatasetScopeTypeID"}
             ],
@@ -1248,11 +1337,11 @@ data.DatasetDetail = {
 
         $('#datasetFileConfigsTable tbody').on('click', 'tr', function () {
             if ($(this).hasClass('active')) {
-                $(this).removeClass('active');
+              //  $(this).removeClass('active');
             }
             else {
                 //table.$('tr.active').removeClass('active');
-                $(this).addClass('active');
+             //   $(this).addClass('active');
             }
         });
 

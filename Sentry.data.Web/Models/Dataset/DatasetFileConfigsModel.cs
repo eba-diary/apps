@@ -22,7 +22,6 @@ namespace Sentry.data.Web
             this.DropPath = dsfc.DropPath;
             this.IsRegexSearch = dsfc.IsRegexSearch;
             this.OverwriteDatasetFile = dsfc.OverwriteDatafile;
-            this.VersionsToKeep = dsfc.VersionsToKeep;
             this.FileTypeId = dsfc.FileTypeId;
             this.ConfigFileName = dsfc.Name;
             this.ConfigFileDesc = dsfc.Description;
@@ -43,8 +42,19 @@ namespace Sentry.data.Web
         public string DropPath { get; set; }
         public Boolean IsRegexSearch { get; set; }
         public Boolean OverwriteDatasetFile { get; set; }
-        public int VersionsToKeep { get; set; }
         public int FileTypeId { get; set; }
+
+        public string FileType {
+            get
+            {
+                return ((FileType) FileTypeId).ToString();
+            }
+            set
+            {
+                FileTypeId = (int) Enum.Parse(typeof(FileType), value); ;
+            }
+        }
+
         [Required]
         public string ConfigFileName { get; set; }
         public string ConfigFileDesc { get; set; }
@@ -64,5 +74,6 @@ namespace Sentry.data.Web
         public int DatasetScopeTypeID { get; set; }
         public IEnumerable<SelectListItem> AllDatasetScopeTypes { get; set; }
         public IEnumerable<SelectListItem> AllFrequencies { get; set; }
+        public IEnumerable<SelectListItem> AllDataFileTypes { get; set; }
     }
 }

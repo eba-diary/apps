@@ -21,7 +21,6 @@ namespace Sentry.data.Core
         private string _dropPath;
         private Boolean _isRegexSearch;
         private Boolean _overwriteDatafile;
-        private int _versionsToKeep;
         private int _fileTypeId;
         private Boolean _isGeneric;
         private Dataset _parentDataset;
@@ -43,7 +42,6 @@ namespace Sentry.data.Core
             string dropPath,
             Boolean isRegexSearch,
             Boolean overwriteDatafile,
-            int versionsToKeep,
             int fileTypeId,
             Boolean isGeneric,
             Dataset parentDataset,
@@ -60,7 +58,6 @@ namespace Sentry.data.Core
             this._dropPath = dropPath;
             this._isRegexSearch = isRegexSearch;
             this._overwriteDatafile = overwriteDatafile;
-            this._versionsToKeep = versionsToKeep;
             this._fileTypeId = fileTypeId;
             this._isGeneric = isGeneric;
             this._parentDataset = parentDataset;
@@ -187,17 +184,6 @@ namespace Sentry.data.Core
             set
             {
                 _overwriteDatafile = value;
-            }
-        }
-        public virtual int VersionsToKeep
-        {
-            get
-            {
-                return _versionsToKeep;
-            }
-            set
-            {
-                _versionsToKeep = value;
             }
         }
         public virtual int FileTypeId

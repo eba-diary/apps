@@ -78,7 +78,7 @@ namespace Sentry.data.Tests
                                           cat,
                                           null,
                                          // dScope,
-                                          0,
+                                          //0,
                                           null,
                                           null);
             List<Dataset> datasetsInList = new List<Dataset>();

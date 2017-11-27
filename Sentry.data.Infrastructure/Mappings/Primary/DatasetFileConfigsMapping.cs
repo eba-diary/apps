@@ -23,7 +23,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Generator(Generators.Identity);
             });
 
-            this.Property((x) => x.DataFileConfigId, (m) => m.Column("DataFileConfig_ID"));
+            //this.Property((x) => x.DataFileConfigId, (m) => m.Column("DataFileConfig_ID"));
             //this.Property((x) => x.DatasetId, (m) => m.Column("Dataset_ID"));
             this.Property((x) => x.SearchCriteria, (m) => m.Column("SearchCriteria"));
             this.Property((x) => x.TargetFileName, (m) => m.Column("TargetFile_NME"));
@@ -31,7 +31,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.DropPath, (m) => m.Column("DropPath"));
             this.Property((x) => x.IsRegexSearch, (m) => m.Column("RegexSearch_IND"));
             this.Property((x) => x.OverwriteDatafile, (m) => m.Column("OverwriteDatafile_IND"));
-            this.Property((x) => x.VersionsToKeep, (m) => m.Column("VersionsToKeep_NBR"));
             this.Property((x) => x.FileTypeId, (m) => m.Column("FileType_ID"));
             this.Property((x) => x.Name, (m) => m.Column("Config_NME"));
             this.Property((x) => x.Description, (m) => m.Column("Config_DSC"));

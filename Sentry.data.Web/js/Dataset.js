@@ -376,10 +376,6 @@ data.Dataset = {
         picker.assocAutocomplete({
             associateSelected: function (associate) {
                 $('#SentryOwnerName').val(associate.Id);
-            },
-            close: function () {
-                picker.assocAutocomplete("clear");
-
             }
         });
     },
@@ -408,10 +404,6 @@ data.Dataset = {
         picker.assocAutocomplete({
             associateSelected: function (associate) {
                 $('#SentryOwnerName').val(associate.Id);
-            },
-            close: function () {
-                picker.assocAutocomplete("clear");
-
             }
         });
 

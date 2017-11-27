@@ -79,18 +79,21 @@
                 </div>
             </div>
             <div class="form-group">
-                @Html.LabelFor(m => m.VersionsToKeep, htmlAttributes: new { @class = "control-lable col-sm-3" })
-                <div class="col-sm-4">
-                    @Html.EditorFor(m => m.VersionsToKeep, new { htmlAttributes = new { @class = "form-control" } })
-                </div>
-            </div>
-            <div class="form-group">
                 @Html.LabelFor(model => model.CreationFreq, htmlAttributes: new { @class = "control-lable col-sm-3" })
                 <div class="col-sm-4">
                     @Html.DropDownListFor(model => model.CreationFreq, 
                    new SelectList(Model.AllFrequencies, "Value", "Text", Model.CreationFreq), new { @class = "form-control " })
                 </div>
             </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.FileType, htmlAttributes: new { @class = "control-lable col-sm-3" })
+                <div class="col-sm-4">
+                    @Html.DropDownListFor(model => model.FileType,
+                   new SelectList(Model.AllDataFileTypes, "Text", "Text", Model.FileType), new { @class = "form-control " })
+                </div>
+            </div>
+
 
             <div class="form-group">
                 @Html.LabelFor((model) => model.DatasetScopeTypeID, htmlAttributes: new { @class = "control-lable col-sm-3" })
