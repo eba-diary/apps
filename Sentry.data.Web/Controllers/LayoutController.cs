@@ -69,7 +69,7 @@ namespace Sentry.data.Web.Controllers
             FooterModel footerModel = new FooterModel();
             
             // Replace the following if necessary to load the correct version number for your app
-            footerModel.AppVersion = AppVersion.ApplicationVersion.ToString();
+            footerModel.AppVersion = Assembly.GetExecutingAssembly().GetName().Version.ToString();
 
             return PartialView("_Footer", footerModel);
         }
