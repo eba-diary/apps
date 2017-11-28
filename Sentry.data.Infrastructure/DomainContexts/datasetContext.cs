@@ -72,7 +72,7 @@ namespace Sentry.data.Infrastructure
 
         public int GetCategoryDatasetCount(Category cat)
         {
-            return Query<Dataset>().Cacheable().Where(w => w.DatasetCategory.Id == cat.Id && w.CanDisplay).Count();
+            return Query<Dataset>().Cacheable().Where(w => w.Category == cat.Name && w.CanDisplay).Count();
         }
 
         public int GetMaxId()

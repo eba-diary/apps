@@ -37,6 +37,26 @@ namespace Sentry.data.Web.Helpers
 
             return false;
         }
+
+        public static int AmountContains(this BaseDatasetModel haystack, params string[] needles)
+        {
+            int i = 0;
+            foreach (string needle in needles)
+            {
+                if (haystack.DatasetDesc.ToLower().Contains(needle))
+                    i++;
+                if (haystack.Category.ToLower().Contains(needle))
+                    i++;
+                if (haystack.DatasetName.ToLower().Contains(needle))
+                    i++;
+                if (haystack.SentryOwner.FullName.ToLower().Contains(needle))
+                    i++;
+                if (haystack.SentryOwnerName.ToLower().Contains(needle))
+                    i++;
+            }
+
+            return i;
+        }
     }
 
 

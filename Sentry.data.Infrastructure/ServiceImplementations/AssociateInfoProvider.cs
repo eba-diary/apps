@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Sentry.Associates;
+using System.Linq;
 
 namespace Sentry.data.Infrastructure
 {
@@ -32,7 +34,15 @@ namespace Sentry.data.Infrastructure
         public Associate GetAssociateInfo(string associateId)
         {
             PopulateCacheIfNeeded();
+
             return _associateService.GetAssociateById(associateId, true);
+        }
+
+        public Associate GetAssociateInfoByName(string associateName)
+        {
+            PopulateCacheIfNeeded();
+
+            return _associateService.GetAssociatesByName(associateName, true).First();
         }
 
         private void PopulateCacheIfNeeded()

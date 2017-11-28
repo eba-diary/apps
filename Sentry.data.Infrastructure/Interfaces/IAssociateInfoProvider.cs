@@ -5,5 +5,7 @@ namespace Sentry.data.Infrastructure
     public interface IAssociateInfoProvider
     {
         Associate GetAssociateInfo(string associateId);
+
+        Associate GetAssociateInfoByName(string associateName);
     }
 }

@@ -157,13 +157,23 @@ namespace Sentry.data.Web.Helpers
             {
                 var predicate = PredicateBuilder.False<BaseDatasetModel>();
 
+
+
+
+
                 predicate = predicate.Or(f => f.DatasetDesc.ToLower().ContainsAny(searchWords.ToArray()));
                 predicate = predicate.Or(f => f.Category.ToLower().ContainsAny(searchWords.ToArray()));
                 predicate = predicate.Or(f => f.DatasetName.ToLower().ContainsAny(searchWords.ToArray()));
                 predicate = predicate.Or(f => f.SentryOwner.FullName.ToLower().ContainsAny(searchWords.ToArray()));
                 predicate = predicate.Or(f => f.SentryOwnerName.ToLower().ContainsAny(searchWords.ToArray()));
 
-                return filteredList.Where(predicate.Compile()).ToList();
+
+
+
+                return filteredList
+                    .Where(predicate.Compile())
+                    .OrderByDescending(x => PredicateBuilder.AmountContains(x, searchWords.ToArray()))  //The more search terms you match the higher in the results a object will be.
+                    .ToList();
             }
 
             //filteredList =

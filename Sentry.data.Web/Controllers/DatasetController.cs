@@ -351,7 +351,25 @@ namespace Sentry.data.Web.Controllers
             if (eds.DatasetDtm > DateTime.MinValue) ds.DatasetDtm = eds.DatasetDtm;
             if (null != eds.DatasetName && eds.DatasetName.Length > 0) ds.DatasetName = eds.DatasetName;
             ds.OriginationCode = originationcode;
-            if (null != eds.SentryOwnerName && eds.SentryOwnerName.Length > 0) ds.SentryOwnerName = eds.SentryOwnerName;
+            if (null != eds.SentryOwnerName && eds.SentryOwnerName.Length > 0)
+            {
+                int n;
+                if(int.TryParse(eds.SentryOwnerName, out n))
+                {
+                    ds.SentryOwnerName = eds.SentryOwnerName;
+                }
+                else
+                {
+                    var associate = _associateInfoProvider.GetAssociateInfoByName(eds.SentryOwnerName);
+                    if (associate.FullName == eds.SentryOwnerName)
+                    {
+                        ds.SentryOwnerName = associate.Id;
+                    }
+                }
+
+            }
+
+
             //if (eds.DatasetScopeTypeID != ds.DatasetScopeType.ScopeTypeId) { ds.DatasetScopeType = _datasetContext.GetDatasetScopeById(eds.DatasetScopeTypeID); }                        
             ds.S3Key = Utilities.GenerateDatasetStorageLocation(ds.Category, ds.DatasetName);
         }
@@ -1097,8 +1115,10 @@ namespace Sentry.data.Web.Controllers
 
             var extension = Path.GetExtension(files[0].FileName);
 
+
             //Do all the files included in the list have the same exact extension.
             Boolean sameExtension = files.All(x => Path.GetExtension(x.FileName) == extension) ? true : false;
+            Boolean allDataFiles = files.All(x => x.DatasetFileConfig.FileTypeId == (int)FileType.DataFile) ? true : false;
 
             //Get the users permissions
             Boolean errorsFound = false;
@@ -1113,6 +1133,12 @@ namespace Sentry.data.Web.Controllers
             {
                 errorsFound = true;
                 errorString += "<p>Please supply a new name to give to your bundled file.</p>";
+            }
+
+            if(!allDataFiles)
+            {
+                errorsFound = true;
+                errorString += "<p>You cannot bundle files that are labeled as supplementary files, help documents, or usage manuals.</p>";
             }
 
             if(files.Count == 1)
