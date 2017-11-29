@@ -332,6 +332,7 @@
     <Compile Include="Models\Dataset\EditDatasetModel.cs" />
     <Compile Include="Models\Dataset\ViewDatasetModel.cs" />
     <Compile Include="Models\FilterNameModel.cs" />
+    <Compile Include="Models\SearchFilterModel.cs" />
     <Compile Include="Models\SearchModel.cs" />
     <Compile Include="Models\SharedContextModel.cs" />
     <Compile Include="Models\Shared\SuccessModel.cs" />

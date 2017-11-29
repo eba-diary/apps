@@ -136,6 +136,50 @@ namespace Sentry.data.Web.Controllers
             return View(searchHelper.List(this, null, searchPhrase, category, ids));
         }
 
+        public JsonResult Filter(string category, string searchPhrase, string ids)
+        {
+            Helpers.Search searchHelper = new Helpers.Search(_cache);
+
+            ListDatasetModel model = searchHelper.List(this, null, searchPhrase, category, ids);
+
+            return Json(model, JsonRequestBehavior.AllowGet);
+        }
+
+
+        public ActionResult SearchFilters(string category, string searchPhrase, string ids)
+        {
+            Helpers.Search searchHelper = new Helpers.Search(_cache);
+
+            ListDatasetModel m = searchHelper.List(this, null, searchPhrase, category, ids);
+
+            SearchFilterModel model = new SearchFilterModel();
+            model.SearchFilters = m.SearchFilters;
+
+            return PartialView("_SearchFilters", model);
+        }
+
+        public JsonResult JsonFun(string category, string searchPhrase, string ids)
+        {
+            Helpers.Search searchHelper = new Helpers.Search(_cache);
+
+            ListDatasetModel m = searchHelper.List(this, null, searchPhrase, category, ids);
+
+            SearchFilterModel model = new SearchFilterModel();
+            model.SearchFilters = m.SearchFilters;
+
+            return Json(model);
+        }
+
+        public ActionResult ListItem(string category, string searchPhrase, string ids)
+        {
+
+            Helpers.Search searchHelper = new Helpers.Search(_cache);
+
+            ListDatasetModel model = searchHelper.List(this, null, searchPhrase, category, ids);
+
+            return PartialView("_ListItem", model);
+        }
+
         [Route("Dataset/List")]
         public ActionResult List(ListDatasetModel ldm)
         {
@@ -450,7 +494,20 @@ namespace Sentry.data.Web.Controllers
             bdm.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
             bdm.CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
             bdm.CanUpload = SharedContext.CurrentUser.CanUpload;
+
+            bdm.IsSubscribed = true;
+
             return View(bdm);
+        }
+
+
+        [HttpPost]
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        public JsonResult Subscribe(int id)
+        {
+
+
+            return Json(new { Success = true, Message = "Success" });
         }
 
         [AuthorizeByPermission(PermissionNames.DatasetView)]

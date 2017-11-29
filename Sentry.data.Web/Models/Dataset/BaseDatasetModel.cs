@@ -202,6 +202,8 @@ namespace Sentry.data.Web
         public Boolean IsPushToSASCompatible { get; set; }
         public Boolean IsPushToTableauCompatible { get; set; }
         public Boolean IsPreviewCompatible { get; set; }
+
+        public Boolean IsSubscribed { get; set; }
         public Category DatasetCategory { get; set; } /* Caden made a change here for the Category reference */ 
         //public IList<String> CategoryList { get; set; }
 

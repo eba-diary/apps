@@ -1,9 +1,8 @@
-﻿@model ListDatasetModel
-
+﻿@model SearchFilterModel
 @{
     string[] colors = new string[] { "blue", "green", "gold", "plum", "orange", "blueGray" };
     int visibleNum = 6; //controls number of filter options are visible to start
-    int i = 0, j = 0;
+    int i = 0;
 
     foreach (var category in Model.SearchFilters)
     {
@@ -18,39 +17,99 @@
             <div class="dataset-list-filter-category panel-body" id="hide_filterType_@catName">
                 <ul class="list-unstyled ul-filter-list">
                     @{
-
-                    for (int t = 0; t < visibleNum; t++)
-                    {
-                        if (t < category.FilterNameList.Count)
+                        if (category.FilterType != "Category")
                         {
-                            FilterNameModel filter = @category.FilterNameList[t];
-                            <li class="list-unstyled li-filter-disabled filterList" id="li-filter-disabled_@filter.id">
-                                @Html.CheckBoxFor(m => m.SearchFilters[i].FilterNameList[t].isChecked, new { @id = @category.FilterType + "_" + @filter.id, @oncheckedchange = "", @class = "filterChbx" })
-                                @Html.HiddenFor(m => m.SearchFilters[i].FilterType)
-                                @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].id)
-                                @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].value)
-                                @Html.DisplayFor(m => m.SearchFilters[i].FilterNameList[t].value)
-                                ( @filter.count )
-                            </li>
+                            category.FilterNameList = category.FilterNameList.OrderByDescending(x => x.count).ToList();
                         }
-                    }
+                        else
+                        {
+                            category.FilterNameList = category.FilterNameList.OrderBy(x => x.value).ToList();
+                        }
+                        if (category.FilterType == "Frequency")
+                        {
+                            visibleNum = 7;
+                        }
+                        else
+                        {
+                            visibleNum = 6;
+                        }
 
-                    <li id="hidden_filterMore_@catName">
-                        <ul class="notNested">
-                            @for (int t = visibleNum; t < category.FilterNameList.Count; t++)
+                        for (int t = 0; t < visibleNum; t++)
+                        {
+                            if (t < category.FilterNameList.Count)
                             {
                                 FilterNameModel filter = @category.FilterNameList[t];
                                 <li class="list-unstyled li-filter-disabled filterList" id="li-filter-disabled_@filter.id">
-                                    @Html.CheckBoxFor(m => m.SearchFilters[i].FilterNameList[t].isChecked, new { @id = @category.FilterType + "_" + @filter.id, @oncheckedchange = "", @class = "filterChbx" })
+                                    @Html.CheckBoxFor(m => m.SearchFilters[i].FilterNameList[t].isChecked, new { @id = @i + "_" + @Model.SearchFilters[i].FilterNameList[t].id, @oncheckedchange = "", @class = "filterChbx" })
                                     @Html.HiddenFor(m => m.SearchFilters[i].FilterType)
                                     @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].id)
                                     @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].value)
                                     @Html.DisplayFor(m => m.SearchFilters[i].FilterNameList[t].value)
-                                    ( @filter.count )
+
+                                    @if (filter.isChecked)
+                                    {
+                                        if (@filter.count > 0)
+                                        {
+                                            <span class="badge badge-info filterHead_@color"> @filter.count</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge"> @filter.count</span>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (@filter.count > 0)
+                                        {
+                                            <span class="badge badge-info filterHead_@color"> @filter.count</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge"> @filter.count</span>
+                                        }
+                                    }
                                 </li>
                             }
-                        </ul>
-                    </li>
+                        }
+
+                        <li id="hidden_filterMore_@catName">
+                            <ul class="notNested">
+                                @for (int t = visibleNum; t < category.FilterNameList.Count; t++)
+                                {
+                                    FilterNameModel filter = @category.FilterNameList[t];
+                                    <li class="list-unstyled li-filter-disabled filterList" id="li-filter-disabled_@filter.id">
+                                        @Html.CheckBoxFor(m => m.SearchFilters[i].FilterNameList[t].isChecked, new { @id = @i + "_" + @Model.SearchFilters[i].FilterNameList[t].id, @oncheckedchange = "", @class = "filterChbx" })
+                                        @Html.HiddenFor(m => m.SearchFilters[i].FilterType)
+                                        @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].id)
+                                        @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].value)
+                                        @Html.DisplayFor(m => m.SearchFilters[i].FilterNameList[t].value)
+
+                                        @if (filter.isChecked)
+                                        {
+                                            if (@filter.count > 0)
+                                            {
+                                                <span class="badge badge-info filterHead_@color"> @filter.count</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge"> @filter.count</span>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            if (@filter.count > 0)
+                                            {
+                                                <span class="badge badge-info filterHead_@color"> @filter.count</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge"> @filter.count</span>
+                                            }
+                                        }
+                                    </li>
+                                }
+                            </ul>
+                        </li>
                         i++;
                     }
                 </ul>
@@ -69,4 +128,15 @@
             </div>
         </div>
                         }
+}
+@section Scripts {
+    <script>
+
+      
+
+
+        $(document).ready(function () {
+            // $("#filterSelector").select2();
+        });
+    </script>
 }

@@ -38,136 +38,11 @@
             </div>
 
             <div class="col-sm-3 clearFloat no-padding hidden-sm hidden-xs">
-                <div class="outsideFilters">
+                <div class="outsideFilters" id="outsideFilters">
                     @{
-                        string[] colors = new string[] { "blue", "green", "gold", "plum", "orange", "blueGray" };
-                        int visibleNum = 6; //controls number of filter options are visible to start
-                        int i = 0;
-
-                        foreach (var category in Model.SearchFilters)
-                        {
-                            string catName = category.FilterType.Split(' ').First();
-                            string color = colors[(i < 6) ? i : i % 6];
-
-                            <div class="panel panel-default dataset-list-filters boxShadow filterBorder_@color">
-                                <div class="panel-heading filterHead_@color filterHead white" id="filterType_@catName">
-                                    @category.FilterType
-                                    <span class="glyphicon glyphicon-chevron-up rightFloat filterViewIcon @color" id="icon_filterType_@catName"></span>
-                                </div>
-                                <div class="dataset-list-filter-category panel-body" id="hide_filterType_@catName">
-                                    <ul class="list-unstyled ul-filter-list">
-                                        @{
-                                            if(category.FilterType != "Category")
-                                            {
-                                                category.FilterNameList = category.FilterNameList.OrderByDescending(x => x.count).ToList();
-                                            }
-                                            else
-                                            {
-                                                category.FilterNameList = category.FilterNameList.OrderBy(x => x.value).ToList();
-                                            }
-                                            if (category.FilterType == "Frequency")
-                                            {
-                                                visibleNum = 7;
-                                            }
-                                            else
-                                            {
-                                                visibleNum = 6;
-                                            }
-
-                                            for (int t = 0; t < visibleNum; t++)
-                                            {
-                                                if (t < category.FilterNameList.Count)
-                                                {
-                                                    FilterNameModel filter = @category.FilterNameList[t];
-                                                    <li class="list-unstyled li-filter-disabled filterList" id="li-filter-disabled_@filter.id">
-                                                        @Html.CheckBoxFor(m => m.SearchFilters[i].FilterNameList[t].isChecked, new { @id = @i + "_" + @Model.SearchFilters[i].FilterNameList[t].id, @oncheckedchange = "", @class = "filterChbx" })
-                                                        @Html.HiddenFor(m => m.SearchFilters[i].FilterType)
-                                                        @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].id)
-                                                        @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].value)
-                                                        @Html.DisplayFor(m => m.SearchFilters[i].FilterNameList[t].value)
-
-                                                        @if (filter.isChecked)
-                                                {
-                                                    if (@filter.count > 0)
-                                                    {
-                                                                <span class="badge badge-info filterHead_@color"> @filter.count</span>
-                                            }
-                                                            else
-                                                            {
-                                                                <span class="badge"> @filter.count</span>
-                                                            }
-                                                        }
-                                                        else
-                                                        {
-                                                            if (@filter.count > 0)
-                                                            {
-                                                                <span class="badge badge-info filterHead_@color"> @filter.count</span>
-                                                            }
-                                                            else
-                                                            {
-                                                                <span class="badge"> @filter.count</span>
-                                                            }
-                                                        }
-                                                    </li>
-                                                }
-                                            }
-
-                                            <li id="hidden_filterMore_@catName">
-                                                <ul class="notNested">
-                                                    @for (int t = visibleNum; t < category.FilterNameList.Count; t++)
-                                                    {
-                                                        FilterNameModel filter = @category.FilterNameList[t];
-                                                        <li class="list-unstyled li-filter-disabled filterList" id="li-filter-disabled_@filter.id">
-                                                            @Html.CheckBoxFor(m => m.SearchFilters[i].FilterNameList[t].isChecked, new { @id = @i + "_" + @Model.SearchFilters[i].FilterNameList[t].id, @oncheckedchange = "", @class = "filterChbx" })
-                                                            @Html.HiddenFor(m => m.SearchFilters[i].FilterType)
-                                                            @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].id)
-                                                            @Html.HiddenFor(m => m.SearchFilters[i].FilterNameList[t].value)
-                                                            @Html.DisplayFor(m => m.SearchFilters[i].FilterNameList[t].value)
-
-                                                            @if (filter.isChecked)
-                                                            {
-                                                                if (@filter.count > 0)
-                                                                {
-                                                                    <span class="badge badge-info filterHead_@color"> @filter.count</span>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <span class="badge"> @filter.count</span>
-                                                                }
-                                                            }
-                                                            else
-                                                            {
-                                                                if (@filter.count > 0)
-                                                                {
-                                                                    <span class="badge badge-info filterHead_@color"> @filter.count</span>
-                                                                }
-                                                                else
-                                                                {
-                                                                    <span class="badge"> @filter.count</span>
-                                                                }
-                                                            }
-                                                        </li>
-                                                    }
-                                                </ul>
-                                            </li>
-                                            i++;
-                                        }
-                                    </ul>
-
-                                    @if (visibleNum < category.FilterNameList.Count)
-                                    {
-                                        <a href="#" class="filterMore" id="filterMore_@catName">
-                                            <div class="glyphicon glyphicon-plus-sign inlineBlock moreIcon leftFloat" id="icon_filterMore_@catName"></div>
-                                            <div class="leftFloat txt_filterMore" id="txt_filterMore_@catName">Show More</div>
-                                        </a>
-                                    }
-
-                                    <div class="inlineBlock rightFloat">
-                                        <input type="submit" name="btn_@category.FilterType" class="button btn-sm btn-filter-apply BG_@color white hover_btn_@color" value="Apply" id="btnApply_@category.FilterType" hidden />
-                                    </div>
-                                </div>
-                            </div>
-                                            }
+                        SearchFilterModel sfm = new SearchFilterModel();
+                        sfm.SearchFilters = Model.SearchFilters;
+                        @Html.Partial("_SearchFilters", sfm);
                     }
                 </div>
             </div>
@@ -183,7 +58,7 @@
                         <select multiple="" class="form-control select2-hidden-accessible"
                                 id="filterSelector" name="filterSelector" tabindex="-1" aria-hidden="true">
                             @{
-                                i = 0;
+                                int i = 0;
                                 foreach (var category in Model.SearchFilters)
                                 {
                                     string catName = category.FilterType.Split(' ').First();
@@ -204,17 +79,11 @@
                             }
                         </select>
                     </div>
+
                         @{
                             if (Model.DatasetList.Any())
                             {
-                                <ul class="list-unstyled">
-                                    @{                                     
-                                        foreach (var item in Model.DatasetList)
-                                        {
-                                            @Html.Partial("_ListItem", item);
-                                        }
-                                     }
-                                </ul>
+                                @Html.Partial("_ListItem", Model);
                             }
                             else
                             {
@@ -300,70 +169,9 @@
                 $('#SearchText')[0].value = searchText;
             }
 
-            //If there is a checkbox that is checked but has not been added to the Local Storage Add it
-            //Happens when coming from the initial landing page.
-            var checkedBoxes = $('.filterChbx:checkbox:checked');
-
-            for (i = 0; i < checkedBoxes.length; i++)
-            {
-                storedNames = JSON.parse(localStorage.getItem("filteredIds"));
-
-                if (storedNames != null) {
-                    if (storedNames.indexOf(checkedBoxes[i].id) == -1)
-                    {
-                        storedNames[storedNames.length] = checkedBoxes[i].id;
-                    }
-                }
-                else {
-                    var storedNames = [];
-                    storedNames[0] = checkedBoxes[i].id;
-                }
-
-                localStorage.setItem("filteredIds", JSON.stringify(storedNames));
-            }
-            $selector.val(storedNames).trigger("change");
-
-            $("[id^=btnApply_]").click(function (e) {
-                var $btn = $("[id^=btnApply_]")
-                $btn.attr('hidden', 'hidden')
-
-            });
-
-            $(".filterList").click(function (e) {
-                var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
-                var data = $($(e.currentTarget.children[0])[0]);
-
-                if (data.prop('checked') === true) {
-                    data.prop('checked', false);
-
-                    if (storedNames != null) {
-                        storedNames.splice(storedNames.indexOf($(data).attr('id')), 1);
-                    }
-
-                    localStorage.setItem("filteredIds", JSON.stringify(storedNames));
-                    $selector.val(storedNames).trigger("change");
-                }
-                else {
-                    data.prop('checked', true);
-
-                    if (storedNames != null) {
-                        storedNames[storedNames.length] = $(data).attr('id');
-                    }
-                    else {
-                        var storedNames = [];
-                        storedNames[0] = $(data).attr('id');
-                    }
-
-                    localStorage.setItem("filteredIds", JSON.stringify(storedNames));
-                    $selector.val(storedNames).trigger("change");
-                }
-
-                changeWindow();
-            });
-
             function changeWindow()
             {
-                var returnUrl = "/Dataset/List/SearchPhrase";
+                var returnUrl = "/Dataset/ListItem";
 
                 var text = JSON.parse(localStorage.getItem("searchText"));
                 var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
@@ -389,13 +197,38 @@
                     returnUrl = returnUrl.replace(/,\s*$/, "");
                 }
 
+                $.ajax({
+                    type: "POST",
+                    url: returnUrl, //in asp.net mvc using ActionResult
+                    dataType: 'html',
+                    success: function (result) {
+                        //Your result is here
+                        $("#datasetList").html(result);
+                    }
+                });
 
-                window.location.href = returnUrl;
+                returnUrl = returnUrl.replace("ListItem", "SearchFilters");
+
+                $.ajax({
+                    type: "POST",
+                    url: returnUrl, //in asp.net mvc using ActionResult
+                    dataType: 'html',
+                    success: function (result) {
+                        //Your result is here
+                        console.log(result);
+                        $("#outsideFilters").html(result);
+                    }
+                });
+
+                Sentry.InjectSpinner($("#datasetList"));
+
+               // window.location.href = returnUrl;
+                
 
                 return false;
             }
 
-            $("#btnClearFilters").click(function (e) {
+            $(document).on('click', "#btnClearFilters", function (e) {
                 var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
 
                 if (storedNames != null) {
@@ -409,27 +242,15 @@
                 localStorage.removeItem("searchText");
                 $selector.val(null).trigger('change');
                 $('#SearchText')[0].value = "";
-                
+
                 changeWindow();
             });
 
-            $('.searchBtn').click(function (e) {          
+            $(document).on('click', ".searchBtn", function (e) {
+
                 localStorage.setItem("searchText", JSON.stringify($('#SearchText')[0].value));
 
                 changeWindow();
-            });
-
-            $(".filterChbx").click(function (e) {
-                var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
-
-                var data = $(e.currentTarget);
-
-                if (data.prop('checked') === true) {
-                    data.prop('checked', false);
-                }
-                else {
-                    data.prop('checked', true);
-                }                
             });
 
             $('#filterSelector').on('select2:select', function (e) {
@@ -474,11 +295,85 @@
                 changeWindow();
             });
 
+
+            //If there is a checkbox that is checked but has not been added to the Local Storage Add it
+            //Happens when coming from the initial landing page.
+            var checkedBoxes = $('.filterChbx:checkbox:checked');
+            console.log('View was reloaded');
+
+            for (i = 0; i < checkedBoxes.length; i++) {
+                storedNames = JSON.parse(localStorage.getItem("filteredIds"));
+
+                if (storedNames != null) {
+                    if (storedNames.indexOf(checkedBoxes[i].id) == -1) {
+                        storedNames[storedNames.length] = checkedBoxes[i].id;
+                    }
+                }
+                else {
+                    var storedNames = [];
+                    storedNames[0] = checkedBoxes[i].id;
+                }
+
+                localStorage.setItem("filteredIds", JSON.stringify(storedNames));
+            }
+            $selector.val(storedNames).trigger("change");
+
+            $(document).on('click', ".filterChbx", function (e) {
+                var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
+
+                var data = $(e.currentTarget);
+
+                if (data.prop('checked') === true) {
+                    data.prop('checked', false);
+                }
+                else {
+                    data.prop('checked', true);
+                }
+            });
+
+            $("[id^=btnApply_]").click(function (e) {
+                var $btn = $("[id^=btnApply_]")
+                $btn.attr('hidden', 'hidden')
+
+            });
+
+            $(document).on('click', ".filterList", function (e) {
+                var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
+                var data = $($(e.currentTarget.children[0])[0]);
+
+                if (data.prop('checked') === true) {
+                    data.prop('checked', false);
+
+                    if (storedNames != null) {
+                        storedNames.splice(storedNames.indexOf($(data).attr('id')), 1);
+                    }
+
+                    localStorage.setItem("filteredIds", JSON.stringify(storedNames));
+                    $selector.val(storedNames).trigger("change");
+                }
+                else {
+                    data.prop('checked', true);
+
+                    if (storedNames != null) {
+                        storedNames[storedNames.length] = $(data).attr('id');
+                    }
+                    else {
+                        var storedNames = [];
+                        storedNames[0] = $(data).attr('id');
+                    }
+
+                    localStorage.setItem("filteredIds", JSON.stringify(storedNames));
+                    $selector.val(storedNames).trigger("change");
+                }
+
+                changeWindow();
+            });
+
                         /**
             //If we want to have the left hand filter boxes to be collapsed when there is nothing yet selected.
             //Turned off because I don't like the animation feature
             //  - Andrew Quaschnick
-             
+
             var catExists = false;
             var ownerExists = false;
             var freqExists = false;

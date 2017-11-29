@@ -5,6 +5,7 @@ using Sentry.data.Infrastructure;
 using System.Collections.Generic;
 using System;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace Sentry.data.Web.Controllers
 {

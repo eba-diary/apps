@@ -49,6 +49,11 @@ namespace Sentry.data.Web.Helpers
                 {
                     ldm = new ListDatasetModel();
 
+                    ldm.CategoryList = new List<string>();
+                    ldm.DatasetList = new List<BaseDatasetModel>();
+                    ldm.SentryOwnerList = new List<string>();
+                    ldm.SearchFilters = new List<FilterModel>();
+
                     using (profiler.Step("Search Filter Creation from Null"))
                     {
                         if (ids != null)
@@ -148,6 +153,7 @@ namespace Sentry.data.Web.Helpers
                 return ldm;
             }
         }
+       
 
         private List<BaseDatasetModel> SearchTextFilter(List<string> searchWords, List<BaseDatasetModel> filteredList)
         {

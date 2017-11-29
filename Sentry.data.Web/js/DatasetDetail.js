@@ -40,11 +40,26 @@ data.DatasetDetail = {
             var request = $.ajax({
                 url: "/Dataset/CreateFilePath/?filePath=" + $($(this).parent().parent().children()[1]).text(),
                 method: "POST",
-               // data: $($(this).parent().parent().children()[1]).text(),
                 dataType: 'json',
                 success: function (obj) {
                 }
             });
+        });
+
+        $("[id^='SubscribeModal']").click(function (e) {
+            e.preventDefault();
+
+            var datasetID = window.location.pathname.substr(window.location.pathname.lastIndexOf('/') + 1);
+
+            var request = $.ajax({
+                url: "/Dataset/Subscribe/?id=" + datasetID,
+                method: "POST",
+                dataType: 'json',
+                success: function (obj) {
+                }
+            });
+
+            location.reload();
         });
 
         $("[id^='UploadModal']").click(function (e) {
