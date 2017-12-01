@@ -14,9 +14,27 @@ namespace Sentry.data.Infrastructure
 
             SmtpClient smtpClient = new SmtpClient("mail.sentry.com");
 
-            smtpClient.Send("notifications@SentryData.com", toAddress, subject, body);
-
             System.Diagnostics.Trace.WriteLine("Sending email to " + toAddress + ". Subject = " + subject + "; Body = " + body);
+
+
+            // set smtp-client with basicAuthentication
+            //mySmtpClient.UseDefaultCredentials = false;
+            //System.Net.NetworkCredential basicAuthenticationInfo = new System.Net.NetworkCredential("username", "password");
+            //mySmtpClient.Credentials = basicAuthenticationInfo;
+
+            // add from,to mailaddresses
+            MailAddress from = new MailAddress(Configuration.Config.GetHostSetting("DatasetMgmtEmail"));
+            MailMessage myMail = new System.Net.Mail.MailMessage();
+            myMail.From = from;
+
+            myMail.IsBodyHtml = true;
+
+            myMail.Body += @"<p><b><font color=""red"">Do Not Reply To This Email, This Inbox Is Not Monitored</font></b></p>";
+
+
+
+
+
 
         }
     }

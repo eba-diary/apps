@@ -537,7 +537,7 @@ namespace Sentry.data.Web.Controllers
 
             _datasetContext.SaveChanges();
 
-            return View();
+            return Redirect(Request.UrlReferrer.PathAndQuery);
         }
 
 
