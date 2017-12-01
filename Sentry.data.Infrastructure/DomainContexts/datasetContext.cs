@@ -288,5 +288,84 @@ namespace Sentry.data.Infrastructure
 
             return da;
         }
+
+        public EventType GetEventType(string description)
+        {
+            return Query<EventType>().Cacheable().Where(x => x.Description.ToLower().Contains(description.ToLower())).FirstOrDefault();
+        }
+
+        public EventType GetEventType(int id)
+        {
+            return Query<EventType>().Cacheable().Where(x => x.Type_ID == id).FirstOrDefault();
+        }
+        public List<EventType> GetAllEventTypes()
+        {
+            return Query<EventType>().Cacheable().ToList();
+        }
+
+        public Interval GetInterval(string description)
+        {
+            return Query<Interval>().Cacheable().Where(x => x.Description.ToLower().Contains(description.ToLower())).FirstOrDefault();
+        }
+
+        public List<Interval> GetAllIntervals()
+        {
+            return Query<Interval>().Cacheable().ToList();
+        }
+
+        public Interval GetInterval(int id)
+        {
+            return Query<Interval>().Cacheable().Where(x => x.Interval_ID == id).FirstOrDefault();
+        }
+
+        public Status GetStatus(string description)
+        {
+            return Query<Status>().Cacheable().Where(x => x.Description.ToLower().Contains(description.ToLower())).FirstOrDefault();
+        }
+
+        public Status GetStatus(int id)
+        {
+            return Query<Status>().Cacheable().Where(x => x.Status_ID == id).FirstOrDefault();
+        }
+
+        public List<Status> GetAllStatuses()
+        {
+            return Query<Status>().Cacheable().ToList();
+        }
+
+        public List<Event> GetEvents(string reason)
+        {
+            return Query<Event>().Cacheable().Where(x => x.Reason.ToLower().Contains(reason.ToLower())).ToList();
+        }
+
+        public Event GetEvent(int id)
+        {
+            return Query<Event>().Cacheable().Where(x => x.EventID == id).FirstOrDefault();
+        }
+
+        public List<Event> GetEventsStartedByUser(string SentryOwnerName)
+        {
+            return Query<Event>().Cacheable().Where(x => x.UserWhoStartedEvent == SentryOwnerName).ToList();
+        }
+
+        public bool IsUserSubscribedToDataset(string SentryOwnerName, int datasetID)
+        {
+            return Query<DatasetSubscription>().Cacheable().Where(x => x.SentryOwnerName == SentryOwnerName && x.Dataset.DatasetId == datasetID).Any();
+        }
+
+        public bool IsUserSubscribedToDataAsset(string SentryOwnerName, int dataAssetID)
+        {
+            return Query<DataAssetSubscription>().Cacheable().Where(x => x.SentryOwnerName == SentryOwnerName && x.DataAsset.Id == dataAssetID).Any();
+        }
+
+        public List<DatasetSubscription> GetAllUserSubscriptionsForDataset(string SentryOwnerName, int datasetID)
+        {
+            return Query<DatasetSubscription>().Cacheable().Where(x => x.SentryOwnerName == SentryOwnerName && x.Dataset.DatasetId == datasetID).ToList();
+        }
+
+        public List<DataAssetSubscription> GetAllUserSubscriptionsForDataAsset(string SentryOwnerName, int dataAssetID)
+        {
+            return Query<DataAssetSubscription>().Cacheable().Where(x => x.SentryOwnerName == SentryOwnerName && x.DataAsset.Id == dataAssetID).ToList();
+        }
     }
 }

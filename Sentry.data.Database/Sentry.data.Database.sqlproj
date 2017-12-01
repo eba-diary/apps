@@ -103,6 +103,7 @@
   <ItemGroup>
     <Folder Include="Properties" />
     <Folder Include="Tables\" />
+    <Folder Include="Tables\Subscriptions" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -128,6 +129,12 @@
     <Build Include="Tables\DatasetFileConfigs.sql" />
     <Build Include="Tables\AssetSource.sql" />
     <Build Include="Tables\AssetNotifications.sql" />
+    <Build Include="Tables\Subscriptions\DataAsset_Subscription.sql" />
+    <Build Include="Tables\Subscriptions\Dataset_Subscription.sql" />
+    <Build Include="Tables\Subscriptions\Event.sql" />
+    <Build Include="Tables\Subscriptions\EventType.sql" />
+    <Build Include="Tables\Subscriptions\IntervalType.sql" />
+    <Build Include="Tables\Subscriptions\StatusType.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

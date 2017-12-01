@@ -80,6 +80,39 @@ namespace Sentry.data.Core
         IList<DataAsset> GetDataAssets();
         DataAsset GetDataAsset(int id);
         DataAsset GetDataAsset(string assetname);
+
+
+        EventType GetEventType(string description);
+
+        EventType GetEventType(int id);
+        List<EventType> GetAllEventTypes();
+
+        Interval GetInterval(string description);
+
+        List<Interval> GetAllIntervals();
+
+        Interval GetInterval(int id);
+
+        Status GetStatus(string description);
+
+        Status GetStatus(int id);
+
+        List<Status> GetAllStatuses();
+
+        List<Event> GetEvents(string reason);
+
+        Event GetEvent(int id);
+
+        List<Event> GetEventsStartedByUser(string SentryOwnerName);
+
+        bool IsUserSubscribedToDataset(string SentryOwnerName, int datasetID);
+
+        List<DatasetSubscription> GetAllUserSubscriptionsForDataset(string SentryOwnerName, int datasetID);
+
+        bool IsUserSubscribedToDataAsset(string SentryOwnerName, int dataAssetID);
+
+        List<DataAssetSubscription> GetAllUserSubscriptionsForDataAsset(string SentryOwnerName, int dataAssetID);
+
     }
 
 }

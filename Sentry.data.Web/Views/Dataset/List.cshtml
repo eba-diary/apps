@@ -171,7 +171,7 @@
 
             function changeWindow()
             {
-                var returnUrl = "/Dataset/ListItem";
+                var returnUrl = "/Dataset/List/SearchPhrase";
 
                 var text = JSON.parse(localStorage.getItem("searchText"));
                 var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
@@ -197,32 +197,32 @@
                     returnUrl = returnUrl.replace(/,\s*$/, "");
                 }
 
-                $.ajax({
-                    type: "POST",
-                    url: returnUrl, //in asp.net mvc using ActionResult
-                    dataType: 'html',
-                    success: function (result) {
-                        //Your result is here
-                        $("#datasetList").html(result);
-                    }
-                });
+                //$.ajax({
+                //    type: "POST",
+                //    url: returnUrl, //in asp.net mvc using ActionResult
+                //    dataType: 'html',
+                //    success: function (result) {
+                //        //Your result is here
+                //        $("#datasetList").html(result);
+                //    }
+                //});
 
-                returnUrl = returnUrl.replace("ListItem", "SearchFilters");
+                //returnUrl = returnUrl.replace("ListItem", "SearchFilters");
 
-                $.ajax({
-                    type: "POST",
-                    url: returnUrl, //in asp.net mvc using ActionResult
-                    dataType: 'html',
-                    success: function (result) {
-                        //Your result is here
-                        console.log(result);
-                        $("#outsideFilters").html(result);
-                    }
-                });
+                //$.ajax({
+                //    type: "POST",
+                //    url: returnUrl, //in asp.net mvc using ActionResult
+                //    dataType: 'html',
+                //    success: function (result) {
+                //        //Your result is here
+                //        console.log(result);
+                //        $("#outsideFilters").html(result);
+                //    }
+                //});
 
-                Sentry.InjectSpinner($("#datasetList"));
+                //Sentry.InjectSpinner($("#datasetList"));
 
-               // window.location.href = returnUrl;
+                window.location.href = returnUrl;
                 
 
                 return false;
@@ -299,7 +299,6 @@
             //If there is a checkbox that is checked but has not been added to the Local Storage Add it
             //Happens when coming from the initial landing page.
             var checkedBoxes = $('.filterChbx:checkbox:checked');
-            console.log('View was reloaded');
 
             for (i = 0; i < checkedBoxes.length; i++) {
                 storedNames = JSON.parse(localStorage.getItem("filteredIds"));

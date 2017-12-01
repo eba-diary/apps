@@ -150,11 +150,17 @@
     <Compile Include="Mappings\Primary\DatasetMetadataMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetScopeTypeMapping.cs" />
+    <Compile Include="Mappings\Subscriptions\DataAssetSubscriptionMapping.cs" />
+    <Compile Include="Mappings\Subscriptions\DatasetSubscriptionMapping.cs" />
+    <Compile Include="Mappings\Subscriptions\EventMapping.cs" />
+    <Compile Include="Mappings\Subscriptions\EventTypeMapping.cs" />
+    <Compile Include="Mappings\Subscriptions\IntervalTypeMapping.cs" />
     <Compile Include="Mappings\Primary\RTAPIParametersMapping.cs" />
     <Compile Include="Mappings\Primary\RTRequestMapping.cs" />
     <Compile Include="Mappings\Primary\RTRequestParametersMapping.cs" />
     <Compile Include="Mappings\Primary\RTSourceTypesMapping.cs" />
     <Compile Include="Mappings\Primary\RTAPIEndpointsMapping.cs" />
+    <Compile Include="Mappings\Subscriptions\StatusTypeMapping.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>

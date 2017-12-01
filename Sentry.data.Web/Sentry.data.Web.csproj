@@ -336,6 +336,7 @@
     <Compile Include="Models\SearchModel.cs" />
     <Compile Include="Models\SharedContextModel.cs" />
     <Compile Include="Models\Shared\SuccessModel.cs" />
+    <Compile Include="Models\Subscription\SubscriptionModel.cs" />
     <Compile Include="Models\User\UserGridModel.cs" />
     <Compile Include="Models\User\UserModel.cs" />
     <Compile Include="Models\User\UserSwitchModel.cs" />
@@ -1126,6 +1127,7 @@
     <Content Include="Views\Dataset\_BundleFilename.cshtml" />
     <Content Include="Views\Dataset\EditDataFile.cshtml" />
     <Content Include="Views\Dataset\CreateDataFileConfig.cshtml" />
+    <Content Include="Views\Dataset\_Subscribe.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1133,9 +1135,9 @@
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Views\Admin\DisplayTemplates\" />
     <Folder Include="Views\DataModel\" />
-    <Folder Include="Views\DatasetController2\" />
     <Folder Include="Views\Defect\" />
     <Folder Include="Views\ExternalFile\" />
+    <Folder Include="Views\Subscription\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

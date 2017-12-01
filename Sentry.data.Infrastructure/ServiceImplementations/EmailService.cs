@@ -1,4 +1,5 @@
-﻿using Sentry.data.Core;
+﻿using System.Net.Mail;
+using Sentry.data.Core;
 
 namespace Sentry.data.Infrastructure
 {
@@ -10,6 +11,10 @@ namespace Sentry.data.Infrastructure
             //Real code could look something like this:
             //Dim smtpClient As New System.Net.Mail.SmtpClient("mail.sentry.com")
             //smtpClient.Send("notifications@SentryData.com", toAddress, subject, body)
+
+            SmtpClient smtpClient = new SmtpClient("mail.sentry.com");
+
+            smtpClient.Send("notifications@SentryData.com", toAddress, subject, body);
 
             System.Diagnostics.Trace.WriteLine("Sending email to " + toAddress + ". Subject = " + subject + "; Body = " + body);
 

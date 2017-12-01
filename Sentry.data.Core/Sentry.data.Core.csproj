@@ -70,6 +70,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DomainServices\MetadataRepositoryService.cs" />
+    <Compile Include="Entities\Subscriptions\DataAssetSubscription.cs" />
+    <Compile Include="Entities\Subscriptions\DatasetSubscription.cs" />
+    <Compile Include="Entities\Subscriptions\Event.cs" />
     <Compile Include="Entities\AssetNotifications.cs" />
     <Compile Include="Entities\AssetSource.cs" />
     <Compile Include="Entities\DataAssetHealth.cs" />
@@ -100,6 +103,10 @@
     <Compile Include="Entities\LoaderFileConfig.cs" />
     <Compile Include="Entities\LoaderSystemConfig.cs" />
     <Compile Include="Entities\NotificationSeverity.cs" />
+    <Compile Include="Entities\Subscriptions\EventType.cs" />
+    <Compile Include="Entities\Subscriptions\Interval.cs" />
+    <Compile Include="Entities\Subscriptions\Status.cs" />
+    <Compile Include="Entities\Subscriptions\Subscription.cs" />
     <Compile Include="Entities\TransferProgressEventArgs.cs" />
     <Compile Include="Entities\RTAPIEndpoints.cs" />
     <Compile Include="Entities\RTAPIParameters.cs" />

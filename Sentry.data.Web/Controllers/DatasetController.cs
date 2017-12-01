@@ -23,6 +23,7 @@ using Sentry.DataTables.QueryableAdapter;
 using Sentry.data.Common;
 using System.Diagnostics;
 using LazyCache;
+using StackExchange.Profiling;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -136,49 +137,15 @@ namespace Sentry.data.Web.Controllers
             return View(searchHelper.List(this, null, searchPhrase, category, ids));
         }
 
-        public JsonResult Filter(string category, string searchPhrase, string ids)
-        {
-            Helpers.Search searchHelper = new Helpers.Search(_cache);
+        //public ActionResult ListItem(string category, string searchPhrase, string ids)
+        //{
 
-            ListDatasetModel model = searchHelper.List(this, null, searchPhrase, category, ids);
+        //    Helpers.Search searchHelper = new Helpers.Search(_cache);
 
-            return Json(model, JsonRequestBehavior.AllowGet);
-        }
+        //    ListDatasetModel model = searchHelper.List(this, null, searchPhrase, category, ids);
 
-
-        public ActionResult SearchFilters(string category, string searchPhrase, string ids)
-        {
-            Helpers.Search searchHelper = new Helpers.Search(_cache);
-
-            ListDatasetModel m = searchHelper.List(this, null, searchPhrase, category, ids);
-
-            SearchFilterModel model = new SearchFilterModel();
-            model.SearchFilters = m.SearchFilters;
-
-            return PartialView("_SearchFilters", model);
-        }
-
-        public JsonResult JsonFun(string category, string searchPhrase, string ids)
-        {
-            Helpers.Search searchHelper = new Helpers.Search(_cache);
-
-            ListDatasetModel m = searchHelper.List(this, null, searchPhrase, category, ids);
-
-            SearchFilterModel model = new SearchFilterModel();
-            model.SearchFilters = m.SearchFilters;
-
-            return Json(model);
-        }
-
-        public ActionResult ListItem(string category, string searchPhrase, string ids)
-        {
-
-            Helpers.Search searchHelper = new Helpers.Search(_cache);
-
-            ListDatasetModel model = searchHelper.List(this, null, searchPhrase, category, ids);
-
-            return PartialView("_ListItem", model);
-        }
+        //    return PartialView("_ListItem", model);
+        //}
 
         [Route("Dataset/List")]
         public ActionResult List(ListDatasetModel ldm)
@@ -494,21 +461,85 @@ namespace Sentry.data.Web.Controllers
             bdm.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
             bdm.CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
             bdm.CanUpload = SharedContext.CurrentUser.CanUpload;
-
-            bdm.IsSubscribed = true;
+            bdm.IsSubscribed = _datasetContext.IsUserSubscribedToDataset(_userService.GetCurrentUser().AssociateId, id);
+            bdm.AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, id).Count;
 
             return View(bdm);
         }
 
+        [HttpGet]
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        public ActionResult Subscribe(int id)
+        {
+            SubscriptionModel sm = new SubscriptionModel();
+
+            sm.AllEventTypes = _datasetContext.GetAllEventTypes().Select((c) => new SelectListItem { Text = c.Description, Value = c.Type_ID.ToString() });
+            sm.AllIntervals = _datasetContext.GetAllIntervals().Select((c) => new SelectListItem { Text = c.Description, Value = c.Interval_ID.ToString() });
+
+            sm.CurrentSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, id);
+
+            sm.datasetID = id;
+
+            sm.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
+
+
+            foreach (Core.EventType et in _datasetContext.GetAllEventTypes())
+            {
+                if(!sm.CurrentSubscriptions.Any(x => x.EventType.Type_ID == et.Type_ID))
+                {
+                    DatasetSubscription subscription = new DatasetSubscription();
+
+                    subscription.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
+                    subscription.EventType = et;
+                    subscription.Interval = _datasetContext.GetInterval("Never");
+                    subscription.ID = 0;
+
+                    sm.CurrentSubscriptions.Add(subscription);
+                }
+            }
+
+            return PartialView("_Subscribe", sm);
+        }
 
         [HttpPost]
         [AuthorizeByPermission(PermissionNames.DatasetView)]
-        public JsonResult Subscribe(int id)
+        public ActionResult Subscribe(SubscriptionModel sm)
         {
+            IApplicationUser user = _userService.GetCurrentUser();
+
+            var a = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, sm.datasetID);
 
 
-            return Json(new { Success = true, Message = "Success" });
+            foreach (DatasetSubscription sub in sm.CurrentSubscriptions)
+            {
+                bool found = false;
+                foreach (DatasetSubscription ds in a)
+                {
+                    if (sub.EventType.Type_ID == ds.EventType.Type_ID)
+                    {
+                        ds.Interval = sub.Interval;
+                        found = true;
+                        break;
+                    }
+                }
+
+                if(!found)
+                {
+                    _datasetContext.Merge<DatasetSubscription>(
+                        new DatasetSubscription(
+                            _datasetContext.GetById<Dataset>(sm.datasetID),
+                            _datasetContext.GetEventType(sub.EventType.Type_ID),
+                            _datasetContext.GetInterval(sub.Interval.Interval_ID),
+                            user.AssociateId));
+                }
+
+            }
+
+            _datasetContext.SaveChanges();
+
+            return View();
         }
+
 
         [AuthorizeByPermission(PermissionNames.DatasetView)]
         public JsonResult GetDatasetFileInfoForGrid(int Id, Boolean bundle, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
@@ -969,7 +1000,6 @@ namespace Sentry.data.Web.Controllers
             IEnumerable<SelectListItem> dScopeTypes;
             if (id == -1)
             {
-
                 dScopeTypes = _datasetContext.GetAllDatasetScopeTypes()
                     .Select((c) => new SelectListItem { Text = c.Name, Value = c.ScopeTypeId.ToString() });
             }

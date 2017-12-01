@@ -224,7 +224,7 @@ namespace Sentry.data.Web
         [DisplayName("Drop Location")]
         public string DropLocation { get; set; }
 
-
+        public int AmountOfSubscriptions { get; set; }
 
     }
 }

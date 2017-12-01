@@ -56,30 +56,20 @@
                 }
                 @*<div class="extension detailExt bg_gray htCenter ext_@Model.FileExtensionDisplay()">@Model.FileExtensionDisplay()</div>*@
 
-                @if (Model.IsSubscribed)
-                {
-                    <button type="button" 
-                            class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color" 
-                            id="SubscribeModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Subscribe">
-                        <span class="glyphicon glyphicon-star @color"></span>
-                    </button>
+                <button type="button" 
+                        class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color" 
+                        id="SubscribeModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Subscribe">
+                    <span class="glyphicon glyphicon-pushpin @color">
+                       @* <span class="numbers categoryBanner-@color">@Model.AmountOfSubscriptions</span> *@
+                    </span>
+                </button>
 
-                }
-                else
-                {
-                    <button type="button"
-                            class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                            id="SubscribeModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Unsubscribe">
-                        <span class="glyphicon glyphicon-star-empty @color"></span>
-                    </button>
-
-                }
 
 
                 @if (Model.CanUpload)
                 {
-                    <button type="button" 
-                            class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color" 
+                    <button type="button"
+                            class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
                             id="UploadModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Upload File">
                         <span class="glyphicon glyphicon-cloud-upload @color"></span>
                     </button>
@@ -87,8 +77,8 @@
 
                 @if (Model.CanEditDataset)
                 {
-                    <button type="button" 
-                            class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color" 
+                    <button type="button"
+                            class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
                             id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
                         <span class="glyphicon glyphicon-edit @color"></span>
                     </button>
@@ -96,17 +86,17 @@
 
                 @if (((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive)) && Model.DatasetFiles.Count != 0)
                 {
-                    <button type="button" 
-                            class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color" 
+                    <button type="button"
+                            class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
                             id="DownloadLatest" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download Latest">
                         <span class="glyphicon glyphicon-cloud-download @color"></span>
                     </button>
                 }
-                               
+
                 @if ((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.IsPreviewCompatible))
                 {
-                    <button type="button" 
-                            class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color" 
+                    <button type="button"
+                            class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
                             id="PreviewLatestData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Preview Latest">
                         <span class="glyphicon glyphicon-search @color"></span>
                     </button>

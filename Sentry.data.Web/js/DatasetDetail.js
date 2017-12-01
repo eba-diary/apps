@@ -49,17 +49,7 @@ data.DatasetDetail = {
         $("[id^='SubscribeModal']").click(function (e) {
             e.preventDefault();
 
-            var datasetID = window.location.pathname.substr(window.location.pathname.lastIndexOf('/') + 1);
-
-            var request = $.ajax({
-                url: "/Dataset/Subscribe/?id=" + datasetID,
-                method: "POST",
-                dataType: 'json',
-                success: function (obj) {
-                }
-            });
-
-            location.reload();
+            data.DatasetDetail.SubscribeModal($(this).data("id"));
         });
 
         $("[id^='UploadModal']").click(function (e) {
@@ -906,6 +896,18 @@ data.DatasetDetail = {
             data.DatasetDetail.UploadModalInit(id);
         });       
     },
+
+    SubscribeModal: function (id) {
+
+        var modal = Sentry.ShowModalWithSpinner("Subscribe");
+        var Url = "/Dataset/Subscribe/?id=" + encodeURI(id);
+
+        $.get(Url, function (e) {
+            modal.ReplaceModalBody(e);
+        });      
+    },
+
+
 
     ProgressModalStatus: function () {
         // --- progress bar stuff : start ---

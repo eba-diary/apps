@@ -1,0 +1,29 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Sentry.data.Core
+{
+    public class Event
+    {
+        public Event()
+        {
+
+        }
+
+        public virtual int EventID { get; set; }
+        public virtual string UserWhoStartedEvent { get; set; }
+        public virtual DateTime TimeCreated { get; set; }
+        public virtual EventType EventType { get; set; }
+        public virtual Status Status { get; set; }
+
+        public virtual string Reason { get; set; }
+
+        public virtual bool IsProcessed { get; set; }
+        public virtual DateTime TimeNotified { get; set; }
+
+
+    }
+}
