@@ -63,8 +63,6 @@ namespace Sentry.data.Infrastructure
                 scanner.AssemblyContainingType<IDataAssetContext>();
                 scanner.AssemblyContainingType<datasetContext>();
                 scanner.AssemblyContainingType<IDatasetContext>();
-                scanner.AssemblyContainingType<S3ServiceProvider>();
-                scanner.AssemblyContainingType<IDatasetService>();
                 scanner.AssemblyContainingType<DataFeedProvider>();
                 scanner.AssemblyContainingType<IDataFeedContext>();
                 scanner.AssemblyContainingType<AssetDynamicDetailsProvider>();
@@ -79,7 +77,6 @@ namespace Sentry.data.Infrastructure
             //Repeat the following line once per database / domain context
             registry.For<IDataAssetContext>().Use(() => new dataAssetContext(_defaultSessionFactory.OpenSession()));
             registry.For<IDatasetContext>().Use(() => new datasetContext(_defaultSessionFactory.OpenSession()));
-            registry.For<IDatasetService>().Use(() => new S3ServiceProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IDataFeedContext>().Use(() => new DataFeedProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IAssetDynamicDetailsProvider>().Use(() => new AssetDynamicDetailsProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IMetadataRepositoryProvider>().Use(() => new MetadataRepositoryProvider(_defaultSessionFactory.OpenStatelessSession()));
@@ -96,7 +93,7 @@ namespace Sentry.data.Infrastructure
             registry.For<ISASService>().Singleton().Use<SASServiceProvider>();
             registry.For<IWeatherDataProvider>().Singleton().Use<WeatherDataProvider>();
             registry.For<IFtpProvider>().Singleton().Use<FTPProvider>();
-
+            
             //Create the StructureMap container
             _container = new StructureMap.Container(registry);
 

@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System;
+//using Amazon.S3.Model;
 
 namespace Sentry.data.Core
 {
-    public interface IDatasetService : IReadableStatelessDomainContext
+    public interface IDatasetService
     {
         IDictionary<string, string> GetDatasetList(string parentDir = null, bool includeSubDirectories = true);
 
@@ -21,6 +22,14 @@ namespace Sentry.data.Core
         /// <param name="sourceFilePath"></param>
         /// <param name="dataSet"></param>
         string UploadDataFile(string sourceFilePath, string targetKey);
+
+        /// <summary>
+        /// Upload file to S3 use a Stream input.  Only utilizes PutObject and limited to 5GB in size.
+        /// </summary>
+        /// <param name="inputstream"></param>
+        /// <param name="targetKey"></param>
+        /// <returns></returns>
+        string UploadDataFile(Stream inputstream, string targetKey);
 
         //string UploadDataset_v2(string sourceFilePath, string targetKey);
 
@@ -47,6 +56,14 @@ namespace Sentry.data.Core
         string MultiPartUpload(string sourceFilePath, string targetKey);
 
         string GetDatasetDownloadURL(string key, string versionId);
+
+        Dictionary<string, string> GetObjectMetadata(string key, string versionId);
+
+        Stream GetObject(string key, string versionId);
+
+        string StartUpload(string uniqueKey);
+
+        //CopyPartResponse CopyPart(string dest_Key, int partnum, string source_key, string source_versionId, string uploadId);
     }
 
 }

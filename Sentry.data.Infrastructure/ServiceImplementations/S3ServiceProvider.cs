@@ -14,15 +14,8 @@ using Amazon.S3.Transfer;
 
 namespace Sentry.data.Infrastructure
 {
-    public class S3ServiceProvider : NHReadableStatelessDomainContext, IDatasetService
+    public class S3ServiceProvider : IDatasetService
     {
-        public S3ServiceProvider(IStatelessSession session) : base(session)
-        {
-            NHQueryableExtensionProvider.RegisterQueryableExtensionsProvider<S3ServiceProvider>();
-
-        }
-
-
         private static Amazon.S3.IAmazonS3 _s3client = null;
 
         public event EventHandler<TransferProgressEventArgs> OnTransferProgressEvent;
@@ -107,6 +100,21 @@ namespace Sentry.data.Infrastructure
             {
                 versionId = PutObject(sourceFilePath, targetKey);
             }
+
+            return versionId;
+        }
+
+        /// <summary>
+        /// Upload file to S3 use a Stream input.  Only utilizes PutObject and limited to 5GB in size.
+        /// </summary>
+        /// <param name="inputstream"></param>
+        /// <param name="targetKey"></param>
+        /// <returns></returns>
+        public string UploadDataFile(Stream inputstream, string targetKey)
+        {
+            string versionId = null;
+
+                versionId = PutObject(inputstream, targetKey);
 
             return versionId;
         }
@@ -298,7 +306,7 @@ namespace Sentry.data.Infrastructure
         /// </summary>
         /// <param name="uniqueKey"></param>
         /// <returns></returns>
-        private string StartUpload(string uniqueKey)
+        public string StartUpload(string uniqueKey)
         {
             InitiateMultipartUploadRequest mReq = new InitiateMultipartUploadRequest();
             mReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
@@ -366,7 +374,133 @@ namespace Sentry.data.Infrastructure
 
         #endregion
 
+        #region MultiPartUpload - Copy
+
+        public string MultiPartCopy(List<Tuple<string, string>> sourceKeys, string targetKey)
+        {
+            throw new NotImplementedException();
+            //List<CopyPartResponse> copyPartResponses = new List<CopyPartResponse>();
+            //string versionId = null;
+            //int partnum = 1;
+
+            //string uploadId = StartUpload(targetKey);
+
+            //for (int i = 0; i < sourceKeys.Count(); i++)
+            //{
+            //    Tuple<string, string> obj = sourceKeys[i];
+
+            //    CopyPartResponse resp = CopyPart(targetKey, partnum, obj.Item1, obj.Item2, uploadId);
+
+            //    copyPartResponses.Add(resp);
+
+            //    partnum++;
+            //}
+
+            //versionId = StopUpload(targetKey, uploadId, copyPartResponses);
+
+
+
+            ////long contentLength = new FileInfo(sourceFilePath).Length;
+            ////long partSize = 5 * (long)Math.Pow(2, 20); // 5 MB
+
+            //return versionId;
+        }
+
+        public CopyPartResponse CopyPart(string dest_Key, int partnum, string source_key, string source_versionId, string uploadId)
+        {
+            throw new NotImplementedException();
+            //CopyPartRequest req = new CopyPartRequest();
+            //req.DestinationBucket = Configuration.Config.GetHostSetting("AWSRootBucket");
+            //req.DestinationKey = dest_Key;
+            //req.PartNumber = partnum;
+            //req.SourceBucket = Configuration.Config.GetHostSetting("AWSRootBucket");
+            //req.SourceKey = source_key;
+            //req.SourceVersionId = source_versionId;
+            //req.UploadId = uploadId;
+
+            //CopyPartResponse response = S3Client.CopyPart(req);
+
+            //return response;
+        }
+
+        private string StopUpload(string uniqueKey, string uploadId, List<CopyPartResponse> responses)
+        {
+            throw new NotImplementedException();
+            //CompleteMultipartUploadRequest cReq = new CompleteMultipartUploadRequest();
+            //cReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+            //cReq.Key = uniqueKey;
+            //cReq.UploadId = uploadId;
+            //cReq.AddPartETags(responses);
+
+            //CompleteMultipartUploadResponse mRsp = S3Client.CompleteMultipartUpload(cReq);
+           
+            //Sentry.Common.Logging.Logger.Debug($"Completed MultipartUpload UploadID: {uploadId}, with response status {mRsp.HttpStatusCode}");
+
+            ////return mRsp.ETag;
+            //return mRsp.VersionId;
+        }
+
+        #endregion
+                
+        private List<List<string>> GetPartList(List<string> sourceKeys)
+        {
+            throw new NotImplementedException();
+
+            foreach (string key in sourceKeys)
+            {
+                int size = GetObjectSize(key);
+            }
+
+        }
+
+        private int GetObjectSize(string key)
+        {
+            GetObjectMetadataRequest headReq = new GetObjectMetadataRequest();
+
+
+
+            throw new NotImplementedException();
+        }
+
+
         #region PutObject
+
+        private string PutObject(Stream filestream, string targetKey)
+        {
+            string versionId = null;
+            try
+            {
+                PutObjectRequest poReq = new PutObjectRequest();
+                poReq.InputStream = filestream;
+                poReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+                poReq.Key = targetKey;
+                poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
+                poReq.AutoCloseStream = true;
+
+                Sentry.Common.Logging.Logger.Debug($"Initialized PutObject Request: Bucket:{poReq.BucketName}, File:{poReq.FilePath}, Key:{targetKey}");
+
+                PutObjectResponse poRsp = S3Client.PutObject(poReq);
+
+                Sentry.Common.Logging.Logger.Debug($"Completed PutObject Request: Key: {targetKey}, Version_ID:{poRsp.VersionId}, ETag:{poRsp.ETag}, Lenght(bytes):{poRsp.ContentLength}");
+
+                versionId = poRsp.VersionId;
+            }
+            catch (AmazonS3Exception amazonS3Exception)
+            {
+                if (amazonS3Exception.ErrorCode != null &&
+                    (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId")
+                    ||
+                    amazonS3Exception.ErrorCode.Equals("InvalidSecurity")))
+                {
+                    throw new Exception("Error attempting to upload dataset to S3: Check the provided AWS Credentials.");
+                }
+                else
+                {
+                    throw new Exception("Error attempting to upload dataset to S3: " + amazonS3Exception.Message);
+                }
+            }
+            return versionId;
+        }
 
         private string PutObject(string sourceFilePath, string targetKey)
         {
@@ -377,7 +511,6 @@ namespace Sentry.data.Infrastructure
                 poReq.FilePath = sourceFilePath;
                 poReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
                 poReq.Key = targetKey;
-                System.IO.FileInfo fInfo = new System.IO.FileInfo(sourceFilePath);
                 poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
 
                 Sentry.Common.Logging.Logger.Debug($"Initialized PutObject Request: Bucket:{poReq.BucketName}, File:{poReq.FilePath}, Key:{targetKey}");
@@ -482,6 +615,67 @@ namespace Sentry.data.Infrastructure
 
             return dsList;
         }
-                
+
+        public Dictionary<string,string> GetObjectMetadata(string key, string versionId)
+        {
+            GetObjectMetadataRequest req = new GetObjectMetadataRequest();
+
+            req.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+            req.Key = key;
+            req.VersionId = versionId;
+
+            GetObjectMetadataResponse resp = S3Client.GetObjectMetadata(req);
+
+            return ConvertObjectMetadataResponse(resp);
+        }
+
+        public Dictionary<string, string> ConvertObjectMetadataResponse(GetObjectMetadataResponse resp)
+        {
+            Dictionary<string, string> output = new Dictionary<string, string>();
+
+            output.Add("ContentLength", resp.ContentLength.ToString());
+            output.Add("ETag", resp.ETag);
+            output.Add("VersionId", resp.VersionId);
+
+            return output;
+
+        }
+
+        //public string GetObject(string key, string versionId)
+        //{
+        //    throw new NotImplementedException();
+
+        //    //GetObjectRequest req = new GetObjectRequest();
+        //    //string contents = null;
+
+        //    //req.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+        //    //req.Key = key;
+        //    //req.VersionId = versionId;
+
+        //    //using (GetObjectResponse response = S3Client.GetObject(req))
+        //    //{
+        //    //    using (StreamReader reader = new StreamReader(response.ResponseStream))
+        //    //    {
+        //    //        contents = reader.ReadToEnd();
+        //    //    }
+        //    //}
+
+        //    //return contents;
+        //}
+
+        public Stream GetObject(string key, string versionId)
+        {
+
+            GetObjectRequest req = new GetObjectRequest();
+
+            req.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+            req.Key = key;
+            req.VersionId = versionId;
+
+            GetObjectResponse response = S3Client.GetObject(req);
+
+            return response.ResponseStream;
+            
+        } 
     }
 }

@@ -33,11 +33,12 @@ namespace Sentry.data.Web.Controllers
         public IAssociateInfoProvider _associateInfoProvider;
         public IDatasetContext _datasetContext;
         private UserService _userService;
-        private IDatasetService _s3Service;
+        private S3ServiceProvider _s3Service;
         private ISASService _sasService;
         private IAppCache _cache;
 
         private static Amazon.S3.IAmazonS3 _s3client = null;
+
 
         // JCG TODO: Revisit, Could this be push down into the Infrastructure\Core layer? 
         private Amazon.S3.IAmazonS3 S3Client
@@ -92,7 +93,7 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        public DatasetController(IDatasetContext dsCtxt, IDatasetService dsSvc, UserService userService, ISASService sasService, IAssociateInfoProvider associateInfoService)
+        public DatasetController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, ISASService sasService, IAssociateInfoProvider associateInfoService)
         {
             _cache = new CachingService();
             _datasetContext = dsCtxt;
@@ -1389,5 +1390,195 @@ namespace Sentry.data.Web.Controllers
 
             return Json(sList, JsonRequestBehavior.AllowGet);
         }
+
+        public string Bundle()
+        {
+            List<DatasetFile> dfList = new List<DatasetFile>();
+
+            dfList.Add(_datasetContext.GetById<DatasetFile>(229));
+            dfList.Add(_datasetContext.GetById<DatasetFile>(230));
+            dfList.Add(_datasetContext.GetById<DatasetFile>(231));
+            dfList.Add(_datasetContext.GetById<DatasetFile>(232));
+            dfList.Add(_datasetContext.GetById<DatasetFile>(233));
+            dfList.Add(_datasetContext.GetById<DatasetFile>(234));
+
+            string userEmail = SharedContext.CurrentUser.EmailAddress;
+
+            DatafileBundleProvider myBundleRequest = new DatafileBundleProvider();
+
+            //myBundleRequest.SubmitBundleRequest(dfList, "JCG_Testing", userEmail, _s3Service);
+
+
+            BundleRequest _request = new BundleRequest();
+
+            List<Tuple<string, string>> sourceKeys = new List<Tuple<string, string>>();
+
+            string requestLocation = @"bundlework/intake/" + _request.RequestGuid;
+            //string requestVersionId = null;
+
+
+            _request.DatasetID = dfList.FirstOrDefault().Dataset.DatasetId;
+            _request.Bucket = Configuration.Config.GetHostSetting("AWSRootBucket");
+            _request.DatasetFileConfigId = dfList.FirstOrDefault().DatasetFileConfig.ConfigId;
+            _request.TargetFileName = "JCG_Testing_" + DateTime.Now.ToString();
+
+            _request.Email = userEmail;
+
+            //Due to the potental large number of files in list, upload SourceKeys file to bundler intake location on S3.
+            //S3 location will be save as part of the request and bundler will getobject when processing request.
+            foreach (DatasetFile df in dfList)
+            {
+                _request.SourceKeys.Add(Tuple.Create(df.FileLocation, df.VersionId));
+            }
+
+            _request.FileExtension = Path.GetExtension(_request.SourceKeys.FirstOrDefault().Item1);
+
+            string jsonRequest = JsonConvert.SerializeObject(_request);
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                StreamWriter writer = new StreamWriter(ms);
+
+                writer.WriteLine(jsonRequest);
+                writer.Flush();
+
+                //You have to rewind the MemoryStream before copying
+                ms.Seek(0, SeekOrigin.Begin);
+
+                using (FileStream fs = new FileStream($"C:\\tmp\\DatasetBundler\\{_request.RequestGuid}.json", FileMode.OpenOrCreate))
+                {
+                    ms.CopyTo(fs);
+                    fs.Flush();
+                }
+
+            }
+
+            //BundleRequest bunReq = _bundleProvider.CreateBundleRequest(dfList, "JCG_Testing", userEmail, _s3Service);
+
+            //BundleResponse response = _bundleProvider.StartBundleProcess(bunReq);
+
+
+
+            return "Done";
+        }
+
+
+
+        //[HttpGet()]
+        //public void GetWeatherData(string zip)
+        //{
+        //    //System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\" + zip + ".xml", _weatherDataProvider.GetWeather("xml"));
+        //    //System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\" + zip + ".json", _weatherDataProvider.GetWeather("json"));
+
+
+        //    request.AddParameter("name", "value"); // adds to POST or URL querystring based on Method
+        //    request.AddUrlSegment("id", "123"); // replaces matching token in request.Resource
+
+        //    // easily add HTTP Headers
+        //    //request.AddHeader("header", "value");
+
+        //    // add files to upload (works with compatible verbs)
+        //    //request.AddFile(path);
+
+        //    // execute the request         
+
+        //    // or automatically deserialize result
+        //    // return content type is sniffed but can be explicitly set via RestClient.AddHandler();
+        //    RestResponse<Person> response2 = client.Execute<Person>(request);
+        //    var name = response2.Data.Name;
+
+        //    // easy async support
+        //    client.ExecuteAsync(request, response =>
+        //    {
+        //        Console.WriteLine(response.Content);
+        //    });
+
+        //    // async with deserialization
+        //    var asyncHandle = client.ExecuteAsync<Person>(request, response =>
+        //    {
+        //        Console.WriteLine(response.Data.Name);
+        //    });
+
+        //    // abort the request on demand
+        //    asyncHandle.Abort();
+        //}
+
+
+        //[HttpGet()]
+        //public void GetWeatherData(string zip)
+        //{
+        //    System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\" + zip + ".xml", _weatherDataProvider.GetWeather("xml"));
+        //    System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\" + zip + ".json", _weatherDataProvider.GetWeather("json"));
+
+
+        //    //request.AddParameter("name", "value"); // adds to POST or URL querystring based on Method
+        //    //request.AddUrlSegment("id", "123"); // replaces matching token in request.Resource
+
+        //    //// easily add HTTP Headers
+        //    ////request.AddHeader("header", "value");
+
+        //    //// add files to upload (works with compatible verbs)
+        //    ////request.AddFile(path);
+
+        //    //// execute the request         
+
+        //    //// or automatically deserialize result
+        //    //// return content type is sniffed but can be explicitly set via RestClient.AddHandler();
+        //    //RestResponse<Person> response2 = client.Execute<Person>(request);
+        //    //var name = response2.Data.Name;
+
+        //    //// easy async support
+        //    //client.ExecuteAsync(request, response => {
+        //    //    Console.WriteLine(response.Content);
+        //    //});
+
+        //    //// async with deserialization
+        //    //var asyncHandle = client.ExecuteAsync<Person>(request, response => {
+        //    //    Console.WriteLine(response.Data.Name);
+        //    //});
+
+        //    //// abort the request on demand
+        //    //asyncHandle.Abort();
+        //}
+
+
+        //[HttpGet()]
+        //public void GetWeather(string zip)
+        //{
+
+        //    JsonResult jr = new JsonResult();
+        //    jr.Data = GetWeatherByZip(zip);
+        //    string json = JsonConvert.SerializeObject(jr.Data);
+
+
+        //    System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\54481.txt", json);
+        //    //return jr;
+        //}
+
+        //public async Task<ActionResult> GetWeatherByZip(string zip)
+        //{
+        //    string relativePath = zip + "/" + zip + ".json";
+        //    return await this.ApiGet(relativePath);
+        //}
+
+        //protected async Task<ActionResult> ApiGet(string relativePath)
+        //{
+        //    ApiResponse response = await this.ApiClient.GetAsync(relativePath);
+        //    ActionResult result = response.IsSuccessful ? new ContentResult { Content = response.Data, ContentType = "application/json" } as ActionResult : new JsonResult();
+        //    return result;
+        //}
+
+        //protected IApiClient ApiClient
+        //{
+        //    get
+        //    {
+        //        return this._apiClient;
+        //    }
+        //}
+
+        //public JsonResult AjaxSuccessJson()
+        //{
+        //    return Json(new { Success = true });
+        //}
     }
 }

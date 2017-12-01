@@ -168,6 +168,7 @@
     </Compile>
     <Compile Include="ServiceImplementations\APIProvider.cs" />
     <Compile Include="ServiceImplementations\CubeProvider.cs" />
+    <Compile Include="ServiceImplementations\DatafileBundleProvider.cs" />
     <Compile Include="ServiceImplementations\MetadataRepositoryProvider.cs" />
     <Compile Include="ServiceImplementations\FTPProvider.cs" />
     <Compile Include="ServiceImplementations\ODCFileProvider.cs" />

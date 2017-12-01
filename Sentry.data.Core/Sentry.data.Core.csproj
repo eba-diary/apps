@@ -75,6 +75,8 @@
     <Compile Include="Entities\Subscriptions\Event.cs" />
     <Compile Include="Entities\AssetNotifications.cs" />
     <Compile Include="Entities\AssetSource.cs" />
+    <Compile Include="Entities\BundleRequest.cs" />
+    <Compile Include="Entities\BundleResponse.cs" />
     <Compile Include="Entities\DataAssetHealth.cs" />
     <Compile Include="Entities\DatasetFile.cs" />
     <Compile Include="Entities\DatasetFileConfig.cs" />
