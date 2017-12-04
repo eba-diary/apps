@@ -367,5 +367,14 @@ namespace Sentry.data.Infrastructure
         {
             return Query<DataAssetSubscription>().Cacheable().Where(x => x.SentryOwnerName == SentryOwnerName && x.DataAsset.Id == dataAssetID).ToList();
         }
+
+
+        public List<Event> EventsSince(DateTime time)
+        {
+            return Query<Event>().Cacheable().Where(x => DateTime.Compare(x.TimeCreated, time) >= 0).ToList();
+
+        }
+
+
     }
 }

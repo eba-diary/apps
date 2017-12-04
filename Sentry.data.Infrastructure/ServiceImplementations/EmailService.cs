@@ -1,20 +1,21 @@
-﻿using System.Net.Mail;
+﻿using System.Collections.Generic;
+using System.Net.Mail;
 using Sentry.data.Core;
+using System.Linq;
+using System.Text;
 
 namespace Sentry.data.Infrastructure
 {
     public class EmailService : IEmailService
     {
 
-        public void SendEmail(string toAddress, string subject, string body)
+        public void SendEmail(List<string> emailAddresses, string subject, List<Event> events)
         {
             //Real code could look something like this:
             //Dim smtpClient As New System.Net.Mail.SmtpClient("mail.sentry.com")
             //smtpClient.Send("notifications@SentryData.com", toAddress, subject, body)
 
             SmtpClient smtpClient = new SmtpClient("mail.sentry.com");
-
-            System.Diagnostics.Trace.WriteLine("Sending email to " + toAddress + ". Subject = " + subject + "; Body = " + body);
 
 
             // set smtp-client with basicAuthentication
@@ -27,14 +28,27 @@ namespace Sentry.data.Infrastructure
             MailMessage myMail = new System.Net.Mail.MailMessage();
             myMail.From = from;
 
+            foreach(string email in emailAddresses)
+            {
+                myMail.To.Add(email);
+            }
+
             myMail.IsBodyHtml = true;
 
             myMail.Body += @"<p><b><font color=""red"">Do Not Reply To This Email, This Inbox Is Not Monitored</font></b></p>";
 
+            myMail.Body += @"<table cellpadding=""0"" cellspacing=""0"" border=""0"" width=""100 %"">";
 
+            foreach (Event e in events.OrderBy(x => x.EventType.Severity))
+            {
+                myMail.Body += @"<tr>";
 
+                myMail.Body += @"< td width = ""300"" height = ""120"" align = ""left"" valign = ""top"" >";
 
+                myMail.Body += @"</ td >";
 
+                myMail.Body += @" </tr>";
+            }
 
         }
     }

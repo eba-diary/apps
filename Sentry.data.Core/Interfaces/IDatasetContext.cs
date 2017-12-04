@@ -113,6 +113,7 @@ namespace Sentry.data.Core
 
         List<DataAssetSubscription> GetAllUserSubscriptionsForDataAsset(string SentryOwnerName, int dataAssetID);
 
+        List<Event> EventsSince(DateTime time);
     }
 
 }

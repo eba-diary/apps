@@ -3,9 +3,7 @@ using Sentry.Common.Logging;
 using Sentry.Configuration;
 using System.Threading.Tasks;
 using System;
-using Sentry.data.Core;
-using Sentry.data.Infrastructure;
-using StructureMap;
+
 
 namespace Sentry.data.SpamFactory
 {
@@ -17,12 +15,6 @@ namespace Sentry.data.SpamFactory
 
         private CancellationTokenSource _tokenSource;
         private CancellationToken _token;
-
-        public static IContainer container;
-        /// <summary>
-        /// 
-        /// </summary>
-        public static IDatasetContext _datasetContext;
 
         /// <summary>
         /// Start the core worker
@@ -39,8 +31,6 @@ namespace Sentry.data.SpamFactory
             Task.Factory.StartNew(this.DoWork, TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted);
         }
 
-
-
         /// <summary>
         /// Loop until cancellation is requested, doing the primary work of this service
         /// </summary>
@@ -48,37 +38,22 @@ namespace Sentry.data.SpamFactory
         {
             Logger.Info("Worker task started.");
 
-            Bootstrapper.Init();
-            using (container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
-            {
-                _datasetContext = container.GetInstance<IDatasetContext>();
-            }
+            //call your bootstrapper to initialize your application
+            //Bootstrapper.Init();
 
             do
             {
-                Task.Factory.StartNew(() => Watch.Run(_datasetContext));
+                Thread.Sleep(TimeSpan.FromSeconds(5));
 
-                if (DateTime.Now.Minute == 0)
-                {
-                    Task.Factory.StartNew(() => Watch.Hourly(_datasetContext));
-                }
-
-                if(DateTime.Now.Hour == 12)
-                {
-                    Task.Factory.StartNew(() => Watch.Daily(_datasetContext));
-                }
-
-                if(DateTime.Now.DayOfWeek == DayOfWeek.Monday)
-                {
-                    Task.Factory.StartNew(() => Watch.Weekly(_datasetContext));
-                }
-
-
-
-                Thread.Sleep(TimeSpan.FromSeconds(60));
-
-
-
+                //create an IOC (structuremap) container to wrap this transaction
+                //using (container = Bootstrapper.Container.GetNestedContainer)
+                //{
+                //    var service = container.GetInstance<MyService>();
+                //    var result = service.DoWork();
+                //    container.GetInstance<ISpamFactoryContext>.SaveChanges();
+                //
+                //    Logger.Info(result & " records processed.");
+                //}
 
             } while (!_token.IsCancellationRequested);
             Logger.Info("Worker task stopped.");
