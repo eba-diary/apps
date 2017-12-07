@@ -4,6 +4,6 @@ namespace Sentry.data.Core
 {
     public interface IEmailService
     {
-        void SendEmail(List<string> emailAddresses, string subject, List<Event> events);
+        void SendEmail(string emailAddress, string subject, List<Event> events);
     }
 }

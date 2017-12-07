@@ -9,7 +9,7 @@ namespace Sentry.data.Infrastructure
     public class EmailService : IEmailService
     {
 
-        public void SendEmail(List<string> emailAddresses, string subject, List<Event> events)
+        public void SendEmail(string emailAddress, string subject, List<Event> events)
         {
             //Real code could look something like this:
             //Dim smtpClient As New System.Net.Mail.SmtpClient("mail.sentry.com")
@@ -28,10 +28,7 @@ namespace Sentry.data.Infrastructure
             MailMessage myMail = new System.Net.Mail.MailMessage();
             myMail.From = from;
 
-            foreach(string email in emailAddresses)
-            {
-                myMail.To.Add(email);
-            }
+            myMail.To.Add(emailAddress);
 
             myMail.IsBodyHtml = true;
 
@@ -43,12 +40,30 @@ namespace Sentry.data.Infrastructure
             {
                 myMail.Body += @"<tr>";
 
-                myMail.Body += @"< td width = ""300"" height = ""120"" align = ""left"" valign = ""top"" >";
+                myMail.Body += @"<td width=""300"" height=""120"" align=""left"" valign=""top"">";
 
-                myMail.Body += @"</ td >";
+                myMail.Body += e.Reason;
+
+                myMail.Body += @"</td>";
+
+                myMail.Body += @"<td width=""300"" height=""120"" align=""left"" valign=""top"">";
+
+                myMail.Body += e.Status.Description;
+
+                myMail.Body += @"</td>";
+
+                myMail.Body += @"<td width=""300"" height=""120"" align=""left"" valign=""top"">";
+
+                myMail.Body += e.EventType.Description;
+
+                myMail.Body += @"</td>";
 
                 myMail.Body += @" </tr>";
             }
+
+            myMail.Body += @"</table>";
+            
+            smtpClient.Send(myMail);
 
         }
     }

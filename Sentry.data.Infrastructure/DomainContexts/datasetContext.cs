@@ -6,6 +6,7 @@ using NHibernate.Linq;
 //using Sentry.Core;
 using Sentry.NHibernate;
 using Sentry.data.Core;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
@@ -368,12 +369,39 @@ namespace Sentry.data.Infrastructure
             return Query<DataAssetSubscription>().Cacheable().Where(x => x.SentryOwnerName == SentryOwnerName && x.DataAsset.Id == dataAssetID).ToList();
         }
 
-
-        public List<Event> EventsSince(DateTime time)
+        public List<DatasetSubscription> GetAllSubscriptions()
         {
-            return Query<Event>().Cacheable().Where(x => DateTime.Compare(x.TimeCreated, time) >= 0).ToList();
-
+            return Query<DatasetSubscription>().Cacheable().ToList();
         }
+
+
+        public List<DatasetSubscription> GetSubscriptionsForDataset(int datasetID)
+        {
+            return Query<DatasetSubscription>().Cacheable().Where(x => x.Dataset.DatasetId == datasetID).ToList();
+        }
+
+        public List<DataAssetSubscription> GetSubscriptionsForDataAsset(int dataAssetID)
+        {
+            return Query<DataAssetSubscription>().Cacheable().Where(x => x.DataAsset.Id == dataAssetID).ToList();
+        }
+
+
+
+        public List<Event> EventsSince(DateTime time, Boolean IsProcessed)
+        {
+            return Query<Event>().Where(x => x.TimeCreated >= time && x.IsProcessed == IsProcessed).ToList();
+        }
+
+
+        //public Task MergeAsync<T> ()
+        //{
+        //    return Task.Factory.StartNew(() => {
+                
+        //        session.Save(user);
+        //    }).ContinueWith(ex => Trace.TraceError(ex?.Exception?.Message ?? "Strange task fault"), TaskContinuationOptions.OnlyOnFaulted);
+        //}
+
+
 
 
     }

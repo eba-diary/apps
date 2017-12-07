@@ -9,6 +9,9 @@ using System.Text.RegularExpressions;
 using System.Security.Principal;
 using Amazon.S3;
 using System.Web;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Web.Script.Serialization;
 
 namespace Sentry.data.Common
 {
@@ -43,6 +46,7 @@ namespace Sentry.data.Common
             //filep = Path.Combine(filep, creationFrequency.Replace(' ', '_').ToLower());
             return filep.ToString();
         }
+
         /// <summary>
         /// Generate storage location path for dataset.
         /// </summary>
@@ -535,5 +539,36 @@ namespace Sentry.data.Common
                     return false;
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public static async Task CreateEventAsync(Event e)
+        {
+            using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
+            using (var client = new HttpClient(handler))
+            {
+                var json = new JavaScriptSerializer().Serialize(e);
+
+                HttpContent contentPost = new StringContent(json, Encoding.UTF8,
+                    "application/json");
+
+                client.BaseAddress = new Uri(Configuration.Config.GetHostSetting("WebApiUrl"));
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+
+                HttpResponseMessage response = await client.PostAsync("api/event/create", contentPost);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // WHY?>
+                }
+            }
+        }
+
+
+
     }
 }

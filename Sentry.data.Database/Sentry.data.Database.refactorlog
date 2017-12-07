@@ -329,4 +329,39 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Notification_ID" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="bddc5780-f320-423e-9657-8b924cac96fb" ChangeDateTime="12/05/2017 22:04:41">
+    <Property Name="ElementName" Value="[dbo].[Event].[Calling_Type]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Event]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CallingObject_Type" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="30a4f0b7-4b55-42d7-8748-9a517e08d6c9" ChangeDateTime="12/05/2017 22:04:46">
+    <Property Name="ElementName" Value="[dbo].[Event].[Calling_ID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Event]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CallingObject_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f5067538-a9d7-49ff-8574-b32cfc35fd4b" ChangeDateTime="12/06/2017 14:27:49">
+    <Property Name="ElementName" Value="[dbo].[Event].[CallingObject_ID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Event]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Dataset_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="41739322-ff03-40ff-880f-dd3eecbc9fd7" ChangeDateTime="12/06/2017 14:27:56">
+    <Property Name="ElementName" Value="[dbo].[Event].[CallingObject_Type]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Event]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DataAsset_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="a8b70859-8041-455d-93cb-b008d29ac19b" ChangeDateTime="12/06/2017 14:42:55">
+    <Property Name="ElementName" Value="[dbo].[Event].[Parent_Event]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Event]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Parent_Event_ID" />
+  </Operation>
 </Operations>

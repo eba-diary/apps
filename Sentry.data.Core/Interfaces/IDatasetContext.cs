@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -113,7 +114,13 @@ namespace Sentry.data.Core
 
         List<DataAssetSubscription> GetAllUserSubscriptionsForDataAsset(string SentryOwnerName, int dataAssetID);
 
-        List<Event> EventsSince(DateTime time);
+        List<DatasetSubscription> GetSubscriptionsForDataset(int datasetID);
+
+        List<DataAssetSubscription> GetSubscriptionsForDataAsset(int dataAssetID);
+
+        List<DatasetSubscription> GetAllSubscriptions();
+
+        List<Event> EventsSince(DateTime time, Boolean IsProcessed);
     }
 
 }

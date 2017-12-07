@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using System;
 using Sentry.data.Core;
 using Sentry.data.Infrastructure;
-using StructureMap;
 
 namespace Sentry.data.SpamFactory
 {
@@ -17,12 +16,6 @@ namespace Sentry.data.SpamFactory
 
         private CancellationTokenSource _tokenSource;
         private CancellationToken _token;
-
-        public static IContainer container;
-        /// <summary>
-        /// 
-        /// </summary>
-        public static IDatasetContext _datasetContext;
 
         /// <summary>
         /// Start the core worker
@@ -44,44 +37,48 @@ namespace Sentry.data.SpamFactory
         /// <summary>
         /// Loop until cancellation is requested, doing the primary work of this service
         /// </summary>
-        private void DoWork()
+        private async Task DoWork()
         {
             Logger.Info("Worker task started.");
 
             Bootstrapper.Init();
-            using (container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
-            {
-                _datasetContext = container.GetInstance<IDatasetContext>();
-            }
+
+            DateTime lastRunMinute = DateTime.Now;
+            DateTime lastRunHour = DateTime.Now;
+            DateTime lastRunDay = DateTime.Now;
+            DateTime lastRunWeek = DateTime.Now;
 
             do
             {
-                Task.Factory.StartNew(() => Watch.Run(_datasetContext));
-
-                if (DateTime.Now.Minute == 0)
+                if ((DateTime.Now - lastRunMinute).TotalMinutes >= 1)
                 {
-                    Task.Factory.StartNew(() => Watch.Hourly(_datasetContext));
+                    lastRunMinute = DateTime.Now;
+                    await Watch.Run("Instant");
                 }
 
-                if(DateTime.Now.Hour == 12)
+                if ((DateTime.Now - lastRunHour).TotalHours >= 1)
                 {
-                    Task.Factory.StartNew(() => Watch.Daily(_datasetContext));
+                    lastRunHour = DateTime.Now;
+                    await Watch.Run("Hourly");
                 }
 
-                if(DateTime.Now.DayOfWeek == DayOfWeek.Monday)
+                if ((DateTime.Now - lastRunDay).TotalHours >= 24)
                 {
-                    Task.Factory.StartNew(() => Watch.Weekly(_datasetContext));
+                    lastRunDay = DateTime.Now;
+                    await Watch.Run( "Daily");
                 }
 
-
-
-                Thread.Sleep(TimeSpan.FromSeconds(60));
-
+                if (DateTime.Now.DayOfWeek == DayOfWeek.Monday && (DateTime.Now - lastRunWeek).TotalDays >= 7)
+                {
+                    lastRunWeek = DateTime.Now;
+                    await Watch.Run("Weekly");
+                }
 
 
 
             } while (!_token.IsCancellationRequested);
             Logger.Info("Worker task stopped.");
+            
         }
 
         /// <summary>
