@@ -72,7 +72,7 @@ namespace Sentry.data.SpamFactory
                     foreach (Event _event in events)
                     {
                         var subsThatMatch = from _sub in _datasetContext.GetAllSubscriptions()
-                                            where _sub.Dataset.DatasetId == _event.Dataset.DatasetId &&
+                                            where _sub.Dataset.DatasetId == _event.Dataset &&
                                                     _sub.EventType.Type_ID == _event.EventType.Type_ID &&
                                                     _sub.Interval == _datasetContext.GetInterval(interval)
                                             select _sub;

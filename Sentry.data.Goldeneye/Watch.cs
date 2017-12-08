@@ -122,7 +122,7 @@ namespace Sentry.data.Goldeneye
             {
                 // Log error.
                 Console.WriteLine("File: " + file.fileName + " was NOT sent to the Dataset Loader : " + ex.Message);
-                Logger.Error("File: " + file.fileName + " was NOT sent to the Dataset Loader : " + ex.Message);
+                Logger.Error("File: " + file.fileName + " was NOT sent to the Dataset Loader", ex);
             }
         }
 

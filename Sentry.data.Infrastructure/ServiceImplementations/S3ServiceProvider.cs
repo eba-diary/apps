@@ -11,11 +11,32 @@ using Sentry.NHibernate;
 using NHibernate;
 using System.IO;
 using Amazon.S3.Transfer;
+using Sentry.Common.Logging;
 
 namespace Sentry.data.Infrastructure
 {
-    public class S3ServiceProvider : IDatasetService
+    public sealed class S3ServiceProvider : IDatasetService
     {
+        private static S3ServiceProvider instance = null;
+        private static readonly object padlock = new object();
+
+        public S3ServiceProvider() { }
+
+        public static S3ServiceProvider Instance
+        {
+            get
+            {
+                lock (padlock)
+                {
+                    if(instance == null)
+                    {
+                        instance = new S3ServiceProvider();
+                    }
+                    return instance;
+                }
+            }
+        }
+
         private static Amazon.S3.IAmazonS3 _s3client = null;
 
         public event EventHandler<TransferProgressEventArgs> OnTransferProgressEvent;
@@ -224,7 +245,7 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        protected virtual void a_TransferProgressEvent(object sender, WriteObjectProgressArgs e)
+        private void a_TransferProgressEvent(object sender, WriteObjectProgressArgs e)
         {
             //OnTransferProgressEvent(this, new TransferProgressEventArgs(e.FilePath, e.PercentDone));
             EventHandler<TransferProgressEventArgs> handler = OnTransferProgressEvent;
@@ -239,7 +260,7 @@ namespace Sentry.data.Infrastructure
             //}
         }
 
-        protected virtual void a_TransferProgressEvent(object sender, UploadProgressArgs e)
+        private void a_TransferProgressEvent(object sender, UploadProgressArgs e)
         {
             //TransferProgressEventArgs args = new TransferProgressEventArgs(e.FilePath, e.PercentDone);
             //OnTransferProgressEvent(args);
@@ -619,12 +640,32 @@ namespace Sentry.data.Infrastructure
         public Dictionary<string,string> GetObjectMetadata(string key, string versionId)
         {
             GetObjectMetadataRequest req = new GetObjectMetadataRequest();
+            GetObjectMetadataResponse resp = null;
 
             req.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
             req.Key = key;
             req.VersionId = versionId;
 
-            GetObjectMetadataResponse resp = S3Client.GetObjectMetadata(req);
+            try
+            {
+                resp = S3Client.GetObjectMetadata(req);
+            }            
+            catch (AmazonS3Exception amazonS3Exception)
+            {
+                if (amazonS3Exception.ErrorCode != null &&
+                    (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId")
+                    ||
+                    amazonS3Exception.ErrorCode.Equals("InvalidSecurity")
+                    ||
+                    amazonS3Exception.ErrorCode.Equals("Forbidden")))
+                {
+                    throw new Exception($"Failed GetObjectMetadata - Check the provided AWS Credentials ({amazonS3Exception.Message})");
+                }
+                else
+                {
+                    throw new Exception($"Failed GetObjectMetadata - {amazonS3Exception.Message}");             
+                }
+            }
 
             return ConvertObjectMetadataResponse(resp);
         }
@@ -667,15 +708,32 @@ namespace Sentry.data.Infrastructure
         {
 
             GetObjectRequest req = new GetObjectRequest();
+            GetObjectResponse response = new GetObjectResponse();
 
             req.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
             req.Key = key;
             req.VersionId = versionId;
 
-            GetObjectResponse response = S3Client.GetObject(req);
-
-            return response.ResponseStream;
             
+            try
+            {
+                response = S3Client.GetObject(req);
+            }
+            catch (AmazonS3Exception amazonS3Exception)
+            {
+                if (amazonS3Exception.ErrorCode != null &&
+                    (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId")
+                    ||
+                    amazonS3Exception.ErrorCode.Equals("InvalidSecurity")))
+                {
+                    throw new Exception("Failed GetObject - Check the provided AWS Credentials");
+                }
+                else
+                {
+                    throw new Exception($"Failed GetObject - {amazonS3Exception.Message}");
+                }
+            }
+            return response.ResponseStream;            
         } 
     }
 }

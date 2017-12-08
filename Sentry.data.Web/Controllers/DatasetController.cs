@@ -24,6 +24,7 @@ using Sentry.data.Common;
 using System.Diagnostics;
 using LazyCache;
 using StackExchange.Profiling;
+using Sentry.Common.Logging;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -200,13 +201,12 @@ namespace Sentry.data.Web.Controllers
                         0,
                         "Default",
                         "Default Config for Dataset.  Uploaded files that do not match any configs will default to this config",
-                        1,
                         "\\.",
                         "DFS",
-                        ds.DropLocation + "\\Default",
+                        ds.DropLocation + "default\\",
                         true,
                         true,
-                        1,
+                        (int)FileType.DataFile,
                         true,
                         ds,
                         Enum.GetName(typeof(DatasetFrequency), cdm.FreqencyID),
@@ -218,11 +218,19 @@ namespace Sentry.data.Web.Controllers
                     _datasetContext.Merge(dfc);
                     _datasetContext.SaveChanges();
 
+                    //create drop locations
                     try
                     {
+                        //Config Drop location
                         if (!System.IO.Directory.Exists(dfc.DropPath))
                         {
                             System.IO.Directory.CreateDirectory(dfc.DropPath);
+                        }
+
+                        //Bundle Drop location
+                        if (!Directory.Exists(ds.DropLocation + "bundle\\"))
+                        {
+                            Directory.CreateDirectory(ds.DropLocation + "bundle\\");
                         }
                     }
                     catch (Exception e)
@@ -233,8 +241,9 @@ namespace Sentry.data.Web.Controllers
                         errmsg.AppendLine($"DatasetId: {ds.DatasetId}");
                         errmsg.AppendLine($"DatasetName: {ds.DatasetName}");
                         errmsg.AppendLine($"DropLocation: {dfc.DropPath}");
+                        errmsg.AppendLine($"BundleDropLocation: {ds.DropLocation + "bundle\\"}");
 
-                        Sentry.Common.Logging.Logger.Error(errmsg.ToString(), e);
+                        Logger.Error(errmsg.ToString(), e);
                     }
 
                     int maxId = _datasetContext.GetMaxId();
@@ -610,7 +619,7 @@ namespace Sentry.data.Web.Controllers
             Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
             Boolean CanEdit = SharedContext.CurrentUser.CanEditDataset;
 
-            foreach (DatasetFile dfversion in _datasetContext.GetDatasetFilesVersions(df.Dataset.DatasetId, df.DatasetFileConfig.DataFileConfigId, df.FileName).ToList())
+            foreach (DatasetFile dfversion in _datasetContext.GetDatasetFilesVersions(df.Dataset.DatasetId, df.DatasetFileConfig.ConfigId, df.FileName).ToList())
             {
                 DatasetFileGridModel dfgm = new DatasetFileGridModel(dfversion, _associateInfoProvider);
                 dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
@@ -728,7 +737,6 @@ namespace Sentry.data.Web.Controllers
                         0,
                         dfcm.ConfigFileName,
                         dfcm.ConfigFileDesc,
-                        1,
                         dfcm.SearchCriteria,
                         dfcm.DropLocationType,
                         dfcm.DropPath,
@@ -1192,7 +1200,7 @@ namespace Sentry.data.Web.Controllers
        
         [HttpPost]
         [AuthorizeByPermission(PermissionNames.DatasetView)]
-        public ActionResult BundleFiles(string listOfIds, string newName, int datasetID)
+        public async Task<ActionResult> BundleFiles(string listOfIds, string newName, int datasetID)
         {
             string[] ids = listOfIds.Split(',');
 
@@ -1263,7 +1271,68 @@ namespace Sentry.data.Web.Controllers
                 if (!errorsFound)
                 {
                     //Pass the list of files off to the File Bundler in S3.
-                    return Json(new { Success = true, Message = "Success" });
+                    string userEmail = SharedContext.CurrentUser.EmailAddress;
+                    DatafileBundleProvider myBundleRequest = new DatafileBundleProvider();
+
+                    Dataset parentDataset = _datasetContext.GetById<Dataset>(files.FirstOrDefault().Dataset.DatasetId);
+
+                    //Passing UserID and Timestamp to hash method to ensure unqiue GUID for request
+                    BundleRequest _request = new BundleRequest(Utilities.GenerateHash($"{SharedContext.CurrentUser.AssociateId}_{DateTime.Now.ToString()}"));
+
+                    //string requestLocation = @"bundlework/intake/" + _request.RequestGuid;
+
+                    _request.DatasetID = files.FirstOrDefault().Dataset.DatasetId;
+                    _request.Bucket = Configuration.Config.GetHostSetting("AWSRootBucket");
+                    _request.DatasetFileConfigId = files.FirstOrDefault().DatasetFileConfig.ConfigId;
+                    _request.TargetFileName = newName;
+                    _request.Email = userEmail;
+                    _request.TargetFileLocation = Configuration.Config.GetSetting("S3BundlePrefix") + parentDataset.S3Key;
+                    _request.DatasetDropLocation = parentDataset.DropLocation + "bundle\\";
+                    _request.RequestInitiatorId = SharedContext.CurrentUser.AssociateId;
+
+                    foreach (DatasetFile df in files)
+                    {
+                        _request.SourceKeys.Add(Tuple.Create(df.FileLocation, df.VersionId));
+                    }
+
+                    _request.FileExtension = Path.GetExtension(_request.SourceKeys.FirstOrDefault().Item1);
+
+                    string jsonRequest = JsonConvert.SerializeObject(_request,Formatting.Indented);
+
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        StreamWriter writer = new StreamWriter(ms);
+
+                        writer.WriteLine(jsonRequest);
+                        writer.Flush();
+
+                        //You have to rewind the MemoryStream before copying
+                        ms.Seek(0, SeekOrigin.Begin);
+
+                        using (FileStream fs = new FileStream($"C:\\tmp\\DatasetBundler\\{_request.RequestGuid}.json", FileMode.OpenOrCreate))
+                        {
+                            ms.CopyTo(fs);
+                            fs.Flush();
+                        }
+                    }
+
+                    //Create Bundle Started Event
+                    Event e = new Event();
+                    e.EventType = _datasetContext.GetEventType(3);
+                    e.Status = _datasetContext.GetStatus(1);
+                    e.TimeCreated = DateTime.Now;
+                    e.TimeNotified = DateTime.Now;
+                    e.IsProcessed = false;
+                    e.UserWhoStartedEvent = _request.RequestInitiatorId;
+                    e.Dataset = _request.DatasetID;
+                    //Dataset ds = _dscontext.GetById(_request.DatasetID);
+                    e.DataConfig = _request.DatasetFileConfigId;
+                    //DatasetFileConfig dfc = _dscontext.getDatasetFileConfigs(_request.DatasetFileConfigId);
+                    e.Reason = $"{_request.RequestGuid} : Bundle Request Sumbitted";
+                    e.Parent_Event = _request.RequestGuid;
+                    await Utilities.CreateEventAsync(e);
+                    
+                    return Json(new { Success = true, Message = "Successfully sent request to Dataset Bundler.  You will recieve notification when completed." });
                 }
                 else
                 {
@@ -1390,195 +1459,5 @@ namespace Sentry.data.Web.Controllers
 
             return Json(sList, JsonRequestBehavior.AllowGet);
         }
-
-        public string Bundle()
-        {
-            List<DatasetFile> dfList = new List<DatasetFile>();
-
-            dfList.Add(_datasetContext.GetById<DatasetFile>(229));
-            dfList.Add(_datasetContext.GetById<DatasetFile>(230));
-            dfList.Add(_datasetContext.GetById<DatasetFile>(231));
-            dfList.Add(_datasetContext.GetById<DatasetFile>(232));
-            dfList.Add(_datasetContext.GetById<DatasetFile>(233));
-            dfList.Add(_datasetContext.GetById<DatasetFile>(234));
-
-            string userEmail = SharedContext.CurrentUser.EmailAddress;
-
-            DatafileBundleProvider myBundleRequest = new DatafileBundleProvider();
-
-            //myBundleRequest.SubmitBundleRequest(dfList, "JCG_Testing", userEmail, _s3Service);
-
-
-            BundleRequest _request = new BundleRequest();
-
-            List<Tuple<string, string>> sourceKeys = new List<Tuple<string, string>>();
-
-            string requestLocation = @"bundlework/intake/" + _request.RequestGuid;
-            //string requestVersionId = null;
-
-
-            _request.DatasetID = dfList.FirstOrDefault().Dataset.DatasetId;
-            _request.Bucket = Configuration.Config.GetHostSetting("AWSRootBucket");
-            _request.DatasetFileConfigId = dfList.FirstOrDefault().DatasetFileConfig.ConfigId;
-            _request.TargetFileName = "JCG_Testing_" + DateTime.Now.ToString();
-
-            _request.Email = userEmail;
-
-            //Due to the potental large number of files in list, upload SourceKeys file to bundler intake location on S3.
-            //S3 location will be save as part of the request and bundler will getobject when processing request.
-            foreach (DatasetFile df in dfList)
-            {
-                _request.SourceKeys.Add(Tuple.Create(df.FileLocation, df.VersionId));
-            }
-
-            _request.FileExtension = Path.GetExtension(_request.SourceKeys.FirstOrDefault().Item1);
-
-            string jsonRequest = JsonConvert.SerializeObject(_request);
-
-            using (MemoryStream ms = new MemoryStream())
-            {
-                StreamWriter writer = new StreamWriter(ms);
-
-                writer.WriteLine(jsonRequest);
-                writer.Flush();
-
-                //You have to rewind the MemoryStream before copying
-                ms.Seek(0, SeekOrigin.Begin);
-
-                using (FileStream fs = new FileStream($"C:\\tmp\\DatasetBundler\\{_request.RequestGuid}.json", FileMode.OpenOrCreate))
-                {
-                    ms.CopyTo(fs);
-                    fs.Flush();
-                }
-
-            }
-
-            //BundleRequest bunReq = _bundleProvider.CreateBundleRequest(dfList, "JCG_Testing", userEmail, _s3Service);
-
-            //BundleResponse response = _bundleProvider.StartBundleProcess(bunReq);
-
-
-
-            return "Done";
-        }
-
-
-
-        //[HttpGet()]
-        //public void GetWeatherData(string zip)
-        //{
-        //    //System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\" + zip + ".xml", _weatherDataProvider.GetWeather("xml"));
-        //    //System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\" + zip + ".json", _weatherDataProvider.GetWeather("json"));
-
-
-        //    request.AddParameter("name", "value"); // adds to POST or URL querystring based on Method
-        //    request.AddUrlSegment("id", "123"); // replaces matching token in request.Resource
-
-        //    // easily add HTTP Headers
-        //    //request.AddHeader("header", "value");
-
-        //    // add files to upload (works with compatible verbs)
-        //    //request.AddFile(path);
-
-        //    // execute the request         
-
-        //    // or automatically deserialize result
-        //    // return content type is sniffed but can be explicitly set via RestClient.AddHandler();
-        //    RestResponse<Person> response2 = client.Execute<Person>(request);
-        //    var name = response2.Data.Name;
-
-        //    // easy async support
-        //    client.ExecuteAsync(request, response =>
-        //    {
-        //        Console.WriteLine(response.Content);
-        //    });
-
-        //    // async with deserialization
-        //    var asyncHandle = client.ExecuteAsync<Person>(request, response =>
-        //    {
-        //        Console.WriteLine(response.Data.Name);
-        //    });
-
-        //    // abort the request on demand
-        //    asyncHandle.Abort();
-        //}
-
-
-        //[HttpGet()]
-        //public void GetWeatherData(string zip)
-        //{
-        //    System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\" + zip + ".xml", _weatherDataProvider.GetWeather("xml"));
-        //    System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\" + zip + ".json", _weatherDataProvider.GetWeather("json"));
-
-
-        //    //request.AddParameter("name", "value"); // adds to POST or URL querystring based on Method
-        //    //request.AddUrlSegment("id", "123"); // replaces matching token in request.Resource
-
-        //    //// easily add HTTP Headers
-        //    ////request.AddHeader("header", "value");
-
-        //    //// add files to upload (works with compatible verbs)
-        //    ////request.AddFile(path);
-
-        //    //// execute the request         
-
-        //    //// or automatically deserialize result
-        //    //// return content type is sniffed but can be explicitly set via RestClient.AddHandler();
-        //    //RestResponse<Person> response2 = client.Execute<Person>(request);
-        //    //var name = response2.Data.Name;
-
-        //    //// easy async support
-        //    //client.ExecuteAsync(request, response => {
-        //    //    Console.WriteLine(response.Content);
-        //    //});
-
-        //    //// async with deserialization
-        //    //var asyncHandle = client.ExecuteAsync<Person>(request, response => {
-        //    //    Console.WriteLine(response.Data.Name);
-        //    //});
-
-        //    //// abort the request on demand
-        //    //asyncHandle.Abort();
-        //}
-
-
-        //[HttpGet()]
-        //public void GetWeather(string zip)
-        //{
-
-        //    JsonResult jr = new JsonResult();
-        //    jr.Data = GetWeatherByZip(zip);
-        //    string json = JsonConvert.SerializeObject(jr.Data);
-
-
-        //    System.IO.File.WriteAllText(@"C:\Temp\WeatherUndergroundData\54481.txt", json);
-        //    //return jr;
-        //}
-
-        //public async Task<ActionResult> GetWeatherByZip(string zip)
-        //{
-        //    string relativePath = zip + "/" + zip + ".json";
-        //    return await this.ApiGet(relativePath);
-        //}
-
-        //protected async Task<ActionResult> ApiGet(string relativePath)
-        //{
-        //    ApiResponse response = await this.ApiClient.GetAsync(relativePath);
-        //    ActionResult result = response.IsSuccessful ? new ContentResult { Content = response.Data, ContentType = "application/json" } as ActionResult : new JsonResult();
-        //    return result;
-        //}
-
-        //protected IApiClient ApiClient
-        //{
-        //    get
-        //    {
-        //        return this._apiClient;
-        //    }
-        //}
-
-        //public JsonResult AjaxSuccessJson()
-        //{
-        //    return Json(new { Success = true });
-        //}
     }
 }

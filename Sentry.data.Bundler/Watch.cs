@@ -8,6 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Sentry.Common.Logging;
 using System.Configuration;
+using Sentry.data.Infrastructure;
+using StructureMap;
+using Sentry.data.Core;
 
 namespace Sentry.data.Bundler
 {
@@ -71,11 +74,23 @@ namespace Sentry.data.Bundler
 
                     file.task =  Task.Factory.StartNew(x =>
                             {
-                                Bundle bundleProcess = new Bundle(file.fileName);
-                                bundleProcess.KeyContatenation();
-                                Console.WriteLine($"Ended Bundle Task for request: {Path.GetFileName(file.fileName)}");
-                                Logger.Info($"Ended Bundle Task for request: {Path.GetFileName(file.fileName)}");
+                                //Call bootstrapper to initialize the application
+                                Bootstrapper.Init();
+
+                                //create an IOC (structuremap) container to wrap this transaction
+                                using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+                                {
+                                    IDatasetContext dscontext = container.GetInstance<IDatasetContext>();
+                                    //var result = service.DoWork();
+                                    //container.GetInstance<ISentry.data.BundlerContext>.SaveChanges();
+                                    Bundle bundleProcess = new Bundle(file.fileName, dscontext);
+                                    bundleProcess.KeyContatenation();
+                                    Console.WriteLine($"Ended Bundle Task for request: {Path.GetFileName(file.fileName)}");
+                                    Logger.Info($"Ended Bundle Task for request: {Path.GetFileName(file.fileName)}");
+                                }
+                                
                             }, TaskCreationOptions.LongRunning);
+
                     file.started = true;
                     
                 }

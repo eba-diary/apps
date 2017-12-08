@@ -15,7 +15,6 @@ namespace Sentry.data.Web
         public DatasetFileConfigsModel(DatasetFileConfig dsfc)
         {
             this.ConfigId = dsfc.ConfigId;
-            this.DatasetFileConfigID = dsfc.DataFileConfigId;
             this.SearchCriteria = dsfc.SearchCriteria;
             this.TargetFileName = dsfc.TargetFileName;
             this.DropLocationType = dsfc.DropLocationType;
@@ -25,14 +24,12 @@ namespace Sentry.data.Web
             this.FileTypeId = dsfc.FileTypeId;
             this.ConfigFileName = dsfc.Name;
             this.ConfigFileDesc = dsfc.Description;
-            //this.DatasetId = dsfc.DatasetId;
             this.ParentDatasetName = dsfc.ParentDataset.DatasetName;
             this.CreationFreq = dsfc.CreationFreqDesc;
             this.DatasetScopeTypeID = dsfc.DatasetScopeTypeID;
         }
         
         public int ConfigId { get; set; }
-        public int DatasetFileConfigID { get; set; }
         [Required]
         public string SearchCriteria { get; set; }
         public string TargetFileName { get; set; }

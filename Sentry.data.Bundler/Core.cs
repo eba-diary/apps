@@ -50,16 +50,6 @@ namespace Sentry.data.Bundler
 
                 Watch.Run();
 
-                //create an IOC (structuremap) container to wrap this transaction
-                //using (container = Bootstrapper.Container.GetNestedContainer)
-                //{
-                //    var service = container.GetInstance<MyService>();
-                //    var result = service.DoWork();
-                //    container.GetInstance<ISentry.data.BundlerContext>.SaveChanges();
-                //
-                //    Logger.Info(result & " records processed.");
-                //}
-
             } while (!_token.IsCancellationRequested);
             Logger.Info("Worker task stopped.");
         }

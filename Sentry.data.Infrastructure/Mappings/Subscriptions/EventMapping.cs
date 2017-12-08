@@ -24,43 +24,13 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.TimeCreated, (m) => m.Column("TimeCreated"));
             this.Property((x) => x.TimeNotified, (m) => m.Column("TimeNotified"));
             this.Property((x) => x.IsProcessed, (m) => m.Column("IsProcessed"));
+            this.Property((x) => x.Parent_Event, (m) => m.Column("Parent_Event_ID"));
+            this.Property((x) => x.DataAsset, (m) => m.Column("DataAsset_ID"));
+            this.Property((x) => x.Dataset, (m) => m.Column("Dataset_ID"));
+            this.Property((x) => x.DataFile, (m) => m.Column("DataFile_ID"));
+            this.Property((x) => x.DataConfig, (m) => m.Column("DataConfig_ID"));
 
             this.Property((x) => x.UserWhoStartedEvent, (m) => m.Column("CreatedUser"));
-        
-            this.ManyToOne(x => x.Parent_Event, m =>
-            {
-                m.Column("Parent_Event_ID");
-                m.ForeignKey("FK_ParentEvent");
-                m.Class(typeof(Event));
-            });
-
-            this.ManyToOne(x => x.DataAsset, m =>
-            {
-                m.Column("DataAsset_ID");
-                m.ForeignKey("FK_DataAsset");
-                m.Class(typeof(DataAsset));
-            });
-
-            this.ManyToOne(x => x.Dataset, m =>
-            {
-                m.Column("Dataset_ID");
-                m.ForeignKey("FK_Dataset");
-                m.Class(typeof(Dataset));
-            });
-
-            this.ManyToOne(x => x.DataFile, m =>
-            {
-                m.Column("DataFile_ID");
-                m.ForeignKey("FK_DataFile");
-                m.Class(typeof(DatasetFile));
-            });
-
-            this.ManyToOne(x => x.DataConfig, m =>
-            {
-                m.Column("DataConfig_ID");
-                m.ForeignKey("FK_DataConfig");
-                m.Class(typeof(DatasetFileConfig));
-            });
 
 
             this.ManyToOne(x => x.EventType, m =>

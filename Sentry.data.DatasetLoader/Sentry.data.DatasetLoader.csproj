@@ -106,11 +106,13 @@
     <Import Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core.cs" />
     <Compile Include="Entities\DatasetMetadata.cs" />
     <Compile Include="Entities\FileConfig.cs" />
     <Compile Include="Entities\FileSearch.cs" />
     <Compile Include="Entities\SystemConfig.cs" />
     <Compile Include="ExitCodes.cs" />
+    <Compile Include="Loader.cs" />
     <Compile Include="MetaFile.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -8,148 +8,36 @@ using System.Threading.Tasks;
 namespace Sentry.data.Core
 {
     public class BundleRequest
-    {
-        private string _requestGuid;
-        private int _datasetId;
-        private int _datasetFileConfigId;
-        private string _bucket;
-        private string _sourceKeysFileLocation;
-        private string _sourceKeysFileVersionId;
-        private List<Tuple<string, string>> _sourceKeys;
-        private string _fileExtension;
-        private string _targetFileName;
-        private string _email;
-                
-        public BundleRequest()
+    {                               
+        public BundleRequest(Guid input)
         {
-            _requestGuid = Guid.NewGuid().ToString("D");
-            _sourceKeys = new List<Tuple<string, string>>();
+            //RequestGuid = Guid.NewGuid().ToString("D");
+            RequestGuid = input.ToString();
+            SourceKeys = new List<Tuple<string, string>>();
         }
+        public string TargetFileLocation { get; set; }
+        public string RequestGuid { get; set; }
+        public int DatasetID { get; set; }
+        public int DatasetFileConfigId { get; set; }
+        public string Bucket { get; set; }
+        public string SourceKeysFileLocation { get; set; }
+        public string SourceKeysFileVersionId { get; set; }
+        public List<Tuple<string, string>> SourceKeys { get; set; }
+        public string TargetFileName { get; set; }
+        public string FileExtension { get; set; }
+        /// <summary>
+        /// Email of orignial requestor
+        /// </summary>
+        public string Email { get; set; }
+        /// <summary>
+        /// Target location for reqeust response.  Typically, the dataset bundle drop location for dataset loader.
+        /// </summary>
+        public string DatasetDropLocation { get; set; }
+        /// <summary>
+        /// Associate ID of request initiator
+        /// </summary>
+        public string RequestInitiatorId { get; set; }
+        public string EventId { get; set; }
 
-        public string RequestGuid
-        {
-            get
-            {
-                return _requestGuid;
-            }
-            set
-            {
-                _requestGuid = value;
-            }
-        }
-
-        public int DatasetID
-        {
-            get
-            {
-                return _datasetId;
-            }
-            set
-            {
-                _datasetId = value;
-            }
-        }
-
-        public int DatasetFileConfigId
-        {
-            get
-            {
-                return _datasetFileConfigId;
-            }
-
-            set
-            {
-                _datasetFileConfigId = value;
-            }
-        }
-
-        public string Bucket
-        {
-            get
-            {
-                return _bucket;
-            }
-
-            set
-            {
-                _bucket = value;
-            }
-        }
-
-        public string SourceKeysFileLocation
-        {
-            get
-            {
-                return _sourceKeysFileLocation;
-            }
-
-            set
-            {
-                _sourceKeysFileLocation = value;
-            }
-        }
-
-        public string SourceKeysFileVersionId
-        {
-            get
-            {
-                return _sourceKeysFileVersionId;
-            }
-            set
-            {
-                _sourceKeysFileVersionId = value;
-            }
-        }
-
-        public List<Tuple<string, string>> SourceKeys
-        {
-            get
-            {
-                return _sourceKeys;
-            }
-            set
-            {
-                _sourceKeys = value;
-            }
-        }
-
-        public string TargetFileName
-        {
-            get
-            {
-                return _targetFileName;
-            }
-
-            set
-            {
-                _targetFileName = value;
-            }
-        }
-
-        public string FileExtension
-        {
-            get
-            {
-                return _fileExtension;
-            }
-
-            set
-            {
-                _fileExtension = value;
-            }
-        }
-
-        public string Email
-        {
-            get
-            {
-                return _email;
-            }
-
-            set
-            {
-                _email = value;
-            }
-        }
     }
 }

@@ -70,11 +70,12 @@ namespace Sentry.data.Core
 
         IEnumerable<DatasetFileConfig> getAllDatasetFileConfigs();
 
-        int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId);
-
-        int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId, string targetFileName);
+        int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId, bool isBundled);
+        int GetLatestBundleFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId);
+        int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId, string targetFileName, bool isBunled);
 
         DatasetFileConfig getDatasetFileConfigs(int configId);
+        DatasetFileConfig getDatasetDefaultConfig(int datasetId);
         IEnumerable<AssetNotifications> GetAssetNotificationsByDataAssetId(int id);
         IEnumerable<AssetNotifications> GetAllAssetNotifications();
         AssetNotifications GetAssetNotificationByID(int id);

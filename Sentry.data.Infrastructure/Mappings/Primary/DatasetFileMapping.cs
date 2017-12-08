@@ -36,6 +36,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.IsUsable, (m) => m.Column("isUsable_IND"));
             this.Property((x) => x.IsBundled, (m) => m.Column("isBundled_IND"));
             this.Property((x) => x.Information, (m) => m.Column("Information_DSC"));
+            this.Property((x) => x.Size, (m) => m.Column("Size_AMT"));
 
             this.ManyToOne(x => x.Dataset, m =>
             {

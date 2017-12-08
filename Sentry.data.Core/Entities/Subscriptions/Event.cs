@@ -31,11 +31,11 @@ namespace Sentry.data.Core
         public virtual DateTime TimeNotified { get; set; }
 
 
-        public virtual Event Parent_Event { get; set; }
-        public virtual DataAsset DataAsset { get; set; }
-        public virtual Dataset Dataset { get; set; }
-        public virtual DatasetFile DataFile { get; set; }
-        public virtual DatasetFileConfig DataConfig { get; set; }
+        public virtual string Parent_Event { get; set; }
+        public virtual int DataAsset { get; set; }
+        public virtual int Dataset { get; set; }
+        public virtual int DataFile { get; set; }
+        public virtual int DataConfig { get; set; }
 
     }
 }

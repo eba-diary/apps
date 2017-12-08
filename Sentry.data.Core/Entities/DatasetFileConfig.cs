@@ -13,7 +13,6 @@ namespace Sentry.data.Core
 #pragma warning restore CS0649
         private string _name;
         private string _description;
-        private int _dataFileConfigId;
         //private int _datasetId;
         private string _searchCriteria;
         private string _targetFileName;
@@ -35,7 +34,6 @@ namespace Sentry.data.Core
             int configId,
             string name,
             string description,
-            int dataFileConfigId,
             //int datasetId,
             string searchCriteria,
             string dropLocationType,
@@ -51,7 +49,6 @@ namespace Sentry.data.Core
             this._configId = configId;
             this._name = name;
             this._description = description;
-            this._dataFileConfigId = dataFileConfigId;
             //this._datasetId = datasetId;
             this._searchCriteria = searchCriteria;
             this._dropLocationType = dropLocationType;
@@ -98,28 +95,6 @@ namespace Sentry.data.Core
                 _description = value;
             }
         }
-        public virtual int DataFileConfigId
-        {
-            get
-            {
-                return _dataFileConfigId;
-            }
-            set
-            {
-                _dataFileConfigId = value;
-            }
-        }
-        //public virtual int DatasetId
-        //{
-        //    get
-        //    {
-        //        return _datasetId;
-        //    }
-        //    set
-        //    {
-        //        _datasetId = value;
-        //    }
-        //}
         public virtual string SearchCriteria
         {
             get

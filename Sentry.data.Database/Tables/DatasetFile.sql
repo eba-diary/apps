@@ -13,6 +13,7 @@
     [isUsable_IND] BIT NOT NULL, 
     [isBundled_IND] BIT NOT NULL, 
     [Information_DSC] NVARCHAR(MAX) NULL, 
+    [Size_AMT] BIGINT NULL, 
     CONSTRAINT [FK_DatasetFile_Dataset] FOREIGN KEY (Dataset_ID) REFERENCES Dataset(Dataset_ID), 
     CONSTRAINT [FK_DatasetFile_DatasetFileConfigs] FOREIGN KEY ([DatasetFileConfig_ID]) REFERENCES [DatasetFileConfigs]([Config_ID]) 
 )

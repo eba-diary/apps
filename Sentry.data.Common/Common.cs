@@ -12,6 +12,9 @@ using System.Web;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Script.Serialization;
+using Sentry.data.Infrastructure;
+using System.Security.Cryptography;
+using Sentry.Common.Logging;
 
 namespace Sentry.data.Common
 {
@@ -19,7 +22,9 @@ namespace Sentry.data.Common
     /// Provides common code between projects
     /// </summary>
     public static class Utilities
-    {
+    {        
+        private static S3ServiceProvider _s3Service = new S3ServiceProvider();
+
         /// <summary>
         /// Generates full drop location path for a dataset
         /// </summary>
@@ -75,11 +80,13 @@ namespace Sentry.data.Common
         /// <param name="ds"></param>
         /// <param name="now"></param>
         /// <param name="filename"></param>
+        /// <param name="dataFileConfigId"></param>
         /// <returns></returns>
-        public static string GenerateDatafileKey(Dataset ds, DateTime now, string filename)
+        public static string GenerateDatafileKey(Dataset ds, DateTime now, string filename, int dataFileConfigId)
         {
             StringBuilder location = new StringBuilder();
             location.Append(GenerateDatasetStorageLocation(ds));
+            location.Append(dataFileConfigId.ToString() + '/');
             location.Append(now.Year.ToString());
             location.Append('/');
             location.Append(now.Month.ToString());
@@ -237,52 +244,150 @@ namespace Sentry.data.Common
         /// </summary>
         /// <param name="dataset"></param>
         /// <param name="dfConfig"></param>
-        /// <param name="dsService"></param>
         /// <param name="dscontext"></param>
         /// <param name="file"></param>
         /// <param name="uploadUserName"></param>
+        /// <param name="isBundled"></param>
+        /// <param name="response"></param>
         /// <returns></returns>
-        public static DatasetFile ProcessInputFile(Dataset dataset, DatasetFileConfig dfConfig, IDatasetService dsService, IDatasetContext dscontext, FileInfo file, string uploadUserName)
+        public static DatasetFile ProcessInputFile(Dataset dataset, DatasetFileConfig dfConfig, IDatasetContext dscontext, string uploadUserName, bool isBundled, BundleResponse response, FileInfo file = null)
         {
-            return ProcessFile(dataset, dfConfig, dsService, dscontext, file, null, uploadUserName, file.Name);
+            string filename = null;
+            if (file != null) { filename = file.Name; }
+
+            return ProcessFile(dataset, dfConfig, dscontext, file, null, uploadUserName, filename, isBundled, response);
         }
-        ///// <summary>
-        ///// Processes filestream and return DatasetFile object. Transfer events are pushed to OnTransferProgressEvent.
-        ///// </summary>
-        ///// <param name="dataset"></param>
-        ///// <param name="dfConfig"></param>
-        ///// <param name="dsService"></param>
-        ///// <param name="dscontext"></param>
-        ///// <param name="file"></param>
-        ///// <param name="uploadUserName"></param>
-        ///// <returns></returns>
-        //public static DatasetFile ProcessInputFile(Dataset dataset, DatasetFileConfig dfConfig, IDatasetService dsService, IDatasetContext dscontext, HttpPostedFileBase file, string uploadUserName)
-        //{
-        //    return ProcessFile(dataset, dfConfig, dsService, dscontext, null, file, uploadUserName, System.IO.Path.GetFileName(file.FileName));
-        //}
 
 
-        private static DatasetFile ProcessFile(Dataset ds, DatasetFileConfig dfc, IDatasetService upload, IDatasetContext dscontext, FileInfo fileInfo, HttpPostedFileBase filestream, string uploadUserName, string filename)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="fileConfig"></param>
+        /// <param name="ds"></param>
+        /// <param name="response"></param>
+        /// <param name="dscontext"></param>
+        public static DatasetFile ProcessBundleFile(DatasetFileConfig fileConfig, Dataset ds, BundleResponse response, IDatasetContext dscontext)
+        {
+            throw new NotImplementedException();
+            //DatasetFile df_Orig = null;
+            //DatasetFile df_newParent = null;
+            //string targetFileName = null;
+            //int df_id = 0;
+
+
+            //targetFileName = response.TargetFileName;
+
+            //df_id = dscontext.GetLatestBundleFileIdForDatasetByDatasetFileConfig(fileConfig.ParentDataset.DatasetId, fileConfig.ConfigId);
+
+            //df_newParent = CreateParentDatasetFile(ds, fileConfig, response.RequestInitiatorId, targetFileName, null, true);
+
+            //////If datafiles exist for this DatasetFileConfig
+            ////if (df_id != 0)
+            ////{
+            ////    df_Orig = dscontext.GetDatasetFile(df_id);
+            ////    df_newParent = Utilities.CreateParentDatasetFile(ds, fileConfig, response.RequestInitiatorId, targetFileName, df_Orig, true);                
+            ////}
+            //////If there are no datafiles for this DatasetFileConfig
+            ////else
+            ////{
+            ////    df_newParent = CreateParentDatasetFile(ds, fileConfig, response.RequestInitiatorId, targetFileName, null, true);
+            ////}
+
+            //df_newParent.IsBundled = true;
+            //df_newParent.UploadUserName = response.RequestInitiatorId;
+            //df_newParent.VersionId = response.TargetVersionId;
+            //df_newParent.S3Key = response.TargetKey;
+
+            ////Register new Parent DatasetFile
+            //try
+            //{
+            //    //Write dataset to database
+            //    dscontext.Merge(df_newParent);
+            //    dscontext.SaveChanges();
+            //}
+            //catch (Exception e)
+            //{
+
+            //    StringBuilder builder = new StringBuilder();
+            //    builder.Append("Failed to record new Bundle DatasetFile to Dataset Management.");
+            //    builder.Append($"File_NME: {df_newParent.FileName}");
+            //    builder.Append($"Dataset_ID: {df_newParent.Dataset.DatasetId}");
+            //    builder.Append($"UploadUser_NME: {df_newParent.UploadUserName}");
+            //    builder.Append($"Create_DTM: {df_newParent.CreateDTM}");
+            //    builder.Append($"Modified_DTM: {df_newParent.ModifiedDTM}");
+            //    builder.Append($"FileLocation: {df_newParent.FileLocation}");
+            //    builder.Append($"DataFileConfig_ID: {df_newParent.DatasetFileConfig.ConfigId}");
+            //    builder.Append($"ParentDatasetFile_ID: {df_newParent.ParentDatasetFileId}");
+            //    builder.Append($"Version_ID: {df_newParent.VersionId}");
+
+            //    Sentry.Common.Logging.Logger.Error(builder.ToString(), e);
+
+            //    //SendNotification(datasetMetadata, (int)ExitCodes.DatabaseError, 0, "Error saving dataset to database", df_newParent.FileLocation);
+            //    throw new Exception("Error saving bundle datafile to database", e);
+            //    //return (int)ExitCodes.DatabaseError;
+            //}
+
+            //// If there were existing datasetfiles set parentdatasetFile_ID on old parent
+            //if (df_id != 0)
+            //{
+            //    try
+            //    {
+            //        //Version the Old Parent DatasetFile
+            //        //int df_newParentId = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(fileConfig.ParentDataset.DatasetId, fileConfig.ConfigId);
+            //        //df_Orig.ParentDatasetFileId = df_newParentId;
+
+            //        //Write dataset to database
+            //        dscontext.Merge(df_Orig);
+            //        dscontext.SaveChanges();
+
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        StringBuilder builder = new StringBuilder();
+            //        builder.Append("Failed to set ParentDatasetFile_ID on Original Parent in Dataset Management.");
+            //        builder.Append($"DatasetFile_ID: {df_Orig.DatasetFileId}");
+            //        builder.Append($"File_NME: {df_Orig.FileName}");
+            //        builder.Append($"ParentDatasetFile_ID: {df_Orig.ParentDatasetFileId}");
+            //    }
+            //}
+
+            //return df_newParent;
+        }
+
+
+
+        private static DatasetFile ProcessFile(Dataset ds, DatasetFileConfig dfc, IDatasetContext dscontext, FileInfo fileInfo, HttpPostedFileBase filestream, string uploadUserName, string filename, bool isBundled, BundleResponse response)
         {
             DatasetFile df_Orig = null;
             DatasetFile df_newParent = null;
             string targetFileName = null;
-            int df_id = 0;            
-            
+            string uplduser = null;
+            int df_id = 0;
 
-            // Determine target file name
-            targetFileName = GetTargetFileName(dfc, filename);
+
+            // Set values appropriately based on isbundled
+            if (isBundled)
+            {
+                targetFileName = response.TargetFileName;
+                uplduser = response.RequestInitiatorId;
+            }
+            else
+            {
+                targetFileName = GetTargetFileName(dfc, filename);
+                uplduser = uploadUserName;
+            }
+            
 
             if (dfc.OverwriteDatafile)
             {
                 // RegexSearch requires passing targetFileName to esnure we get the correct related data file.
                 if (dfc.IsRegexSearch)
                 {
-                    df_id = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.DataFileConfigId, targetFileName);
+                    df_id = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.ConfigId, targetFileName, isBundled);
                 }
                 else
                 {
-                    df_id = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.DataFileConfigId);
+                    df_id = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.ConfigId, isBundled);
                 }
 
 
@@ -290,51 +395,79 @@ namespace Sentry.data.Common
                 if (df_id != 0)
                 {
                     df_Orig = dscontext.GetDatasetFile(df_id);
-                    df_newParent = CreateParentDatasetFile(ds, dfc, uploadUserName, targetFileName, df_Orig);
+                    df_newParent = CreateParentDatasetFile(ds, dfc, uplduser, targetFileName, df_Orig, isBundled);
                     //df_updated = updateOverwrittenDatasetFile(ds, df_Orig, fileInfo);
                 }
                 //If there are no datafiles for this DatasetFileConfig
                 else
                 {
-                    df_newParent = CreateParentDatasetFile(ds, dfc, uploadUserName, targetFileName, null);
+                    df_newParent = CreateParentDatasetFile(ds, dfc, uplduser, targetFileName, null, isBundled);
                 }
 
-                DateTime startUploadTime = DateTime.Now;
-                // Upload new key 
-                try
+
+                if(!isBundled)
                 {
-                    if (filestream == null)
+                    DateTime startUploadTime = DateTime.Now;
+                    // Upload new key 
+                    try
                     {
-                        df_newParent.VersionId = upload.UploadDataFile(fileInfo.FullName, df_newParent.FileLocation);
-                        //df_newParent.VersionId = upload.MultiPartUpload(fileInfo.FullName, df_newParent.FileLocation);
-                        //df_newParent.VersionId = upload.UploadDataset_v2(fileInfo.FullName, df_newParent.FileLocation);
+                        if (filestream == null)
+                        {
+                            df_newParent.VersionId = _s3Service.UploadDataFile(fileInfo.FullName, df_newParent.FileLocation);
+                        }
+                        else
+                        {
+                            throw new NotImplementedException();
+                            //_s3Service.TransferUtlityUploadStream(df_newParent.FileLocation, df_newParent.FileName, filestream.InputStream);
+                        }
+                    }
+                    catch (AmazonS3Exception eS3)
+                    {
+                        Sentry.Common.Logging.Logger.Error("S3 Upload Error", eS3);
+                        //SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Upload Error", df_newParent.FileLocation);
+                        throw new Exception("S3 Upload Error", eS3);
+                        //return (int)ExitCodes.S3UploadError;
 
                     }
-                    else
+                    catch (Exception e)
                     {
-                        //upload.MultiPartUpload(fi.FullName, df.FileLocation);
-                        upload.TransferUtlityUploadStream(df_newParent.FileLocation, df_newParent.FileName, filestream.InputStream);
-                    }                    
-                }
-                catch (AmazonS3Exception eS3)
-                {
-                    Sentry.Common.Logging.Logger.Error("S3 Upload Error", eS3);
-                    //SendNotification(datasetMetadata, (int)ExitCodes.S3UploadError, 0, "S3 Upload Error", df_newParent.FileLocation);
-                    throw new Exception("S3 Upload Error", eS3);
-                    //return (int)ExitCodes.S3UploadError;
-                    
-                }
-                catch (Exception e)
-                {
-                    Sentry.Common.Logging.Logger.Error("Error during establishing upload process", e);
-                    //SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing upload process", df_newParent.FileLocation);
-                    throw new Exception("Error during establishing upload process", e);
-                    //return (int)ExitCodes.Failure;
-                }
+                        Sentry.Common.Logging.Logger.Error("Error during establishing upload process", e);
+                        //SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing upload process", df_newParent.FileLocation);
+                        throw new Exception("Error during establishing upload process", e);
+                        //return (int)ExitCodes.Failure;
+                    }
 
-                //PushFileToStorage(ds, datasetMetadata, upload, dscontext, fileInfo);
-                var diffInSeconds = (DateTime.Now - startUploadTime).TotalSeconds;
-                Sentry.Common.Logging.Logger.Info($"TransferTime: {diffInSeconds} | DatasetName: {ds.DatasetName}");
+                    //PushFileToStorage(ds, datasetMetadata, upload, dscontext, fileInfo);
+                    var diffInSeconds = (DateTime.Now - startUploadTime).TotalSeconds;
+                    Sentry.Common.Logging.Logger.Info($"TransferTime: {diffInSeconds} | DatasetName: {ds.DatasetName}");
+                }
+                else
+                {
+                    df_newParent.IsBundled = true;
+                    df_newParent.UploadUserName = response.RequestInitiatorId;
+                    df_newParent.VersionId = response.TargetVersionId;
+                    df_newParent.FileLocation = response.TargetKey;
+                }
+                
+
+                ////retrieve target file size
+                //try
+                //{
+                //     resp = _s3Service.GetObjectMetadata(df_newParent.S3Key, df_newParent.VersionId);
+                //}
+                //catch (AmazonS3Exception eS3)
+                //{
+                //    Sentry.Common.Logging.Logger.Error("Error Retrieving S3 Object Metadata", eS3);
+                //    throw new Exception("S3 Object Metadata Retrieval Error", eS3);
+                //}
+                //catch (Exception e)
+                //{
+                //    Sentry.Common.Logging.Logger.Error("Error Retrieving S3 Object Metadata", e);
+                //    throw new Exception("Error Retrieving S3 Object Metadata", e);
+                //}
+
+
+                //df_newParent.Size = Convert.ToInt64(resp["ContentLength"]);
 
 
                 //Register new Parent DatasetFile
@@ -355,7 +488,7 @@ namespace Sentry.data.Common
                     builder.Append($"Create_DTM: {df_newParent.CreateDTM}");
                     builder.Append($"Modified_DTM: {df_newParent.ModifiedDTM}");
                     builder.Append($"FileLocation: {df_newParent.FileLocation}");
-                    builder.Append($"DataFileConfig_ID: {df_newParent.DatasetFileConfig.DataFileConfigId}");
+                    builder.Append($"Config_ID: {df_newParent.DatasetFileConfig.ConfigId}");
                     builder.Append($"ParentDatasetFile_ID: {df_newParent.ParentDatasetFileId}");
                     builder.Append($"Version_ID: {df_newParent.VersionId}");
 
@@ -372,7 +505,7 @@ namespace Sentry.data.Common
                     try
                     {
                         //Version the Old Parent DatasetFile
-                        int df_newParentId = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.DataFileConfigId);
+                        int df_newParentId = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.ConfigId, isBundled);
                         df_Orig.ParentDatasetFileId = df_newParentId;
 
                         //Write dataset to database
@@ -429,7 +562,7 @@ namespace Sentry.data.Common
 
             return outFileName;
         }
-        private static DatasetFile CreateParentDatasetFile(Dataset ds, DatasetFileConfig dfc, string uploaduser, string targetFileName, DatasetFile CurrentDatasetFile)
+        private static DatasetFile CreateParentDatasetFile(Dataset ds, DatasetFileConfig dfc, string uploaduser, string targetFileName, DatasetFile CurrentDatasetFile, bool isbundle)
         {
             DatasetFile out_df = null;
             string fileLocation = null;
@@ -438,15 +571,25 @@ namespace Sentry.data.Common
             DateTime processTime = DateTime.Now;
 
 
-            if (CurrentDatasetFile == null)
+            if (isbundle)
             {
-                fileLocation = Utilities.GenerateDatafileKey(ds, processTime, targetFileName);
+                StringBuilder location = new StringBuilder();
+                location.Append(Configuration.Config.GetHostSetting("S3BundlePrefix"));
+                location.Append(GenerateLocationKey(ds.DatasetCategory.Name, ds.DatasetName));
+                location.Append(targetFileName);
+                fileLocation = location.ToString();
             }
             else
             {
-                fileLocation = CurrentDatasetFile.FileLocation;
+                if (CurrentDatasetFile == null)
+                {
+                    fileLocation = Utilities.GenerateDatafileKey(ds, processTime, targetFileName, dfc.ConfigId);
+                }
+                else
+                {
+                    fileLocation = CurrentDatasetFile.FileLocation;
+                }
             }
-
 
             out_df = new DatasetFile(
                         0,
@@ -459,7 +602,9 @@ namespace Sentry.data.Common
                         processTime,
                         null,
                         null,
-                        false);
+                        isbundle,
+                        0,
+                        true);
 
 
             return out_df;
@@ -538,6 +683,23 @@ namespace Sentry.data.Common
                 default:
                     return false;
             }
+        }
+
+        /// <summary>
+        /// Generates hash based on input, returns GUID 
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        public static Guid GenerateHash(string input)
+        {
+            string start = input + DateTime.Now.ToString();
+            Guid result;
+            using (MD5 md5 = MD5.Create())
+            {
+                byte[] hash = md5.ComputeHash(Encoding.Default.GetBytes(input));
+                result = new Guid(hash);                
+            }
+            return result;
         }
 
         /// <summary>

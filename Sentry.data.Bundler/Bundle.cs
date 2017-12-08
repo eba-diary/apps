@@ -9,20 +9,25 @@ using Sentry.Common.Logging;
 using System.Threading;
 using System.IO;
 using Sentry.data.Infrastructure;
+using Sentry.data.Common;
 
 namespace Sentry.data.Bundler
 {
     class Bundle
     {
         private string _requestFilePath;
-        private static BundleRequest _request = null;
+        private BundleRequest _request = null;
         private S3ServiceProvider _s3Service;
+        private string _baseWorkingDir;
+        private IDatasetContext _dscontext;
         //private static Amazon.S3.IAmazonS3 _s3client = null;
 
-        public Bundle(string requestFilePath)
+        public Bundle(string requestFilePath, IDatasetContext dscontext)
         {
             _requestFilePath = requestFilePath;
             _s3Service = new S3ServiceProvider();
+            _baseWorkingDir = Configuration.Config.GetHostSetting("BundleBaseWorkDirectory");
+            _dscontext = dscontext;
         }
 
 
@@ -35,39 +40,139 @@ namespace Sentry.data.Bundler
         }
 
 
-        public void KeyContatenation()
+        public async void KeyContatenation()
         {
-            Console.WriteLine("Reading incoming bundle request file");
-            Logger.Info("Reading incoming bundle request file");
+            DateTime bundleStart = DateTime.MinValue;
 
-            string incomingRequest = System.IO.File.ReadAllText(this._requestFilePath);
-
-            //Get request from DatasetBundler location
-            _request = JsonConvert.DeserializeObject<BundleRequest>(incomingRequest);
-
-            Console.WriteLine($"Loaded request Guid: {_request.RequestGuid}");
-            Logger.Info($"Loaded request Guid: {_request.RequestGuid}");
-
-            DateTime bundleStart = DateTime.Now;
-            List<BundlePart> parts_list = Collect_Parts(_request.SourceKeys);
-            Logger.Debug($"Found {parts_list.Count()} keys to concatenate");
-            List<List<BundlePart>> grouped_parts_list = Chunk_By_Size(parts_list);
-            Sentry.Common.Logging.Logger.Debug($"Created {grouped_parts_list.Count()} concatenation groups");
-            for (int i = 0; i < grouped_parts_list.Count(); i++)
+            try
             {
-                Sentry.Common.Logging.Logger.Debug($"Concatenating group {i}/{grouped_parts_list.Count()}");
-                RunSingleContatenation(grouped_parts_list[i], $"{_request.TargetFileName + _request.FileExtension}");
+                Console.WriteLine("Reading incoming bundle request file");
+                Logger.Info("Reading incoming bundle request file");
+
+                string incomingRequest = System.IO.File.ReadAllText(this._requestFilePath);
+                string bundledFile = null;
+
+                //Get request from DatasetBundler location
+                _request = JsonConvert.DeserializeObject<BundleRequest>(incomingRequest);
+
+                Console.WriteLine($"Loaded request Guid: {_request.RequestGuid}");
+                Logger.Info($"Loaded request Guid: {_request.RequestGuid}");
+
+
+
+                bundleStart = DateTime.Now;
+
+                //Create Bundle Started Event
+                Event e = new Event();
+                e.EventType = _dscontext.GetEventType(3);
+                e.Status = _dscontext.GetStatus(2);
+                e.TimeCreated = bundleStart;
+                e.TimeNotified = bundleStart;
+                e.IsProcessed = false;
+                e.UserWhoStartedEvent = _request.RequestInitiatorId;
+                e.Dataset = _request.DatasetID;
+                //Dataset ds = _dscontext.GetById(_request.DatasetID);
+                e.DataConfig = _request.DatasetFileConfigId;
+                //DatasetFileConfig dfc = _dscontext.getDatasetFileConfigs(_request.DatasetFileConfigId);
+                e.Reason = $"{_request.RequestGuid} : Bundle Request Started";
+                e.Parent_Event = _request.RequestGuid;
+                await Utilities.CreateEventAsync(e);
+
+                Logger.Info($"Start Event Created: {e.ToString()}");
+
+                List<BundlePart> parts_list = Collect_Parts(_request.SourceKeys);
+                Logger.Debug($"Found {parts_list.Count()} keys to concatenate");
+                List<List<BundlePart>> grouped_parts_list = Chunk_By_Size(parts_list);
+                Sentry.Common.Logging.Logger.Debug($"Created {grouped_parts_list.Count()} concatenation groups");
+                for (int i = 0; i < grouped_parts_list.Count(); i++)
+                {
+                    Sentry.Common.Logging.Logger.Debug($"Concatenating group {i}/{grouped_parts_list.Count()}");
+                    bundledFile = RunSingleContatenation(grouped_parts_list[i], $"{_request.TargetFileName + _request.FileExtension}");
+                }
+
+                //Push bundled file to s3 location
+                string versionId = null;
+                try
+                {
+                    versionId = _s3Service.UploadDataFile(bundledFile, (_request.TargetFileLocation + $"{_request.TargetFileName}{_request.FileExtension}"));
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception($"Bundle file upload failed - Request:{_request.RequestGuid} Source:{bundledFile}) Destination:{_request.TargetFileLocation}", ex);
+                }
+
+                //Remove working directory for this request
+                //Passing true to recursively delete all sub-directories\files within the working directory
+                Logger.Info($"Removing processed work file: {Directory.GetParent(bundledFile).ToString()}");
+                Directory.Delete(Directory.GetParent(bundledFile).ToString(), true);
+
+                //Create BundleResponse
+                BundleResponse resp = new BundleResponse();
+                resp.RequestGuid = _request.RequestGuid;
+                resp.DatasetID = _request.DatasetID;
+                resp.DatasetFileConfigId = _request.DatasetFileConfigId;
+                resp.TargetBucket = _request.Bucket;
+                resp.TargetFileName = $"{_request.TargetFileName}{_request.FileExtension}";
+                resp.TargetKey = (_request.TargetFileLocation + $"{resp.TargetFileName}");
+                resp.TargetVersionId = versionId;
+                resp.RequestInitiatorId = _request.RequestInitiatorId;
+                resp.EventID = "";
+
+                //Push BundleResponse to dataset bundle droploaction
+                string jsonResponse = JsonConvert.SerializeObject(resp, Formatting.Indented);
+
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    StreamWriter writer = new StreamWriter(ms);
+
+                    writer.WriteLine(jsonResponse);
+                    writer.Flush();
+
+                    //You have to rewind the MemoryStream before copying
+                    ms.Seek(0, SeekOrigin.Begin);
+
+                    using (FileStream fs = new FileStream($"{_request.DatasetDropLocation}{_request.RequestGuid}.json", FileMode.OpenOrCreate))
+                    {
+                        ms.CopyTo(fs);
+                        fs.Flush();
+                    }
+                }
+
+                Logger.Info($"Bundle Request Processed - Request:{_request.RequestGuid} Parts:{_request.SourceKeys.Count()} TotalTime(sec):{(DateTime.Now - bundleStart).TotalSeconds}");
+
+                //remove reqeust file
+                Logger.Info("Removing processed request file");
+                System.IO.File.Delete(this._requestFilePath);
+
+            }
+            catch (Exception ex)
+            {
+                //Create Bundle Failed Event
+                Event e = new Event();
+                //e.EventType = _dscontext.GetEventType(3);
+                //e.Status = _dscontext.GetStatus(1);
+                e.TimeCreated = DateTime.Now;
+                e.TimeNotified = DateTime.Now;
+                e.IsProcessed = false;
+                e.UserWhoStartedEvent = _request.RequestInitiatorId;
+                e.Dataset = _request.DatasetID;                
+                //e.DataConfig = _dscontext.getDatasetFileConfigs(_request.DatasetFileConfigId);
+                e.Reason = $"{_request.RequestGuid} : Bundle Request Failed - See SEL Logs for further detail.";
+                e.Parent_Event = _request.RequestGuid;
+                await Utilities.CreateEventAsync(e);
+
+                Logger.Info($"Failed Event Created: {e.ToString()}");
+
+
+                Logger.Error($"Bundle Request Failed - Request:{_request.RequestGuid}", ex);
+                throw new Exception($"Bundle Request Failed - Request:{_request.RequestGuid}", ex);
             }
 
-            Logger.Info($"Bundle Request Processed - Request:{_request.RequestGuid} Parts:{_request.SourceKeys.Count()} TotalTime(sec):{(DateTime.Now - bundleStart).TotalSeconds}");
-
-            //Logger.Info("Removing processed request file");
-            //System.IO.File.Delete(this._requestFilePath);
         }
 
-        private void RunSingleContatenation(List<BundlePart> parts_list, string result_filepath)
+        private string RunSingleContatenation(List<BundlePart> parts_list, string result_filepath)
         {
-            string targetfile = AssembleParts(result_filepath, parts_list);            
+            return AssembleParts(result_filepath, parts_list);            
         }
         
         /// <summary>
@@ -82,6 +187,7 @@ namespace Sentry.data.Bundler
 
             List<BundlePart> firstHalf;
             List<BundlePart> secondHalf;
+            BundlePart finalFile;
 
             bool remainerProcessed = false;
 
@@ -90,18 +196,24 @@ namespace Sentry.data.Bundler
             firstHalf = parts_list.Take(partcnt/2).ToList();
             secondHalf = parts_list.Skip(partcnt / 2).ToList();
             object b = new Semaphore(1,10);
+
+            //Create working directory
+            if(!Directory.Exists($"{_baseWorkingDir + _request.RequestGuid}\\"))
+            {
+                Directory.CreateDirectory($"{_baseWorkingDir + _request.RequestGuid}\\");
+            }
             
             //Merge first and second half
             Parallel.ForEach(firstHalf, new ParallelOptions { }, (part) =>
             {
-                Console.WriteLine($"Started merge into C:\\tmp\\DatasetBundlerWork\\{part.Id}");
-                Logger.Info($"Started merge into C:\\tmp\\DatasetBundlerWork\\{ part.Id}");
+                Console.WriteLine($"Started merge into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
+                Logger.Info($"Started merge into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
                 //merge firstHalf with Id of (partcnt/2+i) within secondHalf
                 //utilize firsthalf partID as target file, this will force unique file names
-                using (FileStream fs = new FileStream($"C:\\tmp\\DatasetBundlerWork\\{part.Id}", FileMode.OpenOrCreate))
+                using (FileStream fs = new FileStream($"{_baseWorkingDir + _request.RequestGuid}\\{part.Id}", FileMode.OpenOrCreate))
                 {
-                    Console.WriteLine($"Mering first part into into C:\\tmp\\DatasetBundlerWork\\{part.Id}");
-                    Logger.Info($"Mering first part into into C:\\tmp\\DatasetBundlerWork\\{part.Id}");
+                    Console.WriteLine($"Creating base part {part.Id} from {part.Key}:{part.VersionId} into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
+                    Logger.Info($"Creating base part {part.Id} from {part.Key}:{part.VersionId} into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
                     //stream firsthalf part
                     using (Stream resp = _s3Service.GetObject(part.Key, part.VersionId))
                     {
@@ -118,8 +230,8 @@ namespace Sentry.data.Bundler
                     //stream second half part into target file
 
 
-                    Console.WriteLine($"Mering second part into into C:\\tmp\\DatasetBundlerWork\\{part.Id}");
-                    Logger.Info($"Mering {secondId} part into into C:\\tmp\\DatasetBundlerWork\\{part.Id}");
+                    Console.WriteLine($"Mering part {secondId} ({part.Key}:{part.VersionId}) into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
+                    Logger.Info($"Mering part {secondId} ({part.Key}:{part.VersionId}) into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
                     using (Stream resp = _s3Service.GetObject(secondHalf[secondId].Key, secondHalf[secondId].VersionId))
                     {
                         resp.CopyTo(fs);
@@ -131,10 +243,11 @@ namespace Sentry.data.Bundler
 
                     //If part count is odd, then merge last part of secondhalf into first part of firsthalf
                     //This should only hit once if part count is odd
-                    if (!remainerProcessed && partcnt % 2.0 != 0)
+                    if (part.Id == 0 && !remainerProcessed && partcnt % 2.0 != 0)
                     {
-                        Console.WriteLine($"Mering remainer part into into C:\\tmp\\DatasetBundlerWork\\{part.Id}");
-                        Logger.Info($"Mering remainer part into into C:\\tmp\\DatasetBundlerWork\\{part.Id}");
+                        Console.WriteLine($"Mering remainer part {secondHalf.Last().Id} into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
+                        Logger.Info("Detected odd number of parts, merging remainer into base part");
+                        Logger.Info($"Mering remainer part {secondHalf.Last().Id} into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
                         using (Stream resp = _s3Service.GetObject(secondHalf.Last().Key, secondHalf.Last().VersionId))
                         {
                             resp.CopyTo(fs);
@@ -147,7 +260,7 @@ namespace Sentry.data.Bundler
 
                     fs.Dispose();
 
-                    Console.WriteLine($"Completed merge into C:\\tmp\\DatasetBundlerWork\\{part.Id}");
+                    Console.WriteLine($"Completed merge into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
                 }
                 
             });
@@ -157,14 +270,21 @@ namespace Sentry.data.Bundler
             //Then merge file at first Half ID with object 
 
             //Loop each half
-
-            BundlePart finalFile = AssembleLocalFiles(firstHalf);
+            if (firstHalf.Count() > 1)
+            {
+                finalFile = AssembleLocalFiles(firstHalf);
+            }
+            else
+            {
+                finalFile = firstHalf.First();
+            }
+            
 
             //firstHalf = firstHalf.Take(partcnt / 2).ToList();
             //secondHalf = firstHalf.Skip(partcnt / 2).ToList();
             
 
-            return $"C:\\tmp\\DatasetBundlerWork\\{finalFile.Id}";
+            return $"{_baseWorkingDir + _request.RequestGuid}\\{finalFile.Id}";
         }
 
 
@@ -180,31 +300,31 @@ namespace Sentry.data.Bundler
                 int secondId = part.Id;
                 //merge firstHalf with Id of (partcnt/2+i) within secondHalf
                 //utilize firsthalf partID as target file, this will force unique file names
-                using (FileStream fs = new FileStream($"C:\\tmp\\DatasetBundlerWork\\{part.Id}", FileMode.Append, FileAccess.Write))
+                using (FileStream fs = new FileStream($"{_baseWorkingDir + _request.RequestGuid}\\{part.Id}", FileMode.Append, FileAccess.Write))
                 {
                     Logger.Info($"Merging {secondHalf[secondId].Id} into {part.Id}");
 
                     //stream firsthalf part
-                    using (var secFile = File.OpenRead($"C:\\tmp\\DatasetBundlerWork\\{secondHalf[secondId].Id}"))
+                    using (var secFile = File.OpenRead($"{_baseWorkingDir + _request.RequestGuid}\\{secondHalf[secondId].Id}"))
                     //new FileStream($"C:\\tmp\\DatasetBundlerWork\\{secondHalf[iter].Id}", FileMode.Open))
                     {
                         secFile.CopyTo(fs);
                         fs.Flush();
 
                         secFile.Dispose();
-                    }
+                    }                    
 
                     Logger.Info($"Deleting {secondHalf[secondId].Id} file");
-                    System.IO.File.Delete($"C:\\tmp\\DatasetBundlerWork\\{secondHalf[secondId].Id}");
+                    System.IO.File.Delete($"{_baseWorkingDir + _request.RequestGuid}\\{secondHalf[secondId].Id}");
 
 
                     //If part count is odd, then merge last part of secondhalf into first part of firsthalf
                     //This should only hit once if part count is odd
-                    if (!remainerProcessed && partcnt % 2.0 != 0)
+                    if (part.Id == 0 && !remainerProcessed && partcnt % 2.0 != 0)
                     {
                         Logger.Info($"Merging remainer {secondHalf.Last().Id} into {part.Id}");
 
-                        using (var remainerFile = File.OpenRead($"C:\\tmp\\DatasetBundlerWork\\{secondHalf.Last().Id}"))
+                        using (var remainerFile = File.OpenRead($"{_baseWorkingDir + _request.RequestGuid}\\{secondHalf.Last().Id}"))
                         {
                             remainerFile.CopyTo(fs);
                             fs.Flush();
@@ -213,7 +333,7 @@ namespace Sentry.data.Bundler
                         }
 
                         Logger.Info($"Deleteing {secondHalf.Last().Id}");
-                        System.IO.File.Delete($"C:\\tmp\\DatasetBundlerWork\\{secondHalf.Last().Id}");
+                        System.IO.File.Delete($"{_baseWorkingDir + _request.RequestGuid}\\{secondHalf.Last().Id}");
 
                         remainerProcessed = true;
                     }
@@ -332,27 +452,5 @@ namespace Sentry.data.Bundler
 
             return object_list;
         }
-
-        //private static string GetObject(string key, string versionId)
-        //{
-        //    GetObjectRequest req = new GetObjectRequest();
-        //    string contents = null;
-
-        //    req.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
-        //    req.Key = key;
-        //    req.VersionId = versionId;
-
-        //    using (GetObjectResponse response = S3Client.GetObject(req))
-        //    {
-        //        using (StreamReader reader = new StreamReader(response.ResponseStream))
-        //        {
-        //            contents = reader.ReadToEnd();
-        //        }
-        //    }
-
-        //    return contents;
-        //}
-
-
     }
 }

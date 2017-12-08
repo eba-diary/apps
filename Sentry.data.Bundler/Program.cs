@@ -32,9 +32,7 @@ namespace Sentry.data.Bundler
                 Console.WriteLine("Press any key to stop");
                 while (!Console.KeyAvailable)
                 {
-                    Console.WriteLine("Sleeping 10 seconds");
-                    System.Threading.Thread.Sleep(1000);
-                    
+                    System.Threading.Thread.Sleep(1000);                    
                 }
 
                 myCore.OnStop();

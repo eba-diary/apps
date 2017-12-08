@@ -181,7 +181,7 @@ namespace Sentry.data.Infrastructure
         /// <returns></returns>
         public IEnumerable<DatasetFile> GetDatasetFilesVersions(int datasetId, int dataFileConfigId, string filename)
         {
-            IEnumerable<DatasetFile> list = Query<DatasetFile>().Where(x => x.Dataset.DatasetId == datasetId && x.DatasetFileConfig.DataFileConfigId == dataFileConfigId && x.FileName == filename).AsEnumerable();
+            IEnumerable<DatasetFile> list = Query<DatasetFile>().Where(x => x.Dataset.DatasetId == datasetId && x.DatasetFileConfig.ConfigId == dataFileConfigId && x.FileName == filename).AsEnumerable();
 
             return list;
         }
@@ -240,16 +240,22 @@ namespace Sentry.data.Infrastructure
             return dfcList;
         }
 
-        public int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId)
+        public int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId, bool isBunled)
         {
-            int dfId = Query<DatasetFile>().Where(w => w.Dataset.DatasetId == datasetId && w.DatasetFileConfig.DataFileConfigId == dataFileConfigId && w.ParentDatasetFileId == null).GroupBy(x => x.Dataset.DatasetId).ToList().Select(s => s.OrderByDescending(g => g.CreateDTM).Take(1)).Select(i => i.First().DatasetFileId).FirstOrDefault();
+            int dfId = Query<DatasetFile>().Where(w => w.Dataset.DatasetId == datasetId && w.DatasetFileConfig.ConfigId == dataFileConfigId && w.ParentDatasetFileId == null && w.IsBundled == isBunled).GroupBy(x => x.Dataset.DatasetId).ToList().Select(s => s.OrderByDescending(g => g.CreateDTM).Take(1)).Select(i => i.First().DatasetFileId).FirstOrDefault();
+            return dfId;
+        }
+
+        public int GetLatestBundleFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId)
+        {
+            int dfId = Query<DatasetFile>().Where(w => w.Dataset.DatasetId == datasetId && w.DatasetFileConfig.ConfigId == dataFileConfigId && w.ParentDatasetFileId == null && w.IsBundled).GroupBy(x => x.Dataset.DatasetId).ToList().Select(s => s.OrderByDescending(g => g.CreateDTM).Take(1)).Select(i => i.First().DatasetFileId).FirstOrDefault();
 
             return dfId;
         }
 
-        public int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId, string targetFileName)
+        public int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId, string targetFileName, bool isBundled)
         {
-            int dfId = Query<DatasetFile>().Where(w => w.Dataset.DatasetId == datasetId && w.ParentDatasetFileId == null && w.DatasetFileConfig.DataFileConfigId == dataFileConfigId && w.FileName == targetFileName).GroupBy(x => x.Dataset.DatasetId).ToList().Select(s => s.OrderByDescending(g => g.CreateDTM).Take(1)).Select(i => i.First().DatasetFileId).FirstOrDefault();
+            int dfId = Query<DatasetFile>().Where(w => w.Dataset.DatasetId == datasetId && w.ParentDatasetFileId == null && w.DatasetFileConfig.ConfigId == dataFileConfigId && w.FileName == targetFileName && w.IsBundled == isBundled).GroupBy(x => x.Dataset.DatasetId).ToList().Select(s => s.OrderByDescending(g => g.CreateDTM).Take(1)).Select(i => i.First().DatasetFileId).FirstOrDefault();
 
             return dfId;
         }
@@ -257,6 +263,13 @@ namespace Sentry.data.Infrastructure
         public DatasetFileConfig getDatasetFileConfigs(int configId)
         {
             return Query<DatasetFileConfig>().Where(w => w.ConfigId == configId).FirstOrDefault();
+        }
+        public DatasetFileConfig getDatasetDefaultConfig(int datasetId)
+        {
+            List<DatasetFileConfig> dfcList = Query<DatasetFileConfig>().Where(w => w.ParentDataset.DatasetId == datasetId && w.IsGeneric).ToList();
+            return dfcList.FirstOrDefault();
+
+            //return Query<DatasetFileConfig>().Where(w => w.IsGeneric).FirstOrDefault();
         }
 
         public IEnumerable<AssetNotifications> GetAssetNotificationsByDataAssetId(int id)
