@@ -32,10 +32,10 @@ namespace Sentry.data.Core
 
 
         public virtual string Parent_Event { get; set; }
-        public virtual int DataAsset { get; set; }
-        public virtual int Dataset { get; set; }
-        public virtual int DataFile { get; set; }
-        public virtual int DataConfig { get; set; }
+        public virtual int? DataAsset { get; set; }
+        public virtual int? Dataset { get; set; }
+        public virtual int? DataFile { get; set; }
+        public virtual int? DataConfig { get; set; }
 
     }
 }

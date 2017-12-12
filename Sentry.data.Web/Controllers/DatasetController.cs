@@ -1325,9 +1325,7 @@ namespace Sentry.data.Web.Controllers
                     e.IsProcessed = false;
                     e.UserWhoStartedEvent = _request.RequestInitiatorId;
                     e.Dataset = _request.DatasetID;
-                    //Dataset ds = _dscontext.GetById(_request.DatasetID);
                     e.DataConfig = _request.DatasetFileConfigId;
-                    //DatasetFileConfig dfc = _dscontext.getDatasetFileConfigs(_request.DatasetFileConfigId);
                     e.Reason = $"{_request.RequestGuid} : Bundle Request Sumbitted";
                     e.Parent_Event = _request.RequestGuid;
                     await Utilities.CreateEventAsync(e);

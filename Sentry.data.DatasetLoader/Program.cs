@@ -148,14 +148,14 @@ namespace Sentry.data.DatasetLoader
 
                             //Create Success Event for bundled File Created
                             Event e = new Event();
-                            e.EventType = _dscontext.GetEventType(1);
+                            e.EventType = _dscontext.GetEventType(3);
                             e.Status = _dscontext.GetStatus(3);
                             e.TimeCreated = DateTime.Now;
                             e.TimeNotified = DateTime.Now;
                             e.IsProcessed = false;
                             e.UserWhoStartedEvent = response.RequestInitiatorId;
                             e.Dataset = ds.DatasetId;
-                            e.DataFile = df.DatasetFileId;
+                            //e.DataFile = df.DatasetFileId;
                             e.DataConfig = fileconfig.ConfigId;
                             e.Reason = $"{response.RequestGuid} : Bundled File Uploaded Successfully";
                             e.Parent_Event = response.RequestGuid;
@@ -186,7 +186,7 @@ namespace Sentry.data.DatasetLoader
 
                             //Create Failure Event for bundled File Created
                             Event f = new Event();
-                            f.EventType = _dscontext.GetEventType(1);
+                            f.EventType = _dscontext.GetEventType(3);
                             f.Status = _dscontext.GetStatus(4);
                             f.TimeCreated = DateTime.Now;
                             f.TimeNotified = DateTime.Now;
@@ -251,7 +251,6 @@ namespace Sentry.data.DatasetLoader
 
             foreach (DatasetFileConfig fc in fcList.Where(w => w.IsGeneric == false))
             {
-
                 Logger.Debug($"Found non-generic DatasetFileConfig: ID-{fc.ConfigId}, Name-{fc.Name}");
 
                 Dataset ds = dscontext.GetById(fc.ParentDataset.DatasetId);

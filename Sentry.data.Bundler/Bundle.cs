@@ -71,9 +71,7 @@ namespace Sentry.data.Bundler
                 e.IsProcessed = false;
                 e.UserWhoStartedEvent = _request.RequestInitiatorId;
                 e.Dataset = _request.DatasetID;
-                //Dataset ds = _dscontext.GetById(_request.DatasetID);
                 e.DataConfig = _request.DatasetFileConfigId;
-                //DatasetFileConfig dfc = _dscontext.getDatasetFileConfigs(_request.DatasetFileConfigId);
                 e.Reason = $"{_request.RequestGuid} : Bundle Request Started";
                 e.Parent_Event = _request.RequestGuid;
                 await Utilities.CreateEventAsync(e);
@@ -149,14 +147,14 @@ namespace Sentry.data.Bundler
             {
                 //Create Bundle Failed Event
                 Event e = new Event();
-                //e.EventType = _dscontext.GetEventType(3);
-                //e.Status = _dscontext.GetStatus(1);
+                e.EventType = _dscontext.GetEventType(3);
+                e.Status = _dscontext.GetStatus(4);
                 e.TimeCreated = DateTime.Now;
                 e.TimeNotified = DateTime.Now;
                 e.IsProcessed = false;
                 e.UserWhoStartedEvent = _request.RequestInitiatorId;
-                e.Dataset = _request.DatasetID;                
-                //e.DataConfig = _dscontext.getDatasetFileConfigs(_request.DatasetFileConfigId);
+                e.Dataset = _request.DatasetID;
+                e.DataConfig = _request.DatasetFileConfigId;
                 e.Reason = $"{_request.RequestGuid} : Bundle Request Failed - See SEL Logs for further detail.";
                 e.Parent_Event = _request.RequestGuid;
                 await Utilities.CreateEventAsync(e);
