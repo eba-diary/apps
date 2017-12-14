@@ -28,6 +28,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property(x => x.IsEnabled, m => m.Column("Enable_IND"));
             this.Property(x => x.SystemFolder, m => m.Column("SystemFolder_NME"));
             this.Property(x => x.RequestName, m => m.Column("Request_NME"));
+            this.Property(x => x.Options, m => m.Column("Options_DSC"));
 
             this.ManyToOne(x => x.SourceType, m =>
             {

@@ -526,6 +526,10 @@ namespace Sentry.data.Common
 
                 return df_newParent;
             }
+            else
+            {
+                throw new NotImplementedException($"The Option of not Overwritting a DataFile is not implemented.  Change OverwriteDataFile_IND setting on Dataset_ID:{dfc.ParentDataset.DatasetId} Config_ID:{dfc.ConfigId} Config_Name:{dfc.Name}");
+            }
 
             return df_newParent;
         }

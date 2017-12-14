@@ -770,7 +770,7 @@ namespace Sentry.data.Web.Controllers
                         dfcm.IsRegexSearch,
                         dfcm.OverwriteDatasetFile,
                         dfcm.FileTypeId,
-                        true,
+                        false,
                         parent,
                         dfcm.CreationFreq.ToString(),
                         dfcm.DatasetScopeTypeID

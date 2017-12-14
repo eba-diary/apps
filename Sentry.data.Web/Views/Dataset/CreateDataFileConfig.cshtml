@@ -31,7 +31,6 @@
         @Html.DisplayFor((model) => ViewData.ModelState)
 
         @Html.HiddenFor(model => model.ConfigId)
-        @Html.HiddenFor(model => model.DatasetFileConfigID)
         @Html.HiddenFor(model => model.EditHref)
         @Html.HiddenFor(model => model.ParentDatasetName)
         @Html.HiddenFor(model => model.DatasetId)
@@ -155,7 +154,7 @@
             }
 
             $("#ConfigFileName").keyup(function () {
-                var newName = dropPathName + $("#ConfigFileName").val();
+                var newName = dropPathName + $("#ConfigFileName").val().toLowerCase().replace(new RegExp(" ", "g"), "_")  + "\\";
                 $("#DropPath").val(newName);
 
             });

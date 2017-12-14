@@ -167,7 +167,15 @@ namespace Sentry.data.Goldeneye
         //  The Service will do the rest on it's periodic run.
         private static void OnCreated(object source, FileSystemEventArgs e)
         {
-            allFiles.Add(new FileProcess(e.FullPath));
+            FileAttributes attr = File.GetAttributes(e.FullPath);
+            if (attr.HasFlag(FileAttributes.Directory))
+            {
+                Logger.Info($"New Directory Added for Monitoring: {e.FullPath}");
+            }
+            else
+            {
+                allFiles.Add(new FileProcess(e.FullPath));
+            }            
         }
 
         //We can see when a user is writing to a file.

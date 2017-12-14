@@ -14,6 +14,8 @@ using System.IO;
 using Sentry.Core;
 using System.Net;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
+using Ionic.Zip;
 
 namespace Sentry.data.DatasetRetriever
 {
@@ -56,17 +58,22 @@ namespace Sentry.data.DatasetRetriever
                 var weatherService = container.GetInstance<IWeatherDataProvider>();
                 var requestcontext = container.GetInstance<IRequestContext>();
                 var ftpprovider = container.GetInstance<IFtpProvider>();
+                var dscontext = container.GetInstance<IDatasetContext>();
                 
                 Logger.Debug($"DatasetRetriever Started with Request ID: {_requestId}");
                 RTRequest request = requestcontext.GetRequest(_requestId);
 
                 if (request.SourceType.Type == "FTP")
                 {
-                    ProcessFTPRequest(request, ftpprovider);
+                    ProcessFTPRequest(request, ftpprovider, dscontext);
                 }
                 else if (request.SourceType.Type == "API")
                 {
                     ProcessWeatherRequest_v2(weatherService, request);
+                }
+                else if(request.SourceType.Type == "HTTPS")
+                {
+                    processHTTPRequest(dscontext, request);
                 }
                 
             }
@@ -197,18 +204,21 @@ namespace Sentry.data.DatasetRetriever
 
         }
 
-        private static void ProcessFTPRequest(RTRequest request, IFtpProvider ftpprovider)
+        private static void ProcessFTPRequest(RTRequest request, IFtpProvider ftpprovider, IDatasetContext dscontext)
         {
+            RequestOptions reqOptions = JsonConvert.DeserializeObject<RequestOptions>(request.Options);
+
+
             string filename = null;
             StringBuilder destination = new StringBuilder();
-            string url = null;           
+            string url = null;
 
             foreach (var param in request.Parameters)
             {
                 if (param.ApiParameter.Name == "Destination")
                 {
                     destination.Append(Configuration.Config.GetHostSetting("DatasetLoaderDFSPath"));
-                    destination.Append(@"\");
+                    destination.Append(@"\");                    
                     destination.Append(param.Value);
                 }
 
@@ -216,15 +226,32 @@ namespace Sentry.data.DatasetRetriever
                 {
                     filename = param.Value;
                 }
-                                               
-            }
 
-            destination.Append($@"\{filename}");
+            }
 
             url = $@"{request.SourceType.BaseUrl}\{request.Endpoint.Value}\{filename}";
 
-            Logger.Info("url: " + url);
-            Logger.Info("Destination: " + destination.ToString());
+            //If incoming file is not compressed (or business wants the compressed formatted file to be uploaded), stream to location specified on datasetfileconfig
+            if (!reqOptions.IsCompressed)
+            {
+                try
+                {
+                    DatasetFileConfig TargetConfig = dscontext.GetById<DatasetFileConfig>(reqOptions.DataConfigId);
+                    ftpprovider.DownloadFile(url.ToString(), new NetworkCredential("anonymous", "Jered.Gosse@Sentry.com"), TargetConfig.DropPath + filename);
+                }
+                catch (Exception e)
+                {
+                    Logger.Error("Error Retrieving FTP File", e);
+                }
+            }
+            //Incoming file is compressed, therefore, interrogate reqOptions to determine what to do with compressed file
+            else
+            {
+                //Pull incoming file to storage local to application
+                ftpprovider.DownloadFile(url.ToString(), new NetworkCredential("anonymous", "Jered.Gosse@Sentry.com"), $"C:\\tmp\\DatasetRetriever\\{request.Id}");
+
+                ProcessCompressedFile(dscontext, request, reqOptions);
+            }
 
             try
             {
@@ -235,6 +262,176 @@ namespace Sentry.data.DatasetRetriever
                 Logger.Error("Error Retrieving FTP File", e);
             }
             
+        }
+
+        private static void processHTTPRequest(IDatasetContext dscontext, RTRequest request)
+        {
+
+            //RequestOptions options = new RequestOptions();
+            //options.IsCompressed = true;
+            //options.CompressionFormat = CompressionTypes.ZIP;
+            //options.CompressedFileRules = new List<CompressedFileRule>();
+            //options.CompressedFileRules.Add(new CompressedFileRule("ReadMe_Census.txt", 232, false));
+            //options.CompressedFileRules.Add(new CompressedFileRule(@"\basdfasf(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec?)(?:19[7-9]\d|2\d{3}).txt", 228, true));
+
+            //string jsonRequest = JsonConvert.SerializeObject(options, Formatting.Indented);
+
+            //using (MemoryStream ms = new MemoryStream())
+            //{
+            //    StreamWriter writer = new StreamWriter(ms);
+
+            //    writer.WriteLine(jsonRequest);
+            //    writer.Flush();
+
+            //    //You have to rewind the MemoryStream before copying
+            //    ms.Seek(0, SeekOrigin.Begin);
+
+            //    using (FileStream fs = new FileStream($"C:\\tmp\\OptionsObject.json", FileMode.OpenOrCreate))
+            //    {
+            //        ms.CopyTo(fs);
+            //        fs.Flush();
+            //    }
+            //}
+
+            RequestOptions reqOptions = JsonConvert.DeserializeObject<RequestOptions>(request.Options);
+
+            try
+            {
+                WebRequest webReq = WebRequest.Create(request.SourceType.BaseUrl);
+                WebResponse response = webReq.GetResponse();
+
+
+                //If incoming file is not compressed (or business wants the compressed formatted file to be uploaded), stream to location specified on datasetfileconfig
+                if (!reqOptions.IsCompressed)
+                {
+                    DatasetFileConfig TargetConfig = dscontext.GetById<DatasetFileConfig>(reqOptions.DataConfigId);
+
+                    using (FileStream fs = new FileStream(TargetConfig.DropPath, FileMode.Create, FileAccess.ReadWrite))
+                    {
+                        using (Stream dataStream = response.GetResponseStream())
+                        {
+                            dataStream.CopyTo(fs);
+                            fs.Flush();
+                            dataStream.Close();
+                        }
+                        fs.Close();
+                    }
+                }
+
+                //Incoming file is compressed, therefore, interrogate reqOptions to determine what to do with compressed file
+                else
+                {
+                    //Pull incoming file to storage local to application
+                    using (FileStream fs = new FileStream($"C:\\tmp\\DatasetRetriever\\{request.Id}", FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                    {
+                        using (Stream dataStream = response.GetResponseStream())
+                        {
+                            dataStream.CopyTo(fs);
+                            fs.Flush();
+                            dataStream.Close();
+                        }
+                        fs.Close();
+                    }
+
+                    ProcessCompressedFile(dscontext, request, reqOptions);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error Processing Request", ex);
+            }
+        }
+
+        private static void ProcessCompressedFile(IDatasetContext dscontext, RTRequest request, RequestOptions reqOptions)
+        {
+            //Determine appropriate compression processing
+            if (reqOptions.CompressionFormat == CompressionTypes.ZIP)
+            {
+
+                //Current Assumpiton, if ZIP contains multiple files they are all streamed to the same DropPath
+                //Potential Future expansion: If multiple files exist, each could potentially be extracted to a separate DropPath
+
+                //Determine if there are rules to apply to the files within the compressed file
+                if (reqOptions.CompressedFileRules != null)
+                {
+                    using (ZipFile zip = ZipFile.Read($"C:\\tmp\\DatasetRetriever\\{request.Id}"))
+                    {
+                        //Loop through each file within .ZIP file
+                        foreach (ZipEntry e in zip)
+                        {
+                            foreach (CompressedFileRule rule in reqOptions.CompressedFileRules)
+                            {
+                                if (!rule.IsRegexSearch)
+                                {
+                                    if (e.FileName == rule.FileSearch)
+                                    {
+                                        DatasetFileConfig dfc = dscontext.GetById<DatasetFileConfig>(rule.DataConfigId);
+
+                                        using (FileStream fs = new FileStream((dfc.DropPath + e.FileName), FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                                        {
+                                            e.Extract(fs);
+                                            fs.Flush();
+                                            fs.Close();
+                                        }
+                                        //only process file to first rule match
+                                        break;
+                                    }
+                                }
+                                else if (rule.IsRegexSearch)
+                                {
+                                    if (Regex.IsMatch(e.FileName, rule.FileSearch))
+                                    {
+                                        DatasetFileConfig dfc = dscontext.GetById<DatasetFileConfig>(rule.DataConfigId);
+
+                                        using (FileStream fs = new FileStream((dfc.DropPath + e.FileName), FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                                        {
+                                            e.Extract(fs);
+                                            fs.Flush();
+                                            fs.Close();
+                                        }
+                                    }
+                                    //only process file to first rule match
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                //No rules exist, therefore, file(s) within compressed file will be extracted to DropPath attached to DatasetFileConfig on request
+                else
+                {
+                    DatasetFileConfig TargetConfig = dscontext.GetById<DatasetFileConfig>(reqOptions.DataConfigId);
+
+                    //Stream all files within ZIP file to DropPath attached to TargetConfig
+                    using (ZipFile zip = ZipFile.Read($"C:\\tmp\\DatasetRetriever\\{request.Id}"))
+                    {
+                        foreach (ZipEntry e in zip)
+                        {
+                            using (FileStream fs = new FileStream((TargetConfig.DropPath + e.FileName), FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                            {
+                                e.Extract(fs);
+                                fs.Flush();
+                                fs.Close();
+                            }
+                        }
+                    }
+                }
+
+
+                //If multiple files stream each indiviual file to DropLocation for DatasetFileConfig attached to request
+
+
+                //If single file, stream to file to DropLocation for DatasetFileConfig attached to request
+
+                //Cleanup work file
+                Logger.Info("Removing processed request file");
+                System.IO.File.Delete($"C:\\tmp\\DatasetRetriever\\{request.Id}");
+            }
+            else
+            {
+                Logger.Error($"Specified Unsupported Compression Type: {reqOptions.CompressionFormat}");
+                throw new Exception($"Unsupported Compression Format: {reqOptions.CompressionFormat}");
+            }
         }
 
         private static void CheckArguments(string[] args)
