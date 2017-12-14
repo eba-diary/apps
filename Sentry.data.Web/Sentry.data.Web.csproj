@@ -360,6 +360,7 @@
     <Content Include="Scripts\DataTables\moment-with-locales.min.js" />
     <Content Include="Scripts\DataTables\moment.js" />
     <Content Include="Scripts\DataTables\moment.min.js" />
+    <Content Include="Scripts\knockout-3.4.2.js" />
     <Content Include="Views\Dataset\_PreviewData.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -1134,6 +1135,7 @@
     <Content Include="Views\Dataset\EditDataFile.cshtml" />
     <Content Include="Views\Dataset\CreateDataFileConfig.cshtml" />
     <Content Include="Views\Dataset\_Subscribe.cshtml" />
+    <Content Include="Views\Dataset\ClientSideList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

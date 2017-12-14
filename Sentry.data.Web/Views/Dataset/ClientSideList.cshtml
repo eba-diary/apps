@@ -1,0 +1,705 @@
+﻿@{
+    ViewBag.Title = "Datasets";
+}
+@{
+    @Html.AntiForgeryToken()
+
+}
+<div id="main">
+    <div class="col-md-3 textCenter">
+        <div class="listHeadGroup">
+            <img src="~/Images/Icons/DatasetsBlue.svg" class="datasetImg leftFloat" />
+            <h1 class="htCenter datasetHeader">Datasets</h1>
+        </div>
+    </div>
+    <div class="navbar-form navbar-center">
+        <div class="col-md-9 textCenter">
+            <div class="searchBoxDS  has-feedback has-feedback-left">
+                <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Datasets..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup'" autocomplete="off">
+                <i class="form-control-feedback glyphicon glyphicon-search"></i>
+
+            </div>
+        </div>
+
+        <div id="filterSpinner">
+            <div class="sentry-spinner-container" style=" width: 1166px; padding-top: 150px;">
+                <span class="sentry-spinner" style="height:100px"></span>
+            </div>
+            <div class="col-sm-3 clearFloat no-padding hidden-sm hidden-xs" id="filterColumn" style="display:none;">
+                <div class="outsideFilters" id="outsideFilters">
+
+                    <!-- ko foreach: AllFilters -->
+                    <!-- THE CATEGORY HEADER-->
+                    <div class="panel panel-default dataset-list-filters boxShadow" data-bind="css : BorderColor">
+                        <div class="panel-heading filterHead white" data-bind="css : BannerColor, attr: { id: HeadId }">
+                            <span data-bind="text : Name"></span>
+                            <span class="glyphicon glyphicon-chevron-up rightFloat filterViewIcon" data-bind="css : Color, attr: { id: HeadIcon }"></span>
+                        </div>
+
+                        <!-- FOREACH OF THE CATEGORY FILTERS-->
+                        <div class="dataset-list-filter-category panel-body" data-bind="attr: {id : HeadHide }">
+                            <ul class="list-unstyled ul-filter-list">
+                                <!-- ko foreach: OrderedFilters -->
+                                <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6">
+                                    <label data-bind="attr: { id: id }" style="display: block; font-weight: normal;">
+                                        <input type="checkbox" class="filterChbx"
+                                               data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }"/>
+                                        <span data-bind="text : Title"></span>
+                                        <span class="badge badge-info" data-bind="text : Count, css : $parent.BannerColor"></span>
+                                     </label>
+                                </li>
+
+                                <!-- /ko -->
+
+                                <li data-bind="attr: {id : HiddenMore}">
+                                    <!-- ko foreach: OrderedFilters -->
+                                    <ul class="notNested">
+                                        <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() >= 6">
+                                            <label data-bind="attr: { id: id }" style="display: block; font-weight: normal;">
+                                                <input type="checkbox" class="filterChbx"
+                                                       data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }" />
+                                                <span data-bind="text : Title"></span>
+                                                <span class="badge badge-info" data-bind="text : Count, css : $parent.BannerColor"></span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                    <!-- /ko -->
+                                </li>
+
+                            </ul>
+
+                            <!-- ko if: OrderedFilters().length > 6 -->
+                            <a href="#" class="filterMore" data-bind="attr: { id:  HiddenId}">
+                                <div class="glyphicon glyphicon-plus-sign inlineBlock moreIcon leftFloat" data-bind="attr : {id : IconMore}"></div>
+                                <div class="leftFloat txt_filterMore" data-bind="attr: {id: TxtMore}">Show More</div>
+                            </a>
+                            <!-- /ko -->
+
+                        </div>
+                    </div>
+
+                    <!-- /ko -->
+                </div>
+            </div>
+            <div class="col-md-9 textCenter" id="dataColumn" style="display:none;">
+                <div id="DatasetItemList" class="dataset-list inlineBlock text-left">
+                    <div>
+                        <h4 class="found">
+                            Active Filters:
+                            <button type="button" class="btn btn-sm btn-info" id="btnClearFilters" data-bind="click: clearFilters">Clear Filters</button>
+                        </h4>
+
+                        <select multiple="" class="form-control select2-hidden-accessible"
+                                id="filterSelector" name="filterSelector" tabindex="-1" aria-hidden="true">
+                            <!-- ko foreach: AllFilters -->
+                            <optgroup data-bind="attr: {label: Name}">
+                                <!-- ko foreach: Filters -->
+                                <option data-bind="value: $data.id, text: $data.Title"></option>
+                                <!-- /ko -->
+                            </optgroup>
+                            <!-- /ko -->
+                        </select>
+
+                        @*<select multiple="multiple" id="activeFilters " class="form-control select2-hidden-accessible"
+                        data-bind="select2: { options: SearchFilters, width: '100%', selectedOptions: Select2Filters, optionsText: 'Title' }"></select>*@
+                    </div>
+                    <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults">
+                        <li class="ul-dataset-list-item borderSide_gray boxShadowSm" data-bind="css : BorderColor">
+                            <div class="category-type-wrap">
+                                <div class="category-type" data-bind="css: BannerColor">
+                                    <span data-bind="text: Category" />
+                                </div>
+                            </div>
+                            <div class="dataset-list-content">
+                                <!-- ko foreach: DistinctFileExtensions -->
+                                <div class="extension bg_gray" data-bind="css : $data">
+                                    <span data-bind="text: $data" />
+                                </div>
+                                <!-- /ko -->
+
+                                <a class="dataset-list-dataset-name" data-bind="attr: { href: Link, title: DatasetName }">
+                                    <span data-bind="text: DatasetName" />
+                                </a>
+
+                                <!-- ko if: IsSensitive-->
+                                <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure" style="padding-left: 10px;"></i>
+                                <!-- /ko -->
+                            </div>
+
+                            <div class="dataset-list-content">
+                                <div class="dataset-list-content-label"></div>
+                                <div class="dataset-list-content-value listDesc">
+                                    <span data-bind="text: DatasetDesc"></span>
+                                </div>
+                            </div>
+                            <div class="dataset-list-content">
+                                <span class="custom-glyphiconz" aria-hidden="true" />
+                                <div class="dataset-list-content-label">
+                                    <div>
+
+                                        <div class="ownerDate" style="text-align : left;">                                            
+                                            <span class="textBold ownerDate" data-bind="css : Color">Sentry Owner:&nbsp;</span>
+                                            <span data-bind="text: SentryOwner"></span>
+
+                                            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                            <span class=" textBold ownerDate" data-bind="css : Color">Last Activity Date:&nbsp;</span>
+                                            <span data-bind="text: ChangedDtm"></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </li>
+
+                    </ul>
+                    <hr>
+                    <!-- ko if: searchResults().length == 0 -->
+                    <div>
+                        <h4>
+                            No datasets were found given the active filters and/or search text.  Please refine your search parameters.
+                        </h4>
+                    </div>
+                    <!-- /ko -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            var $selector = $("#filterSelector").select2({
+                selectOnClose: false,
+                closeOnSelect: false,
+                placeholder: "There are no active filters.  Pick an option to the left or click here to begin filtering.",
+            });
+            $selector.select2({
+                selectOnClose: false,
+                closeOnSelect: false,
+                placeholder: "There are no active filters.  Pick an option to the left or click here to begin filtering.",
+            });
+
+            $('.select2-container--default').css('width', '100%');
+
+            $('#filterSelector').on('select2:select', function (e) {
+                // Do something
+                var data = e.params.data;
+
+                console.log(data);
+
+                window.vm.SelectedFilters.push(data.id);
+
+                //$('#' + data.id).prop('checked', true);
+
+                //var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
+
+                //if (storedNames != null) {
+                //    storedNames[storedNames.length] = data.id;
+                //}
+                //else {
+                //    var storedNames = [];
+                //    storedNames[0] = data.id;
+                //}
+
+                //localStorage.setItem("filteredIds", JSON.stringify(storedNames));
+
+                //$('#filterSelector').select2("close");
+
+                //changeWindow();
+
+            });
+
+            $('#filterSelector').on('select2:unselect', function (e) {
+                // Do something
+                var data = e.params.data;
+                console.log('UNSELECT');
+                console.log(data);
+
+                window.vm.RemoveSelection(data.id);
+
+            });
+        });
+
+        function Filter(id, Title, Category, Count) {
+
+            this.id = id;
+            this.Title = Title;
+            this.Category = Category;
+
+            this.Count = ko.computed(function () {
+                var items = ko.utils.arrayFilter(window.vm.searchResults(), function (prod) {
+                    if (Title == prod.Category  && Category == 'Category')
+                    {
+                        return prod;
+                    }
+                    else if (Title == prod.SentryOwner && Category == 'Sentry Owner')
+                    {
+                        return prod;
+                    }
+                    else if (Category == 'Frequency')
+                    {
+                        for (var i = 0; i < prod.Frequencies.length; i++)
+                        {
+                            if (prod.Frequencies[i] == Title)
+                            {
+                                return prod;
+                            }
+                        }
+                    }
+                    else if (Category == 'Extension')
+                    {
+                        for (var i = 0; i < prod.DistinctFileExtensions.length; i++) {
+                            if (prod.DistinctFileExtensions[i] == Title) {
+                                return prod;
+                            }
+                        }
+                    }
+                });
+
+
+
+                return items.length;
+            });
+        }
+
+        function FilterCategory(Name, Filters, Color)
+        {
+            this.Name = Name;
+            this.Filters = ko.observableArray(Filters);
+
+            this.OrderedFilters = ko.computed(function () {
+
+                if (Name != 'Category') {
+                    return Filters.sort(function (left, right) {
+                        return right.Count() - left.Count()
+                    });
+                } else
+                {
+                    return Filters;
+                }
+            });
+
+            this.Color = Color;
+
+            this.BannerColor = 'filterHead_' + Color;
+            this.BorderColor = 'filterBorder_' + Color;
+
+            this.HiddenId = 'filterMore_' + Name.replace(' ', '_');
+            this.HiddenMore = 'hidden_filterMore_' + Name.replace(' ', '_');
+            this.IconMore = 'icon_filterMore_' + Name.replace(' ', '_');
+            this.TxtMore = 'txt_filterMore_' + Name.replace(' ', '_');
+
+            this.HeadId = 'filterType_' + Name.replace(' ', '_');
+            this.HeadIcon = 'icon_filterType_' + Name.replace(' ', '_');
+            this.HeadHide = 'hide_filterType_' + Name.replace(' ', '_');
+        }
+
+
+
+        function Dataset(data) {
+            this.DatasetDesc = data.DatasetDesc;
+            this.SentryOwner = data.SentryOwnerName;
+
+            this.DatasetInformation = data.DatasetInformation;
+            this.DatasetName = data.DatasetName;
+            this.Category = data.Category;
+            this.IsSensitive = data.IsSensitive;
+
+            this.Link = "/Dataset/Detail/" + data.DatasetId;
+
+            this.ChangedDtm = data.ChangedDtm;
+            this.Color = data.Color;
+
+            this.BannerColor = data.BannerColor;
+            this.BorderColor = data.BorderColor;
+
+            this.Frequencies = data.Frequencies;
+            this.DistinctFileExtensions = data.DistinctFileExtensions;
+
+            //this.header = ko.pureComputed(function () {
+            //    return this.currentProfit() < 0 ? "profitWarning" : "profitPositive";
+            //}, viewModel);
+        }
+
+        function ListViewModel() {
+            var self = this;
+            self.datasets = ko.observableArray([]);
+
+            self.AllFilters = ko.observableArray([]);  //This is the master list of all filters.
+
+            self.Query = ko.observable('');
+
+           // self.SearchFilters = ko.observableArray([]);  //For the DropDown List
+            self.SelectedFilters = ko.observableArray([]); 
+
+            self.CategoryFilters = ko.observableArray([]);
+            self.OwnerFilters = ko.observableArray([]);
+            self.FreqFilters = ko.observableArray([]);
+            self.ExtensionFilters = ko.observableArray([]);
+
+
+            self.RemoveSelection = function (id) {
+                console.log('Removing : ' + id);
+
+
+                self.SelectedFilters.remove(function (feature) {
+                    return feature == id;
+                });
+            }
+
+            self.clearFilters = function() {
+                self.SelectedFilters.removeAll();
+            };
+
+            var loaded = false;
+
+            // Load initial state from server, convert it to Dataset instances, then populate self.datasets
+            $.getJSON("/Dataset/DatasetList", function (allData) {
+                var mappedTasks = $.map(allData, function (item) { return new Dataset(item) });
+                self.datasets(mappedTasks);
+
+                var categoryLookup = {};
+                var ownerLookup = {};
+                var frequencyLookup = {};
+                var extensionLookup = {};
+
+                var temp = [];
+
+                var searchParams = new URLSearchParams(window.location.search);
+                var param = searchParams.get('category');
+
+                for (var item, i = 0; item = allData[i++];)
+                {
+                    var category = item.Category;
+
+                    if (!(category in categoryLookup)) {
+                        categoryLookup[category] = 1;
+                        self.CategoryFilters.push(new Filter('0_' + i, category, 'Category'));
+                        //self.SearchFilters.push(new Filter('0_' + i, category, 10));
+
+                        temp.push(new Filter('0_' + i, category, 'Category'));
+
+                        if (category == param)
+                        {
+                            self.SelectedFilters.push('0_' + i);
+                        }
+
+                    }
+                }
+
+                self.AllFilters.push( new FilterCategory('Category', temp, 'blue'));
+                temp = [];
+                
+
+                for (var item, i = 0; item = allData[i++];) {
+                    var owner = item.SentryOwnerName;
+
+                    if (!(owner in ownerLookup)) {
+                        ownerLookup[owner] = 1;
+                        self.OwnerFilters.push(new Filter('1_' + i, owner, 'Sentry Owner'));
+                        //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
+
+                        temp.push(new Filter('1_' + i, owner, 'Sentry Owner'));
+                    }
+
+                }
+
+                self.AllFilters.push( new FilterCategory('Sentry Owner', temp, 'green'));
+                temp = [];
+
+                var counter = 0; //Needs seperate counter as multiple objects can appear per iteration
+                for (var item, i = 0; item = allData[i++];) {
+                    for (var freq, j = 0; freq = item.Frequencies[j++];) {
+                        if (!(freq in frequencyLookup)) {
+                            frequencyLookup[freq] = 1;
+                            self.FreqFilters.push(new Filter('2_' + counter, freq, 'Frequency'));
+                            //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
+
+                            temp.push(new Filter('2_' + counter, freq, 'Frequency'));
+                            counter++;
+                        }
+                    }
+                }
+                self.AllFilters.push(new FilterCategory('Frequency', temp, 'gold'));
+                temp = [];
+
+                counter = 0; //Needs seperate counter as multiple objects can appear per iteration
+                for (var item, i = 0; item = allData[i++];) {
+                    for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
+                        if (!(ext in extensionLookup)) {
+                            extensionLookup[ext] = 1;
+                            self.ExtensionFilters.push(new Filter('3_' + counter, ext, 'Extension'));
+                            //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
+
+                            temp.push(new Filter('3_' + counter, ext, 'Extension'));
+                            counter++;
+                        }
+                    }
+                }
+                self.AllFilters.push(new FilterCategory('Extension', temp, 'plum'));
+
+                $('#dataColumn').show();
+                $('#filterColumn').show();
+                $('.sentry-spinner-container').remove();
+                $('.select2-search__field').css({ width: '500px' });
+                $('#filterSelector').val(self.SelectedFilters()).trigger('change');
+            });
+
+            self.searchResults = ko.computed(function () {
+
+                if (!loaded) {
+                    var list = JSON.parse(localStorage.getItem("filteredIds"));
+
+                    if (list != undefined) {
+
+                        for (var i = 0; i < list.length; i++)
+                        {
+                            self.SelectedFilters.push(list[i]);
+                        }
+                    }
+
+                    var searchText = localStorage.getItem("searchText");
+
+                    if (searchText != undefined && searchText != "") {
+                        self.Query = ko.observable(searchText);
+                    }
+                    loaded = true;
+                }
+                else {
+                    localStorage.setItem("searchText", self.Query());
+                }
+
+                var searchQuery = self.Query().split(" ");
+
+
+                var temp = [];
+
+                for (var i = 0; i < self.datasets().length; i++)
+                {
+                    var keywordFound = false;
+                    var count = 0;
+                    var dataset = self.datasets()[i];
+
+                    for (var j = 0; j < searchQuery.length; j++)
+                    {
+                        var desc = dataset.DatasetDesc.toString();
+                        var name = dataset.DatasetName.toString();
+                        var owner = dataset.SentryOwner.toString();
+
+                        if (desc.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0){
+                            keywordFound = true;
+                            count++;
+                        }
+                        if (owner.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0) {
+                            keywordFound = true;
+                            count++;
+                        }
+                        if (name.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0) {
+                            keywordFound = true;
+                            count++;
+                        }
+                    }
+                    if (keywordFound) {
+                        temp.push({ dataset: dataset, count: count });
+                    }
+                }
+
+                temp = temp.sort(function (left, right) {
+                    return right.count - left.count || new Date(right.dataset.ChangedDtm) - new Date(left.dataset.ChangedDtm);
+                });
+
+                queryResults = temp.map(x => x.dataset);
+
+                //First grab all the selected category ID's
+                var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
+
+                    if (feature.substring(0, 1) == '0') {
+                        return feature;
+                    }
+                });
+
+                if (selectedCategoryIDs.length > 0) {
+                    //Convert those category ID's to Filter Items
+                    var selectedCategories = ko.utils.arrayFilter(self.CategoryFilters(), function (feature) {
+
+                        for (var i = 0; i < selectedCategoryIDs.length; i++) {
+                            if (feature.id == selectedCategoryIDs[i]) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    });
+
+                    //Then filter on those selected Categories
+                    queryResults = queryResults.filter(function (item) {
+
+                        for (var i = 0; i < selectedCategories.length; i++) {
+                            if (item.Category == selectedCategories[i].Title) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    });
+                }
+
+                //First grab all the selected owner ID's
+                var selectedOwnerIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
+
+                    if (feature.substring(0, 1) == '1') {
+                        return feature;
+                    }
+                });
+
+                if (selectedOwnerIDs.length > 0) {
+                    //Convert those category ID's to Filter Items
+                    var selectedOwners = ko.utils.arrayFilter(self.OwnerFilters(), function (feature) {
+
+                        for (var i = 0; i < selectedOwnerIDs.length; i++) {
+                            if (feature.id == selectedOwnerIDs[i]) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    });
+
+                    //Then filter on those selected Categories
+                    queryResults = queryResults.filter(function (item) {
+
+                        for (var i = 0; i < selectedOwners.length; i++) {
+                            if (item.SentryOwner == selectedOwners[i].Title) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    });
+                }
+
+
+
+
+                //First grab all the selected category ID's
+                var selectedFrequencyIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
+
+                    if (feature.substring(0, 1) == '2') {
+                        return feature;
+                    }
+                });
+
+                if (selectedFrequencyIDs.length > 0) {
+                    //Convert those category ID's to Filter Items
+                    var selectedFrequencies = ko.utils.arrayFilter(self.FreqFilters(), function (feature) {
+
+                        for (var i = 0; i < selectedFrequencyIDs.length; i++) {
+                            if (feature.id == selectedFrequencyIDs[i]) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    });
+
+                    //Then filter on those selected Categories
+                    queryResults = queryResults.filter(function (item) {
+
+                        for (var i = 0; i < selectedFrequencies.length; i++) {
+                            for (var j = 0; j < item.Frequencies.length; j++)
+                            {
+                                if (item.Frequencies[j] == selectedFrequencies[i].Title) {
+                                    return true;
+                                }
+                            }
+                        }
+                        return false;
+                    });
+                }
+
+                //First grab all the selected category ID's
+                var selectedExtensionIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
+
+                    if (feature.substring(0, 1) == '3') {
+                        return feature;
+                    }
+                });
+
+                if (selectedExtensionIDs.length > 0) {
+                    //Convert those category ID's to Filter Items
+                    var selectedExtensions = ko.utils.arrayFilter(self.ExtensionFilters(), function (feature) {
+
+                        for (var i = 0; i < selectedExtensionIDs.length; i++) {
+                            if (feature.id == selectedExtensionIDs[i]) {
+                                return true;
+                            }
+                        }
+                        return false;
+                    });
+
+                    //Then filter on those selected Categories
+                    queryResults = queryResults.filter(function (item) {
+
+                        for (var i = 0; i < selectedExtensions.length; i++) {
+                            for (var j = 0; j < item.DistinctFileExtensions.length; j++) {
+                                if (item.DistinctFileExtensions[j] == selectedExtensions[i].Title) {
+                                    return true;
+                                }
+                            }
+                        }
+                        return false;
+                    });
+                }
+
+                $("#SearchText").attr("placeholder", "Search " + queryResults.length + " Datasets...");
+
+
+
+
+                return queryResults;
+            });
+
+            self.SelectedFilters.subscribe(function () {
+                localStorage.setItem("filteredIds", ko.toJSON(self.SelectedFilters()));
+                $('#filterSelector').val(self.SelectedFilters()).trigger('change');
+
+            });
+        }
+
+
+        $(document).ready(function () {
+            window.vm = new ListViewModel();
+            ko.applyBindings(vm);
+
+
+
+
+            $(document).on("click", "[id^='filterType_']", function (e) {
+                e.preventDefault();
+
+                var id = $(this).attr("id");
+                var category = "#hide_" + id
+                var icon = "#icon_" + id;
+
+                $(category).slideToggle();
+                $(icon).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
+            });
+
+            $(document).on("click", "[id^='filterMore_']", function (e) {
+                e.preventDefault();
+
+                var id = $(this).attr("id");
+                var show = "#hidden_" + id
+                var icon = "#icon_" + id;
+                var txt = "#txt_" + id;
+
+                $(show).slideToggle();
+                $(icon).toggleClass("glyphicon-plus-sign glyphicon-minus-sign");
+
+                if ($(txt).text() == "Show Less") {
+                    $(txt).text("Show More");
+                }
+                else {
+                    $(txt).text("Show Less");
+                }
+            });
+        });
+
+    </script>
+}

@@ -19,6 +19,7 @@ namespace Sentry.data.Web
                         Include("~/Scripts/bootbox.js").
                         Include("~/Scripts/spin.js").
                         Include("~/Scripts/ladda.js").
+                        Include("~/Scripts/knockout-3.4.2.js").
                         Include("~/Scripts/jquery.validate.js").
                         Include("~/Scripts/jquery.validate.unobtrusive.js").
                         Include("~/Scripts/jquery.validate.unobtrusive.sentry.js"));

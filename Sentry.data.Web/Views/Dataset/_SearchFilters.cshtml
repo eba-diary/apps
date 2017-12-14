@@ -112,7 +112,10 @@
                         </li>
                         i++;
                     }
-                </ul>
+                </ul>  this.HiddenId = 'filterMore_' + Name;
+            this.HiddenMore = 'hidden_filterMore_' + Name;
+            this.IconMore = 'icon_filterMore_' + Name;
+            this.TxtMore = 'txt_filterMore_' + Name;
 
                 @if (visibleNum < category.FilterNameList.Count)
                 {

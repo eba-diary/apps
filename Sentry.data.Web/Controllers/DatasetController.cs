@@ -134,29 +134,56 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult List(string category, string searchPhrase, string ids)
         {
-            Helpers.Search searchHelper = new Helpers.Search(_cache);
+            //Helpers.Search searchHelper = new Helpers.Search(_cache);
 
-            return View(searchHelper.List(this, null, searchPhrase, category, ids));
+            //return View(searchHelper.List(this, null, searchPhrase, category, ids));
+
+            return View("ClientSideList");
         }
 
-        //public ActionResult ListItem(string category, string searchPhrase, string ids)
-        //{
+        [Route("Dataset/DatasetList")]
+        public JsonResult DatasetList()
+        {
 
-        //    Helpers.Search searchHelper = new Helpers.Search(_cache);
+            List<SearchModel> models = new List<SearchModel>();
+            foreach(BaseDatasetModel bdm in GetDatasetModelList())
+            {
 
-        //    ListDatasetModel model = searchHelper.List(this, null, searchPhrase, category, ids);
+                SearchModel sm = new SearchModel();
 
-        //    return PartialView("_ListItem", model);
-        //}
+                sm.DatasetId = bdm.DatasetId;
+                sm.Category = bdm.Category;
+                sm.DatasetName = bdm.DatasetName;
+                sm.DatasetDesc = bdm.DatasetDesc;
+                sm.DatasetInformation = bdm.DatasetInformation;
+                sm.SentryOwnerName = bdm.SentryOwner.FullName;
+
+                sm.Frequencies = bdm.CreationFreqDesc;
+                sm.DistinctFileExtensions = bdm.DistinctFileExtensions();
+
+                sm.IsSensitive = bdm.IsSensitive;
+                sm.ChangedDtm = bdm.ChangedDtm.ToShortDateString();
+
+                sm.BannerColor = "categoryBanner-" + bdm.DatasetCategory.Color;
+                sm.BorderColor = "borderSide_" + bdm.DatasetCategory.Color;
+                sm.Color = bdm.DatasetCategory.Color;
+
+
+
+                models.Add(sm);
+            }
+
+            return Json(models, JsonRequestBehavior.AllowGet);
+        }
 
         [Route("Dataset/List")]
         public ActionResult List(ListDatasetModel ldm)
         {
-            Helpers.Search searchHelper = new Helpers.Search(_cache);
+            //Helpers.Search searchHelper = new Helpers.Search(_cache);
 
-            Debug.WriteLine(Request.Url.AbsoluteUri);
+           // Debug.WriteLine(Request.Url.AbsoluteUri);
 
-            return View("List", searchHelper.List(this, null));
+            return View("ClientSideList");
         }
         #endregion
 

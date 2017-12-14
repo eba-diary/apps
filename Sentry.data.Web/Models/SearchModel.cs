@@ -1,23 +1,34 @@
 ﻿using Sentry.data.Core;
+using System;
 using System.Collections.Generic;
 
 namespace Sentry.data.Web
 {
     public class SearchModel
     {
-        //input properties
-        public string SearchText { get; set; }
-        public AssetState SearchState { get; set; } = AssetState.Up;
-        public int? SearchCategory { get; set; }
-        //public int? SearchAsset { get; set; }
-        public int SearchPage { get; set; } = 1;
+        public string Category { get; set; }
 
-        //properties set by the result of a search
-        public FullCategoryModel Category { get; set; }
-        public IEnumerable<BaseAssetModel> Assets { get; set; }
-        public int AssetCount { get; set; }
-        public int PageSize { get; set; }
-        public int StartRecordNumber { get; set; }
-        public int EndRecordNumber { get; set; }
+        public string DatasetName { get; set; }
+
+        public int DatasetId { get; set; }
+
+        public string DatasetDesc { get; set; }
+
+        public string DatasetInformation { get; set; }
+
+        public string SentryOwnerName { get; set; }
+
+        public List<string> DistinctFileExtensions { get; set; }
+
+        public List<string> Frequencies { get; set; }
+
+        public Boolean IsSensitive { get; set; }
+
+        public string ChangedDtm { get; set; }
+
+        public string Color { get; set; }
+        public string BannerColor { get; set; }
+        public string BorderColor { get; set; }
+
     }
 }
