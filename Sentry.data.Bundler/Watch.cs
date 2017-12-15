@@ -130,7 +130,7 @@ namespace Sentry.data.Bundler
         {
             // Create a new FileSystemWatcher and set its properties.
             watcher = new FileSystemWatcher();
-            watcher.Path = Sentry.Configuration.Config.GetHostSetting("PathToWatch");
+            watcher.Path = Sentry.Configuration.Config.GetHostSetting("BundleRequestDir");
 
             Console.WriteLine("The Bundler File Watcher is now watching : " + watcher.Path);
             Logger.Info("The Bundler File Watcher is now watching : " + watcher.Path);
