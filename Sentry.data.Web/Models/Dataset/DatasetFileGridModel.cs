@@ -19,7 +19,11 @@ namespace Sentry.data.Web
         {
             this.Id = f.DatasetFileId;
             this.Name = f.FileName;
-            this.UploadUserName = f.UploadUserName == null ? associateInfoService.GetAssociateInfo(f.UploadUserName).FullName : f.UploadUserName;
+
+            //Used to differentiate between service and user accounts, user accounts will parse into a numeric value
+            int n;
+            this.UploadUserName = int.TryParse(f.UploadUserName, out n) ? associateInfoService.GetAssociateInfo(f.UploadUserName).FullName : f.UploadUserName;
+
             this.ModifiedDTM = f.ModifiedDTM;
             this.CreateDTM = f.CreateDTM;
             this.s3Key = f.FileLocation;

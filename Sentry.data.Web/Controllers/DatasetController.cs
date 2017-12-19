@@ -1324,24 +1324,24 @@ namespace Sentry.data.Web.Controllers
 
                     _request.FileExtension = Path.GetExtension(_request.SourceKeys.FirstOrDefault().Item1);
 
-                    //string jsonRequest = JsonConvert.SerializeObject(_request,Formatting.Indented);
+                    string jsonRequest = JsonConvert.SerializeObject(_request, Formatting.Indented);
 
-                    //using (MemoryStream ms = new MemoryStream())
-                    //{
-                    //    StreamWriter writer = new StreamWriter(ms);
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        StreamWriter writer = new StreamWriter(ms);
 
-                    //    writer.WriteLine(jsonRequest);
-                    //    writer.Flush();
+                        writer.WriteLine(jsonRequest);
+                        writer.Flush();
 
-                    //    //You have to rewind the MemoryStream before copying
-                    //    ms.Seek(0, SeekOrigin.Begin);
+                        //You have to rewind the MemoryStream before copying
+                        ms.Seek(0, SeekOrigin.Begin);
 
-                    //    using (FileStream fs = new FileStream($"{Configuration.Config.GetHostSetting("BundleRequestDir")}{_request.RequestGuid}.json", FileMode.OpenOrCreate))
-                    //    {
-                    //        ms.CopyTo(fs);
-                    //        fs.Flush();
-                    //    }
-                    //}
+                        using (FileStream fs = new FileStream($"{Configuration.Config.GetHostSetting("BundleRequestDir")}{_request.RequestGuid}.json", FileMode.OpenOrCreate))
+                        {
+                            ms.CopyTo(fs);
+                            fs.Flush();
+                        }
+                    }
 
                     //Create Bundle Started Event
                     Event e = new Event();
