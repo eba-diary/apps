@@ -252,10 +252,10 @@ namespace Sentry.data.Bundler
                         resp.Dispose();
                     }
 
-
+                    Logger.Debug("Checking for remainer part...");
                     //If part count is odd, then merge last part of secondhalf into first part of firsthalf
                     //This should only hit once if part count is odd
-                    if (part.Id == 0 && !remainerProcessed && partcnt % 2.0 != 0)
+                    if (part.Id == 0 && !remainerProcessed && partcnt % 2.0 > 0)
                     {
                         Console.WriteLine($"Mering remainer part {secondHalf.Last().Id} into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
                         Logger.Info("Detected odd number of parts, merging remainer into base part");
@@ -270,6 +270,7 @@ namespace Sentry.data.Bundler
                         remainerProcessed = true;
                     }
 
+                    Logger.Debug("Disposing File Stream");
                     fs.Dispose();
 
                     Console.WriteLine($"Completed merge into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
