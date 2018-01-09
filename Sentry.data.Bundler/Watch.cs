@@ -94,9 +94,16 @@ namespace Sentry.data.Bundler
                                     //var result = service.DoWork();
                                     //container.GetInstance<ISentry.data.BundlerContext>.SaveChanges();
                                     Bundle bundleProcess = new Bundle(file.fileName, _datasetContext);
-                                    bundleProcess.KeyContatenation();
-                                    Console.WriteLine($"Ended Bundle Task for request: {Path.GetFileName(file.fileName)}");
-                                    Logger.Info($"Ended Bundle Task for request: {Path.GetFileName(file.fileName)}");
+                                    try
+                                    {
+                                        bundleProcess.KeyContatenation();
+                                        Console.WriteLine($"Bundle Task Successful for request: {Path.GetFileName(file.fileName)}");
+                                        Logger.Info($"Ended Bundle Task for request: {Path.GetFileName(file.fileName)}");
+                                    }
+                                    catch
+                                    {
+                                        Logger.Info($"Bundle Task Failed for request: {Path.GetFileName(file.fileName)}");
+                                    }
                                 }
                                 
                             }, TaskCreationOptions.LongRunning);

@@ -244,8 +244,8 @@ namespace Sentry.data.Bundler
                         //stream second half part into target file
 
 
-                        Console.WriteLine($"Mering part {secondId} ({part.Key}:{part.VersionId}) into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
-                        Logger.Info($"Mering part {secondId} ({part.Key}:{part.VersionId}) into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
+                        Console.WriteLine($"Mering part {secondId} ({secondHalf[secondId].Key}:{secondHalf[secondId].VersionId}) into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
+                        Logger.Info($"Mering part {secondId} ({secondHalf[secondId].Key}:{secondHalf[secondId].VersionId}) into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
                         using (Stream resp = _s3Service.GetObject(secondHalf[secondId].Key, secondHalf[secondId].VersionId))
                         {
                             resp.CopyTo(fs);
