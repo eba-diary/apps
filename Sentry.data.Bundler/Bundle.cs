@@ -76,7 +76,7 @@ namespace Sentry.data.Bundler
                 e.Parent_Event = _request.RequestGuid;
                 await Utilities.CreateEventAsync(e);
 
-                Logger.Info($"Start Event Created: {e.ToString()}");
+                Logger.Info("Start Event Created.");
 
                 List<BundlePart> parts_list = Collect_Parts(_request.SourceKeys);
                 Logger.Debug($"Found {parts_list.Count()} keys to concatenate");
@@ -428,25 +428,36 @@ namespace Sentry.data.Bundler
         /// <returns></returns>
         private List<BundlePart> Collect_Parts(List<Tuple<string, string>> sourceKeys)
         {
+            Logger.Debug($"Collecting Parts Metadata Started... RequestGuid:{_request.RequestGuid}");
             int partid = 0;
             List<BundlePart> object_list = new List<BundlePart>();
 
-            foreach (var item in sourceKeys)
+            try
             {
-                BundlePart obj = new BundlePart();
-                obj.Id = partid;
-                obj.Key = item.Item1;
-                obj.VersionId = item.Item2;
+                foreach (var item in sourceKeys)
+                {
+                    BundlePart obj = new BundlePart();
+                    obj.Id = partid;
+                    obj.Key = item.Item1;
+                    obj.VersionId = item.Item2;
 
-                //Get object metadata, without retrieving whole object, specifically for the size of the object
-                Dictionary<string, string> resp = _s3Service.GetObjectMetadata(obj.Key, obj.VersionId);
+                    //Get object metadata, without retrieving whole object, specifically for the size of the object
+                    Dictionary<string, string> resp = _s3Service.GetObjectMetadata(obj.Key, obj.VersionId);
 
-                obj.ContentLenght = Convert.ToInt64(resp["ContentLength"]);
+                    obj.ContentLenght = Convert.ToInt64(resp["ContentLength"]);
 
-                object_list.Add(obj);
+                    object_list.Add(obj);
 
-                partid++;
+                    partid++;
+                }
+
             }
+            catch (Exception ex)
+            {
+                Logger.Error("Failed to Collect parts", ex);
+            }
+
+            Logger.Debug($"Collecting Parts Metadata Finished... RequestGuid:{_request.RequestGuid}");
 
             return object_list;
         }
