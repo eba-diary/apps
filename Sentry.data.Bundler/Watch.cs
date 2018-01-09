@@ -22,6 +22,9 @@ namespace Sentry.data.Bundler
         private static FileSystemWatcher watcher;
         private static List<FileProcess> allFiles = new List<FileProcess>();
 
+        public static IContainer _container;
+        public static IDatasetContext _datasetContext;
+
         private class FileProcess {
 
             public FileProcess(string fileName)
@@ -42,6 +45,7 @@ namespace Sentry.data.Bundler
         public static void Run()
         {
             var files = allFiles.ToList();
+
 
             Console.WriteLine("Run Process Started for : " + files.Capacity + " files.");
 
@@ -73,6 +77,9 @@ namespace Sentry.data.Bundler
                 {
                     Logger.Info($"Initializing Bundle Task for: {Path.GetFileName(file.fileName)}");
 
+
+                    
+
                     file.task =  Task.Factory.StartNew(x =>
                             {
                                 Logger.Debug($"Initializing Bundle Task Bootstrapper Started...");
@@ -81,12 +88,12 @@ namespace Sentry.data.Bundler
                                 Logger.Debug($"Initializing Bundle Task Bootstrapper Finished");
 
                                 //create an IOC (structuremap) container to wrap this transaction
-                                using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+                                using (_container = Bootstrapper.Container.GetNestedContainer())
                                 {
-                                    IDatasetContext dscontext = container.GetInstance<IDatasetContext>();
+                                    _datasetContext = _container.GetInstance<IDatasetContext>();
                                     //var result = service.DoWork();
                                     //container.GetInstance<ISentry.data.BundlerContext>.SaveChanges();
-                                    Bundle bundleProcess = new Bundle(file.fileName, dscontext);
+                                    Bundle bundleProcess = new Bundle(file.fileName, _datasetContext);
                                     bundleProcess.KeyContatenation();
                                     Console.WriteLine($"Ended Bundle Task for request: {Path.GetFileName(file.fileName)}");
                                     Logger.Info($"Ended Bundle Task for request: {Path.GetFileName(file.fileName)}");

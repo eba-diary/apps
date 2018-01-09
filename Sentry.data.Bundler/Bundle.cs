@@ -82,11 +82,13 @@ namespace Sentry.data.Bundler
                 Logger.Debug($"Found {parts_list.Count()} keys to concatenate");
                 List<List<BundlePart>> grouped_parts_list = Chunk_By_Size(parts_list);
                 Sentry.Common.Logging.Logger.Debug($"Created {grouped_parts_list.Count()} concatenation groups");
+                Sentry.Common.Logging.Logger.Debug($"Starting Concatenation process... RequestGuid:{_request.RequestGuid}");
                 for (int i = 0; i < grouped_parts_list.Count(); i++)
                 {
                     Sentry.Common.Logging.Logger.Debug($"Concatenating group {i}/{grouped_parts_list.Count()}");
                     bundledFile = RunSingleContatenation(grouped_parts_list[i], $"{_request.TargetFileName + _request.FileExtension}");
                 }
+                Sentry.Common.Logging.Logger.Debug($"Finished Concatenation process. RequestGuid:{_request.RequestGuid}");
 
                 //Push bundled file to s3 location
                 string versionId = null;
@@ -119,6 +121,8 @@ namespace Sentry.data.Bundler
 
                 //Push BundleResponse to dataset bundle droploaction
                 string jsonResponse = JsonConvert.SerializeObject(resp, Formatting.Indented);
+
+                Logger.Debug($"BundleResponse:{jsonResponse}");
 
                 using (MemoryStream ms = new MemoryStream())
                 {
