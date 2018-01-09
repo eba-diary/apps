@@ -206,8 +206,7 @@ namespace Sentry.data.Bundler
             }
             catch (Exception ex)
             {
-                Logger.Debug($"Filed to create {_baseWorkingDir + _request.RequestGuid}");
-                Logger.Error($"Failed to create working dir - RequestGuid:{_request.RequestGuid}");
+                Logger.Error($"Failed to create working dir - RequestGuid:{_request.RequestGuid} Dir:{_baseWorkingDir + _request.RequestGuid}");
                 throw;
             }
             
