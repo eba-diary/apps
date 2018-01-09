@@ -218,63 +218,72 @@ namespace Sentry.data.Bundler
             //Merge first and second half
             Parallel.ForEach(firstHalf, new ParallelOptions { }, (part) =>
             {
-                Console.WriteLine($"Started merge into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
-                Logger.Info($"Started merge into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
-                //merge firstHalf with Id of (partcnt/2+i) within secondHalf
-                //utilize firsthalf partID as target file, this will force unique file names
-                using (FileStream fs = new FileStream($"{_baseWorkingDir + _request.RequestGuid}\\{part.Id}", FileMode.OpenOrCreate))
+                try
                 {
-                    Console.WriteLine($"Creating base part {part.Id} from {part.Key}:{part.VersionId} into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
-                    Logger.Info($"Creating base part {part.Id} from {part.Key}:{part.VersionId} into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
-                    //stream firsthalf part
-                    using (Stream resp = _s3Service.GetObject(part.Key, part.VersionId))
+                    Console.WriteLine($"Started merge into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
+                    Logger.Info($"Started merge into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
+                    //merge firstHalf with Id of (partcnt/2+i) within secondHalf
+                    //utilize firsthalf partID as target file, this will force unique file names
+                    using (FileStream fs = new FileStream($"{_baseWorkingDir + _request.RequestGuid}\\{part.Id}", FileMode.OpenOrCreate))
                     {
-                        resp.CopyTo(fs);
-                        fs.Flush();
-
-                        resp.Dispose();
-                    }
-
-                    //determine secondhalf part index
-                    //int secondId = ((partcnt / 2) - 2) + part.Id;
-                    int secondId = part.Id;
-                    //BundlePart secondPart = secondHalf.Where(x => x.Id == secondId).First();
-                    //stream second half part into target file
-
-
-                    Console.WriteLine($"Mering part {secondId} ({part.Key}:{part.VersionId}) into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
-                    Logger.Info($"Mering part {secondId} ({part.Key}:{part.VersionId}) into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
-                    using (Stream resp = _s3Service.GetObject(secondHalf[secondId].Key, secondHalf[secondId].VersionId))
-                    {
-                        resp.CopyTo(fs);
-                        fs.Flush();
-
-                        resp.Dispose();
-                    }
-
-                    Logger.Debug("Checking for remainer part...");
-                    //If part count is odd, then merge last part of secondhalf into first part of firsthalf
-                    //This should only hit once if part count is odd
-                    if (part.Id == 0 && !remainerProcessed && partcnt % 2.0 > 0)
-                    {
-                        Console.WriteLine($"Mering remainer part {secondHalf.Last().Id} into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
-                        Logger.Info("Detected odd number of parts, merging remainer into base part");
-                        Logger.Info($"Mering remainer part {secondHalf.Last().Id} into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
-                        using (Stream resp = _s3Service.GetObject(secondHalf.Last().Key, secondHalf.Last().VersionId))
+                        Console.WriteLine($"Creating base part {part.Id} from {part.Key}:{part.VersionId} into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
+                        Logger.Info($"Creating base part {part.Id} from {part.Key}:{part.VersionId} into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
+                        //stream firsthalf part
+                        using (Stream resp = _s3Service.GetObject(part.Key, part.VersionId))
                         {
                             resp.CopyTo(fs);
                             fs.Flush();
 
                             resp.Dispose();
                         }
-                        remainerProcessed = true;
+
+                        //determine secondhalf part index
+                        //int secondId = ((partcnt / 2) - 2) + part.Id;
+                        int secondId = part.Id;
+                        //BundlePart secondPart = secondHalf.Where(x => x.Id == secondId).First();
+                        //stream second half part into target file
+
+
+                        Console.WriteLine($"Mering part {secondId} ({part.Key}:{part.VersionId}) into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
+                        Logger.Info($"Mering part {secondId} ({part.Key}:{part.VersionId}) into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
+                        using (Stream resp = _s3Service.GetObject(secondHalf[secondId].Key, secondHalf[secondId].VersionId))
+                        {
+                            resp.CopyTo(fs);
+                            fs.Flush();
+
+                            resp.Dispose();
+                        }
+
+                        Logger.Debug("Checking for remainer part...");
+                        //If part count is odd, then merge last part of secondhalf into first part of firsthalf
+                        //This should only hit once if part count is odd
+                        if (part.Id == 0 && !remainerProcessed && partcnt % 2.0 > 0)
+                        {
+                            Console.WriteLine($"Mering remainer part {secondHalf.Last().Id} into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
+                            Logger.Info("Detected odd number of parts, merging remainer into base part");
+                            Logger.Info($"Mering remainer part {secondHalf.Last().Id} into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
+                            using (Stream resp = _s3Service.GetObject(secondHalf.Last().Key, secondHalf.Last().VersionId))
+                            {
+                                resp.CopyTo(fs);
+                                fs.Flush();
+
+                                resp.Dispose();
+                            }
+                            remainerProcessed = true;
+                        }
+
+                        Logger.Debug("Disposing File Stream");
+                        fs.Dispose();
+
+                        Console.WriteLine($"Completed merge into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
                     }
-
-                    Logger.Debug("Disposing File Stream");
-                    fs.Dispose();
-
-                    Console.WriteLine($"Completed merge into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
                 }
+                catch (Exception ex)
+                {
+                    Logger.Error($"Failed Concatenation process... RequestGuid:{_request.RequestGuid}",ex);
+                    throw;
+                }
+                
                 
             });
 
