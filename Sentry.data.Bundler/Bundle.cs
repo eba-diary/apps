@@ -96,7 +96,8 @@ namespace Sentry.data.Bundler
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception($"Bundle file upload failed - Request:{_request.RequestGuid} Source:{bundledFile}) Destination:{_request.TargetFileLocation}", ex);
+                    Logger.Error($"Bundle file upload failed - Request:{_request.RequestGuid} Source:{bundledFile}) Destination:{_request.TargetFileLocation}", ex);
+                    throw;
                 }
 
                 //Remove working directory for this request
@@ -193,13 +194,23 @@ namespace Sentry.data.Bundler
             //If odd number second half will have remainer
             firstHalf = parts_list.Take(partcnt/2).ToList();
             secondHalf = parts_list.Skip(partcnt / 2).ToList();
-            object b = new Semaphore(1,10);
+            //object b = new Semaphore(1,10)
 
-            //Create working directory
-            if(!Directory.Exists($"{_baseWorkingDir + _request.RequestGuid}\\"))
+            try
             {
-                Directory.CreateDirectory($"{_baseWorkingDir + _request.RequestGuid}\\");
+                //Create working directory
+                if (!Directory.Exists($"{_baseWorkingDir + _request.RequestGuid}\\"))
+                {
+                    Directory.CreateDirectory($"{_baseWorkingDir + _request.RequestGuid}\\");
+                }
             }
+            catch (Exception ex)
+            {
+                Logger.Debug($"Filed to create {_baseWorkingDir + _request.RequestGuid}");
+                Logger.Error($"Failed to create working dir - RequestGuid:{_request.RequestGuid}");
+                throw;
+            }
+            
             
             //Merge first and second half
             Parallel.ForEach(firstHalf, new ParallelOptions { }, (part) =>
