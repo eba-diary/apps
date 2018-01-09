@@ -71,11 +71,14 @@ namespace Sentry.data.Bundler
                 }
                 else if(!IsFileLocked(file.fileName)  && !file.started)
                 {
+                    Logger.Info($"Initializing Bundle Task for: {Path.GetFileName(file.fileName)}");
 
                     file.task =  Task.Factory.StartNew(x =>
                             {
+                                Logger.Debug($"Initializing Bundle Task Bootstrapper Started...");
                                 //Call bootstrapper to initialize the application
                                 Bootstrapper.Init();
+                                Logger.Debug($"Initializing Bundle Task Bootstrapper Finished");
 
                                 //create an IOC (structuremap) container to wrap this transaction
                                 using (IContainer container = Bootstrapper.Container.GetNestedContainer())
