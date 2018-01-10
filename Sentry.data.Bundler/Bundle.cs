@@ -196,8 +196,8 @@ namespace Sentry.data.Bundler
 
             //Split original part list in half
             //If odd number second half will have remainer
-            firstHalf = parts_list.Take(partcnt/2).ToList();
-            secondHalf = parts_list.Skip(partcnt / 2).ToList();
+            firstHalf = parts_list.OrderByDescending(o => o.Id).Take(partcnt/2).ToList();
+            secondHalf = parts_list.OrderByDescending(o => o.Id).Skip(partcnt / 2).ToList();
             //object b = new Semaphore(1,10)
 
             try
