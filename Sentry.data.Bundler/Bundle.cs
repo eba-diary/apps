@@ -220,6 +220,8 @@ namespace Sentry.data.Bundler
             {
                 try
                 {
+                    Logger.Debug($"PartId:{part.Id}");
+                    Logger.Debug($"firstHalf count:{firstHalf.Count}");
                     Console.WriteLine($"Started merge into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
                     Logger.Info($"Started merge into {_baseWorkingDir + _request.RequestGuid}\\{part.Id}");
                     //merge firstHalf with Id of (partcnt/2+i) within secondHalf
@@ -240,6 +242,8 @@ namespace Sentry.data.Bundler
                         //determine secondhalf part index
                         //int secondId = ((partcnt / 2) - 2) + part.Id;
                         int secondId = part.Id;
+                        Logger.Debug($"secondId:{secondId}");
+                        Logger.Debug($"SecondHalf count:{secondHalf.Count}");
                         //BundlePart secondPart = secondHalf.Where(x => x.Id == secondId).First();
                         //stream second half part into target file
 
