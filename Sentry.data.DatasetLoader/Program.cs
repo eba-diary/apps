@@ -161,24 +161,6 @@ namespace Sentry.data.DatasetLoader
                             e.Parent_Event = response.RequestGuid;
                             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
-                            string jsonRequest = new JavaScriptSerializer().Serialize(e);
-
-                            using (MemoryStream ms = new MemoryStream())
-                            {
-                                StreamWriter writer = new StreamWriter(ms);
-
-                                writer.WriteLine(jsonRequest);
-                                writer.Flush();
-
-                                //You have to rewind the MemoryStream before copying
-                                ms.Seek(0, SeekOrigin.Begin);
-
-                                using (FileStream fs = new FileStream($"C:\\tmp\\SuccessEvent.json", FileMode.OpenOrCreate))
-                                {
-                                    ms.CopyTo(fs);
-                                    fs.Flush();
-                                }
-                            }
                         }
                         catch (Exception e)
                         {
