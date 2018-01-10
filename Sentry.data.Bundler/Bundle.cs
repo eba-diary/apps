@@ -88,7 +88,7 @@ namespace Sentry.data.Bundler
                     Sentry.Common.Logging.Logger.Debug($"Concatenating group {i}/{grouped_parts_list.Count()}");
                     bundledFile = RunSingleContatenation(grouped_parts_list[i], $"{_request.TargetFileName + _request.FileExtension}");
                 }
-                Sentry.Common.Logging.Logger.Debug($"Finished Concatenation process. RequestGuid:{_request.RequestGuid}");
+                Sentry.Common.Logging.Logger.Info($"Finished Concatenation process. RequestGuid:{_request.RequestGuid}");
 
                 //Push bundled file to s3 location
                 string versionId = null;

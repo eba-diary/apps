@@ -100,9 +100,9 @@ namespace Sentry.data.Bundler
                                         Console.WriteLine($"Bundle Task Successful for request: {Path.GetFileName(file.fileName)}");
                                         Logger.Info($"Ended Bundle Task for request: {Path.GetFileName(file.fileName)}");
                                     }
-                                    catch
+                                    catch (Exception e)
                                     {
-                                        Logger.Info($"Bundle Task Failed for request: {Path.GetFileName(file.fileName)}");
+                                        Logger.Error($"Bundle Task Failed for request: {Path.GetFileName(file.fileName)}", e);
                                     }
                                 }
                                 
