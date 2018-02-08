@@ -48,7 +48,6 @@ namespace Sentry.data.Infrastructure
                 if (null == _s3client)
                 {
                     // instantiate a new shared client
-                    // TODO: move this all to the config(s)...
                     AWSConfigsS3.UseSignatureVersion4 = true;
                     AmazonS3Config s3config = new AmazonS3Config();
                     // s3config.RegionEndpoint = RegionEndpoint.GetBySystemName("us-east-1");
@@ -66,27 +65,13 @@ namespace Sentry.data.Infrastructure
         }
 
         /// <summary>
-        /// Get a presigned URL for the dataset in question.
-        /// This can be loaded straight into a client browser in order to support faster downloads of large files.
+        /// Retrieves a presigned URL for the S3 Object. versionId is optional, if not supplied
+        /// default is null and will return latest version of S3 key.
         /// </summary>
-        public string GetDatasetDownloadURL(string uniqueKey)
-        {
-            //var bucketName = Configuration.Config.GetSetting("AWSRootBucket");
-            //return S3Client.GetObjectStream(bucketName, uniqueKey, null);
-
-            GetPreSignedUrlRequest req = new GetPreSignedUrlRequest()
-            {
-                BucketName = Configuration.Config.GetHostSetting("AWSRootBucket"),
-                Key = uniqueKey,
-                Expires = DateTime.Now.AddMinutes(2)
-            };
-            //setting content-disposition to attachment vs. inline (into browser) to force "save as" dialog box for all doc types.
-            req.ResponseHeaderOverrides.ContentDisposition = "attachment";
-            string url = S3Client.GetPreSignedURL(req);
-            return url;
-        }
-
-        public string GetDatasetDownloadURL(string key, string versionId)
+        /// <param name="key"></param>
+        /// <param name="versionId"></param>
+        /// <returns></returns>
+        public string GetDatasetDownloadURL(string key, string versionId = null)
         {
             GetPreSignedUrlRequest req = new GetPreSignedUrlRequest()
             {
@@ -138,33 +123,6 @@ namespace Sentry.data.Infrastructure
                 versionId = PutObject(inputstream, targetKey);
 
             return versionId;
-        }
-
-        public string GetObjectPreview(string key)
-        {
-            string contents = null;
-
-            GetObjectRequest getReq = new GetObjectRequest();
-            getReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
-            getReq.Key = key;
-            
-
-            GetObjectResponse getRsp = S3Client.GetObject(getReq);
-            if (getRsp.HttpStatusCode != System.Net.HttpStatusCode.OK)
-            {
-                throw new Exception("Error attempting to perform get object on S3: " + getRsp.HttpStatusCode);
-            }
-
-            using (Stream stream = getRsp.ResponseStream)
-            {
-                long length = stream.Length;
-                byte[] bytes = new byte[length];
-                stream.Read(bytes,0,(int)length);
-                contents = Encoding.UTF8.GetString(bytes);
-            }
-
-            return contents;
-
         }
 
         public void TransferUtlityUploadStream(string folder, string fileName, Stream stream)
@@ -462,28 +420,7 @@ namespace Sentry.data.Infrastructure
         }
 
         #endregion
-                
-        private List<List<string>> GetPartList(List<string> sourceKeys)
-        {
-            throw new NotImplementedException();
-
-            foreach (string key in sourceKeys)
-            {
-                int size = GetObjectSize(key);
-            }
-
-        }
-
-        private int GetObjectSize(string key)
-        {
-            GetObjectMetadataRequest headReq = new GetObjectMetadataRequest();
-
-
-
-            throw new NotImplementedException();
-        }
-
-
+                 
         #region PutObject
 
         private string PutObject(Stream filestream, string targetKey)
@@ -560,42 +497,127 @@ namespace Sentry.data.Infrastructure
         }
 
         #endregion
-        
+
+        #region Delete Object
         /// <summary>
-        /// Delete a dataset from S3
+        /// Place a s3 Delete marker on the S3 Object.  This prevents any GetObject
+        /// command (with null version ID) to retrieve objects.  You may still retrieve
+        /// specific version if you pass version ID with GetObject command.
+        /// http://docs.aws.amazon.com/AmazonS3/latest/dev/ObjectVersioning.html
         /// </summary>
-        /// <param name="uniqueKey"></param>
-        public void DeleteDataset(string uniqueKey)
+        /// <param name="key"></param>
+        /// <returns></returns>
+        public ObjectKeyVersion MarkDeleted(string key)
         {
             DeleteObjectRequest doReq = new DeleteObjectRequest();
             doReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
-            doReq.Key = uniqueKey;
+            doReq.Key = key;
             DeleteObjectResponse doRsp = S3Client.DeleteObject(doReq);
-            if (doRsp.HttpStatusCode != System.Net.HttpStatusCode.OK)
+
+            //return the delete marker version ID with original key
+            ObjectKeyVersion returnobj = new ObjectKeyVersion();
+            returnobj.key = key;
+            returnobj.versionId = doRsp.VersionId;
+
+            return returnobj;
+        }
+
+        /// <summary>
+        /// Permanently deletes S3 object.  Since our
+        /// </summary>
+        /// <param name="keyVersion"></param>
+        /// <returns></returns>
+        public void DeleteS3Key(ObjectKeyVersion keyVersion)
+        {
+            try
             {
-                throw new Exception("Error attempting to delete dataset from S3: " + doRsp.HttpStatusCode);
+                DeleteObjectRequest doReq = new DeleteObjectRequest();
+                doReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+                doReq.Key = keyVersion.key;
+                //doReq.VersionId = keyversion.versionId;
+                DeleteObjectResponse doRsp = S3Client.DeleteObject(doReq);
+
+                //return the delete marker version ID
+                ObjectKeyVersion returnobj = new ObjectKeyVersion();
+                returnobj.key = keyVersion.key;
+                returnobj.versionId = doRsp.VersionId;
+
+            }
+            catch (AmazonS3Exception amazonS3Exception)
+            {
+                if (amazonS3Exception.ErrorCode != null &&
+                    (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId")
+                    ||
+                    amazonS3Exception.ErrorCode.Equals("InvalidSecurity")
+                    ||
+                    amazonS3Exception.ErrorCode.Equals("Forbidden")))
+                {
+                    throw new Exception($"Failed DeleteS3Key - Check the provided AWS Credentials ({amazonS3Exception.Message})");
+                }
+                else
+                {
+                    throw new Exception("Error attempting to delete S3 key: " + amazonS3Exception.InnerException);
+                }
             }
         }
 
-        public void DeleteS3key(string key)
+        public void DeleteMultipleS3keys(List<ObjectKeyVersion> keyversionids)
         {
-            //IAmazonS3 client = null;
-            //using(client = S3Client)
-            //{
-                try
-                {
-                    DeleteObjectRequest doReq = new DeleteObjectRequest();
-                    doReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
-                    doReq.Key = key;
-                    DeleteObjectResponse doRsp = S3Client.DeleteObject(doReq);
-                }
-                catch (AmazonS3Exception s3Exception)
-                {
-                    throw new Exception("Error attempting to delete S3 key: " + s3Exception.InnerException);
-                }
-            //}
-        }        
+            List<KeyVersion> objects = new List<KeyVersion>();
+            List<ObjectKeyVersion> deletedObjects = new List<ObjectKeyVersion>();
 
+            foreach (ObjectKeyVersion obj in keyversionids)
+            {
+                objects.Add(ToKeyVersion(obj));
+            }
+
+            try
+            {
+                DeleteObjectsRequest dosReq = new DeleteObjectsRequest();
+                dosReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
+                dosReq.Objects = objects;
+                DeleteObjectsResponse dosRsp = S3Client.DeleteObjects(dosReq);
+                Logger.Info($"No. of objects successfully deleted = {dosRsp.DeletedObjects.Count()}");
+
+                foreach (DeletedObject dobj in dosRsp.DeletedObjects)
+                {
+                    ObjectKeyVersion newItem = new ObjectKeyVersion();
+                    newItem.key = dobj.Key;
+                    newItem.versionId = dobj.VersionId;
+                    deletedObjects.Add(newItem);
+                }
+
+            }
+            catch (DeleteObjectsException e)
+            {
+                DeleteObjectsResponse dosRsp = e.Response;
+                StringBuilder sb = new StringBuilder();
+                foreach (DeleteError error in dosRsp.DeleteErrors)
+                {
+                    sb.Append($"Object Key: {error.Key} Object VersionID: {error.VersionId} Code: {error.Code} Message:{error.Message}");
+                }
+                Logger.Error($"Successfully deleted = {dosRsp.DeletedObjects.Count()} : Failed to Delete = {dosRsp.DeleteErrors.Count()}", new Exception(sb.ToString()));
+                throw new Exception($"Failed DeleteMultipleS3keys: Failed to Delete {dosRsp.DeleteErrors.Count()} keys", new Exception(sb.ToString()));
+            }
+            catch (AmazonS3Exception amazonS3Exception)
+            {
+                if (amazonS3Exception.ErrorCode != null &&
+                    (amazonS3Exception.ErrorCode.Equals("InvalidAccessKeyId")
+                    ||
+                    amazonS3Exception.ErrorCode.Equals("InvalidSecurity")
+                    ||
+                    amazonS3Exception.ErrorCode.Equals("Forbidden")))
+                {
+                    throw new Exception($"Failed DeleteS3Key - Check the provided AWS Credentials ({amazonS3Exception.Message})");
+                }
+                else
+                {
+                    throw new Exception("Error attempting to delete S3 keys: " + amazonS3Exception.InnerException);
+                }
+            }
+        }
+        #endregion
+        
         /// <summary>
         /// Get list of datasets currently on S3, within the given parentDir
         /// </summary>
@@ -649,7 +671,7 @@ namespace Sentry.data.Infrastructure
             try
             {
                 resp = S3Client.GetObjectMetadata(req);
-            }            
+            }
             catch (AmazonS3Exception amazonS3Exception)
             {
                 if (amazonS3Exception.ErrorCode != null &&
@@ -659,29 +681,21 @@ namespace Sentry.data.Infrastructure
                     ||
                     amazonS3Exception.ErrorCode.Equals("Forbidden")))
                 {
-                    throw new Exception($"Failed GetObjectMetadata - Check the provided AWS Credentials ({amazonS3Exception.Message})");
+                    throw new Exception($"Failed GetObjectMetadata - Check the provided AWS Credentials ({amazonS3Exception.Message})");                    
                 }
                 else
                 {
-                    throw new Exception($"Failed GetObjectMetadata - {amazonS3Exception.Message}");             
+                    throw new Exception($"Failed GetObjectMetadata - {amazonS3Exception.Message}");
                 }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
 
             return ConvertObjectMetadataResponse(resp);
         }
-
-        public Dictionary<string, string> ConvertObjectMetadataResponse(GetObjectMetadataResponse resp)
-        {
-            Dictionary<string, string> output = new Dictionary<string, string>();
-
-            output.Add("ContentLength", resp.ContentLength.ToString());
-            output.Add("ETag", resp.ETag);
-            output.Add("VersionId", resp.VersionId);
-
-            return output;
-
-        }
-
+        
         //public string GetObject(string key, string versionId)
         //{
         //    throw new NotImplementedException();
@@ -704,7 +718,14 @@ namespace Sentry.data.Infrastructure
         //    //return contents;
         //}
 
-        public Stream GetObject(string key, string versionId)
+        /// <summary>
+        /// Returns an S3 object as a Stream.  By default versionID is null, therefore, will
+        /// return the latest verison of the object (if versions exist).
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="versionId"></param>
+        /// <returns></returns>
+        public Stream GetObject(string key, string versionId = null)
         {
 
             GetObjectRequest req = new GetObjectRequest();
@@ -734,6 +755,49 @@ namespace Sentry.data.Infrastructure
                 }
             }
             return response.ResponseStream;            
-        } 
+        }
+
+
+        #region Helpers
+
+        private KeyVersion ToKeyVersion (ObjectKeyVersion input)
+        {
+            KeyVersion key = null;
+            key.Key = input.key;
+            key.VersionId = input.versionId;
+            return key;
+        }
+        private List<List<string>> GetPartList(List<string> sourceKeys)
+        {
+            throw new NotImplementedException();
+
+            foreach (string key in sourceKeys)
+            {
+                int size = GetObjectSize(key);
+            }
+
+        }
+        private int GetObjectSize(string key)
+        {
+            GetObjectMetadataRequest headReq = new GetObjectMetadataRequest();
+
+
+
+            throw new NotImplementedException();
+        }
+        private Dictionary<string, string> ConvertObjectMetadataResponse(GetObjectMetadataResponse resp)
+        {
+            Dictionary<string, string> output = new Dictionary<string, string>();
+
+            output.Add("ContentLength", resp.ContentLength.ToString());
+            output.Add("ETag", resp.ETag);
+            output.Add("VersionId", resp.VersionId);
+
+            return output;
+
+        }
+        
+        #endregion
+        
     }
 }

@@ -60,7 +60,9 @@
     <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
       <HintPath>..\packages\NHibernate.4.0.2.4000\lib\net40\NHibernate.dll</HintPath>
     </Reference>
-    <Reference Include="Sentry.Associates, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="Sentry.Associates, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sentry.Associates.1.3.0\lib\net35\Sentry.Associates.dll</HintPath>
+    </Reference>
     <Reference Include="Sentry.Common, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Common.1.3.10\lib\net35\Sentry.Common.dll</HintPath>
       <Private>True</Private>
@@ -150,7 +152,9 @@
     <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="UninstallService.cmd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

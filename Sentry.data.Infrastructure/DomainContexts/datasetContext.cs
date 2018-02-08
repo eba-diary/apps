@@ -30,22 +30,7 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                IQueryable<Dataset> qResult = Query<Dataset>().Cacheable().Where(x => x.CanDisplay); //QueryCacheRegion.MediumTerm
-                //if (qResult != null && qResult.Count() > 0)
-                //{
-                //    foreach (Dataset qRow in qResult)
-                //    {
-                //        if (qRow.Columns != null && qRow.Columns.Count == 0)
-                //        {
-                //            qRow.Columns = null;
-                //        }
-                //        if (qRow.Metadata != null && qRow.Metadata.Count == 0)
-                //        {
-                //            qRow.Metadata = null;
-                //        }
-                //    }
-                //}
-                return qResult;
+                return Query<Dataset>().Where(x => x.CanDisplay).Cacheable(); 
             }
         }
 
@@ -58,13 +43,29 @@ namespace Sentry.data.Infrastructure
 
         }
 
-        public IQueryable<DatasetMetadata> DatasetMetadata
+        public IQueryable<EventType> EventTypes
         {
             get
             {
-                return Query<DatasetMetadata>().Cacheable(); //QueryCacheRegion.MediumTerm
+                return Query<EventType>().Cacheable();
             }
         }
+
+        public IQueryable<Status> EventStatus
+        {
+            get
+            {
+                return Query<Status>().Cacheable();
+            }
+        }
+
+        //public IQueryable<DatasetMetadata> DatasetMetadata
+        //{
+        //    get
+        //    {
+        //       // return Query<DatasetMetadata>().Cacheable(); //QueryCacheRegion.MediumTerm
+        //    }
+        //}
 
         public int GetDatasetCount()
         {
@@ -169,6 +170,7 @@ namespace Sentry.data.Infrastructure
                     x => x.Dataset.DatasetId == id && 
                     x.ParentDatasetFileId == null
                 ).Where(where)
+                
                 .AsEnumerable();
 
             return list;
@@ -181,37 +183,33 @@ namespace Sentry.data.Infrastructure
         /// <returns></returns>
         public IEnumerable<DatasetFile> GetDatasetFilesVersions(int datasetId, int dataFileConfigId, string filename)
         {
-            IEnumerable<DatasetFile> list = Query<DatasetFile>().Where(x => x.Dataset.DatasetId == datasetId && x.DatasetFileConfig.ConfigId == dataFileConfigId && x.FileName == filename).AsEnumerable();
+            IEnumerable<DatasetFile> list = Query<DatasetFile>().Where(x => x.Dataset.DatasetId == datasetId && x.DatasetFileConfig.ConfigId == dataFileConfigId && x.FileName == filename).Fetch(x => x.DatasetFileConfig).AsEnumerable();
 
             return list;
         }
 
         public IEnumerable<DatasetFile> GetAllDatasetFiles()
         {
-            IEnumerable<DatasetFile> list = Query<DatasetFile>().Where(x => x.ParentDatasetFileId == null).AsEnumerable();
+            IEnumerable<DatasetFile> list = Query<DatasetFile>().Where(x => x.ParentDatasetFileId == null).Fetch(x => x.DatasetFileConfig).AsEnumerable();
 
             return list;
         }
 
         public DatasetFile GetDatasetFile(int id)
         {
-            DatasetFile df = Query<DatasetFile>().Where(x => x.DatasetFileId == id).FirstOrDefault();
+            DatasetFile df = Query<DatasetFile>().Where(x => x.DatasetFileId == id).Fetch(x=> x.DatasetFileConfig).FirstOrDefault();
             return df;
         }
 
         public int GetLatestDatasetFileIdForDataset(int id)
         {
-            int d = Query<DatasetFile>().Where(w => w.Dataset.DatasetId == id).GroupBy(x => x.Dataset.DatasetId).ToList().Select(s => s.OrderByDescending(g => g.CreateDTM).Take(1)).Select(i => i.First().DatasetFileId).FirstOrDefault();
-            //DatasetFile df = Query<DatasetFile>().GroupBy(x => x.DatasetId).SelectMany(s => s.OrderByDescending(g => g.CreateDTM).Take(1)).FirstOrDefault();
-            //Query<DatasetFile>().Where(d => d.DatasetId == id).GroupBy(x => x.DatasetId).Select(s => s.Select(i => i.CreateDTM).Max());
-            ////DatasetFile df = Query<DatasetFile>().Where(x => x.DatasetId == id && x.DatasetFileId == Query<DatasetFile>().Max(m => m.DatasetFileId)).fir;
-            //return df.DatasetFileId;
+            int d = Query<DatasetFile>().Where(w => w.Dataset.DatasetId == id && !w.IsBundled).GroupBy(x => x.Dataset.DatasetId).ToList().Select(s => s.OrderByDescending(g => g.CreateDTM).Take(1)).Select(i => i.First().DatasetFileId).FirstOrDefault();
             return d;
         }
 
         public IEnumerable<Dataset> GetDatasetByCategoryID(int id)
         {
-            return Query<Dataset>().Where(w => w.DatasetCategory.Id == id).AsEnumerable();
+            return Query<Dataset>().Where(w => w.DatasetCategory.Id == id).Where(x => x.CanDisplay).AsEnumerable();
         }
 
         public Category GetCategoryById(int id)
@@ -402,7 +400,7 @@ namespace Sentry.data.Infrastructure
 
         public List<Event> EventsSince(DateTime time, Boolean IsProcessed)
         {
-            return Query<Event>().Where(x => x.TimeCreated >= time && x.IsProcessed == IsProcessed).ToList();
+            return Query<Event>().Cacheable().Where(e => e.TimeCreated >= time && e.IsProcessed == IsProcessed).ToList();
         }
 
 

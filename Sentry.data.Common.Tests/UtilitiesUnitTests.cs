@@ -94,7 +94,7 @@ namespace Sentry.data.Common.Tests
             ds.S3Key = "";
             ds.IsSensitive = false;
             ds.CanDisplay = true;
-            ds.RawMetadata = null;
+            //ds.RawMetadata = null;
             ds.DatasetCategory = cat;
             ds.DatasetFiles = null;
 

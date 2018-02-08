@@ -76,7 +76,7 @@ namespace Sentry.data.Web.Controllers
                 if (_dsModelList == null)
                 {
                     List<BaseDatasetModel> dsmList = new List<BaseDatasetModel>();
-                    IEnumerable<Dataset> dsList = _datasetContext.Datasets.AsEnumerable();
+                    IEnumerable<Dataset> dsList = _datasetContext.Datasets.FetchMany(x=> x.DatasetFiles).AsEnumerable();
 
                     foreach (Dataset ds in dsList)
                     {
@@ -146,6 +146,8 @@ namespace Sentry.data.Web.Controllers
         {
 
             List<SearchModel> models = new List<SearchModel>();
+
+
             foreach(BaseDatasetModel bdm in GetDatasetModelList())
             {
 
@@ -158,7 +160,7 @@ namespace Sentry.data.Web.Controllers
                 sm.DatasetInformation = bdm.DatasetInformation;
                 sm.SentryOwnerName = bdm.SentryOwner.FullName;
 
-                sm.Frequencies = bdm.CreationFreqDesc;
+                sm.Frequencies = bdm.DistinctFrequencies();
                 sm.DistinctFileExtensions = bdm.DistinctFileExtensions();
 
                 sm.IsSensitive = bdm.IsSensitive;
@@ -319,7 +321,7 @@ namespace Sentry.data.Web.Controllers
                 Utilities.GenerateDatasetStorageLocation(cat, cdm.DatasetName),
                 false,
                 true,
-                null,
+                //null,
                 _datasetContext.GetCategoryById(cdm.CategoryIDs),
                 null,
                 //_datasetContext.GetDatasetScopeById(cdm.DatasetScopeTypeID),
@@ -594,6 +596,7 @@ namespace Sentry.data.Web.Controllers
                 dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
                 dfgm.CanDwnldSenstive = CanDwnldSenstive;
                 dfgm.CanEdit = CanEdit;
+                dfgm.CanPreview = true;
                 files.Add(dfgm);
             }
 
@@ -627,6 +630,7 @@ namespace Sentry.data.Web.Controllers
                 dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
                 dfgm.CanDwnldSenstive = CanDwnldSenstive;
                 dfgm.CanEdit = CanEdit;
+                dfgm.CanPreview = true;
                 files.Add(dfgm);
             }
 
@@ -652,6 +656,7 @@ namespace Sentry.data.Web.Controllers
                 dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
                 dfgm.CanDwnldSenstive = CanDwnldSenstive;
                 dfgm.CanEdit = CanEdit;
+                dfgm.CanPreview = false;
                 files.Add(dfgm);
             }
 
@@ -905,16 +910,16 @@ namespace Sentry.data.Web.Controllers
             return ds;
         }
 
-        // JCG TODO: Add unit tests for [GET]GetDownloadURL
         [AuthorizeByPermission(PermissionNames.DwnldSensitve, PermissionNames.DwnldNonSensitive)]
         [HttpGet()]
         public JsonResult GetDownloadURL(int id)
         {
-            Dataset ds = _datasetContext.GetById(id);
-            JsonResult jr = new JsonResult();
-            jr.Data = _s3Service.GetDatasetDownloadURL(ds.S3Key);
-            jr.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
-            return jr;
+            throw new NotImplementedException();
+            //Dataset ds = _datasetContext.GetById(id);
+            //JsonResult jr = new JsonResult();
+            //jr.Data = _s3Service.GetDatasetDownloadURL(ds.S3Key);
+            //jr.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
+            //return jr;
         }
 
         [HttpGet()]
@@ -922,11 +927,24 @@ namespace Sentry.data.Web.Controllers
         public JsonResult GetDatasetFileDownloadURL(int id)
         {
             DatasetFile df = _datasetContext.GetDatasetFile(id);
-            JsonResult jr = new JsonResult();
-            jr.Data = _s3Service.GetDatasetDownloadURL(df.FileLocation, df.VersionId);
-            jr.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
+            try
+            {                
+                //Testing if object exists in S3, response is not used.
+                Dictionary<string, string> Response = _s3Service.GetObjectMetadata(df.FileLocation, df.VersionId);              
 
-            return jr;
+                JsonResult jr = new JsonResult();
+                //jr.Data = _s3Service.GetDatasetDownloadURL(df.FileLocation, df.VersionId);
+                jr.Data = _s3Service.GetDatasetDownloadURL(df.FileLocation);
+                jr.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
+
+                return jr;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"S3 Data File Not Found - DatasetID:{df.Dataset.DatasetId} DatasetFile_ID:{id}");
+                Response.StatusCode = (int)HttpStatusCode.NotFound;
+                return Json(new { message = "Encountered Error Retrieving File.<br />If this problem persists, please contact <a href=\"mailto:BIPortalAdmin@sentry.com\">Site Administration</a>" }, JsonRequestBehavior.AllowGet);
+            }          
         }
 
         /// <summary>
@@ -1188,28 +1206,60 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet()]
         [AuthorizeByPermission(PermissionNames.DatasetView)]
-        public PartialViewResult PreviewDatafile(int id)
+        public ActionResult PreviewDatafile(int id)
         {
-            PreviewDataModel model = new PreviewDataModel();
+            try
+            {
+                PreviewDataModel model = new PreviewDataModel();
 
-            //Dataset dataset = _datasetContext.GetById<Dataset>(id);
-            string previewKey = _datasetContext.GetPreviewKey(id);
-            model.PreviewData = _s3Service.GetObjectPreview(previewKey);
+                //Dataset dataset = _datasetContext.GetById<Dataset>(id);
+                string previewKey = _datasetContext.GetPreviewKey(id);
 
-            return PartialView("_PreviewData", model);
+                using (Stream stream = _s3Service.GetObject(previewKey))
+                {
+                    long length = stream.Length;
+                    byte[] bytes = new byte[length];
+                    stream.Read(bytes, 0, (int)length);
+                    model.PreviewData = Encoding.UTF8.GetString(bytes);
+                }
+
+                //model.PreviewData = _s3Service.GetObjectPreview(previewKey);
+
+                return PartialView("_PreviewData", model);
+            }
+            catch (Exception e)
+            {
+                return PartialView("_Success", new SuccessModel("Error Retrieving Preview", e.Message, false));
+            }
+            
         }
 
         [HttpGet()]
         [AuthorizeByPermission(PermissionNames.DatasetView)]
         public PartialViewResult PreviewLatestDatafile(int id)
         {
-            PreviewDataModel model = new PreviewDataModel();
+            try
+            {
+                PreviewDataModel model = new PreviewDataModel();
 
-            int latestDatafile = GetLatestDatasetFileIdForDataset(id);
-            string previewKey = _datasetContext.GetPreviewKey(latestDatafile);
-            model.PreviewData = _s3Service.GetObjectPreview(previewKey);
+                int latestDatafile = GetLatestDatasetFileIdForDataset(id);
+                string previewKey = _datasetContext.GetPreviewKey(latestDatafile);
+                using (Stream stream = _s3Service.GetObject(previewKey))
+                {
+                    long length = stream.Length;
+                    byte[] bytes = new byte[length];
+                    stream.Read(bytes, 0, (int)length);
+                    model.PreviewData = Encoding.UTF8.GetString(bytes);
+                }
+                //model.PreviewData = _s3Service.GetObjectPreview(previewKey);
 
-            return PartialView("_PreviewData", model);
+                return PartialView("_PreviewData", model);
+            }
+            catch (Exception e)
+            {
+                return PartialView("_Success", new SuccessModel("Error Retrieving Preview", e.Message, false));
+            }
+           
         }
 
         [HttpGet()]
@@ -1336,7 +1386,7 @@ namespace Sentry.data.Web.Controllers
                         //You have to rewind the MemoryStream before copying
                         ms.Seek(0, SeekOrigin.Begin);
 
-                        using (FileStream fs = new FileStream($"{Configuration.Config.GetHostSetting("BundleRequestDir")}{_request.RequestGuid}.json", FileMode.OpenOrCreate))
+                        using (FileStream fs = new FileStream($"{Configuration.Config.GetHostSetting("DatasetBundleBaseLocation")}\\request\\{_request.RequestGuid}.json", FileMode.OpenOrCreate))
                         {
                             ms.CopyTo(fs);
                             fs.Flush();
@@ -1345,17 +1395,17 @@ namespace Sentry.data.Web.Controllers
 
                     //Create Bundle Started Event
                     Event e = new Event();
-                    e.EventType = _datasetContext.GetEventType(3);
-                    e.Status = _datasetContext.GetStatus(1);
+                    e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Bundle File Process").FirstOrDefault();
+                    e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Started").FirstOrDefault();
                     e.TimeCreated = DateTime.Now;
                     e.TimeNotified = DateTime.Now;
                     e.IsProcessed = false;
                     e.UserWhoStartedEvent = _request.RequestInitiatorId;
                     e.Dataset = _request.DatasetID;
                     e.DataConfig = _request.DatasetFileConfigId;
-                    e.Reason = $"{_request.RequestGuid} : Bundle Request Sumbitted";
+                    e.Reason = $"Submitted bundle request for dataset [<b>{_datasetContext.GetById(_request.DatasetID).DatasetName}</b>] targeting file name [<b>{_request.TargetFileName}</b>]";
                     e.Parent_Event = _request.RequestGuid;
-                    await Utilities.CreateEventAsync(e);
+                    Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
                     
                     return Json(new { Success = true, Message = "Successfully sent request to Dataset Bundler.  You will recieve notification when completed." });
                 }
@@ -1396,6 +1446,8 @@ namespace Sentry.data.Web.Controllers
                 List<DatasetFileConfig> fcList = Utilities.LoadDatasetFileConfigsByDatasetID(id, _datasetContext);
                 IApplicationUser user = _userService.GetCurrentUser();
 
+                LoaderRequest loadReq = null;
+
                 try
                 {
                     if (user.CanUpload)
@@ -1405,7 +1457,9 @@ namespace Sentry.data.Web.Controllers
                         HttpPostedFileBase file = files[0];
 
                         string dsfi;
-                        dsfi = System.IO.Path.GetFileName(file.FileName);
+
+                        //Adding ProcessedFilePrefix so GoldenEye Watch.cs does not pick up the file since we will create a Dataset Loader request
+                        dsfi = Sentry.Configuration.Config.GetHostSetting("ProcessedFilePrefix") + System.IO.Path.GetFileName(file.FileName);
 
                         //Get Matching DataFileConfigs for file path
                         List<DatasetFileConfig> fcMatches = Utilities.GetMatchingDatasetFileConfigs(fcList, file.FileName);
@@ -1423,20 +1477,69 @@ namespace Sentry.data.Web.Controllers
                                 sfile.CopyTo(fileStream);
                             }
 
+                            //Create Dataset Loader request
+                            var hashInput = $"{user.AssociateId.ToString()}_{DateTime.Now.ToString("MM-dd-yyyyHH:mm:ss.fffffff")}_{dsfi}";
+
+                            loadReq = new LoaderRequest(Utilities.GenerateHash(hashInput));
+                            loadReq.File = fileDropLocation;
+                            loadReq.IsBundled = false;
+                            loadReq.DatasetID = first.ParentDataset.DatasetId;
+                            loadReq.DatasetFileConfigId = first.ConfigId;
+                            loadReq.RequestInitiatorId = user.AssociateId;
+
+                            Logger.Debug($"Submitting Loader Request - File:{dsfi} Guid:{loadReq.RequestGuid} HashInput:{hashInput}");
+
+                            string jsonReq = JsonConvert.SerializeObject(loadReq, Formatting.Indented);
+
+                            //Send request to DFS location loader service is watching for requests
+                            using (MemoryStream ms = new MemoryStream())
+                            {
+                                StreamWriter writer = new StreamWriter(ms);
+
+                                writer.WriteLine(jsonReq);
+                                writer.Flush();
+
+                                //You have to rewind the MemoryStream before copying
+                                ms.Seek(0, SeekOrigin.Begin);
+
+                                using (FileStream fs = new FileStream($"{Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath")}{loadReq.RequestGuid}.json", FileMode.OpenOrCreate))
+                                {
+                                    ms.CopyTo(fs);
+                                    fs.Flush();
+                                }
+                            }
+
+                            //Create Bundle Success Event
+                            Event e = new Event();
+                            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Created File").FirstOrDefault();
+                            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Started").FirstOrDefault();
+                            e.TimeCreated = DateTime.Now;
+                            e.TimeNotified = DateTime.Now;
+                            e.IsProcessed = false;
+                            e.UserWhoStartedEvent = loadReq.RequestInitiatorId;
+                            e.Dataset = loadReq.DatasetID;
+                            e.DataConfig = loadReq.DatasetFileConfigId;
+                            e.Reason = $"Successfully submitted requset to load file [<b>{System.IO.Path.GetFileName(file.FileName)}</b>] to dataset [<b>{first.ParentDataset.DatasetName}</b>]";
+                            e.Parent_Event = loadReq.RequestGuid;
+                            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+
                             return Json("File Successfully Sent to Dataset Loader with a Path of : " + fileDropLocation);
                         }
                         else
                         {
+                            Logger.Debug("File did not match a configuration file");
                             return Json("File did not match a configuration file.");
                         }
                     }
                     else
                     {
+                        Logger.Debug("User Unable to upload files to dataset");
                         return Json("You cannot upload files to this dataset.");
                     }
                 }
                 catch (Exception e)
                 {
+                    Logger.Error("Error occurred", e);
                     return Json("Error occurred: " + e.Message);
                 }                
             }
@@ -1444,10 +1547,12 @@ namespace Sentry.data.Web.Controllers
             {
                 if (id == 0)
                 {
+                    Logger.Debug("No Dataset Selected");
                     return Json("No Dataset Selected");
                 }
                 else
                 {
+                    Logger.Debug("No files selected");
                     return Json("No files selected");
                 }                
             }
@@ -1484,5 +1589,26 @@ namespace Sentry.data.Web.Controllers
 
             return Json(sList, JsonRequestBehavior.AllowGet);
         }
+
+        //[HttpGet()]
+        //[AuthorizeByPermission(PermissionNames.DwnldNonSensitive)]
+        //public JsonResult GetUserGuide(string key)
+        //{
+        //    try
+        //    {
+
+        //        JsonResult jr = new JsonResult();
+        //        //jr.Data = _s3Service.GetDatasetDownloadURL(df.FileLocation, df.VersionId);
+        //        jr.Data = _s3Service.GetUserGuideDownloadURL(key, "application\\pdf");
+        //        jr.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
+
+        //        return jr;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Response.StatusCode = (int)HttpStatusCode.NotFound;
+        //        return Json(new { message = "Encountered Error Retrieving File.<br />If this problem persists, please contact <a href=\"mailto:BIPortalAdmin@sentry.com\">Site Administration</a>" }, JsonRequestBehavior.AllowGet);
+        //    }
+        //}
     }
 }

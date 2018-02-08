@@ -45,15 +45,14 @@ namespace Sentry.data.Web
         {
             get
             {
-                string href = null;
+                string href = "";
 
                 if (IsUsable)
                 {
-
-                    //if (IsPreviewCompatible)
-                    //{
-                    href = "<a href = \"#\" onclick=\"data.DatasetDetail.PreviewDatafileModal(" + Id + ")\" class=\"table-row-icon row-filepreview-icon\" title=\"Preview file\"><i class='glyphicon glyphicon-search text-primary'></i></a>";
-                    //}
+                    if (CanPreview)
+                    {
+                        href += "<a href = \"#\" onclick=\"data.DatasetDetail.PreviewDatafileModal(" + Id + ")\" class=\"table-row-icon row-filepreview-icon\" title=\"Preview file\"><i class='glyphicon glyphicon-search text-primary'></i></a>";
+                    }
 
                     if ((IsSensitive && CanDwnldSenstive) || (!IsSensitive && CanDwnldNonSensitive))
                     {
@@ -90,6 +89,7 @@ namespace Sentry.data.Web
         public Boolean CanDwnldNonSensitive { get; set; }
         public Boolean CanEdit { get; set; }
         public Boolean IsSensitive { get; set; }
+        public Boolean CanPreview { get; set; }
         public int ParentDataSetID { get; set; }
         public Boolean IsBundled { get; set; }
         public Boolean IsUsable { get; set; }

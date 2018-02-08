@@ -46,6 +46,9 @@
     <StartArguments>-console</StartArguments>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Iesi.Collections, Version=4.0.0.0, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\Iesi.Collections.4.0.0.4000\lib\net40\Iesi.Collections.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
       <HintPath>..\packages\log4net.2.0.5\lib\net45-full\log4net.dll</HintPath>
       <Private>True</Private>
@@ -54,6 +57,12 @@
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NHibernate, Version=4.0.0.4000, Culture=neutral, PublicKeyToken=aa95f207798dfdb4, processorArchitecture=MSIL">
+      <HintPath>..\packages\NHibernate.4.0.2.4000\lib\net40\NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="Sentry.Associates">
+      <HintPath>..\packages\Sentry.Associates.1.3.0\lib\net35\Sentry.Associates.dll</HintPath>
+    </Reference>
     <Reference Include="Sentry.Common, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Common.1.3.10\lib\net35\Sentry.Common.dll</HintPath>
       <Private>True</Private>
@@ -61,6 +70,15 @@
     <Reference Include="Sentry.Configuration, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Configuration.2.1.7.1\lib\net40\Sentry.Configuration.dll</HintPath>
       <Private>True</Private>
+    </Reference>
+    <Reference Include="Sentry.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sentry.Core.1.0.0.1\lib\net451\Sentry.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Sentry.NHibernate, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sentry.NHibernate.1.0.0.1\lib\net451\Sentry.NHibernate.dll</HintPath>
+    </Reference>
+    <Reference Include="StructureMap">
+      <HintPath>..\packages\StructureMap.4.4.0\lib\net45\StructureMap.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
@@ -84,6 +102,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core.cs" />
+    <Compile Include="DatasetLoader.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -102,6 +121,7 @@
     <Compile Include="Service.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="SpamFactory.cs" />
     <Compile Include="Watch.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -147,6 +167,14 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Sentry.data.Common\Sentry.data.Common.csproj">
+      <Project>{30fbadfb-e6ed-4859-b15e-67bbcdceae17}</Project>
+      <Name>Sentry.data.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
+      <Project>{EA9EE762-CE32-4410-B2B6-367A0985645B}</Project>
+      <Name>Sentry.data.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Sentry.data.Infrastructure\Sentry.data.Infrastructure.csproj">
       <Project>{C766D10B-0008-4CC8-A0C0-5818E5EE464A}</Project>
       <Name>Sentry.data.Infrastructure</Name>

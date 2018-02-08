@@ -70,6 +70,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DomainServices\MetadataRepositoryService.cs" />
+    <Compile Include="Entities\LoaderRequest.cs" />
+    <Compile Include="Entities\Release\Issue.cs" />
+    <Compile Include="Entities\Release\Sprint.cs" />
+    <Compile Include="Entities\Request.cs" />
+    <Compile Include="Entities\ObjectKeyVersion.cs" />
     <Compile Include="Entities\Subscriptions\DataAssetSubscription.cs" />
     <Compile Include="Entities\Subscriptions\DatasetSubscription.cs" />
     <Compile Include="Entities\Subscriptions\Event.cs" />
@@ -110,11 +115,11 @@
     <Compile Include="Entities\Subscriptions\Status.cs" />
     <Compile Include="Entities\Subscriptions\Subscription.cs" />
     <Compile Include="Entities\TransferProgressEventArgs.cs" />
-    <Compile Include="Entities\RTAPIEndpoints.cs" />
-    <Compile Include="Entities\RTAPIParameters.cs" />
-    <Compile Include="Entities\RTRequest.cs" />
-    <Compile Include="Entities\RTRequestParameters.cs" />
-    <Compile Include="Entities\RTSourceTypes.cs" />
+    <Compile Include="Entities\RetrieverRequests\RTAPIEndpoints.cs" />
+    <Compile Include="Entities\RetrieverRequests\RTAPIParameters.cs" />
+    <Compile Include="Entities\RetrieverRequests\RTRequest.cs" />
+    <Compile Include="Entities\RetrieverRequests\RTRequestParameters.cs" />
+    <Compile Include="Entities\RetrieverRequests\RTSourceTypes.cs" />
     <Compile Include="Interfaces\IAPIProvider.cs" />
     <Compile Include="Interfaces\IApplicationUser.cs" />
     <Compile Include="Interfaces\IAssetDynamicDetailsProvider.cs" />
@@ -148,6 +153,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

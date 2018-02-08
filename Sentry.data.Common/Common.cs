@@ -15,6 +15,7 @@ using System.Web.Script.Serialization;
 using Sentry.data.Infrastructure;
 using System.Security.Cryptography;
 using Sentry.Common.Logging;
+using Newtonsoft.Json;
 
 namespace Sentry.data.Common
 {
@@ -250,12 +251,12 @@ namespace Sentry.data.Common
         /// <param name="isBundled"></param>
         /// <param name="response"></param>
         /// <returns></returns>
-        public static DatasetFile ProcessInputFile(Dataset dataset, DatasetFileConfig dfConfig, IDatasetContext dscontext, string uploadUserName, bool isBundled, BundleResponse response, FileInfo file = null)
+        public static DatasetFile ProcessInputFile(Dataset dataset, DatasetFileConfig dfConfig, IDatasetContext dscontext, bool isBundled, LoaderRequest response, FileInfo file = null)
         {
             string filename = null;
             if (file != null) { filename = file.Name; }
 
-            return ProcessFile(dataset, dfConfig, dscontext, file, null, uploadUserName, filename, isBundled, response);
+            return ProcessFile(dataset, dfConfig, dscontext, file, null, filename, isBundled, response);
         }
 
 
@@ -356,31 +357,38 @@ namespace Sentry.data.Common
 
 
 
-        private static DatasetFile ProcessFile(Dataset ds, DatasetFileConfig dfc, IDatasetContext dscontext, FileInfo fileInfo, HttpPostedFileBase filestream, string uploadUserName, string filename, bool isBundled, BundleResponse response)
+        private static DatasetFile ProcessFile(Dataset ds, DatasetFileConfig dfc, IDatasetContext dscontext, FileInfo fileInfo, HttpPostedFileBase filestream, string filename, bool isBundled, LoaderRequest response)
         {
             DatasetFile df_Orig = null;
             DatasetFile df_newParent = null;
             string targetFileName = null;
             string uplduser = null;
             int df_id = 0;
-
-
+            
             // Set values appropriately based on isbundled
             if (isBundled)
             {
+                Logger.Debug("ProcessFile: Detected Bundled file");
                 targetFileName = response.TargetFileName;
                 uplduser = response.RequestInitiatorId;
             }
             else
             {
-                targetFileName = GetTargetFileName(dfc, filename);
-                uplduser = uploadUserName;
+                Logger.Debug("ProcessFile: Detected Dataset file");
+
+                //Remove ProcessedFilePrefix from file name
+                var newFileName = filename.Replace(Configuration.Config.GetHostSetting("ProcessedFilePrefix"), "");
+
+                targetFileName = GetTargetFileName(dfc, newFileName);
+                uplduser = response.RequestInitiatorId;
             }
             
 
             if (dfc.OverwriteDatafile)
             {
+                Logger.Debug("ProcessFile: Data File Config OverwriteDatafile=true");
                 // RegexSearch requires passing targetFileName to esnure we get the correct related data file.
+
                 if (dfc.IsRegexSearch)
                 {
                     df_id = dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.ConfigId, targetFileName, isBundled);
@@ -429,11 +437,11 @@ namespace Sentry.data.Common
                         //return (int)ExitCodes.S3UploadError;
 
                     }
-                    catch (Exception e)
+                    catch (Exception ex)
                     {
-                        Sentry.Common.Logging.Logger.Error("Error during establishing upload process", e);
+                        Sentry.Common.Logging.Logger.Error("Error during establishing upload process", ex);
                         //SendNotification(datasetMetadata, (int)ExitCodes.Failure, 0, "Error during establishing upload process", df_newParent.FileLocation);
-                        throw new Exception("Error during establishing upload process", e);
+                        throw new Exception("Error during establishing upload process", ex);
                         //return (int)ExitCodes.Failure;
                     }
 
@@ -477,7 +485,7 @@ namespace Sentry.data.Common
                     dscontext.Merge(df_newParent);
                     dscontext.SaveChanges();
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
 
                     StringBuilder builder = new StringBuilder();
@@ -492,10 +500,10 @@ namespace Sentry.data.Common
                     builder.Append($"ParentDatasetFile_ID: {df_newParent.ParentDatasetFileId}");
                     builder.Append($"Version_ID: {df_newParent.VersionId}");
 
-                    Sentry.Common.Logging.Logger.Error(builder.ToString(), e);
+                    Sentry.Common.Logging.Logger.Error(builder.ToString(), ex);
 
                     //SendNotification(datasetMetadata, (int)ExitCodes.DatabaseError, 0, "Error saving dataset to database", df_newParent.FileLocation);
-                    throw new Exception("Error saving dataset to database", e);
+                    throw new Exception("Error saving dataset to database", ex);
                     //return (int)ExitCodes.DatabaseError;
                 }
 
@@ -513,7 +521,7 @@ namespace Sentry.data.Common
                         dscontext.SaveChanges();
 
                     }
-                    catch (Exception e)
+                    catch (Exception ex)
                     {
                         StringBuilder builder = new StringBuilder();
                         builder.Append("Failed to set ParentDatasetFile_ID on Original Parent in Dataset Management.");
@@ -522,7 +530,19 @@ namespace Sentry.data.Common
                         builder.Append($"ParentDatasetFile_ID: {df_Orig.ParentDatasetFileId}");                        
                     }
                 }
-                //SendNotification(datasetMetadata, (int)ExitCodes.Success, ds.DatasetId, string.Empty, string.Empty);
+
+                Event f = new Event();
+                f.EventType = dscontext.EventTypes.Where(w => w.Description == "Created File").FirstOrDefault();
+                f.Status = dscontext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+                f.TimeCreated = DateTime.Now;
+                f.TimeNotified = DateTime.Now;
+                f.IsProcessed = false;
+                f.UserWhoStartedEvent = response.RequestInitiatorId;
+                f.Dataset = response.DatasetID;
+                f.DataConfig = response.DatasetFileConfigId;
+                f.Reason = $"Successfully Uploaded file [<b>{Path.GetFileName(targetFileName)}</b>] to dataset [<b>{df_newParent.Dataset.DatasetName}</b>]";
+                f.Parent_Event = response.RequestGuid;
+                Task.Factory.StartNew(() => Utilities.CreateEventAsync(f), TaskCreationOptions.LongRunning);
 
                 return df_newParent;
             }
@@ -716,7 +736,8 @@ namespace Sentry.data.Common
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
             using (var client = new HttpClient(handler))
             {
-                var json = new JavaScriptSerializer().Serialize(e);
+                //https://stackoverflow.com/questions/16697346/datetime-json-return-from-webapi-with-default-serializer
+                var json = JsonConvert.SerializeObject(e, Formatting.None, new JsonSerializerSettings { DateTimeZoneHandling = DateTimeZoneHandling.Local});     
 
                 HttpContent contentPost = new StringContent(json, Encoding.UTF8,
                     "application/json");

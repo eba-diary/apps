@@ -55,21 +55,21 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             //    m.Class(typeof(DatasetScopeType));
             //});
 
-            this.Bag((x) => x.RawMetadata, (m) =>
-            {
-                //m.Lazy(CollectionLazy.Lazy);
-                m.Inverse(true);
-                m.Table("DatasetMetadata");
-                m.Cascade(Cascade.All);
-                m.Cache(c => c.Usage(CacheUsage.ReadWrite));
-                //m.Access(Accessor.Field);
-                //m.Key((k) => k.Column("Dataset_ID"));
-                m.Key((k) =>
-                {
-                    k.Column("Dataset_ID");
-                    k.ForeignKey("FK_DatasetMetadata_Dataset");
-                });
-            }, map => map.OneToMany(a => a.Class(typeof(DatasetMetadata))));
+            //this.Bag((x) => x.RawMetadata, (m) =>
+            //{
+            //    //m.Lazy(CollectionLazy.Lazy);
+            //    m.Inverse(true);
+            //    m.Table("DatasetMetadata");
+            //    m.Cascade(Cascade.All);
+            //    m.Cache(c => c.Usage(CacheUsage.ReadWrite));
+            //    //m.Access(Accessor.Field);
+            //    //m.Key((k) => k.Column("Dataset_ID"));
+            //    m.Key((k) =>
+            //    {
+            //        k.Column("Dataset_ID");
+            //        k.ForeignKey("FK_DatasetMetadata_Dataset");
+            //    });
+            //}, map => map.OneToMany(a => a.Class(typeof(DatasetMetadata))));
 
             this.Bag(x => x.DatasetFiles, (m) =>
             {

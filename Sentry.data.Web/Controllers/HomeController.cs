@@ -10,6 +10,13 @@ using System.Xml;
 using System.ServiceModel.Syndication;
 using LazyCache;
 using System.Threading.Tasks;
+using System.Net.Http;
+using System.Web.Script.Serialization;
+using System.Text;
+using System.Net.Http.Headers;
+using System.Net;
+using Newtonsoft.Json.Linq;
+using System.IO;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -38,6 +45,90 @@ namespace Sentry.data.Web.Controllers
             ViewData["fluid"] = true;
             return View(das);
         }
+
+        private readonly int[] sprintsIds = new int[2] { 2230, 2346 };
+
+
+
+        public async Task<ActionResult> ReleaseNotes()
+        {
+            return View();
+        }
+
+        public class SprintModel
+        {
+            public List<Sprint> sprints { get; set; }
+        }
+
+
+        public JsonResult GetSprint()
+        {
+
+            var credentials = new NetworkCredential("data_sentry_com", "RDCR9g56");
+
+            string mergedCredentials = string.Format("{0}:{1}", "data_sentry_com", "RXC8MGrMSgUv");
+            byte[] byteCredentials = UTF8Encoding.UTF8.GetBytes(mergedCredentials);
+            var base64Credentials = Convert.ToBase64String(byteCredentials);
+
+            List<Sprint> sprints = new List<Sprint>();
+
+            foreach (int sprintId in sprintsIds)
+            {
+                WebRequest wr = WebRequest.Create(String.Format("{0}rest/agile/1.0/sprint/{1}", "http://jira.sentry.com/", sprintId));
+
+                wr.ContentType = "application/json;charset=UTF-8";
+                wr.Method = "GET";
+                wr.Headers.Add("Authorization", "Basic " + base64Credentials);
+                wr.PreAuthenticate = true;
+
+                WebResponse response = wr.GetResponse();
+
+                StreamReader sr = new StreamReader(response.GetResponseStream());
+
+                JObject joResponse = JObject.Parse(sr.ReadToEnd());
+
+
+                Sprint sprint = joResponse.ToObject<Sprint>();
+
+                sprint.issues = GetIssues(sprintId);
+
+                sprints.Add(sprint);
+            }
+
+            SprintModel sm = new SprintModel { sprints = sprints };
+
+
+            return Json(sm, JsonRequestBehavior.AllowGet);
+        }
+
+        public List<Issue> GetIssues(int sprintId)
+        {
+            string mergedCredentials = string.Format("{0}:{1}", "data_sentry_com", "RXC8MGrMSgUv");
+            byte[] byteCredentials = UTF8Encoding.UTF8.GetBytes(mergedCredentials);
+            var base64Credentials = Convert.ToBase64String(byteCredentials);
+
+            var wr = WebRequest.Create(String.Format("{0}rest/agile/1.0/sprint/{1}/issue ", "http://jira.sentry.com/", sprintId));
+
+            wr.ContentType = "application/json;charset=UTF-8";
+            wr.Method = "GET";
+            wr.Headers.Add("Authorization", "Basic " + base64Credentials);
+            wr.PreAuthenticate = true;
+
+            var response = wr.GetResponse();
+
+            var sr = new StreamReader(response.GetResponseStream());
+
+            var joResponse = JObject.Parse(sr.ReadToEnd());         
+
+            List<Issue> issues = joResponse["issues"].ToObject<List<Issue>>();
+
+            return issues;
+
+
+        }
+
+
+
 
         public async Task<ActionResult> GetFeed()
         {

@@ -117,9 +117,18 @@
                                 </div>
                                 <!-- /ko -->
 
+                                <!-- ko if: ExternalLink !== undefined -->
+                                <a class="dataset-list-dataset-name" data-bind="attr: { href: ExternalLink, title: DatasetName }">
+                                    <span data-bind="text: DatasetName" />
+                                </a>
+                                <!-- /ko -->
+                                <!-- ko if: ExternalLink === undefined -->
                                 <a class="dataset-list-dataset-name" data-bind="attr: { href: Link, title: DatasetName }">
                                     <span data-bind="text: DatasetName" />
                                 </a>
+                                <!-- /ko -->
+
+
 
                                 <!-- ko if: IsSensitive-->
                                 <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure" style="padding-left: 10px;"></i>
@@ -148,6 +157,11 @@
                                     </div>
 
                                 </div>
+                            </div>
+                            <div class="dataset-list-content">
+                                <span class=" textBold  ownerDate" data-bind="css : Color">Page Views: </span><span data-bind="text: PageViews"></span>
+                                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                <span class=" textBold  ownerDate" data-bind="css : Color">Downloads: </span><span data-bind="text: Downloads"></span>
                             </div>
                         </li>
 
@@ -307,6 +321,7 @@
             this.IsSensitive = data.IsSensitive;
 
             this.Link = "/Dataset/Detail/" + data.DatasetId;
+            this.ExternalLink = data.Link;
 
             this.ChangedDtm = data.ChangedDtm;
             this.Color = data.Color;
@@ -316,6 +331,10 @@
 
             this.Frequencies = data.Frequencies;
             this.DistinctFileExtensions = data.DistinctFileExtensions;
+
+            this.PageViews = data.PageViews;
+            this.Downloads = data.Downloads;
+
 
             //this.header = ko.pureComputed(function () {
             //    return this.currentProfit() < 0 ? "profitWarning" : "profitPositive";
@@ -354,23 +373,111 @@
 
             var loaded = false;
 
-            // Load initial state from server, convert it to Dataset instances, then populate self.datasets
-            $.getJSON("/Dataset/DatasetList", function (allData) {
-                var mappedTasks = $.map(allData, function (item) { return new Dataset(item) });
-                self.datasets(mappedTasks);
+            var categoryLookup = {};
+            var ownerLookup = {};
+            var frequencyLookup = {};
+            var extensionLookup = {};
 
-                var categoryLookup = {};
-                var ownerLookup = {};
-                var frequencyLookup = {};
-                var extensionLookup = {};
+            /**
+           // var request = new XMLHttpRequest();
+            //request.open('GET', 'http://api.us.socrata.com/api/catalog/v1?domains=data.seattle.gov&search_context=data.seattle.gov&categories=public%20safety&order=page_views_total&only=datasets', true);
+
+            request.onreadystatechange = function () {
+                if (this.readyState === 4) {
+
+                    var onlineDatasets = $.map(JSON.parse(this.responseText).results, function (item) {
+                        var data = {};
+
+                        data["DatasetName"] = (typeof item.resource.name === undefined) ? "hello" : item.resource.name;
+                        data["BannerColor"] = "categoryBanner-orange";
+                        data["BorderColor"] = "borderSide_orange";
+                        data["Category"] = "Public Safety";
+
+                        var d = new Date(item.resource.updatedAt);
+                        var n = d.toLocaleDateString();
+
+                        data["ChangedDtm"] = n;
+                        data["Color"] = "orange";
+                        data["DatasetDesc"] = item.resource.description;
+                        data["DatasetInformation"] = "";
+                        data["DistinctFileExtensions"] = ['External'];
+                        data["Frequencies"] = ["Daily"];
+                        data["IsSensitive"] = false;
+                        data["Link"] = item.link;
+                        data["SentryOwnerName"] = "Seattle OpenData";
+                        data["Downloads"] = item.resource.download_count;
+                        data["PageViews"] = item.resource.page_views.page_views_total;
+                        //data["SentryOwnerName"] = (typeof item.owner.display_name === undefined) ? "Unknown" : item.owner.display_name;
+
+                        console.log(item);
+
+                        return new Dataset(data);
+
+                    });
+                    
+
+                    self.datasets(self.datasets().concat(onlineDatasets));
+
+                    self.populateFilters();
+                }
+            };
+
+            //var request2 = new XMLHttpRequest();
+            //request2.open('GET', 'http://api.us.socrata.com/api/catalog/v1?order=page_views_total&limit=1000&only=datasets', true);
+            //request2.open('GET', 'http://api.us.socrata.com/api/catalog/v1?domains=data.seattle.gov&search_context=data.seattle.gov&order=page_views_total&only=datasets&q=weather&min_should_match=3<60%25', true);
+
+            request2.onreadystatechange = function () {
+                if (this.readyState === 4) {
+
+                    var onlineDatasets = $.map(JSON.parse(this.responseText).results, function (item) {
+                        var data = {};
+
+                        data["DatasetName"] = (typeof item.resource.name === undefined) ? "hello" : item.resource.name;
+                        data["BannerColor"] = "categoryBanner-orange";
+                        data["BorderColor"] = "borderSide_orange";
+                        data["Category"] = "Weather";
+
+                        var d = new Date(item.resource.updatedAt);
+                        var n = d.toLocaleDateString();
+
+                        data["ChangedDtm"] = n;
+                        data["Color"] = "orange";
+                        data["DatasetDesc"] = item.resource.description;
+                        data["DatasetInformation"] = "";
+                        data["DistinctFileExtensions"] = ['External'];
+                        data["Frequencies"] = ["Daily"];
+                        data["IsSensitive"] = false;
+                        data["Link"] = item.link;
+                        data["SentryOwnerName"] = "Seattle OpenData";
+                        data["Downloads"] = item.resource.download_count;
+                        data["PageViews"] = item.resource.page_views.page_views_total;
+                        //data["SentryOwnerName"] = (typeof item.owner.display_name === undefined) ? "Unknown" : item.owner.display_name;
+
+                        console.log(item);
+
+                        return new Dataset(data);
+
+                    });
+
+
+
+                    self.datasets(self.datasets().concat(onlineDatasets));
+
+                    self.populateFilters();
+                }
+            };
+            **/
+
+            self.populateFilters = function () {
+
+                var allData = self.datasets();
 
                 var temp = [];
 
                 var searchParams = new URLSearchParams(window.location.search);
                 var param = searchParams.get('category');
 
-                for (var item, i = 0; item = allData[i++];)
-                {
+                for (var item, i = 0; item = allData[i++];) {
                     var category = item.Category;
 
                     if (!(category in categoryLookup)) {
@@ -380,20 +487,32 @@
 
                         temp.push(new Filter('0_' + i, category, 'Category'));
 
-                        if (category == param)
-                        {
+                        if (category == param) {
                             self.SelectedFilters.push('0_' + i);
                         }
 
                     }
                 }
 
-                self.AllFilters.push( new FilterCategory('Category', temp, 'blue'));
-                temp = [];
+                var item;
+
                 
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name == 'Category') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
+
+                self.AllFilters.push(new FilterCategory('Category', temp, 'blue'));
+                temp = [];
+
 
                 for (var item, i = 0; item = allData[i++];) {
-                    var owner = item.SentryOwnerName;
+                    var owner = item.SentryOwner;
 
                     if (!(owner in ownerLookup)) {
                         ownerLookup[owner] = 1;
@@ -404,8 +523,16 @@
                     }
 
                 }
-
-                self.AllFilters.push( new FilterCategory('Sentry Owner', temp, 'green'));
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name == 'Sentry Owner') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
+                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'green'));
                 temp = [];
 
                 var counter = 0; //Needs seperate counter as multiple objects can appear per iteration
@@ -420,6 +547,15 @@
                             counter++;
                         }
                     }
+                }
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name == 'Frequency') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
                 self.AllFilters.push(new FilterCategory('Frequency', temp, 'gold'));
                 temp = [];
@@ -437,7 +573,28 @@
                         }
                     }
                 }
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name == 'Extension') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
                 self.AllFilters.push(new FilterCategory('Extension', temp, 'plum'));
+            };
+
+            // Load initial state from server, convert it to Dataset instances, then populate self.datasets
+            $.getJSON("/Dataset/DatasetList", function (allData) {
+                var mappedTasks = $.map(allData, function (item) { return new Dataset(item) });
+
+                self.datasets(self.datasets().concat(mappedTasks));
+
+                //request.send();
+                //request2.send();
+
+                self.populateFilters();
 
                 $('#dataColumn').show();
                 $('#filterColumn').show();

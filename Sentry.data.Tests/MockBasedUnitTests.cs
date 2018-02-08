@@ -74,7 +74,7 @@ namespace Sentry.data.Tests
                                           "S3 key",
                                           true,
                                           true,
-                                          null,
+                                          //null,
                                           cat,
                                           null,
                                          // dScope,

@@ -1,23 +1,30 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using Sentry.Common.Logging;
-using System.Configuration;
+using Sentry.data.Core;
+using Newtonsoft.Json;
+using System.Security.Cryptography;
+using StructureMap;
+using Sentry.data.Infrastructure;
+using Sentry.data.Common;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Goldeneye
 {
-    class Watch
+    public class Watch
     {
         //Created by Andrew Quaschnick
         //On 11/15/2017
 
         private static FileSystemWatcher watcher;
         private static List<FileProcess> allFiles = new List<FileProcess>();
+        private static IContainer container;
+        private static IDatasetContext _datasetContext;
+
 
         private class FileProcess {
 
@@ -29,50 +36,57 @@ namespace Sentry.data.Goldeneye
             }
 
             public string fileName { get; set; }
-            public Process process { get; set; }
             public Boolean started { get; set; }
             public Boolean fileCorrectlyDeleted { get; set; }
         }
 
         //This is the main method that is run every iteration of the Core.DoWork() method.
         //  It's most likely wise to set it to a few seconds in Core.DoWork() as you might be wasting CPU cycles making it go faster.
-        public static void Run()
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="path"></param>
+        public static void Run(string path)
         {
             var files = allFiles.ToList();
 
-            Console.WriteLine("Run Process Started for : " + files.Capacity + " files.");
+            //Console.WriteLine("Run Process Started for : " + files.Capacity + " files.");
 
             foreach (FileProcess file in files)
             {
-                if(file.started && file.process != null && file.process.HasExited)
+                if(file.started)
                 {
                     //The DatasetLoader said Success and the file is gone.
-                    if(file.process.ExitCode == 0 && file.fileCorrectlyDeleted)
+                    if(file.fileCorrectlyDeleted)
                     {
-                        Console.WriteLine("File: " + file.fileName + " Success");
+                        //Console.WriteLine("File: " + file.fileName + " Success");
                         Logger.Info("File: " + file.fileName + " Success");
                         allFiles.Remove(file);
                     }
-                    //The DatasetLoader said Success but the file still exists.
-                    else if(file.process.ExitCode == 0)
-                    {
-                        Console.WriteLine("File: " + file.fileName + " Still Exists");
-                        Logger.Info("File: " + file.fileName + " Still Exists");
-                    }
-                    //The DatasetLoader Failed
+                    //The DatasetLoader said Success but the file still exists.                    
                     else
                     {
-                        Console.WriteLine("File: " + file.fileName + " Failed " + file.process.ExitCode);
-                        Logger.Info("File: " + file.fileName + " Failed " + file.process.ExitCode);
+                        //Console.WriteLine("File: " + file.fileName + " Still Exists");
+                        Logger.Info("File: " + file.fileName + " Still Exists");
                     }
                 }
                 else if(!IsFileLocked(file.fileName)  && !file.started)
                 {
-                    StartLoader(file);
+                    //Create non-bundled request
+                    if (path == Sentry.Configuration.Config.GetHostSetting("PathToWatch") && file.fileName.Contains(path))
+                    {
+                        //Console.WriteLine($"Dataset Loader Connection String:{Configuration.Config.GetHostSetting("DatabaseConnectionString")}");
+                        using (container = Bootstrapper.Container.GetNestedContainer())
+                        {
+                            _datasetContext = container.GetInstance<IDatasetContext>();
+                            SubmitLoaderRequest(file);
+                            file.started = true;
+                        }
+                    }                    
                 }
                 else
                 {
-                    Console.WriteLine("File: " + file.fileName + " Locked");
+                    //Console.WriteLine("File: " + file.fileName + " Locked");
                     Logger.Debug("File: " + file.fileName + " Locked");
                 }
             }
@@ -97,33 +111,85 @@ namespace Sentry.data.Goldeneye
             return false;
         }
 
-        //This method starts the DatasetLoader given a specific file for it to load.
-        private static void StartLoader(FileProcess file)
+        private static void SubmitLoaderRequest(FileProcess file)
         {
-            string datasetLoaderLocation = Sentry.Configuration.Config.GetHostSetting("DatasetLoaderLocation");
-
-            ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.CreateNoWindow = false;
-            startInfo.UseShellExecute = false;
-            startInfo.FileName = datasetLoaderLocation;
-            startInfo.WindowStyle = ProcessWindowStyle.Hidden;
-            startInfo.Arguments = $"-p \"{file.fileName}\"";
-
+            LoaderRequest loadReq = null;
             try
             {
-                // Start the process with the info we specified.
-                file.process = Process.Start(startInfo);
-                file.started = true;
+                var orginalPath = Path.GetFullPath(file.fileName).Replace(Path.GetFileName(file.fileName), "");
+                var origFileName = Path.GetFileName(file.fileName);
+                var processingFile = orginalPath + Configuration.Config.GetHostSetting("ProcessedFilePrefix") + origFileName;
+                var fileOwner = Utilities.GetFileOwner(new FileInfo(file.fileName));
 
-                Console.WriteLine("File: " + file.fileName + " was sent to the Dataset Loader : " + file.process.StartTime);
-                Logger.Info("File: " + file.fileName + " was sent to the Dataset Loader : " + file.process.StartTime);
+                //Rename file to indicate a request has been sent to Dataset Loader
+                File.Move(file.fileName, processingFile);
+
+                var hashInput = $"{Sentry.Configuration.Config.GetHostSetting("ServiceAccountID")}_{DateTime.Now.ToString("MM-dd-yyyyHH:mm:ss.fffffff")}_{file.fileName}";
+                //Create new loader request object and set file property
+                loadReq = new LoaderRequest(GenerateHash(hashInput));
+                loadReq.File = processingFile;
+                loadReq.IsBundled = false;
+                loadReq.RequestInitiatorId = fileOwner;
+
+                Logger.Debug($"Submitting Loader Request - File:{file.fileName} Guid:{loadReq.RequestGuid} HashInput:{hashInput}");
+
+                string jsonReq = JsonConvert.SerializeObject(loadReq, Formatting.Indented);
+
+                //Send request to DFS location loader service is watching for requests
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    StreamWriter writer = new StreamWriter(ms);
+
+                    writer.WriteLine(jsonReq);
+                    writer.Flush();
+
+                    //You have to rewind the MemoryStream before copying
+                    ms.Seek(0, SeekOrigin.Begin);
+
+                    using (FileStream fs = new FileStream($"{Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath")}{loadReq.RequestGuid}.json", FileMode.OpenOrCreate))
+                    {
+                        ms.CopyTo(fs);
+                        fs.Flush();
+                    }
+                }
+
+                //Create Bundle Success Event
+                Event e = new Event();
+                e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Created File").FirstOrDefault();
+                e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Started").FirstOrDefault();
+                e.TimeCreated = DateTime.Now;
+                e.TimeNotified = DateTime.Now;
+                e.IsProcessed = false;                
+                e.UserWhoStartedEvent = loadReq.RequestInitiatorId;
+                e.Dataset = loadReq.DatasetID;
+                e.DataConfig = loadReq.DatasetFileConfigId;
+                e.Reason = $"Successfully submitted request to Dataset Loader to upload file [<b>{origFileName}</b>] to dataset [<b>{_datasetContext.GetById(loadReq.DatasetID).DatasetName}</b>]";
+                e.Parent_Event = loadReq.RequestGuid;
+                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
             }
             catch (Exception ex)
             {
-                // Log error.
-                Console.WriteLine("File: " + file.fileName + " was NOT sent to the Dataset Loader : " + ex.Message);
-                Logger.Error("File: " + file.fileName + " was NOT sent to the Dataset Loader", ex);
+                Logger.Error("Error submitting loader request", ex);
+
+                //Create Bundle Failed Event
+                Event e = new Event();
+                e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Created File").FirstOrDefault();
+                e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Error").FirstOrDefault();
+                e.TimeCreated = DateTime.Now;
+                e.TimeNotified = DateTime.Now;
+                e.IsProcessed = false;
+                e.UserWhoStartedEvent = loadReq.RequestInitiatorId;
+                e.Dataset = loadReq.DatasetID;
+                e.DataConfig = loadReq.DatasetFileConfigId;
+                e.Reason = "Failed to submit request to Dataset Loader";
+                e.Parent_Event = loadReq.RequestGuid;
+                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+
             }
+            
+
+            
+
         }
 
         //This method is called when the Windows Process is started in Core and Program.cs
@@ -155,11 +221,15 @@ namespace Sentry.data.Goldeneye
 
             //Get all the files that are currently in the directory on Start to begin monitoring them.
             //  This may happen if the service was killed and needed to restart.
-            foreach(var a in Directory.GetFiles(watcher.Path, "*", SearchOption.AllDirectories))
+            //  Filter out DatasetLoader Request and Failed Request folders.
+            foreach (var a in Directory.GetFiles(watcher.Path, "*", SearchOption.AllDirectories).Where(w => !w.Contains(Configuration.Config.GetHostSetting("LoaderRequestPath")) && !w.Contains(Configuration.Config.GetHostSetting("LoaderFailedRequestPath"))))
             {
-                Console.WriteLine("Found : " + a);
-                Logger.Info("Found : " + a);
-                allFiles.Add(new FileProcess(a));
+                if (!Path.GetFileName(a).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix")))
+                {
+                    Console.WriteLine("Found : " + a);
+                    Logger.Info("Found : " + a);
+                    allFiles.Add(new FileProcess(a));
+                }
             }
         }
 
@@ -174,7 +244,11 @@ namespace Sentry.data.Goldeneye
             }
             else
             {
-                allFiles.Add(new FileProcess(e.FullPath));
+                //  Filter out DatasetLoader Request and Failed Request folders.
+                if (!Path.GetFileName(e.FullPath).Contains(Configuration.Config.GetHostSetting("LoaderRequestPath")) && !Path.GetFileName(e.FullPath).Contains(Configuration.Config.GetHostSetting("LoaderFailedRequestPath")) && !Path.GetFileName(e.FullPath).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix")))
+                {
+                    allFiles.Add(new FileProcess(e.FullPath));
+                }
             }            
         }
 
@@ -189,8 +263,35 @@ namespace Sentry.data.Goldeneye
         //  The Service will do the rest on it's periodic run.
         private static void OnDeleted(object source, FileSystemEventArgs e)
         {
-            var file = allFiles.FirstOrDefault(x => x.fileName == e.FullPath);
-            file.fileCorrectlyDeleted = true;
+            //  Filter out DatasetLoader Request and Failed Request folders.
+            if (!Path.GetFileName(e.FullPath).Contains(Configuration.Config.GetHostSetting("LoaderRequestPath")) && !Path.GetFileName(e.FullPath).Contains(Configuration.Config.GetHostSetting("LoaderFailedRequestPath")) && Path.GetFileName(e.FullPath).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix")))
+            {
+                var path = Path.GetFullPath(e.FullPath).Replace(Path.GetFileName(e.FullPath), "");
+                var fileName = Path.GetFileName(e.FullPath);
+                var origFileName = path + fileName.Substring(Configuration.Config.GetHostSetting("ProcessedFilePrefix").Length);
+                var file = allFiles.FirstOrDefault(x => x.fileName == origFileName);
+                if (file != null)
+                {
+                    file.fileCorrectlyDeleted = true;
+                }
+                else
+                {
+                    Logger.Info($"Watch detected delete for non-tracked file: {e.FullPath}");
+                }                
+            }            
         }
+
+        private static Guid GenerateHash(string input)
+        {
+            string start = input + DateTime.Now.ToString();
+            Guid result;
+            using (MD5 md5 = MD5.Create())
+            {
+                byte[] hash = md5.ComputeHash(Encoding.Default.GetBytes(start));
+                result = new Guid(hash);
+            }
+            return result;
+        }
+
     }
 }

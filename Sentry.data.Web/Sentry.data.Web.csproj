@@ -1136,6 +1136,7 @@
     <Content Include="Views\Dataset\CreateDataFileConfig.cshtml" />
     <Content Include="Views\Dataset\_Subscribe.cshtml" />
     <Content Include="Views\Dataset\ClientSideList.cshtml" />
+    <Content Include="Views\Home\ReleaseNotes.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -12,14 +12,14 @@
 </div>*@
 <div class="form-horizontal">
     <div class="form-group">
-        <div class="error-container offset-sm-4">
-            <i class="fa fa-exclamation-triangle fa-3x text-danger"></i><br />
+        <div class="sentry-error-container">
+            
             @{
                 if ((!Model.WasSuccessful))
-                { <p><b>@Model.Title</b></p>
+                { <p><b><i class="fa fa-exclamation-triangle fa-3x text-danger">@Model.Title</i></b></p>
                       <p>@Model.Message</p><br />
                       <p>We apologize for the inconvenience.</p>
-                      <p>If you need assistance, please contact <a href="mailto:DataArchitecture@sentry.com">Data Architecture</a>.</p>
+                      <p>If you need assistance, please contact <a href="mailto:BIPortalAdmin@sentry.com">Site Administration</a>.</p>
                 }
                 else
                 {<p>@Model.Title</p><br /> 

@@ -12,6 +12,10 @@ namespace Sentry.data.Core
         IQueryable<Dataset> Datasets { get; }
         //IQueryable<Category> DatasetMetadata { get; }
 
+        IQueryable<EventType> EventTypes { get; }
+
+        IQueryable<Status> EventStatus { get; }
+
         Dataset GetById(int id);
 
         int GetDatasetCount();

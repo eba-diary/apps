@@ -20,7 +20,7 @@ namespace Sentry.data.Bundler
         private S3ServiceProvider _s3Service;
         private string _baseWorkingDir;
         private IDatasetContext _dscontext;
-        //private static Amazon.S3.IAmazonS3 _s3client = null;
+        private Event e;
 
         public Bundle(string requestFilePath, IDatasetContext dscontext)
         {
@@ -63,29 +63,29 @@ namespace Sentry.data.Bundler
                 bundleStart = DateTime.Now;
 
                 //Create Bundle Started Event
-                Event e = new Event();
-                e.EventType = _dscontext.GetEventType(3);
-                e.Status = _dscontext.GetStatus(2);
+                e = new Event();
+                e.EventType = _dscontext.EventTypes.Where(w => w.Description == "Bundle File Process").FirstOrDefault();
+                e.Status = _dscontext.EventStatus.Where(w => w.Description == "In Progress").FirstOrDefault();
                 e.TimeCreated = bundleStart;
                 e.TimeNotified = bundleStart;
                 e.IsProcessed = false;
                 e.UserWhoStartedEvent = _request.RequestInitiatorId;
                 e.Dataset = _request.DatasetID;
                 e.DataConfig = _request.DatasetFileConfigId;
-                e.Reason = $"{_request.RequestGuid} : Bundle Request Started";
+                e.Reason = $"Started bundle request for {_request.TargetFileName}";
                 e.Parent_Event = _request.RequestGuid;
                 await Utilities.CreateEventAsync(e);
 
                 Logger.Info("Start Event Created.");
 
                 List<BundlePart> parts_list = Collect_Parts(_request.SourceKeys);
-                Logger.Debug($"Found {parts_list.Count()} keys to concatenate");
+                Logger.Debug($"Found {parts_list.Count} keys to concatenate");
                 List<List<BundlePart>> grouped_parts_list = Chunk_By_Size(parts_list);
-                Sentry.Common.Logging.Logger.Debug($"Created {grouped_parts_list.Count()} concatenation groups");
+                Sentry.Common.Logging.Logger.Debug($"Created {grouped_parts_list.Count} concatenation groups");
                 Sentry.Common.Logging.Logger.Debug($"Starting Concatenation process... RequestGuid:{_request.RequestGuid}");
-                for (int i = 0; i < grouped_parts_list.Count(); i++)
+                for (int i = 0; i < grouped_parts_list.Count; i++)
                 {
-                    Sentry.Common.Logging.Logger.Debug($"Concatenating group {i}/{grouped_parts_list.Count()}");
+                    Sentry.Common.Logging.Logger.Debug($"Concatenating group {i}/{grouped_parts_list.Count}");
                     bundledFile = RunSingleContatenation(grouped_parts_list[i], $"{_request.TargetFileName + _request.FileExtension}");
                 }
                 Sentry.Common.Logging.Logger.Info($"Finished Concatenation process. RequestGuid:{_request.RequestGuid}");
@@ -108,21 +108,20 @@ namespace Sentry.data.Bundler
                 Directory.Delete(Directory.GetParent(bundledFile).ToString(), true);
 
                 //Create BundleResponse
-                BundleResponse resp = new BundleResponse();
-                resp.RequestGuid = _request.RequestGuid;
-                resp.DatasetID = _request.DatasetID;
-                resp.DatasetFileConfigId = _request.DatasetFileConfigId;
-                resp.TargetBucket = _request.Bucket;
-                resp.TargetFileName = $"{_request.TargetFileName}{_request.FileExtension}";
-                resp.TargetKey = (_request.TargetFileLocation + $"{resp.TargetFileName}");
-                resp.TargetVersionId = versionId;
-                resp.RequestInitiatorId = _request.RequestInitiatorId;
-                resp.EventID = "";
+                //Create Dataset Loader Request to register Bundle with Data.Sentry.Com
+                LoaderRequest req = new LoaderRequest(Guid.Parse(_request.RequestGuid));
+                req.IsBundled = true;
+                req.DatasetID = _request.DatasetID;
+                req.DatasetFileConfigId = _request.DatasetFileConfigId;
+                req.TargetBucket = _request.Bucket;
+                req.TargetFileName = $"{_request.TargetFileName}{_request.FileExtension}";
+                req.TargetKey = (_request.TargetFileLocation + $"{req.TargetFileName}");
+                req.TargetVersionId = versionId;
+                req.RequestInitiatorId = _request.RequestInitiatorId;
+                req.EventID = "";
 
                 //Push BundleResponse to dataset bundle droploaction
-                string jsonResponse = JsonConvert.SerializeObject(resp, Formatting.Indented);
-
-                Logger.Debug($"BundleResponse:{jsonResponse}");
+                string jsonResponse = JsonConvert.SerializeObject(req, Formatting.Indented);
 
                 using (MemoryStream ms = new MemoryStream())
                 {
@@ -134,14 +133,28 @@ namespace Sentry.data.Bundler
                     //You have to rewind the MemoryStream before copying
                     ms.Seek(0, SeekOrigin.Begin);
 
-                    using (FileStream fs = new FileStream($"{_request.DatasetDropLocation}{_request.RequestGuid}.json", FileMode.OpenOrCreate))
+                    using (FileStream fs = new FileStream($"{Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath")}{_request.RequestGuid}.json", FileMode.OpenOrCreate))
                     {
                         ms.CopyTo(fs);
                         fs.Flush();
                     }
                 }
 
-                Logger.Info($"Bundle Request Processed - Request:{_request.RequestGuid} Parts:{_request.SourceKeys.Count()} TotalTime(sec):{(DateTime.Now - bundleStart).TotalSeconds}");
+                //Create Bundle Started Event
+                e = new Event();
+                e.EventType = _dscontext.EventTypes.Where(w => w.Description == "Bundle File Process").FirstOrDefault();
+                e.Status = _dscontext.EventStatus.Where(w => w.Description == "In Progress").FirstOrDefault();
+                e.TimeCreated = DateTime.Now;
+                e.TimeNotified = DateTime.Now;
+                e.IsProcessed = false;
+                e.UserWhoStartedEvent = _request.RequestInitiatorId;
+                e.Dataset = _request.DatasetID;
+                e.DataConfig = _request.DatasetFileConfigId;
+                e.Reason = $"Submitted request to dataset loader to upload and register {_request.TargetFileName}";
+                e.Parent_Event = _request.RequestGuid;
+                await Utilities.CreateEventAsync(e);
+
+                Logger.Info($"Bundle Request Processed - Request:{_request.RequestGuid} Parts:{_request.SourceKeys.Count} TotalTime(sec):{(DateTime.Now - bundleStart).TotalSeconds}");
 
                 //remove reqeust file
                 Logger.Info("Removing processed request file");
@@ -151,16 +164,16 @@ namespace Sentry.data.Bundler
             catch (Exception ex)
             {
                 //Create Bundle Failed Event
-                Event e = new Event();
-                e.EventType = _dscontext.GetEventType(3);
-                e.Status = _dscontext.GetStatus(4);
+                e = new Event();
+                e.EventType = _dscontext.EventTypes.Where(w => w.Description == "Bundle File Process").FirstOrDefault();
+                e.Status = _dscontext.EventStatus.Where(w => w.Description == "Error").FirstOrDefault();
                 e.TimeCreated = DateTime.Now;
                 e.TimeNotified = DateTime.Now;
                 e.IsProcessed = false;
                 e.UserWhoStartedEvent = _request.RequestInitiatorId;
                 e.Dataset = _request.DatasetID;
                 e.DataConfig = _request.DatasetFileConfigId;
-                e.Reason = $"{_request.RequestGuid} : Bundle Request Failed - See SEL Logs for further detail.";
+                e.Reason = $"Bundle Request Failed for {_request.TargetFileName}";
                 e.Parent_Event = _request.RequestGuid;
                 await Utilities.CreateEventAsync(e);
 
@@ -284,11 +297,11 @@ namespace Sentry.data.Bundler
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"Failed Concatenation process... RequestGuid:{_request.RequestGuid}",ex);
+                    Logger.Error($"Failed Concatenation process... RequestGuid:{_request.RequestGuid}", ex);
                     throw;
                 }
-                
-                
+
+
             });
 
             //Rebuild 
@@ -304,11 +317,11 @@ namespace Sentry.data.Bundler
             {
                 finalFile = firstHalf.First();
             }
-            
+
 
             //firstHalf = firstHalf.Take(partcnt / 2).ToList();
             //secondHalf = firstHalf.Skip(partcnt / 2).ToList();
-            
+
 
             return $"{_baseWorkingDir + _request.RequestGuid}\\{finalFile.Id}";
         }
@@ -319,7 +332,7 @@ namespace Sentry.data.Bundler
             int partcnt = list.Count();
             bool remainerProcessed = false;
             List<BundlePart> firstHalf = list.OrderBy(o => o.Id).Take(partcnt / 2).ToList();
-            List<BundlePart> secondHalf = list.OrderBy(o => o.Id).Skip(partcnt / 2).ToList();   
+            List<BundlePart> secondHalf = list.OrderBy(o => o.Id).Skip(partcnt / 2).ToList();
             Parallel.ForEach(firstHalf, (part) =>
             {
                 //int secondId = ((partcnt / 2) - 2) + part.Id;
@@ -338,7 +351,7 @@ namespace Sentry.data.Bundler
                         fs.Flush();
 
                         secFile.Dispose();
-                    }                    
+                    }
 
                     Logger.Info($"Deleting {secondHalf[secondId].Id} file");
                     System.IO.File.Delete($"{_baseWorkingDir + _request.RequestGuid}\\{secondHalf[secondId].Id}");

@@ -147,7 +147,7 @@ namespace Sentry.data.Core.Tests
                                             null,//"Claim/S3/Key",
                                             true,
                                             true,
-                                            null,
+                                            //null,
                                             GetMockCategoryData(),
                                             null,
                                            // GetMockDatasetScopeData(),

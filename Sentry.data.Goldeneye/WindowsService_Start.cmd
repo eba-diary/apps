@@ -22,4 +22,6 @@ md "%LOGPATH%"
 SET LOGFILE=%LOGPATH%\WindowsService_Start-%d%_%t%.log
 
 cmd /c "%RUNPATH%WindowsService_Start_run.cmd" > "%LOGFILE%" 2>&1
+echo errorfilecontents
+more %LOGFILE%
 @EXIT %ERRORLEVEL%

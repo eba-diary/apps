@@ -105,7 +105,7 @@ namespace Sentry.data.Bundler
                                         Logger.Error($"Bundle Task Failed for request: {Path.GetFileName(file.fileName)}", e);
                                     }
                                 }
-                                
+
                             }, TaskCreationOptions.LongRunning);
 
                     file.started = true;

@@ -818,17 +818,18 @@ data.DatasetDetail = {
 
         var controllerURL = "/Dataset/GetDatasetFileDownloadURL/?id=" + encodeURI(id);
         $.get(controllerURL, function (result) {
-            var jrUrl = result;
-            window.open(jrUrl, "_blank");
+            window.open(result, "_blank");
+        })
+        .fail(function (jqXHR, textStatus, errorThrown)
+        {
+            Sentry.ShowModalCustom("Error", jqXHR.responseJSON.message, {
+                Cancel:
+                {
+                    label: 'Ok',
+                    className: 'btn-Ok'
+                }
+            });
         });
-    },
-
-    PushToSAS: function (caller, id, filename) {
-       // console.log($(caller).parent().next().text());
-       // console.log(id);
-       // console.log(filename);
-        data.Dataset.FileNameModal(filename);
-        data.Dataset.PushToSAS_Filename(filename, $(caller).parent().next().text());
     },
 
     DownloadLatestDatasetFile: function (id) {
@@ -841,10 +842,26 @@ data.DatasetDetail = {
         $.get(getLatestURL, function (e) {
             var controllerURL = "/Dataset/GetDatasetFileDownloadURL/?id=" + encodeURI(e);
             $.get(controllerURL, function (result) {
-                var jrUrl = result;
-                window.open(jrUrl, "_blank");
+                window.open(result, "_blank");
+            })
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                Sentry.ShowModalCustom("Error", jqXHR.responseJSON.message, {
+                    Cancel:
+                    {
+                        label: 'Ok',
+                        className: 'btn-Ok'
+                    }
+                });
             });
         });
+    },
+
+    PushToSAS: function (caller, id, filename) {
+        // console.log($(caller).parent().next().text());
+        // console.log(id);
+        // console.log(filename);
+        data.Dataset.FileNameModal(filename);
+        data.Dataset.PushToSAS_Filename(filename, $(caller).parent().next().text());
     },
 
     PreviewDatafileModal: function (id) {
@@ -852,6 +869,15 @@ data.DatasetDetail = {
         var modal = Sentry.ShowModalWithSpinner("Preview Datafile");
 
         $.get("/Dataset/PreviewDatafile/" + id, function (result) {
+            modal.ReplaceModalBody(result);
+        });
+    },
+
+    PreviewLatestDatafileModal: function (id) {
+
+        var modal = Sentry.ShowModalWithSpinner("Preview Datafile");
+
+        $.get("/Dataset/PreviewLatestDatafile/" + id, function (result) {
             modal.ReplaceModalBody(result);
         });
     },
@@ -872,15 +898,6 @@ data.DatasetDetail = {
             modal.ReplaceModalBody(result);
             data.DatasetDetail.VersionsModalInit(id);
         })
-    },
-
-    PreviewLatestDatafileModal: function (id) {
-
-        var modal = Sentry.ShowModalWithSpinner("Preview Datafile");
-
-        $.get("/Dataset/PreviewLatestDatafile/" + id, function (result) {
-            modal.ReplaceModalBody(result);
-        });
     },
 
 
@@ -956,11 +973,7 @@ data.DatasetDetail = {
                 { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px", searchable: false },
                 { data: "ActionLinks", className: "downloadFile", width: "100px", searchable: false, orderable: false },
                 {
-                    data: "Name", width: "40%", className: "Name", render: function (data, type, row) {
-                        return "<a href = \"#\" onclick=\"data.DatasetDetail.GetDatasetFileVersions(" + row.Id
-                            + ")\" title=\"View File Versions\">" + row.Name
-                            + "</a>"
-                    }
+                    data: "Name", width: "40%", className: "Name"
                 },
                 { data: "UploadUserName", className: "UploadUserName" },
                 { data: "CreateDTM", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },

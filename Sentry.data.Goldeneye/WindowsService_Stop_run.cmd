@@ -5,11 +5,11 @@
 SET ERRLVL=0
 
 :STOPSERVICE
-sc stop Sentry.data.Goldeneye > tempfile 2>&1
+sc stop Sentry.data.GoldeneyeNRTest > tempfile 2>&1
 @IF %ERRORLEVEL% NEQ 0 IF %ERRORLEVEL% NEQ 1062 IF %ERRORLEVEL% NEQ 1060 GOTO STOPFAILURE
 
 :DISABLESERVICE
-sc config Sentry.data.Goldeneye start= disabled > tempfile 2>&1
+sc config Sentry.data.GoldeneyeNRTest start= disabled > tempfile 2>&1
 @IF %ERRORLEVEL% NEQ 0 GOTO DISABLEFAILURE
 
 

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public class BundleRequest
+    public class BundleRequest : Request
     {                               
         public BundleRequest(Guid input)
         {
@@ -25,19 +25,5 @@ namespace Sentry.data.Core
         public List<Tuple<string, string>> SourceKeys { get; set; }
         public string TargetFileName { get; set; }
         public string FileExtension { get; set; }
-        /// <summary>
-        /// Email of orignial requestor
-        /// </summary>
-        public string Email { get; set; }
-        /// <summary>
-        /// Target location for reqeust response.  Typically, the dataset bundle drop location for dataset loader.
-        /// </summary>
-        public string DatasetDropLocation { get; set; }
-        /// <summary>
-        /// Associate ID of request initiator
-        /// </summary>
-        public string RequestInitiatorId { get; set; }
-        public string EventId { get; set; }
-
     }
 }

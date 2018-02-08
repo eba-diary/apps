@@ -1,0 +1,87 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="sentry-spinner-container" style=" width: 1166px; padding-top: 150px;">
+    <span class="sentry-spinner" style="height:100px"></span>
+</div>
+
+<div data-bind="foreach: sprints">
+    <h3 data-bind="text: name"></h3>
+    <div data-bind="foreach : issues">
+        <div class="ul-dataset-list-item borderSide_gray boxShadowSm borderSide_blueGray">
+            <div>
+                <img data-bind="attr : { src: fields.priority.iconUrl, title: fields.priority.name }" width="20" />
+                <b><span data-bind="text: key"></span> : <span data-bind="text: fields.summary"></span></b>
+            </div>
+            <div data-bind="foreach: fields.fixVersions">
+                <span data-bind="text: name"/>
+            </div>
+            <div>
+                <span data-bind="text: fields.description"/>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+
+@section Scripts {
+    <script>
+        $(function () {
+
+
+        });
+
+        function SprintModel(data) {
+
+            this.Sprint = ko.observableArray([]);
+
+        }
+
+
+        function Sprint(data) {
+
+        }
+
+        function Issue(data) {
+
+        }
+
+
+        function ListViewModel() {
+            var self = this;
+            self.issues = ko.observableArray([]);
+            self.sprints = ko.observableArray([]);
+
+            var loaded = false;
+
+            // Load initial state from server, convert it to Dataset instances, then populate self.datasets
+            $.getJSON("/Home/GetSprint", function (allData) {
+                console.log(allData);
+                var mappedTasks = $.map(allData, function (item) { return new SprintModel(item) });
+
+                
+                //self.issues(allData.issues);
+                self.sprints(allData.sprints);
+
+                $('.sentry-spinner-container').hide();
+            });
+
+
+
+        }
+
+        $(document).ready(function () {
+            window.vm = new ListViewModel();
+            ko.applyBindings(vm);
+
+
+        });
+
+</script>
+}

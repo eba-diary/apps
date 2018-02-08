@@ -49,11 +49,11 @@ namespace Sentry.data.Web
             this.CanDisplay = ds.CanDisplay;
             this.DatasetInformation = ds.DatasetInformation;
             
-            this.RawMetadata = new List<_DatasetMetadataModel>();
-            foreach (DatasetMetadata dsm in ds.RawMetadata)
-            {
-                this.RawMetadata.Add(new _DatasetMetadataModel(dsm));
-            }
+            //this.RawMetadata = new List<_DatasetMetadataModel>();
+            //foreach (DatasetMetadata dsm in ds.RawMetadata)
+            //{
+            //    this.RawMetadata.Add(new _DatasetMetadataModel(dsm));
+            //}
 
             this.IsPushToTableauCompatible = false;
             this.DatasetCategory = ds.DatasetCategory; 
@@ -102,6 +102,16 @@ namespace Sentry.data.Web
                 extensions.Add(Utilities.GetFileExtension(item.FileName));
             }
             return extensions.Distinct().ToList();
+        }
+
+        public List<string> DistinctFrequencies()
+        {
+            List<string> frequencies = new List<string>();
+            foreach (var item in this.DatasetFileConfigs)
+            {
+                frequencies.Add(item.CreationFreq);
+            }
+            return frequencies.Distinct().ToList();
         }
 
         public int DatasetId { get; set; }
@@ -170,29 +180,6 @@ namespace Sentry.data.Web
 
         public Boolean CanDisplay { get; set; }
 
-        public IList<_DatasetMetadataModel> RawMetadata { get; set; }
-
-        public IList<_DatasetMetadataModel> Columns
-        {
-            get
-            {
-                if (null != this.RawMetadata)
-                    return RawMetadata.Where(x => x.IsColumn == true).ToList();
-                else
-                    return null;
-            }
-        }
-
-        public IList<_DatasetMetadataModel> Metadata
-        {
-            get
-            {
-                if (null != this.RawMetadata)
-                    return RawMetadata.Where(x => x.IsColumn == false).ToList();
-                else
-                    return null;
-            }
-        }
 
         public Boolean CanDwnldSenstive { get; set; }
         public Boolean CanEditDataset { get; set; }
@@ -204,13 +191,8 @@ namespace Sentry.data.Web
         public Boolean IsPreviewCompatible { get; set; }
 
         public Boolean IsSubscribed { get; set; }
-        public Category DatasetCategory { get; set; } /* Caden made a change here for the Category reference */ 
-        //public IList<String> CategoryList { get; set; }
+        public Category DatasetCategory { get; set; } 
 
-        ///// <summary>
-        ///// AllCategories holds the sorted list of all possible categories.
-        ///// </summary>
-        //public IEnumerable<SelectListItem> AllCategories { get; set; }
 
         public IList<BaseDatasetFileModel> DatasetFiles { get; set; }
 

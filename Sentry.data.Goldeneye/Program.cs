@@ -36,6 +36,11 @@ namespace Sentry.data.Goldeneye
                 }
 
                 myCore.OnStop();
+
+                while(true)
+                {
+                    int i = 0;
+                }
             }
             else
             {

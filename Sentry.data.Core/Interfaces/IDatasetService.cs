@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System;
-//using Amazon.S3.Model;
 
 namespace Sentry.data.Core
 {
@@ -12,8 +11,6 @@ namespace Sentry.data.Core
         IDictionary<string, string> GetDatasetList(string parentDir = null, bool includeSubDirectories = true);
 
         //Dataset GetDatasetDetails(string uniqueKey);
-
-        string GetDatasetDownloadURL(string uniqueKey);
 
         /// <summary>
         /// Upload a dataset to S3, pulling directly from the given source file path.  Files size less than
@@ -33,17 +30,20 @@ namespace Sentry.data.Core
 
         //string UploadDataset_v2(string sourceFilePath, string targetKey);
 
-        string GetObjectPreview(string key);
-
-        void DeleteDataset(string uniqueKey);
-
         void TransferUtlityUploadStream(string category, string filename, Stream stream);
 
         void TransferUtlityUploadStream(string key, Stream stream);
 
         void TransferUtilityDownload(string baseTargetPath, string folder, string filename, string s3Key);
 
-        void DeleteS3key(string key);
+        #region Object Deletes
+        ObjectKeyVersion MarkDeleted(string key);
+
+        void DeleteS3Key(ObjectKeyVersion keyversion);
+
+        void DeleteMultipleS3keys(List<ObjectKeyVersion> keyversionids);
+        #endregion
+
 
         //DatasetFolder GetSubFolderStructure(DatasetFolder parentFolder = null, bool includeSubDirectories = true);
 

@@ -66,7 +66,7 @@ namespace Sentry.data.Core
                        string s3key,
                        Boolean IsSensitive,
                        Boolean CanDisplay,
-                       IList<DatasetMetadata> rawMetadata,
+                       //IList<DatasetMetadata> rawMetadata,
                        Category cat,
                        IList<DatasetFile> datasetFile,
                        //DatasetScopeType datasetscopetype,
@@ -93,7 +93,7 @@ namespace Sentry.data.Core
             this._s3key = s3key;
             this._IsSensitive = IsSensitive;
             this._canDisplay = CanDisplay;
-            this._rawMetadata = rawMetadata;
+            //this._rawMetadata = rawMetadata;
             this._datasetCategory = cat;
             this._datasetFile = datasetFile;
             //this._datasetScopeType = datasetscopetype;
@@ -289,33 +289,33 @@ namespace Sentry.data.Core
             }
         }
 
-        public virtual IList<DatasetMetadata> RawMetadata
-        {
-            get
-            {
-                return _rawMetadata;
-            }
-            set
-            {
-                _rawMetadata = value;
-            }
-        }
+        //public virtual IList<DatasetMetadata> RawMetadata
+        //{
+        //    get
+        //    {
+        //        return _rawMetadata;
+        //    }
+        //    set
+        //    {
+        //        _rawMetadata = value;
+        //    }
+        //}
 
-        public virtual IList<DatasetMetadata> Metadata
-        {
-            get
-            {
-                return _rawMetadata.Where((x) => x.IsColumn == false).ToList();
-            }
-        }
+        //public virtual IList<DatasetMetadata> Metadata
+        //{
+        //    get
+        //    {
+        //        return _rawMetadata.Where((x) => x.IsColumn == false).ToList();
+        //    }
+        //}
 
-        public virtual IList<DatasetMetadata> Columns
-        {
-            get
-            {
-                return _rawMetadata.Where((x) => x.IsColumn == true).ToList();
-            }
-        }
+        //public virtual IList<DatasetMetadata> Columns
+        //{
+        //    get
+        //    {
+        //        return _rawMetadata.Where((x) => x.IsColumn == true).ToList();
+        //    }
+        //}
 
         public virtual Category DatasetCategory
         {
