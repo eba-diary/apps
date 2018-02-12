@@ -4,11 +4,11 @@
 ::--------------------------------------------------------------------------------------
 
 :ENABLESERVICES
-sc config Sentry.data.GoldeneyeNRTest start= auto > tempfile 2>&1
+sc config %1 start= auto > tempfile 2>&1
 @IF %ERRORLEVEL% NEQ 0 GOTO ENABLEFAILURE 
 
 :STARTSERVICE
-sc start Sentry.data.GoldeneyeNRTest 2> tempfile
+sc start %1 2> tempfile
 @IF %ERRORLEVEL% NEQ 0 IF %ERRORLEVEL% NEQ 1056 GOTO STARTFAILURE
 
 :SUCCESS

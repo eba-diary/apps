@@ -21,7 +21,18 @@ set LOGPATH=%RUNPATH%Logs
 md "%LOGPATH%"
 SET LOGFILE=%LOGPATH%\WindowsService_Start-%d%_%t%.log
 
-cmd /c "%RUNPATH%WindowsService_Start_run.cmd" > "%LOGFILE%" 2>&1
+::Bring in service name
+IF "%~1" == "" GOTO SPECIFIC
+
+set serviceConfigName="Sentry.data.GoldenEye"
+GOTO START
+
+:SPECIFIC
+set serviceConfigName=%1
+GOTO START
+
+:START
+cmd /c "%RUNPATH%WindowsService_Start_run.cmd %serviceConfigName%" > "%LOGFILE%" 2>&1
 echo errorfilecontents
 more %LOGFILE%
 @EXIT %ERRORLEVEL%
