@@ -163,7 +163,7 @@ namespace Sentry.data.Goldeneye
                 e.UserWhoStartedEvent = loadReq.RequestInitiatorId;
                 e.Dataset = loadReq.DatasetID;
                 e.DataConfig = loadReq.DatasetFileConfigId;
-                e.Reason = $"Successfully submitted request to Dataset Loader to upload file [<b>{origFileName}</b>] to dataset [<b>{_datasetContext.GetById(loadReq.DatasetID).DatasetName}</b>]";
+                e.Reason = $"Successfully submitted request to Dataset Loader to upload file [<b>{origFileName}</b>]";
                 e.Parent_Event = loadReq.RequestGuid;
                 Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
             }
