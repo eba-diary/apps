@@ -9,24 +9,46 @@
       - Enter variables that differ per deployment environment in this file
       - For DeployLocations properties, separate multiple locations with a semicolon (;)
 		-->
- 
-      <if test="${TargetEnv=='Test'}">
-        <!--<property name="DeployLocations" value="\\SHO-T-SHDWEB-20\Web$\DataTest"/>-->
-        <property name="DeployLocations_Web" value="\\SHO-T-SHDWEB-20\Web$\DataTestNR"/>
-        <!--<property name="DeployLocations_Loader" value="\\SHO-T-SHDCON-20\ConsoleApps$\DatasetLoaderTestNR"/>-->
-        <!--<property name="DeployLocations_Retriever" value="\\SHO-T-SHDCON-20\ConsoleApps$\DatasetRetrieverTestNR"/>-->
-        <property name="envDashSiteEnvId" value="2403" />
-        <property name="createSeerOutage" value="false"/>
-      </if>
+
+    <if test="${TargetEnv=='Test'}">
+      <!--<property name="DeployLocations" value="\\SHO-T-SHDWEB-20\Web$\DataTest"/>-->
+      <property name="DeployLocations_Web" value="\\SHO-T-SHDWEB-20\Web$\DataTest"/>
+      <!--<property name="DeployLocations_Loader" value="\\SHO-T-SHDCON-20\ConsoleApps$\DatasetLoaderTest"/>-->
+      <property name="DeployLocations_Retriever" value="\\SHO-T-SHDCON-20\ConsoleApps$\DatasetRetrieverTest"/>
+      <property name="DeployLocations_GoldenEye" value="\\SHO-T-SHDCON-20\ConsoleApps$\GoldenEyeTest"/>
+      <property name="envDashSiteEnvId" value="2403" />
+      <property name="createSeerOutage" value="false"/>
+    </if>
       <if test="${TargetEnv=='NR'}">
         <!--<property name="DeployLocations" value="\\SHO-T-SHDWEB-20\Web$\DataTest"/>-->
         <property name="DeployLocations_Web" value="\\SHO-T-SHDWEB-20\Web$\DataTestNR"/>
-        <property name="DeployLocations_Loader" value="\\SHO-T-SHDCON-20\ConsoleApps$\DatasetLoaderNRTest"/>
+        <!--<property name="DeployLocations_Loader" value="\\SHO-T-SHDCON-20\ConsoleApps$\DatasetLoaderNRTest"/>-->
         <property name="DeployLocations_Retriever" value="\\SHO-T-SHDCON-20\ConsoleApps$\DatasetRetrieverNRTest"/>
         <property name="DeployLocations_GoldenEye" value="\\SHO-T-SHDCON-20\ConsoleApps$\GoldenEyeNRTest"/>
         <property name="envDashSiteEnvId" value="2461" />
         <property name="createSeerOutage" value="false"/>
       </if>
+    <if test="${TargetEnv=='Qual'}">
+      <property name="DeployLocations_Web" value="\\SHO-Q-SHDWEB-20\Web$\DataQual;\\DIX-Q-SHDWEB-20\Web$\DataQual"/>
+      <!--<property name="DeployLocations_Loader" value="\\SHO-Q-SHDCON-20\ConsoleApps$\DatasetLoaderQual;\\DIX-Q-SHDCON-20\ConsoleApps$\DatasetLoaderQual"/>-->
+      <property name="DeployLocations_Retriever" value="\\SHO-Q-SHDCON-20\ConsoleApps$\DatasetRetrieverQual;\\DIX-Q-SHDCON-20\ConsoleApps$\DatasetRetrieverQual"/>
+      <property name="DeployLocations_GoldenEye" value="\\SHO-Q-SHDCON-20\ConsoleApps$\GoldenEyeQual"/>
+      <property name="envDashSiteEnvId" value="2404" />
+      <property name="createSeerOutage" value="true"/>
+      <property name="seerOutageServers" value=""/>
+      <property name="seerOutageApplications" value="dataqual"/>
+    </if>
+
+    <if test="${TargetEnv=='Prod'}">
+      <property name="DeployLocations_Web" value="\\SHO-P-SHDWEB-20\Web$\Data;\\DIX-P-SHDWEB-20\Web$\Data"/>
+      <!--<property name="DeployLocations_Loader" value="\\SHO-P-SHDCON-20\ConsoleApps$\DatasetLoader;\\DIX-P-SHDCON-20\ConsoleApps$\DatasetLoader"/>-->
+      <property name="DeployLocations_Retriever" value="\\SHO-P-SHDCON-20\ConsoleApps$\DatasetRetriever;\\DIX-P-SHDCON-20\ConsoleApps$\DatasetRetriever"/>
+      <property name="DeployLocations_GoldenEye" value="\\SHO-P-SHDCON-20\ConsoleApps$\GoldenEye"/>
+      <property name="envDashSiteEnvId" value="2405" />
+      <property name="createSeerOutage" value="true"/>
+      <property name="seerOutageServers" value=""/>
+      <property name="seerOutageApplications" value="data"/>
+    </if>
     
 	</target>
 
