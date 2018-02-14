@@ -37,7 +37,6 @@ namespace Sentry.data.Infrastructure
             myMail.Subject = interval + " Events from data.sentry.com";
 
             myMail.To.Add(emailAddress);
-            myMail.To.Add("andrew.quaschnick@sentry.com");
 
             myMail.IsBodyHtml = true;
 
