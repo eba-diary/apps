@@ -965,50 +965,6 @@ namespace Sentry.data.Web.Controllers
 
         }
 
-
-        /// <summary>
-        /// Callback handler for S3 uploads... Amazon calls this to communicate progress; from here we communicate
-        /// that progress back to the client for their progress bar...
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        static void PushToSAS_ProgressEvent(object sender, TransferProgressEventArgs e)
-        {
-            throw new NotImplementedException();
-            int percent = 0;
-
-            object x = e.GetType();
-
-            if (e.Type == "Downloading")
-            {
-                percent = Convert.ToInt32(Convert.ToDouble(e.PercentDone) * 0.9);
-
-                if (percent % 10 == 0)
-                {
-                    Sentry.Common.Logging.Logger.Debug("PushToSAS_ProgressEvent: " + e.Type + ":" + e.FilePath + ": " + percent);
-                }
-            }
-
-            if (e.Type == "Converting")
-            {
-                percent = Convert.ToInt32(Convert.ToDouble(e.PercentDone) * 0.1) + 90;
-
-                if (percent % 10 == 0)
-                {
-                    Sentry.Common.Logging.Logger.Debug("PushToSAS_ProgressEvent: " + e.Type + ":" + e.FilePath + ": " + percent);
-                }
-            }
-
-            Sentry.data.Web.Helpers.ProgressUpdater.SendProgress(e.FilePath, percent);
-
-            //if (percent % 10 == 0)
-            //{
-            //    Sentry.Common.Logging.Logger.Debug("PushToSAS_ProgressEvent: " + e.Type + ":" + e.FilePath + ": " + percent);
-            //}
-
-        }
-
-
         private IEnumerable<SelectListItem> GetCategoryList()
         {
             IEnumerable<SelectListItem> var = _datasetContext.Categories.OrderByHierarchy().Select((c) => new SelectListItem { Text = c.FullName, Value = c.Id.ToString() });
@@ -1098,95 +1054,89 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult PushToSAS(int id, string fileOverride)
         {
-            DatasetFile ds = _datasetContext.GetById<DatasetFile>(id);
-            string filename = null;
-            string filename_orig = null;
-
-            Sentry.Common.Logging.Logger.Debug("DatasetId: " + id);
-            Sentry.Common.Logging.Logger.Debug("File Name Override Value: " + fileOverride);
-
-            //Test for an override name; if empty or null, use current value on dataset model
-            if (!String.IsNullOrWhiteSpace(fileOverride))
+            try
             {
-                //Test if override name includes an extension; if exists, replace with current value in dataset model
-                if (Path.HasExtension(fileOverride))
+                DatasetFile ds = _datasetContext.GetById<DatasetFile>(id);
+                string filename = null;
+                string filename_orig = null;
+
+                Sentry.Common.Logging.Logger.Debug("DatasetId: " + id);
+                Sentry.Common.Logging.Logger.Debug("File Name Override Value: " + fileOverride);
+
+                //Test for an override name; if empty or null, use current value on dataset model
+                if (!String.IsNullOrWhiteSpace(fileOverride))
                 {
-                    Sentry.Common.Logging.Logger.Debug("Has File Extension: " + System.IO.Path.GetExtension(fileOverride));
-                    Sentry.Common.Logging.Logger.Debug("Dataset Model Extension: " + System.IO.Path.GetExtension(ds.FileName));
-                    filename = fileOverride.Replace(System.IO.Path.GetExtension(fileOverride), System.IO.Path.GetExtension(ds.FileName));
+                    //Test if override name includes an extension; if exists, replace with current value in dataset model
+                    if (Path.HasExtension(fileOverride))
+                    {
+                        Sentry.Common.Logging.Logger.Debug("Has File Extension: " + System.IO.Path.GetExtension(fileOverride));
+                        Sentry.Common.Logging.Logger.Debug("Dataset Model Extension: " + System.IO.Path.GetExtension(ds.FileName));
+                        filename = fileOverride.Replace(System.IO.Path.GetExtension(fileOverride), System.IO.Path.GetExtension(ds.FileName));
+                    }
+                    else
+                    {
+                        Sentry.Common.Logging.Logger.Debug("Has No File Extension");
+                        Sentry.Common.Logging.Logger.Debug("Dataset Model Extension: " + System.IO.Path.GetExtension(ds.FileName));
+                        filename = (fileOverride + System.IO.Path.GetExtension(ds.FileName));
+                    }
                 }
                 else
                 {
-                    Sentry.Common.Logging.Logger.Debug("Has No File Extension");
-                    Sentry.Common.Logging.Logger.Debug("Dataset Model Extension: " + System.IO.Path.GetExtension(ds.FileName));
-                    filename = (fileOverride + System.IO.Path.GetExtension(ds.FileName));
+                    Sentry.Common.Logging.Logger.Debug(" No Override Value");
+                    Sentry.Common.Logging.Logger.Debug("Dataset Model S3Key: " + System.IO.Path.GetFileName(ds.FileLocation));
+                    filename = System.IO.Path.GetFileName(ds.FileLocation);
                 }
-            }
-            else
-            {
-                Sentry.Common.Logging.Logger.Debug(" No Override Value");
-                Sentry.Common.Logging.Logger.Debug("Dataset Model S3Key: " + System.IO.Path.GetFileName(ds.FileLocation));
-                filename = System.IO.Path.GetFileName(ds.FileLocation);
-            }
 
-            filename_orig = filename;
+                filename_orig = filename;
 
-            //Gerenate SAS friendly file name.
-            filename = _sasService.GenerateSASFileName(filename);
+                //Gerenate SAS friendly file name.
+                filename = _sasService.GenerateSASFileName(filename);
 
-            //Sentry.Common.Logging.Logger.Debug($"File Name Translation: Original({filename_orig} SASFriendly({filename})");
+                //Sentry.Common.Logging.Logger.Debug($"File Name Translation: Original({filename_orig} SASFriendly({filename})");
 
-            string BaseTargetPath = Configuration.Config.GetHostSetting("PushToSASTargetPath");
+                string BaseTargetPath = Configuration.Config.GetHostSetting("PushToSASTargetPath");
 
-            //creates category directory if does not exist, otherwise does nothing.
-            System.IO.Directory.CreateDirectory(BaseTargetPath + ds.Dataset.Category);
+                //creates category directory if does not exist, otherwise does nothing.
+                System.IO.Directory.CreateDirectory(BaseTargetPath + ds.Dataset.Category);
 
+                try
+                {
 
-            _s3Service.OnTransferProgressEvent += new EventHandler<TransferProgressEventArgs>(PushToSAS_ProgressEvent);
-            _sasService.OnPushToProgressEvent += new EventHandler<TransferProgressEventArgs>(PushToSAS_ProgressEvent);
+                    _s3Service.TransferUtilityDownload(BaseTargetPath, ds.Dataset.Category, filename, ds.FileLocation);
 
-            try
-            {
-
-                _s3Service.TransferUtilityDownload(BaseTargetPath, ds.Dataset.Category, filename, ds.FileLocation);
-
-            }
-            catch (Exception e)
-            {
-                Sentry.Common.Logging.Logger.Error("S3 Download Error", e);
-                return PartialView("_Success", new SuccessModel("Push to SAS Error", e.Message, false));
-            }
-            finally
-            {
-                _s3Service.OnTransferProgressEvent -= new EventHandler<TransferProgressEventArgs>(PushToSAS_ProgressEvent);
-            }
+                }
+                catch (Exception e)
+                {
+                    Sentry.Common.Logging.Logger.Error("S3 Download Error", e);
+                    return PartialView("_Success", new SuccessModel("Push to SAS Error", e.Message, false));
+                }
 
 
-            //Converting file to .sas7bdat format
-            try
-            {
+                //Converting file to .sas7bdat format
+                try
+                {
 
-                _sasService.ConvertToSASFormat(filename, ds.Dataset.Category);
+                    _sasService.ConvertToSASFormat(filename, ds.Dataset.Category);
 
-            }
-            catch (WebException we)
-            {
-                Sentry.Common.Logging.Logger.Error("Web Error Calling SAS Stored Process", we);
-                return PartialView("_Success", new SuccessModel("Push to SAS Error", we.Message, false));
+                }
+                catch (WebException we)
+                {
+                    Sentry.Common.Logging.Logger.Error("Web Error Calling SAS Stored Process", we);
+                    return PartialView("_Success", new SuccessModel("Push to SAS Error", we.Message, false));
+                }
+                catch (Exception e)
+                {
+                    Sentry.Common.Logging.Logger.Error("Error calling SAS Stored Process", e);
+                    return PartialView("_Success", new SuccessModel("Push to SAS Error", e.Message, false));
+                }
+
+                return PartialView("_Success", new SuccessModel("Successfully Pushed File to SAS", $"Dataset file {filename_orig} has been converted to {filename.Replace(Path.GetExtension(filename), ".sas7bdat")}. The file can be found at {BaseTargetPath.Replace("\\sentry.com\appfs_nonprod", "S: ")}.", true));
             }
             catch (Exception e)
             {
-                Sentry.Common.Logging.Logger.Error("Error calling SAS Stored Process", e);
+                Logger.Error("Error calling SAS Stored Process", e);
                 return PartialView("_Success", new SuccessModel("Push to SAS Error", e.Message, false));
             }
-            finally
-            {
-                _sasService.OnPushToProgressEvent -= new EventHandler<TransferProgressEventArgs>(PushToSAS_ProgressEvent);
-            }
-
-
-            return PartialView("_Success", new SuccessModel("Successfully Pushed File to SAS", $"Dataset file {filename_orig} has been converted to {filename.Replace(Path.GetExtension(filename), ".sas7bdat")}. The file can be found at {BaseTargetPath.Replace("\\sentry.com\appfs_nonprod", "S: ")}.", true));
-
         }
 
         [HttpGet()]

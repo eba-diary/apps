@@ -17,6 +17,7 @@ using System.Net.Http.Headers;
 using System.Net;
 using Newtonsoft.Json.Linq;
 using System.IO;
+using Sentry.Configuration;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -46,6 +47,7 @@ namespace Sentry.data.Web.Controllers
             return View(das);
         }
 
+        //TODO Refactor into table (https://jira.sentry.com/browse/DSC-476)
         private readonly int[] sprintsIds = new int[2] { 2230, 2346 };
 
 
@@ -61,12 +63,12 @@ namespace Sentry.data.Web.Controllers
         }
 
 
+        //TODO Refactor Jira calls into Infrastructure Layer (https://jira.sentry.com/browse/DSC-475)
         public JsonResult GetSprint()
         {
 
-            var credentials = new NetworkCredential("data_sentry_com", "RDCR9g56");
 
-            string mergedCredentials = string.Format("{0}:{1}", "data_sentry_com", "RXC8MGrMSgUv");
+            string mergedCredentials = string.Format("{0}:{1}", Config.GetHostSetting("JiraApiUser"), Config.GetHostSetting("JiraApiPass"));
             byte[] byteCredentials = UTF8Encoding.UTF8.GetBytes(mergedCredentials);
             var base64Credentials = Convert.ToBase64String(byteCredentials);
 
@@ -74,7 +76,7 @@ namespace Sentry.data.Web.Controllers
 
             foreach (int sprintId in sprintsIds)
             {
-                WebRequest wr = WebRequest.Create(String.Format("{0}rest/agile/1.0/sprint/{1}", "http://jira.sentry.com/", sprintId));
+                WebRequest wr = WebRequest.Create(String.Format("{0}rest/agile/1.0/sprint/{1}", Config.GetHostSetting("JiraApiUrl"), sprintId));
 
                 wr.ContentType = "application/json;charset=UTF-8";
                 wr.Method = "GET";
@@ -101,13 +103,14 @@ namespace Sentry.data.Web.Controllers
             return Json(sm, JsonRequestBehavior.AllowGet);
         }
 
+        //TODO Refactor Jira calls into Infrastructure Layer (https://jira.sentry.com/browse/DSC-475)
         public List<Issue> GetIssues(int sprintId)
         {
-            string mergedCredentials = string.Format("{0}:{1}", "data_sentry_com", "RXC8MGrMSgUv");
+            string mergedCredentials = string.Format("{0}:{1}", Config.GetHostSetting("JiraApiUser"), Config.GetHostSetting("JiraApiPass"));
             byte[] byteCredentials = UTF8Encoding.UTF8.GetBytes(mergedCredentials);
             var base64Credentials = Convert.ToBase64String(byteCredentials);
 
-            var wr = WebRequest.Create(String.Format("{0}rest/agile/1.0/sprint/{1}/issue ", "http://jira.sentry.com/", sprintId));
+            var wr = WebRequest.Create(String.Format("{0}rest/agile/1.0/sprint/{1}/issue ", Config.GetHostSetting("JiraApiUrl"), sprintId));
 
             wr.ContentType = "application/json;charset=UTF-8";
             wr.Method = "GET";
