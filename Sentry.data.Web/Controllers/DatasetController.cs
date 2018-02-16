@@ -680,7 +680,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(PermissionNames.UseApp)]
         public JsonResult GetDatasetFileConfigInfo(int Id)
         {
             IEnumerable<DatasetFileConfigsModel> files = null;
