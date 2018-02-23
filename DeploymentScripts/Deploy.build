@@ -9,17 +9,10 @@
   <property name="PublishedWebSiteName" value="Sentry.data.Web"/>
   
   <!-- The list of steps in deploying your app -->
-  <!--<target name="deploy" depends="environmentSettings, deployApp, addOutage, deployApp, deleteOutage, envDashRecordDeploy" />-->
-  <!--<target name="deploy" depends="environmentSettings, addOutage, deployWebSite, envDashRecordDeploy, deleteOutage"/>-->
-  <!--<target name="deploy" depends="environmentSettings, addOutage, deployWebSite, envDashRecordDeploy, deployRetrieverApp, envDashRecordDeploy, deleteOutage"/>-->
-  <target name="deployWeb" depends="environmentSettings, addOutage, deployWebSite, envDashRecordDeploy, deleteOutage"/>
-  <target name="deployConsoleApps" depends="environmentSettings, addOutage, deployRetrieverApp, envDashRecordDeploy, deleteOutage"/>
-  <target name="deployServices" depends="environmentSettings, addOutage, deployGoldenEye, envDashRecordDeploy, deleteOutage"/>
+  <target name="deployWeb" depends="environmentSettings, addOutage, deployWebSite, deleteOutage"/>
+  <target name="deployConsoleApps" depends="environmentSettings, addOutage, deployRetrieverApp, deleteOutage"/>
+  <target name="deployServices" depends="environmentSettings, addOutage, deployGoldenEye, deleteOutage"/>
   
-  <!-- Environment Dashboard Settings -->
-  <property name="envDashSysId" value="278"/>
-  <!--<property name="envDashBuildTypId" value="387"/>-->
-
   <!-- SEER Outage Settings -->
   <property name="seerOutageSystemName" value="DatasetManagement"/>
   <property name="seerOutageLengthMinutes" value="60"/>
@@ -226,20 +219,4 @@
     <deleteOutage outageName="${seerOutageSystemName} ${TargetEnv} Deployment"/>
   </target>
   
-  <!-- BuildDate and deployDate are optional on the task calls below. If they are not present, -->
-  <!-- the target Environment Dashboard web service will use the current date/time. -->
-  <target name="envDashRecordDeploy" depends="environmentSettings, GetVersion" description="Task to record a deployment in the Environment Dashboard application.">
-    <echo message="Calling Environment Dashboard web service to record deployment..."/>
-    <echo message="SourceSystemID: ${envDashSysId}"/>
-    <echo message="envDashSiteEnvId: ${envDashSiteEnvId}"/>
-    <recordDeployment
-			webSvcUrl='https://EnvironmentDashboard.sentry.com/WebService/DashboardService.asmx'
-			sourceSystemId='${envDashSysId}'
-			environmentId='${envDashSiteEnvId}'
-			buildTag='${VersionTag}'
-			sendAlert='true'
-			initiatorName="NAnt script ${project::get-name()}" 
-      failonerror="false"/>
-  </target>
-
 </project>
