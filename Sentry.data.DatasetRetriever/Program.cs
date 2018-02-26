@@ -252,15 +252,6 @@ namespace Sentry.data.DatasetRetriever
 
                 ProcessCompressedFile(dscontext, request, reqOptions);
             }
-
-            //try
-            //{
-            //    ftpprovider.DownloadFile(url.ToString(), new NetworkCredential("anonymous", "Jered.Gosse@Sentry.com"), destination.ToString());
-            //}
-            //catch (Exception e)
-            //{
-            //    Logger.Error("Error Retrieving FTP File", e);
-            //}
             
         }
 
