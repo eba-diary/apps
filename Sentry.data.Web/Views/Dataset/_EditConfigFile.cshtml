@@ -21,10 +21,15 @@
             @Html.HiddenFor(model => model.DropLocationType)
             @Html.HiddenFor(model => model.DropPath)
             @Html.HiddenFor(model => model.FileTypeId)
-            @Html.HiddenFor(model => model.ConfigFileDesc)
             @Html.HiddenFor(model => model.DatasetId)
             @Html.HiddenFor(model => model.ModifyType)
+            @Html.HiddenFor(model => model.OverwriteDatasetFile)
+            @Html.HiddenFor(model => model.CreationFreq)
+            @Html.HiddenFor(model => model.DatasetScopeTypeID)
             @{Model.ModifyType = ViewBag.ModifyType;}
+
+
+            <h2 class="detailSection">Basic Configuration</h2>
 
             <div class="form-group">
                 @Html.LabelFor(m => m.ConfigFileName, htmlAttributes: new { @class = "control-lable col-sm-3" })
@@ -38,31 +43,54 @@
                     @Html.TextAreaFor(m => m.ConfigFileDesc, new { @class = "form-control ConfigFileDesc" })
                 </div>
             </div>
-            <div class="form-group">
-                @Html.LabelFor(m => m.SearchCriteria, htmlAttributes: new { @class = "control-lable col-sm-3" })
-                <div class="col-sm-9">
-                    @Html.EditorFor(m => m.SearchCriteria, new { htmlAttributes = new { @class = "form-control" } })
-                    @Html.ValidationMessageFor(model => model.SearchCriteria, "", new { @class = "text-danger" })
-                </div>
-            </div>
+            
             <div class="form-group">
                 @Html.LabelFor(m => m.DropLocationType, htmlAttributes: new { @class = "control-lable col-sm-3" })
                 <div class="col-sm-9">
-                    @Html.EditorFor(m => m.DropLocationType, new { htmlAttributes = new { @class = "form-control" } })
-                    @Html.ValidationMessageFor(model => model.DropLocationType, "", new { @class = "text-danger" })
+                    @Html.DisplayFor(m => m.DropLocationType, new { htmlAttributes = new { @class = "from-control-static" } })
+                    @*@Html.EditorFor(m => m.DropLocationType, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.DropLocationType, "", new { @class = "text-danger" })*@
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.FileType, htmlAttributes: new { @class = "control-lable col-sm-3" })
+                <div class="col-sm-4">
+                    @*@Html.DisplayFor(m => m.FileType, new { htmlAttributes = new { @class = "from-control-static" } })*@
+                    @Html.DropDownListFor(model => model.FileType,
+                   new SelectList(Model.AllDataFileTypes, "Text", "Text", Model.FileType), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control " })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.CreationFreq, htmlAttributes: new { @class = "control-lable col-sm-3" })
+                <div class="col-sm-4">
+                    @*@Html.DisplayFor(m => m.CreationFreq, new { htmlAttributes = new { @class = "from-control-static" } })*@
+                    @Html.DropDownListFor(model => model.CreationFreq,
+                   new SelectList(Model.AllFrequencies, "Value", "Text", Model.CreationFreq), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control " })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor((model) => model.DatasetScopeTypeID, htmlAttributes: new { @class = "control-lable col-sm-3" })
+                <div class="col-sm-4">
+                    @Html.DropDownListFor(model => model.DatasetScopeTypeID,
+                   new SelectList(Model.AllDatasetScopeTypes, "Value", "Text", Model.DatasetScopeTypeID), new {@disabled="disabled", @readonly = "readonly", @class = "form-control" })
                 </div>
             </div>
             <div class="form-group">
                 @Html.LabelFor(m => m.DropPath, htmlAttributes: new { @class = "control-lable col-sm-3" })
                 <div class="col-sm-9">
-                    @Html.EditorFor(model => model.DropPath, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
-                    @Html.ValidationMessageFor(model => model.DropPath, "", new { @class = "text-danger" })
+                    @Html.DisplayFor(m => m.DropPath, new { htmlAttributes = new { @class = "from-control-static" } })
+                    @*@Html.EditorFor(model => model.DropPath, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
+                    @Html.ValidationMessageFor(model => model.DropPath, "", new { @class = "text-danger" })*@
                 </div>
             </div>
+
+
+            <h2 class="detailSection">Advanced Options</h2>
             <div class="form-group">
-                @Html.LabelFor(m => m.TargetFileName, htmlAttributes: new { @class = "control-lable col-sm-3" })
-                <div class="col-sm-4">
-                    @Html.EditorFor(m => m.TargetFileName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.LabelFor(m => m.SearchCriteria, htmlAttributes: new { @class = "control-lable col-sm-3" })
+                <div class="col-sm-9">
+                    @Html.EditorFor(m => m.SearchCriteria, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.SearchCriteria, "", new { @class = "text-danger" })
                 </div>
             </div>
             <div class="form-group">
@@ -72,33 +100,9 @@
                 </div>
             </div>
             <div class="form-group">
-                @Html.LabelFor(m => m.OverwriteDatasetFile, htmlAttributes: new { @class = "control-lable col-sm-3" })
+                @Html.LabelFor(m => m.TargetFileName, htmlAttributes: new { @class = "control-lable col-sm-3" })
                 <div class="col-sm-4">
-                    @Html.CheckBoxFor(m => m.OverwriteDatasetFile)
-                </div>
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(model => model.CreationFreq, htmlAttributes: new { @class = "control-lable col-sm-3" })
-                <div class="col-sm-4">
-                    @Html.DropDownListFor(model => model.CreationFreq, 
-                   new SelectList(Model.AllFrequencies, "Value", "Text", Model.CreationFreq), new { @class = "form-control " })
-                </div>
-            </div>
-
-            <div class="form-group">
-                @Html.LabelFor(model => model.FileType, htmlAttributes: new { @class = "control-lable col-sm-3" })
-                <div class="col-sm-4">
-                    @Html.DropDownListFor(model => model.FileType,
-                   new SelectList(Model.AllDataFileTypes, "Text", "Text", Model.FileType), new { @class = "form-control " })
-                </div>
-            </div>
-
-
-            <div class="form-group">
-                @Html.LabelFor((model) => model.DatasetScopeTypeID, htmlAttributes: new { @class = "control-lable col-sm-3" })
-                <div class="col-sm-4">
-                    @Html.DropDownListFor(model => model.DatasetScopeTypeID, 
-                   new SelectList(Model.AllDatasetScopeTypes, "Value", "Text", Model.DatasetScopeTypeID), new { @class = "form-control" })
+                    @Html.EditorFor(m => m.TargetFileName, new { htmlAttributes = new { @class = "form-control" } })
                 </div>
             </div>
             <div class="form-group">

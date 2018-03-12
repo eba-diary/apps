@@ -1,0 +1,303 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+
+<ul class="nav nav-tabs">
+    <li class="active"><a href="#one" data-toggle="tab" aria-expanded="true">Option One </a></li>
+    <li><a href="#two" data-toggle="tab" aria-expanded="true">Option Two: Sankey Diagram </a></li>
+    <li><a href="#three" data-toggle="tab" aria-expanded="true">Option Three</a></li>
+</ul>
+
+<div id="myTabContent" class="tab-content">
+    <div id="one"  class="tab-pane fade active in form-horizontal">
+
+        <div class="parent">
+            <div class="elementObject border_blue">
+                <input type="checkbox" style="display: inline-block; float:right;" />
+                <span>SERAPL_Adhoc</span>
+                <span>Sales Org</span>
+                <span>Policy Process Group Code</span>
+                <div class="children">
+                    <ul>
+                        <li class="border_plum">
+                            <input type="text" placeholder="  Search Columns ... " />
+                            <span style="display: inline-block;">50 results.  47 filtered.</span>
+                        </li>
+                        <li class="border_plum">
+                            <input type="checkbox" style="display: inline-block; float:right;" />
+                            <input type="button" value="Show Details" class="btn btn-xs btn-info" style="display: inline-block; margin-right: 10px; float:right;" />
+                            <span>PROD_ADS_SERAPL</span>
+                            <span>vm_Sales_org_D</span>
+                            <span>PolicyProcessGroup_CDE</span>
+                        </li>
+                        <li class="border_plum">
+                            <input type="checkbox" style="display: inline-block; float:right;" />
+                            <input type="button" value="Show Details" class="btn btn-xs btn-info" style="display: inline-block; margin-right: 10px; float:right;" />
+                            <span>PROD_ADS_SERAPL</span>
+                            <span>vm_Sales_org_D</span>
+                            <span>PolicyProcessGroup_CDE</span>
+                        </li>
+                        <li class="border_plum">
+                            <input type="checkbox" style="display: inline-block; float:right;" />
+                            <input type="button" value="Show Details" class="btn btn-xs btn-info" style="display: inline-block; margin-right: 10px; float:right;" />
+                            <span>PROD_ADS_SERAPL</span>
+                            <span>vm_Sales_org_D</span>
+                            <span>PolicyProcessGroup_CDE</span>
+                        </li>
+                    </ul>
+
+                </div>
+            </div>
+
+
+        </div>
+
+    </div>
+    <div id="two"  class="tab-pane fade in form-horizontal">
+
+        <div id="sankey_basic" style="width: 1166px; height: 500px; "></div>
+
+    </div>
+
+
+
+
+    <div id="three" class="tab-pane fade in form-horizontal">
+            <div class="lineageRow">
+                <button type="button" class="btn btn-xs btn-success" style="display: inline-block;  margin-bottom: 6px;">
+                    <span class="glyphicon glyphicon-minus"></span>
+                </button>
+                <div class="elementObject" style="margin-left: 10px; display: inline-block;">
+                    <span>PROD_DPS_SERA.SALES_ORG_D_DP.PolicyProcessGroup_CDE</span>
+                    <input type="button" value="Show Details" class="btn btn-xs btn-info" style="display: inline-block; margin-right: 10px; float:right;">
+                </div>
+            </div>
+            <div class="lineageRow oneTab">
+                <span class="glyphicon glyphicon-share-alt icon-flipped"></span>
+                <button type="button" class="btn btn-xs btn-success" style="display: inline-block;  margin-bottom: 6px;">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+                <div class="elementObject" style="margin-left: 10px; display: inline-block;">
+                    <span>Stage_AMS.AMS_STAGE_PolicyProcess.PolicyProcessvalue_CDE</span>
+                    <input type="button" value="Show Details" class="btn btn-xs btn-info" style="display: inline-block; margin-right: 10px; float:right;">
+                </div>
+            </div>
+            <div class="lineageRow oneTab">
+                <span class="glyphicon glyphicon-share-alt icon-flipped"></span>
+                <button type="button" class="btn btn-xs btn-success" style="display: inline-block;  margin-bottom: 6px;">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+                <div class="elementObject" style="margin-left: 10px; display: inline-block;">
+                    <span>PROD_DPS_SERA.SALES_ORG_D_DP.PolicyProcessGroup_CDE</span>
+                    <input type="button" value="Show Details" class="btn btn-xs btn-info" style="display: inline-block; margin-right: 10px; float:right;">
+                </div>
+            </div>
+
+            <div class="lineageRow">
+                <button type="button" class="btn btn-xs btn-danger" style="display: inline-block;  margin-bottom: 6px;">
+                    <span class="glyphicon glyphicon-minus"></span>
+                </button>
+                <div class="elementObject" style="margin-left: 10px; display: inline-block;">
+                    <span>PROD_DAT_SERAPL.SALES_ORG_D.PolicyProcessGroup_CDE</span>
+                    <input type="button" value="Show Details" class="btn btn-xs btn-info" style="display: inline-block; margin-right: 10px; float:right;">
+                </div>
+            </div>
+
+            <div class="lineageRow oneTab">
+                <span class="glyphicon glyphicon-share-alt icon-flipped"></span>
+                <button type="button" class="btn btn-xs btn-success" style="display: inline-block;  margin-bottom: 6px;">
+                    <span class="glyphicon glyphicon-minus"></span>
+                </button>
+                <div class="elementObject" style="margin-left: 10px; display: inline-block;">
+                    <span>PROD_DPR_SERA.SALES_ORG_D_DP.PolicyProcessGroup_CDE</span>
+                    <input type="button" value="Show Details" class="btn btn-xs btn-info" style="display: inline-block; margin-right: 10px; float:right;">
+                </div>
+            </div>
+
+            <div class="lineageRow twoTab">
+                <span class="glyphicon glyphicon-share-alt icon-flipped"></span>
+                <button type="button" class="btn btn-xs btn-info" style="display: inline-block;  margin-bottom: 6px;">
+                    <span class="glyphicon glyphicon-minus"></span>
+                </button>
+                <div class="elementObject" style="margin-left: 10px; display: inline-block;">
+                    <span>PROD_DPS_SERA.SALES_ORG_D_DP.PolicyProcessGroup_CDE</span>
+                    <input type="button" value="Show Details" class="btn btn-xs btn-info" style="display: inline-block; margin-right: 10px; float:right;">
+                </div>
+            </div>
+
+            <div class="lineageRow threeTab">
+                <span class="glyphicon glyphicon-share-alt icon-flipped"></span>
+                <button type="button" class="btn btn-xs btn-warning disabled" style="display: inline-block;  margin-bottom: 6px;">
+                    <span class="glyphicon glyphicon-minus"></span>
+                </button>
+                <div class="elementObject" style="margin-left: 10px; display: inline-block;">
+                    <span>PROD_DPS_SERA.SALES_ORG_D_DP.PolicyProcessGroup_CDE</span>
+                    <input type="button" value="Show Details" class="btn btn-xs btn-info" style="display: inline-block; margin-right: 10px; float:right;">
+                </div>
+            </div>
+
+            <div class="lineageRow twoTab">
+                <span class="glyphicon glyphicon-share-alt icon-flipped"></span>
+                <button type="button" class="btn btn-xs btn-success" style="display: inline-block;  margin-bottom: 6px;">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+                <div class="elementObject" style="margin-left: 10px; display: inline-block;">
+                    <span>PROD_ADS_SERAPL.VW_SNAPSHOT_POLICY_DRIVER_D_PROFILE.DriverLicenseState_CDE</span>
+                    <input type="button" value="Show Details" class="btn btn-xs btn-info" style="display: inline-block; margin-right: 10px; float:right;">
+                </div>
+            </div>
+
+            <div class="lineageRow">
+                <button type="button" class="btn btn-xs btn-primary" style="display: inline-block;  margin-bottom: 6px;">
+                    <span class="glyphicon glyphicon-plus"></span>
+                </button>
+                <div class="elementObject" style="margin-left: 10px; display: inline-block;">
+                    <span>SERAPL_Transactional.Sales Org.Policy Process Group Code</span>
+                    <input type="button" value="Show Details" class="btn btn-xs btn-info" style="display: inline-block; margin-right: 10px; float:right;">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+    <style>
+
+        .oneTab {
+            margin-left: 10px;
+        }
+
+        .twoTab {
+            margin-left: 30px;
+        }
+
+        .threeTab {
+            margin-left: 50px;
+        }
+
+        .icon-flipped {
+            transform: scaleY(-1);
+            -moz-transform: scaleY(-1);
+            -webkit-transform: scaleY(-1);
+            -ms-transform: scaleY(-1);
+        }
+
+
+        .lineageRow {
+            margin-top: -20px;
+        }
+
+            .lineageRow:first-child {
+                margin-top: 0px;
+            }
+
+        .oneTab .elementObject {
+            width: calc(100% - 55px);
+        }
+
+        .twoTab .elementObject {
+            width: calc(100% - 55px);
+        }
+
+        .threeTab .elementObject {
+            width: calc(100% - 55px);
+        }
+
+        .elementObject {
+            border-radius: 10px;
+            width: calc(100% - 38px);
+            background-color: white;
+            padding: 10px 10px 6px;
+            display: block;
+            -webkit-margin-before: 1em;
+            -webkit-margin-after: 1em;
+            -webkit-margin-start: 0px;
+            -webkit-margin-end: 0px;
+        }
+
+            .elementObject p {
+                color: #003DA5;
+            }
+
+        .children ul li {
+            padding: 5px;
+        }
+
+        .elementObject span:first-child {
+            margin-left: 0px;
+        }
+
+        .elementObject span {
+            margin-left: 10px;
+        }
+    </style>
+
+    <script type="text/javascript">
+
+
+
+
+
+
+
+        google.charts.load('current', { 'packages': ['sankey'] });
+        google.charts.setOnLoadCallback(drawChart);
+
+        function drawChart() {
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'From');
+            data.addColumn('string', 'To');
+            data.addColumn('number', 'Weight');
+
+            data.addRows([
+                ["PROD_DPS_SERA\nSALES_ORG_D_DP\nPolicyProcessGroup_CDE", "Stage_AMS\nAMS_STAGE_PolicyProcess\nPolicyProcessvalue_CDE", 1],
+                ["PROD_DPR_SERA\nSALES_ORG_D_DP\nPolicyProcessGroup_CDE", "PROD_DPS_SERA\nSALES_ORG_D_DP\nPolicyProcessGroup_CDE", 1],
+                ["PROD_DAT_SERAPL\nSALES_ORG_D\nPolicyProcessGroup_CDE", "PROD_DPR_SERA\nSALES_ORG_D_DP\nPolicyProcessGroup_CDE", 1],
+                ["PROD_ADS_SERAPL\nSALES_ORG_D\nPolicyProcessGroup_CDE", "PROD_DAT_SERAPL\nSALES_ORG_D\nPolicyProcessGroup_CDE", 1],
+                ["PROD_ADS_SERAPL\nvw_SALES_ORG_D\nPolicyProcessGroup_CDE", "PROD_ADS_SERAPL\nSALES_ORG_D\nPolicyProcessGroup_CDE", 1],
+                ["PROD_ADS_SERAPL\nVW_SNAPSHOT_SALES_ORG_D\nPolicyProcessGroup_CDE", "PROD_ADS_SERAPL\nVW_SALES_ORG_D\nPolicyProcessGroup_CDE", 1],
+                ["PROD_ADS_SERAPL\nvw_Transactional_Sales_Org_D\nPolicyProcessGroup_CDE", "PROD_ADS_SERAPL\nvw_SALES_ORG_D\nPolicyProcessGroup_CDE", 1],
+                ["SERAPL Snapshot\nSales_Org_D\nPolicy Process Group Code", "PROD_ADS_SERAPL\nVW_SNAPSHOT_SALES_ORG_D\nPolicyProcessGroup_CDE", 1],
+                ["SERAPL Transactional\nSales_Org_D\nPolicy Process Group Code", "PROD_ADS_SERAPL\nvw_Transactional_Sales_Org_D\nPolicyProcessGroup_CDE", 1],
+                ["SERAPL_Adhoc\nSales Org\nPolicy Process Group Code", "PROD_ADS_SERAPL\nvw_SALES_ORG_D\nPolicyProcessGroup_CDE", 1],
+                ["SERAPL_Snapshot\nSales Org\nPolicy Process Group Code", "PROD_ADS_SERAPL\nvw_SALES_ORG_D\nPolicyProcessGroup_CDE", 1],
+                ["SERAPL_Transactional\nSales Org\nPolicy Process Group Code", "PROD_ADS_SERAPL\nvw_SALES_ORG_D\nPolicyProcessGroup_CDE", 1]
+            ]);
+
+            // Sets chart options.
+            var options = {
+                width: 1166,
+                height: 1000,
+                node: {
+                    label: {
+                        fontName: 'Times-Roman',
+                        fontSize: 12,
+                        color: 'black',
+                        bold: true,
+                        italic: false
+                    },
+                    interactivity: true, // Allows you to select nodes.
+                    labelPadding: 6,     // Horizontal distance between the label and the node.
+                    nodePadding: 90,     // Vertical distance between nodes.
+                    width: 1,            // Thickness of the node.
+                    colors: [
+                        '#a6cee3',         // Custom color palette for sankey nodes.
+                        '#1f78b4',         // Nodes will cycle through this palette
+                        '#b2df8a',         // giving each node its own color.
+                        '#33a02c'
+                    ]
+                }
+            };
+
+            // Instantiates and draws our chart, passing in some options.
+            var chart = new google.visualization.Sankey(document.getElementById('sankey_basic'));
+            chart.draw(data, options);
+        }
+    </script>

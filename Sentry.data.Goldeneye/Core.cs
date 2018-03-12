@@ -10,6 +10,7 @@ using Sentry.data.Core;
 using System.IO;
 using Sentry.Configuration;
 using Newtonsoft.Json;
+using StructureMap;
 
 namespace Sentry.data.Goldeneye
 {
@@ -21,6 +22,8 @@ namespace Sentry.data.Goldeneye
 
         private CancellationTokenSource _tokenSource;
         private CancellationToken _token;
+        private IContainer _container;
+        private IDatasetContext _datasetContext;
 
         /// <summary>
         /// Start the core worker
@@ -76,7 +79,7 @@ namespace Sentry.data.Goldeneye
             Bootstrapper.Init();
 
             //Start all the internal processes.
-            Watch.OnStart();
+            
             //Watch.OnStart(Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath"));
 
 
@@ -136,24 +139,6 @@ namespace Sentry.data.Goldeneye
                         }
 
                     }
-
-                    //Directory Monitoring (Original Goldeneye)
-                    //  We don't want to add another directory monitor if the old one is still running.
-                    if (currentTasks.Any(x => x.Task.IsCompleted && x.Name == "Watch") || firstRun)
-                    {
-                        //If it's completed dispose of it.
-                        var tasks = currentTasks.Where(x => x.Name == "Watch").ToList();
-                        tasks.ForEach(x => x.Task.Dispose());
-                        currentTasks.RemoveAll(x => x.Name == "Watch");
-
-                        //Create a new one.
-                        currentTasks.Add(new RunningTask(
-                            Task.Factory.StartNew(() => Watch.Run(Sentry.Configuration.Config.GetHostSetting("PathToWatch")), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),
-                            "Watch")
-                        );
-                    }
-
-
 
                     ////Dataset Loader
                     if (true)
@@ -228,24 +213,95 @@ namespace Sentry.data.Goldeneye
                         );
                     }
 
-
-
-                    //if (currentTasks.Any(x => x.Task.IsCompleted && x.Name == "Goldeneye-LoaderRequest") || firstRun)
+                    ////Directory Monitoring (Original Goldeneye)
+                    ////  We don't want to add another directory monitor if the old one is still running.
+                    //if (currentTasks.Where(x => x.Name.StartsWith("Watch") && x.Task.IsCompleted).Count() > 0 || firstRun)
                     //{
                     //    //If it's completed dispose of it.
-                    //    var tasks = currentTasks.Where(x => x.Name == "Goldeneye-LoaderRequest").ToList();
+                    //    var tasks = currentTasks.Where(x => x.Name.StartsWith("Watch") && x.Task.IsCompleted).ToList();
                     //    tasks.ForEach(x => x.Task.Dispose());
-                    //    currentTasks.RemoveAll(x => x.Name == "Goldeneye-LoaderRequest");
+                    //    tasks.ForEach(x => currentTasks.RemoveAll(ct => ct.Name == x.Name));
 
-                    //    //Create a new one.
-                    //    currentTasks.Add(new RunningTask(
-                    //        Task.Factory.StartNew(() => Watch.Run(Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath")), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),
-                    //        "Goldeneye-LoaderRequest")
-                    //    );
+                    //    List<DatasetFileConfig> dsconfig = null;
+
+                    //    using (_container = Bootstrapper.Container.GetNestedContainer())
+                    //    {
+                    //        _datasetContext = _container.GetInstance<IDatasetContext>();
+                    //        dsconfig = _datasetContext.getAllDatasetFileConfigs().Where(w => w.DropLocationType == "DFS").OrderBy(o => o.ConfigId).ToList();
+                    //    }
+
+                    //    foreach (DatasetFileConfig dsfc in dsconfig)
+                    //    {
+                    //        if (firstRun || tasks.Any(w => Int64.Parse(w.Name.Replace("Watch_", "")) == dsfc.ConfigId))
+                    //        {
+                    //            currentTasks.Add(new RunningTask(
+                    //                Task.Factory.StartNew(() => (new Watch()).OnStart(dsfc.ConfigId),
+                    //                                                TaskCreationOptions.LongRunning).ContinueWith(TaskException,
+                    //                                                TaskContinuationOptions.OnlyOnFaulted),
+                    //                                                $"Watch_{dsfc.ConfigId}")
+                    //            );
+
+                    //            if (!firstRun) { Console.WriteLine($"Restarting Watch_{dsfc.ConfigId}"); }
+                    //        }
+                    //    }
                     //}
 
-                    config.LastRunMinute = DateTime.Now;
-                    
+                    //Dataset File Config Watch
+                    if (true)
+                    {
+                        //If it's completed dispose of it.
+                        var tasks = currentTasks.Where(x => x.Name.StartsWith("Watch") && x.Task.IsCompleted).ToList();
+                        tasks.ForEach(x => x.Task.Dispose());
+                        tasks.ForEach(x => currentTasks.RemoveAll(ct => ct.Name == x.Name));
+
+                        List<DatasetFileConfig> dsconfig = null;
+
+                        using (_container = Bootstrapper.Container.GetNestedContainer())
+                        {
+                            _datasetContext = _container.GetInstance<IDatasetContext>();
+                            dsconfig = _datasetContext.getAllDatasetFileConfigs().Where(w => w.DropLocationType == "DFS").OrderBy(o => o.ConfigId).ToList();
+                        }
+
+                        foreach (DatasetFileConfig dsfc in dsconfig)
+                        {
+                            //On initial run start all watch tasks for all configs
+                            if (firstRun)
+                            {
+                                currentTasks.Add(new RunningTask(
+                                                                    Task.Factory.StartNew(() => (new Watch()).OnStart(dsfc.ConfigId),
+                                                                                                    TaskCreationOptions.LongRunning).ContinueWith(TaskException,
+                                                                                                    TaskContinuationOptions.OnlyOnFaulted),
+                                                                                                    $"Watch_{dsfc.ConfigId}")
+                                                                );
+                            }
+                            //Restart any completed tasks
+                            else if (tasks.Any(w => Int64.Parse(w.Name.Replace("Watch_", "")) == dsfc.ConfigId))
+                            {
+                                currentTasks.Add(new RunningTask(
+                                    Task.Factory.StartNew(() => (new Watch()).OnStart(dsfc.ConfigId),
+                                                                    TaskCreationOptions.LongRunning).ContinueWith(TaskException,
+                                                                    TaskContinuationOptions.OnlyOnFaulted),
+                                                                    $"Watch_{dsfc.ConfigId}")
+                                );
+
+                                Logger.Info($"Resstarting Watch_{ dsfc.ConfigId}");
+                            }
+                            //Start any new directories added
+                            else if (!currentTasks.Any(x => x.Name.StartsWith("Watch") && Int64.Parse(x.Name.Replace("Watch_", "")) == dsfc.ConfigId))
+                            {
+                                Logger.Info($"Detected new config ({dsfc.ConfigId}) to monitor ({dsfc.DropPath})");
+
+                                currentTasks.Add(new RunningTask(
+                                    Task.Factory.StartNew(() => (new Watch()).OnStart(dsfc.ConfigId),
+                                                                    TaskCreationOptions.LongRunning).ContinueWith(TaskException,
+                                                                    TaskContinuationOptions.OnlyOnFaulted),
+                                                                    $"Watch_{dsfc.ConfigId}")
+                                );
+                            }
+                        }
+                    }
+
+                    config.LastRunMinute = DateTime.Now;                    
                 }
                 
                 //HOURLY Processing

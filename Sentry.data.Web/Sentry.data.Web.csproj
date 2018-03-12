@@ -276,6 +276,8 @@
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\AssetController.cs" />
     <Compile Include="Controllers\LayoutController.cs" />
+    <Compile Include="Controllers\LineageController.cs" />
+    <Compile Include="Controllers\QueryToolController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Helpers\PredicateBuilder.cs" />
@@ -348,6 +350,9 @@
     <Compile Include="Models\User\UserSwitchModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Content\jquery.terminal-1.11.3.css" />
+    <Content Include="Content\query-builder.default.css" />
+    <Content Include="Content\query-builder.default.min.css" />
     <Content Include="Images\Icons\bundle.png" />
     <Content Include="Images\Icons\details_close.png" />
     <Content Include="Images\Icons\details_open.png" />
@@ -360,7 +365,13 @@
     <Content Include="Scripts\DataTables\moment-with-locales.min.js" />
     <Content Include="Scripts\DataTables\moment.js" />
     <Content Include="Scripts\DataTables\moment.min.js" />
+    <Content Include="Scripts\doT.js" />
+    <Content Include="Scripts\doT.min.js" />
+    <Content Include="Scripts\jQuery.extendext.min.js" />
+    <Content Include="Scripts\jquery.terminal-1.11.3.js" />
     <Content Include="Scripts\knockout-3.4.2.js" />
+    <Content Include="Scripts\query-builder.js" />
+    <Content Include="Scripts\query-builder.min.js" />
     <Content Include="Views\Dataset\_PreviewData.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -1137,6 +1148,8 @@
     <Content Include="Views\Dataset\_Subscribe.cshtml" />
     <Content Include="Views\Dataset\ClientSideList.cshtml" />
     <Content Include="Views\Home\ReleaseNotes.cshtml" />
+    <Content Include="Views\Dataset\QueryTool.cshtml" />
+    <Content Include="Views\Lineage\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1189,7 +1202,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>2457</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:2457/</IISUrl>
+          <IISUrl>http://localhost:2460/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

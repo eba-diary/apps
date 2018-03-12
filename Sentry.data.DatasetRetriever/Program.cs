@@ -218,7 +218,7 @@ namespace Sentry.data.DatasetRetriever
                 if (param.ApiParameter.Name == "Destination")
                 {
                     destination.Append(Configuration.Config.GetHostSetting("DatasetLoaderDFSPath"));
-                    destination.Append(@"\");                    
+                    destination.Append(@"\");
                     destination.Append(param.Value);
                 }
 

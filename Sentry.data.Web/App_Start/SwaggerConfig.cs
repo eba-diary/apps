@@ -88,7 +88,7 @@ namespace Sentry.data.Web
                         //c.IgnoreObsoleteActions();
 
                         // Comment this setting to disable Access-Control-Allow-Origin
-                        c.AccessControlAllowOrigin("*");
+                        //c.AccessControlAllowOrigin("*");
 
                         // Each operation be assigned one or more tags which are then used by consumers for various reasons.
                         // For example, the swagger-ui groups operations according to the first tag of each operation.

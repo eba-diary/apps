@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using Sentry.data.Core;
+using Sentry.data.Infrastructure;
 
 namespace Sentry.data.Web
 {
@@ -30,26 +31,22 @@ namespace Sentry.data.Web
             this.CanDisplay = true;
         }
 
-
         //[DisplayName("File Upload")]
         //public HttpPostedFile f { get; set; }
 
         //public long ProgressConnectionId { get; set; }
 
-        /// <summary>
-        /// AllCategories holds the sorted list of all possible categories.
-        /// </summary>
-        public IEnumerable<SelectListItem> AllCategories { get; set; }
-
-        public IEnumerable<SelectListItem> AllFrequencies { get; set; }
-
-        public IEnumerable<SelectListItem> AllOriginationCodes { get; set; }
-
-        public IEnumerable<SelectListItem> AllDatasetScopeTypes { get; set; }
-
         [Required]
         [DisplayName("Categories")]
         public int CategoryIDs { get; set; }
+
+        [Required]
+        [DisplayName("Sentry Owner")]
+        public string OwnerID { get; set; }
+
+        [Required]
+        [DisplayName("Data Classification")]
+        public int DataClassification { get; set; }
 
         [Required]
         [DisplayName("Upload Frequency")]
@@ -62,6 +59,54 @@ namespace Sentry.data.Web
         [Required]
         [DisplayName("Dataset Scope")]
         public int DatasetScopeTypeID { get; set; }
+
+        [DisplayName("Search Criteria")]
+        public string SearchCriteria { get; set; }
+
+        [DisplayName("Target File Name")]
+        public string TargetFileName { get; set; }
+
+        [DisplayName("Drop Location Type")]
+        public string DropLocationType { get; set; }
+
+        [Required]
+        [DisplayName("Drop Path")]
+        public string DropPath { get; set; }
+
+        [DisplayName("Custom Drop Path")]
+        public Boolean CustomDropPath { get; set; }
+
+        [DisplayName("Use Regex Search")]
+        public Boolean IsRegexSearch { get; set; }
+
+        [DisplayName("Overwrite Dataset Files")]
+        public Boolean OverwriteDatasetFile { get; set; }
+
+        public int FileTypeId { get; set; }
+
+        [DisplayName("File Type")]
+        public string FileType
+        {
+            get
+            {
+                return ((FileType)FileTypeId).ToString();
+            }
+            set
+            {
+                FileTypeId = (int)Enum.Parse(typeof(FileType), value); ;
+            }
+        }
+
+        [DisplayName("Configuration Name")]
+        public string ConfigFileName { get; set; }
+
+        [DisplayName("Description")]
+        public string ConfigFileDesc { get; set; }
+
+        [Required]
+        [DisplayName("Creation Frequency")]
+        public string CreationFreq { get; set; }
+
 
         //[DisplayName("Dataset File")]
         //public String DatasetFileName { get; set; }

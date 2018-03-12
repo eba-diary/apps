@@ -116,6 +116,18 @@ namespace Sentry.data.Web
 
         public int DatasetId { get; set; }
 
+        public IEnumerable<SelectListItem> AllCategories { get; set; }
+
+        public IEnumerable<SelectListItem> AllFrequencies { get; set; }
+
+        public IEnumerable<SelectListItem> AllOriginationCodes { get; set; }
+
+        public IEnumerable<SelectListItem> AllDatasetScopeTypes { get; set; }
+
+        public IEnumerable<SelectListItem> AllDataFileTypes { get; set; }
+
+        public IEnumerable<SelectListItem> AllDataClassifications { get; set; }
+
         //[Required()]
         [MaxLength(64)]
         [DisplayName("Category")]

@@ -1,0 +1,1925 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<hr />
+<button class="btn btn-primary" onclick="ToggleAdminControls()">Show Advanced Controls</button>
+<button class="btn btn-warning" onclick="CreateSession()">Re-Create Session</button>
+<hr />
+<div id="AdminControls" style="display: none;">
+    <select id="LanguageDropDown">
+        <optgroup label="Language">
+            <option disabled selected>Pick a Language</option>
+            <option value="Python">Python</option>
+            <option value="Scala">Scala</option>
+            <option value="R">R</option>
+        </optgroup>
+    </select>
+    <select id="BucketDropDown">
+        <option>sentry-applog-archive-nonprod</option>
+        <option>sentry-dataset-management</option>
+        <option selected>sentry-dataset-management-np</option>
+        <option>sentry-dataset-management-np-nr</option>
+    </select>
+    <button class="btn btn-primary" onclick="SendCode()">Send Code to Spark</button>
+    <button class="btn btn-danger" onclick="DeleteSessions()">Delete All Sessions</button>
+
+    <textarea id="preivousQueries" style="width: 100%; max-width: 100%; height: 100px;">
+
+    </textarea>
+        <hr />
+    <textarea id="codeArea" style="width: 100%; max-width: 100%; height: 400px; display: none;">
+from pyspark.sql.types import *
+the_schema = StructType([StructField('timestamp', StringType(), True),
+                    StructField('server', StringType(), True),
+                    StructField('server_domain', StringType(), True),
+                    StructField('sitename', StringType(), True),
+                    StructField('environment', StringType(), True), 
+                    StructField('client_ip', StringType(), True),
+                    StructField('x_forwarded_for', StringType(), True),
+                    StructField('method', StringType(), True),
+                    StructField('uri_stem', StringType(), True),
+                    StructField('uri_query', StringType(), True),
+                    StructField('port', StringType(), True),
+                    StructField('username', StringType(), True),
+                    StructField('host_header', StringType(), True),
+                    StructField('server_ip', StringType(), True),
+                    StructField('protocol', StringType(), True),
+                    StructField('useragent', StringType(), True),
+                    StructField('session_id', StringType(), True),
+                    StructField('request_thread', StringType(), True),
+                    StructField('referer', StringType(), True),
+                    StructField('status', IntegerType(), True),
+                    StructField('sent_bytes', IntegerType(), True),
+                    StructField('time_taken', IntegerType(), True),
+                    StructField('sel_version', StringType(), True)]);
+
+
+    </textarea>
+
+        <hr />
+</div>
+<h3>Selected Data Sources:</h3>
+<p><b>Below please select a dataset or group of datasets to join on.</b></p>
+<div class="rule-filter-container">
+    <select multiple="" class="form-control select2-hidden-accessible"
+            id="datasetList" name="filterSelector" tabindex="-1" aria-hidden="true"></select>
+</div>
+<div id="tablePanel" class="query-builder" style="display: none;">
+    <div class="rules-group-container" id="tableSelection">
+    </div>
+</div>
+
+<textarea id="tablePython" style="width: 100%; max-width: 100%; height: 100px;" disabled></textarea>
+
+<hr />
+<button id="btnGetSchema" class="btn btn-primary" onclick="generateSchema()" disabled>Get Schema</button>
+<p id="dataInfo" style="display: inline-block; margin-left: 15px;"></p>
+<hr />
+
+<div id="queryPanel" style="display: none;">
+    <p><b>For more complicated SQL Queries use the Help Section in the top left navigation bar.</b></p>
+    <ul class="nav nav-tabs" id="primaryOptions">
+        <li id="tab1" class="active"><a>Column Selection <span id="columnCountBadge" class="badge badge-success"></span></a></li>
+        <li id="tab2"><a>Join Tables <span id="tableCountBadge" class="badge badge-success"></span></a></li>
+        <li id="tab3"><a>Column Renaming <span id="columnRenameCountBadge" class="badge badge-warning">0</span></a></li>
+        <li id="tab4"><a>Order By <span id="orderByBadge" class="badge badge-warning"></span></a></li>
+        <li id="tab5"><a>Group By / Having <span id="groupByBadge" class="badge badge-warning"></span></a></li>
+        <li id="tab6"><a>Where Clause <span id="whereBadge" class="badge badge-warning"></span></a></li>
+        <li id="tab7"><a>Aggregate Columns  <span id="aggBadge" class="badge badge-warning"></span></a></li>
+    </ul>
+
+    <div id="primaryPanel">
+
+        <div id="columnSelector" class="query-builder">
+            <div id="columnSelectorContainer" class="rules-group-container">
+                
+                <h5>Column Selection</h5>
+                <p>Click below to choose your columns from your dataset.  If you choose no columns all columns will be selected.</p>
+
+                <label for="selectNoneChk">Select No Columns: </label>
+                <input id="selectNoneChk" type="checkbox" onclick="updateBadges()" />
+
+                <select multiple="" class="form-control select2-hidden-accessible"
+                        id="columnSelectorSelect" name="columnSelector" tabindex="-1" aria-hidden="true"></select>
+
+            </div>
+        </div>
+
+        <div id="joinPanel" class="query-builder">
+            <div class="rules-group-container">
+                <h5>Table Joining</h5>
+                <p>Example :  t1 JOIN t2 ON t1.departmentID == t2.ID</p>
+                <p>One join is required per two data sources you chose above.  Example: If you chose 3 data sources, 2 joins would be required.  Join t1 with t2 and then Join t1 with t3</p>
+                <div class="btn-group pull-right group-actions">
+                    <button type="button" class="btn btn-xs ruleController btn-success" id="btnAddJoin" onclick="addJoinRule()">
+                        <i class="glyphicon glyphicon-plus"></i> Add rule
+                    </button>
+                </div>
+                <br />
+
+                <br />
+                <div id="joinContainer">
+                    
+                </div>
+            </div>
+        </div>
+
+        <div id="columnRenamer" class="query-builder">
+            <div class="rules-group-container">
+                <h5>Column Renaming</h5>
+                <p>Click below to choose a column to rename from your dataset.</p>
+
+                <select multiple="" class="form-control select2-hidden-accessible"
+                        id="columnRenamerSelect" name="columnRenamerSelector" tabindex="-1" aria-hidden="true"></select>
+
+                <div id="columnRenamerContainer">
+
+                </div>
+            </div>
+        </div>
+
+        <div id="orderBy" class="query-builder">
+            <div class="rules-group-container">
+                <div class="rules-group-header">
+                    <div class="btn-group pull-right group-actions">
+                        <button type="button" class="btn btn-xs btn-success" id="btnAddOrderBy" onclick="addOrderByRule()">
+                            <i class="glyphicon glyphicon-plus"></i> Add Order By
+                        </button>
+                    </div>
+                </div>
+                <h5>Order By:</h5>
+                <div id="orderByContainer">
+                </div>
+            </div>
+        </div>
+
+        <div id="groupBy" class="query-builder">
+
+            <div class="rules-group-container">
+                <div class="rules-group-header">
+                    <div class="btn-group pull-right group-actions">
+                        <button type="button" class="btn btn-xs btn-success" id="btnAddJoin" onclick="addGroupByRule()">
+                            <i class="glyphicon glyphicon-plus"></i> Add Group By
+                        </button>
+                        <button type="button" class="btn btn-xs btn-success" id="btnAddJoin" onclick="addHavingRule()">
+                            <i class="glyphicon glyphicon-plus"></i> Add Having
+                        </button>
+                    </div>
+                </div>
+                <h5>Group By:</h5>
+                <div id="groupByContainer">
+                </div>
+                <h5>Having:</h5>
+                <div id="havingContainer">
+                </div>
+            </div>
+        </div>
+
+        <div id="whereClause" class="query-builder">
+            <div id="builder-basic">
+            </div>
+        </div>
+
+        <div id="aggregate" class="query-builder">
+
+            <div class="rules-group-container">
+                <div class="rules-group-header">
+                    <div class="btn-group pull-right group-actions">
+                        <button type="button" class="btn btn-xs btn-success" id="btnAddAggregate" onclick="addAggregateRule()">
+                            <i class="glyphicon glyphicon-plus"></i> Add Aggregate
+                        </button>
+                    </div>
+                </div>
+                <h5>Aggregate Columns:</h5>
+                <div id="aggregateContainer">
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <textarea id="joinPython" style="width: 100%; max-width: 100%; height: 100px;" disabled></textarea>
+        <textarea id="additionalCode" style="width: 100%; max-width: 100%; height: 100px;" disabled>
+t1.printSchema();
+spark.catalog.dropTempView("t1");
+t1.createTempView("t1");
+        </textarea>
+        <textarea id="sqlQueryOutput" style="width: 100%; max-width: 100%; height: 100px;" disabled>
+
+        </textarea>
+
+        <h3 id="rowCount"></h3>
+
+        <div>
+            <button class="btn btn-warning" id="btnGetSQL">See SQL Statement</button>
+            <button class="btn btn-primary" onclick="updateBadges()">Validate</button>
+            <button id="runQuery" class="btn btn-success" onclick="runQuery(true)">Run Query</button>
+            <div class="btn btn-default" style="background: white; padding: 2px; color: black; display: inline-block;">
+                <label for="txtAmountOfRows">Rows to Return To Screen:</label>
+                <input id="txtAmountOfRows" type="number" value="20" min="0" max="1000" style="width: 115px;" />
+
+                <label for="distinctChk">Distinct:</label>
+                <input type="checkbox" id="distinctChk" name="distinct">
+
+            </div>
+            <button id="btnRowCount" class="btn btn-default" onclick="GetRowCount()" disabled>Row Count</button>
+        </div>
+
+        <hr />
+        <table class="table table-striped table-bordered" id="datasetRowTable">
+            <thead>
+                <tr id="tableFirstRow" class="filter-row"></tr>
+                <tr id="tableColumnIDs" class="table-header"></tr>
+
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <hr />
+        <h3>Push Dataset to Business Intelligence Tools:</h3>
+        <div>
+            <img class="rcorners1" src="~/Images/sas_logo_rectangle.png" height="75" />
+            <img class="rcorners1" src="~/Images/tableau-icon.png" height="75" />
+            <img class="rcorners1" src="https://jira.sentry.com/secure/projectavatar?pid=15301&avatarId=10124" height="75" />
+            <!--<img class="rcorners1" src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Apache_Spark_logo.svg/640px-Apache_Spark_logo.svg.png" height="75" />-->
+        </div>
+        <div>
+            <br />
+            <p><b>Spaces are not allowed in Hive Table column names.</b></p>
+            <p><b>This action is required to save to Apache Hive to open in Tableau or SAS.</b></p>
+            <br />
+            <input id="replaceSpacesChk" type="checkbox" />
+            <label for="replaceSpacesChk">Replace Spaces in All Columns with : </label>
+            <input type="text" id="replaceSpacesDelimiter" placeholder="Character to Replace ... " />
+        </div>
+        <br />
+        <button class="btn btn-warning" onclick="RenameAllColumns()">Rename All Columns</button>
+        <div>
+            <input id="s3FileLocationName" value="sentry-dataset-management-np/bundles/data-test/government/quarterly_census_of_employment_and_wages/census.csv" style="width:89%;" />
+            <button style="width: 10%; float:right;" onclick="SavetoS3()">Save to S3</button>
+        </div>
+
+        <br />
+        <br />
+
+        <textarea id="replyArea" style="width: 100%; max-width: 100%; height: 200px;" disabled>
+
+        </textarea>
+
+        <style>
+            .rcorners1 {
+                border-radius: 1px;
+                background-color: white;
+                padding: 20px;
+            }
+
+            .select2-selection--multiple .select2-search--inline .select2-search__field {
+                width: auto !important;
+            }
+
+
+            .statement {
+                padding-left: 15px;
+            }
+
+            #columnCountBadge {
+                padding-bottom: 6px;
+            }
+
+            #sparkInfo {
+                height: 95px;
+                z-index: 2;
+                position: fixed;
+                padding-left: 100px;
+                padding-right: 100px;
+                border: 1px solid #dfdfdf;
+                left: 0;
+                right: 0;
+                bottom: 0%;
+                width: 100%;
+                background-color: white;
+                opacity: 1;
+            }
+        </style>
+    </div>
+</div>
+<div style="height: 100px;">
+
+</div>
+<div id="sparkInfo">
+    <div>
+        <h4 id="jobInfo"></h4>
+        <button class="btn btn-xs btn-danger" onclick="CancelJob()" style="float: right; margin-left: 5px; display: inline-block;">Cancel Job</button>
+        <button class="btn btn-xs btn-warning" onclick="HideInfoPanel()" style="float: right; display: inline-block;">Hide</button>
+        
+    </div>
+
+</div>
+@section Scripts {
+    <script src="~/Scripts/dot.js"></script>
+    <script src="~/Scripts/jQuery.extendext.min.js"></script>
+    <script src="~/Scripts/query-builder.js"></script>
+@Scripts.Render("~/bundles/dataTables")
+    <script>
+
+        String.prototype.escapeForJson = function () {
+            return this
+                .replace(/\b/g, "")
+                .replace(/\f/g, "")
+                .replace(/\\/g, "\\")
+                .replace(/\"/g, "\\\"")
+                .replace(/\t/g, "\\t")
+                .replace(/\r/g, "\\r")
+                .replace(/\n/g, "\\n")
+                .replace(/\u2028/g, "\\u2028")
+                .replace(/\u2029/g, "\\u2029");
+        };
+
+        function HideInfoPanel()
+        {
+            $('#sparkInfo').hide();
+        }
+
+        function CancelJob()
+        {
+            for (var i = 0; i < tasksRunning.length; i++)
+            {
+                $.ajax({
+                    type: "POST",
+                    url: "/api/QueryTool/CancelStatement?SessionID=" + sessionID + "&StatementID=" + tasksRunning[i],
+                    dataType: "json",
+                    success: function (msg) {
+                    },
+                    error: function (e) {
+                        console.log("Unavailable");
+                    }
+                });
+            }
+
+        }
+
+        function updateBadges()
+        {
+            var firstSet = true;
+            var secondSet = true;
+            var thirdSet = true;
+
+            //Turn off the Join Tables Tab
+            if (tableList.length > 1) {
+                $('#primaryOptions #tab2').show();
+            } else {
+                $('#primaryOptions #tab2').hide();
+            }
+
+            if ($('#selectNoneChk').is(':checked')) {
+                $('#columnCountBadge').text(0);
+            }
+            else {
+                if ($('#columnSelectorSelect').val().length != 0) {
+                    $('#columnCountBadge').text($('#columnSelectorSelect').val().length);
+                }
+                else {
+                    var count = 0;
+
+                    for (var i = 0; i < schemaList.length; i++) {
+                        count += schemaList[i].schema.length;
+                    }
+
+                    $('#columnCountBadge').text(count);
+
+                }
+            }
+
+            if ($('#columnRenamerSelect').val().length != 0) {
+                $('#columnRenameCountBadge').text($('#columnRenamerContainer').children().length);
+            }
+            else {
+                $('#columnRenameCountBadge').text(0);
+            }
+
+            var groupBys = $('.groupBySelector').length;
+            var havings = $("#havingContainer").children('.rule-container').children().length / 5;
+
+            $('#groupByBadge').text(groupBys + havings);
+
+            var orderBys = $('.orderBySelector').length;
+
+            $('#orderByBadge').text(orderBys);
+
+            var rules = $('#builder-basic_group_0').children('dd.rules-group-body').children('ul.rules-list').children().length;
+
+            if (rules != 0) {
+                if ($('#builder-basic').queryBuilder('getSQL', false, true) == null)
+                {
+                    $('#whereBadge').removeClass('badge-success');
+                    $('#whereBadge').removeClass('badge-warning');
+                    $('#whereBadge').addClass('badge-danger');
+                    $('#whereBadge').text('X');
+                } else {
+                    $('#whereBadge').removeClass('badge-danger');
+                    $('#whereBadge').removeClass('badge-warning');
+                    $('#whereBadge').addClass('badge-success');
+                    $('#whereBadge').text(rules);
+                }
+            } else {
+                $('#whereBadge').removeClass('badge-danger');
+                $('#whereBadge').removeClass('badge-success');
+                $('#whereBadge').addClass('badge-warning');
+                $('#whereBadge').text(0);
+            }
+
+            //Make sure there are enough Join Rules based on the Amount of Tables
+            var rules = $('#joinContainer').children('.rule-container').length;
+            if (tableList.length - 1 != rules || $('.tableNameController option[disabled]:selected').length >= 1 || $('.joinTypeController option[disabled]:selected').length >= 1) {
+                $('#tableCountBadge').removeClass('badge-success');
+                $('#tableCountBadge').addClass('badge-danger');
+                $('#tableCountBadge').text('X');
+                secondSet = false;
+            }
+            else {
+                $('#tableCountBadge').addClass('badge-success');
+                $('#tableCountBadge').removeClass('badge-danger');
+                $('#tableCountBadge').text(rules);
+            }
+
+
+            var aggCount = $("#aggregateContainer").children('.rule-container').children().length / 4;
+
+            var aggChecker = true;
+            for (var i = 0; i < aggCount; i++)
+            {
+                if ($("#aggregateContainer").children('.rule-container').children()[(i * 4) + 1].value == 0 || $("#aggregateContainer").children('.rule-container').children()[(i * 4)].value == "Aggregate")
+                {
+                    aggChecker = false;
+                    break;
+                }
+            }
+
+            if (!aggChecker)
+            {
+                $('#aggBadge').removeClass('badge-warning');
+                $('#aggBadge').removeClass('badge-success');
+                $('#aggBadge').addClass('badge-danger');
+                $('#aggBadge').text('X');
+            } else {
+                $('#aggBadge').addClass('badge-success');
+                $('#aggBadge').removeClass('badge-warning');
+                $('#aggBadge').removeClass('badge-danger');
+                $('#aggBadge').text(aggCount);
+            }
+        }
+
+        $('body').on('click', '.ruleController', function () {
+            updateJoins();
+            updateTables();
+            updateBadges();
+        });
+
+        $('body').on('change', '.ruleController', function () {
+            updateJoins();
+            updateTables();
+            updateBadges();
+        });
+
+        $('body').on('change', '.tableNameController', function () {
+
+            //var id = '#help' + $(this)[0].id + " option[value = \"" + $(this).val() + "\"]";
+            var col = '#col' + $(this)[0].id;
+
+            //console.log(id);
+            //$(id).prop('selected', true);
+
+            for (var i = 0; i < schemaList.length; i++)
+            {
+                if (schemaList[i].tableName == $(this).val())
+                {
+                    $(col).empty();
+                    $(col).prop('disabled', false);
+                    for (var j = 0; j < schemaList[i].schema.length; j++)
+                    {
+                        $(col).append($('<option/>', {
+                            value: schemaList[i].schema[j].id.trim(),
+                            text: schemaList[i].schema[j].label.trim()
+                        }));
+                    }
+                    break;
+                }
+            }
+
+
+        });
+
+        $('#primaryOptions li').on('click', function () {
+
+            $('#primaryOptions').children('li').each(function () {
+                if ($(this).hasClass('active')) {
+                    $(this).removeClass('active');
+                }
+            });
+
+            $(this).addClass('active');
+
+
+            $('#joinPanel').hide();
+            $('#columnRenamer').hide();
+            $('#columnSelector').hide();
+            $('#orderBy').hide();
+            $('#groupBy').hide();
+            $('#whereClause').hide();
+            $('#aggregate').hide();
+
+            switch ($(this)[0].id) {
+                case "tab1":
+                    $('#columnSelector').show();
+                    break;
+                case "tab2":
+                    $('#joinPanel').show();
+                    break;
+                case "tab3":
+                    $('#columnRenamer').show();
+                    break;
+                case "tab4":
+                    $('#orderBy').show();
+                    break;
+                case "tab5":
+                    $('#groupBy').show();
+                    break;
+                case "tab6":
+                    $('#whereClause').show();
+                    break;
+                case "tab7":
+                    $('#aggregate').show();
+                    break;
+            }
+        });
+
+
+        $('body').on('keydown', "#columnRenamerContainer.rule - container input", function () {
+            var oldvalue = $(this).val();
+            var field = this;
+            setTimeout(function () {
+                if (field.value.indexOf('t1') !== 0) {
+                    $(field).val('t1.' + oldvalue);
+                }
+            }, 1);
+        });
+
+        function RenameAllColumns()
+        {
+            if ($('#replaceSpacesChk').is(':checked') && schemaList[0].length >= 1) {
+                var char = $('#replaceSpacesDelimiter').val();
+
+                var col = "";
+
+                for (var i = 0; i < schemaList[0].schema.length; i++)
+                {
+                    col += "t1 = t1.withColumnRenamed('" + schemaList[0].schema[i].label + "','" + schemaList[0].schema[i].label.replace(/ /g, char) + "');";
+                }
+
+                col += "t1.printSchema();";
+
+                var json = JSON.stringify(col.escapeForJson());
+
+                console.log(json);
+
+                SendCode(json, 'Rename Columns');
+
+
+            }
+        }
+
+        function SavetoS3()
+        {
+
+
+
+
+            var json = JSON.stringify("t1.coalesce(1).write.format('csv').mode('overwrite').save('s3a://" + $('#s3FileLocationName').val().escapeForJson() + "');");
+
+            console.log(json);
+
+            SendCode(json);
+        }
+
+
+        function ToggleAdminControls()
+        {
+            $('#AdminControls').toggle();
+            //$('#codeArea').toggle();
+            $('textarea').toggle();
+        }
+
+        function DeleteSessions()
+        {
+            for (var i = 0; i < 50; i++) {
+                $.ajax({
+                    type: "DELETE",
+                    url: "/api/QueryTool/DeleteSession?SessionID=" + i
+                });
+            }
+        }
+
+
+
+        function generateSchema() {
+
+            updateJoins();
+            updateTables();
+            updateBadges();
+
+            var tables = "";
+            var tableNames = "";
+            var valid = true;
+
+            var rules = $('#tableSelection').children('.rule-container').length;
+            for (var i = 0; i < rules; i++) {
+
+
+                var tableName = $($('#tableSelection').children('.rule-container')[i]).children('input')[0].value;
+                var extension = $($($('#tableSelection').children('.rule-container')[i]).children('select')[0]).val();
+                var delimiter = $($('#tableSelection').children('.rule-container')[i]).children('input')[1].value;
+                var bucket = $($('#tableSelection').children('.rule-container')[i]).children('select')[1].value;
+                var s3Location = $($('#tableSelection').children('.rule-container')[i]).children('input')[2].value;
+
+                if (extension) {
+                    tables += tableName.trim() + " = spark.read";
+
+                    if (delimiter) {
+                        tables += ".option('sep', \"" + delimiter + "\")";
+                    }
+
+
+                    switch (extension) {
+
+                        case "txt":
+                            tables += ".option('header', 'true').option('inferSchema', 'true').text('s3a://" + bucket.trim() + "/" + s3Location.trim() + "');";
+                            break;
+                        case "csv":
+                            tables += ".format('" + extension.trim() + "').option('header', 'true').option('inferSchema', 'true').csv('s3a://" + bucket.trim() + "/" + s3Location.trim() + "');";
+                            break;
+                        case "json":
+                            tables += ".format('" + extension.trim() + "').option('inferSchema', 'true').load('s3a://" + bucket.trim() + "/" + s3Location.trim() + "');";
+                            break;
+                        case "parquet":
+                            tables += ".format('" + extension.trim() + "').option('inferSchema', 'true').load('s3a://" + bucket.trim() + "/" + s3Location.trim() + "');";
+                            break;
+                        default:
+                            valid = false;
+                            break;
+                    }
+
+                    tables += tableName.trim() + ".printSchema();";
+                    tables += "spark.catalog.dropTempView(\"" + tableName.trim() + "\");" + tableName.trim() + ".createTempView(\"" + tableName.trim() + "\");";
+
+                    tableNames += tableName.trim() + '|||';
+                }
+            }
+
+            if (valid)
+            {
+                var json = JSON.stringify(tables.escapeForJson());
+
+                $('#preivousQueries').val($('#preivousQueries').val() + tables);
+                SendCode(json, 'Get Schema', tableNames);
+
+                $('#dataInfo').text('Data in memory as of ' + new Date($.now()));
+
+            }
+        }
+
+        function GetRowCount()
+        {
+            var json = JSON.stringify("print(queryResponse.count());".escapeForJson());
+
+            SendCode(json, 'Count Rows');
+        }
+
+        //https://stackoverflow.com/questions/1250079/how-to-escape-single-quotes-within-single-quoted-strings
+        function runQuery(runNow)
+        {
+            var rules = $('#builder-basic_group_0').children('dd.rules-group-body').children('ul.rules-list').children().length;
+            var sql_raw;
+
+            if (rules != 0)
+            {
+                sql_raw = $('#builder-basic').queryBuilder('getSQL', false, true).sql.replace(/\'/g, "\\\\'").replace(/\n/g, " ");
+            }
+
+
+            var rawQuery = "queryResponse = spark.sql('SELECT ";
+
+            if ($('#distinctChk').is(':checked'))
+            {
+                rawQuery += "DISTINCT ";
+            }
+
+            var selected = $("#columnSelectorSelect").val();
+            var renamed = $('#columnRenamerContainer').children('.rule-container').children().length / 3;
+            var aggs = $('#aggregateContainer').children('.rule-container').children().length / 4;
+
+            for (var i = 0; i < aggs; i++) {
+                var aggMethod = $('#aggregateContainer').children('.rule-container').children()[(i * 4)].value;
+                var aggCol = $('#aggregateContainer').children('.rule-container').children()[(i * 4) + 1].value;
+                var aggRenamed = $('#aggregateContainer').children('.rule-container').children()[(i * 4) + 2].value;
+
+
+                if (aggRenamed) {
+                    rawQuery += aggMethod + "(" + aggCol + ") AS " + aggRenamed + ", ";
+                } else {
+                    rawQuery += aggMethod + "(" + aggCol + ")" + ", ";
+                }
+                
+            }
+
+            if (!$('#selectNoneChk').is(':checked')) {
+                if (renamed == 0) {
+                    if (selected.length == 0) {
+                        rawQuery += ' * ';
+                    }
+                    else {
+                        for (var i = 0; i < selected.length; i++) {
+                            if (i == selected.length - 1) {
+                                rawQuery += selected[i];
+                            }
+                            else {
+                                rawQuery += selected[i] + ", ";
+                            }
+                        }
+                    }
+                }
+                else {
+                    if (selected.length != 0) {
+                        for (var i = 0; i < selected.length; i++) {
+                            if (i == selected.length - 1) {
+                                var found = false;
+
+                                for (var j = 0; j < renamed; j++) {
+                                    var col = $('#columnRenamerContainer').children('.rule-container').children()[(j * 3)].value;
+                                    var colRenamed = $('#columnRenamerContainer').children('.rule-container').children()[(j * 3) + 1].value;
+
+                                    console.log(col + ' ' + selected[i]);
+                                    //Column was selected and Renamed
+                                    if (col == selected[i]) {
+                                        rawQuery += selected[i] + " AS " + colRenamed;
+                                        found = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!found) {
+                                    rawQuery += selected[i];
+                                }
+                            }
+                            else {
+
+                                var found = false;
+
+                                for (var j = 0; j < renamed; j++) {
+                                    var col = $('#columnRenamerContainer').children('.rule-container').children()[(j * 3)].value;
+                                    var colRenamed = $('#columnRenamerContainer').children('.rule-container').children()[(j * 3) + 1].value;
+
+                                    //Column was selected and Renamed
+                                    if (col == selected[i]) {
+                                        rawQuery += selected[i] + " AS " + colRenamed + ", ";
+                                        found = true;
+                                        break;
+                                    }
+                                }
+
+                                if (!found) {
+                                    rawQuery += selected[i] + ", ";
+                                }
+                            }
+                        }
+
+                    }
+                    else {
+                        for (var j = 0; j < renamed; j++) {
+                            var col = $('#columnRenamerContainer').children('.rule-container').children()[(j * 3)].value;
+                            var colRenamed = $('#columnRenamerContainer').children('.rule-container').children()[(j * 3) + 1].value;
+
+                            rawQuery += col + " AS " + colRenamed + ", ";
+                        }
+
+                        rawQuery += " * ";
+                    }
+                }
+            }
+            console.log(rawQuery);
+            rawQuery = rawQuery.replace(/,\s*$/, "");
+            console.log(rawQuery);
+
+            var joinRules = $('#joinContainer').children('.rule-container').children('.ruleController').length / 6;
+
+            rawQuery += " FROM t1 ";
+
+            for (var i = 0; i < joinRules; i++) {
+
+                var tableOne = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6)].value;
+                var joinType = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 1].value;
+                var tableTwo = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 2].value;
+                var tableOneCol = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 3].value;
+                var operand = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 4].value;
+                var tableTwoCol = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 5].value;
+
+                var OnStatement = tableOneCol + ' ' + operand + ' ' + tableTwoCol;
+
+                rawQuery += " " + joinType + " JOIN " + tableTwo + " ON " + OnStatement;
+            }
+
+            if (rules != 0) {
+                rawQuery += " WHERE " + sql_raw;
+            } 
+
+            var groupBys = $('.groupBySelector').length;
+
+            for (var i = 0; i < groupBys; i++) {
+                if ($($('.groupBySelector')[i]).val() != 0) {
+
+                    if (i == 0) {
+                        rawQuery += " GROUP BY ";
+                    }
+
+                    if (i == groupBys - 1) {
+                        rawQuery += $($('.groupBySelector')[i]).val();
+                    } else {
+                        rawQuery += $($('.groupBySelector')[i]).val() + ", ";
+                    }
+                }
+
+            } 
+            var havings = $("#havingContainer").children('.rule-container').children().length /5;
+
+            for (var i = 0; i < havings; i++)
+            {
+                var agg = $('#havingContainer').children('.rule-container').children()[(i * 5)].value;
+                var col = $('#havingContainer').children('.rule-container').children()[(i * 5) + 1].value;
+                var operand = $('#havingContainer').children('.rule-container').children()[(i * 5) + 2].value;
+                var aggValue = $('#havingContainer').children('.rule-container').children()[(i * 5) + 3].value;
+
+                if (i == 0)
+                {
+                    rawQuery += " HAVING " +  agg + "(" + col + ") " + operand + " " + aggValue;
+                } else {
+                    rawQuery += " AND " + agg + "(" + col + ") " + operand + " " + aggValue;
+                }
+
+            }
+
+            var orderBys = $('.orderBySelector').length;
+
+            for (var i = 0; i < orderBys; i++) {
+                if ($($('.orderBySelector')[i]).val()) {
+
+                    if (i == 0) {
+                        rawQuery += " ORDER BY ";
+                    }
+                    var option = '#option' + $('.orderBySelector')[i].id;
+                    if (i == orderBys - 1) {
+                        rawQuery += $($('.orderBySelector')[i]).val() + " " +  $(option).val();
+                    } else {
+                        rawQuery += $($('.orderBySelector')[i]).val() + " " + $(option).val() + ", ";
+                    }
+                }
+
+            } 
+
+            rawQuery += "');";
+
+
+            rawQuery += "queryResponse.show(" + $('#txtAmountOfRows').val() + "); ".escapeForJson();
+
+            var json = JSON.stringify(rawQuery);
+
+            console.log(json);
+
+            $('#sqlQueryOutput').val(rawQuery);
+
+            if (runNow)
+            {
+                $('#preivousQueries').val($('#preivousQueries').val() + rawQuery);
+                SendCode(json, 'Select Query');
+            }
+        }
+
+
+        function updateTables()
+        {
+            var valid = true;
+            var rules = $('#tableSelection').children('.rule-container').children('input').length / 3;
+            $('#tablePython').val('');
+
+            var rules = $('#tableSelection').children('.rule-container').length;
+            for (var i = 0; i < rules; i++) {
+
+
+                var tableName = $($('#tableSelection').children('.rule-container')[i]).children('input')[0].value;
+                var extension = $($($('#tableSelection').children('.rule-container')[i]).children('select')[0]).val();
+                var delimiter = $($('#tableSelection').children('.rule-container')[i]).children('input')[1].value;
+                var s3Location = $($('#tableSelection').children('.rule-container')[i]).children('input')[2].value;
+
+                if (extension) {
+
+                    var bucket = $('#BucketDropDown').val();
+
+                    var Join = tableName.trim() + " = spark.read";
+
+                    if (delimiter) {
+                        Join += ".option('delimiter', \"" + delimiter + "\")";
+                    }
+
+
+                    switch (extension) {
+
+                        case "txt":
+                            Join += ".option('header', 'true').option('inferSchema', 'true').text('s3a://" + bucket.trim() + "/" + s3Location.trim() + "');";
+                            break;
+                        case "csv":
+                            Join += ".format('" + extension.trim() + "').option('header', 'true').option('inferSchema', 'true').load('s3a://" + bucket.trim() + "/" + s3Location.trim() + "');";
+                            break;
+                        case "json":
+                            Join += ".format('" + extension.trim() + "').option('inferSchema', 'true').load('s3a://" + bucket.trim() + "/" + s3Location.trim() + "');";
+                            break;
+                        case "parquet":
+                            Join += ".format('" + extension.trim() + "').option('inferSchema', 'true').load('s3a://" + bucket.trim() + "/" + s3Location.trim() + "');";
+                            break;
+                        default:
+                            valid = false;
+                            break;
+                    }
+                    $('#tablePython').val($('#tablePython').val() + Join + "\n");
+                } else {
+                    valid = false;
+                }
+            }
+
+            if (valid && rules !== 0) {
+                $('#btnGetSchema').prop('disabled', false);
+            } else {
+                $('#btnGetSchema').prop('disabled', true);
+            }
+        }
+
+        function joinTables(){
+
+            updateJoins();
+            var rawQuery = "";
+
+            for (var i = 0; i < tableList.length; i++)
+            {
+                rawQuery += "spark.catalog.dropTempView(\"" + tableList[i] + "\");" + tableList[i] + ".createTempView(\"" + tableList[i] + "\");";
+            }
+
+
+            var json = JSON.stringify(rawQuery.escapeForJson());
+
+            console.log(json);
+
+            $('#sqlQueryOutput').val(rawQuery);
+            SendCode(json, 'Set Hive Tables');            
+        }
+
+        function updateJoins()
+        {
+            var rules = $('#joinContainer').children('.rule-container').children('.ruleController').length / 6;
+            $('#joinPython').val('');
+            for (var i = 0; i < rules; i++) {
+
+                var tableOne = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6)].value;
+                var joinType = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 1].value;
+                var tableTwo = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 2].value;
+                var tableOneCol = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 3].value;
+                var operand = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 4].value;
+                var tableTwoCol = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 5].value;
+
+
+                var OnStatement = tableOneCol + ' ' + operand + ' ' + tableTwoCol;
+
+                var Join = tableOne.trim() + " = " + tableOne.trim() + ".join(" + tableTwo.trim() + "," + OnStatement.trim() + ");";
+
+                Join = Join.replace(/`/g, '');
+                console.log(Join);
+
+                $('#joinPython').val($('#joinPython').val() + Join + "\n");
+            }
+
+        }
+
+        function RemoveParent(e)
+        {
+            console.log($(e).parent().parent());
+
+            var id = $(e).parent().parent()[0].id;
+
+            if (id.startsWith('renameT')) {
+                id = id.replace('renameT', '').replace('|||_', ' ');
+                $("#columnRenamerSelect option[value='`" + id + "`']").remove();
+
+                if ($('#columnRenamerSelect').val().length != 0) {
+                    $('#columnRenameCountBadge').text($('#columnRenamerSelect').val().length);
+                }
+                else {
+                    $('#columnRenameCountBadge').text(0);
+                }
+            }
+
+            $(e).parent().parent().remove();
+
+            updateJoins();
+            updateTables();
+            updateBadges();
+        }
+
+        function addAggregateRule()
+        {
+
+            var length = $("#aggregateContainer").children().length;
+            var id = "aggT" + length;
+
+            $("#aggregateContainer").append("<div class=\"rule-container\"><select class=\"form-control\" style=\"width: 10%; display: inline-block; \">" +
+                "<option selected> Aggregate </option>" +
+                    "<option>COUNT</option>" +
+                    "<option>SUM</option> " +
+                    "<option>AVG</option> " +
+                    "<option>MAX</option> " +
+                    "<option>MIN</option> " +
+                "</select >" + 
+                "<select class=\"form-control aggSelector\" id=\"" + id + "\" style=\"width: 40%; display: inline-block;\"></select>" + 
+                "<input class=\"form-control\" style= \"width: 18.4%; display: inline-block;\" placeholder=\"Renamed As ... (Leave blank if wanted)\" />" +
+                "<div class=\"btn-group pull-right rule-actions\">" +
+                    "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
+                        "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
+                    "</button>" +
+                "</div>" +
+                "</div>");
+
+            var selector = "#" + id;
+
+            $(selector).append($('<option/>', {
+                value: 0,
+                disabled: true,
+                selected: true,
+                text: "Pick a Column"
+            }));
+
+            $(selector).append($('<option/>', {
+                value: '*',
+                text: "* (All Rows)"
+            }));
+
+            for (var i = 0; i < schemaList.length; i++) {
+                for (var j = 0; j < schemaList[i].schema.length; j++) {
+                    $(selector).append($('<option/>', {
+                        value: schemaList[i].schema[j].id,
+                        text: schemaList[i].schema[j].label
+                    }));
+                }
+            }
+
+            updateJoins();
+            updateTables();
+            updateBadges();
+        }
+
+
+        function addGroupByRule()
+        {
+
+            var length = $("#groupByContainer").children().length;
+            var id = "groupByT" + length;
+
+            $("#groupByContainer").append("<div class=\"rule-container\">" +
+                "<select id=\"" + id + "\" class=\"form-control groupBySelector\" name=\"builder-basic_rule_0_filter\" style=\"width: 90%; display: inline-block;\"></select>" +
+                "<div class=\"btn-group pull-right rule-actions\">" +
+                    "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
+                    "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
+                    "</button>" +
+                    "</div>" +
+                "</div>");
+
+            var selector = "#" + id;
+
+            $(selector).append($('<option/>', {
+                value: 0,
+                disabled: true,
+                selected: true,
+                text: "Pick a Column"
+            }));
+
+            for (var i = 0; i < schemaList.length; i++) {
+                for (var j = 0; j < schemaList[i].schema.length; j++) {
+                    $(selector).append($('<option/>', {
+                        value: schemaList[i].schema[j].id,
+                        text: schemaList[i].schema[j].label
+                    }));
+                }
+            }
+
+            updateJoins();
+            updateTables();
+            updateBadges();
+        }
+
+        function addHavingRule() {
+
+            var length = $("#havingContainer").children().length;
+            var id = "havingT" + length;
+
+            $("#havingContainer").append("<div class=\"rule-container\"><select class=\"form-control\" style=\"width: 10%; display: inline-block; \">" +
+                "<option selected> Aggregate </option>" + 
+                    "<option>COUNT</option>" + 
+                    "<option>SUM</option> " + 
+                    "<option>AVG</option> " + 
+                    "<option>MAX</option> " + 
+                    "<option>MIN</option> " + 
+                "</select >" + 
+                "<select class=\"form-control havingSelector\" name=\"builder-basic_rule_0_filter\" id=\"" + id + "\" style=\"width: 40%; display: inline-block;\"></select>" + 
+                "<select class=\"form-control ruleController\" style= \"width: 5%; display: inline-block; \"> " +
+                    "<option value='!=' selected> ≠ </option > " +
+                    "<option value='=='> = </option > " +
+                    "<option value='<'> < </option > " +
+                    "<option value='>'> > </option > " +
+                    "<option value='<='> <= </option > " +
+                    "<option value='>='> >= </option > " +
+                "</select>" +
+                "<input class=\"form-control\" style= \"width: 18.4%; display: inline-block;\" />" +
+                "<div class=\"btn-group pull-right rule-actions\">" +
+                    "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
+                        "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
+                    "</button>" +
+                "</div>" +
+                "</div>");
+
+            var selector = "#" + id;
+
+            $(selector).append($('<option/>', {
+                value: 0,
+                disabled: true,
+                selected: true,
+                text: "Pick a Column"
+            }));
+
+            for (var i = 0; i < schemaList.length; i++) {
+                for (var j = 0; j < schemaList[i].schema.length; j++) {
+                    $(selector).append($('<option/>', {
+                        value: schemaList[i].schema[j].id,
+                        text: schemaList[i].schema[j].label
+                    }));
+                }
+            }
+
+            updateJoins();
+            updateTables();
+            updateBadges();
+        }
+
+        function addOrderByRule()
+        {
+            var length = $("#orderByContainer").children().length;
+            var id = "orderBy" + length;
+
+            $("#orderByContainer").append("<div class=\"rule-container\">" +
+                "<select id=\"" + id + "\" class=\"form-control orderBySelector\" style=\"width: 75%; display: inline-block;\"></select>" + 
+
+                "<select id=\"option" + id + "\" class=\"form-control \" style=\"width: 10%; display: inline-block;\">"+
+                    "<option value='ASC'>"+ "Ascending"+ "</option>" +
+                    "<option value='DESC'>" + "Descending" + "</option>" +
+                "</select>" +
+                "<div class=\"btn-group pull-right rule-actions\">" +
+                    "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
+                        "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
+                    "</button>" +
+                "</div>" +
+                "</div>");
+
+            var selector = "#" + id;
+
+            $(selector).append($('<option/>', {
+                value: 0,
+                disabled: true,
+                selected: true,
+                text: "Pick a Column"
+            }));
+
+            for (var i = 0; i < schemaList.length; i++)
+            {
+                for (var j = 0; j < schemaList[i].schema.length; j++) {
+                    $(selector).append($('<option/>', {
+                        value: schemaList[i].schema[j].id,
+                        text: schemaList[i].schema[j].label
+                    }));
+                }
+            }
+
+            updateJoins();
+            updateTables();
+            updateBadges();
+        }
+
+        var joins = 0;
+        function addJoinRule()
+        {
+            var tableOptions = "";
+            for (var i = 0; i < tableList.length; i++)
+            {
+                tableOptions += "<option value=\"" + tableList[i]  + "\">" + tableList[i] + "</option>";
+            }
+
+            var length = joins;
+            joins++;
+            var id = "Join" + length;
+
+            $("#joinContainer").append("<div class=\"rule-container\">"+
+                "<select id=\"firstTable" + id + "\" class=\"form-control ruleController tableNameController\" style= \"width: 11%; display:inline-block; \">" +
+                    "<option selected disabled>Table Name</option>" +
+                    tableOptions +
+                "</select>" +
+                "<select class=\"form-control ruleController joinTypeController\" style= \"width: 12%; display: inline-block; \"> " +
+                    "<option selected disabled>Join Type</option > " +
+                    "<option value='INNER'> Inner Join</option> " +
+                    "<option value='FULL'> Full Join</option> " +
+                    "<option value='LEFT'> Left Join</option> " +
+                    "<option value='RIGHT'> Right Join</option> " +
+                "</select>" +
+                "<select id=\"secondTable" + id + "\"class=\"form-control ruleController tableNameController\" style= \"width: 11%; display:inline-block; \">" +
+                    "<option selected disabled>Table Name</option>" +
+                    tableOptions +
+                "</select>" +
+                "<span> ON </span>"+
+               // "<select id=\"helpfirstTable" + id + "\" class=\"form-control ruleController\" style= \"width: 11%; display:inline-block; \" disabled>" +
+                //    "<option selected>Table Name</option>" +
+              //      tableOptions +
+              //  "</select>" +
+                 "<select id=\"colfirstTable" + id + "\" class=\"form-control ruleController\" style= \"width: 15%; display:inline-block; \" disabled>" +
+                "</select>" +
+                "<select class=\"form-control ruleController\" style= \"width: 5%; display: inline-block; \"> " +
+                    "<option value='!=' selected> ≠ </option > " +
+                    "<option value='=='> = </option > " +
+                    "<option value='<'> < </option > " +
+                    "<option value='>'> > </option > " +
+                    "<option value='<='> <= </option > " +
+                    "<option value='>='> >= </option > " +
+                "</select>" +
+            //    "<select id=\"helpsecondTable" + id + "\" class=\"form-control ruleController\" style= \"width: 11%; display:inline-block; \" disabled>" +
+             //       "<option selected>Table Name</option>" +
+           //         tableOptions +
+            //    "</select>" +
+                "<select id=\"colsecondTable" + id + "\" class=\"form-control ruleController\" style= \"width: 15%; display:inline-block; \" disabled>" +
+                "</select>" +
+                "<div class=\"btn-group pull-right rule-actions\">" +
+                    "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">"+
+                        "<i class=\"glyphicon glyphicon-remove\"></i> Delete"+
+                "</button>"+
+                "</div>"+
+                "</div>");
+
+            updateJoins();
+            updateTables();
+            updateBadges();
+        }
+
+        function addOrRemoveColumnRename(e) {
+            //I'm choosing triple Pipe single Underscore cause I don't think anybody would ever choose that.
+            var id = "renameT" + e.params.data.text.replace(' ', '|||_');
+            if (e.params.data.selected == true) {
+
+                $("#columnRenamerContainer").append("<div class=\"rule-container\"  id=\"" + id + "\">" +
+                    "<input class=\"form-control\" disabled value=\"" + e.params.data.text + "\" style=\"width: 25%; display:inline-block;\" />" +
+                    "<input class=\"form-control ruleController\" style=\"width: 45%; display:inline-block;\" placeholder=\"Renamed As... \">" +
+                    "<div class=\"btn-group pull-right rule-actions\">" +
+                        "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
+                            "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
+                        "</button>" +
+                    "</div>" +
+                    "</div>");
+
+            }
+            else {
+                id = "#" + id;
+                $(id).remove();
+            }
+
+            updateJoins();
+            updateTables();
+            updateBadges();
+        }
+
+        var checkInterval;
+        var prevProgress;
+        var stage;
+
+        var sessionID;
+
+        function SendCode(json, action, tableName)
+        {
+            if (!locked) {
+          
+                locked = true;
+
+                $('#replyArea').val('');
+
+                if (json == null) {
+                    json = JSON.stringify($('#codeArea').val().escapeForJson());
+                    $('#preivousQueries').val($('#preivousQueries').val() + $('#codeArea').val());
+                } 
+
+                stage = 1;
+                prevProgress = 0;
+
+                $.ajax({
+                    type: "POST",
+                    url: "/api/QueryTool/SendCode?SessionID=" + sessionID,
+                    data: json,
+                    //headers: { 'Access-Control-Allow-Origin': '*' },
+                    contentType: "application/json; charset=utf-8",
+                    //dataType: "json",
+                    success: function (msg) {
+                        json = JSON.parse(msg);
+                        //console.log(msg);
+                        console.log(json);
+
+                        prevProgress = json.progress;
+
+                        $('#sparkInfo').show();
+
+
+                        if ((Math.floor(json.progress * 100)) == 0) {
+                            $('#jobInfo').text("Apache Spark Session ID: (" + sessionID + ") is currently scheduled to run.");
+                        }
+                        else {
+                            $('#jobInfo').text("Apache Spark Session ID: (" + sessionID + ") is currently " + json.state + ".");
+                        }
+
+                        $("div").remove(".statement");
+                        $("#sparkInfo").append(
+                            "<div class=\"statement\">" +
+                            "<h6 id=\"statementInfo" + json.id + "\"></h6>" +
+                            "<div class=\"progress progress-striped active\">" +
+                            "<div id=\"statementBar" + json.id + "\" class=\"progress-bar\"></div>" +
+                            "</div>" +
+                            "</div>"
+                        );
+
+                        var width = (Number(Math.round(json.progress + 'e3') + 'e-3') * 100) + "%";
+                        console.log(width);
+                        //$('.progress-bar').css('width', width);
+
+                        var statementInfo = "#statementInfo" + json.id;
+
+                        $(statementInfo).text("Job Number (" + json.id + ") : '" + action + "' is currently on Stage (" + stage + ") : " + (Math.floor(json.progress * 100)) + " % ");
+
+                        var statementBar = "#statementBar" + json.id;
+
+                        $(statementBar).css('width', width);
+
+                        tasksRunning.push(json.id);
+                        checkInterval = setInterval("GetStatus(" + sessionID + "," + json.id + ",\"" + action + "\",\"" + tableName + "\")", 1000);
+                    },
+                    error: function (e) {
+                        console.log("Unavailable");
+                        locked = false;
+                    }
+
+                });
+            }
+        }
+
+        var locked = false;
+        var schemaList = [];
+        var tableList = [];
+        var filterList = [];
+        var table;
+        var tasksRunning = [];
+
+        function GetStatus(sessionID, statementID, action, tableName)
+        {
+            $.ajax({
+                type: "GET",
+                url: "/api/QueryTool/GetStatement?SessionID=" + sessionID + "&StatementID=" + statementID,
+                contentType: "application/json; charset=utf-8",
+                success: function (msg) {
+                    // console.log(msg);
+
+                    json = JSON.parse(msg);
+                    console.log(json);
+
+                    if (Number(Math.round(json.progress + 'e3') + 'e-3') < Number(Math.round(prevProgress + 'e3') + 'e-3')) {
+                        stage = stage + 1;
+                    }
+
+                    if (json.output !== null) {
+
+                        tasksRunning.splice($.inArray(statementID, tasksRunning), 1);
+
+                        locked = false;
+
+                        clearInterval(checkInterval);
+
+                        if (json.output.status == "error") {
+                            alert(json.output.evalue);
+                        }
+                        else {
+                            $('#replyArea').val(json.output.data['text/plain']);
+
+                            var filters = json.output.data['text/plain'].split("\n");
+
+                            $('#queryPanel').show();
+                            switch (action) {
+                                case "Get Schema":
+                                case "Rename Columns":
+                                    renderSchema(filters, tableName);
+                                    break;
+                                case "Set Hive Tables":
+                                    $('#secondaryOptions').show();
+                                    break;
+                                case "Select Query":
+                                    renderTable(filters);
+                                    $('#btnRowCount').prop('disabled', false);
+                                    break;
+                                case "Count Rows":
+                                    $('#rowCount').text(filters[0].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " Total Rows");
+                                    break;
+                            }
+
+                            var schema = [];
+
+                            for (var i = 0; i < schemaList.length; i++)
+                            {
+                                for (var j = 0; j < schemaList[i].schema.length; j++)
+                                {
+                                    schema.push(schemaList[i].schema[j]);
+                                }
+                            }
+                            $('#builder-basic').queryBuilder({
+                                plugins: ['bt-tooltip-errors'],
+                                allow_empty: true,
+                                rules: {
+                                    condition: 'AND',
+                                    rules: []
+                                },
+                                filters: schema
+                            });
+                        }
+
+
+                        
+
+                    }
+
+                    prevProgress = Number(Math.round(json.progress + 'e3') + 'e-3')
+                    if ((Math.floor(json.progress * 100)) == 0) {
+                        $('#jobInfo').text("Apache Spark Session ID: (" + sessionID + ") is currently scheduled to run.");
+                    }
+                    else {
+                        $('#jobInfo').text("Apache Spark Session ID: (" + sessionID + ") is currently " + json.state + ".");
+                    }
+                    var width = (Number(Math.round(json.progress + 'e3') + 'e-3') * 100) + "%";
+                    console.log(width);
+                    //$('.progress-bar').css('width', width);
+
+                    var statementInfo = "#statementInfo" + statementID;
+
+                    $(statementInfo).text("Job Number (" + json.id + ") : '" + action + "' is currently on Stage (" + stage + ") : " + (Math.floor(json.progress * 100)) + " % ");
+
+                    var statementBar = "#statementBar" + statementID;
+
+                    $(statementBar).css('width', width);
+
+
+                },
+                error: function (e) {
+                    console.log("Unavailable");
+                }
+            });
+
+        }
+
+        function renderSchema(filters, tableName)
+        {
+            schemaList = [];
+            tableList = [];
+            var tables = tableName.split('|||');
+
+            if (filters[0].trim() === "root") {
+                console.log(tableName);
+                var internalFilterList;
+
+                $('.groupBySelector').empty();
+                $('.havingSelector').empty();
+                $('#orderBySelector').empty();
+                $('#columnRenamerSelect').empty();
+                $('#columnSelectorSelect').empty();
+
+                $('.groupBySelector').append($('<option/>', {
+                    value: "0",
+                    text: "Pick a Column"
+                }));
+
+                $('.havingSelector').append($('<option/>', {
+                    value: "0",
+                    disabled: true,
+                    selected: true,
+                    text: "Pick a Column"
+                }));
+
+                $('#orderBySelector').append($('<option/>', {
+                    value: "0",
+                    text: "Pick a Column"
+                }));
+
+                var index = -1;
+
+                for (var i = 0; i < filters.length; i++) {
+
+                    if (filters[i].trim() != "root" && filters[i]) {
+                        var column = filters[i].substring(4, filters[i].indexOf(":"));
+                        var type = filters[i].substring(filters[i].indexOf(": ") + 1, filters[i].indexOf("("));
+
+                        //There is no long in Hive.
+                        if (type.trim() == "long") {
+                            type = "double";
+                        }
+
+                        internalFilterList.push({ 'id': tables[index] + '.`' + column.trim() + "`", 'type': type.trim(), 'label': tables[index] + '.' + column.trim() });
+
+                        $('#columnRenamerSelect').append($('<option/>', {
+                            value: tables[index] + '.`' + column.trim() + "`",
+                            text: tables[index] + '.' + column.trim()
+                        }));
+
+
+                        $('#columnSelectorSelect').append($('<option/>', {
+                            value: tables[index] + '.`' + column.trim() + "`",
+                            text: tables[index] + '.' + column.trim()
+                        }));
+
+                        $('.havingSelector').append($('<option/>', {
+                            value: tables[index] + '.`' + column.trim() + "`",
+                            text: tables[index] + '.' + column.trim()
+                        }));
+
+                        $('.groupBySelector').append($('<option/>', {
+                            value: tables[index] + '.`' + column.trim() + "`",
+                            text: tables[index] + '.' + column.trim()
+                        }));
+
+                        $('.orderBySelector').append($('<option/>', {
+                            value: tables[index] + '.`' + column.trim() + "`",
+                            text: tables[index] + '.' + column.trim()
+                        }));
+
+                    }
+                    if (filters[i].trim() === "root" || (i + 1) == filters.length) {
+                        if (index != -1)
+                        {
+                            schemaList.push({ 'tableName': tables[index], 'schema': internalFilterList });
+                            tableList.push(tables[index]);
+                            console.log(schemaList);
+                        }
+
+                        internalFilterList = [];
+                        index++;
+                    }
+                }
+            }
+
+            var count = 0;
+
+            for (var i = 0; i < schemaList.length; i++) {
+                count += schemaList[i].schema.length;
+            }
+
+            $('#columnCountBadge').text(count);
+        }
+
+        function renderTable(filters)
+        {
+            if (filters[0].startsWith("+-")) {
+
+                if (table) {
+                    table.destroy();
+                }
+
+                //Column information
+                var columns = filters[1].split('|');
+                var parsedColumns = [];
+                var nullColumns = [];
+
+                $('#tableColumnIDs').empty();
+                $('#tableFirstRow').empty();
+                $('#datasetRowTable tbody').empty();
+
+                for (var i = 1; i < columns.length; i++) {
+                    if (columns[i]) {
+                        nullColumns.push(null);
+                        parsedColumns.push({ 'title': columns[i].trim(), 'width': "auto" });
+                        $('#tableColumnIDs').append("<th>" + columns[i].trim() + "</th>");
+                        $('#tableFirstRow').append("<td></td>");
+                    }
+                }
+
+                var parsedRows = [];
+
+                //Data for Each Row in the Result Set
+                for (var i = 3; i < filters.length; i++) {
+
+                    if (!filters[i].startsWith("+-")) {
+
+
+                        var cells = filters[i].split('|');
+                        var parsedCells = [];
+                        cells.splice(0, 1);
+                        cells.splice(cells.length, 1);
+                        for (var j = 0; j < cells.length - 1; j++) {
+                            parsedCells.push(cells[j].trim());
+                        }
+
+                        if (parsedCells.length >= 1) {
+                            parsedRows.push(parsedCells);
+                        }
+                    }
+                }
+
+                table = $('#datasetRowTable').DataTable({
+                    "scrollX": true,
+                    data: parsedRows,
+                    columns: parsedColumns,
+                });
+
+                // $("#datasetRowTable").dataTable({
+                //     "columnDefs": [{
+                //         "defaultContent": "-",
+                //         "targets": "_all"
+                //     }],
+                //     "columnFilter": [{
+                //         "sPlaceHolder": "head:after",
+                //         "aoColumns": nullColumns,
+                //     }]
+                // });
+
+
+                $(".dataTables_filter").parent().addClass("text-right");
+            }
+        }
+
+        $('#datasetList').on('select2:select', function (e) {
+            // Do something
+            $('#tablePanel').show();
+
+
+
+
+            var data = e.params.data;
+
+            var count = $("#tableSelection").children().length;
+
+            var controllerURL = "/Dataset/GetS3Key/?datasetID=" + encodeURI(data.id);
+            $.get(controllerURL, function (result) {
+
+                var fileExtensions = "";
+                for (var i = 0; i < result.fileExtensions.length; i++) {
+                    fileExtensions += "<option value=\"" + result.fileExtensions[i] + "\">" + result.fileExtensions[i] + "</option>";
+                }
+
+                if (result.fileExtensions.length == 0)
+                {
+                    fileExtensions += "<option value=\"" + "csv" + "\">" + "csv" + "</option>";
+                    fileExtensions += "<option value=\"" + "parquet" + "\">" + "parquet" + "</option>";
+                }
+
+                var url = result.s3Key + "*/*/*/*/*";
+                var test = 'data-test/sentry/robbs_data/*/*/*/*/daily_premium_data_2014.csv'
+
+                $("#tableSelection").append("<div class=\"rule-container\" id=\"dataset" + data.id + "\">" +
+                    "<input class=\"form-control ruleController\" value=\" t" + (count + 1) + "\" style=\"  width: 10%;display:inline-block; \"/>" + 
+                    "<select class=\"form-control ruleController\" style= \"width: 10%; display:inline-block; \">" +
+                        "<option selected disabled>Extensions</option>" +
+                        fileExtensions +
+                    "</select>" +
+                    "<input class=\"form-control ruleController\" placeholder=\"Delimiter...\" style=\"  width: 10%;display:inline-block; \"/>" +
+                    "<select class=\"form-control ruleController\" style=\"width: 23%; display: inline-block; \">" +
+                    "    <option selected disabled>S3 Bucket</option>" +
+                    "    <option>sentry-applog-archive-nonprod</option>" +
+                    "    <option>sentry-dataset-management</option>"+
+                    "    <option>sentry-dataset-management-np</option>"+
+                    "    <option>sentry-dataset-management-np-nr</option>"+
+                    "</select>"+
+                    "<input class=\"form-control ruleController\" value=\"" + url + "\" style=\"  width: 40%;display:inline-block; \"/>" +
+                  "</div>");
+            });
+
+            $('#datasetList').select2("close");
+
+            updateBadges();
+            updateTables();
+        });
+
+        $('#columnSelectorSelect').on('select2:select', function (e) {
+            updateBadges();
+
+        });
+        $('#columnSelectorSelect').on('select2:unselect', function (e) {
+            updateBadges();
+        });
+
+        $('#columnRenamerSelect').on('select2:select', function (e) {
+            addOrRemoveColumnRename(e);
+            updateBadges(); 
+        });
+        $('#columnRenamerSelect').on('select2:unselect', function (e) {
+            addOrRemoveColumnRename(e);
+            updateBadges();
+        });
+
+
+        $('#datasetList').on('select2:unselect', function (e) {
+            // Do something
+            var data = e.params.data;            
+            var str = '#dataset' + data.id;
+            console.log(str);
+
+            $(str).remove();
+
+            $('#datasetList').select2("close");
+
+            var count = $("#tableSelection").children().length;
+
+            console.log(count);
+            if (count >= 2) {
+                $('#joinPanel').show();
+            } else {
+                $('#joinPanel').hide();
+            }
+
+            updateTables();
+        });
+
+        $(document).ready(function () {
+
+            $('#columnSelector').show();
+            $('#columnRenamer').hide();
+            $('#joinPanel').hide();
+            $('#orderBy').hide();
+            $('#groupBy').hide();
+            $('#whereClause').hide();
+            $('textarea').hide();
+            $('#secondaryOptions').hide();
+            $('#aggregate').hide();
+
+            var $selector = $("#datasetList").select2({
+                selectOnClose: false,
+                closeOnSelect: false,
+                placeholder: "Click here to begin ...",
+            });
+
+            var $selectorColumn = $("#columnSelectorSelect").select2({
+                selectOnClose: false,
+                closeOnSelect: false,
+                forceBelow: true,
+                placeholder: "Click here for Columns.",
+            });
+
+            var $renamerColumn = $("#columnRenamerSelect").select2({
+                selectOnClose: false,
+                closeOnSelect: false,
+                forceBelow: true,
+                placeholder: "Click here for Columns.",
+            });
+
+
+            $selector.select2({
+                selectOnClose: false,
+                closeOnSelect: false,
+                placeholder: "Click here to begin ...",
+            });
+
+            $selectorColumn.select2({
+                selectOnClose: false,
+                closeOnSelect: false,
+                forceBelow: true,
+                placeholder: "Click here for Columns.",
+            });
+
+            $renamerColumn.select2({
+                selectOnClose: false,
+                closeOnSelect: false,
+                forceBelow: true,
+                placeholder: "Click here for Columns.",
+            });
+
+            $('.select2-container--default').css('width', '100%');
+
+            var select = $("#datasetList");
+
+
+            var controllerURL = "/Dataset/GetAllDatasets";
+
+            $.get(controllerURL, function (result) {
+                var optgroup = $('<optgroup>');
+
+                var previousOpt = '';
+                $.each(result, function (index, itemData) {
+
+                    if (itemData.Group.Name != previousOpt)
+                    {
+                        if (previousOpt != '') {
+                            select.append(optgroup);
+                        }
+                        optgroup = $('<optgroup>');
+                        optgroup.attr('label', itemData.Group.Name);
+                        previousOpt = itemData.Group.Name;
+                    }
+
+                    optgroup.append($('<option/>', {
+                        value: itemData.Value,
+                        text: itemData.Text
+                    }));
+                });
+                select.append(optgroup);
+            });
+            
+            
+            if (localStorage.getItem("SparkSession") === null) {
+
+                $.ajax({
+                    type: "POST",
+                    url: "/api/QueryTool/CreateSession?Language=" + $('#LanguageDropDown').val(),
+                    dataType: "json",
+                    success: function (msg) {
+                        json = JSON.parse(msg);
+                        sessionID = json.id;
+
+                        var obj = { 'id': sessionID, 'time': Date.now() };
+
+                        localStorage.setItem("SparkSession", JSON.stringify(obj));
+                    },
+                    error: function (e) {
+                        console.log("Unavailable");
+                    }
+                });
+            }
+            else {
+                sessionID = JSON.parse(localStorage.getItem("SparkSession")).id;
+                console.log(sessionID);
+            }
+
+            //Check the Session to make sure it is still active.
+            $.ajax({
+                type: "GET",
+                url: "/api/QueryTool/GetSession?SessionID=" + sessionID,
+                dataType: "json",
+                success: function (msg) {
+                    json = JSON.parse(msg);
+                    $('#jobInfo').text("Apache Spark Session ID: (" + sessionID + ") is currently " + json.state + ".");
+
+                },
+                error: function (e) {
+                    $.ajax({
+                        type: "POST",
+                        url: "/api/QueryTool/CreateSession?Language=" + $('#LanguageDropDown').val(),
+                        dataType: "json",
+                        success: function (msg) {
+                            json = JSON.parse(msg);
+                            sessionID = json.id;
+
+                            var obj = { 'id': sessionID, 'time': Date.now() };
+
+                            localStorage.setItem("SparkSession", JSON.stringify(obj));
+                            $('#jobInfo').text("Apache Spark Session ID: (" + sessionID + ") is currently idle.");
+                        },
+                        error: function (e) {
+                            console.log("Unavailable");
+                        }
+                    });
+                }
+            });
+
+            $('#btnGetSQL').on('click', function () {
+                runQuery(false);
+
+            });
+        });
+
+        function CreateSession()
+        {
+            $.ajax({
+                type: "POST",
+                url: "/api/QueryTool/CreateSession?Language=" + $('#LanguageDropDown').val(),
+                dataType: "json",
+                success: function (msg) {
+                    json = JSON.parse(msg);
+                    sessionID = json.id;
+
+                    var obj = { 'id': sessionID, 'time': Date.now() };
+
+                    localStorage.setItem("SparkSession", JSON.stringify(obj));
+                    $('#jobInfo').text("Apache Spark Session ID: (" + sessionID + ") is currently idle.");
+                },
+                error: function (e) {
+                    console.log("Unavailable");
+                }
+            });
+        }
+    </script>
+
+}

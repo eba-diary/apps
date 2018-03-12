@@ -87,6 +87,38 @@ namespace Sentry.data.Infrastructure
         }
 
         /// <summary>
+        /// Retrieves a presigned URL for the S3 Object.
+        /// Encoding can be supplied optionally.  If not, ContentDisposition set to attachement
+        /// default is null and will return latest version of S3 key.
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="ecode"></param>
+        /// <returns></returns>
+        public string GetUserGuideDownloadURL(string key, string ecode = null)
+        {
+            GetPreSignedUrlRequest req = new GetPreSignedUrlRequest()
+            {
+                BucketName = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                Key = key,
+                VersionId = null,
+                Expires = DateTime.Now.AddMinutes(2)
+            };
+            //setting content-disposition to attachment vs. inline (into browser) to force "save as" dialog box for all doc types.
+            
+            if (ecode == null)
+            {
+                req.ResponseHeaderOverrides.ContentDisposition = "attachment";
+            }
+            else
+            {
+                req.ResponseHeaderOverrides.ContentEncoding = ecode;
+            }
+            
+            string url = S3Client.GetPreSignedURL(req);
+            return url;
+        }
+
+        /// <summary>
         /// Upload a dataset to S3, pulling directly from the given source file path.  Files size less than
         /// 5MB will use PutObject, larger than 5MB will utilize MultiPartUpload.
         /// </summary>

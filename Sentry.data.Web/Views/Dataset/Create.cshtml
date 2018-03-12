@@ -15,106 +15,619 @@
 {
     @Html.AntiForgeryToken()
 
-    <div class="form-horizontal">
-        @*<h4>Dataset</h4>*@
-        <hr />        
-        @Html.HiddenFor(model => model.DatasetId)
-        @Html.HiddenFor(model => model.SentryOwnerName)
+    <p>Please fill out the following fields describing your dataset.  Before starting check to see if your dataset is not already on this site by using our <a href="~/Dataset/List">search tool.</a></p>
 
-        @*Show the custom validation summary*@
-        @Html.DisplayFor((model) => ViewData.ModelState)
+    @*Show the custom validation summary*@
+    @Html.DisplayFor((model) => ViewData.ModelState)
 
-        <div class="form-group">
-            <span class="text-muted col-md-10 col-md-offset-2"><em>** All Fields Are Required</em></span>
-        </div> 
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
 
-        @*<div class="form-group">
-            <span class="text-muted col-md-10 col-md-offset-2"><em>** Files larger than 100MB, please contact <a href="mailto:DataArchitecture@Sentry.com?Subject=Dataset%20Management%20-%20Large%20File%20Upload&Body=**Please%20do%20not%20attach%20file**">Data Architecture</a> team</em></span>
-        </div>*@
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#informationPanel" data-toggle="tab" aria-expanded="true">Dataset Information <span id="infoBadge" class="badge badge-danger"></span></a></li>
+        <li class=""><a href="#securityPanel" data-toggle="tab" aria-expanded="false">Dataset Security <span id="securityBadge" class="badge badge-danger"></span></a></li>
+        <li class=""><a href="#retrievalPanel" data-toggle="tab" aria-expanded="false">Dataset Retrieval <span id="retBadge" class="badge badge-danger"></span></a></li>
+        <li class="" style="display:none;"><a href="#columnPanel" data-toggle="tab" aria-expanded="false">Column Metadata <span id="columnBadge" class="badge badge-danger"></span></a></li>
+        <li class="" style="display:none;"><a href="#lineagePanel" data-toggle="tab" aria-expanded="false">Data Lineage <span id="lineageBadge" class="badge badge-danger"></span></a></li>
+    </ul>
 
-        <div class="form-group">
-            @Html.LabelFor((model) => model.CategoryIDs, new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownListFor((model) => model.CategoryIDs, Model.AllCategories, new { @class = "form-control edit-dataset-row" })
-                @Html.ValidationMessageFor((model) => model.CategoryIDs, "", new { @class = "text-danger" })
+    <div id="myTabContent" class="tab-content">
+        <div id="informationPanel" class="tab-pane fade active in form-horizontal">
+
+            <br />
+            <h4>Dataset Information</h4>
+            <br />
+
+            @Html.HiddenFor(model => model.DatasetId)
+            @Html.HiddenFor(model => model.SentryOwnerName)
+
+            <div class="form-group">
+                @Html.LabelFor((model) => model.CategoryIDs, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor((model) => model.CategoryIDs, Model.AllCategories, new { @class = "form-control edit-dataset-row" })
+                    @Html.ValidationMessageFor((model) => model.CategoryIDs, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.DatasetName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.DatasetName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                    @Html.ValidationMessageFor(model => model.DatasetName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.DatasetDesc, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextAreaFor(model => model.DatasetDesc, new { @class = "form-control edit-dataset-row", @style = "min-width: 100%; max-width: 100%; width: 100%;" })
+                    @Html.ValidationMessageFor(model => model.DatasetDesc, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group fieldDescription">
+                <label class="control-label col-md-2"></label>
+                <div class="col-md-10">
+                    <span class="text-muted">
+                        <em>This description will be shown on the Dataset List and Search Page and at the top of your Dataset Detail Page.</em>
+                    </span>
+                </div>
+            </div>
+
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.DatasetInformation, htmlAttributes: new { @class = "control-label col-md-2 optional" })
+                <div class="col-md-10">
+                    @Html.TextAreaFor(model => model.DatasetInformation, new { @class = "form-control edit-dataset-row", @style = "min-width: 100%; max-width: 100%; width: 100%;" })
+                    @Html.ValidationMessageFor(model => model.DatasetInformation, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group fieldDescription">
+                <label class="control-label col-md-2"></label>
+                <div class="col-md-10">
+                    <span class="text-muted">
+                        <em>Please roughly describe how users can use your dataset.</em>
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.CreationUserName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.CreationUserName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                    @Html.ValidationMessageFor(model => model.CreationUserName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group fieldDescription">
+                <label class="control-label col-md-2"></label>
+                <div class="col-md-10">
+                    <span class="text-muted">
+                        <em>This is who originally created the data for example external data sources like Mitchell or internal data sources like CustomerOne.</em>
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor((model) => model.OriginationID, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor((model) => model.OriginationID, Model.AllOriginationCodes, new { @class = "form-control edit-dataset-row" })
+                    @Html.ValidationMessageFor((model) => model.OriginationID, "", new { @class = "text-danger" })
+                </div>
             </div>
         </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.DatasetName, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.DatasetName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                @Html.ValidationMessageFor(model => model.DatasetName, "", new { @class = "text-danger" })
+        <div id="securityPanel" class="tab-pane fade in form-horizontal">
+            <br />
+            <h4>Dataset Security</h4>
+            <br />
+            <p>
+                Dataset Security is very important to this site and Sentry as a whole.  
+                It is <b>imperative</b> that you know what you are uploading to this site and what the data is.  
+                Data.Sentry.com uploads data to the cloud so no sensitive data can be uploaded through our site.
+                To find out what data is sensitive and what classification your data is <a href="http://sharepoint.sentry.com/Security/Security%20Architecture/Security%20Policies/Published/Policy-Data%20Classification%20and%20Handling.pdf">click here.</a>
+                Data that is sensitive can be uploaded after it has been tokenized by the information security web service.
+            </p>
+
+            <br />
+            <div class="form-group">
+                @Html.LabelFor(model => model.OwnerID, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.OwnerID, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
+                    @Html.ValidationMessageFor(model => model.OwnerID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            @*
+            <div class="form-group">
+                @Html.LabelFor((model) => model.DataClassification, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor((model) => model.DataClassification, Model.AllDataClassifications, new { @class = "form-control edit-dataset-row" })
+                    @Html.ValidationMessageFor((model) => model.DataClassification, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group fieldDescription">
+                <label class="control-label col-md-2"></label>
+                <div class="col-md-10">
+                    <span class="text-muted"><em id="dataClassInfo"></em></span>
+                </div>
+            </div>
+            *@
+        </div>
+
+        <div id="retrievalPanel" class="tab-pane fade in form-horizontal">
+            <br />
+            <h4>Dataset Retrieval</h4>
+            <br />
+
+            <p>Filling in this tab helps us in figuring out the steps to upload your dataset's files into our site.</p>
+
+            <div id="detailSectionHeader_Simple">
+                <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_Simple"></span>
+                <h5 class="detailSection">Basic Configuration</h5>
+            </div>
+            <div id="hide_detailSectionHeader_Simple">
+
+                @Html.HiddenFor(model => model.ConfigFileName)
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ConfigFileName, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.ConfigFileName, new { htmlAttributes = new { @disabled = "disabled", @readonly = "readonly", @class = "form-control edit-dataset-row" } })
+                        @Html.ValidationMessageFor(model => model.ConfigFileName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                @Html.HiddenFor(model => model.ConfigFileDesc)
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ConfigFileDesc, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.ConfigFileDesc, new { htmlAttributes = new { @disabled = "disabled", @readonly = "readonly", @class = "form-control edit-dataset-row" } })
+                        @Html.ValidationMessageFor(model => model.ConfigFileDesc, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                @Html.HiddenFor(model => model.DropLocationType)
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DropLocationType, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.DropLocationType, new { htmlAttributes = new { @disabled = "disabled", @readonly = "readonly", @class = "form-control edit-dataset-row" } })
+                        @Html.ValidationMessageFor(model => model.DropLocationType, "", new { @class = "text-danger" })
+                    </div>
+                </div>                
+                
+                <div class="form-group fieldDescription">
+                    <label class="control-label col-md-2"></label>
+                    <div class="col-md-10">
+                        <span class="text-muted">
+                            @*<em> The type of protocol (FTP or API) or location type (internal DFS or EC2) that will be used to retrieve this file. </em>*@
+                            <em> Data.Sentry.com will create and manage a file share drop location.  Associates and\or applications can drop files to this location for upload to this dataset (See Drop Path below).</em>
+                        </span>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    @Html.LabelFor((model) => model.FileType, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor((model) => model.FileType, Model.AllDataFileTypes, new { @disabled = "disabled", @readonly = "readonly", @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.FileType, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group fieldDescription">
+                    <label class="control-label col-md-2"></label>
+                    <div class="col-md-10">
+                        <span class="text-muted"><em id="fileTypeInfo"></em></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor((model) => model.CreationFreq, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor((model) => model.CreationFreq, Model.AllFrequencies, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.CreationFreq, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor((model) => model.DatasetScopeTypeID, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor((model) => model.DatasetScopeTypeID, Model.AllDatasetScopeTypes, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.DatasetScopeTypeID, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor((model) => model.DropPath, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor((model) => model.DropPath, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
+                        @Html.ValidationMessageFor((model) => model.DropPath, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group fieldDescription">
+                    <label class="control-label col-md-2"></label>
+                    <div class="col-md-10">
+                        <span class="text-muted">
+                            <em>
+                                <b> Warning:</b> Files that are dropped here will be deleted when the upload to this site is complete.  If this does not work for you then please create a staging location, a copy of the file, or <a href="mailto:BIPortalAdmin@sentry.com?Subject=File_Drop_Location"> click here to contact site Administrators</a>
+                            </em>
+                        </span>
+                    </div>
+                </div>
+                @**
+
+    <div class="form-group fieldDescription" >
+        <label class="control-label col-md-2"></label>
+        <div class="col-md-10">
+            <span class="text-muted"><em>If this file drop location does not work for you. Check the checkbox below and follow the new steps.</em></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.CustomDropPath, htmlAttributes: new { @class = "control-label col-md-2 optional" })
+        <div class="col-md-10">
+            @Html.CheckBoxFor(model => model.CustomDropPath, new {  @class = "" })
+        </div>
+    </div>
+
+    <div class="form-group fieldDescription">
+        <label class="control-label col-md-2"></label>
+        <div class="col-md-10">
+            <span class="text-muted">
+                <em>
+                    <b> Warning:</b> Files that are dropped here will be deleted when the upload to this site is complete.  If this does not work for you then please create a staging location, a copy of the file, or <a href="mailto:BIPortalAdmin@sentry.com?Subject=File_Drop_Location"> click here to contact The Administrators</a>
+                </em>
+            </span>
+        </div>
+    </div>
+
+    <div class="form-group fieldDescription">
+        <label class="control-label col-md-2"></label>
+        <div class="col-md-10">
+            <span class="text-muted">
+                <em>
+                    <b> Warning:</b> The data.sentry.com service accounts will need access to this file share.  This may take some time.
+                </em>
+            </span>
+        </div>
+    </div>
+                *@
+
+
+
+
+
+            </div>
+            <br />
+            <hr />
+            <div id="detailSectionHeader_Advanced">
+                <span class="glyphicon glyphicon-chevron-up element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_Advanced"></span>
+                <h5 class="detailSection">Advanced Options</h5>
+            </div>
+            <br />
+            <div id="hide_detailSectionHeader_Advanced" style="display: none;">
+
+
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.SearchCriteria, htmlAttributes: new { @class = "control-label col-md-2 optional" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.SearchCriteria, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                        @Html.ValidationMessageFor(model => model.SearchCriteria, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group fieldDescription">
+                    <label class="control-label col-md-2"></label>
+                    <div class="col-md-10">
+                        <span class="text-muted">
+                            <em> If this directory has a lot of files and not all of them are being brought into data.sentry.com please provide the criteria for which to search for the correct files.  Using a \. will grab all files in the directory. </em>
+                        </span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.IsRegexSearch, htmlAttributes: new { @class = "control-label col-md-2 optional" })
+                    <div class="col-md-10">
+                        @Html.CheckBoxFor(model => model.IsRegexSearch, new { @class = "" })
+                        @Html.ValidationMessageFor(model => model.IsRegexSearch, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group fieldDescription">
+                    <label class="control-label col-md-2"></label>
+                    <div class="col-md-10">
+                        <span class="text-muted">
+                            <em> Is the above Search Criteria a <a target="_blank" href="https://regexr.com/">Regex Expression?</a></em>
+                        </span>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.TargetFileName, htmlAttributes: new { @class = "control-label col-md-2 optional" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.TargetFileName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                        @Html.ValidationMessageFor(model => model.TargetFileName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group fieldDescription">
+                    <label class="control-label col-md-2"></label>
+                    <div class="col-md-10">
+                        <span class="text-muted">
+                            <em> When we copy a file from the drop location do we change the file name to something different? If nothing is written into the above field we will load the file name into data.sentry.com with the its exact file name.</em>
+                        </span>
+                    </div>
+                </div>
+                @*
+                <div class="form-group">
+                    @Html.LabelFor(model => model.OverwriteDatasetFile, htmlAttributes: new { @class = "control-label col-md-2 optional" })
+                    <div class="col-md-10">
+                        @Html.CheckBoxFor(model => model.OverwriteDatasetFile, new { @class = "" })
+                        @Html.ValidationMessageFor(model => model.OverwriteDatasetFile, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                *@
+                
             </div>
         </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.DatasetDesc, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.DatasetDesc, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                @Html.ValidationMessageFor(model => model.DatasetDesc, "", new { @class = "text-danger" })
+        <div id="columnPanel" class="tab-pane fade in form-horizontal">
+            <br />
+            <h4>Column Metadata</h4>
+            <br />
+
+            <div class="form-group">
+
+                <label for="DatasetFileUpload" class="control-label col-md-2">Example File</label>
+                <div class="col-md-10">
+                    <input type="file" class="edit-dataset-row file-load" id="DatasetFileUpload" />
+                    @*@Html.HiddenFor(model => model.f)*@
+                </div>
             </div>
+
+            <button type="button" class="btn btn-primary" id="btnUploadFile" data-id="0">Upload Example Data File</button>
         </div>
 
-        <div class="form-group">
-            @Html.LabelFor(model => model.CreationUserName, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.CreationUserName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                @Html.ValidationMessageFor(model => model.CreationUserName, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.SentryOwnerName, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.Editor("OwnerID", new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Sentry ID (i.e. 072984)" } })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor((model) => model.OriginationID, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownListFor(model => model.OriginationID, Model.AllOriginationCodes, new { @class = "form-control edit-dataset-row" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.DatasetDtm, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor(model => model.DatasetDtm, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @data_provide = "datepicker" } })
-                @Html.ValidationMessageFor(model => model.DatasetDtm, "", new { @class = "text-danger" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor((model) => model.FreqencyID, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownListFor(model => model.FreqencyID, Model.AllFrequencies, new { @class = "form-control edit-dataset-row" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor((model) => model.DatasetScopeTypeID, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownListFor(model => model.DatasetScopeTypeID, Model.AllDatasetScopeTypes, new { @class = "form-control edit-dataset-row" })
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="Create Dataset" class="btn btn-default" />
-            </div>
+        <div id="lineagePanel" class="tab-pane fade in form-horizontal">
+            <br />
+            <h4>Data Lineage</h4>
+            <br />
         </div>
 
     </div>
+
+    <hr />
+    <div class="form-group">
+        <span class="text-muted"><em>** Fields in <b>Bold</b> are Required</em></span>
+    </div>
+    <div class="form-group">
+        <div>
+            <input type="submit" id="btnCreateDataset" value="Create Dataset" class="btn btn-primary" />
+            <a class="btn btn-warning" href="~/">Cancel</a>
+        </div>
+    </div>
 }
+<style>
+    .fieldDescription{
+        padding-bottom:10px;
+        margin-top: -10px;
+        padding-left: 25px;
+    }
+
+    div.has-error ul.select2-choices {
+        border-color: red !important;
+    }
+
+    .optional{
+        font-weight: 100;
+    }
+
+    input[type="checkbox"]{
+        margin: 10px 0 0;
+    }
+</style>
+
+    @section Scripts {
+        @*@Scripts.Render("~/bundles/jqueryval")*@
+        <script>
+
+            $(function () {
+                data.Dataset.CreateInit();
+
+                $("#CustomDropPath").change(function () {
+                    if (this.checked) {
+                        $("#DropPath").prop('disabled', '');
+                        $("#DropPath").prop('readonly', '');
+                    } else {
+                        $("#DropPath").prop('disabled', 'disabled');
+                        $("#DropPath").prop('readonly', 'readonly');
+                    }
+                });
+
+                if (!localStorage.getItem("DropPath"))
+                {
+                    var dropPathName = $("#DropPath").val();
+                    if (dropPathName.substring(dropPathName.length - 1) !== "\\") {
+                        dropPathName += "\\";
+                    }
+                    localStorage.setItem("DropPath", dropPathName);
+                }
+
+                $("#CategoryIDs").change(function () {
+                    console.log('cat');
+                    var newName = localStorage.getItem("DropPath") + $('#CategoryIDs').find(":selected").text() + "\\" + $("#DatasetName").val().toLowerCase().replace(new RegExp(" ", "g"), "_") + "\\";
+                    $("#DropPath").val(newName);
+                });
+
+                $("#DatasetName").change(function () {
+                    console.log('name');
+                    if ($('#CategoryIDs').find(":selected").text() != "Pick a Category") {
+                        var newName = localStorage.getItem("DropPath") + $('#CategoryIDs').find(":selected").text() + "\\" + $("#DatasetName").val().toLowerCase().replace(new RegExp(" ", "g"), "_") + "\\";
+                        $("#DropPath").val(newName);
+                    }
+                });
+                
+                $("#DataClassification").change(function () {
+                    switch ($("#DataClassification").val()) {
+                        case "1":
+                            $('#dataClassInfo').text('“Restricted” information is proprietary and has significant business value for Sentry. ' +
+                                'Unauthorized disclosure or dissemination could result in severe damage to Sentry.  Examples of restricted data include secret contracts or trade secrets.  '+
+                                'This information must be limited to only the few associates that require access to it.  If it is shared, accessed, or altered without the permission '+
+                                'of the Information Owner, Information Security must be notified immediately.  Designating information as Restricted involves significant '+
+                                'costs to Sentry.  For this reason, Information Owners making classification decisions must balance the damage that could result from '+
+                                'unauthorized access to or disclosure of the information against the cost of additional hardware, software or services required to protect it.');
+                            break;
+                        case "2":
+                            $('#dataClassInfo').text('“Highly Sensitive” information is highly confidential, typically includes personally '+
+                                'identifiable information, and is intended for limited, specific use by a workgroup, ' +
+                                'department, or group of individuals with a legitimate need to know. Disclosure or ' +
+                                'dissemination of this information could result in significant damage to Sentry. ' +
+                                'Examples of highly sensitive data include medical records, financial account or ' +
+                                'bank account numbers, credit card numbers, individuals’ government-issued ' +
+                                'identification numbers (for example driver’s license numbers, social security ' +
+                                'numbers), and user passwords. This information must be limited to need to know ' +
+                                'access. If it is shared, accessed, or altered without the permission of the ' +
+                                    'Information Owner, Information Security must be notified immediately.');
+                            break;
+                        case "3":
+                            $('#dataClassInfo').text('“Internal Use Only” information can be disclosed or disseminated to Sentry ' +
+                                'associates, but will only be shared with other individuals or organizations when a ' +
+                                'non - disclosure agreement is in place and management has approved for legitimate ' +
+                                'business reasons.  Examples include items such as email correspondence, internal ' +
+                                'documentation that is available to all associates.');
+                            break;
+                        case "4":
+                            $('#dataClassInfo').text('“Public” information can be disclosed or disseminated without any restrictions on ' +
+                                'content, audience, or time of publication.  Examples are datasets that were generated by the Federal or State Governments like the Federal Motor Carrier Safety Administration or NOAA Weather Data.  ' +
+                                'These datasets can be freely shared throughout Sentry.');
+                            break;
+                    }
+                });
+
+                $("#FileType").change(function () {
+                    data.Dataset.setFileTypeInfo();
+                });
+                                
+                $("[id^='detailSectionHeader_']").click(function (e) {
+                    e.preventDefault();
+
+                    var id = $(this).attr("id");
+                    var category = "#hide_" + id
+                    var icon = "#icon_" + id;
+
+                    $(category).slideToggle();
+                    $(icon).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
+                });
+
+                $("[id^='btnUploadFile']").off('click').on('click', function () {
+                    $('#btnUploadFile').closest('.bootbox').hide();
+                    $('.modal-backdrop').remove();
+
+                    var modal = Sentry.ShowModalWithSpinner("Upload Results", {
+                        Confirm: {
+                            label: 'Confirm',
+                            className: 'btn-success'
+                        },
+                        Cancel:
+                        {
+                            label: 'Cancel',
+                            className: 'btn-cancel'
+                        }
+                    });
 
 
-@section Scripts {
-    @*@Scripts.Render("~/bundles/jqueryval")*@
-    <script>
-        $(function () {
-            data.Dataset.CreateInit();
-        });
-    </script>
-}
+                    $('.modal-footer btn-success').prop("disabled", true);
+
+                    // This approach is from the following site:
+                    // http://www.c-sharpcorner.com/UploadFile/manas1/upload-files-through-jquery-ajax-in-Asp-Net-mvc/
+                    if (window.FormData !== undefined) {
+                        console.log('File Upload Process Started');
+                        var fileUpload = $("#DatasetFileUpload").get(0);
+                        var files = fileUpload.files;
+
+                        //Create FormData object
+                        var fileData = new FormData();
+
+                        fileData.append(files[0].name, files[0]);
+
+                        if ((files[0].size / 1000000) > 100) {
+
+                            var configID = $("#configList").find(":selected").val();
+                            var dropLocation
+
+                            for (i = 0; i < configs.length; i++) {
+                                if (configs[i].ConfigId == configID) {
+                                    dropLocation = configs[i].DropPath;
+                                    break;
+                                }
+                            }
+
+
+                            modal.ReplaceModalBody('<h3> The file you are attempting to upload to is too large to upload through the browser. </h3>' +
+                                '<p>Please include only a few hundred rows and try again. </p>'
+                            );
+
+                            $('.modal-footer button').prop("disabled", false);
+                        }
+                        else {
+                            var datasetID = window.location.pathname.substr(window.location.pathname.lastIndexOf('/') + 1);
+
+                            if (datasetID == "" || datasetID == null || datasetID == undefined || isNaN(datasetID)) {
+                                datasetID = $("[id^='btnUploadFile']").attr('data-id');
+                            }
+
+                            var configID = $("#configList").val();
+
+                            var token = $('input[name="__RequestVerificationToken"]').val();
+
+                            var xhr = new XMLHttpRequest();
+
+                            modal.ReplaceModalBody('<p> Large files may take a long time to upload through the browser. </p>' +
+                                '<p>Please do not close the window as your file is uploading. </p>' +
+                                '<p> Progress: <span id=\'progressKB\'/></p>' +
+                                '<h3><b><span id=\'percentTotal\'></span></b ></h3>' +
+                                '<div>' +
+                                '<div class="progress progress-striped active">' +
+                                '<div class="progress-bar" id="progressBar"></div>' +
+                                '</div>' +
+                                '</div>'
+                            );
+
+
+                            (xhr.upload || xhr).addEventListener('progress', function (e) {
+                                var done = e.position || e.loaded
+                                var total = e.totalSize || e.total;
+
+                                $('#percentTotal').text(Math.round(done / total * 100) + '%');
+                                $('#progressKB').text('(' + Math.round(done / 1024) + ' KB / ' + Math.round(total / 1024) + ' KB)');
+                                $('#progressBar').width(Math.round(done / total * 100) + '%');
+
+                                $('.btn-success').prop("disabled", true);
+                            });
+                            xhr.addEventListener('load', function (e) {
+                                $('.modal-footer button').prop("disabled", false);
+                                modal.ReplaceModalBody(e.currentTarget.response);
+                                console.log(e);
+                            });
+
+                            function cancelUpload() {
+                                xhr.abort();
+                                console.log('The Upload Process was aborted');
+                            }
+
+                            $('.btn-cancel')[0].addEventListener('click', cancelUpload, false);
+                            $('.bootbox-close-button').hide();
+                            //var url = '/Dataset/UploadDatafile/?id=' + encodeURI(datasetID) + "&configId=" + encodeURI(configID);
+                            //xhr.open('post', url, true);
+                            //xhr.setRequestHeader('__RequestVerificationToken', token);
+                            //xhr.send(fileData);
+                        }
+
+                    } else {
+                        alert("FormData is not supported");
+                    }
+                });
+            });
+        </script>
+    }

@@ -5,6 +5,7 @@ using System.Web;
 using Sentry.data.Core;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
+using System.ComponentModel;
 
 namespace Sentry.data.Web
 {
@@ -28,19 +29,31 @@ namespace Sentry.data.Web
             this.CreationFreq = dsfc.CreationFreqDesc;
             this.DatasetScopeTypeID = dsfc.DatasetScopeTypeID;
         }
-        
+
         public int ConfigId { get; set; }
         [Required]
+        [DisplayName("Search Criteria")]
         public string SearchCriteria { get; set; }
+
+        [DisplayName("Target File Name")]
         public string TargetFileName { get; set; }
+
         [Required]
+        [DisplayName("Drop Location Type")]
         public string DropLocationType { get; set; }
+
         [Required]
+        [DisplayName("Drop Path")]
         public string DropPath { get; set; }
+
+        [DisplayName("Use Regex Search")]
         public Boolean IsRegexSearch { get; set; }
+
         public Boolean OverwriteDatasetFile { get; set; }
+
         public int FileTypeId { get; set; }
 
+        [DisplayName("File Type")]
         public string FileType {
             get
             {
@@ -53,9 +66,14 @@ namespace Sentry.data.Web
         }
 
         [Required]
+        [DisplayName("Configuration Name")]
         public string ConfigFileName { get; set; }
+
+        [DisplayName("Description")]
         public string ConfigFileDesc { get; set; }
+
         public int DatasetId { get; set; }
+
         public string EditHref
         {
             get
@@ -65,10 +83,16 @@ namespace Sentry.data.Web
                 return href;
             }
         }
+
+        [DisplayName("Parent Dataset")]
         public string ParentDatasetName { get; set; }
 
+        [DisplayName("Creation Frequency")]
         public string CreationFreq { get; set; }
+
+        [DisplayName("Data Scope Type")]
         public int DatasetScopeTypeID { get; set; }
+
         public IEnumerable<SelectListItem> AllDatasetScopeTypes { get; set; }
         public IEnumerable<SelectListItem> AllFrequencies { get; set; }
         public IEnumerable<SelectListItem> AllDataFileTypes { get; set; }

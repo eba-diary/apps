@@ -12,6 +12,7 @@ using StructureMap;
 using Sentry.data.Infrastructure;
 using Sentry.data.Common;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace Sentry.data.Goldeneye
 {
@@ -20,11 +21,18 @@ namespace Sentry.data.Goldeneye
         //Created by Andrew Quaschnick
         //On 11/15/2017
 
-        private static FileSystemWatcher watcher;
-        private static List<FileProcess> allFiles = new List<FileProcess>();
-        private static IContainer container;
-        private static IDatasetContext _datasetContext;
+        private FileSystemWatcher watcher;
+        private List<FileProcess> allFiles = new List<FileProcess>();
+        private IContainer container;
+        private IDatasetContext _datasetContext;
+        private int FileCount { get; set; }
+        private DateTime FileCounterStart { get; set; }
+        private int DatasetFileConfigId { get; set; }
 
+        /// <summary>
+        /// Directory that is to be watched
+        /// </summary>
+        public string WatchedDir { get; set; }
 
         private class FileProcess {
 
@@ -46,56 +54,53 @@ namespace Sentry.data.Goldeneye
         /// 
         /// </summary>
         /// <param name="path"></param>
-        public static void Run(string path)
+        public void Run(string path)
         {
-            var files = allFiles.ToList();
-
-            //Console.WriteLine("Run Process Started for : " + files.Capacity + " files.");
-
-            foreach (FileProcess file in files)
+            do
             {
-                if(file.started)
+                var files = allFiles.ToList();
+
+                foreach (FileProcess file in files)
                 {
-                    //The DatasetLoader said Success and the file is gone.
-                    if(file.fileCorrectlyDeleted)
+                    if (file.started)
                     {
-                        //Console.WriteLine("File: " + file.fileName + " Success");
-                        Logger.Info("File: " + file.fileName + " Success");
-                        allFiles.Remove(file);
+                        //The DatasetLoader said Success and the file is gone.
+                        if (file.fileCorrectlyDeleted)
+                        {
+                            Logger.Info("File: " + file.fileName + " Success");
+                            allFiles.Remove(file);
+                        }
+                        //The DatasetLoader said Success but the file still exists.                    
+                        else
+                        {
+                            Logger.Info("File: " + file.fileName + " Still Exists");
+                        }
                     }
-                    //The DatasetLoader said Success but the file still exists.                    
-                    else
+                    else if (!IsFileLocked(file.fileName) && !file.started)
                     {
-                        //Console.WriteLine("File: " + file.fileName + " Still Exists");
-                        Logger.Info("File: " + file.fileName + " Still Exists");
-                    }
-                }
-                else if(!IsFileLocked(file.fileName)  && !file.started)
-                {
-                    //Create non-bundled request
-                    if (path == Sentry.Configuration.Config.GetHostSetting("PathToWatch") && file.fileName.Contains(path))
-                    {
-                        //Console.WriteLine($"Dataset Loader Connection String:{Configuration.Config.GetHostSetting("DatabaseConnectionString")}");
                         using (container = Bootstrapper.Container.GetNestedContainer())
                         {
                             _datasetContext = container.GetInstance<IDatasetContext>();
                             SubmitLoaderRequest(file);
                             file.started = true;
                         }
-                    }                    
+                    }
+                    else
+                    {
+                        Logger.Debug("File: " + file.fileName + " Locked");
+                    }
                 }
-                else
-                {
-                    //Console.WriteLine("File: " + file.fileName + " Locked");
-                    Logger.Debug("File: " + file.fileName + " Locked");
-                }
-            }
+
+                Console.WriteLine("sleeping for 2 seconds");
+                Thread.Sleep(2000);
+                
+            } while (true);
         }
 
         //This method checks to see if a file is locked by another process.  
         //  This allows us to see if the DatasetLoader is correctly processing a file or 
         //  if another process is still uploading or writing to a location.
-        private static bool IsFileLocked(string filePath)
+        private bool IsFileLocked(string filePath)
         {
             try
             {
@@ -111,7 +116,7 @@ namespace Sentry.data.Goldeneye
             return false;
         }
 
-        private static void SubmitLoaderRequest(FileProcess file)
+        private void SubmitLoaderRequest(FileProcess file)
         {
             LoaderRequest loadReq = null;
             try
@@ -153,6 +158,9 @@ namespace Sentry.data.Goldeneye
                     }
                 }
 
+                //Add to file count
+                FileCount++;
+
                 //Create Bundle Success Event
                 Event e = new Event();
                 e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Created File").FirstOrDefault();
@@ -184,87 +192,93 @@ namespace Sentry.data.Goldeneye
                 e.Reason = "Failed to submit request to Dataset Loader";
                 e.Parent_Event = loadReq.RequestGuid;
                 Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-
             }
-            
-
-            
-
         }
 
         //This method is called when the Windows Process is started in Core and Program.cs
         //  First it creates a file watcher, gives it a directory from app.config, then assigns it events to watch.
         //  The last thing it does is grabs all the files that currently in the directory and adds them to the file list.
         //  The Service will do the rest on it's periodic run.
-        public static void OnStart()
+        public void OnStart(int dsConfig)
         {
-            // Create a new FileSystemWatcher and set its properties.
-            watcher = new FileSystemWatcher();
-            watcher.Path = Sentry.Configuration.Config.GetHostSetting("PathToWatch");
+            DatasetFileConfig dsfc = null;
+            DatasetFileConfigId = dsConfig;
 
-            Console.WriteLine("The Goldeneye File Watcher is now watching : " + watcher.Path);
-            Logger.Info("The Goldeneye File Watcher is now watching : " + watcher.Path);
-
-            /* Watch for changes in LastAccess and LastWrite times, and
-               the renaming of files or directories. */
-            watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
-               | NotifyFilters.FileName | NotifyFilters.DirectoryName;
-
-            // Add event handlers.
-            watcher.Changed += new FileSystemEventHandler(OnChanged);
-            watcher.Created += new FileSystemEventHandler(OnCreated);
-            watcher.Deleted += new FileSystemEventHandler(OnDeleted);
-
-            // Begin watching.
-            watcher.EnableRaisingEvents = true;
-            watcher.IncludeSubdirectories = true;
-
-            //Get all the files that are currently in the directory on Start to begin monitoring them.
-            //  This may happen if the service was killed and needed to restart.
-            //  Filter out DatasetLoader Request and Failed Request folders.
-            foreach (var a in Directory.GetFiles(watcher.Path, "*", SearchOption.AllDirectories).Where(w => !w.Contains(Configuration.Config.GetHostSetting("LoaderRequestPath")) && !w.Contains(Configuration.Config.GetHostSetting("LoaderFailedRequestPath"))))
+            try
             {
-                if (!Path.GetFileName(a).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix")))
+                using (container = Bootstrapper.Container.GetNestedContainer())
+                {
+                    _datasetContext = container.GetInstance<IDatasetContext>();
+                    dsfc = _datasetContext.getDatasetFileConfigs(DatasetFileConfigId);
+                    WatchedDir = dsfc.DropPath;
+                }
+
+                // Create a new FileSystemWatcher and set its properties.
+                watcher = new FileSystemWatcher();
+                watcher.Path = WatchedDir;
+                FileCounterStart = DateTime.Now;
+
+                Console.WriteLine("Watcher instance started for : " + watcher.Path);
+                Logger.Info("Watcher instance started for : " + watcher.Path);
+
+                /* Watch for changes in LastAccess and LastWrite times, and
+                   the renaming of files or directories. */
+                watcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite
+                   | NotifyFilters.FileName | NotifyFilters.DirectoryName;
+
+                // Add event handlers.
+                watcher.Changed += new FileSystemEventHandler(OnChanged);
+                watcher.Created += new FileSystemEventHandler(OnCreated);
+                watcher.Deleted += new FileSystemEventHandler(OnDeleted);
+
+                // Begin watching.
+                watcher.EnableRaisingEvents = true;
+                watcher.IncludeSubdirectories = true;
+
+                //Get all the files that are currently in the directory on Start to begin monitoring them.
+                //  This may happen if the service was killed and needed to restart.
+                //  Filter out DatasetLoader Request and Failed Request folders.
+                foreach (var a in Directory.GetFiles(watcher.Path, "*", SearchOption.TopDirectoryOnly).Where(w => !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
                 {
                     Console.WriteLine("Found : " + a);
                     Logger.Info("Found : " + a);
                     allFiles.Add(new FileProcess(a));
                 }
             }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error initilizing watch for {dsfc.Name} config (Id:{dsfc.ConfigId})",ex);
+            }
+            
+
+            //Start directory monitor
+            //Task.Factory.StartNew(() => this.Run(WatchedDir), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted);
+            this.Run(WatchedDir);
         }
 
         //When a new file is created add the file path to the list of All Files.
         //  The Service will do the rest on it's periodic run.
-        private static void OnCreated(object source, FileSystemEventArgs e)
+        private void OnCreated(object source, FileSystemEventArgs e)
         {
-            FileAttributes attr = File.GetAttributes(e.FullPath);
-            if (attr.HasFlag(FileAttributes.Directory))
+            if (!Path.GetFileName(e.FullPath).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix")))
             {
-                Logger.Info($"New Directory Added for Monitoring: {e.FullPath}");
-            }
-            else
-            {
-                //  Filter out DatasetLoader Request and Failed Request folders.
-                if (!Path.GetFileName(e.FullPath).Contains(Configuration.Config.GetHostSetting("LoaderRequestPath")) && !Path.GetFileName(e.FullPath).Contains(Configuration.Config.GetHostSetting("LoaderFailedRequestPath")) && !Path.GetFileName(e.FullPath).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix")))
-                {
-                    allFiles.Add(new FileProcess(e.FullPath));
-                }
+                allFiles.Add(new FileProcess(e.FullPath));
             }            
         }
 
         //We can see when a user is writing to a file.
         //  At this time we don't need this method.
-        private static void OnChanged(object source, FileSystemEventArgs e)
+        private void OnChanged(object source, FileSystemEventArgs e)
         {
             // Method intentionally left empty.
         }
 
         //When a file is deleted find the file in the internal list and mark it deleted.
         //  The Service will do the rest on it's periodic run.
-        private static void OnDeleted(object source, FileSystemEventArgs e)
+        private void OnDeleted(object source, FileSystemEventArgs e)
         {
             //  Filter out DatasetLoader Request and Failed Request folders.
-            if (!Path.GetFileName(e.FullPath).Contains(Configuration.Config.GetHostSetting("LoaderRequestPath")) && !Path.GetFileName(e.FullPath).Contains(Configuration.Config.GetHostSetting("LoaderFailedRequestPath")) && Path.GetFileName(e.FullPath).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix")))
+            if (Path.GetFileName(e.FullPath).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix")))
             {
                 var path = Path.GetFullPath(e.FullPath).Replace(Path.GetFileName(e.FullPath), "");
                 var fileName = Path.GetFileName(e.FullPath);
@@ -281,7 +295,7 @@ namespace Sentry.data.Goldeneye
             }            
         }
 
-        private static Guid GenerateHash(string input)
+        private Guid GenerateHash(string input)
         {
             string start = input + DateTime.Now.ToString();
             Guid result;
@@ -293,5 +307,22 @@ namespace Sentry.data.Goldeneye
             return result;
         }
 
+        /// <summary>
+        /// Returns current processed file count
+        /// </summary>
+        /// <returns></returns>
+        public int GetCount()
+        {
+            return FileCount;
+        }
+
+        /// <summary>
+        /// Returns start datetime of file counter
+        /// </summary>
+        /// <returns></returns>
+        public DateTime GetCountStart()
+        {
+            return FileCounterStart;
+        }
     }
 }

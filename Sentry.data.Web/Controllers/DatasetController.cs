@@ -195,13 +195,20 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.DatasetEdit)]
         public ActionResult Create()
         {
-            CreateDatasetModel udm = new CreateDatasetModel();
-            udm.AllCategories = GetCategoryList();
-            udm.AllFrequencies = GetDatasetFrequencyListItems();  //load all values for dropdown
-            udm.AllOriginationCodes = GetDatasetOriginationListItems(); //load all values for dropdown
-            udm.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
-            udm.FreqencyID = 6; // preselected NonSchedule            
-            return View(udm);
+            CreateDatasetModel cdm = new CreateDatasetModel();
+
+            cdm.ConfigFileName = "Default";
+            cdm.ConfigFileDesc = "Default Config for Dataset.  Uploaded files that do not match any configs will default to this config";
+            cdm.DropLocationType = "DFS";
+
+            cdm.SearchCriteria = "\\.";
+
+            cdm.DropPath = Path.Combine(Configuration.Config.GetHostSetting("DatasetLoaderBaseLocation"));
+
+            cdm = (CreateDatasetModel)setupLists(cdm);
+            cdm.IsRegexSearch = true;
+
+            return View(cdm);
         }
 
         [HttpPost]
@@ -211,7 +218,7 @@ namespace Sentry.data.Web.Controllers
 
             if (_datasetContext.isDatasetNameDuplicate(cdm.DatasetName, _datasetContext.GetCategoryById(cdm.CategoryIDs).Name))
             {
-                AddCoreValidationExceptionsToModel(new ValidationException("Dataset name already exists within category"));
+                AddCoreValidationExceptionsToModel(new ValidationException("DatasetName", "Dataset name already exists within category"));
             }
             try
             {
@@ -225,20 +232,21 @@ namespace Sentry.data.Web.Controllers
                     ds = _datasetContext.Merge<Dataset>(ds);
 
                     List<DatasetFileConfig> dfcList = new List<DatasetFileConfig>();
-                    //Create Generic Data File Config for Dataset                    
+                    //Create Generic Data File Config for Dataset            
+
                     DatasetFileConfig dfc = new DatasetFileConfig(
                         0,
-                        "Default",
-                        "Default Config for Dataset.  Uploaded files that do not match any configs will default to this config",
-                        "\\.",
-                        "DFS",
-                        ds.DropLocation + "default\\",
-                        true,
+                        cdm.ConfigFileName,
+                        cdm.ConfigFileDesc,
+                        cdm.SearchCriteria,
+                        cdm.DropLocationType,
+                        cdm.DropPath + "default\\",
+                        cdm.IsRegexSearch,
                         true,
                         (int)FileType.DataFile,
                         true,
                         ds,
-                        Enum.GetName(typeof(DatasetFrequency), cdm.FreqencyID),
+                        Enum.Parse(typeof(DatasetFrequency), cdm.CreationFreq).ToString(),
                         cdm.DatasetScopeTypeID
                         );
 
@@ -251,9 +259,9 @@ namespace Sentry.data.Web.Controllers
                     try
                     {
                         //Config Drop location
-                        if (!System.IO.Directory.Exists(dfc.DropPath))
+                        if (!Directory.Exists(ds.DropLocation + "default\\"))
                         {
-                            System.IO.Directory.CreateDirectory(dfc.DropPath);
+                            Directory.CreateDirectory(ds.DropLocation + "default\\");
                         }
 
                         //Bundle Drop location
@@ -286,13 +294,8 @@ namespace Sentry.data.Web.Controllers
             finally
             {
                 _datasetContext.Clear();
-                cdm.AllCategories = GetCategoryList();  //Reload dropdown value list
-                //cdm.AllFrequencies = GetDatasetFrequencyListItems();  //Reload dropdown value list
-                cdm.AllOriginationCodes = GetDatasetOriginationListItems(); //Reload dropdown value list
-                //cdm.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
-                cdm.AllFrequencies = GetDatasetFrequencyListItems();  //load all values for dropdown
-                cdm.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
-                cdm.OriginationID = 1; // preselected Internal
+                cdm = (CreateDatasetModel) setupLists(cdm);
+                cdm.DropPath = Path.Combine(Configuration.Config.GetHostSetting("DatasetLoaderBaseLocation"));
             }
 
             return View(cdm);
@@ -303,15 +306,14 @@ namespace Sentry.data.Web.Controllers
         {
             DateTime CreateTime = DateTime.Now;
             string cat = _datasetContext.GetCategoryById(cdm.CategoryIDs).Name;
-            string freqName = Enum.GetName(typeof(DatasetFrequency), cdm.FreqencyID);
             IApplicationUser user = _userService.GetCurrentUser();
             Dataset ds = new Dataset(
                 0,
                 cat,
                 cdm.DatasetName,
                 cdm.DatasetDesc,
-                "This is a test Information line.",
-                cdm.CreationUserName,
+                cdm.DatasetInformation,
+                user.DisplayName,
                 cdm.SentryOwnerName,
                 user.AssociateId,
                 Enum.GetName(typeof(DatasetOriginationCode), cdm.OriginationID),
@@ -327,7 +329,7 @@ namespace Sentry.data.Web.Controllers
                 //_datasetContext.GetDatasetScopeById(cdm.DatasetScopeTypeID),
                 //cdm.DatafilesFilesToKeep,
                 null,
-                Utilities.GenerateDatasetDropLocation(cat, cdm.DatasetName));
+                cdm.DropPath);
 
             return ds;
         }
@@ -338,13 +340,13 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Edit(int id)
         {
             Dataset ds = _datasetContext.GetById<Dataset>(id);
+
             EditDatasetModel item = new EditDatasetModel(ds, _associateInfoProvider);
-            //item.AllFrequencies = GetDatasetFrequencyListItems();  // Load dropdown value list
-            //item.FreqencyID = (int)(Enum.Parse(typeof(DatasetFrequency), ds.CreationFreqDesc));  //Preselect current value
-            item.AllOriginationCodes = GetDatasetOriginationListItems();
-            item.OriginationID = (int)(Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode));  //Preselect current value
-            //item.AllDatasetScopeTypes = GetDatasetScopeTypesListItems();
-            //item.DatasetScopeTypeID = ds.DatasetScopeType.ScopeTypeId;
+
+            item = (EditDatasetModel) setupLists(item);
+
+            item.OwnerID = ds.SentryOwnerName;
+
             return View(item);
         }
 
@@ -371,9 +373,8 @@ namespace Sentry.data.Web.Controllers
             finally
             {
                 _datasetContext.Clear();
-                i.AllFrequencies = GetDatasetFrequencyListItems();  //Reload dropdown value list
-                i.AllOriginationCodes = GetDatasetOriginationListItems(); //Reload dropdown value list
-                i.AllDatasetScopeTypes = GetDatasetScopeTypesListItems(); //Reload dropdown value list
+
+                i = (EditDatasetModel) setupLists(i);
             }
 
             return View(i);
@@ -385,13 +386,9 @@ namespace Sentry.data.Web.Controllers
         {
             DateTime now = DateTime.Now;
 
-            string frequency = ((DatasetFrequency)eds.FreqencyID).ToString();
-            string originationcode = ((DatasetOriginationCode)eds.OriginationID).ToString();
+            string originationcode = eds.OriginationCode;
 
-            if (eds.DatasetInformation != null && eds.DatasetInformation.Length > 0)
-            {
-                ds.DatasetInformation = eds.DatasetInformation;
-            }
+            ds.DatasetInformation = eds.DatasetInformation;
 
             ds.ChangedDtm = now;
             if (null != eds.Category && eds.Category.Length > 0) ds.Category = eds.Category;
@@ -462,12 +459,8 @@ namespace Sentry.data.Web.Controllers
         {
             DateTime now = DateTime.Now;
 
-
-            if (dfgm.Information != null && dfgm.Information.Length > 0)
-            {
-                df.Information = dfgm.Information;
-            }
-
+            df.Information = dfgm.Information;
+            
             df.IsUsable = dfgm.IsUsable;
 
             df.ModifiedDTM = now;
@@ -740,6 +733,8 @@ namespace Sentry.data.Web.Controllers
 
             dfcm.SearchCriteria = "\\.";
             dfcm.CreationFreq = DatasetFrequency.NonSchedule.ToString();
+            dfcm.OverwriteDatasetFile = true;
+            dfcm.IsRegexSearch = true;
             
 
             return View(dfcm);
@@ -777,7 +772,7 @@ namespace Sentry.data.Web.Controllers
                         dfcm.FileTypeId,
                         false,
                         parent,
-                        dfcm.CreationFreq.ToString(),
+                        Enum.Parse(typeof(DatasetFrequency), dfcm.CreationFreq).ToString(),
                         dfcm.DatasetScopeTypeID
                         );
 
@@ -891,6 +886,7 @@ namespace Sentry.data.Web.Controllers
             dfc.CreationFreqDesc = edfc.CreationFreq;
             dfc.DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(edfc.DatasetScopeTypeID);
             dfc.FileTypeId = edfc.FileTypeId;
+            dfc.Description = edfc.ConfigFileDesc;
 
             return dfc;
         }
@@ -964,6 +960,94 @@ namespace Sentry.data.Web.Controllers
             }
 
         }
+
+        private BaseDatasetModel setupLists(BaseDatasetModel model)
+        {
+            var temp = GetCategoryList().ToList();
+
+            temp.Add(new SelectListItem()
+            {
+                Text = "Pick a Category",
+                Value = "0",
+                Selected = true,
+                Disabled = true
+            });
+
+            model.AllCategories = temp.OrderBy(x => x.Value);
+
+            //Origination Codes
+            temp = GetDatasetOriginationListItems().ToList();
+
+            temp.Add(new SelectListItem()
+            {
+                Text = "Pick an Origination Location",
+                Value = "0",
+                Selected = true,
+                Disabled = true
+            });
+
+            model.AllOriginationCodes = temp.OrderBy(x => x.Value);
+
+            //Dataset Frequency
+            temp = GetDatasetFrequencyListItems().ToList();
+
+            temp.Add(new SelectListItem()
+            {
+                Text = "Pick a Frequency",
+                Value = "0",
+                Selected = true,
+                Disabled = true
+            });
+
+            model.AllFrequencies = temp.OrderBy(x => x.Value);
+
+            //Dataset Scope
+            temp = GetDatasetScopeTypesListItems().ToList();
+
+            temp.Add(new SelectListItem()
+            {
+                Text = "Pick a Scope",
+                Value = "0",
+                Selected = true,
+                Disabled = true
+            });
+            model.AllDatasetScopeTypes = temp.OrderBy(x => x.Value);
+            model.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
+                => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+
+            List<string> obj = new List<string>();
+            obj.Add("Restricted");
+            obj.Add("Highly Sensitive");
+            obj.Add("Internal Use Only");
+            obj.Add("Public");
+
+            List<SelectListItem> dataClassifications = new List<SelectListItem>();
+
+            dataClassifications.Add(new SelectListItem()
+            {
+                Text = "Pick a Classification",
+                Value = "0",
+                Selected = true,
+                Disabled = true
+            });
+
+            int index = 1;
+            foreach (String classification in obj)
+            {
+                dataClassifications.Add(new SelectListItem()
+                {
+                    Text = classification,
+                    Value = index.ToString()
+                });
+                index++;
+            }
+
+
+            model.AllDataClassifications = dataClassifications;
+
+            return model;
+        }
+
 
         private IEnumerable<SelectListItem> GetCategoryList()
         {
@@ -1531,34 +1615,89 @@ namespace Sentry.data.Web.Controllers
         {
             IEnumerable<Dataset> dfList = GetDatasetByCategoryId(id);
 
+            SelectListGroup group = new SelectListGroup(){ Name = _datasetContext.GetCategoryById(id).FullName };
+
             IEnumerable<SelectListItem> sList = dfList.Select(m => new SelectListItem()
             {
                 Text = m.DatasetName,
-                Value = m.DatasetId.ToString()
+                Value = m.DatasetId.ToString(),
+                Group = group
             });
 
             return Json(sList, JsonRequestBehavior.AllowGet);
         }
 
-        //[HttpGet()]
-        //[AuthorizeByPermission(PermissionNames.DwnldNonSensitive)]
-        //public JsonResult GetUserGuide(string key)
-        //{
-        //    try
-        //    {
+        [HttpGet()]
+        [AuthorizeByPermission(PermissionNames.DwnldNonSensitive)]
+        public JsonResult GetUserGuide(string key)
+        {
+            try
+            {
 
-        //        JsonResult jr = new JsonResult();
-        //        //jr.Data = _s3Service.GetDatasetDownloadURL(df.FileLocation, df.VersionId);
-        //        jr.Data = _s3Service.GetUserGuideDownloadURL(key, "application\\pdf");
-        //        jr.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
+                JsonResult jr = new JsonResult();
+                //jr.Data = _s3Service.GetDatasetDownloadURL(df.FileLocation, df.VersionId);
+                jr.Data = _s3Service.GetUserGuideDownloadURL(key, "application\\pdf");
+                //jr.Data = _s3Service.GetDatasetDownloadURL(key);
+                jr.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
+                return jr;
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = (int)HttpStatusCode.NotFound;
+                return Json(new { message = "Encountered Error Retrieving File.<br />If this problem persists, please contact <a href=\"mailto:BIPortalAdmin@sentry.com\">Site Administration</a>" }, JsonRequestBehavior.AllowGet);
+            }
+        }
 
-        //        return jr;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Response.StatusCode = (int)HttpStatusCode.NotFound;
-        //        return Json(new { message = "Encountered Error Retrieving File.<br />If this problem persists, please contact <a href=\"mailto:BIPortalAdmin@sentry.com\">Site Administration</a>" }, JsonRequestBehavior.AllowGet);
-        //    }
-        //}
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        public JsonResult GetAllDatasets()
+        {
+            var list = _datasetContext.Categories;
+
+            List<SelectListItem> sList = new List<SelectListItem>();
+
+            foreach (var cat in list)
+            {
+                IEnumerable<Dataset> dfList = GetDatasetByCategoryId(cat.Id);
+
+                SelectListGroup group = new SelectListGroup() { Name = cat.FullName };
+
+                sList.AddRange(dfList.Select(m => new SelectListItem()
+                {
+                    Text = m.DatasetName,
+                    Value = m.DatasetId.ToString(),
+                    Group = group
+                }));
+            }
+
+            return Json(sList, JsonRequestBehavior.AllowGet);
+        }
+
+
+        public JsonResult GetS3Key(int datasetID)
+        {
+            Dataset ds = _datasetContext.GetById<Dataset>(datasetID);
+
+            List<string> extensions = new List<string>();
+
+            foreach (var item in ds.DatasetFiles)
+            {
+                extensions.Add(Utilities.GetFileExtension(item.FileName));
+            }
+
+
+            var obj = new
+            {
+                s3Key = ds.S3Key,
+                fileExtensions = extensions.Distinct()
+            };
+
+            return Json(obj, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult QueryTool()
+        {
+            return View("QueryTool");
+        }
+        
     }
 }

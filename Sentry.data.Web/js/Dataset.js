@@ -378,6 +378,9 @@ data.Dataset = {
                 $('#SentryOwnerName').val(associate.Id);
             }
         });
+
+        //Initialize FileType description
+        data.Dataset.setFileTypeInfo();
     },
 
     EditInit: function () {
@@ -431,6 +434,18 @@ data.Dataset = {
         /// This will initiate the download process
         /// </summary>
         var controllerURL = "/Dataset/GetDownloadURL/?id=" + encodeURI(id);
+        $.get(controllerURL, function (result) {
+            var jrUrl = result;
+            window.open(jrUrl, "_blank");
+        });
+    },
+
+    GetUserGuide: function (key) {
+        /// <summary>
+        /// Send temp URL (containing the dataset, from S3) to a new window
+        /// This will initiate the download process
+        ///
+        var controllerURL = "/Dataset/GetUserGuide/?key=" + encodeURI("user-guides/" + key);
         $.get(controllerURL, function (result) {
             var jrUrl = result;
             window.open(jrUrl, "_blank");
@@ -681,6 +696,18 @@ data.Dataset = {
             window.getSelection().addRange(range);
             document.execCommand("Copy");
             alert("Text Copied to Clipboard");
+        }
+    },
+
+    setFileTypeInfo: function () {
+        switch ($("#FileType").val()) {
+            case "0":
+                $('#fileTypeInfo').text('"Data Files" contain data pertaining to the dataset.');
+                break;
+            case "1":
+                $('#fileTypeInfo').text('“Supplementary Files” offer additional information about the data files or dataset (i.e. vendor publishes a schema or descriptions in a ReadMe.txt file).  ' +
+                    'Supplementary files are limited to viewing only capabilities.');
+                break;
         }
     }
 

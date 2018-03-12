@@ -49,9 +49,13 @@ namespace Sentry.data.Web
 
                 if (IsUsable)
                 {
-                    if (CanPreview)
+                    if (CanPreview && (Path.GetExtension(Name).Contains("csv") || Path.GetExtension(Name).Contains("txt") || Path.GetExtension(Name).Contains("json")))
                     {
                         href += "<a href = \"#\" onclick=\"data.DatasetDetail.PreviewDatafileModal(" + Id + ")\" class=\"table-row-icon row-filepreview-icon\" title=\"Preview file\"><i class='glyphicon glyphicon-search text-primary'></i></a>";
+                    }
+                    else
+                    {
+                        href += "<a disabled class=\"table-row-icon row-filepreview-icon disabled\" title=\"Not available for this file type.\"><i class='glyphicon glyphicon-search text-primary disabled' style='color:gray;'></i></a>";
                     }
 
                     if ((IsSensitive && CanDwnldSenstive) || (!IsSensitive && CanDwnldNonSensitive))
