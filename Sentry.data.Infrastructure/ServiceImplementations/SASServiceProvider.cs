@@ -32,13 +32,13 @@ namespace Sentry.data.Infrastructure
 
         public event EventHandler<TransferProgressEventArgs> OnPushToProgressEvent;
 
-        public void ConvertToSASFormat(string filename, string category)
+        public void ConvertToSASFormat(string filename, string category, string delimiter, int guessingrows)
         {
             try
             {
                 OnPushToProgress(new TransferProgressEventArgs(filename, 0, "Converting"));
 
-                StringBuilder url = GernerateSASURL(filename, category);
+                StringBuilder url = GernerateSASURL(filename, category, delimiter, guessingrows);
 
                 OnPushToProgress(new TransferProgressEventArgs(filename, 50, "Converting"));
 
@@ -76,7 +76,7 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        private static StringBuilder GernerateSASURL(string filename, string category)
+        private static StringBuilder GernerateSASURL(string filename, string category, string delimiter, int guessingrows)
         {
             StringBuilder url = new StringBuilder();
             url.Append(Configuration.Config.GetHostSetting("PushToSASUrl"));
@@ -90,12 +90,18 @@ namespace Sentry.data.Infrastructure
                 url.Append(Configuration.Config.GetHostSetting("SASCsvStpFolder"));
                 url.Append(Uri.EscapeUriString(Configuration.Config.GetHostSetting("SASCsvStpName")));
             }
+            url.Append(Uri.EscapeUriString("&ROOT_DIR="));
+            url.Append(Uri.EscapeUriString(Configuration.Config.GetHostSetting("PushToSASTargetPath")));
             url.Append(Uri.EscapeUriString("&FILE_NAME="));
             url.Append(Uri.EscapeUriString(Path.GetFileNameWithoutExtension(filename)));
             url.Append(Uri.EscapeUriString("&FILE_EXT="));
             url.Append(Uri.EscapeUriString(Path.GetExtension(filename)));
             url.Append(Uri.EscapeUriString("&CATEGORY="));
             url.Append(Uri.EscapeUriString(category));
+            url.Append(Uri.EscapeUriString("&DELIMITER="));
+            url.Append(Uri.EscapeUriString(delimiter));
+            url.Append(Uri.EscapeUriString("&GUESSINGROWS="));
+            url.Append(Uri.EscapeUriString(guessingrows.ToString()));
 
             Sentry.Common.Logging.Logger.Info($"URL: {url.ToString()}");
             return url;

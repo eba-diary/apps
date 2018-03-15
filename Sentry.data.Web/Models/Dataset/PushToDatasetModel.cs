@@ -11,7 +11,9 @@ namespace Sentry.data.Web
     {
         public PushToDatasetModel()
         {
-
+            //Default values
+            Delimiter = ",";
+            GuessingRows = 1000;
         }
 
         [DisplayName("File Name")]
@@ -19,7 +21,13 @@ namespace Sentry.data.Web
 
 
         [MaxLength(32)]
-        [DisplayName("File Name Override (exclude extension)")]
+        [DisplayName("File Name Override")]
         public string FileNameOverride { get; set; }
+
+        [DisplayName("Delimiter")]
+        public string Delimiter { get; set; }
+
+        [DisplayName("Guessing Rows")]
+        public int GuessingRows { get; set; }
     }
 }

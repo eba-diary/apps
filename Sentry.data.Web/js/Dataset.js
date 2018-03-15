@@ -470,12 +470,12 @@ data.Dataset = {
         //});
     },
 
-    PushToSAS_Filename: function (id, filename) {
+    PushToSAS_Filename: function (id, filename, delimiter, guessingrows) {
         /// <summary>
         /// Download dataset from S3 and push to SAS file share
         /// </summary>
         var modal = Sentry.ShowModalWithSpinner("PushToMessage");
-        var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(id) + "&fileOverride=" + encodeURI(filename);
+        var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(id) + "&fileOverride=" + encodeURI(filename) + "&delimiter=" + encodeURI(delimiter) + "&guessingrows=" + encodeURI(guessingrows);
         $.post(controllerURL, function (result) {
             modal.ReplaceModalBody(result);
         });
@@ -489,7 +489,7 @@ data.Dataset = {
 
         $("[id^='FilenameOverride']").off('click').on('click', function (e) {
             e.preventDefault();
-            data.Dataset.PushToSAS_Filename($(this).data("id"), $("#FileNameOverride").val());
+            data.Dataset.PushToSAS_Filename($(this).data("id"), $("#FileNameOverride").val(), $("#Delimiter").val(), $("#GuessingRows").val());
         });
     },
 

@@ -1136,7 +1136,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [AuthorizeByPermission(PermissionNames.DatasetView)]
-        public ActionResult PushToSAS(int id, string fileOverride)
+        public ActionResult PushToSAS(int id, string fileOverride, string delimiter, int guessingrows)
         {
             try
             {
@@ -1200,7 +1200,7 @@ namespace Sentry.data.Web.Controllers
                 try
                 {
 
-                    _sasService.ConvertToSASFormat(filename, ds.Dataset.Category);
+                    _sasService.ConvertToSASFormat(filename, ds.Dataset.Category, delimiter, guessingrows);
 
                 }
                 catch (WebException we)
@@ -1506,10 +1506,14 @@ namespace Sentry.data.Web.Controllers
 
 
                             using (Stream sfile = file.InputStream)
-                            using (Stream fileStream = new FileStream(fileDropLocation, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
                             {
-                                sfile.CopyTo(fileStream);
+                                Logger.Debug($"Upload input stream|length:{sfile.Length.ToString()}|DropPath:{fileDropLocation}|TgtFileName:{dsfi}");
+                                using (Stream fileStream = new FileStream(fileDropLocation, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
+                                {
+                                    sfile.CopyTo(fileStream);
+                                }
                             }
+                            
 
                             //Create Dataset Loader request
                             var hashInput = $"{user.AssociateId.ToString()}_{DateTime.Now.ToString("MM-dd-yyyyHH:mm:ss.fffffff")}_{dsfi}";

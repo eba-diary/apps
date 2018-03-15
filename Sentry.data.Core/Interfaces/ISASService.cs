@@ -9,7 +9,7 @@ namespace Sentry.data.Core
     public interface ISASService
     {
 
-        void ConvertToSASFormat(string filename, string category);
+        void ConvertToSASFormat(string filename, string category, string delimiter, int guessingrows);
 
         string GenerateSASFileName(string filename);
 
