@@ -11,29 +11,14 @@
         <br />
         <h4>Dataset Retrieval</h4>
         <br />
-        @*Show the custom validation summary
-                Html.DisplayFor((model) => ViewData.ModelState)
-
-            @Html.HiddenFor(model => model.ConfigFileName)
-            @Html.HiddenFor(model => model.SearchCriteria)
-            @Html.HiddenFor(model => model.TargetFileName)
-            @Html.HiddenFor(model => model.IsRegexSearch)
-            @Html.HiddenFor(model => model.OverwriteDatasetFile)
-            @Html.HiddenFor(model => model.VersionsToKeep)
-            @Html.HiddenFor(model => model.DropPath)
-            @Html.HiddenFor(model => model.DropLocationType)
-            @Html.HiddenFor(model => model.CreationFreq)
-            @Html.HiddenFor(model => model.DatasetScopeTypeID)*@
-
+        
         @Html.DisplayFor((model) => ViewData.ModelState)
 
         @Html.HiddenFor(model => model.ConfigId)
-        @*@Html.HiddenFor(model => model.ConfigFileName)*@
-        @*@Html.HiddenFor(model => model.ConfigFileDesc)*@
+        @Html.HiddenFor(model => model.ConfigFileDesc)
         @Html.HiddenFor(model => model.EditHref)
         @Html.HiddenFor(model => model.ParentDatasetName)
         @Html.HiddenFor(model => model.DatasetId)
-        @*@Html.HiddenFor(model => model.CreationFreq)*@
         @Html.HiddenFor(model => model.OverwriteDatasetFile)
 
 
