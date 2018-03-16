@@ -747,7 +747,7 @@ namespace Sentry.data.Web.Controllers
 
             Dataset parent = _datasetContext.GetById<Dataset>(dfcm.DatasetId);
 
-            if (parent.DatasetFileConfigs.Any(x => x.Name == dfcm.ConfigFileName))
+            if (parent.DatasetFileConfigs.Any(x => x.Name.ToLower() == dfcm.ConfigFileName.ToLower()))
             {
                 AddCoreValidationExceptionsToModel(new ValidationException("Dataset config with that name already exists within dataset"));
             }
