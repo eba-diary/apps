@@ -1,6 +1,7 @@
 ﻿@{
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+
 <hr />
 <button class="btn btn-primary" onclick="ToggleAdminControls()">Show Advanced Controls</button>
 <button class="btn btn-warning" onclick="CreateSession()">Re-Create Session</button>
@@ -92,7 +93,7 @@ the_schema = StructType([StructField('timestamp', StringType(), True),
 
         <div id="columnSelector" class="query-builder">
             <div id="columnSelectorContainer" class="rules-group-container">
-                
+
                 <h5>Column Selection</h5>
                 <p>Click below to choose your columns from your dataset.  If you choose no columns all columns will be selected.</p>
 
@@ -119,7 +120,7 @@ the_schema = StructType([StructField('timestamp', StringType(), True),
 
                 <br />
                 <div id="joinContainer">
-                    
+
                 </div>
             </div>
         </div>
@@ -235,28 +236,42 @@ t1.createTempView("t1");
             <tbody></tbody>
         </table>
 
-        <hr />
-        <h3>Push Dataset to Business Intelligence Tools:</h3>
-        <div>
-            <img class="rcorners1" src="~/Images/sas_logo_rectangle.png" height="75" />
-            <img class="rcorners1" src="~/Images/tableau-icon.png" height="75" />
-            <img class="rcorners1" src="https://jira.sentry.com/secure/projectavatar?pid=15301&avatarId=10124" height="75" />
-            <!--<img class="rcorners1" src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f3/Apache_Spark_logo.svg/640px-Apache_Spark_logo.svg.png" height="75" />-->
-        </div>
-        <div>
+        <div id="savePanel" style="display: none;">
+            <hr />
+            <h3>Push Query Results to File:</h3>
+            <div style="display: none;">
+                <br />
+                <p><b>Spaces are not allowed in Hive Table column names.</b></p>
+                <p><b>This action is required to save to Apache Hive to open in Tableau or SAS.</b></p>
+                <br />
+                <input id="replaceSpacesChk" type="checkbox" />
+                <label for="replaceSpacesChk">Replace Spaces in All Columns with : </label>
+                <input type="text" id="replaceSpacesDelimiter" placeholder="Character to Replace ... " />
+                <br />
+                <button class="btn btn-warning" onclick="RenameAllColumns()">Rename All Columns</button>
+            </div>
             <br />
-            <p><b>Spaces are not allowed in Hive Table column names.</b></p>
-            <p><b>This action is required to save to Apache Hive to open in Tableau or SAS.</b></p>
+            <div>
+                <span class="text-muted">Please choose a name for your dataset below.  When saving is complete you will be prompted to rename the single file to download to your computer.</span>
+            </div>
             <br />
-            <input id="replaceSpacesChk" type="checkbox" />
-            <label for="replaceSpacesChk">Replace Spaces in All Columns with : </label>
-            <input type="text" id="replaceSpacesDelimiter" placeholder="Character to Replace ... " />
-        </div>
-        <br />
-        <button class="btn btn-warning" onclick="RenameAllColumns()">Rename All Columns</button>
-        <div>
-            <input id="s3FileLocationName" value="sentry-dataset-management-np/bundles/data-test/government/quarterly_census_of_employment_and_wages/census.csv" style="width:89%;" />
-            <button style="width: 10%; float:right;" onclick="SavetoS3()">Save to S3</button>
+            <div>
+                <input id="s3FileLocation" value="sentry-dataset-management-np/bundles/data-test/government/quarterly_census_of_employment_and_wages/" style="width:39%; display:inline-block;" class="form-control" disabled />
+
+                <input id="s3FileName" value="" placeholder="Personal Dataset Name ..." style="width:27%; display:inline-block;" class="form-control" />
+                <input id="s3Delimiter" value="" placeholder="Delimiter..." style="width:8%; display:inline-block;" class="form-control" />
+                <select style="width: 15%; display:inline-block;" id="s3SaveAsFileExtension" class="form-control">
+                    <option selected disabled>File Extensions: </option>
+                    <option>csv</option>
+                    <option>json</option>
+                    <option>parquet</option>
+                </select>
+                <button style="width: 10%; float:right; display:inline-block;" class="form-control btn btn-success" onclick="SavetoS3()">Save to S3</button>
+            </div>
+            <h3>File Download Location: <span id="spanTimeLeft"></span></h3>
+            <div>
+                <a id="s3DownloadLocation"><span id="s3DownloadKeyText"></span></a>
+            </div>
         </div>
 
         <br />
@@ -590,15 +605,50 @@ t1.createTempView("t1");
 
         function SavetoS3()
         {
+            var tableName = $('#s3FileName').val().escapeForJson();
+            var extension = $('#s3SaveAsFileExtension').val().escapeForJson();
+            var delimiter = $('#s3Delimiter').val();
+            var s3Location = $('#s3FileLocation').val().escapeForJson();
+
+            var table;
+            var valid = true;
+
+            if (extension) {
+                table = "queryResponse.coalesce(1).write";
+
+                if (extension == "csv" && delimiter) {
+                    table += ".option('sep', '" + delimiter + "')";
+                }
 
 
+                switch (extension) {
+                    case "csv":
+                        table += ".format('" + extension.trim() + "').option('header', 'true')";
+                        break;
+                    case "json":
+                        table += ".format('" + extension.trim() + "')";
+                        break;
+                    case "parquet":
+                        table += ".format('" + extension.trim() + "')";
+                        break;
+                    default:
+                        valid = false;
+                        break;
+                }
 
+                table += ".mode('overwrite').save('s3a://" + s3Location + tableName + "');";
 
-            var json = JSON.stringify("t1.coalesce(1).write.format('csv').mode('overwrite').save('s3a://" + $('#s3FileLocationName').val().escapeForJson() + "');");
+            }
 
-            console.log(json);
+            if (valid) {
+                var json = JSON.stringify(table);
 
-            SendCode(json);
+                console.log(json);
+
+                $('#preivousQueries').val($('#preivousQueries').val() + json);
+
+                SendCode(json, 'Save to S3', (s3Location + tableName));
+            }
         }
 
 
@@ -1435,9 +1485,13 @@ t1.createTempView("t1");
                                 case "Select Query":
                                     renderTable(filters);
                                     $('#btnRowCount').prop('disabled', false);
+                                    $('#savePanel').show();
                                     break;
                                 case "Count Rows":
                                     $('#rowCount').text(filters[0].toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",") + " Total Rows");
+                                    break;
+                                case "Save to S3":
+                                    callFileDownload(tableName);
                                     break;
                             }
 
@@ -1661,6 +1715,62 @@ t1.createTempView("t1");
                 $(".dataTables_filter").parent().addClass("text-right");
             }
         }
+
+        function callFileDownload(s3Key)
+        {
+            //Trim the Bucket
+            var bucket = s3Key.substring(0, s3Key.indexOf('/') + 1);
+            s3Key = s3Key.replace(bucket, '');
+
+            console.log(s3Key);
+            $.ajax({
+                type: "GET",
+                url: "/api/QueryTool/GetDatasetFileDownloadURL?s3Key=" + s3Key,
+                dataType: "json",
+                success: function (msg) {
+                    $('#s3DownloadLocation').attr('href', msg);
+                    $('#s3DownloadKeyText').text(msg);
+                    var countDownDate = new Date(new Date().getTime() + 2 * 60000);
+
+                    // Update the count down every 1 second
+                    var x = setInterval(function () {
+
+                        // Get todays date and time
+                        var now = new Date().getTime();
+
+                        // Find the distance between now an the count down date
+                        var distance = countDownDate - now;
+
+                        // Time calculations for days, hours, minutes and seconds
+                        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                        // Display the result in the element with id="demo"
+
+                        $('#spanTimeLeft').text("(Time Left : " + minutes + "m " + seconds + "s )");
+
+
+                        // If the count down is finished, write some text 
+                        if (distance < 0) {
+                            clearInterval(x);
+                            $('#s3DownloadLocation').attr('href', "");
+                            $('#s3DownloadKeyText').text("");
+                            $('#spanTimeLeft').text("(Time Left : EXPIRED.  Please press download again.)");
+                        }
+                    }, 1000);
+
+                    var win = window.open(msg, '_blank');
+                    win.focus();
+                },
+                error: function (e) {
+                    console.log("Unavailable");
+                }
+            });
+        }
+
+
+
+
 
         $('#datasetList').on('select2:select', function (e) {
             // Do something
@@ -1893,6 +2003,19 @@ t1.createTempView("t1");
                     });
                 }
             });
+
+            $.ajax({
+                type: "GET",
+                url: "/api/QueryTool/FileDropLocation",
+                dataType: "json",
+                success: function (msg) {
+                    $('#s3FileLocation').val(msg.s3Key);
+                },
+                error: function (e) {
+                    console.log("Unavailable");
+                }
+            });
+
 
             $('#btnGetSQL').on('click', function () {
                 runQuery(false);

@@ -63,6 +63,8 @@ namespace Sentry.data.Core
 
         string StartUpload(string uniqueKey);
 
+        List<string> FindObject(string keyPrefix);
+
         //CopyPartResponse CopyPart(string dest_Key, int partnum, string source_key, string source_versionId, string uploadId);
     }
 

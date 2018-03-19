@@ -353,9 +353,13 @@
     <Content Include="Content\jquery.terminal-1.11.3.css" />
     <Content Include="Content\query-builder.default.css" />
     <Content Include="Content\query-builder.default.min.css" />
+    <Content Include="Images\Hole16_Summer_Flowers_14.jpg" />
+    <Content Include="Images\Hole16_Summer_Flowers_14.png" />
     <Content Include="Images\Icons\bundle.png" />
     <Content Include="Images\Icons\details_close.png" />
     <Content Include="Images\Icons\details_open.png" />
+    <Content Include="Images\SHO_Aerial_10-4-17.jpg" />
+    <Content Include="Images\SHO_Aerial_10-4-17.png" />
     <Content Include="js\DatasetDetail.js" />
     <Content Include="js\ManageAssetAlert.js" />
     <Content Include="js\ManageConfigs.js" />

@@ -34,6 +34,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<Lineage> Lineage
+        {
+            get
+            {
+                return Query<Lineage>().Cacheable();
+            }
+        }
+
         public IQueryable<Category> Categories
         {
             get

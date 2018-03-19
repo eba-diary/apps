@@ -28,6 +28,9 @@ namespace Sentry.data.Core
         Boolean CanDwnldNonSensitive { get; }
         Boolean CanEditDataset { get; }
         Boolean CanUpload { get; }
+        Boolean CanQueryTool { get; }
+        Boolean CanQueryToolPowerUser { get; }
+
         //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
         Boolean CanUseApp { get; }
         Boolean CanUserSwitch { get; }

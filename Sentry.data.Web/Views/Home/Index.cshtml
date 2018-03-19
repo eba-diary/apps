@@ -1,67 +1,185 @@
-﻿@model List<Sentry.data.Core.DataAsset>
-
-@{
-    ViewData["Title"] = "data.sentry.com - Your home for Sentry Data Assets";
-    string color = "gold";
-    string color2 = "green";
+﻿@{
+    ViewData["Title"] = "Data at Sentry";
+    string color2 = "gold";
 }
 
-@*<div class="outside">
-    <div class="searchBox">
-        <input type="text" class="form-control" id="search" placeholder="Search Everything Data">
-        <button type="button" class="btn btn-primary searchBtn"><span class="glyphicon glyphicon-search"></span></button>
-    </div>
-</div>*@
 
-<div class="outside">
-    <div class="hidden-xs hidden-sm hidden-md asset border_@color">
-        <h2 class="assetHeader @color row_@color">Data Assets</h2>
-        <div class="assetBox">
-            @foreach (Sentry.data.Core.DataAsset da in Model)
-            {
-                <a href="/DataAsset/@da.Name">
-                    <div class="assetItem">@da.DisplayName</div>
-                </a>
-            }
-        </div>
-    </div>
 
-    @*@Html.Partial("_GridFull")*@
 
-    <div class="insideDataset">
-        @Html.Action("HomeDataset", "Dataset")
-    </div>
+<center>
+    <h2 style="color: white; margin: 80px; text-shadow: -.1px 0 black, 0 .1px black, .1px 0 black, 0 -.1px black;">Welcome to the Data.Sentry.com Portal.  Please choose an option below to begin your journey.</h2>
 
-    <div class="feed hidden-xs hidden-sm border_@color2">
-        <div class="row_@color2 topFeed">
-            <h2 class="@color2 leftFloat feedHeader">Feed</h2>
-
-            @*<div class="feedCheckbox rightFloat">
-                <label>
-                    <input type="checkbox" id="chbx" />
-                    <span>Sentry feeds only</span>
-                </label>
-            </div>*@
-        </div>
-
-        <div class="feedBox clearFloat" id="feed">
-            <div class="feedSpinner">
-                <span class="sentry-spinner"></span>
+    <div class="container">
+        <div class="ds-grid col-md-12" style="margin-bottom: 40px; display: none;">
+            <div class="row">
+                @{
+                    var htmlAttrsObj = new { @class = "navbar-form navbar-center", @id = "DatasetSearch" };
+                    var htmlAttributes = HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttrsObj);
+                    using (Html.BeginForm(@"List\SearchPhrase", "Dataset", FormMethod.Get, htmlAttributes))
+                    {
+                        <div class="input-group dataset-search">
+                            <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
+                            <input type="text" id="SearchText" name="searchPhrase" class="form-control" placeholder="Search " />
+                        </div>
+                    }
+                }
             </div>
-            @*@Html.Action("GetFeed", "Home")*@
         </div>
+        <div class="ds-grid col-md-12" style="margin-top: 75px;">
+            <div class="row text-center">
+                <div class="col-lg-4 tile borderdk_green">
+                    <a class="" href="~/DataAsset/Index">
+                        <img src="~/Images/Icons/DataAssets.svg" class="tile-image">
+                        <div class="tile-header" style="color: rgb(0, 0, 0);">Data Assets</div>
+                        <div class="tile-description" style="color: rgb(0, 0, 0); max-height: 4.5em; -webkit-line-clamp: 3;">
+                            Data Asset Health and Information
+                        </div>
+                    </a>
+                </div>
+                <div class="col-lg-4 tile borderdk_blue">
+                    <a class="" href="~/Dataset/Index">
+                        <img src="~/Images/Icons/Datasets.svg" class="tile-image">
+                        <div class="tile-header" style="color: rgb(0, 0, 0);">Datasets</div>
+                        <div class="tile-description" style="color: rgb(0, 0, 0); max-height: 4.5em; -webkit-line-clamp: 3;">
+                            Internal and External Datasets
+                        </div>
+                    </a>
+                </div>
+            </div>
+            <div class="row text-center" style="margin-top: 175px;">
+                <div class="feed hidden-xs hidden-sm border_@color2">
+                    <div class="row_@color2 topFeed">
+                        <h2 class="@color2 leftFloat feedHeader">Feed</h2>
 
-        <div class="feedBox clearFloat hidden" id="sentryFeed">
-            @*@Html.Action("GetSentryFeed", "Home")*@
+                        @*<div class="feedCheckbox rightFloat">
+                        <label>
+                            <input type="checkbox" id="chbx" />
+                            <span>Sentry feeds only</span>
+                        </label>
+                    </div>*@
+                    </div>
+
+                    <div class="feedBox clearFloat" id="feed">
+                        <div class="feedSpinner">
+                            <span class="sentry-spinner"></span>
+                        </div>
+                        @*@Html.Action("GetFeed", "Home")*@
+                    </div>
+
+                    <div class="feedBox clearFloat hidden" id="sentryFeed">
+                        @*@Html.Action("GetSentryFeed", "Home")*@
+                    </div>
+                </div>
+            </div>
         </div>
-    </div>
 </div>
+</center>
+
+
+
+
+
+
+
+
+
+<style>
+
+    .feed{
+        width:100%;
+        height: 225px;
+        margin-left: 0px;
+    }
+
+    .feedBox{
+        position:relative;
+        max-height: 90%;
+        margin-right: 2px;
+    }
+
+    .borderdk_blue {
+        border: 1.5px solid #285780;
+        border-top: 6px solid #285780;
+    }
+
+    .borderdk_green {
+        border: 1.5px solid #005844;
+        border-top: 6px solid #005844;
+    }
+
+    .dataset-operation-button {
+        font-size: 20px;
+    }
+
+    body {
+        overflow-y: hidden;
+        height: 100%;
+    }
+
+    .row.text-center > div {
+        display: inline-block;
+        float: none;
+    }
+
+    .body-content {
+        width: 100%;
+        margin-top: -6px;
+        height: 941px;
+        background-image: url(../../Images/Hole16_Summer_Flowers_14.png);
+        background-size: 1946px;
+        background-repeat: no-repeat;
+        max-width: 100%;
+        overflow-x: hidden;
+        overflow-y: hidden;
+        /* background-color: transparent; */
+    }
+
+
+    .imageFooter {
+        height: 400px;
+    }
+
+    .tile {
+        background: white;
+        margin: 30px;
+        opacity: .825;
+    }
+
+        .tile a {
+            text-decoration: none !important;
+        }
+
+    .tile-image {
+        width: 100px;
+        padding: 10px;
+        filter: invert(100%);
+        height: 115px;
+    }
+
+    .tile-header {
+        font-size: 1.5em;
+    }
+
+    .tile-description {
+        font-size: .8em;
+        max-height: 4.5em;
+        display: flex;
+        justify-content: center;
+        padding-bottom: 15px;
+    }
+</style>
 
 @section Scripts {
     <script>
         $(function () {
                 data.Home.Init();
                 data.Dataset.IndexInit();
+
+                var div = $('div.feedBox');
+                var scroller = setInterval(function () {
+                    var pos = div.scrollTop();
+                    div.scrollTop(++pos);
+                }, 100);
 
                 $('.browse-category-card').click(function (e) {
                     var storedNames = JSON.parse(localStorage.getItem("filteredIds"));

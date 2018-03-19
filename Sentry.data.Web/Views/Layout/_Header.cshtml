@@ -8,7 +8,7 @@
                 data.sentry.com
             </h1>
             <h2>
-                Sentry Data Assets - Information and Metadata
+                Everything Data
             </h2>
         </div>
         @{if (Model.EnvironmentName != "Prod") {
@@ -94,34 +94,52 @@
                         </li>
                     }
                     
-                    @if (Model.CanManageConfigs || Model.CanEditDataset || Model.CanUpload)
-                    {
+                    
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">Datasets<b class="caret"></b></a>
                             <ul class="dropdown-menu">
-                                @if (Model.CanEditDataset)
+                                <li><a href="~/Dataset/Index">Home</a></li>
+                                <li><a href="~/Dataset/List">Search</a></li>
+
+                                @if (Model.CanManageConfigs || Model.CanEditDataset || Model.CanUpload)
                                 {
-                                    <li><a href="#" onclick="data.Dataset.ViewUpload()">Create Dataset</a></li>
-                                }
-                                @if (Model.CanUpload)
-                                {
-                                    <li><a href="#" onclick="data.DatasetDetail.UploadFileModal(0)">Upload Data File</a></li>
-                                }
-                                
-                                @{
+                                    <li class="divider"></li>
+                                    <li class="dropdown-header">Dataset Actions</li>
+
+                                    if (Model.CanEditDataset)
+                                    {
+                                        <li><a href="#" onclick="data.Dataset.ViewUpload()">Create Dataset</a></li>
+                                    }
+
+                                    if (Model.CanUpload)
+                                    {
+                                        <li><a href="#" onclick="data.DatasetDetail.UploadFileModal(0)">Upload Data File</a></li>
+                                    }
+
                                     if (Model.CanManageConfigs)
                                     {
-                                        <li class="divider"></li>
-                                        <li class="dropdown-header">Dataset Administration</li>
                                         if (Model.CanManageConfigs)
                                         {
+                                            <li class="divider"></li>
+                                            <li class="dropdown-header">Dataset Administration</li>
                                             <li><a href="/Dataset/EditDataFileConfig">Manage Configs</a></li>
                                         }
+                                        
                                     }
                                 }
                             </ul>
                         </li>
-                    }
+                    
+
+                    @if (Model.CanQueryToolPowerUser || Model.CanQueryTool)
+                    {
+                        <li>
+                            <a href="~/Dataset/QueryTool" class="">Query Tool</a>                               
+                        </li>
+                     }
+
+
+
 
                     <li class="dropdown-xs">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Help<b class="caret"></b></a>
@@ -154,9 +172,8 @@
                     
                     <li class="visible-xs"><a href="#">About</a></li>
                 </ul>
-                @*<ul class="nav navbar-nav navbar-right text-right about hidden-xs">
-                    <li class=""><a href="#">About</a></li>
-                </ul>*@
+
+
             </div>
         </div>
     @*}*@

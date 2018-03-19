@@ -134,10 +134,6 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult List(string category, string searchPhrase, string ids)
         {
-            //Helpers.Search searchHelper = new Helpers.Search(_cache);
-
-            //return View(searchHelper.List(this, null, searchPhrase, category, ids));
-
             return View("ClientSideList");
         }
 
@@ -906,7 +902,7 @@ namespace Sentry.data.Web.Controllers
             return ds;
         }
 
-        [AuthorizeByPermission(PermissionNames.DwnldSensitve, PermissionNames.DwnldNonSensitive)]
+        [AuthorizeByPermission(PermissionNames.DwnldSensitive, PermissionNames.DwnldNonSensitive)]
         [HttpGet()]
         public JsonResult GetDownloadURL(int id)
         {
@@ -1698,6 +1694,7 @@ namespace Sentry.data.Web.Controllers
             return Json(obj, JsonRequestBehavior.AllowGet);
         }
 
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public ActionResult QueryTool()
         {
             return View("QueryTool");
