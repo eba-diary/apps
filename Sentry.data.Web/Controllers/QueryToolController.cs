@@ -11,32 +11,22 @@ using System.Threading.Tasks;
 using System.Net.Http.Headers;
 using Sentry.data.Infrastructure;
 using Sentry.Configuration;
-using System.Web.Http.Results;
-using Sentry.data.Common;
-using Amazon.S3.Model;
 
 namespace Sentry.data.Web.Controllers
 {
     public class QueryToolController : ApiController
     {
-        public IAssociateInfoProvider _associateInfoProvider;
         public IDatasetContext _datasetContext;
-        private UserService _userService;
-        private S3ServiceProvider _s3Service;
         public string _livyUrl;
 
-        public QueryToolController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, ISASService sasService, IAssociateInfoProvider associateInfoService)
+        public QueryToolController(IDatasetContext dsCtxt)
         {
             _datasetContext = dsCtxt;
-            _userService = userService;
-            _s3Service = dsSvc;
-            _associateInfoProvider = associateInfoService;
             _livyUrl = Sentry.Configuration.Config.GetHostSetting("ApacheLivy");
         }
 
         [HttpPost]
         [Route("Create")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> CreateSession(string Language)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -82,7 +72,6 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Send")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> SendCode(int SessionID, [FromBody] string Code)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -121,7 +110,6 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Get")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> GetSessions()
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -148,7 +136,6 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Get")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> GetSession(int SessionID)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -175,7 +162,6 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Get")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> GetStatement(int SessionID, int StatementID)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -202,7 +188,6 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Post")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> CancelStatement(int SessionID, int StatementID)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -229,7 +214,6 @@ namespace Sentry.data.Web.Controllers
 
         [HttpDelete]
         [Route("Delete")]
-        [AuthorizeByPermission(PermissionNames.QueryToolAdmin)]
         public async Task<IHttpActionResult> DeleteSession(int SessionID)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -253,47 +237,5 @@ namespace Sentry.data.Web.Controllers
                 }
             }
         }
-
-        [HttpGet]
-        [Route("Get")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
-        public async Task<IHttpActionResult> FileDropLocation()
-        {
-            IApplicationUser user = _userService.GetCurrentUser();
-
-            var obj = new
-            {
-                s3Key = Sentry.Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + Utilities.GenerateDatasetStorageLocation("QueryTool/Bundle", user.AssociateId)
-            };
-
-            return Ok(obj);
-        }
-
-
-        [HttpGet]
-        [Route("Get")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
-        public async Task<IHttpActionResult> GetDatasetFileDownloadURL(string s3Key)
-        {
-            try
-            {
-                List<string> list = _s3Service.FindObject(s3Key);
-
-                foreach(string obj in list)
-                {
-                    if(obj.Contains("part-00000"))
-                    {
-                        return Ok(_s3Service.GetDatasetDownloadURL(obj));
-                    }
-                }
-
-                return NotFound();
-            }
-            catch (Exception ex)
-            {
-                return NotFound();
-            }
-        }
-
     }
 }

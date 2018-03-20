@@ -1,191 +1,201 @@
 ﻿@model IList<Sentry.data.Web.BaseDatasetModel>
 
 @{
-    ViewBag.Title = "Datasets at Sentry";
+    ViewBag.Title = "Datasets";
 }
 
-
-
 <center>
-    <h2 style="color: white; margin: 80px; text-shadow: -.1px 0 black, 0 .1px black, .1px 0 black, 0 -.1px black;">Welcome to the Sentry Dataset Portal.  Please type below to search or choose a category.</h2>
-
-    <div class="container">
-        <div class="ds-grid col-md-12" style="margin-bottom: 40px;">
-            <div class="row">
+    <h1>Datasets</h1>
+    Search from @Model.Count() datasets.
+    @{
+        var htmlAttrsObj = new { @class = "navbar-form navbar-center", @id = "DatasetSearch" };
+        var htmlAttributes = HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttrsObj);
+        using (Html.BeginForm(@"List\SearchPhrase", "Dataset", FormMethod.Get, htmlAttributes))
+        {
+            <div class="input-group dataset-search">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
+                <input type="text" id="SearchText" name="searchPhrase" class="form-control" placeholder="Enter dataset search term(s)" />
+            </div>
+        }
+    }
+    <p> &nbsp; </p>
+    <div class="upload-row">
+        <h4>
+            Upload a New Dataset
+        </h4>
+        <button type="button" class="btn btn-default btn-sm dataset-operation-button" id="UploadDataset">
+            <span class="glyphicon glyphicon-cloud-upload text-primary"></span> Upload...
+        </button>
+    </div>
+    <p> &nbsp; </p>
+    <div class="browse-category">
+        <h4>
+            Or Browse Dataset Categories...
+        </h4>
+        <div class="index-card-table-div">
+            @*<table class="index-card-table">
                 @{
-                    var htmlAttrsObj = new { @class = "navbar-form navbar-center", @id = "DatasetSearch" };
-                    var htmlAttributes = HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttrsObj);
-                    using (Html.BeginForm(@"List\SearchPhrase", "Dataset", FormMethod.Get, htmlAttributes))
+                    /* rudimentary logic to establish a grid of category "cards" */
+                    var category = Model.Select(m => m.Category).Distinct().OrderBy(cat => cat).ToList();
+                    var itemsPerRow = 3;
+                    if (category.Count() >= 20)
                     {
-                        <div class="input-group dataset-search">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
-                            <input type="text" id="SearchText" name="searchPhrase" class="form-control" placeholder="Search from @Model.Count() datasets ..." />
-                        </div>
+                        itemsPerRow = 5;
+                    }
+                    else if (category.Count() >= 12)
+                    {
+                        itemsPerRow = 4;
+                    }
+                    else if (category.Count() >= 6)
+                    {
+                        itemsPerRow = 3;
+                    }
+                    for (var i = 0; i < category.Count; i += itemsPerRow)
+                    {
+                        <tr>
+                            @for (var j = 0; j < itemsPerRow; j++)
+                            {
+                                if (i + j < category.Count)
+                                {
+                                    <td>
+                                        <div class="browse-category-card" id="category_@category[i + j].ToLower()" data-category="@category[i + j]">
+                                            <p><img src="~/Images/Category/@{@category[i + j]}.png" /></p>
+                                            <p>@category[i + j]</p>
+                                        </div>
+                                    </td>
+                                }
+                            }
+                        </tr>
                     }
                 }
-            </div>
-        </div>
-        <div class="ds-grid col-md-12">
+            </table>*@
+
             @{
                 var category = Model.Select(m => m.Category).Distinct().OrderBy(cat => cat).ToList();
                 int c = category.Count();
                 string[] colors = new string[] { "blue", "green", "gold", "plum", "orange", "blueGray" };
 
-
-            }
-
-            @for (int i = 0; i < c; i++)
-            {
-                if (i % 3 == 0)
+                if (c == 1)
                 {
-                    @:<div class="row text-center">
-                }
-
-                <div class="col-md-3 tile border_@colors[i]">
-                    <a class="" href="~/Dataset/List/Index?category=@category[i]">
-                        <img src="/Images/Category/@{@category[i]}.svg" class="tile-image">
-                        <div class="tile-header" style="color: rgb(0, 0, 0);">@category[i]</div>
-                        <div class="tile-description" style="color: rgb(0, 0, 0); max-height: 4.5em; -webkit-line-clamp: 3;">
-                           
+                    <div class="row">
+                        <div class="col-sm-3"></div>
+                        <div class="col-sm-6">
+                            <div class="browse-category-card vertCenter border_@colors[0]" id="category_@category[0]" data-category="@category[0]">
+                                <img src="~/Images/Category/@{@category[0]}.png" class="catImg" />
+                                <h5 class="@colors[0] catTitle">@category[0]</h5>
+                            </div>
                         </div>
-                    </a>
-                </div>
-
-
-                if (i % 3 == 2 || i + 1 == c)
+                    </div>
+                }
+                else if (c == 2)
                 {
-                    @:</div>
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <div class="browse-category-card vertCenter border_@colors[0]" id="category_@category[0]" data-category="@category[0]">
+                                <img src="~/Images/Category/@{@category[0]}.png" class="catImg" />
+                                <h5 class="@colors[0] catTitle">@category[0]</h5>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="browse-category-card vertCenter border_@colors[1]" id="category_@category[1]" data-category="@category[1]">
+                                <img src="~/Images/Category/@{@category[1]}.png" class="catImg" />
+                                <h5 class="@colors[1] catTitle">@category[1]</h5>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="hidden-sm">
+                        @for (int i = 0; i < c; i++)
+                        {
+                            <div class="row">
+                                <div class="col-sm-4">
+                                    <div class="browse-category-card vertCenter border_@colors[(i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
+                                        <img src="~/Images/Category/@{@category[i]}.png" class="catImg" />
+                                        <h5 class="@colors[i] catTitle">@category[i]</h5>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="browse-category-card vertCenter border_@colors[(++i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
+                                        <img src="~/Images/Category/@{@category[i]}.png" class="catImg" />
+                                        <h5 class="@colors[i] catTitle">@category[i]</h5>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="browse-category-card vertCenter border_@colors[(++i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
+                                        <img src="~/Images/Category/@{@category[i]}.png" class="catImg" />
+                                        <h5 class="@colors[i] catTitle">@category[i]</h5>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                @if (i + 1 == c - 1)
+                                {
+                                    <div class="col-sm-4"></div>
+                                    <div class="col-sm-4">
+                                        <div class="browse-category-card vertCenter border_@colors[(++i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
+                                            <img src="~/Images/Category/@{@category[i]}.png" class="catImg" />
+                                            <h5 class="@colors[i] catTitle">@category[i]</h5>
+                                        </div>
+                                    </div>
+    }
+                                @if (i + 2 == c - 1)
+                                {
+                                    <div class="col-md-2"></div>
+                                    <div class="col-sm-4">
+                                        <div class="browse-category-card vertCenter border_@colors[(++i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
+                                            <img src="~/Images/Category/@{@category[i]}.png" class="catImg" />
+                                            <h5 class="@colors[i] catTitle">@category[i]</h5>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <div class="browse-category-card vertCenter border_@colors[(++i < 6) ? i : i % 6]" id="category_@category[i]" data-category="@category[i]">
+                                            <img src="~/Images/Category/@{@category[i]}.png" class="catImg" />
+                                            <h5 class="@colors[i] catTitle">@category[i]</h5>
+                                        </div>
+                                    </div>
+    }
+                            </div>
+                        }
+                    </div>
+
+                    @*<div class="visible-sm">
+                        @for (int i = 0; i < c; i++)
+                        {
+                            <div class="row">
+                                <div class="col-md-4 col-sm-6 clcCard border_@colors[(i < 6) ? i : i % 6]">
+                                    
+                                </div>
+                                <div class="col-md-4 col-sm-6 clcCard border_@colors[(++i < 6) ? i : i % 6]">
+                                    
+                                </div>
+                            </div>
+
+                            if (i + 1 == c - 1)
+                            {
+                                <div class="row">
+                                    <div class="col-sm-3"></div>
+                                    <div class="col-md-4 col-sm-6 clcCard border_@colors[(++i < 6) ? i : i % 6]">
+                                        
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>*@
                 }
             }
 
-        <div class="row text-center">
-            <div class="upload-row">
-                <button type="button" class="btn btn-default btn-lg dataset-operation-button" id="CreateDataset">
-                    <span class="glyphicon glyphicon-plus text-primary"></span> Create Dataset
-                </button>
-                <button type="button" class="btn btn-default btn-lg dataset-operation-button" id="UploadDatafile">
-                    <span class="glyphicon glyphicon-cloud-upload text-primary"></span> Upload Datafile
-                </button>
-            </div>
+
         </div>
     </div>
-    </div>
-    <div class="imageFooter"></div>
 </center>
-
-
-
-
-
-
-
-
-
-<style>
-    .sentry-app-version{
-        display: none;
-    }
-    
-    .dataset-operation-button {
-        font-size: 20px;
-    }
-
-    body {
-        overflow-y: hidden;
-        height: 100%;
-    }
-
-    .row.text-center > div {
-        display: inline-block;
-        float: none;
-    }
-
-    .body-content {
-        width: 100%;
-        margin-top: -6px;
-        height: 941px;
-        background-image: url(../../Images/SHO_Aerial_10-4-17.png);
-        background-size: 1946px;
-        background-repeat: no-repeat;
-        max-width: 100%;
-        overflow-x: hidden;
-        overflow-y: hidden;
-        /* background-color: transparent; */
-    }
-
-
-    .imageFooter {
-        height: 127px;
-    }
-
-    .tile{
-        background: white;
-        margin: 30px;
-        opacity: 0.80;
-    }
-
-        .tile a {
-
-            text-decoration: none !important;
-
-        }
-
-    .tile-image {
-        width: 100px;
-        padding: 10px;
-        filter: invert(100%);
-        height: 115px;
-    }
-
-    .tile-header{
-        font-size: 1.5em;
-    }
-
-    .tile-description{
-        font-size: .8em;
-        max-height: 4.5em;
-        display: flex;
-        justify-content: center;
-        padding-bottom: 15px;
-
-    }
-
-    .input-group-addon {
-        cursor: pointer;
-    }
-</style>
-
 
 @section Scripts {
     <script>
         $(function () {
             data.Dataset.IndexInit();
-
-            $('.tile').click(function (e) {
-                var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
-
-                if (storedNames != null) {
-                    for (i = 0; i < storedNames.length; i++) {
-                        $('#' + storedNames[i]).prop('checked', false);
-                    }
-
-                    localStorage.removeItem("filteredIds");
-                }
-
-                localStorage.removeItem("searchText");
-            });
-
-            $('#DatasetSearch').submit(function (e) {
-                localStorage.removeItem("filteredIds");
-
-                localStorage.removeItem("searchText");
-
-                localStorage.setItem("searchText", $('#SearchText')[0].value);
-            });
-
-            $('.input-group-addon').click(function (e) {
-                $('#DatasetSearch').submit();
-            });
         });
     </script>
 }

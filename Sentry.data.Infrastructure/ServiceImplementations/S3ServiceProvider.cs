@@ -789,19 +789,6 @@ namespace Sentry.data.Infrastructure
             return response.ResponseStream;            
         }
 
-        public List<string> FindObject(string keyPrefix)
-        {
-            var request = new ListObjectsRequest();
-
-            request.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
-            request.Prefix = keyPrefix;
-
-            ListObjectsResponse response = S3Client.ListObjects(request);
-
-            return response.S3Objects.Select(x => x.Key).ToList();
-
-        }
-
 
         #region Helpers
 

@@ -34,8 +34,6 @@ namespace Sentry.data.Web.Controllers
             headerModel.CanViewDataAsset = SharedContext.CurrentUser.CanViewDataAsset;
             headerModel.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
             headerModel.CanUpload = SharedContext.CurrentUser.CanUpload;
-            headerModel.CanQueryTool = SharedContext.CurrentUser.CanQueryTool;
-            headerModel.CanQueryToolPowerUser = SharedContext.CurrentUser.CanQueryToolPowerUser;
 
             if (SharedContext.CurrentUser.GetType() == typeof(ImpersonatedApplicationUser))
             {

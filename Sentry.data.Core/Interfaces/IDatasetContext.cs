@@ -16,8 +16,6 @@ namespace Sentry.data.Core
 
         IQueryable<Status> EventStatus { get; }
 
-        IQueryable<Lineage> Lineage { get; }
-
         Dataset GetById(int id);
 
         int GetDatasetCount();

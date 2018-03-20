@@ -11,7 +11,6 @@ namespace Sentry.data.Web
         public string RealUserName { get; set; }
         public string AssociatePhotoUrl { get; set; }
         public string EnvironmentName { get; set; }
-
         //###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific
         public Boolean CanApproveAssets { get; set; }
         public Boolean CanManageConfigs { get; set; }
@@ -21,8 +20,7 @@ namespace Sentry.data.Web
         public Boolean CanViewDataAsset { get; set; }
         public Boolean CanEditDataset { get; set; }
         public Boolean CanUpload { get; set; }
-        public Boolean CanQueryTool { get; set; }
-        public Boolean CanQueryToolPowerUser { get; set; }
-
+        //public bool HasMenu { get; set; }
+        //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
     }
 }

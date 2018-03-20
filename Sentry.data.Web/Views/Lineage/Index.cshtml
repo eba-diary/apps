@@ -133,22 +133,11 @@
 
             <div class="lineageRow threeTab">
                 <span class="glyphicon glyphicon-share-alt icon-flipped"></span>
-                <button type="button" class="btn btn-xs btn-cancel disabled" style="display: inline-block;  margin-bottom: 6px;">
+                <button type="button" class="btn btn-xs btn-warning disabled" style="display: inline-block;  margin-bottom: 6px;">
                     <span class="glyphicon glyphicon-minus"></span>
                 </button>
                 <div class="elementObject" style="margin-left: 10px; display: inline-block;">
                     <span>PROD_DPS_SERA.SALES_ORG_D_DP.PolicyProcessGroup_CDE</span>
-                    <input type="button" value="Show Details" class="btn btn-xs btn-info" style="display: inline-block; margin-right: 10px; float:right;">
-                </div>
-            </div>
-
-            <div class="lineageRow threeTab">
-                <span class="glyphicon glyphicon-share-alt icon-flipped"></span>
-                <button type="button" class="btn btn-xs btn-warning" style="display: inline-block;  margin-bottom: 6px;">
-                    <span class="glyphicon glyphicon-plus"></span>
-                </button>
-                <div class="elementObject" style="margin-left: 10px; display: inline-block;">
-                    <span>SERAPL_Transactional.Sales Org.Policy Process Group Code</span>
                     <input type="button" value="Show Details" class="btn btn-xs btn-info" style="display: inline-block; margin-right: 10px; float:right;">
                 </div>
             </div>
@@ -287,20 +276,6 @@
                 width: 1166,
                 height: 1000,
                 node: {
-                    link: {
-                        color: {
-                            fill: '#efd',     // Color of the link.
-                            fillOpacity: 0.8, // Transparency of the link.
-                            stroke: 'black',  // Color of the link border.
-                            strokeWidth: 0    // Thickness of the link border (default 0).
-                        },
-                        colors: [
-                            '#a6cee3',        // Custom color palette for sankey links.
-                            '#1f78b4',        // Nodes will cycle through this palette
-                            '#b2df8a',        // giving the links for that node the color.
-                            '#33a02c'
-                        ]
-                    },
                     label: {
                         fontName: 'Times-Roman',
                         fontSize: 12,
@@ -311,7 +286,13 @@
                     interactivity: true, // Allows you to select nodes.
                     labelPadding: 6,     // Horizontal distance between the label and the node.
                     nodePadding: 90,     // Vertical distance between nodes.
-                    width: 1
+                    width: 1,            // Thickness of the node.
+                    colors: [
+                        '#a6cee3',         // Custom color palette for sankey nodes.
+                        '#1f78b4',         // Nodes will cycle through this palette
+                        '#b2df8a',         // giving each node its own color.
+                        '#33a02c'
+                    ]
                 }
             };
 

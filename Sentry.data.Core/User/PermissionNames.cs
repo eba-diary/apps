@@ -11,7 +11,7 @@
         public const string ApproveItems = "App_DataMgmt_ApproveItems";
         // JCG TODO: Revisit removing unused App_DataMgmt_AddItems
         public const string AddItems = "App_DataMgmt_AddItems";
-        public const string DwnldSensitive = "DatasetSensDwnld";
+        public const string DwnldSensitve = "DatasetSensDwnld";
         public const string DwnldNonSensitive = "DatasetNonSensDwnld";
         public const string Upload = "DatasetUpload";
         public const string DatasetEdit = "DatasetModify";
@@ -20,8 +20,5 @@
         public const string UserSwitch = "UserSwitch";
         public const string ManageDataFileConfigs = "DatasetMngConfig";
         public const string ManageAssetNotifications = "DataAssetMngAlert";
-        public const string QueryToolUser = "QueryToolUser";
-        public const string QueryToolPowerUser = "QueryToolPowerUser";
-        public const string QueryToolAdmin = "QueryToolAdmin";
     }
 }
