@@ -906,7 +906,7 @@ namespace Sentry.data.Web.Controllers
             return ds;
         }
 
-        [AuthorizeByPermission(PermissionNames.DwnldSensitve, PermissionNames.DwnldNonSensitive)]
+        [AuthorizeByPermission(PermissionNames.DwnldSensitive, PermissionNames.DwnldNonSensitive)]
         [HttpGet()]
         public JsonResult GetDownloadURL(int id)
         {

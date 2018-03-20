@@ -42,7 +42,7 @@ namespace Sentry.data.Core
             get
             {
                 //return true;
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.DwnldSensitve);
+                return _extendedUserInfo.Permissions.Contains(PermissionNames.DwnldSensitive);
             }
         }
 
@@ -85,6 +85,27 @@ namespace Sentry.data.Core
             get
             {
                 return _extendedUserInfo.Permissions.Contains(PermissionNames.UserSwitch);
+            }
+        }
+        public virtual Boolean CanQueryTool
+        {
+            get
+            {
+                return _extendedUserInfo.Permissions.Contains(PermissionNames.QueryToolUser);
+            }
+        }
+        public virtual Boolean CanQueryToolPowerUser
+        {
+            get
+            {
+                return _extendedUserInfo.Permissions.Contains(PermissionNames.QueryToolPowerUser);
+            }
+        }
+        public virtual Boolean CanQueryToolAdmin
+        {
+            get
+            {
+                return _extendedUserInfo.Permissions.Contains(PermissionNames.QueryToolAdmin);
             }
         }
 
