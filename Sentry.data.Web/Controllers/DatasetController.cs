@@ -1698,6 +1698,7 @@ namespace Sentry.data.Web.Controllers
             return Json(obj, JsonRequestBehavior.AllowGet);
         }
 
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public ActionResult QueryTool()
         {
             return View("QueryTool");
