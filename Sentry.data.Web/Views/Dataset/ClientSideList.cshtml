@@ -243,26 +243,20 @@
 
             this.Count = ko.computed(function () {
                 var items = ko.utils.arrayFilter(window.vm.searchResults(), function (prod) {
-                    if (Title == prod.Category  && Category == 'Category')
-                    {
+                    if (Title == prod.Category && Category == 'Category') {
                         return prod;
                     }
-                    else if (Title == prod.SentryOwner && Category == 'Sentry Owner')
-                    {
+                    else if (Title == prod.SentryOwner && Category == 'Sentry Owner') {
                         return prod;
                     }
-                    else if (Category == 'Frequency')
-                    {
-                        for (var i = 0; i < prod.Frequencies.length; i++)
-                        {
-                            if (prod.Frequencies[i] == Title)
-                            {
+                    else if (Category == 'Frequency') {
+                        for (var i = 0; i < prod.Frequencies.length; i++) {
+                            if (prod.Frequencies[i] == Title) {
                                 return prod;
                             }
                         }
                     }
-                    else if (Category == 'Extension')
-                    {
+                    else if (Category == 'Extension') {
                         for (var i = 0; i < prod.DistinctFileExtensions.length; i++) {
                             if (prod.DistinctFileExtensions[i] == Title) {
                                 return prod;
@@ -277,8 +271,7 @@
             });
         }
 
-        function FilterCategory(Name, Filters, Color)
-        {
+        function FilterCategory(Name, Filters, Color) {
             this.Name = Name;
             this.Filters = ko.observableArray(Filters);
 
@@ -288,8 +281,7 @@
                     return Filters.sort(function (left, right) {
                         return right.Count() - left.Count()
                     });
-                } else
-                {
+                } else {
                     return Filters;
                 }
             });
@@ -349,8 +341,8 @@
 
             self.Query = ko.observable('');
 
-           // self.SearchFilters = ko.observableArray([]);  //For the DropDown List
-            self.SelectedFilters = ko.observableArray([]); 
+            // self.SearchFilters = ko.observableArray([]);  //For the DropDown List
+            self.SelectedFilters = ko.observableArray([]);
 
             self.CategoryFilters = ko.observableArray([]);
             self.OwnerFilters = ko.observableArray([]);
@@ -367,7 +359,7 @@
                 });
             }
 
-            self.clearFilters = function() {
+            self.clearFilters = function () {
                 self.SelectedFilters.removeAll();
             };
 
@@ -414,7 +406,7 @@
                         return new Dataset(data);
 
                     });
-                    
+
 
                     self.datasets(self.datasets().concat(onlineDatasets));
 
@@ -474,8 +466,7 @@
 
                 var temp = [];
 
-                var searchParams = new URLSearchParams(window.location.search);
-                var param = searchParams.get('category');
+                var param = getParameterByName('category');
 
                 for (var item, i = 0; item = allData[i++];) {
                     var category = item.Category;
@@ -496,7 +487,7 @@
 
                 var item;
 
-                
+
                 ko.utils.arrayForEach(self.AllFilters(), function (v) {
                     if (v.Name == 'Category') {
                         item = v;
@@ -610,8 +601,7 @@
 
                     if (list != undefined) {
 
-                        for (var i = 0; i < list.length; i++)
-                        {
+                        for (var i = 0; i < list.length; i++) {
                             self.SelectedFilters.push(list[i]);
                         }
                     }
@@ -632,19 +622,17 @@
 
                 var temp = [];
 
-                for (var i = 0; i < self.datasets().length; i++)
-                {
+                for (var i = 0; i < self.datasets().length; i++) {
                     var keywordFound = false;
                     var count = 0;
                     var dataset = self.datasets()[i];
 
-                    for (var j = 0; j < searchQuery.length; j++)
-                    {
+                    for (var j = 0; j < searchQuery.length; j++) {
                         var desc = dataset.DatasetDesc.toString();
                         var name = dataset.DatasetName.toString();
                         var owner = dataset.SentryOwner.toString();
 
-                        if (desc.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0){
+                        if (desc.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0) {
                             keywordFound = true;
                             count++;
                         }
@@ -759,8 +747,7 @@
                     queryResults = queryResults.filter(function (item) {
 
                         for (var i = 0; i < selectedFrequencies.length; i++) {
-                            for (var j = 0; j < item.Frequencies.length; j++)
-                            {
+                            for (var j = 0; j < item.Frequencies.length; j++) {
                                 if (item.Frequencies[j] == selectedFrequencies[i].Title) {
                                     return true;
                                 }
@@ -858,5 +845,16 @@
             });
         });
 
-    </script>
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
+
+</script>
+
 }

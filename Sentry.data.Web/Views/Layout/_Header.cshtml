@@ -1,5 +1,12 @@
 ﻿@model HeaderModel
 
+<div id="internetExplorerWarning" role="banner" aria-hidden="false" style="padding:10px; font-size: 14px; display:none;" class="alert alert-warning">
+    <span class="glyphicon glyphicon-warning-sign" style="margin: 0px 15px 0px 5px;"></span>
+    We noticed you are using <strong>Internet Explorer</strong>.  Many of our site's functionalities use features only available in <strong>
+        Edge, Firefox, or Chrome.
+    </strong>  We recommend you switch to one of those browsers. <a href="microsoft-edge:@Request.Url.AbsoluteUri">Click here to change to Edge.</a>
+</div>
+
 <nav class="navbar navbar-default navbar-fixed-top sentry-navbar" role="navigation">
     <header class="sentry-header">
         <a href="/"><div class="sentry-logo"></div></a>
@@ -11,10 +18,11 @@
                 Sentry Data Assets - Information and Metadata
             </h2>
         </div>
-        @{if (Model.EnvironmentName != "Prod") {
-            <div class="sentry-environment">
-                <span class="sentry-environment-name">@Model.EnvironmentName.ToUpper()</span>
-            </div>
+        @{if (Model.EnvironmentName != "Prod")
+            {
+                <div class="sentry-environment">
+                    <span class="sentry-environment-name">@Model.EnvironmentName.ToUpper()</span>
+                </div>
             }
         }
         <!-- User Menu -->
@@ -27,7 +35,7 @@
                     else
                     {
                         //<span class="glyphicon glyphicon-user"></span>
-                    <span><img src="@Model.AssociatePhotoUrl"/></span>
+                        <span><img src="@Model.AssociatePhotoUrl" /></span>
                     }
                 }
                 <span class="sentry-user-name">@Model.CurrentUserName</span>
@@ -49,122 +57,14 @@
                     <li role="presentation" class="divider"></li>
                     <li role="presentation"><a role="menuitem" tabindex="-1" href="#">Logout</a></li>
                 </ul>
-            }
+                        }
         </div>
     </header>
 
     <!-- Main Menu -->
-
     @*@if (Model.HasMenu)
-    {*@
-        <div class="container-fluid menu">
-            <div class="navbar-header">
-                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
-            </div>
-            <div class="navbar-collapse collapse" id="navbar-main">
-                <ul class="nav navbar-nav text-right">
-                    @if (Model.CanViewDataAsset)
-                    {
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Assets <b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                                <li class="dropdown-submenu">
-                                    <a data-toggle="dropdown">Assets </a>
-                                    <ul class="dropdown-menu">
-                                        @foreach (Sentry.data.Core.DataAsset da in ViewBag.DataAssets)
-                                        {
-                                            <li class="text-right"><a href="/DataAsset/@da.Name">@da.DisplayName</a></li>
-                                        }
-                                    </ul>
-                                </li>
-                                @if (Model.CanManageAssetAlerts)
-                                {
-                                    <li class="divider"></li>
-                                    <li class="dropdown-header">Asset Administration</li>
-                                    if (Model.CanManageAssetAlerts)
-                                    {
-                                        <li><a href="/DataAsset/ManageAssetNotification">Manage Alerts</a></li>
-                                    }
-                                }
-                            </ul>
-                        </li>
-                    }
-                    
-                    @if (Model.CanManageConfigs || Model.CanEditDataset || Model.CanUpload)
-                    {
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Datasets<b class="caret"></b></a>
-                            <ul class="dropdown-menu">
-                                @if (Model.CanEditDataset)
-                                {
-                                    <li><a href="#" onclick="data.Dataset.ViewUpload()">Create Dataset</a></li>
-                                }
-                                @if (Model.CanUpload)
-                                {
-                                    <li><a href="#" onclick="data.DatasetDetail.UploadFileModal(0)">Upload Data File</a></li>
-                                }
-                                
-                                @{
-                                    if (Model.CanManageConfigs)
-                                    {
-                                        <li class="divider"></li>
-                                        <li class="dropdown-header">Dataset Administration</li>
-                                        if (Model.CanManageConfigs)
-                                        {
-                                            <li><a href="/Dataset/EditDataFileConfig">Manage Configs</a></li>
-                                        }
-                                    }
-                                }
-                            </ul>
-                        </li>
-                    }
-
-                    <li class="dropdown-xs">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Help<b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            @*<li><a href="/About/">About</a></li>*@
-                            <li><a href="/Home/ReleaseNotes">Release Notes</a></li>
-                            <li><a href="mailto:BIPortalAdmin@sentry.com?Subject=Feedback">Provide Feedback</a></li>
-                            <li><a href="mailto:BIPortalAdmin@sentry.com?Subject=Bug&nbsp;Report">Report Bug</a></li>
-                            @*<li><a href="/Tutorial">Tutorial</a></li>*@
-                            <li class="dropdown-submenu">
-                                <a data-toggle="dropdown">User Guides</a>
-                                <ul class="dropdown-menu">                                    
-                                    <li class="dropdown-submenu">
-                                        <a data-toggle="dropdown">Data Assets</a>
-                                        <ul class="dropdown-menu">
-                                            <li class="text-right"><a href="#" onclick="data.Dataset.GetUserGuide('data-asset/Alert-Notifications.pdf')">Alert Notifications</a></li>
-                                        </ul>
-                                    </li>
-                                    <li class="dropdown-submenu">
-                                        <a data-toggle="dropdown">Dataset Management</a>
-                                        <ul class="dropdown-menu">
-                                            <li class="text-right"><a href="#" onclick="">Coming Soon!</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
-
-                        </ul>
-                    </li>
-                    
-                    <li class="visible-xs"><a href="#">About</a></li>
-                </ul>
-                @*<ul class="nav navbar-nav navbar-right text-right about hidden-xs">
-                    <li class=""><a href="#">About</a></li>
-                </ul>*@
-            </div>
-        </div>
-    @*}*@
-
-    <!--  hide the entire menu / search bar div... uncomment all this to add the menu back in and etc...
-    @{if (Model.CanUseApp)
-        {
-        <div class="container-fluid">
+        {*@
+    <div class="container-fluid menu">
         <div class="navbar-header">
             <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
                 <span class="icon-bar"></span>
@@ -173,66 +73,174 @@
             </button>
         </div>
         <div class="navbar-collapse collapse" id="navbar-main">
-            <ul class="nav navbar-nav">
-                @* ###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific *@
-                <li>@Html.ActionLink("Click Here to Enter a Defect", "Create", "Defect")</li>
-                <li>@Html.ActionLink("Datasets", "Index", "Dataset")</li>
-                @*TODO: Add security around admin menu*@
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        Admin <span class="badge badge-warning" id="adminBadge"></span><b class="caret"></b>
-                    </a>
+            <ul class="nav navbar-nav text-right">
+                @if (Model.CanViewDataAsset)
+                {
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Assets <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li class="dropdown-submenu">
+                                <a data-toggle="dropdown">Assets </a>
+                                <ul class="dropdown-menu">
+                                    @foreach (Sentry.data.Core.DataAsset da in ViewBag.DataAssets)
+                                    {
+                                        <li class="text-right"><a href="/DataAsset/@da.Name">@da.DisplayName</a></li>
+                                    }
+                                </ul>
+                            </li>
+                            @if (Model.CanManageAssetAlerts)
+                            {
+                                <li class="divider"></li>
+                                    <li class="dropdown-header">Asset Administration</li>
+                                if (Model.CanManageAssetAlerts)
+                                {
+                                    <li><a href="/DataAsset/ManageAssetNotification">Manage Alerts</a></li>
+                                }
+                            }
+                        </ul>
+                    </li>
+                }
+
+                @if (Model.CanManageConfigs || Model.CanEditDataset || Model.CanUpload)
+                {
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Datasets<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            @if (Model.CanEditDataset)
+                            {
+                                <li><a href="#" onclick="data.Dataset.ViewUpload()">Create Dataset</a></li>
+                            }
+                            @if (Model.CanUpload)
+                            {
+                                <li><a href="#" onclick="data.DatasetDetail.UploadFileModal(0)">Upload Data File</a></li>
+                            }
+
+                            @{
+                                if (Model.CanManageConfigs)
+                                {
+                                    <li class="divider"></li>
+                                        <li class="dropdown-header">Dataset Administration</li>
+                                    if (Model.CanManageConfigs)
+                                    {
+                                        <li><a href="/Dataset/EditDataFileConfig">Manage Configs</a></li>
+                                    }
+                                }
+                            }
+                        </ul>
+                    </li>
+                                }
+
+                <li class="dropdown-xs">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Help<b class="caret"></b></a>
                     <ul class="dropdown-menu">
-                        @if (Model.CanApproveAssets)
-                        {
-                        <li>
-                            <a href="@Url.Action("Approve", "Admin")">Approve Assets <span class="badge badge-warning" id="approveBadge"></span></a>
-                        </li>
-                        }
-                        <li><a href="@Url.Action("Complete","Admin")">Complete Auctions <span class="badge badge-warning" id="completeBadge"></span></a></li>
-                        <li>@Html.ActionLink("Manage Users", "ManageUsers", "Admin")</li>
-                        <li>@Html.ActionLink("Manage Categories", "Index", "Category")</li>
-                        <li>@Html.ActionLink("Error Tester", "Index", "Error")</li>
-                        <li><a onclick="data._Layout.showRefreshDemoDataConfirmation();" href="#">Refresh Demo Data</a></li>
+                        @*<li><a href="/About/">About</a></li>*@
+                        <li><a href="/Home/ReleaseNotes">Release Notes</a></li>
+                        <li><a href="mailto:BIPortalAdmin@sentry.com?Subject=Feedback">Provide Feedback</a></li>
+                        <li><a href="mailto:BIPortalAdmin@sentry.com?Subject=Bug&nbsp;Report">Report Bug</a></li>
+                        @*<li><a href="/Tutorial">Tutorial</a></li>*@
                         <li class="dropdown-submenu">
-                            <a data-toggle="dropdown">Demo of submenu</a>
+                            <a data-toggle="dropdown">User Guides</a>
                             <ul class="dropdown-menu">
-                                <li><a href="#">Do Stuff</a></li>
-                                <li><a href="#">Other things</a></li>
-                                <li><a href="#">Solve world hunger</a></li>
                                 <li class="dropdown-submenu">
-                                    <a data-toggle="dropdown">Down the rabbit hole</a>
+                                    <a data-toggle="dropdown">Data Assets</a>
                                     <ul class="dropdown-menu">
-                                        <li><a href="#">Do you really think</a></li>
-                                        <li><a href="#">you can find something</a></li>
-                                        <li><a href="#">interesting down here?</a></li>
-                                        <li class="dropdown-submenu">
-                                            <a data-toggle="dropdown">Yes, I do</a>
-                                            <ul class="dropdown-menu">
-                                                <li><a href="#">Just give up already</a></li>
-                                            </ul>
-                                        </li>
+                                        <li class="text-right"><a href="#" onclick="data.Dataset.GetUserGuide('data-asset/Alert-Notifications.pdf')">Alert Notifications</a></li>
+                                    </ul>
+                                </li>
+                                <li class="dropdown-submenu">
+                                    <a data-toggle="dropdown">Dataset Management</a>
+                                    <ul class="dropdown-menu">
+                                        <li class="text-right"><a href="#" onclick="">Coming Soon!</a></li>
                                     </ul>
                                 </li>
                             </ul>
                         </li>
+
                     </ul>
-
                 </li>
-                @* ###  END Sentry.Data  ### - Code above is Sentry.Data-specific *@
+
+                <li class="visible-xs"><a href="#">About</a></li>
             </ul>
-
-            <form class="navbar-form navbar-right" id="SearchForm">
-                <div class="input-group">
-                    <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
-                    <input type="text" id="SearchText" class="form-control" placeholder="What would you like to do today?" />
-                </div>
-            </form>
-
+            @*<ul class="nav navbar-nav navbar-right text-right about hidden-xs">
+                    <li class=""><a href="#">About</a></li>
+                </ul>*@
         </div>
     </div>
-        }
-    }
+    @*}*@
 
--->
+    <!--  hide the entire menu / search bar div... uncomment all this to add the menu back in and etc...
+        @{if (Model.CanUseApp)
+            {
+            <div class="container-fluid">
+            <div class="navbar-header">
+                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <div class="navbar-collapse collapse" id="navbar-main">
+                <ul class="nav navbar-nav">
+                    @* ###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific *@
+                    <li>@Html.ActionLink("Click Here to Enter a Defect", "Create", "Defect")</li>
+                    <li>@Html.ActionLink("Datasets", "Index", "Dataset")</li>
+                    @*TODO: Add security around admin menu*@
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                            Admin <span class="badge badge-warning" id="adminBadge"></span><b class="caret"></b>
+                        </a>
+                        <ul class="dropdown-menu">
+                            @if (Model.CanApproveAssets)
+                            {
+                            <li>
+                                <a href="@Url.Action("Approve", "Admin")">Approve Assets <span class="badge badge-warning" id="approveBadge"></span></a>
+                            </li>
+                            }
+                            <li><a href="@Url.Action("Complete","Admin")">Complete Auctions <span class="badge badge-warning" id="completeBadge"></span></a></li>
+                            <li>@Html.ActionLink("Manage Users", "ManageUsers", "Admin")</li>
+                            <li>@Html.ActionLink("Manage Categories", "Index", "Category")</li>
+                            <li>@Html.ActionLink("Error Tester", "Index", "Error")</li>
+                            <li><a onclick="data._Layout.showRefreshDemoDataConfirmation();" href="#">Refresh Demo Data</a></li>
+                            <li class="dropdown-submenu">
+                                <a data-toggle="dropdown">Demo of submenu</a>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#">Do Stuff</a></li>
+                                    <li><a href="#">Other things</a></li>
+                                    <li><a href="#">Solve world hunger</a></li>
+                                    <li class="dropdown-submenu">
+                                        <a data-toggle="dropdown">Down the rabbit hole</a>
+                                        <ul class="dropdown-menu">
+                                            <li><a href="#">Do you really think</a></li>
+                                            <li><a href="#">you can find something</a></li>
+                                            <li><a href="#">interesting down here?</a></li>
+                                            <li class="dropdown-submenu">
+                                                <a data-toggle="dropdown">Yes, I do</a>
+                                                <ul class="dropdown-menu">
+                                                    <li><a href="#">Just give up already</a></li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    </li>
+                    @* ###  END Sentry.Data  ### - Code above is Sentry.Data-specific *@
+                </ul>
+
+                <form class="navbar-form navbar-right" id="SearchForm">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
+                        <input type="text" id="SearchText" class="form-control" placeholder="What would you like to do today?" />
+                    </div>
+                </form>
+
+            </div>
+        </div>
+            }
+        }
+
+    -->
 </nav>
+

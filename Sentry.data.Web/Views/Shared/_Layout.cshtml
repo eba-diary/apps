@@ -60,25 +60,12 @@
     @Scripts.Render("~/bundles/js")    
 
     <script>
-        $(function () {
+        $(document).ready(function () {
 
-            //// Reference the auto-generated proxy for the hub.
-            //var progress = $.connection.progressHub;
-            //console.log(progress);
-
-            //// Create a function that the hub can call back to display messages.
-            //progress.client.AddProgress = function (message, percentage) {
-            //    ProgressBarModal("show", message + " " + percentage);
-            //    $('#ProgressMessage').width(percentage);
-            //    if (percentage == "100%") {
-            //        data.ProgressBarModal();
-            //    }
-            //};
-
-            //$.connection.hub.start().done(function () {
-            //    var connectionId = $.connection.hub.id;
-            //    console.log(connectionId);
-            //});
+            if (/rv:11.0/i.test(navigator.userAgent) || /MSIE 10/i.test(navigator.userAgent) || /MSIE 9/i.test(navigator.userAgent)) {
+                // This is internet explorer
+                $('#internetExplorerWarning').show();
+            }
 
             data._Layout.Init();
         });
