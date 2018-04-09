@@ -226,6 +226,9 @@
                 @*<h2 class="detailSection @color">Data Files <i>(Latest Versions)</i></h2>*@
             </div>
             <div id="hide_detailSectionHeader_DataFiles">
+                
+                @if (((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive)) && Model.DatasetFiles.Count != 0)
+                {
                 <div id="userToolbar">
                    <button id="bundle_selected" type="button" class="btn btn-link" title="Bundle Selected Files">
                         <img src="~/Images/icons/bundle.png" />
@@ -236,6 +239,8 @@
                         Filtered Files (<span id="bundleCountFiltered">0</span> Shown)
                     </button>
                 </div>
+                }
+
 
                 <table class="table table-striped table-bordered @color" id="datasetFilesTable">
                     <thead>

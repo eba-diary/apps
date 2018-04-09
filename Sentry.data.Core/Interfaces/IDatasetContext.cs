@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Sentry.data.Core.Entities.Metadata;
 
 namespace Sentry.data.Core
 {
@@ -15,6 +16,14 @@ namespace Sentry.data.Core
         IQueryable<EventType> EventTypes { get; }
 
         IQueryable<Status> EventStatus { get; }
+
+        IQueryable<DataElement> DataElements { get; }
+
+        IQueryable<DataObject> DataObjects { get; }
+
+        List<String> BusinessTerms(string dataElementCode, int? DataAsset_ID);
+
+        List<Lineage> Lineage(string dataElementCode, List<string> dataObjectFieldDetailTypes, int? DataAsset_ID, String DataElement_NME = "", String DataObject_NME = "", String DataObjectField_NME = "");
 
         Dataset GetById(int id);
 

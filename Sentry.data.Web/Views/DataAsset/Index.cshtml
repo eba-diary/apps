@@ -11,6 +11,80 @@
     Model.Components = Model.Components.OrderBy(x => x.Type.Name).ToList();
 }
 
+
+<div id="assetMenu">
+    <div class="mini-submenu" style="display: none;">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+    </div>
+    <div class="list-group assetBox" style="display: block;">
+        <span href="#" class="assetHeader list-group-item active">
+            Data Assets
+            <span class="pull-right" id="slide-submenu">
+                <i class="fa glyphicon glyphicon-minus"></i>
+            </span>
+        </span>
+        @foreach (Sentry.data.Core.DataAsset da in assets)
+        {
+            if (da.Id == Model.Id)
+            {
+                <a href="/DataAsset/@da.Name">
+                    <div class="assetItem" style="background-color: #f2f2f2; border-right: 3px solid gray;">@da.DisplayName</div>
+                </a>
+            }
+            else
+            {
+                <a href="/DataAsset/@da.Name">
+                    <div class="assetItem">@da.DisplayName</div>
+                </a>
+            }
+        }
+    </div>
+</div>
+
+<style>
+    .fa {
+        display: inline-block;
+        line-height: 1;
+    }
+
+    .mini-submenu {
+        display: none;
+        background-color: rgba(0, 0, 0, 0);
+        border: 1px solid rgba(0, 0, 0, 0.9);
+        border-radius: 4px;
+        padding: 9px;
+        /*position: relative;*/
+        width: 42px;
+    }
+
+        .mini-submenu:hover {
+            cursor: pointer;
+        }
+
+        .mini-submenu .icon-bar {
+            border-radius: 1px;
+            display: block;
+            height: 2px;
+            width: 22px;
+            margin-top: 3px;
+        }
+
+        .mini-submenu .icon-bar {
+            background-color: #000;
+        }
+
+    #slide-submenu {
+        background: rgba(0, 0, 0, 0.45);
+        display: inline-block;
+        padding: 0 8px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+</style>
+
+
 <div class="outside">
     <!-- Data Asset Header -->
     @{
@@ -28,26 +102,7 @@
             </div>
              }
      }
-    @*<div class="alert alert-dismissable alert-danger">
-        <button type="button" class="close" data-dismiss="alert">×</button>
-        <h4>Danger!</h4> There are major issues with this asset.
-    </div>
-    <div class="alert alert-dismissable alert-warning">
-        <button type="button" class="close" data-dismiss="alert">x</button>
-        <p><strong>Warning!</strong> Hey, we are aware of an issue, fix has been identified and being applied. Hey, we are aware of an issue, fix has been identified and being applied. Hey, we are aware of an issue, fix has been identified and being applied</p>
-    </div>*@
 
-
-    @*<div class="assetAlerts">
-        Asset Alerts (Div Level)
-        <div class="assetAlertRows">
-            <ul>
-                <li class="assetAlertItem">Alert 1</li>
-                <li class="assetAlertItem">Alert 2</li>
-            </ul>
-        </div>
-        
-    </div>*@
     <div class="row page-header indexHeader">
         <div class="row">
             <img src="~/Images/Icons/DataAssetsBlue.svg" class="assetImg leftFloat hidden-xs" />
@@ -82,6 +137,11 @@
 
             <div class="daNav row">
                 <ul class="nav nav-pills hidden-xs">
+                    <li><a href="~/DataAsset/@Model.Name">Home</a></li>
+
+                    @{ disabled = (Model.DisplayName == "SERA PL" && ViewBag.CanUserSwitch) ? "" : "disabled"; }
+                    <li class="@disabled"><a href="/Lineage/DataAsset/SERAPL">Lineage</a></li>
+
                     @{ disabled = (Model.ArchLink != null) ? "" : "disabled"; }
                     <li class="@disabled"><a href="@arch" target="_blank">Arch Diagrams</a></li>
 
@@ -100,6 +160,9 @@
         <div class="visible-xs daCollapse">
             <div class="navbar-collapse collapse navbar-responsive-collapse">
                 <ul class="nav navbar-nav">
+                    @{ disabled = (Model.DisplayName == "SERA PL" && ViewBag.CanUserSwitch) ? "" : "disabled"; }
+                    <li class="@disabled"><a href="/Lineage/DataAsset/SERAPL">Lineage</a></li>
+
                     @{ disabled = (Model.ArchLink != null) ? "" : "disabled"; }
                     <li class="@disabled"><a href="@arch" target="_blank">Arch Diagrams</a></li>
 
@@ -115,6 +178,14 @@
             </div>
         </div>
     </div>
+
+    <style>
+        .disabled {
+            pointer-events: none;
+            cursor: not-allowed;
+        }
+    </style>
+
 
     @*<div class="desc_container hidden-xs">*@
         @if (Model.Description != null)
@@ -302,6 +373,22 @@
                     }
                 }
             }
+
+            $(function () {
+
+                $('#slide-submenu').on('click', function () {
+                    $(this).closest('.list-group').fadeOut('slide', function () {
+                        $('.mini-submenu').fadeIn();
+                    });
+
+                });
+
+                $('.mini-submenu').on('click', function () {
+                    $('.mini-submenu').hide();
+                    $(this).next('.list-group').toggle('slide');
+                })
+            });
+
         });
     </script>
 }

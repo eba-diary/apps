@@ -1,0 +1,848 @@
+﻿@model Sentry.data.Core.DataAsset
+
+@{
+    ViewBag.Title = Model.DisplayName + " Lineage";
+    string disabled;
+    string arch = "http://sharepoint.sentry.com/it/DataArch/_layouts/15/VisioWebAccess/VisioWebAccess.aspx?id=/it/DataArch/Shared%20Documents/Data%20Services%20Architecture%20Diagrams/" + Model.ArchLink;
+    string guide = "http://sharepoint.sentry.com/it/DataArch/Consumer%20Guides/Pages/" + Model.GuideLink;
+}
+
+
+
+<!-- Data Asset Header -->
+@{
+    foreach (var item in Model.AssetNotifications)
+    {
+        <div class="alert alert-dismissable alert-@item.MessageSeverityTag">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            @Html.Raw(@item.DisplayMessage)
+            @*@switch (@item.MessageSeverityTag)
+                {
+                    case "danger":
+
+                        break;
+                }*@
+        </div>
+    }
+}
+<div class="row page-header indexHeader">
+    <div class="row">
+        <img src="~/Images/Icons/DataAssetsBlue.svg" class="assetImg leftFloat hidden-xs" />
+        <div class="indexName">
+            <h1 class="daName">@Model.DisplayName</h1>
+            @*<a href="#" class="btn btn-primary dropdown-toggle daDD" data-toggle="dropdown" aria-expanded="false"><span class="glyphicon glyphicon-chevron-down daArrow"></span></a>*@
+            @*<ul class="dropdown-menu">
+                    @foreach (Sentry.data.Core.DataAsset da in assets)
+                        {
+                            string active = (da.DisplayName.Equals(Model.DisplayName)) ? "active" : "";
+                        <li class="@active"><a href="@Url.Action("Index", "DataAsset", new { id = da.Id })">@da.DisplayName</a></li>
+                    }
+                </ul>*@
+        </div>
+
+        <!-- Removed Status and Last Updated goes here -->
+        @*@{
+                if (!Model.HealthIncludesSourceSystems)
+                {
+                    <div>
+                        <h2 class="col-xs-8 col-sm-4 text-left text-xs-left indexUpdate @color" title="@Model.MaxProcessTime">Last Updated: @Sentry.data.Web.Helpers.Utility.TimeDisplay(Model.MaxProcessTime)</h2>
+                    </div>
+                }
+            }*@
+
+
+        <div class="visible-xs">
+            <button type="button" class="btn btn-lg btn-default daHamburger" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                <span class="glyphicon glyphicon-menu-hamburger"></span>
+            </button>
+        </div>
+
+        <div class="daNav row">
+            <ul class="nav nav-pills hidden-xs">
+                <li><a href="~/DataAsset/@Model.Name">Home</a></li>
+
+                @{ disabled = (Model.DisplayName == "SERA PL") ? "" : "disabled"; }
+                <li class="@disabled"><a href="/Lineage/DataAsset/SERAPL">Lineage</a></li>
+
+                @{ disabled = (Model.ArchLink != null) ? "" : "disabled"; }
+                <li class="@disabled"><a href="@arch" target="_blank">Arch Diagrams</a></li>
+
+                @{ disabled = (Model.DataModelLink != null) ? "" : "disabled"; }
+                <li class="@disabled"><a href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = Model.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
+
+                @{ disabled = (Model.GuideLink != null) ? "" : "disabled"; }
+                <li class="@disabled"><a href="@guide" target="_blank">Consumer Guide</a></li>
+
+                @{ disabled = (Model.Contact != null) ? "" : "disabled"; }
+                <li class="@disabled"><a href="mailto:@Model.Contact">Contact Us</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="visible-xs daCollapse">
+        <div class="navbar-collapse collapse navbar-responsive-collapse">
+            <ul class="nav navbar-nav">
+                @{ disabled = (Model.DisplayName == "SERA PL") ? "" : "disabled"; }
+                <li class="@disabled"><a href="/Lineage/DataAsset/SERAPL">Lineage</a></li>
+
+                @{ disabled = (Model.ArchLink != null) ? "" : "disabled"; }
+                <li class="@disabled"><a href="@arch" target="_blank">Arch Diagrams</a></li>
+
+                @{ disabled = (Model.DataModelLink != null) ? "" : "disabled"; }
+                <li class="@disabled"><a href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = Model.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
+
+                @{ disabled = (Model.GuideLink != null) ? "" : "disabled"; }
+                <li class="@disabled"><a href="@guide" target="_blank">Consumer Guide</a></li>
+
+                @{ disabled = (Model.Contact != null) ? "" : "disabled"; }
+                <li class="@disabled"><a href="mailto:@Model.Contact">Contact Us</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+    .disabled {
+        pointer-events: none;
+        cursor: not-allowed;
+    }
+</style>
+
+<div id="filterRow" class="row">
+    <div class="col-lg-4">
+        <h4>Business Term</h4>
+        <select class="form-control select2-hidden-accessible"
+                id="dataObjectFields" name="filterSelector" tabindex="-1" aria-hidden="true"></select>
+    </div>
+    <div class="col-lg-4">
+        <h4>Consumption Layer</h4>
+        <select class="form-control select2-hidden-accessible"
+                id="dataElements" name="filterSelector" tabindex="-1" aria-hidden="true">
+            <optgroup label="Cubes">
+                <option value="SERAPL Loss Triangles">SERAPL Loss Triangles</option>
+                <option value="SERAPL Snapshot">SERAPL Snapshot</option>
+                <option value="SERAPL Transactional">SERAPL Transactional</option>
+            </optgroup>
+            <optgroup label="Business Objects">
+                <option value="SERAPL_Adhoc">SERAPL_Adhoc</option>
+                <option value="SERAPL_Snapshot">SERAPL_Snapshot</option>
+                <option value="SERAPL_Transactional">SERAPL_Transactional</option>
+            </optgroup>
+
+        </select>
+    </div>
+    <div class="col-lg-4">
+        <h4>Table</h4>
+        <select class="form-control select2-hidden-accessible"
+                id="dataObjects" name="filterSelector" tabindex="-1" aria-hidden="true"></select>
+
+    </div>
+</div>
+
+
+<hr />
+<div class="row">
+    <div class="col-lg-4">
+        <input type="button" id="btnNextLayer" value="Show Next Layer" class="btn btn-xs btn-info" onclick="FireAllRows();" style="display:inline-block;" />
+    </div>
+</div>
+<hr />
+
+<div id="filterSpinner">
+    <div class="sentry-spinner-container" style=" width: 1166px;">
+        <span class="sentry-spinner" style="height:100px"></span>
+    </div>
+</div>
+<div id="lineagePanel">
+</div>
+
+
+<style>
+
+    .businessObjects{
+        background-color: rgba(137,171,227,0.5);
+    }
+
+    .cubes {
+        background-color: rgba(229,114,0,0.5);
+    }
+
+    .databases {
+        background-color: rgba(187,133,171,0.5);
+    }
+
+    .rootTab {
+        float: right;
+        width: calc(100%);
+    }
+
+        .rootTab .Source {
+            width: calc(100% - 42px);
+        }
+
+    .oneTab {
+        float: right;
+        width: calc(100% - 15px);
+    }
+
+    .twoTab {
+        float: right;
+        width: calc(100% - 30px);
+    }
+
+    .threeTab {
+        float: right;
+        width: calc(100% - 45px);
+    }
+
+    .fourTab {
+        float: right;
+        width: calc(100% - 60px);
+    }
+
+    .fiveTab {
+        float: right;
+        width: calc(100% - 75px);
+    }
+
+    .sixTab {
+        float: right;
+        width: calc(100% - 90px);
+    }
+
+    .sevenTab {
+        float: right;
+        width: calc(100% - 105px);
+    }
+
+    .eightTab {
+        float: right;
+        width: calc(100% - 120px);
+    }
+
+    .nineTab {
+        float: right;
+        width: calc(100% - 135px);
+    }
+
+    .icon-flipped {
+        transform: scaleY(-1);
+        -moz-transform: scaleY(-1);
+        -webkit-transform: scaleY(-1);
+        -ms-transform: scaleY(-1);
+    }
+
+    .lineageRow {
+        padding-left: 10px;
+        border-radius: 10px;
+        margin-bottom: 5px;
+    }
+    .Source {
+        background-color: white;
+        width: calc(100% - 55px);
+        padding: 10px 10px 6px;
+        border-radius: 10px;
+        -webkit-margin-before: 1em;
+        -webkit-margin-after: 1em;
+        -webkit-margin-start: 0px;
+        -webkit-margin-end: 0px;
+    }
+
+        .Source p {
+            color: #003DA5;
+        }
+
+    .Source span:first-child {
+        margin-left: 0px;
+    }
+
+    .Source span {
+        margin-left: 10px;
+    }
+</style>
+@section Scripts {
+    <script type="text/javascript">
+
+        function FireAllRows() {
+            $('.btnShowChildren .glyphicon-plus').trigger("click", function () { });
+        }
+
+        $(function () {
+
+            String.prototype.escapeForJson = function () {
+                return this
+                    .replace(/\b/g, "")
+                    .replace(/\f/g, "")
+                    .replace(/\\/g, "\\")
+                    .replace(/\"/g, "\\\"")
+                    .replace(/\t/g, "\\t")
+                    .replace(/\r/g, "\\r")
+                    .replace(/\n/g, "\\n")
+                    .replace(/\#/g, "\#")
+                    .replace(/\u2028/g, "\\u2028")
+                    .replace(/\u2029/g, "\\u2029");
+            };
+
+
+            $('#dataElements').on('select2:select', function (e) {
+                console.log('Data Element Select');
+                DataObjects();
+                DataFields();
+                updatePanel();
+
+            });
+            $('#dataElements').on('select2:unselect', function (e) {
+                console.log('Data Element UnSelect');
+                $('#dataElements').empty();
+                $('#dataElements').select2("close");
+                DataElements();
+                DataObjects();
+                DataFields();
+                updatePanel();
+            });
+
+            $('#dataObjects').on('select2:select', function (e) {
+                console.log('Data Object Select');
+                DataElements();
+                DataFields();
+                updatePanel();
+
+            });
+            $('#dataObjects').on('select2:unselect', function (e) {
+                console.log('Data Object UnSelect');
+                $('#dataObjects').empty();
+                $('#dataObjects').select2("close");
+                DataElements();
+                DataObjects();
+                DataFields();
+                updatePanel();
+            });
+
+
+            $('#dataObjectFields').on('select2:select', function (e) {
+                console.log('Data Object Field Select');
+                DataElements();
+                DataObjects();
+                updatePanel();
+
+            });
+            $('#dataObjectFields').on('select2:unselect', function (e) {
+                console.log('Data Object Field UnSelect');
+                $('#dataObjectFields').empty();
+                $('#dataObjectFields').select2("close");
+                DataElements();
+                DataObjects();
+                DataFields();
+                updatePanel();
+
+            });
+            $("select").on('select2:unselecting', function (e) {
+                $(this).on('select2:opening', function (e) {
+                    e.preventDefault();
+                });
+
+            });
+            $("select").on('select2:unselect', function (e) {
+                var sel = $(this);
+                setTimeout(function () {
+                    sel.off('select2:opening');
+                }, 1);
+            });
+
+
+            function RenderFilters() {
+                DataElements();
+                DataObjects();
+                DataFields();
+
+                updatePanel();
+            }
+
+            function DataElements() {
+                var select = $("#dataElements");
+
+                var element = location.href.substr(location.href.lastIndexOf('/') + 1);
+
+                var url = "/api/Lineage/GetDataElementsFor?DataAsset_ID=9";
+                if ($('#dataObjects').val()) {
+                    url += "&DataObject_NME=" + $('#dataObjects').val();
+                }
+
+                if ($('#dataObjectFields').val()) {
+                    url += "&DataObjectField_NME=" + $('#dataObjectFields').val();
+                }
+                console.log("DataElements : " + url);
+                //Check the Session to make sure it is still active.
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: "json",
+                    success: function (result) {
+                        //console.log(result);
+
+                        var val = $("#dataElements").val();
+
+                        select.empty();
+
+                        select.append($('<option/>', {
+                            selected: true,
+                            disabled: true
+                        }));
+
+                        $.each(result, function (index, itemData) {
+                            select.append($('<option/>', {
+                                value: itemData,
+                                text: itemData
+                            }));
+                        });
+                        $("#dataElements").val(val);
+                    },
+                    error: function (e) {
+                        console.log(e);
+                    }
+                });
+            }
+
+            function DataObjects() {
+                var select = $("#dataObjects");
+
+                var element = location.href.substr(location.href.lastIndexOf('/') + 1);
+
+                var url = "/api/Lineage/GetDataObjectsFor?DataAsset_ID=9";
+                if ($('#dataElements').val()) {
+                    url += "&DataElement_NME=" + $('#dataElements').val();
+                }
+
+                if ($('#dataObjectFields').val()) {
+                    url += "&DataObjectField_NME=" + $('#dataObjectFields').val();
+                }
+
+                console.log("DataObjects : " + url);
+                //Check the Session to make sure it is still active.
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: "json",
+                    success: function (result) {
+                        //console.log(result);
+
+                        var val = $("#dataObjects").val();
+
+                        select.empty();
+
+                        select.append($('<option/>', {
+                            selected: true,
+                            disabled: true
+                        }));
+
+                        $.each(result, function (index, itemData) {
+                            select.append($('<option/>', {
+                                value: itemData,
+                                text: itemData
+                            }));
+                        });
+                        $("#dataObjects").val(val);
+                    },
+                    error: function (e) {
+                        console.log(e);
+                    }
+                });
+            }
+
+            function DataFields() {
+                var select = $("#dataObjectFields");
+
+                var element = location.href.substr(location.href.lastIndexOf('/') + 1);
+
+                var url = "/api/Lineage/GetDataFieldDetailsFor?DataAsset_ID=9";
+                if ($('#dataElements').val()) {
+                    url += "&DataElement_NME=" + $('#dataElements').val();
+                }
+
+                if ($('#dataObjects').val()) {
+                    url += "&DataObject_NME=" + $('#dataObjects').val();
+                }
+                console.log("DataFields : " + url);
+                //Check the Session to make sure it is still active.
+                $.ajax({
+                    type: "GET",
+                    url: url,
+                    dataType: "json",
+                    success: function (result) {
+                        //console.log(result);
+
+                        var val = $("#dataObjectFields").val();
+
+                        select.empty();
+
+                        select.append($('<option/>', {
+                            selected: true,
+                            disabled: true
+                        }));
+
+                        $.each(result, function (index, itemData) {
+                            select.append($('<option/>', {
+                                value: itemData,
+                                text: itemData
+                            }));
+                        });
+                        $("#dataObjectFields").val(val);
+                    },
+                    error: function (e) {
+                        console.log(e);
+                    }
+                });
+            }
+
+
+
+
+
+
+
+
+            function updateDataObjects() {
+                var select = $("#dataObjects");
+
+                var element = location.href.substr(location.href.lastIndexOf('/') + 1);
+
+
+                //Check the Session to make sure it is still active.
+                $.ajax({
+                    type: "GET",
+                    url: "/api/Lineage/GetDataObjectsFor?DataAsset_ID=9&DataElement_NME=" + $('#dataElements').val(),
+                    dataType: "json",
+                    success: function (result) {
+                        console.log(result);
+
+                        select.empty();
+
+                        select.append($('<option/>', {
+                            selected: true,
+                            disabled: true
+                        }));
+
+                        $.each(result, function (index, itemData) {
+                            select.append($('<option/>', {
+                                value: itemData,
+                                text: itemData
+                            }));
+                        });
+
+                    },
+                    error: function (e) {
+                        console.log(e);
+                    }
+                });
+
+                $('#dataObjects').prop('disabled', false);
+            }
+
+
+            function updateDataObjectFields() {
+                var select = $("#dataObjectFields");
+
+                var element = location.href.substr(location.href.lastIndexOf('/') + 1);
+
+
+                //Check the Session to make sure it is still active.
+                $.ajax({
+                    type: "GET",
+                    url: "/api/Lineage/GetDataFieldDetailsFor?DataAsset_ID=9&DataElement_NME=" + $('#dataElements').val() + "&DataObject_NME=" + $('#dataObjects').val(),
+                    dataType: "json",
+                    success: function (result) {
+                        console.log(result);
+
+                        select.empty();
+
+                        select.append($('<option/>', {
+                            selected: true,
+                            disabled: true
+                        }));
+
+                        $.each(result, function (index, itemData) {
+                            select.append($('<option/>', {
+                                value: itemData,
+                                text: itemData
+                            }));
+                        });
+
+                    },
+                    error: function (e) {
+                        console.log(e);
+                    }
+                });
+
+                $('#dataObjectFields').prop('disabled', false);
+            }
+
+            function BackgroundColors(itemData) {
+                switch (itemData.DataObjectCode_DSC) {
+                    case "Analysis Services Dimension":
+                        return "cubes";
+                        break;
+                    case "BO Class":
+                        return "businessObjects";
+                        break;
+                    case "Table":
+                    case "View":
+                    default:
+                        return "databases";
+                        break;
+                }
+            }
+
+            function GetTab(div) {
+                if ($(div).hasClass('oneTab')) {
+                    return 'twoTab';
+                } else if ($(div).hasClass('twoTab')) {
+                    return 'threeTab';
+                } else if ($(div).hasClass('threeTab')) {
+                    return 'fourTab';
+                } else if ($(div).hasClass('fourTab')) {
+                    return 'fiveTab';
+                } else if ($(div).hasClass('fiveTab')) {
+                    return 'sixTab';
+                } else if ($(div).hasClass('sixTab')) {
+                    return 'sevenTab';
+                } else if ($(div).hasClass('sevenTab')) {
+                    return 'eightTab';
+                } else if ($(div).hasClass('eightTab')) {
+                    return 'nineTab';
+                } else {
+                    return 'oneTab';
+                }
+            }
+
+            function updatePanel() {
+                $('#filterSpinner').show();
+                $('#lineagePanel').empty();
+
+                var url = "/api/Lineage/GetLineageFor?DataAsset_ID=9";
+
+                if ($('#dataElements').val()) {
+                    url += "&DataElement_NME=" + $('#dataElements').val();
+                }
+                if ($('#dataObjects').val()) {
+                    url += "&DataObject_NME=" + $('#dataObjects').val();
+                }
+                if ($('#dataObjectFields').val()) {
+                    url += "&DataObjectField_NME=" + $('#dataObjectFields').val();
+                }
+
+                console.log(url);
+
+                $.ajax({
+                    type: "GET",
+                    url: encodeURI(url),
+                    dataType: "json",
+                    success: function (msg) {
+
+                        $.each(msg, function (index, itemData) {
+
+                            var color = BackgroundColors(itemData);
+
+
+                            $('#lineagePanel').append(
+                                "<div id=\"lineage_" + index + "\" class=\"lineageRow rootTab " + color + "\">" +
+
+                                "<button type=\"button\" class=\"btn btn-xs btn-success btnShowChildren\" style=\"display: inline-block;  margin-bottom: 6px;\">" +
+                                "<span id=\"icon_\" class=\"glyphicon glyphicon-plus\"></span>" +
+                                "</button>" +
+                                "<div class=\"Source\" style=\"margin-left: 10px; display: inline-block;\">" +
+                                "<span class=\"SourceElement_NME\">" + itemData.DataElement_NME + "</span>" +
+                                "<span class=\"SourceObject_NME\">" + itemData.DataObject_NME + "</span>" +
+                                "<span class=\"SourceObjectField_NME\">" + itemData.DataObjectField_NME + "</span> " +
+
+                                // "<input type=\"button\" value=\"Show Details\" class=\"btn btn-xs btn-info\" style=\"display: inline-block; margin-right: 10px; float:right;\">" +
+                                "</div>" +
+                                "</div>"
+
+                            );
+                        });
+                        $('#filterSpinner').hide();
+
+                        if ($('.glyphicon-plus').length >= 1) {
+                            $('#btnNextLayer').prop('disabled', false);
+                        } else {
+                            $('#btnNextLayer').prop('disabled', true);
+                        }
+                    },
+                    error: function (e) {
+                        console.log("Unavailable");
+                    }
+                });
+            }
+
+            $(document).ready(function () {
+
+                var $selector = $("#dataElements").select2({
+                    selectOnClose: false,
+                    closeOnSelect: true,
+                    allowClear: true,
+                    placeholder: "Click here to begin ...",
+                });
+                var $selector2 = $("#dataObjects").select2({
+                    selectOnClose: false,
+                    closeOnSelect: true,
+                    allowClear: true,
+                    placeholder: "Click here to begin ...",
+                });
+                var $selector3 = $("#dataObjectFields").select2({
+                    selectOnClose: false,
+                    closeOnSelect: true,
+                    allowClear: true,
+                    placeholder: "Click here to begin ...",
+                });
+
+                $selector.select2({
+                    selectOnClose: false,
+                    closeOnSelect: true,
+                    allowClear: true,
+                    placeholder: "Click here to begin ...",
+                });
+
+                $selector2.select2({
+                    selectOnClose: false,
+                    closeOnSelect: true,
+                    allowClear: true,
+                    placeholder: "Click here to begin ...",
+                });
+
+                $selector3.select2({
+                    selectOnClose: false,
+                    closeOnSelect: true,
+                    allowClear: true,
+                    placeholder: "Click here to begin ...",
+                });
+
+                $("#filterRow").sortable();
+                $("#filterRow").disableSelection();
+
+                var select = $("#dataElements");
+
+                var element = location.href.substr(location.href.lastIndexOf('/') + 1);
+                select.val(decodeURIComponent(element)).trigger('change');
+                RenderFilters();
+
+                $(document).on("click", ".btnShowChildren", function (e) {
+                    var parent = $(this).parent();
+                    console.log(parent);
+
+                    if ($($(this).children('span')).hasClass("glyphicon-plus")) {
+                        if (!parent.hasClass('hasChildren')) {
+
+                            var element = $($(this).parent().children('.Source').children('.SourceElement_NME')).text();
+                            var object = $($(this).parent().children('.Source').children('.SourceObject_NME')).text();
+                            var field = $($(this).parent().children('.Source').children('.SourceObjectField_NME')).text();
+
+                            var url = "/api/Lineage/GetLineageFor?DataAsset_ID=9&DataElement_NME=" + encodeURIComponent(element) + "&DataObject_NME=" + encodeURIComponent(object) + "&DataObjectField_NME=" + encodeURIComponent(field);
+
+                            $.ajax({
+                                type: "GET",
+                                url: encodeURI(url),
+                                dataType: "json",
+                                success: function (msg) {
+                                    parent.addClass('hasChildren');
+
+                                    $.each(msg, function (index, itemData) {
+
+                                        console.log(itemData);
+                                        var id = parent.attr('id') + "_" + index;
+
+                                        var color = BackgroundColors(itemData);
+                                        var tab = GetTab(parent);
+
+                                        $(parent).after(
+                                            "<div id=\"" + id + "\" class=\"lineageRow " + color + " " + tab + "\">" +
+                                            "<span class=\"glyphicon glyphicon-share-alt icon-flipped\"></span>" +
+                                            "<button type=\"button\" class=\"btn btn-xs btn-success btnShowChildren\" style=\"display: inline-block;  margin-bottom: 6px;\">" +
+                                            "<span id=\"icon_\" class=\"glyphicon glyphicon-plus\"></span>" +
+                                            "</button>" +
+                                            "<div class=\"Source\" style=\"margin-left: 10px; display: inline-block;\">" +
+                                            "<span class=\"SourceElement_NME\">" + itemData.SourceElement_NME + "</span>" +
+                                            "<span class=\"SourceObject_NME\">" + itemData.SourceObject_NME + "</span>" +
+                                            "<span class=\"SourceObjectField_NME\">" + itemData.SourceObjectField_NME + "</span> " +
+                                            //"<hr />" +
+                                            //"<span class=\"DataElement_NME\">" + itemData.DataElement_NME + "</span>" +
+                                            //"<span class=\"DataObject_NME\">" + itemData.DataObject_NME + "</span>" +
+                                            //"<span class=\"DataObjectField_NME\">" + itemData.DataObjectField_NME + "</span> " +
+                                            //"<hr />" +
+                                            //"<span class=\"Source_TXT\">" + itemData.Source_TXT + "</span>" +
+                                            //"<span class=\"Transformation_TXT\">" + itemData.Transformation_TXT + "</span> " +
+                                            //"<input type=\"button\" value=\"Show Details\" class=\"btn btn-xs btn-info\" style=\"display: inline-block; margin-right: 10px; float:right;\">" +
+                                            "</div>" +
+                                            "</div>"
+                                        );
+
+
+                                        if ($('.glyphicon-plus').length >= 1) {
+                                            $('#btnNextLayer').prop('disabled', false);
+                                        } else {
+                                            $('#btnNextLayer').prop('disabled', true);
+                                        }
+                                    });
+                                },
+                                error: function (e) {
+                                    console.log("Unavailable");
+                                    return false;
+                                }
+                            });
+                        } else {
+                            //Does already have children.
+
+                            var search = "div[id*=" + parent.attr('id') + "_]";
+                            console.log("Children : ");
+                            console.log($(search));
+
+                            toggleChild(parent.attr('id'));
+                            //$(search).hide();
+                        }
+                    } else {
+                        var search = "div[id*=" + parent.attr('id') + "_]";
+                        console.log("Minus : ");
+                        console.log($(search));
+
+                        $(search).hide();
+                    }
+
+                    $($(this).children('span')).toggleClass("glyphicon-plus glyphicon-minus");
+
+                    if ($('.glyphicon-plus').length >= 1) {
+                        $('#btnNextLayer').prop('disabled', false);
+                    } else {
+                        $('#btnNextLayer').prop('disabled', true);
+                    }
+
+                    return true;
+                });
+
+
+
+
+            });
+
+
+
+        });
+
+        function toggleChild(id) {
+            var search = "#" + id + "_0";
+            console.log(search);
+            $(search).each(function (index) {
+                $(this).show();
+                if ($($(this).children('button').children('span')).hasClass("glyphicon-minus")) {
+                    toggleChild($(this).attr('id'));
+                }
+                else {
+                    //Do nothing.
+                }
+            });
+
+        }
+
+
+
+
+    </script>
+}

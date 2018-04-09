@@ -70,7 +70,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DomainServices\MetadataRepositoryService.cs" />
+    <Compile Include="Entities\Metadata\DataElement.cs" />
+    <Compile Include="Entities\Metadata\DataElementDetail.cs" />
+    <Compile Include="Entities\Metadata\DataObject.cs" />
+    <Compile Include="Entities\Metadata\DataObjectDetail.cs" />
+    <Compile Include="Entities\Metadata\DataObjectField.cs" />
+    <Compile Include="Entities\Metadata\DataObjectFieldDetail.cs" />
+    <Compile Include="Entities\Metadata\Lineage.cs" />
     <Compile Include="Entities\LoaderRequest.cs" />
+    <Compile Include="Entities\Metadata\Metadata.cs" />
+    <Compile Include="Entities\Metadata\MetadataAsset.cs" />
     <Compile Include="Entities\Release\Issue.cs" />
     <Compile Include="Entities\Release\Sprint.cs" />
     <Compile Include="Entities\Request.cs" />

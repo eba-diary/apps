@@ -7,6 +7,10 @@ using NHibernate.Linq;
 using Sentry.NHibernate;
 using Sentry.data.Core;
 using System.Threading.Tasks;
+using Sentry.data.Core.Entities.Metadata;
+using System.Reflection;
+using System.Collections;
+using System.Web;
 
 namespace Sentry.data.Infrastructure
 {
@@ -30,9 +34,177 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                return Query<Dataset>().Where(x => x.CanDisplay).Cacheable(); 
+                return Query<Dataset>().Where(x => x.CanDisplay).Cacheable();
             }
         }
+
+        public IQueryable<DataElement> DataElements
+        {
+            get
+            {
+                return Query<DataElement>().Cacheable();
+            }
+        }
+
+        public IQueryable<DataObject> DataObjects
+        {
+            get
+            {
+                return Query<DataObject>().Cacheable();
+            }
+        }
+
+
+        public class LineageCreation : IEnumerable<LineageCreation>
+        {
+            public virtual int ID { get; set; }
+            public virtual int DataAsset_ID { get; set; }
+            public virtual String DataElement_NME { get; set; }
+            public virtual String DataObject_NME { get; set; }
+            public virtual String DataObjectCode_DSC { get; set; }
+            public virtual String DataObjectDetailType_VAL { get; set; }
+            public virtual String DataObjectFieldDetailType_CDE { get; set; }
+            public virtual String DataObjectFieldDetailType_VAL { get; set; }
+
+            public virtual String DataObjectField_NME { get; set; }
+
+            public virtual String DataObjectField_DSC { get; set; }
+
+            public virtual String DataObject_DSC { get; set; }
+
+            public IEnumerator<LineageCreation> GetEnumerator()
+            {
+                throw new NotImplementedException();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        public List<String> BusinessTerms(string dataElementCode, int? DataAsset_ID)
+        {
+            var rawQuery = Query<DataElement>()
+                .Where(a => a.DataElement_CDE == dataElementCode)
+                .Where(x => x.MetadataAsset.DataAsset_ID == DataAsset_ID);
+
+            return rawQuery.Select(x => x.DataElement_NME).ToList();
+        }
+
+        public List<Lineage> Lineage(string dataElementCode, List<string> dataObjectFieldDetailTypes, int? DataAsset_ID, String DataElement_NME = "", String DataObject_NME = "", String DataObjectField_NME = "")
+        {
+            DataElement_NME = HttpUtility.UrlDecode(DataElement_NME);
+            DataObject_NME = HttpUtility.UrlDecode(DataObject_NME);
+            DataObjectField_NME = HttpUtility.UrlDecode(DataObjectField_NME);
+
+            var rawQuery = Query<DataObjectFieldDetail>()
+                .Where(a => a.DataObjectField.DataObject.DataElement.DataElement_CDE == dataElementCode)
+                .Where(b => dataObjectFieldDetailTypes.Contains(b.DataObjectFieldDetailType_CDE));
+
+            if (DataAsset_ID != null)
+            {
+                rawQuery = rawQuery.Where(c => c.DataObjectField.DataObject.DataElement.MetadataAsset.DataAsset_ID == DataAsset_ID);
+            }
+            if (!string.IsNullOrEmpty(DataElement_NME))
+            {
+                rawQuery = rawQuery.Where(c => c.DataObjectField.DataObject.DataElement.DataElement_NME == DataElement_NME);
+            }
+            if (!string.IsNullOrEmpty(DataObject_NME))
+            {
+                rawQuery = rawQuery.Where(d => d.DataObjectField.DataObject.DataObject_NME == DataObject_NME);
+            }
+            if (!string.IsNullOrEmpty(DataObjectField_NME))
+            {
+                rawQuery = rawQuery.Where(e => e.DataObjectField.DataObjectField_NME == DataObjectField_NME);
+            }
+
+            var query = rawQuery.Select(x => new LineageCreation
+            {
+                DataAsset_ID = x.DataObjectField.DataObject.DataElement.MetadataAsset.DataAsset_ID,
+                DataElement_NME = x.DataObjectField.DataObject.DataElement.DataElement_NME,
+                DataObject_NME = x.DataObjectField.DataObject.DataObject_NME,
+                DataObjectCode_DSC = x.DataObjectField.DataObject.DataObjectCode_DSC,
+                DataObjectField_NME = x.DataObjectField.DataObjectField_NME,
+                DataObjectFieldDetailType_CDE = x.DataObjectFieldDetailType_CDE,
+                DataObjectFieldDetailType_VAL = x.DataObjectFieldDetailType_VAL
+            });
+
+            List<Lineage> lineage = new List<Lineage>();
+
+            try
+            {
+                foreach (var item in query)
+                {
+
+                    var found = lineage.FirstOrDefault(x => x.DataAsset_ID == item.DataAsset_ID &&
+                        x.DataElement_NME == item.DataElement_NME &&
+                        x.DataObject_NME == item.DataObject_NME &&
+                        x.DataObjectCode_DSC == item.DataObjectCode_DSC &&
+                        x.DataObjectDetailType_VAL == item.DataObjectDetailType_VAL &&
+                        x.DataObjectField_NME == item.DataObjectField_NME);
+
+                    Lineage l;
+
+                    if (found == null)
+                    {
+                        l = new Lineage();
+
+                        l.DataAsset_ID = item.DataAsset_ID;
+                        l.DataElement_NME = item.DataElement_NME;
+                        l.DataObject_NME = item.DataObject_NME;
+                        l.DataObjectCode_DSC = item.DataObjectCode_DSC;
+                        l.DataObjectDetailType_VAL = item.DataObjectDetailType_VAL;
+                        l.DataObjectField_NME = item.DataObjectField_NME;
+                        l.DataObjectField_DSC = item.DataObjectField_DSC;
+                        l.DataObject_DSC = item.DataObject_DSC;
+                        l.ID = lineage.Count;
+                    }
+                    else
+                    {
+                        l = found;
+                    }
+
+                    switch (item.DataObjectFieldDetailType_CDE)
+                    {
+                        case "SourceElement_NME":
+                            l.SourceElement_NME = item.DataObjectFieldDetailType_VAL;
+                            break;
+                        case "SourceObject_NME":
+                            l.SourceObject_NME = item.DataObjectFieldDetailType_VAL;
+                            break;
+                        case "SourceObjectField_NME":
+                            l.SourceObjectField_NME = item.DataObjectFieldDetailType_VAL;
+                            break;
+                        case "Source_TXT":
+                            l.Source_TXT = item.DataObjectFieldDetailType_VAL;
+                            break;
+                        case "Transformation_TXT":
+                            l.Transformation_TXT = item.DataObjectFieldDetailType_VAL;
+                            break;
+                        case "Display_IND":
+                            //l.Display_IND = Convert.ToInt32(item.DataObjectFieldDetailType_VAL);
+                            break;
+                        case "MultipleSourceField_IND":
+                            //l.MultipleSourceField_IND = Convert.ToInt32(item.DataObjectFieldDetailType_VAL);
+                            break;
+                    }
+
+                    if (found == null)
+                    {
+                        lineage.Add(l);
+                    }
+
+                }
+            }
+            catch(Exception ex)
+            {
+                var a = 0;
+            }
+
+            return lineage;
+        }
+        
 
         public IQueryable<Category> Categories
         {

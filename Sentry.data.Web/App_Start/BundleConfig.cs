@@ -12,6 +12,7 @@ namespace Sentry.data.Web
             //This bundle contains basic jquery stuff and some common plugins
             bundles.Add(new ScriptBundle("~/bundles/jquery").
                         Include("~/Scripts/jquery-{version}.js").
+                        Include("~/Scripts/jquery-ui.js").
                         Include("~/Scripts/jquery.unobtrusive-ajax.js").
                         Include("~/Scripts/jquery.placeholder.js").
                         Include("~/Scripts/select2.js").

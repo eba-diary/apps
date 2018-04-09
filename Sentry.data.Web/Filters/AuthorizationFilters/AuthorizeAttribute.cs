@@ -46,7 +46,7 @@ namespace Sentry.data.Web
         {
             if (filterContext.HttpContext.Request.IsAuthenticated)
             {
-                    throw new NotAuthorizedException("User is authenticated but does not have permission");
+                    //throw new NotAuthorizedException("User is authenticated but does not have permission");
             }
             else
             {

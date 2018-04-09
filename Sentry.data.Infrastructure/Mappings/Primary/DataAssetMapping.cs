@@ -1,6 +1,7 @@
 ﻿using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
 using Sentry.data.Core;
+using Sentry.data.Core.Entities.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,6 +24,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Generator(Generators.Identity);
             });
 
+
             this.Property(x => x.Name, m => m.Column("DataAsset_NME"));
             this.Property(x => x.DisplayName, m => m.Column("Display_NME"));
             this.Property(x => x.ArchLink, m => m.Column("ArchDiagram_URL"));
@@ -30,6 +32,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property(x => x.GuideLink, m => m.Column("Guide_URL"));
             this.Property(x => x.Contact, m => m.Column("Contact_EML"));
             this.Property(x => x.Description, m => m.Column("DataAsset_DSC"));
+           
             this.Bag(x => x.Components, m =>
             {
                 m.Cache(c => c.Usage(CacheUsage.ReadOnly));

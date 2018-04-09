@@ -87,6 +87,7 @@ namespace Sentry.data.Core
                 return _extendedUserInfo.Permissions.Contains(PermissionNames.UserSwitch);
             }
         }
+
         public virtual Boolean CanQueryTool
         {
             get
@@ -94,6 +95,7 @@ namespace Sentry.data.Core
                 return _extendedUserInfo.Permissions.Contains(PermissionNames.QueryToolUser);
             }
         }
+
         public virtual Boolean CanQueryToolPowerUser
         {
             get
@@ -101,6 +103,7 @@ namespace Sentry.data.Core
                 return _extendedUserInfo.Permissions.Contains(PermissionNames.QueryToolPowerUser);
             }
         }
+
         public virtual Boolean CanQueryToolAdmin
         {
             get

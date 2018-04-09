@@ -2259,3 +2259,30 @@ tr.shown td.details-control {
 .form-horizontal .has-feedback-left .form-control-feedback {
     left: 15px;
 }
+
+#assetMenu {
+    position: fixed;
+    left: 15px;
+    top: 261px;
+    width: 175px;
+    margin-top: -2.5em;
+}
+
+.assetItem {
+    background-color: white;
+    padding-left: 15px;
+    border-right: 1px solid gray;
+    border-left: 1px solid gray;
+}
+
+@media only screen and (max-width: 1650px) {
+    #assetMenu {
+        left: 0;
+    }
+}
+
+@media only screen and (max-width: 1500px) {
+    #assetMenu {
+        display: none;
+    }
+}

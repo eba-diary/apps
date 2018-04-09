@@ -9,13 +9,14 @@
 
 <nav class="navbar navbar-default navbar-fixed-top sentry-navbar" role="navigation">
     <header class="sentry-header">
+
         <a href="/"><div class="sentry-logo"></div></a>
         <div class="sentry-app-title">
             <h1>
                 data.sentry.com
             </h1>
             <h2>
-                Sentry Data Assets - Information and Metadata
+                Everything Data
             </h2>
         </div>
         @{if (Model.EnvironmentName != "Prod")
@@ -63,109 +64,156 @@
 
     <!-- Main Menu -->
     @*@if (Model.HasMenu)
-        {*@
-    <div class="container-fluid menu">
-        <div class="navbar-header">
-            <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-        </div>
-        <div class="navbar-collapse collapse" id="navbar-main">
-            <ul class="nav navbar-nav text-right">
-                @if (Model.CanViewDataAsset)
-                {
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Assets <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li class="dropdown-submenu">
-                                <a data-toggle="dropdown">Assets </a>
-                                <ul class="dropdown-menu">
-                                    @foreach (Sentry.data.Core.DataAsset da in ViewBag.DataAssets)
-                                    {
-                                        <li class="text-right"><a href="/DataAsset/@da.Name">@da.DisplayName</a></li>
-                                    }
-                                </ul>
-                            </li>
-                            @if (Model.CanManageAssetAlerts)
-                            {
-                                <li class="divider"></li>
-                                    <li class="dropdown-header">Asset Administration</li>
-                                if (Model.CanManageAssetAlerts)
-                                {
-                                    <li><a href="/DataAsset/ManageAssetNotification">Manage Alerts</a></li>
-                                }
-                            }
-                        </ul>
-                    </li>
-                }
-
-                @if (Model.CanManageConfigs || Model.CanEditDataset || Model.CanUpload)
-                {
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Datasets<b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            @if (Model.CanEditDataset)
-                            {
-                                <li><a href="#" onclick="data.Dataset.ViewUpload()">Create Dataset</a></li>
-                            }
-                            @if (Model.CanUpload)
-                            {
-                                <li><a href="#" onclick="data.DatasetDetail.UploadFileModal(0)">Upload Data File</a></li>
-                            }
-
-                            @{
-                                if (Model.CanManageConfigs)
-                                {
-                                    <li class="divider"></li>
-                                        <li class="dropdown-header">Dataset Administration</li>
-                                    if (Model.CanManageConfigs)
-                                    {
-                                        <li><a href="/Dataset/EditDataFileConfig">Manage Configs</a></li>
-                                    }
-                                }
-                            }
-                        </ul>
-                    </li>
-                                }
-
-                <li class="dropdown-xs">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Help<b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        @*<li><a href="/About/">About</a></li>*@
-                        <li><a href="/Home/ReleaseNotes">Release Notes</a></li>
-                        <li><a href="mailto:BIPortalAdmin@sentry.com?Subject=Feedback">Provide Feedback</a></li>
-                        <li><a href="mailto:BIPortalAdmin@sentry.com?Subject=Bug&nbsp;Report">Report Bug</a></li>
-                        @*<li><a href="/Tutorial">Tutorial</a></li>*@
-                        <li class="dropdown-submenu">
-                            <a data-toggle="dropdown">User Guides</a>
+    {*@
+        <div class="container-fluid menu">
+            <div class="navbar-header">
+                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+            </div>
+            <div class="navbar-collapse collapse" id="navbar-main">
+                <ul class="nav navbar-nav text-right">
+                    @if (Model.CanViewDataAsset)
+                    {
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Assets <b class="caret"></b></a>
                             <ul class="dropdown-menu">
                                 <li class="dropdown-submenu">
-                                    <a data-toggle="dropdown">Data Assets</a>
+                                    <a data-toggle="dropdown">Assets </a>
                                     <ul class="dropdown-menu">
-                                        <li class="text-right"><a href="#" onclick="data.Dataset.GetUserGuide('data-asset/Alert-Notifications.pdf')">Alert Notifications</a></li>
+                                        @foreach (Sentry.data.Core.DataAsset da in ViewBag.DataAssets)
+                                        {
+                                            <li class="text-right"><a href="/DataAsset/@da.Name">@da.DisplayName</a></li>
+                                        }
                                     </ul>
                                 </li>
+                                @if (Model.CanUserSwitch)
+                                {
                                 <li class="dropdown-submenu">
-                                    <a data-toggle="dropdown">Dataset Management</a>
+                                    <a data-toggle="dropdown">Lineage </a>
                                     <ul class="dropdown-menu">
-                                        <li class="text-right"><a href="#" onclick="">Coming Soon!</a></li>
+                                        <li class="dropdown-submenu">
+                                            <a data-toggle="dropdown">SERA PL </a>
+                                            <ul class="dropdown-menu">
+                                                <li class="dropdown-header">Search</li>
+
+                                                <li class="text-left"><a href="/Lineage/DataAsset/SERAPL/">Business Term</a></li>
+
+                                                <li class="divider"></li>
+                                                <li class="dropdown-header">Cubes</li>
+
+                                                <li class="text-left"><a href="/Lineage/DataAsset/SERAPL/Cubes/SERAPL Loss Triangles">SERAPL Loss Triangles</a></li>
+                                                <li class="text-left"><a href="/Lineage/DataAsset/SERAPL/Cubes/SERAPL Snapshot">SERAPL Snapshot</a></li>
+                                                <li class="text-left"><a href="/Lineage/DataAsset/SERAPL/Cubes/SERAPL Transactional">SERAPL Transactional</a></li>
+                                                
+                                                <li class="divider"></li>
+                                                <li class="dropdown-header">Business Objects</li>
+
+                                                <li class="text-left"><a href="/Lineage/DataAsset/SERAPL/BusinessObjects/SERAPL_Adhoc">SERAPL_Adhoc</a></li>
+                                                <li class="text-left"><a href="/Lineage/DataAsset/SERAPL/BusinessObjects/SERAPL_Snapshot">SERAPL_Snapshot</a></li>
+                                                <li class="text-left"><a href="/Lineage/DataAsset/SERAPL/BusinessObjects/SERAPL_Transactional">SERAPL_Transactional</a></li>
+                                            </ul>
+                                        </li>
                                     </ul>
                                 </li>
+                                }
+                                @if (Model.CanManageAssetAlerts)
+                                {
+                                    <li class="divider"></li>
+                                    <li class="dropdown-header">Asset Administration</li>
+                                    if (Model.CanManageAssetAlerts)
+                                    {
+                                        <li><a href="/DataAsset/ManageAssetNotification">Manage Alerts</a></li>
+                                    }
+                                }
                             </ul>
                         </li>
+                    }
+                    
+                    
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Datasets<b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="~/Dataset/Index">Home</a></li>
+                                <li><a href="~/Dataset/List">Search</a></li>
 
-                    </ul>
-                </li>
+                                @if (Model.CanManageConfigs || Model.CanEditDataset || Model.CanUpload)
+                                {
+                                    <li class="divider"></li>
+                                    <li class="dropdown-header">Dataset Actions</li>
 
-                <li class="visible-xs"><a href="#">About</a></li>
-            </ul>
-            @*<ul class="nav navbar-nav navbar-right text-right about hidden-xs">
-                    <li class=""><a href="#">About</a></li>
-                </ul>*@
+                                    if (Model.CanEditDataset)
+                                    {
+                                        <li><a href="#" onclick="data.Dataset.ViewUpload()">Create Dataset</a></li>
+                                    }
+
+                                    if (Model.CanUpload)
+                                    {
+                                        <li><a href="#" onclick="data.DatasetDetail.UploadFileModal(0)">Upload Data File</a></li>
+                                    }
+
+                                    if (Model.CanManageConfigs)
+                                    {
+                                        if (Model.CanManageConfigs)
+                                        {
+                                            <li class="divider"></li>
+                                            <li class="dropdown-header">Dataset Administration</li>
+                                            <li><a href="/Dataset/EditDataFileConfig">Manage Configs</a></li>
+                                        }
+                                        
+                                    }
+                                }
+                            </ul>
+                        </li>
+                    
+
+                    @if (Model.CanQueryToolPowerUser || Model.CanQueryTool)
+                    {
+                        <li>
+                            <a href="~/Dataset/QueryTool" class="">Query Tool</a>                               
+                        </li>
+                     }
+
+
+
+
+                    <li class="dropdown-xs">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Help<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            @*<li><a href="/About/">About</a></li>*@
+                            <li><a href="/Home/ReleaseNotes">Release Notes</a></li>
+                            <li><a href="mailto:BIPortalAdmin@sentry.com?Subject=Feedback">Provide Feedback</a></li>
+                            <li><a href="mailto:BIPortalAdmin@sentry.com?Subject=Bug&nbsp;Report">Report Bug</a></li>
+                            @*<li><a href="/Tutorial">Tutorial</a></li>*@
+                            <li class="dropdown-submenu">
+                                <a data-toggle="dropdown">User Guides</a>
+                                <ul class="dropdown-menu">                                    
+                                    <li class="dropdown-submenu">
+                                        <a data-toggle="dropdown">Data Assets</a>
+                                        <ul class="dropdown-menu">
+                                            <li class="text-right"><a href="#" onclick="data.Dataset.GetUserGuide('data-asset/Alert-Notifications.pdf')">Alert Notifications</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="dropdown-submenu">
+                                        <a data-toggle="dropdown">Dataset Management</a>
+                                        <ul class="dropdown-menu">
+                                            <li class="text-right"><a href="#" onclick="">Coming Soon!</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+
+                        </ul>
+                    </li>
+                    
+                    <li class="visible-xs"><a href="#">About</a></li>
+                </ul>
+
+
+            </div>
         </div>
-    </div>
     @*}*@
 
     <!--  hide the entire menu / search bar div... uncomment all this to add the menu back in and etc...
@@ -241,6 +289,5 @@
             }
         }
 
-    -->
+-->
 </nav>
-

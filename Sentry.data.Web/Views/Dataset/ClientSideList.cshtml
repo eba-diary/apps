@@ -655,7 +655,7 @@
                 });
 
                 queryResults = temp.map(x => x.dataset);
-
+                
                 //First grab all the selected category ID's
                 var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
 
@@ -855,6 +855,5 @@
             return decodeURIComponent(results[2].replace(/\+/g, " "));
         }
 
-</script>
-
+    </script>
 }

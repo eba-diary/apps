@@ -13,16 +13,6 @@ namespace Sentry.data.Web.Tests
     public class DataAssetTests
     {
         [TestMethod]
-        public void Index_Returns_Index_View_With_ID_0()
-        {
-            var dac = GetMockProviderForIndex(GetMockData());
-
-            var result = dac.Index(0) as ViewResult;
-
-            Assert.AreEqual("", result.ViewName);
-        }
-
-        [TestMethod]
         public void Index_Returns_Index_View_With_Valid_ID()
         {
             var dac = GetMockProviderForIndex(GetMockData());
@@ -104,6 +94,8 @@ namespace Sentry.data.Web.Tests
 
         public DataAssetController GetMockProviderForIndex(DataAsset da)
         {
+            DomainUser domainUser1 = new DomainUser("123456");
+
             List<DataAsset> daList = new List<DataAsset>();
             daList.Add(da);
 
@@ -117,12 +109,15 @@ namespace Sentry.data.Web.Tests
 
             var mockMetadataRepositoryService = MockRepository.GenerateStub<MetadataRepositoryService>(mockMetadataRepositoryProvider);
             var mockUserService = MockRepository.GenerateStub<UserService>(mockDataAssetContext, mockExtendedUserInfoProvider, mockCurrentUserIdProvider);
+            var mockSharedContextModel = MockRepository.GenerateStub<SharedContextModel>();            
 
             mockDatasetContext.Stub(x => x.GetDataAsset(da.Id)).Return(da);
             mockDatasetContext.Stub(x => x.GetDataAssets()).Return(daList);
             mockDatasetContext.Stub(x => x.GetAssetNotificationsByDataAssetId(da.Id)).Return(da.AssetNotifications);
+            mockSharedContextModel.CurrentUser = GetMockAdminUser();
 
             var dac = new DataAssetController(mockDataAssetProvider, mockMetadataRepositoryService, mockDatasetContext, mockAssociateService, mockUserService);
+            dac.SharedContext = mockSharedContextModel;                      
 
             return dac;
         }
@@ -140,6 +135,7 @@ namespace Sentry.data.Web.Tests
             var mockCurrentUserIdProvider = MockRepository.GenerateStub<ICurrentUserIdProvider>();
             var mockMetadataRepositoryProvider = MockRepository.GenerateStub<IMetadataRepositoryProvider>();
             var mockDataAssetContext = MockRepository.GenerateStub<IDataAssetContext>();
+            var mockSharedContextModel = MockRepository.GenerateStub<SharedContextModel>();
 
             var mockMetadataRepositoryService = MockRepository.GenerateStub<MetadataRepositoryService>(mockMetadataRepositoryProvider);
             var mockUserService = MockRepository.GenerateStub<UserService>(mockDataAssetContext, mockExtendedUserInfoProvider, mockCurrentUserIdProvider);
@@ -147,10 +143,23 @@ namespace Sentry.data.Web.Tests
             mockDatasetContext.Stub(x => x.GetDataAsset(da.Name)).Return(da);
             mockDatasetContext.Stub(x => x.GetDataAssets()).Return(daList);
             mockDatasetContext.Stub(x => x.GetAssetNotificationsByDataAssetId(da.Id)).Return(da.AssetNotifications);
+            mockSharedContextModel.CurrentUser = GetMockAdminUser();
 
             var dac = new DataAssetController(mockDataAssetProvider, mockMetadataRepositoryService, mockDatasetContext, mockAssociateService, mockUserService);
+            dac.SharedContext = mockSharedContextModel;
 
             return dac;
+        }
+
+        public IApplicationUser GetMockAdminUser()
+        {
+            var user1 = MockRepository.GenerateStub<IApplicationUser>();
+
+            user1.Stub(x => x.EmailAddress).Return("user2@b.com");
+
+            user1.Stub(x => x.CanUserSwitch).Return(true);
+
+            return user1;
         }
     }
 }

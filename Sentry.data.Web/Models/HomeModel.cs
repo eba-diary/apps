@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Sentry.data.Core;
+using System;
+using System.Collections.Generic;
 
 namespace Sentry.data.Web
 {
@@ -8,11 +10,10 @@ namespace Sentry.data.Web
         {
 
         }
-        //###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific
-        public List<BaseCategoryModel> RootCategories;
-        public List<BaseAssetModel> RootAssets;
-        public List<DataFeedItemModel> RootNewsFeedItems;
-        public List<DataFeedItemModel> RootHotTopicFeedItems;
-        //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
+
+        public int DatasetCount { get; set; }
+        public List<Category> Categories { get; set; }
+        public Boolean CanEditDataset { get; set; }
+        public Boolean CanUpload { get; set; }
     }
 }

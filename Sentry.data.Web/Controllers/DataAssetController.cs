@@ -34,8 +34,9 @@ namespace Sentry.data.Web.Controllers
         {
             das = new List<DataAsset>(_dsContext.GetDataAssets());
             ViewBag.DataAssets = das;
+            ViewBag.CanUserSwitch = SharedContext.CurrentUser.CanUserSwitch;
 
-            id = (id == 0) ? das[0].Id : id;
+            id = (id == 0) ? das.FirstOrDefault(x => x.DisplayName.ToLower().Contains("sera pl")).Id : id;
 
             DataAsset da = _dsContext.GetDataAsset(id);
 
@@ -52,10 +53,34 @@ namespace Sentry.data.Web.Controllers
             else { return RedirectToAction("NotFound", "Error"); }
         }
 
+        [Route("Lineage")]
+        [Route("Lineage/DataAsset")]
+        [Route("Lineage/DataAsset/{assetName}")]
+        [Route("Lineage/DataAsset/{assetName}/{businessObject}/{sourceElement}")]
+        [AuthorizeByPermission(PermissionNames.UserSwitch)]
+        public ActionResult Lineage(string assetName, string businessObject, string sourceElement)
+        {
+            das = new List<DataAsset>(_dsContext.GetDataAssets());
+
+            assetName = (assetName == null) ? das[0].Name : assetName;
+
+            DataAsset da = _dsContext.GetDataAsset(assetName);
+            if (da != null)
+            {
+                da.AssetNotifications = _dsContext.GetAssetNotificationsByDataAssetId(da.Id).Where(w => w.StartTime < DateTime.Now && w.ExpirationTime > DateTime.Now).ToList();
+                da.LastUpdated = DateTime.Now;
+                da.Status = 1;
+            }
+
+            if (da != null) { return View(da); }
+            else { return RedirectToAction("NotFound", "Error"); }
+        }
+
         public ActionResult DataAsset(string assetName)
         {
             das = new List<DataAsset>(_dsContext.GetDataAssets());
             ViewBag.DataAssets = das;
+            ViewBag.CanUserSwitch = SharedContext.CurrentUser.CanUserSwitch;
 
             assetName = (assetName == null) ? das[0].Name : assetName;
 

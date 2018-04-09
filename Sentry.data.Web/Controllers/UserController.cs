@@ -36,14 +36,14 @@ namespace Sentry.data.Web.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (_associateInfoProvider.GetAssociateInfo(model.RequestedUserSwitchId) != null)
+                if (_associateInfoProvider.GetAssociateInfo(model.OwnerID) != null)
                 {
-                    _webCurrentUserIdProvider.SetImpersonatedUserId(model.RequestedUserSwitchId);
+                    _webCurrentUserIdProvider.SetImpersonatedUserId(model.OwnerID);
                     return RedirectToAction("Switch");
                 }
                 else
                 {
-                    ModelState.AddModelError("RequestedUserSwitchId", "User Id not found");
+                    ModelState.AddModelError("OwnerID", "User Id not found");
                 }
             }
             return View(model);

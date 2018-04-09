@@ -77,6 +77,12 @@ namespace Sentry.data.Web
                 url: "DataAsset/ODCFile/{assetId}/{cubeName}",
                 defaults: new { controller = "ExternalFile", action = "ODCFile" }
             );
+
+            routes.MapRoute(
+                name: "Lineage",
+                url: "Lineage/DataAsset/{assetName}/{businessObject}/{sourceElement}",
+                defaults: new { controller = "DataAsset", action = "Lineage", assetName = "", businessObject = UrlParameter.Optional, sourceElement = UrlParameter.Optional }
+            );
         }
     } 
 }

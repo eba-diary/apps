@@ -11,22 +11,32 @@ using System.Threading.Tasks;
 using System.Net.Http.Headers;
 using Sentry.data.Infrastructure;
 using Sentry.Configuration;
+using System.Web.Http.Results;
+using Sentry.data.Common;
+using Amazon.S3.Model;
 
 namespace Sentry.data.Web.Controllers
 {
     public class QueryToolController : ApiController
     {
+        public IAssociateInfoProvider _associateInfoProvider;
         public IDatasetContext _datasetContext;
+        private UserService _userService;
+        private S3ServiceProvider _s3Service;
         public string _livyUrl;
 
-        public QueryToolController(IDatasetContext dsCtxt)
+        public QueryToolController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, ISASService sasService, IAssociateInfoProvider associateInfoService)
         {
             _datasetContext = dsCtxt;
+            _userService = userService;
+            _s3Service = dsSvc;
+            _associateInfoProvider = associateInfoService;
             _livyUrl = Sentry.Configuration.Config.GetHostSetting("ApacheLivy");
         }
 
         [HttpPost]
         [Route("Create")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> CreateSession(string Language)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -72,6 +82,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Send")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> SendCode(int SessionID, [FromBody] string Code)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -110,6 +121,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Get")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> GetSessions()
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -136,6 +148,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Get")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> GetSession(int SessionID)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -162,6 +175,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Get")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> GetStatement(int SessionID, int StatementID)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -188,6 +202,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Post")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> CancelStatement(int SessionID, int StatementID)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -214,6 +229,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpDelete]
         [Route("Delete")]
+        [AuthorizeByPermission(PermissionNames.QueryToolAdmin)]
         public async Task<IHttpActionResult> DeleteSession(int SessionID)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -236,6 +252,95 @@ namespace Sentry.data.Web.Controllers
                     return NotFound();
                 }
             }
+        }
+
+        [HttpGet]
+        [Route("Get")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        public async Task<IHttpActionResult> FileDropLocation()
+        {
+            IApplicationUser user = _userService.GetCurrentUser();
+
+            var obj = new
+            {
+                s3Key = Sentry.Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + Utilities.GenerateDatasetStorageLocation("QueryTool/Bundle", user.AssociateId)
+            };
+
+            return Ok(obj);
+        }
+
+
+        [HttpGet]
+        [Route("Get")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        public async Task<IHttpActionResult> FileCount(string s3Key)
+        {
+            try
+            {
+                return Ok(_s3Service.FindObject(s3Key).Count);
+            }
+            catch (Exception ex)
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpGet]
+        [Route("Get")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        public async Task<IHttpActionResult> GetDatasetFileDownloadURL(string s3Key)
+        {
+            try
+            {
+                List<string> list = _s3Service.FindObject(s3Key);
+
+                foreach(string obj in list)
+                {
+                    if(obj.Contains("part-00000"))
+                    {
+                        return Ok(_s3Service.GetDatasetDownloadURL(obj));
+                    }
+                }
+
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                return NotFound();
+            }
+        }
+
+        private class QueryableDataset
+        {
+            public string s3Key { get; set; }
+            public List<string> extensions { get; set; }
+            public int fileCount { get; set; }
+            public Boolean IsGeneric { get; set; }
+        }
+
+
+        public async Task<IHttpActionResult> GetS3Key(int datasetID)
+        {
+            Dataset ds = _datasetContext.GetById<Dataset>(datasetID);
+
+            List<QueryableDataset> reply = new List<QueryableDataset>();
+
+            foreach (var item in ds.DatasetFileConfigs)
+            {
+                if (ds.DatasetFiles.Any(x => x.DatasetFileConfig.ConfigId == item.ConfigId) || ds.DatasetFileConfigs.Count == 1)
+                {
+                    QueryableDataset qd = new QueryableDataset();
+
+                    qd.s3Key = ds.S3Key + item.Name;
+                    qd.fileCount = ds.DatasetFiles.Where(x => x.DatasetFileConfig.ConfigId == item.ConfigId).ToList().Count;
+                    qd.extensions = ds.DatasetFiles.Where(x => x.DatasetFileConfig.ConfigId == item.ConfigId).Select(x => Utilities.GetFileExtension(x.FileName)).Distinct().ToList();
+                    qd.IsGeneric = item.IsGeneric;
+
+                    reply.Add(qd);
+                }
+            }
+
+            return Ok(reply);
         }
     }
 }

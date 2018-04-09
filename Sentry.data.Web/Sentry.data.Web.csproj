@@ -353,9 +353,14 @@
     <Content Include="Content\jquery.terminal-1.11.3.css" />
     <Content Include="Content\query-builder.default.css" />
     <Content Include="Content\query-builder.default.min.css" />
+    <Content Include="Images\Hole16_Summer_Flowers_14.jpg" />
+    <Content Include="Images\Hole16_Summer_Flowers_14.png" />
     <Content Include="Images\Icons\bundle.png" />
     <Content Include="Images\Icons\details_close.png" />
     <Content Include="Images\Icons\details_open.png" />
+    <Content Include="Images\SHO_Aerial_10-4-17.jpg" />
+    <Content Include="Images\SHO_Aerial_10-4-17.png" />
+    <Content Include="Images\SHO_SentryWorld_Aerial.jpg" />
     <Content Include="js\DatasetDetail.js" />
     <Content Include="js\ManageAssetAlert.js" />
     <Content Include="js\ManageConfigs.js" />
@@ -367,6 +372,7 @@
     <Content Include="Scripts\DataTables\moment.min.js" />
     <Content Include="Scripts\doT.js" />
     <Content Include="Scripts\doT.min.js" />
+    <Content Include="Scripts\jquery-ui.js" />
     <Content Include="Scripts\jQuery.extendext.min.js" />
     <Content Include="Scripts\jquery.terminal-1.11.3.js" />
     <Content Include="Scripts\knockout-3.4.2.js" />
@@ -1149,7 +1155,7 @@
     <Content Include="Views\Dataset\ClientSideList.cshtml" />
     <Content Include="Views\Home\ReleaseNotes.cshtml" />
     <Content Include="Views\Dataset\QueryTool.cshtml" />
-    <Content Include="Views\Lineage\Index.cshtml" />
+    <Content Include="Views\DataAsset\Lineage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1159,6 +1165,7 @@
     <Folder Include="Views\DataModel\" />
     <Folder Include="Views\Defect\" />
     <Folder Include="Views\ExternalFile\" />
+    <Folder Include="Views\Lineage\" />
     <Folder Include="Views\Subscription\" />
   </ItemGroup>
   <ItemGroup>
@@ -1202,7 +1209,7 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>2457</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:2460/</IISUrl>
+          <IISUrl>http://localhost:2461/</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

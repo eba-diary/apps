@@ -25,6 +25,7 @@ using System.Diagnostics;
 using LazyCache;
 using StackExchange.Profiling;
 using Sentry.Common.Logging;
+using Sentry.data.Core.Entities.Metadata;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -107,13 +108,22 @@ namespace Sentry.data.Web.Controllers
         // GET: Dataset
         public ActionResult Index()
         {
-            List<BaseDatasetModel> dsList = GetDatasetModelList();
-            return View(dsList);
+            HomeModel hm = new HomeModel();
+
+            hm.DatasetCount = _datasetContext.GetDatasetCount();
+            hm.Categories = _datasetContext.Categories.ToList();
+            hm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
+            hm.CanUpload = SharedContext.CurrentUser.CanUpload;
+
+            return View(hm);
         }
 
         [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult HomeDataset()
         {
+            throw new NotImplementedException();
+
+
             List<Category> categories = _datasetContext.Categories.ToList();
             ViewData["dsCount"] = _datasetContext.GetDatasetCount();
             ViewData["CanEditDataset"] = SharedContext.CurrentUser.CanEditDataset;
@@ -134,10 +144,6 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult List(string category, string searchPhrase, string ids)
         {
-            //Helpers.Search searchHelper = new Helpers.Search(_cache);
-
-            //return View(searchHelper.List(this, null, searchPhrase, category, ids));
-
             return View("ClientSideList");
         }
 
@@ -1701,6 +1707,8 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public ActionResult QueryTool()
         {
+            ViewBag.PowerUser = SharedContext.CurrentUser.CanQueryToolPowerUser;
+
             return View("QueryTool");
         }
         

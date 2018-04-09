@@ -29,16 +29,39 @@
             @Html.DisplayFor(((model) => ViewData.ModelState))
 
             <div class="form-group">
-                @Html.LabelFor(((model) => model.RequestedUserSwitchId), "Enter the user id you wish to switch to", new { @class = "control-label" })
+                @Html.LabelFor(((model) => model.OwnerID), "Enter the user id you wish to switch to", new { @class = "control-label" })
                 <div class="">
-                    @Html.EditorFor(((model) => model.RequestedUserSwitchId), new { htmlAttributes = new { @class = "form-control" } })
-                    @Html.ValidationMessageFor(((model) => model.RequestedUserSwitchId), "", new { @class = "text-danger" })
+                    @Html.Editor("OwnerPicker", new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.HiddenFor(((model) => model.OwnerID), new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(((model) => model.OwnerID), "", new { @class = "text-danger" })
                 </div>
             </div>
 
-            <input type="submit" value="Switch to User" class="btn btn-primary" />
-            @Html.ActionLink("Undo User Switch", "Restore", null, new { @class = "btn btn-default" })
+
+           
         </fieldset>
+        <hr />
+        <input type="submit" value="Switch to User" class="btn btn-primary" />
+        @Html.ActionLink("Undo User Switch", "Restore", null, new { @class = "btn btn-default" })
+        
 
     </div>
+}
+
+
+@section Scripts {
+    <script>
+        $(function () {
+            $.assocSetup({ url: "https://hrempsecurequal.sentry.com/api/associates" });
+
+            var picker = $("#OwnerPicker");
+
+            picker.assocAutocomplete({
+                associateSelected: function (associate) {
+                    console.log(associate);
+                    $('#OwnerID').val(associate.Id);
+                }
+            });
+        });
+    </script>
 }

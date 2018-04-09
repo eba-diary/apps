@@ -138,6 +138,14 @@
     <Compile Include="DomainContexts\datasetContext.cs" />
     <Compile Include="DomainContexts\dataAssetContext.cs" />
     <Compile Include="DomainContexts\RequestContext.cs" />
+    <Compile Include="Mappings\Metadata\DataElementDetailMapping.cs" />
+    <Compile Include="Mappings\Metadata\DataElementMapping.cs" />
+    <Compile Include="Mappings\Metadata\DataLineageMapping.cs" />
+    <Compile Include="Mappings\Metadata\DataObjectDetailMapping.cs" />
+    <Compile Include="Mappings\Metadata\DataObjectFieldDetailMapping.cs" />
+    <Compile Include="Mappings\Metadata\DataObjectFieldMapping.cs" />
+    <Compile Include="Mappings\Metadata\DataObjectMapping.cs" />
+    <Compile Include="Mappings\Metadata\MetadataAssetMapping.cs" />
     <Compile Include="Mappings\Primary\AssetNotificationMapping.cs" />
     <Compile Include="Mappings\Primary\AssetSourceMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetFileConfigsMapping.cs" />
