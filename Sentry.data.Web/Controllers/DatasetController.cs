@@ -105,7 +105,7 @@ namespace Sentry.data.Web.Controllers
             _associateInfoProvider = associateInfoService;
         }
 
-        // GET: Dataset
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult Index()
         {
             HomeModel hm = new HomeModel();

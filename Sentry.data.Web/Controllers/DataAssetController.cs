@@ -29,7 +29,8 @@ namespace Sentry.data.Web.Controllers
             _associateInfoService = associateInfoService;
             _userService = userService;
         }
-        
+
+        [AuthorizeByPermission(PermissionNames.DatasetAsset)]
         public ActionResult Index(int id)
         {
             das = new List<DataAsset>(_dsContext.GetDataAssets());

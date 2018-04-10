@@ -178,7 +178,7 @@ namespace Sentry.data.Core
         {
             get
             {
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.DatasetView);
+                return _extendedUserInfo.Permissions.Contains(PermissionNames.DatasetAsset);
             }
         }
 
