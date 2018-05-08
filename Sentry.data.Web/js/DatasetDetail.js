@@ -36,16 +36,6 @@ data.DatasetDetail = {
             data.DatasetDetail.PreviewLatestDatafileModal($(this).data("id"));
         });
 
-        $("#btnCreateDirectory").off('click').on('click', function (e) {
-            var request = $.ajax({
-                url: "/Dataset/CreateFilePath/?filePath=" + $($(this).parent().parent().children()[1]).text(),
-                method: "POST",
-                dataType: 'json',
-                success: function (obj) {
-                }
-            });
-        });
-
         $("[id^='SubscribeModal']").click(function (e) {
             e.preventDefault();
 
@@ -367,6 +357,7 @@ data.DatasetDetail = {
             if (id > 0) {
                 var controllerURL = "/Dataset/GetDatasetFileConfigInfo/?id=" + encodeURI(id);
                 $.get(controllerURL, function (result) {
+                    console.log(result);
                     configs = result;
                     var select = $("#configList");
 
@@ -617,27 +608,30 @@ data.DatasetDetail = {
                 if (files.length > 0) {
                     var matchFound = false;
                     var matchIndex;
+                    var j;
                     for (i = 1; i < configs.length; i++) {
-                        if (configs[i].IsRegexSearch && files[0].name.match(configs[i].SearchCriteria)) {
-                            select.append($('<option/>', {
-                                value: configs[i].ConfigId,
-                                text: configs[i].ConfigFileName
-                            }));
+                        for (j = 0; j < configs[i].SearchCriteria.length; j++) {
+                            if (configs[i].IsRegexSearch[j] && files[0].name.match(configs[i].SearchCriteria[j])) {
+                                select.append($('<option/>', {
+                                    value: configs[i].ConfigId,
+                                    text: configs[i].ConfigFileName
+                                }));
 
-                            if (i != 0) {
-                                matchFound = true;
-                                matchIndex = i;
+                                if (i != 0) {
+                                    matchFound = true;
+                                    matchIndex = i;
+                                }
                             }
-                        }
-                        else if (!configs[i].IsRegexSearch && files[0].name === configs[i].SearchCriteria) {
-                            select.append($('<option/>', {
-                                value: configs[i].ConfigId,
-                                text: configs[i].ConfigFileName
-                            }));
+                            else if (!configs[i].IsRegexSearch[j] && files[0].name === configs[i].SearchCriteria[j]) {
+                                select.append($('<option/>', {
+                                    value: configs[i].ConfigId,
+                                    text: configs[i].ConfigFileName
+                                }));
 
-                            if (i != 0) {
-                                matchFound = true;
-                                matchIndex = i;
+                                if (i != 0) {
+                                    matchFound = true;
+                                    matchIndex = i;
+                                }
                             }
                         }
                     }
@@ -754,27 +748,30 @@ data.DatasetDetail = {
                         if (files.length > 0) {
                             var matchFound = false;
                             var matchIndex;
+                            var j;
                             for (i = 1; i < configs.length; i++) {
-                                if (configs[i].IsRegexSearch && files[0].name.match(configs[i].SearchCriteria)) {
-                                    select.append($('<option/>', {
-                                        value: configs[i].ConfigId,
-                                        text: configs[i].ConfigFileName
-                                    }));
+                                for (j = 0; j < configs[i].SearchCriteria.length; j++) {
+                                    if (configs[i].IsRegexSearch[j] && files[0].name.match(configs[i].SearchCriteria[j])) {
+                                        select.append($('<option/>', {
+                                            value: configs[i].ConfigId,
+                                            text: configs[i].ConfigFileName
+                                        }));
 
-                                    if (i != 0) {
-                                        matchFound = true;
-                                        matchIndex = i;
+                                        if (i != 0) {
+                                            matchFound = true;
+                                            matchIndex = i;
+                                        }
                                     }
-                                }
-                                else if (!configs[i].IsRegexSearch && files[0].name === configs[i].SearchCriteria) {
-                                    select.append($('<option/>', {
-                                        value: configs[i].ConfigId,
-                                        text: configs[i].ConfigFileName
-                                    }));
+                                    else if (!configs[i].IsRegexSearch[j] && files[0].name === configs[i].SearchCriteria[j]) {
+                                        select.append($('<option/>', {
+                                            value: configs[i].ConfigId,
+                                            text: configs[i].ConfigFileName
+                                        }));
 
-                                    if (i != 0) {
-                                        matchFound = true;
-                                        matchIndex = i;
+                                        if (i != 0) {
+                                            matchFound = true;
+                                            matchIndex = i;
+                                        }
                                     }
                                 }
                             }
@@ -1199,15 +1196,23 @@ data.DatasetDetail = {
                             $('#bundleCountSelected').html(parseInt($('#bundleCountSelected').html(), 10) + 1);
                         }
                     }
-                    if (parseInt($('#bundleCountSelected').html(), 10) === 0) {
-                        $('#bundle_selected').attr("disabled", true);
-                    }
-                    else {
-                        $('#bundle_selected').attr("disabled", false);
-                    }
+
                 }
             }
-        
+
+            if (parseInt($('#bundleCountSelected').html(), 10) < 2) {
+                $('#bundle_selected').attr("disabled", true);
+            }
+            else {
+                $('#bundle_selected').attr("disabled", false);
+            }
+
+            if (parseInt($('#bundleCountFiltered').html(), 10) < 2) {
+                $('#bundle_allFiltered').attr("disabled", true);
+            }
+            else {
+                $('#bundle_allFiltered').attr("disabled", false);
+            }
         });
 
         $('#datasetFilesTable').on('draw.dt', function () {
@@ -1215,7 +1220,7 @@ data.DatasetDetail = {
             $('#bundleCountSelected').html(0);
             localStorage.setItem("listOfFilesToBundle", JSON.stringify([]));
 
-            if (data.Dataset.DatasetFilesTable.page.info().recordsDisplay === 0)
+            if (data.Dataset.DatasetFilesTable.page.info().recordsDisplay < 2)
             {
                 $('#bundle_allFiltered').attr("disabled", true);
             }
@@ -1223,7 +1228,7 @@ data.DatasetDetail = {
                 $('#bundle_allFiltered').attr("disabled", false);
             }
 
-            if (parseInt($('#bundleCountSelected').html(), 10) === 0)
+            if (parseInt($('#bundleCountSelected').html(), 10) < 2)
             {
                 $('#bundle_selected').attr("disabled", true);
             }
@@ -1337,7 +1342,6 @@ data.DatasetDetail = {
                         { data: "IsRegexSearch", className: "isRegexSearch", render: function (data, type, row) { return (data == true) ? '<span class="glyphicon glyphicon-ok"> </span>' : '<span class="glyphicon glyphicon-remove"></span>';} },
                         { data: "OverwriteDatasetFile", type: "date", className: "overwriteDatsetFile", render: function (data, type, row) { return (data == true) ? '<span class="glyphicon glyphicon-ok"> </span>' : '<span class="glyphicon glyphicon-remove"></span>'; } },
                         { data: "FileType", className: "fileType", },
-                        { data: "CreationFreq", className: "CreationFreq" },
                         { data: "DatasetScopeTypeID", className: "DatasetScopeTypeID"}
             ],
             order: [1, 'asc']
@@ -1400,10 +1404,6 @@ data.DatasetDetail = {
         '<tr>' +
             '<td><b>Description</b>:</td>' +
             '<td>' + d.ConfigFileDesc + '</td>' +
-        '</tr>' +
-        '<tr>' +
-            '<td><b>Drop Location Type</b>: </td>' +
-            '<td>' + d.DropLocationType + '</td>' +
         '</tr>' +
         '<tr>' +
             '<td><b>Drop Path</b>: </td>' +

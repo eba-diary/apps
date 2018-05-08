@@ -123,10 +123,6 @@ data.ManageConfigs = {
                 '<td>' + d.ConfigFileDesc + '</td>' +
             '</tr>' +
             '<tr>' +
-                '<td><b>Drop Location Type</b>: </td>' +
-                '<td>' + d.DropLocationType + '</td>' +
-            '</tr>' +
-            '<tr>' +
                 '<td><b>Drop Path</b>: </td>' +
                 '<td>' + d.DropPath + '</td>' +
             '</tr>' +

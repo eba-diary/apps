@@ -13,6 +13,7 @@ using Sentry.data.Infrastructure;
 using Sentry.data.Common;
 using System.Threading.Tasks;
 using System.Threading;
+using Hangfire;
 
 namespace Sentry.data.Goldeneye
 {
@@ -28,6 +29,7 @@ namespace Sentry.data.Goldeneye
         private int FileCount { get; set; }
         private DateTime FileCounterStart { get; set; }
         private int DatasetFileConfigId { get; set; }
+        private int RetrieverJobId { get; set; }
 
         /// <summary>
         /// Directory that is to be watched
@@ -81,7 +83,12 @@ namespace Sentry.data.Goldeneye
                         using (container = Bootstrapper.Container.GetNestedContainer())
                         {
                             _datasetContext = container.GetInstance<IDatasetContext>();
-                            SubmitLoaderRequest(file);
+                            //SubmitLoaderRequest(file);
+
+                            //Create a fire-forget Hangfire job to decompress the file and drop extracted file into drop location
+                            BackgroundJob.Enqueue<RetrieverJobService>(RetrieverJobService => RetrieverJobService.RunRetrieverJob(RetrieverJobId, Path.GetFileName(file.fileName)));
+                            //RecurringJob.AddOrUpdate<RetrieverJobService>($"RetrieverJob_{RetrieverJobId}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(RetrieverJobId), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+
                             file.started = true;
                         }
                     }
@@ -91,7 +98,7 @@ namespace Sentry.data.Goldeneye
                     }
                 }
 
-                Console.WriteLine("sleeping for 2 seconds");
+                //Console.WriteLine("sleeping for 2 seconds");
                 Thread.Sleep(2000);
                 
             } while (true);
@@ -194,29 +201,24 @@ namespace Sentry.data.Goldeneye
                 Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
             }
         }
-
-        //This method is called when the Windows Process is started in Core and Program.cs
-        //  First it creates a file watcher, gives it a directory from app.config, then assigns it events to watch.
-        //  The last thing it does is grabs all the files that currently in the directory and adds them to the file list.
-        //  The Service will do the rest on it's periodic run.
-        public void OnStart(int dsConfig)
+  
+        /// <summary>
+        /// This method is called when the Windows Process is started in Core and Program.cs
+        /// First it creates a file watcher, gives it a directory from app.config, then assigns it events to watch.
+        /// The last thing it does is grabs all the files that currently in the directory and adds them to the file list.
+        /// The Service will do the rest on it's periodic run.
+        /// </summary>
+        /// <param name="watchPath"></param>
+        public void OnStart(int jobId, Uri watchPath)
         {
-            DatasetFileConfig dsfc = null;
-            DatasetFileConfigId = dsConfig;
 
             try
             {
-                using (container = Bootstrapper.Container.GetNestedContainer())
-                {
-                    _datasetContext = container.GetInstance<IDatasetContext>();
-                    dsfc = _datasetContext.getDatasetFileConfigs(DatasetFileConfigId);
-                    WatchedDir = dsfc.DropPath;
-                }
-
                 // Create a new FileSystemWatcher and set its properties.
                 watcher = new FileSystemWatcher();
-                watcher.Path = WatchedDir;
+                watcher.Path = watchPath.LocalPath;
                 FileCounterStart = DateTime.Now;
+                RetrieverJobId = jobId;
 
                 Console.WriteLine("Watcher instance started for : " + watcher.Path);
                 Logger.Info("Watcher instance started for : " + watcher.Path);
@@ -247,12 +249,11 @@ namespace Sentry.data.Goldeneye
             }
             catch (Exception ex)
             {
-                Logger.Error($"Error initilizing watch for {dsfc.Name} config (Id:{dsfc.ConfigId})",ex);
+                Logger.Error($"Error initilizing watch for {watchPath}",ex);
             }
             
 
             //Start directory monitor
-            //Task.Factory.StartNew(() => this.Run(WatchedDir), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted);
             this.Run(WatchedDir);
         }
 

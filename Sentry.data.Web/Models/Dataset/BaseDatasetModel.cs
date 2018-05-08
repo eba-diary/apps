@@ -43,17 +43,10 @@ namespace Sentry.data.Web
             this.FileExtension = ds.FileExtension;
             this.DatasetDtm = ds.DatasetDtm;
             this.ChangedDtm = ds.ChangedDtm;
-            this.CreationFreqDesc = ds.CreationFreqDesc;
             this.S3Key = ds.S3Key;
             this.IsSensitive = ds.IsSensitive;
             this.CanDisplay = ds.CanDisplay;
-            this.DatasetInformation = ds.DatasetInformation;
-            
-            //this.RawMetadata = new List<_DatasetMetadataModel>();
-            //foreach (DatasetMetadata dsm in ds.RawMetadata)
-            //{
-            //    this.RawMetadata.Add(new _DatasetMetadataModel(dsm));
-            //}
+            this.DatasetInformation = ds.DatasetInformation; 
 
             this.IsPushToTableauCompatible = false;
             this.DatasetCategory = ds.DatasetCategory; 
@@ -69,7 +62,7 @@ namespace Sentry.data.Web
             this.DatasetFileConfigs = new List<DatasetFileConfigsModel>();
             foreach (DatasetFileConfig dfc in ds.DatasetFileConfigs)
             {
-                this.DatasetFileConfigs.Add(new DatasetFileConfigsModel(dfc));
+                this.DatasetFileConfigs.Add(new DatasetFileConfigsModel(dfc, true, false));
             }
             this.DropLocation = ds.DropLocation;
             if (this.DistinctFileExtensions().Where(w => Utilities.IsExtentionPushToSAScompatible(w)).Count() > 0)
@@ -104,15 +97,32 @@ namespace Sentry.data.Web
             return extensions.Distinct().ToList();
         }
 
+        [DisplayName("Creation Frequency")]
         public List<string> DistinctFrequencies()
         {
             List<string> frequencies = new List<string>();
-            foreach (var item in this.DatasetFileConfigs)
+
+            foreach(var item in this.DatasetFileConfigs)
             {
-                frequencies.Add(item.CreationFreq);
+                if (item.RetrieverJobs != null)
+                {
+                    if(item.RetrieverJobs.Count == 1)
+                    {
+                        frequencies.Add(item.RetrieverJobs.First().ReadableSchedule);
+                    }
+                    else
+                    {
+                        foreach (var job in item.RetrieverJobs.Where(x => !x.IsGeneric))
+                        {
+                            frequencies.Add(job.ReadableSchedule);
+                        }
+                    }
+                }
             }
+
             return frequencies.Distinct().ToList();
         }
+
 
         public int DatasetId { get; set; }
 
@@ -178,9 +188,6 @@ namespace Sentry.data.Web
 
         [DisplayName("Last Modified")]
         public DateTime ChangedDtm { get; set; }
-
-        [DisplayName("Creation Frequency")]
-        public List<string> CreationFreqDesc { get; set; }
 
         //[Required]
         [MaxLength(1024)]

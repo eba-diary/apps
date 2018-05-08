@@ -1,0 +1,152 @@
+﻿@model Sentry.data.Web.EditSourceModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="topBanner">
+    <div>
+        <a class="backToList" href="/"><span class="glyphicon glyphicon-chevron-left"></span>Back to Previous Page</a>
+    </div>
+
+</div>
+
+
+@using (Html.BeginForm("EditSource", "Config", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(model => model.ReturnUrl)
+    @Html.HiddenFor(model => model.Name)
+    @Html.HiddenFor(model => model.Id)
+
+    <h1>Edit Data Source</h1>
+    <hr />
+
+    <div id="myTabContent" class="tab-content">
+        <div id="informationPanel" class="tab-pane fade active in form-horizontal">
+            <div class="form-group">
+                @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.Name, new { @disabled = "disabled", @class = "form-control edit-dataset-row" })
+                    @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.Description, new { @value = "", @class = "form-control edit-dataset-row" })
+                    @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor((model) => model.SourceType, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor((model) => model.SourceType, Model.SourceTypesDropdown, new { @class = "form-control edit-dataset-row" })
+                    @Html.ValidationMessageFor((model) => model.SourceType, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group fieldDescription">
+                <label class="control-label col-md-2"></label>
+                <div class="col-md-10">
+                    <span class="text-muted">
+                        <em id="sourceDescription"></em>
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.BaseUri, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.BaseUri, new { @value = "", @class = "form-control edit-dataset-row" })
+                    @Html.ValidationMessageFor(model => model.BaseUri, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor((model) => model.AuthID, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor((model) => model.AuthID, Model.AuthTypesDropdown, new { @class = "form-control edit-dataset-row" })
+                    @Html.ValidationMessageFor((model) => model.AuthID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group fieldDescription">
+                <label class="control-label col-md-2"></label>
+                <div class="col-md-10">
+                    <span class="text-muted">
+                        <em id="authDescription"></em>
+                    </span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor((model) => model.IsUserPassRequired, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.CheckBoxFor((model) => model.IsUserPassRequired, new { @class = "edit-dataset-row" })
+                    @Html.ValidationMessageFor((model) => model.IsUserPassRequired, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <span class="text-muted"><em>** Fields in <b>Bold</b> are Required</em></span>
+    </div>
+    <div class="form-group">
+        <div>
+            <input type="submit" id="btnCreateDataSource" value="Edit Data Source" class="btn btn-primary" />
+        </div>
+    </div>
+}
+
+
+
+
+@section Scripts {
+
+    <script>
+        $(document).ready(function () {
+            $('.backToList').attr("href", document.referrer);
+            $('#ReturnUrl').val(document.referrer);
+
+            $("#SourceType").change(function () {
+                var val = $(this).val();
+                var subItems = "";
+
+                $.getJSON("@Url.Action("SourceTypeDescription", "Config")", {sourceType:val} ,function (data) {
+
+                    $("#sourceDescription").text(data);
+                });
+            });
+
+            var val = $("#SourceType").val();
+            $.getJSON("@Url.Action("SourceTypeDescription", "Config")", {sourceType:val} ,function (data) {
+                $("#sourceDescription").text(data);
+            });
+
+            var val = $("#AuthID").val();
+            $.getJSON("@Url.Action("AuthTypeDescription", "Config")", {AuthID:val} ,function (data) {
+                $("#authDescription").text(data);
+            });
+
+            $("#AuthID").change(function () {
+                var val = $(this).val();
+                var subItems = "";
+
+                $.getJSON("@Url.Action("AuthTypeDescription", "Config")", {AuthID:val} ,function (data) {
+
+                    $("#authDescription").text(data);
+                });
+            });
+
+        });
+    </script>
+
+}

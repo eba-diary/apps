@@ -12,6 +12,7 @@ using NHibernate;
 using System.IO;
 using Amazon.S3.Transfer;
 using Sentry.Common.Logging;
+using Amazon.S3.IO;
 
 namespace Sentry.data.Infrastructure
 {
@@ -465,7 +466,7 @@ namespace Sentry.data.Infrastructure
                 poReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
                 poReq.Key = targetKey;
                 poReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
-                poReq.AutoCloseStream = true;
+                poReq.AutoCloseStream = true;                
 
                 Sentry.Common.Logging.Logger.Debug($"Initialized PutObject Request: Bucket:{poReq.BucketName}, File:{poReq.FilePath}, Key:{targetKey}");
 
@@ -566,7 +567,6 @@ namespace Sentry.data.Infrastructure
                 DeleteObjectRequest doReq = new DeleteObjectRequest();
                 doReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
                 doReq.Key = keyVersion.key;
-                //doReq.VersionId = keyversion.versionId;
                 DeleteObjectResponse doRsp = S3Client.DeleteObject(doReq);
 
                 //return the delete marker version ID
@@ -800,6 +800,77 @@ namespace Sentry.data.Infrastructure
 
             return response.S3Objects.Select(x => x.Key).ToList();
 
+        }
+
+        /// <summary>
+        /// Lists all objects
+        /// </summary>
+        /// <param name="bucket"></param>
+        /// <param name="prefix"></param>
+        /// <returns></returns>
+        public IList<string> ListObjects(string bucket, string prefix)
+        {
+            if (string.IsNullOrEmpty(bucket))
+            {
+                throw new ArgumentNullException(bucket,"Parameter is required");
+            }
+            else if(string.IsNullOrEmpty(prefix))
+            {
+                throw new ArgumentNullException(prefix, "Parameter is required");
+            }
+
+            // List all objects
+            ListObjectsRequest listRequest = new ListObjectsRequest
+            {
+                BucketName = bucket,
+                Prefix = prefix
+            };
+
+            List<string> objectlist = new List<string>();
+
+            ListObjectsResponse listResponse;
+            do
+            {
+                // Get a list of objects
+                listResponse = S3Client.ListObjects(listRequest);
+                foreach (S3Object obj in listResponse.S3Objects)
+                {
+                    //Remove prefix object (folder)
+                    if (obj.Key != prefix)
+                    {
+                        objectlist.Add(obj.Key);
+                    }                    
+                }
+                // Set the marker property
+                listRequest.Marker = listResponse.NextMarker;
+            } while (listResponse.IsTruncated);
+
+            return objectlist;
+        }
+
+        public string CopyObject(string srcBucket, string srcKey, string destBucket, string destKey)
+        {
+            //S3FileInfo source = new S3FileInfo(S3Client, srcBucket, srcKey);
+            //S3FileInfo target = new S3FileInfo(S3Client, destBucket, destKey);
+            //source.CopyTo(target, true);
+
+            Dictionary<string, string> resp = null;
+
+            CopyObjectRequest request = new CopyObjectRequest
+            {
+                SourceBucket = srcBucket,
+                SourceKey = srcKey,
+                DestinationBucket = destBucket,
+                DestinationKey = destKey,
+                ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256                
+            };
+
+            CopyObjectResponse response = S3Client.CopyObject(request);
+            if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
+            {
+                resp = GetObjectMetadata(destKey, null);
+            }
+            return (resp != null) ? Convert.ToString(resp["VersionId"]) : null;
         }
 
         #region Helpers

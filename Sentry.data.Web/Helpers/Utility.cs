@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using Sentry.data.Core;
 using System.Text;
+using System.Web.Mvc;
 
 namespace Sentry.data.Web.Helpers
 {
@@ -72,6 +73,156 @@ namespace Sentry.data.Web.Helpers
             }
 
             return result;
+        }
+
+        public static BaseDatasetModel setupLists(IDatasetContext _datasetContext, BaseDatasetModel model)
+        {
+            var temp = GetCategoryList(_datasetContext).ToList();
+
+            temp.Add(new SelectListItem()
+            {
+                Text = "Pick a Category",
+                Value = "0",
+                Selected = true,
+                Disabled = true
+            });
+
+            model.AllCategories = temp.OrderBy(x => x.Value);
+
+            //Origination Codes
+            temp = GetDatasetOriginationListItems().ToList();
+
+            temp.Add(new SelectListItem()
+            {
+                Text = "Pick an Origination Location",
+                Value = "0",
+                Selected = true,
+                Disabled = true
+            });
+
+            model.AllOriginationCodes = temp.OrderBy(x => x.Value);
+
+            //Dataset Frequency
+            temp = GetDatasetFrequencyListItems().ToList();
+
+            temp.Add(new SelectListItem()
+            {
+                Text = "Pick a Frequency",
+                Value = "0",
+                Selected = true,
+                Disabled = true
+            });
+
+            model.AllFrequencies = temp.OrderBy(x => x.Value);
+
+            //Dataset Scope
+            temp = GetDatasetScopeTypesListItems(_datasetContext).ToList();
+
+            temp.Add(new SelectListItem()
+            {
+                Text = "Pick a Scope",
+                Value = "0",
+                Selected = true,
+                Disabled = true
+            });
+            model.AllDatasetScopeTypes = temp.OrderBy(x => x.Value);
+            model.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
+                => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+
+            List<string> obj = new List<string>();
+            obj.Add("Restricted");
+            obj.Add("Highly Sensitive");
+            obj.Add("Internal Use Only");
+            obj.Add("Public");
+
+            List<SelectListItem> dataClassifications = new List<SelectListItem>();
+
+            dataClassifications.Add(new SelectListItem()
+            {
+                Text = "Pick a Classification",
+                Value = "0",
+                Selected = true,
+                Disabled = true
+            });
+
+            int index = 1;
+            foreach (String classification in obj)
+            {
+                dataClassifications.Add(new SelectListItem()
+                {
+                    Text = classification,
+                    Value = index.ToString()
+                });
+                index++;
+            }
+
+
+            model.AllDataClassifications = dataClassifications;
+
+            return model;
+        }
+
+        public static IEnumerable<SelectListItem> GetCategoryList(IDatasetContext _datasetContext)
+        {
+            IEnumerable<SelectListItem> var = _datasetContext.Categories.OrderByHierarchy().Select((c) => new SelectListItem { Text = c.FullName, Value = c.Id.ToString() });
+
+            return var;
+        }
+
+        public static IEnumerable<Dataset> GetDatasetByCategoryId(IDatasetContext _datasetContext, int id)
+        {
+            IEnumerable<Dataset> dsQ = _datasetContext.GetDatasetByCategoryID(id);
+            return dsQ;
+        }
+
+        public static IEnumerable<SelectListItem> GetDatasetFrequencyListItems(string freq = null)
+        {
+            List<SelectListItem> items;
+
+            if (freq == null)
+            {
+                items = Enum.GetValues(typeof(DatasetFrequency)).Cast<DatasetFrequency>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+            }
+            else
+            {
+                items = Enum.GetValues(typeof(DatasetFrequency)).Cast<DatasetFrequency>().Select(v =>
+                    new SelectListItem
+                    {
+                        Selected = (v.ToString() == freq),
+                        Text = v.ToString(),
+                        Value = v.ToString()
+                    }).ToList();
+            }
+            return items;
+        }
+
+        public static IEnumerable<SelectListItem> GetDatasetOriginationListItems()
+        {
+            List<SelectListItem> items = Enum.GetValues(typeof(DatasetOriginationCode)).Cast<DatasetOriginationCode>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+
+            return items;
+        }
+
+        public static IEnumerable<SelectListItem> GetDatasetScopeTypesListItems(IDatasetContext _datasetContext, int id = -1)
+        {
+            IEnumerable<SelectListItem> dScopeTypes;
+            if (id == -1)
+            {
+                dScopeTypes = _datasetContext.GetAllDatasetScopeTypes()
+                    .Select((c) => new SelectListItem { Text = c.Name, Value = c.ScopeTypeId.ToString() });
+            }
+            else
+            {
+                dScopeTypes = _datasetContext.GetAllDatasetScopeTypes()
+                    .Select((c) => new SelectListItem
+                    {
+                        Selected = (c.ScopeTypeId == id),
+                        Text = c.Name,
+                        Value = c.ScopeTypeId.ToString()
+                    });
+            }
+
+            return dScopeTypes;
         }
 
 

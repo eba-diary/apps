@@ -54,12 +54,21 @@ namespace Sentry.data.Web.Controllers
             else { return RedirectToAction("NotFound", "Error"); }
         }
 
-        [Route("Lineage")]
-        [Route("Lineage/DataAsset")]
-        [Route("Lineage/DataAsset/{assetName}")]
-        [Route("Lineage/DataAsset/{assetName}/{businessObject}/{sourceElement}")]
+        [Route("Lineage/{line}")]
         [AuthorizeByPermission(PermissionNames.UserSwitch)]
-        public ActionResult Lineage(string assetName, string businessObject, string sourceElement)
+        public ActionResult Lineage(string line)
+        {
+            ViewBag.IsLine = true;
+            ViewBag.LineName = line;
+
+            return View();
+        }
+
+
+        [Route("Lineage/{line}/{assetName}")]
+        [Route("Lineage/{line}/{assetName}/{businessObject}/{sourceElement}")]
+        [AuthorizeByPermission(PermissionNames.UserSwitch)]
+        public ActionResult Lineage(string line, string assetName, string businessObject, string sourceElement)
         {
             das = new List<DataAsset>(_dsContext.GetDataAssets());
 
@@ -73,9 +82,15 @@ namespace Sentry.data.Web.Controllers
                 da.Status = 1;
             }
 
+            ViewBag.IsLine = false;
+            ViewBag.DataAsset = da;
+
             if (da != null) { return View(da); }
             else { return RedirectToAction("NotFound", "Error"); }
         }
+
+
+
 
         public ActionResult DataAsset(string assetName)
         {
@@ -216,7 +231,8 @@ namespace Sentry.data.Web.Controllers
 
         private AssetNotifications UpdateAssetNotificationFromModel(AssetNotifications an, EditAssetNotificationModel ean)
         {
-            if(an.ExpirationTime != ean.ExpirationTime) { an.ExpirationTime = ean.ExpirationTime; }
+            an.ExpirationTime = ean.ExpirationTime;
+            an.MessageSeverity = ean.SeverityID;
             return an;
         }
 

@@ -104,6 +104,9 @@
     <Folder Include="Properties" />
     <Folder Include="Tables\" />
     <Folder Include="Tables\Subscriptions" />
+    <Folder Include="Tables\RetrieverJobs" />
+    <Folder Include="Security\" />
+    <Folder Include="Tables\HangFire" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -135,6 +138,22 @@
     <Build Include="Tables\Subscriptions\EventType.sql" />
     <Build Include="Tables\Subscriptions\IntervalType.sql" />
     <Build Include="Tables\Subscriptions\StatusType.sql" />
+    <Build Include="Tables\RetrieverJobs\RetrieverJob.sql" />
+    <Build Include="Tables\RetrieverJobs\DataSource.sql" />
+    <Build Include="Tables\RetrieverJobs\AuthenticationType.sql" />
+    <Build Include="Tables\RetrieverJobs\DataSourceType.sql" />
+    <Build Include="Security\HangFire.sql" />
+    <Build Include="Tables\HangFire\AggregatedCounter.sql" />
+    <Build Include="Tables\HangFire\Counter.sql" />
+    <Build Include="Tables\HangFire\Hash.sql" />
+    <Build Include="Tables\HangFire\Job.sql" />
+    <Build Include="Tables\HangFire\JobParameter.sql" />
+    <Build Include="Tables\HangFire\JobQueue.sql" />
+    <Build Include="Tables\HangFire\List.sql" />
+    <Build Include="Tables\HangFire\Schema.sql" />
+    <Build Include="Tables\HangFire\Server.sql" />
+    <Build Include="Tables\HangFire\Set.sql" />
+    <Build Include="Tables\HangFire\State.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

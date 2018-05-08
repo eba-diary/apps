@@ -101,7 +101,7 @@ namespace Sentry.data.Web.Helpers
                             filteredList =
                             (
                                 from item in filteredList
-                                from a in item.CreationFreqDesc
+                                from a in item.DistinctFrequencies()
                                 join f in freq
                                     on a equals f.value
                                 select item
@@ -430,7 +430,7 @@ namespace Sentry.data.Web.Helpers
 
 
                     nf.count = (from a in ldm.DatasetList
-                                from b in a.CreationFreqDesc
+                                from b in a.DistinctFrequencies()
                                 where b == nf.value
                                 select a).Count();
 

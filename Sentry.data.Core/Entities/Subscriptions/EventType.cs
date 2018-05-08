@@ -10,7 +10,8 @@ namespace Sentry.data.Core
     {
         public EventType()
         {
-
+            //default any new event type display indicator to true
+            Display = true;
         }
 
         public virtual int Type_ID { get; set; }
@@ -18,5 +19,10 @@ namespace Sentry.data.Core
         public virtual string Description { get; set; }
 
         public virtual int Severity { get; set; }
+
+        /// <summary>
+        /// Indicates whether to display this event type
+        /// </summary>
+        public virtual Boolean Display { get; set; }
     }
 }

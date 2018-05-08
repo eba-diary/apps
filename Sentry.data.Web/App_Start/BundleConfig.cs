@@ -58,6 +58,13 @@ namespace Sentry.data.Web
                         Include(dataTablesScriptsDirectory + "/moment.js").
                         Include(dataTablesScriptsDirectory + "/moment.min.js"));
 
+            bundles.Add(new ScriptBundle("~/bundles/prettyCron").
+                        Include(dataTablesScriptsDirectory + "/moment.js").
+                        Include(dataTablesScriptsDirectory + "/moment.min.js").
+                        Include("~/Scripts/later.js").
+                        Include("~/Scripts/prettycron.js"));
+
+
             //This bundle contains styles that are used commonly across the site, including bootstrap and jquery plugins
             bundles.Add(new StyleBundle("~/bundles/css/main").
                         Include("~/Content/bootstrap.min.css", new CssRewriteUrlTransform()).

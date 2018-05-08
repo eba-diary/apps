@@ -16,6 +16,7 @@ using Sentry.data.Infrastructure;
 using System.Security.Cryptography;
 using Sentry.Common.Logging;
 using Newtonsoft.Json;
+using System.ComponentModel;
 
 namespace Sentry.data.Common
 {
@@ -24,7 +25,10 @@ namespace Sentry.data.Common
     /// </summary>
     public static class Utilities
     {        
+
+
         private static S3ServiceProvider _s3Service = new S3ServiceProvider();
+        private static StructureMap.IContainer _container = null;
 
         /// <summary>
         /// Generates full drop location path for a dataset
@@ -250,13 +254,14 @@ namespace Sentry.data.Common
         /// <param name="uploadUserName"></param>
         /// <param name="isBundled"></param>
         /// <param name="response"></param>
+        /// <param name="retrieverJobId"></param>
         /// <returns></returns>
-        public static DatasetFile ProcessInputFile(Dataset dataset, DatasetFileConfig dfConfig, IDatasetContext dscontext, bool isBundled, LoaderRequest response, FileInfo file = null)
+        public static DatasetFile ProcessInputFile(Dataset dataset, DatasetFileConfig dfConfig, bool isBundled, LoaderRequest response, string file = null)
         {
             string filename = null;
-            if (file != null) { filename = file.Name; }
+            if (file != null) { filename = Path.GetFileName(file); }
 
-            return ProcessFile(dataset, dfConfig, dscontext, file, null, filename, isBundled, response);
+            return ProcessFile(dataset, dfConfig, file, null, filename, isBundled, response);
         }
 
 
@@ -357,14 +362,370 @@ namespace Sentry.data.Common
 
 
 
-        private static DatasetFile ProcessFile(Dataset ds, DatasetFileConfig dfc, IDatasetContext dscontext, FileInfo fileInfo, HttpPostedFileBase filestream, string filename, bool isBundled, LoaderRequest response)
+        private static DatasetFile ProcessFile(Dataset ds, DatasetFileConfig dfc, string fileInfo, HttpPostedFileBase filestream, string filename, bool isBundled, LoaderRequest response)
         {
             DatasetFile df_Orig = null;
             DatasetFile df_newParent = null;
             string targetFileName = null;
             string uplduser = null;
             int df_id = 0;
+            RetrieverJob job = null;
+
+            using (_container = Bootstrapper.Container.GetNestedContainer())
+            {
+                IDatasetContext _dscontext = _container.GetInstance<IDatasetContext>();
+                IRequestContext _requestContext = _container.GetInstance<IRequestContext>();
             
+                if (isBundled)
+                {
+                    Logger.Debug("ProcessFile: Detected Bundled file");
+                    targetFileName = response.TargetFileName;
+                    uplduser = response.RequestInitiatorId;
+
+                    if (dfc.OverwriteDatafile)
+                    {
+                        Logger.Debug("ProcessFile: Data File Config OverwriteDatafile=true");
+
+                        // RegexSearch requires passing targetFileName to esnure we get the correct related data file.
+                        if (dfc.IsRegexSearch)
+                        {
+                            df_id = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.ConfigId, targetFileName, isBundled);
+                        }
+                        else
+                        {
+                            df_id = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.ConfigId, isBundled);
+                        }   
+
+                        //If datafiles exist for this DatasetFileConfig
+                        if (df_id != 0)
+                        {
+                            df_Orig = _dscontext.GetDatasetFile(df_id);
+                            df_newParent = CreateParentDatasetFile(ds, dfc, uplduser, targetFileName, df_Orig, isBundled);
+                        }
+                        //If there are no datafiles for this DatasetFileConfig
+                        else
+                        {
+                            df_newParent = CreateParentDatasetFile(ds, dfc, uplduser, targetFileName, null, isBundled);
+                        }
+                                        
+                        df_newParent.IsBundled = true;
+                        df_newParent.UploadUserName = response.RequestInitiatorId;
+                        df_newParent.VersionId = response.TargetVersionId;
+                        df_newParent.FileLocation = response.TargetKey;
+                    
+
+                        //Register new Parent DatasetFile
+                        try
+                        {
+                            //Write dataset to database
+                            _dscontext.Merge(df_newParent);
+                            _dscontext.SaveChanges();
+                        }
+                        catch (Exception ex)
+                        {
+
+                            StringBuilder builder = new StringBuilder();
+                            builder.Append("Failed to record new Parent DatasetFile to Dataset Management.");
+                            builder.Append($"File_NME: {df_newParent.FileName}");
+                            builder.Append($"Dataset_ID: {df_newParent.Dataset.DatasetId}");
+                            builder.Append($"UploadUser_NME: {df_newParent.UploadUserName}");
+                            builder.Append($"Create_DTM: {df_newParent.CreateDTM}");
+                            builder.Append($"Modified_DTM: {df_newParent.ModifiedDTM}");
+                            builder.Append($"FileLocation: {df_newParent.FileLocation}");
+                            builder.Append($"Config_ID: {df_newParent.DatasetFileConfig.ConfigId}");
+                            builder.Append($"ParentDatasetFile_ID: {df_newParent.ParentDatasetFileId}");
+                            builder.Append($"Version_ID: {df_newParent.VersionId}");
+
+                            Sentry.Common.Logging.Logger.Error(builder.ToString(), ex);
+                        
+                            throw new Exception("Error saving dataset to database", ex);
+                        }
+
+                        // If there were existing datasetfiles set parentdatasetFile_ID on old parent
+                        if (df_id != 0)
+                        {
+                            try
+                            {
+                                //Version the Old Parent DatasetFile
+                                int df_newParentId = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.ConfigId, isBundled);
+                                df_Orig.ParentDatasetFileId = df_newParentId;
+
+                                //Write dataset to database
+                                _dscontext.Merge(df_Orig);
+                                _dscontext.SaveChanges();
+
+                            }
+                            catch (Exception ex)
+                            {
+                                StringBuilder builder = new StringBuilder();
+                                builder.Append("Failed to set ParentDatasetFile_ID on Original Parent in Dataset Management.");
+                                builder.Append($"DatasetFile_ID: {df_Orig.DatasetFileId}");
+                                builder.Append($"File_NME: {df_Orig.FileName}");
+                                builder.Append($"ParentDatasetFile_ID: {df_Orig.ParentDatasetFileId}");
+                            }
+                        }
+
+                        Event f = new Event()
+                        {
+                            EventType = _dscontext.EventTypes.Where(w => w.Description == "Created File").FirstOrDefault(),
+                            Status = _dscontext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                            TimeCreated = DateTime.Now,
+                            TimeNotified = DateTime.Now,
+                            IsProcessed = false,
+                            UserWhoStartedEvent = response.RequestInitiatorId,
+                            Dataset = response.DatasetID,
+                            DataConfig = response.DatasetFileConfigId,
+                            Reason = $"Successfully Uploaded file [<b>{Path.GetFileName(targetFileName)}</b>] to dataset [<b>{df_newParent.Dataset.DatasetName}</b>]",
+                            Parent_Event = response.RequestGuid
+                        };
+                        Task.Factory.StartNew(() => Utilities.CreateEventAsync(f), TaskCreationOptions.LongRunning);
+                    
+                    }
+                    else
+                    {
+                        throw new NotImplementedException($"The Option of not Overwritting a DataFile is not implemented.  Change OverwriteDataFile_IND setting on Dataset_ID:{dfc.ParentDataset.DatasetId} Config_ID:{dfc.ConfigId} Config_Name:{dfc.Name}");
+                    }
+                }
+                else if (!isBundled)
+                {
+                    Logger.Debug("ProcessFile: Detected Dataset file");
+
+                    if (response.RetrieverJobId > 0)
+                    {
+                        job = _requestContext.RetrieverJob.Where(w => w.Id == response.RetrieverJobId).FirstOrDefault();
+                    }
+
+                    //Remove ProcessedFilePrefix from file name
+                    var newFileName = filename.Replace(Configuration.Config.GetHostSetting("ProcessedFilePrefix"), "");
+
+                    targetFileName = GetTargetFileName(job.DatasetConfig, newFileName);
+                    uplduser = response.RequestInitiatorId;
+
+
+                    if (job.JobOptions.OverwriteDataFile)
+                    {
+                        Logger.Debug("ProcessFile: Data File Config OverwriteDatafile=true");
+                        // RegexSearch requires passing targetFileName to esnure we get the correct related data file.
+
+                        if (dfc.IsRegexSearch)
+                        {
+                            df_id = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(job.DatasetConfig.ParentDataset.DatasetId, job.DatasetConfig.ConfigId, targetFileName, isBundled);
+                        }
+                        else
+                        {
+                            df_id = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(job.DatasetConfig.ParentDataset.DatasetId, job.DatasetConfig.ConfigId, isBundled);
+                        }
+
+
+                        //If datafiles exist for this DatasetFileConfig
+                        if (df_id != 0)
+                        {
+                            df_Orig = _dscontext.GetDatasetFile(df_id);
+                            df_newParent = CreateParentDatasetFile(ds, job.DatasetConfig, uplduser, targetFileName, df_Orig, isBundled);
+                        }
+                        //If there are no datafiles for this DatasetFileConfig
+                        else
+                        {
+                            df_newParent = CreateParentDatasetFile(ds, job.DatasetConfig, uplduser, targetFileName, null, isBundled);
+                        }
+
+                        DateTime startUploadTime = DateTime.Now;
+
+
+                        //if the incoming data file is in the S3 drop location, then we can stay within the S3 realm and copy the object.
+                        // Otherwise we need to upload the data file from the DFS drop location.
+                        try
+                        {
+                            if (filestream == null)
+                            {
+                                if (job.DataSource.Is<S3Basic>())
+                                {
+                                    df_newParent.VersionId = _s3Service.CopyObject(job.DataSource.Bucket, fileInfo, job.DataSource.Bucket, df_newParent.FileLocation);
+
+                                    ObjectKeyVersion deleteobject = _s3Service.MarkDeleted(fileInfo);
+                                    Logger.Info($"Deleted S3 Drop Location Object - Delete Object(key:{deleteobject.key} versionid:{deleteobject.versionId}");
+                                }
+                                else if (job.DataSource.Is<DfsBasic>() || job.DataSource.Is<DfsCustom>())
+                                {
+                                    df_newParent.VersionId = _s3Service.UploadDataFile(fileInfo, df_newParent.FileLocation);
+                                }
+                                else
+                                {
+                                    throw new NotImplementedException("Method not configured for DataSource Type");
+                                }
+                                
+                            }
+                            else
+                            {
+                                throw new NotImplementedException();
+                            }
+                        }
+                        catch (AmazonS3Exception eS3)
+                        {
+                            Sentry.Common.Logging.Logger.Error("S3 Upload Error", eS3);
+                            throw new Exception("S3 Upload Error", eS3);
+
+                        }
+                        catch (Exception ex)
+                        {
+                            Sentry.Common.Logging.Logger.Error("Error during establishing upload process", ex);
+                            throw new Exception("Error during establishing upload process", ex);
+                        }
+                    
+                        var diffInSeconds = (DateTime.Now - startUploadTime).TotalSeconds;
+                        Sentry.Common.Logging.Logger.Info($"TransferTime: {diffInSeconds} | DatasetName: {ds.DatasetName}");
+
+                        //Register new Parent DatasetFile
+                        try
+                        {
+                            //Write dataset to database
+                            _dscontext.Merge(df_newParent);
+                            _dscontext.SaveChanges();
+                        }
+                        catch (Exception ex)
+                        {
+
+                            StringBuilder builder = new StringBuilder();
+                            builder.Append("Failed to record new Parent DatasetFile to Dataset Management.");
+                            builder.Append($"File_NME: {df_newParent.FileName}");
+                            builder.Append($"Dataset_ID: {df_newParent.Dataset.DatasetId}");
+                            builder.Append($"UploadUser_NME: {df_newParent.UploadUserName}");
+                            builder.Append($"Create_DTM: {df_newParent.CreateDTM}");
+                            builder.Append($"Modified_DTM: {df_newParent.ModifiedDTM}");
+                            builder.Append($"FileLocation: {df_newParent.FileLocation}");
+                            builder.Append($"Config_ID: {df_newParent.DatasetFileConfig.ConfigId}");
+                            builder.Append($"ParentDatasetFile_ID: {df_newParent.ParentDatasetFileId}");
+                            builder.Append($"Version_ID: {df_newParent.VersionId}");
+
+                            Sentry.Common.Logging.Logger.Error(builder.ToString(), ex);
+                        
+                            throw new Exception("Error saving dataset to database", ex);
+                        }
+
+                        // If there were existing datasetfiles set parentdatasetFile_ID on old parent
+                        if (df_id != 0)
+                        {
+                            try
+                            {
+                                //Version the Old Parent DatasetFile
+                                int df_newParentId = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(job.DatasetConfig.ParentDataset.DatasetId, job.DatasetConfig.ConfigId, isBundled);
+                                df_Orig.ParentDatasetFileId = df_newParentId;
+
+                                //Write dataset to database
+                                _dscontext.Merge(df_Orig);
+                                _dscontext.SaveChanges();
+
+                            }
+                            catch (Exception ex)
+                            {
+                                StringBuilder builder = new StringBuilder();
+                                builder.Append("Failed to set ParentDatasetFile_ID on Original Parent in Dataset Management.");
+                                builder.Append($"DatasetFile_ID: {df_Orig.DatasetFileId}");
+                                builder.Append($"File_NME: {df_Orig.FileName}");
+                                builder.Append($"ParentDatasetFile_ID: {df_Orig.ParentDatasetFileId}");
+                            }
+                        }
+
+                        Event f = new Event()
+                        {
+                            EventType = _dscontext.EventTypes.Where(w => w.Description == "Created File").FirstOrDefault(),
+                            Status = _dscontext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                            TimeCreated = DateTime.Now,
+                            TimeNotified = DateTime.Now,
+                            IsProcessed = false,
+                            UserWhoStartedEvent = response.RequestInitiatorId,
+                            Dataset = response.DatasetID,
+                            DataConfig = response.DatasetFileConfigId,
+                            Reason = $"Successfully Uploaded file [<b>{Path.GetFileName(targetFileName)}</b>] to dataset [<b>{df_newParent.Dataset.DatasetName}</b>]",
+                            Parent_Event = response.RequestGuid
+                        };
+                        Task.Factory.StartNew(() => Utilities.CreateEventAsync(f), TaskCreationOptions.LongRunning);
+                    }
+                    else
+                    {
+                        throw new NotImplementedException($"The Option of not Overwritting a DataFile is not implemented.  Change OverwriteDataFile_IND setting on Dataset_ID:{job.DatasetConfig.ParentDataset.DatasetId} Config_ID:{job.DatasetConfig.ConfigId} Config_Name:{job.DatasetConfig.Name}");
+                    }
+
+                    if (job.JobOptions.CreateCurrentFile && job.DataSource.Is<S3Basic>())
+                    {
+                        Logger.Info("Creating Current File...");
+
+                        try
+                        {
+                            //Create target directory if does not exist
+                            Directory.CreateDirectory(job.DatasetConfig.GetCurrentFileDir().LocalPath);
+
+                            //Delete contents of current file dir, since there should only be one file
+                            // in this location at any given time.
+                            foreach (string file in Directory.GetFiles(job.DatasetConfig.GetCurrentFileDir().LocalPath))
+                            {
+                                File.Delete(file);
+                            }
+
+                            Logger.Debug($"Current file target : {Path.Combine(job.DatasetConfig.GetCurrentFileDir().LocalPath, targetFileName)}");
+
+                            if (job.DataSource.Is<S3Basic>())
+                            {
+                                //Stream file to work location
+                                using (Stream sourcefs = _s3Service.GetObject(df_newParent.S3Key, df_newParent.VersionId))
+                                {
+                                    //Using FileMode.Create will overwrite file if exists
+                                    using (Stream targetfs = new FileStream(Path.Combine(job.DatasetConfig.GetCurrentFileDir().LocalPath, targetFileName), FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
+                                    {
+                                        sourcefs.CopyTo(targetfs);
+                                    }
+                                }
+                            }
+                            else if (job.DataSource.Is<DfsBasic>() || job.DataSource.Is<DfsCustom>())
+                            {
+                                //Copy file to current file directory
+                                //Using the overwrite option since this should only ever be the latest version
+                                File.Copy(fileInfo, Path.Combine(job.DatasetConfig.GetCurrentFileDir().LocalPath, targetFileName), true);
+                            }
+                            else
+                            {
+                                throw new NotImplementedException("Method not configured for DataSource Type");
+                            }   
+
+                            Event f = new Event()
+                            {
+                                EventType = _dscontext.EventTypes.Where(w => w.Description == "Current File Created").FirstOrDefault(),
+                                Status = _dscontext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                                TimeCreated = DateTime.Now,
+                                TimeNotified = DateTime.Now,
+                                IsProcessed = false,
+                                UserWhoStartedEvent = response.RequestInitiatorId,
+                                Dataset = response.DatasetID,
+                                DataConfig = response.DatasetFileConfigId,
+                                Reason = $"Successfully created new current file for [<b>{job.DatasetConfig.ParentDataset.DatasetName}</b>] dataset.",
+                                Parent_Event = response.RequestGuid
+                            };
+                            Task.Factory.StartNew(() => Utilities.CreateEventAsync(f), TaskCreationOptions.LongRunning);
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Error("Failed to create current file", ex);
+
+                            Event f = new Event()
+                            {
+                                EventType = _dscontext.EventTypes.Where(w => w.Description == "Current File Created").FirstOrDefault(),
+                                Status = _dscontext.EventStatus.Where(w => w.Description == "Error").FirstOrDefault(),
+                                TimeCreated = DateTime.Now,
+                                TimeNotified = DateTime.Now,
+                                IsProcessed = false,
+                                UserWhoStartedEvent = response.RequestInitiatorId,
+                                Dataset = response.DatasetID,
+                                DataConfig = response.DatasetFileConfigId,
+                                Reason = $"Failed to created current file for [<b>{job.DatasetConfig.ParentDataset.DatasetName}</b>] dataset.",
+                                Parent_Event = response.RequestGuid
+                            };
+                            Task.Factory.StartNew(() => Utilities.CreateEventAsync(f), TaskCreationOptions.LongRunning);
+                        }
+                    }
+                }
+            }
+
+            /*
             // Set values appropriately based on isbundled
             if (isBundled)
             {
@@ -383,7 +744,6 @@ namespace Sentry.data.Common
                 uplduser = response.RequestInitiatorId;
             }
             
-
             if (dfc.OverwriteDatafile)
             {
                 Logger.Debug("ProcessFile: Data File Config OverwriteDatafile=true");
@@ -544,13 +904,68 @@ namespace Sentry.data.Common
                 f.Parent_Event = response.RequestGuid;
                 Task.Factory.StartNew(() => Utilities.CreateEventAsync(f), TaskCreationOptions.LongRunning);
 
-                return df_newParent;
+                //return df_newParent;
             }
             else
             {
                 throw new NotImplementedException($"The Option of not Overwritting a DataFile is not implemented.  Change OverwriteDataFile_IND setting on Dataset_ID:{dfc.ParentDataset.DatasetId} Config_ID:{dfc.ConfigId} Config_Name:{dfc.Name}");
             }
 
+            if (!isBundled && dfc.CreateCurrentFile)
+            {
+                Logger.Info("Creating Current File...");
+
+                try
+                {
+                    //Create target directory if does not exist
+                    Directory.CreateDirectory(dfc.GetCurrentFileDir().LocalPath);
+
+                    //Delete contents of current file dir, since there should only be one file
+                    // in this location at any given time.
+                    foreach(string file in Directory.GetFiles(dfc.GetCurrentFileDir().LocalPath))
+                    {
+                        File.Delete(file);
+                    }
+
+                    Logger.Debug($"Current file target : {Path.Combine(dfc.GetCurrentFileDir().LocalPath, targetFileName)}");
+
+                    //Copy file to current file directory
+                    //Using the overwrite option since this should only ever be the latest version
+                    File.Copy(fileInfo.FullName, Path.Combine(dfc.GetCurrentFileDir().LocalPath, targetFileName), true);
+
+
+                    Event f = new Event();
+                    f.EventType = dscontext.EventTypes.Where(w => w.Description == "Current File Created").FirstOrDefault();
+                    f.Status = dscontext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+                    f.TimeCreated = DateTime.Now;
+                    f.TimeNotified = DateTime.Now;
+                    f.IsProcessed = false;
+                    f.UserWhoStartedEvent = response.RequestInitiatorId;
+                    f.Dataset = response.DatasetID;
+                    f.DataConfig = response.DatasetFileConfigId;
+                    f.Reason = $"Successfully created new current file for [<b>{dfc.ParentDataset.DatasetName}</b>] dataset.";
+                    f.Parent_Event = response.RequestGuid;
+                    Task.Factory.StartNew(() => Utilities.CreateEventAsync(f), TaskCreationOptions.LongRunning);
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("Failed to create current file", ex);
+
+                    Event f = new Event();
+                    f.EventType = dscontext.EventTypes.Where(w => w.Description == "Current File Created").FirstOrDefault();
+                    f.Status = dscontext.EventStatus.Where(w => w.Description == "Error").FirstOrDefault();
+                    f.TimeCreated = DateTime.Now;
+                    f.TimeNotified = DateTime.Now;
+                    f.IsProcessed = false;
+                    f.UserWhoStartedEvent = response.RequestInitiatorId;
+                    f.Dataset = response.DatasetID;
+                    f.DataConfig = response.DatasetFileConfigId;
+                    f.Reason = $"Failed to created current file for [<b>{dfc.ParentDataset.DatasetName}</b>] dataset.";
+                    f.Parent_Event = response.RequestGuid;
+                    Task.Factory.StartNew(() => Utilities.CreateEventAsync(f), TaskCreationOptions.LongRunning);
+                }
+            }
+            */
             return df_newParent;
         }
         private static string GetTargetFileName(DatasetFileConfig dfc, string filename)
@@ -754,8 +1169,5 @@ namespace Sentry.data.Common
                 }
             }
         }
-
-
-
     }
 }

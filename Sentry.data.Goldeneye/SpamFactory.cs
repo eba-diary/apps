@@ -6,9 +6,11 @@ using Sentry.data.Core;
 using Sentry.data.Infrastructure;
 using Sentry.Common.Logging;
 using StructureMap;
+using Hangfire;
 
 namespace Sentry.data.Goldeneye
 {
+    [Queue("spamfactory")]
     class SpamFactory
     {
         public class UserEvent
@@ -20,7 +22,7 @@ namespace Sentry.data.Goldeneye
 
 
 
-        public static async Task<Request> Run(string interval)
+        public static void Run(string interval)
         {
             try
             {
@@ -173,7 +175,7 @@ namespace Sentry.data.Goldeneye
                 Console.Write(ex);
             }
 
-            return new Request();
+            //return new Request();
             
         }
     }

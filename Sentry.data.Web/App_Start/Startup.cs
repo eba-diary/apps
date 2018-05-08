@@ -1,5 +1,8 @@
 ﻿using Owin;
 using Sentry.data;
+using Hangfire;
+using Sentry.Configuration;
+using Hangfire.SqlServer;
 
 namespace Sentry.data.Web
 {
@@ -8,6 +11,22 @@ namespace Sentry.data.Web
         public void Configuration(IAppBuilder app)
         {
             app.MapSignalR();
+
+            var options = new SqlServerStorageOptions
+            {
+                //Turn off automatic creation of HangFire database schema
+                PrepareSchemaIfNecessary = false
+            };
+
+            GlobalConfiguration.Configuration.UseSqlServerStorage(Config.GetHostSetting("DatabaseConnectionString"), options);
+            // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=316888
+
+
+            //Default URL is /Hangfire
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new[] { new AuthorizeHangfireDashboard() }
+            });
         }
     }
 }

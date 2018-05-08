@@ -36,127 +36,65 @@ namespace Sentry.data.Goldeneye
 
         public static async Task<LoaderRequest> Run(string reqPath)
         {
-            LoaderRequest req = null;  
-                       
-            //Process request object
-            try
+            LoaderRequest req = null;
+
+            IContainer container;
+            IDatasetContext _datasetContext;
+            IRequestContext _requestContext;
+
+            using (container = Bootstrapper.Container.GetNestedContainer())
             {
-                //Attempt to deserialize incoming request object
-                string incomingRequest = System.IO.File.ReadAllText(reqPath);
+                _datasetContext = container.GetInstance<IDatasetContext>();
+                _requestContext = container.GetInstance<IRequestContext>();
 
-                //Get request from DatasetBundler location
-                req = JsonConvert.DeserializeObject<LoaderRequest>(incomingRequest);
-                if (req == null || req.RequestGuid == "00000000-0000-0000-0000-000000000000")
+                //Process request object
+                try
                 {
-                    throw new JsonSerializationException($"Failed Deserialzing Request File Path:{reqPath}");
-                }
+                    //Attempt to deserialize incoming request object
+                    string incomingRequest = System.IO.File.ReadAllText(reqPath);
 
-                IContainer container;
-                IDatasetContext _datasetContext;
-
-                //Console.WriteLine($"Dataset Loader Connection String:{Configuration.Config.GetHostSetting("DatabaseConnectionString")}");
-                using (container = Bootstrapper.Container.GetNestedContainer())
-                {
-                    _datasetContext = container.GetInstance<IDatasetContext>();
-                    string SystemDir = null;
-                    string SystemName = null;
-
-
-                    Logger.Info($"Starting to process RequestGuid:{req.RequestGuid}");
-
-                    try
+                    //Get request from DatasetBundler location
+                    req = JsonConvert.DeserializeObject<LoaderRequest>(incomingRequest);
+                    if (req == null || req.RequestGuid == "00000000-0000-0000-0000-000000000000")
                     {
-                        //Set additional properties for non-bundled requests
-                        if (!req.IsBundled)
-                        {
-                            SystemDir = Directory.GetParent(req.File).FullName + @"\";
-                            SystemName = Directory.GetParent(req.File).Name;
-                            Logger.Debug($"SystemDir: {SystemDir}");
-                            Logger.Debug($"SystemName: {SystemName}");
-                        }
-                    }
-                    catch (Exception e)
-                    {
-                        Logger.Error($"Loader Request Failed(File Access Error): RequestGuid:{req.RequestGuid}", e);
-                    }
+                        throw new JsonSerializationException($"Failed Deserialzing Request File Path:{reqPath}");
+                    }                    
 
+                    RetrieverJob job = null;
+
+                    Logger.Info($"Starting to process RequestGuid:{req.RequestGuid}");                    
+                    
+                    //Set additional properties for non-bundled requests
                     if (!req.IsBundled)
                     {
-                        List<DatasetFileConfig> fileConfigs = new List<DatasetFileConfig>();
-                        try
-                        {
-                            fileConfigs = Utilities.LoadDatasetFileConfigsByDir(SystemDir, _datasetContext);
-                            Logger.Debug($"Count of fileConfigs Loaded: {fileConfigs.Count}");
-                            SingleFileProcessor(fileConfigs, req.File, _datasetContext, req);
+                        job = _requestContext.RetrieverJob.Where(w => w.Id == req.RetrieverJobId).FirstOrDefault();
 
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Error("Error Processing File", e);
-                            Event f = new Event();
-                            f.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Upload Failure").FirstOrDefault();
-                            f.Status = _datasetContext.EventStatus.Where(w => w.Description == "Error").FirstOrDefault();
-                            f.TimeCreated = DateTime.Now;
-                            f.TimeNotified = DateTime.Now;
-                            f.IsProcessed = false;
-                            f.UserWhoStartedEvent = req.RequestInitiatorId;
-                            f.Dataset = req.DatasetID;
-                            f.DataConfig = req.DatasetFileConfigId;
-                            f.Reason = $"Failed uploading file [<b>{Path.GetFileName(req.File)}</b>] to dataset [<b>{_datasetContext.GetById(req.DatasetID).DatasetName}</b>]";
-                            f.Parent_Event = req.RequestGuid;
-                            Task.Factory.StartNew(() => Utilities.CreateEventAsync(f), TaskCreationOptions.LongRunning);
-                        }
+                        SingleFileProcessor(req.File, _datasetContext, req, job);
                     }
                     else
-                    {
-                        try
-                        {
-                            DatasetFileConfig fileconfig = _datasetContext.getDatasetDefaultConfig(req.DatasetID);
-                            Dataset ds = _datasetContext.GetById<Dataset>(req.DatasetID);
+                    {                        
+                        DatasetFileConfig fileconfig = _datasetContext.getDatasetDefaultConfig(req.DatasetID);
+                        Dataset ds = _datasetContext.GetById<Dataset>(req.DatasetID);
+                        
+                        DatasetFile df = Utilities.ProcessInputFile(ds, fileconfig, true, req, null);
 
-                            //DatasetFile df = Utilities.ProcessBundleFile(fileconfig, ds, response, dscontext);
-                            DatasetFile df = Utilities.ProcessInputFile(ds, fileconfig, _datasetContext, true, req, null);
+                        //remove request file
+                        Utilities.RemoveProcessedFile(df, new FileInfo(reqPath));
 
-                            //remove request file
-                            Utilities.RemoveProcessedFile(df, new FileInfo(reqPath));
-
-                            //Create Success Event for bundled File Created
-                            Event e = new Event();
-                            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Bundle File Process").FirstOrDefault();
-                            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-                            e.TimeCreated = DateTime.Now;
-                            e.TimeNotified = DateTime.Now;
-                            e.IsProcessed = false;
-                            e.UserWhoStartedEvent = req.RequestInitiatorId;
-                            e.Dataset = ds.DatasetId;
-                            //e.DataFile = df.DatasetFileId;
-                            e.DataConfig = fileconfig.ConfigId;
-                            e.Reason = $"Successfully uploaded bundled file [<b>{req.TargetFileName}</b>] to dataset [<b>{_datasetContext.GetById(ds.DatasetId).DatasetName}</b>]";
-                            e.Parent_Event = req.RequestGuid;
-                            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-
-                        }
-                        catch (Exception e)
-                        {
-                            Logger.Error("Error Processing File", e);
-
-                            //Create Failure Event for bundled File Created
-                            Event f = new Event();
-
-                            f.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Bundle File Process").FirstOrDefault();
-                            f.Status = _datasetContext.EventStatus.Where(w => w.Description == "Error").FirstOrDefault();
-                            f.TimeCreated = DateTime.Now;
-                            f.TimeNotified = DateTime.Now;
-                            f.IsProcessed = false;
-                            f.UserWhoStartedEvent = req.RequestInitiatorId;
-                            f.Dataset = req.DatasetID;
-                            f.DataConfig = req.DatasetFileConfigId;
-                            f.Reason = $"Failed processing bundled file";
-                            f.Parent_Event = req.RequestGuid;
-                            Task.Factory.StartNew(() => Utilities.CreateEventAsync(f), TaskCreationOptions.LongRunning);
-
-                            throw new Exception("Error Processing File", e);
-                        }
+                        //Create Success Event for bundled File Created
+                        Event e = new Event();
+                        e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Bundle File Process").FirstOrDefault();
+                        e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+                        e.TimeCreated = DateTime.Now;
+                        e.TimeNotified = DateTime.Now;
+                        e.IsProcessed = false;
+                        e.UserWhoStartedEvent = req.RequestInitiatorId;
+                        e.Dataset = ds.DatasetId;
+                        e.DataConfig = fileconfig.ConfigId;
+                        e.Reason = $"Successfully uploaded bundled file [<b>{req.TargetFileName}</b>] to dataset [<b>{_datasetContext.GetById(ds.DatasetId).DatasetName}</b>]";
+                        e.Parent_Event = req.RequestGuid;
+                        Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+                        
                     }
 
                     //Remove Dataset loader Request file
@@ -169,69 +107,104 @@ namespace Sentry.data.Goldeneye
                     {
                         //Allow application to continue without error.  Log message for BI Portal SOS group.
                         Logger.Error($"Failed deleting Dataset loader request file: RequestGuid:{req.RequestGuid}", e);
-                        throw;
+                    }                
+                }
+                catch (Exception ex)
+                {
+                    if (ex is JsonSerializationException)
+                    {
+                        Logger.Error("Loader Request Serialization Failed ", ex);
                     }
-                }
-            }
-            catch (Exception ex)
-            {
-                if (ex is JsonSerializationException)
-                {
-                    Logger.Error("Loader Request Failed ", ex);
-                }
-                else
-                {
-                    Logger.Error($"Loader Request Failed - RequestGuid:{req.RequestGuid}", ex);
-                }
+                    else
+                    {
+                        Logger.Error($"Loader Request Failed - RequestGuid:{req.RequestGuid}", ex);
 
-                //Move request to failed request directory for potential reprocessing later
-                var processFileName = Path.GetFileName(reqPath).Replace(Configuration.Config.GetHostSetting("ProcessedFilePrefix"),"");
-                var originalFile = Configuration.Config.GetHostSetting("LoaderFailedRequestPath") + processFileName;                
-                File.Move(reqPath, originalFile);
+                        if (!req.IsBundled)
+                        {
+                            Event f = new Event()
+                            {
+                                EventType = _datasetContext.EventTypes.Where(w => w.Description == "Upload Failure").FirstOrDefault(),
+                                Status = _datasetContext.EventStatus.Where(w => w.Description == "Error").FirstOrDefault(),
+                                TimeCreated = DateTime.Now,
+                                TimeNotified = DateTime.Now,
+                                IsProcessed = false,
+                                UserWhoStartedEvent = req.RequestInitiatorId,
+                                Dataset = req.DatasetID,
+                                DataConfig = req.DatasetFileConfigId,
+                                Reason = $"Failed uploading file [<b>{Path.GetFileName(req.File).Replace(Configuration.Config.GetHostSetting("ProcessedFilePrefix"),"")}</b>] to dataset [<b>{_datasetContext.GetById(req.DatasetID).DatasetName}</b>]",
+                                Parent_Event = req.RequestGuid
+                            };
+                            Task.Factory.StartNew(() => Utilities.CreateEventAsync(f), TaskCreationOptions.LongRunning);
+                        }
+                        else
+                        {
+                            //Create Failure Event for bundled File Created
+                            Event f = new Event()
+                            {
+                                EventType = _datasetContext.EventTypes.Where(w => w.Description == "Bundle File Process").FirstOrDefault(),
+                                Status = _datasetContext.EventStatus.Where(w => w.Description == "Error").FirstOrDefault(),
+                                TimeCreated = DateTime.Now,
+                                TimeNotified = DateTime.Now,
+                                IsProcessed = false,
+                                UserWhoStartedEvent = req.RequestInitiatorId,
+                                Dataset = req.DatasetID,
+                                DataConfig = req.DatasetFileConfigId,
+                                Reason = $"Failed processing bundled file",
+                                Parent_Event = req.RequestGuid
+                            };
+                            Task.Factory.StartNew(() => Utilities.CreateEventAsync(f), TaskCreationOptions.LongRunning);
+                        }
+                    }
 
-                throw;
+                    //Move request to failed request directory for potential reprocessing later
+                    var processFileName = Path.GetFileName(reqPath).Replace(Configuration.Config.GetHostSetting("ProcessedFilePrefix"),"");
+                    var originalFile = Configuration.Config.GetHostSetting("LoaderFailedRequestPath") + processFileName;                
+                    File.Move(reqPath, originalFile);                   
+
+                    throw;
+                }
             }
 
             return req;
         }
         
 
-        private static void SingleFileProcessor(List<DatasetFileConfig> systemMetaFiles, string _path, IDatasetContext dscontext, LoaderRequest req = null)
+        private static void SingleFileProcessor(string _path, IDatasetContext dscontext, LoaderRequest req = null, RetrieverJob job = null)
         {
-            int configMatch = 0;
+            //int configMatch = 0;
 
             //Add ProcessingPrefix to file name
 
-            //Find matching configs for the given incoming file path
-            List<DatasetFileConfig> fcList = Utilities.GetMatchingDatasetFileConfigs(systemMetaFiles, _path);
+            ////Find matching configs for the given incoming file path
+            //List<DatasetFileConfig> fcList = Utilities.GetMatchingDatasetFileConfigs(systemMetaFiles, _path);
 
-            FileInfo fi = new FileInfo(_path);
+            //FileInfo fi = new FileInfo(_path);
 
-            foreach (DatasetFileConfig fc in fcList.Where(w => w.IsGeneric == false).Take(1))
-            {
-                Logger.Debug($"Found non-generic DatasetFileConfig: ID-{fc.ConfigId}, Name-{fc.Name}");
-                Dataset ds = dscontext.GetById(fc.ParentDataset.DatasetId);
-                req.DatasetID = ds.DatasetId;
-                req.DatasetFileConfigId = fc.ConfigId;
-                DatasetFile df = Utilities.ProcessInputFile(ds, fc, dscontext, false, req, fi);
+            //foreach (DatasetFileConfig fc in fcList.Where(w => w.IsGeneric == false).Take(1))
+            //{
+                Logger.Debug($"Processing file for DatasetFileConfig: ID-{job.DatasetConfig.ConfigId}, Name-{job.DatasetConfig.Name}, Job-{job.Id}");
+                Dataset ds = dscontext.GetById(job.DatasetConfig.ParentDataset.DatasetId);
+                req.DatasetID = job.DatasetConfig.ParentDataset.DatasetId;
+                req.DatasetFileConfigId = job.DatasetConfig.ConfigId;
+                DatasetFile df = Utilities.ProcessInputFile(ds, job.DatasetConfig, false, req, _path);
                 Utilities.RemoveProcessedFile(df, new FileInfo(_path));
-                configMatch++;
-            }
+                //configMatch++;
+            //}
 
-            if (configMatch == 0)
-            {
-                DatasetFileConfig fc = systemMetaFiles.Where(w => w.IsGeneric == true).FirstOrDefault();
-                Logger.Debug($"Using generic DatasetFileConfig: ID-{fc.ConfigId}, Name-{fc.Name}");
-                Logger.Debug($"Retrieving Dataset associated with DatasetFileConfig: ID-{fc.ParentDataset.DatasetId}");
-                Dataset ds = dscontext.GetById(fc.ParentDataset.DatasetId);
-                Logger.Debug("Processing DatasetFile");
-                req.DatasetID = ds.DatasetId;
-                req.DatasetFileConfigId = fc.ConfigId;
-                DatasetFile df = Utilities.ProcessInputFile(ds, fc, dscontext, false, req, fi);
+            //if (configMatch == 0)
+            //{
+            //    DatasetFileConfig fc = systemMetaFiles.Where(w => w.IsGeneric == true).FirstOrDefault();
+            //    Logger.Debug($"Using generic DatasetFileConfig: ID-{fc.ConfigId}, Name-{fc.Name}");
+            //    Logger.Debug($"Retrieving Dataset associated with DatasetFileConfig: ID-{fc.ParentDataset.DatasetId}");
+            //    Dataset ds = dscontext.GetById(fc.ParentDataset.DatasetId);
+            //    Logger.Debug("Processing DatasetFile");
+            //    req.DatasetID = ds.DatasetId;
+            //    req.DatasetFileConfigId = fc.ConfigId;
+            //    DatasetFile df = Utilities.ProcessInputFile(ds, fc, dscontext, false, req, fi);
 
-                Logger.Debug($"Removing successful processed file - Path:{_path}");
-                Utilities.RemoveProcessedFile(df, new FileInfo(_path));
-            }            
+            //    Logger.Debug($"Removing successful processed file - Path:{_path}");
+            //    Utilities.RemoveProcessedFile(df, new FileInfo(_path));
+            //}            
         }
     }
 }

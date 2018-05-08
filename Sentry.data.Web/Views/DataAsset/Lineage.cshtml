@@ -1,104 +1,100 @@
-﻿@model Sentry.data.Core.DataAsset
+﻿@{
+    Sentry.data.Core.DataAsset dataAsset = ViewBag.DataAsset;
+    string DisplayName;
+    string arch = "";
+    string guide = "";
+    if (ViewBag.IsLine == true)
+    {
+        ViewBag.Title = ViewBag.LineName + " Lineage";
+        DisplayName = ViewBag.LineName;
+    }
+    else
+    {
+        ViewBag.Title = dataAsset.DisplayName + " Lineage";
+        DisplayName = dataAsset.DisplayName;
+        arch = "http://sharepoint.sentry.com/it/DataArch/_layouts/15/VisioWebAccess/VisioWebAccess.aspx?id=/it/DataArch/Shared%20Documents/Data%20Services%20Architecture%20Diagrams/" + Model.ArchLink;
+        guide = "http://sharepoint.sentry.com/it/DataArch/Consumer%20Guides/Pages/" + Model.GuideLink;
+    }
 
-@{
-    ViewBag.Title = Model.DisplayName + " Lineage";
     string disabled;
-    string arch = "http://sharepoint.sentry.com/it/DataArch/_layouts/15/VisioWebAccess/VisioWebAccess.aspx?id=/it/DataArch/Shared%20Documents/Data%20Services%20Architecture%20Diagrams/" + Model.ArchLink;
-    string guide = "http://sharepoint.sentry.com/it/DataArch/Consumer%20Guides/Pages/" + Model.GuideLink;
 }
 
 
 
 <!-- Data Asset Header -->
 @{
-    foreach (var item in Model.AssetNotifications)
+    if (ViewBag.IsLine == false)
     {
-        <div class="alert alert-dismissable alert-@item.MessageSeverityTag">
-            <button type="button" class="close" data-dismiss="alert">×</button>
-            @Html.Raw(@item.DisplayMessage)
-            @*@switch (@item.MessageSeverityTag)
-                {
-                    case "danger":
-
-                        break;
-                }*@
-        </div>
+        foreach (var item in dataAsset.AssetNotifications)
+        {
+            <div class="alert alert-dismissable alert-@item.MessageSeverityTag">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                @Html.Raw(@item.DisplayMessage)
+            </div>
+        }
     }
 }
 <div class="row page-header indexHeader">
     <div class="row">
         <img src="~/Images/Icons/DataAssetsBlue.svg" class="assetImg leftFloat hidden-xs" />
         <div class="indexName">
-            <h1 class="daName">@Model.DisplayName</h1>
-            @*<a href="#" class="btn btn-primary dropdown-toggle daDD" data-toggle="dropdown" aria-expanded="false"><span class="glyphicon glyphicon-chevron-down daArrow"></span></a>*@
-            @*<ul class="dropdown-menu">
-                    @foreach (Sentry.data.Core.DataAsset da in assets)
-                        {
-                            string active = (da.DisplayName.Equals(Model.DisplayName)) ? "active" : "";
-                        <li class="@active"><a href="@Url.Action("Index", "DataAsset", new { id = da.Id })">@da.DisplayName</a></li>
-                    }
-                </ul>*@
+            <h1 class="daName">@DisplayName</h1>
         </div>
 
-        <!-- Removed Status and Last Updated goes here -->
-        @*@{
-                if (!Model.HealthIncludesSourceSystems)
-                {
-                    <div>
-                        <h2 class="col-xs-8 col-sm-4 text-left text-xs-left indexUpdate @color" title="@Model.MaxProcessTime">Last Updated: @Sentry.data.Web.Helpers.Utility.TimeDisplay(Model.MaxProcessTime)</h2>
-                    </div>
-                }
-            }*@
+        @if (ViewBag.IsLine == false)
+        {
+            <div class="visible-xs">
+                <button type="button" class="btn btn-lg btn-default daHamburger" data-toggle="collapse" data-target=".navbar-responsive-collapse">
+                    <span class="glyphicon glyphicon-menu-hamburger"></span>
+                </button>
+            </div>
 
+            <div class="daNav row">
+                <ul class="nav nav-pills hidden-xs">
+                    <li><a href="~/DataAsset/@dataAsset.Name">Home</a></li>
 
-        <div class="visible-xs">
-            <button type="button" class="btn btn-lg btn-default daHamburger" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-                <span class="glyphicon glyphicon-menu-hamburger"></span>
-            </button>
-        </div>
+                    @{ disabled = (dataAsset.DisplayName == "SERA PL") ? "" : "disabled"; }
+                    <li class="@disabled"><a href="/Lineage/DataAsset/SERAPL">Lineage</a></li>
 
-        <div class="daNav row">
-            <ul class="nav nav-pills hidden-xs">
-                <li><a href="~/DataAsset/@Model.Name">Home</a></li>
+                    @{ disabled = (dataAsset.ArchLink != null) ? "" : "disabled"; }
+                    <li class="@disabled"><a href="@arch" target="_blank">Arch Diagrams</a></li>
 
-                @{ disabled = (Model.DisplayName == "SERA PL") ? "" : "disabled"; }
-                <li class="@disabled"><a href="/Lineage/DataAsset/SERAPL">Lineage</a></li>
+                    @{ disabled = (dataAsset.DataModelLink != null) ? "" : "disabled"; }
+                    <li class="@disabled"><a href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = dataAsset.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
 
-                @{ disabled = (Model.ArchLink != null) ? "" : "disabled"; }
-                <li class="@disabled"><a href="@arch" target="_blank">Arch Diagrams</a></li>
+                    @{ disabled = (dataAsset.GuideLink != null) ? "" : "disabled"; }
+                    <li class="@disabled"><a href="@guide" target="_blank">Consumer Guide</a></li>
 
-                @{ disabled = (Model.DataModelLink != null) ? "" : "disabled"; }
-                <li class="@disabled"><a href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = Model.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
+                    @{ disabled = (dataAsset.Contact != null) ? "" : "disabled"; }
+                    <li class="@disabled"><a href="mailto:@Model.Contact">Contact Us</a></li>
+                </ul>
+            </div>
+                        }
+           </div>
+        @if (ViewBag.IsLine == false)
+        {
+            <div class="visible-xs daCollapse">
+                <div class="navbar-collapse collapse navbar-responsive-collapse">
+                    <ul class="nav navbar-nav">
+                        @{ disabled = (dataAsset.DisplayName == "SERA PL") ? "" : "disabled"; }
+                        <li class="@disabled"><a href="/Lineage/DataAsset/SERAPL">Lineage</a></li>
 
-                @{ disabled = (Model.GuideLink != null) ? "" : "disabled"; }
-                <li class="@disabled"><a href="@guide" target="_blank">Consumer Guide</a></li>
+                        @{ disabled = (dataAsset.ArchLink != null) ? "" : "disabled"; }
+                        <li class="@disabled"><a href="@arch" target="_blank">Arch Diagrams</a></li>
 
-                @{ disabled = (Model.Contact != null) ? "" : "disabled"; }
-                <li class="@disabled"><a href="mailto:@Model.Contact">Contact Us</a></li>
-            </ul>
-        </div>
-    </div>
+                        @{ disabled = (dataAsset.DataModelLink != null) ? "" : "disabled"; }
+                        <li class="@disabled"><a href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = dataAsset.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
 
-    <div class="visible-xs daCollapse">
-        <div class="navbar-collapse collapse navbar-responsive-collapse">
-            <ul class="nav navbar-nav">
-                @{ disabled = (Model.DisplayName == "SERA PL") ? "" : "disabled"; }
-                <li class="@disabled"><a href="/Lineage/DataAsset/SERAPL">Lineage</a></li>
+                        @{ disabled = (dataAsset.GuideLink != null) ? "" : "disabled"; }
+                        <li class="@disabled"><a href="@guide" target="_blank">Consumer Guide</a></li>
 
-                @{ disabled = (Model.ArchLink != null) ? "" : "disabled"; }
-                <li class="@disabled"><a href="@arch" target="_blank">Arch Diagrams</a></li>
+                        @{ disabled = (dataAsset.Contact != null) ? "" : "disabled"; }
+                        <li class="@disabled"><a href="mailto:@Model.Contact">Contact Us</a></li>
+                    </ul>
+                </div>
+            </div>
+        }
 
-                @{ disabled = (Model.DataModelLink != null) ? "" : "disabled"; }
-                <li class="@disabled"><a href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = Model.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
-
-                @{ disabled = (Model.GuideLink != null) ? "" : "disabled"; }
-                <li class="@disabled"><a href="@guide" target="_blank">Consumer Guide</a></li>
-
-                @{ disabled = (Model.Contact != null) ? "" : "disabled"; }
-                <li class="@disabled"><a href="mailto:@Model.Contact">Contact Us</a></li>
-            </ul>
-        </div>
-    </div>
 </div>
 
 <style>
@@ -118,16 +114,6 @@
         <h4>Consumption Layer</h4>
         <select class="form-control select2-hidden-accessible"
                 id="dataElements" name="filterSelector" tabindex="-1" aria-hidden="true">
-            <optgroup label="Cubes">
-                <option value="SERAPL Loss Triangles">SERAPL Loss Triangles</option>
-                <option value="SERAPL Snapshot">SERAPL Snapshot</option>
-                <option value="SERAPL Transactional">SERAPL Transactional</option>
-            </optgroup>
-            <optgroup label="Business Objects">
-                <option value="SERAPL_Adhoc">SERAPL_Adhoc</option>
-                <option value="SERAPL_Snapshot">SERAPL_Snapshot</option>
-                <option value="SERAPL_Transactional">SERAPL_Transactional</option>
-            </optgroup>
 
         </select>
     </div>
@@ -283,6 +269,56 @@
                     .replace(/\u2029/g, "\\u2029");
             };
 
+            $(document).on('click', '.btnShowDetails', function () {
+
+                var url = "/api/Lineage/GetDescriptionFor?DataAsset_ID=9";
+                if ($($(this).parent().children('.SourceElement_NME')[0]).text()) {
+                    url += "&DataElement_NME=" + $($(this).parent().children('.SourceElement_NME')[0]).text();
+                }
+
+                if ($($(this).parent().children('.SourceObject_NME')[0]).text()) {
+                    url += "&DataObject_NME=" + $($(this).parent().children('.SourceObject_NME')[0]).text();
+                }
+
+                if ($($(this).parent().children('.SourceObjectField_NME')[0]).text()) {
+                    url += "&DataObjectField_NME=" + $($(this).parent().children('.SourceObjectField_NME')[0]).text();
+                }
+
+                var DataObject_DSC_span = $($(this).parent().children('.detailsPanel').children('.DataObject_DSC')[0]);
+                var DataObjectField_DSC_span = $($(this).parent().children('.detailsPanel').children('.DataObjectField_DSC')[0]);
+                var noDetails = $($(this).parent().children('.noDetails')[0]);
+                
+                var panel = $($(this).parent().children('.detailsPanel'));
+
+                if ($(this).attr("value") == "Show Details"){
+                    $(this).attr("value", "Hide Details");
+                }
+                else {
+                    $(this).attr("value", "Show Details");
+                }
+
+                DataObject_DSC_span.empty();
+                DataObjectField_DSC_span.empty();
+
+                $.ajax({
+                    type: "GET",
+                    url: encodeURI(url),
+                    dataType: "json",
+                    success: function (result) {
+                        console.log(result);
+                        panel.toggle();
+                        
+                        DataObjectField_DSC_span.append(result.DataObjectField_DSC);
+                        DataObject_DSC_span.append(result.DataObject_DSC);
+                    },
+                    error: function (e) {
+                        noDetails.toggle();
+                    }
+                });
+
+
+
+            });
 
             $('#dataElements').on('select2:select', function (e) {
                 console.log('Data Element Select');
@@ -616,62 +652,86 @@
 
             function updatePanel() {
                 $('#filterSpinner').show();
+                $('#optionText').hide();
                 $('#lineagePanel').empty();
 
                 var url = "/api/Lineage/GetLineageFor?DataAsset_ID=9";
+                var isSomethingPicked = false;
 
                 if ($('#dataElements').val()) {
                     url += "&DataElement_NME=" + $('#dataElements').val();
+                    isSomethingPicked = true;
                 }
                 if ($('#dataObjects').val()) {
                     url += "&DataObject_NME=" + $('#dataObjects').val();
+                    isSomethingPicked = true;
                 }
                 if ($('#dataObjectFields').val()) {
                     url += "&DataObjectField_NME=" + $('#dataObjectFields').val();
+                    isSomethingPicked = true;
                 }
 
                 console.log(url);
 
-                $.ajax({
-                    type: "GET",
-                    url: encodeURI(url),
-                    dataType: "json",
-                    success: function (msg) {
+                if (isSomethingPicked) {
+                    $.ajax({
+                        type: "GET",
+                        url: encodeURI(url),
+                        dataType: "json",
+                        success: function (msg) {
 
-                        $.each(msg, function (index, itemData) {
+                            $.each(msg, function (index, itemData) {
 
-                            var color = BackgroundColors(itemData);
+                                var color = BackgroundColors(itemData);
 
 
-                            $('#lineagePanel').append(
-                                "<div id=\"lineage_" + index + "\" class=\"lineageRow rootTab " + color + "\">" +
+                                $('#lineagePanel').append(
+                                    "<div id=\"lineage_" + index + "\" class=\"lineageRow rootTab " + color + "\">" +
 
-                                "<button type=\"button\" class=\"btn btn-xs btn-success btnShowChildren\" style=\"display: inline-block;  margin-bottom: 6px;\">" +
-                                "<span id=\"icon_\" class=\"glyphicon glyphicon-plus\"></span>" +
-                                "</button>" +
-                                "<div class=\"Source\" style=\"margin-left: 10px; display: inline-block;\">" +
-                                "<span class=\"SourceElement_NME\">" + itemData.DataElement_NME + "</span>" +
-                                "<span class=\"SourceObject_NME\">" + itemData.DataObject_NME + "</span>" +
-                                "<span class=\"SourceObjectField_NME\">" + itemData.DataObjectField_NME + "</span> " +
+                                    "<button type=\"button\" class=\"btn btn-xs btn-success btnShowChildren\" style=\"display: inline-block;  margin-bottom: 6px;\">" +
+                                    "<span id=\"icon_\" class=\"glyphicon glyphicon-plus\"></span>" +
+                                    "</button>" +
+                                    "<div class=\"Source\" style=\"margin-left: 10px; display: inline-block;\">" +
+                                    "<span class=\"SourceElement_NME\">" + itemData.DataElement_NME + "</span>" +
+                                    "<span class=\"SourceObject_NME\">" + itemData.DataObject_NME + "</span>" +
+                                    "<span class=\"SourceObjectField_NME\">" + itemData.DataObjectField_NME + "</span> " +
 
-                                // "<input type=\"button\" value=\"Show Details\" class=\"btn btn-xs btn-info\" style=\"display: inline-block; margin-right: 10px; float:right;\">" +
-                                "</div>" +
-                                "</div>"
+                                    "<input type=\"button\" value=\"Show Details\" class=\"btn btnShowDetails btn-xs btn-info\" style=\"display: inline-block; margin-right: 10px; float:right;\">" +
 
-                            );
-                        });
-                        $('#filterSpinner').hide();
+                                    "<span class='noDetails' style='display: none;'><hr />There currently is no description for this object.</span>" +
+                                    "<div class='detailsPanel' style='display: none;'>" +
+                                    "<hr/>" +
+                                    "<span><b>Table Description : </b></span>" +
+                                    "<span class=\"DataObject_DSC\"></span>" +
+                                    "<hr/>" +
+                                    "<span><b>Field Description : </b></span>" +
+                                    "<span class=\"DataObjectField_DSC\"></span>" +
+                                    "</div>" +
+                                    "</div>"
 
-                        if ($('.glyphicon-plus').length >= 1) {
-                            $('#btnNextLayer').prop('disabled', false);
-                        } else {
-                            $('#btnNextLayer').prop('disabled', true);
+                                );
+                            });
+                            $('#filterSpinner').hide();
+
+                            if ($('.glyphicon-plus').length >= 1) {
+                                $('#btnNextLayer').prop('disabled', false);
+                            } else {
+                                $('#btnNextLayer').prop('disabled', true);
+                            }
+                        },
+                        error: function (e) {
+                            console.log("Unavailable");
                         }
-                    },
-                    error: function (e) {
-                        console.log("Unavailable");
+                    });
+                } else {
+                    $('#filterSpinner').hide();
+
+                    if ($('#optionText').length == 0) {
+                        $("<p id='optionText'>Please Pick an Option Above</p>").insertBefore('#filterSpinner');
+                    } else {
+                        $('#optionText').show();
                     }
-                });
+                }
             }
 
             $(document).ready(function () {
@@ -770,7 +830,15 @@
                                             //"<hr />" +
                                             //"<span class=\"Source_TXT\">" + itemData.Source_TXT + "</span>" +
                                             //"<span class=\"Transformation_TXT\">" + itemData.Transformation_TXT + "</span> " +
-                                            //"<input type=\"button\" value=\"Show Details\" class=\"btn btn-xs btn-info\" style=\"display: inline-block; margin-right: 10px; float:right;\">" +
+                                            "<input type=\"button\" value=\"Show Details\" class=\"btn btnShowDetails btn-xs btn-info\" style=\"display: inline-block; margin-right: 10px; float:right;\">" +
+                                            "<span class='noDetails' style='display: none;'><hr />There currently is no description for this object.</span>" +
+                                            "<div class='detailsPanel' style='display: none;'>" +
+                                            "<hr/>" +
+                                            "<span><b>Table Description : </b></span>" +
+                                            "<span class=\"DataObject_DSC\"></span>" +
+                                            "<hr/>" +
+                                            "<span><b>Field Description : </b></span>" +
+                                            "<span class=\"DataObjectField_DSC\"></span>" +
                                             "</div>" +
                                             "</div>"
                                         );

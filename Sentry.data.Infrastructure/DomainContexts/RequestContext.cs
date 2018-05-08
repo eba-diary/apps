@@ -9,11 +9,35 @@ using NHibernate;
 
 namespace Sentry.data.Infrastructure
 {
-    class requestContext : NHWritableDomainContext, IRequestContext
+    public class RequestContext : NHWritableDomainContext, IRequestContext
     {
-        public requestContext(ISession session) : base(session)
+        public RequestContext(ISession session) : base(session)
         {
-            NHQueryableExtensionProvider.RegisterQueryableExtensionsProvider<requestContext>();
+            NHQueryableExtensionProvider.RegisterQueryableExtensionsProvider<RequestContext>();
+        }
+
+        public IQueryable<DataSource> DataSource
+        {
+            get
+            {
+                return Query<DataSource>();
+            }
+        }
+
+        public IQueryable<RetrieverJob> RetrieverJob
+        {
+            get
+            {
+                return Query<RetrieverJob>();
+            }
+        }
+
+        public IQueryable<AuthenticationType> AuthenticationType
+        {
+            get
+            {
+                return Query<AuthenticationType>();
+            }
         }
 
         public IQueryable<DomainUser> Users
@@ -21,6 +45,14 @@ namespace Sentry.data.Infrastructure
             get
             {
                 return null;
+            }
+        }
+
+        public IQueryable<DataSourceType> DataSourceTypes
+        {
+            get
+            {
+                return Query<DataSourceType>();
             }
         }
 

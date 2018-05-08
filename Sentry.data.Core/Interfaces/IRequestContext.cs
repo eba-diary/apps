@@ -9,6 +9,14 @@ namespace Sentry.data.Core
 {
     public interface IRequestContext : IWritableDomainContext
     {
+        IQueryable<DataSource> DataSource { get; }
+
+        IQueryable<RetrieverJob> RetrieverJob { get; }
+
+        IQueryable<AuthenticationType> AuthenticationType { get; }
+
+        IQueryable<DataSourceType> DataSourceTypes { get; }
+
         IList<RTSourceTypes> GetSourceTypes();
 
         IList<RTRequest> GetEnabledRequests();

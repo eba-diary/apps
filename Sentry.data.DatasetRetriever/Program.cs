@@ -236,8 +236,9 @@ namespace Sentry.data.DatasetRetriever
             {
                 try
                 {
-                    DatasetFileConfig TargetConfig = dscontext.GetById<DatasetFileConfig>(reqOptions.DataConfigId);
-                    ftpprovider.DownloadFile(url.ToString(), new NetworkCredential("anonymous", "Jered.Gosse@Sentry.com"), TargetConfig.DropPath + filename);
+                    throw new NotImplementedException();
+                    //DatasetFileConfig TargetConfig = dscontext.GetById<DatasetFileConfig>(reqOptions.DataConfigId);
+                    //ftpprovider.DownloadFile(url.ToString(), new NetworkCredential("anonymous", "Jered.Gosse@Sentry.com"), TargetConfig.DropPath + filename);
                 }
                 catch (Exception e)
                 {
@@ -247,10 +248,11 @@ namespace Sentry.data.DatasetRetriever
             //Incoming file is compressed, therefore, interrogate reqOptions to determine what to do with compressed file
             else
             {
-                //Pull incoming file to storage local to application
-                ftpprovider.DownloadFile(url.ToString(), new NetworkCredential("anonymous", "Jered.Gosse@Sentry.com"), $"C:\\tmp\\DatasetRetriever\\{request.Id}");
+                throw new NotImplementedException();
+                ////Pull incoming file to storage local to application
+                //ftpprovider.DownloadFile(url.ToString(), new NetworkCredential("anonymous", "Jered.Gosse@Sentry.com"), $"C:\\tmp\\DatasetRetriever\\{request.Id}");
 
-                ProcessCompressedFile(dscontext, request, reqOptions);
+                //ProcessCompressedFile(dscontext, request, reqOptions);
             }
             
         }

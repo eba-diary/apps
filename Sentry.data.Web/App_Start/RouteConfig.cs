@@ -65,6 +65,12 @@ namespace Sentry.data.Web
             );
 
             routes.MapRoute(
+               name: "Retrieval Job Creation",
+               url: "Config/{configId}/Job/Create",
+               defaults: new { controller = "Config", action = "CreateRetrievalJob", configId = 251 }
+            );
+
+            routes.MapRoute(
                 name: "Default",
                 url: "{controller}/{action}/{id}",
                 //defaults: new { controller = "DataAsset", action = "Index", id = 1 }
@@ -80,9 +86,24 @@ namespace Sentry.data.Web
 
             routes.MapRoute(
                 name: "Lineage",
-                url: "Lineage/DataAsset/{assetName}/{businessObject}/{sourceElement}",
+                url: "Lineage/{line}/{assetName}/{businessObject}/{sourceElement}",
                 defaults: new { controller = "DataAsset", action = "Lineage", assetName = "", businessObject = UrlParameter.Optional, sourceElement = UrlParameter.Optional }
             );
+
+            routes.MapRoute(
+                name: "Dataset Configuration",
+                url: "Dataset/Detail/{id}/Configuration",
+                defaults: new { controller = "Dataset", action = "DatasetConfiguration", id= 0 }
+            );
+
+            routes.MapRoute(
+               name: "New Configuration",
+               url: "Dataset/Detail/{id}/Configuration/Create",
+               defaults: new { controller = "Dataset", action = "CreateDataFileConfig", id = 0 }
+           );
+
+
+
         }
     } 
 }

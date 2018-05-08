@@ -7,7 +7,7 @@
 
 
 <center>
-    <h2 style="color: white; margin: 80px; text-shadow: -.1px 0 black, 0 .1px black, .1px 0 black, 0 -.1px black;">Welcome to the Data.Sentry.com Portal.  Please choose an option below to begin your journey.</h2>
+    <h2 style="color: white; margin: 80px; text-shadow: -.5px 0 black, 0 .5px black, .5px 0 black, 0 -.5px black;">Welcome to the Data.Sentry.com Portal.  Please choose an option below to begin your journey.</h2>
 
     <div class="container">
         <div class="ds-grid col-md-12" style="margin-bottom: 40px; display: none;">
@@ -47,7 +47,7 @@
                 </div>
             </div>
             <div class="row text-center" style="margin-top: 175px;">
-                <div class="feed hidden-xs hidden-sm border_@color2">
+                <div class="feed hidden-xs hidden-sm border_@color2" style="width: 100%;">
                     <div class="row_@color2 topFeed">
                         <h2 class="@color2 leftFloat feedHeader">Feed</h2>
 
@@ -84,22 +84,23 @@
 
 
 <style>
-    html {
+    /*html {
         overflow: scroll;
         overflow-x: hidden;
     }
 
     ::-webkit-scrollbar {
-        width: 0px; /* remove scrollbar space */
-        background: transparent; /* optional: just make scrollbar invisible */
-    }
-    /* optional: show position indicator in red */
-    ::-webkit-scrollbar-thumb {
-        background: #FF0000;
+        width: 0px;  remove scrollbar space */
+        /*background: transparent;  optional: just make scrollbar invisible */
     }
 
+    /* optional: show position indicator in red
+    ::-webkit-scrollbar-thumb {
+        background: #FF0000;
+    } */
+
     .feed{
-        width:100%;
+        width:100% !important;
         height: 225px;
         margin-left: 0px;
     }
@@ -128,10 +129,10 @@
         font-size: 20px;
     }
 
-    body {
+    /*body {
         overflow-y: hidden;
         height: 100%;
-    }
+    }*/
 
     .row.text-center > div {
         display: inline-block;

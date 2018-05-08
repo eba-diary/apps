@@ -54,6 +54,13 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<DatasetScopeType> DatasetScopeTypes
+        {
+            get
+            {
+                return Query<DatasetScopeType>().Cacheable();
+            }
+        }
 
         public class LineageCreation : IEnumerable<LineageCreation>
         {
@@ -65,12 +72,10 @@ namespace Sentry.data.Infrastructure
             public virtual String DataObjectDetailType_VAL { get; set; }
             public virtual String DataObjectFieldDetailType_CDE { get; set; }
             public virtual String DataObjectFieldDetailType_VAL { get; set; }
-
             public virtual String DataObjectField_NME { get; set; }
-
             public virtual String DataObjectField_DSC { get; set; }
-
             public virtual String DataObject_DSC { get; set; }
+
 
             public IEnumerator<LineageCreation> GetEnumerator()
             {
@@ -90,6 +95,50 @@ namespace Sentry.data.Infrastructure
                 .Where(x => x.MetadataAsset.DataAsset_ID == DataAsset_ID);
 
             return rawQuery.Select(x => x.DataElement_NME).ToList();
+        }
+
+
+
+
+        public Lineage Description(int DataAsset_ID, string DataObject_NME, string DataObjectField_NME)
+        {
+            DataObject_NME = HttpUtility.UrlDecode(DataObject_NME);
+            DataObjectField_NME = HttpUtility.UrlDecode(DataObjectField_NME);
+
+            Lineage l = new Lineage();
+
+            try
+            {
+                var dofDescription = Query<DataObjectField>()
+                     .Where(a => a.DataObject.DataElement.DataElement_NME == "SERA PL.dm1")
+                     .Where(b => DataObject_NME == b.DataObject.DataObject_NME)
+                     .Where(c => DataObjectField_NME == c.DataObjectField_NME);
+
+                l.DataObjectField_DSC = dofDescription.FirstOrDefault().DataObjectField_DSC;
+            }
+            catch (Exception ex)
+            {
+                //There was no description.
+                //Return a null Lineage Object
+            }
+
+            try
+            {
+                var doDescription = Query<DataObject>()
+                     .Where(a => a.DataElement.DataElement_NME == "SERA PL.dm1")
+                     .Where(b => DataObject_NME == b.DataObject_NME);
+
+                l.DataObject_DSC = doDescription.FirstOrDefault().DataObject_DSC;
+            }
+            catch (Exception ex)
+            {
+                //There was no description.
+                //Return a null Lineage Object
+            }
+
+
+
+            return l;
         }
 
         public List<Lineage> Lineage(string dataElementCode, List<string> dataObjectFieldDetailTypes, int? DataAsset_ID, String DataElement_NME = "", String DataObject_NME = "", String DataObjectField_NME = "")
@@ -124,11 +173,15 @@ namespace Sentry.data.Infrastructure
                 DataAsset_ID = x.DataObjectField.DataObject.DataElement.MetadataAsset.DataAsset_ID,
                 DataElement_NME = x.DataObjectField.DataObject.DataElement.DataElement_NME,
                 DataObject_NME = x.DataObjectField.DataObject.DataObject_NME,
+               // DataObject_DSC = x.DataObjectField.DataObject.DataObject_DSC,
                 DataObjectCode_DSC = x.DataObjectField.DataObject.DataObjectCode_DSC,
                 DataObjectField_NME = x.DataObjectField.DataObjectField_NME,
+               // DataObjectField_DSC = x.DataObjectField.DataObjectField_DSC,
                 DataObjectFieldDetailType_CDE = x.DataObjectFieldDetailType_CDE,
                 DataObjectFieldDetailType_VAL = x.DataObjectFieldDetailType_VAL
             });
+
+
 
             List<Lineage> lineage = new List<Lineage>();
 
@@ -156,8 +209,6 @@ namespace Sentry.data.Infrastructure
                         l.DataObjectCode_DSC = item.DataObjectCode_DSC;
                         l.DataObjectDetailType_VAL = item.DataObjectDetailType_VAL;
                         l.DataObjectField_NME = item.DataObjectField_NME;
-                        l.DataObjectField_DSC = item.DataObjectField_DSC;
-                        l.DataObject_DSC = item.DataObject_DSC;
                         l.ID = lineage.Count;
                     }
                     else
@@ -219,9 +270,39 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
+                //TODO: Revisit for solution to filter based on user (i.e. Admins can see all eventtypes)
                 return Query<EventType>().Cacheable();
             }
         }
+
+        public IQueryable<DataSourceType> DataSourceTypes
+        {
+            get
+            {
+                //TODO: Revisit for solution to filter based on user (i.e. Admins can see all eventtypes)
+                return Query<DataSourceType>().Cacheable();
+            }
+        }
+
+        public IQueryable<DataSource> DataSources
+        {
+            get
+            {
+                //TODO: Revisit for solution to filter based on user (i.e. Admins can see all eventtypes)
+                return Query<DataSource>().Cacheable();
+            }
+        }
+
+        public IQueryable<AuthenticationType> AuthTypes
+        {
+            get
+            {
+                //TODO: Revisit for solution to filter based on user (i.e. Admins can see all eventtypes)
+                return Query<AuthenticationType>().Cacheable();
+            }
+        }
+
+
 
         public IQueryable<Status> EventStatus
         {
@@ -473,19 +554,7 @@ namespace Sentry.data.Infrastructure
             return da;
         }
 
-        public EventType GetEventType(string description)
-        {
-            return Query<EventType>().Cacheable().Where(x => x.Description.ToLower().Contains(description.ToLower())).FirstOrDefault();
-        }
 
-        public EventType GetEventType(int id)
-        {
-            return Query<EventType>().Cacheable().Where(x => x.Type_ID == id).FirstOrDefault();
-        }
-        public List<EventType> GetAllEventTypes()
-        {
-            return Query<EventType>().Cacheable().ToList();
-        }
 
         public Interval GetInterval(string description)
         {

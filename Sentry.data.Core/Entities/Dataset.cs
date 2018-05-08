@@ -28,8 +28,6 @@ namespace Sentry.data.Core
         //private string _fileExtension;
         private DateTime _datasetDtm;
         private DateTime _changedDtm;
-        //private string _creationFreqCode;
-        private string _creationFreqDesc;
         private string _s3key;
         private Boolean _IsSensitive;
         private Boolean _canDisplay;
@@ -61,8 +59,6 @@ namespace Sentry.data.Core
                        //string fileExtension,
                        DateTime datasetDtm,
                        DateTime changedDtm,
-                       //string creationFreqCode,
-                       //string creationFreqDesc,
                        string s3key,
                        Boolean IsSensitive,
                        Boolean CanDisplay,
@@ -88,8 +84,6 @@ namespace Sentry.data.Core
             //this._fileExtension = fileExtension;
             this._datasetDtm = datasetDtm;
             this._changedDtm = changedDtm;
-            //this._creationFreqCode = creationFreqCode;
-            //this._creationFreqDesc = creationFreqDesc;
             this._s3key = s3key;
             this._IsSensitive = IsSensitive;
             this._canDisplay = CanDisplay;
@@ -266,14 +260,6 @@ namespace Sentry.data.Core
             set
             {
                 _changedDtm = value;
-            }
-        }
-
-        public virtual List<string> CreationFreqDesc
-        {
-            get
-            {
-                return DatasetFileConfigs.Select(x => x.CreationFreqDesc).Distinct().ToList();
             }
         }
 

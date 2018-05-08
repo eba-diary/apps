@@ -15,13 +15,12 @@ namespace Sentry.data.Web
         public CreateDatasetModel()
         {
             this.Category = "";
-            //this.CategoryList = new List<string>();
             this.ChangedDtm = DateTime.MinValue;
-            //this.CreationFreqDesc = DatasetFrequency.NonSchedule.ToString();  // Default to NonScheduled
             this.DatasetDesc = "";
-            //this.DatasetDtm = DateTime.MinValue;
             this.DatasetName = "";
             this.FileExtension = "";
+            this.ConfigFileName = "Default";
+            this.ConfigFileDesc = "Default Config for Dataset.  Uploaded files that do not match any configs will default to this config";
             this.DatasetId = 0;
             this.OriginationCode = "";
             this.S3Key = "";
@@ -66,9 +65,6 @@ namespace Sentry.data.Web
         [DisplayName("Target File Name")]
         public string TargetFileName { get; set; }
 
-        [DisplayName("Drop Location Type")]
-        public string DropLocationType { get; set; }
-
         [Required]
         [DisplayName("Drop Path")]
         public string DropPath { get; set; }
@@ -97,16 +93,21 @@ namespace Sentry.data.Web
             }
         }
 
+        public List<DatasetFileConfigsModel> Configs { get; set; }
+
+
+
+
         [DisplayName("Configuration Name")]
         public string ConfigFileName { get; set; }
 
         [DisplayName("Description")]
         public string ConfigFileDesc { get; set; }
 
-        [Required]
-        [DisplayName("Creation Frequency")]
-        public string CreationFreq { get; set; }
+        [DisplayName("Data Source")]
+        public DataSource DataSource { get; set; }
 
+        public IEnumerable<SelectListItem> SourceTypes { get; set; }
 
         //[DisplayName("Dataset File")]
         //public String DatasetFileName { get; set; }

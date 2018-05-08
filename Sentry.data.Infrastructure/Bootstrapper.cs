@@ -71,6 +71,7 @@ namespace Sentry.data.Infrastructure
                 scanner.AssemblyContainingType<IMetadataRepositoryProvider>();
                 scanner.AssemblyContainingType<DataAssetProvider>();
                 scanner.AssemblyContainingType<IDataAssetProvider>();
+                scanner.AddAllTypesOf<IDataSource>();
                 scanner.WithDefaultConventions();
             });
 
@@ -82,7 +83,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IMetadataRepositoryProvider>().Use(() => new MetadataRepositoryProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IDataAssetProvider>().Use(() => new DataAssetProvider(_defaultSessionFactory.OpenSession()));
             registry.For<IODCFileProvider>().Use(() => new ODCFileProvider(_defaultSessionFactory.OpenSession()));
-            registry.For<IRequestContext>().Use(() => new requestContext(_defaultSessionFactory.OpenSession()));
+            registry.For<IRequestContext>().Use(() => new RequestContext(_defaultSessionFactory.OpenSession()));
 
             //Register other services
             Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider obsidianUserProvider = new Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider();
@@ -92,7 +93,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IExtendedUserInfoProvider>().Singleton().Use<ExtendedUserInfoProvider>();
             registry.For<ISASService>().Singleton().Use<SASServiceProvider>();
             registry.For<IWeatherDataProvider>().Singleton().Use<WeatherDataProvider>();
-            registry.For<IFtpProvider>().Singleton().Use<FTPProvider>();
+            registry.For<IFtpProvider>().Singleton().Use<FtpProvider>();
             
             //Create the StructureMap container
             _container = new StructureMap.Container(registry);
@@ -140,7 +141,7 @@ namespace Sentry.data.Infrastructure
             //Configure entity Validation
             config.SetInterceptor(new Sentry.NHibernate.ValidationInterceptor());
 
-            return config.BuildSessionFactory();
+           return config.BuildSessionFactory();
 
         }
     }

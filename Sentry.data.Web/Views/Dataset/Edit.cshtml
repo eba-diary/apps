@@ -103,7 +103,7 @@
                 <label class="control-label col-md-2"></label>
                 <div class="col-md-10">
                     <span class="text-muted">
-                        <em>This is who originally created the data for example external data sources like Mitchell or internal data sources like CustomerOne.</em>
+                        <em>This is the original creator of the data. For Example: External data sources like Mitchell or Internal Data Sources like CustomerOne.</em>
                     </span>
                 </div>
             </div>
@@ -251,13 +251,6 @@
                 <br />
                 <div id="hide_detailSectionHeader_Advanced" style="display: none;">
 
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.DropLocationType, htmlAttributes: new { @class = "control-label col-md-2 optional" })
-                        <div class="col-md-10">
-                            @Html.EditorFor(model => model.DropLocationType, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                            @Html.ValidationMessageFor(model => model.DropLocationType, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
 
                     <div class="form-group fieldDescription">
                         <label class="control-label col-md-2"></label>

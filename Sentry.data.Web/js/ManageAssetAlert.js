@@ -68,6 +68,14 @@ data.ManageAssetAlert = {
             modal.ReplaceModalBody(e);
             data.ManageAssetAlert.CreatetNotificationInit();
         })
+
+        //adding draggable property to modal, attaching handle to the header of the modal.
+        // Additionaly, change the cursor when hovering over modal-header.
+        $(".modal-content").draggable({
+            handle: ".modal-header",
+            scroll: false
+        });
+        $('.modal-header').css('cursor', 'pointer');
     },
 
     AssetNotificationTableInit: function () {
@@ -159,7 +167,6 @@ data.ManageAssetAlert = {
         //$("#userTable_wrapper .dt-toolbar").html($("#userToolbar"));
 
         $("#Add_Notification").click(function () {
-            alert("Add Notification Function");
             data.ManageAssetAlert.CreateNotification();
         });
     },

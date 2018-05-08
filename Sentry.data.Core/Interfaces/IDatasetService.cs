@@ -65,6 +65,8 @@ namespace Sentry.data.Core
 
         List<string> FindObject(string keyPrefix);
 
+        IList<string> ListObjects(string bucket, string prefix);
+
         //CopyPartResponse CopyPart(string dest_Key, int partnum, string source_key, string source_versionId, string uploadId);
     }
 

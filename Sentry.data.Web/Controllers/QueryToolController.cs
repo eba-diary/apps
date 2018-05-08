@@ -269,7 +269,6 @@ namespace Sentry.data.Web.Controllers
             return Ok(obj);
         }
 
-
         [HttpGet]
         [Route("Get")]
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
@@ -312,13 +311,18 @@ namespace Sentry.data.Web.Controllers
 
         private class QueryableDataset
         {
+            public string configName { get; set; }
+            public string bucket { get; set; }
             public string s3Key { get; set; }
             public List<string> extensions { get; set; }
             public int fileCount { get; set; }
             public Boolean IsGeneric { get; set; }
+            public Boolean IsPowerUser { get; set; }
         }
 
-
+        [HttpGet]
+        [Route("Get")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> GetS3Key(int datasetID)
         {
             Dataset ds = _datasetContext.GetById<Dataset>(datasetID);
@@ -327,14 +331,17 @@ namespace Sentry.data.Web.Controllers
 
             foreach (var item in ds.DatasetFileConfigs)
             {
-                if (ds.DatasetFiles.Any(x => x.DatasetFileConfig.ConfigId == item.ConfigId) || ds.DatasetFileConfigs.Count == 1)
+                if ((ds.DatasetFiles.Any(x => x.DatasetFileConfig.ConfigId == item.ConfigId) || ds.DatasetFileConfigs.Count == 1) && item.FileTypeId != (int) FileType.Supplementary)
                 {
                     QueryableDataset qd = new QueryableDataset();
 
-                    qd.s3Key = ds.S3Key + item.Name;
-                    qd.fileCount = ds.DatasetFiles.Where(x => x.DatasetFileConfig.ConfigId == item.ConfigId).ToList().Count;
+                    qd.configName = item.Name;
+                    qd.bucket = Sentry.Configuration.Config.GetHostSetting("AWSRootBucket");
+                    qd.s3Key = ds.S3Key + item.ConfigId;
+                    qd.fileCount = ds.DatasetFiles.Where(x => x.DatasetFileConfig.ConfigId == item.ConfigId && x.ParentDatasetFileId == null).ToList().Count;
                     qd.extensions = ds.DatasetFiles.Where(x => x.DatasetFileConfig.ConfigId == item.ConfigId).Select(x => Utilities.GetFileExtension(x.FileName)).Distinct().ToList();
                     qd.IsGeneric = item.IsGeneric;
+                    qd.IsPowerUser = _userService.GetCurrentUser().CanQueryToolPowerUser;
 
                     reply.Add(qd);
                 }

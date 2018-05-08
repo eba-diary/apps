@@ -76,105 +76,120 @@
             <div class="navbar-collapse collapse" id="navbar-main">
                 <ul class="nav navbar-nav text-right">
                     @if (Model.CanViewDataAsset)
-                    {
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Assets <b class="caret"></b></a>
+    {
+                <li class="dropdown">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Data Assets <b class="caret"></b></a>
+                    <ul class="dropdown-menu">
+                        <li class="dropdown-submenu">
+                            <a data-toggle="dropdown">Assets </a>
                             <ul class="dropdown-menu">
-                                <li class="dropdown-submenu">
-                                    <a data-toggle="dropdown">Assets </a>
-                                    <ul class="dropdown-menu">
-                                        @foreach (Sentry.data.Core.DataAsset da in ViewBag.DataAssets)
-                                        {
-                                            <li class="text-right"><a href="/DataAsset/@da.Name">@da.DisplayName</a></li>
-                                        }
-                                    </ul>
-                                </li>
-                                @if (Model.CanUserSwitch)
-                                {
-                                <li class="dropdown-submenu">
-                                    <a data-toggle="dropdown">Lineage </a>
-                                    <ul class="dropdown-menu">
-                                        <li class="dropdown-submenu">
-                                            <a data-toggle="dropdown">SERA PL </a>
-                                            <ul class="dropdown-menu">
-                                                <li class="dropdown-header">Search</li>
-
-                                                <li class="text-left"><a href="/Lineage/DataAsset/SERAPL/">Business Term</a></li>
-
-                                                <li class="divider"></li>
-                                                <li class="dropdown-header">Cubes</li>
-
-                                                <li class="text-left"><a href="/Lineage/DataAsset/SERAPL/Cubes/SERAPL Loss Triangles">SERAPL Loss Triangles</a></li>
-                                                <li class="text-left"><a href="/Lineage/DataAsset/SERAPL/Cubes/SERAPL Snapshot">SERAPL Snapshot</a></li>
-                                                <li class="text-left"><a href="/Lineage/DataAsset/SERAPL/Cubes/SERAPL Transactional">SERAPL Transactional</a></li>
-                                                
-                                                <li class="divider"></li>
-                                                <li class="dropdown-header">Business Objects</li>
-
-                                                <li class="text-left"><a href="/Lineage/DataAsset/SERAPL/BusinessObjects/SERAPL_Adhoc">SERAPL_Adhoc</a></li>
-                                                <li class="text-left"><a href="/Lineage/DataAsset/SERAPL/BusinessObjects/SERAPL_Snapshot">SERAPL_Snapshot</a></li>
-                                                <li class="text-left"><a href="/Lineage/DataAsset/SERAPL/BusinessObjects/SERAPL_Transactional">SERAPL_Transactional</a></li>
-                                            </ul>
-                                        </li>
-                                    </ul>
-                                </li>
-                                }
-                                @if (Model.CanManageAssetAlerts)
-                                {
-                                    <li class="divider"></li>
-                                    <li class="dropdown-header">Asset Administration</li>
-                                    if (Model.CanManageAssetAlerts)
-                                    {
-                                        <li><a href="/DataAsset/ManageAssetNotification">Manage Alerts</a></li>
-                                    }
-                                }
+                                @foreach (Sentry.data.Core.DataAsset da in ViewBag.DataAssets)
+                {
+                    <li class="text-right"><a href="/DataAsset/@da.Name">@da.DisplayName</a></li>
+}
                             </ul>
                         </li>
-                    }
-                    
-                    
-                        <li class="dropdown">
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">Datasets<b class="caret"></b></a>
+                        @if (Model.CanUserSwitch)
+        {
+                <li class="dropdown-submenu">
+                    <a data-toggle="dropdown">Lineage </a>
+                    <ul class="dropdown-menu">
+
+                        <li class="dropdown-submenu">
+                            <a data-toggle="dropdown">Personal Lines </a>
                             <ul class="dropdown-menu">
-                                <li><a href="~/Dataset/Index">Home</a></li>
-                                <li><a href="~/Dataset/List">Search</a></li>
+                                <li class="dropdown-header">Search</li>
 
-                                @if (Model.CanManageConfigs || Model.CanEditDataset || Model.CanUpload)
-                                {
-                                    <li class="divider"></li>
-                                    <li class="dropdown-header">Dataset Actions</li>
+                                <li class="text-left"><a href="/Lineage/Personal Lines/">Business Term</a></li>
 
-                                    if (Model.CanEditDataset)
-                                    {
-                                        <li><a href="#" onclick="data.Dataset.ViewUpload()">Create Dataset</a></li>
-                                    }
+                                <li class="divider"></li>
 
-                                    if (Model.CanUpload)
-                                    {
-                                        <li><a href="#" onclick="data.DatasetDetail.UploadFileModal(0)">Upload Data File</a></li>
-                                    }
+                                <li class="dropdown-header">Assets</li>
 
-                                    if (Model.CanManageConfigs)
-                                    {
-                                        if (Model.CanManageConfigs)
-                                        {
-                                            <li class="divider"></li>
-                                            <li class="dropdown-header">Dataset Administration</li>
-                                            <li><a href="/Dataset/EditDataFileConfig">Manage Configs</a></li>
-                                        }
-                                        
-                                    }
-                                }
+                                <li class="dropdown-submenu">
+                                    <a data-toggle="dropdown">SERA PL </a>
+                                    <ul class="dropdown-menu">
+
+                                        <li class="dropdown-header">Search</li>
+
+                                        <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/">Business Term</a></li>
+
+                                        <li class="divider"></li>
+                                        <li class="dropdown-header">Cubes</li>
+
+                                        <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/Cubes/SERAPL Loss Triangles">SERAPL Loss Triangles</a></li>
+                                        <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/Cubes/SERAPL Snapshot">SERAPL Snapshot</a></li>
+                                        <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/Cubes/SERAPL Transactional">SERAPL Transactional</a></li>
+
+                                        <li class="divider"></li>
+                                        <li class="dropdown-header">Business Objects</li>
+
+                                        <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/BusinessObjects/SERAPL_Adhoc">SERAPL_Adhoc</a></li>
+                                        <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/BusinessObjects/SERAPL_Snapshot">SERAPL_Snapshot</a></li>
+                                        <li class="text-left"><a href="/Lineage/Personal Lines/SERAPL/BusinessObjects/SERAPL_Transactional">SERAPL_Transactional</a></li>
+                                    </ul>
+                                </li>
                             </ul>
                         </li>
-                    
+                    </ul>
+                </li>
+}
+                        @if (Model.CanManageAssetAlerts)
+        {
+                <li class="divider"></li>
+                <li class="dropdown-header">Asset Administration</li>
+if (Model.CanManageAssetAlerts)
+{
+                <li><a href="/DataAsset/ManageAssetNotification">Manage Alerts</a></li>
+}
+}
+                    </ul>
+                </li>
+}
+
+
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Datasets<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="~/Dataset/Index">Home</a></li>
+                            <li><a href="~/Dataset/List">Search</a></li>
+
+                            @if (Model.CanManageConfigs || Model.CanEditDataset || Model.CanUpload)
+            {
+                <li class="divider"></li>
+                <li class="dropdown-header">Dataset Actions</li>
+
+if (Model.CanEditDataset)
+{
+                <li><a href="#" onclick="data.Dataset.ViewUpload()">Create Dataset</a></li>
+}
+
+if (Model.CanUpload)
+{
+                <li><a href="#" onclick="data.DatasetDetail.UploadFileModal(0)">Upload Data File</a></li>
+}
+
+if (Model.CanManageConfigs)
+{
+if (Model.CanManageConfigs)
+{
+                <li class="divider"></li>
+                <li class="dropdown-header">Dataset Administration</li>
+                <li><a href="/Config/Manage">Manage Configs</a></li>
+}
+
+}
+}
+                        </ul>
+                    </li>
+
 
                     @if (Model.CanQueryToolPowerUser || Model.CanQueryTool)
-                    {
-                        <li>
-                            <a href="~/Dataset/QueryTool" class="">Query Tool</a>                               
-                        </li>
-                     }
+    {
+                <li>
+                    <a href="~/Dataset/QueryTool" class="">Query Tool</a>
+                </li>
+}
 
 
 
@@ -189,7 +204,7 @@
                             @*<li><a href="/Tutorial">Tutorial</a></li>*@
                             <li class="dropdown-submenu">
                                 <a data-toggle="dropdown">User Guides</a>
-                                <ul class="dropdown-menu">                                    
+                                <ul class="dropdown-menu">
                                     <li class="dropdown-submenu">
                                         <a data-toggle="dropdown">Data Assets</a>
                                         <ul class="dropdown-menu">
@@ -207,8 +222,11 @@
 
                         </ul>
                     </li>
-                    
-                    <li class="visible-xs"><a href="#">About</a></li>
+                     @if (Model.CanUserSwitch)
+                     {
+                    <li><a href="~/swagger">API</a></li>
+                    <li><a href="~/hangfire">Hangfire</a></li>
+                     }
                 </ul>
 
 

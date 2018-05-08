@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -9,6 +10,6 @@ namespace Sentry.data.Core
 {
     public interface IFtpProvider
     {
-        void DownloadFile(string url, NetworkCredential cred, string destination);
+        Stream GetJobStream(RetrieverJob Job);
     }
 }

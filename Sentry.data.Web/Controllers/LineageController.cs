@@ -53,6 +53,30 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         [Route("Get")]
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        public async Task<IHttpActionResult> GetDescriptionFor(int DataAsset_ID, string DataObject_NME, string DataObjectField_NME = "")
+        {
+            try
+            {
+                var doDesc = _dsContext.Description(DataAsset_ID, DataObject_NME, DataObjectField_NME);
+
+                if(doDesc.DataObject_DSC == null && doDesc.DataObjectField_DSC == null)
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    return Ok(doDesc);
+                }
+            }
+            catch (Exception ex)
+            {
+                return NotFound();
+            }
+        }
+
+        [HttpGet]
+        [Route("Get")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> GetSourceElementsFor(int? DataAsset_ID, string DataElement_NME = "")
         {
             try

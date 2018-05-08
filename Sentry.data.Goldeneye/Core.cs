@@ -8,9 +8,10 @@ using Sentry.data.Infrastructure;
 using System.Collections.Generic;
 using Sentry.data.Core;
 using System.IO;
-using Sentry.Configuration;
 using Newtonsoft.Json;
 using StructureMap;
+using Hangfire;
+using Hangfire.SqlServer;
 
 namespace Sentry.data.Goldeneye
 {
@@ -24,6 +25,7 @@ namespace Sentry.data.Goldeneye
         private CancellationToken _token;
         private IContainer _container;
         private IDatasetContext _datasetContext;
+        private IRequestContext _requestContext;
 
         /// <summary>
         /// Start the core worker
@@ -37,7 +39,7 @@ namespace Sentry.data.Goldeneye
             _token = _tokenSource.Token;
 
             //start up a new task
-            Task.Factory.StartNew(this.DoWork, TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted);
+            Task.Factory.StartNew(this.DoWork, TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted);          
         }
 
         /// <summary>
@@ -79,9 +81,8 @@ namespace Sentry.data.Goldeneye
             Bootstrapper.Init();
 
             //Start all the internal processes.
-            
-            //Watch.OnStart(Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath"));
 
+            //Watch.OnStart(Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath"));
 
             //Get or Create the Runtime Configuration
             Configuration config = new Configuration();
@@ -99,6 +100,7 @@ namespace Sentry.data.Goldeneye
 
             List<RunningTask> currentTasks = new List<RunningTask>();
             List<Request> requests = new List<Request>();
+            
 
             Boolean firstRun = true;
             do
@@ -109,7 +111,7 @@ namespace Sentry.data.Goldeneye
                     Console.WriteLine("There are currently " + currentTasks.Count + " processes running. "  + currentTasks.Count(x => x.Task.IsCompleted) + " Completed.");
                     foreach (RunningTask rt in currentTasks)
                     {
-                        Console.WriteLine("Name: " + rt.Name  + " - Done : " + rt.Task.IsCompleted  + " - Time Elapsed:" + (DateTime.Now - rt.TimeStarted).TotalSeconds.ToString("0.00") + " seconds");
+                        //Console.WriteLine("Name: " + rt.Name  + " - Done : " + rt.Task.IsCompleted  + " - Time Elapsed:" + (DateTime.Now - rt.TimeStarted).TotalSeconds.ToString("0.00") + " seconds");
 
                         if(rt.Task.IsFaulted)
                         {
@@ -137,7 +139,40 @@ namespace Sentry.data.Goldeneye
                                 currentTasks.RemoveAll(x => x.Name == task.Name);
                             }
                         }
+                    }
 
+                    if (firstRun)
+                    {
+                        var backgroundJobServer = new Scheduler();
+                        currentTasks.Add(new RunningTask(
+                            Task.Factory.StartNew(() => backgroundJobServer.Run(_token), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),
+                            "BackgroundJobServer")
+                        );
+
+                        //https://crontab.guru/
+                        //Schecule SpamFactory:Instance to run every minute
+                        // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
+                        RecurringJob.AddOrUpdate("spamfactory_instant", () => SpamFactory.Run("Instant"), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                        RecurringJob.AddOrUpdate("spamfactory_hourly", () => SpamFactory.Run("Hourly"), "00 * * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                        RecurringJob.AddOrUpdate("spamfactory_daily", () => SpamFactory.Run("Daily"), "00 8 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                        RecurringJob.AddOrUpdate("spamfactory_weekly", () => SpamFactory.Run("Weekly"), "00 8 * * MON", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+
+                        //Load all scheduled jobs into hangfire on startup to ensure all jobs are registered
+                        using (_container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                        {
+                            IRequestContext requestContext = _container.GetInstance<IRequestContext>();
+
+                            List<RetrieverJob> JobList = requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant").ToList();
+
+                            foreach (RetrieverJob Job in JobList)
+                            {
+                                var datasetName = Job.DatasetConfig.ParentDataset.DatasetName;
+                                var configName = Job.DatasetConfig.Name;
+                                
+                                // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
+                                RecurringJob.AddOrUpdate<RetrieverJobService>($"RJob~{Job.DatasetConfig.ParentDataset.DatasetId}~{Job.Id}~{Job.DatasetConfig.ConfigId}~{Job.DataSource.Name}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                            }
+                        }
                     }
 
                     ////Dataset Loader
@@ -166,11 +201,14 @@ namespace Sentry.data.Goldeneye
                                     File.Move(a, processingFile);
 
                                     //Create a new one.
+
                                     currentTasks.Add(new RunningTask(
                                         Task.Factory.StartNew(() => DatasetLoader.Run(processingFile), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),
                                         $"DatasetLoader : Minute : {Path.GetFileNameWithoutExtension(a)}"));
-                                }
-                                availableLoaderTasks--;
+
+                                    //Remove one available loader task
+                                    availableLoaderTasks--;
+                                }                                
                             }
                             else
                             {
@@ -197,54 +235,41 @@ namespace Sentry.data.Goldeneye
                         Logger.Info($"Dataset Loader Back Pressure: {files}");
                     }
 
-                    //Spam Factory
-                    //  We don't want to add another Spam Factory : Instant if the old one is still running.  i.e. Race Conditions sending Emails.
-                    if (currentTasks.Any(x => x.Task.IsCompleted && x.Name == "Spam Factory : Instant") || firstRun)
+                    //Reload and modifed\new jobs
+                    using (_container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
                     {
-                        //If it's completed dispose of it.
-                        var tasks = currentTasks.Where(x => x.Name == "Spam Factory : Instant").ToList();
-                        tasks.ForEach(x => x.Task.Dispose());
-                        currentTasks.RemoveAll(x => x.Name == "Spam Factory : Instant");
+                        IRequestContext requestContext = _container.GetInstance<IRequestContext>();
 
-                        //Create a new one.
-                        currentTasks.Add(new RunningTask(
-                            Task.Factory.StartNew(() => SpamFactory.Run("Instant"), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),
-                            "Spam Factory : Instant")
-                        );
+                        List<RetrieverJob> JobList = new List<RetrieverJob>();
+                        JobList = requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && (w.Created > config.LastRunMinute || w.Modified > config.LastRunMinute)).ToList();
+
+                        foreach (RetrieverJob Job in JobList)
+                        {
+                            // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
+                            RecurringJob.AddOrUpdate<RetrieverJobService>($"RJob~{Job.DatasetConfig.ParentDataset.DatasetId}~{Job.Id}~{Job.DatasetConfig.ConfigId}~{Job.DataSource.Name}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                        }
+
+                        if (JobList.Count > 0)
+                        {
+                            string jobIds = null;
+                            int cnt = 0;
+                            foreach (RetrieverJob a in JobList)
+                            {
+                                if (cnt > 0)
+                                {
+                                    jobIds += " | " + a.Id.ToString();
+                                }
+                                else
+                                {
+                                    jobIds += a.Id.ToString();
+                                }
+                                cnt++;
+                            }
+
+                            Console.WriteLine($"Detected {JobList.Count} new or modified jobs to be loaded into hangfire : JobIds:{jobIds}");
+                            Logger.Info($"Detected {JobList.Count} new or modified jobs to be loaded into hangfire : JobIds:{jobIds}");
+                        }
                     }
-
-                    ////Directory Monitoring (Original Goldeneye)
-                    ////  We don't want to add another directory monitor if the old one is still running.
-                    //if (currentTasks.Where(x => x.Name.StartsWith("Watch") && x.Task.IsCompleted).Count() > 0 || firstRun)
-                    //{
-                    //    //If it's completed dispose of it.
-                    //    var tasks = currentTasks.Where(x => x.Name.StartsWith("Watch") && x.Task.IsCompleted).ToList();
-                    //    tasks.ForEach(x => x.Task.Dispose());
-                    //    tasks.ForEach(x => currentTasks.RemoveAll(ct => ct.Name == x.Name));
-
-                    //    List<DatasetFileConfig> dsconfig = null;
-
-                    //    using (_container = Bootstrapper.Container.GetNestedContainer())
-                    //    {
-                    //        _datasetContext = _container.GetInstance<IDatasetContext>();
-                    //        dsconfig = _datasetContext.getAllDatasetFileConfigs().Where(w => w.DropLocationType == "DFS").OrderBy(o => o.ConfigId).ToList();
-                    //    }
-
-                    //    foreach (DatasetFileConfig dsfc in dsconfig)
-                    //    {
-                    //        if (firstRun || tasks.Any(w => Int64.Parse(w.Name.Replace("Watch_", "")) == dsfc.ConfigId))
-                    //        {
-                    //            currentTasks.Add(new RunningTask(
-                    //                Task.Factory.StartNew(() => (new Watch()).OnStart(dsfc.ConfigId),
-                    //                                                TaskCreationOptions.LongRunning).ContinueWith(TaskException,
-                    //                                                TaskContinuationOptions.OnlyOnFaulted),
-                    //                                                $"Watch_{dsfc.ConfigId}")
-                    //            );
-
-                    //            if (!firstRun) { Console.WriteLine($"Restarting Watch_{dsfc.ConfigId}"); }
-                    //        }
-                    //    }
-                    //}
 
                     //Dataset File Config Watch
                     if (true)
@@ -254,90 +279,61 @@ namespace Sentry.data.Goldeneye
                         tasks.ForEach(x => x.Task.Dispose());
                         tasks.ForEach(x => currentTasks.RemoveAll(ct => ct.Name == x.Name));
 
-                        List<DatasetFileConfig> dsconfig = null;
+                        List<RetrieverJob> rtjob = null;
 
                         using (_container = Bootstrapper.Container.GetNestedContainer())
                         {
-                            _datasetContext = _container.GetInstance<IDatasetContext>();
-                            dsconfig = _datasetContext.getAllDatasetFileConfigs().Where(w => w.DropLocationType == "DFS").OrderBy(o => o.ConfigId).ToList();
-                        }
+                            _requestContext = _container.GetInstance<IRequestContext>();
+                            rtjob = _requestContext.RetrieverJob.Where(w => (w.DataSource is DfsBasic || w.DataSource is DfsCustom) && w.Schedule == "Instant").ToList();
 
-                        foreach (DatasetFileConfig dsfc in dsconfig)
-                        {
+                        
+
+                        foreach (RetrieverJob job in rtjob)
+                            {
+                                Uri watchPath = job.GetUri();
+                                int jobId = job.Id;
+                                int configID = job.DatasetConfig.ConfigId;
+
                             //On initial run start all watch tasks for all configs
-                            if (firstRun)
+                                if (firstRun)
                             {
                                 currentTasks.Add(new RunningTask(
-                                                                    Task.Factory.StartNew(() => (new Watch()).OnStart(dsfc.ConfigId),
+                                                                    Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath),
                                                                                                     TaskCreationOptions.LongRunning).ContinueWith(TaskException,
                                                                                                     TaskContinuationOptions.OnlyOnFaulted),
-                                                                                                    $"Watch_{dsfc.ConfigId}")
+                                                                                                    $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
                                                                 );
                             }
                             //Restart any completed tasks
-                            else if (tasks.Any(w => Int64.Parse(w.Name.Replace("Watch_", "")) == dsfc.ConfigId))
+                            else if (tasks.Any(w => Int64.Parse(w.Name.Replace("Watch_", "")) == configID))
                             {
                                 currentTasks.Add(new RunningTask(
-                                    Task.Factory.StartNew(() => (new Watch()).OnStart(dsfc.ConfigId),
+                                    Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath),
                                                                     TaskCreationOptions.LongRunning).ContinueWith(TaskException,
                                                                     TaskContinuationOptions.OnlyOnFaulted),
-                                                                    $"Watch_{dsfc.ConfigId}")
+                                                                    $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
                                 );
 
-                                Logger.Info($"Resstarting Watch_{ dsfc.ConfigId}");
+                                Logger.Info($"Resstarting Watch_{configID}");
                             }
                             //Start any new directories added
-                            else if (!currentTasks.Any(x => x.Name.StartsWith("Watch") && Int64.Parse(x.Name.Replace("Watch_", "")) == dsfc.ConfigId))
+                            else if (!currentTasks.Any(x => x.Name.StartsWith("Watch") && x.Name.Replace("Watch_", "") == $"{job.Id}_{job.DatasetConfig.ConfigId}"))
                             {
-                                Logger.Info($"Detected new config ({dsfc.ConfigId}) to monitor ({dsfc.DropPath})");
+                                Logger.Info($"Detected new config ({configID}) to monitor ({configID})");
 
                                 currentTasks.Add(new RunningTask(
-                                    Task.Factory.StartNew(() => (new Watch()).OnStart(dsfc.ConfigId),
+                                    Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath),
                                                                     TaskCreationOptions.LongRunning).ContinueWith(TaskException,
                                                                     TaskContinuationOptions.OnlyOnFaulted),
-                                                                    $"Watch_{dsfc.ConfigId}")
+                                                                    $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
                                 );
                             }
                         }
+                        }
+
                     }
 
                     config.LastRunMinute = DateTime.Now;                    
-                }
-                
-                //HOURLY Processing
-                if ((DateTime.Now - config.LastRunHour).TotalHours >= 1 || firstRun)
-                {
-                    //Create a new one.
-                    currentTasks.Add(new RunningTask(
-                        Task.Factory.StartNew(() => SpamFactory.Run("Hourly"), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),
-                        "Spam Factory : Hourly")
-                    );
-
-                    config.LastRunHour = DateTime.Now;
-                }
-
-                //DAILY Processing
-                if ((DateTime.Now - config.LastRunDay).TotalHours >= 24 || firstRun)
-                {
-                    //Create a new one.
-                    currentTasks.Add(new RunningTask(
-                        Task.Factory.StartNew(() => SpamFactory.Run("Daily"), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),
-                        "Spam Factory : Daily")
-                    );
-
-                    config.LastRunDay = DateTime.Now;
-                }
-
-                //WEEKLY Processing
-                if (DateTime.Now.DayOfWeek == DayOfWeek.Monday && (DateTime.Now - config.LastRunWeek).TotalDays >= 7 || firstRun)
-                {
-                    //Create a new one.
-                    currentTasks.Add(new RunningTask(
-                        Task.Factory.StartNew(() => SpamFactory.Run("Weekly"), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),
-                        "Spam Factory : Weekly")
-                    );
-
-                    config.LastRunWeek = DateTime.Now;
                 }
 
                 firstRun = false;

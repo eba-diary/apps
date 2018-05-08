@@ -140,7 +140,7 @@
                     <li><a href="~/DataAsset/@Model.Name">Home</a></li>
 
                     @{ disabled = (Model.DisplayName == "SERA PL" && ViewBag.CanUserSwitch) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="/Lineage/DataAsset/SERAPL">Lineage</a></li>
+                    <li class="@disabled"><a href="/Lineage/Personal Lines/SERAPL">Lineage</a></li>
 
                     @{ disabled = (Model.ArchLink != null) ? "" : "disabled"; }
                     <li class="@disabled"><a href="@arch" target="_blank">Arch Diagrams</a></li>
@@ -161,7 +161,7 @@
             <div class="navbar-collapse collapse navbar-responsive-collapse">
                 <ul class="nav navbar-nav">
                     @{ disabled = (Model.DisplayName == "SERA PL" && ViewBag.CanUserSwitch) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="/Lineage/DataAsset/SERAPL">Lineage</a></li>
+                    <li class="@disabled"><a href="/Lineage/DataAsset/SERAPL/">Lineage</a></li>
 
                     @{ disabled = (Model.ArchLink != null) ? "" : "disabled"; }
                     <li class="@disabled"><a href="@arch" target="_blank">Arch Diagrams</a></li>
@@ -375,7 +375,6 @@
             }
 
             $(function () {
-
                 $('#slide-submenu').on('click', function () {
                     $(this).closest('.list-group').fadeOut('slide', function () {
                         $('.mini-submenu').fadeIn();

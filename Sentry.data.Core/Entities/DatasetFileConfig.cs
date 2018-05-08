@@ -3,228 +3,70 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace Sentry.data.Core
 {
     public class DatasetFileConfig
     {
-#pragma warning disable CS0649
-        private int _configId;
-#pragma warning restore CS0649
-        private string _name;
-        private string _description;
-        //private int _datasetId;
-        private string _searchCriteria;
-        private string _targetFileName;
-        private string _dropLocationType;
-        private string _dropPath;
-        private Boolean _isRegexSearch;
-        private Boolean _overwriteDatafile;
-        private int _fileTypeId;
-        private Boolean _isGeneric;
-        private Dataset _parentDataset;
 
-        private string _creationFreqDesc;
-        private DatasetScopeType _datasetScopeType;
-        private int _datasetScopeTypeID;
-
-        public DatasetFileConfig() { }
-
-        public DatasetFileConfig(
-            int configId,
-            string name,
-            string description,
-            //int datasetId,
-            string searchCriteria,
-            string dropLocationType,
-            string dropPath,
-            Boolean isRegexSearch,
-            Boolean overwriteDatafile,
-            int fileTypeId,
-            Boolean isGeneric,
-            Dataset parentDataset,
-            string creationFreqDesc,
-            int datasetScopeTypeID)
+        public DatasetFileConfig()
         {
-            this._configId = configId;
-            this._name = name;
-            this._description = description;
-            //this._datasetId = datasetId;
-            this._searchCriteria = searchCriteria;
-            this._dropLocationType = dropLocationType;
-            this._dropPath = dropPath;
-            this._isRegexSearch = isRegexSearch;
-            this._overwriteDatafile = overwriteDatafile;
-            this._fileTypeId = fileTypeId;
-            this._isGeneric = isGeneric;
-            this._parentDataset = parentDataset;
-            this._datasetScopeTypeID = datasetScopeTypeID;
-            this._creationFreqDesc = creationFreqDesc;
-        }
+            //Default to false
+            CreateCurrentFile = false;
+        }        
         
-        public virtual int ConfigId
-        {
-            get
-            {
-                return _configId;
-            }
-            set
-            {
-                _configId = value;
-            }
-        }
-        public virtual string Name
-        {
-            get
-            {
-                return _name;
-            }
-            set
-            {
-                _name = value;
-            }
-        }
-        public virtual string Description
-        {
-            get
-            {
-                return _description;
-            }
-            set
-            {
-                _description = value;
-            }
-        }
-        public virtual string SearchCriteria
-        {
-            get
-            {
-                return _searchCriteria;
-            }
-            set
-            {
-                _searchCriteria = value;
-            }
-        }
-        public virtual string TargetFileName
-        {
-            get
-            {
-                return _targetFileName;
-            }
-            set
-            {
-                _targetFileName = value;
-            }
-        }
-        public virtual string DropLocationType
-        {
-            get
-            {
-                return _dropLocationType;
-            }
-            set
-            {
-                _dropLocationType = value;
-            }
-        }
-        public virtual string DropPath
-        {
-            get
-            {
-                return _dropPath;
-            }
-            set
-            {
-                _dropPath = value;
-            }
-        }
-        public virtual Boolean IsRegexSearch
-        {
-            get
-            {
-                return _isRegexSearch;
-            }
-            set
-            {
-                _isRegexSearch = value;
-            }
-        }
-        public virtual Boolean OverwriteDatafile
-        {
-            get
-            {
-                return _overwriteDatafile;
-            }
-            set
-            {
-                _overwriteDatafile = value;
-            }
-        }
-        public virtual int FileTypeId
-        {
-            get
-            {
-                return _fileTypeId;
-            }
-            set
-            {
-                _fileTypeId = value;
-            }
-        }
-
-        public virtual Boolean IsGeneric
-        {
-            get
-            {
-                return _isGeneric;
-            }
-            set
-            {
-                _isGeneric = value;
-            }
-        }
-        public virtual Dataset ParentDataset
-        {
-            get
-            {
-                return _parentDataset;
-            }
-            set
-            {
-                _parentDataset = value;
-            }
-        }
-        public virtual string CreationFreqDesc
-        {
-            get
-            {
-                return _creationFreqDesc;
-            }
-            set
-            {
-                _creationFreqDesc = value;
-            }
-        }
-
-        public virtual DatasetScopeType DatasetScopeType
-        {
-            get
-            {
-                return _datasetScopeType;
-            }
-            set
-            {
-                _datasetScopeType = value;
-            }
-        }
+        public virtual int ConfigId { get; set; }
+        public virtual string Name { get; set; }
+        public virtual string Description { get; set; }
+        public virtual string SearchCriteria { get; set; }
+        public virtual string TargetFileName { get; set; }
+        public virtual string DropPath { get; set; }
+        public virtual Boolean IsRegexSearch { get; set; }
+        public virtual Boolean OverwriteDatafile { get; set; }
+        public virtual int FileTypeId { get; set; }
+        public virtual Boolean IsGeneric { get; set; }
+        public virtual Dataset ParentDataset { get; set; }
+        public virtual DatasetScopeType DatasetScopeType { get; set; }
+        public virtual Boolean CreateCurrentFile { get; set; }
 
         public virtual int DatasetScopeTypeID
         {
             get
             {
-                return _datasetScopeType.ScopeTypeId;
+                return DatasetScopeType.ScopeTypeId;
             }
+        }
+
+        public virtual IList<RetrieverJob> RetrieverJobs { get; set; }
+
+
+
+        /// <summary>
+        /// Return path to current file
+        /// </summary>
+        public virtual Uri GetCurrentFileDir()
+        {
+            if (CreateCurrentFile)
+            {
+                //This is a Short-Term solution to maintaining a current file for access via SAS tool.
+
+                //Need to add category, dataset name, and config name, to ensure we can delete all 
+                // contents of directory to ensure only one file.
+                var path = System.IO.Path.Combine(
+                        Configuration.Config.GetHostSetting("PushToSASTargetPath"),
+                        "current_files",
+                        ParentDataset.DatasetCategory.Name.ToLower(),
+                        ParentDataset.DatasetName.Replace(' ', '_').ToLower(),
+                        Name.Replace(' ', '_').ToLower()
+                        );
+
+                return new Uri(path);
+            }
+            else
+            {
+                throw new InvalidOperationException("CreateCurrentFile is false on data file config");
+            }                
         }
     }
 }

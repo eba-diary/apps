@@ -13,6 +13,13 @@ namespace Sentry.data.Core
         IQueryable<Dataset> Datasets { get; }
         //IQueryable<Category> DatasetMetadata { get; }
 
+
+        IQueryable<DataSourceType> DataSourceTypes { get; }
+
+        IQueryable<DataSource> DataSources { get; }
+
+        IQueryable<AuthenticationType> AuthTypes { get; }
+
         IQueryable<EventType> EventTypes { get; }
 
         IQueryable<Status> EventStatus { get; }
@@ -21,7 +28,11 @@ namespace Sentry.data.Core
 
         IQueryable<DataObject> DataObjects { get; }
 
+        IQueryable<DatasetScopeType> DatasetScopeTypes { get; }
+
         List<String> BusinessTerms(string dataElementCode, int? DataAsset_ID);
+
+        Lineage Description(int DataAsset_ID, string DataObject_NME, string DataObjectField_NME);
 
         List<Lineage> Lineage(string dataElementCode, List<string> dataObjectFieldDetailTypes, int? DataAsset_ID, String DataElement_NME = "", String DataObject_NME = "", String DataObjectField_NME = "");
 
@@ -96,11 +107,6 @@ namespace Sentry.data.Core
         DataAsset GetDataAsset(int id);
         DataAsset GetDataAsset(string assetname);
 
-
-        EventType GetEventType(string description);
-
-        EventType GetEventType(int id);
-        List<EventType> GetAllEventTypes();
 
         Interval GetInterval(string description);
 

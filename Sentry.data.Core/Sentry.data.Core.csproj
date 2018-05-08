@@ -51,6 +51,9 @@
       <HintPath>..\packages\Sentry.Common.1.3.9\lib\net35\Sentry.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Sentry.Configuration, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sentry.Configuration.2.1.7.1\lib\net40\Sentry.Configuration.dll</HintPath>
+    </Reference>
     <Reference Include="Sentry.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Sentry.Core.1.0.0.1\lib\net451\Sentry.Core.dll</HintPath>
@@ -84,6 +87,19 @@
     <Compile Include="Entities\Release\Sprint.cs" />
     <Compile Include="Entities\Request.cs" />
     <Compile Include="Entities\ObjectKeyVersion.cs" />
+    <Compile Include="Entities\RetrieverRequests\AnonymousAuthentication.cs" />
+    <Compile Include="Entities\RetrieverRequests\AuthenticationType.cs" />
+    <Compile Include="Entities\RetrieverRequests\CompressionTypes.cs" />
+    <Compile Include="Entities\RetrieverRequests\DataSource.cs" />
+    <Compile Include="Entities\RetrieverRequests\DataSourceType.cs" />
+    <Compile Include="Entities\RetrieverRequests\DfsBasic.cs" />
+    <Compile Include="Entities\RetrieverRequests\DfsCustom.cs" />
+    <Compile Include="Entities\RetrieverRequests\DfsSource.cs" />
+    <Compile Include="Entities\RetrieverRequests\FTPSource.cs" />
+    <Compile Include="Entities\RetrieverRequests\RetrieverJob.cs" />
+    <Compile Include="Entities\RetrieverRequests\RetrieverJobOptions.cs" />
+    <Compile Include="Entities\RetrieverRequests\S3Basic.cs" />
+    <Compile Include="Entities\RetrieverRequests\S3Source.cs" />
     <Compile Include="Entities\Subscriptions\DataAssetSubscription.cs" />
     <Compile Include="Entities\Subscriptions\DatasetSubscription.cs" />
     <Compile Include="Entities\Subscriptions\Event.cs" />
@@ -150,6 +166,11 @@
     <Compile Include="Interfaces\IWeatherDataProvider.cs" />
     <Compile Include="Interfaces\ISASService.cs" />
     <Compile Include="Interfaces\IODCFileProvider.cs" />
+    <Compile Include="Interfaces\Retriever\BasicAuthentication.cs" />
+    <Compile Include="Interfaces\Retriever\IAuthenticationType.cs" />
+    <Compile Include="Interfaces\Retriever\IDataSource.cs" />
+    <Compile Include="Interfaces\Retriever\IRetrieverJob.cs" />
+    <Compile Include="Interfaces\Retriever\IRetrieverJobService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Queries\CategoryQueries.cs" />
     <Compile Include="Queries\DatasetFolderQueries.cs" />
@@ -160,6 +181,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
+    <None Include="ClassDiagram3.cd" />
+    <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

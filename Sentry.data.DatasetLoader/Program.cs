@@ -148,8 +148,8 @@ namespace Sentry.data.DatasetLoader
 
                             //Create Success Event for bundled File Created
                             Event e = new Event();
-                            e.EventType = _dscontext.GetEventType(3);
-                            e.Status = _dscontext.GetStatus(3);
+                            e.EventType = _dscontext.EventTypes.Where(w => w.Description == "Bundle File Process").FirstOrDefault();
+                            e.Status = _dscontext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
                             e.TimeCreated = DateTime.Now;
                             e.TimeNotified = DateTime.Now;
                             e.IsProcessed = false;
@@ -168,8 +168,8 @@ namespace Sentry.data.DatasetLoader
 
                             //Create Failure Event for bundled File Created
                             Event f = new Event();
-                            f.EventType = _dscontext.GetEventType(3);
-                            f.Status = _dscontext.GetStatus(4);
+                            f.EventType = _dscontext.EventTypes.Where(w => w.Description == "Bundle File Process").FirstOrDefault();
+                            f.Status = _dscontext.EventStatus.Where(w => w.Description == "Error").FirstOrDefault();
                             f.TimeCreated = DateTime.Now;
                             f.TimeNotified = DateTime.Now;
                             f.IsProcessed = false;

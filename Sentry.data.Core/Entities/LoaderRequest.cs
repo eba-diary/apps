@@ -14,6 +14,7 @@ namespace Sentry.data.Core
         public string RequestGuid { get; set; }
         public int DatasetID { get; set; }
         public int DatasetFileConfigId { get; set; }
+        public int RetrieverJobId { get; set; }
         public string TargetBucket { get; set; }
         public string TargetKey { get; set; }
         public string TargetVersionId { get; set; }
