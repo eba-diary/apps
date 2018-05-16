@@ -89,6 +89,12 @@ namespace Sentry.data.Web.Controllers
             else { return RedirectToAction("NotFound", "Error"); }
         }
 
+        [Route("DataAsset/Test")]
+        public ActionResult Test()
+        {
+            return View();
+        }
+
 
 
 

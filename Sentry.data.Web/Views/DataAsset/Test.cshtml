@@ -1,109 +1,9 @@
-﻿@{
-    Sentry.data.Core.DataAsset dataAsset = ViewBag.DataAsset;
-    string DisplayName;
-    string arch = "";
-    string guide = "";
-    if (ViewBag.IsLine == true)
-    {
-        ViewBag.Title = ViewBag.LineName + " Lineage";
-        DisplayName = ViewBag.LineName;
-    }
-    else
-    {
-        ViewBag.Title = dataAsset.DisplayName + " Lineage";
-        DisplayName = dataAsset.DisplayName;
-        arch = "http://sharepoint.sentry.com/it/DataArch/_layouts/15/VisioWebAccess/VisioWebAccess.aspx?id=/it/DataArch/Shared%20Documents/Data%20Services%20Architecture%20Diagrams/" + Model.ArchLink;
-        guide = "http://sharepoint.sentry.com/it/DataArch/Consumer%20Guides/Pages/" + Model.GuideLink;
-    }
-
-    string disabled;
-}
-
-
-
-<!-- Data Asset Header -->
+﻿
 @{
-    if (ViewBag.IsLine == false)
-    {
-        foreach (var item in dataAsset.AssetNotifications)
-        {
-            <div class="alert alert-dismissable alert-@item.MessageSeverityTag">
-                <button type="button" class="close" data-dismiss="alert">×</button>
-                @Html.Raw(@item.DisplayMessage)
-            </div>
-        }
-    }
+    ViewBag.Title = "Test";
+    @Html.AntiForgeryToken()
+
 }
-<div class="row page-header indexHeader">
-    <div class="row">
-        <img src="~/Images/Icons/DataAssetsBlue.svg" class="assetImg leftFloat hidden-xs" />
-        <div class="indexName">
-            <h1 class="daName">@DisplayName</h1>
-        </div>
-
-        @if (ViewBag.IsLine == false)
-        {
-            <div class="visible-xs">
-                <button type="button" class="btn btn-lg btn-default daHamburger" data-toggle="collapse" data-target=".navbar-responsive-collapse">
-                    <span class="glyphicon glyphicon-menu-hamburger"></span>
-                </button>
-            </div>
-
-            <div class="daNav row">
-                <ul class="nav nav-pills hidden-xs">
-                    <li><a href="~/DataAsset/@dataAsset.Name">Home</a></li>
-
-                    @{ disabled = (dataAsset.DisplayName == "SERA PL" || dataAsset.DisplayName == "PL Policy ODS") ? "" : "disabled"; }
-                    <li class="@disabled"><a href="/Lineage/Personal Lines/@dataAsset.Name">Lineage</a></li>
-
-                    @{ disabled = (dataAsset.ArchLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@arch" target="_blank">Arch Diagrams</a></li>
-
-                    @{ disabled = (dataAsset.DataModelLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = dataAsset.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
-
-                    @{ disabled = (dataAsset.GuideLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@guide" target="_blank">Consumer Guide</a></li>
-
-                    @{ disabled = (dataAsset.Contact != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="mailto:@Model.Contact">Contact Us</a></li>
-                </ul>
-            </div>
-        }
-    </div>
-    @if (ViewBag.IsLine == false)
-    {
-        <div class="visible-xs daCollapse">
-            <div class="navbar-collapse collapse navbar-responsive-collapse">
-                <ul class="nav navbar-nav">
-                    @{ disabled = (dataAsset.DisplayName == "SERA PL" || dataAsset.DisplayName == "PL Policy ODS") ? "" : "disabled"; }
-                    <li class="@disabled"><a href="/Lineage/Personal Lines/@dataAsset.Name">Lineage</a></li>
-
-                    @{ disabled = (dataAsset.ArchLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@arch" target="_blank">Arch Diagrams</a></li>
-
-                    @{ disabled = (dataAsset.DataModelLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@Url.Action("DataModel", "ExternalFile", new { dataModelName = dataAsset.DataModelLink, filename = "index.htm" })" target="_blank">Data Model</a></li>
-
-                    @{ disabled = (dataAsset.GuideLink != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="@guide" target="_blank">Consumer Guide</a></li>
-
-                    @{ disabled = (dataAsset.Contact != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="mailto:@Model.Contact">Contact Us</a></li>
-                </ul>
-            </div>
-        </div>
-    }
-
-</div>
-
-<style>
-    .disabled {
-        pointer-events: none;
-        cursor: not-allowed;
-    }
-</style>
-
 <div id="filterRow" class="row">
     <div class="col-lg-4">
         <h4>Business Term</h4>
@@ -142,18 +42,9 @@
 </div>
 <hr />
 
-<div data-bind="visible : hasBusinessTerm">
-    <h6 data-bind="text : selectedDataObjectField"></h6>
-    <span data-bind="text: businessTermDescription"></span>
-    <hr />
-</div>
-
-<div id="filterSpinner" data-bind="visible: SpinnerOn">
+<div id="filterSpinner">
     <div class="sentry-spinner-container" style=" width: 1166px;">
         <span class="sentry-spinner" style="height:100px"></span>
-        <div id="filterText">
-            Please Wait ...
-        </div>
     </div>
 </div>
 <div id="lineagePanel">
@@ -221,6 +112,7 @@
 
     .legend {
         display: inline-block;
+       
         border: 1px gray solid;
         padding: 5px;
         border-radius: 10px;
@@ -228,7 +120,7 @@
 
     .hiddenLegend {
         display: inline-block;
-        background-color: lightgray;
+        background-color: #ffe1eb;
     }
 
     .layer:before {
@@ -326,8 +218,10 @@
     <script>
 
         var tabLength = 40;
-        var Line_CDE;
-        var DataAsset_ID;
+
+        $(document).ready(function () {
+
+        });
 
         function ShowAllRows() {
             $('.layer').parent().show();
@@ -347,7 +241,8 @@
 
         function ToggleHiddenRows(justStyle) {
 
-            if ($('.hiddenLayer').children('div').is(":visible") || justStyle) {;
+            if ($('.hiddenLayer').children('div').is(":visible") || justStyle) {
+                console.log('Toggle on:');
                 $($('#lineagePanel').find('li')).each(function () {
                     if ($(this).attr('class') != 'layer0') {
 
@@ -426,7 +321,7 @@
 
         $(document).on('click', '.btnShowDetails', function () {
 
-            var url = "/api/Lineage/GetDescriptionFor?LineCDE=" + Line_CDE + "&DataAsset_ID=" + DataAsset_ID;
+            var url = "/api/Lineage/GetDescriptionFor?DataAsset_ID=2";
             if ($($(this).parent().children('.SourceElement_NME')[0]).text()) {
                 url += "&DataElement_NME=" + $($(this).parent().children('.SourceElement_NME')[0]).text();
             }
@@ -479,17 +374,9 @@
         $(document).on('click', '.btnShowChildren', function () {
             console.log(this);
             $($(this).children('span')).toggleClass("glyphicon-plus glyphicon-minus");
+            $(this).parent().parent().children("ul").children("li").toggle();
 
-            var row = $(this).parent().parent();
 
-            var childRow = $(row).children("ul").children("li");
-            $(row).children("ul").children("li").toggle();
-
-            if ($(childRow).hasClass('hiddenLayer')) {
-                $($(row).children()).find('li:has(".hiddenLayer")').show();
-
-                $($(row).children()).find('li:not(".hiddenLayer")').first().show();
-            }
         });
 
 
@@ -567,9 +454,9 @@
                 }
 
                 if (data.Layer == 0) {
-                    output += "layer" + data.Layer;
+                    output +=  "layer" + data.Layer;
                 } else {
-                    output += "layer" + data.Layer;
+                    output +=  "layer" + data.Layer;
                 }
                 return output;
             });
@@ -649,214 +536,98 @@
             self.selectedDataObject = ko.observable();
             self.selectedDataElement = ko.observable();
 
-            self.businessTermDescription = ko.observable();
-            self.hasBusinessTerm = ko.computed(function () {
-                if (self.businessTermDescription() && self.selectedDataObjectField()) {
-                    return true;
-                } else {
-                    return false;
-                }
-
-            });
-
-            self.SpinnerOn = ko.computed(function () {
-                //i have to watch each of the three selects for nullability and empty arrays and the knockout object for its existance
-                if (self.selectedDataElement() || self.selectedDataObject() || self.selectedDataObjectField() || ($('#dataElements').val() == null || $('#dataObjectFields').val() == [])
-                    || ($('#dataObjects').val() == null || $('#dataObjectFields').val() == [])
-                    || $('#dataObjectFields').val() == null || $('#dataObjectFields').val() == []) {
-                    return true;
-                } 
-                return false;
-
-            });
+            var element = location.href.substr(location.href.lastIndexOf('/') + 1);
 
             DropdownSelects(true);
 
             function DropdownSelects(first) {
 
-                $('#lineagePanel').hide();
                 $('#filterSpinner').show();
 
-                var baseUrlParameters = '';
-                var elementFromURL = "&DataElement_NME=" + decodeURI(location.href.substr(location.href.lastIndexOf('/') + 1));
+                var url = "/api/Lineage/Layers?DataAsset_ID=2";
 
-                var dataElementParameter = '';
-
-                if (elementFromURL && first) {
-                    dataElementParameter = elementFromURL;
-                } else {
-                    dataElementParameter = "&DataElement_NME=" + encodeURIComponent($('#dataElements').val());
-                }
-
-                var dataObjectParameter = "&DataObject_NME=" + encodeURIComponent($('#dataObjects').val());
-                var dataFieldParameter = "&DataObjectField_NME=" + encodeURIComponent($('#dataObjectFields').val());
-
-                if (first || (($('#dataElements').val() == null || $('#dataObjectFields').val() == [])
-                    && ($('#dataObjects').val() == null || $('#dataObjectFields').val() == [])
-                    && ($('#dataObjectFields').val() == null || $('#dataObjectFields').val() == []))) {
-                    $('#filterSpinner').hide();
-                }
-
-
-
-                if (first) {
-                    var url = decodeURI(location.href);
-
-
-                    if (url.includes("Personal Lines")) {
-                        Line_CDE = "PL";
-                    } else {
-                        Line_CDE = "CL";
-                    }
-
-                    if (url.includes("SERAPL")) {
-                        DataAsset_ID = 2;
-                    } else if (url.includes("PLPolicyODS")) {
-                        DataAsset_ID = 6;
-                    }
-                }
-
-                if (DataAsset_ID) {
-                    baseUrlParameters = "?LineCDE=" + Line_CDE + "&DataAsset_ID= " + DataAsset_ID;
-                } else {
-                    baseUrlParameters = "?LineCDE=" + Line_CDE;
-                }
-
-                var url = "/api/Lineage/BusinessTerms" + baseUrlParameters;
-
-                if (($('#dataElements').val() && !first) || (elementFromURL && first)) {
-                    url += dataElementParameter;
-                }
                 if ($('#dataObjects').val() && !first) {
-                    url += dataObjectParameter;
+                    url += "&DataObject_NME=" + encodeURIComponent($('#dataObjects').val());
+                }
+                if ($('#dataObjectFields').val() && !first) {
+                    url += "&DataObjectField_NME=" + encodeURIComponent($('#dataObjectFields').val());
                 }
 
                 $.getJSON(encodeURI(url), function (allData) {
                     allData.push('');
-                    self.availableDataObjectFields(allData);
+                    self.availableDataElements(allData);
 
-                    var url2 = "/api/Lineage/LineageTables" + baseUrlParameters;
+                    var url2 = "/api/Lineage/LineageTables?DataAsset_ID=2";
 
                     if ($('#dataElements').val() && !first) {
-                        url2 += dataElementParameter;
+                        url2 += "&DataElement_NME=" + encodeURIComponent($('#dataElements').val());
                     }
                     if ($('#dataObjectFields').val() && !first) {
-                        url2 += dataFieldParameter;
+                        url2 += "&DataObjectField_NME=" + encodeURIComponent($('#dataObjectFields').val());
                     }
 
                     $.getJSON(encodeURI(url2), function (allData2) {
                         allData2.push('');
                         self.availableDataObjects(allData2);
-
-
                         if (first) {
                             $('.select2').val([]).trigger('change');
-                            if (elementFromURL) {
-                                self.selectedDataElement(decodeURI(decodeURI(location.href.substr(location.href.lastIndexOf('/') + 1))));
-                            }
                         }
                     });
 
-                    var url3 = "/api/Lineage/Layers" + baseUrlParameters;
+                    var url3 = "/api/Lineage/BusinessTerms?DataAsset_ID=2";
 
-                    if ($('#dataObjects').val() && !first) {
-                        url3 += dataObjectParameter;
+                    if ($('#dataElements').val() && !first) {
+                        url3 += "&DataElement_NME=" + encodeURIComponent($('#dataElements').val());
                     }
-                    if ($('#dataObjectFields').val() && !first) {
-                        url3 += dataFieldParameter;
+                    if ($('#dataObjects').val() && !first) {
+                        url3 += "&DataObject_NME=" + encodeURIComponent($('#dataObjects').val());
                     }
 
                     $.getJSON(encodeURI(url3), function (allData3) {
                         allData3.push('');
-                        self.availableDataElements(allData3);
+                        self.availableDataObjectFields(allData3);
 
                         if (first) {
-                            if (elementFromURL) {
-                                self.selectedDataElement(decodeURI(location.href.substr(location.href.lastIndexOf('/') + 1)));
-                                $('#dataElements').val(decodeURI(location.href.substr(location.href.lastIndexOf('/') + 1))).trigger('change');
-                            } else {
-                                $('.select2').val([]).trigger('change');
-                            }
+                            $('.select2').val([]).trigger('change');
                         }
                     });
 
-                    var url4 = "/api/Lineage/GetLineageFor" + baseUrlParameters;
+                    var url4 = "/api/Lineage/GetLineageFor?DataAsset_ID=2";
 
                     if ($('#dataElements').val()) {
-                        url4 += dataElementParameter;
+                        url4 += "&DataElement_NME=" + encodeURIComponent($('#dataElements').val());
                     }
                     if ($('#dataObjects').val()) {
-                        url4 += dataObjectParameter;
+                        url4 += "&DataObject_NME=" + encodeURIComponent($('#dataObjects').val());
                     }
                     if ($('#dataObjectFields').val()) {
-                        url4 += dataFieldParameter;
+                        url4 += "&DataObjectField_NME=" + encodeURIComponent($('#dataObjectFields').val());
                     }
 
                     if (!first) {
-                        $.getJSON(encodeURI(url4), function (allData4) {
-                            var items = $.map(allData4, function (item) { return new Lineage(item) });
+                        $.getJSON(encodeURI(url4), function (allData) {
+                            var items = $.map(allData, function (item) { return new Lineage(item) });
                             self.lineage(items);
                             $('.layer0').show();
                             $('#filterSpinner').hide();
-                            $('#lineagePanel').show();
 
                             $('.hiddenLayer').children('div').toggle();
                             $('<br />').insertBefore('.layer0')
                             ToggleHiddenRows(true);
 
-                            $('.hiddenLayer').children('div').css('background-color', 'lightgray');
-                            // $('.hiddenLayer').children('div').css('opacity', '0.75');
+                            $('.hiddenLayer').children('div').css('background-color', '#ffe1eb');
+                           // $('.hiddenLayer').children('div').css('opacity', '0.75');
                         });
-                    }
-
-                    var url6 = "/api/Lineage/BusinessTermDescription" + baseUrlParameters;
-
-                    if ($('#dataObjectFields').val() && !first) {
-                        url6 += dataFieldParameter;
-
-                        $.getJSON(encodeURI(url6), function (allData6) {
-                            self.businessTermDescription(allData6);
-                        });
-                    } else {
                     }
 
                 });
-
-                //THIS WILL RUN IF AND ONLY IF THERE IS A DATA ELEMENT IN THE URL.
-                if (first && elementFromURL) {
-                    var url5 = "/api/Lineage/GetLineageFor" + baseUrlParameters + elementFromURL;
-
-                    $.getJSON(encodeURI(url5), function (allData) {
-                        var items = $.map(allData, function (item) { return new Lineage(item) });
-                        self.lineage(items);
-                        $('.layer0').show();
-                        $('#filterSpinner').hide();
-                        $('#lineagePanel').show();
-
-                        $('.hiddenLayer').children('div').toggle();
-                        $('<br />').insertBefore('.layer0');
-                        ToggleHiddenRows(true);
-
-                        $('.hiddenLayer').children('div').css('background-color', 'lightgray');
-                    });
-                }
             }
-
 
             $('.select2').on('select2:select', function (e) {
                 DropdownSelects(false);
             });
 
-            $('#dataObjectFields').on('select2:unselect', function (e) {
-                $('#dataObjectFields').val([]);
-                DropdownSelects(false);
-            });
-            $('#dataElements').on('select2:unselect', function (e) {
-                $('#dataElements').val([]);
-                DropdownSelects(false);
-            });
-            $('#dataObjects').on('select2:unselect', function (e) {
-                $('#dataObjects').val([]);
+            $('.select2').on('select2:unselect', function (e) {
                 DropdownSelects(false);
             });
         };

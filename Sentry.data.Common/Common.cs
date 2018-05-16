@@ -17,12 +17,14 @@ using System.Security.Cryptography;
 using Sentry.Common.Logging;
 using Newtonsoft.Json;
 using System.ComponentModel;
+using System.Linq.Expressions;
 
 namespace Sentry.data.Common
 {
     /// <summary>
     /// Provides common code between projects
     /// </summary>
+    /// 
     public static class Utilities
     {        
 

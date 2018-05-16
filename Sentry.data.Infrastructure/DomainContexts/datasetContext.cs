@@ -11,9 +11,37 @@ using Sentry.data.Core.Entities.Metadata;
 using System.Reflection;
 using System.Collections;
 using System.Web;
+using System.Linq.Expressions;
 
 namespace Sentry.data.Infrastructure
 {
+
+    /// <summary>
+    /// Provides common code between projects
+    /// </summary>
+    /// 
+    public static class PredicateBuilder
+    {
+        public static Expression<Func<T, bool>> True<T>() { return f => true; }
+        public static Expression<Func<T, bool>> False<T>() { return f => false; }
+
+        public static Expression<Func<T, bool>> Or<T>(this Expression<Func<T, bool>> expr1,
+                                                            Expression<Func<T, bool>> expr2)
+        {
+            var invokedExpr = Expression.Invoke(expr2, expr1.Parameters.Cast<Expression>());
+            return Expression.Lambda<Func<T, bool>>
+                  (Expression.OrElse(expr1.Body, invokedExpr), expr1.Parameters);
+        }
+
+        public static Expression<Func<T, bool>> And<T>(this Expression<Func<T, bool>> expr1,
+                                                             Expression<Func<T, bool>> expr2)
+        {
+            var invokedExpr = Expression.Invoke(expr2, expr1.Parameters.Cast<Expression>());
+            return Expression.Lambda<Func<T, bool>>
+                  (Expression.AndAlso(expr1.Body, invokedExpr), expr1.Parameters);
+        }
+    }
+
     public class datasetContext : NHWritableDomainContext, IDatasetContext
     {
         public datasetContext(ISession session) : base(session)
@@ -62,48 +90,185 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public class LineageCreation : IEnumerable<LineageCreation>
+        public List<String> BusinessTerms(string dataElementCode, int? DataAsset_ID, String DataElement_NME = "", String DataObject_NME = "", String DataObjectField_NME = "", String Line_CDE = "")
         {
-            public virtual int ID { get; set; }
-            public virtual int DataAsset_ID { get; set; }
-            public virtual String DataElement_NME { get; set; }
-            public virtual String DataObject_NME { get; set; }
-            public virtual String DataObjectCode_DSC { get; set; }
-            public virtual String DataObjectDetailType_VAL { get; set; }
-            public virtual String DataObjectFieldDetailType_CDE { get; set; }
-            public virtual String DataObjectFieldDetailType_VAL { get; set; }
-            public virtual String DataObjectField_NME { get; set; }
-            public virtual String DataObjectField_DSC { get; set; }
-            public virtual String DataObject_DSC { get; set; }
+            DataElement_NME = HttpUtility.UrlDecode(DataElement_NME);
+            DataObject_NME = HttpUtility.UrlDecode(DataObject_NME);
+            DataObjectField_NME = HttpUtility.UrlDecode(DataObjectField_NME);
+            Line_CDE = HttpUtility.UrlDecode(Line_CDE);
 
+            var rawQuery = Query<Lineage>().Where(x => x.DataElement_TYP == DataElementCode.BusinessTerm);
 
-            public IEnumerator<LineageCreation> GetEnumerator()
+            if (DataAsset_ID != null)
             {
-                throw new NotImplementedException();
+                rawQuery = rawQuery.Where(c => c.DataAsset_ID == DataAsset_ID);
             }
-
-            IEnumerator IEnumerable.GetEnumerator()
+            if (!string.IsNullOrEmpty(Line_CDE))
             {
-                throw new NotImplementedException();
+                rawQuery = rawQuery.Where(c => c.Line_CDE == Line_CDE);
             }
-        }
-
-        public List<String> BusinessTerms(string dataElementCode, int? DataAsset_ID)
-        {
-            var rawQuery = Query<DataElement>()
-                .Where(a => a.DataElement_CDE == dataElementCode)
-                .Where(x => x.MetadataAsset.DataAsset_ID == DataAsset_ID);
+            if (!string.IsNullOrEmpty(DataElement_NME))
+            {
+                rawQuery = rawQuery.Where(c => c.SourceElement_NME == DataElement_NME);
+            }
+            if (!string.IsNullOrEmpty(DataObject_NME))
+            {
+                rawQuery = rawQuery.Where(d => d.SourceObject_NME == DataObject_NME);
+            }
 
             return rawQuery.Select(x => x.DataElement_NME).ToList();
         }
 
+        public List<String> ConsumptionLayers(string dataElementCode, int? DataAsset_ID, String DataElement_NME = "", String DataObject_NME = "", String DataObjectField_NME = "", String Line_CDE = "")
+        {
+            DataElement_NME = HttpUtility.UrlDecode(DataElement_NME);
+            DataObject_NME = HttpUtility.UrlDecode(DataObject_NME);
+            DataObjectField_NME = HttpUtility.UrlDecode(DataObjectField_NME);
+            Line_CDE = HttpUtility.UrlDecode(Line_CDE);
+
+            var rawQuery = Query<Lineage>().Where(x => x.DataElement_TYP == DataElementCode.BusinessTerm);
+
+            if (DataAsset_ID != null)
+            {
+                rawQuery = rawQuery.Where(c => c.DataAsset_ID == DataAsset_ID);
+            }
+            if (!string.IsNullOrEmpty(Line_CDE))
+            {
+                rawQuery = rawQuery.Where(c => c.Line_CDE == Line_CDE);
+            }
+            if (!string.IsNullOrEmpty(DataObject_NME))
+            {
+                rawQuery = rawQuery.Where(d => d.SourceObject_NME == DataObject_NME);
+            }
+            if (!string.IsNullOrEmpty(DataObjectField_NME))
+            {
+                var predicate = PredicateBuilder.False<Lineage>();
+
+                var BusinessTermSources = Query<Lineage>()
+                    .Where(x => x.DataElement_TYP == DataElementCode.BusinessTerm)
+                    .Where(x => x.DataElement_NME == DataObjectField_NME);
+
+                if (DataAsset_ID != null)
+                {
+                    BusinessTermSources = BusinessTermSources.Where(c => c.DataAsset_ID == DataAsset_ID);
+                }
+                if (!string.IsNullOrEmpty(Line_CDE))
+                {
+                    BusinessTermSources = BusinessTermSources.Where(c => c.Line_CDE == Line_CDE);
+                }
+
+                foreach (string keyword in BusinessTermSources.Select(x => x.SourceField_NME).ToList())
+                {
+                    string temp = keyword;
+                    predicate = predicate.Or(p => p.SourceField_NME == temp);
+                }
+
+                rawQuery = rawQuery.Where(predicate);
+            }
+
+            return rawQuery.Select(x => x.SourceElement_NME).ToList();
+        }
 
 
+        public List<String> LineageTables(string dataElementCode, int? DataAsset_ID, String DataElement_NME = "", String DataObject_NME = "", String DataObjectField_NME = "", String Line_CDE = "")
+        {
+            DataElement_NME = HttpUtility.UrlDecode(DataElement_NME);
+            DataObject_NME = HttpUtility.UrlDecode(DataObject_NME);
+            DataObjectField_NME = HttpUtility.UrlDecode(DataObjectField_NME);
+            Line_CDE = HttpUtility.UrlDecode(Line_CDE);
 
-        public Lineage Description(int DataAsset_ID, string DataObject_NME, string DataObjectField_NME)
+            var rawQuery = Query<Lineage>().Where(x => x.DataElement_TYP == DataElementCode.BusinessTerm);
+
+            if (DataAsset_ID != null)
+            {
+                rawQuery = rawQuery.Where(c => c.DataAsset_ID == DataAsset_ID);
+            }
+            if (!string.IsNullOrEmpty(Line_CDE))
+            {
+                rawQuery = rawQuery.Where(c => c.Line_CDE == Line_CDE);
+            }
+            if (!string.IsNullOrEmpty(DataElement_NME))
+            {
+                rawQuery = rawQuery.Where(c => c.SourceElement_NME == DataElement_NME);
+            }
+            if (!string.IsNullOrEmpty(DataObjectField_NME))
+            {
+                var predicate = PredicateBuilder.False<Lineage>();
+
+                var BusinessTermSources = Query<Lineage>()
+                   .Where(x => x.DataElement_TYP == DataElementCode.BusinessTerm)
+                   .Where(x => x.DataElement_NME == DataObjectField_NME);
+
+                if (DataAsset_ID != null)
+                {
+                    BusinessTermSources = BusinessTermSources.Where(c => c.DataAsset_ID == DataAsset_ID);
+                }
+                if (!string.IsNullOrEmpty(Line_CDE))
+                {
+                    BusinessTermSources = BusinessTermSources.Where(c => c.Line_CDE == Line_CDE);
+                }
+
+                foreach (string keyword in BusinessTermSources.Select(x => x.SourceField_NME).ToList())
+                {
+                    string temp = keyword;
+                    predicate = predicate.Or(p => p.SourceField_NME == temp);
+                }
+
+                rawQuery = rawQuery.Where(predicate);
+            }
+
+            return rawQuery.Select(x => x.SourceObject_NME).ToList();
+        }
+
+        public List<String> BusinessTermDescription(string dataElementCode, int? DataAsset_ID, string DataObjectField_NME, String Line_CDE = "")
+        {
+            DataObjectField_NME = HttpUtility.UrlDecode(DataObjectField_NME);
+            Line_CDE = HttpUtility.UrlDecode(Line_CDE);
+
+            var rawQuery = Query<Lineage>().Where(x => x.DataElement_TYP == dataElementCode);
+
+            if (DataAsset_ID != null)
+            {
+                rawQuery = rawQuery.Where(c => c.DataAsset_ID == DataAsset_ID);
+            }
+            if (!string.IsNullOrEmpty(Line_CDE))
+            {
+                rawQuery = rawQuery.Where(c => c.Line_CDE == Line_CDE);
+            }
+            if (!string.IsNullOrEmpty(DataObjectField_NME))
+            {
+                var predicate = PredicateBuilder.False<Lineage>();
+
+                var BusinessTermSources = Query<Lineage>()
+                   .Where(x => x.DataElement_TYP == DataElementCode.BusinessTerm)
+                   .Where(x => x.DataElement_NME == DataObjectField_NME);
+
+                if (DataAsset_ID != null)
+                {
+                    BusinessTermSources = BusinessTermSources.Where(c => c.DataAsset_ID == DataAsset_ID);
+                }
+                if (!string.IsNullOrEmpty(Line_CDE))
+                {
+                    BusinessTermSources = BusinessTermSources.Where(c => c.Line_CDE == Line_CDE);
+                }
+
+                foreach (string keyword in BusinessTermSources.Select(x => x.SourceField_NME).ToList())
+                {
+                    string temp = keyword;
+                    predicate = predicate.Or(p => p.SourceField_NME == temp);
+                }
+
+                rawQuery = rawQuery.Where(predicate);
+            }
+
+            return rawQuery.Select(x => x.BusTerm_DSC).ToList();
+        }
+
+        public Lineage Description(int? DataAsset_ID, string DataObject_NME, string DataObjectField_NME, String Line_CDE = "")
         {
             DataObject_NME = HttpUtility.UrlDecode(DataObject_NME);
             DataObjectField_NME = HttpUtility.UrlDecode(DataObjectField_NME);
+            Line_CDE = HttpUtility.UrlDecode(Line_CDE);
 
             Lineage l = new Lineage();
 
@@ -135,127 +300,292 @@ namespace Sentry.data.Infrastructure
                 //There was no description.
                 //Return a null Lineage Object
             }
-
-
-
             return l;
         }
 
-        public List<Lineage> Lineage(string dataElementCode, List<string> dataObjectFieldDetailTypes, int? DataAsset_ID, String DataElement_NME = "", String DataObject_NME = "", String DataObjectField_NME = "")
+        public List<LineageCreation> Lineage(string dataElementCode, int? DataAsset_ID, String DataElement_NME = "", String DataObject_NME = "", String DataObjectField_NME = "", String Line_CDE = "")
         {
             DataElement_NME = HttpUtility.UrlDecode(DataElement_NME);
             DataObject_NME = HttpUtility.UrlDecode(DataObject_NME);
             DataObjectField_NME = HttpUtility.UrlDecode(DataObjectField_NME);
+            Line_CDE = HttpUtility.UrlDecode(Line_CDE);
 
-            var rawQuery = Query<DataObjectFieldDetail>()
-                .Where(a => a.DataObjectField.DataObject.DataElement.DataElement_CDE == dataElementCode)
-                .Where(b => dataObjectFieldDetailTypes.Contains(b.DataObjectFieldDetailType_CDE));
+            var rawQuery = Query<Lineage>();
 
             if (DataAsset_ID != null)
             {
-                rawQuery = rawQuery.Where(c => c.DataObjectField.DataObject.DataElement.MetadataAsset.DataAsset_ID == DataAsset_ID);
+                rawQuery = rawQuery.Where(c => c.DataAsset_ID == DataAsset_ID);
+            }
+            if (!string.IsNullOrEmpty(Line_CDE))
+            {
+                rawQuery = rawQuery.Where(c => c.Line_CDE == Line_CDE);
             }
             if (!string.IsNullOrEmpty(DataElement_NME))
             {
-                rawQuery = rawQuery.Where(c => c.DataObjectField.DataObject.DataElement.DataElement_NME == DataElement_NME);
+                rawQuery = rawQuery.Where(c => c.DataElement_NME == DataElement_NME);
             }
             if (!string.IsNullOrEmpty(DataObject_NME))
             {
-                rawQuery = rawQuery.Where(d => d.DataObjectField.DataObject.DataObject_NME == DataObject_NME);
+                rawQuery = rawQuery.Where(d => d.DataObject_NME == DataObject_NME);
             }
             if (!string.IsNullOrEmpty(DataObjectField_NME))
             {
-                rawQuery = rawQuery.Where(e => e.DataObjectField.DataObjectField_NME == DataObjectField_NME);
+                var predicate = PredicateBuilder.False<Lineage>();
+
+                var BusinessTermSources = Query<Lineage>()
+                    .Where(x => x.DataElement_TYP == DataElementCode.BusinessTerm)
+                    .Where(x => x.DataElement_NME == DataObjectField_NME);
+
+                if (DataAsset_ID != null)
+                {
+                    BusinessTermSources = BusinessTermSources.Where(c => c.DataAsset_ID == DataAsset_ID);
+                }
+                if (!string.IsNullOrEmpty(Line_CDE))
+                {
+                    BusinessTermSources = BusinessTermSources.Where(c => c.Line_CDE == Line_CDE);
+                }
+
+                foreach (string keyword in BusinessTermSources.Select(x => x.SourceField_NME).ToList())
+                {
+                    string temp = keyword;
+                    predicate = predicate.Or(p => p.DataObjectField_NME == temp);
+                }
+
+                rawQuery = rawQuery.Where(predicate);
             }
 
-            var query = rawQuery.Select(x => new LineageCreation
+            List<LineageCreation> masterList = new List<LineageCreation>();
+
+            List<Lineage> allLineage = Query<Lineage>().ToList();
+
+            foreach (Lineage l in rawQuery)
             {
-                DataAsset_ID = x.DataObjectField.DataObject.DataElement.MetadataAsset.DataAsset_ID,
-                DataElement_NME = x.DataObjectField.DataObject.DataElement.DataElement_NME,
-                DataObject_NME = x.DataObjectField.DataObject.DataObject_NME,
-               // DataObject_DSC = x.DataObjectField.DataObject.DataObject_DSC,
-                DataObjectCode_DSC = x.DataObjectField.DataObject.DataObjectCode_DSC,
-                DataObjectField_NME = x.DataObjectField.DataObjectField_NME,
-               // DataObjectField_DSC = x.DataObjectField.DataObjectField_DSC,
-                DataObjectFieldDetailType_CDE = x.DataObjectFieldDetailType_CDE,
-                DataObjectFieldDetailType_VAL = x.DataObjectFieldDetailType_VAL
-            });
+                LineageCreation lc = masterList.FirstOrDefault(a => a.DataElement_NME == l.DataElement_NME && a.DataObject_NME == l.DataObject_NME && a.DataObjectField_NME == l.DataObjectField_NME);
 
-
-
-            List<Lineage> lineage = new List<Lineage>();
-
-            try
-            {
-                foreach (var item in query)
+                if(lc != null)
                 {
-
-                    var found = lineage.FirstOrDefault(x => x.DataAsset_ID == item.DataAsset_ID &&
-                        x.DataElement_NME == item.DataElement_NME &&
-                        x.DataObject_NME == item.DataObject_NME &&
-                        x.DataObjectCode_DSC == item.DataObjectCode_DSC &&
-                        x.DataObjectDetailType_VAL == item.DataObjectDetailType_VAL &&
-                        x.DataObjectField_NME == item.DataObjectField_NME);
-
-                    Lineage l;
-
-                    if (found == null)
+                    lc.SourceElement_NME = l.SourceElement_NME;
+                    lc.SourceField_NME = l.SourceField_NME;
+                    lc.SourceObject_NME = l.SourceObject_NME;
+                }
+                else
+                {
+                    lc = new LineageCreation()
                     {
-                        l = new Lineage();
+                        DataAsset_ID = l.DataAsset_ID,
+                        Layer = 0,
 
-                        l.DataAsset_ID = item.DataAsset_ID;
-                        l.DataElement_NME = item.DataElement_NME;
-                        l.DataObject_NME = item.DataObject_NME;
-                        l.DataObjectCode_DSC = item.DataObjectCode_DSC;
-                        l.DataObjectDetailType_VAL = item.DataObjectDetailType_VAL;
-                        l.DataObjectField_NME = item.DataObjectField_NME;
-                        l.ID = lineage.Count;
-                    }
-                    else
+                        Model_NME = l.Model_NME,
+
+                        DataElement_NME = l.DataElement_NME,
+                        DataElement_TYP = l.DataElement_TYP,
+
+                        DataObject_NME = l.DataObject_NME,
+                        DataObject_DSC = l.DataObject_DSC,
+                        DataObjectCode_DSC = l.DataObjectCode_DSC,
+
+                        DataObjectDetailType_VAL = l.DataObjectDetailType_VAL,
+                        DataObjectField_NME = l.DataObjectField_NME,
+                        DataObjectField_DSC = l.DataObjectField_DSC,
+
+                        SourceElement_NME = l.SourceElement_NME,
+                        SourceField_NME = l.SourceField_NME,
+                        SourceObject_NME = l.SourceObject_NME,
+
+                        Display_IND = l.Display_IND,
+                        Sources = new List<LineageCreation>(),
+                        DataLineage_ID = l.DataLineage_ID,
+                        Transformation_TXT = l.Transformation_TXT,
+                        Source_TXT = l.Source_TXT
+                    };
+
+                    masterList.Add(lc);
+                }
+
+                foreach (var source in RecursiveSources(lc, allLineage))
+                {
+                    if (!lc.Sources.Any(x => x.DataLineage_ID == source.DataLineage_ID))
                     {
-                        l = found;
+                        lc.Sources.Add(source);
                     }
-
-                    switch (item.DataObjectFieldDetailType_CDE)
-                    {
-                        case "SourceElement_NME":
-                            l.SourceElement_NME = item.DataObjectFieldDetailType_VAL;
-                            break;
-                        case "SourceObject_NME":
-                            l.SourceObject_NME = item.DataObjectFieldDetailType_VAL;
-                            break;
-                        case "SourceObjectField_NME":
-                            l.SourceObjectField_NME = item.DataObjectFieldDetailType_VAL;
-                            break;
-                        case "Source_TXT":
-                            l.Source_TXT = item.DataObjectFieldDetailType_VAL;
-                            break;
-                        case "Transformation_TXT":
-                            l.Transformation_TXT = item.DataObjectFieldDetailType_VAL;
-                            break;
-                        case "Display_IND":
-                            //l.Display_IND = Convert.ToInt32(item.DataObjectFieldDetailType_VAL);
-                            break;
-                        case "MultipleSourceField_IND":
-                            //l.MultipleSourceField_IND = Convert.ToInt32(item.DataObjectFieldDetailType_VAL);
-                            break;
-                    }
-
-                    if (found == null)
-                    {
-                        lineage.Add(l);
-                    }
-
                 }
             }
-            catch(Exception ex)
+
+            return masterList.ToList();
+        }
+
+
+        //private List<LineageCreation> RecursiveSources(LineageCreation parent, List<Lineage> allLineage, List<LineageCreation> cachedList)
+        //{
+        //    var children = allLineage.Where(a =>
+        //        a.DataObject_NME.Trim().ToLower() == parent.SourceObject_NME.Trim().ToLower()
+        //        && a.DataObjectField_NME.Trim().ToLower() == parent.SourceField_NME.Trim().ToLower()
+        //        && a.DataElement_NME.Trim().ToLower() == parent.SourceElement_NME.Trim().ToLower()
+        //    ).ToList();
+
+        //    if (parent.Sources == null)
+        //    {
+        //        parent.Sources = new List<LineageCreation>();
+        //    }
+
+        //    foreach (Lineage child in children)
+        //    {
+        //        //Search the Cached List for the Child
+        //        LineageCreation cachedChild = cachedList.FirstOrDefault(cache =>
+        //            cache.DataElement_NME == child.DataElement_NME
+        //                && cache.DataObject_NME == child.DataObject_NME
+        //                && cache.DataObjectField_NME == child.DataObjectField_NME
+        //                && cache.SourceElement_NME == child.SourceElement_NME
+        //                && cache.SourceObject_NME == child.SourceObject_NME
+        //                && cache.SourceField_NME == child.SourceField_NME
+        //            );
+
+        //        if (cachedChild != null)
+        //        {
+        //            parent.Sources.Add(cachedChild);
+        //        }
+        //        else
+        //        {
+
+        //            LineageCreation candidateChild = parent.Sources.FirstOrDefault(a =>
+        //            a.DataElement_NME == child.DataElement_NME
+        //            && a.DataObject_NME == child.DataObject_NME
+        //            && a.DataObjectField_NME == child.DataObjectField_NME);
+
+        //            if (candidateChild != null)
+        //            {
+        //                candidateChild.SourceElement_NME = child.SourceElement_NME;
+        //                candidateChild.SourceField_NME = child.SourceField_NME;
+        //                candidateChild.SourceObject_NME = child.SourceObject_NME;
+        //            }
+        //            else
+        //            {
+        //                candidateChild = new LineageCreation()
+        //                {
+        //                    DataAsset_ID = child.DataAsset_ID,
+        //                    Layer = parent.Layer + 1,
+
+        //                    Model_NME = child.Model_NME,
+
+        //                    DataElement_NME = child.DataElement_NME,
+        //                    DataElement_TYP = child.DataElement_TYP,
+
+        //                    DataObject_NME = child.DataObject_NME,
+        //                    DataObject_DSC = child.DataObject_DSC,
+        //                    DataObjectCode_DSC = child.DataObjectCode_DSC,
+
+        //                    DataObjectDetailType_VAL = child.DataObjectDetailType_VAL,
+        //                    DataObjectField_NME = child.DataObjectField_NME,
+        //                    DataObjectField_DSC = child.DataObjectField_DSC,
+
+        //                    SourceElement_NME = child.SourceElement_NME,
+        //                    SourceField_NME = child.SourceField_NME,
+        //                    SourceObject_NME = child.SourceObject_NME,
+
+        //                    Display_IND = child.Display_IND,
+        //                    Sources = new List<LineageCreation>(),
+
+        //                    DataLineage_ID = child.DataLineage_ID,
+        //                    Transformation_TXT = child.Transformation_TXT,
+        //                    Source_TXT = child.Source_TXT
+        //                };
+
+        //                parent.Sources.Add(candidateChild);
+        //            }
+
+        //            foreach (var source in RecursiveSources(candidateChild, allLineage, cachedList))
+        //            {
+        //                if (!candidateChild.Sources.Any(x => x.DataLineage_ID == source.DataLineage_ID))
+        //                {
+        //                    candidateChild.Sources.Add(source);
+        //                }
+        //            }
+
+        //        }
+
+        //    }
+
+        //    if (!cachedList.Any(cache => cache.DataElement_NME == parent.DataElement_NME
+        //                && cache.DataObject_NME == parent.DataObject_NME
+        //                && cache.DataObjectField_NME == parent.DataObjectField_NME))
+        //    {
+        //        cachedList.Add(parent);
+        //    }
+
+        //    return parent.Sources;
+
+        //}
+
+        private List<LineageCreation> RecursiveSources(LineageCreation input, List<Lineage> allLineage)
+        {
+            var lcList = allLineage.Where(a => a.DataObject_NME.Trim().ToLower() == input.SourceObject_NME.Trim().ToLower() && 
+            a.DataObjectField_NME.Trim().ToLower() == input.SourceField_NME.Trim().ToLower() && 
+            a.DataElement_NME.Trim().ToLower() == input.SourceElement_NME.Trim().ToLower()).ToList();
+
+            if(input.Sources == null)
             {
-                var a = 0;
+                input.Sources = new List<LineageCreation>();
             }
 
-            return lineage;
+            foreach (Lineage l in lcList)
+            {
+                LineageCreation lc = input.Sources.FirstOrDefault(a => a.DataElement_NME == l.DataElement_NME && a.DataObject_NME == l.DataObject_NME && a.DataObjectField_NME == l.DataObjectField_NME);
+
+                if (lc != null)
+                {
+                    lc.SourceElement_NME = l.SourceElement_NME;
+                    lc.SourceField_NME = l.SourceField_NME;
+                    lc.SourceObject_NME = l.SourceObject_NME;
+                }
+                else
+                {
+                    lc = new LineageCreation()
+                    {
+                        DataAsset_ID = l.DataAsset_ID,
+                        Layer = input.Layer + 1,
+
+                        Model_NME = l.Model_NME,
+
+                        DataElement_NME = l.DataElement_NME,
+                        DataElement_TYP = l.DataElement_TYP,
+
+                        DataObject_NME = l.DataObject_NME,
+                        DataObject_DSC = l.DataObject_DSC,
+                        DataObjectCode_DSC = l.DataObjectCode_DSC,
+
+                        DataObjectDetailType_VAL = l.DataObjectDetailType_VAL,
+                        DataObjectField_NME = l.DataObjectField_NME,
+                        DataObjectField_DSC = l.DataObjectField_DSC,
+
+                        SourceElement_NME = l.SourceElement_NME,
+                        SourceField_NME = l.SourceField_NME,
+                        SourceObject_NME = l.SourceObject_NME,
+
+                        Display_IND = l.Display_IND,
+                        Sources = new List<LineageCreation>(),
+
+                        DataLineage_ID = l.DataLineage_ID,
+                        Transformation_TXT = l.Transformation_TXT,
+                        Source_TXT = l.Source_TXT
+                    };
+
+                    input.Sources.Add(lc);
+                }
+
+                foreach(var source in RecursiveSources(lc, allLineage))
+                {
+                    if(!lc.Sources.Any(x => x.DataLineage_ID == source.DataLineage_ID))
+                    {
+                        lc.Sources.Add(source);
+                    }
+                }                
+            }
+           
+            return input.Sources;
         }
-        
+
+
+
 
         public IQueryable<Category> Categories
         {

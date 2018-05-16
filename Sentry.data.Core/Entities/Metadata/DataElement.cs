@@ -34,19 +34,8 @@ namespace Sentry.data.Core.Entities.Metadata
 
     public class DataElementCode
     {
-        public const String Analysis_Services = "A";
+        public const String BusinessTerm = "Business Term";
+        public const String Lineage = "Lineage";
 
-        public const String Business_Objects = "B";
-
-        public const String Database = "D";
-
-        public const String Lineage = "L";
-        public const String Business_Objects_Lineage = "L";
-        public const String Analysis_Services_Lineage = "L";
-        public const String Database_Lineage = "L";
-
-        public const String Tableau = "T";
-
-        public const String SQL_Server = "S";
     }
 }
