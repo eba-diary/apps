@@ -608,31 +608,34 @@ data.DatasetDetail = {
                 if (files.length > 0) {
                     var matchFound = false;
                     var matchIndex;
-                    var j;
+                    var j;                            
+                    var extension = files[0].name.substr((files[0].name.lastIndexOf('.') + 1));  //https://stackoverflow.com/questions/3042312/jquery-find-file-extension-from-string
                     for (i = 1; i < configs.length; i++) {
                         for (j = 0; j < configs[i].SearchCriteria.length; j++) {
-                            if (configs[i].IsRegexSearch[j] && files[0].name.match(configs[i].SearchCriteria[j])) {
-                                select.append($('<option/>', {
-                                    value: configs[i].ConfigId,
-                                    text: configs[i].ConfigFileName
-                                }));
+                            if (configs[i].FileExtension.Name.toLowerCase().trim() == 'any' || configs[i].FileExtension.Name.toLowerCase().trim() == extension.toLowerCase()) {
+                                if (configs[i].IsRegexSearch[j] && files[0].name.match(configs[i].SearchCriteria[j])) {
+                                    select.append($('<option/>', {
+                                        value: configs[i].ConfigId,
+                                        text: configs[i].ConfigFileName
+                                    }));
 
-                                if (i != 0) {
-                                    matchFound = true;
-                                    matchIndex = i;
+                                    if (i != 0) {
+                                        matchFound = true;
+                                        matchIndex = i;
+                                    }
                                 }
-                            }
-                            else if (!configs[i].IsRegexSearch[j] && files[0].name === configs[i].SearchCriteria[j]) {
-                                select.append($('<option/>', {
-                                    value: configs[i].ConfigId,
-                                    text: configs[i].ConfigFileName
-                                }));
+                                else if (!configs[i].IsRegexSearch[j] && files[0].name === configs[i].SearchCriteria[j]) {
+                                    select.append($('<option/>', {
+                                        value: configs[i].ConfigId,
+                                        text: configs[i].ConfigFileName
+                                    }));
 
-                                if (i != 0) {
-                                    matchFound = true;
-                                    matchIndex = i;
+                                    if (i != 0) {
+                                        matchFound = true;
+                                        matchIndex = i;
+                                    }
                                 }
-                            }
+                            }                            
                         }
                     }
 

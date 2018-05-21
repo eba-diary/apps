@@ -224,6 +224,19 @@
                         </span>
                     </div>
                 </div>
+                <div class="form-group">
+                    @Html.LabelFor((model) => model.FileExtensionID, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor((model) => model.FileExtensionID, Model.ExtensionList, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.FileExtensionID, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group fieldDescription">
+                    <label class="control-label col-md-2"></label>
+                    <div class="col-md-10">
+                        <span class="text-muted"><em id="fileTypeInfo"></em>File extension which will be loaded into this configuration. Extensions not matching this file extension will not be processed.</span>
+                    </div>
+                </div>
                 @**
 
         <div class="form-group fieldDescription" >

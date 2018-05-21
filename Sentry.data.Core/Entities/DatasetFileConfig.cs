@@ -10,11 +10,7 @@ namespace Sentry.data.Core
     public class DatasetFileConfig
     {
 
-        public DatasetFileConfig()
-        {
-            //Default to false
-            CreateCurrentFile = false;
-        }        
+        public DatasetFileConfig() {}        
         
         public virtual int ConfigId { get; set; }
         public virtual string Name { get; set; }
@@ -39,6 +35,7 @@ namespace Sentry.data.Core
         }
 
         public virtual IList<RetrieverJob> RetrieverJobs { get; set; }
+        public virtual FileExtension FileExtension { get; set; }
 
 
 

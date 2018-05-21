@@ -171,40 +171,17 @@ namespace Sentry.data.Goldeneye
 
         private static void SingleFileProcessor(string _path, IDatasetContext dscontext, LoaderRequest req = null, RetrieverJob job = null)
         {
-            //int configMatch = 0;
-
-            //Add ProcessingPrefix to file name
-
-            ////Find matching configs for the given incoming file path
-            //List<DatasetFileConfig> fcList = Utilities.GetMatchingDatasetFileConfigs(systemMetaFiles, _path);
-
-            //FileInfo fi = new FileInfo(_path);
-
-            //foreach (DatasetFileConfig fc in fcList.Where(w => w.IsGeneric == false).Take(1))
-            //{
-                Logger.Debug($"Processing file for DatasetFileConfig: ID-{job.DatasetConfig.ConfigId}, Name-{job.DatasetConfig.Name}, Job-{job.Id}");
-                Dataset ds = dscontext.GetById(job.DatasetConfig.ParentDataset.DatasetId);
-                req.DatasetID = job.DatasetConfig.ParentDataset.DatasetId;
-                req.DatasetFileConfigId = job.DatasetConfig.ConfigId;
-                DatasetFile df = Utilities.ProcessInputFile(ds, job.DatasetConfig, false, req, _path);
+            Logger.Debug($"Processing file for DatasetFileConfig: ID-{job.DatasetConfig.ConfigId}, Name-{job.DatasetConfig.Name}, Job-{job.Id}");
+            Dataset ds = dscontext.GetById(job.DatasetConfig.ParentDataset.DatasetId);
+            req.DatasetID = job.DatasetConfig.ParentDataset.DatasetId;
+            req.DatasetFileConfigId = job.DatasetConfig.ConfigId;
+            DatasetFile df = Utilities.ProcessInputFile(ds, job.DatasetConfig, false, req, _path);
+            
+            //If datasource if DFS delete the incoming file.  S3 data sources is handled within the ProcesinputFile method.
+            if (job.DataSource.Is<DfsBasic>() || job.DataSource.Is<DfsCustom>())
+            {
                 Utilities.RemoveProcessedFile(df, new FileInfo(_path));
-                //configMatch++;
-            //}
-
-            //if (configMatch == 0)
-            //{
-            //    DatasetFileConfig fc = systemMetaFiles.Where(w => w.IsGeneric == true).FirstOrDefault();
-            //    Logger.Debug($"Using generic DatasetFileConfig: ID-{fc.ConfigId}, Name-{fc.Name}");
-            //    Logger.Debug($"Retrieving Dataset associated with DatasetFileConfig: ID-{fc.ParentDataset.DatasetId}");
-            //    Dataset ds = dscontext.GetById(fc.ParentDataset.DatasetId);
-            //    Logger.Debug("Processing DatasetFile");
-            //    req.DatasetID = ds.DatasetId;
-            //    req.DatasetFileConfigId = fc.ConfigId;
-            //    DatasetFile df = Utilities.ProcessInputFile(ds, fc, dscontext, false, req, fi);
-
-            //    Logger.Debug($"Removing successful processed file - Path:{_path}");
-            //    Utilities.RemoveProcessedFile(df, new FileInfo(_path));
-            //}            
+            }                          
         }
     }
 }

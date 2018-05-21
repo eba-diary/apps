@@ -11,7 +11,8 @@ namespace Sentry.data.Web
 {
     public class DatasetFileConfigsModel
     {
-        public DatasetFileConfigsModel() { }
+        public DatasetFileConfigsModel() {
+        }
 
         public DatasetFileConfigsModel(DatasetFileConfig dsfc, Boolean renderingForTable, Boolean renderingForPopup)
         {
@@ -23,6 +24,8 @@ namespace Sentry.data.Web
             this.ParentDatasetName = dsfc.ParentDataset.DatasetName;
             this.DatasetScopeTypeID = dsfc.DatasetScopeTypeID;
             this.ScopeType = dsfc.DatasetScopeType;
+            this.FileExtensionID = dsfc.FileExtension.Id;
+            this.FileExtension = dsfc.FileExtension;
 
             try
             {
@@ -99,9 +102,13 @@ namespace Sentry.data.Web
         [DisplayName("Data Scope Type")]
         public int DatasetScopeTypeID { get; set; }
 
+        public FileExtension FileExtension { get; set; }
+        public int FileExtensionID { get; set; }
+
         public IList<RetrieverJob> RetrieverJobs { get; set; }
 
         public IEnumerable<SelectListItem> AllDatasetScopeTypes { get; set; }
         public IEnumerable<SelectListItem> AllDataFileTypes { get; set; }
+        public IEnumerable<SelectListItem> ExtensionList { get; set; }
     }
 }

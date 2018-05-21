@@ -83,6 +83,13 @@
             </div>
 
             <div class="form-group">
+                @Html.LabelFor((model) => model.FileExtensionID, new { @class = "control-label col-md-2" })
+                <div class="col-md-2">
+                    @Html.DropDownListFor(model => model.FileExtensionID, Model.ExtensionList, new { @class = "form-control edit-dataset-row" })
+                </div>
+            </div>
+
+            <div class="form-group">
                 @Html.LabelFor((model) => model.DropPath, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
                     @Html.EditorFor((model) => model.DropPath, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })

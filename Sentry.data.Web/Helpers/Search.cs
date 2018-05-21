@@ -93,22 +93,6 @@ namespace Sentry.data.Web.Helpers
 
                     }
 
-                    using (profiler.Step("Frequency"))
-                    {
-                        var freq = ldm.SearchFilters.Where(f => f.FilterType == "Frequency").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).ToList();
-                        if (freq.Any())
-                        {
-                            filteredList =
-                            (
-                                from item in filteredList
-                                from a in item.DistinctFrequencies()
-                                join f in freq
-                                    on a equals f.value
-                                select item
-                            ).ToList();
-                        }
-                    }
-
                     using (profiler.Step("Owner"))
                     {
                         var own = ldm.SearchFilters.Where(f => f.FilterType == "Sentry Owner").SelectMany(fi => fi.FilterNameList).Where(fil => fil.isChecked == true).ToList();
@@ -209,8 +193,7 @@ namespace Sentry.data.Web.Helpers
 
             FilterList.Add(CategoryFilter(dsc, ldm, ids, 0, cat));
             FilterList.Add(OwnerFilter(dsc, ldm, ids, 1, ownerList));
-            FilterList.Add(FrequencyFilter(ldm, ids, 2));
-            FilterList.Add(ExtensionFilter(dsc, ldm, ids, 3));
+            FilterList.Add(ExtensionFilter(dsc, ldm, ids, 2));
 
             return FilterList;
         }
@@ -362,85 +345,6 @@ namespace Sentry.data.Web.Helpers
                     // Only add filter if there are datasets associated based on filtering 
                     fList.Add(nf);
 
-                    filterIndex++;
-                }
-                Filter.FilterNameList = fList.ToList();
-
-                return Filter;
-            }
-        }
-
-        private FilterModel FrequencyFilter(ListDatasetModel ldm, string[] ids, int filterID)
-        {
-            var profiler = MiniProfiler.Current; // it's ok if this is null
-
-            using (profiler.Step("Frequency Filter"))
-            {
-                IDictionary<int, string> datasetFrequencyList = EnumToDictionary(typeof(DatasetFrequency));
-
-                //Generate Frequency Filters
-                FilterModel Filter = new FilterModel();
-                Filter.FilterType = "Frequency";
-
-                int filterIndex = 0;
-
-                List<FilterNameModel> fList = new List<FilterNameModel>();
-
-                foreach (var item in datasetFrequencyList)
-                {
-                    FilterNameModel nf = new FilterNameModel();
-                    nf.id = filterIndex;
-                    nf.value = item.Value;
-
-                    Boolean hasCategoryID = false;
-
-                    if (ids != null)
-                    {
-                        foreach (string id in ids)
-                        {
-                            if (id.StartsWith(filterID.ToString()) && id.Substring(id.IndexOf("_") + 1) == (nf.id.ToString()))
-                            {
-                                hasCategoryID = true;
-                            }
-                        }
-                    }
-
-                    if (
-                        (
-                            ldm.SearchFilters.Any()
-                            &&
-                            ldm.SearchFilters.
-                                Where(f => f.FilterType == "Frequency").
-                                SelectMany(fi => fi.FilterNameList).
-                                Any(fil => fil.isChecked == true)
-                            &&
-                            ldm.SearchFilters.
-                                Where(f => f.FilterType == "Frequency").
-                                SelectMany(fi => fi.FilterNameList).
-                                Any(fil => fil.value == item.Value && fil.isChecked == true)
-                        )
-                        ||
-                            hasCategoryID
-                        )
-                    {
-                        nf.isChecked = true;
-                    }
-
-                    //Count of all datasets equal to this filter
-
-
-                    nf.count = (from a in ldm.DatasetList
-                                from b in a.DistinctFrequencies()
-                                where b == nf.value
-                                select a).Count();
-
-                    //nf.count = ldm.DatasetList.Where(f => f.CreationFreqDesc == nf.value).Count();
-
-                    // Only add filter if there are datasets associated based on filtering 
-                    //if (nf.count > 0)
-                    //{
-                    fList.Add(nf);
-                    //}
                     filterIndex++;
                 }
                 Filter.FilterNameList = fList.ToList();

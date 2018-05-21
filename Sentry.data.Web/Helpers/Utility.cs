@@ -225,6 +225,34 @@ namespace Sentry.data.Web.Helpers
             return dScopeTypes;
         }
 
+        public static IEnumerable<SelectListItem> GetFileExtensionListItems(IDatasetContext _datasetContext, int id = -1)
+        {
+
+            IEnumerable<SelectListItem> dFileExtensions;
+            if (id == -1)
+            {
+                dFileExtensions = _datasetContext.FileExtensions
+                    .Select((c) => new SelectListItem
+                    {
+                        Selected = (c.Name == "ANY"),
+                        Text = c.Name,
+                        Value = c.Id.ToString()
+                    });
+            }
+            else
+            {
+                dFileExtensions = _datasetContext.FileExtensions
+                    .Select((c) => new SelectListItem
+                    {
+                        Selected = (c.Id == id),
+                        Text = c.Name,
+                        Value = c.Id.ToString()
+                    });
+            }
+
+            return dFileExtensions;
+        }
+
 
     }
 

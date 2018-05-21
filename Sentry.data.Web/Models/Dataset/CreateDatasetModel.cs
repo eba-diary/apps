@@ -18,7 +18,7 @@ namespace Sentry.data.Web
             this.ChangedDtm = DateTime.MinValue;
             this.DatasetDesc = "";
             this.DatasetName = "";
-            this.FileExtension = "";
+            this.FileExtension = null;
             this.ConfigFileName = "Default";
             this.ConfigFileDesc = "Default Config for Dataset.  Uploaded files that do not match any configs will default to this config";
             this.DatasetId = 0;
@@ -106,8 +106,12 @@ namespace Sentry.data.Web
 
         [DisplayName("Data Source")]
         public DataSource DataSource { get; set; }
+        
+        public string TargetFileType { get; set; }
 
         public IEnumerable<SelectListItem> SourceTypes { get; set; }
+
+        public IEnumerable<SelectListItem> ExtensionList { get; set; }
 
         //[DisplayName("Dataset File")]
         //public String DatasetFileName { get; set; }

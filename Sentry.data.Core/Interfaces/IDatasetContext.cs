@@ -29,6 +29,7 @@ namespace Sentry.data.Core
         IQueryable<DataObject> DataObjects { get; }
 
         IQueryable<DatasetScopeType> DatasetScopeTypes { get; }
+        IQueryable<FileExtension> FileExtensions { get; }
 
         List<String> BusinessTerms(string dataElementCode, int? DataAsset_ID, String DataElement_NME = "", String DataObject_NME = "", String DataObjectField_NME = "", String Line_CDE = "");
         List<String> ConsumptionLayers(string dataElementCode, int? DataAsset_ID, String DataElement_NME = "", String DataObject_NME = "", String DataObjectField_NME = "", String Line_CDE = "");

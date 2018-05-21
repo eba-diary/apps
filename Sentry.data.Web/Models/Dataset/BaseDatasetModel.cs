@@ -40,7 +40,7 @@ namespace Sentry.data.Web
             }
 
             this.OriginationCode = ds.OriginationCode;
-            this.FileExtension = ds.FileExtension;
+            this.FileExtension = null;
             this.DatasetDtm = ds.DatasetDtm;
             this.ChangedDtm = ds.ChangedDtm;
             this.S3Key = ds.S3Key;
@@ -79,12 +79,6 @@ namespace Sentry.data.Web
             { this.IsPreviewCompatible = true; }
             else
             { this.IsPreviewCompatible = false; }
-        }
-
-        public string FileExtensionDisplay()
-        {
-            string fe = FileExtension.TrimStart('.');
-            return fe;
         }
 
         public List<string> DistinctFileExtensions()
@@ -180,6 +174,7 @@ namespace Sentry.data.Web
         [MaxLength(16)]
         [DisplayName("File Extension")]
         public string FileExtension { get; set; }
+        public int FileExtensionID { get; set; }
 
         [Required]
         [DisplayName("Creation Date")]

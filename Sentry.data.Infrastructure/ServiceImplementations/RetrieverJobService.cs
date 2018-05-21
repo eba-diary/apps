@@ -111,10 +111,14 @@ namespace Sentry.data.Infrastructure
                                 {
                                     //check for searchcriteria for filtering incoming files
                                     if (!_job.FilterIncomingFile(Path.GetFileName(a)))
-                                        {
-                                            //Submit Loader Request
-                                            SubmitLoaderRequest(a);
-                                        }
+                                    {
+                                        //Submit Loader Request
+                                        SubmitLoaderRequest(a);
+                                    }
+                                    else
+                                    {
+                                        Logger.Info($"Filtered file from processing - Job:{_job.Id} File:{a}");
+                                    }
                                 }                                                                                              
                             }
                             break;
@@ -140,7 +144,11 @@ namespace Sentry.data.Infrastructure
                                         //Submit Loader Request
                                         SubmitLoaderRequest(b);
                                     }
-                                }                                
+                                }
+                                else
+                                {
+                                    Logger.Info($"Filtered file from processing - Job:{_job.Id} File:{b}");
+                                }
                             }                            
                             break;
                         }
@@ -168,6 +176,10 @@ namespace Sentry.data.Infrastructure
                                         //Submit Loader Request
                                         SubmitLoaderRequest(a);
                                     }
+                                }
+                                else
+                                {
+                                    Logger.Info($"Filtered file from processing - Job:{_job.Id} File:{a}");
                                 }
                             }
                             break;

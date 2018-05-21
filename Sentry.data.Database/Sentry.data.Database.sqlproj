@@ -154,6 +154,7 @@
     <Build Include="Tables\HangFire\Server.sql" />
     <Build Include="Tables\HangFire\Set.sql" />
     <Build Include="Tables\HangFire\State.sql" />
+    <Build Include="Tables\FileExtension.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

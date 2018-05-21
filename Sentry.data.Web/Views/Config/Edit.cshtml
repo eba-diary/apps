@@ -24,6 +24,7 @@
             @Html.HiddenFor(model => model.DatasetId)
             @Html.HiddenFor(model => model.ModifyType)
             @Html.HiddenFor(model => model.DatasetScopeTypeID)
+            @Html.HiddenFor(model => model.FileExtensionID)
             @{Model.ModifyType = ViewBag.ModifyType;}
 
 
@@ -63,6 +64,13 @@
                     @Html.DisplayFor(m => m.DropPath, new { htmlAttributes = new { @class = "from-control-static" } })
                     @*@Html.EditorFor(model => model.DropPath, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
                         @Html.ValidationMessageFor(model => model.DropPath, "", new { @class = "text-danger" })*@
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor((model) => model.FileExtensionID, new { @class = "control-label col-md-3" })
+                <div class="col-md-4">
+                    @Html.DropDownListFor(model => model.FileExtensionID,
+                        new SelectList(Model.ExtensionList, "Value", "Text", Model.FileExtensionID), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control" })
                 </div>
             </div>
 

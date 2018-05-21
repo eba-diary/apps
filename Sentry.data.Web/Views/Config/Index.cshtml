@@ -111,7 +111,12 @@
             {
                 <div class="glyphicon glyphicon-lock lockIconSml leftFloat" data-toggle="tooltip" data-placement="top" title="Secure"></div>
             }
-            <div class="extension detailExtSml bg_gray htCenter ext_@Model.FileExtensionDisplay()">@Model.FileExtensionDisplay()</div>
+            @{
+                foreach (string item in Model.DistinctFileExtensions())
+                {
+                    <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
+                }
+            }
         </div>
 
         @*@if (Model.CanEditDataset)
@@ -163,8 +168,12 @@
 
                         <p>@item.ConfigFileDesc</p>
                         <p>This configuration is classified as a @item.FileType</p>
-                        <p>This configurations Data Scope is @item.ScopeType.Name which means : </p>
+                        <p>This configuration Data Scope is @item.ScopeType.Name which means : </p>
                         <p style="margin-left: 25px;">@item.ScopeType.Description</p>
+                        @if (item.FileExtension.Name.Trim() == "ANY") {<p>This configuration will allow all files extensions.</p>}
+                        else
+                        {<p>This configuration will only allow files with .@item.FileExtension.Name.ToLower() extension</p>}
+                        
                        
                         <a class="backToList" href="/Config/Edit/@item.ConfigId"><span class="glyphicon glyphicon-edit"></span>  Edit Config</a>
 

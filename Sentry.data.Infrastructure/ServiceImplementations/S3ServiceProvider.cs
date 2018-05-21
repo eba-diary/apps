@@ -226,8 +226,7 @@ namespace Sentry.data.Infrastructure
                 s3tuDwnldReq.Key = s3Key;
 
                 s3tuDwnldReq.WriteObjectProgressEvent += new EventHandler<WriteObjectProgressArgs>(a_TransferProgressEvent);
-                //s3tuDwnldReq.WriteObjectProgressEvent += new EventHandler<WriteObjectProgressArgs>(downloadRequest_DownloadPartProgressEvent);
-
+                
                 s3tu.Download(s3tuDwnldReq);
             }
             catch (AmazonS3Exception e)

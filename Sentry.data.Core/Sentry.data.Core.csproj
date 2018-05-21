@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DomainServices\MetadataRepositoryService.cs" />
+    <Compile Include="Entities\FileExtension.cs" />
     <Compile Include="Entities\Metadata\DataElement.cs" />
     <Compile Include="Entities\Metadata\DataElementDetail.cs" />
     <Compile Include="Entities\Metadata\DataObject.cs" />

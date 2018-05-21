@@ -420,4 +420,25 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Name" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="f78eed8e-918a-49b0-bb85-d551027592f4" ChangeDateTime="05/15/2018 03:52:33">
+    <Property Name="ElementName" Value="[dbo].[FileExtension].[Name]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FileExtension]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Extension_NME" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="bb334809-aa92-4d1c-b40e-623d35064775" ChangeDateTime="05/15/2018 03:52:40">
+    <Property Name="ElementName" Value="[dbo].[FileExtension].[Create]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FileExtension]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Created_DTM" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="780330c5-2abd-4f5b-886c-75b58947e035" ChangeDateTime="05/15/2018 04:00:55">
+    <Property Name="ElementName" Value="[dbo].[FileExtension].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FileExtension]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Extension_Id" />
+  </Operation>
 </Operations>

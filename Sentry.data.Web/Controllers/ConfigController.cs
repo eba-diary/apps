@@ -64,6 +64,7 @@ namespace Sentry.data.Web.Controllers
             dfcm.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext);
             dfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
                     => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+            dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext);
 
             dfcm.DropPath = parent.DropLocation;
 
@@ -100,6 +101,7 @@ namespace Sentry.data.Web.Controllers
                         FileTypeId = dfcm.FileTypeId,
                         IsGeneric = false,
                         ParentDataset = parent,
+                        FileExtension = _datasetContext.GetById<FileExtension>(dfcm.FileExtensionID),
                         DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dfcm.DatasetScopeTypeID)
                     };
 
@@ -208,6 +210,7 @@ namespace Sentry.data.Web.Controllers
             edfc.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext, edfc.DatasetScopeTypeID);
             edfc.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+            edfc.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, edfc.FileExtensionID);
 
             ViewBag.ModifyType = "Edit";
 
@@ -225,6 +228,7 @@ namespace Sentry.data.Web.Controllers
             edfc.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext, edfc.DatasetScopeTypeID);
             edfc.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+            edfc.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, edfc.FileExtensionID);
 
             ViewBag.ModifyType = "Edit";
 
@@ -245,6 +249,7 @@ namespace Sentry.data.Web.Controllers
                     dfc.DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(edfc.DatasetScopeTypeID);
                     dfc.FileTypeId = edfc.FileTypeId;
                     dfc.Description = edfc.ConfigFileDesc;
+                    dfc.FileExtension = _datasetContext.GetById<FileExtension>(edfc.FileExtensionID);
                     _datasetContext.SaveChanges();
 
                     return RedirectToAction("Index", new { id = edfc.DatasetId });

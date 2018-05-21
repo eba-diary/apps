@@ -216,6 +216,8 @@ namespace Sentry.data.Web.Controllers
             cdm = (CreateDatasetModel) Utility.setupLists(_datasetContext, cdm);
             cdm.IsRegexSearch = true;
 
+            cdm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext);
+
             return View(cdm);
         }
 
@@ -242,7 +244,7 @@ namespace Sentry.data.Web.Controllers
                     List<DatasetFileConfig> dfcList = new List<DatasetFileConfig>();
                     //Create Generic Data File Config for Dataset            
 
-                    
+
                     DatasetFileConfig dfc = new DatasetFileConfig()
                     {
                         ConfigId = 0,
@@ -255,7 +257,8 @@ namespace Sentry.data.Web.Controllers
                         FileTypeId = (int)FileType.DataFile,
                         IsGeneric = true,
                         ParentDataset = ds,
-                        DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(cdm.DatasetScopeTypeID)
+                        DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(cdm.DatasetScopeTypeID),
+                        FileExtension = _datasetContext.GetById<FileExtension>(cdm.FileExtensionID)
                     };
 
                     List<RetrieverJob> jobList =  new List<RetrieverJob>();
@@ -342,6 +345,7 @@ namespace Sentry.data.Web.Controllers
                 _datasetContext.Clear();
                 cdm = (CreateDatasetModel) Utility.setupLists(_datasetContext, cdm);
                 cdm.DropPath = Path.Combine(Configuration.Config.GetHostSetting("DatasetLoaderBaseLocation"));
+                cdm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext);
             }
 
             return View(cdm);
@@ -1258,7 +1262,7 @@ namespace Sentry.data.Web.Controllers
                             //Create Dataset Loader request
                             //Find job DFSBasic generic job associated with this config and add ID to request.
                             int dfsBasicJobId = 0;
-                            List<RetrieverJob> jobList = _requestContext.RetrieverJob.Where(w => w.DatasetConfig.ConfigId == configId && w.IsGeneric).ToList();
+                            List<RetrieverJob> jobList = _requestContext.RetrieverJob.Where(w => w.DatasetConfig.ConfigId == configId).ToList();
                             bool jobFound = false;
                             foreach (RetrieverJob job in jobList)
                             {
@@ -1271,7 +1275,7 @@ namespace Sentry.data.Web.Controllers
 
                             if (!jobFound)
                             {
-                                throw new NotImplementedException("Failed to find generic dfsbaic job");
+                                throw new NotImplementedException("Failed to find generic DFS Basic job");
                             }
 
                             var hashInput = $"{user.AssociateId.ToString()}_{DateTime.Now.ToString("MM-dd-yyyyHH:mm:ss.fffffff")}_{dsfi}";

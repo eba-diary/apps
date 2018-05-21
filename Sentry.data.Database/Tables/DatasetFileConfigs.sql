@@ -11,12 +11,13 @@
     [Config_DSC]            VARCHAR (250)  NULL,
     [IsGeneric]             BIT            NOT NULL,
     [TargetFile_NME]        VARCHAR (250)  NULL,
-    [CreationFreq_DSC]      NVARCHAR (100) NULL,
     [DatasetScopeType_ID]   INT            NOT NULL,
     [CurrentFile_IND]       BIT            NULL,
+    [FileExtension_CDE] INT NOT NULL, 
     CONSTRAINT [PK_DatasetFileConfigs] PRIMARY KEY CLUSTERED ([Config_ID] ASC),
     CONSTRAINT [FK_DatasetFileConfigs_Dataset] FOREIGN KEY ([Dataset_ID]) REFERENCES [dbo].[Dataset] ([Dataset_ID]),
-    CONSTRAINT [FK_DatasetFileConfigs_DatasetScopeTypes] FOREIGN KEY ([DatasetScopeType_ID]) REFERENCES [dbo].[DatasetScopeTypes] ([ScopeType_ID])
+    CONSTRAINT [FK_DatasetFileConfigs_DatasetScopeTypes] FOREIGN KEY ([DatasetScopeType_ID]) REFERENCES [dbo].[DatasetScopeTypes] ([ScopeType_ID]),
+    CONSTRAINT [FK_DatasetFileConfigs_FileExtension] FOREIGN KEY ([FileExtension_CDE]) REFERENCES [dbo].[FileExtension] ([Extension_ID])
 );
 
 

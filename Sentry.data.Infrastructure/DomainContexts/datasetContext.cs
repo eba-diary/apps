@@ -90,6 +90,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<FileExtension> FileExtensions
+        {
+            get
+            {
+                return Query<FileExtension>().Cacheable();
+            }
+        }
+
         public List<String> BusinessTerms(string dataElementCode, int? DataAsset_ID, String DataElement_NME = "", String DataObject_NME = "", String DataObjectField_NME = "", String Line_CDE = "")
         {
             DataElement_NME = HttpUtility.UrlDecode(DataElement_NME);

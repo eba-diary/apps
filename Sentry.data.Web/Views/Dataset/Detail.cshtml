@@ -55,7 +55,6 @@
                         <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
                 }
                     }
-                    @*<div class="extension detailExt bg_gray htCenter ext_@Model.FileExtensionDisplay()">@Model.FileExtensionDisplay()</div>*@
 
                     <button type="button"
                             class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
@@ -114,7 +113,12 @@
             {
                 <div class="glyphicon glyphicon-lock lockIconSml leftFloat" data-toggle="tooltip" data-placement="top" title="Secure"></div>
         }
-                <div class="extension detailExtSml bg_gray htCenter ext_@Model.FileExtensionDisplay()">@Model.FileExtensionDisplay()</div>
+                @{
+                    foreach (string item in Model.DistinctFileExtensions())
+                    {
+                        <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
+                    }
+                }                
             </div>
 
             @if (Model.CanEditDataset)

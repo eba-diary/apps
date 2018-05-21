@@ -48,6 +48,13 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Class(typeof(DatasetScopeType));
             });
 
+            this.ManyToOne(x => x.FileExtension, m =>
+            {
+                m.Column("FileExtension_CDE");
+                m.ForeignKey("FK_DatasetFileConfigs_FileExtension");
+                m.Class(typeof(FileExtension));
+            });
+
             this.Bag(x => x.RetrieverJobs, (m) =>
             {
                 m.Lazy(CollectionLazy.Lazy);

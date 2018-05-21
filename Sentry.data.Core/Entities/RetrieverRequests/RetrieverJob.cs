@@ -106,11 +106,42 @@ namespace Sentry.data.Core
         /// <returns></returns>
         public virtual string GetTargetFileName(string incomingFileName)
         {
-            if (JobOptions.TargetFileName != null)
+            //if (JobOptions.TargetFileName != null)
+            //{
+            //    return JobOptions.TargetFileName;
+            //}
+            //else return incomingFileName;
+
+            string outFileName = null;
+            // Are we overwritting target file
+            if (JobOptions.OverwriteDataFile)
             {
-                return JobOptions.TargetFileName;
+                // Non-Regex and TargetFileName is null
+                // Use SearchCriteria value
+                if (!(JobOptions.IsRegexSearch) && String.IsNullOrWhiteSpace(JobOptions.TargetFileName))
+                {
+                    outFileName = JobOptions.SearchCriteria;
+                }
+                // Non-Regex and TargetFileName has value
+                // Use TargetFileName value
+                else if (!(JobOptions.IsRegexSearch) && !(String.IsNullOrWhiteSpace(JobOptions.TargetFileName)))
+                {
+                    outFileName = JobOptions.TargetFileName;
+                }
+                // Regex and TargetFileName has value
+                // Use TargetFileName value
+                else if (JobOptions.IsRegexSearch && !(String.IsNullOrWhiteSpace(JobOptions.TargetFileName)))
+                {
+                    outFileName = JobOptions.TargetFileName;
+                }
+                // Regex and TargetFileName is null - Use input file name
+                else if (JobOptions.IsRegexSearch && String.IsNullOrWhiteSpace(JobOptions.TargetFileName))
+                {
+                    outFileName = incomingFileName;
+                }
             }
-            else return incomingFileName;
+
+            return outFileName;
         }
 
         /// <summary>
@@ -120,22 +151,27 @@ namespace Sentry.data.Core
         /// <returns></returns>
         public virtual Boolean FilterIncomingFile(string fileName)
         {
+            var filterfile = false;
             //if there are no options, then no filtering can take place
             if (!String.IsNullOrEmpty(_jobOptions))
             {
                 if (JobOptions.IsRegexSearch)
                 {
-                    return (Regex.IsMatch(fileName, JobOptions.SearchCriteria)) ? false : true;
+                    filterfile = !(Regex.IsMatch(fileName, JobOptions.SearchCriteria));
                 }
                 else
                 {
-                    return (fileName == JobOptions.SearchCriteria) ? false : true;
+                    filterfile = (fileName != JobOptions.SearchCriteria);
                 }
             }
-            else
+
+            //if Job options already is filtering file, no need to check if file extension is correct
+            if (!filterfile)
             {
-                return false;
-            }                 
+                filterfile = (DatasetConfig.FileExtension.Name.ToLower().Trim() != "any" && DatasetConfig.FileExtension.Name.ToLower().Trim() != Path.GetExtension(fileName).Replace(".",""));
+            }                     
+
+            return filterfile;
         }
     }
 }
