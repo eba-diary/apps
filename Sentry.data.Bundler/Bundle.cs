@@ -15,21 +15,21 @@ namespace Sentry.data.Bundler
 {
     class Bundle
     {
-        private string _requestFilePath;
         private BundleRequest _request = null;
-        private S3ServiceProvider _s3Service;
+        private IDatasetService _s3Service;
         private string _baseWorkingDir;
         private IDatasetContext _dscontext;
         private Event e;
 
-        public Bundle(string requestFilePath, IDatasetContext dscontext)
+        public Bundle(IDatasetContext dscontext, IDatasetService dsService)
         {
-            _requestFilePath = requestFilePath;
-            _s3Service = new S3ServiceProvider();
+            //_s3Service = new S3ServiceProvider();
             _baseWorkingDir = Configuration.Config.GetHostSetting("BundleBaseWorkDirectory");
             _dscontext = dscontext;
+            _s3Service = dsService;
         }
 
+        public string RequestFilePath { get; set; }
 
         private class BundlePart
         {
@@ -49,7 +49,7 @@ namespace Sentry.data.Bundler
                 Console.WriteLine("Reading incoming bundle request file");
                 Logger.Info("Reading incoming bundle request file");
 
-                string incomingRequest = System.IO.File.ReadAllText(this._requestFilePath);
+                string incomingRequest = System.IO.File.ReadAllText(this.RequestFilePath);
                 string bundledFile = null;
 
                 //Get request from DatasetBundler location
@@ -102,11 +102,20 @@ namespace Sentry.data.Bundler
                     throw;
                 }
 
-                //Remove working directory for this request
-                //Passing true to recursively delete all sub-directories\files within the working directory
-                Logger.Info($"Removing processed work file: {Directory.GetParent(bundledFile).ToString()}");
-                Directory.Delete(Directory.GetParent(bundledFile).ToString(), true);
+                try
+                {
+                    //Remove working directory for this request
+                    //Passing true to recursively delete all sub-directories\files within the working directory
+                    Logger.Info($"Removing processed work file: {Directory.GetParent(bundledFile).ToString()}");
+                    Directory.Delete(Directory.GetParent(bundledFile).ToString(), true);
+                    Logger.Info($"Successfully removed work file");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"Failed to remove work file: {Directory.GetParent(bundledFile).ToString()}", ex);
+                }
 
+                Logger.Debug("Creating LoaderRequest...");
                 //Create BundleResponse
                 //Create Dataset Loader Request to register Bundle with Data.Sentry.Com
                 LoaderRequest req = new LoaderRequest(Guid.Parse(_request.RequestGuid));
@@ -120,49 +129,83 @@ namespace Sentry.data.Bundler
                 req.RequestInitiatorId = _request.RequestInitiatorId;
                 req.EventID = "";
 
+                Logger.Debug("Successfully Created LoaderRequest, continuing on....");
+
+                Logger.Debug("Serializing LoaderRequest");
                 //Push BundleResponse to dataset bundle droploaction
                 string jsonResponse = JsonConvert.SerializeObject(req, Formatting.Indented);
+                Logger.Debug("Successfully Serialized LoaderRequest, continuing on....");
 
-                using (MemoryStream ms = new MemoryStream())
+                Logger.Debug($"BundleResponse: {jsonResponse}");
+
+                try
                 {
-                    StreamWriter writer = new StreamWriter(ms);
-
-                    writer.WriteLine(jsonResponse);
-                    writer.Flush();
-
-                    //You have to rewind the MemoryStream before copying
-                    ms.Seek(0, SeekOrigin.Begin);
-
-                    using (FileStream fs = new FileStream($"{Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath")}{_request.RequestGuid}.json", FileMode.OpenOrCreate))
+                    using (MemoryStream ms = new MemoryStream())
                     {
-                        ms.CopyTo(fs);
-                        fs.Flush();
+                        StreamWriter writer = new StreamWriter(ms);
+
+                        writer.WriteLine(jsonResponse);
+                        writer.Flush();
+
+                        //You have to rewind the MemoryStream before copying
+                        ms.Seek(0, SeekOrigin.Begin);
+
+                        Logger.Debug($"Streaming LoaderRequest to {Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath")}");
+
+                        using (FileStream fs = new FileStream($"{Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath")}{_request.RequestGuid}.json", FileMode.OpenOrCreate))
+                        {
+                            ms.CopyTo(fs);
+                            fs.Flush();
+                        }
+
+                        Logger.Debug("Successfully Streamed LoaderRequest, continuing on....");
                     }
+
+                    Logger.Debug("Creating bundle file process event");
+                    //Create Bundle Started Event
+                    e = new Event();
+                    e.EventType = _dscontext.EventTypes.Where(w => w.Description == "Bundle File Process").FirstOrDefault();
+                    e.Status = _dscontext.EventStatus.Where(w => w.Description == "In Progress").FirstOrDefault();
+                    e.TimeCreated = DateTime.Now;
+                    e.TimeNotified = DateTime.Now;
+                    e.IsProcessed = false;
+                    e.UserWhoStartedEvent = _request.RequestInitiatorId;
+                    e.Dataset = _request.DatasetID;
+                    e.DataConfig = _request.DatasetFileConfigId;
+                    e.Reason = $"Submitted request to dataset loader to upload and register {_request.TargetFileName}";
+                    e.Parent_Event = _request.RequestGuid;
+                    Logger.Debug("Successfully created bundle file process event, continuing on...");
+
+                    Logger.Debug("Sending bundle file process event");
+                    await Utilities.CreateEventAsync(e);
+                    Logger.Debug("Successfully sent bundle file process event, continuing on...");
+
+                    Logger.Info($"Bundle Request Processed - Request:{_request.RequestGuid} Parts:{_request.SourceKeys.Count} TotalTime(sec):{(DateTime.Now - bundleStart).TotalSeconds}");
+                    
                 }
-
-                //Create Bundle Started Event
-                e = new Event();
-                e.EventType = _dscontext.EventTypes.Where(w => w.Description == "Bundle File Process").FirstOrDefault();
-                e.Status = _dscontext.EventStatus.Where(w => w.Description == "In Progress").FirstOrDefault();
-                e.TimeCreated = DateTime.Now;
-                e.TimeNotified = DateTime.Now;
-                e.IsProcessed = false;
-                e.UserWhoStartedEvent = _request.RequestInitiatorId;
-                e.Dataset = _request.DatasetID;
-                e.DataConfig = _request.DatasetFileConfigId;
-                e.Reason = $"Submitted request to dataset loader to upload and register {_request.TargetFileName}";
-                e.Parent_Event = _request.RequestGuid;
-                await Utilities.CreateEventAsync(e);
-
-                Logger.Info($"Bundle Request Processed - Request:{_request.RequestGuid} Parts:{_request.SourceKeys.Count} TotalTime(sec):{(DateTime.Now - bundleStart).TotalSeconds}");
-
-                //remove reqeust file
-                Logger.Info("Removing processed request file");
-                System.IO.File.Delete(this._requestFilePath);
-
+                catch (Exception ex)
+                {
+                    Logger.Error($"Failed to write BundleResponse.  Manually write the following to {Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath")}{_request.RequestGuid}.json. BundleResponse:{jsonResponse}", ex);
+                }
+                finally
+                {
+                    //remove reqeust file
+                    Logger.Info("Removing processed request file");
+                    try
+                    {
+                        System.IO.File.Delete(this.RequestFilePath);
+                        Logger.Info("Successfully removed processed request file");
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"Failed removing bundle request file.  Manually delete the following file: {this.RequestFilePath}", ex);
+                    }                    
+                }
             }
             catch (Exception ex)
             {
+                Logger.Error($"Bundle Request Failed", ex);
+
                 //Create Bundle Failed Event
                 e = new Event();
                 e.EventType = _dscontext.EventTypes.Where(w => w.Description == "Bundle File Process").FirstOrDefault();
@@ -176,14 +219,8 @@ namespace Sentry.data.Bundler
                 e.Reason = $"Bundle Request Failed for {_request.TargetFileName}";
                 e.Parent_Event = _request.RequestGuid;
                 await Utilities.CreateEventAsync(e);
-
-                Logger.Info($"Failed Event Created: {e.ToString()}");
-
-
-                Logger.Error($"Bundle Request Failed - Request:{_request.RequestGuid}", ex);
-                throw new Exception($"Bundle Request Failed - Request:{_request.RequestGuid}", ex);
+                //Logger.Info($"Failed Event Created: {e.ToString()}");
             }
-
         }
 
         private string RunSingleContatenation(List<BundlePart> parts_list, string result_filepath)

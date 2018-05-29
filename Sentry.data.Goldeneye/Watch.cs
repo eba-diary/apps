@@ -98,7 +98,6 @@ namespace Sentry.data.Goldeneye
                     }
                 }
 
-                //Console.WriteLine("sleeping for 2 seconds");
                 Thread.Sleep(2000);
                 
             } while (true);

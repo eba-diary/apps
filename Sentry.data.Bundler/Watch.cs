@@ -24,6 +24,7 @@ namespace Sentry.data.Bundler
 
         public static IContainer _container;
         public static IDatasetContext _datasetContext;
+        public static IDatasetService _datasetService;
 
         private class FileProcess {
 
@@ -75,41 +76,42 @@ namespace Sentry.data.Bundler
                 }
                 else if(!IsFileLocked(file.fileName)  && !file.started)
                 {
-                    Logger.Info($"Initializing Bundle Task for: {Path.GetFileName(file.fileName)}");
+                    Logger.Info($"Initializing Bundle Task for: {Path.GetFileName(file.fileName)}");   
 
-
-                    
-
-                    file.task =  Task.Factory.StartNew(x =>
+                    file.task = Task.Run(() =>
+                    {
+                        Logger.Info($"Beginning Bundle Task for: {Path.GetFileName(file.fileName)}");
+                        try
+                        {
+                            //create an IOC (structuremap) container to wrap this transaction
+                            using (_container = Bootstrapper.Container.GetNestedContainer())
                             {
-                                Logger.Debug($"Initializing Bundle Task Bootstrapper Started...");
-                                //Call bootstrapper to initialize the application
-                                Bootstrapper.Init();
-                                Logger.Debug($"Initializing Bundle Task Bootstrapper Finished");
+                                _datasetContext = _container.GetInstance<IDatasetContext>();
+                                _datasetService = _container.GetInstance<IDatasetService>();
+                                Bundle bundleProcess = _container.GetInstance<Bundle>();
 
-                                //create an IOC (structuremap) container to wrap this transaction
-                                using (_container = Bootstrapper.Container.GetNestedContainer())
+                                bundleProcess.RequestFilePath = file.fileName;
+
+                                try
                                 {
-                                    _datasetContext = _container.GetInstance<IDatasetContext>();
-                                    //var result = service.DoWork();
-                                    //container.GetInstance<ISentry.data.BundlerContext>.SaveChanges();
-                                    Bundle bundleProcess = new Bundle(file.fileName, _datasetContext);
-                                    try
-                                    {
-                                        bundleProcess.KeyContatenation();
-                                        Console.WriteLine($"Bundle Task Successful for request: {Path.GetFileName(file.fileName)}");
-                                        Logger.Info($"Ended Bundle Task for request: {Path.GetFileName(file.fileName)}");
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        Logger.Error($"Bundle Task Failed for request: {Path.GetFileName(file.fileName)}", e);
-                                    }
+                                    bundleProcess.KeyContatenation();
+                                    Console.WriteLine($"Bundle Task Successful for request: {Path.GetFileName(file.fileName)}");
+                                    Logger.Info($"Ended Bundle Task for request: {Path.GetFileName(file.fileName)}");
                                 }
+                                catch (Exception e)
+                                {
+                                    Logger.Error($"Bundle Task Failed for request: {Path.GetFileName(file.fileName)}", e);
+                                }
+                            }
 
-                            }, TaskCreationOptions.LongRunning);
-
-                    file.started = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Error("Problem initializing bundle task for: {Path.GetFileName(file.fileName)} ", ex);
+                        }
+                    });
                     
+                    file.started = true;                    
                 }
                 else
                 {

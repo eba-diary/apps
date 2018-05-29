@@ -24,7 +24,7 @@ SET LOGFILE=%LOGPATH%\WindowsService_Start-%d%_%t%.log
 ::Bring in service name
 IF NOT "%~1" == "" GOTO SPECIFIC
 
-set serviceConfigName="Sentry.data.GoldenEye"
+set serviceConfigName="GoldenEye"
 GOTO START
 
 :SPECIFIC

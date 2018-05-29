@@ -12,7 +12,7 @@
   <target name="deployWeb" depends="environmentSettings, addOutage, deployWebSite, deleteOutage"/>
   <target name="deployConsoleApps" depends="environmentSettings, addOutage, deployRetrieverApp, deleteOutage"/>
   <target name="deployServices" depends="environmentSettings, addOutage, deployGoldenEye, deleteOutage"/>
-  
+
   <!-- SEER Outage Settings -->
   <property name="seerOutageSystemName" value="DatasetManagement"/>
   <property name="seerOutageLengthMinutes" value="60"/>

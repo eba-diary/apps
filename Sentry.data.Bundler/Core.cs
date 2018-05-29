@@ -3,7 +3,7 @@ using Sentry.Common.Logging;
 using Sentry.Configuration;
 using System.Threading.Tasks;
 using System;
-
+using Sentry.data.Infrastructure;
 
 namespace Sentry.data.Bundler
 {
@@ -38,14 +38,16 @@ namespace Sentry.data.Bundler
         {
             Logger.Info("Worker task started.");
 
+            Logger.Debug($"Initializing Bundle Task Bootstrapper Started...");
+            //Call bootstrapper to initialize the application
+            Bootstrapper.Init();
+            Logger.Debug($"Initializing Bundle Task Bootstrapper Finished");
+
             Watch.OnStart();
 
-            //call your bootstrapper to initialize your application
-            //Bootstrapper.Init();
-
+            Logger.Info("Worker task is set to sleep for 5 seconds between executions.");
             do
-            {
-                Logger.Info("Worker task sleeping for.");
+            {                
                 Thread.Sleep(TimeSpan.FromSeconds(5));
 
                 Watch.Run();

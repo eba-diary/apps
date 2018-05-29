@@ -16,7 +16,8 @@ using Sentry.data.Infrastructure;
 using System.Security.Cryptography;
 using Sentry.Common.Logging;
 using Newtonsoft.Json;
-using System.ComponentModel;
+using System.Linq.Expressions;
+using StructureMap;
 using System.Linq.Expressions;
 
 namespace Sentry.data.Common
@@ -30,7 +31,9 @@ namespace Sentry.data.Common
 
 
         private static S3ServiceProvider _s3Service = new S3ServiceProvider();
-        private static StructureMap.IContainer _container = null;
+        public static IContainer _container;
+        public static IDatasetService _datasetService;
+        public static IDatasetContext _datasetContext;
 
         /// <summary>
         /// Generates full drop location path for a dataset
@@ -1158,25 +1161,20 @@ namespace Sentry.data.Common
         /// <returns></returns>
         public static async Task CreateEventAsync(Event e)
         {
-            using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
-            using (var client = new HttpClient(handler))
+            using (_container = Bootstrapper.Container.GetNestedContainer())
             {
-                //https://stackoverflow.com/questions/16697346/datetime-json-return-from-webapi-with-default-serializer
-                var json = JsonConvert.SerializeObject(e, Formatting.None, new JsonSerializerSettings { DateTimeZoneHandling = DateTimeZoneHandling.Local});     
+                _datasetContext = _container.GetInstance<IDatasetContext>();
 
-                HttpContent contentPost = new StringContent(json, Encoding.UTF8,
-                    "application/json");
-
-                client.BaseAddress = new Uri(Configuration.Config.GetHostSetting("WebApiUrl"));
-                client.DefaultRequestHeaders.Accept.Clear();
-                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-
-                HttpResponseMessage response = await client.PostAsync("api/event/create", contentPost);
-
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    // WHY?>
+                    _datasetContext.Merge<Event>(e);
+                    _datasetContext.SaveChanges();
                 }
+                catch (Exception ex)
+                {
+                    Logger.Error("Failed to save event", ex);
+                }
+
             }
         }
     }

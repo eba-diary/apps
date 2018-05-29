@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using StructureMap;
 using Hangfire;
 using Hangfire.SqlServer;
+using System.Runtime.InteropServices;
 
 namespace Sentry.data.Goldeneye
 {
@@ -180,7 +181,7 @@ namespace Sentry.data.Goldeneye
                     {
                         //How many loader tasks can be started
                         var availableLoaderTasks = Int32.Parse(Config.GetHostSetting("activeLoaderTaskThrottle")) - currentTasks.Where(x => x.Name.StartsWith("DatasetLoader : Minute") && !x.Task.IsCompleted).ToList().Count;
-                        foreach (var a in Directory.GetFiles(Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath"), "*", SearchOption.AllDirectories))
+                        foreach (var a in Directory.GetFiles(Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath"), "*", SearchOption.AllDirectories).Where(w => !IsFileLocked(w)))
                         {
                             if(availableLoaderTasks > 0)
                             {
@@ -360,6 +361,22 @@ namespace Sentry.data.Goldeneye
         {
             Logger.Fatal("Exception occurred on main Windows Service Task. Stopping Service immediately.", t.Exception);
             Environment.Exit(10001);
+        }
+
+        private bool IsFileLocked(string filePath)
+        {
+            try
+            {
+                using (File.Open(filePath, FileMode.Open)) { }
+            }
+            catch (IOException e)
+            {
+                var errorCode = Marshal.GetHRForException(e) & ((1 << 16) - 1);
+
+                return errorCode == 32 || errorCode == 33;
+            }
+
+            return false;
         }
 
     }

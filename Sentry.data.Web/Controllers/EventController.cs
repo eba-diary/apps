@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 
+//TODO: Remove after 18.03.21 DSC Release
 namespace Sentry.data.Web.Controllers
 {
     public class EventController : ApiController
@@ -15,18 +16,20 @@ namespace Sentry.data.Web.Controllers
 
         public EventController(IDatasetContext dsCtxt)
         {
-            _datasetContext = dsCtxt;
+            throw new NotImplementedException();
+            //_datasetContext = dsCtxt;
         }
 
-        [HttpPost]
-        [Route("Create")]
-        public HttpResponseMessage Create(Event e)
-        {
-            _datasetContext.Merge<Event>(e);
-            _datasetContext.SaveChanges();
+        //[HttpPost]
+        //[Route("Create")]
+        //public HttpResponseMessage Create(Event e)
+        //{
+            
+        //    //_datasetContext.Merge<Event>(e);
+        //    //_datasetContext.SaveChanges();
 
-            return new HttpResponseMessage(HttpStatusCode.Created);
-        }
+        //    //return new HttpResponseMessage(HttpStatusCode.Created);
+        //}
 
     }
 }

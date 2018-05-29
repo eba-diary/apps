@@ -40,7 +40,7 @@
       <property name="DeployLocations_Web" value="\\SHO-P-SHDWEB-20\Web$\Data;\\DIX-P-SHDWEB-20\Web$\Data"/>
       <!--<property name="DeployLocations_Loader" value="\\SHO-P-SHDCON-20\ConsoleApps$\DatasetLoader;\\DIX-P-SHDCON-20\ConsoleApps$\DatasetLoader"/>-->
       <property name="DeployLocations_Retriever" value="\\SHO-P-SHDCON-20\ConsoleApps$\DatasetRetriever;\\DIX-P-SHDCON-20\ConsoleApps$\DatasetRetriever"/>
-      <property name="DeployLocations_GoldenEye" value="\\SHO-P-SHDCON-20\ConsoleApps$\GoldenEye;\\DIX-P-SHDCON-20\ConsoleApps$\GoldenEye"/>
+      <property name="DeployLocations_GoldenEye" value="\\SHO-P-SHDCON-20\ConsoleApps$\GoldenEye"/>
       <property name="createSeerOutage" value="true"/>
       <property name="seerOutageServers" value=""/>
       <property name="seerOutageApplications" value="data"/>

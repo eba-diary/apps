@@ -12,7 +12,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Sentry.data.Common</RootNamespace>
     <AssemblyName>Sentry.data.Common</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <MyType>Console</MyType>
     <SccProjectName>SAK</SccProjectName>
@@ -67,8 +67,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Sentry.Common, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.Common.1.3.9\lib\net35\Sentry.Common.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\Sentry.Common.1.3.10\lib\net35\Sentry.Common.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.Configuration, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Configuration.2.1.6.0\lib\net35\Sentry.Configuration.dll</HintPath>
@@ -126,7 +125,9 @@
     <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Project_Readme.txt" />
     <None Include="Properties\Application.myapp" />
     <None Include="Properties\Settings.settings">

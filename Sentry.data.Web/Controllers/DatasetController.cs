@@ -1163,12 +1163,14 @@ namespace Sentry.data.Web.Controllers
 
                         //You have to rewind the MemoryStream before copying
                         ms.Seek(0, SeekOrigin.Begin);
+                        Logger.Info($"Sending Bundle Request to:{Path.Combine($"{Configuration.Config.GetHostSetting("DatasetBundleBaseLocation")}", "request", $"{_request.RequestGuid}.json")}");
 
-                        using (FileStream fs = new FileStream($"{Configuration.Config.GetHostSetting("DatasetBundleBaseLocation")}\\request\\{_request.RequestGuid}.json", FileMode.OpenOrCreate))
+                        using (FileStream fs = new FileStream(Path.Combine($"{Configuration.Config.GetHostSetting("DatasetBundleBaseLocation")}", "request", $"{_request.RequestGuid}.json"), FileMode.CreateNew))
                         {
                             ms.CopyTo(fs);
                             fs.Flush();
                         }
+
                     }
 
                     //Create Bundle Started Event
@@ -1195,6 +1197,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch(Exception ex)
             {
+                Logger.Error("Error Processing Bundle Request", ex);
                 return Json(new { Success = false, Message = "An error occurred, please try later! : " + ex.Message });
             }
         }
@@ -1303,7 +1306,7 @@ namespace Sentry.data.Web.Controllers
                                 //You have to rewind the MemoryStream before copying
                                 ms.Seek(0, SeekOrigin.Begin);
 
-                                using (FileStream fs = new FileStream($"{Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath")}{loadReq.RequestGuid}.json", FileMode.OpenOrCreate))
+                                using (FileStream fs = new FileStream($"{Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath")}{loadReq.RequestGuid}.json", FileMode.OpenOrCreate, FileAccess.ReadWrite))
                                 {
                                     ms.CopyTo(fs);
                                     fs.Flush();
@@ -1320,7 +1323,7 @@ namespace Sentry.data.Web.Controllers
                             e.UserWhoStartedEvent = loadReq.RequestInitiatorId;
                             e.Dataset = loadReq.DatasetID;
                             e.DataConfig = loadReq.DatasetFileConfigId;
-                            e.Reason = $"Successfully submitted requset to load file [<b>{System.IO.Path.GetFileName(file.FileName)}</b>] to dataset [<b>{first.ParentDataset.DatasetName}</b>]";
+                            e.Reason = $"Successfully submitted request to load file [<b>{System.IO.Path.GetFileName(file.FileName)}</b>] to dataset [<b>{first.ParentDataset.DatasetName}</b>]";
                             e.Parent_Event = loadReq.RequestGuid;
                             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
@@ -1392,7 +1395,7 @@ namespace Sentry.data.Web.Controllers
             });
 
             return Json(sList, JsonRequestBehavior.AllowGet);
-        }
+        }       
 
         [HttpGet()]
         [AuthorizeByPermission(PermissionNames.DwnldNonSensitive)]

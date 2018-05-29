@@ -94,6 +94,7 @@ namespace Sentry.data.Infrastructure
             registry.For<ISASService>().Singleton().Use<SASServiceProvider>();
             registry.For<IWeatherDataProvider>().Singleton().Use<WeatherDataProvider>();
             registry.For<IFtpProvider>().Singleton().Use<FtpProvider>();
+            registry.For<IDatasetService>().Singleton().Use<S3ServiceProvider>();
             
             //Create the StructureMap container
             _container = new StructureMap.Container(registry);
