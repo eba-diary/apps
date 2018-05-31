@@ -2286,3 +2286,104 @@ tr.shown td.details-control {
         display: none;
     }
 }
+
+#primaryOptions{
+
+}
+
+#primaryOptions li{
+    z-index: 100;
+}
+
+#primaryPanel {
+    margin-top: -1px;
+}
+
+    #primaryPanel .query-builder {
+        border-top-left-radius: 0px;
+        border-top-right-radius: 0px;
+        padding: 10px 10px 6px;
+        border: 1px solid #aaa;
+        background: white;
+    }
+
+        #primaryPanel .query-builder div{
+
+        }
+
+#datasetsContainer {
+    border-radius: 5px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    background: white;
+    border: 1px solid black;
+    padding: 15px;
+}
+
+#datasetsHeader {
+    background-color: #003da5;
+    color: white;
+    display: inline-block;
+    width: 100%;
+    padding: 7px;
+    cursor: pointer;
+    border-radius: 5px 5px 0px 0px;
+    font-weight: 700;
+}
+
+
+    #datasetsHeader h4 {
+        color: white;
+        padding-left: 15px;
+        display: inline-block;
+    }
+
+    #datasetsHeader .tracker-menu-icon {
+        margin: 2px 10px 0 10px;
+        color: white;
+        display: inline-block;
+    }
+
+#bannerRow {
+    width: 1166px;
+    
+}
+#adminToolsButtons {
+    float: right;
+    margin-top: 18px;
+    margin-right: -35px;
+}
+
+@media (min-width: 992px) and (max-width: 1200px) {
+    #bannerRow {
+        width: 966px;
+    }
+    #adminToolsButtons {
+        margin-top: -40px;
+        margin-right: 0px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 992px) {
+    #bannerRow {
+        width: 746px;
+    }
+    #adminToolsButtons {
+        margin-top: -40px;
+        margin-right: 0px;
+    }
+}
+@media (max-width: 768px) {
+    #bannerRow {
+        width: 746px;
+    }
+    #adminToolsButtons {
+        margin-top: -40px;
+        margin-right: 0px;
+    }
+}
+
+
+.optional {
+    font-weight: 100;
+}

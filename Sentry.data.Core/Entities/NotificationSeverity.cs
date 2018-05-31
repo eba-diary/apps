@@ -8,8 +8,8 @@ namespace Sentry.data.Core
 {
     public enum NotificationSeverity
     {
-        danger = 1,
-        warning = 2,
-        info = 3
+        Danger = 1,
+        Warning = 2,
+        Info = 3
     }
 }

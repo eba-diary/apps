@@ -350,6 +350,7 @@
     <Compile Include="Models\User\UserModel.cs" />
     <Compile Include="Models\User\UserSwitchModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Content Include="Content\bootstrap-datetimepicker.css" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\jquery.terminal-1.11.3.css" />
     <Content Include="Content\query-builder.default.css" />
@@ -365,6 +366,7 @@
     <Content Include="js\DatasetDetail.js" />
     <Content Include="js\ManageAssetAlert.js" />
     <Content Include="js\ManageConfigs.js" />
+    <Content Include="js\QueryToolModel.js" />
     <Content Include="Scripts\bootstrap-datetimepicker.js" />
     <Content Include="Scripts\bootstrap-datetimepicker.min.js" />
     <Content Include="Scripts\DataTables\moment-with-locales.js" />
@@ -377,6 +379,7 @@
     <Content Include="Scripts\jQuery.extendext.min.js" />
     <Content Include="Scripts\jquery.terminal-1.11.3.js" />
     <Content Include="Scripts\knockout-3.4.2.js" />
+    <Content Include="Scripts\knockout-sortable.min.js" />
     <Content Include="Scripts\later.js" />
     <Content Include="Scripts\prettycron.js" />
     <Content Include="Scripts\query-builder.js" />
@@ -1149,8 +1152,8 @@
     <Content Include="Views\Config\Manage.cshtml" />
     <Content Include="Views\Config\_EditConfigFile.cshtml" />
     <Content Include="Views\DataAsset\ManageAssetNotification.cshtml" />
-    <Content Include="Views\DataAsset\_EditAssetNotification.cshtml" />
-    <Content Include="Views\DataAsset\_CreateAssetNotification.cshtml" />
+    <Content Include="Views\DataAsset\EditAssetNotification.cshtml" />
+    <Content Include="Views\DataAsset\CreateAssetNotification.cshtml" />
     <Content Include="Views\Dataset\_BundleFilename.cshtml" />
     <Content Include="Views\Dataset\EditDataFile.cshtml" />
     <Content Include="Views\Config\Create.cshtml" />

@@ -54,7 +54,7 @@ namespace Sentry.data.Web
             get
             {
                 string href = null;
-                href = $"<a href=\"#\" onclick=\"data.ManageAssetAlert.EditNotification({NotificationId})\">Edit</a>";
+                href = $"<a href=\"/DataAsset/EditAssetNotification?notificationId={NotificationId}\">Edit</a>";
                 return href;
             }
         }

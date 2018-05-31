@@ -9,6 +9,9 @@ using System.Web;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Security.Cryptography;
+using Amazon.S3.IO;
+using StructureMap;
 
 namespace Sentry.data.Infrastructure
 {
@@ -30,30 +33,92 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public event EventHandler<TransferProgressEventArgs> OnPushToProgressEvent;
+        private IContainer Container { get; set; }
 
-        public void ConvertToSASFormat(string filename, string category, string delimiter, int guessingrows)
+
+        public void ConvertToSASFormat(int datafileId, string filename, string delimiter, int guessingrows)
         {
+            DatasetFile df = null;
+            string datasetFileSchema = null;
+            Boolean containsHeader = true;
             try
             {
-                OnPushToProgress(new TransferProgressEventArgs(filename, 0, "Converting"));
+                using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                {
+                    IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
 
-                StringBuilder url = GernerateSASURL(filename, category, delimiter, guessingrows);
+                    df = _datasetContext.GetById<DatasetFile>(datafileId);
 
-                OnPushToProgress(new TransferProgressEventArgs(filename, 50, "Converting"));
+                    //Throw error and stop processing if datafile record is not found
+                    if (df == null)
+                    {
+                        throw new ArgumentException($"No DatasetFile Found - ID:{datafileId}");
+                    }
 
-                //JCG TODO: Revisit after SAS fixes issue around initial logon attempt fails, additional attempts succeed.
-                Retry.Do(() => CallSASConvertSTP(url), TimeSpan.FromSeconds(15), 2);
+                    StringBuilder url = GernerateSASURL(filename, df.Dataset.DatasetCategory.Name, delimiter, guessingrows);
+
+                
+                    //JCG TODO: Revisit after SAS fixes issue around initial logon attempt fails, additional attempts succeed.
+                    Retry.Do(() => CallSASConvertSTP(url), TimeSpan.FromSeconds(15), 2);
+                }
             }
             catch (Exception e)
             {
                 throw new Exception(e.Message);
             }
-            finally
+        }
+
+        private string GenerateSchemaFile(string schema, string delimiter)
+        {
+            Guid result;
+            using (MD5 md5 = MD5.Create())
             {
-                OnPushToProgress(new TransferProgressEventArgs(filename, 100, "Converting"));
+                byte[] hash = md5.ComputeHash(Encoding.Default.GetBytes(DateTime.Now.ToString()));
+                result = new Guid(hash);
+            }
+            
+
+            string outfilename = result.ToString() + ".sas";
+            
+            //Generate SAS length in includes file
+            StringBuilder lengthline = new StringBuilder();
+            StringBuilder inputline = new StringBuilder();
+            lengthline.Append("length ");
+            inputline.Append("input ");
+            int truncatedColCount = 1;
+            foreach (string col in schema.Split(Convert.ToChar(delimiter)))
+            {
+                //Need to follow sas variable name restrictions
+                //http://support.sas.com/documentation/cdl/en/lrcon/62955/HTML/default/viewer.htm#a000998953.htm
+                string colName = null;
+                if (col.Length >= 32)
+                {
+                    //Take first 30 characters and append and underscore (_) and an incremetor to eliminate potential duplicate column names
+                    colName = col.Substring(0, 30) + $"_{truncatedColCount}";
+                    truncatedColCount++;
+                }
+                else
+                {
+                    colName = col;
+                }
+
+                lengthline.Append($"{colName} ");
+                inputline.Append($"'{colName}'N ");
+            }
+            lengthline.Append("$ 1024;");
+            inputline.Append(";");
+
+            //Combine all lines into final includes file
+            StringBuilder outIncludesFile = new StringBuilder();
+            outIncludesFile.AppendLine(lengthline.ToString());
+            outIncludesFile.AppendLine(inputline.ToString());
+
+            using (StreamWriter sw = new StreamWriter($"\\\\sentry.com\\appfs_nonprod\\sasrepository\\datasets\\datasetmanagement\\schemafiles\\{outfilename}", true))
+            {
+                sw.Write(outIncludesFile.ToString());
             }
 
+            return outfilename;
         }
 
         private void CallSASConvertSTP(StringBuilder url)
@@ -62,13 +127,14 @@ namespace Sentry.data.Infrastructure
 
             httpRequest.CookieContainer = cookies;
             httpRequest.Proxy.Credentials = System.Net.CredentialCache.DefaultNetworkCredentials;
+            httpRequest.Timeout = (int)TimeSpan.FromMinutes(120).TotalMilliseconds;
             HttpWebResponse httpResponse = httpRequest.GetResponse() as HttpWebResponse;
             string responsecontent = string.Empty;
 
             using (var stream = httpResponse.GetResponseStream())
             using (var reader = new StreamReader(stream))
             {
-                responsecontent = reader.ReadToEnd();
+               responsecontent = reader.ReadToEnd();
                 if (!(String.IsNullOrEmpty(responsecontent)))
                 {
                     throw new WebException("Error Executing SAS Conversion", new Exception(responsecontent));
@@ -102,6 +168,9 @@ namespace Sentry.data.Infrastructure
             url.Append(Uri.EscapeUriString(delimiter));
             url.Append(Uri.EscapeUriString("&GUESSINGROWS="));
             url.Append(Uri.EscapeUriString(guessingrows.ToString()));
+
+            //Future enhancement is to add this to end of url, then return error output for user to debug issue.
+            //url.Append(Uri.EscapeUriString("&_DEBUG=LOG"));
 
             Sentry.Common.Logging.Logger.Info($"URL: {url.ToString()}");
             return url;
@@ -179,17 +248,5 @@ namespace Sentry.data.Infrastructure
                 throw new WebException(exceptions.Message, new Exception(exceptions.InnerException.ToString()));
             }
         }
-
-
-        protected virtual void OnPushToProgress(TransferProgressEventArgs e)
-        {
-            EventHandler<TransferProgressEventArgs> handler = OnPushToProgressEvent;
-            if (handler != null)
-            {
-                handler(this, e);
-            }
-        }
-
-
     }
 }

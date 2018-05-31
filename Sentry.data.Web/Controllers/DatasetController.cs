@@ -943,8 +943,8 @@ namespace Sentry.data.Web.Controllers
                 //Converting file to .sas7bdat format
                 try
                 {
-
-                    _sasService.ConvertToSASFormat(filename, ds.Dataset.Category, delimiter, guessingrows);
+                    // Pass preview object key for data file to ConvertToSASFormat  
+                    _sasService.ConvertToSASFormat(ds.DatasetFileId, filename, delimiter, guessingrows);
 
                 }
                 catch (WebException we)
@@ -1224,7 +1224,8 @@ namespace Sentry.data.Web.Controllers
         {
             if (Request.Files.Count > 0 && id != 0)
             {
-                List<DatasetFileConfig> fcList = Utilities.LoadDatasetFileConfigsByDatasetID(id, _datasetContext);
+                DatasetFileConfig dfc = _datasetContext.getDatasetFileConfigs(configId);
+
                 IApplicationUser user = _userService.GetCurrentUser();
 
                 LoaderRequest loadReq = null;
@@ -1242,15 +1243,29 @@ namespace Sentry.data.Web.Controllers
                         //Adding ProcessedFilePrefix so GoldenEye Watch.cs does not pick up the file since we will create a Dataset Loader request
                         dsfi = Sentry.Configuration.Config.GetHostSetting("ProcessedFilePrefix") + System.IO.Path.GetFileName(file.FileName);
 
-                        //Get Matching DataFileConfigs for file path
-                        List<DatasetFileConfig> fcMatches = Utilities.GetMatchingDatasetFileConfigs(fcList, file.FileName);
-
-                        DatasetFileConfig first = fcMatches.First(x => x.ConfigId == configId);
-
-                        if (first != null)
+                        if (dfc != null)
                         {
-                            string fileDropLocation = first.DropPath + "\\" + dsfi;
+                            //Create Dataset Loader request
+                            //Find job DFSBasic generic job associated with this config and add ID to request.
+                            RetrieverJob dfsBasicJob = null;
+                            List<RetrieverJob> jobList = _requestContext.RetrieverJob.Where(w => w.DatasetConfig.ConfigId == configId).ToList();
+                            bool jobFound = false;
+                            foreach (RetrieverJob job in jobList)
+                            {
+                                if (job.DataSource.Is<DfsBasic>())
+                                {
+                                    dfsBasicJob = job;
+                                    jobFound = true;
+                                    break;
+                                }
+                            }
 
+                            if (!jobFound)
+                            {
+                                throw new NotImplementedException("Failed to find generic DFS Basic job");
+                            }
+
+                            string fileDropLocation = Path.Combine(dfsBasicJob.GetUri().LocalPath, dsfi);
 
                             using (Stream sfile = file.InputStream)
                             {
@@ -1261,34 +1276,14 @@ namespace Sentry.data.Web.Controllers
                                 }
                             }
 
-
-                            //Create Dataset Loader request
-                            //Find job DFSBasic generic job associated with this config and add ID to request.
-                            int dfsBasicJobId = 0;
-                            List<RetrieverJob> jobList = _requestContext.RetrieverJob.Where(w => w.DatasetConfig.ConfigId == configId).ToList();
-                            bool jobFound = false;
-                            foreach (RetrieverJob job in jobList)
-                            {
-                                if (job.DataSource.Is<DfsBasic>())
-                                {
-                                    dfsBasicJobId = job.Id;
-                                    jobFound = true;
-                                }
-                            }
-
-                            if (!jobFound)
-                            {
-                                throw new NotImplementedException("Failed to find generic DFS Basic job");
-                            }
-
                             var hashInput = $"{user.AssociateId.ToString()}_{DateTime.Now.ToString("MM-dd-yyyyHH:mm:ss.fffffff")}_{dsfi}";
 
                             loadReq = new LoaderRequest(Utilities.GenerateHash(hashInput));
                             loadReq.File = fileDropLocation;
                             loadReq.IsBundled = false;
-                            loadReq.DatasetID = first.ParentDataset.DatasetId;
-                            loadReq.DatasetFileConfigId = first.ConfigId;
-                            loadReq.RetrieverJobId = dfsBasicJobId;
+                            loadReq.DatasetID = dfc.ParentDataset.DatasetId;
+                            loadReq.DatasetFileConfigId = dfc.ConfigId;
+                            loadReq.RetrieverJobId = dfsBasicJob.Id;
                             loadReq.RequestInitiatorId = user.AssociateId;
 
                             Logger.Debug($"Submitting Loader Request - File:{dsfi} Guid:{loadReq.RequestGuid} HashInput:{hashInput}");
@@ -1323,11 +1318,11 @@ namespace Sentry.data.Web.Controllers
                             e.UserWhoStartedEvent = loadReq.RequestInitiatorId;
                             e.Dataset = loadReq.DatasetID;
                             e.DataConfig = loadReq.DatasetFileConfigId;
-                            e.Reason = $"Successfully submitted request to load file [<b>{System.IO.Path.GetFileName(file.FileName)}</b>] to dataset [<b>{first.ParentDataset.DatasetName}</b>]";
+                            e.Reason = $"Successfully submitted requset to load file [<b>{System.IO.Path.GetFileName(file.FileName)}</b>] to dataset [<b>{dfc.ParentDataset.DatasetName}</b>]";
                             e.Parent_Event = loadReq.RequestGuid;
                             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
-                            return Json("File Successfully Sent to Dataset Loader with a Path of : " + fileDropLocation);
+                            return Json("File Successfully Sent to Dataset Loader.");
                         }
                         else
                         {

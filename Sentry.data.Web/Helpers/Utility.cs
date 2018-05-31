@@ -49,23 +49,25 @@ namespace Sentry.data.Web.Helpers
             //    int months = (span.Days / 30);
             //    result = string.Format("{0} {1} ago", months, months == 1 ? "month" : "months");
             //}
-            //else if (span.Days > 0)
-            //{
-            //    result = string.Format("{0} {1} ago", span.Days, span.Days == 1 ? "day" : "days");
-            //} else
-            if (span.Hours > 0)
+            if (span.TotalDays > 1)
             {
-                //result = dt.ToString("MM/dd/yyyy HH:mm:ss"); //24hr format
                 result = dt.ToString("MM/dd/yyyy hh:mm:ss tt"); //12hr AM/PM
-                //result = string.Format("{0} {1} ago", span.Hours, span.Hours == 1 ? "hour" : "hours");
             }
-            else if (span.Minutes > 0)
+            else if (span.TotalHours > 1)
             {
-                result = string.Format("{0} {1} ago", span.Minutes, span.Minutes == 1 ? "minute" : "minutes");
+                var h = String.Format("{0:0}", span.TotalHours);
+
+                result = string.Format("{0} {1} ago", h, h == "1" ? "hour" : "hours");
             }
-            else if (span.Seconds > 5)
+            else if (span.TotalMinutes > 1)
             {
-                result = string.Format("{0} seconds ago", span.Seconds);
+                var m = String.Format("{0:0}", span.TotalMinutes);
+
+                result = string.Format("{0} {1} ago", m, m == "1" ? "minute" : "minutes");
+            }
+            else if (span.TotalSeconds > 5)
+            {
+                result = string.Format("{0} seconds ago", String.Format("{0:0}",span.TotalSeconds));
             }
             else
             {

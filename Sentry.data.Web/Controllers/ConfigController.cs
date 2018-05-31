@@ -366,9 +366,9 @@ namespace Sentry.data.Web.Controllers
                 Disabled = true
             });
 
-            cjm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic").OrderBy(x => x.Value);
+            cjm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic").Where(x => x.Value != "S3Basic").OrderBy(x => x.Value);
 
-            List<SelectListItem> temp2 = new List<SelectListItem>();
+            List <SelectListItem> temp2 = new List<SelectListItem>();
 
             if(cjm.SelectedSourceType != null && cjm.SelectedDataSource != 0)
             {
@@ -486,27 +486,63 @@ namespace Sentry.data.Web.Controllers
 
         private EditJobModel EditDropDownSetup(EditJobModel ejm, RetrieverJob retrieverJob)
         {
-            var temp = _datasetContext.DataSourceTypes.Select(v
-               => new SelectListItem { Text = v.Name, Value = v.DiscrimatorValue }).ToList();
 
-            temp.Add(new SelectListItem()
+            List<SelectListItem> temp;
+            List<SelectListItem> temp2;
+
+
+            if(retrieverJob.DataSource.SourceType == "DFSBasic")
             {
-                Text = "Pick a Source Type",
-                Value = "0",
-                Selected = true,
-                Disabled = true
-            });
+                temp = _datasetContext.DataSourceTypes.Where(x => x.DiscrimatorValue == "DFSBasic").Select(v
+                   => new SelectListItem
+                   {
+                       Text = v.Name,
+                       Value = v.DiscrimatorValue,
+                       Disabled = v.DiscrimatorValue == "DFSBasic" ? true : false
+               }).ToList();
 
-            ejm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic").OrderBy(x => x.Value);
-
-            var temp2 = DataSourcesByType(ejm.SelectedSourceType, ejm.SelectedDataSource);
-
-            temp2.Add(new SelectListItem()
+                temp2 = DataSourcesByType(ejm.SelectedSourceType, ejm.SelectedDataSource).Where(x => x.Text == retrieverJob.DataSource.Name).ToList();
+            }
+            else if (retrieverJob.DataSource.SourceType == "S3Basic")
             {
-                Text = "Pick a Source",
-                Value = "0"
-            });
+                temp = _datasetContext.DataSourceTypes.Where(x => x.DiscrimatorValue == "S3Basic").Select(v
+                   => new SelectListItem
+                   {
+                       Text = v.Name,
+                       Value = v.DiscrimatorValue,
+                       Disabled = v.DiscrimatorValue == "S3Basic" ? true : false
+                   }).ToList();
 
+                temp2 = DataSourcesByType(ejm.SelectedSourceType, ejm.SelectedDataSource).Where(x => x.Text == retrieverJob.DataSource.Name).ToList();
+            }
+            else
+            {
+                temp = _datasetContext.DataSourceTypes.Select(v
+                   => new SelectListItem
+                   {
+                       Text = v.Name,
+                       Value = v.DiscrimatorValue,
+                       Disabled = v.DiscrimatorValue == "DFSBasic" || v.DiscrimatorValue == "S3Basic" ? true : false
+                   }).ToList();
+
+                temp.Add(new SelectListItem()
+                {
+                    Text = "Pick a Source Type",
+                    Value = "0",
+                    Selected = true,
+                    Disabled = true
+                });
+
+                temp2 = DataSourcesByType(ejm.SelectedSourceType, ejm.SelectedDataSource);
+
+                temp2.Add(new SelectListItem()
+                {
+                    Text = "Pick a Source",
+                    Value = "0"
+                });
+            }
+
+            ejm.SourceTypesDropdown = temp.OrderBy(x => x.Value);
             ejm.SourcesForDropdown = temp2.OrderBy(x => x.Value);
 
             string[] schedules = new string[5] { "Hourly", "Daily", "Weekly", "Monthly", "Yearly" };
@@ -831,6 +867,19 @@ namespace Sentry.data.Web.Controllers
                     }
 
                     output = dfsCustomList.Select(v
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
+                    break;
+                case "S3Basic":
+                    List<DataSource> s3BasicList = new List<DataSource>();
+                    foreach (var a in list)
+                    {
+                        if (a.Is<S3Basic>())
+                        {
+                            s3BasicList.Add(a);
+                        }
+                    }
+
+                    output = s3BasicList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
                     break;
                 default:

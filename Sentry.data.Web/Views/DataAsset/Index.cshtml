@@ -90,7 +90,7 @@
     @{
         foreach (var item in Model.AssetNotifications)
         {
-            <div class="alert alert-dismissable alert-@item.MessageSeverityTag">
+            <div class="alert alert-dismissable alert-@item.MessageSeverityTag.ToLower()">
                 <button type="button" class="close" data-dismiss="alert">×</button>
                 @Html.Raw(@item.DisplayMessage)
                 @*@switch (@item.MessageSeverityTag)

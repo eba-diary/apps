@@ -36,17 +36,25 @@ namespace Sentry.data.Web
 
         [Required]
         [DisplayName("Schedule")]
-        public string SchedulePicker { get; set; }
+        public int SchedulePicker { get; set; }
 
         [Required]
+        [DisplayName("Relative URI")]
         public string RelativeUri { get; set; }
 
+        [DisplayName("Search Criteria")]
         public string SearchCriteria { get; set; }
 
+        [DisplayName("Is Regex Search")]
         public Boolean IsRegexSearch { get; set; }
 
+        [DisplayName("Overwrite Data File")]
         public Boolean OverwriteDataFile { get; set; }
+
+        [DisplayName("Target File Name")]
         public string TargetFileName { get; set; }
+
+        [DisplayName("Create Current File")]
         public Boolean CreateCurrentFile { get; set; }
 
         public int DatasetID { get; set; }

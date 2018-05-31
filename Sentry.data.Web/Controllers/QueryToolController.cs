@@ -311,9 +311,20 @@ namespace Sentry.data.Web.Controllers
 
         private class QueryableDataset
         {
+            public List<QueryableConfig> Configs { get; set; }
+            public string datasetCategory { get; set; }
+            public string datasetColor { get; set; }
+        }
+
+        private class QueryableConfig
+        {
             public string configName { get; set; }
             public string bucket { get; set; }
             public string s3Key { get; set; }
+            public string description { get; set; }
+
+            public string primaryFileId { get; set; }
+
             public List<string> extensions { get; set; }
             public int fileCount { get; set; }
             public Boolean IsGeneric { get; set; }
@@ -327,19 +338,28 @@ namespace Sentry.data.Web.Controllers
         {
             Dataset ds = _datasetContext.GetById<Dataset>(datasetID);
 
-            List<QueryableDataset> reply = new List<QueryableDataset>();
+            List<QueryableConfig> reply = new List<QueryableConfig>();
 
             foreach (var item in ds.DatasetFileConfigs)
             {
-                if ((ds.DatasetFiles.Any(x => x.DatasetFileConfig.ConfigId == item.ConfigId) || ds.DatasetFileConfigs.Count == 1) && item.FileTypeId != (int) FileType.Supplementary)
+                if (item.FileTypeId != (int) FileType.Supplementary)
                 {
-                    QueryableDataset qd = new QueryableDataset();
+                    QueryableConfig qd = new QueryableConfig();
 
                     qd.configName = item.Name;
                     qd.bucket = Sentry.Configuration.Config.GetHostSetting("AWSRootBucket");
                     qd.s3Key = ds.S3Key + item.ConfigId;
+                    
+
                     qd.fileCount = ds.DatasetFiles.Where(x => x.DatasetFileConfig.ConfigId == item.ConfigId && x.ParentDatasetFileId == null).ToList().Count;
+
+                    if (ds.DatasetFiles.OrderBy(x => x.CreateDTM).FirstOrDefault(x => x.DatasetFileConfig.ConfigId == item.ConfigId) != null)
+                    {
+                        qd.primaryFileId = ds.DatasetFiles.OrderBy(x => x.CreateDTM).FirstOrDefault(x => x.DatasetFileConfig.ConfigId == item.ConfigId).DatasetFileId.ToString();
+                    }
                     qd.extensions = ds.DatasetFiles.Where(x => x.DatasetFileConfig.ConfigId == item.ConfigId).Select(x => Utilities.GetFileExtension(x.FileName)).Distinct().ToList();
+                    qd.description = item.Description;                   
+
                     qd.IsGeneric = item.IsGeneric;
                     qd.IsPowerUser = _userService.GetCurrentUser().CanQueryToolPowerUser;
 
@@ -347,7 +367,12 @@ namespace Sentry.data.Web.Controllers
                 }
             }
 
-            return Ok(reply);
+            QueryableDataset output = new QueryableDataset() { Configs = reply };
+
+            output.datasetCategory = ds.DatasetCategory.Name;
+            output.datasetColor = ds.DatasetCategory.Color;
+
+            return Ok(output);
         }
     }
 }

@@ -788,6 +788,14 @@ namespace Sentry.data.Infrastructure
             return response.ResponseStream;            
         }
 
+        public S3FileInfo GetFileInfo(string key)
+        {
+            S3DirectoryInfo s3Root = new S3DirectoryInfo(S3Client, Configuration.Config.GetHostSetting("AWSRootBucket"));
+            S3FileInfo outfile = s3Root.GetFile(key);
+
+            return outfile;
+        }
+
         public List<string> FindObject(string keyPrefix)
         {
             var request = new ListObjectsRequest();

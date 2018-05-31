@@ -86,11 +86,26 @@ namespace Sentry.data.Web.Tests
             an.NotificationId = 1;
             an.ParentDataAsset = da;
             an.Message = "Alert Message";
-            an.StartTime = DateTime.Now.AddDays(-1);
+            an.StartTime = DateTime.Now.AddHours(-1).AddMinutes(1);
             an.ExpirationTime = DateTime.Now.AddDays(1);
 
             return an;
         }
+
+        [TestMethod]
+        public void DataAssetNotification_IsNotInPast()
+        {
+            var da = GetMockData();
+
+            var an = GetMockData(da);
+
+            Assert.IsTrue(an.StartTime >= DateTime.Now.AddHours(-1));
+            Assert.IsTrue(an.StartTime <= an.ExpirationTime);
+
+            Assert.IsTrue(an.ExpirationTime >= an.StartTime);
+            Assert.IsTrue(an.ExpirationTime >= DateTime.Now);
+        }
+
 
         public DataAssetController GetMockProviderForIndex(DataAsset da)
         {

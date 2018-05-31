@@ -12,24 +12,24 @@
 
 
         @if (@Model.DatasetFiles.Count == 0)
-    {
-        <div id="alertInfoBanner" class="alert alert-dismissable alert-info">
-            <button type="button" class="close" data-dismiss="alert">×</button>
-            <div>
-                @if (Model.CanUpload)
-            {
-                <strong class="alertHeading">Info: </strong>
-                <span>This dataset has no files attached to it yet.  Please click the flashing upload button to upload your first file.</span>
-        }
-        else
         {
-            <strong class="alertHeading">Info: </strong>
-            <span>This dataset has no files attached to it yet.  Please contact the Sentry Owner: @Model.SentryOwner.FullName.</span>
-    }
+            <div id="alertInfoBanner" class="alert alert-dismissable alert-info">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <div>
+                    @if (Model.CanUpload)
+                    {
+                        <strong class="alertHeading">Info: </strong>
+                        <span>This dataset has no files attached to it yet.  Please click the flashing upload button to upload your first file.</span>
+                    }
+                    else
+                    {
+                        <strong class="alertHeading">Info: </strong>
+                        <span>This dataset has no files attached to it yet.  Please contact the Sentry Owner: @Model.SentryOwner.FullName.</span>
+                    }
+                </div>
             </div>
-        </div>
 
-}
+        }
 
         <div class="categoryBanner-@color categoryBannerSml rightFloat hidden-md hidden-lg">@Model.DatasetCategory.Name</div>
 
@@ -44,16 +44,16 @@
                         @Model.DatasetName
 
                         @if (Model.IsSensitive)
-                    {
-                        <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
-                }
+                        {
+                            <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
+                        }
                     </h1>
 
                     @{
-                    foreach (string item in Model.DistinctFileExtensions())
-                    {
-                        <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
-                }
+                        foreach (string item in Model.DistinctFileExtensions())
+                        {
+                            <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
+                        }
                     }
 
                     <button type="button"
@@ -67,40 +67,40 @@
 
 
                     @if (Model.CanUpload)
-                {
-                    <button type="button"
-                            class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                            id="UploadModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Upload File">
-                        <span class="glyphicon glyphicon-cloud-upload @color"></span>
-                    </button>
-            }
+                    {
+                        <button type="button"
+                                class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                                id="UploadModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Upload File">
+                            <span class="glyphicon glyphicon-cloud-upload @color"></span>
+                        </button>
+                    }
 
                     @if (Model.CanEditDataset)
-                {
-                    <button type="button"
-                            class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                            id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
-                        <span class="glyphicon glyphicon-edit @color"></span>
-                    </button>
-            }
+                    {
+                        <button type="button"
+                                class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                                id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
+                            <span class="glyphicon glyphicon-edit @color"></span>
+                        </button>
+                    }
 
                     @if (((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive)) && Model.DatasetFiles.Count != 0)
-                {
-                    <button type="button"
-                            class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                            id="DownloadLatest" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download Latest">
-                        <span class="glyphicon glyphicon-cloud-download @color"></span>
-                    </button>
-            }
+                    {
+                        <button type="button"
+                                class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                                id="DownloadLatest" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download Latest">
+                            <span class="glyphicon glyphicon-cloud-download @color"></span>
+                        </button>
+                    }
 
                     @if ((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.IsPreviewCompatible))
-                {
-                    <button type="button"
-                            class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                            id="PreviewLatestData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Preview Latest">
-                        <span class="glyphicon glyphicon-search @color"></span>
-                    </button>
-            }
+                    {
+                        <button type="button"
+                                class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                                id="PreviewLatestData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Preview Latest">
+                            <span class="glyphicon glyphicon-search @color"></span>
+                        </button>
+                    }
                 </div>
             </div>
         </div>
@@ -110,51 +110,77 @@
 
             <div class="clearFloat leftFloat iconExt">
                 @if (Model.IsSensitive)
-            {
-                <div class="glyphicon glyphicon-lock lockIconSml leftFloat" data-toggle="tooltip" data-placement="top" title="Secure"></div>
-        }
+                {
+                    <div class="glyphicon glyphicon-lock lockIconSml leftFloat" data-toggle="tooltip" data-placement="top" title="Secure"></div>
+                }
                 @{
                     foreach (string item in Model.DistinctFileExtensions())
                     {
                         <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
                     }
-                }                
+                }
             </div>
 
             @if (Model.CanEditDataset)
-        {
-            <button type="button" class="btn btn-default btn dataset-operation-button borderdk_gray borderdk_@color rightFloat" id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
-                <span class="glyphicon glyphicon-edit @color"></span>
-            </button>
-    }
+            {
+                <button type="button" class="btn btn-default btn dataset-operation-button borderdk_gray borderdk_@color rightFloat" id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
+                    <span class="glyphicon glyphicon-edit @color"></span>
+                </button>
+            }
 
             @if ((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive))
-        {
-            <button type="button" class="btn btn-default btn dataset-operation-button borderdk_gray borderdk_@color rightFloat" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download Latest">
-                <span class="glyphicon glyphicon-cloud-download @color"></span>
-            </button>
-    }
+            {
+                <button type="button" class="btn btn-default btn dataset-operation-button borderdk_gray borderdk_@color rightFloat" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download Latest">
+                    <span class="glyphicon glyphicon-cloud-download @color"></span>
+                </button>
+            }
 
             @if ((Model.IsSensitive && Model.CanDwnldSenstive && Model.IsPreviewCompatible) || (!Model.IsSensitive && Model.IsPreviewCompatible))
-        {
-            <button type="button" class="btn btn-default dataset-operation-button borderdk_gray borderdk_@color rightFloat" id="PreviewData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Preview Latest">
-                <span class="glyphicon glyphicon-search @color"></span>
-            </button>
-    }
+            {
+                <button type="button" class="btn btn-default dataset-operation-button borderdk_gray borderdk_@color rightFloat" id="PreviewData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Preview Latest">
+                    <span class="glyphicon glyphicon-search @color"></span>
+                </button>
+            }
 
         </div>
 
     </div>
- 
-    <div class="detailDesc clearFloat">
-        <h6>@Model.DatasetDesc</h6>
+
+    @if (!String.IsNullOrWhiteSpace(Model.DatasetDesc))
+    {
         <br />
-        <h7>@Model.DatasetInformation</h7>
-    </div>
-
-
     <div class="row">
+        <div class="col-lg-12">
+            <div id="detailSectionHeader_Desc">
+                <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_Desc"></span>
+                <h2 class="detailSection @color">Dataset Description</h2>
+            </div>
+            <div id="hide_detailSectionHeader_Desc" style="margin-left: 35px;">
+                <h7>@Model.DatasetDesc</h7>
+            </div>
+        </div>
+    </div>
+    }
+    @if (!String.IsNullOrWhiteSpace(Model.DatasetInformation))
+    {
+    <div class="row">
+        <div class="col-lg-12">
+            <div id="detailSectionHeader_Info">
+                <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_Info"></span>
+                <h2 class="detailSection @color">Usage Information</h2>
+            </div>
+            <div id="hide_detailSectionHeader_Info" style="margin-left: 35px;">
+                <h7>@Model.DatasetInformation</h7>
+            </div>
+        </div>
+    </div>
+    }
 
+    @if (!String.IsNullOrWhiteSpace(Model.DatasetInformation) || !String.IsNullOrWhiteSpace(Model.DatasetDesc))
+    {
+        <hr/>
+    }
+    <div class="row">
         <div class="col-lg-8">
             <div id="detailSectionHeader_Metadata">
                 <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_Metadata"></span>
@@ -201,14 +227,14 @@
         <div class="col-lg-4">
             @if (Model.CanManageConfigs)
             {
-            <div id="detailSectionHeader_Metadata">
-                <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_Metadata"></span>
-                <h2 class="detailSection @color">Administrative Actions</h2>
-            </div>
-            <div>
-                <a style="margin-left: 35px;" class="backToList" href="/Config/Dataset/@Model.DatasetId">Manage Data File Configurations <span class="glyphicon glyphicon-chevron-right"></span></a>
-                <br />
-            </div>
+                <div id="detailSectionHeader_Admin">
+                    <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_Admin"></span>
+                    <h2 class="detailSection @color">Administrative Actions</h2>
+                </div>
+                <div id="hide_detailSectionHeader_Admin">
+                    <a style="margin-left: 35px;" class="backToList" href="/Config/Dataset/@Model.DatasetId">Manage Data File Configurations <span class="glyphicon glyphicon-chevron-right"></span></a>
+                    <br />
+                </div>
             }
 
         </div>
@@ -217,24 +243,6 @@
 
     <hr />
 
-    @*<div class="datasetdetail-datasetfileconfigs">
-            @Html.Action("DatasetFileConfigs", "Dataset", new { datasetFileConfigModels = Model.DatasetFileConfigs })
-        </div>*@
-    @*<div>
-            <h2 class="detailSection @color">Data Files</h2>
-
-            <div id="DatasetItemList" class="dataset-list inlineBlock text-left">
-                <ul class="list-unstyled">
-                    @{
-                        foreach (var item in Model.DatasetFiles)
-                        {
-                            //<li>@item.FileName</li>
-                            @Html.Partial("_ListDatasetFile", item)
-                        }
-                    }
-                </ul>
-            </div>
-        </div>*@
     <div id="datasetDataFilePanel">
         <div>
             <div id="detailSectionHeader_DataFiles">

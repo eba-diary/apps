@@ -21,6 +21,7 @@ namespace Sentry.data.Web
                         Include("~/Scripts/spin.js").
                         Include("~/Scripts/ladda.js").
                         Include("~/Scripts/knockout-3.4.2.js").
+                        Include("~/Scripts/knockout-sortable.min.js").
                         Include("~/Scripts/jQuery.extendext.min.js").
                         Include("~/Scripts/jquery.validate.js").
                         Include("~/Scripts/jquery.validate.unobtrusive.js").
@@ -68,6 +69,7 @@ namespace Sentry.data.Web
             //This bundle contains styles that are used commonly across the site, including bootstrap and jquery plugins
             bundles.Add(new StyleBundle("~/bundles/css/main").
                         Include("~/Content/bootstrap.min.css", new CssRewriteUrlTransform()).
+                       
                         Include("~/Content/font-awesome.min.css", new CssRewriteUrlTransform()).
                         Include("~/Content/css/select2.css", new CssRewriteUrlTransform()).
                         Include("~/Content/ladda-themeless.css"));
@@ -83,6 +85,7 @@ namespace Sentry.data.Web
 
             //This bundle contains styles that override everything else, and must come after all other css includes
             bundles.Add(new StyleBundle("~/bundles/css/site").
+                 Include("~/Content/bootstrap-datetimepicker.css", new CssRewriteUrlTransform()).
                         Include("~/Content/sentry-internal.min.css", new CssRewriteUrlTransform()).
                         Include("~/Content/query-builder.default.min.css").
                         Include("~/Content/site.css"));

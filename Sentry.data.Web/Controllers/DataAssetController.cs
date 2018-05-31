@@ -143,13 +143,34 @@ namespace Sentry.data.Web.Controllers
             canm.DisplayCreateUser = _associateInfoService.GetAssociateInfo(user.AssociateId);
             canm.StartTime = DateTime.Now; //preset Start Time
             canm.ExpirationTime = DateTime.Now.AddHours(1);
-            return PartialView("_CreateAssetNotification",canm);
+            return View("CreateAssetNotification",canm);
         }
 
         [HttpPost]
         public ActionResult CreateAssetNotification(CreateAssetNotificationModel canm)
         {
             AssetNotifications an = new AssetNotifications();
+
+            if (canm.ExpirationTime <= canm.StartTime)
+            {
+                ModelState.AddModelError(string.Empty, "Expiration Time cannot be before Start Time");
+            }
+
+            if (canm.StartTime >= canm.ExpirationTime)
+            {
+                ModelState.AddModelError(string.Empty, "Start Time cannot be after Expiration Time");
+            }
+
+            if (canm.StartTime <= DateTime.Now.AddHours(-1))
+            {
+                ModelState.AddModelError(string.Empty, "Start Time cannot be greater than an hour in the past");
+            }
+
+            if (canm.ExpirationTime <= DateTime.Now)
+            {
+                ModelState.AddModelError(string.Empty, "Expiration Time cannot be in the past");
+            }
+
             try
             {
                 if (ModelState.IsValid)
@@ -157,7 +178,7 @@ namespace Sentry.data.Web.Controllers
                     an = UpdateAssetNotificationFromModel(an, canm);
                     _dsContext.Merge<AssetNotifications>(an);
                     _dsContext.SaveChanges();
-                    return AjaxSuccessJson();
+                    return View("ManageAssetNotification");
                 }
             }
             catch (Sentry.Core.ValidationException ex)
@@ -165,8 +186,14 @@ namespace Sentry.data.Web.Controllers
                 AddCoreValidationExceptionsToModel(ex);
                 _dsContext.Clear();
             }
-                        
-            return CreateAssetNotification();
+
+            IApplicationUser user = _userService.GetCurrentUser();
+            canm.CreateUser = user.AssociateId;
+            canm.DisplayCreateUser = _associateInfoService.GetAssociateInfo(user.AssociateId);
+            canm.AllDataAssets = GetDataAssetsList();
+            canm.AllSeverities = GetNotificationSeverities();
+
+            return View("CreateAssetNotification", canm);
         }
 
         //[AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
@@ -186,35 +213,44 @@ namespace Sentry.data.Web.Controllers
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
         }
 
-        //[HttpGet()]
-        ////[AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
-        //public ActionResult GetEditConfigPartialView(int notificationId)
-        //{
-        //    AssetNotifications an = _dsContext.GetAssetNotificationByID(notificationId);
-        //   // EditDatasetFileConfigModel edfc = new (dfc);
-
-        //    ViewBag.ModifyType = "Edit";
-
-        //    //return PartialView("_EditConfigFile", edfc);
-        //}
 
         [HttpGet()]
         [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
-        public ActionResult GetEditAssetNotificationPartialView(int notificationId)
+        public ActionResult EditAssetNotification(int notificationId)
         {
             AssetNotifications an = _dsContext.GetAssetNotificationByID(notificationId);
             EditAssetNotificationModel ean = new EditAssetNotificationModel(an, _associateInfoService);
             ean.AllSeverities = GetNotificationSeverities();
             ean.SeverityID = an.MessageSeverity;  //Preselect current value
 
-            return PartialView("_EditAssetNotification", ean);
+            return View("EditAssetNotification", ean);
         }
 
         [HttpPost()]
-        //[AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
+        [AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
         public ActionResult EditAssetNotification(EditAssetNotificationModel ean)
         {
             AssetNotifications an = _dsContext.GetAssetNotificationByID(ean.NotificationId);
+
+            if(ean.ExpirationTime <= ean.StartTime)
+            {
+                ModelState.AddModelError(string.Empty, "Expiration Time cannot be before Start Time");
+            }
+
+            if (ean.StartTime >= ean.ExpirationTime)
+            {
+                ModelState.AddModelError(string.Empty, "Start Time cannot be after Expiration Time");
+            }
+
+            if (ean.StartTime <= DateTime.Now.AddHours(-1))
+            {
+                ModelState.AddModelError(string.Empty, "Start Time cannot be greater than an hour in the past");
+            }
+
+            if (ean.ExpirationTime <= DateTime.Now)
+            {
+                ModelState.AddModelError(string.Empty, "Expiration Time cannot be in the past");
+            }
 
             try
             {
@@ -222,7 +258,7 @@ namespace Sentry.data.Web.Controllers
                 {
                     an = UpdateAssetNotificationFromModel(an, ean);
                     _dsContext.SaveChanges();
-                    return AjaxSuccessJson();
+                    return View("ManageAssetNotification");
                 }
             }
             catch (Sentry.Core.ValidationException ex)
@@ -232,13 +268,15 @@ namespace Sentry.data.Web.Controllers
             }
 
             //Return partial view when there are errors
-            return GetEditAssetNotificationPartialView(ean.NotificationId);
+            ean.AllSeverities = GetNotificationSeverities();
+            return View("EditAssetNotification", ean);
         }
 
         private AssetNotifications UpdateAssetNotificationFromModel(AssetNotifications an, EditAssetNotificationModel ean)
         {
             an.ExpirationTime = ean.ExpirationTime;
             an.MessageSeverity = ean.SeverityID;
+            an.Message = ean.Message;
             return an;
         }
 

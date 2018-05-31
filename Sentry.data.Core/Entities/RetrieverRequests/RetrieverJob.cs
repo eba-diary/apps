@@ -58,6 +58,10 @@ namespace Sentry.data.Core
                     return "Hourly";
                 }
                 //
+                else if(cronParts[0].StartsWith("*/"))
+                {
+                    return "Every " + cronParts[0].Substring(2) + " Minutes";
+                }
                 else
                 {
                     return "Instant";

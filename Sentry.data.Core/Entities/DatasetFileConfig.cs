@@ -65,5 +65,10 @@ namespace Sentry.data.Core
                 throw new InvalidOperationException("CreateCurrentFile is false on data file config");
             }                
         }
+
+        public virtual string GetSchema()
+        {
+            return null;
+        }
     }
 }

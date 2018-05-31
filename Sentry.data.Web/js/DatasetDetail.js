@@ -84,11 +84,8 @@ data.DatasetDetail = {
             }
 
             if (multipleConfigs) {
-
-                var modal = Sentry.ShowModalCustom(
-                    "Upload Warning:",
-                    "There are multiple configuration files associated with the set of files you want to bundle.  Do you want to continue?",
-                    Sentry.ModalButtonsOKCancel(function (result) { data.DatasetDetail.PushToBundler(datasetID, listOfFilesToBundle) })
+                var modal = Sentry.ShowModalAlert(
+                    "There are multiple configuration files associated with the set of files you want to bundle.  Please only select file from a single configuration."
                 );
             }
             else {
@@ -129,10 +126,8 @@ data.DatasetDetail = {
 
                     if (multipleConfigs) {
 
-                        var modal = Sentry.ShowModalCustom(
-                            "Upload Warning:",
-                            "There are multiple configuration files associated with the set of files you want to bundle.  Do you want to continue?",
-                            Sentry.ModalButtonsOKCancel(function (result) { data.DatasetDetail.PushToBundler(datasetID, listOfFilesToBundle) })
+                        var modal = Sentry.ShowModalAlert(
+                            "There are multiple configuration files associated with the set of files you want to bundle.  Please only select file from a single configuration."
                         );
                     }
                     else {
@@ -905,7 +900,7 @@ data.DatasetDetail = {
         /// <summary>
         /// Load Modal for Uploading new Datafile
         /// </summary>
-        var modal = Sentry.ShowModalWithSpinner("UploadDataFile");
+        var modal = Sentry.ShowModalWithSpinner("Upload Data File");
         var createDatafileUrl = "/Dataset/GetDatasetUploadPartialView/?datasetId=" + encodeURI(id);
 
         $.get(createDatafileUrl, function (e) {

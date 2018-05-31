@@ -37,16 +37,27 @@ namespace Sentry.data.Web
         public int JobID { get; set; }
         public Boolean IsGeneric { get; set; }
         public string Schedule { get; set; }
-        public int SchedulePicker { get; set; }
         public IEnumerable<SelectListItem> ScheduleOptions { get; set; }
+
+        [DisplayName("Schedule")]
+        public int SchedulePicker { get; set; }
+
+        [DisplayName("Relative URI")]
         public string RelativeUri { get; set; }
 
+        [DisplayName("Search Criteria")]
         public string SearchCriteria { get; set; }
 
+        [DisplayName("Is Regex Search")]
         public Boolean IsRegexSearch { get; set; }
 
+        [DisplayName("Overwrite Data File")]
         public Boolean OverwriteDataFile { get; set; }
+
+        [DisplayName("Target File Name")]
         public string TargetFileName { get; set; }
+
+        [DisplayName("Create Current File")]
         public Boolean CreateCurrentFile { get; set; }
 
         public int DatasetID { get; set; }
