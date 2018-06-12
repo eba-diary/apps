@@ -106,143 +106,155 @@ namespace Sentry.data.Goldeneye
             Boolean firstRun = true;
             do
             {
-                //Run All the Processes that MUST BE run once per SECOND
-                if ((DateTime.Now - config.LastRunSecond).TotalSeconds >= 1 || firstRun)
+                using (_container = Bootstrapper.Container.GetNestedContainer())
                 {
-                    Console.WriteLine("There are currently " + currentTasks.Count + " processes running. "  + currentTasks.Count(x => x.Task.IsCompleted) + " Completed.");
-                    foreach (RunningTask rt in currentTasks)
+                    //THIS IS A BANDAID.  No copyright intended.
+                    Boolean complete = false;
+                    while (!complete)
                     {
-                        //Console.WriteLine("Name: " + rt.Name  + " - Done : " + rt.Task.IsCompleted  + " - Time Elapsed:" + (DateTime.Now - rt.TimeStarted).TotalSeconds.ToString("0.00") + " seconds");
-
-                        if(rt.Task.IsFaulted)
+                        try
                         {
-                            Console.WriteLine(rt.Name + " faulted.");
+                            _requestContext = _container.GetInstance<IRequestContext>();
+                            complete = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            Logger.Error("Cannot Get Instance of IRequestContext", ex);
+                            System.Threading.Thread.Sleep(100);
                         }
                     }
 
-                    //Cleanup Completed or Faulted Dataset Loader Tasks
-                    if (currentTasks.Where(x => x.Name.StartsWith("DatasetLoader : Minute") && (x.Task.IsCompleted || x.Task.IsFaulted)).ToList().Count >= 1 || firstRun)
+                    //Run All the Processes that MUST BE run once per SECOND
+                    if ((DateTime.Now - config.LastRunSecond).TotalSeconds >= 1 || firstRun)
                     {
-                        if (firstRun)
+                        Console.WriteLine("There are currently " + currentTasks.Count + " processes running. " + currentTasks.Count(x => x.Task.IsCompleted) + " Completed.");
+                        foreach (RunningTask rt in currentTasks)
                         {
-                            //Remove all DatasetLoader tasks
-                            var tasks = currentTasks.Where(x => x.Name.StartsWith("DatasetLoader : Minute")).ToList();
-                            tasks.ForEach(x => x.Task.Dispose());
-                            currentTasks.RemoveAll(x => x.Name.StartsWith("DatasetLoader : Minute"));
-                        }
-                        else
-                        {
-                            //If it's completed dispose of it.
-                            var tasks = currentTasks.Where(x => x.Name.StartsWith("DatasetLoader : Minute") && (x.Task.IsCompleted || x.Task.IsFaulted)).ToList();
-                            tasks.ForEach(x => x.Task.Dispose());
-                            foreach (RunningTask task in tasks)
+                            //Console.WriteLine("Name: " + rt.Name  + " - Done : " + rt.Task.IsCompleted  + " - Time Elapsed:" + (DateTime.Now - rt.TimeStarted).TotalSeconds.ToString("0.00") + " seconds");
+
+                            if (rt.Task.IsFaulted)
                             {
-                                currentTasks.RemoveAll(x => x.Name == task.Name);
+                                Console.WriteLine(rt.Name + " faulted.");
                             }
                         }
-                    }
 
-                    if (firstRun)
-                    {
-                        var backgroundJobServer = new Scheduler();
-                        currentTasks.Add(new RunningTask(
-                            Task.Factory.StartNew(() => backgroundJobServer.Run(_token), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),
-                            "BackgroundJobServer")
-                        );
-
-                        //https://crontab.guru/
-                        //Schecule SpamFactory:Instance to run every minute
-                        // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
-                        RecurringJob.AddOrUpdate("spamfactory_instant", () => SpamFactory.Run("Instant"), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-                        RecurringJob.AddOrUpdate("spamfactory_hourly", () => SpamFactory.Run("Hourly"), "00 * * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-                        RecurringJob.AddOrUpdate("spamfactory_daily", () => SpamFactory.Run("Daily"), "00 8 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-                        RecurringJob.AddOrUpdate("spamfactory_weekly", () => SpamFactory.Run("Weekly"), "00 8 * * MON", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-
-                        //Load all scheduled jobs into hangfire on startup to ensure all jobs are registered
-                        using (_container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                        //Cleanup Completed or Faulted Dataset Loader Tasks
+                        if (currentTasks.Where(x => x.Name.StartsWith("DatasetLoader : Minute") && (x.Task.IsCompleted || x.Task.IsFaulted)).ToList().Count >= 1 || firstRun)
                         {
-                            IRequestContext requestContext = _container.GetInstance<IRequestContext>();
+                            if (firstRun)
+                            {
+                                //Remove all DatasetLoader tasks
+                                var tasks = currentTasks.Where(x => x.Name.StartsWith("DatasetLoader : Minute")).ToList();
+                                tasks.ForEach(x => x.Task.Dispose());
+                                currentTasks.RemoveAll(x => x.Name.StartsWith("DatasetLoader : Minute"));
+                            }
+                            else
+                            {
+                                //If it's completed dispose of it.
+                                var tasks = currentTasks.Where(x => x.Name.StartsWith("DatasetLoader : Minute") && (x.Task.IsCompleted || x.Task.IsFaulted)).ToList();
+                                tasks.ForEach(x => x.Task.Dispose());
+                                foreach (RunningTask task in tasks)
+                                {
+                                    currentTasks.RemoveAll(x => x.Name == task.Name);
+                                }
+                            }
+                        }
 
-                            List<RetrieverJob> JobList = requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant").ToList();
+                        if (firstRun)
+                        {
+                            var backgroundJobServer = new Scheduler();
+                            currentTasks.Add(new RunningTask(
+                                Task.Factory.StartNew(() => backgroundJobServer.Run(_token), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),
+                                "BackgroundJobServer")
+                            );
+
+                            //https://crontab.guru/
+                            //Schecule SpamFactory:Instance to run every minute
+                            // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
+                            RecurringJob.AddOrUpdate("spamfactory_instant", () => SpamFactory.Run("Instant"), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                            RecurringJob.AddOrUpdate("spamfactory_hourly", () => SpamFactory.Run("Hourly"), "00 * * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                            RecurringJob.AddOrUpdate("spamfactory_daily", () => SpamFactory.Run("Daily"), "00 8 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                            RecurringJob.AddOrUpdate("spamfactory_weekly", () => SpamFactory.Run("Weekly"), "00 8 * * MON", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+
+                            //Load all scheduled jobs into hangfire on startup to ensure all jobs are registered
+
+                            List<RetrieverJob> JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant").ToList();
 
                             foreach (RetrieverJob Job in JobList)
                             {
                                 var datasetName = Job.DatasetConfig.ParentDataset.DatasetName;
                                 var configName = Job.DatasetConfig.Name;
-                                
+
                                 // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
                                 RecurringJob.AddOrUpdate<RetrieverJobService>($"RJob~{Job.DatasetConfig.ParentDataset.DatasetId}~{Job.Id}~{Job.DatasetConfig.ConfigId}~{Job.DataSource.Name}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
                             }
+                            
                         }
-                    }
 
-                    ////Dataset Loader
-                    if (true)
-                    {
-                        //How many loader tasks can be started
-                        var availableLoaderTasks = Int32.Parse(Config.GetHostSetting("activeLoaderTaskThrottle")) - currentTasks.Where(x => x.Name.StartsWith("DatasetLoader : Minute") && !x.Task.IsCompleted).ToList().Count;
-                        foreach (var a in Directory.GetFiles(Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath"), "*", SearchOption.AllDirectories).Where(w => !IsFileLocked(w)))
+                        ////Dataset Loader
+                        if (true)
                         {
-                            if(availableLoaderTasks > 0)
+                            //How many loader tasks can be started
+                            var availableLoaderTasks = Int32.Parse(Config.GetHostSetting("activeLoaderTaskThrottle")) - currentTasks.Where(x => x.Name.StartsWith("DatasetLoader : Minute") && !x.Task.IsCompleted).ToList().Count;
+                            foreach (var a in Directory.GetFiles(Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath"), "*", SearchOption.AllDirectories).Where(w => !IsFileLocked(w)))
                             {
-                                //Disregard any request files picked up via Dataset Loader
-                                //This will need to change when Reading requests from SDP
-                                if (!Path.GetFileName(a).StartsWith(Sentry.Configuration.Config.GetHostSetting("ProcessedFilePrefix")))
+                                if (availableLoaderTasks > 0)
                                 {
-                                    Console.WriteLine("Found : " + a);
-                                    Logger.Info("Found : " + a);
+                                    //Disregard any request files picked up via Dataset Loader
+                                    //This will need to change when Reading requests from SDP
+                                    if (!Path.GetFileName(a).StartsWith(Sentry.Configuration.Config.GetHostSetting("ProcessedFilePrefix")))
+                                    {
+                                        Console.WriteLine("Found : " + a);
+                                        Logger.Info("Found : " + a);
 
-                                    //Add Processing Prefix to file name so it is not picked up by another DatasetLoader task
-                                    var orginalPath = Path.GetFullPath(a).Replace(Path.GetFileName(a), "");
-                                    var origFileName = Path.GetFileName(a);
-                                    var processingFile = orginalPath + Sentry.Configuration.Config.GetHostSetting("ProcessedFilePrefix") + origFileName;
+                                        //Add Processing Prefix to file name so it is not picked up by another DatasetLoader task
+                                        var orginalPath = Path.GetFullPath(a).Replace(Path.GetFileName(a), "");
+                                        var origFileName = Path.GetFileName(a);
+                                        var processingFile = orginalPath + Sentry.Configuration.Config.GetHostSetting("ProcessedFilePrefix") + origFileName;
 
 
-                                    //Rename file to indicate request has been sent for processing
-                                    File.Move(a, processingFile);
+                                        //Rename file to indicate request has been sent for processing
+                                        File.Move(a, processingFile);
 
-                                    //Create a new one.
+                                        //Create a new one.
 
-                                    currentTasks.Add(new RunningTask(
-                                        Task.Factory.StartNew(() => DatasetLoader.Run(processingFile), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),
-                                        $"DatasetLoader : Minute : {Path.GetFileNameWithoutExtension(a)}"));
+                                        currentTasks.Add(new RunningTask(
+                                            Task.Factory.StartNew(() => DatasetLoader.Run(processingFile), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),
+                                            $"DatasetLoader : Minute : {Path.GetFileNameWithoutExtension(a)}"));
 
-                                    //Remove one available loader task
-                                    availableLoaderTasks--;
-                                }                                
+                                        //Remove one available loader task
+                                        availableLoaderTasks--;
+                                    }
+                                }
+                                else
+                                {
+                                    //Max number of loader tasks has been reached.
+                                    break;
+                                }
                             }
-                            else
-                            {
-                                //Max number of loader tasks has been reached.
-                                break;
-                            }                            
                         }
+
+                        config.LastRunSecond = DateTime.Now;
                     }
 
-                    config.LastRunSecond = DateTime.Now;
-                }
 
 
-
-                //Run All the Processes that MUST BE run once per MINUTE
-                if ((DateTime.Now - config.LastRunMinute).TotalMinutes >= 1 || firstRun)
-                {
-
-                    //DatasetLoader Back Pressure
-                    if (true)
+                    //Run All the Processes that MUST BE run once per MINUTE
+                    if ((DateTime.Now - config.LastRunMinute).TotalMinutes >= 1 || firstRun)
                     {
-                        int files = Directory.GetFiles(Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath"), "*", SearchOption.AllDirectories).Where(w => !w.Contains(Config.GetHostSetting("LoaderRequestPath")+ Config.GetHostSetting("ProcessedFilePrefix"))).Count();
-                        Console.WriteLine($"Dataset Loader Back Pressure: {files}");
-                        Logger.Info($"Dataset Loader Back Pressure: {files}");
-                    }
 
-                    //Reload and modifed\new jobs
-                    using (_container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
-                    {
-                        IRequestContext requestContext = _container.GetInstance<IRequestContext>();
+                        //DatasetLoader Back Pressure
+                        if (true)
+                        {
+                            int files = Directory.GetFiles(Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath"), "*", SearchOption.AllDirectories).Where(w => !w.Contains(Config.GetHostSetting("LoaderRequestPath") + Config.GetHostSetting("ProcessedFilePrefix"))).Count();
+                            Console.WriteLine($"Dataset Loader Back Pressure: {files}");
+                            Logger.Info($"Dataset Loader Back Pressure: {files}");
+                        }
+
+                        //Reload and modifed\new jobs
 
                         List<RetrieverJob> JobList = new List<RetrieverJob>();
-                        JobList = requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && (w.Created > config.LastRunMinute || w.Modified > config.LastRunMinute)).ToList();
+                        JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && (w.Created > config.LastRunMinute || w.Modified > config.LastRunMinute)).ToList();
 
                         foreach (RetrieverJob Job in JobList)
                         {
@@ -270,71 +282,71 @@ namespace Sentry.data.Goldeneye
                             Console.WriteLine($"Detected {JobList.Count} new or modified jobs to be loaded into hangfire : JobIds:{jobIds}");
                             Logger.Info($"Detected {JobList.Count} new or modified jobs to be loaded into hangfire : JobIds:{jobIds}");
                         }
-                    }
-
-                    //Dataset File Config Watch
-                    if (true)
-                    {
-                        //If it's completed dispose of it.
-                        var tasks = currentTasks.Where(x => x.Name.StartsWith("Watch") && x.Task.IsCompleted).ToList();
-                        tasks.ForEach(x => x.Task.Dispose());
-                        tasks.ForEach(x => currentTasks.RemoveAll(ct => ct.Name == x.Name));
-
-                        List<RetrieverJob> rtjob = null;
-
-                        using (_container = Bootstrapper.Container.GetNestedContainer())
-                        {
-                            _requestContext = _container.GetInstance<IRequestContext>();
-                            rtjob = _requestContext.RetrieverJob.Where(w => (w.DataSource is DfsBasic || w.DataSource is DfsCustom) && w.Schedule == "Instant").ToList();
-
                         
 
-                        foreach (RetrieverJob job in rtjob)
+                        //Dataset File Config Watch
+                        if (true)
+                        {
+                            //If it's completed dispose of it.
+                            var tasks = currentTasks.Where(x => x.Name.StartsWith("Watch") && x.Task.IsCompleted).ToList();
+                            tasks.ForEach(x => x.Task.Dispose());
+                            tasks.ForEach(x => currentTasks.RemoveAll(ct => ct.Name == x.Name));
+
+                            List<RetrieverJob> rtjob = null;
+
+
+
+                            rtjob = _requestContext.RetrieverJob.Where(w => (w.DataSource is DfsBasic || w.DataSource is DfsCustom) && w.Schedule == "Instant").ToList();
+
+
+
+                            foreach (RetrieverJob job in rtjob)
                             {
                                 Uri watchPath = job.GetUri();
                                 int jobId = job.Id;
                                 int configID = job.DatasetConfig.ConfigId;
 
-                            //On initial run start all watch tasks for all configs
+                                //On initial run start all watch tasks for all configs
                                 if (firstRun)
-                            {
-                                currentTasks.Add(new RunningTask(
-                                                                    Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath),
-                                                                                                    TaskCreationOptions.LongRunning).ContinueWith(TaskException,
-                                                                                                    TaskContinuationOptions.OnlyOnFaulted),
-                                                                                                    $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
+                                {
+                                    currentTasks.Add(new RunningTask(
+                                        Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath),
+                                                                        TaskCreationOptions.LongRunning).ContinueWith(TaskException,
+                                                                        TaskContinuationOptions.OnlyOnFaulted),
+                                                                        $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
                                                                 );
-                            }
-                            //Restart any completed tasks
-                            else if (tasks.Any(w => Int64.Parse(w.Name.Replace("Watch_", "")) == configID))
-                            {
-                                currentTasks.Add(new RunningTask(
-                                    Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath),
-                                                                    TaskCreationOptions.LongRunning).ContinueWith(TaskException,
-                                                                    TaskContinuationOptions.OnlyOnFaulted),
-                                                                    $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
-                                );
+                                }
+                                //Restart any completed tasks
+                                else if (tasks.Any(w => Int64.Parse(w.Name.Replace("Watch_", "")) == configID))
+                                {
+                                    currentTasks.Add(new RunningTask(
+                                        Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath),
+                                                                        TaskCreationOptions.LongRunning).ContinueWith(TaskException,
+                                                                        TaskContinuationOptions.OnlyOnFaulted),
+                                                                        $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
+                                    );
 
-                                Logger.Info($"Resstarting Watch_{configID}");
-                            }
-                            //Start any new directories added
-                            else if (!currentTasks.Any(x => x.Name.StartsWith("Watch") && x.Name.Replace("Watch_", "") == $"{job.Id}_{job.DatasetConfig.ConfigId}"))
-                            {
-                                Logger.Info($"Detected new config ({configID}) to monitor ({configID})");
+                                    Logger.Info($"Resstarting Watch_{configID}");
+                                }
+                                //Start any new directories added
+                                else if (!currentTasks.Any(x => x.Name.StartsWith("Watch") && x.Name.Replace("Watch_", "") == $"{job.Id}_{job.DatasetConfig.ConfigId}"))
+                                {
+                                    Logger.Info($"Detected new config ({configID}) to monitor ({configID})");
 
-                                currentTasks.Add(new RunningTask(
-                                    Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath),
-                                                                    TaskCreationOptions.LongRunning).ContinueWith(TaskException,
-                                                                    TaskContinuationOptions.OnlyOnFaulted),
-                                                                    $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
-                                );
+                                    currentTasks.Add(new RunningTask(
+                                        Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath),
+                                                                        TaskCreationOptions.LongRunning).ContinueWith(TaskException,
+                                                                        TaskContinuationOptions.OnlyOnFaulted),
+                                                                        $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
+                                    );
+                                }
                             }
+
+
                         }
-                        }
 
+                        config.LastRunMinute = DateTime.Now;
                     }
-
-                    config.LastRunMinute = DateTime.Now;                    
                 }
 
                 firstRun = false;
@@ -374,6 +386,14 @@ namespace Sentry.data.Goldeneye
                 var errorCode = Marshal.GetHRForException(e) & ((1 << 16) - 1);
 
                 return errorCode == 32 || errorCode == 33;
+            }
+            catch(UnauthorizedAccessException e)
+            { 
+                return false;
+            }
+            catch(Exception e)
+            {
+                Logger.Error("File Locked Test Try/Catch Failed", e);
             }
 
             return false;

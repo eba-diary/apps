@@ -118,6 +118,14 @@ namespace Sentry.data.Goldeneye
 
                 return errorCode == 32 || errorCode == 33;
             }
+            catch (UnauthorizedAccessException e)
+            {
+                return false;
+            }
+            catch (Exception e)
+            {
+                Logger.Error("File Locked Test Try/Catch Failed", e);
+            }
 
             return false;
         }
