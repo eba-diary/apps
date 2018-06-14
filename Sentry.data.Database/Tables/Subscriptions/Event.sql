@@ -13,6 +13,23 @@
     [DataFile_ID] INT NULL, 
     [DataConfig_ID] INT NULL, 
     [CreatedUser] NCHAR(256) NULL, 
+    [Line_CDE] NVARCHAR(50) NULL, 
+    [Search] NVARCHAR(MAX) NULL, 
+	[Business_Term] AS JSON_VALUE(Search, '$.Business_Term'),
+	[Consumption_Layer] AS JSON_VALUE(Search, '$.Consumption_Layer'),
+	[Lineage_Table] AS JSON_VALUE(Search, '$.Lineage_Table'),
     CONSTRAINT [FK_EventType] FOREIGN KEY ([EventType]) REFERENCES [EventType]([Type_ID]), 
     CONSTRAINT [FK_StatusType] FOREIGN KEY ([StatusType]) REFERENCES [StatusType]([Status_ID])
 )
+
+GO
+
+CREATE INDEX [Search_BusinessTerms] ON [dbo].[Event] ([Business_Term])
+
+GO
+CREATE INDEX [Search_Consumption_Layer] ON [dbo].[Event] ([Consumption_Layer])
+
+GO
+CREATE INDEX [Search_Lineage_Table] ON [dbo].[Event] ([Lineage_Table])
+
+GO

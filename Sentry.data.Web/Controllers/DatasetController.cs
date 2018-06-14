@@ -118,6 +118,16 @@ namespace Sentry.data.Web.Controllers
             hm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
             hm.CanUpload = SharedContext.CurrentUser.CanUpload;
 
+            Event e = new Event();
+            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            e.Reason = "Viewed Dataset Home Page";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+
             return View(hm);
         }
 
@@ -149,6 +159,45 @@ namespace Sentry.data.Web.Controllers
         {
             return View("ClientSideList");
         }
+
+        public class SearchTerms
+        {
+            public List<string> Category_Filters { get; set; }
+            public List<string> Sentry_Owners { get; set; }
+            public List<string> Extensions { get; set; }
+            public String Search_Term { get; set; }
+            public int Results_Returned { get; set; }
+        }
+
+        [HttpPost]
+        [Route("Dataset/SearchEvent")]
+        public JsonResult SearchEvent(string categoryFilters, string sentryOwners, string extensions, String searchTerm, int resultsReturned)
+        {
+            Event e = new Event();
+            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Search").FirstOrDefault();
+            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+
+            e.Search = JsonConvert.SerializeObject(new SearchTerms()
+            {
+                Category_Filters = categoryFilters.Split(',').Where(x => !String.IsNullOrWhiteSpace(x)).ToList(),
+                Sentry_Owners = sentryOwners.Split('|').Where(x => !String.IsNullOrWhiteSpace(x)).ToList(),
+                Extensions = extensions.Split(',').Where(x => !String.IsNullOrWhiteSpace(x)).ToList(),
+                Search_Term = searchTerm,
+                Results_Returned = resultsReturned
+            });
+
+            e.Reason = "Searched Datasets";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+
+
+            return Json(true, JsonRequestBehavior.AllowGet);
+        }
+
+
 
         [Route("Dataset/DatasetList")]
         public JsonResult DatasetList()
@@ -211,12 +260,20 @@ namespace Sentry.data.Web.Controllers
 
             cdm.SearchCriteria = "\\.";           
 
-            cdm.DropPath = Path.Combine(Configuration.Config.GetHostSetting("DatasetLoaderBaseLocation"));
-
             cdm = (CreateDatasetModel) Utility.setupLists(_datasetContext, cdm);
             cdm.IsRegexSearch = true;
 
             cdm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext);
+
+            Event e = new Event();
+            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            e.Reason = "Viewed Dataset Creation Page";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
             return View(cdm);
         }
@@ -250,10 +307,10 @@ namespace Sentry.data.Web.Controllers
                         ConfigId = 0,
                         Name = cdm.ConfigFileName,
                         Description = cdm.ConfigFileDesc,
-                        SearchCriteria = cdm.SearchCriteria,
-                        DropPath = cdm.DropPath + "default\\",
-                        IsRegexSearch = cdm.IsRegexSearch,
-                        OverwriteDatafile = true,
+                        //SearchCriteria = cdm.SearchCriteria,
+                        //DropPath = cdm.DropPath + "default\\",
+                        //IsRegexSearch = cdm.IsRegexSearch,
+                        //OverwriteDatafile = true,
                         FileTypeId = (int)FileType.DataFile,
                         IsGeneric = true,
                         ParentDataset = ds,
@@ -263,7 +320,8 @@ namespace Sentry.data.Web.Controllers
 
                     List<RetrieverJob> jobList =  new List<RetrieverJob>();
 
-                    DataSource dataSource = _datasetContext.DataSources.Where(x => x.Name == "Default Drop Location").First();
+                    //Do not drop tolist in chain.
+                    DataSource dataSource = _datasetContext.DataSources.ToList().First(x => x.SourceType == "DFSBasic" && x.Name == "Default Drop Location");
 
                     Compression compression = new Compression()
                     {
@@ -308,16 +366,11 @@ namespace Sentry.data.Web.Controllers
                     try
                     {
                         //Config Drop location
-                        if (!Directory.Exists(ds.DropLocation + "default\\"))
+                        if (!Directory.Exists(rj.GetUri().LocalPath))
                         {
-                            Directory.CreateDirectory(ds.DropLocation + "default\\");
+                            Directory.CreateDirectory(rj.GetUri().LocalPath);
                         }
 
-                        //Bundle Drop location
-                        if (!Directory.Exists(ds.DropLocation + "bundle\\"))
-                        {
-                            Directory.CreateDirectory(ds.DropLocation + "bundle\\");
-                        }
                     }
                     catch (Exception e)
                     {
@@ -326,8 +379,7 @@ namespace Sentry.data.Web.Controllers
                         errmsg.AppendLine("Failed to Create Drop Location:");
                         errmsg.AppendLine($"DatasetId: {ds.DatasetId}");
                         errmsg.AppendLine($"DatasetName: {ds.DatasetName}");
-                        errmsg.AppendLine($"DropLocation: {dfc.DropPath}");
-                        errmsg.AppendLine($"BundleDropLocation: {ds.DropLocation + "bundle\\"}");
+                        errmsg.AppendLine($"DropLocation: {rj.GetUri().LocalPath}");
 
                         Logger.Error(errmsg.ToString(), e);
                     }
@@ -344,7 +396,6 @@ namespace Sentry.data.Web.Controllers
             {
                 _datasetContext.Clear();
                 cdm = (CreateDatasetModel) Utility.setupLists(_datasetContext, cdm);
-                cdm.DropPath = Path.Combine(Configuration.Config.GetHostSetting("DatasetLoaderBaseLocation"));
                 cdm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext);
             }
 
@@ -357,29 +408,27 @@ namespace Sentry.data.Web.Controllers
             DateTime CreateTime = DateTime.Now;
             string cat = _datasetContext.GetCategoryById(cdm.CategoryIDs).Name;
             IApplicationUser user = _userService.GetCurrentUser();
-            Dataset ds = new Dataset(
-                0,
-                cat,
-                cdm.DatasetName,
-                cdm.DatasetDesc,
-                cdm.DatasetInformation,
-                user.DisplayName,
-                cdm.SentryOwnerName,
-                user.AssociateId,
-                Enum.GetName(typeof(DatasetOriginationCode), cdm.OriginationID),
-                CreateTime,
-                CreateTime,
-                //freqName,
-                Utilities.GenerateDatasetStorageLocation(cat, cdm.DatasetName),
-                false,
-                true,
-                //null,
-                _datasetContext.GetCategoryById(cdm.CategoryIDs),
-                null,
-                //_datasetContext.GetDatasetScopeById(cdm.DatasetScopeTypeID),
-                //cdm.DatafilesFilesToKeep,
-                null,
-                cdm.DropPath);
+
+            Dataset ds = new Dataset()
+            {
+                DatasetId = 0,
+                Category = cat,
+                DatasetCategory = _datasetContext.GetCategoryById(cdm.CategoryIDs),
+                DatasetName = cdm.DatasetName,
+                DatasetDesc = cdm.DatasetDesc,
+                DatasetInformation = cdm.DatasetInformation,
+                CreationUserName = user.DisplayName,
+                SentryOwnerName = cdm.SentryOwnerName,
+                UploadUserName = user.AssociateId,
+                OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), cdm.OriginationID),
+                DatasetDtm = CreateTime,
+                ChangedDtm = CreateTime,
+                S3Key = Utilities.GenerateDatasetStorageLocation(cat, cdm.DatasetName),
+                IsSensitive = false,
+                CanDisplay = true,
+                DatasetFiles = null,
+                DatasetFileConfigs = null
+            };
 
             return ds;
         }
@@ -396,6 +445,16 @@ namespace Sentry.data.Web.Controllers
             item = (EditDatasetModel) Utility.setupLists(_datasetContext,item);
 
             item.OwnerID = ds.SentryOwnerName;
+
+            Event e = new Event();
+            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            e.Reason = "Viewed Dataset Edit Page";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
             return View(item);
         }
@@ -536,7 +595,7 @@ namespace Sentry.data.Web.Controllers
         {
             Dataset ds = _datasetContext.GetById(id);
             // IList<String> catList = _datasetContext.GetCategoryList();
-            BaseDatasetModel bdm = new BaseDatasetModel(ds, _associateInfoProvider);
+            BaseDatasetModel bdm = new BaseDatasetModel(ds, _associateInfoProvider, _datasetContext);
             bdm.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
             bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
             bdm.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
@@ -544,6 +603,18 @@ namespace Sentry.data.Web.Controllers
             bdm.CanUpload = SharedContext.CurrentUser.CanUpload;
             bdm.IsSubscribed = _datasetContext.IsUserSubscribedToDataset(_userService.GetCurrentUser().AssociateId, id);
             bdm.AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, id).Count;
+            bdm.CanQueryTool = SharedContext.CurrentUser.CanQueryTool || SharedContext.CurrentUser.CanQueryToolPowerUser;
+
+            Event e = new Event();
+            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            e.Dataset = ds.DatasetId;
+            e.Reason = "Viewed Dataset Detail Page";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
             return View(bdm);
         }
@@ -562,6 +633,17 @@ namespace Sentry.data.Web.Controllers
             bdm.CanUpload = SharedContext.CurrentUser.CanUpload;
             bdm.IsSubscribed = _datasetContext.IsUserSubscribedToDataset(_userService.GetCurrentUser().AssociateId, id);
             bdm.AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, id).Count;
+
+            Event e = new Event();
+            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            e.Reason = "Viewed Dataset Configuration Page";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+
             return View("Configuration", bdm);
         }
 
@@ -638,20 +720,18 @@ namespace Sentry.data.Web.Controllers
             return Redirect(Request.UrlReferrer.PathAndQuery);
         }
 
-
-
-
         [AuthorizeByPermission(PermissionNames.DatasetView)]
         public JsonResult GetDatasetFileInfoForGrid(int Id, Boolean bundle, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
             //IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
+
             List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
             Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
             Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
             Boolean CanEdit = SharedContext.CurrentUser.CanEditDataset;
 
             //Query the Dataset for the following information:
-            foreach (DatasetFile df in _datasetContext.GetDatasetFilesForDataset(Id, x => !x.IsBundled).ToList())
+            foreach (DatasetFile df in _datasetContext.GetDatasetFilesForDatasetFileConfig(Id, x => !x.IsBundled).ToList())
             {
                 DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider);
                 dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
@@ -777,11 +857,6 @@ namespace Sentry.data.Web.Controllers
             DataTablesQueryableAdapter<DatasetFileConfigsModel> dtqa = new DataTablesQueryableAdapter<DatasetFileConfigsModel>(files.AsQueryable(), dtRequest);
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
         }
-
-        #endregion
-
-        #region Create Data File Configuration
-        
 
         #endregion
 
@@ -1077,7 +1152,7 @@ namespace Sentry.data.Web.Controllers
             Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
             Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
 
-            Boolean bundlingSensitive = files.Any(x => x.IsSensitive);
+            Boolean bundlingSensitive = files.Any(x => x.Dataset.IsSensitive);
             Boolean bundlingUnUsable = files.Any(x => !x.IsUsable);
 
             if(newName == "" || newName == null)
@@ -1142,7 +1217,7 @@ namespace Sentry.data.Web.Controllers
                     _request.TargetFileName = newName;
                     _request.Email = userEmail;
                     _request.TargetFileLocation = Configuration.Config.GetSetting("S3BundlePrefix") + parentDataset.S3Key;
-                    _request.DatasetDropLocation = parentDataset.DropLocation + "bundle\\";
+                    _request.DatasetDropLocation = files.FirstOrDefault().DatasetFileConfig.RetrieverJobs.FirstOrDefault(x => x.DataSource.Is<DfsBasic>()).GetUri().LocalPath;
                     _request.RequestInitiatorId = SharedContext.CurrentUser.AssociateId;
 
                     foreach (DatasetFile df in files)
@@ -1471,6 +1546,16 @@ namespace Sentry.data.Web.Controllers
         public ActionResult QueryTool()
         {
             ViewBag.PowerUser = SharedContext.CurrentUser.CanQueryToolPowerUser;
+
+            Event e = new Event();
+            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            e.Reason = "Viewed Query Tool Page";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
             return View("QueryTool");
         }

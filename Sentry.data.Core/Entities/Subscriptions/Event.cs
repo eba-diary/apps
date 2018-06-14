@@ -36,6 +36,8 @@ namespace Sentry.data.Core
         public virtual int? Dataset { get; set; }
         public virtual int? DataFile { get; set; }
         public virtual int? DataConfig { get; set; }
+        public virtual string Line_CDE { get; set; }
 
+        public virtual string Search { get; set; }
     }
 }

@@ -7,7 +7,7 @@
 
 
 <center>
-    <h2 style="color: white; margin: 80px; text-shadow: -.5px 0 black, 0 .5px black, .5px 0 black, 0 -.5px black;">Welcome to the Data.Sentry.com Portal.  Please choose an option below to begin your journey.</h2>
+    <h2 style="color: white; margin: 80px; text-shadow: -.95px 0 black, 0 .95px black, .95px 0 black, 0 -.95px black;">Welcome to the Data.Sentry.com Portal.  Please choose an option below to begin your journey.</h2>
 
     <div class="container">
         <div class="ds-grid col-md-12" style="margin-bottom: 40px; display: none;">
@@ -46,31 +46,34 @@
                     </a>
                 </div>
             </div>
-            <div class="row text-center" style="margin-top: 175px;">
-                <div class="feed hidden-xs hidden-sm border_@color2" style="width: 100%;">
-                    <div class="row_@color2 topFeed">
-                        <h2 class="@color2 leftFloat feedHeader">Feed</h2>
+            <div class="row">
+                <div class="col-lg-12 text-center" style="margin-top: 175px;">
+                    <div class="feed hidden-xs hidden-sm border_@color2" style="width: 100%;">
+                        <div class="row_@color2 topFeed">
+                            <h2 class="@color2 leftFloat feedHeader">Feed</h2>
 
-                        @*<div class="feedCheckbox rightFloat">
+                            @*<div class="feedCheckbox rightFloat">
                         <label>
                             <input type="checkbox" id="chbx" />
                             <span>Sentry feeds only</span>
                         </label>
                     </div>*@
-                    </div>
-
-                    <div class="feedBox clearFloat" id="feed">
-                        <div class="feedSpinner">
-                            <span class="sentry-spinner"></span>
                         </div>
-                        @*@Html.Action("GetFeed", "Home")*@
-                    </div>
 
-                    <div class="feedBox clearFloat hidden" id="sentryFeed">
-                        @*@Html.Action("GetSentryFeed", "Home")*@
+                        <div class="feedBox clearFloat" id="feed">
+                            <div class="feedSpinner">
+                                <span class="sentry-spinner"></span>
+                            </div>
+                            @*@Html.Action("GetFeed", "Home")*@
+                        </div>
+
+                        <div class="feedBox clearFloat hidden" id="sentryFeed">
+                            @*@Html.Action("GetSentryFeed", "Home")*@
+                        </div>
                     </div>
                 </div>
             </div>
+            
         </div>
 </div>
 </center>
@@ -102,7 +105,7 @@
     .feed{
         width:100% !important;
         height: 225px;
-        margin-left: 0px;
+        margin-left: 0px !important;
     }
 
     .feedBox{
@@ -202,36 +205,60 @@
 @section Scripts {
     <script>
         $(function () {
-                data.Home.Init();
-                data.Dataset.IndexInit();
+            data.Home.Init();
+            data.Dataset.IndexInit();
 
-                var div = $('div.feedBox');
-                var scroller = setInterval(function () {
+            var div = $('div.feedBox');
+            var scroller = setInterval(function () {
+                var pos = div.scrollTop();
+                div.scrollTop(++pos);
+            }, 50);
+
+
+            $('body').on('DOMNodeInserted', function (e) {
+                var target = e.target; //inserted element;
+
+                if ($(target).hasClass('noFeedBox')) {
+                    div.scrollTop(0);
+                    $('.noFeedBox').remove();
+                }
+            });
+
+            $(document).on("mouseenter", ".feedItem", function () {
+                // hover starts code here
+                clearInterval(scroller);
+            });
+
+            $(document).on("mouseleave", ".feedItem", function () {
+                // hover ends code here
+                scroller = setInterval(function () {
                     var pos = div.scrollTop();
                     div.scrollTop(++pos);
-                }, 100);
+                }, 50);
+            });
 
-                $('.browse-category-card').click(function (e) {
-                    var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
 
-                    if (storedNames != null) {
-                        for (i = 0; i < storedNames.length; i++) {
-                            $('#' + storedNames[i]).prop('checked', false);
-                        }
+            $('.browse-category-card').click(function (e) {
+                var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
 
-                        localStorage.removeItem("filteredIds");
+                if (storedNames != null) {
+                    for (i = 0; i < storedNames.length; i++) {
+                        $('#' + storedNames[i]).prop('checked', false);
                     }
 
-                    localStorage.removeItem("searchText");
-                });
-
-                $('.searchBtn').click(function (e) {
                     localStorage.removeItem("filteredIds");
+                }
 
-                    localStorage.removeItem("searchText");
+                localStorage.removeItem("searchText");
+            });
 
-                    localStorage.setItem("searchText", $('#SearchText')[0].value);
-                });
+            $('.searchBtn').click(function (e) {
+                localStorage.removeItem("filteredIds");
+
+                localStorage.removeItem("searchText");
+
+                localStorage.setItem("searchText", $('#SearchText')[0].value);
+            });
         });
     </script>
 }

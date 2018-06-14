@@ -629,6 +629,7 @@
                     }
                 });
 
+                var selectedCategoryList = [];
                 if (selectedCategoryIDs.length > 0) {
                     //Convert those category ID's to Filter Items
                     var selectedCategories = ko.utils.arrayFilter(self.CategoryFilters(), function (feature) {
@@ -640,6 +641,10 @@
                         }
                         return false;
                     });
+
+                    for (var i = 0; i < selectedCategories.length; i++) {
+                        selectedCategoryList.push(selectedCategories[i].Title);
+                    }
 
                     //Then filter on those selected Categories
                     queryResults = queryResults.filter(function (item) {
@@ -661,6 +666,7 @@
                     }
                 });
 
+                var selectedOwnerList = '';
                 if (selectedOwnerIDs.length > 0) {
                     //Convert those category ID's to Filter Items
                     var selectedOwners = ko.utils.arrayFilter(self.OwnerFilters(), function (feature) {
@@ -672,6 +678,10 @@
                         }
                         return false;
                     });
+
+                    for (var i = 0; i < selectedOwners.length; i++) {
+                        selectedOwnerList += (selectedOwners[i].Title) + "|";
+                    }
 
                     //Then filter on those selected Categories
                     queryResults = queryResults.filter(function (item) {
@@ -688,11 +698,12 @@
                 //First grab all the selected category ID's
                 var selectedExtensionIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
 
-                    if (feature.substring(0, 1) == '2') {
+                    if (feature.substring(0, 1) == '3') {
                         return feature;
                     }
                 });
 
+                var selectedExtensionsList = [];
                 if (selectedExtensionIDs.length > 0) {
                     //Convert those category ID's to Filter Items
                     var selectedExtensions = ko.utils.arrayFilter(self.ExtensionFilters(), function (feature) {
@@ -704,6 +715,10 @@
                         }
                         return false;
                     });
+
+                    for (var i = 0; i < selectedExtensions.length; i++) {
+                        selectedExtensionsList.push(selectedExtensions[i].Title);
+                    }
 
                     //Then filter on those selected Categories
                     queryResults = queryResults.filter(function (item) {
@@ -721,7 +736,18 @@
 
                 $("#SearchText").attr("placeholder", "Search " + queryResults.length + " Datasets...");
 
-
+                if ($('#dataColumn').is(":visible")) {
+                    $.ajax({
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        type: 'POST',
+                        url: '/Dataset/SearchEvent?categoryFilters=' + selectedCategoryList +
+                            '&sentryOwners=' + selectedOwnerList +
+                            '&extensions=' + selectedExtensionsList +
+                            '&searchTerm=' + self.Query() +
+                            '&resultsReturned=' + queryResults.length
+                    });
+                }
 
 
                 return queryResults;

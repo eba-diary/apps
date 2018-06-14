@@ -21,6 +21,10 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             });
 
             this.Property((x) => x.Reason, (m) => m.Column("Reason"));
+
+            this.Property((x) => x.Search, (m) => m.Column("Search"));
+
+
             this.Property((x) => x.TimeCreated, (m) => m.Column("TimeCreated"));
             this.Property((x) => x.TimeNotified, (m) => m.Column("TimeNotified"));
             this.Property((x) => x.IsProcessed, (m) => m.Column("IsProcessed"));
@@ -29,6 +33,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.Dataset, (m) => m.Column("Dataset_ID"));
             this.Property((x) => x.DataFile, (m) => m.Column("DataFile_ID"));
             this.Property((x) => x.DataConfig, (m) => m.Column("DataConfig_ID"));
+            this.Property((x) => x.Line_CDE, (m) => m.Column("Line_CDE"));
+
 
             this.Property((x) => x.UserWhoStartedEvent, (m) => m.Column("CreatedUser"));
 

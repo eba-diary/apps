@@ -18,6 +18,7 @@ using System.Net;
 using Newtonsoft.Json.Linq;
 using System.IO;
 using Sentry.Configuration;
+using Sentry.data.Common;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -26,6 +27,7 @@ namespace Sentry.data.Web.Controllers
     {
         private IDataFeedContext _feedContext;
         private IDataAssetProvider _dataAssetProvider;
+        private IDatasetContext _dsContext;
         private IAppCache cache;
         private List<DataAsset> das;
         private List<DataFeedItem> dfisAll;
@@ -33,10 +35,11 @@ namespace Sentry.data.Web.Controllers
 
         public HomeController() { }
 
-        public HomeController(IDataAssetProvider dap, IDataFeedContext feedContext)
+        public HomeController(IDataAssetProvider dap, IDataFeedContext feedContext, IDatasetContext datasetContext)
         {
             _dataAssetProvider = dap;
             _feedContext = feedContext;
+            _dsContext = datasetContext;
             das = new List<DataAsset>(_dataAssetProvider.GetDataAssets());
             cache = new CachingService();
         }
@@ -44,6 +47,19 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Index()
         {
             ViewData["fluid"] = true;
+
+            Event e = new Event();
+            e.EventType = _dsContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _dsContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            e.Reason = "Viewed Home Page";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+
+
+
             return View(das);
         }
 

@@ -14,7 +14,6 @@
     [IsSensitive_IND] BIT NOT NULL, 
     [Category_ID] INT NOT NULL, 
     [Display_IND] BIT NOT NULL, 
-    [DropLocation] VARCHAR(250) NOT NULL, 
     [Information_DSC] NVARCHAR(MAX) NULL, 
     PRIMARY KEY CLUSTERED 
 (

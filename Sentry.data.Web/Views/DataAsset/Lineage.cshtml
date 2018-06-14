@@ -19,7 +19,7 @@
     string disabled;
 }
 
-
+@Html.HiddenFor(x => dataAsset.Name)
 
 <!-- Data Asset Header -->
 @{
@@ -666,16 +666,16 @@
 
             self.SpinnerOn = ko.computed(function () {
 
-                console.log('1: ' + self.selectedDataElement() + ' ' + self.selectedDataElement() == null || self.selectedDataElement() == '' ? 0 : 1)
-                console.log('2: ' + self.selectedDataObject() + ' ' + self.selectedDataObject() == null || self.selectedDataObject() == ''? 0 : 1)
-                console.log('3: ' + self.selectedDataObjectField() + ' ' + self.selectedDataObjectField() == null || self.selectedDataObjectField() == ''? 0 : 1)
-                console.log('4: ' + $('#dataElements').val() === [] || $('#dataElements').val() == null || $('#dataElements').val().length === 0 ? 0 : 1)
-                console.log('5: ' + $('#dataObjects').val() === [] || $('#dataObjects').val() == null ||$('#dataObjects').val().length === 0 ? 0 : 1)
-                console.log('6: ' + $('#dataObjectFields').val() === [] || $('#dataObjectFields').val() == null || $('#dataObjectFields').val().length === 0 ? 0 : 1)
+                //console.log('1: ' + self.selectedDataElement() + ' ' + self.selectedDataElement() == null || self.selectedDataElement() == '' ? 0 : 1)
+                //console.log('2: ' + self.selectedDataObject() + ' ' + self.selectedDataObject() == null || self.selectedDataObject() == ''? 0 : 1)
+                //console.log('3: ' + self.selectedDataObjectField() + ' ' + self.selectedDataObjectField() == null || self.selectedDataObjectField() == ''? 0 : 1)
+                //console.log('4: ' + $('#dataElements').val() === [] || $('#dataElements').val() == null || $('#dataElements').val().length === 0 ? 0 : 1)
+                //console.log('5: ' + $('#dataObjects').val() === [] || $('#dataObjects').val() == null ||$('#dataObjects').val().length === 0 ? 0 : 1)
+                //console.log('6: ' + $('#dataObjectFields').val() === [] || $('#dataObjectFields').val() == null || $('#dataObjectFields').val().length === 0 ? 0 : 1)
 
                 //i have to watch each of the three selects for nullability and empty arrays and the knockout object for its existance
 
-                console.log('7: ' + self.lineage().length)
+                //console.log('7: ' + self.lineage().length)
 
                 if (self.lineage().length > 0 && $('#lineagePanel').is(":visible")) {
                     return false;
@@ -704,13 +704,11 @@
 
                 var baseUrlParameters = '';
 
-                console.log(("str1,str2,str3,str4".match(/,/g) || []).length);
-
                 var elementFromURL = "&DataElement_NME=" + decodeURI(location.href.substr(location.href.lastIndexOf('/') + 1));
 
                 var dataElementParameter = '';
 
-                if (elementFromURL && first) {
+                if (elementFromURL && first && $('#dataAsset_Name').val() != decodeURI(location.href.substr(location.href.lastIndexOf('/') + 1)))  {
                     dataElementParameter = elementFromURL;
                 } else {
                     dataElementParameter = "&DataElement_NME=" + encodeURIComponent($('#dataElements').val());

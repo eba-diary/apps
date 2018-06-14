@@ -58,31 +58,29 @@ namespace Sentry.data.Tests
             Category cat = new Category("Claim", null);
             DatasetScopeType dScope = new DatasetScopeType("Transactional", "Transactional Data", true);
 
-            Dataset dataset = new Dataset(999999,
-                                          "Some Category",
-                                          "Some dataset",
-                                          "A really cool dataset",
-                                          "This is how you use this dataset",
-                                          "Creator Name",
-                                          "SentryOwner Name",
-                                          "UploadUser Name",
-                                          "O",
-                                          //"txt", 
-                                          System.DateTime.Now.AddDays(-3),
-                                          System.DateTime.Now.AddDays(-2),
-                                          //"Yearly",
-                                          "S3 key",
-                                          true,
-                                          true,
-                                          //null,
-                                          cat,
-                                          null,
-                                         // dScope,
-                                          //0,
-                                          null,
-                                          null);
+            Dataset ds = new Dataset()
+            {
+                DatasetId = 0,
+                Category = "Claim",
+                DatasetCategory = cat,
+                DatasetName = "Claim Dataset",
+                DatasetDesc = "Test Claim Datasaet",
+                DatasetInformation = "Specific Information regarding datasetfile consumption",
+                CreationUserName = "Creater_User",
+                SentryOwnerName = "072984",
+                UploadUserName = "Upload_User",
+                OriginationCode = "Internal",
+                DatasetDtm = System.DateTime.Now.AddDays(-3),
+                ChangedDtm = System.DateTime.Now.AddDays(-2),
+                S3Key = null,
+                IsSensitive = true,
+                CanDisplay = true,
+                DatasetFiles = null,
+                DatasetFileConfigs = null
+            };
+
             List<Dataset> datasetsInList = new List<Dataset>();
-            datasetsInList.Add(dataset);
+            datasetsInList.Add(ds);
             mockDatasetContext.Stub(x => x.Datasets).Return(datasetsInList.AsQueryable());
 
             // //// Act ////

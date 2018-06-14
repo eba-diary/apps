@@ -41,6 +41,8 @@ data.Home = {
 
         if(data.Home.AllSkipTotal < 100 && data.Home.SentrySkipTotal < 100)
         {
+            console.log(elem[0].scrollHeight - elem[0].scrollTop + " - " + startLoadHt);
+
             if (elem[0].scrollHeight - elem[0].scrollTop <= startLoadHt && data.Home.AjaxStatus)
             {
                 data.Home.AjaxStatus = false;

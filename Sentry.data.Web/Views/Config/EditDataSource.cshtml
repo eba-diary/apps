@@ -22,6 +22,7 @@
     @Html.HiddenFor(model => model.ReturnUrl)
     @Html.HiddenFor(model => model.Name)
     @Html.HiddenFor(model => model.Id)
+    @Html.HiddenFor(model => model.SourceType)
 
     <h1>Edit Data Source</h1>
     <hr />
@@ -47,7 +48,7 @@
             <div class="form-group">
                 @Html.LabelFor((model) => model.SourceType, new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.DropDownListFor((model) => model.SourceType, Model.SourceTypesDropdown, new { @class = "form-control edit-dataset-row" })
+                    @Html.DropDownListFor((model) => model.SourceType, Model.SourceTypesDropdown, new { @readonly = "readonly", @disabled = "disabled", @class = "form-control edit-dataset-row" })
                     @Html.ValidationMessageFor((model) => model.SourceType, "", new { @class = "text-danger" })
                 </div>
             </div>
@@ -101,7 +102,7 @@
     </div>
     <div class="form-group">
         <div>
-            <input type="submit" id="btnCreateDataSource" value="Edit Data Source" class="btn btn-primary" />
+            <input type="submit" id="btnCreateDataSource" value="Save" class="btn btn-primary" />
         </div>
     </div>
 }

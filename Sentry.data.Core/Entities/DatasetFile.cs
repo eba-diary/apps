@@ -1,4 +1,5 @@
 ﻿using Sentry.Core;
+using Sentry.data.Core.Entities.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,255 +10,37 @@ namespace Sentry.data.Core
 {
     public class DatasetFile
     {
-#pragma warning disable CS0649
-        private int _datasetFileId;
-#pragma warning restore CS0649
-        private string _fileName;
-        private Dataset _dataset;
-        private DatasetFileConfig _datasetFileConfig;
-        private string _uploadUserName;
-        private DateTime _createDTM;
-        private DateTime _modifiedDTM;
-        private string _fileLocation;
-        private string _s3Key;
-        private int? _parentDatasetFileId;
-        private string _versionId;
-        private Boolean _isSensitive;
-        private Boolean _isBundled;
-        private Boolean _isUsable;
-        private string _information;
-        private long _size;
-
-        protected DatasetFile()
+        public DatasetFile()
         {
         }
 
-        public DatasetFile(int datasetFileId,
-            string fileName,
-            Dataset dataset,
-            DatasetFileConfig datasetFileConfig,
-            string uploadUserName,
-            string fileLocation,
-            DateTime createDTM,
-            DateTime modifiedDTM,
-            int? parentDatasetFileId,
-            string versionId,
-            Boolean isBundled,
-            long size,
-            Boolean isUsable)
-        {
-            this._datasetFileId = datasetFileId;
-            this._fileName = fileName;
-            this._dataset = dataset;
-            this._datasetFileConfig = datasetFileConfig;
-            this._uploadUserName = uploadUserName;
-            this._fileLocation = fileLocation;
-            this._createDTM = createDTM;
-            this._modifiedDTM = modifiedDTM;
-            this._parentDatasetFileId = parentDatasetFileId;
-            this._versionId = versionId;
-            this._isBundled = isBundled;
-            this._size = size;
-            this._isUsable = isUsable;
-        }
+        public virtual int DatasetFileId { get; set; }
 
-        public virtual int DatasetFileId
-        {
-            get
-            {
-                return _datasetFileId;
-            }
-            set
-            {
-                _datasetFileId = value;
-            }
-        }
+        public virtual string FileName { get; set; }
 
-        public virtual string FileName
-        {
-            get
-            {
-                return _fileName;
-            }
-            set
-            {
-                _fileName = value;
-            }
-        }
+        public virtual Dataset Dataset { get; set; }
 
-        //public virtual int DatasetId
-        //{
-        //    get
-        //    {
-        //        return _datasetId;
-        //    }
-        //    set
-        //    {
-        //        _datasetId = value;
-        //    }
-        //}
+        public virtual DatasetFileConfig DatasetFileConfig { get; set; }
 
-        public virtual Dataset Dataset
-        {
-            get
-            {
-                return _dataset;
-            }
-            set
-            {
-                _dataset = value;
-            }
-        }
+        public virtual string UploadUserName { get; set; }
 
-        public virtual DatasetFileConfig DatasetFileConfig
-        {
-            get
-            {
-                return _datasetFileConfig;
-            }
-            set
-            {
-                _datasetFileConfig = value;
-            }
-        }
+        public virtual DateTime CreateDTM { get; set; }
 
-        public virtual string UploadUserName
-        {
-            get
-            {
-                return _uploadUserName;
-            }
-            set
-            {
-                _uploadUserName = value;
-            }
-        }
+        public virtual DateTime ModifiedDTM { get; set; }
 
-        public virtual DateTime CreateDTM
-        {
-            get
-            {
-                return _createDTM;
-            }
-            set
-            {
-                _createDTM = value;
-            }
-        }
+        public virtual string FileLocation { get; set; }
 
-        public virtual DateTime ModifiedDTM
-        {
-            get
-            {
-                return _modifiedDTM;
-            }
-            set
-            {
-                _modifiedDTM = value;
-            }
-        }
+        public virtual int? ParentDatasetFileId { get; set; }
 
-        public virtual string FileLocation
-        {
-            get
-            {
-                return _fileLocation;
-            }
-            set
-            {                 
-                _fileLocation = value;
-            }
-        }
+        public virtual string VersionId { get; set; }
 
-        public virtual int? ParentDatasetFileId
-        {
-            get
-            {
-                return _parentDatasetFileId;
-            }
-            set
-            {
-                _parentDatasetFileId = value;
-            }
-        }
+        public virtual Boolean IsBundled { get; set; }
 
-        public virtual string VersionId
-        {
-            get
-            {
-                return _versionId;
-            }
-            set
-            {
-                _versionId = value;
-            }
-        }
+        public virtual Boolean IsUsable { get; set; }
 
-        /// <summary>
-        /// Full S3 key of DatasetFile
-        /// </summary>
-        public virtual string S3Key
-        {
-            get
-            {
-                return this._fileLocation;
-            }
-        }
-        public virtual Boolean IsSensitive
-        {
-            get
-            {
-                return _dataset.IsSensitive;
-            }
-        }
+        public virtual string Information { get; set; }
 
-        public virtual Boolean IsBundled
-        {
-            get
-            {
-                return this._isBundled;
-            }
-            set
-            {
-                _isBundled = value;
-            }
-        }
-
-        public virtual Boolean IsUsable
-        {
-            get
-            {
-                return this._isUsable;
-            }
-            set
-            {
-                _isUsable = value;
-            }
-        }
-
-        public virtual string Information
-        {
-            get
-            {
-                return this._information;
-            }
-            set
-            {
-                _information = value;
-            }
-        }
-
-        public virtual long Size
-        {
-            get
-            {
-                return this._size;
-            }
-            set
-            {
-                this._size = value;
-            }
-        }
+        public virtual long Size { get; set; }
     }
 
 }

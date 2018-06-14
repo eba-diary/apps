@@ -89,23 +89,23 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                @Html.LabelFor((model) => model.DropPath, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.EditorFor((model) => model.DropPath, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
-                    @Html.ValidationMessageFor((model) => model.DropPath, "", new { @class = "text-danger" })
-                </div>
+            @*<div class="form-group">
+            @Html.LabelFor((model) => model.DropPath, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor((model) => model.DropPath, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
+                @Html.ValidationMessageFor((model) => model.DropPath, "", new { @class = "text-danger" })
             </div>
-            <div class="form-group fieldDescription">
-                <label class="control-label col-md-2"></label>
-                <div class="col-md-10">
-                    <span class="text-muted">
-                        <em>
-                            <b> Warning:</b> Files that are dropped here will be deleted when the upload to this site is complete.  If this does not work for you then please create a staging location, a copy of the file, or <a href="mailto:BIPortalAdmin@sentry.com?Subject=File_Drop_Location"> click here to contact site Administrators</a>
-                        </em>
-                    </span>
-                </div>
+        </div>
+        <div class="form-group fieldDescription">
+            <label class="control-label col-md-2"></label>
+            <div class="col-md-10">
+                <span class="text-muted">
+                    <em>
+                        <b> Warning:</b> Files that are dropped here will be deleted when the upload to this site is complete.  If this does not work for you then please create a staging location, a copy of the file, or <a href="mailto:BIPortalAdmin@sentry.com?Subject=File_Drop_Location"> click here to contact site Administrators</a>
+                    </em>
+                </span>
             </div>
+        </div>*@
         </div>
         <hr />
         <div class="form-group">

@@ -25,6 +25,7 @@ namespace Sentry.data.Web.Controllers
         public ActionResult GetHeader(/*bool hasMenu*/)
         {
             HeaderModel headerModel = new HeaderModel();
+            headerModel.ShowAdminControls = SharedContext.CurrentUser.CanUserSwitch;
             headerModel.CanUserSwitch = (SharedContext.CurrentUser.CanUserSwitch && Configuration.Config.GetHostSetting("ShowUserChoice").ToLower() == "true");
             headerModel.CurrentUserName = SharedContext.CurrentUser.DisplayName;
             headerModel.CanUseApp = SharedContext.CurrentUser.CanUseApp;

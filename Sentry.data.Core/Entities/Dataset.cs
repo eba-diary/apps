@@ -12,321 +12,41 @@ namespace Sentry.data.Core
 {
     public class Dataset : IValidatable
     {
-#pragma warning disable CS0649
-        private int _datasetId;
-#pragma warning restore CS0649
-        private string _category;
-        private string _datasetName;
-        private string _datasetDesc;
-        private string _datasetInformation;
-        //private string _creationUserId;
-        private string _creationUserName;
-        //private string _sentryOwnerId;
-        private string _sentryOwnerName;
-        private string _uploadUserName;
-        private string _originationCode;
-        //private string _fileExtension;
-        private DateTime _datasetDtm;
-        private DateTime _changedDtm;
-        private string _s3key;
-        private Boolean _IsSensitive;
-        private Boolean _canDisplay;
-        IList<DatasetMetadata> _rawMetadata;
-        private Category _datasetCategory;
-        private IList<DatasetFile> _datasetFile;
-        //private DatasetScopeType _datasetScopeType;
-        //private int _datafilesToKeep;
-        private IList<DatasetFileConfig> _datasetFileConfigs;
-        //private IDictionary<string, string> _columns;
-        //private IDictionary<string, string> _metadata;
-        private string _dropLocation;
+        public Dataset(){ }
 
-        public Dataset()
-        {
-        }
+        public virtual int DatasetId { get; set; }
+        public virtual string Category { get; set; }
 
-        public Dataset(int datasetId,
-                       string category, 
-                       string datasetName,
-                       string datasetDesc,
-                       string datasetInformation,
-                       //string creationUserId,
-                       string creationUserName,
-                       //string sentryOwnerId,
-                       string sentryOwnerName,
-                       string uploadUserName,
-                       string originationCode,
-                       //string fileExtension,
-                       DateTime datasetDtm,
-                       DateTime changedDtm,
-                       string s3key,
-                       Boolean IsSensitive,
-                       Boolean CanDisplay,
-                       //IList<DatasetMetadata> rawMetadata,
-                       Category cat,
-                       IList<DatasetFile> datasetFile,
-                       //DatasetScopeType datasetscopetype,
-                       //int datafilesToKeep,
-                       IList<DatasetFileConfig> datasetFileConfigs,
-                       string dropLocation)
-        {
-            this._datasetId = datasetId;
-            this._category = category;
-            this._datasetName = datasetName;
-            this._datasetDesc = datasetDesc;
-            this._datasetInformation = datasetInformation;
-            //this._creationUserId = creationUserId;
-            this._creationUserName = creationUserName;
-            //this._sentryOwnerId = sentryOwnerId;
-            this._sentryOwnerName = sentryOwnerName;
-            this._uploadUserName = uploadUserName;
-            this._originationCode = originationCode;
-            //this._fileExtension = fileExtension;
-            this._datasetDtm = datasetDtm;
-            this._changedDtm = changedDtm;
-            this._s3key = s3key;
-            this._IsSensitive = IsSensitive;
-            this._canDisplay = CanDisplay;
-            //this._rawMetadata = rawMetadata;
-            this._datasetCategory = cat;
-            this._datasetFile = datasetFile;
-            //this._datasetScopeType = datasetscopetype;
-            //this._datafilesToKeep = datafilesToKeep;
-            this._datasetFileConfigs = datasetFileConfigs;
-            this._dropLocation = dropLocation;
-        }
+        public virtual Boolean IsSensitive { get; set; }
 
-        public virtual Boolean IsSensitive
-        {
-            get
-            {
-                return _IsSensitive;
-            }
-            set
-            {
-                _IsSensitive = value;
-            }
-        }
+        public virtual string S3Key { get; set; }
 
-        public virtual int DatasetId
-        {
-            get
-            {
-                return _datasetId;
-            }
-            set
-            {
-                _datasetId = value;
-            }
-        }
+        public virtual string DatasetName { get; set; }
 
-        public virtual string Category
-        {
-            get
-            {
-                return _category;
-            }
-            set
-            {
-                _category = value;
-            }
-        }
+        public virtual string DatasetDesc { get; set; }
 
-        public virtual string S3Key
-        {
-            get
-            {
-                return _s3key;
-            }
-            set
-            {
-                _s3key = value;
-            }
-        }
+        public virtual string DatasetInformation { get; set; }
 
-        public virtual string DatasetName
-        {
-            get
-            {
-                return _datasetName;
-            }
-            set
-            {
-                _datasetName = value;
-            }
-        }
+        public virtual string CreationUserName { get; set; }
 
-        public virtual string DatasetDesc
-        {
-            get
-            {
-                return _datasetDesc;
-            }
-            set
-            {
-                _datasetDesc = value;
-            }
-        }
+        public virtual string SentryOwnerName { get; set; }
 
-        public virtual string DatasetInformation
-        {
-            get
-            {
-                return _datasetInformation;
-            }
-            set
-            {
-                _datasetInformation = value;
-            }
-        }
+        public virtual string UploadUserName { get; set; }
 
-        public virtual string CreationUserName
-        {
-            get
-            {
-                return _creationUserName;
-            }
-            set
-            {
-                _creationUserName = value;
-            }
-        }
+        public virtual string OriginationCode { get; set; }
 
-        public virtual string SentryOwnerName
-        {
-            get
-            {
-                return _sentryOwnerName;
-            }
-            set
-            {
-                _sentryOwnerName = value;
-            }
-        }
+        public virtual DateTime DatasetDtm { get; set; }
 
-        public virtual string UploadUserName
-        {
-            get
-            {
-                return _uploadUserName;
-            }
-            set
-            {
-                _uploadUserName = value;
-            }
-        }
+        public virtual DateTime ChangedDtm { get; set; }
 
-        public virtual string OriginationCode
-        {
-            get
-            {
-                return _originationCode;
-            }
-            set
-            {
-                _originationCode = value;
-            }
-        }
+        public virtual Boolean CanDisplay { get; set; }
 
-        public virtual string FileExtension
-        {
-            get
-            {
-                var extension = System.IO.Path.GetExtension(this.S3Key);
+        public virtual Category DatasetCategory { get; set; }
 
-                return extension;
-            }
+        public virtual IList<DatasetFile> DatasetFiles { get; set; }
 
-        }
+        public virtual IList<DatasetFileConfig> DatasetFileConfigs { get; set; }
 
-        public virtual DateTime DatasetDtm
-        {
-            get
-            {
-                return _datasetDtm;
-            }
-            set
-            {
-                _datasetDtm = value;
-            }
-        }
-
-        public virtual DateTime ChangedDtm
-        {
-            get
-            {
-                return _changedDtm;
-            }
-            set
-            {
-                _changedDtm = value;
-            }
-        }
-
-        public virtual Boolean CanDisplay
-        {
-            get
-            {
-                return _canDisplay;
-            }
-            set
-            {
-                _canDisplay = value;
-            }
-        }
-
-        //public virtual IList<DatasetMetadata> RawMetadata
-        //{
-        //    get
-        //    {
-        //        return _rawMetadata;
-        //    }
-        //    set
-        //    {
-        //        _rawMetadata = value;
-        //    }
-        //}
-
-        //public virtual IList<DatasetMetadata> Metadata
-        //{
-        //    get
-        //    {
-        //        return _rawMetadata.Where((x) => x.IsColumn == false).ToList();
-        //    }
-        //}
-
-        //public virtual IList<DatasetMetadata> Columns
-        //{
-        //    get
-        //    {
-        //        return _rawMetadata.Where((x) => x.IsColumn == true).ToList();
-        //    }
-        //}
-
-        public virtual Category DatasetCategory
-        {
-            get
-            {
-                return _datasetCategory;
-            }
-
-            set
-            {
-                _datasetCategory = value;
-            }
-        }
-
-        public virtual IList<DatasetFile> DatasetFiles
-        {
-            get
-            {
-                return _datasetFile;
-            }
-            set
-            {
-                _datasetFile = value;
-            }
-        }
         public virtual List<DatasetScopeType> DatasetScopeType
         {
             get
@@ -334,25 +54,6 @@ namespace Sentry.data.Core
                 return DatasetFileConfigs.Select(x => x.DatasetScopeType).GroupBy(x => x.Name).Select(x => x.First()).ToList();
             }
         }
-
-        public virtual IList<DatasetFileConfig> DatasetFileConfigs
-        {
-            get
-            {
-                return _datasetFileConfigs;
-            }
-            set
-            {
-                _datasetFileConfigs = value;
-            }
-        }
-
-        public virtual string DropLocation
-        {
-            get { return _dropLocation; }
-            set { _dropLocation = value; }
-        }
-
 
         public virtual ValidationResults ValidateForDelete()
         {
@@ -371,10 +72,6 @@ namespace Sentry.data.Core
             {
                 vr.Add(ValidationErrors.categoryIsBlank, "The Dataset Category is required");
             }
-            //if (!string.IsNullOrWhiteSpace(S3Key) && !string.IsNullOrWhiteSpace(Category) && Category != S3Key.Substring(0,S3Key.IndexOf("/")).Replace("/",""))
-            //{
-            //    vr.Add(ValidationErrors.s3KeyCategoryMismatch, "The Dataset Category does not match first portion of S3 Key");
-            //}
             if (string.IsNullOrWhiteSpace(DatasetName))
             {
                 vr.Add(ValidationErrors.nameIsBlank, "The Dataset Name is required");
@@ -406,7 +103,6 @@ namespace Sentry.data.Core
         {
             public const string s3keyIsBlank = "keyIsBlank";
             public const string categoryIsBlank = "categoryIsBlank";
-            //public const string s3KeyCategoryMismatch = "s3KeyCategoryMismatch";
             public const string nameIsBlank = "nameIsBlank";
             public const string creationUserNameIsBlank = "creationUserNameIsBlank";
             public const string uploadUserNameIsBlank = "uploadUserNameIsBlank";

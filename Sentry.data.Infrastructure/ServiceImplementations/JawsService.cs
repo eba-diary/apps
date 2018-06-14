@@ -46,14 +46,14 @@ namespace Sentry.data.Infrastructure
                                     //Exclude file if name exists in ExclusionList or does not match job search criteria
                                     if (!ExclusionList.Contains(entry.FullName) || !_job.FilterIncomingFile(entry.FullName))
                                     {
-                                        entry.ExtractToFile(Path.Combine(_job.DatasetConfig.DropPath, _job.GetTargetFileName(entry.FullName)));
+                                        entry.ExtractToFile(Path.Combine(_job.GetUri().LocalPath, _job.GetTargetFileName(entry.FullName)));
                                     }
                                 }
                             }
                         }
                         else
                         {
-                            ZipFile.ExtractToDirectory(filePath, _job.DatasetConfig.DropPath);
+                            ZipFile.ExtractToDirectory(filePath, _job.GetUri().LocalPath);
                         }
 
                         //cleanup temp file after successful processing

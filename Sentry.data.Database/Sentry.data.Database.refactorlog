@@ -441,4 +441,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Extension_Id" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="93c590e7-6aae-4a81-bc55-9b0754fcea69" ChangeDateTime="06/11/2018 15:22:15">
+    <Property Name="ElementName" Value="[dbo].[Event].[Reason_CDE]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Event]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Business_Term" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="045d136a-f380-41e9-a88e-4746698241f4" ChangeDateTime="06/11/2018 16:06:35">
+    <Property Name="ElementName" Value="[dbo].[Event].[Business_Term]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Event]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Search" />
+  </Operation>
 </Operations>

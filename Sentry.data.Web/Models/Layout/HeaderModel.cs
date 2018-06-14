@@ -4,6 +4,7 @@ namespace Sentry.data.Web
 {
     public class HeaderModel
     {
+        public Boolean ShowAdminControls { get; set; }
         public Boolean CanUseApp { get; set; }
         public Boolean CanUserSwitch { get; set; }
         public string CurrentUserName { get; set; }

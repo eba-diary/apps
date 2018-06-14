@@ -14,6 +14,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public DataObjectMapping()
         {
+            this.Lazy(false);
+
             this.Table("MetadataRepository.dbo.DataObject");
 
             this.Id(x => x.DataObject_ID);
@@ -41,8 +43,9 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             this.Bag(x => x.DataObjectDetails, (m) =>
             {
-                m.Lazy(CollectionLazy.Lazy);
-                m.Inverse(true);
+
+                m.Lazy(CollectionLazy.NoLazy);
+                m.Inverse(false);
                 m.Table("MetadataRepository.dbo.DataObjectDetail");
                 m.Cascade(Cascade.All);
                 m.Cache(c => c.Usage(CacheUsage.ReadWrite));
@@ -55,15 +58,15 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             this.Bag(x => x.DataObjectFields, (m) =>
             {
-                m.Lazy(CollectionLazy.Lazy);
-                m.Inverse(true);
+                m.Lazy(CollectionLazy.NoLazy);
+                m.Inverse(false);
                 m.Table("MetadataRepository.dbo.DataObjectField");
                 m.Cascade(Cascade.All);
                 m.Cache(c => c.Usage(CacheUsage.ReadWrite));
 
                 m.Key((k) =>
                 {
-                    k.Column("DataObjectField_ID");
+                    k.Column("DataObject_ID");
                 });
             }, map => map.OneToMany(a => a.Class(typeof(DataObjectField))));
         }

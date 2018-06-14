@@ -207,11 +207,11 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    @Html.LabelFor((model) => model.DropPath, htmlAttributes: new { @class = "control-label col-md-2" })
+                @*<div class="form-group">
+                    @Html.LabelFor((model) => model.CustomDropPath, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
-                        @Html.EditorFor((model) => model.DropPath, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
-                        @Html.ValidationMessageFor((model) => model.DropPath, "", new { @class = "text-danger" })
+                        @Html.EditorFor((model) => model.CustomDropPath, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
+                        @Html.ValidationMessageFor((model) => model.CustomDropPath, "", new { @class = "text-danger" })
                     </div>
                 </div>
                 <div class="form-group fieldDescription">
@@ -223,7 +223,7 @@
                             </em>
                         </span>
                     </div>
-                </div>
+                </div>*@
                 <div class="form-group">
                     @Html.LabelFor((model) => model.FileExtensionID, new { @class = "control-label col-md-2" })
                     <div class="col-md-10">

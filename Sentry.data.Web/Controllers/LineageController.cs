@@ -1,4 +1,6 @@
-﻿using Sentry.data.Core;
+﻿using Newtonsoft.Json;
+using Sentry.data.Common;
+using Sentry.data.Core;
 using Sentry.data.Core.Entities.Metadata;
 using Sentry.data.Infrastructure;
 using System;
@@ -7,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 
 
@@ -30,6 +33,16 @@ namespace Sentry.data.Web.Controllers
             _userService = userService;
         }
 
+        private class SearchTerms {
+
+            public String Business_Term { get; set; }
+            public String Consumption_Layer { get; set; }
+            public String Lineage_Table { get; set; }
+            public int Results_Returned { get; set; }
+        }
+
+
+
         [HttpGet]
         [Route("Get")]
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
@@ -40,6 +53,29 @@ namespace Sentry.data.Web.Controllers
                 if (!String.IsNullOrWhiteSpace(DataElement_NME) || !String.IsNullOrWhiteSpace(DataObject_NME) || !String.IsNullOrWhiteSpace(DataObjectField_NME))
                 {
                     var allLineage = _dsContext.Lineage(DataElementCode.Lineage, DataAsset_ID, DataElement_NME, DataObject_NME, DataObjectField_NME, LineCDE);
+
+
+                    Event e = new Event();
+                    e.EventType = _dsContext.EventTypes.Where(w => w.Description == "Search").FirstOrDefault();
+                    e.Status = _dsContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+                    e.TimeCreated = DateTime.Now;
+                    e.TimeNotified = DateTime.Now;
+                    e.IsProcessed = false;
+                    e.UserWhoStartedEvent = RequestContext.Principal.Identity.Name;
+                    e.DataAsset = DataAsset_ID;
+                    e.Line_CDE = LineCDE;
+
+                    e.Search = JsonConvert.SerializeObject(new SearchTerms() {
+                        Business_Term = HttpUtility.UrlDecode(DataObjectField_NME),
+                        Consumption_Layer = HttpUtility.UrlDecode(DataElement_NME),
+                        Lineage_Table = HttpUtility.UrlDecode(DataObject_NME),
+                        Results_Returned = allLineage.Count
+                    });
+
+                    e.Reason = "Searched Lineage";
+                    Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+                
+
                     return Ok(allLineage);
                 }
                 else

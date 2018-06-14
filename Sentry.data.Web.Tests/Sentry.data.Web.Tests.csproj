@@ -47,8 +47,8 @@
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="NHibernate">
       <HintPath>..\Sentry.data.Web\Bin\NHibernate.dll</HintPath>
@@ -57,8 +57,10 @@
       <HintPath>..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Sentry.Common, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.Common.1.3.10\lib\net35\Sentry.Common.dll</HintPath>
+    <Reference Include="Sentry.Associates, Version=1.3.0.0, Culture=neutral, PublicKeyToken=null" />
+    <Reference Include="Sentry.Common, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sentry.Common.1.2.4\lib\net35\Sentry.Common.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="Sentry.Configuration, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Configuration.2.1.0.0\lib\net35\Sentry.Configuration.dll</HintPath>
@@ -130,10 +132,28 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AccessControlTests.cs" />
+    <Compile Include="CategoryTests.cs" />
+    <Compile Include="ConfigTests.cs" />
     <Compile Include="DataAssetTests.cs" />
+    <Compile Include="DatasetContextTests.cs" />
+    <Compile Include="DatasetTests.cs" />
+    <Compile Include="DomainModelUnitTests.cs" />
+    <Compile Include="LiveDatabaseUnitTests.cs" />
+    <Compile Include="MockBasedUnitTests.cs" />
+    <Compile Include="Mockups\MockClasses.cs" />
+    <Compile Include="Mockups\MockControllers.cs" />
+    <Compile Include="Mockups\MockUsers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="IntegrationTests.cs" />
+    <Compile Include="RetrieverTests.cs" />
+    <Compile Include="UtilitiesUnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Sentry.data.Common\Sentry.data.Common.csproj">
+      <Project>{30FBADFB-E6ED-4859-B15E-67BBCDCEAE17}</Project>
+      <Name>Sentry.data.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
       <Project>{EA9EE762-CE32-4410-B2B6-367A0985645B}</Project>
       <Name>Sentry.data.Core</Name>
@@ -154,7 +174,9 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">

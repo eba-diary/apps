@@ -19,7 +19,7 @@ namespace Sentry.data.Web
 
         }
 
-        public BaseDatasetModel(Dataset ds, IAssociateInfoProvider associateInfoService)
+        public BaseDatasetModel(Dataset ds, IAssociateInfoProvider associateInfoService, IDatasetContext datasetContext = null)
         {
             this.SentryOwner = associateInfoService.GetAssociateInfo(ds.SentryOwnerName);
             this.SentryOwnerName = this.SentryOwner.FullName;
@@ -51,6 +51,7 @@ namespace Sentry.data.Web
             this.IsPushToTableauCompatible = false;
             this.DatasetCategory = ds.DatasetCategory; 
             this.DatasetFiles = new List<BaseDatasetFileModel>();
+
             foreach (DatasetFile df in ds.DatasetFiles.OrderByDescending(x => x.CreateDTM))
             {
                 this.DatasetFiles.Add(new BaseDatasetFileModel(df));
@@ -60,11 +61,27 @@ namespace Sentry.data.Web
 
             
             this.DatasetFileConfigs = new List<DatasetFileConfigsModel>();
+            List<string> locations = new List<string>();
             foreach (DatasetFileConfig dfc in ds.DatasetFileConfigs)
             {
-                this.DatasetFileConfigs.Add(new DatasetFileConfigsModel(dfc, true, false));
+                if(datasetContext != null)
+                {
+                    this.DatasetFileConfigs.Add(new DatasetFileConfigsModel(dfc, true, false, datasetContext));
+                }
+                else
+                {
+                    this.DatasetFileConfigs.Add(new DatasetFileConfigsModel(dfc, true, false));
+                }
+
+                foreach (RetrieverJob rj in dfc.RetrieverJobs.Where(x => x.DataSource.Is<DfsBasic>()))
+                {
+                    locations.Add(rj.GetUri().LocalPath);
+                }
             }
-            this.DropLocation = ds.DropLocation;
+
+            this.DropLocations = locations;
+
+
             if (this.DistinctFileExtensions().Where(w => Utilities.IsExtentionPushToSAScompatible(w)).Count() > 0)
             { this.IsPushToSASCompatible = true; }
             else
@@ -203,6 +220,7 @@ namespace Sentry.data.Web
         public Boolean IsPushToSASCompatible { get; set; }
         public Boolean IsPushToTableauCompatible { get; set; }
         public Boolean IsPreviewCompatible { get; set; }
+        public Boolean CanQueryTool { get; set; }
 
         public Boolean IsSubscribed { get; set; }
         public Category DatasetCategory { get; set; } 
@@ -218,7 +236,7 @@ namespace Sentry.data.Web
         public IList<DatasetFileConfigsModel> DatasetFileConfigs { get; set; }
 
         [DisplayName("Drop Location")]
-        public string DropLocation { get; set; }
+        public List<string> DropLocations { get; set; }
 
         public int AmountOfSubscriptions { get; set; }
 

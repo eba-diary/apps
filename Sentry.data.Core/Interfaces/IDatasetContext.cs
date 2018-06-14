@@ -31,6 +31,8 @@ namespace Sentry.data.Core
         IQueryable<DatasetScopeType> DatasetScopeTypes { get; }
         IQueryable<FileExtension> FileExtensions { get; }
 
+        IQueryable<DataObject> Schema { get; }
+
         List<String> BusinessTerms(string dataElementCode, int? DataAsset_ID, String DataElement_NME = "", String DataObject_NME = "", String DataObjectField_NME = "", String Line_CDE = "");
         List<String> ConsumptionLayers(string dataElementCode, int? DataAsset_ID, String DataElement_NME = "", String DataObject_NME = "", String DataObjectField_NME = "", String Line_CDE = "");
         List<String> LineageTables(string dataElementCode, int? DataAsset_ID, String DataElement_NME = "", String DataObject_NME = "", String DataObjectField_NME = "", String Line_CDE = "");
@@ -74,7 +76,9 @@ namespace Sentry.data.Core
 
         string GetPreviewKey(int id);
 
-        IEnumerable<DatasetFile> GetDatasetFilesForDataset(int id, Func<DatasetFile, bool> where);
+        IEnumerable<DatasetFile> GetDatasetFilesForDataset(int datasetId, Func<DatasetFile, bool> where);
+
+        IEnumerable<DatasetFile> GetDatasetFilesForDatasetFileConfig(int configId, Func<DatasetFile, bool> where);
 
         IEnumerable<DatasetFile> GetDatasetFilesVersions(int datasetId, int dataFileConfigId, string filename);
 

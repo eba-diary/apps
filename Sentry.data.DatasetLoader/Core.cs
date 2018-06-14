@@ -127,52 +127,54 @@ namespace Sentry.data.DatasetLoader
 
         private static void SingleFileProcessor(List<DatasetFileConfig> systemMetaFiles, string _path, IDatasetService upload, IDatasetContext dscontext)
         {
-            int configMatch = 0;
-            //Pick correct meta file for processing
-            //foreach (SystemConfig sc in systemMetaFiles)
+            throw new System.NotImplementedException();
+
+            //int configMatch = 0;
+            ////Pick correct meta file for processing
+            ////foreach (SystemConfig sc in systemMetaFiles)
+            ////{
+
+            //List<DatasetFileConfig> fcList = Utilities.GetMatchingDatasetFileConfigs(systemMetaFiles, _path);
+
+            //FileInfo fi = new FileInfo(_path);
+
+            //foreach (DatasetFileConfig fc in fcList.Where(w => w.IsGeneric == false))
             //{
 
-            List<DatasetFileConfig> fcList = Utilities.GetMatchingDatasetFileConfigs(systemMetaFiles, _path);
+            //    Logger.Debug($"Found non-generic DatasetFileConfig: ID-{fc.ConfigId}, Name-{fc.Name}");
 
-            FileInfo fi = new FileInfo(_path);
+            //    Dataset ds = dscontext.GetById(fc.ParentDataset.DatasetId);
 
-            foreach (DatasetFileConfig fc in fcList.Where(w => w.IsGeneric == false))
-            {
+            //    DatasetFile df = Utilities.ProcessInputFile(ds, fc, dscontext, Utilities.GetFileOwner(fi), false, null, fi);
 
-                Logger.Debug($"Found non-generic DatasetFileConfig: ID-{fc.ConfigId}, Name-{fc.Name}");
+            //    Utilities.RemoveProcessedFile(df, new FileInfo(_path));
 
-                Dataset ds = dscontext.GetById(fc.ParentDataset.DatasetId);
+            //    configMatch++;
 
-                DatasetFile df = Utilities.ProcessInputFile(ds, fc, dscontext, Utilities.GetFileOwner(fi), false, null, fi);
+            //    break;
+            //}
 
-                Utilities.RemoveProcessedFile(df, new FileInfo(_path));
+            //if (configMatch == 0)
+            //{
+            //    DatasetFileConfig fc = systemMetaFiles.Where(w => w.IsGeneric == true).FirstOrDefault();
+            //    Logger.Debug($"Using generic DatasetFileConfig: ID-{fc.ConfigId}, Name-{fc.Name}");
+            //    Logger.Debug($"Retrieving Dataset associated with DatasetFileConfig: ID-{fc.ParentDataset.DatasetId}");
+            //    Dataset ds = dscontext.GetById(fc.ParentDataset.DatasetId);
+            //    Logger.Debug("Processing DatasetFile");
+            //    DatasetFile df = Utilities.ProcessInputFile(ds, fc, dscontext, Utilities.GetFileOwner(fi), false, null, fi);
 
-                configMatch++;
+            //    Logger.Debug("Removing successful processed file");
+            //    Utilities.RemoveProcessedFile(df, new FileInfo(_path));
 
-                break;
-            }
+            //    //ProcessGeneralFile(upload, dscontext, new FileInfo(_path));
+            //    //StringBuilder message = new StringBuilder();
+            //    //message.AppendLine("Configuration Not Defined for File");
+            //    //message.AppendLine($"Path: {Path.GetFullPath(_path)}");
 
-            if (configMatch == 0)
-            {
-                DatasetFileConfig fc = systemMetaFiles.Where(w => w.IsGeneric == true).FirstOrDefault();
-                Logger.Debug($"Using generic DatasetFileConfig: ID-{fc.ConfigId}, Name-{fc.Name}");
-                Logger.Debug($"Retrieving Dataset associated with DatasetFileConfig: ID-{fc.ParentDataset.DatasetId}");
-                Dataset ds = dscontext.GetById(fc.ParentDataset.DatasetId);
-                Logger.Debug("Processing DatasetFile");
-                DatasetFile df = Utilities.ProcessInputFile(ds, fc, dscontext, Utilities.GetFileOwner(fi), false, null, fi);
+            //    //Logger.Error(message.ToString());
 
-                Logger.Debug("Removing successful processed file");
-                Utilities.RemoveProcessedFile(df, new FileInfo(_path));
-
-                //ProcessGeneralFile(upload, dscontext, new FileInfo(_path));
-                //StringBuilder message = new StringBuilder();
-                //message.AppendLine("Configuration Not Defined for File");
-                //message.AppendLine($"Path: {Path.GetFullPath(_path)}");
-
-                //Logger.Error(message.ToString());
-
-                //SendNotification(null, (int)ExitCodes.Failure, 0, message.ToString(), Path.GetFileName(_path));
-            }
+            //    //SendNotification(null, (int)ExitCodes.Failure, 0, message.ToString(), Path.GetFileName(_path));
+            //}
 
         }
 

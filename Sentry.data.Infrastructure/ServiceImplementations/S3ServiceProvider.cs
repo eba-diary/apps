@@ -16,7 +16,7 @@ using Amazon.S3.IO;
 
 namespace Sentry.data.Infrastructure
 {
-    public sealed class S3ServiceProvider : IDatasetService
+    public class S3ServiceProvider : IDatasetService
     {
         private static S3ServiceProvider instance = null;
         private static readonly object padlock = new object();

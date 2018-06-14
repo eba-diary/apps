@@ -87,7 +87,7 @@
                 Dataset Information
             </span>
         </a>
-        <div class="category-type-wrap">
+        <div class="category-type-wrap" style="width: 79px;">
             <div class="category-type" data-bind="css: BannerColor">
                 <span data-bind="text: DatasetCategory"></span>
             </div>
@@ -2066,8 +2066,26 @@ t1.createTempView("t1");
                         text: itemData.Text
                     }));
                 });
+
                 select.append(optgroup);
+
+                var id = getParameterByName("DatasetID");
+                console.log(id);
+                $("#datasetList option").each(function () {
+                    // Add $(this).val() to your list
+                    if ($(this).val() == id) {
+                        $("#datasetList").val($(this).val()).trigger('change');
+                        $("#datasetList").trigger({
+                            type: 'select2:select',
+                            params: {
+                                data: { "id": $(this).val(), "text": $(this).text() }
+                            }
+                        });
+                    }
+                });
             });
+
+
 
 
             if (localStorage.getItem("SparkSession") === null) {
@@ -2196,14 +2214,20 @@ t1.createTempView("t1");
                     CreateSession();
                 }
             });
-
-            console.log('this fired');
         }
 
         vm = new ViewModel();
         ko.applyBindings(vm);
 
-
+        function getParameterByName(name, url) {
+            if (!url) url = window.location.href;
+            name = name.replace(/[\[\]]/g, "\\$&");
+            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+                results = regex.exec(url);
+            if (!results) return null;
+            if (!results[2]) return '';
+            return decodeURIComponent(results[2].replace(/\+/g, " "));
+        }
 
     </script>
 

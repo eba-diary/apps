@@ -445,34 +445,86 @@ div[id*="filterType_"]:hover
     color: #FFFFFF;
 }
 
+
+
 .categoryBanner-green {
-    background-color: #005844;
+    background-color: #005844 !important;
     color: #FFFFFF;
+}
+
+tr.categoryBanner-green th.sorting_asc {
+    background-color: #84BD00 !important;
+}
+
+tr.categoryBanner-green th.sorting_desc {
+    background-color: #84BD00 !important;
 }
 
 .categoryBanner-gold {
-    background-color: #74531C;
+    background-color: #74531C !important;
     color: #FFFFFF;
 }
+
+tr.categoryBanner-gold th.sorting_asc {
+    background-color: #EAAA00 !important;
+}
+
+tr.categoryBanner-gold th.sorting_desc {
+    background-color: #EAAA00 !important;
+}
+
 
 .categoryBanner-plum {
-    background-color: #72246C;
+    background-color: #72246C !important;
     color: #FFFFFF;
 }
 
+tr.categoryBanner-plum th.sorting_asc {
+    background-color: #BB85AB !important;
+}
+
+tr.categoryBanner-plum th.sorting_desc {
+    background-color: #BB85AB !important;
+}
+
+
 .categoryBanner-orange {
-    background-color: #683431;
+    background-color: #683431 !important;
     color: #FFFFFF;
+}
+
+tr.categoryBanner-orange th.sorting_asc {
+    background-color: #E57200 !important;
+}
+
+tr.categoryBanner-orange th.sorting_desc {
+    background-color: #E57200 !important;
 }
 
 .categoryBanner-blueGray {
-    background-color: #285780;
+    background-color: #285780 !important;
     color: #FFFFFF;
 }
 
+tr.categoryBanner-blueGray th.sorting_asc {
+    background-color: #89ABE3 !important;
+}
+
+tr.categoryBanner-blueGray th.sorting_desc {
+    background-color: #89ABE3 !important;
+}
+
 .categoryBanner-blue {
-    background-color: #003DA5;
+    background-color: #003DA5 !important;
     color: #FFFFFF;
+}
+
+tr.categoryBanner-blue th.sorting_asc {
+    background-color: #00A3E0 !important;
+}
+
+tr.categoryBanner-blue th.sorting_desc {
+    background-color: #00A3E0 !important;
 }
 
 /*.category-claim {
@@ -721,7 +773,6 @@ div[id*="filterType_"]:hover
 
 .detailTable
 {
-    width: auto;
     max-width: calc(100% - 2em);
     min-width: 50%;
     margin: 1em;
@@ -1698,7 +1749,6 @@ body { background-color: #f8f8f8; }
 
 .feed 
 { 
-    margin-left: 3em; 
     width: 20%;
     min-width: 235px;
     padding: 1em 0 1em 1em;

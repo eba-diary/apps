@@ -9,7 +9,7 @@ namespace Sentry.data.Web
     {
         public override Boolean DoesUserHaveAccess(IApplicationUser appUser)
         {
-            return appUser.CanUseApp;
+            return true;// appUser.CanUseApp;
         }
     }
 }

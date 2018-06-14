@@ -9,6 +9,8 @@ using Sentry.DataTables.Mvc;
 using Sentry.DataTables.Shared;
 using Sentry.DataTables.QueryableAdapter;
 using Sentry.data.Infrastructure;
+using System.Threading.Tasks;
+using Sentry.data.Common;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -46,6 +48,17 @@ namespace Sentry.data.Web.Controllers
                 da.AssetNotifications = _dsContext.GetAssetNotificationsByDataAssetId(da.Id).Where(w => w.StartTime < DateTime.Now && w.ExpirationTime > DateTime.Now).ToList();
                 da.LastUpdated = DateTime.Now;
                 da.Status = 1;
+
+                Event e = new Event();
+                e.EventType = _dsContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+                e.Status = _dsContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+                e.TimeCreated = DateTime.Now;
+                e.TimeNotified = DateTime.Now;
+                e.IsProcessed = false;
+                e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+                e.DataAsset = da.Id;
+                e.Reason = "Viewed Data Asset";
+                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
             }
 
             //ViewData["fluid"] = true;
@@ -60,6 +73,25 @@ namespace Sentry.data.Web.Controllers
         {
             ViewBag.IsLine = true;
             ViewBag.LineName = line;
+
+            Event e = new Event();
+            e.EventType = _dsContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _dsContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            if (line == "Personal Lines" || line.ToUpper() == "PL")
+            {
+                e.Line_CDE = "PL";
+            }
+            else if (line == "Commercial Lines" || line.ToUpper() == "CL")
+            {
+                e.Line_CDE = "CL";
+            }
+
+            e.Reason = "Viewed Lineage for " + line;
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
             return View();
         }
@@ -80,6 +112,27 @@ namespace Sentry.data.Web.Controllers
                 da.AssetNotifications = _dsContext.GetAssetNotificationsByDataAssetId(da.Id).Where(w => w.StartTime < DateTime.Now && w.ExpirationTime > DateTime.Now).ToList();
                 da.LastUpdated = DateTime.Now;
                 da.Status = 1;
+
+                Event e = new Event();
+                e.EventType = _dsContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+                e.Status = _dsContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+                e.TimeCreated = DateTime.Now;
+                e.TimeNotified = DateTime.Now;
+                e.IsProcessed = false;
+                e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+                e.DataAsset = da.Id;
+
+                if(line == "Personal Lines" || line.ToUpper() == "PL")
+                {
+                    e.Line_CDE = "PL";
+                }
+                else if (line == "Commercial Lines" || line.ToUpper() == "CL")
+                {
+                    e.Line_CDE = "CL";
+                }
+
+                e.Reason = "Viewed Lineage for " + da.DisplayName;
+                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
             }
 
             ViewBag.IsLine = false;
@@ -112,6 +165,17 @@ namespace Sentry.data.Web.Controllers
                 da.AssetNotifications = _dsContext.GetAssetNotificationsByDataAssetId(da.Id).Where(w => w.StartTime < DateTime.Now && w.ExpirationTime > DateTime.Now).ToList();
                 da.LastUpdated = DateTime.Now;
                 da.Status = 1;
+
+                Event e = new Event();
+                e.EventType = _dsContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+                e.Status = _dsContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+                e.TimeCreated = DateTime.Now;
+                e.TimeNotified = DateTime.Now;
+                e.IsProcessed = false;
+                e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+                e.DataAsset = da.Id;
+                e.Reason = "Viewed Data Asset";
+                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
             }
 
             //ViewData["fluid"] = true;

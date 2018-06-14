@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using Sentry.Core;
 using Sentry.data.Infrastructure;
 using Sentry.data.Core;
-using StructureMap;
 using Rhino.Mocks;
 using System.Linq;
 

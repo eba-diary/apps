@@ -65,10 +65,6 @@ namespace Sentry.data.Web
         [DisplayName("Target File Name")]
         public string TargetFileName { get; set; }
 
-        [Required]
-        [DisplayName("Drop Path")]
-        public string DropPath { get; set; }
-
         [DisplayName("Custom Drop Path")]
         public Boolean CustomDropPath { get; set; }
 

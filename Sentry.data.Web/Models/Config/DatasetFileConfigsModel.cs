@@ -6,6 +6,7 @@ using Sentry.data.Core;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 using System.ComponentModel;
+using Sentry.data.Core.Entities.Metadata;
 
 namespace Sentry.data.Web
 {
@@ -17,12 +18,11 @@ namespace Sentry.data.Web
         public DatasetFileConfigsModel(DatasetFileConfig dsfc, Boolean renderingForTable, Boolean renderingForPopup)
         {
             this.ConfigId = dsfc.ConfigId;
-            this.DropPath = dsfc.DropPath;
             this.FileTypeId = dsfc.FileTypeId;
             this.ConfigFileName = dsfc.Name;
             this.ConfigFileDesc = dsfc.Description;
             this.ParentDatasetName = dsfc.ParentDataset.DatasetName;
-            this.DatasetScopeTypeID = dsfc.DatasetScopeTypeID;
+            this.DatasetScopeTypeID = dsfc.DatasetScopeType.ScopeTypeId;
             this.ScopeType = dsfc.DatasetScopeType;
             this.FileExtensionID = dsfc.FileExtension.Id;
             this.FileExtension = dsfc.FileExtension;
@@ -53,15 +53,48 @@ namespace Sentry.data.Web
             }
         }
 
+        public DatasetFileConfigsModel(DatasetFileConfig dsfc, Boolean renderingForTable, Boolean renderingForPopup, IDatasetContext datasetContext)
+        {
+            this.ConfigId = dsfc.ConfigId;
+            this.FileTypeId = dsfc.FileTypeId;
+            this.ConfigFileName = dsfc.Name;
+            this.ConfigFileDesc = dsfc.Description;
+            this.ParentDatasetName = dsfc.ParentDataset.DatasetName;
+            this.DatasetScopeTypeID = dsfc.DatasetScopeType.ScopeTypeId;
+            this.ScopeType = dsfc.DatasetScopeType;
+            this.FileExtensionID = dsfc.FileExtension.Id;
+            this.FileExtension = dsfc.FileExtension;
+            try
+            {
+
+
+                if (renderingForTable)
+                {
+                    this.RetrieverJobs = dsfc.RetrieverJobs.ToList();
+                }
+
+                if (renderingForPopup)
+                {
+                    SearchCriteria = new List<string>();
+                    IsRegexSearch = new List<bool>();
+                    foreach (var job in dsfc.RetrieverJobs)
+                    {
+                        SearchCriteria.Add(job.JobOptions.SearchCriteria);
+                        IsRegexSearch.Add(job.JobOptions.IsRegexSearch);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+        }
+
         //This is a list in order of retriever jobs info for the UI.
         public List<String> SearchCriteria { get; set; }
         public List<Boolean> IsRegexSearch { get; set; }
 
         public int ConfigId { get; set; }
-
-        [Required]
-        [DisplayName("Drop Path")]
-        public string DropPath { get; set; }
 
         public int FileTypeId { get; set; }
 

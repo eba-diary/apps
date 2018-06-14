@@ -91,10 +91,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="DomainModelUnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="LiveDatabaseUnitTests.cs" />
-    <Compile Include="MockBasedUnitTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\DefaultSettings\defaultSettings.config">

@@ -156,14 +156,14 @@
             @foreach (var item in Model.DatasetFileConfigs)
             {
                 <div>
-                    <div class="configHeader">
-                        <h1>@item.ConfigFileName</h1>
+                    <div class="configHeader categoryBanner-@color">
+                        <h1 class="@color">@item.ConfigFileName</h1>
                         <i class="glyphicon glyphicon-menu-down tracker-menu-icon"></i>
                     </div>
 
                     <div class="configContainer">
 
-                        <h4>Configuration Information</h4>
+                        <h4 class="@color">Configuration Information</h4>
                         <hr />
 
                         <p>@item.ConfigFileDesc</p>
@@ -173,18 +173,17 @@
                         @if (item.FileExtension.Name.Trim() == "ANY") {<p>This configuration will allow all files extensions.</p>}
                         else
                         {<p>This configuration will only allow files with .@item.FileExtension.Name.ToLower() extension</p>}
-                        
-                       
+                  
                         <a class="backToList" href="/Config/Edit/@item.ConfigId"><span class="glyphicon glyphicon-edit"></span>  Edit Config</a>
 
                         <br />
-                        <h4>Dataset Retrieval Jobs</h4>
+                        <h4 class="@color">Dataset Retrieval Jobs</h4>
                         <hr />
 
                         @foreach (var job in item.RetrieverJobs)
                         {
                             <div class="retJob @job.DataSource.SourceType">
-                                <div class="jobHeader">
+                                <div class="jobHeader categoryBanner-@color">
                                     <h6>@job.DataSource.Name</h6>
                                     <i class="glyphicon glyphicon-menu-up tracker-menu-icon"></i>
                                 </div>

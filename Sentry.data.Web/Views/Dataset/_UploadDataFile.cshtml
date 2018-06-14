@@ -4,65 +4,79 @@
 }
 
 @Html.AntiForgeryToken()
-    <div class="form-horizontal">
-        <br />
-        @{
-            if (Model.dsID == 0)
-            {
-                <div class="form-group">
-                    @Html.LabelFor(m => m.CategoryIDs, new { @class = "col-md-2 control-label" })
-                    <div class="col-md-10">
-                        @Html.DropDownListFor((model) => model.CategoryIDs, new SelectList(ViewBag.Categories as
-                        System.Collections.IEnumerable, "Value", "Text"), new { id = "categoryList", @class = "form-control edit-dataset-row" })
-                    </div>
-                </div>
-           
-                <div class="form-group">
-                    @Html.LabelFor(m => m.dsID, new { @class = "col-md-2 control-label" })
-                    <div class="col-md-10">
-                        @Html.DropDownListFor((model) => model.dsID, new
-                        SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"), new { id = "datasetList", @class = "form-control edit-dataset-row" })
-                    </div>
-                </div>
+<div class="form-horizontal">
 
-            }
-            else
-            {
-                <div class="form-group">
-                    @Html.LabelFor(m => m.CategoryIDs, new { @class = "col-md-2 control-label" })
-                    <div class="col-md-10">
-                        @Html.TextBoxFor(model => model.DatasetCategory.Name, new { @disabled = "disabled", @class = "form-control edit-dataset-row" })
-                    </div>
+    <div class="alert-warning alert">
+        Dataset Security is very important to this site and Sentry as a whole.
+        It is imperative that you know what you are uploading to this site.
+        <br />
+        <br />
+        Data.Sentry.com uploads data to the cloud so no sensitive data should be uploaded through our site.
+        <br />
+        <br />
+        To find out what data is sensitive and what classification your data is <a href="http://sharepoint.sentry.com/Security/Security%20Architecture/Security%20Policies/Published/Policy-Data%20Classification%20and%20Handling.pdf">click here.</a>
+        <button type="button" class="close" data-dismiss="alert">×</button>
+    </div>
+
+
+    <br />
+    @{
+        if (Model.dsID == 0)
+        {
+            <div class="form-group">
+                @Html.LabelFor(m => m.CategoryIDs, new { @class = "col-md-2 control-label" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor((model) => model.CategoryIDs, new SelectList(ViewBag.Categories as
+                         System.Collections.IEnumerable, "Value", "Text"), new { id = "categoryList", @class = "form-control edit-dataset-row" })
                 </div>
-                <div class="form-group">
-                    @Html.LabelFor(m => m.dsID, new { @class = "col-md-2 control-label" })
-                    <div class="col-md-10">
-                        @Html.TextBoxFor(model => model.DatasetName, new { @disabled = "disabled", @class = "form-control edit-dataset-row" })
-                    </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.dsID, new { @class = "col-md-2 control-label" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor((model) => model.dsID, new
+                         SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"), new { id = "datasetList", @class = "form-control edit-dataset-row" })
                 </div>
-            }
+            </div>
 
         }
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.f, new { @class = "col-md-2 control-label" })
-            <div class="col-md-10">
-                <input type="file" class="edit-dataset-row file-load" id="DatasetFileUpload" />
-                @*@Html.HiddenFor(model => model.f)*@
+        else
+        {
+            <div class="form-group">
+                @Html.LabelFor(m => m.CategoryIDs, new { @class = "col-md-2 control-label" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.DatasetCategory.Name, new { @disabled = "disabled", @class = "form-control edit-dataset-row" })
+                </div>
             </div>
-        </div>
-
-        <div class="form-group">
-            @Html.Label("Configuration", new { @class = "col-md-2 control-label" })
-            <div class="col-md-10">
-                <select id="configList" class="form-control edit-dataset-row" />
+            <div class="form-group">
+                @Html.LabelFor(m => m.dsID, new { @class = "col-md-2 control-label" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.DatasetName, new { @disabled = "disabled", @class = "form-control edit-dataset-row" })
+                </div>
             </div>
-        </div>
+        }
 
-        <div>
-            <span id="configDescription" />
+    }
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.f, new { @class = "col-md-2 control-label" })
+        <div class="col-md-10">
+            <input type="file" class="edit-dataset-row file-load" id="DatasetFileUpload" />
+            @*@Html.HiddenFor(model => model.f)*@
         </div>
     </div>
+
+    <div class="form-group">
+        @Html.Label("Configuration", new { @class = "col-md-2 control-label" })
+        <div class="col-md-10">
+            <select id="configList" class="form-control edit-dataset-row" />
+        </div>
+    </div>
+
+    <div>
+        <span id="configDescription" />
+    </div>
+</div>
 
 
 <div class="modal-footer">

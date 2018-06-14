@@ -1057,6 +1057,7 @@ data.DatasetDetail = {
             processing: true,
             searching: true,
             paging: true,
+            destroy: true,
             rowId: 'Id',
             ajax: {
                 url: "/Dataset/GetDatasetFileInfoForGrid/?Id=" + Id + "&bundle=" + false,
@@ -1214,6 +1215,14 @@ data.DatasetDetail = {
         });
 
         $('#datasetFilesTable').on('draw.dt', function () {
+            if ($('#datasetFilesTable >tbody >tr').length >= 1 && $($('#datasetFilesTable >tbody >tr>td')[0]).hasClass('dataTables_empty') == false) {
+                $("#UploadModal").css({ "animation": "none" });
+                $('#alertInfoBanner').hide();
+            } else {
+                $("#UploadModal").css({ "animation": "blink 2s ease-in infinite" });
+                $('#alertInfoBanner').show();
+            }
+
             $('#bundleCountFiltered').html(data.Dataset.DatasetFilesTable.page.info().recordsDisplay);
             $('#bundleCountSelected').html(0);
             localStorage.setItem("listOfFilesToBundle", JSON.stringify([]));

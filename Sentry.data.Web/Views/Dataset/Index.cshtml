@@ -7,7 +7,7 @@
 
 
 <center>
-    <h2 style="color: white; margin: 80px; text-shadow: -.1px 0 black, 0 .1px black, .1px 0 black, 0 -.1px black;">Welcome to the Sentry Dataset Portal.  Please type below to search or choose a category.</h2>
+    <h2 style="color: white; margin: 80px; text-shadow: -.5px 0 black, 0 .5px black, .5px 0 black, 0 -.5px black;">Welcome to the Sentry Dataset Portal.  Please type below to search or choose a category.</h2>
     
     @{
         var category = Model.Categories.ToList();
@@ -56,7 +56,7 @@
             }
 
         <div class="row text-center">
-            <div class="upload-row">
+            <div class="upload-row" style="background-color: rgba(255,255,255,0.2); padding: 10px;">
 
                 @if (Model.CanEditDataset)
                 {
@@ -89,17 +89,8 @@
 
 <style>
     html {
-        overflow: scroll;
-        overflow-x: hidden;
-    }
-
-    ::-webkit-scrollbar {
-        width: 0px; /* remove scrollbar space */
-        background: transparent; /* optional: just make scrollbar invisible */
-    }
-    /* optional: show position indicator in red */
-    ::-webkit-scrollbar-thumb {
-        background: #FF0000;
+        /*overflow: scroll;
+        overflow-x: hidden;*/
     }
 
     .sentry-app-version{
@@ -129,7 +120,7 @@
 
 
     .imageFooter {
-        height: 127px;
+        height: 150px;
     }
 
     .tile{

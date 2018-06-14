@@ -98,6 +98,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<DataObject> Schema
+        {
+            get
+            {
+                return Query<DataObject>().Where(x => x.DataObject_ID == 550).Cacheable();
+            }
+        }
+
         public List<String> BusinessTerms(string dataElementCode, int? DataAsset_ID, String DataElement_NME = "", String DataObject_NME = "", String DataObjectField_NME = "", String Line_CDE = "")
         {
             DataElement_NME = HttpUtility.UrlDecode(DataElement_NME);
@@ -115,7 +123,7 @@ namespace Sentry.data.Infrastructure
             {
                 rawQuery = rawQuery.Where(c => c.Line_CDE == Line_CDE);
             }
-            if (!string.IsNullOrEmpty(DataElement_NME))
+            if (!string.IsNullOrEmpty(DataElement_NME) && DataElement_NME != "null")
             {
                 rawQuery = rawQuery.Where(c => c.SourceElement_NME == DataElement_NME);
             }
@@ -753,15 +761,34 @@ namespace Sentry.data.Infrastructure
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public IEnumerable<DatasetFile> GetDatasetFilesForDataset(int id, Func<DatasetFile, bool> where)
+        public IEnumerable<DatasetFile> GetDatasetFilesForDataset(int datasetId, Func<DatasetFile, bool> where)
         {
             IEnumerable<DatasetFile> list = 
                 Query<DatasetFile>().Where
                 (
-                    x => x.Dataset.DatasetId == id && 
+                    x => x.Dataset.DatasetId == datasetId && 
                     x.ParentDatasetFileId == null
                 ).Where(where)
                 
+                .AsEnumerable();
+
+            return list;
+        }
+
+        /// <summary>
+        /// Returns all datasetfiles for data file config
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public IEnumerable<DatasetFile> GetDatasetFilesForDatasetFileConfig(int configId, Func<DatasetFile, bool> where)
+        {
+            IEnumerable<DatasetFile> list =
+                Query<DatasetFile>().Where
+                (
+                    x => x.DatasetFileConfig.ConfigId == configId &&
+                    x.ParentDatasetFileId == null
+                ).Where(where)
+
                 .AsEnumerable();
 
             return list;
@@ -979,7 +1006,7 @@ namespace Sentry.data.Infrastructure
 
         public List<Event> EventsSince(DateTime time, Boolean IsProcessed)
         {
-            return Query<Event>().Cacheable().Where(e => e.TimeCreated >= time && e.IsProcessed == IsProcessed).ToList();
+            return Query<Event>().Cacheable().Where(e => e.TimeCreated >= time && e.IsProcessed == IsProcessed && e.EventType.Display).ToList();
         }
 
 

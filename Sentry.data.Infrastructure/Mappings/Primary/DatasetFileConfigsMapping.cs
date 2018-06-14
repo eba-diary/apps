@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Sentry.data.Core;
 using NHibernate.Mapping.ByCode.Conformist;
 using NHibernate.Mapping.ByCode;
+using Sentry.data.Core.Entities.Metadata;
 
 namespace Sentry.data.Infrastructure.Mappings.Primary
 {
@@ -23,16 +24,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Generator(Generators.Identity);
             });
 
-            this.Property((x) => x.SearchCriteria, (m) => m.Column("SearchCriteria"));
-            this.Property((x) => x.TargetFileName, (m) => m.Column("TargetFile_NME"));
-            this.Property((x) => x.DropPath, (m) => m.Column("DropPath"));
-            this.Property((x) => x.IsRegexSearch, (m) => m.Column("RegexSearch_IND"));
-            this.Property((x) => x.OverwriteDatafile, (m) => m.Column("OverwriteDatafile_IND"));
             this.Property((x) => x.FileTypeId, (m) => m.Column("FileType_ID"));
             this.Property((x) => x.Name, (m) => m.Column("Config_NME"));
             this.Property((x) => x.Description, (m) => m.Column("Config_DSC"));
             this.Property((x) => x.IsGeneric, (m) => m.Column("IsGeneric"));
-            this.Property((x) => x.CreateCurrentFile, (m) => m.Column("CurrentFile_IND"));
+            this.Property((x) => x.DataElement_ID, (m) => m.Column("DataElement_ID"));
+
             this.ManyToOne(x => x.ParentDataset, m =>
             {
                 m.Column("Dataset_ID");
@@ -68,6 +65,20 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                     k.ForeignKey("FK_RetrieverJob_DatasetFileConfigs");
                 });
             }, map => map.OneToMany(a => a.Class(typeof(RetrieverJob))));
+
+            this.Bag(x => x.DatasetFiles, (m) =>
+            {
+                m.Lazy(CollectionLazy.Lazy);
+                m.Inverse(true);
+                m.Table("DatasetFile");
+                m.Cascade(Cascade.All);
+                m.Cache(c => c.Usage(CacheUsage.ReadWrite));
+                m.Key((k) =>
+                {
+                    k.Column("DatasetFileConfig_ID");
+                    k.ForeignKey("FK_DatasetFile_DatasetFileConfigs");
+                });
+            }, map => map.OneToMany(a => a.Class(typeof(DatasetFile))));
 
         }
     }

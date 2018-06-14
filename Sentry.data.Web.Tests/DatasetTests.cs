@@ -7,7 +7,7 @@ namespace Sentry.data.Core.Tests
     [TestClass]
     public class DatasetTests
     {
-        [TestCategory("DatasetTests")]
+        [TestCategory("Dataset")]
         [TestMethod]
         public void Can_prevent_dataset_with_no_s3Key()
         {
@@ -17,7 +17,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.s3keyIsBlank));
         }
 
-        [TestCategory("DatasetTests")]
+        [TestCategory("Dataset")]
         [TestMethod]
         public void Can_prevent_dataset_with_no_Category()
         {
@@ -27,7 +27,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.categoryIsBlank));
         }
 
-        [TestCategory("DatasetTests")]
+        [TestCategory("Dataset")]
         [TestMethod()]
         public void Can_prevent_dataset_with_no_description()
         {
@@ -38,7 +38,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.datasetDescIsBlank));
         }
 
-        [TestCategory("DatasetTests")]
+        [TestCategory("Dataset")]
         [TestMethod]
         public void Can_prevent_dataset_with_no_DatasetName()
         {
@@ -48,7 +48,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.nameIsBlank));
         }
 
-        [TestCategory("DatasetTests")]
+        [TestCategory("Dataset")]
         [TestMethod]
         public void Can_prevent_dataset_with_no_CreationUser()
         {
@@ -58,7 +58,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.creationUserNameIsBlank));
         }
 
-        [TestCategory("DatasetTests")]
+        [TestCategory("Dataset")]
         [TestMethod]
         public void Can_prevent_dataset_with_no_UploadUser()
         {
@@ -68,7 +68,7 @@ namespace Sentry.data.Core.Tests
             Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.uploadUserNameIsBlank));
         }
 
-        [TestCategory("DatasetTests")]
+        [TestCategory("Dataset")]
         [TestMethod]
         public void Can_prevent_dataset_with_old_Dataset_Date()
         {

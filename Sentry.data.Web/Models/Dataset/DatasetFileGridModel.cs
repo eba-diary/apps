@@ -30,7 +30,7 @@ namespace Sentry.data.Web
             this.ConfigFileName = f.DatasetFileConfig.Name;
             this.ConfigFileDesc = f.DatasetFileConfig.Description;
             this.VersionId = f.VersionId;
-            this.IsSensitive = f.IsSensitive;
+            this.IsSensitive = f.Dataset.IsSensitive;
             this.ParentDataSetID = f.Dataset.DatasetId;
             this.IsBundled = f.IsBundled;
             this.Information = f.Information;

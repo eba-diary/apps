@@ -19,7 +19,6 @@
 
             @Html.HiddenFor(model => model.ConfigId, new { @name = "configId" })
             @Html.HiddenFor(model => model.ConfigFileName)
-            @Html.HiddenFor(model => model.DropPath)
             @Html.HiddenFor(model => model.FileTypeId)
             @Html.HiddenFor(model => model.DatasetId)
             @Html.HiddenFor(model => model.ModifyType)
@@ -58,14 +57,14 @@
                         new SelectList(Model.AllDatasetScopeTypes, "Value", "Text", Model.DatasetScopeTypeID), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control" })
                 </div>
             </div>
-            <div class="form-group">
+            @*<div class="form-group">
                 @Html.LabelFor(m => m.DropPath, htmlAttributes: new { @class = "control-label col-sm-3" })
                 <div class="col-sm-9">
                     @Html.DisplayFor(m => m.DropPath, new { htmlAttributes = new { @class = "from-control-static" } })
-                    @*@Html.EditorFor(model => model.DropPath, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
-                        @Html.ValidationMessageFor(model => model.DropPath, "", new { @class = "text-danger" })*@
+                    @Html.EditorFor(model => model.DropPath, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
+                        @Html.ValidationMessageFor(model => model.DropPath, "", new { @class = "text-danger" })
                 </div>
-            </div>
+            </div>*@
             <div class="form-group">
                 @Html.LabelFor((model) => model.FileExtensionID, new { @class = "control-label col-md-3" })
                 <div class="col-md-4">

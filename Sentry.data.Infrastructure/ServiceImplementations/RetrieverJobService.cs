@@ -71,7 +71,7 @@ namespace Sentry.data.Infrastructure
                             {
                                 using (Stream ftpstream = _ftpProvider.GetJobStream(_job))
                                 {
-                                    using (Stream filestream = new FileStream(Path.Combine(_job.DatasetConfig.DropPath, _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString()))), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
+                                    using (Stream filestream = new FileStream(Path.Combine(_job.GetUri().LocalPath, _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString()))), FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
                                     {
                                         ftpstream.CopyTo(filestream);
                                     }                                    

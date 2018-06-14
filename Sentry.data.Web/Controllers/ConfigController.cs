@@ -1,12 +1,15 @@
 ﻿using LazyCache;
 using Sentry.Core;
+using Sentry.data.Common;
 using Sentry.data.Core;
+using Sentry.data.Core.Entities.Metadata;
 using Sentry.data.Infrastructure;
 using Sentry.data.Web.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using static Sentry.data.Core.RetrieverJobOptions;
@@ -38,14 +41,23 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Index(int id)
         {
             Dataset ds = _datasetContext.GetById(id);
-            BaseDatasetModel bdm = new BaseDatasetModel(ds, _associateInfoProvider);
+            BaseDatasetModel bdm = new BaseDatasetModel(ds, _associateInfoProvider, _datasetContext);
             bdm.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
             bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
             bdm.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
             bdm.CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
             bdm.CanUpload = SharedContext.CurrentUser.CanUpload;
-            bdm.IsSubscribed = _datasetContext.IsUserSubscribedToDataset(_userService.GetCurrentUser().AssociateId, id);
-            bdm.AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, id).Count;
+
+            Event e = new Event();
+            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.Dataset = ds.DatasetId;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            e.Reason = "Viewed Dataset Configuration Page";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
             return View(bdm);
         }
@@ -66,7 +78,16 @@ namespace Sentry.data.Web.Controllers
                     => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
             dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext);
 
-            dfcm.DropPath = parent.DropLocation;
+            Event e = new Event();
+            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.Dataset = parent.DatasetId;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            e.Reason = "Viewed Configuration Creation Page";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
             return View(dfcm);
         }
@@ -97,7 +118,7 @@ namespace Sentry.data.Web.Controllers
                         ConfigId = 0,
                         Name = dfcm.ConfigFileName,
                         Description = dfcm.ConfigFileDesc,
-                        DropPath = dfcm.DropPath,
+                        //DropPath = dfcm.DropPath,
                         FileTypeId = dfcm.FileTypeId,
                         IsGeneric = false,
                         ParentDataset = parent,
@@ -153,9 +174,9 @@ namespace Sentry.data.Web.Controllers
 
                     try
                     {
-                        if (!System.IO.Directory.Exists(dfcm.DropPath))
+                        if (!System.IO.Directory.Exists(rj.GetUri().LocalPath))
                         {
-                            System.IO.Directory.CreateDirectory(dfcm.DropPath);
+                            System.IO.Directory.CreateDirectory(rj.GetUri().LocalPath);
                         }
                     }
                     catch (Exception e)
@@ -165,7 +186,7 @@ namespace Sentry.data.Web.Controllers
                         errmsg.AppendLine("Failed to Create Drop Location:");
                         errmsg.AppendLine($"DatasetId: {parent.DatasetId}");
                         errmsg.AppendLine($"DatasetName: {parent.DatasetName}");
-                        errmsg.AppendLine($"DropLocation: {parent.DropLocation}");
+                        errmsg.AppendLine($"DropLocation: {rj.GetUri().LocalPath}");
 
                         Sentry.Common.Logging.Logger.Error(errmsg.ToString(), e);
                     }
@@ -195,6 +216,16 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetFileConfigsModel edfc = new DatasetFileConfigsModel();
 
+            Event e = new Event();
+            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            e.Reason = "Viewed Configuration Management Page";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+
             return View(edfc);
         }
 
@@ -213,6 +244,18 @@ namespace Sentry.data.Web.Controllers
             edfc.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, edfc.FileExtensionID);
 
             ViewBag.ModifyType = "Edit";
+
+            Event e = new Event();
+            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.DataConfig = dfc.ConfigId;
+            e.Dataset = dfc.ParentDataset.DatasetId;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            e.Reason = "Viewed Configuration Edit Page";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
             return View(edfc);
         }
@@ -275,6 +318,18 @@ namespace Sentry.data.Web.Controllers
             CreateJobModel cjm = new CreateJobModel(dfc.ConfigId, dfc.ParentDataset.DatasetId);
 
             cjm = CreateDropDownSetup(cjm);
+
+            Event e = new Event();
+            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.DataConfig = dfc.ConfigId;
+            e.Dataset = dfc.ParentDataset.DatasetId;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            e.Reason = "Viewed Retrieval Creation Page";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
 
             return View(cjm);
@@ -417,6 +472,16 @@ namespace Sentry.data.Web.Controllers
 
             ejm = EditDropDownSetup(ejm, retrieverJob);
 
+            Event e = new Event();
+            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            e.Reason = "Viewed Retrieval Edit Page";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+
 
             return View(ejm);
         }
@@ -475,9 +540,13 @@ namespace Sentry.data.Web.Controllers
                 AddCoreValidationExceptionsToModel(ex);
                 _datasetContext.Clear();
             }
-            catch (System.UriFormatException uriEx)
+            catch (System.ArgumentNullException ex)
             {
-                ModelState.AddModelError("RelativeUri", uriEx.Message);
+                ModelState.AddModelError("RelativeUri", ex.Message);
+            }
+            catch (System.UriFormatException ex)
+            {
+                ModelState.AddModelError("RelativeUri", ex.Message);
             }
 
             ejm = EditDropDownSetup(ejm, rj);
@@ -622,6 +691,16 @@ namespace Sentry.data.Web.Controllers
 
             csm = CreateSourceDropDown(csm);
 
+            Event e = new Event();
+            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            e.Reason = "Viewed Data Source Creation Page";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+
             return View("CreateDataSource", csm);
         }
 
@@ -726,6 +805,16 @@ namespace Sentry.data.Web.Controllers
 
             esm = EditSourceDropDown(esm);
 
+            Event e = new Event();
+            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            e.Reason = "Viewed Data Source Edit Page";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+
             return View("EditDataSource", esm);
         }
 
@@ -744,6 +833,7 @@ namespace Sentry.data.Web.Controllers
                     switch (esm.SourceType)
                     {
                         case "DFSBasic":
+                            //source = new DfsBasic();
                             source = _datasetContext.GetById<DfsBasic>(esm.Id);
                             break;
                         case "DFSCustom":
@@ -751,6 +841,9 @@ namespace Sentry.data.Web.Controllers
                             break;
                         case "FTP":
                             source = _datasetContext.GetById<FtpSource>(esm.Id);
+                            break;
+                        case "S3Basic":
+                            source = _datasetContext.GetById<S3Basic>(esm.Id);
                             break;
                         default:
                             throw new NotImplementedException();
