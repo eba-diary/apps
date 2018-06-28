@@ -249,7 +249,7 @@ namespace Sentry.data.Goldeneye
 
                         //Reload and modifed\new jobs
 
-                        List<RetrieverJob> JobList = requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && (w.Created > config.LastRunMinute || w.Modified > config.LastRunMinute)).ToList();
+                        List<RetrieverJob> JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && (w.Created > config.LastRunMinute || w.Modified > config.LastRunMinute)).ToList();
 
                         foreach (RetrieverJob Job in JobList)
                         {
