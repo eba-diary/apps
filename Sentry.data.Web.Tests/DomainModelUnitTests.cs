@@ -2,7 +2,7 @@
 using Sentry.Core;
 using Sentry.data.Core;
 
-namespace Sentry.data.Tests
+namespace Sentry.data.Web.Tests
 {
 
     [TestClass()]

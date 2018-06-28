@@ -4,7 +4,16 @@
     ViewBag.Title = "Edit Asset Notification";
 }
 
+<div class="topBanner">
+    <div>
+        <a class="backToList" href="/DataAsset/ManageAssetNotification"><span class="glyphicon glyphicon-chevron-left"></span>Back to Previous Page</a>
+    </div>
+</div>
+
+
 <h1>Edit Data Asset Notification</h1>
+
+<hr />
 
 @using (Html.BeginForm("EditAssetNotification", "DataAsset", FormMethod.Post))
 {
@@ -60,9 +69,12 @@
     <div class="form-group">
         <span class="text-muted"><em>** Fields in <b>Bold</b> are Required</em></span>
     </div>
+    <br />
     <div class="form-group">
-        <div class="col-sm-offset-4 col-sm-8">
+
+        <div>
             <input type="submit" value="Update Notification" class="btn btn-primary" />
+            <a class="btn btn-warning" href="/DataAsset/ManageAssetNotification">Cancel</a>
         </div>
     </div>
 </div>

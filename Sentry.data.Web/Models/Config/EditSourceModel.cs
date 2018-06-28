@@ -21,10 +21,16 @@ namespace Sentry.data.Web
             Id = ds.Id;
             Name = ds.Name;
             Description = ds.Description;
-            SourceType = ds.SourceType;
             AuthID = ds.SourceAuthType.AuthID.ToString();
             IsUserPassRequired = ds.IsUserPassRequired;
             BaseUri = ds.BaseUri;
+            PortNumber = ds.PortNumber;
+
+            if (ds.Is<DfsBasic>()) { SourceType = "DFSBasic"; }
+            else if (ds.Is<S3Basic>()) { SourceType = "S3Basic"; }
+            else if (ds.Is<FtpSource>()) { SourceType = "FTP"; }
+            else if (ds.Is<SFtpSource>()) { SourceType = "SFTP"; }
+            else if (ds.Is<DfsCustom>()) { SourceType = "DFSCustom"; }
         }
 
         public virtual int Id { get; set; }
@@ -46,6 +52,9 @@ namespace Sentry.data.Web
         [Required]
         [DisplayName("Are Username and Password Required?")]
         public virtual bool IsUserPassRequired { get; set; }
+
+        [DisplayName("Port Number")]
+        public virtual int PortNumber { get; set; }
 
         [Required]
         [DisplayName("Base URL")]

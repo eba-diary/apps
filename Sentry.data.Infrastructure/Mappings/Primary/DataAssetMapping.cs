@@ -32,7 +32,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property(x => x.GuideLink, m => m.Column("Guide_URL"));
             this.Property(x => x.Contact, m => m.Column("Contact_EML"));
             this.Property(x => x.Description, m => m.Column("DataAsset_DSC"));
-           
+            this.Property(x => x.MetadataRepAssetName, m => m.Column("MetadataRepositoryAsset_NME"));
+
             this.Bag(x => x.Components, m =>
             {
                 m.Cache(c => c.Usage(CacheUsage.ReadOnly));

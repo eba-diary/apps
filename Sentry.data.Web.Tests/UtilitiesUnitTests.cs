@@ -4,7 +4,7 @@ using Rhino.Mocks;
 using Sentry.data.Common;
 using Sentry.data.Core;
 
-namespace Sentry.data.Tests
+namespace Sentry.data.Web.Tests
 {
     [TestClass]
     public class CommonTests

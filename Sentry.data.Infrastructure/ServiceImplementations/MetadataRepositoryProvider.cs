@@ -17,20 +17,6 @@ namespace Sentry.data.Infrastructure
             NHQueryableExtensionProvider.RegisterQueryableExtensionsProvider<MetadataRepositoryProvider>();
         }
 
-        //public IList<DataAssetHealth> GetAssetHealthByName(string assetName)
-        //{
-        //    ISQLQuery query = Session.CreateSQLQuery(
-        //        "SELECT DataAsset_NME, MAX(AssetUpdt_DTM), null, null, SourceSystem_VAL,null,0" +
-        //        "FROM dbo.DataAssetHealth {dah} " +
-        //        $"Where Cube_NME = '' and DataAsset_NME = '{assetName}' " +
-        //        "GROUP BY DataAsset_NME, SourceSystem_VAL " +
-        //        "order by 2 desc");
-        //    query.AddEntity("dah", typeof(DataAssetHealth));
-        //    query.ca
-        //    var result = query.List<DataAssetHealth>();
-        //    return result;
-        //}
-
         public List<DataAssetHealth> GetByAssetName(string assetName)
         {
             string sqlConnString = null;

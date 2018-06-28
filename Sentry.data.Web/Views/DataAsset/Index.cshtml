@@ -3,7 +3,7 @@
 @{
     ViewBag.Title = Model.DisplayName;
     string color = "plum";
-    List<Sentry.data.Core.DataAsset> assets = ViewBag.DataAssets;
+    List<Sentry.data.Web.Models.AssetUIModel> assets = ViewBag.DataAssets;
     string disabled;
     string arch = "http://sharepoint.sentry.com/it/DataArch/_layouts/15/VisioWebAccess/VisioWebAccess.aspx?id=/it/DataArch/Shared%20Documents/Data%20Services%20Architecture%20Diagrams/" + Model.ArchLink;
     string guide = "http://sharepoint.sentry.com/it/DataArch/Consumer%20Guides/Pages/" + Model.GuideLink;
@@ -25,7 +25,7 @@
                 <i class="fa glyphicon glyphicon-minus"></i>
             </span>
         </span>
-        @foreach (Sentry.data.Core.DataAsset da in assets)
+        @foreach (Sentry.data.Web.Models.AssetUIModel da in assets)
         {
             if (da.Id == Model.Id)
             {
@@ -152,7 +152,7 @@
                     <li class="@disabled"><a href="@guide" target="_blank">Consumer Guide</a></li>
 
                     @{ disabled = (Model.Contact != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="mailto:@Model.Contact">Contact Us</a></li>
+                    <li class="@disabled"><a href="mailto:@Model.Contact">Contact the @Model.DisplayName Team</a></li>
                 </ul>
             </div>
         </div>
@@ -173,7 +173,7 @@
                     <li class="@disabled"><a href="@guide" target="_blank">Consumer Guide</a></li>
 
                     @{ disabled = (Model.Contact != null) ? "" : "disabled"; }
-                    <li class="@disabled"><a href="mailto:@Model.Contact">Contact Us</a></li>
+                    <li class="@disabled"><a href="mailto:@Model.Contact">Contact the @Model.DisplayName Team</a></li>
                 </ul>
             </div>
         </div>

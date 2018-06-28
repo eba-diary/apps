@@ -71,6 +71,24 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.NotNullable(false);
             });
 
+            Property(x => x.PortNumber, m =>
+            {
+                m.Column("PortNumber");
+                m.NotNullable(false);
+            });
+
+            Property(x => x.HostFingerPrintKey, m =>
+            {
+                m.Column("HostFingerPrintkey");
+                m.NotNullable(false);
+            });
+
+            Property(x => x.IsUserPassRequired, m =>
+            {
+                m.Column("IsUserPassRequired");
+                m.NotNullable(false);
+            });
+
             this.ManyToOne(x => x.SourceAuthType, m =>
             {
                 m.Column("SourceAuth_ID");
@@ -129,5 +147,14 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
         {
             DiscriminatorValue(@"S3Basic");
         }
+    }
+
+    public class SFtpSourceMapping : SubclassMapping<SFtpSource>
+    {
+        public SFtpSourceMapping()
+        {
+            DiscriminatorValue(@"SFTP");
+        }
+
     }
 }

@@ -278,7 +278,7 @@ namespace Sentry.data.Web.Controllers
             {
                 return Ok(_s3Service.FindObject(s3Key).Count);
             }
-            catch (Exception ex)
+            catch
             {
                 return NotFound();
             }

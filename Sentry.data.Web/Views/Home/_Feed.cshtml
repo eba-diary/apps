@@ -15,7 +15,15 @@
 @foreach (Sentry.data.Core.DataFeedItem item in Model)
 {
     <div class="feedItem">
-        <img src="@item.Img" class="feedImg" />
+
+        @if(item.Feed.Name == "Datasets" || item.Feed.Name == "Data Assets")
+        {
+            <img src="@item.Img" class="feedImg" style="width: 20px; filter: invert(100%);" />
+        } else
+        {
+            <img src="@item.Img" class="feedImg" />
+        }
+
         <div class="feedName lt_@color">@item.Feed.Name</div>
 
         @if (item.Title.Length > 50)
@@ -27,7 +35,14 @@
             <h5 class="@color">@item.DisplayTitle()</h5>
         }
 
-        <a href="@item.Url" target="_blank" class="pointer">Read More</a>
+        @if(item.Feed.Name == "Datasets")
+        {
+            <a href="@item.Url" target="_blank" class="pointer">View this Dataset</a>
+        } else
+        {
+            <a href="@item.Url" target="_blank" class="pointer">Read More</a>
+        }
+
         <p class="rightFloat">@Sentry.data.Web.Helpers.Utility.TimeDisplay(item.PublishDate)</p>
     </div>
 }

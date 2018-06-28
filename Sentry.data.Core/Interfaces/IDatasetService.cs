@@ -10,8 +10,6 @@ namespace Sentry.data.Core
     {
         IDictionary<string, string> GetDatasetList(string parentDir = null, bool includeSubDirectories = true);
 
-        //Dataset GetDatasetDetails(string uniqueKey);
-
         /// <summary>
         /// Upload a dataset to S3, pulling directly from the given source file path.  Files size less than
         /// 5MB will use PutObject, larger than 5MB will utilize MultiPartUpload.
@@ -28,8 +26,6 @@ namespace Sentry.data.Core
         /// <returns></returns>
         string UploadDataFile(Stream inputstream, string targetKey);
 
-        //string UploadDataset_v2(string sourceFilePath, string targetKey);
-
         void TransferUtlityUploadStream(string category, string filename, Stream stream);
 
         void TransferUtlityUploadStream(string key, Stream stream);
@@ -45,19 +41,11 @@ namespace Sentry.data.Core
         #endregion
 
 
-        //DatasetFolder GetSubFolderStructure(DatasetFolder parentFolder = null, bool includeSubDirectories = true);
-
-        //IQueryable<Dataset> GetDatasetsByFolderName(string folderName);
-
-        //DatasetFolder GetFolderByUniqueKey(string uniqueKey);
-
-        event EventHandler<TransferProgressEventArgs> OnTransferProgressEvent;
-
         string MultiPartUpload(string sourceFilePath, string targetKey);
 
         string GetDatasetDownloadURL(string key, string versionId);
 
-        Dictionary<string, string> GetObjectMetadata(string key, string versionId);
+        Dictionary<string, string> GetObjectMetadata(string key, string versionId = null);
 
         Stream GetObject(string key, string versionId);
 
@@ -66,8 +54,6 @@ namespace Sentry.data.Core
         List<string> FindObject(string keyPrefix);
 
         IList<string> ListObjects(string bucket, string prefix);
-
-        //CopyPartResponse CopyPart(string dest_Key, int partnum, string source_key, string source_versionId, string uploadId);
     }
 
 }

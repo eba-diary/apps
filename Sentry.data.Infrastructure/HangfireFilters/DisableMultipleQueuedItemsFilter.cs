@@ -107,10 +107,12 @@ namespace Sentry.data.Infrastructure
 
         void IClientFilter.OnCreated(CreatedContext filterContext)
         {
+            throw new NotSupportedException();
         }
 
         void IServerFilter.OnPerforming(PerformingContext filterContext)
         {
+            throw new NotSupportedException();
         }
     }
 }

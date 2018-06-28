@@ -40,7 +40,7 @@ namespace Sentry.data.Bundler
         }
 
 
-        public async void KeyContatenation()
+        public void KeyContatenation()
         {
             DateTime bundleStart = DateTime.MinValue;
 
@@ -74,7 +74,7 @@ namespace Sentry.data.Bundler
                 e.DataConfig = _request.DatasetFileConfigId;
                 e.Reason = $"Started bundle request for {_request.TargetFileName}";
                 e.Parent_Event = _request.RequestGuid;
-                await Utilities.CreateEventAsync(e);
+                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
                 Logger.Info("Start Event Created.");
 
@@ -177,7 +177,7 @@ namespace Sentry.data.Bundler
                     Logger.Debug("Successfully created bundle file process event, continuing on...");
 
                     Logger.Debug("Sending bundle file process event");
-                    await Utilities.CreateEventAsync(e);
+                    Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
                     Logger.Debug("Successfully sent bundle file process event, continuing on...");
 
                     Logger.Info($"Bundle Request Processed - Request:{_request.RequestGuid} Parts:{_request.SourceKeys.Count} TotalTime(sec):{(DateTime.Now - bundleStart).TotalSeconds}");
@@ -218,8 +218,7 @@ namespace Sentry.data.Bundler
                 e.DataConfig = _request.DatasetFileConfigId;
                 e.Reason = $"Bundle Request Failed for {_request.TargetFileName}";
                 e.Parent_Event = _request.RequestGuid;
-                await Utilities.CreateEventAsync(e);
-                //Logger.Info($"Failed Event Created: {e.ToString()}");
+                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
             }
         }
 
@@ -258,7 +257,7 @@ namespace Sentry.data.Bundler
                     Directory.CreateDirectory($"{_baseWorkingDir + _request.RequestGuid}\\");
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 Logger.Error($"Failed to create working dir - RequestGuid:{_request.RequestGuid} Dir:{_baseWorkingDir + _request.RequestGuid}");
                 throw;
@@ -396,7 +395,7 @@ namespace Sentry.data.Bundler
 
                     //If part count is odd, then merge last part of secondhalf into first part of firsthalf
                     //This should only hit once if part count is odd
-                    if (part.Id == 0 && !remainerProcessed && partcnt % 2.0 != 0)
+                    if (part.Id == 0 && !remainerProcessed && partcnt % 2 != 0)
                     {
                         Logger.Info($"Merging remainer {secondHalf.Last().Id} into {part.Id}");
 

@@ -10,7 +10,6 @@ namespace Sentry.data.Infrastructure
     class RestAPIProvider
     {
         private RestClient _client;
-        private string _baseURL;
 
         public RestAPIProvider()
         {

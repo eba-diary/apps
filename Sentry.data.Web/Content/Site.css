@@ -1007,7 +1007,7 @@ tr.categoryBanner-blue th.sorting_desc {
   background-repeat: no-repeat;
   background-size: contain;
   background-position-x: right;
-  vertical-align: central;
+  vertical-align: middle;
   position: relative;
   border-style: solid;
   border-color: #003DA5;
@@ -2437,3 +2437,80 @@ tr.shown td.details-control {
 .optional {
     font-weight: 100;
 }
+
+.hero {
+    height: 420px;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+
+@media (min-width: 768px) 
+{
+    .hero {
+        height: 420px;
+    }
+}
+
+.hero-media {
+    height: 488px;
+    margin: 0 0 0;
+    position: relative;
+    overflow: inherit !important;
+}
+
+    .hero-media .picture {
+        height: 488px;
+        overflow: hidden !important;
+        position: relative;
+        z-index: 1;
+    }
+
+.hero .backgroundImage {
+    height: auto;
+    left: 50%;
+    margin-left: -384px;
+    position: absolute;
+    top: 0;
+    width: 768px;
+    z-index: 1;
+}
+
+.hero .backgroundImage {
+    border: 0;
+    display: block;
+    font-style: italic;
+    height: auto;
+    width: 100%;
+    vertical-align: middle;
+    left: 0;
+    margin-left: 0 !important;
+    position: relative;
+    width: 100% !important;
+}
+
+
+
+.hero-media .container {
+    display: block !important;
+    height: 420px;
+    left: 0;
+    margin: 0 auto;
+    position: relative;
+    top: -420px;
+    -moz-transform: translateX(0) !important;
+    -webkit-transform: translateX(0) !important;
+    transform: translateX(0) !important;
+    z-index: 5;
+    background-color: transparent;
+}
+    .hero-media .container .bar, .hero-media .listing-grid .swiper-container .bar, .listing-grid .hero-media .swiper-container .bar,
+    .hero-media .section-media-default .swiper-container .bar, .section-media-default .hero-media .swiper-container .bar {
+        bottom: 0;
+        left: 0;
+        margin: 0;
+        position: absolute;
+        width: 100%;
+        height: auto;
+        top: auto;
+    }

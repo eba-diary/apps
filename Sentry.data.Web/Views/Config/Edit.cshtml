@@ -7,6 +7,11 @@
     <a class="backToList" href="/Config/Dataset/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>Back to Dataset Configuration</a>
 </div>
 
+
+<h1>Basic Configuration</h1>
+
+<hr/>
+
 @{using (Html.BeginForm("Edit", "Config", FormMethod.Post))
 {
         @Html.AntiForgeryToken()
@@ -27,7 +32,7 @@
             @{Model.ModifyType = ViewBag.ModifyType;}
 
 
-            <h2 class="detailSection">Basic Configuration</h2>
+           
 
             <div class="form-group">
                 @Html.LabelFor(m => m.ConfigFileName, htmlAttributes: new { @class = "control-label col-sm-3" })
@@ -47,35 +52,41 @@
                 <div class="col-sm-4">
                     @*@Html.DisplayFor(m => m.FileType, new { htmlAttributes = new { @class = "from-control-static" } })*@
                     @Html.DropDownListFor(model => model.FileType,
-                        new SelectList(Model.AllDataFileTypes, "Text", "Text", Model.FileType), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control " })
+                  new SelectList(Model.AllDataFileTypes, "Text", "Text", Model.FileType), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control " })
                 </div>
             </div>
             <div class="form-group">
                 @Html.LabelFor((model) => model.DatasetScopeTypeID, htmlAttributes: new { @class = "control-label col-sm-3" })
                 <div class="col-sm-4">
                     @Html.DropDownListFor(model => model.DatasetScopeTypeID,
-                        new SelectList(Model.AllDatasetScopeTypes, "Value", "Text", Model.DatasetScopeTypeID), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control" })
+                  new SelectList(Model.AllDatasetScopeTypes, "Value", "Text", Model.DatasetScopeTypeID), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control" })
                 </div>
             </div>
             @*<div class="form-group">
-                @Html.LabelFor(m => m.DropPath, htmlAttributes: new { @class = "control-label col-sm-3" })
-                <div class="col-sm-9">
-                    @Html.DisplayFor(m => m.DropPath, new { htmlAttributes = new { @class = "from-control-static" } })
-                    @Html.EditorFor(model => model.DropPath, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
-                        @Html.ValidationMessageFor(model => model.DropPath, "", new { @class = "text-danger" })
-                </div>
-            </div>*@
+            @Html.LabelFor(m => m.DropPath, htmlAttributes: new { @class = "control-label col-sm-3" })
+            <div class="col-sm-9">
+                @Html.DisplayFor(m => m.DropPath, new { htmlAttributes = new { @class = "from-control-static" } })
+                @Html.EditorFor(model => model.DropPath, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
+                    @Html.ValidationMessageFor(model => model.DropPath, "", new { @class = "text-danger" })
+            </div>
+        </div>*@
             <div class="form-group">
                 @Html.LabelFor((model) => model.FileExtensionID, new { @class = "control-label col-md-3" })
                 <div class="col-md-4">
                     @Html.DropDownListFor(model => model.FileExtensionID,
-                        new SelectList(Model.ExtensionList, "Value", "Text", Model.FileExtensionID), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control" })
+                  new SelectList(Model.ExtensionList, "Value", "Text", Model.FileExtensionID), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control" })
                 </div>
             </div>
 
+
+            <hr />
             <div class="form-group">
-                <div class="col-sm-offset-4 col-sm-8">
-                    <input type="submit" value="Update Config File" class="btn btn-primary" />
+                <span class="text-muted"><em>** Fields in <b>Bold</b> are Required</em></span>
+            </div>
+            <div class="form-group">
+                <div>
+                    <input type="submit" value="Edit Config File" class="btn btn-primary" />
+                    <a class="btn btn-warning" href="/Config/Dataset/@Model.DatasetId">Cancel</a>
                 </div>
             </div>
         </div>

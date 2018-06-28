@@ -10,12 +10,12 @@ namespace Sentry.data.Web.Tests
 {
     public static class MockUsers
     {
-
         public static IApplicationUser App_DataMgmt_Admin_User()
         {
             var admin = MockRepository.GenerateStub<IApplicationUser>();
 
-            admin.Stub(x => x.EmailAddress).Return("user2@b.com");
+            admin.Stub(x => x.AssociateId).Return("012345");
+            admin.Stub(x => x.DisplayName).Return("Nye, Bill");
 
             admin.Stub(x => x.CanApproveItems).Return(true);
             admin.Stub(x => x.CanDwnldNonSensitive).Return(true);
@@ -41,7 +41,8 @@ namespace Sentry.data.Web.Tests
         {
             var user = MockRepository.GenerateStub<IApplicationUser>();
 
-            user.Stub(x => x.EmailAddress).Return("user2@b.com");
+            user.Stub(x => x.AssociateId).Return("012345");
+            user.Stub(x => x.DisplayName).Return("Nye, Bill");
 
             user.Stub(x => x.CanApproveItems).Return(false);
             user.Stub(x => x.CanDwnldNonSensitive).Return(false);
@@ -63,27 +64,55 @@ namespace Sentry.data.Web.Tests
             return user;
         }
 
-        public static IApplicationUser App_DataMgmt_MgAlert(IApplicationUser user = null)
+        public static IApplicationUser App_DataMgmt_MgAlert()
         {
-            if (user == null)
-            {
-                user = MockRepository.GenerateStub<IApplicationUser>();
+            var user = MockRepository.GenerateStub<IApplicationUser>();
 
-                user.Stub(x => x.EmailAddress).Return("user2@b.com");
-            }
+            user.Stub(x => x.AssociateId).Return("012345");
+            user.Stub(x => x.DisplayName).Return("Nye, Bill");
+
+            user.Stub(x => x.CanApproveItems).Return(false);
+            user.Stub(x => x.CanDwnldNonSensitive).Return(true);
+            user.Stub(x => x.CanDwnldSenstive).Return(false);
+            user.Stub(x => x.CanEditDataset).Return(false);
+            user.Stub(x => x.CanManageConfigs).Return(false);
+
+            user.Stub(x => x.CanQueryTool).Return(false);
+            user.Stub(x => x.CanQueryToolPowerUser).Return(false);
+
+            user.Stub(x => x.CanUpload).Return(true);
+            user.Stub(x => x.CanUseApp).Return(true);
+            user.Stub(x => x.CanUserSwitch).Return(false);
+
+            user.Stub(x => x.CanViewDataAsset).Return(true);
+            user.Stub(x => x.CanViewDataset).Return(true);
 
             user.Stub(x => x.CanManageAssetAlerts).Return(true);
             return user;
         }
 
-        public static IApplicationUser App_DataMgmt_MngDS(IApplicationUser user = null)
+        public static IApplicationUser App_DataMgmt_MngDS()
         {
-            if (user == null)
-            {
-                user = MockRepository.GenerateStub<IApplicationUser>();
+            var user = MockRepository.GenerateStub<IApplicationUser>();
 
-                user.Stub(x => x.EmailAddress).Return("user2@b.com");
-            }
+            user.Stub(x => x.AssociateId).Return("012345");
+            user.Stub(x => x.DisplayName).Return("Nye, Bill");
+
+            user.Stub(x => x.CanApproveItems).Return(false);
+            user.Stub(x => x.CanDwnldNonSensitive).Return(true);
+            user.Stub(x => x.CanDwnldSenstive).Return(false);
+
+            user.Stub(x => x.CanQueryTool).Return(false);
+            user.Stub(x => x.CanQueryToolPowerUser).Return(false);
+
+            user.Stub(x => x.CanUpload).Return(true);
+            user.Stub(x => x.CanUseApp).Return(true);
+            user.Stub(x => x.CanUserSwitch).Return(false);
+
+            user.Stub(x => x.CanViewDataAsset).Return(true);
+            user.Stub(x => x.CanViewDataset).Return(true);
+
+            user.Stub(x => x.CanManageAssetAlerts).Return(true);
 
             user.Stub(x => x.CanEditDataset).Return(true);
             user.Stub(x => x.CanManageConfigs).Return(true);
@@ -95,8 +124,8 @@ namespace Sentry.data.Web.Tests
         {
             var user = MockRepository.GenerateStub<IApplicationUser>();
 
-            user.Stub(x => x.AssociateId).Return("082698");
-            user.Stub(x => x.DisplayName).Return("Quaschnick, Andrew");
+            user.Stub(x => x.AssociateId).Return("012345");
+            user.Stub(x => x.DisplayName).Return("Nye, Bill");
 
             user.Stub(x => x.CanApproveItems).Return(false);
             user.Stub(x => x.CanDwnldNonSensitive).Return(true);
@@ -122,8 +151,8 @@ namespace Sentry.data.Web.Tests
         {
             var user = MockRepository.GenerateStub<IApplicationUser>();
 
-            user.Stub(x => x.AssociateId).Return("072984");
-            user.Stub(x => x.DisplayName).Return("Quaschnick, Andrew");
+            user.Stub(x => x.AssociateId).Return("012345");
+            user.Stub(x => x.DisplayName).Return("Nye, Bill");
 
             user.Stub(x => x.CanApproveItems).Return(false);
             user.Stub(x => x.CanDwnldNonSensitive).Return(true);

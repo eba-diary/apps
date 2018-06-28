@@ -4,6 +4,17 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+<div id="alertRow" class="row" style="position: relative; z-index: 999">
+    <div class="col-lg-12">
+        <div id="alertContainer" class="bs-component">
+            <div id="configWarningAlert" class="alert" style="display: none;">
+                <button type="button" class="close" data-dismiss="alert">×</button>
+                <h4 id="configWarningHeader">Warning!</h4>
+                <p id="configWarningText"></p>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div class="topBanner">
     <div>
@@ -23,6 +34,7 @@
     @Html.HiddenFor(model => model.Name)
     @Html.HiddenFor(model => model.Id)
     @Html.HiddenFor(model => model.SourceType)
+    @Html.HiddenFor(model => model.BaseUri)
 
     <h1>Edit Data Source</h1>
     <hr />
@@ -65,7 +77,7 @@
             <div class="form-group">
                 @Html.LabelFor(model => model.BaseUri, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.TextBoxFor(model => model.BaseUri, new { @value = "", @class = "form-control edit-dataset-row" })
+                    @Html.TextBoxFor(model => model.BaseUri, new { @value = "", @disabled = "disabled", @class = "form-control edit-dataset-row" })
                     @Html.ValidationMessageFor(model => model.BaseUri, "", new { @class = "text-danger" })
                 </div>
             </div>
@@ -87,13 +99,40 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                @Html.LabelFor((model) => model.IsUserPassRequired, new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.CheckBoxFor((model) => model.IsUserPassRequired, new { @class = "edit-dataset-row" })
-                    @Html.ValidationMessageFor((model) => model.IsUserPassRequired, "", new { @class = "text-danger" })
+            <div id="userPassPanel">
+                <div class="form-group">
+                    @Html.LabelFor((model) => model.IsUserPassRequired, new { @class = "control-label col-md-2" })
+                    <div class="col-md-1">
+                        @Html.CheckBoxFor((model) => model.IsUserPassRequired, new { @class = "edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.IsUserPassRequired, "", new { @class = "text-danger" })
+                    </div>
+                    <div id="userPassNotificationPanel" class="credentialWarning">
+                        <div class="col-md-9">
+                            <em>Work with data.sentry.com administrators to configure credentials.  The data source will not operate until credentials are configured.</em>
+                        </div>
+                    </div>
                 </div>
             </div>
+            <div id="portNumberPanel">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.PortNumber, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.PortNumber, new { @value = "", @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor(model => model.PortNumber, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group fieldDescription">
+                    <label class="control-label col-md-2"></label>
+                    <div class="col-md-10 text-muted">
+                        <em>Industry statandard default port values:</em>
+                        <ul>
+                            <li><em>FTP : 21</em></li>
+                            <li><em>SSH\SFTP : 22</em></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>            
+
         </div>
     </div>
 
@@ -114,8 +153,54 @@
 
     <script>
         $(document).ready(function () {
+
+            function setSourceTypeDefaults(sourceType) {
+                if (sourceType == "SFTP" || sourceType == "FTP") {
+                    //Assign Default values
+                    if (sourceType == "SFTP") {
+                        //User\Pass is required, so check and disable for changing
+                        $('#IsUserPassRequired').attr('disabled', true);
+
+                        //Set Authentication to Basic and disable as this is the only choice
+                        $('#AuthID').attr('disabled', true);
+                    }
+                    else if (sourceType == "FTP") {
+                        //User\Pass is not required, so uncheck and disable for changing
+                        $('#IsUserPassRequired').attr('disabled', false);
+
+                        //Enable Auth picker and set to default value
+                        $('#AuthID').attr('readonly', false); // enabling picker
+                    }
+
+                    $('#portNumberPanel').show();
+                    $('#userPassPanel').show();
+                    $('#authPanel').show();
+                }
+                else if (sourceType == "S3Basic" || sourceType == "DFSCustom") {
+
+                    //User\Pass is not required, so uncheck and disable
+                    $('#IsUserPassRequired').attr('disabled', true);
+
+                    //Default authentication and disable
+                    $('#AuthID').attr('readonly', true);
+                    
+                    $('#portNumberPanel').hide();
+                    $('#userPassPanel').hide();
+                    $('#authPanel').hide();
+                }
+                else {
+                    $('#portNumberPanel').hide();
+                    var userpasschkbx = $('#IsUserPassRequired');
+                    userpasschkbx.attr('disabled', false);
+                    $('#userPassPanel').show();
+                    $('#authPanel').show();
+                }
+            }
+
             $('.backToList').attr("href", document.referrer);
             $('#ReturnUrl').val(document.referrer);
+
+            setSourceTypeDefaults($('#SourceType').val())
 
             $("#SourceType").change(function () {
                 var val = $(this).val();
@@ -139,14 +224,106 @@
 
             $("#AuthID").change(function () {
                 var val = $(this).val();
+                var txt = $(this).find(":selected").text()
                 var subItems = "";
 
                 $.getJSON("@Url.Action("AuthTypeDescription", "Config")", {AuthID:val} ,function (data) {
 
                     $("#authDescription").text(data);
                 });
+
+                if (txt == 'Anonymous Authentication') {
+                    $('#IsUserPassRequired').prop('checked', false);
+                    $('#IsUserPassRequired').attr('disabled', true);
+                    $('#userPassPanel').hide();
+                }
+                else if (txt == 'Basic Authentication') {
+                    $('#IsUserPassRequired').prop('checked', true);
+                    $('#IsUserPassRequired').attr('disabled', true);
+                    $('#IsUserPassRequired').trigger("change");
+                    $('#userPassPanel').show();
+                }
+                else {
+                    $('#IsUserPassRequired').attr('disabled', false);
+                    $('#userPassPanel').show();
+                }
             });
 
+            function HideAlert() {
+                $('#configWarningAlert').hide();
+            };
+
+            $('#IsUserPassRequired').change(function () {
+                if ($(this).prop('checked') == false) {
+                    HideAlert();
+                }
+                else {
+                    var text = "<p>Any jobs referencing this data source will fail until data.sentry.com administrators configure the credentials.</p>" +
+                        "<p>Please click <a href= \"mailto:DSCSupport@sentry.com?Subject=Data&nbsp;Source&nbsp;Credentials&nbsp;Request&Body=Please contact me regarding setting up credentials for a new data source.%0AData Source Name: <Insert Your Value>%0ASource Type: <Insert Your Value>%0ABaseUri: <Insert Your Value>\" > here </a > to start request for credential setup.</p > ";
+
+                    PassHelpText("Warning", text);
+                }
+            });            
+
+            function PassHelpText(type, information) {
+
+                var banner;
+                var header;
+                var text;
+
+                if ($('#alertContainer').children().length == 0) {
+                    $('#alertContainer').append("<div id=\"configWarningAlert\" class=\"alert alert-dismissable alert-warning\">" +
+                        "<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>" +
+                        "<h4 id=\"configWarningHeader\">Warning!</h4>" +
+                        "<p id=\"configWarningText\"></p>" +
+                        "</div>");
+                }
+
+                banner = $('#configWarningAlert');
+                header = $('#configWarningHeader');
+                text = $('#configWarningText');
+
+                text.empty();
+
+                if (information.startsWith('u\'')) {
+                    information = information.substr(2, information.length - 1);
+                }
+
+                text.append(information);
+                Banner = information;
+                AlertLevel = type;
+
+                if (type == "Warning") {
+                    banner.switchClass("alert-success", "alert-warning", 10);
+                    banner.switchClass("alert-info", "alert-warning", 10);
+                    header.text("Warning!");
+
+                } else if (type == "Success") {
+                    banner.switchClass("alert-warning", "alert-success", 10);
+                    banner.switchClass("alert-info", "alert-success", 10);
+                    header.text("Success");
+                } else if (type == "Error") {
+                    banner.switchClass("alert-warning", "alert-danger", 10);
+                    banner.switchClass("alert-info", "alert-danger", 10);
+                    header.text("Error");
+                } else {
+                    banner.switchClass("alert-warning", "alert-info", 10);
+                    banner.switchClass("alert-success", "alert-info", 10);
+                    header.text("Information");
+                }
+
+                banner.show();
+            
+            }
+            // For certain types of Data Sources the isUserPassRequired checkbox required to be true.  Setting a checkboxfor to readonly still allows
+            //   a user to change the value.  A workaround being used for this property is using jquery to disable the property
+            //   for the specific data source types which require it to be true.  Then a $('form').on('submit') function
+            //   enables the checkbox right before submitting the form.  This allows the value to be passed back to the controller.
+            //https://stackoverflow.com/questions/40134337/set-mvc-checkbox-to-readonly-or-disabled-on-client-side
+            $("form").on("submit", function (e) {
+                $('#IsUserPassRequired').attr('disabled', false);
+                $('#AuthID').attr('disabled', false);
+            });
         });
     </script>
 

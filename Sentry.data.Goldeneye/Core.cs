@@ -25,7 +25,6 @@ namespace Sentry.data.Goldeneye
         private CancellationTokenSource _tokenSource;
         private CancellationToken _token;
         private IContainer _container;
-        private IDatasetContext _datasetContext;
         private IRequestContext _requestContext;
 
         /// <summary>
@@ -56,8 +55,14 @@ namespace Sentry.data.Goldeneye
             public DateTime LastRunWeek { get; set; }
         }
 
+        /// <summary>
+        /// Task!
+        /// </summary>
         protected class RunningTask
         {
+            /// <summary>
+            /// Task!
+            /// </summary>
             public RunningTask(Task task, String name)
             {
                 this.Task = task;
@@ -65,7 +70,6 @@ namespace Sentry.data.Goldeneye
                 this.TimeStarted = DateTime.Now;
             }
 
-            //public Task Task { get; set; }
             public Task Task { get; set; }
             public string Name { get; set; }
             public DateTime TimeStarted { get; set; }
@@ -83,25 +87,17 @@ namespace Sentry.data.Goldeneye
 
             //Start all the internal processes.
 
-            //Watch.OnStart(Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath"));
-
             //Get or Create the Runtime Configuration
             Configuration config = new Configuration();
+            config.TimeLastStarted = DateTime.Now;  //The last time Goldeneye was started.
 
-            if(true) //There is no runtime configuration in the directory
-            {
-                config.TimeLastStarted = DateTime.Now;  //The last time Goldeneye was started.
-
-                config.LastRunSecond = DateTime.Now;    //For Logging Purposes.  Don't need logs more then once per second.
-                config.LastRunMinute = DateTime.Now;    //Keeps track of the processes that must run once per minute.
-                config.LastRunHour = DateTime.Now;      //  once per hour
-                config.LastRunDay = DateTime.Now;       //  once per day
-                config.LastRunWeek = DateTime.Now;      //  once per week
-            }
-
-            List<RunningTask> currentTasks = new List<RunningTask>();
-            List<Request> requests = new List<Request>();
+            config.LastRunSecond = DateTime.Now;    //For Logging Purposes.  Don't need logs more then once per second.
+            config.LastRunMinute = DateTime.Now;    //Keeps track of the processes that must run once per minute.
+            config.LastRunHour = DateTime.Now;      //  once per hour
+            config.LastRunDay = DateTime.Now;       //  once per day
+            config.LastRunWeek = DateTime.Now;      //  once per week
             
+            List<RunningTask> currentTasks = new List<RunningTask>();            
 
             Boolean firstRun = true;
             do
@@ -253,8 +249,7 @@ namespace Sentry.data.Goldeneye
 
                         //Reload and modifed\new jobs
 
-                        List<RetrieverJob> JobList = new List<RetrieverJob>();
-                        JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && (w.Created > config.LastRunMinute || w.Modified > config.LastRunMinute)).ToList();
+                        List<RetrieverJob> JobList = requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && (w.Created > config.LastRunMinute || w.Modified > config.LastRunMinute)).ToList();
 
                         foreach (RetrieverJob Job in JobList)
                         {

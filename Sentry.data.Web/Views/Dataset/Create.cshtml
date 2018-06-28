@@ -15,7 +15,7 @@
 {
     @Html.AntiForgeryToken()
 
-    <p>Please fill out the following fields describing your dataset.  Before starting check to see if your dataset is not already on this site by using our <a href="~/Dataset/List">search tool.</a></p>
+    <p>Please fill out the following fields describing your dataset.  Before starting check to see if your dataset is not already on this site by using our <a href="~/Search/Datasets">search tool.</a></p>
 
     @*Show the custom validation summary*@
     @Html.DisplayFor((model) => ViewData.ModelState)
@@ -208,22 +208,22 @@
                 </div>
 
                 @*<div class="form-group">
-                    @Html.LabelFor((model) => model.CustomDropPath, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.EditorFor((model) => model.CustomDropPath, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
-                        @Html.ValidationMessageFor((model) => model.CustomDropPath, "", new { @class = "text-danger" })
-                    </div>
-                </div>
-                <div class="form-group fieldDescription">
-                    <label class="control-label col-md-2"></label>
-                    <div class="col-md-10">
-                        <span class="text-muted">
-                            <em>
-                                <b> Warning:</b> Files that are dropped here will be deleted when the upload to this site is complete.  If this does not work for you then please create a staging location, a copy of the file, or <a href="mailto:BIPortalAdmin@sentry.com?Subject=File_Drop_Location"> click here to contact site Administrators</a>
-                            </em>
-                        </span>
-                    </div>
-                </div>*@
+            @Html.LabelFor((model) => model.CustomDropPath, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor((model) => model.CustomDropPath, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
+                @Html.ValidationMessageFor((model) => model.CustomDropPath, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group fieldDescription">
+            <label class="control-label col-md-2"></label>
+            <div class="col-md-10">
+                <span class="text-muted">
+                    <em>
+                        <b> Warning:</b> Files that are dropped here will be deleted when the upload to this site is complete.  If this does not work for you then please create a staging location, a copy of the file, or <a href="mailto:DSCSupport@sentry.com?Subject=File_Drop_Location"> click here to contact site Administrators</a>
+                    </em>
+                </span>
+            </div>
+        </div>*@
                 <div class="form-group">
                     @Html.LabelFor((model) => model.FileExtensionID, new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
@@ -258,7 +258,7 @@
             <div class="col-md-10">
                 <span class="text-muted">
                     <em>
-                        <b> Warning:</b> Files that are dropped here will be deleted when the upload to this site is complete.  If this does not work for you then please create a staging location, a copy of the file, or <a href="mailto:BIPortalAdmin@sentry.com?Subject=File_Drop_Location"> click here to contact The Administrators</a>
+                        <b> Warning:</b> Files that are dropped here will be deleted when the upload to this site is complete.  If this does not work for you then please create a staging location, a copy of the file, or <a href="mailto:DSCSupport@sentry.com?Subject=File_Drop_Location"> click here to contact The Administrators</a>
                     </em>
                 </span>
             </div>

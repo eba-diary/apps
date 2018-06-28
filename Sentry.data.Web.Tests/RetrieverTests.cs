@@ -8,8 +8,9 @@ using Rhino.Mocks;
 using Sentry.data.Web.Tests;
 using Sentry.Configuration;
 using System.IO;
+using Sentry.data.Core;
 
-namespace Sentry.data.Core.Tests
+namespace Sentry.data.Web.Tests
 {
     [TestClass]
     public class RetrieverTests

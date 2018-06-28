@@ -3,14 +3,22 @@
     ViewData["Title"] = "Edit";
 }
 
-<h2>Edit Dataset</h2>
-<div></div>
+<div class="topBanner">
+    <div>
+        <a class="backToList" href="/Dataset/Detail/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>Back to Dataset</a>
+    </div>
+</div>
+
+<h1>Edit Dataset</h1>
+
+
+<hr/>
+<p>This page allows you to edit your dataset.  Please fill out the following fields describing your dataset.</p>
+<hr />
 
 @using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
-
-    <p>This page allows you to edit your dataset.  Please fill out the following fields describing your dataset.</p>
 
     @Html.HiddenFor(model => model.Category)
     @Html.HiddenFor(model => model.S3Key)
@@ -155,203 +163,203 @@
             *@
         </div>
         @*
-    <div id="retrievalPanel" class="tab-pane fade in form-horizontal">
-        <br />
-        <h4>Dataset Retrieval</h4>
-        <br />
+        <div id="retrievalPanel" class="tab-pane fade in form-horizontal">
+            <br />
+            <h4>Dataset Retrieval</h4>
+            <br />
 
-        <p>Filling in this tab helps us in figuring out the steps to upload your dataset's files into our site.</p>
+            <p>Filling in this tab helps us in figuring out the steps to upload your dataset's files into our site.</p>
 
-        <div id="detailSectionHeader_Simple">
-            <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_Simple"></span>
-            <h5 class="detailSection">Basic Options</h5>
-        </div>
-        <div id="hide_detailSectionHeader_Simple">
+            <div id="detailSectionHeader_Simple">
+                <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_Simple"></span>
+                <h5 class="detailSection">Basic Options</h5>
+            </div>
+            <div id="hide_detailSectionHeader_Simple">
 
-            <div class="form-group">
-                @Html.LabelFor((model) => model.FreqencyID, new { @class = "control-label col-md-2" })
+                <div class="form-group">
+                    @Html.LabelFor((model) => model.FreqencyID, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor((model) => model.FreqencyID, Model.AllFrequencies, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.FreqencyID, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor((model) => model.DatasetFileConfigs[0].DatasetScopeTypeID, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor((model) => model.DatasetFileConfigs[0].DatasetScopeTypeID, Model.AllDatasetScopeTypes, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.DatasetFileConfigs[0].DatasetScopeTypeID, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DatasetFileConfigs[0].DropPath, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.DatasetFileConfigs[0].DropPath, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
+                        @Html.ValidationMessageFor((model) => model.DatasetFileConfigs[0].DropPath, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                @**
+
+            <div class="form-group fieldDescription" >
+                <label class="control-label col-md-2"></label>
                 <div class="col-md-10">
-                    @Html.DropDownListFor((model) => model.FreqencyID, Model.AllFrequencies, new { @class = "form-control edit-dataset-row" })
-                    @Html.ValidationMessageFor((model) => model.FreqencyID, "", new { @class = "text-danger" })
+                    <span class="text-muted"><em>If this file drop location does not work for you. Check the checkbox below and follow the new steps.</em></span>
                 </div>
             </div>
-            <div class="form-group">
-                @Html.LabelFor((model) => model.DatasetFileConfigs[0].DatasetScopeTypeID, new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.DropDownListFor((model) => model.DatasetFileConfigs[0].DatasetScopeTypeID, Model.AllDatasetScopeTypes, new { @class = "form-control edit-dataset-row" })
-                    @Html.ValidationMessageFor((model) => model.DatasetFileConfigs[0].DatasetScopeTypeID, "", new { @class = "text-danger" })
-                </div>
-            </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.DatasetFileConfigs[0].DropPath, htmlAttributes: new { @class = "control-label col-md-2" })
+                @Html.LabelFor(model => model.CustomDropPath, htmlAttributes: new { @class = "control-label col-md-2 optional" })
                 <div class="col-md-10">
-                    @Html.EditorFor(model => model.DatasetFileConfigs[0].DropPath, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
-                    @Html.ValidationMessageFor((model) => model.DatasetFileConfigs[0].DropPath, "", new { @class = "text-danger" })
+                    @Html.CheckBoxFor(model => model.CustomDropPath, new {  @class = "" })
                 </div>
             </div>
-
-            @**
-
-        <div class="form-group fieldDescription" >
-            <label class="control-label col-md-2"></label>
-            <div class="col-md-10">
-                <span class="text-muted"><em>If this file drop location does not work for you. Check the checkbox below and follow the new steps.</em></span>
-            </div>
-        </div>
-
-        <div class="form-group">
-            @Html.LabelFor(model => model.CustomDropPath, htmlAttributes: new { @class = "control-label col-md-2 optional" })
-            <div class="col-md-10">
-                @Html.CheckBoxFor(model => model.CustomDropPath, new {  @class = "" })
-            </div>
-        </div>
-
-        <div class="form-group fieldDescription">
-            <label class="control-label col-md-2"></label>
-            <div class="col-md-10">
-                <span class="text-muted">
-                    <em>
-                        <b> Warning:</b> Files that are dropped here will be deleted when the upload to this site is complete.  If this does not work for you then please create a staging location, a copy of the file, or <a href="mailto:BIPortalAdmin@sentry.com?Subject=File_Drop_Location"> click here to contact The Administrators</a>
-                    </em>
-                </span>
-            </div>
-        </div>
-
-        <div class="form-group fieldDescription">
-            <label class="control-label col-md-2"></label>
-            <div class="col-md-10">
-                <span class="text-muted">
-                    <em>
-                        <b> Warning:</b> The data.sentry.com service accounts will need access to this file share.  This may take some time.
-                    </em>
-                </span>
-            </div>
-        </div>
 
             <div class="form-group fieldDescription">
                 <label class="control-label col-md-2"></label>
                 <div class="col-md-10">
                     <span class="text-muted">
                         <em>
-                            <b> Warning:</b> Files that are dropped here will be deleted when the upload to this site is complete.  If this does not work for you then please create a staging location, a copy of the file, or <a href="mailto:BIPortalAdmin@sentry.com?Subject=File_Drop_Location"> click here to contact The Administrators</a>
+                            <b> Warning:</b> Files that are dropped here will be deleted when the upload to this site is complete.  If this does not work for you then please create a staging location, a copy of the file, or <a href="mailto:DSCSupport@sentry.com?Subject=File_Drop_Location"> click here to contact The Administrators</a>
                         </em>
                     </span>
                 </div>
             </div>
 
-
-        </div>
-                <br />
-                <hr />
-                <div id="detailSectionHeader_Advanced">
-                    <span class="glyphicon glyphicon-chevron-up element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_Advanced"></span>
-                    <h5 class="detailSection">Advanced Options</h5>
-                </div>
-                <br />
-                <div id="hide_detailSectionHeader_Advanced" style="display: none;">
-
-
-                    <div class="form-group fieldDescription">
-                        <label class="control-label col-md-2"></label>
-                        <div class="col-md-10">
-                            <span class="text-muted">
-                                <em> The type of protocol (FTP or API) or location type (internal DFS or EC2) that will be used to retrieve this file. </em>
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.SearchCriteria, htmlAttributes: new { @class = "control-label col-md-2 optional" })
-                        <div class="col-md-10">
-                            @Html.EditorFor(model => model.SearchCriteria, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                            @Html.ValidationMessageFor(model => model.SearchCriteria, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-
-                    <div class="form-group fieldDescription">
-                        <label class="control-label col-md-2"></label>
-                        <div class="col-md-10">
-                            <span class="text-muted">
-                                <em> If this directory has a lot of files and not all of them are being brought into data.sentry.com please provide the criteria for which to search for the correct files.  Using a \. will grab all files in the directory. </em>
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.IsRegexSearch, htmlAttributes: new { @class = "control-label col-md-2 optional" })
-                        <div class="col-md-10">
-                            @Html.CheckBoxFor(model => model.IsRegexSearch, new { @class = "" })
-                            @Html.ValidationMessageFor(model => model.IsRegexSearch, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-
-                    <div class="form-group fieldDescription">
-                        <label class="control-label col-md-2"></label>
-                        <div class="col-md-10">
-                            <span class="text-muted">
-                                <em> Is the above Search Criteria a <a target="_blank" href="https://regexr.com/">Regex Expression?</a></em>
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.TargetFileName, htmlAttributes: new { @class = "control-label col-md-2 optional" })
-                        <div class="col-md-10">
-                            @Html.EditorFor(model => model.TargetFileName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                            @Html.ValidationMessageFor(model => model.TargetFileName, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-
-                    <div class="form-group fieldDescription">
-                        <label class="control-label col-md-2"></label>
-                        <div class="col-md-10">
-                            <span class="text-muted">
-                                <em> When we copy a file from the drop location do we change the file name to something different? If nothing is written into the above field we will load the file name into data.sentry.com with the its exact file name.</em>
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.OverwriteDatasetFile, htmlAttributes: new { @class = "control-label col-md-2 optional" })
-                        <div class="col-md-10">
-                            @Html.CheckBoxFor(model => model.OverwriteDatasetFile, new { @class = "" })
-                            @Html.ValidationMessageFor(model => model.OverwriteDatasetFile, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        @Html.LabelFor((model) => model.FileType, new { @class = "control-label col-md-2 optional" })
-                        <div class="col-md-10">
-                            @Html.DropDownListFor((model) => model.FileType, Model.AllDataFileTypes, new { @class = "form-control edit-dataset-row" })
-                            @Html.ValidationMessageFor((model) => model.FileType, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
+            <div class="form-group fieldDescription">
+                <label class="control-label col-md-2"></label>
+                <div class="col-md-10">
+                    <span class="text-muted">
+                        <em>
+                            <b> Warning:</b> The data.sentry.com service accounts will need access to this file share.  This may take some time.
+                        </em>
+                    </span>
                 </div>
             </div>
 
-            <div id="columnPanel" class="tab-pane fade in form-horizontal">
-                <br />
-                <h4>Column Metadata</h4>
-                <br />
-
-                <div class="form-group">
-
-                    <label for="DatasetFileUpload" class="control-label col-md-2">Example File</label>
+                <div class="form-group fieldDescription">
+                    <label class="control-label col-md-2"></label>
                     <div class="col-md-10">
-                        <input type="file" class="edit-dataset-row file-load" id="DatasetFileUpload" />
-                        Html.HiddenFor(model => model.f)
+                        <span class="text-muted">
+                            <em>
+                                <b> Warning:</b> Files that are dropped here will be deleted when the upload to this site is complete.  If this does not work for you then please create a staging location, a copy of the file, or <a href="mailto:DSCSupport@sentry.com?Subject=File_Drop_Location"> click here to contact The Administrators</a>
+                            </em>
+                        </span>
                     </div>
                 </div>
 
-                <button type="button" class="btn btn-primary" id="btnUploadFile" data-id="0">Upload Example Data File</button>
-            </div>
 
-            <div id="lineagePanel" class="tab-pane fade in form-horizontal">
-                <br />
-                <h4>Data Lineage</h4>
-                <br />
             </div>
+                    <br />
+                    <hr />
+                    <div id="detailSectionHeader_Advanced">
+                        <span class="glyphicon glyphicon-chevron-up element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_Advanced"></span>
+                        <h5 class="detailSection">Advanced Options</h5>
+                    </div>
+                    <br />
+                    <div id="hide_detailSectionHeader_Advanced" style="display: none;">
+
+
+                        <div class="form-group fieldDescription">
+                            <label class="control-label col-md-2"></label>
+                            <div class="col-md-10">
+                                <span class="text-muted">
+                                    <em> The type of protocol (FTP or API) or location type (internal DFS or EC2) that will be used to retrieve this file. </em>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.SearchCriteria, htmlAttributes: new { @class = "control-label col-md-2 optional" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.SearchCriteria, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                                @Html.ValidationMessageFor(model => model.SearchCriteria, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group fieldDescription">
+                            <label class="control-label col-md-2"></label>
+                            <div class="col-md-10">
+                                <span class="text-muted">
+                                    <em> If this directory has a lot of files and not all of them are being brought into data.sentry.com please provide the criteria for which to search for the correct files.  Using a \. will grab all files in the directory. </em>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.IsRegexSearch, htmlAttributes: new { @class = "control-label col-md-2 optional" })
+                            <div class="col-md-10">
+                                @Html.CheckBoxFor(model => model.IsRegexSearch, new { @class = "" })
+                                @Html.ValidationMessageFor(model => model.IsRegexSearch, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group fieldDescription">
+                            <label class="control-label col-md-2"></label>
+                            <div class="col-md-10">
+                                <span class="text-muted">
+                                    <em> Is the above Search Criteria a <a target="_blank" href="https://regexr.com/">Regex Expression?</a></em>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.TargetFileName, htmlAttributes: new { @class = "control-label col-md-2 optional" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.TargetFileName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                                @Html.ValidationMessageFor(model => model.TargetFileName, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group fieldDescription">
+                            <label class="control-label col-md-2"></label>
+                            <div class="col-md-10">
+                                <span class="text-muted">
+                                    <em> When we copy a file from the drop location do we change the file name to something different? If nothing is written into the above field we will load the file name into data.sentry.com with the its exact file name.</em>
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.OverwriteDatasetFile, htmlAttributes: new { @class = "control-label col-md-2 optional" })
+                            <div class="col-md-10">
+                                @Html.CheckBoxFor(model => model.OverwriteDatasetFile, new { @class = "" })
+                                @Html.ValidationMessageFor(model => model.OverwriteDatasetFile, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor((model) => model.FileType, new { @class = "control-label col-md-2 optional" })
+                            <div class="col-md-10">
+                                @Html.DropDownListFor((model) => model.FileType, Model.AllDataFileTypes, new { @class = "form-control edit-dataset-row" })
+                                @Html.ValidationMessageFor((model) => model.FileType, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="columnPanel" class="tab-pane fade in form-horizontal">
+                    <br />
+                    <h4>Column Metadata</h4>
+                    <br />
+
+                    <div class="form-group">
+
+                        <label for="DatasetFileUpload" class="control-label col-md-2">Example File</label>
+                        <div class="col-md-10">
+                            <input type="file" class="edit-dataset-row file-load" id="DatasetFileUpload" />
+                            Html.HiddenFor(model => model.f)
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" id="btnUploadFile" data-id="0">Upload Example Data File</button>
+                </div>
+
+                <div id="lineagePanel" class="tab-pane fade in form-horizontal">
+                    <br />
+                    <h4>Data Lineage</h4>
+                    <br />
+                </div>
         *@
     </div>
 
@@ -362,8 +370,8 @@
     </div>
     <div class="form-group">
         <div>
-            <input type="submit" value="Save" class="btn btn-primary" />
-            @Html.ActionLink("Back to Dataset", "Detail", new { id = Model.DatasetId }, new { @class = "btn btn-warning" })
+            <input type="submit" value="Edit Dataset" class="btn btn-primary" />
+            @Html.ActionLink("Cancel", "Detail", new { id = Model.DatasetId }, new { @class = "btn btn-warning" })
         </div>
     </div>
 }

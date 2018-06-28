@@ -7,7 +7,7 @@
 
 
 <center>
-    <h2 style="color: white; margin: 80px; text-shadow: -.5px 0 black, 0 .5px black, .5px 0 black, 0 -.5px black;">Welcome to the Sentry Dataset Portal.  Please type below to search or choose a category.</h2>
+    <h2 style="margin: 80px;">Welcome to the Sentry Dataset Portal.  Please type below to search or choose a category.</h2>
     
     @{
         var category = Model.Categories.ToList();
@@ -20,12 +20,13 @@
                 @{
                     var htmlAttrsObj = new { @class = "navbar-form navbar-center", @id = "DatasetSearch" };
                     var htmlAttributes = HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttrsObj);
-                    using (Html.BeginForm(@"List\SearchPhrase", "Dataset", FormMethod.Get, htmlAttributes))
+                    using (Html.BeginForm(@"Datasets", "Search", FormMethod.Get, htmlAttributes))
                     {
-                        <div class="input-group dataset-search">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
-                            <input type="text" id="SearchText" name="searchPhrase" class="form-control" placeholder="Search from @Model.DatasetCount datasets ..." />
-                        </div>
+                    <div class="input-group" style="width: 50%; margin-bottom:5px; margin-top: 5px;">
+                        <span class="input-group-addon" style="width: 50px; height: 50px;" onclick="$(function() {$('#SearchText').focus();});"><i class="glyphicon glyphicon-search"></i></span>
+
+                        <input style="height: 50px;" type="text" id="SearchText" name="searchPhrase" class="form-control" placeholder="Search from @Model.DatasetCount Datasets ..." />
+                    </div>
                     }
                 }
             </div>
@@ -37,11 +38,12 @@
                 {
                     @:<div class="row text-center">
                 }
+                var color = category[i].Name.ToLower() + "Tile";
 
-                <div class="col-md-3 tile border_@colors[i]">
-                    <a class="" href="~/Dataset/List/Index?category=@category[i]">
-                        <img src="/Images/Category/@{@category[i]}.svg" class="tile-image">
-                        <div class="tile-header" style="color: rgb(0, 0, 0);">@category[i]</div>
+                <div class="col-md-3 tile border_@colors[i] @color ">
+                    <a class="" href="~/Search/Datasets/Index?category=@category[i].Name">
+                        <img src="/Images/Category/@{@category[i].Name}.svg" class="tile-image">
+                        <div class="tile-header" style="color: rgb(0, 0, 0);">@category[i].Name</div>
                         <div class="tile-description" style="color: rgb(0, 0, 0); max-height: 4.5em; -webkit-line-clamp: 3;">
                            
                         </div>
@@ -112,7 +114,6 @@
 
     body {
         margin-top: -6px;
-        background: url(../../Images/SHO_Aerial_10-4-17.png) no-repeat center center fixed;
         -moz-background-size: cover;
         -webkit-background-size: cover;
         -o-background-size: cover;
@@ -132,6 +133,7 @@
     .tile:hover
     {
         opacity: 0.95;
+        background: lightgray;
     }
 
         .tile a {
@@ -141,6 +143,42 @@
             text-decoration: none !important;
 
         }
+
+    .claimTile:hover {
+        opacity: 0.95;
+        background-color: rgba(0, 163, 224, 0.05);
+        box-shadow: 2px 6px 10px #888888;
+    }
+
+    .industryTile:hover {
+        opacity: 0.95;
+        background-color: rgba(132, 189, 0, 0.05);
+        box-shadow: 2px 6px 10px #888888;
+    }
+
+    .governmentTile:hover {
+        opacity: 0.95;
+        background-color: rgba(234, 170, 0, 0.05);
+        box-shadow: 2px 6px 10px #888888;
+    }
+
+    .geographicTile:hover {
+        opacity: 0.95;
+        background-color: rgba(187, 133, 171, 0.05);
+        box-shadow: 2px 6px 10px #888888;
+    }
+
+    .weatherTile:hover {
+        opacity: 0.95;
+        background-color: rgba(229, 114, 0, 0.05);
+        box-shadow: 2px 6px 10px #888888;
+    }
+
+    .sentryTile:hover {
+        opacity: 0.95;
+        background-color: rgba(137, 171, 227, 0.05);
+        box-shadow: 2px 6px 10px #888888;
+    }
 
     .tile-image {
         width: 100px;

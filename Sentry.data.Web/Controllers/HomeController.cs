@@ -25,28 +25,28 @@ namespace Sentry.data.Web.Controllers
     [SessionState(SessionStateBehavior.ReadOnly)]
     public class HomeController : BaseController
     {
-        private IDataFeedContext _feedContext;
-        private IDataAssetProvider _dataAssetProvider;
-        private IDatasetContext _dsContext;
-        private IAppCache cache;
-        private List<DataAsset> das;
+        private readonly IDataFeedContext _feedContext;
+        private readonly IDatasetContext _dsContext;
+        private readonly IAppCache cache;
         private List<DataFeedItem> dfisAll;
-        private List<DataFeedItem> dfisSentry;
 
-        public HomeController() { }
-
-        public HomeController(IDataAssetProvider dap, IDataFeedContext feedContext, IDatasetContext datasetContext)
+        public HomeController(IDataFeedContext feedContext, IDatasetContext datasetContext, IDataAssetContext dataAssetContext)
         {
-            _dataAssetProvider = dap;
             _feedContext = feedContext;
             _dsContext = datasetContext;
-            das = new List<DataAsset>(_dataAssetProvider.GetDataAssets());
             cache = new CachingService();
         }
 
         public ActionResult Index()
         {
             ViewData["fluid"] = true;
+
+            HomeModel hm = new HomeModel();
+
+            hm.DatasetCount = _dsContext.GetDatasetCount();
+            hm.Categories = _dsContext.Categories.ToList();
+            hm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
+            hm.CanUpload = SharedContext.CurrentUser.CanUpload;
 
             Event e = new Event();
             e.EventType = _dsContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
@@ -58,15 +58,11 @@ namespace Sentry.data.Web.Controllers
             e.Reason = "Viewed Home Page";
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
-
-
-            return View(das);
+            return View(hm);
         }
 
         //TODO Refactor into table (https://jira.sentry.com/browse/DSC-476)
         private readonly int[] sprintsIds = new int[2] { 2230, 2346 };
-
-
 
         public async Task<ActionResult> ReleaseNotes()
         {
@@ -77,7 +73,6 @@ namespace Sentry.data.Web.Controllers
         {
             public List<Sprint> sprints { get; set; }
         }
-
 
         //TODO Refactor Jira calls into Infrastructure Layer (https://jira.sentry.com/browse/DSC-475)
         public JsonResult GetSprint()
@@ -146,19 +141,10 @@ namespace Sentry.data.Web.Controllers
 
         }
 
-
-
-
         public async Task<ActionResult> GetFeed()
         {
-            dfisAll = await Task.Factory.StartNew(() => cache.GetOrAdd("feedAll", () => _feedContext.GetAllFeedItems().ToList()));
+            dfisAll = await Task.Factory.StartNew(() => cache.GetOrAdd("feedAll", () => _feedContext.GetAllFeedItems().ToList(), TimeSpan.FromHours(1)));
             return PartialView("_Feed", dfisAll.Take(10).ToList());
-        }
-        
-        public ActionResult GetSentryFeed()
-        {
-            dfisSentry = cache.GetOrAdd("feedSentry", () => _feedContext.GetSentryFeedItems().ToList());
-            return PartialView("_Feed", dfisSentry.Take(10).ToList());
         }
 
         public ActionResult GetMoreFeeds(int skip)
@@ -173,56 +159,4 @@ namespace Sentry.data.Web.Controllers
             return PartialView("_Feed", tempList);
         }
     }
-
-    //private IDataAssetContext _domainContext;
-
-    //public HomeController(IDataAssetContext domainContext, IDataFeedContext feedContext)
-    //{
-    //    _domainContext = domainContext;
-    //    _feedContext = feedContext;
-    //}
-
-    //public JsonResult LongRunningProcess()
-    //{
-    //    //THIS COULD BE SOME LIST OF DATA
-    //    int itemsCount = 100;
-
-    //    for (int i = 0; i <= itemsCount; i++)
-    //    {
-    //        //SIMULATING SOME TASK
-    //        Thread.Sleep(50);
-
-    //        //CALLING A FUNCTION THAT CALCULATES PERCENTAGE AND SENDS THE DATA TO THE CLIENT
-    //        Functions.SendProgress("Process in progress...", i, itemsCount);
-    //    }
-
-    //    return Json("", JsonRequestBehavior.AllowGet);
-    //}
-
-    //###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific
-    //public PartialViewResult AssetOverview()
-    //{
-    //    return PartialView("_AssetOverview", _domainContext.Assets.OrderBy((i) => i.Name).Select((i) => new BaseAssetModel(i)).ToList());
-    //}
-
-    //public PartialViewResult HotTopicsFeed()
-    //{
-    //    return PartialView("_HotTopicsFeed", _feedContext.HotTopicsFeed.OrderBy((i) => i.PublishDate).Take(3).Select((i) => new DataFeedItemModel(i)).ToList());
-    //}
-
-    //public PartialViewResult NewsFeed()
-    //{
-    //    return PartialView("_NewsFeed", _feedContext.NewsFeed.OrderBy((i) => i.PublishDate).Take(3).Select((i) => new DataFeedItemModel(i)).ToList());
-    //}
-    //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
-
-    //FROM INDEX ACTION METHOD
-    //HomeModel model = new HomeModel();
-    //###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific
-    //model.RootCategories = _domainContext.Categories.WhereIsRoot().Select((c) => new BaseCategoryModel(c)).ToList();
-    //model.RootAssets = _domainContext.Assets.Select((c) => new BaseAssetModel(c)).ToList();
-    //model.RootNewsFeedItems = _feedContext.NewsFeed.Select((c) => new DataFeedItemModel(c)).ToList();
-    //model.RootHotTopicFeedItems = _feedContext.HotTopicsFeed.Select((c) => new DataFeedItemModel(c)).ToList();
-    //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
-    //return View(model);
 }

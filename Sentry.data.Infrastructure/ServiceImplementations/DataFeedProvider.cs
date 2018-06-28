@@ -16,6 +16,9 @@ namespace Sentry.data.Infrastructure
 {
     public class DataFeedProvider : NHReadableStatelessDomainContext, IDataFeedContext
     {
+        private readonly IDatasetContext _datasetContext;
+
+
         public DataFeedProvider(IStatelessSession session) : base(session)
         {
             NHQueryableExtensionProvider.RegisterQueryableExtensionsProvider<DataFeedProvider>();
@@ -24,7 +27,6 @@ namespace Sentry.data.Infrastructure
         public IList<DataFeed> GetDataFeeds()
         {
             return Query<DataFeed>().Cacheable().ToList();
-            //return Query<DataFeed>().ToList();
         }
 
         public IList<DataFeedItem> GetAllFeedItems()
@@ -59,11 +61,7 @@ namespace Sentry.data.Infrastructure
                 }
             });
 
-            //foreach(var feed in dataFeeds)
-            //{
-            //    List<DataFeedItem> list = GetFeedItems(feed).ToList();
-            //    items.AddRange(list);
-            //}
+            items.AddRange(SentryEvents());
 
             return items.OrderByDescending(o => o.PublishDate).Take(100).ToList();
         }
@@ -110,62 +108,29 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        //public IQueryable<DataFeedItem> HotTopicsFeed
-        //{
-        //    get
-        //    {
-        //        List<DataFeedItem> dataFeed = new List<DataFeedItem>();
-        //        try
-        //        {
-        //            string url = "http://www.sas.com/content/sascom/en_us/resource-center/rss/_jcr_content/par/rssfeed_c3da.rss.xml";
-        //            XmlReader reader = XmlReader.Create(url);
-        //            SyndicationFeed feed = SyndicationFeed.Load(reader);
-        //            reader.Close();
-        //            foreach (SyndicationItem item in feed.Items)
-        //            {
-        //                dataFeed.Add(new DataFeedItem(
-        //                    item.PublishDate.DateTime,
-        //                    item.Id,
-        //                    item.Title.Text,
-        //                    item.Summary.Text));
-        //            }
-        //            return dataFeed.AsQueryable();
-        //            //return DataFeedService.GetHotTopics().AsQueryable();
-        //        }
-        //        catch
-        //        {
-        //            return dataFeed.AsQueryable();
-        //        }
-        //    }
-        //}
+        public IList<DataFeedItem> SentryEvents()
+        {
+            List<DataFeedItem> items = new List<DataFeedItem>();
+            var events = Query<Event>().Where(x => x.Dataset != null && x.EventType.Description == "Created Dataset").OrderByDescending(x => x.TimeCreated).Take(50);
 
-        //public IQueryable<DataFeedItem> NewsFeed
-        //{
-        //    get
-        //    {
-        //        List<DataFeedItem> dataFeed = new List<DataFeedItem>();
-        //        try
-        //        {
-        //            string url = "https://community.tableau.com/groups/feeds/popularthreads?socialGroup=1061";
-        //            XmlReader reader = XmlReader.Create(url);
-        //            SyndicationFeed feed = SyndicationFeed.Load(reader);
-        //            reader.Close();
-        //            foreach (SyndicationItem item in feed.Items)
-        //            {
-        //                dataFeed.Add(new DataFeedItem(
-        //                    item.PublishDate.DateTime,
-        //                    item.Id,
-        //                    item.Title.Text,
-        //                    item.Summary.Text));
-        //            }
-        //            return dataFeed.AsQueryable();
-        //        }
-        //        catch
-        //        {
-        //            return dataFeed.AsQueryable();
-        //        }
-        //        //return DataFeedService.GetNewsFeed().AsQueryable();
-        //    }
-        //}
+            foreach(Event e in events)
+            {
+                Dataset ds = Query<Dataset>().FirstOrDefault(y => y.DatasetId == e.Dataset);
+
+                DataFeedItem dfi = new DataFeedItem(
+                    e.TimeCreated,
+                    e.Dataset.ToString(),
+                    ds.DatasetName + " - A New Dataset was Created in the " + ds.Category + " Category",
+                    ds.DatasetName + " - A New Dataset was Created in the " + ds.Category + " Category",
+                    new DataFeed() { Name = "Datasets", Url = "/Datasets/Detail/" + e.Dataset, Type = "Datasets" }
+                );
+
+                items.Add(dfi);
+
+
+            }
+
+            return items;
+        }
     }
 }

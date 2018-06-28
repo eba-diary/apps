@@ -33,6 +33,42 @@ namespace Sentry.data.Core
     public class LineageCreation
     {
 
+        public LineageCreation()
+        {
+        }
+
+        public LineageCreation(Lineage l, int layer)
+        {
+            DataAsset_ID = l.DataAsset_ID;
+            Model_NME = l.Model_NME;
+            Layer = layer;
+
+            DataElement_NME = l.DataElement_NME;
+            DataElement_TYP = l.DataElement_TYP;
+
+            DataObject_NME = l.DataObject_NME;
+            DataObject_DSC = l.DataObject_DSC;
+            DataObjectCode_DSC = l.DataObjectCode_DSC;
+
+            DataObjectDetailType_VAL = l.DataObjectDetailType_VAL;
+            DataObjectField_NME = l.DataObjectField_NME;
+            DataObjectField_DSC = l.DataObjectField_DSC;
+
+            SourceElement_NME = l.SourceElement_NME;
+            SourceField_NME = l.SourceField_NME;
+            SourceObject_NME = l.SourceObject_NME;
+
+            Display_IND = l.Display_IND;
+            Sources = new List<LineageCreation>();
+
+            DataLineage_ID = l.DataLineage_ID;
+            Transformation_TXT = l.Transformation_TXT;
+            Source_TXT = l.Source_TXT;
+        }
+
+
+
+
         public virtual int Layer { get; set; }
 
         public virtual Guid DataLineage_ID { get; set; }

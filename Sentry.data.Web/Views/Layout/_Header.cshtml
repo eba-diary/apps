@@ -6,7 +6,7 @@
 {
     <div id="NoAccessWarning" role="banner" aria-hidden="false" style="margin-bottom: -2px; font-size: 14px;" class="alert alert-warning">
         <span class="glyphicon glyphicon-warning-sign" style="margin: 0px 15px 0px 5px;"></span>
-        You currently <b>Do Not</b> have access to data.sentry.com.    Please <a>click here</a> or go to our help menu above to find out how to get access through <a target="_blank" href="https://myaccess.sentry.com">My Access</a>.
+        You currently <b>Do Not</b> have access to data.sentry.com.    Please <a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/_layouts/15/WopiFrame.aspx?sourcedoc=/it/DataArch/Shared%20Documents/Data.Sentry.com/004.%20Project%20Documentation/SiteAccess.docx&action=default">click here</a> or go to our help menu above to find out how to get access through <a target="_blank" href="https://myaccess.sentry.com">My Access</a>.
     </div>
 
     <div id="internetExplorerWarning" role="banner" aria-hidden="false" style="font-size: 14px; display:none;" class="alert alert-warning">
@@ -34,9 +34,9 @@ else
             <h1>
                 data.sentry.com
             </h1>
-            <h2>
-                Everything Data
-            </h2>
+            @*<h2>
+                Data for all of Sentry
+            </h2>*@
         </div>
         @{if (Model.EnvironmentName.ToUpper() != "PROD")
             {
@@ -102,7 +102,7 @@ else
                             <li class="dropdown-submenu">
                                 <a data-toggle="dropdown">Assets </a>
                                 <ul class="dropdown-menu">
-                                    @foreach (Sentry.data.Core.DataAsset da in ViewBag.DataAssets)
+                                    @foreach (Sentry.data.Web.Models.AssetUIModel da in ViewBag.DataAssets)
                                     {
                                         <li class="text-right"><a href="/DataAsset/@da.Name">@da.DisplayName</a></li>
                                     }
@@ -187,7 +187,7 @@ else
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Datasets<b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         <li><a href="~/Dataset/Index">Home</a></li>
-                        <li><a href="~/Dataset/List">Search</a></li>
+                        <li><a href="~/Search/Datasets">Search</a></li>
 
                         @if (Model.CanManageConfigs || Model.CanEditDataset || Model.CanUpload)
                         {
@@ -234,8 +234,8 @@ else
                     <ul class="dropdown-menu">
                         @*<li><a href="/About/">About</a></li>*@
                         @*<li><a href="/Home/ReleaseNotes">Release Notes</a></li>*@
-                        <li><a href="mailto:BIPortalAdmin@sentry.com?Subject=Feedback">Provide Feedback</a></li>
-                        <li><a href="mailto:BIPortalAdmin@sentry.com?Subject=Bug&nbsp;Report">Report Bug</a></li>
+                        <li><a href="mailto:DSCSupport@sentry.com?Subject=Feedback">Provide Feedback</a></li>
+                        <li><a href="mailto:DSCSupport@sentry.com?Subject=Bug&nbsp;Report">Report Bug</a></li>
                         @*<li><a href="/Tutorial">Tutorial</a></li>*@
                         <li class="dropdown-submenu">
                             <a data-toggle="dropdown">User Guides</a>
@@ -246,12 +246,13 @@ else
                                         <li class="text-right"><a href="#" onclick="data.Dataset.GetUserGuide('data-asset/Alert-Notifications.pdf')">Alert Notifications</a></li>
                                     </ul>
                                 </li>
-                                <li class="dropdown-submenu">
+                                @*<li class="dropdown-submenu">
                                     <a data-toggle="dropdown">Dataset Management</a>
                                     <ul class="dropdown-menu">
                                         <li class="text-right"><a href="#" onclick="">Coming Soon!</a></li>
                                     </ul>
-                                </li>
+                                </li>*@
+                                <li><a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/_layouts/15/WopiFrame.aspx?sourcedoc=/it/DataArch/Shared%20Documents/Data.Sentry.com/004.%20Project%20Documentation/SiteAccess.docx&action=default">Access Guide</a></li>
                             </ul>
                         </li>
 

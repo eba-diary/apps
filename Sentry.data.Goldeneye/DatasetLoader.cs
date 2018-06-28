@@ -15,25 +15,6 @@ namespace Sentry.data.Goldeneye
 {
     class DatasetLoader
     {
-
-        class SystemConfig
-        {
-            public string systemName { get; set; }
-            public List<FileConfig> fileConfigs { get; set; }
-        }
-
-        class FileConfig
-        {
-            public FileSearch fileSearch { get; set; }
-            public DatasetMetadata datasetMetadata { get; set; }
-        }
-
-        class FileSearch
-        {
-            public string fileName { get; set; }
-            public string regex { get; set; }
-        }
-
         public static async Task<LoaderRequest> Run(string reqPath)
         {
             LoaderRequest req = null;

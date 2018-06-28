@@ -10,6 +10,9 @@
     [Created_DTM]       DATETIME       NOT NULL,
     [Modified_DTM]      DATETIME       NOT NULL,
     [Bucket_NME] NVARCHAR(250) NULL, 
+    [PortNumber] INT NULL, 
+    [HostFingerPrintKey] NVARCHAR(MAX) NULL, 
+    [IsUserPassRequired] BIT NULL, 
     PRIMARY KEY CLUSTERED ([DataSource_Id] ASC),
     CONSTRAINT [FK_DataSource_AuthenticationType] FOREIGN KEY ([SourceAuth_ID]) REFERENCES [dbo].[AuthenticationType] ([Auth_Id])
 );

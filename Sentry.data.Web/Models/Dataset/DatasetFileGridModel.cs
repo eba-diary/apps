@@ -46,19 +46,25 @@ namespace Sentry.data.Web
             get
             {
                 string href = "";
+                Boolean correctFileTypeForPreview = (Path.GetExtension(Name).Contains("csv") || Path.GetExtension(Name).Contains("txt") || Path.GetExtension(Name).Contains("json"));
+                Boolean correctSensitivityForDownload = ((IsSensitive && CanDwnldSenstive) || (!IsSensitive && CanDwnldNonSensitive));
 
                 if (IsUsable)
                 {
-                    if (CanPreview && (Path.GetExtension(Name).Contains("csv") || Path.GetExtension(Name).Contains("txt") || Path.GetExtension(Name).Contains("json")))
+                    if (CanPreview && correctSensitivityForDownload && correctFileTypeForPreview)
                     {
                         href += "<a href = \"#\" onclick=\"data.DatasetDetail.PreviewDatafileModal(" + Id + ")\" class=\"table-row-icon row-filepreview-icon\" title=\"Preview file\"><i class='glyphicon glyphicon-search text-primary'></i></a>";
                     }
-                    else
+                    else if(!correctFileTypeForPreview)
                     {
                         href += "<a disabled class=\"table-row-icon row-filepreview-icon disabled\" title=\"Not available for this file type.\"><i class='glyphicon glyphicon-search text-primary disabled' style='color:gray;'></i></a>";
                     }
+                    else
+                    {
+                        href += "<a disabled class=\"table-row-icon row-filepreview-icon disabled\" title=\"This operation is not available.\"><i class='glyphicon glyphicon-search text-primary disabled' style='color:gray;'></i></a>";
+                    }
 
-                    if ((IsSensitive && CanDwnldSenstive) || (!IsSensitive && CanDwnldNonSensitive))
+                    if (correctSensitivityForDownload)
                     {
                         href += "<a href = \"#\" onclick=\"data.DatasetDetail.DownloadDatasetFile(" + Id + ")\" class=\"table-row-icon row-filedownload-icon\" title=\"Download File\"><i class='glyphicon glyphicon-cloud-download text-primary'></i></a>";
                     }
@@ -70,15 +76,13 @@ namespace Sentry.data.Web
 
                 if (IsUsable)
                 {
-
-                    if ((IsSensitive && CanDwnldSenstive && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(Name))) || (!IsSensitive && CanDwnldNonSensitive && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(Name))))
+                    if (correctSensitivityForDownload && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(Name)))
                     {
                         href += "<a href = \"#\" onclick=\"data.Dataset.FileNameModal(" + Id + ")\" title=\"Push to SAS\">" +
                             "<img src=\"../../Images/sas_logo_min.png\" style=\" height: 15px; margin-bottom: 4px; margin-left: 5px;\"/>" +
                             "</a>";
 
                     }
-
                 }
                 return href;
             }

@@ -6,10 +6,9 @@
     string headerColor = "categoryBanner-" + Model.DatasetCategory.Color;
 }
 
-<div>
-
+<div>   
     <div class="topBanner">
-        <a href="@Url.Action("List", "Dataset")" class="backToList" id="linkReturnToList"><span class="glyphicon glyphicon-chevron-left"></span>Back to list</a>
+        <a href="@Url.Action("Datasets", "Search")" class="backToList" id="linkReturnToList"><span class="glyphicon glyphicon-chevron-left"></span>Back to list</a>
 
 
         @if (@Model.DatasetFiles.Count == 0)
@@ -104,7 +103,7 @@
                         </button>
                     }
 
-                    @if ((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.IsPreviewCompatible))
+                    @if ((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive))
                     {
                         <button type="button"
                                 class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
@@ -163,7 +162,21 @@
         <div class="row">
             <div class="col-lg-8">
                 <div style="margin-left: 35px;">
-                    <h6 class="@color">@Model.DatasetDesc</h6>
+
+                    @if(Model.DatasetDesc.Length >= 300)
+                    {
+                        <h6 class="@color">
+                         <span style="margin-top: 15px;">@Model.DatasetDesc.Substring(0, 300)</span>
+                         <span id="descSeeMoreEllipsis">...</span>
+                         <span id="descSeeMorePanel" style="display: none;">@Model.DatasetDesc.Substring(300) </span>
+                         <span id="descSeeMoreButton" style="cursor: pointer;"><a onclick="$('#descSeeMorePanel').show(); $(this).parent().hide(); $('#descShowLessButton').show(); $('#descSeeMoreEllipsis').hide();">See More</a></span>
+                         <span id="descShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#descSeeMorePanel').hide(); $(this).parent().hide(); $('#descSeeMoreButton').show(); $('#descSeeMoreEllipsis').show();">Show Less</a></span>
+                        </h6>
+                    }
+                    else
+                    {
+                         <h6 class="@color">@Model.DatasetDesc</h6>
+                    }
                 </div>
             </div>
             <div class="col-lg-4">
@@ -175,7 +188,7 @@
                     </div>
                     <div id="hide_detailSectionHeader_Admin">
                         <a style="margin-left: 35px; margin-top: -2px;" class="backToList" href="/Config/Dataset/@Model.DatasetId">
-                            Manage Data File Configurations <span class="glyphicon glyphicon-chevron-right"></span>
+                            Manage Schemas <span class="glyphicon glyphicon-chevron-right"></span>
                         </a>
                         <br />
                     </div>
@@ -191,7 +204,21 @@
             <div class="col-lg-8">
                 <div style="margin-left: 35px;">
                     <h6 class="@color">Usage Information:</h6><br />
-                    <span style="margin-top: 15px;">@Model.DatasetInformation</span>
+
+                    @if(Model.DatasetInformation.Length >= 150)
+                    {
+                         <span style="margin-top: 15px;">@Model.DatasetInformation.Substring(0, 150)</span>
+                         <span id="usageSeeMoreEllipsis">...</span>
+                         <span id="usageSeeMorePanel" style="display: none;">@Model.DatasetInformation.Substring(150)</span>
+                         <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
+                         <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
+
+                    }
+                    else
+                    {
+                         <span style="margin-top: 15px;">@Model.DatasetInformation</span>
+                    }
+
                 </div>
             </div>
         </div>
@@ -577,7 +604,7 @@
 
             $('#datasetConfigList').select2({ width: '85%' });
 
-            var returnUrl = "/Dataset/List/SearchPhrase";
+            var returnUrl = "/Search/Datasets";
 
             if (localStorage.getItem("searchText") !== null) {
                 var text = localStorage.getItem("searchText");

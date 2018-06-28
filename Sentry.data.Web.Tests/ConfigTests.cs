@@ -8,7 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 
-namespace Sentry.data.Tests
+namespace Sentry.data.Web.Tests
 {
     [TestClass]
     public class ConfigTests

@@ -6,7 +6,7 @@ using Sentry.data.Core;
 using Rhino.Mocks;
 using System.Linq;
 
-namespace Sentry.data.Tests
+namespace Sentry.data.Web.Tests
 {
 
     // All test methods that go against a live database should be marked with a specific Test Category

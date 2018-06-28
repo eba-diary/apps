@@ -48,7 +48,7 @@ namespace Sentry.data.Web
         [DisplayName("Search Criteria")]
         public string SearchCriteria { get; set; }
 
-        [DisplayName("Is Regex Search")]
+        [DisplayName("Is Search Regex?")]
         public Boolean IsRegexSearch { get; set; }
 
         [DisplayName("Overwrite Data File")]
@@ -63,7 +63,7 @@ namespace Sentry.data.Web
         public int DatasetID { get; set; }
         public int DatasetConfigID { get; set; }
 
-        [DisplayName("Is Source Compressed")]
+        [DisplayName("Decompress File?")]
         public Boolean IsSourceCompressed { get; set; }
         [DisplayName("Compression Type")]
         public string CompressionType { get; set; }

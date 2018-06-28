@@ -3,16 +3,27 @@
     ViewBag.Title = "Manage Asset Notifications";
 }
 
+<div class="topBanner">
+    <div>
+        <a class="backToList" href="/DataAsset/Index"><span class="glyphicon glyphicon-chevron-left"></span>Back to Data Assets</a>
+    </div>
+</div>
+
+<h1>Asset Notifications</h1>
+
+<hr />
+
+<div class="form-group">
+    <div>
+        <a href="~/DataAsset/CreateAssetNotification" class="btn btn-md btn-info">Create New Notification</a>
+    </div>
+</div>
+
+<hr />
 
 <div>
-    <div id="detailSectionHeader_AssetNotification">
-        <h2 class="detailSection ">Asset Notifications</h2>
-    </div>
     <div id="hide_detailSectionHeader_AssetNotification">
-
-        <a href="~/DataAsset/CreateAssetNotification" class="btn btn-md btn-info">Create New Notification</a>
-
-        <table class="table table-striped table-bordered " id="assetnotificationTable" width="90%">
+        <table class="table table-striped table-bordered " id="assetnotificationTable">
             <thead>
                 <tr>
                     <th></th>
@@ -30,6 +41,8 @@
         </table>
     </div>
 </div>
+<br />
+
 
 @section Scripts{
 
@@ -37,9 +50,9 @@
     @Scripts.Render("~/bundles/dataTables")
 
     <script>
-    $(function () {
-        data.ManageAssetAlert.Init();
-    });
+        $(function () {
+            data.ManageAssetAlert.Init();
+        });
     </script>
 
 }

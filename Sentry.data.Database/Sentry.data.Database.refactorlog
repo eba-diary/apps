@@ -455,4 +455,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Search" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="a0db434a-0b2c-4e20-a575-c85484c21ff1" ChangeDateTime="06/18/2018 11:30:17">
+    <Property Name="ElementName" Value="[dbo].[DataSource].[SshHostKey]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataSource]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="PortNumber" />
+  </Operation>
 </Operations>

@@ -11,7 +11,7 @@ namespace Sentry.data.Infrastructure
     /// <summary>
     /// This class is responsible for wiring up the Infrastructure to the application.
     /// </summary>
-    public class Bootstrapper
+    public static class Bootstrapper
     {
 
         private static StructureMap.IContainer _container;
@@ -65,12 +65,8 @@ namespace Sentry.data.Infrastructure
                 scanner.AssemblyContainingType<IDatasetContext>();
                 scanner.AssemblyContainingType<DataFeedProvider>();
                 scanner.AssemblyContainingType<IDataFeedContext>();
-                scanner.AssemblyContainingType<AssetDynamicDetailsProvider>();
-                scanner.AssemblyContainingType<IAssetDynamicDetailsProvider>();
                 scanner.AssemblyContainingType<MetadataRepositoryProvider>();
                 scanner.AssemblyContainingType<IMetadataRepositoryProvider>();
-                scanner.AssemblyContainingType<DataAssetProvider>();
-                scanner.AssemblyContainingType<IDataAssetProvider>();
                 scanner.AddAllTypesOf<IDataSource>();
                 scanner.WithDefaultConventions();
             });
@@ -79,9 +75,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IDataAssetContext>().Use(() => new dataAssetContext(_defaultSessionFactory.OpenSession()));
             registry.For<IDatasetContext>().Use(() => new datasetContext(_defaultSessionFactory.OpenSession()));
             registry.For<IDataFeedContext>().Use(() => new DataFeedProvider(_defaultSessionFactory.OpenStatelessSession()));
-            registry.For<IAssetDynamicDetailsProvider>().Use(() => new AssetDynamicDetailsProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IMetadataRepositoryProvider>().Use(() => new MetadataRepositoryProvider(_defaultSessionFactory.OpenStatelessSession()));
-            registry.For<IDataAssetProvider>().Use(() => new DataAssetProvider(_defaultSessionFactory.OpenSession()));
             registry.For<IODCFileProvider>().Use(() => new ODCFileProvider(_defaultSessionFactory.OpenSession()));
             registry.For<IRequestContext>().Use(() => new RequestContext(_defaultSessionFactory.OpenSession()));
 
@@ -92,7 +86,6 @@ namespace Sentry.data.Infrastructure
             registry.For<IAssociateInfoProvider>().Singleton().Use<AssociateInfoProvider>();
             registry.For<IExtendedUserInfoProvider>().Singleton().Use<ExtendedUserInfoProvider>();
             registry.For<ISASService>().Singleton().Use<SASServiceProvider>();
-            registry.For<IWeatherDataProvider>().Singleton().Use<WeatherDataProvider>();
             registry.For<IFtpProvider>().Singleton().Use<FtpProvider>();
             registry.For<IDatasetService>().Singleton().Use<S3ServiceProvider>();
             

@@ -1,82 +1,155 @@
-﻿@{
+﻿@model HomeModel
+@{
     ViewData["Title"] = "Data at Sentry";
     string color2 = "gold";
+    Layout = "~/Views/Shared/_HomePageLayout.cshtml";
 }
 
 
+<style>
+    .frontPageh1 {
+        text-align:center;
+
+    }
+</style>
+
+<div class="hero hero-media ReplaceSpecialChars" style="height: 275px;">
+
+    <div class="picture">
+
+        <picture>
+            @*<source srcset="~/Images/SHO_SentryWorld_Aerial.jpg" media="(min-width: 768px)">
+                <img src="~/Images/SHO_SentryWorld_Aerial.jpg" style="top: -200px !important;" alt="" title="">*@
+
+            @*<source srcset="~/Images/Hole16_Summer_Flowers_14.png" media="(min-width: 768px)">
+            <img src="~/Images/Hole16_Summer_Flowers_14.png" class="backgroundImage" style="top: -450px !important;" alt="" title="">*@
+
+            @*<source srcset="~/Images/SHO_Aerial_10-4-17.png" media="(min-width: 768px)">
+                <img src="~/Images/SHO_Aerial_10-4-17.png" style="top: -200px !important;" alt="" title="">*@
+
+        </picture>
+    </div>
 
 
-<center>
-    <h2 style="color: white; margin: 80px; text-shadow: -.95px 0 black, 0 .95px black, .95px 0 black, 0 -.95px black;">Welcome to the Data.Sentry.com Portal.  Please choose an option below to begin your journey.</h2>
 
-    <div class="container">
-        <div class="ds-grid col-md-12" style="margin-bottom: 40px; display: none;">
-            <div class="row">
-                @{
+    <div class="container" style="">
+        <h1 class="frontPageh1">
+            Welcome to data.sentry.com.
+            Please choose a section below to begin.
+        </h1>
+        @*<section class="bar" style="">
+                <div id="searchBar" >
+                    <div class="col-lg-2"></div>
+                    <div class="col-lg-8">
+                        <div class="row">
+                            @{
+                        var htmlAttrsObj = new { @class = "navbar-form navbar-center", @id = "DatasetSearch" };
+                        var htmlAttributes = HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttrsObj);
+                        using (Html.BeginForm(@"Datasets", "Search", FormMethod.Get, htmlAttributes))
+                        {
+                            <div class="input-group" style="width: 100%; margin-bottom:5px; margin-top: 5px;">
+                                <span class="input-group-addon" style="width: 50px; height: 50px;" onclick="$(function() {$('#SearchText').focus();});"><i class="glyphicon glyphicon-search"></i></span>
+
+                                <input style="height: 50px;" type="text" id="SearchText" name="searchPhrase" class="form-control" placeholder="Search from @Model.DatasetCount datasets ..." />
+                            </div>
+                        }
+                            }
+                        </div>
+                    </div>
+                    <div class="col-lg-2"></div>
+                </div>
+            </section>*@
+
+    </div>
+</div>
+
+<div class="hero hero-media ReplaceSpecialChars">
+
+    <div class="container" style="    top: -50px;">
+        <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8" id="leftPanel">
+            <a class="" href="/DataAsset/Index" style="background: white;">
+                <div class="borderdk_green tile assetTile" style="height:200px;">
+
+                    <div class="text-center col-lg-6 ">
+                        <img src="~/Images/Icons/DataAssets.svg" class="tile-image">
+                        <div class="tile-header" style="color: #005844;">Data Assets</div>
+                    </div>
+                    <div class="text-center col-lg-5" style="margin-top:27px;">
+                        <h3 style="color: #005844;">Data Asset Health</h3>
+                        <h3 style="color: #005844;">Data Lineage</h3>
+                        <h3 style="color: #005844;">Data Asset Information</h3>
+                    </div>
+
+                </div>
+            </a>
+            <div style="height:1px;">
+            </div>
+            <a class="" href="/Dataset/Index" style="background: white;">
+                <div class="borderdk_blue tile setTile" style="height:200px;">
+
+                    <div class="text-center col-lg-6 ">
+                        <img src="~/Images/Icons/Datasets.svg" class="tile-image">
+                        <div class="tile-header" style="color: #285780;">Datasets</div>
+                    </div>
+                    <div class="text-center col-lg-5" style="margin-top:42px;">
+                        <h3 style="color: #285780;">Internal Sentry Datasets</h3>
+                        <h3 style="color: #285780;">External Datasets</h3>
+                    </div>
+
+                </div>
+            </a>
+
+            <div>
+                <div style="margin-left: 30px; margin-right:30px;">
+                    <div>
+                        @{
                     var htmlAttrsObj = new { @class = "navbar-form navbar-center", @id = "DatasetSearch" };
                     var htmlAttributes = HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttrsObj);
-                    using (Html.BeginForm(@"List\SearchPhrase", "Dataset", FormMethod.Get, htmlAttributes))
+                    using (Html.BeginForm(@"Datasets", "Search", FormMethod.Get, htmlAttributes))
                     {
-                        <div class="input-group dataset-search">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
-                            <input type="text" id="SearchText" name="searchPhrase" class="form-control" placeholder="Search " />
+                        <div class="input-group" style="width: 100%; margin-bottom:5px; margin-top: 5px;">
+                            <span class="input-group-addon" style="width: 50px; height: 50px;" onclick="$(function() {$('#SearchText').focus();});"><i class="glyphicon glyphicon-search"></i></span>
+
+                            <input style="height: 50px;" type="text" id="SearchText" name="searchPhrase" class="form-control" placeholder="Search from @Model.DatasetCount Datasets ..." />
                         </div>
-                    }
-                }
+            }
+                        }
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="ds-grid col-md-12" style="margin-top: 75px;">
-            <div class="row text-center">
-                <div class="col-lg-4 tile borderdk_green">
-                    <a class="" href="~/DataAsset/Index">
-                        <img src="~/Images/Icons/DataAssets.svg" class="tile-image">
-                        <div class="tile-header" style="color: rgb(0, 0, 0);">Data Assets</div>
-                        <div class="tile-description" style="color: rgb(0, 0, 0); max-height: 4.5em; -webkit-line-clamp: 3;">
-                            Data Asset Health and Information
-                        </div>
-                    </a>
-                </div>
-                <div class="col-lg-4 tile borderdk_blue">
-                    <a class="" href="~/Dataset/Index">
-                        <img src="~/Images/Icons/Datasets.svg" class="tile-image">
-                        <div class="tile-header" style="color: rgb(0, 0, 0);">Datasets</div>
-                        <div class="tile-description" style="color: rgb(0, 0, 0); max-height: 4.5em; -webkit-line-clamp: 3;">
-                            Internal and External Datasets
-                        </div>
-                    </a>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-lg-12 text-center" style="margin-top: 175px;">
-                    <div class="feed hidden-xs hidden-sm border_@color2" style="width: 100%;">
-                        <div class="row_@color2 topFeed">
-                            <h2 class="@color2 leftFloat feedHeader">Feed</h2>
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+            <div class="col-lg-12 text-center">
+                <div class="feed hidden-xs hidden-sm border_@color2" style="width: 100%; margin-top: 30px;">
+                    <div class="row_@color2 topFeed">
+                        <h2 class="@color2 leftFloat feedHeader">Feed</h2>
 
-                            @*<div class="feedCheckbox rightFloat">
+                        @*<div class="feedCheckbox rightFloat">
                         <label>
                             <input type="checkbox" id="chbx" />
                             <span>Sentry feeds only</span>
                         </label>
                     </div>*@
-                        </div>
+                    </div>
 
-                        <div class="feedBox clearFloat" id="feed">
-                            <div class="feedSpinner">
-                                <span class="sentry-spinner"></span>
-                            </div>
-                            @*@Html.Action("GetFeed", "Home")*@
+                    <div class="feedBox clearFloat" id="feed">
+                        <div class="feedSpinner">
+                            <span class="sentry-spinner"></span>
                         </div>
+                        @*@Html.Action("GetFeed", "Home")*@
+                    </div>
 
-                        <div class="feedBox clearFloat hidden" id="sentryFeed">
-                            @*@Html.Action("GetSentryFeed", "Home")*@
-                        </div>
+                    <div class="feedBox clearFloat hidden" id="sentryFeed">
+                        @*@Html.Action("GetSentryFeed", "Home")*@
                     </div>
                 </div>
             </div>
-            
         </div>
+
+
+    </div>
 </div>
-</center>
+
 
 
 
@@ -93,8 +166,7 @@
     }
 
     ::-webkit-scrollbar {
-        width: 0px;  remove scrollbar space */
-        /*background: transparent;  optional: just make scrollbar invisible */
+        width: 0px;  
     }
 
     /* optional: show position indicator in red
@@ -102,14 +174,14 @@
         background: #FF0000;
     } */
 
-    .feed{
-        width:100% !important;
-        height: 225px;
+    .feed {
+        width: 100% !important;
+        height: 546px;
         margin-left: 0px !important;
     }
 
-    .feedBox{
-        position:relative;
+    .feedBox {
+        position: relative;
         max-height: 90%;
         margin-right: 2px;
     }
@@ -144,7 +216,7 @@
 
     body {
         margin-top: -6px;
-        background: url(../../Images/SHO_SentryWorld_Aerial.jpg) no-repeat center center fixed;
+        /*background: url(../../Images/SHO_SentryWorld_Aerial.jpg) no-repeat center center fixed;*/
         -moz-background-size: cover;
         -webkit-background-size: cover;
         -o-background-size: cover;
@@ -166,40 +238,48 @@
     .tile {
         background: white;
         margin: 30px;
-        opacity: 0.80;
         cursor: pointer;
     }
 
-        .tile:hover {
-            opacity: 0.95;
-        }
-
-        .tile a {
+         .tile a {
             height: 100%;
             width: 100%;
             display: block;
             text-decoration: none !important;
         }
 
+    .assetTile:hover {
+        opacity: 0.95;
+        background-color: rgba(0, 88, 68, 0.05);
+        box-shadow: 2px 6px 10px #888888;
+    }
+
+    .setTile:hover {
+        opacity: 0.95;
+        background-color: rgba(0, 61, 165, 0.05);
+        box-shadow: 2px 6px 10px #888888;
+    }
+
     .tile-image {
         width: 100px;
         padding: 10px;
         filter: invert(100%);
         height: 115px;
+        margin-top:20px;
     }
 
     .tile-header {
-        font-size: 1.5em;
+        font-size: 2em;
     }
 
     .tile-description {
-        font-size: .8em;
+        font-size: 1em;
         max-height: 4.5em;
         display: flex;
+        padding-top:3px;
         justify-content: center;
         padding-bottom: 15px;
     }
-
 </style>
 
 @section Scripts {
@@ -208,9 +288,11 @@
             data.Home.Init();
             data.Dataset.IndexInit();
 
+            ////Does not work for less then 100% magnifcation. DO NOT ZOOM OUT.  div.scrollTop is not happy with floating point pixels.
             var div = $('div.feedBox');
             var scroller = setInterval(function () {
                 var pos = div.scrollTop();
+                pos = Number((pos).toFixed(0));
                 div.scrollTop(++pos);
             }, 50);
 
@@ -219,7 +301,6 @@
                 var target = e.target; //inserted element;
 
                 if ($(target).hasClass('noFeedBox')) {
-                    div.scrollTop(0);
                     $('.noFeedBox').remove();
                 }
             });
@@ -233,6 +314,7 @@
                 // hover ends code here
                 scroller = setInterval(function () {
                     var pos = div.scrollTop();
+                    pos = Number((pos).toFixed(0));
                     div.scrollTop(++pos);
                 }, 50);
             });

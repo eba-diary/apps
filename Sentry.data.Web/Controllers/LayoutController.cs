@@ -4,6 +4,7 @@ using Sentry.data.Core;
 using Sentry.data.Infrastructure;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Diagnostics;
 
@@ -12,13 +13,11 @@ namespace Sentry.data.Web.Controllers
     [SessionState(SessionStateBehavior.ReadOnly)]
     public class LayoutController : BaseController
     {
-        private IDataAssetProvider _dataAssetProvider;
-        private List<DataAsset> das;
+        private readonly IDataAssetContext _dataAssetContext;
 
-        public LayoutController(IDataAssetProvider dap)
+        public LayoutController(IDataAssetContext dataAssetContext)
         {
-            _dataAssetProvider = dap;
-            das = new List<DataAsset>(_dataAssetProvider.GetDataAssets());
+            _dataAssetContext = dataAssetContext;
         }
 
         [ChildActionOnly()]
@@ -50,9 +49,9 @@ namespace Sentry.data.Web.Controllers
                         
             headerModel.EnvironmentName = Sentry.Configuration.Config.GetHostSetting("EnvironmentName");
             headerModel.AssociatePhotoUrl = "http://sentryphoto.sentry.com/associate/" + SharedContext.CurrentUser.AssociateId + "/height/25px";
-            
-            //headerModel.HasMenu = hasMenu;
-            ViewBag.DataAssets = das;
+
+            var das = new List<DataAsset>(_dataAssetContext.GetDataAssets());
+            ViewBag.DataAssets = das.Select(x => new Models.AssetUIModel(x)).ToList();
 
             return PartialView("_Header", headerModel);
         }

@@ -4,7 +4,7 @@ using Sentry.data.Infrastructure;
 using Rhino.Mocks;
 using Sentry.Core;
 
-namespace Sentry.data.Tests
+namespace Sentry.data.Web.Tests
 {
     [TestClass]
     public class DatasetContextTests

@@ -35,7 +35,15 @@ namespace Sentry.data.Web
 
         [Required]
         [DisplayName("Are Username and Password Required?")]
+        // For certain types of Data Sources this value is required to be true.  Setting a checkboxfor to readonly still allows
+        //   a user to change the value.  A workaround being used for this property is using jquery to disable the property
+        //   for the specific data source types which require it to be true.  Then a $('form').on('submit') function
+        //   enables the checkbox right before submitting the form.  This allows the value to be passed back to the controller.
+        //https://stackoverflow.com/questions/40134337/set-mvc-checkbox-to-readonly-or-disabled-on-client-side
         public virtual bool IsUserPassRequired { get; set; }
+
+        [DisplayName("Port Number")]
+        public virtual int PortNumber { get; set; }
 
         [Required]
         [DisplayName("Base URL")]

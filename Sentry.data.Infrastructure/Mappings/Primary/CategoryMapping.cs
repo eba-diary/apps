@@ -15,33 +15,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                          c.Usage(CacheUsage.ReadWrite));
 
             this.Id((x) => x.Id, (m) => {
-                m.Access(Accessor.Field);
+                m.Column("Id");
                 m.Generator(Generators.Identity);
             });
 
             this.Property((x) => x.Name);
             this.Property(x => x.Color);
-
-            this.ManyToOne((x) => x.ParentCategory, (m) => {
-                m.Access(Accessor.Field);
-                m.ForeignKey("FK_Category_Category");
-            });
-
-            this.Bag((x) => x.SubCategories,
-                (c) =>
-                {
-                    c.Inverse(true);
-                    c.Cascade(Cascade.All);
-                    c.Access(Accessor.Field);
-                    //c.Cache(Sub(h)
-                    //            h.Usage(CacheUsage.ReadWrite)
-                    //            h.Region(QueryCacheRegion.MediumTerm.ToString)
-                    //        End Sub)
-                },
-                (m) =>
-                    m.OneToMany());
-
-
 
         }
     }

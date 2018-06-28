@@ -16,42 +16,43 @@ namespace Sentry.data.Web.Controllers
 {
     public class DataAssetController : BaseController
     {
-        private IDataAssetProvider _dataAssetProvider;
-        private MetadataRepositoryService _metadataRepositoryService;
-        private IDatasetContext _dsContext;
-        private IAssociateInfoProvider _associateInfoService;
-        private UserService _userService;
-        private List<DataAsset> das;
+        public readonly MetadataRepositoryService _metadataRepositoryService;
 
-        public DataAssetController(IDataAssetProvider dap, MetadataRepositoryService metadataRepositoryService, IDatasetContext dsContext, IAssociateInfoProvider associateInfoService, UserService userService)
+        public readonly IDataAssetContext _dataAssetContext;
+        public readonly IDatasetContext _dataSetContext;
+
+        public readonly IAssociateInfoProvider _associateInfoService;
+        public readonly UserService _userService;
+
+        public DataAssetController(MetadataRepositoryService metadataRepositoryService, IDataAssetContext dataAssetContext, IDatasetContext datasetContext,  IAssociateInfoProvider associateInfoService, UserService userService)
         {
-            _dataAssetProvider = dap;
             _metadataRepositoryService = metadataRepositoryService;
-            _dsContext = dsContext;
+            _dataAssetContext = dataAssetContext;
+            _dataSetContext = datasetContext;
             _associateInfoService = associateInfoService;
             _userService = userService;
         }
 
-        [AuthorizeByPermission(PermissionNames.DatasetAsset)]
+        [AuthorizeByPermission(PermissionNames.DataAssetView)]
         public ActionResult Index(int id)
         {
-            das = new List<DataAsset>(_dsContext.GetDataAssets());
-            ViewBag.DataAssets = das;
+            var das = new List<DataAsset>(_dataAssetContext.GetDataAssets());
+            ViewBag.DataAssets = das.Select(x => new Models.AssetUIModel(x)).ToList();
             ViewBag.CanUserSwitch = SharedContext.CurrentUser.CanUserSwitch;
 
             id = (id == 0) ? das.FirstOrDefault(x => x.DisplayName.ToLower().Contains("sera pl")).Id : id;
 
-            DataAsset da = _dsContext.GetDataAsset(id);
+            DataAsset da = _dataAssetContext.GetDataAsset(id);
 
             if (da != null)
             {
-                da.AssetNotifications = _dsContext.GetAssetNotificationsByDataAssetId(da.Id).Where(w => w.StartTime < DateTime.Now && w.ExpirationTime > DateTime.Now).ToList();
+                da.AssetNotifications = _dataAssetContext.GetAssetNotificationsByDataAssetId(da.Id).Where(w => w.StartTime < DateTime.Now && w.ExpirationTime > DateTime.Now).ToList();
                 da.LastUpdated = DateTime.Now;
                 da.Status = 1;
 
                 Event e = new Event();
-                e.EventType = _dsContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-                e.Status = _dsContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+                e.EventType = _dataSetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+                e.Status = _dataSetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
                 e.TimeCreated = DateTime.Now;
                 e.TimeNotified = DateTime.Now;
                 e.IsProcessed = false;
@@ -60,8 +61,6 @@ namespace Sentry.data.Web.Controllers
                 e.Reason = "Viewed Data Asset";
                 Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
             }
-
-            //ViewData["fluid"] = true;
 
             if (da != null) { return View(da); }
             else { return RedirectToAction("NotFound", "Error"); }
@@ -75,8 +74,8 @@ namespace Sentry.data.Web.Controllers
             ViewBag.LineName = line;
 
             Event e = new Event();
-            e.EventType = _dsContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _dsContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.EventType = _dataSetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _dataSetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
             e.TimeCreated = DateTime.Now;
             e.TimeNotified = DateTime.Now;
             e.IsProcessed = false;
@@ -102,20 +101,20 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.UserSwitch)]
         public ActionResult Lineage(string line, string assetName, string businessObject, string sourceElement)
         {
-            das = new List<DataAsset>(_dsContext.GetDataAssets());
+            var das = new List<DataAsset>(_dataAssetContext.GetDataAssets());
 
             assetName = (assetName == null) ? das[0].Name : assetName;
 
-            DataAsset da = _dsContext.GetDataAsset(assetName);
+            DataAsset da = _dataAssetContext.GetDataAsset(assetName);
             if (da != null)
             {
-                da.AssetNotifications = _dsContext.GetAssetNotificationsByDataAssetId(da.Id).Where(w => w.StartTime < DateTime.Now && w.ExpirationTime > DateTime.Now).ToList();
+                da.AssetNotifications = _dataAssetContext.GetAssetNotificationsByDataAssetId(da.Id).Where(w => w.StartTime < DateTime.Now && w.ExpirationTime > DateTime.Now).ToList();
                 da.LastUpdated = DateTime.Now;
                 da.Status = 1;
 
                 Event e = new Event();
-                e.EventType = _dsContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-                e.Status = _dsContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+                e.EventType = _dataSetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+                e.Status = _dataSetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
                 e.TimeCreated = DateTime.Now;
                 e.TimeNotified = DateTime.Now;
                 e.IsProcessed = false;
@@ -142,33 +141,25 @@ namespace Sentry.data.Web.Controllers
             else { return RedirectToAction("NotFound", "Error"); }
         }
 
-        [Route("DataAsset/Test")]
-        public ActionResult Test()
-        {
-            return View();
-        }
-
-
-
-
+        [AuthorizeByPermission(PermissionNames.DataAssetView)]
         public ActionResult DataAsset(string assetName)
         {
-            das = new List<DataAsset>(_dsContext.GetDataAssets());
-            ViewBag.DataAssets = das;
+            var das = new List<DataAsset>(_dataAssetContext.GetDataAssets());
+            ViewBag.DataAssets = das.Select(x => new Models.AssetUIModel(x)).ToList();
             ViewBag.CanUserSwitch = SharedContext.CurrentUser.CanUserSwitch;
 
             assetName = (assetName == null) ? das[0].Name : assetName;
 
-            DataAsset da = _dsContext.GetDataAsset(assetName);
+            DataAsset da = _dataAssetContext.GetDataAsset(assetName);
             if (da != null)
             {
-                da.AssetNotifications = _dsContext.GetAssetNotificationsByDataAssetId(da.Id).Where(w => w.StartTime < DateTime.Now && w.ExpirationTime > DateTime.Now).ToList();
+                da.AssetNotifications = _dataAssetContext.GetAssetNotificationsByDataAssetId(da.Id).Where(w => w.StartTime < DateTime.Now && w.ExpirationTime > DateTime.Now).ToList();
                 da.LastUpdated = DateTime.Now;
                 da.Status = 1;
 
                 Event e = new Event();
-                e.EventType = _dsContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-                e.Status = _dsContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+                e.EventType = _dataSetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+                e.Status = _dataSetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
                 e.TimeCreated = DateTime.Now;
                 e.TimeNotified = DateTime.Now;
                 e.IsProcessed = false;
@@ -178,17 +169,11 @@ namespace Sentry.data.Web.Controllers
                 Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
             }
 
-            //ViewData["fluid"] = true;
-
             if (da != null) { return View("Index", da); }
             else { return RedirectToAction("NotFound", "Error"); }
         }
-        //public ActionResult GetAssetNotifications(int Id)
-        //{
-        //    List<AssetNotifications> aList = _dataAssetProvider.GetNotificationsById(Id).Where(w => w.StartTime < DateTime.Now && w.ExpirationTime > DateTime.Now).ToList();
-        //    return aList;
-        //}
-        //[AuthorizeByPermission(per)]
+
+        [AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
         public ActionResult ManageAssetNotification()
         {
             BaseAssetNotificationModel banm = new BaseAssetNotificationModel();
@@ -196,9 +181,15 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
+        [AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
         public ActionResult CreateAssetNotification()
         {
             IApplicationUser user = _userService.GetCurrentUser();
+
+            if (!user.CanManageAssetAlerts)
+            {
+                throw new UnauthorizedAccessException();
+            }
 
             CreateAssetNotificationModel canm = new CreateAssetNotificationModel();
             canm.AllDataAssets = GetDataAssetsList();
@@ -207,12 +198,21 @@ namespace Sentry.data.Web.Controllers
             canm.DisplayCreateUser = _associateInfoService.GetAssociateInfo(user.AssociateId);
             canm.StartTime = DateTime.Now; //preset Start Time
             canm.ExpirationTime = DateTime.Now.AddHours(1);
+
             return View("CreateAssetNotification",canm);
         }
 
         [HttpPost]
+        [AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
         public ActionResult CreateAssetNotification(CreateAssetNotificationModel canm)
         {
+            IApplicationUser user = _userService.GetCurrentUser();
+
+            if(!user.CanManageAssetAlerts)
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             AssetNotifications an = new AssetNotifications();
 
             if (canm.ExpirationTime <= canm.StartTime)
@@ -239,19 +239,18 @@ namespace Sentry.data.Web.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    an = UpdateAssetNotificationFromModel(an, canm);
-                    _dsContext.Merge<AssetNotifications>(an);
-                    _dsContext.SaveChanges();
+                    an = CreateAssetNotificationFromModel(an, canm);
+                    _dataAssetContext.Merge<AssetNotifications>(an);
+                    _dataAssetContext.SaveChanges();
                     return View("ManageAssetNotification");
                 }
             }
             catch (Sentry.Core.ValidationException ex)
             {
                 AddCoreValidationExceptionsToModel(ex);
-                _dsContext.Clear();
+                _dataSetContext.Clear();
             }
-
-            IApplicationUser user = _userService.GetCurrentUser();
+          
             canm.CreateUser = user.AssociateId;
             canm.DisplayCreateUser = _associateInfoService.GetAssociateInfo(user.AssociateId);
             canm.AllDataAssets = GetDataAssetsList();
@@ -260,17 +259,17 @@ namespace Sentry.data.Web.Controllers
             return View("CreateAssetNotification", canm);
         }
 
-        //[AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
+        [AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
         public JsonResult GetAssetNotificationInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
             IEnumerable<BaseAssetNotificationModel> files = null;
             if (Id > 0)
             {
-                files =  _dsContext.GetAssetNotificationsByDataAssetId(Id).ToList().Select((an) => new BaseAssetNotificationModel(an, _associateInfoService));
+                files = _dataAssetContext.GetAssetNotificationsByDataAssetId(Id).Select((an) => new BaseAssetNotificationModel(an, _associateInfoService));
             }
             else
             {
-                files = _dsContext.GetAllAssetNotifications().ToList().Select((an) => new BaseAssetNotificationModel(an, _associateInfoService));
+                files = _dataAssetContext.GetAllAssetNotifications().Select((an) => new BaseAssetNotificationModel(an, _associateInfoService));
             }
 
             DataTablesQueryableAdapter<BaseAssetNotificationModel> dtqa = new DataTablesQueryableAdapter<BaseAssetNotificationModel>(files.AsQueryable(), dtRequest);
@@ -279,10 +278,17 @@ namespace Sentry.data.Web.Controllers
 
 
         [HttpGet()]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
         public ActionResult EditAssetNotification(int notificationId)
         {
-            AssetNotifications an = _dsContext.GetAssetNotificationByID(notificationId);
+            IApplicationUser user = _userService.GetCurrentUser();
+
+            if (!user.CanManageAssetAlerts)
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            AssetNotifications an = _dataAssetContext.GetAssetNotificationByID(notificationId);
             EditAssetNotificationModel ean = new EditAssetNotificationModel(an, _associateInfoService);
             ean.AllSeverities = GetNotificationSeverities();
             ean.SeverityID = an.MessageSeverity;  //Preselect current value
@@ -294,7 +300,14 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
         public ActionResult EditAssetNotification(EditAssetNotificationModel ean)
         {
-            AssetNotifications an = _dsContext.GetAssetNotificationByID(ean.NotificationId);
+            IApplicationUser user = _userService.GetCurrentUser();
+
+            if (!user.CanManageAssetAlerts)
+            {
+                throw new UnauthorizedAccessException();
+            }
+
+            AssetNotifications an = _dataAssetContext.GetAssetNotificationByID(ean.NotificationId);
 
             if(ean.ExpirationTime <= ean.StartTime)
             {
@@ -321,14 +334,14 @@ namespace Sentry.data.Web.Controllers
                 if (ModelState.IsValid)
                 {
                     an = UpdateAssetNotificationFromModel(an, ean);
-                    _dsContext.SaveChanges();
+                    _dataSetContext.SaveChanges();
                     return View("ManageAssetNotification");
                 }
             }
             catch (Sentry.Core.ValidationException ex)
             {
                 AddCoreValidationExceptionsToModel(ex);
-                _dsContext.Clear();
+                _dataSetContext.Clear();
             }
 
             //Return partial view when there are errors
@@ -336,7 +349,8 @@ namespace Sentry.data.Web.Controllers
             return View("EditAssetNotification", ean);
         }
 
-        private AssetNotifications UpdateAssetNotificationFromModel(AssetNotifications an, EditAssetNotificationModel ean)
+        [AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
+        public AssetNotifications UpdateAssetNotificationFromModel(AssetNotifications an, EditAssetNotificationModel ean)
         {
             an.ExpirationTime = ean.ExpirationTime;
             an.MessageSeverity = ean.SeverityID;
@@ -344,14 +358,15 @@ namespace Sentry.data.Web.Controllers
             return an;
         }
 
-        private AssetNotifications UpdateAssetNotificationFromModel(AssetNotifications an, CreateAssetNotificationModel can)
+        [AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
+        public AssetNotifications CreateAssetNotificationFromModel(AssetNotifications an, CreateAssetNotificationModel can)
         {
             an.Message = can.Message;
             an.CreateUser = can.CreateUser;
             an.StartTime = can.StartTime;
             an.ExpirationTime = can.ExpirationTime;
             an.MessageSeverity = can.SeverityID;
-            an.ParentDataAsset = _dsContext.GetDataAsset(can.DataAssetID);
+            an.ParentDataAsset = _dataAssetContext.GetDataAsset(can.DataAssetID);
             
             return an;
         }
@@ -365,7 +380,7 @@ namespace Sentry.data.Web.Controllers
 
         private IEnumerable<SelectListItem> GetDataAssetsList()
         {
-            List<SelectListItem> assets = _dsContext.GetDataAssets().Select(v => new SelectListItem { Text = v.DisplayName, Value = ((int)v.Id).ToString() }).ToList();
+            List<SelectListItem> assets = _dataAssetContext.GetDataAssets().Select(v => new SelectListItem { Text = v.DisplayName, Value = ((int)v.Id).ToString() }).ToList();
 
             return assets;
         }

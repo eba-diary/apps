@@ -12,7 +12,7 @@ namespace Sentry.data.Web
         {
             if (shouldValidateManually(filterContext))
             {
-                if (filterContext.RequestContext.HttpContext.Request.UrlReferrer != null ||
+                if (filterContext.RequestContext.HttpContext.Request.UrlReferrer == null ||
                       filterContext.RequestContext.HttpContext.Request.UrlReferrer.Host.Contains(Sentry.Configuration.Config.GetHostSetting("ValidURL")) ||
                       string.IsNullOrEmpty(filterContext.RequestContext.HttpContext.Request.UrlReferrer.Host))
                 {
@@ -22,7 +22,7 @@ namespace Sentry.data.Web
                 {
                     //bad referrer header.  This is here mainly to appease a particular security app scan.  It ensures that 
                     //non-sentry.com referrers are blocked from being able to POST to our application.
-                    throw new Exception("Bad referrer.  Failing out on a possible CSRF attack.");
+                    throw new UnauthorizedAccessException("Bad referrer.  Failing out on a possible CSRF attack.");
                 }
 
                 //The token may be in the http headers.  This happens if you make an ajax request using $.ajax or one of its

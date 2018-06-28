@@ -12,8 +12,6 @@ namespace Sentry.data.Core
         IList<DataFeedItem> GetSentryFeedItems();
         IList<DataFeedItem> GoGetItems(List<DataFeed> dataFeeds);
         IList<DataFeedItem> GetFeedItems(DataFeed feed);
-        //IQueryable<DataFeedItem> HotTopicsFeed { get; }
-        //IQueryable<DataFeedItem> NewsFeed { get; }
     }
 
 }

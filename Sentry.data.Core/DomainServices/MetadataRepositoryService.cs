@@ -22,7 +22,7 @@ namespace Sentry.data.Core
 
             foreach(DataAssetHealth dah in dahList)
             {
-                if (assetSource.Where(w => w.IsVisiable && w.MetadataRepositorySrcSysName.ToLower() == dah.SourceSystem.ToLower()).Count() > 0)
+                if (assetSource.Any(w => w.IsVisiable && w.MetadataRepositorySrcSysName.ToLower() == dah.SourceSystem.ToLower()))
                 {
                     outList.Add(dah);
                 }

@@ -13,16 +13,13 @@ namespace Sentry.data.Web.Controllers
 {
     public class SchemaController : ApiController
     {
-        private IDataAssetProvider _dataAssetProvider;
         private MetadataRepositoryService _metadataRepositoryService;
         private IDatasetContext _dsContext;
         private IAssociateInfoProvider _associateInfoService;
         private UserService _userService;
-        private List<DataAsset> das;
 
-        public SchemaController(IDataAssetProvider dap, MetadataRepositoryService metadataRepositoryService, IDatasetContext dsContext, IAssociateInfoProvider associateInfoService, UserService userService)
+        public SchemaController(MetadataRepositoryService metadataRepositoryService, IDatasetContext dsContext, IAssociateInfoProvider associateInfoService, UserService userService)
         {
-            _dataAssetProvider = dap;
             _metadataRepositoryService = metadataRepositoryService;
             _dsContext = dsContext;
             _associateInfoService = associateInfoService;
@@ -102,7 +99,7 @@ namespace Sentry.data.Web.Controllers
                 return Ok(m);
 
             }
-            catch (Exception ex)
+            catch
             {
                 return NotFound();
             }
@@ -153,7 +150,7 @@ namespace Sentry.data.Web.Controllers
                 return Ok(s);
 
             }
-            catch (Exception ex)
+            catch
             {
                 return NotFound();
             }

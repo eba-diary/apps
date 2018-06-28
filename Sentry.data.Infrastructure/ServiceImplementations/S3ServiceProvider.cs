@@ -39,8 +39,6 @@ namespace Sentry.data.Infrastructure
         }
 
         private static Amazon.S3.IAmazonS3 _s3client = null;
-
-        public event EventHandler<TransferProgressEventArgs> OnTransferProgressEvent;
         
         private Amazon.S3.IAmazonS3 S3Client
         {
@@ -130,15 +128,8 @@ namespace Sentry.data.Infrastructure
             string versionId = null;
 
             System.IO.FileInfo fInfo = new System.IO.FileInfo(sourceFilePath);
-            
-            if (fInfo.Length > 5 * (long)Math.Pow(2, 20))
-            {
-                versionId = MultiPartUpload(sourceFilePath, targetKey);
-            }
-            else
-            {
-                versionId = PutObject(sourceFilePath, targetKey);
-            }
+
+            versionId = fInfo.Length > 5 * (long)Math.Pow(2, 20) ? MultiPartUpload(sourceFilePath, targetKey) : PutObject(sourceFilePath, targetKey);
 
             return versionId;
         }
@@ -165,16 +156,11 @@ namespace Sentry.data.Infrastructure
             {
                 Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
                 Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
-                //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + Configuration.Config.GetSetting("AWSRootBucket"));
                 s3tuReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
-                //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - InputStream");
                 s3tuReq.InputStream = stream;
-                //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + category + "/" + dsfi);
                 s3tuReq.Key = folder + fileName;
-                s3tuReq.UploadProgressEvent += new EventHandler<UploadProgressArgs>(a_TransferProgressEvent);
                 s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                 s3tuReq.AutoCloseStream = true;
-                //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Starting Upload " + s3tuReq.Key);
                 s3tu.Upload(s3tuReq);
             }
             catch (AmazonS3Exception e)
@@ -192,16 +178,15 @@ namespace Sentry.data.Infrastructure
             {
                 Amazon.S3.Transfer.TransferUtility s3tu = new Amazon.S3.Transfer.TransferUtility(S3Client);
                 Amazon.S3.Transfer.TransferUtilityUploadRequest s3tuReq = new Amazon.S3.Transfer.TransferUtilityUploadRequest();
-                //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set AWS BucketName: " + Configuration.Config.GetSetting("AWSRootBucket"));
+
                 s3tuReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
-                //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - InputStream");
+
                 s3tuReq.InputStream = stream;
-                //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: TransferUtility - Set S3Key: " + category + "/" + dsfi);
+
                 s3tuReq.Key = key;
-                s3tuReq.UploadProgressEvent += new EventHandler<UploadProgressArgs>(a_TransferProgressEvent);
                 s3tuReq.ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256;
                 s3tuReq.AutoCloseStream = true;
-                //Sentry.Common.Logging.Logger.Debug("HttpPost <Upload>: Starting Upload " + s3tuReq.Key);
+
                 s3tu.Upload(s3tuReq);
             }
             catch (AmazonS3Exception e)
@@ -224,8 +209,6 @@ namespace Sentry.data.Infrastructure
                 s3tuDwnldReq.FilePath = baseTargetPath + folder + @"\" + filename;
 
                 s3tuDwnldReq.Key = s3Key;
-
-                s3tuDwnldReq.WriteObjectProgressEvent += new EventHandler<WriteObjectProgressArgs>(a_TransferProgressEvent);
                 
                 s3tu.Download(s3tuDwnldReq);
             }
@@ -235,34 +218,15 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        private void a_TransferProgressEvent(object sender, WriteObjectProgressArgs e)
-        {
-            //OnTransferProgressEvent(this, new TransferProgressEventArgs(e.FilePath, e.PercentDone));
-            EventHandler<TransferProgressEventArgs> handler = OnTransferProgressEvent;
-            if (handler != null)
-            {
-                handler(this, new TransferProgressEventArgs(Path.GetFileName(e.FilePath), e.PercentDone, "Downloading"));
-            }
-            
-            //if (handler != null)
-            //{
-            //    handler(this, e);
-            //}
-        }
-
-        private void a_TransferProgressEvent(object sender, UploadProgressArgs e)
-        {
-            //TransferProgressEventArgs args = new TransferProgressEventArgs(e.FilePath, e.PercentDone);
-            //OnTransferProgressEvent(args);
-            OnTransferProgressEvent(this, new TransferProgressEventArgs(Path.GetFileName(e.FilePath), e.PercentDone, "Uploading"));
-            //EventHandler<WriteObjectProgressArgs> handler = OnTransferProgressEvent;
-            //if (handler != null)
-            //{
-            //    handler(this, e);
-            //}
-        }
 
         #region MultiPartUpload
+
+        
+        private bool IsPartSizeToSmall(long incomingLength, long partSize, long partLimit)
+        {
+            //Number of parts need to be less that 95% of S3 multipart limit ("buffer" set by us)
+            return ((incomingLength / partSize) > (partLimit * .95));            
+        }
 
         public string MultiPartUpload(string sourceFilePath, string targetKey)
         {
@@ -272,21 +236,46 @@ namespace Sentry.data.Infrastructure
             string uploadId = StartUpload(targetKey);
 
             long contentLength = new FileInfo(sourceFilePath).Length;
-            long partSize = 5 * (long)Math.Pow(2, 20); // 5 MB
+
+                        
+            long partSizeSeed = 5;
+            long partSize = partSizeSeed * (long)Math.Pow(2, 20); // 5 MB
+            long partSizeUpperLimit = 5 * (long)Math.Pow(2, 30); // 5GB
+            long partLimit = 10000;
+
+            //Determine PartSize that will not exceed 10,000 parts (s3 multipart upload limit).  In addition, 
+            //  leaving a buffer of 5% of 10,000.  Process will initially start with 5MB parts, and incremetally 
+            //  increase by 1MB until buffer >= 5% part limit.
+            while (IsPartSizeToSmall(contentLength, partSize, partLimit))
+            {
+                partSizeSeed++;
+                partSize = partSizeSeed * (long)Math.Pow(2, 20);
+            }
+
+            //Check part size upper limit
+            if (partSize > partSizeUpperLimit)
+            {
+                throw new NotSupportedException("Multi-Upload part size exceeds 5GB limit");
+            }
+
+            Logger.Info($"Calculated part size - size(bytes):{partSize}");
 
             try
             {
-                long filePositiion = 0;
-                for (int i = 1; filePositiion < contentLength; i++)
+                long filePosition = 0;
+                int partnumber = 1;
+                while (filePosition < contentLength)
                 {
                     //Adding responses to list as returned ETags are needed to close Multipart upload
-                    UploadPartResponse resp = UploadPart(targetKey, sourceFilePath, filePositiion, partSize, i, uploadId);
+                    UploadPartResponse resp = UploadPart(targetKey, sourceFilePath, filePosition, partSize, partnumber, uploadId);
 
-                    Sentry.Common.Logging.Logger.Debug($"UploadID: {uploadId}: Processed part #{i} (source file position: {filePositiion}), and recieved response status {resp.HttpStatusCode} with ETag ({resp.ETag})");
+                    Sentry.Common.Logging.Logger.Debug($"UploadID: {uploadId}: Processed part #{partnumber} (source file position: {filePosition}), and recieved response status {resp.HttpStatusCode} with ETag ({resp.ETag})");
 
                     uploadResponses.Add(resp);
 
-                    filePositiion += partSize;
+                    filePosition += partSize;
+
+                    partnumber++;
                 }
 
                 //Complete successful Multipart Upload so we do not continue to get chared for upload storage
@@ -690,7 +679,7 @@ namespace Sentry.data.Infrastructure
             return dsList;
         }
 
-        public Dictionary<string,string> GetObjectMetadata(string key, string versionId)
+        public Dictionary<string,string> GetObjectMetadata(string key, string versionId = null)
         {
             GetObjectMetadataRequest req = new GetObjectMetadataRequest();
             GetObjectMetadataResponse resp = null;
@@ -884,7 +873,7 @@ namespace Sentry.data.Infrastructure
 
         private KeyVersion ToKeyVersion (ObjectKeyVersion input)
         {
-            KeyVersion key = null;
+            KeyVersion key = new KeyVersion();
             key.Key = input.key;
             key.VersionId = input.versionId;
             return key;
@@ -892,21 +881,13 @@ namespace Sentry.data.Infrastructure
         private List<List<string>> GetPartList(List<string> sourceKeys)
         {
             throw new NotImplementedException();
-
-            foreach (string key in sourceKeys)
-            {
-                int size = GetObjectSize(key);
-            }
-
         }
+
         private int GetObjectSize(string key)
         {
-            GetObjectMetadataRequest headReq = new GetObjectMetadataRequest();
-
-
-
             throw new NotImplementedException();
         }
+
         private Dictionary<string, string> ConvertObjectMetadataResponse(GetObjectMetadataResponse resp)
         {
             Dictionary<string, string> output = new Dictionary<string, string>();

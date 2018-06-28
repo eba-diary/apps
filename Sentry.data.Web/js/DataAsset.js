@@ -11,7 +11,7 @@ data.DataAsset = {
         $(newClass).slideToggle();
 
         $(button).each(function () {
-            if ($(this).text() == "View Less") {
+            if ($(this).text() === "View Less") {
                 $(this).text("View More");
             }
             else {

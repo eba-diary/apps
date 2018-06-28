@@ -21,7 +21,7 @@ data.DatasetDetail = {
         });
 
         $("[id^='PushtoSAS_']").off('click').on('click', function (e) {
-            console.log(e);
+            //console.log(e);
             e.preventDefault();
             data.Dataset.PushToSAS($(this).data("id"));
         });
@@ -52,7 +52,7 @@ data.DatasetDetail = {
             e.preventDefault();
 
             var id = $(this).attr("id");
-            var category = "#hide_" + id
+            var category = "#hide_" + id;
             var icon = "#icon_" + id;
 
             $(category).slideToggle();
@@ -76,15 +76,15 @@ data.DatasetDetail = {
             var configName = $('#' + listOfFilesToBundle[0]).children('td.ConfigFileName').text();
             var multipleConfigs = false;
 
-            for (i = 0; i < listOfFilesToBundle.length; i++) {
-                if ($('#' + listOfFilesToBundle[i]).children('td.ConfigFileName').text() != configName) {
+            for (var i = 0; i < listOfFilesToBundle.length; i++) {
+                if ($('#' + listOfFilesToBundle[i]).children('td.ConfigFileName').text() !== configName) {
                     multipleConfigs = true;
                     break;
                 }
             }
 
             if (multipleConfigs) {
-                var modal = Sentry.ShowModalAlert(
+                Sentry.ShowModalAlert(
                     "There are multiple configuration files associated with the set of files you want to bundle.  Please only select file from a single configuration."
                 );
             }
@@ -100,14 +100,14 @@ data.DatasetDetail = {
 
             var params = Sentry.GetDataTableParamsForExport($('#datasetFilesTable').DataTable());
 
-            var request = $.ajax({
+            $.ajax({
                 url: "/Dataset/GetDatasetFileInfoForGrid/?Id=" + datasetID + "&bundle=" + true,
                 method: "POST",
                 data:  params,
                 dataType: 'json',
                 success: function (obj) {
-                    console.log('success');
-                    console.log(obj);
+                    //console.log('success');
+                    //console.log(obj);
 
                     var listOfFilesToBundle = [];
                     var configName = obj.data[0].ConfigFileName;
@@ -122,11 +122,11 @@ data.DatasetDetail = {
                             multipleConfigs = true;
                         }
                     }
-                    console.log(listOfFilesToBundle);
+                    //console.log(listOfFilesToBundle);
 
                     if (multipleConfigs) {
 
-                        var modal = Sentry.ShowModalAlert(
+                        Sentry.ShowModalAlert(
                             "There are multiple configuration files associated with the set of files you want to bundle.  Please only select file from a single configuration."
                         );
                     }
@@ -135,13 +135,13 @@ data.DatasetDetail = {
                     }
                 },
                 failure: function (obj) {
-                    console.log('failed');
-                    console.log(obj);
+                    //console.log('failed');
+                    //console.log(obj);
                 },
                 error: function (obj)
                 {
-                    console.log('error');
-                    console.log(obj);
+                    //console.log('error');
+                    //console.log(obj);
                 }
             });        
         });
@@ -149,7 +149,7 @@ data.DatasetDetail = {
 
     PushToBundler: function (dataSetID, listOfFilesToBundle) {
         for (i = 0; i < listOfFilesToBundle.length; i++) {
-            console.log("Bundle " + i + " : " + listOfFilesToBundle[i]);
+            //console.log("Bundle " + i + " : " + listOfFilesToBundle[i]);
         }
 
         function DoWork(dataSetID, listOfFilesToBundle, newName) {
@@ -168,18 +168,18 @@ data.DatasetDetail = {
                     );
                 },
                 failure: function (obj) {
-                    console.log(obj);
+                    //console.log(obj);
                 },
                 error: function (xhr, e) {
-                    console.log(e);
-                    console.log(xhr);
+                    //console.log(e);
+                    //console.log(xhr);
                 }
             });        
         }
 
-        var modal = Sentry.ShowModalCustom(
+        Sentry.ShowModalCustom(
             "Upload Results:",
-            "<div> Please supply the new name of your bundled file: (Please Do NOT include the file extension)</div><div><input id='inputNewName' placeholder='New Name: '/></div>",
+            "<div> Please supply the new name of your bundled file: (Please Do NOT include the file extension)</div><hr/><div><input id='inputNewName' placeholder='New Name: '/></div>",
             Sentry.ModalButtonsOKCancel(function (result) { DoWork(dataSetID, listOfFilesToBundle, $('#inputNewName').val()) })
         );
 
@@ -188,8 +188,8 @@ data.DatasetDetail = {
         $('#inputNewName').keyup(function (e) {
             e.preventDefault();
 
-            console.log($('#inputNewName').val());
-            if ($('#inputNewName').val() != "" && $('#inputNewName').val() != undefined && $('#inputNewName').val() != null)
+            //console.log($('#inputNewName').val());
+            if ($('#inputNewName').val() !== "" && $('#inputNewName').val() !== undefined && $('#inputNewName').val() != null)
             {
                 $('.btn-primary').prop("disabled", false);
             }
@@ -201,12 +201,10 @@ data.DatasetDetail = {
         
     },
 
+    ///<summary>
+    ///Initialize the PushToFilenameOverride partial view
+    ///</summary>
     PushToBundleInit: function () {
-        ///<summary>
-        ///Initialize the PushToFilenameOverride partial view
-        ///</summary>
-        // $("PushToForm").validateBootstrap(true);
-
         $("[id^='BundleFilename']").off('click').on('click', function (e) {
             e.preventDefault();
             data.Dataset.PushToSAS_Filename($(this).data("id"), $("#BundleFilename").val());
@@ -215,23 +213,6 @@ data.DatasetDetail = {
 
     VersionsModalInit: function (Id) {
         $('.modal-dialog').css('width','900px');
-        //m.addClass('datasetversionmodal');
-
-        $('#datasetFilesVersionsTable tbody').on('click', 'td.details-control', function () {
-            var tr = $(this).closest('tr');
-            var row = table.row(tr);
-
-            if (row.child.isShown()) {
-                // This row is already open - close it
-                row.child.hide();
-                tr.removeClass('shown');
-            }
-            else {
-                // Open this row
-                row.child(data.DatasetDetail.formatDatasetFileVersionDetails(row.data())).show();
-                tr.addClass('shown');
-            }
-        });
 
         $("#datasetFilesVersionsTable").DataTable({
             autoWidth: true,
@@ -258,7 +239,7 @@ data.DatasetDetail = {
             //stateSave: true,
             //stateDuration: -1  // indicates session storage, not local storage
             "createdRow": function (row, data, dataIndex) {
-                if (data["IsUsable"] == false)
+                if (data["IsUsable"] === false)
                 {
                     $(row).css('background-color', '#ffd1d1');
                 }
@@ -285,6 +266,22 @@ data.DatasetDetail = {
         // DataTable
         var table = $('#datasetFilesVersionsTable').DataTable();
 
+        $('#datasetFilesVersionsTable tbody').on('click', 'td.details-control', function () {
+            var tr = $(this).closest('tr');
+            var row = table.row(tr);
+
+            if (row.child.isShown()) {
+                // This row is already open - close it
+                row.child.hide();
+                tr.removeClass('shown');
+            }
+            else {
+                // Open this row
+                row.child(data.DatasetDetail.formatDatasetFileVersionDetails(row.data())).show();
+                tr.addClass('shown');
+            }
+        });
+
         // Apply the filter
         table.columns().every(function () {
             var column = this;
@@ -297,30 +294,30 @@ data.DatasetDetail = {
         });
 
         $("#userTable_wrapper .dt-toolbar").html($("#userToolbar"));
-
-        $("#exportToExcel").click(function () {
-            alert("exportToExcel Function");
-        });
     },
 
     UploadModalInit: function (id) {
-        // Initialize SignalR Hub
-        //data.DatasetDetail.ProgressModalStatus();
-
         var configs;
+        var idFromSelectList = $('#datasetList').find(":selected").val();
+        var dID;
+
+        //console.log(idFromSelectList + "," + dID);
+
+        if (idFromSelectList === undefined) {
+            dId = id;
+        } else {
+            dId = idFromSelectList;
+        }
 
         $("#categoryList").prepend($("<option />").val(0).html("-- Select a Category --"));
 
         $("#categoryList").each(function (i) {
             $(this).val(i);
-        })
+        });
+
+        $('#btnUploadFile').prop("disabled", true);  
 
         if (id == 0 || id == 1) {
-
-            //Hide Upload Button
-            $("[id^='btnUploadFile']").attr('data-id', id);
-            $("[id^='btnUploadFile']").prop("disabled", true);
-
             //Hide Create Button
             $("#btnCreateDatasetAtUpload").prop("disabled", true);
             $("#btnCreateDatasetAtUpload").hide();
@@ -341,32 +338,12 @@ data.DatasetDetail = {
             $("#btnCreateDatasetAtUpload").prop("disabled", true);
             $("#btnCreateDatasetAtUpload").hide();
 
-            //Hide Upload Button
-            $("[id^='btnUploadFile']").attr('data-id', id);
-            $("[id^='btnUploadFile']").prop("disabled", true);
-
-
             $('#configList').parent().parent().show();
             $("#configDescription").show();
 
             if (id > 0) {
-                var controllerURL = "/Dataset/GetDatasetFileConfigInfo/?id=" + encodeURI(id);
-                $.get(controllerURL, function (result) {
-                    console.log(result);
-                    configs = result;
-                    var select = $("#configList");
-
-                    select.empty();
-
-                    $.each(result, function (index, itemData) {
-                        select.append($('<option/>', {
-                            value: itemData.ConfigId,
-                            text: itemData.ConfigFileName
-                        }));
-                    });
-                    $("#configDescription").html(configs[0].ConfigFileDesc);
-                    
-                });
+                //console.log('Main Loop');
+                getConfigs();
             }
         }
 
@@ -392,7 +369,7 @@ data.DatasetDetail = {
             // This approach is from the following site:
             // http://www.c-sharpcorner.com/UploadFile/manas1/upload-files-through-jquery-ajax-in-Asp-Net-mvc/
             if (window.FormData !== undefined) {
-                console.log('File Upload Process Started');
+                //console.log('File Upload Process Started');
                 var fileUpload = $("#DatasetFileUpload").get(0);
                 var files = fileUpload.files;
 
@@ -404,7 +381,7 @@ data.DatasetDetail = {
                 if ((files[0].size / 1000000) > 100) {
 
                     var configID = $("#configList").find(":selected").val();
-                    var dropLocation 
+                    var dropLocation;
 
                     for (i = 0; i < configs.length; i++) {
                         if (configs[i].ConfigId == configID) {
@@ -419,16 +396,18 @@ data.DatasetDetail = {
                         '<br />' + 
                         '<p>' + dropLocation + '</p>' +
                         '<br />' + 
-                        '<p>If you don\'t have access to this drop location please contact <a href="mailto:BIPortalAdmin@Sentry.com"> Data.sentry.com Administration </a> for further assistance </p>'
+                        '<p>If you don\'t have access to this drop location please contact <a href="mailto:DSCSupport@sentry.com"> Data.sentry.com Administration </a> for further assistance </p>'
                         );
 
                     $('.modal-footer button').prop("disabled", false);
                 }
                 else {
-                    var datasetID = window.location.pathname.substr(window.location.pathname.lastIndexOf('/') + 1);
+                    var datasetID;
 
-                    if (datasetID == "" || datasetID == null || datasetID == undefined || isNaN(datasetID)) {
-                        datasetID = $("[id^='btnUploadFile']").attr('data-id');
+                    if ($('#datasetList').find(":selected").val() === undefined) {
+                        datasetID = id;
+                    } else {
+                        datasetID = $('#datasetList').find(":selected").val();
                     }
 
                     var configID = $("#configList").val();
@@ -461,13 +440,14 @@ data.DatasetDetail = {
                     });
                     xhr.addEventListener('load', function (e) {
                         $('.modal-footer button').prop("disabled", false);
-                        modal.ReplaceModalBody(e.currentTarget.response);
-                        console.log(e);
+                        //modal.ReplaceModalBody('Successful');
+                        modal.ReplaceModalBody(e.currentTarget.response.replace(/"/g,''));
+                        //console.log(e);
                     });
 
                     function cancelUpload() {
                         xhr.abort();
-                        console.log('The Upload Process was aborted');
+                        //console.log('The Upload Process was aborted');
                     }
 
                     $('.btn-cancel')[0].addEventListener('click', cancelUpload, false);
@@ -504,10 +484,19 @@ data.DatasetDetail = {
                     }));
 
                     $.each(result, function (index, itemData) {
-                        select.append($('<option/>', {
-                            value: itemData.Value,
-                            text: itemData.Text
-                        }));
+
+                        if (itemData.Value === id) {
+                            select.append($('<option/>', {
+                                value: itemData.Value,
+                                selected: true,
+                                text: itemData.Text
+                            }));
+                        } else {
+                            select.append($('<option/>', {
+                                value: itemData.Value,
+                                text: itemData.Text
+                            }));
+                        }
                     });
                 });
             }
@@ -582,7 +571,6 @@ data.DatasetDetail = {
 
 
         $("#DatasetFileUpload").change(function () {
-            var dID = $(this).val();
 
             //Hide Configuration List
             $('#configList').parent().parent().show();
@@ -592,63 +580,12 @@ data.DatasetDetail = {
             var files = fileUpload.files;
 
             if (files.length > 0) {
-                if (dID != 0 && dID != 1 && files[0].name != null) {
-                    $("[id^='btnUploadFile']").prop("disabled", false);
-                }
 
-                var select = $("#configList");
-
-                select.empty();
-
-                if (files.length > 0) {
-                    var matchFound = false;
-                    var matchIndex;
-                    var j;                            
-                    var extension = files[0].name.substr((files[0].name.lastIndexOf('.') + 1));  //https://stackoverflow.com/questions/3042312/jquery-find-file-extension-from-string
-                    for (i = 1; i < configs.length; i++) {
-                        for (j = 0; j < configs[i].SearchCriteria.length; j++) {
-                            if (configs[i].FileExtension.Name.toLowerCase().trim() == 'any' || configs[i].FileExtension.Name.toLowerCase().trim() == extension.toLowerCase()) {
-                                if (configs[i].IsRegexSearch[j] && files[0].name.match(configs[i].SearchCriteria[j])) {
-                                    select.append($('<option/>', {
-                                        value: configs[i].ConfigId,
-                                        text: configs[i].ConfigFileName
-                                    }));
-
-                                    if (i != 0) {
-                                        matchFound = true;
-                                        matchIndex = i;
-                                    }
-                                }
-                                else if (!configs[i].IsRegexSearch[j] && files[0].name === configs[i].SearchCriteria[j]) {
-                                    select.append($('<option/>', {
-                                        value: configs[i].ConfigId,
-                                        text: configs[i].ConfigFileName
-                                    }));
-
-                                    if (i != 0) {
-                                        matchFound = true;
-                                        matchIndex = i;
-                                    }
-                                }
-                            }                            
-                        }
-                    }
-
-                    if (matchFound) {
-                        $("#configDescription").html(configs[matchIndex].ConfigFileDesc);
-                    }
-                    else {
-                        select.append($('<option/>', {
-                            value: configs[0].ConfigId,
-                            text: configs[0].ConfigFileName
-                        }));
-                        $("#configDescription").html(configs[0].ConfigFileDesc);
-                    }
-                }
+                //console.log('File Upload Change Loop');
+                getConfigs();              
             }   
             else
             {
-                $("[id^='btnUploadFile']").prop("disabled", true);
                 //Hide Configuration List
                 $('#configList').parent().parent().hide();
                 $("#configDescription").hide();
@@ -656,15 +593,8 @@ data.DatasetDetail = {
         });
 
         $("#datasetList").change(function () {
-            var dID = $(this).val();
-            console.log("DatasetList : " + dID);
-            $("[id^='btnUploadFile']").attr('data-id', dID);
-
-            if (dID == 0)
+            if ($('#datasetList').find(":selected").val() == 0)
             {
-                //Hide Upload Button
-                $("[id^='btnUploadFile']").prop("disabled", true);
-
                 //Hide Create Button
                 $("#btnCreateDatasetAtUpload").prop("disabled", true);
                 $("#btnCreateDatasetAtUpload").hide();
@@ -677,11 +607,8 @@ data.DatasetDetail = {
                 $('#configList').parent().parent().hide();
                 $("#configDescription").hide();
             }
-            else if (dID == 1)
+            else if ($('#datasetList').find(":selected").val() == 1)
             {
-                //Hide Upload Button
-                $("[id^='btnUploadFile']").prop("disabled", true);
-
                 //Show Create Button
                 $("#btnCreateDatasetAtUpload").prop("disabled", false);
                 $("#btnCreateDatasetAtUpload").show();
@@ -696,8 +623,6 @@ data.DatasetDetail = {
             }
             else
             {
-                //Show Upload Button
-                //$("[id^='btnUploadFile']").prop("disabled", false);
 
                 //Hide Create Button
                 $("#btnCreateDatasetAtUpload").prop("disabled", true);
@@ -722,74 +647,113 @@ data.DatasetDetail = {
                     $("#configDescription").hide();
                 }
 
+                //console.log('Dataset List Change Loop');
+                getConfigs();
+
+            }
+        });
+
+        function getConfigs() {
+            var idFromSelectList = $('#datasetList').find(":selected").val();
+            var dID;
+
+            //console.log(idFromSelectList + "," + dID);
+
+            if (idFromSelectList === undefined) {
+                dID = id;
+            } else {
+                dID = idFromSelectList;
+            }
+            
+            var controllerURL = "/Dataset/GetDatasetFileConfigInfo/?id=" + encodeURI(dID);
+            $.get(controllerURL, function (result) {
+                configs = result;
+                var select = $("#configList");
+
+                select.empty();
+
                 var fileUpload = $("#DatasetFileUpload").get(0);
                 var files = fileUpload.files;
 
                 if (files.length > 0) {
+                   
+                    var matchFound = false;
+                    var indexes = [];
+                    var matchIndex;
+                    var amountMatched = 0;
+                    var j;
 
-                    if (dID != 0 && dID != 1 && files[0].name != null) {
-                        $("[id^='btnUploadFile']").prop("disabled", false);
-                    }
-                }
+                    var extension = files[0].name.substr((files[0].name.lastIndexOf('.') + 1));  //https://stackoverflow.com/questions/3042312/jquery-find-file-extension-from-string
 
-                if (dID > 0) {
-                    var controllerURL = "/Dataset/GetDatasetFileConfigInfo/?id=" + encodeURI(dID);
-                    $.get(controllerURL, function (result) {
-                        configs = result;
-                        var select = $("#configList");
+                    //console.log(configs);
 
-                        select.empty();
+                    for (i = 1; i < configs.length; i++) {
+                        for (j = 0; j < configs[i].SearchCriteria.length; j++) {
+                            if (configs[i].FileExtension.Name.toLowerCase().trim() == 'any' || configs[i].FileExtension.Name.toLowerCase().trim() == extension.toLowerCase()) {
+                                if (configs[i].IsRegexSearch[j] && files[0].name.match(configs[i].SearchCriteria[j])) {
+                                    if (indexes.indexOf(i) == -1) {
+                                        if (!matchFound) {
+                                            matchIndex = i;
+                                            matchFound = true;
+                                        }
 
-                        var fileUpload = $("#DatasetFileUpload").get(0);
-                        var files = fileUpload.files;
-
-                        if (files.length > 0) {
-                            var matchFound = false;
-                            var matchIndex;
-                            var j;
-                            for (i = 1; i < configs.length; i++) {
-                                for (j = 0; j < configs[i].SearchCriteria.length; j++) {
-                                    if (configs[i].IsRegexSearch[j] && files[0].name.match(configs[i].SearchCriteria[j])) {
                                         select.append($('<option/>', {
                                             value: configs[i].ConfigId,
+                                            selected: matchIndex == i ? true : false,
                                             text: configs[i].ConfigFileName
                                         }));
 
-                                        if (i != 0) {
-                                            matchFound = true;
+                                        indexes.push(i);
+                                        amountMatched++;
+                                    }                               
+                                }
+                                else if (!configs[i].IsRegexSearch[j] && files[0].name === configs[i].SearchCriteria[j]) {
+                                    if (indexes.indexOf(i) == -1) {
+                                        if (!matchFound) {
                                             matchIndex = i;
+                                            matchFound = true;
                                         }
-                                    }
-                                    else if (!configs[i].IsRegexSearch[j] && files[0].name === configs[i].SearchCriteria[j]) {
+
                                         select.append($('<option/>', {
                                             value: configs[i].ConfigId,
+                                            selected: matchIndex == i ? true : false,
                                             text: configs[i].ConfigFileName
                                         }));
 
-                                        if (i != 0) {
-                                            matchFound = true;
-                                            matchIndex = i;
-                                        }
+                                        indexes.push(i);
+                                        amountMatched++;
                                     }
                                 }
                             }
-
-                            if (matchFound) {
-                                $("#configDescription").html(configs[matchIndex].ConfigFileDesc);
-                            }
-                            else {
-                                select.append($('<option/>', {
-                                    value: configs[0].ConfigId,
-                                    text: configs[0].ConfigFileName
-                                }));
-                                $("#configDescription").html(configs[0].ConfigFileDesc);
-                            }
                         }
+                    }
 
-                    });
+                    if (matchFound) {
+                        $("#configDescription").html(configs[matchIndex].ConfigFileDesc);
+
+                        if (amountMatched > 1) {
+                            $("#configList").prop('disabled',false);
+                        }
+                        $('#btnUploadFile').prop("disabled", false);                      
+                    }
+                    else {
+                        select.append($('<option/>', {
+                            value: configs[0].ConfigId,
+                            selected: true,
+                            text: configs[0].ConfigFileName
+                        }));
+                        $("#configList").prop('disabled', false);
+                        $('#btnUploadFile').prop("disabled", false);
+                        $("#configDescription").html(configs[0].ConfigFileDesc);
+                    }
+                } else {
+                    $("#configList").prop('disabled',true);
+                    $('#btnUploadFile').prop("disabled", true);       
+                    $("#configDescription").html("Please choose a file from the Choose File button.");
                 }
-            }
-        });
+
+            });
+        }
 
         $("#configList").change(function () {
             var configID = $(this).val();
@@ -852,9 +816,9 @@ data.DatasetDetail = {
     },
 
     PushToSAS: function (caller, id, filename) {
-        // console.log($(caller).parent().next().text());
-        // console.log(id);
-        // console.log(filename);
+        // //console.log($(caller).parent().next().text());
+        // //console.log(id);
+        // //console.log(filename);
         data.Dataset.FileNameModal(filename);
         data.Dataset.PushToSAS_Filename(filename, $(caller).parent().next().text());
     },
@@ -956,10 +920,6 @@ data.DatasetDetail = {
                 [10, 25, 50, 100, 200, -1],
                 [10, 25, 50, 100, 200, "All"]
             ],
-            select: {
-                selector: 'td:not(:last-child)',
-                selector: 'td:not(:first-child)'
-            },
             ajax: {
                 url: "/Dataset/GetBundledFileInfoForGrid/?Id=" + Id,
                 type: "POST",
@@ -1068,10 +1028,6 @@ data.DatasetDetail = {
                 [10, 25, 50, 100, 200, -1],
                 [10, 25, 50, 100, 200, "All"]
             ],
-            select: {
-                selector: 'td:not(:last-child)',
-                selector: 'td:not(:first-child)'
-            },
             columns: [
                 { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px", searchable: false },
                 { data: "ActionLinks", className: "downloadFile", width: "100px", searchable: false, orderable: false },
@@ -1356,19 +1312,6 @@ data.DatasetDetail = {
             //stateDuration: -1  // indicates session storage, not local storage
         });
 
-        //$("#datasetFileConfigsTable").dataTable().columnFilter({
-        //    sPlaceHolder: "head:after",
-        //    aoColumns: [
-        //            null,
-        //            null,
-        //            null,
-        //            { type: "number-range" },
-        //            { type: "text" },
-        //            { type: "text" },
-        //            { type: "text" },
-        //            { type: "text" }
-        //    ]
-        //});
 
         var DataFilesTable = $('#datasetFileConfigsTable').dataTable();
 
@@ -1386,23 +1329,6 @@ data.DatasetDetail = {
             }
         });
 
-
-        //// Apply the filter
-        //table.columns().every(function () {
-        //    var column = this;
-
-        //    $('input', this.footer()).on('keyup change', function () {
-        //        column
-        //            .search(this.value)
-        //            .draw();
-        //    });
-        //});
-
-        //$("#userTable_wrapper .dt-toolbar").html($("#userToolbar"));
-
-        //$("#exportToExcel").click(function () {
-        //    alert("exportToExcel Function");
-        //});
     },
 
     formatDatasetFileConfigDetails: function (d) {

@@ -14,7 +14,7 @@ namespace Sentry.data.Web.WebApi
         {
             if (shouldValidateManually(actionContext))
             {
-                if (actionContext.Request.Headers.Referrer != null ||
+                if (actionContext.Request.Headers.Referrer == null ||
                        actionContext.Request.Headers.Referrer.Host.Contains(Sentry.Configuration.Config.GetHostSetting("ValidURL")) ||
                       string.IsNullOrEmpty(actionContext.Request.Headers.Referrer.Host))
                 {
@@ -24,7 +24,7 @@ namespace Sentry.data.Web.WebApi
                 {
                     //bad referrer header.  This is here mainly to appease a particular security app scan.  It ensures that 
                     //non-sentry.com referrers are blocked from being able to POST to our application.
-                    throw new Exception("Bad referrer.  Failing out on a possible CSRF attack.");
+                    throw new UnauthorizedAccessException("Bad referrer.  Failing out on a possible CSRF attack.");
                 }
 
                 string token = actionContext.Request.Headers.GetValues("__RequestVerificationToken").FirstOrDefault();

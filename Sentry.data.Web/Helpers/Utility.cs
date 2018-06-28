@@ -166,7 +166,7 @@ namespace Sentry.data.Web.Helpers
 
         public static IEnumerable<SelectListItem> GetCategoryList(IDatasetContext _datasetContext)
         {
-            IEnumerable<SelectListItem> var = _datasetContext.Categories.OrderByHierarchy().Select((c) => new SelectListItem { Text = c.FullName, Value = c.Id.ToString() });
+            IEnumerable<SelectListItem> var = _datasetContext.Categories.Select((c) => new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
 
             return var;
         }
@@ -236,8 +236,8 @@ namespace Sentry.data.Web.Helpers
                 dFileExtensions = _datasetContext.FileExtensions
                     .Select((c) => new SelectListItem
                     {
-                        Selected = (c.Name == "ANY"),
-                        Text = c.Name,
+                        Selected = c.Name.Contains("ANY") ? true : false,
+                        Text = c.Name.Trim(),
                         Value = c.Id.ToString()
                     });
             }
@@ -246,13 +246,13 @@ namespace Sentry.data.Web.Helpers
                 dFileExtensions = _datasetContext.FileExtensions
                     .Select((c) => new SelectListItem
                     {
-                        Selected = (c.Id == id),
-                        Text = c.Name,
+                        Selected = c.Id == id ? true : false,
+                        Text = c.Name.Trim(),
                         Value = c.Id.ToString()
                     });
             }
 
-            return dFileExtensions;
+            return dFileExtensions.OrderByDescending(x => x.Selected);
         }
 
 

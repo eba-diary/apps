@@ -22,88 +22,32 @@ data.Dataset = {
 
         $("[id^='UploadDatafile']").click(function (e) {
             e.preventDefault();
-            //data.Dataset.ViewCreateIndex();
-            //data.DatasetDetail.ProgressModalStatus();
             data.DatasetDetail.UploadFileModal(0);
         });
     },
-
-    //CreateInit: function () {
-    //    $("#categoryList").change(function () {
-    //        var cID = $(this).val();
-    //        var controllerURL = "/Dataset/LoadDatasetList/?id=" + encodeURI(cID);
-    //        $.get(controllerURL, function (result) {
-    //            var select = $("#datasetList");
-    //            select.empty();
-    //            select.append($('<option/>', {
-    //                value: 0,
-    //                text: "Select Dataset"
-    //            }));
-    //            $.each(result, function (index, itemData) {
-    //                select.append($('<option/>', {
-    //                    value: itemData.Value,
-    //                    text: itemData.Text
-    //                }));
-    //            });
-    //        });
-    //    })
-    //},
 
     ListInit: function () {
         /// <summary>
         /// Initialize the List results page for data assets
         /// </summary>
 
-        //$("[id^='datasetViewDetails_']").off('click').on('click', function (e) {
-        //    e.preventDefault();
-        //    data.Dataset.ViewDetails($(this).data("id"));
-        //});
-
-        console.log(window.location.href);
+        //console.log(window.location.href);
 
         $("[id^='DownloadDataset_']").off('click').on('click', function (e) {
             e.preventDefault();
             data.Dataset.DownloadDataset($(this).data("id"));
         });
-        /*
-                $("[id^='datasetViewDetails_']").mouseenter(function (e) {
-                    e.preventDefault();
-                    $("[id=datasetViewDetailsHover_" + $(this).data("id") + "]").fadeIn();
-                });
-        
-                $("[id^='datasetViewDetails_']").mouseleave(function (e) {
-                    e.preventDefault();
-                    $("[id=datasetViewDetailsHover_" + $(this).data("id") + "]").fadeOut(0);
-                });
-        */
+
         $("[id^='li-filter-disabled_']").hover(function (e) {
             $(this).children('span.filter-disabled-glyph').css({ 'display': 'inline-block' });
         }, function (e) {
             $(this).children('span.filter-disabled-glyph').css({ 'display': 'none' });
         });
 
-        //$("[id^='li-filter-disabled_']").click(function (e) {
-        //    e.preventDefault();
-        //    data.Dataset.DisplayCategory($(this).data("cat"));
-        //});
-
-        //$("[id^='li-filter-enabled_']").click(function (e) {
-        //    e.preventDefault();
-        //    data.Dataset.DisplayCategory(null);
-        //});
-
         $("[id^='Pushtofilename_']").off('click').on('click', function (e) {
             e.preventDefault();
             data.Dataset.FileNameModal($(this).data("id"));
         });
-
-        //$(document).on('show.bs.modal', '.modal', function (event) {
-        //    var zIndex = 1040 + (10 * $('.modal:visible').length);
-        //    $(this).css('z-index', zIndex);
-        //    setTimeout(function () {
-        //        $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
-        //    }, 0);
-        //});
 
         //Testing Functionality
         $("[id^='li-filter-disabled_Test_']").click(function (e) {
@@ -132,38 +76,9 @@ data.Dataset = {
         });
 
 
-        //$(function () {
-        //    var $btn = $("[id^=btnApply_]");
-        //    var $chk = $("[id^='frequency_']");
-        //    // check on page load
-        //    checkChecked($chk);
-        //    $chk.click(function () {
-        //        checkChecked($chk);
-        //    });
-        //    function checkChecked(chkBox) {
-        //        if ($chk.is(':checked')) {
-        //            $btn.removeAttr('hidden');
-        //        }
-        //        else {
-        //            $btn.attr('hidden', 'hidden')
-        //        }
-        //    }
-        //});
-
         var stickySidebar = $('.outsideFilters').offset().top;
         var el = $('.menu');
         var bottom = el.position().top + el.outerHeight(true) + 10;
-
-        //$(window).scroll(function () {
-        //    console.log(bottom + " : " + (stickySidebar - $(window).scrollTop()));
-
-        //    if (bottom >= (stickySidebar - $(window).scrollTop())) {
-        //        $('.outsideFilters').addClass('fixedScroll');
-        //    }
-        //    else {
-        //        $('.outsideFilters').removeClass('fixedScroll');
-        //    }
-        //});
 
         $("[id^='filterType_']").click(function (e) {
             e.preventDefault();
@@ -187,32 +102,13 @@ data.Dataset = {
             $(show).slideToggle();
             $(icon).toggleClass("glyphicon-plus-sign glyphicon-minus-sign");
 
-            if ($(txt).text() == "Show Less") {
+            if ($(txt).text() === "Show Less") {
                 $(txt).text("Show More");
             }
             else {
                 $(txt).text("Show Less");
             }
         });
-
-        //var progress = $.connection.progressHub;
-
-        //// Create a function that the hub can call back to display messages.
-        //progress.client.AddProgress = function (message, percentage) {
-        //    ProgressBarModal("show", message, "Progress: " + percentage);
-        //    $('#ProgressMessage').width(percentage);
-        //    if (percentage == "100%") {
-        //        ProgressBarModal();
-        //    }
-        //};
-
-        //$.connection.hub.start()
-        //    .done(function () {
-        //        var connectionId = $.connection.hub.id;
-        //        console.log('Now connected, connection ID = ' + connectionId)
-        //    })
-        //    .fail(function () { console.log('Failed to connect') });
-
     },
 
     DetailInit: function () {
@@ -248,16 +144,6 @@ data.Dataset = {
             alert("DatasetFile_ID function")
         })
 
-
-        //$(document).on('show.bs.modal', '.modal', function (event) {
-        //    var zIndex = 1040 + (10 * $('.modal:visible').length);
-        //    $(this).css('z-index', zIndex);
-        //    setTimeout(function () {
-        //        $('.modal-backdrop').not('.modal-stack').css('z-index', zIndex - 1).addClass('modal-stack');
-        //    }, 0);
-        //});
-
-        //data.Dataset.DatasetFilesTable = $("#datasetFilesTable").DataTable({
          $("#datasetFilesTable").DataTable({
             autoWidth: false,
             serverSide: true,
@@ -294,37 +180,6 @@ data.Dataset = {
             ]
         });
 
-        //$("#datasetFilesTable").dataTable().columns('.filter-row').every(function () {
-        //    var that = this;
-
-        //    // Create the select list and search operation
-        //    var select = $('<select />')
-        //        .appendTo(
-        //            this.footer()
-        //        )
-        //        .on('change', function () {
-        //            that
-        //                .search($(this).val())
-        //                .draw();
-        //        });
-
-        //    // Get the search data for the first column and add to the select list
-        //    this
-        //        .cache('search')
-        //        .sort()
-        //        .unique()
-        //        .each(function (d) {
-        //            select.append($('<option value="' + d + '">' + d + '</option>'));
-        //        });
-        //});
-
-        //// Setup - add a text input to each footer cell
-        //$('#datasetFilesTable tfoot th').each(function () {
-        //    alert("This Function");
-        //    var title = $('#datasetFilesTable thead th').eq($(this).index()).text();
-        //    $(this).html('<input type="text" placeholder="Search ' + title + '" />');
-        //});
-
         // DataTable
         var table = $('#datasetFilesTable').DataTable();
 
@@ -344,24 +199,16 @@ data.Dataset = {
         $("#exportToExcel").click(function () {
             alert("exportToExcel Function");
         });
-
-
-
-
     },
 
     make_upload_links: function (cellData, type, rowData) {
         return String.format($("#userTableRowIcons").html(), rowData.Id);
     },
 
-    showConfirmDeleteModal: function (cell) {
-        alert("showConfirmDeleteModal");
-        alert(cell);
-        //var data = data.Dataset.DatasetFilesTable.row($(cell).closest("tr")).data();
-
-        //alert(data.Id);
-        //alert(data.Name);
-    },
+    //showConfirmDeleteModal: function (cell) {
+    //    alert("showConfirmDeleteModal");
+    //    alert(cell);
+    //},
 
     CreateInit: function () {
         /// <summary>
@@ -387,10 +234,6 @@ data.Dataset = {
         /// <summary>
         /// Initialize the Edit Dataset view
         /// </summary>
-        //var x = 3;
-        //$("#CategoryIDs").select2({
-        //    placeholder: "Click here to choose one or more categories"
-        //});
 
         var n1 = document.getElementById('SentryOwnerName');
         var n2 = document.getElementById('OwnerID');
@@ -409,8 +252,6 @@ data.Dataset = {
                 $('#SentryOwnerName').val(associate.Id);
             }
         });
-
-        //$("#OwnerID").val($("SentryOwnerName").val);
     },
 
     PreviewInit: function () {
@@ -419,14 +260,6 @@ data.Dataset = {
             data.Dataset.CopyToClipboard("PreviewText");
         });
     },
-
-    //ViewDetails: function (id) {
-    //    /// <summary>
-    //    /// Load the Dataset Details page
-    //    /// </summary>
-    //    var url = "/Dataset/Detail/?id=" + encodeURI(id);
-    //    window.location = url;
-    //},
 
     DownloadDataset: function (id) {
         /// <summary>
@@ -453,21 +286,11 @@ data.Dataset = {
     },
 
     DownloadDatasetFile: function (id) {
-        alert(id);
+        //alert(id);
 
         var data = data.Dataset.DatasetFilesTable.row($(id).closest("tr")).data();
 
-        alert(data.Id);
-        /// <summary>
-        /// Send temp URL (containing the dataset, from S3) to a new window
-        /// This will initiate the download process
-        /// </summary>
-
-        //var controllerURL = "/Dataset/GetDatasetFileDownloadURL/?id=" + encodeURI(id);
-        //$.get(controllerURL, function (result) {
-        //    var jrUrl = result;
-        //    window.open(jrUrl, "_blank");
-        //});
+        //alert(data.Id);
     },
 
     PushToSAS_Filename: function (id, filename, delimiter, guessingrows) {
@@ -498,12 +321,12 @@ data.Dataset = {
         /// Load a dataset Listing for a given category
         /// </summary>
         searchPhrase = data.Dataset.getParameterByName("searchPhrase");
-        url = "/Dataset/List/Index";
-        if (searchPhrase != null && searchPhrase != "") {
+        url = "/Search/Datasets";
+        if (searchPhrase !== null && searchPhrase !== "") {
             url = url + "?searchPhrase=" + encodeURI(searchPhrase);
         }
-        if (category != null && category != "") {
-            if (searchPhrase != null && searchPhrase != "") {
+        if (category !== null && category !== "") {
+            if (searchPhrase !== null && searchPhrase !== "") {
                 url = url + "&category=" + encodeURI(category);
             } else {
                 url = url + "?category=" + encodeURI(category);
@@ -517,12 +340,12 @@ data.Dataset = {
         /// Load a dataset Listing for a given category
         /// </summary>
         searchPhrase = data.Dataset.getParameterByName("searchPhrase");
-        url = "/Dataset/List";
-        if (searchPhrase != null && searchPhrase != "") {
+        url = "/Search/Datasets";
+        if (searchPhrase !== null && searchPhrase !== "") {
             url = url + "?searchPhrase=" + encodeURI(searchPhrase);
         }
-        if (value != null && value != "") {
-            if (searchPhrase != null && searchPhrase != "") {
+        if (value !== null && value !== "") {
+            if (searchPhrase !== null && searchPhrase !== "") {
                 url = url + "&filtertype=" + encodeURI(type) + "&filtervalue=" + encodeURI(value);
             } else {
                 url = url + "?filtertype=" + encodeURI(type) + "&filtervalue=" + encodeURI(value);
@@ -530,41 +353,6 @@ data.Dataset = {
         }
         window.location = url;
     },
-
-    //AjaxSuccess: function (data) {
-    //    /// <summary>
-    //    /// Event handlers for a successful AJAX post from the Add or
-    //    /// Edit category modal dialogs
-    //    /// </summary>
-    //    /// <param name="data">Response from the Ajax post</param>
-    //    /// <param name="parentCategory">The parent category ID, that we now need to reload</param>
-
-    //    alert("AjaxSuccess Function");
-    //    if (Sentry.WasAjaxSuccessful(data)) {
-    //        alert(JSON.stringify(data));
-    //        Sentry.HideAllModals();
-    //    //Sentry.ShowModalAlert("File has been pushed to SAS Successfully.");
-    //    //var controllerURL = "/Dataset/PushToSAS/?id=" + encodeURI(datasetID) + "&Override=" + encodeURI(filenameOverride);
-    //    //data.Dataset.ProgressModalStatus();
-    //    //$.post(controllerURL);
-    //    //dataMySentryBayTestApp.Category.ReloadCategory(parentCategory);
-    //    }
-    //    else
-    //    {
-    //        var modal = Sentry.ShowModalAlert(data);
-    //        alert(JSON.stringify(data));
-    //    }
-    //},
-
-    //AjaxFailure: function () {
-    //    /// <summary>
-    //    /// Called when there was a non-200 response
-    //    /// </summary>
-
-    //    alert("AjaxFailure function");
-
-    //    Sentry.ShowModalAlert("Error Processing your request, please try again!");
-    //},
 
     ViewEdit: function (id) {
         /// <summary>
@@ -618,7 +406,7 @@ data.Dataset = {
         progress.client.AddProgress = function (message, percentage) {
             ProgressBarModal("show", message, "Progress: " + percentage);
             $('#ProgressMessage').width(percentage);
-            if (percentage == "100%") {
+            if (percentage === "100%") {
                 ProgressBarModal();
             }
         };
@@ -660,26 +448,18 @@ data.Dataset = {
     },
 
     GenWeather: function () {
-        //(function ($) {
-            $.ajax({
-                url: "http://api.wunderground.com/api/219e771595b60ca7/geolookup/conditions/q/54481/54481.json",
-                dataType: "jsonp",
-                success: function (parsed_json) {
-                    var location = parsed_json['location']['city'];
-                    var temp_f = parsed_json['current_observation']['temp_f'];
-                    alert("Current temperature in " + location + " is: " + temp_f);
-                }
-            });
+        $.ajax({
+            url: "http://api.wunderground.com/api/219e771595b60ca7/geolookup/conditions/q/54481/54481.json",
+            dataType: "jsonp",
+            success: function (parsed_json) {
+                var location = parsed_json['location']['city'];
+                var temp_f = parsed_json['current_observation']['temp_f'];
+                alert("Current temperature in " + location + " is: " + temp_f);
+            }
+        });
 
-            //$.get("/Dataset/GetWeather?" + "zip=" + encodeURI(54481));
-            $.get("/Dataset/GetWeatherData?zip=54481");
+        $.get("/Dataset/GetWeatherData?zip=54481");
         
-        //});
-
-        //$.get("/Dataset/GetWeather", function (result) {
-        //    var jrUrl = result;
-        //    window.open(jrUrl, "_blank");
-        //});
     },
 
     CopyToClipboard: function (containerid) {

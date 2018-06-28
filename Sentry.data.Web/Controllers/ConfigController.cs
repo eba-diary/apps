@@ -659,7 +659,7 @@ namespace Sentry.data.Web.Controllers
 
             if (ejm.NewFileNameExclusionList != null)
             {
-                if (ejm.FileNameExclusionList != null || ejm.FileNameExclusionList.Count != 0)
+                if (ejm.FileNameExclusionList.Any())
                 {
                     //I honestly have no idea where this is being added from.
                     ejm.FileNameExclusionList = ejm.FileNameExclusionList
@@ -709,34 +709,59 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
         public ActionResult CreateSource(CreateSourceModel csm)
         {
+            DataSource source = null;
             try
             {
+                switch (csm.SourceType)
+                {
+                    case "DFSBasic":
+                        source = new DfsBasic();
+                        break;
+                    case "DFSCustom":
+                        source = new DfsCustom();
+                        if (_datasetContext.DataSources.Where(w => w is DfsCustom && w.Name == csm.Name).Count() > 0)
+                        {
+                            AddCoreValidationExceptionsToModel(new ValidationException("Name", "An DFS Custom Data Source is already exists with this name."));
+                        }
+                        break;
+                    case "FTP":
+                        source = new FtpSource();
+                        if (_datasetContext.DataSources.Where(w => w is FtpSource && w.Name == csm.Name).Count() > 0)
+                        {
+                            AddCoreValidationExceptionsToModel(new ValidationException("Name", "An FTP Data Source is already exists with this name."));
+                        }
+                        if (!(csm.BaseUri.ToString().StartsWith("ftp://")))
+                        {
+                            AddCoreValidationExceptionsToModel(new ValidationException("BaseUri", "A valid FTP URI starts with ftp:// (i.e. ftp://foo.bar.com/base/dir)"));
+                        }
+                        break;
+                    case "SFTP":
+                        source = new SFtpSource();
+                        if (_datasetContext.DataSources.Where(w => w is SFtpSource && w.Name == csm.Name).Count() > 0)
+                        {
+                            AddCoreValidationExceptionsToModel(new ValidationException("Name", "An SFTP Data Source is already exists with this name."));
+                        }
+                        if (!(csm.BaseUri.ToString().StartsWith("sftp://")))
+                        {
+                            AddCoreValidationExceptionsToModel(new ValidationException("BaseUri","A valid SFTP URI starts with sftp:// (i.e. sftp://foo.bar.com//base/dir/)"));
+                        }
+                        
+                        break;
+                    default:
+                        throw new NotImplementedException();
+                }
+
                 if (ModelState.IsValid)
                 {
-                    DataSource source = null;
-                    AuthenticationType auth = _datasetContext.GetById<AuthenticationType>(Convert.ToInt32(csm.AuthID));
-
-                    switch (csm.SourceType)
-                    {
-                        case "DFSBasic":
-                            source = new DfsBasic();
-                            break;
-                        case "DFSCustom":
-                            source = new DfsCustom();
-                            break;
-                        case "FTP":
-                            source = new FtpSource();
-                            break;
-                        default:
-                            throw new NotImplementedException();
-                    }
                     
+                    AuthenticationType auth = _datasetContext.GetById<AuthenticationType>(Convert.ToInt32(csm.AuthID));
 
                     source.Name = csm.Name;
                     source.Description = csm.Description;
                     source.SourceAuthType = auth;
                     source.IsUserPassRequired = csm.IsUserPassRequired;
                     source.BaseUri = csm.BaseUri;
+                    source.PortNumber = csm.PortNumber;
 
                     _datasetContext.Add(source);
                     _datasetContext.SaveChanges();
@@ -801,7 +826,6 @@ namespace Sentry.data.Web.Controllers
         {
             DataSource ds = _datasetContext.GetById<DataSource>(sourceID);
             EditSourceModel esm = new EditSourceModel(ds);
-            esm.Id = sourceID;
 
             esm = EditSourceDropDown(esm);
 
@@ -833,7 +857,6 @@ namespace Sentry.data.Web.Controllers
                     switch (esm.SourceType)
                     {
                         case "DFSBasic":
-                            //source = new DfsBasic();
                             source = _datasetContext.GetById<DfsBasic>(esm.Id);
                             break;
                         case "DFSCustom":
@@ -845,15 +868,19 @@ namespace Sentry.data.Web.Controllers
                         case "S3Basic":
                             source = _datasetContext.GetById<S3Basic>(esm.Id);
                             break;
+                        case "SFTP":
+                            source = _datasetContext.GetById<SFtpSource>(esm.Id);
+                            break;
                         default:
                             throw new NotImplementedException();
                     }
 
-                    source.Name = esm.Name;
+                    //source.Name = esm.Name;
                     source.Description = esm.Description;
                     source.SourceAuthType = auth;
                     source.IsUserPassRequired = esm.IsUserPassRequired;
                     source.BaseUri = esm.BaseUri;
+                    source.PortNumber = esm.PortNumber;
 
                     _datasetContext.SaveChanges();
 
@@ -883,26 +910,16 @@ namespace Sentry.data.Web.Controllers
             var temp = _datasetContext.DataSourceTypes.Select(v
               => new SelectListItem { Text = v.Name, Value = v.DiscrimatorValue }).ToList();
 
-            temp.Add(new SelectListItem()
-            {
-                Text = "Pick a Source Type",
-                Value = "0",
-                Selected = true,
-                Disabled = true
-            });
+            //set selected for current value
+            temp.ForEach(x => x.Selected = esm.SourceType.Equals(x.Value));
+
 
             esm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic").OrderBy(x => x.Value);
 
             var temp2 = _datasetContext.AuthTypes.Select(v
              => new SelectListItem { Text = v.AuthName, Value = v.AuthID.ToString() }).ToList();
 
-            temp2.Add(new SelectListItem()
-            {
-                Text = "Pick a Authentication Type",
-                Value = "0",
-                Selected = true,
-                Disabled = true
-            });
+            temp2.ForEach(x => x.Selected = esm.AuthID.ToString().Equals(x.Value));
 
             esm.AuthTypesDropdown = temp2.OrderBy(x => x.Value);
 
@@ -920,58 +937,31 @@ namespace Sentry.data.Web.Controllers
         {
             List<SelectListItem> output;
 
-            var list = _datasetContext.DataSources.ToList();
 
             switch (sourceType)
             {
                 case "FTP":
-
-                    List<DataSource> fTpList = new List<DataSource>();
-                    foreach (var a  in list)
-                    {
-                        if (a.Is<FtpSource>())
-                        {
-                            fTpList.Add(a);
-                        }
-                    }
+                    List<DataSource> fTpList = _datasetContext.DataSources.Where(x => x is FtpSource).ToList();
                     output = fTpList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
                     break;
+                case "SFTP":                                        
+                    List<DataSource> sfTpList = _datasetContext.DataSources.Where(x => x is SFtpSource).ToList();
+                    output = sfTpList.Select(v
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
+                    break;
                 case "DFSBasic":
-                    List<DataSource> dfsBasicList = new List<DataSource>();
-                    foreach (var a in list)
-                    {
-                        if (a.Is<DfsBasic>())
-                        {
-                            dfsBasicList.Add(a);
-                        }
-                    }
+                    List<DataSource> dfsBasicList = _datasetContext.DataSources.Where(x => x is DfsBasic).ToList();
                     output = dfsBasicList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
                     break;
                 case "DFSCustom":
-                    List<DataSource> dfsCustomList = new List<DataSource>();
-                    foreach (var a in list)
-                    {
-                        if (a.Is<DfsCustom>())
-                        {
-                            dfsCustomList.Add(a);
-                        }
-                    }
-
+                    List<DataSource> dfsCustomList = _datasetContext.DataSources.Where(x => x is DfsCustom).ToList();
                     output = dfsCustomList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
                     break;
                 case "S3Basic":
-                    List<DataSource> s3BasicList = new List<DataSource>();
-                    foreach (var a in list)
-                    {
-                        if (a.Is<S3Basic>())
-                        {
-                            s3BasicList.Add(a);
-                        }
-                    }
-
+                    List<DataSource> s3BasicList = _datasetContext.DataSources.Where(x => x is S3Basic).ToList();
                     output = s3BasicList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
                     break;
@@ -1022,6 +1012,9 @@ namespace Sentry.data.Web.Controllers
                         break;
                     case Dataset.ValidationErrors.datasetDateIsOld:
                         ModelState.AddModelError("DatasetDate", vr.Description);
+                        break;
+                    case SFtpSource.ValidationErrors.portNumberValueNonZeroValue:
+                        ModelState.AddModelError("PortNumber", vr.Description);
                         break;
                     default:
                         ModelState.AddModelError(string.Empty, vr.Description);

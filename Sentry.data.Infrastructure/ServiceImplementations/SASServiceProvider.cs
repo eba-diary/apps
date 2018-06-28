@@ -15,7 +15,9 @@ using StructureMap;
 
 namespace Sentry.data.Infrastructure
 {
+#pragma warning disable S101 // Types should be named in camel case
     class SASServiceProvider : ISASService
+#pragma warning restore S101 // Types should be named in camel case
     {
         private CookieContainer _cookies = null;
         
@@ -39,8 +41,6 @@ namespace Sentry.data.Infrastructure
         public void ConvertToSASFormat(int datafileId, string filename, string delimiter, int guessingrows)
         {
             DatasetFile df = null;
-            string datasetFileSchema = null;
-            Boolean containsHeader = true;
             try
             {
                 using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
@@ -62,9 +62,9 @@ namespace Sentry.data.Infrastructure
                     Retry.Do(() => CallSASConvertSTP(url), TimeSpan.FromSeconds(15), 2);
                 }
             }
-            catch (Exception e)
+            catch
             {
-                throw new Exception(e.Message);
+                throw;
             }
         }
 
@@ -137,7 +137,7 @@ namespace Sentry.data.Infrastructure
                responsecontent = reader.ReadToEnd();
                 if (!(String.IsNullOrEmpty(responsecontent)))
                 {
-                    throw new WebException("Error Executing SAS Conversion", new Exception(responsecontent));
+                    throw new WebException("Error Executing SAS Conversion", new WebException(responsecontent));
                 }
             }
         }
