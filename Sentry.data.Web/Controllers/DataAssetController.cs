@@ -67,7 +67,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [Route("Lineage/{line}")]
-        [AuthorizeByPermission(PermissionNames.UserSwitch)]
+        [AuthorizeByPermission(PermissionNames.DataAssetView)]
         public ActionResult Lineage(string line)
         {
             ViewBag.IsLine = true;
@@ -98,7 +98,7 @@ namespace Sentry.data.Web.Controllers
 
         [Route("Lineage/{line}/{assetName}")]
         [Route("Lineage/{line}/{assetName}/{businessObject}/{sourceElement}")]
-        [AuthorizeByPermission(PermissionNames.UserSwitch)]
+        [AuthorizeByPermission(PermissionNames.DataAssetView)]
         public ActionResult Lineage(string line, string assetName, string businessObject, string sourceElement)
         {
             var das = new List<DataAsset>(_dataAssetContext.GetDataAssets());

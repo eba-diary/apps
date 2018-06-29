@@ -139,7 +139,7 @@
                 <ul class="nav nav-pills hidden-xs">
                     <li><a href="~/DataAsset/@Model.Name">Home</a></li>
 
-                    @{ disabled = ((Model.DisplayName == "SERA PL" || Model.DisplayName == "PL Policy ODS") && ViewBag.CanUserSwitch) ? "" : "disabled"; }
+                    @{ disabled = ((Model.DisplayName == "SERA PL" || Model.DisplayName == "PL Policy ODS")) ? "" : "disabled"; }
                     <li class="@disabled"><a href="/Lineage/Personal Lines/@Model.Name">Lineage</a></li>
 
                     @{ disabled = (Model.ArchLink != null) ? "" : "disabled"; }
@@ -160,7 +160,7 @@
         <div class="visible-xs daCollapse">
             <div class="navbar-collapse collapse navbar-responsive-collapse">
                 <ul class="nav navbar-nav">
-                    @{ disabled = ((Model.DisplayName == "SERA PL" || Model.DisplayName == "PL Policy ODS") && ViewBag.CanUserSwitch) ? "" : "disabled"; }
+                    @{ disabled = ((Model.DisplayName == "SERA PL" || Model.DisplayName == "PL Policy ODS")) ? "" : "disabled"; }
                     <li class="@disabled"><a href="/Lineage/Personal Lines/@Model.Name/">Lineage</a></li>
 
                     @{ disabled = (Model.ArchLink != null) ? "" : "disabled"; }
