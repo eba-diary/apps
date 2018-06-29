@@ -135,6 +135,11 @@ namespace Sentry.data.Core
                     outFileName = incomingFileName;
                 }
             }
+            else
+            {
+                JobLoggerMessage("Error", "OverwriteDataFile option is set to false. Change setting to true for job to work");
+                throw new NotImplementedException("OverwriteDataFile setting of false is not implemented.  Change setting to true.");
+            }
 
             return outFileName;
         }
