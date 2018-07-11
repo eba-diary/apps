@@ -32,7 +32,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             Property(x => x.Description, m => 
             {
                 m.Column("Source_DSC");
-                m.NotNullable(true);
+                m.NotNullable(false);
             });
 
             Property(x => x.BaseUri, m => 

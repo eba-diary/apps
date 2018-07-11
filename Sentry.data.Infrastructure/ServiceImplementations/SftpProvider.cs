@@ -17,14 +17,16 @@ namespace Sentry.data.Infrastructure
         SessionOptions _sessionOptions;
         private IContainer Container { get; set; }
 
-        private void createSessionOptions(string hostname, NetworkCredential creds)
+        private void CreateSessionOptions(string hostname, int portNumber, NetworkCredential creds)
         {
             _sessionOptions = new SessionOptions
             {
                 Protocol = Protocol.Sftp,
                 HostName = hostname,
                 UserName = creds.UserName,
-                Password = creds.Password
+                Password = creds.Password,
+                PortNumber = portNumber,
+                Timeout = TimeSpan.FromMinutes(1)
             };
         }
 
@@ -33,7 +35,8 @@ namespace Sentry.data.Infrastructure
             string fingerprint = null;
             DataSource source = job.DataSource;
 
-            createSessionOptions(job.DataSource.BaseUri.ToString(), job.DataSource.SourceAuthType.GetCredentials(job));
+            //Using host name of the BaseUri (i.e. URI=SFTP://ftp.sentry.com/, host=ftp.sentry.com)
+            CreateSessionOptions(job.DataSource.BaseUri.Host, job.DataSource.PortNumber, job.DataSource.SourceAuthType.GetCredentials(job));
 
             if (source.HostFingerPrintKey != null)
             {
@@ -43,12 +46,25 @@ namespace Sentry.data.Infrastructure
             else
             {
                 Logger.Info($"Connecting to new SFTP Source - Job:{job.Id} | DataSource:{source.Name} | DataSource:{source.Id} | Url:{source.BaseUri}");
-                
-                using (Session session = new Session())
+                try
                 {
-                    fingerprint = session.ScanFingerprint(_sessionOptions, "SHA-256");
-                    _sessionOptions.SshHostKeyFingerprint = fingerprint;
+                    using (Session session = new Session())
+                    {
+                        fingerprint = session.ScanFingerprint(_sessionOptions, "SHA-256");
+                        _sessionOptions.SshHostKeyFingerprint = fingerprint;
+                    }
                 }
+                catch (SessionRemoteException ex)
+                {
+                    job.JobLoggerMessage("Error", "Failed connecting to SFTP remote server", ex);
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    job.JobLoggerMessage("Error", "Failed scaning SFTP remote server fingerprint", ex);
+                    throw;
+                }
+                
 
                 Logger.Info($"Adding SFTP source SSH fingerprint key - Job:{job.Id} | DataSource:{source.Name} | DataSourceId:{source.Id} | Url:{source.BaseUri}");
                 try

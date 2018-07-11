@@ -143,43 +143,12 @@ namespace Sentry.data.Web.Controllers
 
                     List<RetrieverJob> jobList =  new List<RetrieverJob>();
 
-                    //Do not drop tolist in chain.
-                    DataSource dataSource = _datasetContext.DataSources.First(x => x.Name == "Default Drop Location");
-
-                    Compression compression = new Compression()
-                    {
-                        IsCompressed = false,
-                        CompressionType = null,
-                        FileNameExclusionList = new List<string>()
-                    };
-
-                    RetrieverJobOptions rjo = new RetrieverJobOptions()
-                    {
-                        OverwriteDataFile = true,
-                        TargetFileName = "",
-                        CreateCurrentFile = false,
-                        IsRegexSearch = true,
-                        SearchCriteria = "\\.",
-                        CompressionOptions = compression
-                    };
-                    RetrieverJob rj = new RetrieverJob()
-                    {
-
-                        Schedule = "Instant",
-                        TimeZone = "Central Standard Time",
-                        RelativeUri = null,
-                        DataSource = dataSource,
-                        DatasetConfig = dfc,
-                        Created = DateTime.Now,
-                        Modified = DateTime.Now,
-                        IsGeneric = false,
-
-                        JobOptions = rjo
-
-
-                    };
-
+                    //Store this one so that the local drop location can be created.
+                    RetrieverJob rj = Utility.InstantiateJobsForCreation(dfc, _datasetContext.DataSources.First(x => x.Name.Contains("Default Drop Location")));
                     jobList.Add(rj);
+
+                    jobList.Add(Utility.InstantiateJobsForCreation(dfc, _datasetContext.DataSources.First(x => x.Name.Contains("Default S3 Drop Location"))));
+
                     dfc.RetrieverJobs = jobList;
 
                     _datasetContext.Merge<DatasetFileConfig>(dfc);

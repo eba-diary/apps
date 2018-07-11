@@ -112,7 +112,7 @@ namespace Sentry.data.Infrastructure
                                         //Upload all extracted files to S3 drop location
                                         foreach (string file in Directory.GetFiles(extractPath))
                                         {
-                                            string targetkey = $"{defaultjob.DataSource.GetDropPrefix(defaultjob)}{_job.GetTargetFileName(Path.GetFileNameWithoutExtension(file))}";
+                                            string targetkey = $"{defaultjob.DataSource.GetDropPrefix(defaultjob)}{_job.GetTargetFileName(Path.GetFileName(file))}";
                                             var versionId = s3Service.UploadDataFile(file, targetkey);
                                             _job.JobLoggerMessage("Info", $"Extracted File contents to S3 Drop Location (key:{targetkey} | versionId:{versionId})");
                                         }

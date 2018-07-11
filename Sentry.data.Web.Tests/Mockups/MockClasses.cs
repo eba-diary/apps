@@ -115,9 +115,26 @@ namespace Sentry.data.Web.Tests
             DfsBasic dfs = new DfsBasic();
 
             dfs.Name = "Default Drop Location";
-            dfs.Description = "Basic Description";
+            dfs.Description = "Default Drop Location";
 
             dataSources.Add(dfs);
+
+            S3Basic s3 = new S3Basic();
+
+            s3.Name = "Default S3 Drop Location";
+            s3.Description = "Default S3 Drop Location";
+            s3.Bucket = "sentry-dataset-management-np-nr";
+            s3.BaseUri = new Uri("http://s3-sa-east-1.amazonaws.com/sentry-dataset-management-np-nr/data-dev/droplocation");
+
+            dataSources.Add(s3);
+
+            FtpSource ftp = new FtpSource();
+
+            ftp.Name = "CAB";
+            ftp.Description = "CAB";
+            ftp.BaseUri = new Uri("ftp://ftp.cabfinancial.com/");
+
+            dataSources.Add(ftp);
 
             return dataSources;
         }

@@ -5,6 +5,7 @@ using System.Web;
 using Sentry.data.Core;
 using System.Text;
 using System.Web.Mvc;
+using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Web.Helpers
 {
@@ -33,7 +34,6 @@ namespace Sentry.data.Web.Helpers
             //return results;
             return var;
         }
-
         public static string TimeDisplay(DateTime dt)
         {
             string result;
@@ -76,7 +76,6 @@ namespace Sentry.data.Web.Helpers
 
             return result;
         }
-
         public static BaseDatasetModel setupLists(IDatasetContext _datasetContext, BaseDatasetModel model)
         {
             var temp = GetCategoryList(_datasetContext).ToList();
@@ -163,20 +162,17 @@ namespace Sentry.data.Web.Helpers
 
             return model;
         }
-
         public static IEnumerable<SelectListItem> GetCategoryList(IDatasetContext _datasetContext)
         {
             IEnumerable<SelectListItem> var = _datasetContext.Categories.Select((c) => new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
 
             return var;
         }
-
         public static IEnumerable<Dataset> GetDatasetByCategoryId(IDatasetContext _datasetContext, int id)
         {
             IEnumerable<Dataset> dsQ = _datasetContext.GetDatasetByCategoryID(id);
             return dsQ;
         }
-
         public static IEnumerable<SelectListItem> GetDatasetFrequencyListItems(string freq = null)
         {
             List<SelectListItem> items;
@@ -197,14 +193,12 @@ namespace Sentry.data.Web.Helpers
             }
             return items;
         }
-
         public static IEnumerable<SelectListItem> GetDatasetOriginationListItems()
         {
             List<SelectListItem> items = Enum.GetValues(typeof(DatasetOriginationCode)).Cast<DatasetOriginationCode>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
 
             return items;
         }
-
         public static IEnumerable<SelectListItem> GetDatasetScopeTypesListItems(IDatasetContext _datasetContext, int id = -1)
         {
             IEnumerable<SelectListItem> dScopeTypes;
@@ -226,7 +220,6 @@ namespace Sentry.data.Web.Helpers
 
             return dScopeTypes;
         }
-
         public static IEnumerable<SelectListItem> GetFileExtensionListItems(IDatasetContext _datasetContext, int id = -1)
         {
 
@@ -254,7 +247,54 @@ namespace Sentry.data.Web.Helpers
 
             return dFileExtensions.OrderByDescending(x => x.Selected);
         }
+        public static RetrieverJob InstantiateJobsForCreation(DatasetFileConfig dfc, DataSource dataSource)
+        {
+            Compression compression = new Compression()
+            {
+                IsCompressed = false,
+                CompressionType = null,
+                FileNameExclusionList = new List<string>()
+            };
 
+            RetrieverJobOptions rjo = new RetrieverJobOptions()
+            {
+                OverwriteDataFile = true,
+                TargetFileName = "",
+                CreateCurrentFile = false,
+                IsRegexSearch = true,
+                SearchCriteria = "\\.",
+                CompressionOptions = compression
+            };
+            RetrieverJob rj = new RetrieverJob()
+            {
+                TimeZone = "Central Standard Time",
+                RelativeUri = null,
+                DataSource = dataSource,
+                DatasetConfig = dfc,
+                Created = DateTime.Now,
+                Modified = DateTime.Now,
+                IsGeneric = true,
+
+                JobOptions = rjo
+            };
+
+            if(dataSource.Is<S3Basic>())
+            {
+                rj.Schedule = "*/1 * * * *";
+            }
+            else if(dataSource.Is<DfsBasic>())
+            {
+                rj.Schedule = "Instant";
+            }
+            else
+            {
+                throw new NotImplementedException("This method does not support this type of Data Source");
+            }
+
+
+
+            return rj;
+        }
 
     }
 

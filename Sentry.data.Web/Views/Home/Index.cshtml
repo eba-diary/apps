@@ -334,12 +334,16 @@
                 localStorage.removeItem("searchText");
             });
 
-            $('.searchBtn').click(function (e) {
+            $('#DatasetSearch').click(function (e) {
                 localStorage.removeItem("filteredIds");
 
                 localStorage.removeItem("searchText");
 
                 localStorage.setItem("searchText", $('#SearchText')[0].value);
+            });
+
+            $('.input-group-addon').click(function (e) {
+                $('#DatasetSearch').submit();
             });
         });
     </script>

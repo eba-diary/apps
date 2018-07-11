@@ -41,7 +41,14 @@ namespace Sentry.data.Core
             PortNumber = 22;
         }
 
-        public override List<AuthenticationType> ValidAuthTypes { get; set; }              
+        public override List<AuthenticationType> ValidAuthTypes { get; set; }
+        public override string SourceType
+        {
+            get
+            {
+                return "SFTP";
+            }
+        }
         public override AuthenticationType SourceAuthType { get; set; }
         public virtual List<CompressionTypes> ValidCompressionTypes { get; set; }
         public override Uri BaseUri

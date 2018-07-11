@@ -13,6 +13,7 @@ using System.IO;
 using Amazon.S3.Transfer;
 using Sentry.Common.Logging;
 using Amazon.S3.IO;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
@@ -20,6 +21,7 @@ namespace Sentry.data.Infrastructure
     {
         private static S3ServiceProvider instance = null;
         private static readonly object padlock = new object();
+        private static string versionId;
 
         public S3ServiceProvider() { }
 
@@ -40,7 +42,7 @@ namespace Sentry.data.Infrastructure
 
         private static Amazon.S3.IAmazonS3 _s3client = null;
         
-        private Amazon.S3.IAmazonS3 S3Client
+        private static Amazon.S3.IAmazonS3 S3Client
         {
             get
             {
@@ -125,13 +127,9 @@ namespace Sentry.data.Infrastructure
         /// <param name="dataSet"></param>
         public string UploadDataFile(string sourceFilePath, string targetKey)
         {
-            string versionId = null;
-
             System.IO.FileInfo fInfo = new System.IO.FileInfo(sourceFilePath);
 
-            versionId = fInfo.Length > 5 * (long)Math.Pow(2, 20) ? MultiPartUpload(sourceFilePath, targetKey) : PutObject(sourceFilePath, targetKey);
-
-            return versionId;
+            return fInfo.Length > 5 * (long)Math.Pow(2, 20) ? MultiPartUpload(sourceFilePath, targetKey) : PutObject(sourceFilePath, targetKey);
         }
 
         /// <summary>
@@ -328,7 +326,7 @@ namespace Sentry.data.Infrastructure
             uReq.FilePosition = filePosition;
             uReq.PartSize = partSize;
             uReq.PartNumber = partNumber;
-            uReq.UploadId = uploadId;            
+            uReq.UploadId = uploadId;
             uReq.StreamTransferProgress += new EventHandler<Amazon.Runtime.StreamTransferProgressArgs>(UploadProgressEventCallbackHandler);
             UploadPartResponse uRsp = S3Client.UploadPart(uReq);
             if (uRsp.HttpStatusCode != System.Net.HttpStatusCode.OK)
@@ -376,72 +374,119 @@ namespace Sentry.data.Infrastructure
 
         #region MultiPartUpload - Copy
 
-        public string MultiPartCopy(List<Tuple<string, string>> sourceKeys, string targetKey)
+        private async Task MultiPartCopy(string sourceKey, string targetKey)
         {
-            throw new NotImplementedException();
-            //List<CopyPartResponse> copyPartResponses = new List<CopyPartResponse>();
-            //string versionId = null;
-            //int partnum = 1;
+            List<CopyPartResponse> copyPartResponses = new List<CopyPartResponse>();
 
-            //string uploadId = StartUpload(targetKey);
+            string uploadId = StartUpload(targetKey);
 
-            //for (int i = 0; i < sourceKeys.Count(); i++)
-            //{
-            //    Tuple<string, string> obj = sourceKeys[i];
+            try
+            {
+                Dictionary<string, string> metadataresp = GetObjectMetadata(sourceKey);
 
-            //    CopyPartResponse resp = CopyPart(targetKey, partnum, obj.Item1, obj.Item2, uploadId);
+                long objectSize = Convert.ToInt64(metadataresp["ContentLength"]);
 
-            //    copyPartResponses.Add(resp);
+                long partSizeSeed = 5;
+                long partSize = partSizeSeed * (long)Math.Pow(2, 20); // 5 MB
+                long partSizeUpperLimit = 5 * (long)Math.Pow(2, 30); // 5GB
+                long partLimit = 10000;
 
-            //    partnum++;
-            //}
+                //Determine PartSize that will not exceed 10,000 parts (s3 multipart upload limit).  In addition, 
+                //  leaving a buffer of 5% of 10,000.  Process will initially start with 5MB parts, and incremetally 
+                //  increase by 1MB until buffer >= 5% part limit.
+                while (IsPartSizeToSmall(objectSize, partSize, partLimit))
+                {
+                    partSizeSeed++;
+                    partSize = partSizeSeed * (long)Math.Pow(2, 20);
+                }
 
-            //versionId = StopUpload(targetKey, uploadId, copyPartResponses);
+                //Check part size upper limit
+                if (partSize > partSizeUpperLimit)
+                {
+                    throw new NotSupportedException("Multi-Upload part size exceeds 5GB limit");
+                }
 
+                Logger.Info($"Calculated part size - size(bytes):{partSize}");
 
+                long bytePosition = 0;
+                for (int i = 1; bytePosition < objectSize; i++)
+                {
+                    CopyPartRequest copyRequest = new CopyPartRequest
+                    {
+                        DestinationBucket = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                        DestinationKey = targetKey,
+                        SourceBucket = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                        SourceKey = sourceKey,
+                        UploadId = uploadId,
+                        FirstByte = bytePosition,
+                        LastByte = bytePosition + partSize - 1 >= objectSize ? objectSize - 1 : bytePosition + partSize - 1,
+                        PartNumber = i
+                    };
 
-            ////long contentLength = new FileInfo(sourceFilePath).Length;
-            ////long partSize = 5 * (long)Math.Pow(2, 20); // 5 MB
+                    copyPartResponses.Add(await S3Client.CopyPartAsync(copyRequest));
 
-            //return versionId;
+                    CopyPartResponse resp = copyPartResponses.Last();
+                    Sentry.Common.Logging.Logger.Debug($"UploadID: {uploadId}: Processed part #{i} (source file position: {bytePosition}), and recieved response status {resp.HttpStatusCode} with ETag ({resp.ETag})");
+                    
+                    bytePosition += partSize;
+                }
+
+                // Complete the copy.
+                await StopUpload(targetKey, uploadId, copyPartResponses);
+            }
+
+            catch (AmazonS3Exception e)
+            {
+                Logger.Error($"Error encountered on server. Message:'{e.Message}' when writing an object", e);
+                Logger.Info($"Issuing an Abort request - bucket:{Configuration.Config.GetHostSetting("AWSRootBucket")} | key:{targetKey} | uploadid:{uploadId}");
+                AbortMultipartUploadRequest abortreq = new AbortMultipartUploadRequest
+                {
+                    BucketName = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                    Key = targetKey,
+                    UploadId = uploadId
+                };
+
+                AbortMultipartUploadResponse abortresp =  S3Client.AbortMultipartUpload(abortreq);
+                Logger.Info($"Abort request was {abortresp.HttpStatusCode.ToString()}");
+                throw new AmazonS3Exception(e);
+                
+            }
+            catch (Exception e)
+            {
+                Logger.Error($"Unknown encountered on server. Message:'{e.Message}' when writing an object", e);
+                Logger.Info($"Issuing an Abort request - bucket:{Configuration.Config.GetHostSetting("AWSRootBucket")} | key:{targetKey} | uploadid:{uploadId}");
+                AbortMultipartUploadRequest abortreq = new AbortMultipartUploadRequest
+                {
+                    BucketName = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                    Key = targetKey,
+                    UploadId = uploadId
+                };
+
+                AbortMultipartUploadResponse abortresp = S3Client.AbortMultipartUpload(abortreq);
+                Logger.Info($"Abort request was {abortresp.HttpStatusCode.ToString()}");
+                throw new AmazonS3Exception(e);
+            }
         }
 
-        public CopyPartResponse CopyPart(string dest_Key, int partnum, string source_key, string source_versionId, string uploadId)
+        private static async Task StopUpload(string uniqueKey, string uploadId, List<CopyPartResponse> responses)
         {
-            throw new NotImplementedException();
-            //CopyPartRequest req = new CopyPartRequest();
-            //req.DestinationBucket = Configuration.Config.GetHostSetting("AWSRootBucket");
-            //req.DestinationKey = dest_Key;
-            //req.PartNumber = partnum;
-            //req.SourceBucket = Configuration.Config.GetHostSetting("AWSRootBucket");
-            //req.SourceKey = source_key;
-            //req.SourceVersionId = source_versionId;
-            //req.UploadId = uploadId;
+            CompleteMultipartUploadRequest cReq = new CompleteMultipartUploadRequest
+            { 
+                BucketName = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                Key = uniqueKey,
+                UploadId = uploadId
+            };
+            cReq.AddPartETags(responses);
 
-            //CopyPartResponse response = S3Client.CopyPart(req);
+            CompleteMultipartUploadResponse mRsp = await S3Client.CompleteMultipartUploadAsync(cReq);
 
-            //return response;
-        }
+            Sentry.Common.Logging.Logger.Debug($"Completed MultipartUpload UploadID: {uploadId}, with response status {mRsp.HttpStatusCode}");
 
-        private string StopUpload(string uniqueKey, string uploadId, List<CopyPartResponse> responses)
-        {
-            throw new NotImplementedException();
-            //CompleteMultipartUploadRequest cReq = new CompleteMultipartUploadRequest();
-            //cReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
-            //cReq.Key = uniqueKey;
-            //cReq.UploadId = uploadId;
-            //cReq.AddPartETags(responses);
-
-            //CompleteMultipartUploadResponse mRsp = S3Client.CompleteMultipartUpload(cReq);
-           
-            //Sentry.Common.Logging.Logger.Debug($"Completed MultipartUpload UploadID: {uploadId}, with response status {mRsp.HttpStatusCode}");
-
-            ////return mRsp.ETag;
-            //return mRsp.VersionId;
+            versionId = mRsp.VersionId;
         }
 
         #endregion
-                 
+
         #region PutObject
 
         private string PutObject(Stream filestream, string targetKey)
@@ -804,7 +849,7 @@ namespace Sentry.data.Infrastructure
         /// <param name="bucket"></param>
         /// <param name="prefix"></param>
         /// <returns></returns>
-        public IList<string> ListObjects(string bucket, string prefix)
+        public IList<string> ListObjects(string bucket, string prefix, List<KeyValuePair<string, string>> tagList = null)
         {
             if (string.IsNullOrEmpty(bucket))
             {
@@ -834,7 +879,23 @@ namespace Sentry.data.Infrastructure
                     //Remove prefix object (folder)
                     if (obj.Key != prefix)
                     {
-                        objectlist.Add(obj.Key);
+                        //filter list based on tags supplied
+                        if (tagList != null)
+                        {
+                            //if all key\values within incoming tagList exist on the incoming object, then add to objectlist
+                            if (!tagList.Except(GetObjectTags(bucket, obj.Key)).Any())
+                            {
+                                objectlist.Add(obj.Key);
+                            }
+                            else
+                            {
+                                Logger.Info($"S3 object filtered by ListObject (Does not contain all tags) - key:{obj.Key}");
+                            }
+                        }
+                        else
+                        {
+                            objectlist.Add(obj.Key);
+                        }                        
                     }                    
                 }
                 // Set the marker property
@@ -842,31 +903,140 @@ namespace Sentry.data.Infrastructure
             } while (listResponse.IsTruncated);
 
             return objectlist;
-        }
+        }       
 
         public string CopyObject(string srcBucket, string srcKey, string destBucket, string destKey)
         {
-            //S3FileInfo source = new S3FileInfo(S3Client, srcBucket, srcKey);
-            //S3FileInfo target = new S3FileInfo(S3Client, destBucket, destKey);
-            //source.CopyTo(target, true);
 
-            Dictionary<string, string> resp = null;
+            Dictionary<string, string> resp = GetObjectMetadata(srcKey);
 
-            CopyObjectRequest request = new CopyObjectRequest
+            long objectSize = Convert.ToInt64(resp["ContentLength"]);
+
+            //Copy object file size upper limit is 5GB, if larger use multipartcopy command.
+            if (objectSize > 5 * (long)Math.Pow(2, 30))
             {
-                SourceBucket = srcBucket,
-                SourceKey = srcKey,
-                DestinationBucket = destBucket,
-                DestinationKey = destKey,
-                ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256                
+                Logger.Info($"Using MultiPartCopy method - FileSize({objectSize})");
+                MultiPartCopy(srcKey, destKey).Wait();
+
+                return versionId;
+            }
+            else
+            {
+                Logger.Info($"Using MultiPartCopy method - FileSize({objectSize})");
+
+                CopyObjectRequest request = new CopyObjectRequest
+                {
+                    SourceBucket = srcBucket,
+                    SourceKey = srcKey,
+                    DestinationBucket = destBucket,
+                    DestinationKey = destKey,
+                    ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256
+                };
+
+                CopyObjectResponse response = S3Client.CopyObject(request);
+                if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
+                {
+                    resp = GetObjectMetadata(destKey, null);
+                }
+                return (resp != null) ? Convert.ToString(resp["VersionId"]) : null;
+            }            
+        }
+
+        public List<KeyValuePair<string, string>> GetObjectTags(string bucket, string key, string versionId = null)
+        {
+            GetObjectTaggingRequest tagReq = new GetObjectTaggingRequest()
+            {
+                BucketName = bucket,
+                Key = key,
+                VersionId = versionId
             };
 
-            CopyObjectResponse response = S3Client.CopyObject(request);
-            if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
+            GetObjectTaggingResponse tagResp = S3Client.GetObjectTagging(tagReq);
+
+            if (tagResp.HttpStatusCode == System.Net.HttpStatusCode.OK)
             {
-                resp = GetObjectMetadata(destKey, null);
+                List<KeyValuePair<string, string>> tags = new List<KeyValuePair<string, string>>();
+
+                foreach (Tag tag in tagResp.Tagging)
+                {
+                    tags.Add(new KeyValuePair<string, string>(tag.Key, tag.Value));
+                }
+                return tags;
             }
-            return (resp != null) ? Convert.ToString(resp["VersionId"]) : null;
+            else
+            {
+                throw new AmazonS3Exception($"Error retrieving object tags - HttpStatusCode{tagResp.HttpStatusCode}");
+            }
+        }
+
+        /// <summary>
+        /// Adds tags to given object.  Duplicate tags will be disregarded.
+        /// </summary>
+        /// <param name="bucket"></param>
+        /// <param name="key"></param>
+        /// <param name="tagsToAdd"></param>
+        /// <param name="versionId"></param>
+        public void AddObjectTag(string bucket, string key, List<KeyValuePair<string, string>> tagsToAdd, string versionId = null)
+        {
+            List<KeyValuePair<string, string>> newTags;
+            List<KeyValuePair<string, string>> currentTags;
+
+            //Retrieve current tags on object
+            currentTags = GetObjectTags(bucket, key, versionId);
+
+            //Determine, of the tags requested to be added, do not already exits on the object
+            newTags = tagsToAdd.Except(currentTags).ToList();
+
+            if (newTags != null)
+            {
+                try
+                {
+                    Tagging newTagSet = new Tagging();
+                    List<Tag> tags = new List<Tag>();
+
+                    //Add non-duplicate tags to current tag list
+                    foreach (KeyValuePair<string, string> tag in newTags)
+                    {
+                        currentTags.Add(tag);
+                    }
+
+                    //Convert to TagSet
+                    foreach (KeyValuePair<string, string> tag in currentTags)
+                    {
+                        tags.Add(new Tag { Key = tag.Key, Value = tag.Value });
+                    }
+
+                    //Add tag list to TagSet
+                    newTagSet.TagSet = tags;
+
+                    //Create put tagging request
+                    PutObjectTaggingRequest putTagReq = new PutObjectTaggingRequest()
+                    {
+                        BucketName = bucket,
+                        Key = key,
+                        VersionId = versionId,
+                        Tagging = newTagSet
+                    };
+
+                    PutObjectTaggingResponse putTagResp = S3Client.PutObjectTagging(putTagReq);
+
+                    if (putTagResp.HttpStatusCode != System.Net.HttpStatusCode.OK)
+                    {
+                        Logger.Error($"Error Encountered during PutObjectTaggingResponse - HttpStatusCode:{putTagResp.HttpStatusCode}");
+                        throw new AmazonS3Exception($"Error Encountered during PutObjectTaggingResponse - HttpStatusCode:{putTagResp.HttpStatusCode}");
+                    }
+                }
+                catch (AmazonS3Exception ex)
+                {
+                    Logger.Error("Error Encountered during PutObjectTaggingResponse", ex);
+                    throw;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("Error Encountered during PutObjectTaggingResponse", ex);
+                    throw;
+                }
+            }
         }
 
         #region Helpers

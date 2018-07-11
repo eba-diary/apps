@@ -4,7 +4,7 @@
     [DropLocationType]      VARCHAR (250)  NULL,
     [FileType_ID]           INT            NOT NULL,
     [Config_NME]            VARCHAR (250)  NOT NULL,
-    [Config_DSC]            VARCHAR (250)  NULL,
+    [Config_DSC]            VARCHAR(MAX)  NULL,
     [IsGeneric]             BIT            NOT NULL,
     [DatasetScopeType_ID]   INT            NOT NULL,
     [FileExtension_CDE] INT NOT NULL, 

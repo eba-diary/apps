@@ -128,42 +128,11 @@ namespace Sentry.data.Web.Controllers
 
                     List<RetrieverJob> jobList = new List<RetrieverJob>();
 
-                    DataSource dataSource = _datasetContext.DataSources.Where(x => x.Name == "Default Drop Location").First();
-
-                    Compression compression = new Compression()
-                    {
-                        IsCompressed = false,
-                        CompressionType = null,
-                        FileNameExclusionList = new List<string>()
-                    };
-
-                    RetrieverJobOptions rjo = new RetrieverJobOptions()
-                    {
-                        OverwriteDataFile = true,
-                        TargetFileName = "",
-                        CreateCurrentFile = false,
-                        IsRegexSearch = true,
-                        SearchCriteria = "\\.",
-                        CompressionOptions = compression
-                    };
-                    RetrieverJob rj = new RetrieverJob()
-                    {
-
-                        Schedule = "Instant",
-                        TimeZone = "Central Standard Time",
-                        RelativeUri = null,
-                        DataSource = dataSource,
-                        DatasetConfig = dfc,
-                        Created = DateTime.Now,
-                        Modified = DateTime.Now,
-                        IsGeneric = false,
-
-                        JobOptions = rjo
-
-
-                    };
-
+                    RetrieverJob rj = Utility.InstantiateJobsForCreation(dfc, _datasetContext.DataSources.First(x => x.Name.Contains("Default Drop Location")));
                     jobList.Add(rj);
+
+                    jobList.Add(Utility.InstantiateJobsForCreation(dfc, _datasetContext.DataSources.First(x => x.Name.Contains("Default S3 Drop Location"))));
+
                     dfc.RetrieverJobs = jobList;
 
                     dfcList.Add(dfc);
@@ -365,7 +334,6 @@ namespace Sentry.data.Web.Controllers
                         CompressionOptions = compression
                     };
 
-
                     RetrieverJob rj = new RetrieverJob() {
                         
                         Schedule = cjm.Schedule,
@@ -376,13 +344,9 @@ namespace Sentry.data.Web.Controllers
                         Created = DateTime.Now,
                         Modified = DateTime.Now,
                         IsGeneric = false,
-
                         JobOptions = rjo
-
-
                     };
-
-                    
+               
                     rj.DataSource.CalcRelativeUri(rj);
                     
                     jobList.Add(rj);

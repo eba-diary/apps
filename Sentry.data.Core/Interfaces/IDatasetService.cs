@@ -53,7 +53,9 @@ namespace Sentry.data.Core
 
         List<string> FindObject(string keyPrefix);
 
-        IList<string> ListObjects(string bucket, string prefix);
+        IList<string> ListObjects(string bucket, string prefix, List<KeyValuePair<string, string>> tagList);
+
+        List<KeyValuePair<string, string>> GetObjectTags(string bucket, string key, string versionId = null);
     }
 
 }

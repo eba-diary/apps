@@ -13,12 +13,17 @@ using System.Security.Principal;
 using Newtonsoft.Json;
 using Hangfire;
 using System.Threading;
+using Sentry.Core;
 
 namespace Sentry.data.Infrastructure
 {
     public class RetrieverJobService : IRetrieverJobService
     {
         private RetrieverJob _job;
+        private readonly List<KeyValuePair<string, string>> _dropLocationTags = new List<KeyValuePair<string, string>>()
+        {
+            new KeyValuePair<string, string>("ProcessingStatus","NotStarted")
+        };
 
         private IContainer Container { get; set; }
 
@@ -36,11 +41,14 @@ namespace Sentry.data.Infrastructure
                     IRequestContext _requestContext = Container.GetInstance<IRequestContext>();
 
                     //Retrieve job details
-                    _job = _requestContext.RetrieverJob.Where(w => w.Id == JobId).FirstOrDefault();
+                    _job = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).Fetch(f => f.DataSource).Where(w => w.Id == JobId).FirstOrDefault();
 
                     if (_job.DataSource.Is<FtpSource>())
                     {
                         IFtpProvider _ftpProvider = Container.GetInstance<IFtpProvider>();
+
+                        //Setup temporary work space for job
+                        var tempFile = SetupTempWorkSpace();
 
                         try
                         {
@@ -48,16 +56,6 @@ namespace Sentry.data.Infrastructure
                             if (_job.JobOptions != null && _job.JobOptions.CompressionOptions.IsCompressed)
                             {
                                 _job.JobLoggerMessage("Debug", $"Compressed option is detected... Streaming to temp location");                                
-
-                                var tempFile = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Path.GetFileName(_job.GetUri().ToString()));
-
-                                //Create temp directory if exists
-                                Directory.CreateDirectory(Path.GetDirectoryName(tempFile));
-
-                                //Remove temp file if exists
-                                if (File.Exists(tempFile)) {
-                                    File.Delete(tempFile);
-                                }
 
                                 try
                                 {
@@ -88,29 +86,70 @@ namespace Sentry.data.Infrastructure
                             //Source file is not compressed, stream to drop path location.
                             else
                             {
-                                string targetFullPath = Path.Combine(_job.GetUri().LocalPath, _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString())));
+                                //Find appropriate drop location (S3Basic or DfsBasic)
+                                RetrieverJob targetJob = FindBasicJob();
 
-                                try
+                                //Get target path based on basic job found
+                                string targetFullPath = GetTargetPath(targetJob);
+
+                                if (targetJob.DataSource.Is<S3Basic>())
                                 {
-                                    using (Stream ftpstream = _ftpProvider.GetJobStream(_job))
+                                    _job.JobLoggerMessage("Info", "Sending file to S3 drop location");
+
+                                    try
                                     {
-                                        using (Stream filestream = new FileStream(targetFullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
+                                        using (Stream ftpstream = _ftpProvider.GetJobStream(_job))
                                         {
-                                            ftpstream.CopyTo(filestream);
+                                            using (Stream filestream = new FileStream(tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
+                                            {
+                                                ftpstream.CopyTo(filestream);
+                                            }
                                         }
                                     }
-                                }
-                                catch (Exception ex)
-                                {
-                                    _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
-                                    _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
-
-                                    //Cleanup target file if exists
-                                    if (File.Exists(targetFullPath))
+                                    catch (Exception ex)
                                     {
-                                        File.Delete(targetFullPath);
+                                        _job.JobLoggerMessage("Error", "Retriever job failed streaming temp location.", ex);
+                                        _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
+
+                                        //Cleanup temp file if exists
+                                        if (File.Exists(tempFile))
+                                        {
+                                            File.Delete(tempFile);
+                                        }
                                     }
-                                }                                
+
+
+                                    S3ServiceProvider s3Service = new S3ServiceProvider();
+                                    string targetkey = $"{targetJob.DataSource.GetDropPrefix(targetJob)}{_job.GetTargetFileName(Path.GetFileName(targetFullPath))}";
+                                    var versionId = s3Service.UploadDataFile(tempFile, targetkey);
+
+                                    _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
+                                }
+                                else if (targetJob.DataSource.Is<DfsBasic>())
+                                {
+                                    _job.JobLoggerMessage("Info", "Sending file to DFS drop location");
+                                    try
+                                    {
+                                        using (Stream ftpstream = _ftpProvider.GetJobStream(_job))
+                                        {
+                                            using (Stream filestream = new FileStream(targetFullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
+                                            {
+                                                ftpstream.CopyTo(filestream);
+                                            }
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
+                                        _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
+
+                                        //Cleanup target file if exists
+                                        if (File.Exists(targetFullPath))
+                                        {
+                                            File.Delete(targetFullPath);
+                                        }
+                                    }
+                                }       
 
                                 //Short-Term establishes a new connection to the source and sends file to current files location
                                 if (_job.JobOptions.CreateCurrentFile)
@@ -143,7 +182,7 @@ namespace Sentry.data.Infrastructure
                         }
                         catch (Exception ex)
                         {
-                            _job.JobLoggerMessage("Error", $"Retriever Job Failed");
+                            _job.JobLoggerMessage("Error", $"Retriever Job Failed", ex);
                         }                        
                     }
                     else if (_job.DataSource.Is<SFtpSource>())
@@ -195,13 +234,13 @@ namespace Sentry.data.Infrastructure
                                 //Find the DFSBasic job for the config the SFTP Job is assigned too.  Use the GetUri() from the DFSBasic job as target path, combined with the SFTP job GetTargetFileName().
                                 RetrieverJob TargetJob = null;
                                 string targetpath = null;
-                                TargetJob = _requestContext.RetrieverJob.FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource.Is<S3Basic>());
+                                TargetJob = _requestContext.RetrieverJob.FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is S3Basic);
                                 
                                 // If an S3Basic job was not found, find the DfsBasic job to drop the file
                                 if (TargetJob == null)
                                 {
                                     _job.JobLoggerMessage("Info", "No S3Basic job found for Schema... Finding DfsBasic job");
-                                    TargetJob = _requestContext.RetrieverJob.FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource.Is<DfsBasic>());
+                                    TargetJob = _requestContext.RetrieverJob.FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is DfsBasic);
                                          
                                     if (TargetJob == null)
                                     {
@@ -332,41 +371,119 @@ namespace Sentry.data.Infrastructure
                     {
                         S3ServiceProvider s3Service = new S3ServiceProvider();
 
-                        //Set directory search
-                        var dirSearchCriteria = (String.IsNullOrEmpty(filePath)) ? "*" : filePath;
+                        List<string> objectList = new List<string>();
 
-
-                        IList<String> objectList = s3Service.ListObjects(_job.DataSource.Bucket, _job.DataSource.GetDropPrefix(_job));
-
-                        foreach (string a in objectList)
-                        {                            
-                            if (_job.JobOptions.CompressionOptions.IsCompressed)
+                        //filter any keys which contain a ProcessingStatus tag
+                        foreach (string key in s3Service.ListObjects(_job.DataSource.Bucket, _job.DataSource.GetDropPrefix(_job)))
+                        {
+                            if(!s3Service.GetObjectTags(_job.DataSource.Bucket, key).Any(w => w.Key == "ProcessingStatus"))
                             {
-                                //File filtering takes place on decompressed files
-                                //TODO: Revisit delete source file logic to handle not deleting source file
-                                ProcessCompressedFile(a, true);
+                                //Add ProcessingStatus tag to signify object is being process and subsequent S3BasicJobs do not pick up file for processing
+                                s3Service.AddObjectTag(_job.DataSource.Bucket, key, _dropLocationTags);
+                                objectList.Add(key);
                             }
-                            else
+                        }
+
+                        if (objectList == null)
+                        {
+                            _job.JobLoggerMessage("Info", "S3 Basic job detected 0 new files");
+                        }
+                        else
+                        {
+                            _job.JobLoggerMessage("Info", $"S3 Basic job detected {objectList.Count.ToString()} new files");
+
+                            foreach (string a in objectList)
                             {
-                                if (!_job.FilterIncomingFile(Path.GetFileName(a)))
+                                if (_job.JobOptions.CompressionOptions.IsCompressed)
                                 {
-                                    //Submit Loader Request
-                                    SubmitLoaderRequest(a);
+                                    //File filtering takes place on decompressed files
+                                    //TODO: Revisit delete source file logic to handle not deleting source file
+                                    ProcessCompressedFile(a, true);
                                 }
                                 else
                                 {
-                                    _job.JobLoggerMessage("Info", $"Filtered file from processing ({a})");
+                                    if (!_job.FilterIncomingFile(Path.GetFileName(a)))
+                                    {
+                                        //Submit Loader Request
+                                        SubmitLoaderRequest(a);
+                                    }
+                                    else
+                                    {
+                                        _job.JobLoggerMessage("Info", $"Filtered file from processing ({a})");
+                                    }
                                 }
-                            }                            
+                            }
                         }
                     }
-                                
                 }
             }
             catch (Exception ex)
             {
                 Logger.Error($"Retriever Job Failed to initialize", ex);
             }
+        }
+
+        private string GetTargetPath(RetrieverJob basicJob)
+        {
+            string targetPath = null;
+            if (basicJob.DataSource.Is<DfsBasic>())
+            {
+                targetPath = Path.Combine(basicJob.GetUri().LocalPath, _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString())));
+            }
+            else if (basicJob.DataSource.Is<S3Basic>())
+            {
+                targetPath = Path.Combine(basicJob.GetUri().AbsolutePath, _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString())));
+            }
+            else
+            {
+                _job.JobLoggerMessage("Error", "Not Configured to determine target path for data source type");
+                throw new NotImplementedException("Not Configured to determine target path for data source type");
+            }
+            return targetPath;
+        }
+
+        private RetrieverJob FindBasicJob()
+        {
+            RetrieverJob basicJob = null;
+
+            using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+            {
+                IRequestContext _requestContext = Container.GetInstance<IRequestContext>();
+                
+                basicJob = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).ThenFetch(d => d.ParentDataset).ThenFetch(c => c.DatasetCategory).Fetch(f => f.DataSource).FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is S3Basic);
+                
+                if (basicJob == null)
+                {
+                    _job.JobLoggerMessage("Info", "No S3Basic job found for Schema... Finding DfsBasic job");
+                    basicJob = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).ThenFetch(d => d.ParentDataset).ThenFetch(c => c.DatasetCategory).Fetch(f => f.DataSource).FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is DfsBasic);
+
+                    if (basicJob == null)
+                    {
+                        _job.JobLoggerMessage("Fatal", "Failed to find basic job");
+                        throw new NotImplementedException("Failed to find generic Basic job");
+                    }
+                }
+            }                
+            return basicJob;
+        }
+
+        /// <summary>
+        /// Generates temp work location and removes temp file if already exists
+        /// </summary>
+        /// <returns></returns>
+        public string SetupTempWorkSpace()
+        {
+            string tempFile = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Path.GetFileName(_job.GetUri().ToString()));
+
+            //Create temp directory if exists
+            Directory.CreateDirectory(Path.GetDirectoryName(tempFile));
+
+            //Remove temp file if exists
+            if (File.Exists(tempFile))
+            {
+                File.Delete(tempFile);
+            }
+            return tempFile;
         }
 
         private void ProcessCompressedFile(string filepath, bool deleteSrcFile)

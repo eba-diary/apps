@@ -5,6 +5,7 @@ using Sentry.data.Web.Tests;
 using System.Web.Mvc;
 using Sentry.data.Web;
 using System.Linq;
+using Sentry.data.Web.Helpers;
 
 namespace Sentry.data.Web.Tests
 {
@@ -253,5 +254,76 @@ namespace Sentry.data.Web.Tests
             Assert.IsTrue(model.SentryOwnerName == user.AssociateId);
         }
 
+        [TestMethod]
+        [TestCategory("Dataset Controller")]
+        [TestCategory("Integration Tests")]
+        [TestCategory("Utility")]
+        public void Dataset_Controller_Utility_InstantiateJobs_For_Create_DFSBasic()
+        {
+            var user = MockUsers.App_DataMgmt_Admin_User();
+            var ds = MockClasses.MockDataset(user, true);
+            var dataSource = MockClasses.MockDataSources()[0];
+
+            var job = Utility.InstantiateJobsForCreation(ds.DatasetFileConfigs[0], dataSource);
+
+            Assert.IsTrue(job.DataSource.Is<DfsBasic>());
+            Assert.IsTrue(job.DataSource.Name == dataSource.Name);
+            Assert.IsTrue(job.DataSource.Id == dataSource.Id);
+            Assert.IsTrue(job.DatasetConfig.ConfigId == ds.DatasetFileConfigs[0].ConfigId);
+
+            Assert.IsTrue(job.JobOptions.CompressionOptions.IsCompressed == false);
+            Assert.IsTrue(job.JobOptions.IsRegexSearch == true);
+
+            Assert.IsTrue(job.IsGeneric == true);
+            Assert.IsTrue(job.Schedule == "Instant");
+        }
+
+        [TestMethod]
+        [TestCategory("Dataset Controller")]
+        [TestCategory("Integration Tests")]
+        [TestCategory("Utility")]
+        public void Dataset_Controller_Utility_InstantiateJobs_For_Create_S3Basic()
+        {
+            var user = MockUsers.App_DataMgmt_Admin_User();
+            var ds = MockClasses.MockDataset(user, true);
+            var dataSource = MockClasses.MockDataSources()[1];
+
+            var job = Utility.InstantiateJobsForCreation(ds.DatasetFileConfigs[0], dataSource);
+
+            Assert.IsTrue(job.DataSource.Is<S3Basic>());
+            Assert.IsTrue(job.DataSource.Name == dataSource.Name);
+            Assert.IsTrue(job.DataSource.Id == dataSource.Id);
+            Assert.IsTrue(job.DatasetConfig.ConfigId == ds.DatasetFileConfigs[0].ConfigId);
+
+            Assert.IsTrue(job.JobOptions.CompressionOptions.IsCompressed == false);
+            Assert.IsTrue(job.JobOptions.IsRegexSearch == true);
+
+            Assert.IsTrue(job.IsGeneric == true);
+            Assert.IsTrue(job.Schedule == "*/1 * * * *");
+        }
+
+        [TestMethod]
+        [TestCategory("Dataset Controller")]
+        [TestCategory("Integration Tests")]
+        [TestCategory("Utility")]
+        public void Dataset_Controller_Utility_InstantiateJobs_For_Create_FTPBasic()
+        {
+            var user = MockUsers.App_DataMgmt_Admin_User();
+            var ds = MockClasses.MockDataset(user, true);
+            var dataSource = MockClasses.MockDataSources()[2];
+
+            try
+            {
+                var job = Utility.InstantiateJobsForCreation(ds.DatasetFileConfigs[0], dataSource);
+                Assert.Fail();
+            }
+            catch (Exception ex)
+            {
+                Assert.IsTrue(ex is NotImplementedException);
+            }
+
+
+
+        }
     }
 }
