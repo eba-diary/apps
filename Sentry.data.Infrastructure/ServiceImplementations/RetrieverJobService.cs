@@ -80,9 +80,10 @@ namespace Sentry.data.Infrastructure
                                     if (File.Exists(tempFile)) {
                                         File.Delete(tempFile);
                                     }
+
+                                    throw;
                                 }                                
-                            }
-                            
+                            }                            
                             //Source file is not compressed, stream to drop path location.
                             else
                             {
@@ -116,6 +117,8 @@ namespace Sentry.data.Infrastructure
                                         {
                                             File.Delete(tempFile);
                                         }
+
+                                        throw;
                                     }
 
 
@@ -148,6 +151,8 @@ namespace Sentry.data.Infrastructure
                                         {
                                             File.Delete(targetFullPath);
                                         }
+
+                                        throw;
                                     }
                                 }       
 

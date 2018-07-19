@@ -61,108 +61,104 @@ namespace Sentry.data.Infrastructure
                 {
                     try
                     {
-                        //Process only if file matches file search criteria
-                        if (!_job.FilterIncomingFile(Path.GetFileName(filePath)))
+                        if (defaultjob.DataSource.Is<S3Basic>())
                         {
-                            if (defaultjob.DataSource.Is<S3Basic>())
+                            S3ServiceProvider s3Service = new S3ServiceProvider();
+
+                            //local directory where compressed file contents will be extracted
+                            var extractPath = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Path.GetFileNameWithoutExtension(filePath));
+
+                            //create local extraction directory
+                            if (!Directory.Exists(extractPath))
                             {
-                                S3ServiceProvider s3Service = new S3ServiceProvider();
-
-                                //local directory where compressed file contents will be extracted
-                                var extractPath = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Path.GetFileNameWithoutExtension(filePath));
-
-                                //create local extraction directory
-                                if (!Directory.Exists(extractPath))
-                                {
-                                    Directory.CreateDirectory(extractPath);
-                                }
-
-                                try
-                                {
-                                    //Do we need to exclude any files from zip archive?  If not extract all files to target directory
-                                    if (_job.JobOptions.CompressionOptions.FileNameExclusionList != null && _job.JobOptions.CompressionOptions.FileNameExclusionList.Count > 0)
-                                    {
-                                        List<String> ExclusionList = _job.JobOptions.CompressionOptions.FileNameExclusionList;
-                                        
-                                        using (ZipArchive archive = ZipFile.OpenRead(filePath))
-                                        {
-                                            foreach (ZipArchiveEntry entry in archive.Entries)
-                                            {
-                                                //Exclude file if name exists in ExclusionList or does not match job search criteria
-                                                if (!ExclusionList.Contains(entry.FullName) && !_job.FilterIncomingFile(entry.FullName))
-                                                {
-                                                    //extract to local work directory, overrwrite file if exists
-                                                    entry.ExtractToFile(Path.Combine(extractPath, entry.FullName), true);
-                                                }
-                                            }
-                                        }
-
-                                        //Upload all extracted files to S3 drop location
-                                        foreach (string file in Directory.GetFiles(extractPath))
-                                        {
-                                            string targetkey = $"{defaultjob.DataSource.GetDropPrefix(defaultjob)}{_job.GetTargetFileName(Path.GetFileNameWithoutExtension(file))}";
-                                            var versionId = s3Service.UploadDataFile(file, targetkey);
-                                            _job.JobLoggerMessage("Info", $"Extracted File to S3 Drop Location (key:{targetkey} | versionId:{versionId})");
-                                        }                                                                        
-                                    }
-                                    else
-                                    {
-                                        ZipFile.ExtractToDirectory(filePath, extractPath);
-
-                                        //Upload all extracted files to S3 drop location
-                                        foreach (string file in Directory.GetFiles(extractPath))
-                                        {
-                                            string targetkey = $"{defaultjob.DataSource.GetDropPrefix(defaultjob)}{_job.GetTargetFileName(Path.GetFileName(file))}";
-                                            var versionId = s3Service.UploadDataFile(file, targetkey);
-                                            _job.JobLoggerMessage("Info", $"Extracted File contents to S3 Drop Location (key:{targetkey} | versionId:{versionId})");
-                                        }
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    _job.JobLoggerMessage("Error", "Jaws failed extracting and uploading to S3 drop location", ex);
-                                }
-                                finally
-                                {
-                                    _job.JobLoggerMessage("Info", $"Deleting all files in extract directory ({extractPath})");
-
-                                    //cleanup local extracts
-                                    CleanupTempDir(extractPath);
-                                }
-
-                                //cleanup Source temp file after successful processing
-                                CleanupTempFile(filePath);
+                                Directory.CreateDirectory(extractPath);
                             }
-                            else if (defaultjob.DataSource.Is<DfsBasic>())
-                            {
-                                //Set target path based on DfsBasic URI
-                                string targetPath = defaultjob.GetUri().LocalPath;
 
+                            try
+                            {
+                                //Do we need to exclude any files from zip archive?  If not extract all files to target directory
                                 if (_job.JobOptions.CompressionOptions.FileNameExclusionList != null && _job.JobOptions.CompressionOptions.FileNameExclusionList.Count > 0)
                                 {
                                     List<String> ExclusionList = _job.JobOptions.CompressionOptions.FileNameExclusionList;
-
+                                        
                                     using (ZipArchive archive = ZipFile.OpenRead(filePath))
                                     {
                                         foreach (ZipArchiveEntry entry in archive.Entries)
                                         {
                                             //Exclude file if name exists in ExclusionList or does not match job search criteria
-                                            if (!ExclusionList.Contains(entry.FullName) || !_job.FilterIncomingFile(entry.FullName))
+                                            if (!ExclusionList.Contains(entry.FullName) && !_job.FilterIncomingFile(entry.FullName))
                                             {
-                                                //extract to DfsBasic drop location
-                                                entry.ExtractToFile(Path.Combine(targetPath, entry.FullName));
+                                                //extract to local work directory, overrwrite file if exists
+                                                entry.ExtractToFile(Path.Combine(extractPath, entry.FullName), true);
                                             }
                                         }
                                     }
+
+                                    //Upload all extracted files to S3 drop location
+                                    foreach (string file in Directory.GetFiles(extractPath))
+                                    {
+                                        string targetkey = $"{defaultjob.DataSource.GetDropPrefix(defaultjob)}{_job.GetTargetFileName(Path.GetFileNameWithoutExtension(file))}";
+                                        var versionId = s3Service.UploadDataFile(file, targetkey);
+                                        _job.JobLoggerMessage("Info", $"Extracted File to S3 Drop Location (key:{targetkey} | versionId:{versionId})");
+                                    }                                                                        
                                 }
                                 else
                                 {
-                                    ZipFile.ExtractToDirectory(filePath, targetPath);
-                                }
+                                    ZipFile.ExtractToDirectory(filePath, extractPath);
 
-                                //cleanup temp file after successful processing
-                                CleanupTempFile(filePath);
+                                    //Upload all extracted files to S3 drop location
+                                    foreach (string file in Directory.GetFiles(extractPath))
+                                    {
+                                        string targetkey = $"{defaultjob.DataSource.GetDropPrefix(defaultjob)}{_job.GetTargetFileName(Path.GetFileName(file))}";
+                                        var versionId = s3Service.UploadDataFile(file, targetkey);
+                                        _job.JobLoggerMessage("Info", $"Extracted File contents to S3 Drop Location (key:{targetkey} | versionId:{versionId})");
+                                    }
+                                }
                             }
+                            catch (Exception ex)
+                            {
+                                _job.JobLoggerMessage("Error", "Jaws failed extracting and uploading to S3 drop location", ex);
+                            }
+                            finally
+                            {
+                                _job.JobLoggerMessage("Info", $"Deleting all files in extract directory ({extractPath})");
+
+                                //cleanup local extracts
+                                CleanupTempDir(extractPath);
+                            }
+
+                            //cleanup Source temp file after successful processing
+                            CleanupTempFile(filePath);
+                        }
+                        else if (defaultjob.DataSource.Is<DfsBasic>())
+                        {
+                            //Set target path based on DfsBasic URI
+                            string targetPath = defaultjob.GetUri().LocalPath;
+
+                            if (_job.JobOptions.CompressionOptions.FileNameExclusionList != null && _job.JobOptions.CompressionOptions.FileNameExclusionList.Count > 0)
+                            {
+                                List<String> ExclusionList = _job.JobOptions.CompressionOptions.FileNameExclusionList;
+
+                                using (ZipArchive archive = ZipFile.OpenRead(filePath))
+                                {
+                                    foreach (ZipArchiveEntry entry in archive.Entries)
+                                    {
+                                        //Exclude file if name exists in ExclusionList or does not match job search criteria
+                                        if (!ExclusionList.Contains(entry.FullName) || !_job.FilterIncomingFile(entry.FullName))
+                                        {
+                                            //extract to DfsBasic drop location
+                                            entry.ExtractToFile(Path.Combine(targetPath, entry.FullName));
+                                        }
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                ZipFile.ExtractToDirectory(filePath, targetPath);
+                            }
+
+                            //cleanup temp file after successful processing
+                            CleanupTempFile(filePath);
                         }
                     }
                     catch(System.IO.InvalidDataException ex)
@@ -185,54 +181,44 @@ namespace Sentry.data.Infrastructure
 
                     try
                     {                        
-                        //Process only if file matches file search criteria
-                        if (!_job.FilterIncomingFile(Path.GetFileNameWithoutExtension(filePath)))
+                        //Extract files within local work directory
+                        tempfile = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Path.GetFileNameWithoutExtension(filePath));
+
+                        //remove temp file if already exists
+                        if (File.Exists(tempfile)) {
+                            File.Delete(tempfile);
+                        }
+
+                        using (Stream fd = File.Create(tempfile))
+                        using (Stream fs = File.OpenRead(filePath))
+                        using (Stream csStream = new GZipStream(fs, CompressionMode.Decompress))
                         {
-                            //Extract files within local work directory
-                            tempfile = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Path.GetFileNameWithoutExtension(filePath));
-
-                            //remove temp file if already exists
-                            if (File.Exists(tempfile)) {
-                                File.Delete(tempfile);
-                            }
-
-                            using (Stream fd = File.Create(tempfile))
-                            using (Stream fs = File.OpenRead(filePath))
-                            using (Stream csStream = new GZipStream(fs, CompressionMode.Decompress))
+                            byte[] buffer = new byte[1024];
+                            int nRead;
+                            while ((nRead = csStream.Read(buffer, 0, buffer.Length)) > 0)
                             {
-                                byte[] buffer = new byte[1024];
-                                int nRead;
-                                while ((nRead = csStream.Read(buffer, 0, buffer.Length)) > 0)
-                                {
-                                    fd.Write(buffer, 0, nRead);
-                                }
-                            }                            
+                                fd.Write(buffer, 0, nRead);
+                            }
+                        }                            
                                 
-                            if(defaultjob.DataSource.Is<S3Basic>())
-                            {
-                                S3ServiceProvider s3Service = new S3ServiceProvider();                                
-                                string targetkey = $"{defaultjob.DataSource.GetDropPrefix(defaultjob)}{_job.GetTargetFileName(Path.GetFileNameWithoutExtension(filePath))}";
-                                var versionId = s3Service.UploadDataFile(tempfile, targetkey);
-                                _job.JobLoggerMessage("Info", $"Extracted File to S3 Drop Location (Key:{targetkey} VersionId:{versionId}");
-                            }
-                            else if(defaultjob.DataSource.Is<DfsBasic>())
-                            {                                    
-                                string target = Path.Combine(defaultjob.GetUri().LocalPath, _job.GetTargetFileName(Path.GetFileNameWithoutExtension(filePath)));
-                                File.Move(tempfile, target);
-                                _job.JobLoggerMessage("Info", $"Extracted File to DFS Drop Location ({target})");
-                            }
-                            else
-                            {
-                                _job.JobLoggerMessage("Error", $"The Schema does not have DFS or S3 basic job defined");
-                                throw new NotImplementedException($"The Dataset config ({_job.DatasetConfig.ConfigId}) does not have a generic DFS or S3 basic job defined.");
-                            }                           
+                        if(defaultjob.DataSource.Is<S3Basic>())
+                        {
+                            S3ServiceProvider s3Service = new S3ServiceProvider();                                
+                            string targetkey = $"{defaultjob.DataSource.GetDropPrefix(defaultjob)}{_job.GetTargetFileName(Path.GetFileNameWithoutExtension(filePath))}";
+                            var versionId = s3Service.UploadDataFile(tempfile, targetkey);
+                            _job.JobLoggerMessage("Info", $"Extracted File to S3 Drop Location (Key:{targetkey} VersionId:{versionId}");
+                        }
+                        else if(defaultjob.DataSource.Is<DfsBasic>())
+                        {                                    
+                            string target = Path.Combine(defaultjob.GetUri().LocalPath, _job.GetTargetFileName(Path.GetFileNameWithoutExtension(filePath)));
+                            File.Move(tempfile, target);
+                            _job.JobLoggerMessage("Info", $"Extracted File to DFS Drop Location ({target})");
                         }
                         else
                         {
-                            _job.JobLoggerMessage("Warn", $"Incoming file filtered ({filePath})");
-                            _job.JobLoggerMessage("Info", $"Cleaning up incoming file ({filePath})");
-                            CleanupTempFile(filePath);
-                        }
+                            _job.JobLoggerMessage("Error", $"The Schema does not have DFS or S3 basic job defined");
+                            throw new NotImplementedException($"The Dataset config ({_job.DatasetConfig.ConfigId}) does not have a generic DFS or S3 basic job defined.");
+                        }                           
                     }
                     catch (Exception ex)
                     {
