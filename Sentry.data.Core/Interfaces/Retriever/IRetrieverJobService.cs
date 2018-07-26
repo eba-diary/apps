@@ -8,6 +8,6 @@ namespace Sentry.data.Core
 {
     public interface IRetrieverJobService
     {
-        void RunRetrieverJob(int JobId, string filePath = null);
+        //void RunRetrieverJob(int JobId, string filePath = null);
     }
 }

@@ -45,18 +45,11 @@ namespace Sentry.data.Goldeneye
 
             _server = new BackgroundJobServer(options);
 
-            while (true)
+            token.Register(() =>
             {
-                if (token.IsCancellationRequested)
-                {
-                    Sentry.Common.Logging.Logger.Info("Cancellation Requested of HangFire Server");
-                    _server.Dispose();
-                }
-                else
-                {
-                    Thread.Sleep(TimeSpan.FromSeconds(10));
-                }
-            }
+                Sentry.Common.Logging.Logger.Info("Cancellation Requested of HangFire Server");
+                _server.Dispose();
+            });
         }
     }
 }

@@ -40,7 +40,7 @@
                 </div>
 
                 <div class="no-overflow">
-                    <h1 class="detailName leftFloat @color">
+                    <h1 class="detailName leftFloat @color" style="margin-left: 2.25em !important;">
                         @Model.DatasetName
 
                         @if (Model.IsSensitive)
@@ -163,20 +163,23 @@
             <div class="col-lg-8">
                 <div style="margin-left: 35px;">
 
-                    @if(Model.DatasetDesc.Length >= 300)
-                    {
-                        <h6 class="@color">
-                         <span style="margin-top: 15px;">@Model.DatasetDesc.Substring(0, 300)</span>
-                         <span id="descSeeMoreEllipsis">...</span>
-                         <span id="descSeeMorePanel" style="display: none;">@Model.DatasetDesc.Substring(300) </span>
-                         <span id="descSeeMoreButton" style="cursor: pointer;"><a onclick="$('#descSeeMorePanel').show(); $(this).parent().hide(); $('#descShowLessButton').show(); $('#descSeeMoreEllipsis').hide();">See More</a></span>
-                         <span id="descShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#descSeeMorePanel').hide(); $(this).parent().hide(); $('#descSeeMoreButton').show(); $('#descSeeMoreEllipsis').show();">Show Less</a></span>
-                        </h6>
-                    }
-                    else
-                    {
-                         <h6 class="@color">@Model.DatasetDesc</h6>
-                    }
+                    @if (Model.DatasetDesc.Length >= 500)
+    {
+
+        int last = Model.DatasetDesc.Substring(0, 500).LastIndexOf(" ");
+
+                <p class="spanContainer">
+                    <span style="margin-top: 15px;">@Model.DatasetDesc.Substring(0, last)</span>
+                    <span id="descSeeMoreEllipsis">...&nbsp;</span>
+                    <span id="descSeeMorePanel" style="display: none;">@Model.DatasetDesc.Substring(last) </span>
+                    <span id="descSeeMoreButton" style="cursor: pointer;"><a onclick="$('#descSeeMorePanel').show(); $(this).parent().hide(); $('#descShowLessButton').show(); $('#descSeeMoreEllipsis').hide();">See More</a></span>
+                    <span id="descShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#descSeeMorePanel').hide(); $(this).parent().hide(); $('#descSeeMoreButton').show(); $('#descSeeMoreEllipsis').show();">Show Less</a></span>
+                </p>
+}
+else
+{
+                <p>@Model.DatasetDesc</p>
+}
                 </div>
             </div>
             <div class="col-lg-4">
@@ -205,20 +208,22 @@
                 <div style="margin-left: 35px;">
                     <h6 class="@color">Usage Information:</h6><br />
 
-                    @if(Model.DatasetInformation.Length >= 150)
-                    {
-                         <span style="margin-top: 15px;">@Model.DatasetInformation.Substring(0, 150)</span>
-                         <span id="usageSeeMoreEllipsis">...</span>
-                         <span id="usageSeeMorePanel" style="display: none;">@Model.DatasetInformation.Substring(150)</span>
-                         <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
-                         <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
+                    @if (Model.DatasetInformation.Length >= 300)
+    {
 
-                    }
-                    else
-                    {
-                         <span style="margin-top: 15px;">@Model.DatasetInformation</span>
-                    }
+        int lastInfo = Model.DatasetInformation.Substring(0, 300).LastIndexOf(" ");
 
+                <span style="margin-top: 15px;">@Model.DatasetInformation.Substring(0, lastInfo)</span>
+                <span id="usageSeeMoreEllipsis">...&nbsp;</span>
+                <span id="usageSeeMorePanel" style="display: none;">@Model.DatasetInformation.Substring(lastInfo)</span>
+                <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
+                <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
+
+}
+else
+{
+                <span style="margin-top: 15px;">@Model.DatasetInformation</span>
+}
                 </div>
             </div>
         </div>
@@ -250,9 +255,15 @@
                 <div class="col-lg-12">
 
                     <br />
-                    <div style="margin-left: 35px;" data-bind="visible: Description() != null">
+                    <div style="margin-left: 35px;" data-bind="visible: Description() != null" class="spanContainer">
                         <h6 class="@color">Schema Description:</h6><br />
-                        <span style="margin-top: 15px;" data-bind="text: Description"></span>
+                        <span style="margin-top: 15px;" data-bind="text: LessDescription"></span>
+                        <span id="schemaHasMoreDescription">
+                            <span id="schemaSeeMoreEllipsis">&nbsp;...</span>
+                            <span id="schemaSeeMorePanel" style="display: none; padding-left: 4px;" data-bind="text: MoreDescription"></span>
+                            <span id="schemaSeeMoreButton" style="cursor: pointer;"><a onclick="$('#schemaSeeMorePanel').show(); $(this).parent().hide(); $('#schemaShowLessButton').show(); $('#schemaSeeMoreEllipsis').hide();">See More</a></span>
+                            <span id="schemaShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#schemaSeeMorePanel').hide(); $(this).parent().hide(); $('#schemaSeeMoreButton').show(); $('#schemaSeeMoreEllipsis').show();">Show Less</a></span>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -287,9 +298,15 @@
                 <div class="col-lg-12">
 
                     <br />
-                    <div style="margin-left: 35px;" data-bind="visible: Description() != null">
+                    <div style="margin-left: 35px;" data-bind="visible: Description() != null" class="spanContainer">
                         <h6 class="@color">Schema Description:</h6><br />
-                        <span style="margin-top: 15px;" data-bind="text: Description"></span>
+                        <span style="margin-top: 15px;" data-bind="text: LessDescription"></span>
+                        <span id="schemaHasMoreDescription">
+                            <span id="schemaSeeMoreEllipsis">&nbsp;...</span>
+                            <span id="schemaSeeMorePanel" style="display: none; padding-left: 4px;" data-bind="text: MoreDescription"></span>
+                            <span id="schemaSeeMoreButton" style="cursor: pointer;"><a onclick="$('#schemaSeeMorePanel').show(); $(this).parent().hide(); $('#schemaShowLessButton').show(); $('#schemaSeeMoreEllipsis').hide();">See More</a></span>
+                            <span id="schemaShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#schemaSeeMorePanel').hide(); $(this).parent().hide(); $('#schemaSeeMoreButton').show(); $('#schemaSeeMoreEllipsis').show();">Show Less</a></span>
+                        </span>
                     </div>
                 </div>
             </div>
@@ -659,6 +676,33 @@
             self.DataLastUpdated = ko.observable();
 
             self.Description = ko.observable();
+
+            self.LessDescription = ko.computed(function () {
+                if (self.Description() != null && self.Description().length > 300) {
+
+                    var last = self.Description().substring(0, 300).lastIndexOf(" ");
+
+                    $('#schemaHasMoreDescription').show();
+                    return self.Description().substring(0, last);
+                } else {
+                    $('#schemaHasMoreDescription').hide();
+                    return self.Description();
+                }
+            });
+
+            self.MoreDescription = ko.computed(function () {
+                if (self.Description() != null && self.Description().length > 300) {
+                    $('#schemaHasMoreDescription').show();
+                    var last = self.Description().substring(0, 300).lastIndexOf(" ");
+
+                    return " " + self.Description().substring(last);
+                } else {
+                    $('#schemaHasMoreDescription').hide();
+                    return '';
+                }
+            });
+
+
             self.DFSDropLocation = ko.observable();
             self.S3DropLocation = ko.observable();
             self.OtherJobs = ko.observableArray();

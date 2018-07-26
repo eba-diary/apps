@@ -56,7 +56,8 @@ namespace Sentry.data.Goldeneye
         /// 
         /// </summary>
         /// <param name="path"></param>
-        public void Run(string path)
+        /// <param name="token"></param>
+        public void Run(string path, CancellationToken token)
         {
             do
             {
@@ -86,7 +87,7 @@ namespace Sentry.data.Goldeneye
                             //SubmitLoaderRequest(file);
 
                             //Create a fire-forget Hangfire job to decompress the file and drop extracted file into drop location
-                            BackgroundJob.Enqueue<RetrieverJobService>(RetrieverJobService => RetrieverJobService.RunRetrieverJob(RetrieverJobId, Path.GetFileName(file.fileName)));
+                            BackgroundJob.Enqueue<RetrieverJobService>(RetrieverJobService => RetrieverJobService.RunRetrieverJob(RetrieverJobId, JobCancellationToken.Null, Path.GetFileName(file.fileName)));
                             //RecurringJob.AddOrUpdate<RetrieverJobService>($"RetrieverJob_{RetrieverJobId}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(RetrieverJobId), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
 
                             file.started = true;
@@ -100,7 +101,12 @@ namespace Sentry.data.Goldeneye
 
                 Thread.Sleep(2000);
                 
-            } while (true);
+            } while (!token.IsCancellationRequested);
+
+            if (token.IsCancellationRequested)
+            {
+                Logger.Info($"Watch cancelled for Job:{RetrieverJobId.ToString()}");
+            }
         }
 
         //This method checks to see if a file is locked by another process.  
@@ -216,7 +222,7 @@ namespace Sentry.data.Goldeneye
         /// The Service will do the rest on it's periodic run.
         /// </summary>
         /// <param name="watchPath"></param>
-        public void OnStart(int jobId, Uri watchPath)
+        public void OnStart(int jobId, Uri watchPath, CancellationToken token)
         {
 
             try
@@ -261,7 +267,7 @@ namespace Sentry.data.Goldeneye
             
 
             //Start directory monitor
-            this.Run(WatchedDir);
+            this.Run(WatchedDir, token);
         }
 
         //When a new file is created add the file path to the list of All Files.

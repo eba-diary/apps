@@ -26,6 +26,8 @@ namespace Sentry.data.Goldeneye
         private CancellationToken _token;
         private IContainer _container;
         private IRequestContext _requestContext;
+        private Scheduler _backgroundJobServer;
+        private List<RunningTask> currentTasks = new List<RunningTask>();
 
         /// <summary>
         /// Start the core worker
@@ -39,7 +41,7 @@ namespace Sentry.data.Goldeneye
             _token = _tokenSource.Token;
 
             //start up a new task
-            Task.Factory.StartNew(this.DoWork, TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted);          
+            Task.Factory.StartNew(() => DoWork(), _token, TaskCreationOptions.LongRunning, TaskScheduler.Default).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted);
         }
 
         /// <summary>
@@ -97,8 +99,6 @@ namespace Sentry.data.Goldeneye
             config.LastRunDay = DateTime.Now;       //  once per day
             config.LastRunWeek = DateTime.Now;      //  once per week
             
-            List<RunningTask> currentTasks = new List<RunningTask>();            
-
             Boolean firstRun = true;
             do
             {
@@ -158,10 +158,9 @@ namespace Sentry.data.Goldeneye
 
                         if (firstRun)
                         {
-                            var backgroundJobServer = new Scheduler();
+                            _backgroundJobServer = new Scheduler();
                             currentTasks.Add(new RunningTask(
-                                Task.Factory.StartNew(() => backgroundJobServer.Run(_token), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),
-                                "BackgroundJobServer")
+                                Task.Factory.StartNew(() => _backgroundJobServer.Run(_token), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),"BackgroundJobServer")
                             );
 
                             //https://crontab.guru/
@@ -182,7 +181,7 @@ namespace Sentry.data.Goldeneye
                                 var configName = Job.DatasetConfig.Name;
 
                                 // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
-                                RecurringJob.AddOrUpdate<RetrieverJobService>($"RJob~{Job.DatasetConfig.ParentDataset.DatasetId}~{Job.Id}~{Job.DatasetConfig.ConfigId}~{Job.DataSource.Name}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                                RecurringJob.AddOrUpdate<RetrieverJobService>($"RJob~{Job.DatasetConfig.ParentDataset.DatasetId}~{Job.Id}~{Job.DatasetConfig.ConfigId}~{Job.DataSource.Name}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, JobCancellationToken.Null, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
                             }
                             
                         }
@@ -254,7 +253,7 @@ namespace Sentry.data.Goldeneye
                         foreach (RetrieverJob Job in JobList)
                         {
                             // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
-                            RecurringJob.AddOrUpdate<RetrieverJobService>($"RJob~{Job.DatasetConfig.ParentDataset.DatasetId}~{Job.Id}~{Job.DatasetConfig.ConfigId}~{Job.DataSource.Name}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                            RecurringJob.AddOrUpdate<RetrieverJobService>($"RJob~{Job.DatasetConfig.ParentDataset.DatasetId}~{Job.Id}~{Job.DatasetConfig.ConfigId}~{Job.DataSource.Name}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, JobCancellationToken.Null, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
                         }
 
                         if (JobList.Count > 0)
@@ -305,7 +304,7 @@ namespace Sentry.data.Goldeneye
                                 if (firstRun)
                                 {
                                     currentTasks.Add(new RunningTask(
-                                        Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath),
+                                        Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath, _token),
                                                                         TaskCreationOptions.LongRunning).ContinueWith(TaskException,
                                                                         TaskContinuationOptions.OnlyOnFaulted),
                                                                         $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
@@ -315,7 +314,7 @@ namespace Sentry.data.Goldeneye
                                 else if (tasks.Any(w => Int64.Parse(w.Name.Replace("Watch_", "")) == configID))
                                 {
                                     currentTasks.Add(new RunningTask(
-                                        Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath),
+                                        Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath, _token),
                                                                         TaskCreationOptions.LongRunning).ContinueWith(TaskException,
                                                                         TaskContinuationOptions.OnlyOnFaulted),
                                                                         $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
@@ -329,15 +328,13 @@ namespace Sentry.data.Goldeneye
                                     Logger.Info($"Detected new config ({configID}) to monitor ({configID})");
 
                                     currentTasks.Add(new RunningTask(
-                                        Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath),
+                                        Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath, _token),
                                                                         TaskCreationOptions.LongRunning).ContinueWith(TaskException,
                                                                         TaskContinuationOptions.OnlyOnFaulted),
                                                                         $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
                                     );
                                 }
                             }
-
-
                         }
 
                         config.LastRunMinute = DateTime.Now;
@@ -347,6 +344,12 @@ namespace Sentry.data.Goldeneye
                 firstRun = false;
 
             } while (!_token.IsCancellationRequested);
+
+            if (_token.IsCancellationRequested)
+            {
+                Logger.Info("Cancellation Requested, shutting down Goldeneye");
+            };
+
             Logger.Info("Worker task stopped.");
         }
 
@@ -358,6 +361,38 @@ namespace Sentry.data.Goldeneye
             Logger.Info("Windows Service stopping...");
             //request the task to cancel itself
             _tokenSource.Cancel();
+
+            try
+            {
+                Task.WaitAll(currentTasks.Select(s => s.Task).ToArray());
+            }
+            catch (AggregateException e)
+            {
+                Logger.Debug("AggregateException thrown with inner exceptions:");
+                // Display information about each exception. 
+                foreach (var v in e.InnerExceptions)
+                {
+                    if (v is TaskCanceledException)
+                    {
+                        Logger.Debug($"TaskCanceledException: Task {((TaskCanceledException)v).Task.Id.ToString()}");
+                    }
+                    else
+                    {
+                        Logger.Error($"   Exception: {v.GetType().Name}");
+                    }
+                }
+            }
+            finally
+            {
+                _tokenSource.Dispose();
+            }
+
+            foreach (RunningTask task in currentTasks)
+            {
+                Logger.Info($"Task {task.Name} status is now {task.Task.Status}");
+            }
+
+            Logger.Info("Windows Service stopped.");
         }
 
         /// <summary>

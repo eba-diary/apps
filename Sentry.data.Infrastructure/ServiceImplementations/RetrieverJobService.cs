@@ -14,10 +14,11 @@ using Newtonsoft.Json;
 using Hangfire;
 using System.Threading;
 using Sentry.Core;
+using System.Net;
 
 namespace Sentry.data.Infrastructure
 {
-    public class RetrieverJobService : IRetrieverJobService
+    public class RetrieverJobService
     {
         private RetrieverJob _job;
         private readonly List<KeyValuePair<string, string>> _dropLocationTags = new List<KeyValuePair<string, string>>()
@@ -32,10 +33,12 @@ namespace Sentry.data.Infrastructure
         /// </summary>
         /// <param name="JobId">ID of the retriever job</param>
         /// <param name="filePath">(For DFSBasic jobs) File name, including extension, to process.  If null is passed then will process all files within directory</param>
-        public void RunRetrieverJob(int JobId, string filePath = null)
+        public void RunRetrieverJob(int JobId, IJobCancellationToken token, string filePath = null)
         {
             try
-            {            
+            {
+                token.ThrowIfCancellationRequested();
+
                 using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
                 {
                     IRequestContext _requestContext = Container.GetInstance<IRequestContext>();
@@ -419,8 +422,13 @@ namespace Sentry.data.Infrastructure
                                 }
                             }
                         }
-                    }
+                    }                    
                 }
+            }
+            catch (OperationCanceledException)
+            {
+                Logger.Info($"Retriever Job Cancelled - Job:{JobId}");
+                throw;
             }
             catch (Exception ex)
             {

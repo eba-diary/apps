@@ -777,7 +777,18 @@ data.DatasetDetail = {
 
         var controllerURL = "/Dataset/GetDatasetFileDownloadURL/?id=" + encodeURI(id);
         $.get(controllerURL, function (result) {
-            window.open(result, "_blank");
+
+            if (result.message && result.message.startsWith('Encountered Error Retrieving File')) {
+                Sentry.ShowModalCustom("Error", result.message, {
+                    Cancel:
+                        {
+                            label: 'Ok',
+                            className: 'btn-Ok'
+                        }
+                });
+            } else {
+                window.open(result, "_blank");
+            }
         })
         .fail(function (jqXHR, textStatus, errorThrown)
         {
