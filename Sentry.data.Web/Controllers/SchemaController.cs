@@ -50,6 +50,7 @@ namespace Sentry.data.Web.Controllers
         {
             public string Name { get; set; }
             public string Location { get; set; }
+            public int JobId { get; set; }
         }
         
 
@@ -77,7 +78,7 @@ namespace Sentry.data.Web.Controllers
                 Metadata m = new Metadata();
 
                 m.Description = config.Description;
-                m.DFSDropLocation = config.RetrieverJobs.Where(x => x.DataSource.Is<DfsBasic>()).Select(x => new DropLocation() { Location = x.Schedule, Name = x.DataSource.SourceType }).FirstOrDefault();
+                m.DFSDropLocation = config.RetrieverJobs.Where(x => x.DataSource.Is<DfsBasic>()).Select(x => new DropLocation() { Location = x.Schedule, Name = x.DataSource.SourceType, JobId = x.Id }).FirstOrDefault();
 
                 if (config.DatasetFiles.Any())
                 {
@@ -86,14 +87,14 @@ namespace Sentry.data.Web.Controllers
 
                 if (config.RetrieverJobs.Any(x => x.DataSource.Is<S3Basic>()))
                 {
-                    m.S3DropLocation = config.RetrieverJobs.Where(x => x.DataSource.Is<S3Basic>()).Select(x => new DropLocation() { Location = x.Schedule, Name = x.DataSource.SourceType }).FirstOrDefault();
+                    m.S3DropLocation = config.RetrieverJobs.Where(x => x.DataSource.Is<S3Basic>()).Select(x => new DropLocation() { Location = x.Schedule, Name = x.DataSource.SourceType, JobId = x.Id }).FirstOrDefault();
                 }
 
                
                 if (config.RetrieverJobs.Any(x => !x.DataSource.Is<S3Basic>() && !x.DataSource.Is<DfsBasic>()))
                 {
                     m.OtherJobs = config.RetrieverJobs.Where(x => !x.DataSource.Is<S3Basic>() && !x.DataSource.Is<DfsBasic>()).OrderBy(x => x.Id)
-                        .Select(x => new DropLocation() { Location = x.Schedule, Name = x.DataSource.SourceType }).ToList();
+                        .Select(x => new DropLocation() { Location = x.Schedule, Name = x.DataSource.SourceType, JobId = x.Id }).ToList();
                 }
 
                 return Ok(m);

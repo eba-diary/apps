@@ -27,6 +27,7 @@ using StackExchange.Profiling;
 using Sentry.Common.Logging;
 using Sentry.data.Core.Entities.Metadata;
 using static Sentry.data.Core.RetrieverJobOptions;
+using Hangfire;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -1323,6 +1324,22 @@ namespace Sentry.data.Web.Controllers
         }
 
 #endregion
+
+        [HttpPost]
+        public ActionResult RunRetrieverJob(int id)
+        {
+            try
+            {
+                BackgroundJob.Enqueue<RetrieverJobService>(RetrieverJobService => RetrieverJobService.RunRetrieverJob(id, JobCancellationToken.Null, null));
+            }
+            catch(Exception ex)
+            {
+                Logger.Error($"Error Enqueing Retriever Job ({id}).", ex);
+                return Json(new { Success = false, Message = "Failed to queue job, please try later! Contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a> if problem persists." });
+            }
+
+            return Json(new { Success = true, Message = "Job successfully queued." });
+        }
 
         [AuthorizeByPermission(PermissionNames.DatasetView)]
         public JsonResult LoadDatasetList(int id)

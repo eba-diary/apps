@@ -330,14 +330,17 @@ else
                         <tr class="borderMeta_@color">
                             <td class="borderMeta_@color colOneMeta">Sentry Owner</td>
                             <td class="borderMeta_@color">@Model.SentryOwner.FullName</td>
+                            <td class="borderMeta_@color"></td>
                         </tr>
                         <tr class="borderMeta_@color">
                             <td class="borderMeta_@color colOneMeta">Dataset Creator</td>
                             <td class="borderMeta_@color">@Model.CreationUserName</td>
+                            <td class="borderMeta_@color"></td>
                         </tr>
                         <tr class="borderMeta_@color">
                             <td class="borderMeta_@color colOneMeta">Dataset Origination</td>
                             <td class="borderMeta_@color">@Model.OriginationCode</td>
+                            <td class="borderMeta_@color"></td>
                         </tr>
 
                         <tr>
@@ -348,21 +351,27 @@ else
                                     <span class="comma" title='@dst.Description'>@dst.Name</span>
                                 }
                             </td>
+                            <td class="borderMeta_@color"></td>
                         </tr>
 
                         <tr data-bind="if: DFSDropLocation(), visible: DFSDropLocation != undefined" style="display:none;">
                             <td class="borderMeta_@color colOneMeta">DFS Drop Location</td>
                             <td class="borderMeta_@color" data-bind="text: DFSDropLocation().Location()"></td>
+                            <td class="borderMeta_@color"></td>
                         </tr>
 
                         <tr data-bind="if: S3DropLocation(), visible: S3DropLocation != undefined" style="display:none;">
                             <td class="borderMeta_@color colOneMeta">S3 Drop Location</td>
                             <td class="borderMeta_@color" data-bind="text: S3DropLocation().Location()"></td>
+                            <td class="borderMeta_@color"></td>
                         </tr>
 
                         <tr data-bind="foreach: OtherJobs(), visible: OtherJobs != undefined" style="display:none;">
                             <td class="borderMeta_@color colOneMeta" data-bind="text: Name()"></td>
                             <td class="borderMeta_@color" data-bind="text: Location()"></td>
+                            <td class="borderMeta_@color">
+                                <button class="btn btn-default on-demand-run" data-bind="attr: { id: JobId }">On-Demand Run</button>
+                            </td>
                         </tr>
 
 
@@ -648,6 +657,27 @@ else
             }
 
             $('#linkReturnToList').attr('href', returnUrl);
+
+            $('body').on('click', '.on-demand-run', function () {
+                var request = $.ajax({
+                    url: "/Dataset/RunRetrieverJob/?id=" + $(this).attr('id'),
+                    method: "POST",
+                    dataType: 'json',
+                    success: function (obj) {
+                        var modal = Sentry.ShowModalConfirmation(
+                            obj.Message, function () { })
+                    },
+                    failure: function (obj) {
+                        var modal = Sentry.ShowModalAlert(
+                            obj.Message, function () { })
+                    },
+                    error: function (obj) {
+                        var modal = Sentry.ShowModalAlert(
+                            obj.Message, function () { })
+                    }
+                });
+
+            });
         });
 
 
@@ -664,6 +694,7 @@ else
         function DropLocation(data) {
             this.Name = ko.observable(data.Name);
             this.Location = ko.observable('Next Processing Time is ' + prettyCron.getNext(data.Location));
+            this.JobId = ko.observable(data.JobId);
         }
 
         function ViewModel() {

@@ -166,7 +166,23 @@
                         <h4 class="@color">Schema and Configuration Information</h4>
                         <hr />
 
-                        <p>@item.ConfigFileDesc</p>
+                        @if (item.ConfigFileDesc != null && item.ConfigFileDesc.Length >= 300)
+                        {
+
+                        int lastInfo = item.ConfigFileDesc.Substring(0, 300).LastIndexOf(" ");
+                        <p>
+                            <span style="margin-top: 15px;">@item.ConfigFileDesc.Substring(0, lastInfo)</span>
+                            <span id="usageSeeMoreEllipsis">...&nbsp;</span>
+                            <span id="usageSeeMorePanel" style="display: none;">@item.ConfigFileDesc.Substring(lastInfo)</span>
+                            <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
+                            <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
+                        </p>
+                        }
+                        else
+                        {
+                        <p style="margin-top: 15px;">@item.ConfigFileDesc</p>
+                        }
+
                         <p>This configuration is classified as a @item.FileType</p>
                         <p>This configuration Data Scope is @item.ScopeType.Name which means : </p>
                         <p style="margin-left: 25px;">@item.ScopeType.Description</p>
@@ -185,7 +201,11 @@
                             <div class="retJob @job.DataSource.SourceType">
                                 <div class="jobHeader categoryBanner-@color">
                                     <h6>@job.DataSource.Name</h6>
-                                    <i class="glyphicon glyphicon-menu-up tracker-menu-icon"></i>
+                                    <i id="retJobDetails" class="tracker-menu-icon glyphicon glyphicon-menu-up"></i>
+                                    @if (job.DataSource.SourceType != "S3Basic" && job.DataSource.SourceType != "DFSBasic")
+                                    {
+                                        <button class="btn btn-default on-demand-run" id="@job.Id">On-Demand Run</button>
+                                    }                                    
                                 </div>
                                 <div class="jobContainer" style="display:none;">
                                     <p>@job.DataSource.Description</p>
@@ -330,18 +350,21 @@
         font-weight: 700;
     }
 
+    .jobHeader h6 {
+        color: white;
+        padding-left: 15px;
+        display: inline-block;
+    }
 
-        .jobHeader h6 {
-            color: white;
-            padding-left: 15px;
-            display: inline-block;
-        }
+    .jobHeader .tracker-menu-icon {
+        margin: 2px 10px 0 10px;
+        color: white;
+        display: inline-block;
+    }
 
-        .jobHeader .tracker-menu-icon {
-            margin: 2px 10px 0 10px;
-            color: white;
-            display: inline-block;
-        }
+    .on-demand-run{
+        margin-bottom: 3px;
+    }
 </style>
 
 
@@ -383,6 +406,27 @@
                 } else {
                     $(this).css('border-radius', '5px 5px 0px 0px');
                 }
+            });
+
+            $('body').on('click', '.on-demand-run', function () {
+                var request = $.ajax({
+                    url: "/Dataset/RunRetrieverJob/?id=" + $(this).attr('id'),
+                    method: "POST",
+                    dataType: 'json',
+                    success: function (obj) {
+                        var modal = Sentry.ShowModalConfirmation(
+                            obj.Message, function () { })
+                    },
+                    failure: function (obj) {
+                        var modal = Sentry.ShowModalAlert(
+                            obj.Message, function () { })
+                    },
+                    error: function (obj) {
+                        var modal = Sentry.ShowModalAlert(
+                            obj.Message, function () { })
+                    }
+                });
+
             });
 
             $(".schedule").each(function (index, element) {
