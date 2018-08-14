@@ -30,7 +30,7 @@ namespace Sentry.data.Core
 
         void TransferUtlityUploadStream(string key, Stream stream);
 
-        void TransferUtilityDownload(string baseTargetPath, string folder, string filename, string s3Key);
+        void TransferUtilityDownload(string baseTargetPath, string folder, string filename, string s3Key, string versionId = null);
 
         #region Object Deletes
         ObjectKeyVersion MarkDeleted(string key);

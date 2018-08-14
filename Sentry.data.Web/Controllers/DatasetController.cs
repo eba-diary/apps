@@ -715,7 +715,7 @@ namespace Sentry.data.Web.Controllers
                 _s3Service.GetObjectMetadata(df.FileLocation);              
 
                 JsonResult jr = new JsonResult();
-                jr.Data = _s3Service.GetDatasetDownloadURL(df.FileLocation);
+                jr.Data = _s3Service.GetDatasetDownloadURL(df.FileLocation, df.VersionId);
                 jr.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
 
                 e.Reason = "Successfully Downloaded Data File";
@@ -829,7 +829,7 @@ namespace Sentry.data.Web.Controllers
                 try
                 {
 
-                    _s3Service.TransferUtilityDownload(BaseTargetPath, ds.Dataset.Category, filename, ds.FileLocation);
+                    _s3Service.TransferUtilityDownload(BaseTargetPath, ds.Dataset.Category, filename, ds.FileLocation, ds.VersionId);
 
                 }
                 catch (Exception e)

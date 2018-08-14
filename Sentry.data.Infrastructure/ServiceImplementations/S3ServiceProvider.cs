@@ -194,7 +194,7 @@ namespace Sentry.data.Infrastructure
 
         }
 
-        public void TransferUtilityDownload(string baseTargetPath, string folder, string filename, string s3Key)
+        public void TransferUtilityDownload(string baseTargetPath, string folder, string filename, string s3Key, string versionId = null)
         {
             try
             {
@@ -207,6 +207,7 @@ namespace Sentry.data.Infrastructure
                 s3tuDwnldReq.FilePath = baseTargetPath + folder + @"\" + filename;
 
                 s3tuDwnldReq.Key = s3Key;
+                s3tuDwnldReq.VersionId = versionId;
                 
                 s3tu.Download(s3tuDwnldReq);
             }
