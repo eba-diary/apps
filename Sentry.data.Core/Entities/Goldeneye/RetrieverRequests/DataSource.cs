@@ -28,6 +28,15 @@ namespace Sentry.data.Core
         public virtual string SourceType { get; set; }
         public virtual List<AuthenticationType> ValidAuthTypes { get; set; }
         public virtual AuthenticationType SourceAuthType { get; set; }
+
+        //#region Token Authentication properties
+        //// Only used for TokenAuthentication type
+        //public virtual string AuthHeaderName { get; set; }
+        //// Only used for TokenAuthentication type
+        //public virtual string AuthHeaderValue { get; set; }
+        //public virtual string IVKey { get; set; }
+        //#endregion
+
         public virtual Boolean IsUriEditable { get; set; }
         public virtual Uri BaseUri { get; set; }
         public virtual string KeyCode { get; set; }

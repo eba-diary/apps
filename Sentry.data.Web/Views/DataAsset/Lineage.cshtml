@@ -19,6 +19,12 @@
     string disabled;
 }
 
+<style>
+    _:-ms-lang(x), .lineageRow {
+        padding: 15px 10px 15px 10px;
+    }
+</style>
+
 @Html.HiddenFor(x => dataAsset.Name)
 
 <!-- Data Asset Header -->
@@ -347,7 +353,8 @@
 
         function ToggleHiddenRows(justStyle) {
 
-            if ($('.hiddenLayer').children('div').is(":visible") || justStyle) {;
+            if ($('.hiddenLayer').children('div').is(":visible") || justStyle) {
+                ;
                 $($('#lineagePanel').find('li')).each(function () {
                     if ($(this).attr('class') != 'layer0') {
                         if ($(this).attr('class') !== undefined) {
@@ -708,7 +715,7 @@
 
                 var dataElementParameter = '';
 
-                if (elementFromURL && first && $('#dataAsset_Name').val() != decodeURI(location.href.substr(location.href.lastIndexOf('/') + 1)))  {
+                if (elementFromURL && first && $('#dataAsset_Name').val() != decodeURI(location.href.substr(location.href.lastIndexOf('/') + 1))) {
                     dataElementParameter = elementFromURL;
                 } else {
                     dataElementParameter = "&DataElement_NME=" + encodeURIComponent($('#dataElements').val());

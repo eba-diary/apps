@@ -26,6 +26,7 @@ namespace Sentry.data.Web
             this.ScopeType = dsfc.DatasetScopeType;
             this.FileExtensionID = dsfc.FileExtension.Id;
             this.FileExtension = dsfc.FileExtension;
+            this.DataElement_ID = dsfc.DataElement_ID;
 
             try
             {
@@ -64,9 +65,14 @@ namespace Sentry.data.Web
             this.ScopeType = dsfc.DatasetScopeType;
             this.FileExtensionID = dsfc.FileExtension.Id;
             this.FileExtension = dsfc.FileExtension;
+            this.DataElement_ID = dsfc.DataElement_ID;
+
             try
             {
-
+                if (datasetContext.Schemas.Any(x => x.DatasetFileConfig.ConfigId == this.ConfigId))
+                {
+                    this.Schemas = datasetContext.Schemas.Where(x => x.DatasetFileConfig.ConfigId == this.ConfigId).ToList();
+                }
 
                 if (renderingForTable)
                 {
@@ -97,6 +103,8 @@ namespace Sentry.data.Web
         public int ConfigId { get; set; }
 
         public int FileTypeId { get; set; }
+
+        public int DataElement_ID { get; set; }
 
         [DisplayName("File Type")]
         public string FileType {
@@ -139,6 +147,8 @@ namespace Sentry.data.Web
         public int FileExtensionID { get; set; }
 
         public IList<RetrieverJob> RetrieverJobs { get; set; }
+
+        public IList<Schema> Schemas { get; set; }     
 
         public IEnumerable<SelectListItem> AllDatasetScopeTypes { get; set; }
         public IEnumerable<SelectListItem> AllDataFileTypes { get; set; }

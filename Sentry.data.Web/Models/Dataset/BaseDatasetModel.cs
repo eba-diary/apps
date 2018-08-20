@@ -240,5 +240,7 @@ namespace Sentry.data.Web
 
         public int AmountOfSubscriptions { get; set; }
 
+        public int Views { get; set; }
+        public int Downloads { get; set; }
     }
 }

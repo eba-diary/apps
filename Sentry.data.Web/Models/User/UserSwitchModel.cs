@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Sentry.data.Core;
+using System.ComponentModel.DataAnnotations;
 
 namespace Sentry.data.Web
 {
@@ -9,5 +10,7 @@ namespace Sentry.data.Web
         public string OwnerID { get; set; }
         public string CurrentRealUserName { get; set; }
         public string CurrentImpersonatedUserName { get; set; }
+
+        public IApplicationUser ImpersonatedUser { get; set; }
     }
 }

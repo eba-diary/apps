@@ -51,8 +51,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.ForeignKey("FK_DatasetFile_DatasetFileConfigs");
                 m.Class(typeof(DatasetFileConfig));
             });
-
-
         }
 
     }

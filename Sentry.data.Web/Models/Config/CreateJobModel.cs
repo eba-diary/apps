@@ -25,6 +25,8 @@ namespace Sentry.data.Web
             this.DatasetConfigID = configID;
             this.DatasetID = datasetID;
 
+            this.IsRegexSearch = true;
+            this.SearchCriteria = "\\.";
             this.OverwriteDataFile = true;
             this.CreateCurrentFile = false;
             this.TargetFileName = "";

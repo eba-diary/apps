@@ -81,30 +81,23 @@ namespace Sentry.data.Infrastructure
                                 {
                                     List<String> ExclusionList = _job.JobOptions.CompressionOptions.FileNameExclusionList;
                                         
-                                    using (ZipArchive archive = ZipFile.OpenRead(filePath))
-                                    {
-                                        foreach (ZipArchiveEntry entry in archive.Entries)
+                                        using (ZipArchive archive = ZipFile.OpenRead(filePath))
                                         {
-                                            //Exclude file if name exists in ExclusionList or does not match job search criteria
-                                            if (!ExclusionList.Contains(entry.FullName) && !_job.FilterIncomingFile(entry.FullName))
+                                            foreach (ZipArchiveEntry entry in archive.Entries)
                                             {
-                                                //extract to local work directory, overrwrite file if exists
-                                                entry.ExtractToFile(Path.Combine(extractPath, entry.FullName), true);
+                                                //Exclude file if name exists in ExclusionList or does not match job search criteria
+                                                if (!ExclusionList.Contains(entry.FullName) && !_job.FilterIncomingFile(entry.FullName))
+                                                {
+                                                    //extract to local work directory, overrwrite file if exists
+                                                    entry.ExtractToFile(Path.Combine(extractPath, entry.FullName), true);
+                                                }
                                             }
-                                        }
+                                        }                                                                     
                                     }
-
-                                    //Upload all extracted files to S3 drop location
-                                    foreach (string file in Directory.GetFiles(extractPath))
+                                    else
                                     {
-                                        string targetkey = $"{defaultjob.DataSource.GetDropPrefix(defaultjob)}{_job.GetTargetFileName(Path.GetFileNameWithoutExtension(file))}";
-                                        var versionId = s3Service.UploadDataFile(file, targetkey);
-                                        _job.JobLoggerMessage("Info", $"Extracted File to S3 Drop Location (key:{targetkey} | versionId:{versionId})");
-                                    }                                                                        
-                                }
-                                else
-                                {
-                                    ZipFile.ExtractToDirectory(filePath, extractPath);
+                                        ZipFile.ExtractToDirectory(filePath, extractPath);                                        
+                                    }
 
                                     //Upload all extracted files to S3 drop location
                                     foreach (string file in Directory.GetFiles(extractPath))
@@ -114,14 +107,13 @@ namespace Sentry.data.Infrastructure
                                         _job.JobLoggerMessage("Info", $"Extracted File contents to S3 Drop Location (key:{targetkey} | versionId:{versionId})");
                                     }
                                 }
-                            }
-                            catch (Exception ex)
-                            {
-                                _job.JobLoggerMessage("Error", "Jaws failed extracting and uploading to S3 drop location", ex);
-                            }
-                            finally
-                            {
-                                _job.JobLoggerMessage("Info", $"Deleting all files in extract directory ({extractPath})");
+                                catch (Exception ex)
+                                {
+                                    _job.JobLoggerMessage("Error", "Jaws failed extracting and uploading to S3 drop location", ex);
+                                }
+                                finally
+                                {
+                                    _job.JobLoggerMessage("Info", $"Deleting all files in extract directory ({extractPath})");
 
                                 //cleanup local extracts
                                 CleanupTempDir(extractPath);

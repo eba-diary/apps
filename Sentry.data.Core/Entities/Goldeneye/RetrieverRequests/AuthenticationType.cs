@@ -25,5 +25,10 @@ namespace Sentry.data.Core
         public virtual string Description { get; set; }
         public virtual bool IsUserPassRequired { get; set; }
         public abstract NetworkCredential GetCredentials(RetrieverJob Job);
+        public virtual Boolean Is<T>() where T : AuthenticationType
+        {
+            return (this is T) ? true : false;
+        }
     }
+    
 }

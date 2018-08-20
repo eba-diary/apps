@@ -43,7 +43,7 @@ namespace Sentry.data.Core
 
         string MultiPartUpload(string sourceFilePath, string targetKey);
 
-        string GetDatasetDownloadURL(string key, string versionId);
+        string GetDatasetDownloadURL(string key, string versionId, string fileName);
 
         Dictionary<string, string> GetObjectMetadata(string key, string versionId = null);
 

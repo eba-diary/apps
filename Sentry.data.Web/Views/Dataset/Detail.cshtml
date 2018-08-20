@@ -6,41 +6,43 @@
     string headerColor = "categoryBanner-" + Model.DatasetCategory.Color;
 }
 
-<div>   
-    <div class="topBanner">
-        <a href="@Url.Action("Datasets", "Search")" class="backToList" id="linkReturnToList"><span class="glyphicon glyphicon-chevron-left"></span>Back to list</a>
 
 
-        @if (@Model.DatasetFiles.Count == 0)
-        {
-            <div id="alertInfoBanner" class="alert alert-dismissable alert-info">
-                <button type="button" class="close" data-dismiss="alert">×</button>
-                <div>
-                    @if (Model.CanUpload)
-                    {
-                        <strong class="alertHeading">Info: </strong>
-                        <span>This dataset has no files attached to it yet.  Please click the flashing upload button to upload your first file.</span>
-                    }
-                    else
-                    {
-                        <strong class="alertHeading">Info: </strong>
-                        <span>This dataset has no files attached to it yet.  Please contact the Sentry Owner: @Model.SentryOwner.FullName.</span>
-                    }
-                </div>
+@if (@Model.DatasetFiles.Count == 0)
+{
+    <div>
+        <div id="alertInfoBanner" class="alert alert-dismissable alert-info">
+            <button type="button" class="close" data-dismiss="alert">×</button>
+            <div>
+                @if (Model.CanUpload)
+                {
+                    <strong class="alertHeading">Info: </strong>
+                    <span>This dataset has no files attached to it yet.  Please click the flashing upload button to upload your first file.</span>
+                }
+                else
+                {
+                    <strong class="alertHeading">Info: </strong>
+                    <span>This dataset has no files attached to it yet.  Please contact the Sentry Owner: @Model.SentryOwner.FullName.</span>
+                }
             </div>
+        </div>
+    </div>
+}
 
-        }
 
-        <div class="categoryBanner-@color categoryBannerSml rightFloat hidden-md hidden-lg">@Model.DatasetCategory.Name</div>
+<a href="@Url.Action("Datasets", "Search")" class="backToList" id="linkReturnToList"><span class="glyphicon glyphicon-chevron-left"></span>Back to list</a>
+
+<div style="font-feature-settings: 'lnum';">
+    <div class="topBanner" style="height: 60px;
+    margin-top: 20px;
+    border-bottom: 1px #DDDDDD solid;">
+
 
         <div class="relative hidden-sm hidden-xs">
-            <div class="category-type-wrap-detail bg_gray BG_@color">
-                <div class="category-type-detail categoryBanner-@color">
-                    @Model.DatasetCategory.Name
-                </div>
+            <div>
 
                 <div class="no-overflow">
-                    <h1 class="detailName leftFloat @color" style="margin-left: 2.25em !important;">
+                    <h1 class="detailName leftFloat @color">
                         @Model.DatasetName
 
                         @if (Model.IsSensitive)
@@ -56,381 +58,435 @@
                         }
                     }
 
+                    <div style="margin-top:-29px;">
+                        <div class="btn-group rightFloat dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions">
+                            <button type="button"
+                                    class="btn btn-default borderdk_gray borderdk_@color dropdown"
+                                    data-toggle="dropdown">
+                                <span class="glyphicon glyphicon-menu-hamburger @color"></span>
+                            </button>
 
-                    <button type="button"
-                            class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                            id="SubscribeModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Subscribe">
-                        <span class="glyphicon glyphicon-pushpin @color">
-                            @* <span class="numbers categoryBanner-@color">@Model.AmountOfSubscriptions</span> *@
-                        </span>
-                    </button>
+                            <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
+                                <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
+                                    <a>
+                                        Subscribe
+                                    </a>
+                                </li>
 
-                    @if (Model.CanQueryTool)
-                    {
-                        <button class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color" onclick="window.location = '/Dataset/QueryTool?DatasetID=@Model.DatasetId'"
-                                data-toggle="tooltip" data-placement="top" title="Query Dataset">
-                            <span class="glyphicon glyphicon-filter @color">
-                                @* <span class="numbers categoryBanner-@color">@Model.AmountOfSubscriptions</span> *@
-                            </span>
-                        </button>
-                    }
+                                @if (Model.CanQueryTool)
+                                {
+                                    <li title="Query Dataset">
+                                        <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
+                                            Query this Dataset
+                                        </a>
+                                    </li>
+                                }
+                                @if (Model.CanManageConfigs)
+                                {
+                                    <li>
+                                        <a href="/Config/Dataset/@Model.DatasetId">
+                                            Manage Schemas
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
 
+                        @if (Model.CanUpload)
+                        {
+                            <button type="button"
+                                    class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                                    id="UploadModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Upload File">
+                                <span class="glyphicon glyphicon-cloud-upload @color"></span>
+                            </button>
+                        }
 
-                    @if (Model.CanUpload)
-                    {
-                        <button type="button"
-                                class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                                id="UploadModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Upload File">
-                            <span class="glyphicon glyphicon-cloud-upload @color"></span>
-                        </button>
-                    }
+                        @if (Model.CanEditDataset)
+                        {
+                            <button type="button"
+                                    class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                                    id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
+                                <span class="glyphicon glyphicon-edit @color"></span>
+                            </button>
+                        }
 
-                    @if (Model.CanEditDataset)
-                    {
-                        <button type="button"
-                                class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                                id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
-                            <span class="glyphicon glyphicon-edit @color"></span>
-                        </button>
-                    }
+                        @*@if (((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive)) && Model.DatasetFiles.Count != 0)
+                            {
+                                <button type="button"
+                                        class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                                        id="DownloadLatest" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download Latest">
+                                    <span class="glyphicon glyphicon-cloud-download @color"></span>
+                                </button>
+                            }
 
-                    @if (((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive)) && Model.DatasetFiles.Count != 0)
-                    {
-                        <button type="button"
-                                class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                                id="DownloadLatest" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download Latest">
-                            <span class="glyphicon glyphicon-cloud-download @color"></span>
-                        </button>
-                    }
-
-                    @if ((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive))
-                    {
-                        <button type="button"
-                                class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                                id="PreviewLatestData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Preview Latest">
-                            <span class="glyphicon glyphicon-search @color"></span>
-                        </button>
-                    }
+                            @if ((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive))
+                            {
+                                <button type="button"
+                                        class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                                        id="PreviewLatestData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Preview Latest">
+                                    <span class="glyphicon glyphicon-search @color"></span>
+                                </button>
+                            }*@
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="hidden-md hidden-lg">
-            <h1 class="detailNameSml leftFloat @color BG_@color text-center">@Model.DatasetName</h1>
+            <div>
+                <h1 class="detailName leftFloat @color">
+                    @Model.DatasetName
 
-            <div class="clearFloat leftFloat iconExt">
-                @if (Model.IsSensitive)
-                {
-                    <div class="glyphicon glyphicon-lock lockIconSml leftFloat" data-toggle="tooltip" data-placement="top" title="Secure"></div>
-                }
-                @{
-                    foreach (string item in Model.DistinctFileExtensions())
+                    @if (Model.IsSensitive)
                     {
-                        <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
+                        <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
                     }
-                }
+                </h1>
+
+                <div>
+                    <div class="btn-group rightFloat dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions" style="margin-top: 5px;">
+                        <button type="button"
+                                class="btn btn-default borderdk_gray borderdk_@color dropdown"
+                                data-toggle="dropdown">
+                            <span class="glyphicon glyphicon-menu-hamburger @color"></span>
+                        </button>
+
+                        <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
+                            <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
+                                <a>
+                                    Subscribe
+                                </a>
+                            </li>
+
+                            @if (Model.CanQueryTool)
+                            {
+                                <li title="Query Dataset">
+                                    <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
+                                        Query this Dataset
+                                    </a>
+                                </li>
+                            }
+                            @if (Model.CanManageConfigs)
+                            {
+                                <li>
+                                    <a href="/Config/Dataset/@Model.DatasetId">
+                                        Manage Schemas
+                                    </a>
+                                </li>
+                            }
+
+                            @if (Model.CanUpload)
+                            {
+                                <li id="UploadModal" data-id="@Model.DatasetId">
+                                    <a>Upload Files</a>
+                                </li>
+                            }
+
+                            @if (Model.CanEditDataset)
+                            {
+                                <li id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId">
+                                    <a>Edit Dataset</a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                </div>
             </div>
-
-            @if (Model.CanEditDataset)
-            {
-                <button type="button" class="btn btn-default btn dataset-operation-button borderdk_gray borderdk_@color rightFloat" id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
-                    <span class="glyphicon glyphicon-edit @color"></span>
-                </button>
-            }
-
-            @if ((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive))
-            {
-                <button type="button" class="btn btn-default btn dataset-operation-button borderdk_gray borderdk_@color rightFloat" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download Latest">
-                    <span class="glyphicon glyphicon-cloud-download @color"></span>
-                </button>
-            }
-
-            @if ((Model.IsSensitive && Model.CanDwnldSenstive && Model.IsPreviewCompatible) || (!Model.IsSensitive && Model.IsPreviewCompatible))
-            {
-                <button type="button" class="btn btn-default dataset-operation-button borderdk_gray borderdk_@color rightFloat" id="PreviewData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Preview Latest">
-                    <span class="glyphicon glyphicon-search @color"></span>
-                </button>
-            }
-
+            
         </div>
-
+        
     </div>
 
-    @if (!String.IsNullOrWhiteSpace(Model.DatasetDesc))
-    {
-        <br />
-        <div class="row">
-            <div class="col-lg-8">
-                <div style="margin-left: 35px;">
+    <br />
 
-                    @if (Model.DatasetDesc.Length >= 500)
-    {
+    <div class="row" style="margin-top: 15px;" >
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="col-lg-8 col-sm-6">
+                    <div style="margin-top: 15px;">
+                        @if (!String.IsNullOrWhiteSpace(Model.DatasetDesc))
+                        {
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div>
+                                        <h6 class="@color">Description:</h6><br />
 
-        int last = Model.DatasetDesc.Substring(0, 500).LastIndexOf(" ");
+                                        @if (Model.DatasetDesc.Length >= 500)
+                                        {
 
-                <p class="spanContainer">
-                    <span style="margin-top: 15px;">@Model.DatasetDesc.Substring(0, last)</span>
-                    <span id="descSeeMoreEllipsis">...&nbsp;</span>
-                    <span id="descSeeMorePanel" style="display: none;">@Model.DatasetDesc.Substring(last) </span>
-                    <span id="descSeeMoreButton" style="cursor: pointer;"><a onclick="$('#descSeeMorePanel').show(); $(this).parent().hide(); $('#descShowLessButton').show(); $('#descSeeMoreEllipsis').hide();">See More</a></span>
-                    <span id="descShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#descSeeMorePanel').hide(); $(this).parent().hide(); $('#descSeeMoreButton').show(); $('#descSeeMoreEllipsis').show();">Show Less</a></span>
-                </p>
-}
-else
-{
-                <p>@Model.DatasetDesc</p>
-}
+                                            int last = Model.DatasetDesc.Substring(0, 500).LastIndexOf(" ");
+
+                                            <p class="spanContainer">
+                                                <span style="margin-top: 15px;">@Model.DatasetDesc.Substring(0, last)</span>
+                                                <span id="descSeeMoreEllipsis">...&nbsp;</span>
+                                                <span id="descSeeMorePanel" style="display: none;">@Model.DatasetDesc.Substring(last) </span>
+                                                <span id="descSeeMoreButton" style="cursor: pointer;"><a onclick="$('#descSeeMorePanel').show(); $(this).parent().hide(); $('#descShowLessButton').show(); $('#descSeeMoreEllipsis').hide();">See More</a></span>
+                                                <span id="descShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#descSeeMorePanel').hide(); $(this).parent().hide(); $('#descSeeMoreButton').show(); $('#descSeeMoreEllipsis').show();">Show Less</a></span>
+                                            </p>
+                                        }
+                                        else
+                                        {
+                                            <p>@Model.DatasetDesc</p>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                        }
+                        @if (!String.IsNullOrWhiteSpace(Model.DatasetInformation))
+                        {
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="spanContainer">
+                                        <h6 class="@color">Usage Information:</h6><br />
+
+
+
+                                        @if (Model.DatasetInformation.Length >= 300)
+                                        {
+
+                                            int lastInfo = Model.DatasetInformation.Substring(0, 300).LastIndexOf(" ");
+
+                                            <span style="margin-top: 15px;">@Model.DatasetInformation.Substring(0, lastInfo)</span>
+                                            <span id="usageSeeMoreEllipsis">...&nbsp;</span>
+                                            <span id="usageSeeMorePanel" style="display: none;">@Model.DatasetInformation.Substring(lastInfo)</span>
+                                            <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
+                                            <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
+
+                                        }
+                                        else
+                                        {
+                                            <span style="margin-top: 15px;">@Model.DatasetInformation</span>
+                                        }
+
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <hr />
+                    <div>
+                        <h3 class="@color">
+                            Schemas
+                        </h3>
+                    </div>
+                    <div>
+
+                        <div class="row">
+                            <div class="col-lg-12" style="margin-left: 20px; margin-top: 10px;">
+                                <select class="form-control" style="margin:1em !important;"
+                                        id="datasetConfigList" name="filterSelector">
+                                    @foreach (var a in Model.DatasetFileConfigs)
+                                    {
+                                        <option value="@a.ConfigId">@a.ConfigFileName</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+
+
+                        <div class="row">
+                            <div class="col-lg-12">
+
+                                <br />
+                                <div style="margin-left: 35px;" data-bind="visible: Description() != null" class="spanContainer">
+                                    <h6 class="@color">Schema Description:</h6><br />
+                                    <span style="margin-top: 15px;" data-bind="text: LessDescription"></span>
+                                    <span id="schemaHasMoreDescription">
+                                        <span id="schemaSeeMoreEllipsis">&nbsp;...</span>
+                                        <span id="schemaSeeMorePanel" style="display: none; padding-left: 4px;" data-bind="text: MoreDescription"></span>
+                                        <span id="schemaSeeMoreButton" style="cursor: pointer;"><a onclick="$('#schemaSeeMorePanel').show(); $(this).parent().hide(); $('#schemaShowLessButton').show(); $('#schemaSeeMoreEllipsis').hide();">See More</a></span>
+                                        <span id="schemaShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#schemaSeeMorePanel').hide(); $(this).parent().hide(); $('#schemaSeeMoreButton').show(); $('#schemaSeeMoreEllipsis').show();">Show Less</a></span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="row" style="border: 1px #DDDDDD solid; background: white; padding: 20px;">
+
+                        <div class="row" style="min-height: 60px;">
+                            <div class="col-lg-6">
+                                <h5 class="@color">Last Activity Date</h5>
+                                <h6 class="@color">@Model.ChangedDtm.ToString("MMMM d, yyyy")</h6>
+                            </div>
+                            <div class="col-lg-6">
+                                <h5 class="@color">Date Created</h5>
+                                <h6 class="@color">@Model.DatasetDtm.ToString("MMMM d, yyyy")</h6>
+                            </div>
+                        </div>
+                        <hr />
+                        <div class="row">
+
+                            <div class="col-lg-12">
+                                <h5 class="@color">Sentry Owner</h5>
+                                <h6 class="@color">@Model.SentryOwner.FullName</h6>
+                            </div>
+
+                        </div>
+                        <hr />
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <h5 class="@color">Dataset Views</h5>
+                                <h6 class="@color" style="font-feature-settings: 'lnum';">@Model.Views</h6>
+                            </div>
+                            <div class="col-lg-6">
+                                <h5 class="@color">Dataset Downloads</h5>
+                                <h6 class="@color" style="font-feature-settings: 'lnum';">@Model.Downloads</h6>
+                            </div>
+                        </div>
+
+                    </div>
                 </div>
             </div>
-            <div class="col-lg-4">
-                @if (Model.CanManageConfigs)
-                {
-                    <div id="detailSectionHeader_Admin">
-                        <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_Admin"></span>
-                        <h2 class="detailSection @color" style="margin-top:10px;">Actions</h2>
-                    </div>
-                    <div id="hide_detailSectionHeader_Admin">
-                        <a style="margin-left: 35px; margin-top: -2px;" class="backToList" href="/Config/Dataset/@Model.DatasetId">
-                            Manage Schemas <span class="glyphicon glyphicon-chevron-right"></span>
-                        </a>
-                        <br />
-                    </div>
-                }
-
-            </div>
         </div>
-        <br />
-    }
-    @if (!String.IsNullOrWhiteSpace(Model.DatasetInformation))
-    {
-        <div class="row">
-            <div class="col-lg-8">
-                <div style="margin-left: 35px;">
-                    <h6 class="@color">Usage Information:</h6><br />
-
-                    @if (Model.DatasetInformation.Length >= 300)
-    {
-
-        int lastInfo = Model.DatasetInformation.Substring(0, 300).LastIndexOf(" ");
-
-                <span style="margin-top: 15px;">@Model.DatasetInformation.Substring(0, lastInfo)</span>
-                <span id="usageSeeMoreEllipsis">...&nbsp;</span>
-                <span id="usageSeeMorePanel" style="display: none;">@Model.DatasetInformation.Substring(lastInfo)</span>
-                <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
-                <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
-
-}
-else
-{
-                <span style="margin-top: 15px;">@Model.DatasetInformation</span>
-}
-                </div>
-            </div>
-        </div>
-    }
+    </div>
 
     <hr />
 
-
-    @if (Model.DatasetFileConfigs.Count == 1)
-    {
-
-        <div id="hide_detailSectionHeader_Configuration" style="display: none;">
-
-            <div class="row">
-                <div class="col-lg-8" style="margin-left: 20px; margin-top: 10px;">
-                    <select class="form-control" style="margin:1em !important;"
-                            id="datasetConfigList" name="filterSelector">
-                        @foreach (var a in Model.DatasetFileConfigs)
-                        {
-                            <option value="@a.ConfigId">@a.ConfigFileName</option>
-                        }
-                    </select>
-                </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div id="aboutThisSchema" class="metadataHeader">
+                <h3 class="@color">About this Schema</h3>
             </div>
 
+            <div class="metadataBody container row" style="border: 1px #DDDDDD solid; background: white; padding: 10px;">
+                <div class="col-lg-4">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <h5 class="@color">Last Updated:</h5>
+                        </div>
+                    </div>
+                    <div class="row" style="margin-bottom:15px;">
+                        <div class="col-lg-6">
+                            <h5 class="@color">Data</h5>
+                            <h6 class="@color" data-bind="text: DataLastUpdated"></h6>
+                            <p id="dataLastUpdatedSpinner" class="mini-sentry-spinner-container sentry-spinner-container">
+                                <span class="sentry-spinner" style="background-size: 25px 25px; margin-left: 290px;"></span>
+                            </p>
+                        </div>
+                        <div class="col-lg-6">
+                            <h5 class="@color">Metadata</h5>
+                            <h6 class="@color" data-bind="text: MetadataLastDT"></h6>
+                            <p id="sessionSpinner" class="mini-sentry-spinner-container sentry-spinner-container">
+                                <span class="sentry-spinner" style="background-size: 25px 25px; margin-left: 290px;"></span>
+                            </p>
+                        </div>
+                    </div>
+                    @*<hr />
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <h6 class="@color">Schema Views</h6>
+                                <h2 class="@color" style="font-feature-settings: 'lnum';" data-bind="text: Views"></h2>
+                            </div>
+                            <div class="col-lg-6">
+                                <h6 class="@color">Schema Downloads</h6>
+                                <h2 class="@color" style="font-feature-settings: 'lnum';" data-bind="text: Downloads"></h2>
+                            </div>
+                        </div>*@
+                    <div class="row" data-bind="visible: SchemaRows().length > 0">
+                        <hr />
+                        <div class="col-lg-12">
+                            <h5 class="@color">In this Schema:</h5>
+                        </div>
+                    </div>
+                    <div class="row" data-bind="visible: SchemaRows().length > 0">
 
-
-            <div class="row">
-                <div class="col-lg-12">
-
-                    <br />
-                    <div style="margin-left: 35px;" data-bind="visible: Description() != null" class="spanContainer">
-                        <h6 class="@color">Schema Description:</h6><br />
-                        <span style="margin-top: 15px;" data-bind="text: LessDescription"></span>
-                        <span id="schemaHasMoreDescription">
-                            <span id="schemaSeeMoreEllipsis">&nbsp;...</span>
-                            <span id="schemaSeeMorePanel" style="display: none; padding-left: 4px;" data-bind="text: MoreDescription"></span>
-                            <span id="schemaSeeMoreButton" style="cursor: pointer;"><a onclick="$('#schemaSeeMorePanel').show(); $(this).parent().hide(); $('#schemaShowLessButton').show(); $('#schemaSeeMoreEllipsis').hide();">See More</a></span>
-                            <span id="schemaShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#schemaSeeMorePanel').hide(); $(this).parent().hide(); $('#schemaSeeMoreButton').show(); $('#schemaSeeMoreEllipsis').show();">Show Less</a></span>
-                        </span>
+                        <div class="col-lg-6">
+                            <h5 class="@color">Rows</h5>
+                            <h6 class="@color" id="rowCount" data-bind="text: RowCount"></h6>
+                        </div>
+                        <div class="col-lg-6">
+                            <h5 class="@color">Columns</h5>
+                            <h6 class="@color" data-bind="text: SchemaRows().length"></h6>
+                        </div>
                     </div>
                 </div>
-            </div>
+                <div class="col-lg-8">
 
-        </div>
-    }
-    else
-    {
-        <div id="detailSectionHeader_Configuration" class="leftSectionHeaderDiv">
-            <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_Configuration"></span>
-            <h2 class="detailSection @color">Schemas</h2>
-            @*<h2 class="detailSection @color">Data Files <i>(Latest Versions)</i></h2>*@
-
-        </div>
-        <div id="hide_detailSectionHeader_Configuration">
-
-            <div class="row">
-                <div class="col-lg-8" style="margin-left: 20px; margin-top: 10px;">
-                    <select class="form-control" style="margin:1em !important;"
-                            id="datasetConfigList" name="filterSelector">
-                        @foreach (var a in Model.DatasetFileConfigs)
-                        {
-                            <option value="@a.ConfigId">@a.ConfigFileName</option>
-                        }
-                    </select>
-                </div>
-            </div>
-
-
-
-            <div class="row">
-                <div class="col-lg-12">
-
+                    <h5 class="@color">Data Ownership:</h5>
+                    <table class="table table-striped table-hover detailTable" style="margin-left: 0px;">
+                        <tbody>
+                            <tr class="borderMeta_@color">
+                                <td class="borderMeta_@color colOneMeta">Dataset Creator</td>
+                                <td class="borderMeta_@color">@Model.CreationUserName</td>
+                            </tr>
+                            <tr class="borderMeta_@color">
+                                <td class="borderMeta_@color colOneMeta">Dataset Origination</td>
+                                <td class="borderMeta_@color">@Model.OriginationCode</td>
+                            </tr>
+                        </tbody>
+                    </table>
                     <br />
-                    <div style="margin-left: 35px;" data-bind="visible: Description() != null" class="spanContainer">
-                        <h6 class="@color">Schema Description:</h6><br />
-                        <span style="margin-top: 15px;" data-bind="text: LessDescription"></span>
-                        <span id="schemaHasMoreDescription">
-                            <span id="schemaSeeMoreEllipsis">&nbsp;...</span>
-                            <span id="schemaSeeMorePanel" style="display: none; padding-left: 4px;" data-bind="text: MoreDescription"></span>
-                            <span id="schemaSeeMoreButton" style="cursor: pointer;"><a onclick="$('#schemaSeeMorePanel').show(); $(this).parent().hide(); $('#schemaShowLessButton').show(); $('#schemaSeeMoreEllipsis').hide();">See More</a></span>
-                            <span id="schemaShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#schemaSeeMorePanel').hide(); $(this).parent().hide(); $('#schemaSeeMoreButton').show(); $('#schemaSeeMoreEllipsis').show();">Show Less</a></span>
-                        </span>
-                    </div>
+                    <h5 class="@color">Refresh Frequency:</h5>
+                    <table class="table table-striped table-hover detailTable" style="margin-left: 0px;">
+                        <tbody>
+                            <tr>
+                                <td class="borderMeta_@color colOneMeta">Dataset Scope Type</td>
+                                <td class="borderMeta_@color ">
+                                    @foreach (var dst in @Model.DatasetScopeType)
+                                    {
+                                        <span class="comma" title='@dst.Description'>@dst.Name</span>
+                                    }
+                                </td>
+                                <td class="borderMeta_@color"></td>
+                            </tr>
+
+                            <tr data-bind="if: DFSDropLocation(), visible: DFSDropLocation != undefined" style="display:none;">
+                                <td class="borderMeta_@color colOneMeta">DFS Drop Location</td>
+                                <td class="borderMeta_@color" data-bind="text: DFSDropLocation().Location()"></td>
+                            </tr>
+
+                            <tr data-bind="if: S3DropLocation(), visible: S3DropLocation != undefined" style="display:none;">
+                                <td class="borderMeta_@color colOneMeta">S3 Drop Location</td>
+                                <td class="borderMeta_@color" data-bind="text: S3DropLocation().Location()"></td>
+                            </tr>
+
+                            <!-- ko if: OtherJobs != undefined-->
+                            <!-- ko foreach: OtherJobs -->
+                            <tr>
+                                <td class="borderMeta_@color colOneMeta" data-bind="text: Name()"></td>
+                                <td class="borderMeta_@color" data-bind="text: Location()"></td>
+                                <td class="borderMeta_@color">
+                                    <button class="btn btn-default on-demand-run" data-bind="attr: { id: JobId }">On-Demand Run</button>
+                                </td>
+                            </tr>
+                            <!-- /ko -->
+                            <!-- /ko -->
+
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-
-        </div>
-
-        <hr />
-    }
-
-    <div id="detailSectionHeader_Metadata" class="leftSectionHeaderDiv">
-        <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_Metadata"></span>
-        <h2 class="detailSection @color">Metadata</h2>
-    </div>
-
-
-    <div class="row" id="hide_detailSectionHeader_Metadata">
-        <div class="col-lg-8">
-            <div>
-                <table class="table table-striped table-hover detailTable" style="margin-left: 0px;">
-                    <tbody>
-                        <tr class="borderMeta_@color">
-                            <td class="borderMeta_@color colOneMeta">Sentry Owner</td>
-                            <td class="borderMeta_@color">@Model.SentryOwner.FullName</td>
-                            <td class="borderMeta_@color"></td>
-                        </tr>
-                        <tr class="borderMeta_@color">
-                            <td class="borderMeta_@color colOneMeta">Dataset Creator</td>
-                            <td class="borderMeta_@color">@Model.CreationUserName</td>
-                            <td class="borderMeta_@color"></td>
-                        </tr>
-                        <tr class="borderMeta_@color">
-                            <td class="borderMeta_@color colOneMeta">Dataset Origination</td>
-                            <td class="borderMeta_@color">@Model.OriginationCode</td>
-                            <td class="borderMeta_@color"></td>
-                        </tr>
-
-                        <tr>
-                            <td class="borderMeta_@color colOneMeta">Dataset Scope Type</td>
-                            <td class="borderMeta_@color ">
-                                @foreach (var dst in @Model.DatasetScopeType)
-                                {
-                                    <span class="comma" title='@dst.Description'>@dst.Name</span>
-                                }
-                            </td>
-                            <td class="borderMeta_@color"></td>
-                        </tr>
-
-                        <tr data-bind="if: DFSDropLocation(), visible: DFSDropLocation != undefined" style="display:none;">
-                            <td class="borderMeta_@color colOneMeta">DFS Drop Location</td>
-                            <td class="borderMeta_@color" data-bind="text: DFSDropLocation().Location()"></td>
-                            <td class="borderMeta_@color"></td>
-                        </tr>
-
-                        <tr data-bind="if: S3DropLocation(), visible: S3DropLocation != undefined" style="display:none;">
-                            <td class="borderMeta_@color colOneMeta">S3 Drop Location</td>
-                            <td class="borderMeta_@color" data-bind="text: S3DropLocation().Location()"></td>
-                            <td class="borderMeta_@color"></td>
-                        </tr>
-
-                        <tr data-bind="foreach: OtherJobs(), visible: OtherJobs != undefined" style="display:none;">
-                            <td class="borderMeta_@color colOneMeta" data-bind="text: Name()"></td>
-                            <td class="borderMeta_@color" data-bind="text: Location()"></td>
-                            <td class="borderMeta_@color">
-                                <button class="btn btn-default on-demand-run" data-bind="attr: { id: JobId }">On-Demand Run</button>
-                            </td>
-                        </tr>
-
-
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        <div class="col-lg-4">
-            <div>
-                <table class="table table-striped table-hover detailTable" style="    margin-left: 25px;">
-                    <tbody>
-                        <tr>
-                            <td class="borderMeta_@color colOneMeta">Date Created</td>
-                            <td class="borderMeta_@color">@Model.DatasetDtm.ToString("M/d/yyyy")</td>
-                        </tr>
-                        <tr>
-                            <td class="borderMeta_@color colOneMeta">Dataset Info Last Updated</td>
-                            <td class="borderMeta_@color">@Model.ChangedDtm.ToString("M/d/yyyy")</td>
-                        </tr>
-                        <tr>
-                            <td class="borderMeta_@color colOneMeta">Data Last Updated</td>
-                            <td class="borderMeta_@color" data-bind="text: DataLastUpdated"></td>
-                            <td id="dataLastUpdatedSpinner" class="mini-sentry-spinner-container sentry-spinner-container">
-                                <span class="sentry-spinner" style="background-size: 25px 25px;"></span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td class="borderMeta_@color colOneMeta">Metadata Last Updated</td>
-                            <td class="borderMeta_@color" data-bind="text: MetadataLastDT"></td>
-                            <td id="sessionSpinner" class="mini-sentry-spinner-container sentry-spinner-container">
-                                <span class="sentry-spinner" style="background-size: 25px 25px;"></span>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
-    <hr />
+
 
     <div class="row" id="schemaSection">
-        <div class="col-lg-12">
-            <section class="landing-page-section schema-preview">
-                <div id="detailSectionHeader_Columns" class="leftSectionHeaderDiv">
-                    <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_Columns"></span>
-                    <h2 class="detailSection @color">Columns</h2>
-                </div>
 
+        <div class="col-lg-12">
+            <hr />
+            <section class="landing-page-section schema-preview">
+                <div id="columnsInThisSchema">
+                    <h3 class="detailSection @color">Columns</h3>
+                </div>
                 <div class="section-content collapsed" id="hide_detailSectionHeader_Columns">
 
                     <div class="table-wrapper">
                         <table class="table table-bordered table-striped schema-table">
                             <thead>
                                 <tr class="@headerColor">
-                                    <th scope="col" style="width: 12%;" class="column-type">Column Name</th>
+                                    <th scope="col" style="width: 35%;" class="column-type">Column Name</th>
                                     <th scope="col" class="column-type">Description</th>
                                     <th scope="col" class="column-type">Type</th>
-                                    <th scope="col" class="column-type">Precision</th>
-                                    <th scope="col" class="column-type">Scale</th>
+                                    <th scope="col" style="width: 10%;" class="column-type">Precision</th>
+                                    <th scope="col" style="width: 10%;" class="column-type">Scale</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -489,64 +545,110 @@ else
 
     <hr id="schemaHR" />
 
-    <div id="datasetDataFilePanel">
-        <div>
-            <div id="detailSectionHeader_DataFiles" class="leftSectionHeaderDiv">
-                <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_DataFiles"></span>
-                <h2 class="detailSection @color">Data Files</h2>
+    <div data-bind="visible: DataLoading() == true">
+        <div class="row">
+            <div class="col-lg-12">
+                <div>
+                    <h3 class="@color">Data Preview (Top 20 Rows)</h3>
+                </div>
             </div>
-            <div id="hide_detailSectionHeader_DataFiles">
+        </div>
+        <div class="row" style="height: 150px;">
+            <div class="col-lg-12">
+                <div>
+                    <p id="dataSpinner" class="mini-sentry-spinner-container sentry-spinner-container" style="margin-left: 0; margin-top: 50px;">
+                        <span class="sentry-spinner"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 
-                @if (((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive)) && Model.DatasetFiles.Count >= 2)
-                {
-                    <div id="userToolbar">
-                        <button id="bundle_selected" type="button" class="btn btn-link" title="Bundle Selected Files">
-                            <img src="~/Images/icons/bundle.png" />
-                            Selected Files (<span id="bundleCountSelected">0</span> Selected)
-                        </button>
-                        <button id="bundle_allFiltered" type="button" class="btn btn-link" title="Bundle Filtered Files">
-                            <img src="~/Images/icons/bundle.png" />
-                            Filtered Files (<span id="bundleCountFiltered">0</span> Shown)
-                        </button>
-                    </div>
-                }
-
-
-                <table class="table table-striped table-bordered @color" id="datasetFilesTable">
+    <div id="dataSection" data-bind="visible: DataLoading() == false && SchemaRows().length > 0">
+        <div class="row">
+            <div class="col-lg-12">
+                <div>
+                    <h3 class="@color">Data Preview (Top 20 Rows)</h3>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <table class="table table-striped table-bordered @color" id="datasetRowTable">
                     <thead>
-                        <tr class="filter-row">
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td id="configFilterName"></td>
-                            <td></td>
-                        </tr>
-                        <tr class="table-header_@color @headerColor">
-                            <th>Details</th>
-                            <th>Actions</th>
-                            <th>Name</th>
-                            <th>Upload User Name</th>
-                            <th>Initial Upload Date</th>
-                            <th>Modified Date</th>
-                            <th>Schema</th>
-                            <th>Usable</th>
-                        </tr>
-
+                        <tr id="tableFirstRow" class="filter-row"></tr>
+                        <tr id="tableColumnIDs" class="table-header table-header_@color @headerColor"></tr>
                     </thead>
-                    @*<tfoot>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        </tfoot>*@
                     <tbody></tbody>
                 </table>
             </div>
+
+            <hr />
         </div>
+    </div>
+
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div data-bind="visible: ShowDataFileTable() == true">
+                <div>
+                    <h3 class="@color">Data Files</h3>
+                </div>
+                <div id="hide_detailSectionHeader_DataFiles">
+
+                    @if (((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive)) && Model.DatasetFiles.Count >= 2)
+                    {
+                        <div id="userToolbar">
+                            <button id="bundle_selected" type="button" class="btn btn-link" title="Bundle Selected Files">
+                                <img src="~/Images/icons/bundle.png" />
+                                Selected Files (<span id="bundleCountSelected">0</span> Selected)
+                            </button>
+                            <button id="bundle_allFiltered" type="button" class="btn btn-link" title="Bundle Filtered Files">
+                                <img src="~/Images/icons/bundle.png" />
+                                Filtered Files (<span id="bundleCountFiltered">0</span> Shown)
+                            </button>
+                        </div>
+                    }
+
+
+                    <table class="table table-striped table-bordered @color" id="datasetFilesTable">
+                        <thead>
+                            <tr class="filter-row">
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td id="configFilterName"></td>
+                                <td></td>
+                            </tr>
+                            <tr class="table-header_@color @headerColor">
+                                <th>Details</th>
+                                <th>Actions</th>
+                                <th>Name</th>
+                                <th>Upload User Name</th>
+                                <th>Initial Upload Date</th>
+                                <th>Modified Date</th>
+                                <th>Schema</th>
+                                <th>Usable</th>
+                            </tr>
+
+                        </thead>
+                        @*<tfoot>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>*@
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
         <div>
             <div id="detailSectionHeader_BundledFiles" style="display: none;" class="leftSectionHeaderDiv">
                 <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_BundledFiles"></span>
@@ -589,6 +691,10 @@ else
             </div>
         </div>
     </div>
+
+    <div style="height: 150px;">
+
+    </div>
 </div>
 
 <style>
@@ -616,6 +722,14 @@ else
         background-color: #74531C !important;
         border-color: #74531C !important;
     }
+
+    .spanContainer {
+        font-size: 0;
+    }
+
+        .spanContainer span {
+            font-size: 14px;
+        }
 </style>
 
 @section Scripts {
@@ -624,8 +738,78 @@ else
 
     <script>
         var Id = $('#datasetConfigList').val();
+        var table;
+
+        function renderTable(input, push) {
+
+            var filters = input.split("\n");
+
+            if (filters[0].startsWith("+-")) {
+
+                if (table) {
+                    table.destroy();
+                }
+
+                //Column information
+                var columns = filters[1].split('|');
+                var parsedColumns = [];
+                var nullColumns = [];
+
+                $('#tableColumnIDs').empty();
+                $('#tableFirstRow').empty();
+                $('#datasetRowTable tbody').empty();
+
+                for (var i = 1; i < columns.length; i++) {
+                    if (columns[i]) {
+                        nullColumns.push(null);
+                        parsedColumns.push({ 'title': columns[i].trim(), 'width': "auto" });
+                        $('#tableColumnIDs').append("<th>" + columns[i].trim() + "</th>");
+                        $('#tableFirstRow').append("<td></td>");
+                    }
+                }
+
+                var parsedRows = [];
+
+                //Data for Each Row in the Result Set
+                for (var i = 3; i < filters.length; i++) {
+
+                    if (!filters[i].startsWith("+-")) {
+
+
+                        var cells = filters[i].split('|');
+                        var parsedCells = [];
+                        cells.splice(0, 1);
+                        cells.splice(cells.length, 1);
+                        for (var j = 0; j < cells.length - 1; j++) {
+                            parsedCells.push(cells[j].trim());
+                        }
+
+                        if (parsedCells.length >= 1) {
+                            parsedRows.push(parsedCells);
+                        }
+                    }
+                }
+
+                if (!push) {
+                    table = $('#datasetRowTable').DataTable({
+                        "scrollX": true,
+                        data: parsedRows,
+                        columns: parsedColumns,
+                    });
+                } else {
+                    table = $('#datasetRowTable').DataTable({ "scrollX": true }).rows.add(parsedRows).draw();
+                    $($('#datasetRowTable_info').children()[2]).text($('#rowCount').text());
+                }
+
+
+                $(".dataTables_filter").parent().addClass("text-right");
+            }
+        }
+
+
 
         $(function () {
+
             data.DatasetDetail.Init();
 
             $('#datasetConfigList').select2({ width: '85%' });
@@ -680,7 +864,20 @@ else
             });
         });
 
+        var getUrlParameter = function getUrlParameter(sParam) {
+            var sPageURL = decodeURIComponent(window.location.search.substring(1)),
+                sURLVariables = sPageURL.split('&'),
+                sParameterName,
+                i;
 
+            for (i = 0; i < sURLVariables.length; i++) {
+                sParameterName = sURLVariables[i].split('=');
+
+                if (sParameterName[0] === sParam) {
+                    return sParameterName[1] === undefined ? true : sParameterName[1];
+                }
+            }
+        };
 
         function SchemaRow(data) {
             this.Name = ko.observable(data.Name);
@@ -701,7 +898,9 @@ else
             var self = this;
 
             self.NoColumnsReturned = ko.observable();
-            
+            self.DataLoading = ko.observable(false);
+
+            self.RowCount = ko.observableArray();
             self.SchemaRows = ko.observableArray();
 
             self.DataLastUpdated = ko.observable();
@@ -733,7 +932,6 @@ else
                 }
             });
 
-
             self.DFSDropLocation = ko.observable();
             self.S3DropLocation = ko.observable();
             self.OtherJobs = ko.observableArray();
@@ -741,6 +939,19 @@ else
             self.DFSCronJob = ko.observable();
             self.S3CronJob = ko.observable();
             self.CronJobs = ko.observableArray();
+
+            self.Views = ko.observable();
+            self.Downloads = ko.observable();
+
+            self.ShowDataFileTable = ko.computed(function () {
+                if (self.DataLastUpdated() === 'No Data Files Exist') {
+                    return false;
+                }
+                else {
+                    return true;
+                }
+
+            });
 
             self.FooterRow = ko.computed(function () {
                 if (self.SchemaRows().length > 10) {
@@ -758,22 +969,56 @@ else
                         var f = new Date(feature.LastUpdated());
                         if (f > d) { d = f }
                     });
-                    d = (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
+                    d = d.toLocaleString("en-us", { month: "long" }) + ' ' + d.getDate() + ', ' + d.getFullYear();
                     $('#sessionSpinner').hide();
                     return d;
                 }
-                else if (self.NoColumnsReturned())
-                {
+                else if (self.NoColumnsReturned()) {
                     $('#sessionSpinner').hide();
                     return "No Columns Exist";
                 }
-                else
-                {
+                else {
                     $('#sessionSpinner').show();
                 }
             });
 
+            self.AnyLastUpdated = ko.computed(function () {
+
+                var d1 = Date.parse(self.DataLastUpdated());
+                var d2 = Date.parse(self.MetadataLastDT());
+
+                if (!isNaN(d1) && !isNaN(d2)) {
+
+                    var d1 = new Date(d1);
+                    var d2 = new Date(d2);
+
+                    $('#updatedSpinner').hide();
+                    if (d1 > d2) {
+                        return d1.toLocaleString("en-us", { month: "long" }) + ' ' + d1.getDate() + ', ' + d1.getFullYear();
+                    } else {
+                        return d2.toLocaleString("en-us", { month: "long" }) + ' ' + d2.getDate() + ', ' + d2.getFullYear();
+                    }
+                }
+                else if (!isNaN(d1) && isNaN(d2)) {
+                    $('#updatedSpinner').hide();
+                    var d1 = new Date(d1);
+                    return d1.toLocaleString("en-us", { month: "long" }) + ' ' + d1.getDate() + ', ' + d1.getFullYear();
+                }
+                else if (isNaN(d1) && !isNaN(d2)) {
+                    $('#updatedSpinner').hide();
+                    var d2 = new Date(d2);
+                    return d2.toLocaleString("en-us", { month: "long" }) + ' ' + d2.getDate() + ', ' + d2.getFullYear();
+                }
+                else if (self.DataLastUpdated() === 'No Data Files Exist' && self.MetadataLastDT() === 'No Columns Exist') {
+                    $('#updatedSpinner').hide();
+                    return $('#datasetInfoLastUpdated').text();
+                }
+
+            });
+
             $('#datasetConfigList').on('select2:select', function (e) {
+
+                window.history.pushState('Config Changed', 'Title', '?configID=' + $('#datasetConfigList').val());
 
                 self.NoColumnsReturned(false);
                 $('#schemaSection').show();
@@ -781,23 +1026,40 @@ else
 
                 $('#panelSpinner').show();
                 self.SchemaRows.removeAll();
-
+                console.log($('#datasetConfigList').val());
                 var fileInfoURL = "/Dataset/GetDatasetFileInfoForGrid/?Id=" + $('#datasetConfigList').val() + "&bundle=false";
                 $('#datasetFilesTable').DataTable().ajax.url(fileInfoURL).load();
 
+                UpdateMetadata();
+
+                UpdateColumnSchema();
+            });
+
+            $('#dataLastUpdatedSpinner').show();
+            UpdateMetadata();
+
+            $('#panelSpinner').show();
+            UpdateColumnSchema();
+            
+
+            function UpdateMetadata() {
+                if (!isNaN(getUrlParameter('configID'))) {
+                    $('#datasetConfigList').val(getUrlParameter('configID')).trigger('change');
+                }
+
                 var metadataURL = "/api/Schema/GetBasicMetadataInformationFor?DatasetConfigID=" + $('#datasetConfigList').val();
                 $.get(metadataURL, function (result) {
-
+                    self.Downloads(result.Downloads);
+                    self.Views(result.Views);
                     self.Description(result.Description);
 
-                    var dfs = new DropLocation(result.DFSDropLocation);
-                    self.DFSDropLocation(dfs);
+                    //var dfs = new DropLocation(result.DFSDropLocation);
+                    //self.DFSDropLocation(dfs);
 
-                    if (result.S3DropLocation) {
-                        var s3 = new DropLocation(result.S3DropLocation);
-                        self.S3DropLocation(s3);
-                    }
-
+                    //if (result.S3DropLocation) {
+                    //    var s3 = new DropLocation(result.S3DropLocation);
+                    //    self.S3DropLocation(s3);
+                    //}
                     self.OtherJobs.removeAll();
                     $.each(result.OtherJobs, function (i, val) {
                         var item = new DropLocation(val);
@@ -806,18 +1068,56 @@ else
                     });
                     self.OtherJobs.notifySubscribers();
 
+
                     var d = new Date(result.DataLastUpdated);
+
                     if (d < new Date('1990-01-01')) {
                         self.DataLastUpdated('No Data Files Exist');
                     } else {
-                        d = (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
+                        d = d.toLocaleString("en-us", { month: "long" }) + ' ' + d.getDate() + ', ' + d.getFullYear();
                         self.DataLastUpdated(d);
                     }
-
+                    $('#dataLastUpdatedSpinner').hide();
                 });
+            }
 
+            function UpdateColumnSchema() {
                 var schemaURL = "/api/Schema/GetColumnSchemaInformationFor?DatasetConfigID=" + $('#datasetConfigList').val();
+                self.DataLoading(true);
+
                 $.get(schemaURL, function (result) {
+
+                    if (result.RowCount) {
+                        self.RowCount(result.RowCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+                    } else {
+                        self.RowCount(0);
+                    }
+
+                    if (result.HiveTableName) {
+
+                        $.ajax({
+                            type: "GET",
+                            url: "/api/QueryTool/GetPrimarySessionID",
+                            dataType: "json",
+                            success: function (msg) {
+                                $.get("/api/QueryTool/GetHiveTable?SessionID=" + msg.id + "&configID=" + $('#datasetConfigList').val() + "&rows=20&skip=0&hiveTableName=" + result.HiveTableName + "&hiveDatabaseName=" + result.HiveDatabaseName, function (result2) {
+                                    $('#dataSection').hide();
+
+                                    renderTable(result2, false);
+
+                                    $('#dataSection').show();
+                                    self.DataLoading(false);
+                                });
+                            }
+                        });
+                    } else {
+                        $('#dataSection').hide();
+                        self.DataLoading(false);
+                    }
+
+                    self.NoColumnsReturned(false);
+                    $('#schemaSection').show();
+                    $('#schemaHR').show();
 
                     $.each(result.rows, function (i, val) {
                         var item = new SchemaRow(val);
@@ -826,70 +1126,20 @@ else
                     });
                     self.SchemaRows.notifySubscribers();
                     $('#panelSpinner').hide();
-
                 }).fail(function () {
+                    self.RowCount(0);
+                    self.SchemaRows([]);
+
                     self.NoColumnsReturned(true);
+                    self.DataLoading(false);
                     $('#panelSpinner').hide();
                     $('#schemaSection').hide();
                     $('#schemaHR').hide();
                 });
-            });
-
-            $('#dataLastUpdatedSpinner').show();
-            var metadataURL = "/api/Schema/GetBasicMetadataInformationFor?DatasetConfigID=" + $('#datasetConfigList').val();
-            $.get(metadataURL, function (result) {
-                self.Description(result.Description);
-
-                var dfs = new DropLocation(result.DFSDropLocation);
-                self.DFSDropLocation(dfs);
-
-                if (result.S3DropLocation) {
-                    var s3 = new DropLocation(result.S3DropLocation);
-                    self.S3DropLocation(s3);
-                }
-                self.OtherJobs.removeAll();
-                $.each(result.OtherJobs, function (i, val) {
-                    var item = new DropLocation(val);
-
-                    self.OtherJobs().push(item);
-                });
-                self.OtherJobs.notifySubscribers();
-
-
-                var d = new Date(result.DataLastUpdated);
-
-                if (d < new Date('1990-01-01')) {
-                    self.DataLastUpdated('No Data Files Exist');
-                } else {
-                    d = (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
-                    self.DataLastUpdated(d);
-                }
-                $('#dataLastUpdatedSpinner').hide();
-            });
-
-            $('#panelSpinner').show();
-            var schemaURL = "/api/Schema/GetColumnSchemaInformationFor?DatasetConfigID=" + $('#datasetConfigList').val();
-            $.get(schemaURL, function (result) {
-                self.NoColumnsReturned(false);
-                $('#schemaSection').show();
-                $('#schemaHR').show();
-
-                $.each(result.rows, function (i, val) {
-                    var item = new SchemaRow(val);
-
-                    self.SchemaRows().push(item);
-                });
-                self.SchemaRows.notifySubscribers();
-                $('#panelSpinner').hide();
-            }).fail(function () {
-                self.NoColumnsReturned(true);
-                $('#panelSpinner').hide();
-                $('#schemaSection').hide();
-                $('#schemaHR').hide();
-            });
-
-
+            }
         };
+
+
 
         vm = new ViewModel();
         ko.applyBindings(vm);

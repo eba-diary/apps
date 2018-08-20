@@ -81,12 +81,13 @@ namespace Sentry.data.Web.Tests
 
                 if (ds.DatasetFileConfigs.Any())
                 {
+                    mockDatasetContext.Stub(x => x.Schemas).Return(MockClasses.MockSchemas(ds.DatasetFileConfigs[0]).AsQueryable());
                     mockDatasetContext.Stub(x => x.Merge<DatasetFileConfig>(ds.DatasetFileConfigs[0])).Return(ds.DatasetFileConfigs[0]);
                 }
             }
 
-            mockDatasetContext.Stub(x => x.Merge<Dataset>(ds)).Return(ds);     
-
+            mockDatasetContext.Stub(x => x.Merge<Dataset>(ds)).Return(ds);
+            mockDatasetContext.Stub(x => x.Events).Return(new List<Event>().AsQueryable());
             mockDatasetContext.Stub(x => x.EventTypes).Return(MockClasses.MockEventTypes().AsQueryable());
             mockDatasetContext.Stub(x => x.GetAllIntervals()).Return(MockClasses.MockIntervals());
             mockDatasetContext.Stub(x => x.GetInterval("Never")).Return(MockClasses.MockIntervals().FirstOrDefault(x =>x.Description == "Never"));
@@ -142,6 +143,7 @@ namespace Sentry.data.Web.Tests
             mockDatasetContext.Stub(x => x.EventTypes).Return(MockClasses.MockEventTypes().AsQueryable());
             mockDatasetContext.Stub(x => x.EventStatus).Return(MockClasses.MockEventStatuses().AsQueryable());
             mockDatasetContext.Stub(x => x.FileExtensions).Return(MockClasses.MockFileExtensions().AsQueryable());
+            mockDatasetContext.Stub(x => x.Schemas).Return(MockClasses.MockSchemas(dfc).AsQueryable());
 
             mockUserService.Stub(x => x.GetCurrentUser()).Return(user != null ? user : MockUsers.App_DataMgmt_Admin_User());
 

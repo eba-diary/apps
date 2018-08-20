@@ -35,8 +35,8 @@ else
                 data.sentry.com
             </h1>
             @*<h2>
-                Data for all of Sentry
-            </h2>*@
+                    Data for all of Sentry
+                </h2>*@
         </div>
         @{if (Model.EnvironmentName.ToUpper() != "PROD")
             {
@@ -70,6 +70,7 @@ else
                     }
                     @{if (Model.CanUserSwitch)
                         {
+                            <li role="presentation"><a id="dscSession" role="menuitem" tabindex="-1" href="">Primary DSC Livy Session</a></li>
                             <li role="presentation"><a role="menuitem" tabindex="-1" href="@Url.Action("Switch", "User")">User Switch to Anybody</a></li>
                             <li class="divider"></li>
                             <li class="dropdown-header">Quick User Switch</li>
@@ -79,7 +80,7 @@ else
                         }
                     }
                 </ul>
-             }
+            }
         </div>
     </header>
 
@@ -168,7 +169,7 @@ else
                                     </li>
                                 </ul>
                             </li>
-                            
+
                             @if (Model.CanManageAssetAlerts)
                             {
                                 <li class="divider"></li>
@@ -184,40 +185,40 @@ else
 
                 @if (Model.CanUseApp)
                 {
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Datasets<b class="caret"></b></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="~/Dataset/Index">Home</a></li>
-                        <li><a href="~/Search/Datasets">Search</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Datasets<b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="~/Dataset/Index">Home</a></li>
+                            <li><a href="~/Search/Datasets">Search</a></li>
 
-                        @if (Model.CanManageConfigs || Model.CanEditDataset || Model.CanUpload)
-                        {
-                            <li class="divider"></li>
-                            <li class="dropdown-header">Dataset Actions</li>
-
-                            if (Model.CanEditDataset)
+                            @if (Model.CanManageConfigs || Model.CanEditDataset || Model.CanUpload)
                             {
-                                <li><a href="#" onclick="data.Dataset.ViewUpload()">Create Dataset</a></li>
-                            }
+                                <li class="divider"></li>
+                                <li class="dropdown-header">Dataset Actions</li>
 
-                            if (Model.CanUpload)
-                            {
-                                <li><a href="#" onclick="data.DatasetDetail.UploadFileModal(0)">Upload Data File</a></li>
-                            }
-
-                            if (Model.CanManageConfigs)
-                            {
-                                if (Model.CanManageConfigs)
+                                if (Model.CanEditDataset)
                                 {
-                                    <li class="divider"></li>
-                                    <li class="dropdown-header">Dataset Administration</li>
-                                    <li><a href="/Config/Manage">Manage Configs</a></li>
+                                    <li><a href="#" onclick="data.Dataset.ViewUpload()">Create Dataset</a></li>
                                 }
 
+                                if (Model.CanUpload)
+                                {
+                                    <li><a href="#" onclick="data.DatasetDetail.UploadFileModal(0)">Upload Data File</a></li>
+                                }
+
+                                if (Model.CanManageConfigs)
+                                {
+                                    if (Model.CanManageConfigs)
+                                    {
+                                        <li class="divider"></li>
+                                        <li class="dropdown-header">Dataset Administration</li>
+                                        <li><a href="/Config/Manage">Manage Configs</a></li>
+                                    }
+
+                                }
                             }
-                        }
-                    </ul>
-                </li>
+                        </ul>
+                    </li>
                 }
 
                 @if (Model.CanQueryToolPowerUser || Model.CanQueryTool)
@@ -249,11 +250,11 @@ else
                                     </ul>
                                 </li>
                                 @*<li class="dropdown-submenu">
-                                    <a data-toggle="dropdown">Dataset Management</a>
-                                    <ul class="dropdown-menu">
-                                        <li class="text-right"><a href="#" onclick="">Coming Soon!</a></li>
-                                    </ul>
-                                </li>*@
+                                        <a data-toggle="dropdown">Dataset Management</a>
+                                        <ul class="dropdown-menu">
+                                            <li class="text-right"><a href="#" onclick="">Coming Soon!</a></li>
+                                        </ul>
+                                    </li>*@
                                 <li><a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/SiteAccess.docx?Web=1">Access Guide</a></li>
                             </ul>
                         </li>

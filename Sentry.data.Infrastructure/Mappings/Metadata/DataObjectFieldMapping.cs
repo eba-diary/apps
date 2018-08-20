@@ -17,15 +17,15 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
         {
             this.Lazy(false);
 
-            this.Table("MetadataRepository.dbo.DataObjectField");
+            this.Table(Sentry.Configuration.Config.GetHostSetting("MetadataRepository") + ".dbo.DataObjectField");
 
-            this.Id(x => x.DataObjectField_ID);
+            this.Id(x => x.DataObjectField_ID, m => m.Generator(Generators.Identity));
 
-            this.ManyToOne(x => x.DataObject, m =>
-            {
-                m.Column("DataObject_ID");
-                m.Class(typeof(DataObject));
-            });
+            //this.ManyToOne(x => x.DataObject, m =>
+            //{
+            //    m.Column("DataObject_ID");
+            //    m.Class(typeof(DataObject));
+            //});
 
             this.Property(x => x.DataObject_ID);
             this.Property(x => x.DataTag_ID);
@@ -34,14 +34,14 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property(x => x.DataObjectFieldCreate_DTM);
             this.Property(x => x.DataObjectFieldChange_DTM);
             this.Property(x => x.LastUpdt_DTM);
-            this.Property(x => x.BusObjectKey);
-            this.Property(x => x.BusFieldKey);
+            //this.Property(x => x.BusObjectKey);
+            //this.Property(x => x.BusFieldKey);
 
             this.Bag(x => x.DataObjectFieldDetails, (m) =>
             {
                 m.Lazy(CollectionLazy.NoLazy);
                 m.Inverse(false);
-                m.Table("MetadataRepository.dbo.DataObjectFieldDetail");
+                m.Table(Sentry.Configuration.Config.GetHostSetting("MetadataRepository") + ".dbo.DataObjectFieldDetail");
                 m.Cascade(Cascade.All);
                 m.Cache(c => c.Usage(CacheUsage.ReadWrite));
 

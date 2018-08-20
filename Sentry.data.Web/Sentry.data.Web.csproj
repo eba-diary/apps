@@ -64,6 +64,9 @@
       <HintPath>..\packages\AWSSDK.S3.3.3.5.10\lib\net45\AWSSDK.S3.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="BeginCollectionItem, Version=1.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\BeginCollectionItem.1.2.1.0\lib\net35\BeginCollectionItem.dll</HintPath>
+    </Reference>
     <Reference Include="ClosedXML, Version=0.76.0.0, Culture=neutral, PublicKeyToken=fd1eb21b62ae805b, processorArchitecture=MSIL">
       <HintPath>..\packages\ClosedXML.0.76.0\lib\net40-client\ClosedXML.dll</HintPath>
       <Private>True</Private>
@@ -279,6 +282,8 @@
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Filters\AuthorizationFilters\AuthorizeHangfireDashboard.cs" />
+    <Compile Include="Helpers\LivyHelper.cs" />
+    <Compile Include="Helpers\BeginCollectionItem.cs" />
     <Compile Include="Helpers\PredicateBuilder.cs" />
     <Compile Include="Helpers\Utility.cs" />
     <Compile Include="DependencyResolution\ControllerConvention.cs" />
@@ -974,8 +979,6 @@
     <Content Include="Scripts\jquery.ba-throttle-debounce.min.js" />
     <Content Include="Scripts\jquery.placeholder.js" />
     <Content Include="Scripts\jquery.placeholder.min.js" />
-    <Content Include="Scripts\jquery.signalR-2.2.1.js" />
-    <Content Include="Scripts\jquery.signalR-2.2.1.min.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.js" />
     <Content Include="Scripts\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Scripts\jquery.validate.js" />
@@ -1149,6 +1152,8 @@
     <Content Include="Views\DataAsset\Test.cshtml" />
     <Content Include="Views\Search\Index.cshtml" />
     <Content Include="Views\Shared\_HomePageLayout.cshtml" />
+    <Content Include="Views\Config\_Headers.cshtml" />
+    <Content Include="Views\Shared\EditorTemplates\Collection.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

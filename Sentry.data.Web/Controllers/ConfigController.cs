@@ -120,6 +120,7 @@ namespace Sentry.data.Web.Controllers
                         Description = dfcm.ConfigFileDesc,
                         //DropPath = dfcm.DropPath,
                         FileTypeId = dfcm.FileTypeId,
+                        DataElement_ID = dfcm.DataElement_ID,
                         IsGeneric = false,
                         ParentDataset = parent,
                         FileExtension = _datasetContext.GetById<FileExtension>(dfcm.FileExtensionID),
@@ -211,6 +212,7 @@ namespace Sentry.data.Web.Controllers
             edfc.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
             edfc.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, edfc.FileExtensionID);
+            edfc.DataElement_ID = dfc.DataElement_ID;
 
             ViewBag.ModifyType = "Edit";
 
@@ -236,7 +238,7 @@ namespace Sentry.data.Web.Controllers
             DatasetFileConfig dfc = _datasetContext.getDatasetFileConfigs(configId);
             EditDatasetFileConfigModel edfc = new EditDatasetFileConfigModel(dfc);
             edfc.DatasetId = dfc.ParentDataset.DatasetId;
-
+            edfc.DataElement_ID = dfc.DataElement_ID;
             edfc.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext, edfc.DatasetScopeTypeID);
             edfc.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
@@ -261,6 +263,7 @@ namespace Sentry.data.Web.Controllers
                     dfc.DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(edfc.DatasetScopeTypeID);
                     dfc.FileTypeId = edfc.FileTypeId;
                     dfc.Description = edfc.ConfigFileDesc;
+                    dfc.DataElement_ID = edfc.DataElement_ID;
                     dfc.FileExtension = _datasetContext.GetById<FileExtension>(edfc.FileExtensionID);
                     _datasetContext.SaveChanges();
 
@@ -651,7 +654,7 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
         public ActionResult CreateSource()
         {
-            CreateSourceModel csm = new CreateSourceModel();
+            CreateSourceModel csm = new CreateSourceModel();            
 
             csm = CreateSourceDropDown(csm);
 
@@ -676,6 +679,9 @@ namespace Sentry.data.Web.Controllers
             DataSource source = null;
             try
             {
+
+                AuthenticationType auth = _datasetContext.GetById<AuthenticationType>(Convert.ToInt32(csm.AuthID));
+
                 switch (csm.SourceType)
                 {
                     case "DFSBasic":
@@ -708,8 +714,69 @@ namespace Sentry.data.Web.Controllers
                         if (!(csm.BaseUri.ToString().StartsWith("sftp://")))
                         {
                             AddCoreValidationExceptionsToModel(new ValidationException("BaseUri","A valid SFTP URI starts with sftp:// (i.e. sftp://foo.bar.com//base/dir/)"));
+                        }                        
+                        break;
+                    case "HTTPS":
+                        source = new HTTPSSource();
+                        bool valid = true;
+
+                        if (_datasetContext.DataSources.Where(w => w is HTTPSSource && w.Name == csm.Name).Count() > 0)
+                        {
+                            AddCoreValidationExceptionsToModel(new ValidationException("Name", "An HTTPS Data Source is already exists with this name."));
+                            valid = false;
                         }
-                        
+                        if (!(csm.BaseUri.ToString().StartsWith("https://")))
+                        {
+                            AddCoreValidationExceptionsToModel(new ValidationException("BaseUri", "A valid HTTPS URI starts with https:// (i.e. https://foo.bar.com/base/api/)"));
+                            valid = false;
+                        }
+
+                        //if token authentication, user must enter values for token header and value
+                        if (auth.Is<TokenAuthentication>())                            
+                        {
+                            
+                            if(String.IsNullOrWhiteSpace(csm.TokenAuthHeader))
+                            {
+                                AddCoreValidationExceptionsToModel(new ValidationException("TokenAuthHeader", "Token Authenticaion requires a token header"));
+                                valid = false;
+                            }
+
+                            if (String.IsNullOrWhiteSpace(csm.TokenAuthValue))
+                            {
+                                AddCoreValidationExceptionsToModel(new ValidationException("TokenAuthValue", "Token Authentication requires a token header value"));
+                                valid = false;
+                            }
+                            
+                            if (valid)
+                            {
+                                ((HTTPSSource)source).AuthenticationHeaderName = csm.TokenAuthHeader;
+
+                                EncryptionService encryptService = new EncryptionService();
+                                Tuple<string,string> eresp = encryptService.EncryptString(csm.TokenAuthValue, Configuration.Config.GetHostSetting("EncryptionServiceKey"));
+
+                                ((HTTPSSource)source).AuthenticationTokenValue = eresp.Item1;
+                                ((HTTPSSource)source).IVKey = eresp.Item2;
+                            }                            
+                        }
+
+                        foreach (RequestHeader h in csm.Headers)
+                        {
+                            if (String.IsNullOrWhiteSpace(h.Key) || String.IsNullOrWhiteSpace(h.Value))
+                            {
+                                valid = false;
+                                AddCoreValidationExceptionsToModel(new ValidationException("RequestHeader", "Request headers need to contain valid values"));
+                            }
+                        }
+
+
+                        //Process only if validations pass and headers exist
+                        if (valid && csm.Headers.Any())
+                        {
+                            
+
+                            ((HTTPSSource)source).RequestHeaders = csm.Headers;
+                        }
+
                         break;
                     default:
                         throw new NotImplementedException();
@@ -718,8 +785,6 @@ namespace Sentry.data.Web.Controllers
                 if (ModelState.IsValid)
                 {
                     
-                    AuthenticationType auth = _datasetContext.GetById<AuthenticationType>(Convert.ToInt32(csm.AuthID));
-
                     source.Name = csm.Name;
                     source.Description = csm.Description;
                     source.SourceAuthType = auth;
@@ -749,6 +814,11 @@ namespace Sentry.data.Web.Controllers
             csm = CreateSourceDropDown(csm);
             return View("CreateDataSource", csm);
 
+        }
+
+        public ActionResult HeaderEntryRow()
+        {
+            return PartialView("_Headers");
         }
 
         private CreateSourceModel CreateSourceDropDown(CreateSourceModel csm)
@@ -835,28 +905,86 @@ namespace Sentry.data.Web.Controllers
                         case "SFTP":
                             source = _datasetContext.GetById<SFtpSource>(esm.Id);
                             break;
+                        case "HTTPS":
+                            source = _datasetContext.GetById<HTTPSSource>(esm.Id);
+                            bool valid = true;
+
+                            //if token authentication, a token header is required.  However, a token header value is not required.  The existing
+                            // token header value will be used if no value is specified.
+                            if (auth.Is<TokenAuthentication>())
+                            {
+                                if (String.IsNullOrWhiteSpace(esm.TokenAuthHeader))
+                                {
+                                    AddCoreValidationExceptionsToModel(new ValidationException("TokenAuthHeader", "Token Authenticaion requires a token header"));
+                                    valid = false;
+                                }
+
+                                if (valid)
+                                {
+                                    //If a new value was supplied, save new encrypted value and assoicated initial value
+                                    if (!String.IsNullOrWhiteSpace(esm.TokenAuthValue))
+                                    {
+                                        EncryptionService encryptService = new EncryptionService();
+                                        Tuple<string, string> eresp = encryptService.EncryptString(esm.TokenAuthValue, Configuration.Config.GetHostSetting("EncryptionServiceKey"));
+
+                                        ((HTTPSSource)source).AuthenticationTokenValue = eresp.Item1;
+                                        ((HTTPSSource)source).IVKey = eresp.Item2;
+                                        ((HTTPSSource)source).AuthenticationHeaderName = esm.TokenAuthHeader;
+                                    }
+                                }
+                            }
+
+                            foreach (RequestHeader h in esm.Headers)
+                            {
+                                //Check each request header\value pair to ensure they each have values
+                                if (String.IsNullOrWhiteSpace(h.Key) || String.IsNullOrWhiteSpace(h.Value))
+                                {
+                                    valid = false;
+                                    AddCoreValidationExceptionsToModel(new ValidationException("RequestHeader", "Request headers need to contain valid values"));
+                                }
+                            }
+
+                            //Replace all headers on each save
+                            if (valid && esm.Headers.Any())
+                            {
+                                ((HTTPSSource)source).RequestHeaders = esm.Headers;
+                            }
+                            break;
                         default:
                             throw new NotImplementedException();
                     }
-
-                    //source.Name = esm.Name;
-                    source.Description = esm.Description;
-                    source.SourceAuthType = auth;
-                    source.IsUserPassRequired = esm.IsUserPassRequired;
-                    source.BaseUri = esm.BaseUri;
-                    source.PortNumber = esm.PortNumber;
-
-                    _datasetContext.SaveChanges();
-
-                    if (!String.IsNullOrWhiteSpace(esm.ReturnUrl))
+                    try
                     {
-                        return Redirect(esm.ReturnUrl);
+                        if (ModelState.IsValid)
+                        {
+                            source.Description = esm.Description;
+                            source.SourceAuthType = auth;
+                            source.IsUserPassRequired = esm.IsUserPassRequired;
+                            source.BaseUri = esm.BaseUri;
+                            source.PortNumber = esm.PortNumber;
+
+                            _datasetContext.SaveChanges();
+
+                            if (!String.IsNullOrWhiteSpace(esm.ReturnUrl))
+                            {
+                                return Redirect(esm.ReturnUrl);
+                            }
+                            else
+                            {
+                                return Redirect("/");
+                            }
+                        }
                     }
-                    else
+                    catch (Sentry.Core.ValidationException ex)
                     {
-                        return Redirect("/");
-                    }
+                        AddCoreValidationExceptionsToModel(ex);
+                        _datasetContext.Clear();
+                    }                                       
                 }
+
+                esm = EditSourceDropDown(esm);
+                return View("EditDataSource", esm);
+
             }
             catch (Sentry.Core.ValidationException ex)
             {
@@ -929,6 +1057,11 @@ namespace Sentry.data.Web.Controllers
                     output = s3BasicList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
                     break;
+                case "HTTPS":
+                    List<DataSource> HttpsList = _datasetContext.DataSources.Where(x => x is HTTPSSource).ToList();
+                    output = HttpsList.Select(v
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
+                    break;
                 default:
                     throw new NotImplementedException();
             }
@@ -981,7 +1114,7 @@ namespace Sentry.data.Web.Controllers
                         ModelState.AddModelError("PortNumber", vr.Description);
                         break;
                     default:
-                        ModelState.AddModelError(string.Empty, vr.Description);
+                        ModelState.AddModelError(vr.Id, vr.Description);
                         break;
                 }
             }

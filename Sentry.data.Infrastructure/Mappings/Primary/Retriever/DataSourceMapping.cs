@@ -155,6 +155,38 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
         {
             DiscriminatorValue(@"SFTP");
         }
+    }
 
+    public class HTTPSSourceMapping : SubclassMapping<HTTPSSource>
+    {
+        public HTTPSSourceMapping()
+        {
+            DiscriminatorValue(@"HTTPS");
+
+
+            Property(x => x.AuthenticationHeaderName, m =>
+            {
+                m.Column("AuthHeaderName");
+                m.NotNullable(false);
+            });
+
+            Property(x => x.AuthenticationTokenValue, m =>
+            {
+                m.Column("AuthHeaderValue");
+                m.NotNullable(false);
+            });
+
+            Property(x => x.IVKey, m =>
+            {
+                m.Column("IVKey");
+                m.NotNullable(false);
+            });
+
+            Property(x => x.RequestHeaders, m =>
+            {
+                m.Column("RequestHeaders");
+                m.Access(Accessor.Field);
+            });
+        }
     }
 }

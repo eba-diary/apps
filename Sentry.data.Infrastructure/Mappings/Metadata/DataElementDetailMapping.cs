@@ -1,4 +1,5 @@
 ﻿using NHibernate.Mapping.ByCode.Conformist;
+using NHibernate.Mapping.ByCode;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.Metadata;
 using System;
@@ -13,16 +14,9 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public DataElementDetailMapping()
         {
-            this.Table("MetadataRepository.dbo.DataElementDetail");
+            this.Table(Sentry.Configuration.Config.GetHostSetting("MetadataRepository") + ".dbo.DataElementDetail");
 
-            this.Id(x => x.DataElementDetail_ID);
-
-
-            this.ManyToOne(x => x.DataElement, m =>
-            {
-                m.Column("DataElement_ID");
-                m.Class(typeof(DataElement));
-            });
+            this.Id(x => x.DataElementDetail_ID, m => m.Generator(Generators.Identity));
 
             this.Property(x => x.DataElementDetailCreate_DTM);
             this.Property(x => x.DataElementDetailChange_DTM);

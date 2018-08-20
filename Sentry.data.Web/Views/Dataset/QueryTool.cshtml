@@ -1,11 +1,12 @@
 ﻿@{
     Layout = "~/Views/Shared/_Layout.cshtml";
     Boolean powerUser = ViewBag.PowerUser;
+    String livyURL = ViewBag.LivyURL + "/ui/session/";
 }
 
 <div id="bannerRow" class="row" style="position: fixed; z-index: 999">
     <div class="col-lg-12">
-        <div id="bannerContainer" class="bs-component" onclick="HideBanner();" >
+        <div id="bannerContainer" class="bs-component" onclick="HideBanner();">
             <div id="schemaWarningBanner" class="alert" style="display: none;">
                 <button type="button" class="close" data-dismiss="alert">×</button>
                 <h4 id="schemaWarningHeader">Warning!</h4>
@@ -14,16 +15,17 @@
         </div>
     </div>
 </div>
-
-
-@if (powerUser)
-{
-    <br />
-    <div class="row">
-        <div class="col-lg-9">
-            <h1>Query Tool</h1>
+<br />
+<div class="row">
+    <div class="col-lg-7">
+        <h1>Query Tool</h1>
+    </div>
+    @if (powerUser)
+    {
+        <div class="col-lg-2">
+            <h3 style="margin-top: 22px;"><a href="@livyURL" id="LivyURL">Spark Session: <span id="sessionID"></span></a></h3>
         </div>
-        <div class="col-lg-3" id="adminToolsButtons" >
+        <div class="col-lg-3" id="adminToolsButtons">
             <div class="btn-group">
                 <a class="btn btn-primary" onclick="ToggleAdminControls()">Code History and Custom Code</a>
                 <a href="#/" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></a>
@@ -33,7 +35,18 @@
                 </ul>
             </div>
         </div>
-    </div>
+    }
+    else
+    {
+        <div style="display:none;">
+            <a href="@livyURL" id="LivyURL"></a>
+        </div>
+    }
+</div>
+
+
+@if (powerUser)
+{
     <hr />
     <div id="AdminControls" style="display: none;">
         <h4>Administrative and Power User Controls</h4>
@@ -52,11 +65,7 @@
         <p>With great power comes great responsibility.  You are being monitored.</p>
         <div class="btn-group">
             <a class="btn btn-primary" onclick="SendCode()">Send Code to Spark</a>
-            <a href="#/" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></a>
-            <ul class="dropdown-menu">
-                <li><a onclick="SendCode(null, 'Get Hive Table')">HiveQL Query</a></li>
-            </ul>
-
+            <a class="btn btn-success" onclick="SendCode(null, 'Get Hive Table')">HiveQL Query</a>
         </div>
         <hr />
     </div>
@@ -112,6 +121,7 @@
                     <br>
                 </div>
                 <div data-bind="if: hasFiles() === true, visible: hasFiles() === true, css: rowsClass">
+
                     <input class="form-control tableNameController ruleController" data-bind="attr : { id: tableName }, value : tableName"
                            data-toggle="tooltip" data-placement="bottom" style="width: 10%;display:inline-block; "
                            title="This is the name of this Dataset in this instance of the Query Tool.  It represents all the files combined into one object like a Temporary Table.">
@@ -128,12 +138,28 @@
                     <input class="form-control ruleController" value="/*/*/*" data-html="true" data-toggle="tooltip" data-placement="bottom" style="
                             width: 20%;display:inline-block; " title="<span>This is the search query you are making against our site.<span><br/><em>It is simply denoted as /Year/Month/Day/File Name.<em><br/><em>Example: To get everything type /*/*/* </em><br/><em>Example: To get a specific set of file names choose something like /*/*/*/FileNameWithNumber*. Where the Star is a wildcard grabbing all items with any character in the stars position.</em><br/><em>Example: To get everything from a specific month type /*/10/*">
 
-                    <select class="form-control ruleController" data-toggle="tooltip" data-placement="bottom" style="width: 6%; display:inline-block; "
+                    <select class="form-control ruleController extensionPicker" data-toggle="tooltip" data-placement="bottom" style="width: 8%; display:inline-block; "
                             title="These are the file extensions that are available for this dataset.">
                         <!-- ko foreach: extensions -->
                         <option data-bind="value : $data, text: $data"></option>
                         <!-- /ko -->
                     </select>
+
+                    <label>
+                        <span>Has Header Row:</span>
+                        <input style="margin-left: 5px;" type="checkbox" checked="checked" class="ruleController csvHeaderCheckbox" />
+                    </label>
+
+                    <label>
+                        <span>Is Multiline:</span>
+                        <input style="margin-left: 5px;" type="checkbox" checked="checked" class="ruleController jsonMultiline" />
+                    </label>
+
+                    <label style="float: right; margin-top:3px;">
+                        <span>Include in Query:</span>
+                        <input style="margin-left: 5px;" type="checkbox" checked="checked" class="ruleController includeCheckbox" />
+                    </label>
+
                 </div>
                 <div data-bind="if: hasFiles() === false, visible: hasFiles() === false" style="margin-bottom: -15px;">
                     <h6 style='display:inline-block;margin-right: 15px;margin-left: 15px;' data-bind="text: config.configName"></h6>
@@ -222,7 +248,7 @@
                      optionsDisableDefault: false, placeholder: 'Select an option', allowClear: true, selectOnClose: false, closeOnSelect: true"
                             id="columnRenamerSelect" name="SelectedColumns[]"></select>
 
-                    <br/>
+                    <br />
                     <p>To reorder your columns simply click and drag the Rows below this to the desired order.</p>
                     <div id="columnRenamerContainer" data-bind="sortable: SelectedColumns" style="
                         padding: 10px;
@@ -404,8 +430,8 @@ t1.createTempView("t1");
                         <option>json</option>
                         @if (powerUser)
                         {
-                    <option>parquet</option>
-                    <option>orc</option>
+                            <option>parquet</option>
+                            <option>orc</option>
                         }
                     </select>
                     <button style="width: 10%; float:right; display:inline-block;" class="form-control btn btn-success" onclick="SavetoS3()">Download File</button>
@@ -874,12 +900,11 @@ t1.createTempView("t1");
             }
         }
 
-        function HideBanner()
-        {
+        function HideBanner() {
             $('#schemaWarningBanner').hide();
             console.log(Banner);
 
-            if (AlertLevel != "Error" && AlertLevel != "Success" ) {
+            if (AlertLevel != "Error" && AlertLevel != "Success") {
                 listOfDismissedBanners.push(Banner);
             }
         }
@@ -901,7 +926,7 @@ t1.createTempView("t1");
                         "<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>" +
                         "<h4 id=\"schemaWarningHeader\">Warning!</h4>" +
                         "<p id=\"schemaWarningText\"></p>" +
-                    "</div>");
+                        "</div>");
                 }
 
                 banner = $('#schemaWarningBanner');
@@ -911,7 +936,7 @@ t1.createTempView("t1");
                 text.empty();
 
                 if (information.startsWith('u\'')) {
-                    information = information.substr(2, information.length-1);
+                    information = information.substr(2, information.length - 1);
                 }
 
                 if (information.includes('cancelled job group')) {
@@ -1012,8 +1037,6 @@ t1.createTempView("t1");
             }
         }
 
-
-
         function generateSchema() {
 
             updateJoins();
@@ -1036,45 +1059,67 @@ t1.createTempView("t1");
                 var s3Location = $($(rows)[i]).children('input')[3].value;
                 var query = $($(rows)[i]).children('input')[4].value;
                 var extension = $($($(rows)[i]).children('select')[0]).find(":selected").text();
+                var include = $($(rows)[i]).children().children('.includeCheckbox')[0].checked;
+                var csvHeader = $($(rows)[i]).children().children('.csvHeaderCheckbox')[0].checked;
+                var jsonMultiline = $($(rows)[i]).children().children('.jsonMultiline')[0].checked;
 
-                if (extension) {
+                if (include) {
+                    if (extension) {
 
-                    if (i == 0) {
-                        firstTableName = tableName.trim();
+                        if (i == 0) {
+                            firstTableName = tableName.trim();
+                        }
+
+
+                        tables += "spark.catalog.dropTempView(\"" + tableName.trim() + "\");";
+                        tables += tableName.trim() + " = spark.read";
+
+                        if (delimiter) {
+                            tables += ".option('sep', \"" + delimiter + "\")";
+                        }
+
+
+                        switch (extension) {
+
+                            case "txt":
+                                tables += ".option('header', 'true').option('inferSchema', 'true').text('s3a://" + bucket.trim() + "/" + s3Location.trim() + query + "');";
+                                break;
+                            case "csv":
+                                tables += ".format('" + extension.trim() + "')";
+
+                                if (csvHeader) {
+                                    tables += ".option('header', 'true')";
+                                } else {
+                                    tables += ".option('header', 'false')";
+                                }
+                                tables += ".option('inferSchema', 'true').load('s3a://" + bucket.trim() + "/" + s3Location.trim() + query + "'); ";
+
+                                break;
+                            case "json":
+
+                                tables += ".format('" + extension.trim() + "')";
+
+                                if (csvHeader) {
+                                    tables += ".option('multiline', 'true')";
+                                } else {
+                                    tables += ".option('multiline', 'false')";
+                                }
+                                tables += ".option('inferSchema', 'true').json('s3a://" + bucket.trim() + "/" + s3Location.trim() + "/" + query + "'); ";
+
+                                break;
+                            case "parquet":
+                                tables += ".format('" + extension.trim() + "').option('inferSchema', 'true').load('s3a://" + bucket.trim() + "/" + s3Location.trim() + query + "');";
+                                break;
+                            default:
+                                valid = false;
+                                break;
+                        }
+
+                        tables += tableName.trim() + ".createTempView(\"" + tableName.trim() + "\");";
+                        tables += tableName.trim() + ".printSchema();";
+
+                        tableNames += tableName.trim() + '|||';
                     }
-
-
-                    tables += "spark.catalog.dropTempView(\"" + tableName.trim() + "\");";
-                    tables += tableName.trim() + " = spark.read";
-
-                    if (delimiter) {
-                        tables += ".option('sep', \"" + delimiter + "\")";
-                    }
-
-
-                    switch (extension) {
-
-                        case "txt":
-                            tables += ".option('header', 'true').option('inferSchema', 'true').text('s3a://" + bucket.trim() + "/" + s3Location.trim() + query + "');";
-                            break;
-                        case "csv":
-                            tables += ".format('" + extension.trim() + "').option('header', 'true').option('inferSchema', 'true').load('s3a://" + bucket.trim() + "/" + s3Location.trim() + query + "');";
-                            break;
-                        case "json":
-                            tables += ".format('" + extension.trim() + "').option('inferSchema', 'true').load('s3a://" + bucket.trim() + "/" + s3Location.trim() + query + "');";
-                            break;
-                        case "parquet":
-                            tables += ".format('" + extension.trim() + "').option('inferSchema', 'true').load('s3a://" + bucket.trim() + "/" + s3Location.trim() + query + "');";
-                            break;
-                        default:
-                            valid = false;
-                            break;
-                    }
-
-                    tables += tableName.trim() + ".createTempView(\"" + tableName.trim() + "\");";
-                    tables += tableName.trim() + ".printSchema();";
-
-                    tableNames += tableName.trim() + '|||';
                 }
             }
 
@@ -1131,7 +1176,17 @@ t1.createTempView("t1");
             var failureReason = "";
             $('#tablePython').val('');
 
+            $('.extensionPicker').each(function (index, value) {
+                if ($(value).find(":selected").text() !== "csv"){
+                    console.log($(value).siblings().children(".csvHeaderCheckbox").parent());
+                    $(value).siblings().children(".csvHeaderCheckbox").parent().hide();
+                }
 
+                if ($(value).find(":selected").text() !== "json") {
+                    console.log($(value).siblings().children(".jsonMultiline").parent());
+                    $(value).siblings().children(".jsonMultiline").parent().hide();
+                }
+            });
 
 
             var rows = $('#tableSelection').children('.rule-container').children().children().children('.configRow');
@@ -1146,42 +1201,63 @@ t1.createTempView("t1");
                 var s3Location = $($(rows)[i]).children('input')[3].value;
                 var query = $($(rows)[i]).children('input')[4].value;
                 var extension = $($($(rows)[i]).children('select')[0]).find(":selected").text();
+                var include = $($(rows)[i]).children().children('.includeCheckbox')[0].checked;
+                var csvHeader = $($(rows)[i]).children().children('.csvHeaderCheckbox')[0].checked;
+                var jsonMultiline = $($(rows)[i]).children().children('.jsonMultiline')[0].checked;
 
-                if (extension) {
+                if (include) {
+                    if (extension) {
 
-                    //var bucket = $('#BucketDropDown').val();
+                        //var bucket = $('#BucketDropDown').val();
 
-                    var Join = tableName.trim() + " = spark.read";
+                        var Join = tableName.trim() + " = spark.read";
 
-                    if (delimiter) {
-                        Join += ".option('delimiter', \"" + delimiter + "\")";
+                        if (delimiter) {
+                            Join += ".option('delimiter', \"" + delimiter + "\")";
+                        }
+
+                        switch (extension) {
+
+                            case "txt":
+                                Join += ".option('header', 'true').option('inferSchema', 'true').text('s3a://" + bucket.trim() + "/" + s3Location.trim() + "/" + query + "');";
+                                break;
+                            case "csv":
+
+                                Join += ".format('" + extension.trim() + "')";
+
+                                if (csvHeader) {
+                                    Join += ".option('header', 'true')";
+                                } else {
+                                    Join += ".option('header', 'false')";
+                                }
+                                Join += ".option('inferSchema', 'true').load('s3a://" + bucket.trim() + "/" + s3Location.trim() + "/" + query + "'); ";
+
+                                break;
+                            case "json":
+                                Join += ".format('" + extension.trim() + "')";
+
+                                if (csvHeader) {
+                                    Join += ".option('multiline', 'true')";
+                                } else {
+                                    Join += ".option('multiline', 'false')";
+                                }
+                                Join += ".option('inferSchema', 'true').json('s3a://" + bucket.trim() + "/" + s3Location.trim() + "/" + query + "'); ";
+
+                                break;
+                            case "parquet":
+                                Join += ".format('" + extension.trim() + "').option('inferSchema', 'true').load('s3a://" + bucket.trim() + "/" + s3Location.trim() + "/" + query + "');";
+                                break;
+                            default:
+                                valid = false;
+                                failureReason = "Invalid Format for Table " + tableName.trim() + " Extension " + extension;
+                                break;
+                        }
+                        $('#tablePython').val($('#tablePython').val() + Join + "\n");
+
+                    } else {
+                        valid = false;
+                        failureReason = "No Extension Picked for " + tableName.trim();
                     }
-
-
-                    switch (extension) {
-
-                        case "txt":
-                            Join += ".option('header', 'true').option('inferSchema', 'true').text('s3a://" + bucket.trim() + "/" + s3Location.trim() + "/" + query + "');";
-                            break;
-                        case "csv":
-                            Join += ".format('" + extension.trim() + "').option('header', 'true').option('inferSchema', 'true').load('s3a://" + bucket.trim() + "/" + s3Location.trim() + "/" + query + "');";
-                            break;
-                        case "json":
-                            Join += ".format('" + extension.trim() + "').option('inferSchema', 'true').load('s3a://" + bucket.trim() + "/" + s3Location.trim() + "/" + query + "');";
-                            break;
-                        case "parquet":
-                            Join += ".format('" + extension.trim() + "').option('inferSchema', 'true').load('s3a://" + bucket.trim() + "/" + s3Location.trim() + "/" + query + "');";
-                            break;
-                        default:
-                            valid = false;
-                            failureReason = "Invalid Format for Table " + tableName.trim() + " Extension " + extension;
-                            break;
-                    }
-                    $('#tablePython').val($('#tablePython').val() + Join + "\n");
-
-                } else {
-                    valid = false;
-                    failureReason = "No Extension Picked for " + tableName.trim();
                 }
             }
 
@@ -1741,7 +1817,7 @@ t1.createTempView("t1");
 
                     $(statementBar).css('width', width);
 
-                    
+
                 },
                 error: function (e) {
                     console.log("Unavailable");
@@ -1937,10 +2013,12 @@ t1.createTempView("t1");
             var bucket = s3Key.substring(0, s3Key.indexOf('/') + 1);
             s3Key = s3Key.replace(bucket, '');
 
+            var s3FileName = $('#s3FileName').val() + "." + $('#s3SaveAsFileExtension').find(":selected").text();
+
             console.log(s3Key);
             $.ajax({
                 type: "GET",
-                url: "/api/QueryTool/GetDatasetFileDownloadURL?s3Key=" + s3Key,
+                url: "/api/QueryTool/GetDatasetFileDownloadURL?s3Key=" + s3Key + "&fileName=" + s3FileName,
                 dataType: "json",
                 success: function (msg) {
                     $('#s3DownloadLocation').attr('href', msg);
@@ -2120,7 +2198,8 @@ t1.createTempView("t1");
                 success: function (msg) {
                     json = JSON.parse(msg);
                     $('#jobInfo').text("Your Session is currently " + json.state + ".");
-
+                    $('#sessionID').text(sessionID);
+                    UpdateLivyURL();
                 },
                 error: function (e) {
                     $.ajax({
@@ -2130,6 +2209,8 @@ t1.createTempView("t1");
                         success: function (msg) {
                             json = JSON.parse(msg);
                             sessionID = json.id;
+                            $('#sessionID').text(sessionID);
+                            UpdateLivyURL();
 
                             var obj = { 'id': sessionID, 'time': Date.now() };
 
@@ -2159,6 +2240,15 @@ t1.createTempView("t1");
 
         });
 
+        function UpdateLivyURL() {
+            var url = $("#LivyURL").attr('href') + sessionID;
+            var to = url.lastIndexOf('/')
+            to = to == -1 ? url.length : to + 1;
+            url = url.substring(0, to);
+            url = url + sessionID;
+            $("#LivyURL").attr("href", url);
+        }
+
         function CreateSession() {
             $.ajax({
                 type: "POST",
@@ -2167,6 +2257,8 @@ t1.createTempView("t1");
                 success: function (msg) {
                     json = JSON.parse(msg);
                     sessionID = json.id;
+                    $('#sessionID').text(sessionID);
+                    UpdateLivyURL();
 
                     var obj = { 'id': sessionID, 'time': Date.now() };
 

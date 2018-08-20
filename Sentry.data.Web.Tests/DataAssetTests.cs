@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Sentry.data.Infrastructure;
 using System;
 using System.Linq;
+using Sentry.data.Web.Helpers;
 
 namespace Sentry.data.Web.Tests
 {
@@ -272,6 +273,47 @@ namespace Sentry.data.Web.Tests
             Assert.IsTrue(an.DisplayMessage.EndsWith(mock));
 
 
+        }
+
+
+        [TestMethod]
+        [TestCategory("Data Asset Detail")]
+        public void TimeDisplay_HourCheck()
+        {
+
+            DateTime dateTime = DateTime.Now.AddHours(-20);
+
+            String display = Utility.TimeDisplay(dateTime);
+
+            Assert.IsTrue(display == "20 hours ago");
+
+
+
+        }
+
+        [TestMethod]
+        [TestCategory("Data Asset Detail")]
+        public void TimeDisplay_DaysCheck()
+        {
+
+            DateTime dateTime = DateTime.Now.AddDays(-20);
+
+            String display = Utility.TimeDisplay(dateTime);
+
+            Assert.IsTrue(display == dateTime.ToString("MM/dd/yyyy hh:mm:ss tt"));
+
+        }
+
+
+        [TestMethod]
+        [TestCategory("Data Asset Detail")]
+        public void TimeDisplay_DaysCheckFromTimeStamp()
+        {
+            DateTime acclaim = Convert.ToDateTime("2018-07-31 08:37:51.000");
+
+            String display = Utility.TimeDisplay(acclaim);
+
+            Assert.IsTrue(display == acclaim.ToString("MM/dd/yyyy hh:mm:ss tt"));
         }
 
     }

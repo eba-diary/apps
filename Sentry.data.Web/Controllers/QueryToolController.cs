@@ -14,6 +14,12 @@ using Sentry.Configuration;
 using System.Web.Http.Results;
 using Sentry.data.Common;
 using Amazon.S3.Model;
+using Newtonsoft.Json;
+using System.Threading;
+using Sentry.data.Core.Entities.Metadata;
+using Sentry.data.Core.Entities.Livy;
+using Sentry.data.Web.Helpers;
+using Sentry.data.Core.Entities;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -23,6 +29,7 @@ namespace Sentry.data.Web.Controllers
         public IDatasetContext _datasetContext;
         private UserService _userService;
         private S3ServiceProvider _s3Service;
+        public LivyHelper _livy;
         public string _livyUrl;
 
         public QueryToolController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, ISASService sasService, IAssociateInfoProvider associateInfoService)
@@ -30,14 +37,137 @@ namespace Sentry.data.Web.Controllers
             _datasetContext = dsCtxt;
             _userService = userService;
             _s3Service = dsSvc;
+            _livy = new LivyHelper(dsCtxt);
             _associateInfoProvider = associateInfoService;
             _livyUrl = Sentry.Configuration.Config.GetHostSetting("ApacheLivy");
         }
 
+        [HttpGet]
+        [Route("Get")]
+        public async Task<IHttpActionResult> GetPrimarySessionID()
+        {
+            LivyCreation lc = null;
+            try
+            { 
+                lc = _datasetContext.LivySessions.Where(x => x.ForDSC_IND == true && x.Session_NME == "Primary Data.Sentry.com Livy Session" && x.Active_IND == true).FirstOrDefault();
+            }
+            catch(Exception ex)
+            {
+
+            }
+
+            if (lc == null)
+            {
+                lc = new LivyCreation()
+                {
+                    Session_NME = "Primary Data.Sentry.com Livy Session",
+                    Active_IND = true,
+                    ForDSC_IND = true,
+                    Kind = "Python",
+                    ExecutorCores = 6,
+                    ExecutorMemory = "8G",
+                    NumExecutors = 1,
+                    HeartbeatTimeoutInSecond = 86400
+                };
+
+                IHttpActionResult creationResponse = await (CreateSession(lc.Kind, lc));
+
+                if (creationResponse.GetType() == typeof(OkNegotiatedContentResult<String>))
+                {
+                    try
+                    {
+                        var a = creationResponse as OkNegotiatedContentResult<String>;
+                        LivySession ls = JsonConvert.DeserializeObject<LivySession>(a.Content);
+
+                        lc.LivySession_ID = ls.id;
+                        lc.Start_DTM = DateTime.Now;
+                        lc.End_DTM = DateTime.Now;
+                        lc.Active_IND = true;
+                        _datasetContext.Merge<LivyCreation>(lc);
+                        _datasetContext.SaveChanges();
+                    }
+                    catch (Exception ex)
+                    {
+
+                    }
+                }
+                else
+                {
+                    return BadRequest("For some reason we couldn't start a new session.");
+                }
+            }
+
+
+            IHttpActionResult response = await (GetSession(lc.LivySession_ID));
+
+            //Reply from Livy.
+            if (response.GetType() == typeof(OkNegotiatedContentResult<String>))
+            {
+                var a = response as OkNegotiatedContentResult<String>;
+                LivyReply lr = JsonConvert.DeserializeObject<LivyReply>(a.Content);
+
+                lr.livyURL = _livyUrl;
+
+                return Ok(lr);
+            }
+            //No Reply From Livy
+            else
+            {
+                lc.End_DTM = DateTime.Now;
+                lc.Active_IND = false;
+                _datasetContext.Merge<LivyCreation>(lc);
+                _datasetContext.SaveChanges();
+
+                lc = new LivyCreation()
+                {
+                    Session_NME = "Primary Data.Sentry.com Livy Session",
+                    Active_IND = true,
+                    ForDSC_IND = true,
+                    Kind = "Python",
+                    ExecutorCores = 6,
+                    ExecutorMemory = "8G",
+                    NumExecutors = 1,
+                    HeartbeatTimeoutInSecond = 86400
+                };
+
+                IHttpActionResult creationResponse = await (CreateSession(lc.Kind, lc));
+
+                if (creationResponse.GetType() == typeof(OkNegotiatedContentResult<String>))
+                {
+                    try
+                    {
+                        var a = creationResponse as OkNegotiatedContentResult<String>;
+                        LivySession ls = JsonConvert.DeserializeObject<LivySession>(a.Content);
+
+                        lc.LivySession_ID = ls.id;
+                        lc.Start_DTM = DateTime.Now;
+                        lc.End_DTM = DateTime.Now;
+                        lc.Active_IND = true;
+                        _datasetContext.Merge<LivyCreation>(lc);
+                        _datasetContext.SaveChanges();
+
+                        ls.livyURL = _livyUrl;
+                        return Ok(ls);
+                    }
+                    catch (Exception ex)
+                    {
+                        return BadRequest("For some reason we couldn't start a new session.");
+                    }
+                }
+                else
+                {
+                    return BadRequest("For some reason we couldn't start a new session.");
+                }
+            }
+        }
+
+
+
+
         [HttpPost]
         [Route("Create")]
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
-        public async Task<IHttpActionResult> CreateSession(string Language)
+        public async Task<IHttpActionResult> CreateSession(string Language, LivyCreation lc = null)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
             using (var client = new HttpClient(handler))
@@ -47,20 +177,63 @@ namespace Sentry.data.Web.Controllers
                 {
                     default:
                     case "Python":
-                        json = "{\"kind\": \"pyspark\"}";
+                        json = "{\"kind\": \"pyspark\"";
                         break;
                     case "Scala":
-                        json = "{\"kind\": \"spark\"}";
+                        json = "{\"kind\": \"spark\"";
                         break;
                     case "R":
-                        json = "{\"kind\": \"rspark\"}";
+                        json = "{\"kind\": \"rspark\"";
                         break;
                 }
+
+                if (lc != null)
+                { 
+                    if (lc.Session_NME != null)
+                    {
+                        json += ", \"name\": \"" + lc.Session_NME + "\"";
+                    }
+
+                    if (lc.Queue != null)
+                    {
+                        json += ", \"queue\": \"" + lc.Queue + "\"";
+                    }
+
+                    if(lc.ExecutorCores != 0)
+                    {
+                        json += ", \"executorCores\": " + lc.ExecutorCores + "";
+                    }
+
+                    if (lc.ExecutorMemory != null)
+                    {
+                        json += ", \"executorMemory\": \"" + lc.ExecutorMemory + "\"";
+                    }
+
+                    if (lc.NumExecutors != 0)
+                    {
+                        json += ", \"numExecutors\": " + lc.NumExecutors + "";
+                    }
+
+                    if (lc.HeartbeatTimeoutInSecond != 0)
+                    {
+                        json += ", \"heartbeatTimeoutInSecond\": " + lc.HeartbeatTimeoutInSecond + "";
+                    }
+                }
+                else
+                {
+                    json += ", \"name\": \"DSC_" + _userService.GetCurrentUser().AssociateId + "\"";
+                }
+
+
+                json += ", \"conf\": { \"spark.hadoop.fs.s3a.security.credntial.provider.path\" : \"" + Config.GetHostSetting("SparkS3AKeyLocation") + "\"}";
+                json += "}";
+                
 
                 HttpContent contentPost = new StringContent(json, Encoding.UTF8, "application/json");
 
                 client.DefaultRequestHeaders.Accept.Clear();
 
+                client.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));//ACCEPT header
 
                 HttpResponseMessage response = await client.PostAsync(_livyUrl  + "/sessions", contentPost);
@@ -98,6 +271,7 @@ namespace Sentry.data.Web.Controllers
 
                 client.DefaultRequestHeaders.Accept.Clear();
 
+                client.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
                 client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));//ACCEPT header
 
                 HttpResponseMessage response = await client.PostAsync(_livyUrl + "/sessions/" + SessionID + "/statements", contentPost);
@@ -117,21 +291,26 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-
-
         [HttpGet]
         [Route("Get")]
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
-        public async Task<IHttpActionResult> GetSessions()
+        public async Task<IHttpActionResult> GetSessions(String name = null)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
             using (var client = new HttpClient(handler))
             {
                 client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
 
                 HttpResponseMessage response = await client.GetAsync(_livyUrl + "/sessions");
 
-                if (response.IsSuccessStatusCode)
+                if(name != null && response.IsSuccessStatusCode)
+                {
+                    LivySessionList livySessionList = JsonConvert.DeserializeObject<LivySessionList>(response.Content.ReadAsStringAsync().Result);
+
+                    return Ok(livySessionList.sessions.Where(x => x.appId.Contains(name)));
+                }
+                else if (response.IsSuccessStatusCode)
                 {
                     return Ok(response.Content.ReadAsStringAsync().Result);
                 }
@@ -155,6 +334,7 @@ namespace Sentry.data.Web.Controllers
             using (var client = new HttpClient(handler))
             {
                 client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
 
                 HttpResponseMessage response = await client.GetAsync(_livyUrl + "/sessions/" + SessionID);
 
@@ -182,6 +362,7 @@ namespace Sentry.data.Web.Controllers
             using (var client = new HttpClient(handler))
             {
                 client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
 
                 HttpResponseMessage response = await client.GetAsync(_livyUrl + "/sessions/" + SessionID + "/statements/" + StatementID);
                 
@@ -209,6 +390,7 @@ namespace Sentry.data.Web.Controllers
             using (var client = new HttpClient(handler))
             {
                 client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
 
                 HttpResponseMessage response = await client.PostAsync(_livyUrl + "/sessions/" + SessionID + "/statements/" + StatementID + "/cancel", null);
 
@@ -236,6 +418,7 @@ namespace Sentry.data.Web.Controllers
             using (var client = new HttpClient(handler))
             {
                 client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
 
                 HttpResponseMessage response = await client.DeleteAsync(_livyUrl + "/sessions/" + SessionID);
 
@@ -287,7 +470,7 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         [Route("Get")]
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
-        public async Task<IHttpActionResult> GetDatasetFileDownloadURL(string s3Key)
+        public async Task<IHttpActionResult> GetDatasetFileDownloadURL(string s3Key, string fileName)
         {
             try
             {
@@ -297,7 +480,7 @@ namespace Sentry.data.Web.Controllers
                 {
                     if(obj.Contains("part-00000"))
                     {
-                        return Ok(_s3Service.GetDatasetDownloadURL(obj));
+                        return Ok(_s3Service.GetDatasetDownloadURL(obj, null, fileName));
                     }
                 }
 
@@ -307,28 +490,6 @@ namespace Sentry.data.Web.Controllers
             {
                 return NotFound();
             }
-        }
-
-        private class QueryableDataset
-        {
-            public List<QueryableConfig> Configs { get; set; }
-            public string datasetCategory { get; set; }
-            public string datasetColor { get; set; }
-        }
-
-        private class QueryableConfig
-        {
-            public string configName { get; set; }
-            public string bucket { get; set; }
-            public string s3Key { get; set; }
-            public string description { get; set; }
-
-            public string primaryFileId { get; set; }
-
-            public List<string> extensions { get; set; }
-            public int fileCount { get; set; }
-            public Boolean IsGeneric { get; set; }
-            public Boolean IsPowerUser { get; set; }
         }
 
         [HttpGet]
@@ -373,6 +534,622 @@ namespace Sentry.data.Web.Controllers
             output.datasetColor = ds.DatasetCategory.Color;
 
             return Ok(output);
+        }
+
+        [HttpGet]
+        [Route("Get")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        private async Task<LivyReply> WaitForLivyReply(int SessionID, int StatementID)
+        {
+            LivyReply lr = new LivyReply();
+
+            while(lr.state != "available")
+            {
+                IHttpActionResult response = await (GetStatement(SessionID, StatementID));
+
+                if (response.GetType() == typeof(OkNegotiatedContentResult<String>))
+                {
+                    var a = response as OkNegotiatedContentResult<String>;
+                    lr = JsonConvert.DeserializeObject<LivyReply>(a.Content);
+                }
+                else
+                {
+                    //Something happened and Livy Broke.  :(
+                    return null;
+                }
+
+                //Wait before polling again
+                Thread.Sleep(500);
+            }
+
+
+            return lr;
+        }
+
+        [HttpGet]
+        [Route("Get")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        public async Task<IHttpActionResult> AddFileToHiveTable(int SessionID, string s3Key, int configID)
+        {
+            //Make sure that everything on that config is loaded into the Metadata Repository
+            IHttpActionResult stepOne = await (CreateDataElementandObject(configID));
+
+            if (stepOne.GetType() != typeof(OkResult))
+            {
+                return BadRequest(stepOne.ToString());
+            }
+
+            //Check the schema of the file against the metadata repository
+            IHttpActionResult stepTwo = await (CheckSchema(SessionID, s3Key, configID));
+
+            if (stepTwo.GetType() != typeof(OkNegotiatedContentResult<String>))
+            {
+                var result = stepTwo as BadRequestErrorMessageResult;
+                return BadRequest(result.Message);
+            }
+
+            var a = stepTwo as OkNegotiatedContentResult<String>;
+            var guid = a.Content;
+
+            //Check to see if a Hive Table Exists for a given Config
+            IHttpActionResult stepThree = await (CreateHiveTable(SessionID, configID));
+
+            if (stepThree.GetType() != typeof(OkNegotiatedContentResult<String>))
+            {
+                return BadRequest(stepThree.ToString());
+            }
+
+            var b = stepThree as OkNegotiatedContentResult<String>;
+            var hiveTableName = b.Content;
+
+            IHttpActionResult stepFour = await (CreateParquet(SessionID, guid, configID, true));
+
+            if (stepFour.GetType() != typeof(OkNegotiatedContentResult<String>))
+            {
+                return BadRequest(stepFour.ToString());
+            }
+
+            var c = stepFour as OkNegotiatedContentResult<String>;
+            var dropLocation = c.Content;
+
+            return Ok("Hive Table: " + hiveTableName + " - Drop Location: " + dropLocation);
+        }
+
+
+        /// <summary>
+        /// S3KEY COULD BE A FILE OR STAR PREFIX IN S3.
+        /// We need the Session ID to identify where that DataFrame is and the ConfigID to know where the Hive table is located and its Schema in the Metadata Repository.
+        /// </summary>
+        /// <param name="SessionID"></param>
+        /// <param name="s3Key"></param>
+        /// <param name="configID"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("Get")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        public async Task<IHttpActionResult> CheckSchema(int SessionID, string s3Key, int configID)
+        {
+            Guid guid = Guid.NewGuid();
+
+            try
+            {                
+                IHttpActionResult response = await (SendCode(SessionID, _livy.GetDataFrameFromS3Key(guid, s3Key, configID)));
+
+                if (response.GetType() == typeof(OkNegotiatedContentResult<String>))
+                {
+                    //We can save this Schema back to the Database easily now that we have it.
+                    var a = response as OkNegotiatedContentResult<String>;
+                    LivyReply lr = JsonConvert.DeserializeObject<LivyReply>(a.Content);
+
+                    lr = await WaitForLivyReply(SessionID, lr.id);
+
+                    DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
+                    var dataObjectID = _datasetContext.Schemas.Where(x => x.DatasetFileConfig.ConfigId == dfc.ConfigId).FirstOrDefault().DataObject_ID;
+                    DataObject dataObject = _datasetContext.GetById<DataObject>(dataObjectID);
+
+                    String output = "";
+                    if (dataObject.DataObjectFields.Any())
+                    {
+                        output = _livy.CompareSchemas(_livy.GetHiveColumns(lr), dataObject.DataObjectFields);
+                    }
+                    else
+                    {
+                        CreateDataObjectFields(configID, _livy.GetHiveColumns(lr));
+                    }
+
+                    if (output == "")
+                    {
+                        //If schema is the same happily give back the Ok and Guid so that the parquet can be created.
+                        return Ok("tmp_" + guid.ToString("N"));
+                    }
+                    else
+                    {
+                        //If the schema is not the same there is a lot of work that needs to be done.
+                        return BadRequest(output);
+                    }
+                }
+                else
+                {
+                    return response;
+                }
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError();
+            }
+        }
+
+        [HttpGet]
+        [Route("Get")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        public async Task<IHttpActionResult> GetHiveTable(int SessionID, int configID, int rows, int skip, string hiveTableName, string hiveDatabaseName)
+        {
+            String python;
+
+            python = "spark.sql('SELECT * FROM "+ hiveTableName +"').show(" + rows + ", False)";
+
+            String quoted = System.Web.Helpers.Json.Encode(python);
+            quoted = quoted.Substring(1, quoted.Length - 2);
+
+            IHttpActionResult response = await (SendCode(SessionID, quoted));
+
+            if (response.GetType() == typeof(OkNegotiatedContentResult<String>))
+            {
+                //We can save this Schema back to the Database easily now that we have it.
+                var a = response as OkNegotiatedContentResult<String>;
+                LivyReply lr = JsonConvert.DeserializeObject<LivyReply>(a.Content);
+
+                lr = await WaitForLivyReply(SessionID, lr.id);
+
+                return Ok(lr.output.data.text);
+            }
+            else
+            {
+                return response;
+            }
+        }
+
+
+
+        [HttpGet]
+        [Route("Get")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        public async Task<IHttpActionResult> SaveRowCount(int SessionID, String guid, int configID)
+        {
+            String python;
+
+            python = guid + ".count()";
+
+            String quoted = System.Web.Helpers.Json.Encode(python);
+            quoted = quoted.Substring(1, quoted.Length - 2);
+
+            IHttpActionResult response = await (SendCode(SessionID, quoted));
+
+            if (response.GetType() == typeof(OkNegotiatedContentResult<String>))
+            {
+                //We can save this Schema back to the Database easily now that we have it.
+                var a = response as OkNegotiatedContentResult<String>;
+                LivyReply lr = JsonConvert.DeserializeObject<LivyReply>(a.Content);
+
+                lr = await WaitForLivyReply(SessionID, lr.id);
+
+                DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
+                var dataObjectID = _datasetContext.Schemas.Where(x => x.DatasetFileConfig.ConfigId == dfc.ConfigId).FirstOrDefault().DataObject_ID;
+                DataObject dataObject = _datasetContext.GetById<DataObject>(dataObjectID);
+
+                if (dataObject.DataObjectDetails.Any(x => x.DataObjectDetailType_CDE == "Row_CNT"))
+                {
+                    var detail = dataObject.DataObjectDetails.FirstOrDefault(x => x.DataObjectDetailType_CDE == "Row_CNT");
+                    detail.DataObjectDetailType_VAL = (Convert.ToInt32(detail.DataObjectDetailType_VAL) + Convert.ToInt32(lr.output.data.text)).ToString();
+
+                    _datasetContext.Merge<DataObjectDetail>(detail);
+                    _datasetContext.SaveChanges();
+                }
+                else
+                {
+                    dataObject.DataObjectDetails.Add(
+                        new DataObjectDetail()
+                        {
+                            DataObject = dataObject,
+                            DataObjectDetailType_CDE = "Row_CNT",
+                            DataObjectDetailType_VAL = lr.output.data.text,
+                            DataObjectDetailCreate_DTM = DateTime.Now,
+                            DataObjectDetailChange_DTM = DateTime.Now,
+                            LastUpdt_DTM = DateTime.Now
+                        });
+                    _datasetContext.Merge<DataObject>(dataObject);
+                    _datasetContext.SaveChanges();
+                }
+
+                return Ok(lr.output.data.text);
+            }
+            else
+            {
+                return response;
+            }
+
+
+        }
+
+        /// <summary>
+        /// THIS METHOD WILL ONLY WORK IF THE CHECK SCHEMA METHOD WAS SUCCESSFUL. 
+        /// THIS METHOD REQUIRES THE GUID GENERATED FROM THAT METHOD.
+        /// The GUID itself is the pointer in the Temporary DataFrame in Memory in Hadoop/Spark.
+        /// We need the Session ID to identify where that DataFrame is and the ConfigID to know where the Hive table is located.
+        /// </summary>
+        /// <param name="SessionID"></param>
+        /// <param name="guid"></param>
+        /// <param name="configID"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("Get")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        public async Task<IHttpActionResult> CreateParquet(int SessionID, String guid, int configID, Boolean hiveTableExists)
+        {
+            DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
+
+            String python;
+            String tableName = dfc.ParentDataset.DatasetId + "_" + dfc.ConfigId + "_" + dfc.Name.Replace(' ', '_').Replace('-', '_');
+            String dropLocation = "";
+
+            //Get Write Mode Strategy
+            String writeMode = "append";
+
+            if (hiveTableExists)
+            {
+                //It requires that the schema of the class:DataFrame is the same as the schema of the table.
+
+                python = guid + @".write";
+                python += ".mode('" + writeMode + "')";
+                python += ".insertInto('" + tableName + "')";
+
+                dropLocation = tableName;
+            }
+            else
+            {
+                python = guid + @".write.format('parquet')";
+
+                python += ".mode('" + writeMode + "')";
+
+                //Get Partitioning Strategy
+                //STATIC PARTITIONING
+                //adding partition statically and loading data into it,takes less time than dynamic partitions as it won't need to look into data while creating partitions.
+
+                //DYNAMIC PARTITIONING
+                //creating partitions dynamically based on the column value, take more time than static partitions if data is huge because it needs to look into data while creating partitions.
+
+                //python += ".partitionBy('own_code')";
+
+                String bucket = Sentry.Configuration.Config.GetHostSetting("AWSRootBucket");
+                String s3Prefix = Sentry.Configuration.Config.GetHostSetting("S3DataPrefix");
+
+                dropLocation = "s3a://"
+                    + bucket + "/"
+                    + s3Prefix + "/"
+                    + "parquet" + "/"
+                    + dfc.ParentDataset.DatasetCategory.Id + "/"
+                    + dfc.ParentDataset.DatasetId + "/"
+                    + dfc.ConfigId + "/"
+                    //Schema Revision
+                    ;
+
+                python += ".save('" + dropLocation + "')";      
+            }
+
+
+            String quoted = System.Web.Helpers.Json.Encode(python);
+            quoted = quoted.Substring(1, quoted.Length - 2);
+
+            IHttpActionResult response = await (SendCode(SessionID, quoted));
+
+            if (response.GetType() == typeof(OkNegotiatedContentResult<String>))
+            {
+                //We can save this Schema back to the Database easily now that we have it.
+                var a = response as OkNegotiatedContentResult<String>;
+                LivyReply lr = JsonConvert.DeserializeObject<LivyReply>(a.Content);
+
+                lr = await WaitForLivyReply(SessionID, lr.id);
+
+                return Ok(dropLocation);
+            }
+            else
+            {
+                return response;
+            }
+        }
+
+        /// <summary>
+        /// CREATES A HIVE TABLE IF IT DOESNT ALREADY EXIST. ELSE NOTHING HAPPENS.
+        /// </summary>
+        /// <param name="SessionID"></param>
+        /// <param name="configID"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("Get")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        public async Task<IHttpActionResult> CreateHiveTable(int SessionID, int configID)
+        {
+            DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
+
+            String bucket = Sentry.Configuration.Config.GetHostSetting("AWSRootBucket");
+            String s3Prefix = Sentry.Configuration.Config.GetHostSetting("S3DataPrefix");
+
+            String dropLocation = "s3a://"
+                + bucket + "/"
+                + s3Prefix + "/"
+                + "parquet" + "/"
+                + dfc.ParentDataset.DatasetCategory.Id + "/"
+                + dfc.ParentDataset.DatasetId + "/"
+                + dfc.ConfigId + "/"
+                //Schema Revision
+                ;
+
+            //Yes Python -> Livy -> Spark -> Hive seriously needs triple quotes.
+
+            String python = @"spark.sql(""""""CREATE TABLE IF NOT EXISTS";
+
+            String hiveTableName = dfc.ParentDataset.DatasetId + "_" + dfc.ConfigId + "_" + dfc.Name.Replace(' ', '_').Replace('-', '_');
+
+            python += "`" + hiveTableName + "`";
+
+            var dataObjectID = _datasetContext.Schemas.Where(x => x.DatasetFileConfig.ConfigId == dfc.ConfigId).FirstOrDefault().DataObject_ID;
+            DataObject dataObject = _datasetContext.GetById<DataObject>(dataObjectID);
+
+            if (dataObject != null)
+            {
+                python += " (";
+
+                foreach (DataObjectField b in dataObject.DataObjectFields)
+                {
+                    String sqlServerDataType = null;
+                    if (b.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Datatype_TYP"))
+                    {
+                        sqlServerDataType = LivyHelper.SQLServerDataTypeToHive(b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Datatype_TYP").DataObjectFieldDetailType_VAL);
+                    }
+                    else
+                    {
+                        sqlServerDataType = LivyHelper.SQLServerDataTypeToHive("NVARCHAR");
+                    }
+
+                    python += $"`{b.DataObjectField_NME}` {sqlServerDataType},";
+
+                }
+
+                python = python.TrimEnd(',');
+                python += ")";
+
+                //IT WILL LOOK LIKE THIS
+                // "(`area_fips` string,`own_code` int,`industry_code` string,`agglvl_code` int,`size_code` int,`year` int)"
+            }
+            else
+            {
+                //THERE IS NOTHING IN THE METADATA REPOSITORY FOR THIS FILE.
+            }
+            //PARTITIONED BY (THING DATATYPE)
+
+            python += "STORED AS PARQUET LOCATION '" + dropLocation + @"'"""""")";
+
+
+
+
+            String quoted = System.Web.Helpers.Json.Encode(python);
+            quoted = quoted.Substring(1, quoted.Length - 2);
+
+            IHttpActionResult response = await (SendCode(SessionID, quoted));
+            var type = response.GetType();
+
+            if (type == typeof(OkResult))
+            {
+                return Ok(hiveTableName);
+            }
+            else
+            {
+                return response;
+            }
+        }
+
+        [HttpGet]
+        [Route("Get")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        public async Task<IHttpActionResult> CreateDataElementandObject(int configID)
+        {
+            /*  DATA ELEMENT CREATION:
+            *    THIS CORRELATES TO A DATASET
+            */
+            DataElement de = null;
+            try
+            {
+                DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
+
+                if (dfc.DataElement_ID != 0)
+                {
+                    de = _datasetContext.GetById<DataElement>(dfc.DataElement_ID);
+                }
+                else
+                {
+                    de = new DataElement()
+                    {
+                        MetadataAsset = null,
+                        DataElement_NME = dfc.Name,
+                        DataElement_DSC = dfc.Description,
+                        DataElement_CDE = "F",
+                        DataElementCode_DSC = "Data File",
+                        DataElementCreate_DTM = DateTime.Now,
+                        DataElementChange_DTM = DateTime.Now,
+                        LastUpdt_DTM = DateTime.Now
+                    };
+
+                    _datasetContext.Add<DataElement>(de);
+                    _datasetContext.SaveChanges();
+                    de = _datasetContext.DataElements.FirstOrDefault(x => x.DataElement_NME == dfc.Name);
+
+                    dfc.DataElement_ID = de.DataElement_ID;
+                    _datasetContext.Merge<DatasetFileConfig>(dfc);
+                    _datasetContext.SaveChanges();
+
+
+                    /*  DATA ELEMENT DETAIL CREATION:
+                     *   THESE ARE FIELDS THAT COULD BE STORED ON THE CONFIG
+                     */
+
+                    de.DataElementDetails = new List<DataElementDetail>();
+
+                    de.DataElementDetails.Add(new DataElementDetail()
+                    {
+                        DataElement = de,
+                        DataElementDetailType_CDE = "FileFormat_TYP",
+                        DataElementDetailType_VAL = "json",// ALREADY STORED ON THE CONFIG
+                        DataElementDetailCreate_DTM = DateTime.Now,
+                        DataElementDetailChange_DTM = DateTime.Now,
+                        LastUpdt_DTM = DateTime.Now
+                    });
+
+                    de.DataElementDetails.Add(new DataElementDetail()
+                    {
+                        DataElement = de,
+                        DataElementDetailType_CDE = "FileDelimiter_TYP",
+                        DataElementDetailType_VAL = ",",
+                        DataElementDetailCreate_DTM = DateTime.Now,
+                        DataElementDetailChange_DTM = DateTime.Now,
+                        LastUpdt_DTM = DateTime.Now
+                    });
+
+                    _datasetContext.Merge<DataElement>(de);
+                    _datasetContext.SaveChanges();
+
+                }
+            }catch(Exception ex)
+            {
+                return BadRequest();
+            }
+
+
+            /*  DATA OBJECT CREATION:
+            *    ESSENTIALLY THIS IS A SCHEMA.  THIS CORRELATES TO A DATA FILE CONFIG
+            */
+            try
+            {
+                DatasetFileConfig dfc2 = _datasetContext.GetById<DatasetFileConfig>(configID);
+
+                Schema schema = dfc2.Schemas.OrderByDescending(x => x.Revision_ID).FirstOrDefault();
+
+                DataObject dataObject;
+
+                if (schema.DataObject_ID != 0)
+                {
+                    dataObject = _datasetContext.GetById<DataObject>(schema.DataObject_ID);
+                }
+                else
+                {
+                    dataObject = new DataObject()
+                    {
+                        DataElement = de,
+                        DataElement_ID = de.DataElement_ID,
+                        DataObject_NME = schema.Schema_NME,
+                        DataObject_DSC = schema.Schema_DSC,
+                        DataObject_CDE = "C",  //Duplicate of Data Element Detail.
+                        DataObjectCode_DSC = "CSV File",  //Duplicate of Data Element Detail. ALREADY STORED ON THE CONFIG.
+                        DataObjectCreate_DTM = DateTime.Now,
+                        DataObjectChange_DTM = DateTime.Now,
+                        LastUpdt_DTM = DateTime.Now
+                    };
+
+                    _datasetContext.Add<DataObject>(dataObject);
+                    _datasetContext.SaveChanges();
+                    dataObject = _datasetContext.DataObjects.FirstOrDefault(x => x.DataElement == de && x.DataObject_NME == schema.Schema_NME);
+
+                    //Cast the ID onto the Dataset File Config           
+                    schema.DataObject_ID = dataObject.DataObject_ID;
+                    _datasetContext.Merge<Schema>(schema);
+                    _datasetContext.SaveChanges();
+
+
+                    /*  DATA OBJECT DETAIL CREATION:
+                     *   THESE ARE FIELDS THAT COULD BE STORED ON THE CONFIG
+                     */
+
+                    List<DataObjectDetail> dataObjectDetails = new List<DataObjectDetail>();
+
+                    DataObjectDetail dod = new DataObjectDetail()
+                    {
+                        DataObject = dataObject,
+                        DataObjectDetailType_CDE = "HeaderRow_IND",
+                        DataObjectDetailType_VAL = "Y",
+                        DataObjectDetailCreate_DTM = DateTime.Now,
+                        DataObjectDetailChange_DTM = DateTime.Now,
+                        LastUpdt_DTM = DateTime.Now
+                    };
+                    dataObjectDetails.Add(dod);
+
+                    dataObject.DataObjectDetails = dataObjectDetails;
+
+                    _datasetContext.Add<DataObject>(dataObject);
+                    _datasetContext.SaveChanges();
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest();
+            }
+
+            return Ok();
+        }
+
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        private void CreateDataObjectFields(int configID, List<HiveColumn> hiveColumns)
+        {
+            DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
+            var dataObjectID = _datasetContext.Schemas.Where(x => x.DatasetFileConfig.ConfigId == dfc.ConfigId).FirstOrDefault().DataObject_ID;
+            DataObject dataObject = _datasetContext.GetById<DataObject>(dataObjectID);
+
+            /*  DATA OBJECT FIELDS CREATION:
+            *    THESE ARE THE COLUMNS IN THE SCHEMA / DATA OBJECT
+            */
+
+            if (dataObject != null)
+            {
+                foreach (HiveColumn hc in hiveColumns)
+                {
+                    
+
+                    DataObjectField dof = new DataObjectField()
+                    {
+                        DataObject = dataObject,
+                        DataObjectField_NME = hc.name,
+                        DataObjectFieldCreate_DTM = DateTime.Now,
+                        DataObjectFieldChange_DTM = DateTime.Now,
+                        LastUpdt_DTM = DateTime.Now
+                    };
+
+                    dof.DataObjectFieldDetails = new List<DataObjectFieldDetail>();
+
+                    dof.DataObjectFieldDetails.Add(new DataObjectFieldDetail()
+                    {
+                        DataObjectField = dof,
+                        DataObjectFieldDetailType_VAL = hc.datatype,
+                        DataObjectFieldDetailType_CDE = "Datatype_TYP",
+                        DataObjectFieldDetailCreate_DTM = DateTime.Now,
+                        DataObjectFieldDetailChange_DTM = DateTime.Now,
+                        LastUpdt_DTM = DateTime.Now
+                    });
+
+                    dof.DataObjectFieldDetails.Add(new DataObjectFieldDetail()
+                    {
+                        DataObjectField = dof,
+                        DataObjectFieldDetailType_VAL = hc.nullable == true ? "Y" : "N",
+                        DataObjectFieldDetailType_CDE = "Nullable_IND",
+                        DataObjectFieldDetailCreate_DTM = DateTime.Now,
+                        DataObjectFieldDetailChange_DTM = DateTime.Now,
+                        LastUpdt_DTM = DateTime.Now
+                    });
+
+                    dataObject.DataObjectFields.Add(dof);
+
+                    _datasetContext.Add<DataObjectField>(dof);
+                    _datasetContext.SaveChanges();
+
+                }
+            }
         }
     }
 }

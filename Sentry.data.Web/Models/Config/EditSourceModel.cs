@@ -13,7 +13,7 @@ namespace Sentry.data.Web
     {
         public EditSourceModel()
         {
-
+            Headers = new List<RequestHeader>();
         }
 
         public EditSourceModel(DataSource ds)
@@ -25,12 +25,25 @@ namespace Sentry.data.Web
             IsUserPassRequired = ds.IsUserPassRequired;
             BaseUri = ds.BaseUri;
             PortNumber = ds.PortNumber;
+            Headers = new List<RequestHeader>();
+
 
             if (ds.Is<DfsBasic>()) { SourceType = "DFSBasic"; }
             else if (ds.Is<S3Basic>()) { SourceType = "S3Basic"; }
             else if (ds.Is<FtpSource>()) { SourceType = "FTP"; }
             else if (ds.Is<SFtpSource>()) { SourceType = "SFTP"; }
             else if (ds.Is<DfsCustom>()) { SourceType = "DFSCustom"; }
+            else if (ds.Is<HTTPSSource>())
+            {
+                SourceType = "HTTPS";
+                Headers = ((HTTPSSource)ds).RequestHeaders ?? new List<RequestHeader>();
+                if (ds.SourceAuthType.Is<TokenAuthentication>())
+                {
+                    TokenAuthHeader = ((HTTPSSource)ds).AuthenticationHeaderName;
+                    //We do not populate the AuthenticationHeaderValue.  On Post
+                    // if a value exists, then a new value is encrypted.  Otherwise, old value is unchanged.
+                }
+            }
         }
 
         public virtual int Id { get; set; }
@@ -59,6 +72,15 @@ namespace Sentry.data.Web
         [Required]
         [DisplayName("Base URL")]
         public virtual Uri BaseUri { get; set; }
+
+        [DisplayName("Token Name")]
+        public string TokenAuthHeader { get; set; }
+
+        [DisplayName("Token Value")]
+        public string TokenAuthValue { get; set; }
+
+        [DisplayName("Request Headers")]
+        public List<RequestHeader> Headers { get; set; }
 
         public IEnumerable<SelectListItem> SourceTypesDropdown { get; set; }
         public IEnumerable<SelectListItem> AuthTypesDropdown { get; set; }

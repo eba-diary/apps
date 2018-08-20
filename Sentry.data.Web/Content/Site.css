@@ -669,7 +669,7 @@ tr.categoryBanner-blue th.sorting_desc {
 .detailName
 {
     margin: 0;
-    padding-left: 2.25em;
+    /*padding-left: 2.25em;*/
     margin-top: 10px;
 }
 
@@ -2037,11 +2037,6 @@ body { background-color: #f8f8f8; }
     {  
         width: 20%; 
         height: 545px;
-    }
-
-    .dataset-operation-button:first-of-type
-    {
-        margin-right: 2em;
     }
 
     .detailDesc

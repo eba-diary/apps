@@ -437,6 +437,18 @@ namespace Sentry.data.Web.Controllers
             bdm.AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, id).Count;
             bdm.CanQueryTool = SharedContext.CurrentUser.CanQueryTool || SharedContext.CurrentUser.CanQueryToolPowerUser;
 
+            bdm.Views = _datasetContext.Events.Where(x => x.EventType.Description == "Viewed" && x.Dataset == ds.DatasetId).Count();
+            bdm.Downloads = _datasetContext.Events.Where(x => x.EventType.Description == "Downloaded Data File" && x.Dataset == ds.DatasetId).Count();
+
+            if (ds.DatasetFiles.Any())
+            {
+                bdm.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);
+            }
+            else
+            {
+                bdm.ChangedDtm = ds.ChangedDtm;
+            }
+
             Event e = new Event();
             e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
             e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
@@ -1431,10 +1443,11 @@ namespace Sentry.data.Web.Controllers
             return Json(obj, JsonRequestBehavior.AllowGet);
         }
 
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        [AuthorizeByPermission(PermissionNames.QueryToolPowerUser)]
         public ActionResult QueryTool()
         {
             ViewBag.PowerUser = SharedContext.CurrentUser.CanQueryToolPowerUser;
+            ViewBag.LivyURL = Sentry.Configuration.Config.GetHostSetting("ApacheLivy");
 
             Event e = new Event();
             e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
@@ -1448,6 +1461,5 @@ namespace Sentry.data.Web.Controllers
 
             return View("QueryTool");
         }
-        
     }
 }

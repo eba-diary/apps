@@ -54,4 +54,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             DiscriminatorValue(@"BasicAuth");
         }
     }
+
+    public class TokenAuthenticationMapping : SubclassMapping<TokenAuthentication>
+    {
+        public TokenAuthenticationMapping()
+        {
+            DiscriminatorValue(@"TokenAuth");
+        }
+    }
 }

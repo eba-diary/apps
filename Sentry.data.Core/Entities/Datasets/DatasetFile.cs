@@ -20,6 +20,8 @@ namespace Sentry.data.Core
 
         public virtual Dataset Dataset { get; set; }
 
+        public virtual Schema Schema { get; set; }
+
         public virtual DatasetFileConfig DatasetFileConfig { get; set; }
 
         public virtual string UploadUserName { get; set; }

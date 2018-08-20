@@ -16,9 +16,9 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
         {
             this.Lazy(false);
 
-            this.Table("MetadataRepository.dbo.DataElement");
+            this.Table(Sentry.Configuration.Config.GetHostSetting("MetadataRepository") + ".dbo.DataElement");
 
-            this.Id(x => x.DataElement_ID);
+            this.Id(x => x.DataElement_ID, m => m.Generator(Generators.Identity));
 
             this.ManyToOne(x => x.MetadataAsset, m =>
             {
@@ -40,7 +40,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             {
                 m.Lazy(CollectionLazy.NoLazy);
                 m.Inverse(false);
-                m.Table("MetadataRepository.dbo.DataElementDetail");
+                m.Table(Sentry.Configuration.Config.GetHostSetting("MetadataRepository") + ".dbo.DataElementDetail");
                 m.Cascade(Cascade.All);
                 m.Cache(c => c.Usage(CacheUsage.ReadWrite));
 
@@ -54,7 +54,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             {
                 m.Lazy(CollectionLazy.NoLazy);
                 m.Inverse(false);
-                m.Table("MetadataRepository.dbo.DataObject");
+                m.Table(Sentry.Configuration.Config.GetHostSetting("MetadataRepository") + ".dbo.DataObject");
                 m.Cascade(Cascade.All);
                 m.Cache(c => c.Usage(CacheUsage.ReadWrite));
 

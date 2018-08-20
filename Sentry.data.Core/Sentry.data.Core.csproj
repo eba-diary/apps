@@ -25,6 +25,8 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>
+    </CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -33,6 +35,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <CodeAnalysisRuleSet>
+    </CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net, Version=1.2.15.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
@@ -73,17 +77,27 @@
   <ItemGroup>
     <Compile Include="DomainServices\MetadataRepositoryService.cs" />
     <Compile Include="Entities\Datasets\FileExtension.cs" />
+    <Compile Include="Entities\Goldeneye\RetrieverRequests\TokenAuthentication.cs" />
+    <Compile Include="Entities\Goldeneye\RetrieverRequests\HTTPSSource.cs" />
+    <Compile Include="Entities\Goldeneye\RetrieverRequests\BasicAuthentication.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\SFTPSource.cs" />
+    <Compile Include="Entities\Livy\HiveColumn.cs" />
+    <Compile Include="Entities\Livy\LivyReply.cs" />
+    <Compile Include="Entities\Livy\LivySession.cs" />
+    <Compile Include="Entities\Livy\QueryableDataset.cs" />
+    <Compile Include="Entities\Goldeneye\RequestHeader.cs" />
     <Compile Include="Entities\Metadata\DataElement.cs" />
     <Compile Include="Entities\Metadata\DataElementDetail.cs" />
     <Compile Include="Entities\Metadata\DataObject.cs" />
     <Compile Include="Entities\Metadata\DataObjectDetail.cs" />
     <Compile Include="Entities\Metadata\DataObjectField.cs" />
     <Compile Include="Entities\Metadata\DataObjectFieldDetail.cs" />
+    <Compile Include="Entities\Metadata\HiveTable.cs" />
     <Compile Include="Entities\Metadata\Lineage.cs" />
     <Compile Include="Entities\Goldeneye\LoaderRequest.cs" />
     <Compile Include="Entities\Metadata\Metadata.cs" />
     <Compile Include="Entities\Metadata\MetadataAsset.cs" />
+    <Compile Include="Entities\Metadata\Schema.cs" />
     <Compile Include="Entities\Release\Issue.cs" />
     <Compile Include="Entities\Release\Sprint.cs" />
     <Compile Include="Entities\Goldeneye\Request.cs" />
@@ -149,7 +163,6 @@
     <Compile Include="Interfaces\IRequestContext.cs" />
     <Compile Include="Interfaces\ISASService.cs" />
     <Compile Include="Interfaces\IODCFileProvider.cs" />
-    <Compile Include="Interfaces\Retriever\BasicAuthentication.cs" />
     <Compile Include="Interfaces\Retriever\IAuthenticationType.cs" />
     <Compile Include="Interfaces\Retriever\IDataSource.cs" />
     <Compile Include="Interfaces\Retriever\IRetrieverJob.cs" />
@@ -160,7 +173,9 @@
     <Compile Include="Entities\User\PermissionNames.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="ClassDiagram1.cd" />
     <None Include="ClassDiagram2.cd" />
     <None Include="ClassDiagram3.cd" />
@@ -168,8 +183,8 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="packages.config" />
+    <None Include="Sentry.data.Core.ruleset" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

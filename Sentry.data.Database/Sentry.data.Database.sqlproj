@@ -155,6 +155,9 @@
     <Build Include="Tables\HangFire\Set.sql" />
     <Build Include="Tables\HangFire\State.sql" />
     <Build Include="Tables\FileExtension.sql" />
+    <Build Include="Tables\Hive_Table.sql" />
+    <Build Include="Tables\Hive_Schema.sql" />
+    <Build Include="Tables\Livy_Sessions.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

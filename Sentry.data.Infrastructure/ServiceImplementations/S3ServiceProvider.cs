@@ -72,7 +72,7 @@ namespace Sentry.data.Infrastructure
         /// <param name="key"></param>
         /// <param name="versionId"></param>
         /// <returns></returns>
-        public string GetDatasetDownloadURL(string key, string versionId = null)
+        public string GetDatasetDownloadURL(string key, string versionId = null, string fileName = null)
         {
             GetPreSignedUrlRequest req = new GetPreSignedUrlRequest()
             {
@@ -82,7 +82,7 @@ namespace Sentry.data.Infrastructure
                 Expires = DateTime.Now.AddMinutes(2)
             };
             //setting content-disposition to attachment vs. inline (into browser) to force "save as" dialog box for all doc types.
-            req.ResponseHeaderOverrides.ContentDisposition = "attachment";
+            req.ResponseHeaderOverrides.ContentDisposition = fileName != null ? "attachment; filename = " + fileName : "attachment";
             string url = S3Client.GetPreSignedURL(req);
             return url;
         }

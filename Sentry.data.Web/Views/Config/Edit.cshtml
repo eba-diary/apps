@@ -32,34 +32,34 @@
             @{Model.ModifyType = ViewBag.ModifyType;}
 
 
-           
+
 
             <div class="form-group">
-                @Html.LabelFor(m => m.ConfigFileName, htmlAttributes: new { @class = "control-label col-sm-3" })
+                @Html.LabelFor(m => m.ConfigFileName, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-sm-4">
                     @Html.DisplayFor(m => m.ConfigFileName, new { htmlAttributes = new { @class = "from-control-static" } })
                 </div>
             </div>
             <div class="form-group">
-                @Html.LabelFor(m => m.ConfigFileDesc, htmlAttributes: new { @class = "control-label col-sm-3" })
+                @Html.LabelFor(m => m.ConfigFileDesc, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-sm-9">
                     @Html.TextAreaFor(m => m.ConfigFileDesc, new { @class = "form-control ConfigFileDesc" })
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.FileType, htmlAttributes: new { @class = "control-label col-sm-3" })
+                @Html.LabelFor(model => model.FileType, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-sm-4">
                     @*@Html.DisplayFor(m => m.FileType, new { htmlAttributes = new { @class = "from-control-static" } })*@
                     @Html.DropDownListFor(model => model.FileType,
-                  new SelectList(Model.AllDataFileTypes, "Text", "Text", Model.FileType), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control " })
+               new SelectList(Model.AllDataFileTypes, "Text", "Text", Model.FileType), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control " })
                 </div>
             </div>
             <div class="form-group">
-                @Html.LabelFor((model) => model.DatasetScopeTypeID, htmlAttributes: new { @class = "control-label col-sm-3" })
+                @Html.LabelFor((model) => model.DatasetScopeTypeID, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-sm-4">
                     @Html.DropDownListFor(model => model.DatasetScopeTypeID,
-                  new SelectList(Model.AllDatasetScopeTypes, "Value", "Text", Model.DatasetScopeTypeID), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control" })
+               new SelectList(Model.AllDatasetScopeTypes, "Value", "Text", Model.DatasetScopeTypeID), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control" })
                 </div>
             </div>
             @*<div class="form-group">
@@ -71,10 +71,26 @@
             </div>
         </div>*@
             <div class="form-group">
-                @Html.LabelFor((model) => model.FileExtensionID, new { @class = "control-label col-md-3" })
+                @Html.LabelFor((model) => model.FileExtensionID, new { @class = "control-label col-md-2" })
                 <div class="col-md-4">
                     @Html.DropDownListFor(model => model.FileExtensionID,
-                  new SelectList(Model.ExtensionList, "Value", "Text", Model.FileExtensionID), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control" })
+               new SelectList(Model.ExtensionList, "Value", "Text", Model.FileExtensionID), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor((model) => model.DataElement_ID, new { @class = "control-label col-md-2", @style = "font-weight: 100;" })
+                <div class="col-md-2">
+                    @Html.TextBoxFor(model => model.DataElement_ID, new { @type = "number", @value = "", @class = "form-control edit-dataset-row" })
+                </div>
+            </div>
+
+            <div class="form-group fieldDescription">
+                <label class="control-label col-md-2"></label>
+                <div class="col-md-10">
+                    <span class="text-muted">
+                        <em> Data.Sentry.com has ID's associated to the Schema / Metadata Repository.  This can be set to 0 and filled in later.</em>
+                    </span>
                 </div>
             </div>
 

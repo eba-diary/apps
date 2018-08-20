@@ -26,7 +26,12 @@ namespace Sentry.data.Web.Controllers
             if ((SharedContext.CurrentUser).GetType() == typeof(ImpersonatedApplicationUser))
             {
                 model.CurrentImpersonatedUserName = SharedContext.CurrentUser.DisplayName;
+                model.ImpersonatedUser = SharedContext.CurrentUser;
             }
+
+            
+
+
             return View(model);
         }
 

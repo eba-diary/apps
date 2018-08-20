@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Collections;
 using System.Web;
 using System.Linq.Expressions;
+using Sentry.data.Core.Entities;
 
 namespace Sentry.data.Infrastructure
 {
@@ -85,6 +86,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<Event> Events
+        {
+            get
+            {
+                return Query<Event>();
+            }
+        }
+
         public IQueryable<Status> EventStatus
         {
             get
@@ -130,6 +139,30 @@ namespace Sentry.data.Infrastructure
             get
             {
                 return Query<Category>().Cacheable();  //QueryCacheRegion.MediumTerm
+            }
+        }
+
+        public IQueryable<Schema> Schemas
+        {
+            get
+            {
+                return Query<Schema>();  //QueryCacheRegion.MediumTerm
+            }
+        }
+
+        public IQueryable<HiveTable> HiveTables
+        {
+            get
+            {
+                return Query<HiveTable>();  //QueryCacheRegion.MediumTerm
+            }
+        }
+
+        public IQueryable<LivyCreation> LivySessions
+        {
+            get
+            {
+                return Query<LivyCreation>();  //QueryCacheRegion.MediumTerm
             }
         }
 

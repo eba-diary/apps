@@ -195,7 +195,18 @@
     @*</div>*@
     <div class="assetlastUpdt border_@color">
         <div class="row">
-            <h2 class="@color text-center">@Model.DisplayName was last updated @Sentry.data.Web.Helpers.Utility.TimeDisplay(Model.MaxProcessTime)</h2>
+            @{             
+                String title = @Sentry.data.Web.Helpers.Utility.TimeDisplay(Model.MaxProcessTime);
+
+                if (title == "No Metadata Found")
+                    title += " for " + @Model.DisplayName;
+                else
+                    title = @Model.DisplayName + " was last updated " + title;
+
+            }
+            
+
+            <h2 class="@color text-center">@title</h2>
         </div>
         <div class="row tableHeader row_@color hidden-xs">
             <div></div>
@@ -245,7 +256,7 @@
                             }
                         </table>                        
                     </div>
-                }
+                                }
                 @*else
                 {
                     <div class="assetItem">No Source Systems Details</div>
@@ -285,7 +296,7 @@
             {
                 <div class="hidden-sm">
                     @for (int i = 0; i < c; i++)
-                {
+                    {
                         <div class="row">
                             <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[i].Type.Color">
                                 @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
@@ -322,7 +333,7 @@
 
                 <div class="visible-sm">
                     @for (int i = 0; i < c; i++)
-                {
+                    {
                         <div class="row">
                             <div class="col-md-4 col-sm-6 clcCard border_@Model.Components[i].Type.Color">
                                 @Html.Partial("_ConsumptionLayerComponent", Model.Components[i])
@@ -362,7 +373,7 @@
 
                 foreach (Sentry.data.Core.ComponentElement ce in dc.ComponentElements)
                 {
-                    if(ce.Elements.Count > 0)
+                    if (ce.Elements.Count > 0)
                     {
                         string ceName = ce.Name.Split(' ').First();
                         @:$(".row_@ceName").click(function()

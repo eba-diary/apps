@@ -92,7 +92,7 @@ namespace Sentry.data.Core
         {
             get
             {
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.QueryToolUser);
+                return _extendedUserInfo.Permissions.Contains(PermissionNames.QueryToolUser) || _extendedUserInfo.Permissions.Contains(PermissionNames.QueryToolPowerUser);
             }
         }
 

@@ -1,4 +1,5 @@
-﻿@model Sentry.data.Web.EditSourceModel
+﻿@using Sentry.data.Core;
+@model Sentry.data.Web.EditSourceModel
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -113,11 +114,26 @@
                     </div>
                 </div>
             </div>
+            <div id="tokenAuthPanel">
+                <div class="form-group">
+                    @Html.Label("Authentication Header", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <div class="col-md-5 headerEntry">
+                            @Html.Label("Token Header Name", new { @class = "col-md-5 headerEntryLabel" })
+                            @Html.TextBoxFor(m => m.TokenAuthHeader, new { @value = "", @class = "form-control edit-dataset-row col-md-3" })
+                        </div>
+                        <div class="col-md-5 headerEntry">
+                            @Html.Label("Token Value", new { @class = "col-md-5 headerEntryLabel" })
+                            @Html.PasswordFor(m => m.TokenAuthValue, new { @value = "", @class = "form-control edit-dataset-row col-md-3", @placeholder = "Leave blank to retain current token value" })
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div id="portNumberPanel">
                 <div class="form-group">
                     @Html.LabelFor(model => model.PortNumber, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
-                        @Html.EditorFor(model => model.PortNumber, new { @value = "", @class = "form-control edit-dataset-row" })
+                    <div class="col-md-3">
+                        @Html.TextBoxFor(model => model.PortNumber, new { @value = "", @class = "form-control edit-dataset-row col-md-3" })
                         @Html.ValidationMessageFor(model => model.PortNumber, "", new { @class = "text-danger" })
                     </div>
                 </div>
@@ -128,11 +144,32 @@
                         <ul>
                             <li><em>FTP : 21</em></li>
                             <li><em>SSH\SFTP : 22</em></li>
+                            <li><em>HTTPS : 443</em></li>
                         </ul>
                     </div>
                 </div>
             </div>            
-
+            <div id="requestHeaderPanel">
+                <div class="form-group">
+                    @Html.LabelFor((model) => model.Headers, new { @class = "control-label col-md-2" })
+                    <div id="requestHeader" class="col-md-10">
+                        <div class="form-group col-md-10 headerEntry">
+                            <a class="addHeader" style="display: inline-block; margin-left: 10px;"><span class="glyphicon glyphicon-plus"></span> Add Header</a>
+                        </div>
+                            <div class="col-md-5 headerEntryLabel">
+                                @Html.Label("Header Name", new { @value = "", @class = "col-md-5 headerEntryLabel" })
+                            </div>
+                            <div class="col-md-5 headerEntryLabel">
+                                @Html.Label("Header Value", new { @value = "", @class = "col-md-5 headerEntryLabel" })
+                            </div>
+                        @*This approach is described at the site http://ivanz.com/2011/06/16/editing-variable-length-reorderable-collections-in-asp-net-mvc-part-1/*@
+                        @foreach (RequestHeader header in Model.Headers)
+                        {
+                            Html.RenderPartial("_Headers", header);
+                        }
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -146,7 +183,11 @@
     </div>
 }
 
-
+<style>
+    .headerEntry, .headerEntryLabel {
+        padding-left: 0px;
+    }
+</style>
 
 
 @section Scripts {
@@ -155,6 +196,8 @@
         $(document).ready(function () {
 
             function setSourceTypeDefaults(sourceType) {
+                var authtxt = $('#AuthID').find(":selected").text()
+
                 if (sourceType == "SFTP" || sourceType == "FTP") {
                     //Assign Default values
                     if (sourceType == "SFTP") {
@@ -175,6 +218,21 @@
                     $('#portNumberPanel').show();
                     $('#userPassPanel').show();
                     $('#authPanel').show();
+                    $('#tokenAuthPanel').hide();
+                    $('#requestHeaderPanel').hide();
+                }
+                else if (sourceType == "HTTPS") {
+                    $('#IsUserPassRequired').attr('disabled', true);
+                    $('#userPassPanel').hide();
+                    $('#requestHeaderPanel').show();
+                    if (authtxt == 'Token Authentication') {
+                        $('#tokenAuthPanel').show();
+                        $('#userPassPanel').hide();
+                    }
+                    else {
+                        $('#tokenAuthPanel').hide();
+                        $('#userPassPanel').hide();
+                    }
                 }
                 else if (sourceType == "S3Basic" || sourceType == "DFSCustom") {
 
@@ -183,10 +241,11 @@
 
                     //Default authentication and disable
                     $('#AuthID').attr('readonly', true);
-                    
+
                     $('#portNumberPanel').hide();
                     $('#userPassPanel').hide();
                     $('#authPanel').hide();
+                    $('#tokenAuthPanel').hide();
                 }
                 else {
                     $('#portNumberPanel').hide();
@@ -236,12 +295,21 @@
                     $('#IsUserPassRequired').prop('checked', false);
                     $('#IsUserPassRequired').attr('disabled', true);
                     $('#userPassPanel').hide();
+                    $('#tokenAuthPanel').hide();
                 }
                 else if (txt == 'Basic Authentication') {
                     $('#IsUserPassRequired').prop('checked', true);
                     $('#IsUserPassRequired').attr('disabled', true);
                     $('#IsUserPassRequired').trigger("change");
                     $('#userPassPanel').show();
+                    $('#tokenAuthPanel').hide();
+                } else if (txt == 'Token Authentication') {
+                    var userpasschkbx = $('#IsUserPassRequired');
+                    userpasschkbx.prop('checked', false);
+                    userpasschkbx.attr('disabled', true);
+                    userpasschkbx.trigger("change");
+                    $('#userPassPanel').hide();
+                    $('#tokenAuthPanel').show();
                 }
                 else {
                     $('#IsUserPassRequired').attr('disabled', false);
@@ -263,7 +331,7 @@
 
                     PassHelpText("Warning", text);
                 }
-            });            
+            });
 
             function PassHelpText(type, information) {
 
@@ -313,8 +381,22 @@
                 }
 
                 banner.show();
-            
+
             }
+
+            $('body').on('click', '.removeHeader', function () {
+
+                $(this).parent().parent().remove();
+            });
+
+            $('.addHeader').click(function () {
+                //This approach is described at the site below
+                // http://ivanz.com/2011/06/16/editing-variable-length-reorderable-collections-in-asp-net-mvc-part-1/
+                $.get("@Url.Action("HeaderEntryRow", "Config")", function (template) {
+                    $('#requestHeader').append(template);
+                });
+            });
+
             // For certain types of Data Sources the isUserPassRequired checkbox required to be true.  Setting a checkboxfor to readonly still allows
             //   a user to change the value.  A workaround being used for this property is using jquery to disable the property
             //   for the specific data source types which require it to be true.  Then a $('form').on('submit') function

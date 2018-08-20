@@ -179,9 +179,15 @@ namespace Sentry.data.Goldeneye
                             {
                                 var datasetName = Job.DatasetConfig.ParentDataset.DatasetName;
                                 var configName = Job.DatasetConfig.Name;
+                                try
+                                {
+                                    // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
+                                    RecurringJob.AddOrUpdate<RetrieverJobService>($"RJob~{Job.DatasetConfig.ParentDataset.DatasetId}~{Job.Id}~{Job.DatasetConfig.ConfigId}~{Job.DataSource.Name}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, JobCancellationToken.Null, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                                }
+                                catch (Exception ex)
+                                {
 
-                                // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
-                                RecurringJob.AddOrUpdate<RetrieverJobService>($"RJob~{Job.DatasetConfig.ParentDataset.DatasetId}~{Job.Id}~{Job.DatasetConfig.ConfigId}~{Job.DataSource.Name}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, JobCancellationToken.Null, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                                }
                             }
                             
                         }

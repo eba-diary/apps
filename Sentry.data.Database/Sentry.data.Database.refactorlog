@@ -462,4 +462,39 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="PortNumber" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="c56a8ac1-3664-4230-bce4-81f86288cc88" ChangeDateTime="07/10/2018 20:41:27">
+    <Property Name="ElementName" Value="[dbo].[DatasetFileConfigs].[DataElement_ID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetFileConfigs]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DataObject_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="3bdaaf25-3cc4-46ba-a157-42a03d06c279" ChangeDateTime="08/06/2018 21:15:15">
+    <Property Name="ElementName" Value="[dbo].[DatasetFileConfigs].[DataObject_ID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetFileConfigs]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DataElement_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="a9e4849d-4685-46ed-8607-f361b8a5b2e5" ChangeDateTime="08/13/2018 16:27:25">
+    <Property Name="ElementName" Value="[dbo].[Hive_Sessions].[LivySessionId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Hive_Sessions]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="LivySession_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="50efb144-eacb-414d-8b1e-bbdbd470f9a1" ChangeDateTime="08/13/2018 16:27:29">
+    <Property Name="ElementName" Value="[dbo].[Hive_Sessions].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Hive_Sessions]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="bbd70b29-cced-45b0-84fb-a4334051cb0a" ChangeDateTime="08/13/2018 16:32:47">
+    <Property Name="ElementName" Value="[dbo].[Hive_Sessions].[CPUCore_CNT]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Hive_Sessions]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DriverCore_CNT" />
+  </Operation>
 </Operations>

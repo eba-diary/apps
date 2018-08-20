@@ -99,7 +99,7 @@
             <div class="form-group">
                 @Html.LabelFor(model => model.RelativeUri, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    <input type="text" id="baseURLTextBox" readonly="readonly" disabled="disabled" class="form-control edit-dataset-row col-md-4"  style="width:40%;" />
+                    <input type="text" id="baseURLTextBox" readonly="readonly" disabled="disabled" class="form-control edit-dataset-row col-md-4"  style="width:40% ;" />
                     @Html.TextBoxFor(model => model.RelativeUri, new { @class = "form-control edit-dataset-row col-md-6", @style = "width:60%;", @placeholder = "Do not include starting forward slash (/)" })
                     @Html.ValidationMessageFor(model => model.RelativeUri, "", new { @class = "text-danger" })
                 </div>
@@ -108,20 +108,20 @@
             <div class="form-group configQuestion">
                 <div class="col-md-12">
                     <hr />
-                    <h6>Should files be renamed?</h6>
+                    <h6 id="targetfilenamequestion"></h6>
                 </div>
             </div>
 
             <div class="form-group questionDescription">
                 <div class="col-md-12">
                     <span class="text-muted">
-                        <em> The incoming file will be renamed to Target File Name supplied.&nbsp;&nbsp;If left blank, original source file name will used when saved to data.sentry.com.</em>
+                        <em id="targetfilenamedesc"></em>
                     </span>
                 </div>
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.TargetFileName, htmlAttributes: new { @class = "control-label col-md-2 optional" })
+                @Html.LabelFor(model => model.TargetFileName, htmlAttributes: new { @class = "control-label col-md-2 optional", @id = "targetfilenamelabel" })
                 <div class="col-md-10">
                     @Html.EditorFor(model => model.TargetFileName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
                     @Html.ValidationMessageFor(model => model.TargetFileName, "", new { @class = "text-danger" })
@@ -402,7 +402,26 @@
 
                     $("#SelectedDataSource").html(subItems);
                 });
+
+                targetFileNameDescUpdate();
             });
+
+            function targetFileNameDescUpdate() {
+                var val = $('#SelectedSourceType :selected').val();
+
+                if (val == 'HTTPS') {
+                    $("#targetfilenamequestion").text("What should target file be named?");
+                    $("#targetfilenamedesc").text("Due to the type of data source, a target file name is required as we are receiving a message not retrieving specific file.");
+                    $('#targetfilenamelabel').removeClass("optional");
+                }
+                else {
+                    $("#targetfilenamequestion").text("Should file be renamed?");
+                    $("#targetfilenamedesc").text("The incoming file will be renamed to Target File Name supplied.  If left blank, original source file name will used when saved to data.sentry.com.");
+                    $('#targetfilenamelabel').addClass("optional");
+                }
+            };
+
+            targetFileNameDescUpdate();
 
             $("#SelectedDataSource").change(function () {
                 var val = $(this).val();

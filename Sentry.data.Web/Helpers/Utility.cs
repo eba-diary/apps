@@ -39,17 +39,16 @@ namespace Sentry.data.Web.Helpers
             string result;
             TimeSpan span = DateTime.Now - dt;
 
-            //if (span.Days > 365)
-            //{
-            //    int years = (span.Days / 365);
-            //    result = string.Format("{0} {1} ago", years, years == 1 ? "year" : "years");
-            //}
+            if (dt == DateTime.MinValue)
+            {
+                result = "No Metadata Found";
+            }
             //else if (span.Days > 30)
             //{
             //    int months = (span.Days / 30);
             //    result = string.Format("{0} {1} ago", months, months == 1 ? "month" : "months");
             //}
-            if (span.TotalDays > 1)
+            else if (span.TotalDays > 1)
             {
                 result = dt.ToString("MM/dd/yyyy hh:mm:ss tt"); //12hr AM/PM
             }

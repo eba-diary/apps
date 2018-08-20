@@ -13,7 +13,7 @@ namespace Sentry.data.Web
     {
         public CreateSourceModel()
         {
-
+            Headers = new List<RequestHeader>();
         }
 
         public virtual int Id { get; set; }
@@ -51,5 +51,14 @@ namespace Sentry.data.Web
 
         public IEnumerable<SelectListItem> SourceTypesDropdown { get; set; }
         public IEnumerable<SelectListItem> AuthTypesDropdown { get; set; }
+
+        [DisplayName("Token Name")]
+        public string TokenAuthHeader { get; set; }
+
+        [DisplayName("Token Value")]
+        public string TokenAuthValue { get; set; }
+
+        [DisplayName("Request Headers")]
+        public List<RequestHeader> Headers { get; set; }
     }
 }

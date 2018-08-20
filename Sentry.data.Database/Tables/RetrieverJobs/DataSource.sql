@@ -13,6 +13,10 @@
     [PortNumber] INT NULL, 
     [HostFingerPrintKey] NVARCHAR(MAX) NULL, 
     [IsUserPassRequired] BIT NULL, 
+    [AuthHeaderName] NVARCHAR(MAX) NULL, 
+    [AuthHeaderValue] NVARCHAR(MAX) NULL, 
+    [IVKey] NVARCHAR(MAX) NULL, 
+    [RequestHeaders] NVARCHAR(MAX) NULL, 
     PRIMARY KEY CLUSTERED ([DataSource_Id] ASC),
     CONSTRAINT [FK_DataSource_AuthenticationType] FOREIGN KEY ([SourceAuth_ID]) REFERENCES [dbo].[AuthenticationType] ([Auth_Id])
 );

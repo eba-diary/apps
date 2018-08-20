@@ -1,0 +1,21 @@
+﻿CREATE TABLE [dbo].[Livy_Sessions]
+(
+	[ID] INT IDENTITY(1,1) NOT NULL PRIMARY KEY, 
+    [LivySession_ID] INT NOT NULL, 
+    [Session_NME] NVARCHAR(MAX) NOT NULL, 
+    [Associate_ID] NVARCHAR(50) NULL, 
+    [Active_IND] BIT NULL,
+	[Start_DTM] DATETIME NOT NULL,
+	[End_DTM] DATETIME NULL, 
+    [ForDSC_IND] BIT NOT NULL, 
+    [Kind] NVARCHAR(50) NULL, 
+    [Jars] NVARCHAR(MAX) NULL, 
+    [PyFiles] NVARCHAR(MAX) NULL, 
+    [DriverMemory] NVARCHAR(MAX) NULL, 
+    [DriverCores] INT NULL, 
+    [ExecutorMemory] NVARCHAR(MAX) NULL, 
+    [ExecutorCores] INT NULL, 
+    [NumExecutors] INT NULL, 
+    [Queue] NVARCHAR(MAX) NULL, 
+    [HeartbeatTimeoutInSecond] INT NULL, 
+)

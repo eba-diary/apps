@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 using System.IO;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
+using Sentry.Core;
 
 namespace Sentry.data.Core
 {
-    public class RetrieverJob : IRetrieverJob
+    public class RetrieverJob : IRetrieverJob, IValidatable
     {
         private string _jobOptions;
 
@@ -199,5 +200,30 @@ namespace Sentry.data.Core
                     break;
             }
         }
+
+        public virtual ValidationResults ValidateForSave()
+        {
+            ValidationResults vr = new ValidationResults();
+
+            //Validations specific for HTTPSSource
+            if (DataSource.Is<HTTPSSource>())
+            {
+                if (String.IsNullOrWhiteSpace(JobOptions.TargetFileName))
+                {
+                    vr.Add(ValidationErrors.httpsTargetFileNameBlank, "Target file name is required for HTTPS data sources");
+                }
+            }
+            return vr;
+        }
+
+        public virtual ValidationResults ValidateForDelete()
+        {
+            throw new NotImplementedException();
+        }
+        public class ValidationErrors
+        {
+            public const string httpsTargetFileNameBlank = "keyIsBlank";
+        }
+
     }
 }

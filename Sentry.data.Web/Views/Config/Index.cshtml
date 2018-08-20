@@ -5,38 +5,13 @@
     string color = Model.DatasetCategory.Color;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
+<a class="backToList" href="/Dataset/Detail/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>  Back to Dataset Information</a>
 
-<div class="topBanner">
-    <a class="backToList" href="/Dataset/Detail/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>  Back to Dataset Information</a>
-
-
-    @if (@Model.DatasetFiles.Count == 0)
-    {
-        <div id="alertInfoBanner" class="alert alert-dismissable alert-info">
-            <button type="button" class="close" data-dismiss="alert">×</button>
-            <div>
-                @if (Model.CanUpload)
-                {
-                    <strong class="alertHeading">Info: </strong>
-                    <span>This dataset has no files attached to it yet.  Please click the flashing upload button to upload your first file.</span>
-                }
-                else
-                {
-                    <strong class="alertHeading">Info: </strong>
-                    <span>This dataset has no files attached to it yet.  Please contact the Sentry Owner: @Model.SentryOwner.FullName.</span>
-                }
-            </div>
-        </div>
-
-    }
-
-    <div class="categoryBanner-@color categoryBannerSml rightFloat hidden-md hidden-lg">@Model.DatasetCategory.Name</div>
-
+<div class="topBanner" style="height: 60px;
+    margin-top: 20px;
+    border-bottom: 1px #DDDDDD solid;">
     <div class="relative hidden-sm hidden-xs">
-        <div class="category-type-wrap-detail bg_gray BG_@color">
-            <div class="category-type-detail categoryBanner-@color">
-                @Model.DatasetCategory.Name
-            </div>
+        <div>
 
             <div class="no-overflow">
                 <h1 class="detailName leftFloat @color">
@@ -54,104 +29,154 @@
                         <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
                     }
                 }
-                @*<div class="extension detailExt bg_gray htCenter ext_@Model.FileExtensionDisplay()">@Model.FileExtensionDisplay()</div>*@
 
-                @*<button type="button"
-                        class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                        id="SubscribeModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Subscribe">
-                    <span class="glyphicon glyphicon-pushpin @color">
-                        @* <span class="numbers categoryBanner-@color">@Model.AmountOfSubscriptions</span>
-                    </span>
-                </button>
+                <div style="margin-top:-29px;">
+                    <div class="btn-group rightFloat dataset-operation-button">
+                        <button type="button"
+                                class="btn btn-default borderdk_gray borderdk_@color dropdown"
+                                data-toggle="dropdown" data-placement="top" title="Additional Actions">
+                            <span class="glyphicon glyphicon-menu-hamburger @color"></span>
+                        </button>
 
-                @if (Model.CanUpload)
-                {
-                    <button type="button"
-                            class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                            id="UploadModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Upload File">
-                        <span class="glyphicon glyphicon-cloud-upload @color"></span>
-                    </button>
-                }
+                        <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
+                            <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
+                                <a>
+                                    Subscribe
+                                </a>
+                            </li>
 
-                @if (Model.CanEditDataset)
-                {
-                    <button type="button"
-                            class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                            id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
-                        <span class="glyphicon glyphicon-edit @color"></span>
-                    </button>
-                }
+                            @if (Model.CanQueryTool)
+                            {
+                                <li title="Query Dataset">
+                                    <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
+                                        Query this Dataset
+                                    </a>
+                                </li>
+                            }
+                            @if (Model.CanManageConfigs)
+                            {
+                                <li>
+                                    <a href="/Config/Dataset/@Model.DatasetId">
+                                        Manage Schemas
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
 
-                @if (((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive)) && Model.DatasetFiles.Count != 0)
-                {
-                    <button type="button"
-                            class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                            id="DownloadLatest" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download Latest">
-                        <span class="glyphicon glyphicon-cloud-download @color"></span>
-                    </button>
-                }
+                    @if (Model.CanUpload)
+                    {
+                        <button type="button"
+                                class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                                id="UploadModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Upload File">
+                            <span class="glyphicon glyphicon-cloud-upload @color"></span>
+                        </button>
+                    }
 
-                @if ((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.IsPreviewCompatible))
-                {
-                    <button type="button"
-                            class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                            id="PreviewLatestData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Preview Latest">
-                        <span class="glyphicon glyphicon-search @color"></span>
-                    </button>
-                }*@
+                    @if (Model.CanEditDataset)
+                    {
+                        <button type="button"
+                                class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                                id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
+                            <span class="glyphicon glyphicon-edit @color"></span>
+                        </button>
+                    }
+
+                    @*@if (((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive)) && Model.DatasetFiles.Count != 0)
+                    {
+                        <button type="button"
+                                class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                                id="DownloadLatest" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download Latest">
+                            <span class="glyphicon glyphicon-cloud-download @color"></span>
+                        </button>
+                    }
+
+                    @if ((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive))
+                    {
+                        <button type="button"
+                                class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                                id="PreviewLatestData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Preview Latest">
+                            <span class="glyphicon glyphicon-search @color"></span>
+                        </button>
+                    }*@
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="hidden-md hidden-lg">
-        <h1 class="detailNameSml leftFloat @color BG_@color text-center">@Model.DatasetName</h1>
+    <br />
 
-        <div class="clearFloat leftFloat iconExt">
+    <div class="hidden-md hidden-lg">
+        <h1 class="detailName leftFloat @color">
+            @Model.DatasetName
+
             @if (Model.IsSensitive)
             {
-                <div class="glyphicon glyphicon-lock lockIconSml leftFloat" data-toggle="tooltip" data-placement="top" title="Secure"></div>
+                <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
             }
-            @{
-                foreach (string item in Model.DistinctFileExtensions())
-                {
-                    <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
-                }
-            }
+        </h1>
+
+        <div>
+            <div class="btn-group rightFloat dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions" style="margin-top: 5px;">
+                <button type="button"
+                        class="btn btn-default borderdk_gray borderdk_@color dropdown"
+                        data-toggle="dropdown">
+                    <span class="glyphicon glyphicon-menu-hamburger @color"></span>
+                </button>
+
+                <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
+                    <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
+                        <a>
+                            Subscribe
+                        </a>
+                    </li>
+
+                    @if (Model.CanQueryTool)
+                    {
+                        <li title="Query Dataset">
+                            <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
+                                Query this Dataset
+                            </a>
+                        </li>
+                    }
+                    @if (Model.CanManageConfigs)
+                    {
+                        <li>
+                            <a href="/Config/Dataset/@Model.DatasetId">
+                                Manage Schemas
+                            </a>
+                        </li>
+                    }
+
+                    @if (Model.CanUpload)
+                    {
+                        <li id="UploadModal" data-id="@Model.DatasetId">
+                            <a>Upload Files</a>
+                        </li>
+                    }
+
+                    @if (Model.CanEditDataset)
+                    {
+                        <li id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId">
+                            <a>Edit Dataset</a>
+                        </li>
+                    }
+                </ul>
+            </div>
         </div>
-
-        @*@if (Model.CanEditDataset)
-        {
-            <button type="button" class="btn btn-default btn dataset-operation-button borderdk_gray borderdk_@color rightFloat" id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
-                <span class="glyphicon glyphicon-edit @color"></span>
-            </button>
-        }
-
-        @if ((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive))
-        {
-            <button type="button" class="btn btn-default btn dataset-operation-button borderdk_gray borderdk_@color rightFloat" id="DownloadDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download Latest">
-                <span class="glyphicon glyphicon-cloud-download @color"></span>
-            </button>
-        }
-
-        @if ((Model.IsSensitive && Model.CanDwnldSenstive && Model.IsPreviewCompatible) || (!Model.IsSensitive && Model.IsPreviewCompatible))
-        {
-            <button type="button" class="btn btn-default dataset-operation-button borderdk_gray borderdk_@color rightFloat" id="PreviewData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Preview Latest">
-                <span class="glyphicon glyphicon-search @color"></span>
-            </button>
-        }*@
 
     </div>
 
 </div>
 
 
-
+<br />
 
 @{
     if (Model.CanManageConfigs)
     {
         <div id="configs">
-            <hr />
+
 
             @foreach (var item in Model.DatasetFileConfigs)
             {
@@ -169,30 +194,32 @@
                         @if (item.ConfigFileDesc != null && item.ConfigFileDesc.Length >= 300)
                         {
 
-                        int lastInfo = item.ConfigFileDesc.Substring(0, 300).LastIndexOf(" ");
-                        <p>
-                            <span style="margin-top: 15px;">@item.ConfigFileDesc.Substring(0, lastInfo)</span>
-                            <span id="usageSeeMoreEllipsis">...&nbsp;</span>
-                            <span id="usageSeeMorePanel" style="display: none;">@item.ConfigFileDesc.Substring(lastInfo)</span>
-                            <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
-                            <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
-                        </p>
+                            int lastInfo = item.ConfigFileDesc.Substring(0, 300).LastIndexOf(" ");
+                            <p>
+                                <span style="margin-top: 15px;">@item.ConfigFileDesc.Substring(0, lastInfo)</span>
+                                <span id="usageSeeMoreEllipsis">...&nbsp;</span>
+                                <span id="usageSeeMorePanel" style="display: none;">@item.ConfigFileDesc.Substring(lastInfo)</span>
+                                <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
+                                <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
+                            </p>
                         }
                         else
                         {
-                        <p style="margin-top: 15px;">@item.ConfigFileDesc</p>
+                            <p style="margin-top: 15px;">@item.ConfigFileDesc</p>
                         }
 
                         <p>This configuration is classified as a @item.FileType</p>
+                        <p>This configuration has a Data Element ID of @item.DataElement_ID</p>
                         <p>This configuration Data Scope is @item.ScopeType.Name which means : </p>
                         <p style="margin-left: 25px;">@item.ScopeType.Description</p>
-                        @if (item.FileExtension.Name.Trim() == "ANY") {<p>This configuration will allow all files extensions.</p>}
+                        @if (item.FileExtension.Name.Trim() == "ANY")
+                        {<p>This configuration will allow all file extensions.</p>}
                         else
                         {<p>This configuration will only allow files with .@item.FileExtension.Name.ToLower() extension</p>}
-                  
+
                         <a class="backToList" href="/Config/Edit/@item.ConfigId"><span class="glyphicon glyphicon-edit"></span>  Edit Config</a>
 
-                        <br />
+                        <hr />
                         <h4 class="@color">Dataset Retrieval Jobs</h4>
                         <hr />
 
@@ -201,16 +228,16 @@
                             <div class="retJob @job.DataSource.SourceType">
                                 <div class="jobHeader categoryBanner-@color">
                                     <h6>@job.DataSource.Name</h6>
-                                    <i id="retJobDetails" class="tracker-menu-icon glyphicon glyphicon-menu-up"></i>
+                                    <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
                                     @if (job.DataSource.SourceType != "S3Basic" && job.DataSource.SourceType != "DFSBasic")
                                     {
-                                        <button class="btn btn-default on-demand-run" id="@job.Id">On-Demand Run</button>
-                                    }                                    
+                                        <button style="float:right; margin-top:3px;" class="btn btn-default on-demand-run" id="@job.Id">On-Demand Run</button>
+                                    }
                                 </div>
                                 <div class="jobContainer" style="display:none;">
                                     <p>@job.DataSource.Description</p>
-                                    
-                                    @if(job.IsGeneric)
+
+                                    @if (job.IsGeneric)
                                     {
                                         <p>This is the Generic Data File Configuration that was created when the Dataset was created. Certain fields cannot be modified.</p>
                                     }
@@ -251,7 +278,7 @@
 
                                             foreach (var fileName in job.JobOptions.CompressionOptions.FileNameExclusionList)
                                             {
-                                            <p>@fileName is being excluded.</p>
+                                                <p>@fileName is being excluded.</p>
                                             }
                                         }
                                     }
@@ -263,9 +290,71 @@
 
                                 </div>
                             </div>
-                         }
+                        }
 
                         <a class="backToList" href="/Config/@item.ConfigId/Job/Create"><span class="glyphicon glyphicon-plus"></span>  Add New Retrieval Job</a>
+
+
+                        @if (item.Schemas != null && item.Schemas.Any())
+                        {
+                            <hr />
+                            <h4 class="@color">Schemas (Sorted by Most Recent)</h4>
+                            <hr />
+                            foreach (var schema in item.Schemas.OrderByDescending(x => x.Created_DTM))
+                            {
+                                <div class="retJob">
+                                    <div class="jobHeader categoryBanner-@color">
+                                        <h6>@schema.Schema_NME</h6>
+                                        <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
+                                        @if (schema.HiveTables.Any(x => x.IsPrimary))
+                                        {
+                                            <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-ok"></span> This Schema has the Primary Hive Table</span>
+                                        }
+                                        @if (schema.IsForceMatch)
+                                        {
+                                            <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-ok"></span> Force Match</span>
+                                        }
+                                        else
+                                        {
+                                            <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-remove"></span> Force Match</span>
+                                        }
+                                    </div>
+                                    <div class="jobContainer" style="display:none;">
+
+                                        <p>This schema has a Data Object ID of @schema.DataObject_ID.</p>
+
+                                        @if (schema.IsForceMatch)
+                                        {
+                                            <p>This schema is currently set to force match for this data file config.</p>
+                                        }
+
+                                        <br />
+                                        <h4 class="@color">Hive Tables</h4>
+                                        <hr />
+
+                                        @foreach (var table in schema.HiveTables)
+                                        {
+                                            <div class="retJob">
+                                                <div class="jobHeader categoryBanner-@color">
+                                                    <h6>@table.HiveDatabase_NME.@table.Hive_NME</h6>
+                                                    <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
+                                                    @if (table.IsPrimary)
+                                                    {
+                                                        <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-ok"></span> Primary Hive Table</span>
+                                                    }
+                                                </div>
+                                                <div class="jobContainer" style="display:none;">
+                                                    <p>@table.Hive_DSC</p>
+
+                                                </div>
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                        }
+
+                        @*<a class="backToList" href="/Config/@item.ConfigId/Job/Create"><span class="glyphicon glyphicon-plus"></span>  Add New Schema</a>*@
                     </div>
 
                 </div>
@@ -275,14 +364,14 @@
         </div>
     }
 
-        <div>
-            @if (HttpContext.Current.IsDebuggingEnabled)
-            {
-                <a class="btnCreateDirectory"><span class="glyphicon glyphicon-plus"></span>  Create Directories</a>
-                <hr />
-            }
-            <a class="backToList" href="/Config/Dataset/@Model.DatasetId/Create"><span class="glyphicon glyphicon-plus"></span>  Create new Data File Configuration</a>
-        </div>
+    <div>
+        @if (HttpContext.Current.IsDebuggingEnabled)
+        {
+            <a class="btnCreateDirectory"><span class="glyphicon glyphicon-plus"></span>  Create Directories</a>
+            <hr />
+        }
+        <a class="backToList" href="/Config/Dataset/@Model.DatasetId/Create"><span class="glyphicon glyphicon-plus"></span>  Create new Data File Configuration</a>
+    </div>
     <hr />
 }
 
@@ -350,19 +439,19 @@
         font-weight: 700;
     }
 
-    .jobHeader h6 {
-        color: white;
-        padding-left: 15px;
-        display: inline-block;
-    }
+        .jobHeader h6 {
+            color: white;
+            padding-left: 15px;
+            display: inline-block;
+        }
 
-    .jobHeader .tracker-menu-icon {
-        margin: 2px 10px 0 10px;
-        color: white;
-        display: inline-block;
-    }
+        .jobHeader .tracker-menu-icon {
+            margin: 2px 10px 0 10px;
+            color: white;
+            display: inline-block;
+        }
 
-    .on-demand-run{
+    .on-demand-run {
         margin-bottom: 3px;
     }
 </style>
@@ -385,7 +474,7 @@
 
                 if ($(this).next('.configContainer:visible').length == 0) {
                     // action when all are hidden
-                    $(this).css('border-radius','5px 5px 5px 5px');
+                    $(this).css('border-radius', '5px 5px 5px 5px');
                 } else {
                     $(this).css('border-radius', '5px 5px 0px 0px');
                 }

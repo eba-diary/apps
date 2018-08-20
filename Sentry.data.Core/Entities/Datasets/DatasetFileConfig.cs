@@ -23,6 +23,7 @@ namespace Sentry.data.Core
 
         public virtual IList<DatasetFile> DatasetFiles { get; set; }
         public virtual IList<RetrieverJob> RetrieverJobs { get; set; }
+        public virtual IList<Schema> Schemas { get; set; }
         public virtual FileExtension FileExtension { get; set; }
 
         public virtual int DataElement_ID { get; set; }

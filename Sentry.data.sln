@@ -29,6 +29,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.data.Goldeneye", "Se
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.data.Bundler", "Sentry.data.Bundler\Sentry.data.Bundler.csproj", "{647FD2CD-F82C-4CA3-BCBA-79CB22C179E3}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SonarQube", "SonarQube", "{62813CDA-3D7A-42AC-8E6D-99F9A603C740}"
+	ProjectSection(SolutionItems) = preProject
+		SonarQube\DATA_Sentry.data_Mainline-NRCSharp.ruleset = SonarQube\DATA_Sentry.data_Mainline-NRCSharp.ruleset
+		SonarQube\SolutionBinding.sqconfig = SonarQube\SolutionBinding.sqconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -48,6 +54,8 @@ Global
 		{C766D10B-0008-4CC8-A0C0-5818E5EE464A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C766D10B-0008-4CC8-A0C0-5818E5EE464A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B07AACE7-C256-4E7F-9007-B8EF19577CBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B07AACE7-C256-4E7F-9007-B8EF19577CBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B07AACE7-C256-4E7F-9007-B8EF19577CBA}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{B07AACE7-C256-4E7F-9007-B8EF19577CBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B07AACE7-C256-4E7F-9007-B8EF19577CBA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B07AACE7-C256-4E7F-9007-B8EF19577CBA}.Release|Any CPU.Deploy.0 = Release|Any CPU

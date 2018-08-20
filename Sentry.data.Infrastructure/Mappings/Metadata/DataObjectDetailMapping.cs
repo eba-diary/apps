@@ -1,4 +1,5 @@
-﻿using NHibernate.Mapping.ByCode.Conformist;
+﻿using NHibernate.Mapping.ByCode;
+using NHibernate.Mapping.ByCode.Conformist;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.Metadata;
 using System;
@@ -13,17 +14,19 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public DataObjectDetailMapping()
         {
-            this.Table("MetadataRepository.dbo.DataObjectDetail");
+            this.Lazy(false);
 
-            this.Id(x => x.DataObjectDetail_ID);
+            this.Table(Sentry.Configuration.Config.GetHostSetting("MetadataRepository") + ".dbo.DataObjectDetail");
 
-            this.ManyToOne(x => x.DataObject, m =>
-            {
-                m.Column("DataObject_ID");
-                m.Class(typeof(DataObject));
-            });
+            this.Id(x => x.DataObjectDetail_ID, m => m.Generator(Generators.Identity));
 
-            this.Property(x => x.DataObject_ID);
+            //this.ManyToOne(x => x.DataObject, m =>
+            //{
+            //    m.Column("DataObject_ID");
+            //    m.Class(typeof(DataObject));
+            //});
+
+            //this.Property(x => x.DataObject_ID);
             this.Property(x => x.DataObjectDetailCreate_DTM);
             this.Property(x => x.DataObjectDetailChange_DTM);
             this.Property(x => x.DataObjectDetailType_CDE);

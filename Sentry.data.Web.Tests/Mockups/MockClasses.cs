@@ -1,4 +1,5 @@
 ﻿using Sentry.data.Core;
+using Sentry.data.Core.Entities.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -382,5 +383,23 @@ namespace Sentry.data.Web.Tests
             return e;
         }
 
+        public static List<Schema> MockSchemas(DatasetFileConfig dfc = null)
+        {
+            Schema schema = new Schema()
+            {
+                Schema_NME = "Mock Schema",
+                Schema_ID = 11000,
+                Schema_DSC = "Mock Schema",
+                Created_DTM = DateTime.Now,
+                DatasetFileConfig = dfc
+            };
+
+            var schemas = new List<Schema>();
+
+            schemas.Add(schema);
+
+            return schemas;
+           
+        }
     }
 }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Sentry.data.Core.Entities.Metadata;
+using Sentry.data.Core.Entities;
 
 namespace Sentry.data.Core
 {
@@ -16,11 +17,15 @@ namespace Sentry.data.Core
         IQueryable<DataSource> DataSources { get; }
         IQueryable<AuthenticationType> AuthTypes { get; }
         IQueryable<EventType> EventTypes { get; }
+        IQueryable<Event> Events { get; }
         IQueryable<Status> EventStatus { get; }
         IQueryable<DataElement> DataElements { get; }
         IQueryable<DataObject> DataObjects { get; }
         IQueryable<FileExtension> FileExtensions { get; }
         IQueryable<Category> Categories { get; }
+        IQueryable<Schema> Schemas { get; }
+        IQueryable<HiveTable> HiveTables { get; }
+        IQueryable<LivyCreation> LivySessions { get; }
 
         /** Datasets **/
 
