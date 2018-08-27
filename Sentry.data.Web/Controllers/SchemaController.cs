@@ -146,8 +146,11 @@ namespace Sentry.data.Web.Controllers
 
                 s.rows = new List<SchemaRow>();
 
-                s.HiveDatabaseName = ht.HiveDatabase_NME;
-                s.HiveTableName = ht.Hive_NME;
+                if (ht != null)
+                {
+                    s.HiveDatabaseName = ht.HiveDatabase_NME;
+                    s.HiveTableName = ht.Hive_NME;
+                }
 
                 if (dataObject.DataObjectDetails.Any(x => x.DataObjectDetailType_CDE == "Row_CNT"))
                 {
