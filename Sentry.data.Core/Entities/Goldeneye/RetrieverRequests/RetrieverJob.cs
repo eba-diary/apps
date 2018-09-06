@@ -16,7 +16,7 @@ namespace Sentry.data.Core
 
         public RetrieverJob()
         {
-
+            IsEnabled = true;
         }
 
         public virtual int Id { get; set; }
@@ -76,6 +76,7 @@ namespace Sentry.data.Core
         public virtual DateTime Created { get; set; }
         public virtual DateTime Modified { get; set; }
         public virtual Boolean IsGeneric { get; set; }
+        public virtual Boolean IsEnabled { get; set; }
 
         //Property is stored within database as string
         public virtual RetrieverJobOptions JobOptions
@@ -110,6 +111,13 @@ namespace Sentry.data.Core
         /// <returns></returns>
         public virtual string GetTargetFileName(string incomingFileName)
         {
+            //Current functionality does not allow renaming of files extracted
+            // from a ZIP file, therefore, pass the incomingFileName back.
+            if (JobOptions.CompressionOptions.IsCompressed && Convert.ToInt32(JobOptions.CompressionOptions.CompressionType) == (int)CompressionTypes.ZIP)
+            {
+                return incomingFileName;
+            }
+
             string outFileName = null;
             // Are we overwritting target file
             if (JobOptions.OverwriteDataFile)
@@ -128,7 +136,14 @@ namespace Sentry.data.Core
                 else if ((!(JobOptions.IsRegexSearch) && !(String.IsNullOrWhiteSpace(JobOptions.TargetFileName))) ||
                         JobOptions.IsRegexSearch && !(String.IsNullOrWhiteSpace(JobOptions.TargetFileName)))
                 {
-                    outFileName = JobOptions.TargetFileName;
+                    if (DataSource.Is<HTTPSSource>())
+                    {
+                        outFileName = JobOptions.TargetFileName;
+                    }
+                    else
+                    {
+                        outFileName = JobOptions.TargetFileName + Path.GetExtension(incomingFileName);
+                    }
                 }
                 // Regex and TargetFileName is null - Use input file name
                 else if (JobOptions.IsRegexSearch && String.IsNullOrWhiteSpace(JobOptions.TargetFileName))
@@ -180,19 +195,19 @@ namespace Sentry.data.Core
 
         public virtual void JobLoggerMessage(string severity, string message, Exception ex = null)
         {
-            switch (severity)
+            switch (severity.ToUpper())
             {
-                case "Debug":
+                case "DEBUG":
                     Sentry.Common.Logging.Logger.Debug($"{message} - Job:{this.Id} | DataSource:{this.DataSource.Name} | DataSourceID:{this.DataSource.Id} | Schema:{this.DatasetConfig.Name} | SchemaID:{this.DatasetConfig.ConfigId} | Dataset:{this.DatasetConfig.ParentDataset.DatasetName} | DatasetID:{this.DatasetConfig.ParentDataset.DatasetId}");
                     break;
-                case "Info":
+                case "INFO":
                     Sentry.Common.Logging.Logger.Info($"{message} - Job:{this.Id} | DataSource:{this.DataSource.Name} | DataSourceID:{this.DataSource.Id} | Schema:{this.DatasetConfig.Name} | SchemaID:{this.DatasetConfig.ConfigId} | Dataset:{this.DatasetConfig.ParentDataset.DatasetName} | DatasetID:{this.DatasetConfig.ParentDataset.DatasetId}");
                     break;
-                case "Warn":
+                case "WARN":
                     if(ex == null){ Sentry.Common.Logging.Logger.Warn($"{message} - Job:{this.Id} | DataSource:{this.DataSource.Name} | DataSourceID:{this.DataSource.Id} | Schema:{this.DatasetConfig.Name} | SchemaID:{this.DatasetConfig.ConfigId} | Dataset:{this.DatasetConfig.ParentDataset.DatasetName} | DatasetID:{this.DatasetConfig.ParentDataset.DatasetId}"); }
                     else{ Sentry.Common.Logging.Logger.Warn($"{message} - Job:{this.Id} | DataSource:{this.DataSource.Name} | DataSourceID:{this.DataSource.Id} | Schema:{this.DatasetConfig.Name} | SchemaID:{this.DatasetConfig.ConfigId} | Dataset:{this.DatasetConfig.ParentDataset.DatasetName} | DatasetID:{this.DatasetConfig.ParentDataset.DatasetId}",ex); }
                     break;
-                case "Error":
+                case "ERROR":
                     if (ex == null){ Sentry.Common.Logging.Logger.Error($"{message} - Job:{this.Id} | DataSource:{this.DataSource.Name} | DataSourceID:{this.DataSource.Id} | Schema:{this.DatasetConfig.Name} | SchemaID:{this.DatasetConfig.ConfigId} | Dataset:{this.DatasetConfig.ParentDataset.DatasetName} | DatasetID:{this.DatasetConfig.ParentDataset.DatasetId}"); }
                     else{ Sentry.Common.Logging.Logger.Error($"{message} - Job:{this.Id} | DataSource:{this.DataSource.Name} | DataSourceID:{this.DataSource.Id} | Schema:{this.DatasetConfig.Name} | SchemaID:{this.DatasetConfig.ConfigId} | Dataset:{this.DatasetConfig.ParentDataset.DatasetName} | DatasetID:{this.DatasetConfig.ParentDataset.DatasetId}", ex); }
                     break;
@@ -225,5 +240,9 @@ namespace Sentry.data.Core
             public const string httpsTargetFileNameBlank = "keyIsBlank";
         }
 
+        public virtual string JobName()
+        {
+            return $"RJob~{this.DatasetConfig.ParentDataset.DatasetId}~{this.Id}~{this.DatasetConfig.ConfigId}~{this.DataSource.Name}";
+        }
     }
 }

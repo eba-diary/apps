@@ -57,6 +57,14 @@ namespace Sentry.data.Core
             {
                 vr.Add(ValidationErrors.expireDateBeforeStartDate, "The Expiration Date must be after the Start Date");
             }
+            if (!Enum.IsDefined(typeof(NotificationSeverity), MessageSeverity))
+            {
+                vr.Add(ValidationErrors.invalidSeverity, "The severity is not valid");
+            }
+            if (ParentDataAsset == null)
+            {
+                vr.Add(ValidationErrors.parentAssetIsNull, "The Asset is required");
+            }
 
             return vr;
         }
@@ -71,6 +79,8 @@ namespace Sentry.data.Core
             public const string messageIsBlank = "messageIsBlank";
             public const string emptyCreateUser = "emptyCreateUser";
             public const string expireDateBeforeStartDate = "expireDateBeforeStartDate";
+            public const string invalidSeverity = "invalidSeverity";
+            public const string parentAssetIsNull = "parentAssetIsNull";
         }
     }
 }

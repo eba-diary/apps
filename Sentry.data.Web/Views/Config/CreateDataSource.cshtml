@@ -266,7 +266,7 @@
                         $('#userPassPanel').hide();
                         $('#authPanel').show();
                         $('#requestHeaderPanel').show();
-                    }                    
+                    }
                 }
                 else if (sourceType == "S3Basic" || sourceType == "DFSCustom") {
 
@@ -317,6 +317,14 @@
                     $("#sourceDescription").text(data);
 
                     setSourceTypeDefaults(val)
+                });
+
+                $.getJSON("@Url.Action("AuthenticationByType", "Config")", {sourceType:val} ,function (data) {
+                    $.each(data, function (index, item) {
+                        subItems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+                    });
+
+                    $("#AuthID").html(subItems);
                 });
             });
 

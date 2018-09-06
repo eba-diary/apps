@@ -5,6 +5,8 @@ using Sentry.data.Core;
 using Sentry.data.Core.Entities.Metadata;
 using Sentry.data.Infrastructure;
 using Sentry.data.Web.Helpers;
+using Sentry.data.Web.Models;
+using Sentry.data.Web.Models.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using Sentry.Common.Logging;
 using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Web.Controllers
@@ -121,7 +124,7 @@ namespace Sentry.data.Web.Controllers
                         //DropPath = dfcm.DropPath,
                         FileTypeId = dfcm.FileTypeId,
                         DataElement_ID = dfcm.DataElement_ID,
-                        IsGeneric = false,
+                        //IsGeneric = false,
                         ParentDataset = parent,
                         FileExtension = _datasetContext.GetById<FileExtension>(dfcm.FileExtensionID),
                         DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dfcm.DatasetScopeTypeID)
@@ -326,7 +329,7 @@ namespace Sentry.data.Web.Controllers
                         CompressionType = cjm.CompressionType,
                         FileNameExclusionList = cjm.NewFileNameExclusionList != null ? cjm.NewFileNameExclusionList.Split('|').Where(x => !String.IsNullOrWhiteSpace(x)).ToList() : new List<string>()
                     };
-                   
+
                     RetrieverJobOptions rjo = new RetrieverJobOptions()
                     {
                         OverwriteDataFile = cjm.OverwriteDataFile,
@@ -337,8 +340,9 @@ namespace Sentry.data.Web.Controllers
                         CompressionOptions = compression
                     };
 
-                    RetrieverJob rj = new RetrieverJob() {
-                        
+                    RetrieverJob rj = new RetrieverJob()
+                    {
+
                         Schedule = cjm.Schedule,
                         TimeZone = "Central Standard Time",
                         RelativeUri = cjm.RelativeUri,
@@ -349,9 +353,9 @@ namespace Sentry.data.Web.Controllers
                         IsGeneric = false,
                         JobOptions = rjo
                     };
-               
+
                     rj.DataSource.CalcRelativeUri(rj);
-                    
+
                     jobList.Add(rj);
                     dfc.RetrieverJobs = jobList;
 
@@ -366,7 +370,7 @@ namespace Sentry.data.Web.Controllers
                 AddCoreValidationExceptionsToModel(ex);
                 _datasetContext.Clear();
             }
-            catch(System.UriFormatException uriEx)
+            catch (System.UriFormatException uriEx)
             {
                 ModelState.AddModelError("RelativeUri", uriEx.Message);
             }
@@ -390,9 +394,9 @@ namespace Sentry.data.Web.Controllers
 
             cjm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic").Where(x => x.Value != "S3Basic").OrderBy(x => x.Value);
 
-            List <SelectListItem> temp2 = new List<SelectListItem>();
+            List<SelectListItem> temp2 = new List<SelectListItem>();
 
-            if(cjm.SelectedSourceType != null && cjm.SelectedDataSource != 0)
+            if (cjm.SelectedSourceType != null && cjm.SelectedDataSource != 0)
             {
                 temp2 = DataSourcesByType(cjm.SelectedSourceType, cjm.SelectedDataSource);
             }
@@ -410,7 +414,7 @@ namespace Sentry.data.Web.Controllers
             cjm.CompressionTypesDropdown = Enum.GetValues(typeof(CompressionTypes)).Cast<CompressionTypes>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
 
-            if(cjm.NewFileNameExclusionList != null)
+            if (cjm.NewFileNameExclusionList != null)
             {
                 cjm.FileNameExclusionList = cjm.NewFileNameExclusionList.Split('|').Where(x => !String.IsNullOrWhiteSpace(x)).ToList();
             }
@@ -466,7 +470,7 @@ namespace Sentry.data.Web.Controllers
                 {
                     DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(ejm.DatasetConfigID);
                     DataSource dataSource = _datasetContext.GetById<DataSource>(ejm.SelectedDataSource);
-                   
+
                     Compression compression = new Compression()
                     {
                         IsCompressed = ejm.IsSourceCompressed,
@@ -487,7 +491,7 @@ namespace Sentry.data.Web.Controllers
                     rj.Schedule = ejm.Schedule;
                     rj.TimeZone = "Central Standard Time";
                     rj.RelativeUri = ejm.RelativeUri;
-                    if(!rj.IsGeneric)
+                    if (!rj.IsGeneric)
                     {
                         rj.DataSource = dataSource;
                     }
@@ -527,7 +531,7 @@ namespace Sentry.data.Web.Controllers
             List<SelectListItem> temp2;
 
 
-            if(retrieverJob.DataSource.SourceType == "DFSBasic")
+            if (retrieverJob.DataSource.SourceType == "DFSBasic")
             {
                 temp = _datasetContext.DataSourceTypes.Where(x => x.DiscrimatorValue == "DFSBasic").Select(v
                    => new SelectListItem
@@ -535,7 +539,7 @@ namespace Sentry.data.Web.Controllers
                        Text = v.Name,
                        Value = v.DiscrimatorValue,
                        Disabled = v.DiscrimatorValue == "DFSBasic" ? true : false
-               }).ToList();
+                   }).ToList();
 
                 temp2 = DataSourcesByType(ejm.SelectedSourceType, ejm.SelectedDataSource).Where(x => x.Text == retrieverJob.DataSource.Name).ToList();
             }
@@ -594,7 +598,7 @@ namespace Sentry.data.Web.Controllers
                 Disabled = true
             });
 
-            
+
 
             foreach (string s in schedules)
             {
@@ -622,7 +626,7 @@ namespace Sentry.data.Web.Controllers
 
             List<string> a = new List<string>();
 
-            
+
 
             if (ejm.NewFileNameExclusionList != null)
             {
@@ -654,7 +658,7 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
         public ActionResult CreateSource()
         {
-            CreateSourceModel csm = new CreateSourceModel();            
+            CreateSourceModel csm = new CreateSourceModel();
 
             csm = CreateSourceDropDown(csm);
 
@@ -713,8 +717,8 @@ namespace Sentry.data.Web.Controllers
                         }
                         if (!(csm.BaseUri.ToString().StartsWith("sftp://")))
                         {
-                            AddCoreValidationExceptionsToModel(new ValidationException("BaseUri","A valid SFTP URI starts with sftp:// (i.e. sftp://foo.bar.com//base/dir/)"));
-                        }                        
+                            AddCoreValidationExceptionsToModel(new ValidationException("BaseUri", "A valid SFTP URI starts with sftp:// (i.e. sftp://foo.bar.com//base/dir/)"));
+                        }
                         break;
                     case "HTTPS":
                         source = new HTTPSSource();
@@ -732,10 +736,10 @@ namespace Sentry.data.Web.Controllers
                         }
 
                         //if token authentication, user must enter values for token header and value
-                        if (auth.Is<TokenAuthentication>())                            
+                        if (auth.Is<TokenAuthentication>())
                         {
-                            
-                            if(String.IsNullOrWhiteSpace(csm.TokenAuthHeader))
+
+                            if (String.IsNullOrWhiteSpace(csm.TokenAuthHeader))
                             {
                                 AddCoreValidationExceptionsToModel(new ValidationException("TokenAuthHeader", "Token Authenticaion requires a token header"));
                                 valid = false;
@@ -746,17 +750,17 @@ namespace Sentry.data.Web.Controllers
                                 AddCoreValidationExceptionsToModel(new ValidationException("TokenAuthValue", "Token Authentication requires a token header value"));
                                 valid = false;
                             }
-                            
+
                             if (valid)
                             {
                                 ((HTTPSSource)source).AuthenticationHeaderName = csm.TokenAuthHeader;
 
                                 EncryptionService encryptService = new EncryptionService();
-                                Tuple<string,string> eresp = encryptService.EncryptString(csm.TokenAuthValue, Configuration.Config.GetHostSetting("EncryptionServiceKey"));
+                                Tuple<string, string> eresp = encryptService.EncryptString(csm.TokenAuthValue, Configuration.Config.GetHostSetting("EncryptionServiceKey"));
 
                                 ((HTTPSSource)source).AuthenticationTokenValue = eresp.Item1;
                                 ((HTTPSSource)source).IVKey = eresp.Item2;
-                            }                            
+                            }
                         }
 
                         foreach (RequestHeader h in csm.Headers)
@@ -772,7 +776,7 @@ namespace Sentry.data.Web.Controllers
                         //Process only if validations pass and headers exist
                         if (valid && csm.Headers.Any())
                         {
-                            
+
 
                             ((HTTPSSource)source).RequestHeaders = csm.Headers;
                         }
@@ -784,7 +788,7 @@ namespace Sentry.data.Web.Controllers
 
                 if (ModelState.IsValid)
                 {
-                    
+
                     source.Name = csm.Name;
                     source.Description = csm.Description;
                     source.SourceAuthType = auth;
@@ -795,7 +799,7 @@ namespace Sentry.data.Web.Controllers
                     _datasetContext.Add(source);
                     _datasetContext.SaveChanges();
 
-                    if(!String.IsNullOrWhiteSpace(csm.ReturnUrl))
+                    if (!String.IsNullOrWhiteSpace(csm.ReturnUrl))
                     {
                         return Redirect(csm.ReturnUrl);
                     }
@@ -821,6 +825,16 @@ namespace Sentry.data.Web.Controllers
             return PartialView("_Headers");
         }
 
+        public ActionResult FieldEntryRow()
+        {
+            return PartialView("_Fields", new FieldRowModel());
+        }
+
+        public ActionResult ExtensionEntryRow()
+        {
+            return PartialView("_ExtensionMapping");
+        }
+
         private CreateSourceModel CreateSourceDropDown(CreateSourceModel csm)
         {
             var temp = _datasetContext.DataSourceTypes.Select(v
@@ -836,19 +850,35 @@ namespace Sentry.data.Web.Controllers
 
             csm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic").OrderBy(x => x.Value);
 
-            var temp2 = _datasetContext.AuthTypes.Select(v
+            if (csm.SourceType == null)
+            {
+                var temp2 = _datasetContext.AuthTypes.Select(v
              => new SelectListItem { Text = v.AuthName, Value = v.AuthID.ToString() }).ToList();
 
-            temp2.Add(new SelectListItem()
+                temp2.Add(new SelectListItem()
+                {
+                    Text = "Pick a Authentication Type",
+                    Value = "0",
+                    Selected = true,
+                    Disabled = true
+                });
+
+                csm.AuthTypesDropdown = temp2.OrderBy(x => x.Value);
+            }
+            else
             {
-                Text = "Pick a Authentication Type",
-                Value = "0",
-                Selected = true,
-                Disabled = true
-            });
+                int intvalue;
+                var temp2 = AuthenticationTypesByType(csm.SourceType, Int32.TryParse(csm.AuthID, out intvalue) ? (int?)intvalue : null);
+                temp2.Add(new SelectListItem()
+                {
+                    Text = "Pick a Authentication Type",
+                    Value = "0",
+                    Selected = false,
+                    Disabled = true
+                });
 
-            csm.AuthTypesDropdown = temp2.OrderBy(x => x.Value);
-
+                csm.AuthTypesDropdown = temp2.OrderBy(x => x.Value);                
+            }
             return csm;
         }
 
@@ -979,7 +1009,7 @@ namespace Sentry.data.Web.Controllers
                     {
                         AddCoreValidationExceptionsToModel(ex);
                         _datasetContext.Clear();
-                    }                                       
+                    }
                 }
 
                 esm = EditSourceDropDown(esm);
@@ -997,6 +1027,68 @@ namespace Sentry.data.Web.Controllers
 
         }
 
+        [HttpGet]
+        [Route("Config/Extension/Create")]
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        public ActionResult CreateExtensionMapping()
+        {
+            CreateExtensionMapModel cem = new CreateExtensionMapModel();
+            cem.ExtensionMappings = _datasetContext.MediaTypeExtensions.ToList();
+
+            return View("CreateExtensionMapping", cem);
+        }
+
+        [HttpPost]
+        [Route("Config/Extension/Create")]
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        public ActionResult CreateExtensionMapping(CreateExtensionMapModel cem)
+        {
+            int changeCnt = 0;
+            try
+            {
+                List<MediaTypeExtension> currentExtensions = _datasetContext.MediaTypeExtensions.ToList();
+
+                foreach (MediaTypeExtension extension in cem.ExtensionMappings)
+                {
+                    if (!currentExtensions.Any(x => x.Key == extension.Key && x.Value == extension.Value))
+                    {
+                        _datasetContext.Merge(extension);
+                        Logger.Info($"Adding Extension Mapping - Key:{extension.Key} Value:{extension.Value} Requestor:{SharedContext.CurrentUser.AssociateId}");
+                        changeCnt++;
+                    }
+                }
+
+                List<MediaTypeExtension> deleteList = currentExtensions.Except(cem.ExtensionMappings, new MediaTypeExtension()).ToList();
+
+                foreach (MediaTypeExtension extension in deleteList)
+                {
+                    _datasetContext.RemoveById<MediaTypeExtension>(extension.Id);
+                    
+                    Logger.Info($"Deleting Extension Mapping - Key:{extension.Key} Value:{extension.Value} Requestor:{SharedContext.CurrentUser.AssociateId}");
+                    changeCnt++;
+                }                
+
+                if(changeCnt > 0)
+                {
+                    _datasetContext.SaveChanges();
+                }                
+            }
+            catch (Exception ex)
+            {
+                Configuration.Logging.Logger.Logger.Error("Failed to save extension changes", ex);
+                return Json(new { Success = false, Message = "Failed to save changes! Contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a> if problem persists." });
+            }
+
+            if (changeCnt == 0)
+            {
+                return Json(new { Success = true, Message = "No changes detected" });
+            }
+            else
+            {
+                return Json(new { Success = true, Message = $"Successfully saved {changeCnt} changes" });
+            }            
+        }
+
         private EditSourceModel EditSourceDropDown(EditSourceModel esm)
         {
             var temp = _datasetContext.DataSourceTypes.Select(v
@@ -1005,14 +1097,11 @@ namespace Sentry.data.Web.Controllers
             //set selected for current value
             temp.ForEach(x => x.Selected = esm.SourceType.Equals(x.Value));
 
-
             esm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic").OrderBy(x => x.Value);
 
-            var temp2 = _datasetContext.AuthTypes.Select(v
-             => new SelectListItem { Text = v.AuthName, Value = v.AuthID.ToString() }).ToList();
-
-            temp2.ForEach(x => x.Selected = esm.AuthID.ToString().Equals(x.Value));
-
+            int intvalue;
+            var temp2 = AuthenticationTypesByType(esm.SourceType, Int32.TryParse(esm.AuthID, out intvalue) ? (int?)intvalue : null);
+            
             esm.AuthTypesDropdown = temp2.OrderBy(x => x.Value);
 
             return esm;
@@ -1023,6 +1112,78 @@ namespace Sentry.data.Web.Controllers
         public JsonResult SourcesByType(string sourceType)
         {
             return Json(DataSourcesByType(sourceType, null), JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult AuthenticationByType(string sourceType)
+        {
+            return Json(AuthenticationTypesByType(sourceType, null), JsonRequestBehavior.AllowGet);
+        }
+
+
+        private List<SelectListItem> AuthenticationTypesByType(string sourceType, int? selectedId)
+        {
+            List<SelectListItem> output = new List<SelectListItem>();
+
+            switch (sourceType)
+            {
+                case "FTP":
+                    FtpSource ftp = new FtpSource();
+                    foreach(AuthenticationType authtype in ftp.ValidAuthTypes)
+                    {
+                        output.Add(GetAuthSelectedListItem(authtype, selectedId));
+                    }
+                    break;
+                case "SFTP":
+                    SFtpSource sftp = new SFtpSource();
+                    foreach (AuthenticationType authtype in sftp.ValidAuthTypes)
+                    {
+                        output.Add(GetAuthSelectedListItem(authtype, selectedId));
+                    }
+                    break;
+                case "DFSCustom":
+                    DfsCustom dfscust = new DfsCustom();
+                    foreach (AuthenticationType authtype in dfscust.ValidAuthTypes)
+                    {
+                        output.Add(GetAuthSelectedListItem(authtype, selectedId));
+                    }
+                    break;
+                case "HTTPS":
+                    HTTPSSource https = new HTTPSSource();
+                    foreach (AuthenticationType authtype in https.ValidAuthTypes)
+                    {
+                        output.Add(GetAuthSelectedListItem(authtype, selectedId));
+                    }
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+
+            return output;
+
+        }
+
+        private SelectListItem GetAuthSelectedListItem(AuthenticationType authtype, int? selectedId)
+        {
+            if (authtype.Is<BasicAuthentication>())
+            {
+                AuthenticationType auth = _datasetContext.AuthTypes.Where(w => w is BasicAuthentication).First();
+                return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID ? true : false };
+            }
+            else if (authtype.Is<AnonymousAuthentication>())
+            {
+                AuthenticationType auth = _datasetContext.AuthTypes.Where(w => w is AnonymousAuthentication).First();
+                return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID ? true : false };
+            }
+            else if (authtype.Is<TokenAuthentication>())
+            {
+                AuthenticationType auth = _datasetContext.AuthTypes.Where(w => w is TokenAuthentication).First();
+                return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID ? true : false };
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
 
         private List<SelectListItem> DataSourcesByType(string sourceType, int? selectedId)
@@ -1037,7 +1198,7 @@ namespace Sentry.data.Web.Controllers
                     output = fTpList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
                     break;
-                case "SFTP":                                        
+                case "SFTP":
                     List<DataSource> sfTpList = _datasetContext.DataSources.Where(x => x is SFtpSource).ToList();
                     output = sfTpList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
@@ -1073,13 +1234,13 @@ namespace Sentry.data.Web.Controllers
         public JsonResult SourceTypeDescription(string sourceType)
         {
             var temp = _datasetContext.DataSourceTypes.Where(x => x.DiscrimatorValue == sourceType).Select(x => x.Description).FirstOrDefault();
-           
+
             return Json(temp, JsonRequestBehavior.AllowGet);
         }
 
         public JsonResult DataSourceDescription(int sourceId)
         {
-            var temp = _datasetContext.DataSources.Where(x => x.Id == sourceId).Select(x => new { Description = x.Description, BaseUri = x.BaseUri}).FirstOrDefault();
+            var temp = _datasetContext.DataSources.Where(x => x.Id == sourceId).Select(x => new { Description = x.Description, BaseUri = x.BaseUri }).FirstOrDefault();
 
             return Json(temp, JsonRequestBehavior.AllowGet);
         }
@@ -1118,6 +1279,405 @@ namespace Sentry.data.Web.Controllers
                         break;
                 }
             }
+        }
+
+
+        [HttpGet]
+        [Route("Config/{configId}/Schema/{schemaId}/Fields")]
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        public ActionResult Fields(int configId, int schemaId)
+        {
+            DatasetFileConfig config = _datasetContext.GetById<DatasetFileConfig>(configId);
+
+            BaseDatasetModel bdm = new BaseDatasetModel(config.ParentDataset, _associateInfoProvider, _datasetContext);
+            bdm.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
+            bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
+            bdm.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
+            bdm.CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
+            bdm.CanUpload = SharedContext.CurrentUser.CanUpload;
+
+            Event e = new Event();
+            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.DataConfig = config.ConfigId;
+            e.Dataset = config.ParentDataset.DatasetId;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            e.Reason = "Viewed Edit Fields";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+
+            ViewBag.Schema = _datasetContext.GetById<Schema>(schemaId);
+
+            return View(bdm);
+        }
+
+        [HttpPost]
+        [Route("Config/{configId}/Schema/{schemaId}/UpdateFields")]
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        public JsonResult UpdateFields(int configId, int schemaId, List<SchemaRow> schemaRows)
+        {
+            DatasetFileConfig config = _datasetContext.GetById<DatasetFileConfig>(configId);
+            Schema schema = _datasetContext.GetById<Schema>(schemaId);
+
+            foreach (SchemaRow sr in schemaRows)
+            {
+                DataObjectField dof = null;
+
+                //Update Row
+                if (sr.DataObjectField_ID != 0)
+                {
+                    dof = _datasetContext.GetById<DataObjectField>(sr.DataObjectField_ID);
+                    dof.DataObjectField_NME = sr.Name;
+                    dof.DataObjectField_DSC = sr.Description;
+                    dof.LastUpdt_DTM = DateTime.Now;
+                    dof.DataObjectFieldChange_DTM = DateTime.Now;
+                }
+                //Add New Row
+                else
+                {
+                    dof = new DataObjectField();
+                    dof.DataObject_ID = _datasetContext.GetById<DataObject>(schema.DataObject_ID).DataObject_ID;
+
+                    dof.DataObjectFieldCreate_DTM = DateTime.Now;
+                    dof.DataObjectField_NME = sr.Name;
+                    dof.DataObjectField_DSC = sr.Description;
+                    dof.LastUpdt_DTM = DateTime.Now;
+                    dof.DataObjectFieldChange_DTM = DateTime.Now;
+
+                    dof.DataObjectFieldDetails = new List<DataObjectFieldDetail>();
+                }
+
+                dof = _datasetContext.Merge<DataObjectField>(dof);
+                _datasetContext.SaveChanges();
+
+                if (dof.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Datatype_TYP"))
+                {
+                    var temp = dof.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Datatype_TYP");
+
+                    if (sr.Type != "ARRAY")
+                    {
+                        temp.DataObjectFieldDetailType_VAL = sr.Type;
+                    }
+                    else
+                    {
+                        temp.DataObjectFieldDetailType_VAL = sr.Type + "<" + sr.ArrayType + ">";
+                    }
+
+                    temp.DataObjectFieldDetailChange_DTM = DateTime.Now;
+
+                    _datasetContext.Merge<DataObjectFieldDetail>(temp);
+                    _datasetContext.SaveChanges();
+                }
+                else
+                {
+                    DataObjectFieldDetail dofd = new DataObjectFieldDetail()
+                    {
+                        DataObjectField = dof,
+                        DataObjectField_ID = dof.DataObjectField_ID,
+                        DataObjectFieldDetailCreate_DTM = DateTime.Now,
+                        DataObjectFieldDetailChange_DTM = DateTime.Now,
+                        LastUpdt_DTM = DateTime.Now,
+                        DataObjectFieldDetailType_CDE = "Datatype_TYP"
+
+                    };
+
+                    if (sr.Type != "ARRAY")
+                    {
+                        dofd.DataObjectFieldDetailType_VAL = sr.Type;
+                    }
+                    else
+                    {
+                        dofd.DataObjectFieldDetailType_VAL = sr.Type + "<" + sr.ArrayType + ">";
+                    }
+
+                    _datasetContext.Merge<DataObjectFieldDetail>(dofd);
+                    _datasetContext.SaveChanges();
+                }
+
+                if (dof.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Nullable_IND"))
+                {
+                    var temp = dof.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Nullable_IND");
+
+                    temp.LastUpdt_DTM = DateTime.Now;
+                    temp.DataObjectFieldDetailType_VAL = sr.Nullable == true ? "Y" : "N";
+                    temp.DataObjectFieldDetailChange_DTM = DateTime.Now;
+
+                    _datasetContext.Merge<DataObjectFieldDetail>(temp);
+                    _datasetContext.SaveChanges();
+                }
+                else
+                {
+                    DataObjectFieldDetail dofd = new DataObjectFieldDetail()
+                    {
+                        DataObjectField = dof,
+                        DataObjectField_ID = dof.DataObjectField_ID,
+                        DataObjectFieldDetailCreate_DTM = DateTime.Now,
+                        DataObjectFieldDetailChange_DTM = DateTime.Now,
+                        DataObjectFieldDetailType_CDE = "Nullable_IND",
+                        LastUpdt_DTM = DateTime.Now
+
+                    };
+
+                    dofd.DataObjectFieldDetailType_VAL = sr.Nullable == true ? "Y" : "N";
+
+                    _datasetContext.Merge<DataObjectFieldDetail>(dofd);
+                    _datasetContext.SaveChanges();
+                }
+
+                if (dof.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Precision_AMT"))
+                {
+                    var temp = dof.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Precision_AMT");
+
+                    if (sr.Type == "DECIMAL")
+                    {
+                        temp.LastUpdt_DTM = DateTime.Now;
+                        temp.DataObjectFieldDetailType_VAL = sr.Precision;
+                        temp.DataObjectFieldDetailChange_DTM = DateTime.Now;
+
+                        _datasetContext.Merge<DataObjectFieldDetail>(temp);
+                    }
+                    else
+                    {
+                        dof.DataObjectFieldDetails.Remove(temp);
+
+                        //_datasetContext.Remove<DataObjectFieldDetail>(temp);
+                    }
+                    _datasetContext.SaveChanges();
+                }
+                else
+                {
+                    if (sr.Type == "DECIMAL")
+                    {
+                        DataObjectFieldDetail dofd = new DataObjectFieldDetail()
+                        {
+                            DataObjectField = dof,
+                            DataObjectField_ID = dof.DataObjectField_ID,
+                            DataObjectFieldDetailCreate_DTM = DateTime.Now,
+                            DataObjectFieldDetailChange_DTM = DateTime.Now,
+                            LastUpdt_DTM = DateTime.Now,
+                            DataObjectFieldDetailType_CDE = "Precision_AMT"
+                        };
+
+                        dofd.DataObjectFieldDetailType_VAL = sr.Precision;
+
+                        _datasetContext.Merge<DataObjectFieldDetail>(dofd);
+                        _datasetContext.SaveChanges();
+                    }
+                }
+
+
+                if (dof.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Scale_AMT"))
+                {
+                    var temp = dof.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Scale_AMT");
+
+                    if (sr.Type == "DECIMAL")
+                    {
+                        temp.LastUpdt_DTM = DateTime.Now;
+                        temp.DataObjectFieldDetailType_VAL = sr.Scale;
+                        temp.DataObjectFieldDetailChange_DTM = DateTime.Now;
+
+                        _datasetContext.Merge<DataObjectFieldDetail>(temp);
+                    }
+                    else
+                    {
+                        dof.DataObjectFieldDetails.Remove(temp);
+                        //_datasetContext.Remove<DataObjectFieldDetail>(temp);
+                    }
+
+                    _datasetContext.SaveChanges();
+                }
+                else
+                {
+                    if (sr.Type == "DECIMAL")
+                    {
+                        DataObjectFieldDetail dofd = new DataObjectFieldDetail()
+                        {
+                            DataObjectField = dof,
+                            DataObjectField_ID = dof.DataObjectField_ID,
+                            DataObjectFieldDetailCreate_DTM = DateTime.Now,
+                            DataObjectFieldDetailChange_DTM = DateTime.Now,
+                            DataObjectFieldDetailType_CDE = "Scale_AMT",
+                            LastUpdt_DTM = DateTime.Now
+
+                        };
+
+                        dofd.DataObjectFieldDetailType_VAL = sr.Scale;
+
+
+
+                        _datasetContext.Merge<DataObjectFieldDetail>(dofd);
+                        _datasetContext.SaveChanges();
+                    }
+                }
+            }
+
+
+
+            Event e = new Event();
+            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.DataConfig = config.ConfigId;
+            e.Dataset = config.ParentDataset.DatasetId;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            e.Reason = "Viewed Edit Fields";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+
+
+            return Json("Success", JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        [Route("Config/{configId}/Schema/Create")]
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        public ActionResult CreateSchema(int configId)
+        {
+            //Schema schema = _datasetContext.GetById<Schema>(schemaId);
+
+            DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configId);
+
+            CreateSchemaModel createSchemaModel = new CreateSchemaModel()
+            {
+                DatasetId = dfc.ParentDataset.DatasetId
+            };
+
+            Event e = new Event();
+            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            e.Reason = "Viewed Retrieval Edit Page";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+
+            return View(createSchemaModel);
+        }
+
+        [HttpPost]
+        [Route("Config/{configId}/Schema/Create")]
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        public ActionResult CreateSchema(int configId, CreateSchemaModel csm)
+        {
+            DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configId);
+
+            try
+            {
+                if(dfc.Schemas.Any(x => x.IsPrimary) && csm.IsPrimary)
+                {
+                }
+
+
+
+                if (ModelState.IsValid)
+                {
+                    Schema schema = new Schema() {
+                        Schema_NME = csm.Name,
+                        Schema_DSC = csm.Description,
+                        IsForceMatch = csm.IsForceMatch,
+                        IsPrimary = dfc.Schemas.Any(x => x.IsPrimary) == false ? true : csm.IsPrimary,
+                        DatasetFileConfig = dfc,
+                        Changed_DTM =DateTime.Now,
+                        Created_DTM = DateTime.Now,
+                        DataObject_ID = csm.DataObject_ID
+                    };
+
+                    _datasetContext.Merge<Schema>(schema);
+                    _datasetContext.SaveChanges();
+
+                    return RedirectToAction("Index", new { id = csm.DatasetId });
+                }
+            }
+            catch (Sentry.Core.ValidationException ex)
+            {
+                AddCoreValidationExceptionsToModel(ex);
+                _datasetContext.Clear();
+            }
+            catch (System.ArgumentNullException ex)
+            {
+                ModelState.AddModelError("RelativeUri", ex.Message);
+            }
+            catch (System.UriFormatException ex)
+            {
+                ModelState.AddModelError("RelativeUri", ex.Message);
+            }
+
+            return View(csm);
+        }
+
+        [HttpGet]
+        [Route("Config/{configId}/Schema/{schemaId}/Edit")]
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        public ActionResult EditSchema(int configId, int schemaId)
+        {
+            Schema schema = _datasetContext.GetById<Schema>(schemaId);
+
+            EditSchemaModel editSchemaModel = new EditSchemaModel()
+            {
+                Name = schema.Schema_NME,
+                Description = schema.Schema_DSC,
+                IsForceMatch = schema.IsForceMatch,
+                IsPrimary = schema.IsPrimary,
+                DatasetId = schema.DatasetFileConfig.ParentDataset.DatasetId,
+                DataObject_ID = schema.DataObject_ID 
+            };
+
+            Event e = new Event();
+            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            e.Reason = "Viewed Retrieval Edit Page";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+
+            return View(editSchemaModel);
+        }
+
+        [HttpPost]
+        [Route("Config/{configId}/Schema/{schemaId}/Edit")]
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        public ActionResult EditSchema(int configId, int schemaId, EditSchemaModel esm)
+        {
+            Schema schema = _datasetContext.GetById<Schema>(schemaId);
+
+            try
+            {
+                if (ModelState.IsValid)
+                {
+                    schema.Schema_NME = esm.Name;
+                    schema.Schema_DSC = esm.Description;
+                    schema.IsForceMatch = esm.IsForceMatch;
+                    schema.IsPrimary = esm.IsPrimary;
+                    schema.Changed_DTM = DateTime.Now;
+                    schema.DataObject_ID = esm.DataObject_ID;
+
+                    _datasetContext.Merge<Schema>(schema);
+                    _datasetContext.SaveChanges();
+
+                    return RedirectToAction("Index", new { id = esm.DatasetId });
+                }
+            }
+            catch (Sentry.Core.ValidationException ex)
+            {
+                AddCoreValidationExceptionsToModel(ex);
+                _datasetContext.Clear();
+            }
+            catch (System.ArgumentNullException ex)
+            {
+                ModelState.AddModelError("RelativeUri", ex.Message);
+            }
+            catch (System.UriFormatException ex)
+            {
+                ModelState.AddModelError("RelativeUri", ex.Message);
+            }
+
+            return View(esm);
         }
     }
 }

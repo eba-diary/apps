@@ -12,13 +12,13 @@ namespace Sentry.data.Infrastructure
 {
     public class HTTPSProvider
     {
-        private WebRequest _request;
+        private HttpWebRequest _request;
         private Uri _uri;
         
         public HTTPSProvider(RetrieverJob job, List<KeyValuePair<string,string>> headers)
         {
             _uri = job.GetUri();
-            _request = WebRequest.Create(_uri);
+            _request = (HttpWebRequest)WebRequest.Create(_uri);
             _request.Method = "GET";
             _request.Proxy = new WebProxy(Configuration.Config.GetHostSetting("SentryWebProxyHost"))
             {
@@ -30,12 +30,26 @@ namespace Sentry.data.Infrastructure
                 EncryptionService encryptService = new EncryptionService();
                 _request.Headers.Add(((HTTPSSource)job.DataSource).AuthenticationHeaderName, encryptService.DecryptString(((HTTPSSource)job.DataSource).AuthenticationTokenValue, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)job.DataSource).IVKey));
             }
+            
+            //Add datasource specific headers to request
+            List<RequestHeader> headerList = ((HTTPSSource)job.DataSource).RequestHeaders;
 
-            if (headers != null)
+            if (headerList != null)
             {
-                foreach (KeyValuePair<string, string> header in headers)
-                {                    
-                    _request.Headers.Add(header.Key, header.Value);
+                foreach (RequestHeader header in headerList)
+                {
+                    switch (header.Key.ToUpper())
+                    {
+                        case "ACCEPT":
+                            _request.Accept = header.Value;
+                            break;
+                        case "EXPECT":
+                            _request.Expect = header.Value;
+                            break;
+                        default:
+                            _request.Headers.Add(header.Key, header.Value);
+                            break;
+                    }
                 }
             }            
         }

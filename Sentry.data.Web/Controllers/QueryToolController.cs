@@ -70,7 +70,7 @@ namespace Sentry.data.Web.Controllers
                     HeartbeatTimeoutInSecond = 86400
                 };
 
-                IHttpActionResult creationResponse = await (CreateSession(lc.Kind, lc));
+                IHttpActionResult creationResponse = await (CreateInternalSession(lc.Kind, lc));
 
                 if (creationResponse.GetType() == typeof(OkNegotiatedContentResult<String>))
                 {
@@ -130,7 +130,7 @@ namespace Sentry.data.Web.Controllers
                     HeartbeatTimeoutInSecond = 86400
                 };
 
-                IHttpActionResult creationResponse = await (CreateSession(lc.Kind, lc));
+                IHttpActionResult creationResponse = await (CreateInternalSession(lc.Kind, lc));
 
                 if (creationResponse.GetType() == typeof(OkNegotiatedContentResult<String>))
                 {
@@ -161,13 +161,66 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-
-
-
         [HttpPost]
         [Route("Create")]
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
-        public async Task<IHttpActionResult> CreateSession(string Language, LivyCreation lc = null)
+        public async Task<IHttpActionResult> CreateSession(string Language)
+        {
+            using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
+            using (var client = new HttpClient(handler))
+            {
+                string json;
+                switch (Language)
+                {
+                    default:
+                    case "Python":
+                        json = "{\"kind\": \"pyspark\"";
+                        break;
+                    case "Scala":
+                        json = "{\"kind\": \"spark\"";
+                        break;
+                    case "R":
+                        json = "{\"kind\": \"rspark\"";
+                        break;
+                }
+
+                json += ", \"name\": \"DSC_" + _userService.GetCurrentUser().AssociateId + "\"";
+                
+
+
+                json += ", \"conf\": { \"spark.hadoop.fs.s3a.security.credntial.provider.path\" : \"" + Config.GetHostSetting("SparkS3AKeyLocation") + "\"}";
+                json += "}";
+
+
+                HttpContent contentPost = new StringContent(json, Encoding.UTF8, "application/json");
+
+                client.DefaultRequestHeaders.Accept.Clear();
+
+                client.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));//ACCEPT header
+
+                HttpResponseMessage response = await client.PostAsync(_livyUrl + "/sessions", contentPost);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return Ok(response.Content.ReadAsStringAsync().Result);
+                }
+                else if (response.StatusCode == HttpStatusCode.BadRequest)
+                {
+                    return BadRequest();
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+        }
+
+
+        [HttpPost]
+        //[Route("Create")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        public async Task<IHttpActionResult> CreateInternalSession(string Language = "", LivyCreation lc = null)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
             using (var client = new HttpClient(handler))
@@ -521,7 +574,6 @@ namespace Sentry.data.Web.Controllers
                     qd.extensions = ds.DatasetFiles.Where(x => x.DatasetFileConfig.ConfigId == item.ConfigId).Select(x => Utilities.GetFileExtension(x.FileName)).Distinct().ToList();
                     qd.description = item.Description;                   
 
-                    qd.IsGeneric = item.IsGeneric;
                     qd.IsPowerUser = _userService.GetCurrentUser().CanQueryToolPowerUser;
 
                     reply.Add(qd);

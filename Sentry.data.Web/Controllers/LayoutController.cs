@@ -36,6 +36,7 @@ namespace Sentry.data.Web.Controllers
             headerModel.CanUpload = SharedContext.CurrentUser.CanUpload;
             headerModel.CanQueryTool = SharedContext.CurrentUser.CanQueryTool;
             headerModel.CanQueryToolPowerUser = SharedContext.CurrentUser.CanQueryToolPowerUser;
+            headerModel.AdminUser = SharedContext.CurrentUser.AdminUser;
 
             if (SharedContext.CurrentUser.GetType() == typeof(ImpersonatedApplicationUser))
             {

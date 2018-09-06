@@ -136,7 +136,6 @@ namespace Sentry.data.Web.Controllers
                         //IsRegexSearch = cdm.IsRegexSearch,
                         //OverwriteDatafile = true,
                         FileTypeId = (int)FileType.DataFile,
-                        IsGeneric = true,
                         ParentDataset = ds,
                         DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(cdm.DatasetScopeTypeID),
                         FileExtension = _datasetContext.GetById<FileExtension>(cdm.FileExtensionID)
@@ -610,7 +609,9 @@ namespace Sentry.data.Web.Controllers
             Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
             Boolean CanEdit = SharedContext.CurrentUser.CanEditDataset;
 
-            foreach (DatasetFile df in _datasetContext.GetDatasetFilesForDataset(Id, x => x.IsBundled).ToList())
+            List<DatasetFile> bundledList = _datasetContext.GetDatasetFilesForDatasetFileConfig(Id, w => w.IsBundled).ToList();
+
+            foreach (DatasetFile df in bundledList)
             {
                 DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider);
                 dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
@@ -1335,8 +1336,9 @@ namespace Sentry.data.Web.Controllers
             return PartialView("_UploadDataFile", cd);
         }
 
-#endregion
+        #endregion
 
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
         [HttpPost]
         public ActionResult RunRetrieverJob(int id)
         {
@@ -1351,6 +1353,44 @@ namespace Sentry.data.Web.Controllers
             }
 
             return Json(new { Success = true, Message = "Job successfully queued." });
+        }
+
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [HttpPost]
+        public ActionResult DisableRetrieverJob(int id)
+        {
+            try
+            {
+                RetrieverJobService jobservice = new RetrieverJobService();
+
+                jobservice.DisableJob(id);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error disabling retriever job ({id}).", ex);
+                return Json(new { Success = false, Message = "Failed disabling job.  If problem persists, please contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a>." });
+            }
+
+            return Json(new { Success = true, Message = "Job has been marked as disabled and will be removed from the job scheduler." });
+        }
+
+        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [HttpPost]
+        public ActionResult EnableRetrieverJob(int id)
+        {
+            try
+            {
+                RetrieverJobService jobservice = new RetrieverJobService();
+
+                jobservice.EnableJob(id);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Error enabling retriever job ({id}).", ex);
+                return Json(new { Success = false, Message = "Failed enabling job.  If problem persists, please contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a>." });
+            }
+
+            return Json(new { Success = true, Message = "Job has been marked as enabled and will be added to the job scheduler." });
         }
 
         [AuthorizeByPermission(PermissionNames.DatasetView)]

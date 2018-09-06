@@ -268,112 +268,99 @@ namespace Sentry.data.Common
                     targetFileName = response.TargetFileName;
                     uplduser = response.RequestInitiatorId;
 
-                    if (job.JobOptions.OverwriteDataFile)
+                    //This will always overwrite an existing data file.
+
+                    Logger.Debug("ProcessFile: Data File Config OverwriteDatafile=true");
+                    // RegexSearch requires passing targetFileName to esnure we get the correct related data file.
+
+                    df_id = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.ConfigId, isBundled, targetFileName);
+                    
+                    //If datafiles exist for this DatasetFileConfig
+                    if (df_id != 0)
                     {
-                        Logger.Debug("ProcessFile: Data File Config OverwriteDatafile=true");
-                        // RegexSearch requires passing targetFileName to esnure we get the correct related data file.
-
-                        if (job.JobOptions.IsRegexSearch)
-                        {
-                            df_id = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.ConfigId, isBundled, targetFileName);
-                        }
-                        else
-                        {
-                            df_id = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.ConfigId, isBundled);
-                        }   
-
-                        //If datafiles exist for this DatasetFileConfig
-                        if (df_id != 0)
-                        {
-                            df_Orig = _dscontext.GetDatasetFile(df_id);
-                            df_newParent = CreateParentDatasetFile(ds, dfc, uplduser, targetFileName, df_Orig, isBundled);
-                        }
-                        //If there are no datafiles for this DatasetFileConfig
-                        else
-                        {
-                            df_newParent = CreateParentDatasetFile(ds, dfc, uplduser, targetFileName, null, isBundled);
-                        }
-                                        
-                        df_newParent.IsBundled = true;
-                        df_newParent.UploadUserName = response.RequestInitiatorId;
-                        df_newParent.VersionId = response.TargetVersionId;
-                        df_newParent.FileLocation = response.TargetKey;
-                    
-
-                        //Register new Parent DatasetFile
-                        try
-                        {
-                            //Write dataset to database
-                            _dscontext.Merge(df_newParent);
-                            _dscontext.SaveChanges();
-                        }
-                        catch (Exception ex)
-                        {
-
-                            StringBuilder builder = new StringBuilder();
-                            builder.Append("Failed to record new Parent DatasetFile to Dataset Management.");
-                            builder.Append($"File_NME: {df_newParent.FileName}");
-                            builder.Append($"Dataset_ID: {df_newParent.Dataset.DatasetId}");
-                            builder.Append($"UploadUser_NME: {df_newParent.UploadUserName}");
-                            builder.Append($"Create_DTM: {df_newParent.CreateDTM}");
-                            builder.Append($"Modified_DTM: {df_newParent.ModifiedDTM}");
-                            builder.Append($"FileLocation: {df_newParent.FileLocation}");
-                            builder.Append($"Config_ID: {df_newParent.DatasetFileConfig.ConfigId}");
-                            builder.Append($"ParentDatasetFile_ID: {df_newParent.ParentDatasetFileId}");
-                            builder.Append($"Version_ID: {df_newParent.VersionId}");
-
-                            Sentry.Common.Logging.Logger.Error(builder.ToString(), ex);
-                        
-                            //Preserve the Stack Trace
-                            throw;
-                        }
-
-                        // If there were existing datasetfiles set parentdatasetFile_ID on old parent
-                        if (df_id != 0)
-                        {
-                            try
-                            {
-                                //Version the Old Parent DatasetFile
-                                int df_newParentId = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.ConfigId, isBundled);
-                                df_Orig.ParentDatasetFileId = df_newParentId;
-
-                                //Write dataset to database
-                                _dscontext.Merge(df_Orig);
-                                _dscontext.SaveChanges();
-
-                            }
-                            catch(Exception ex)
-                            {
-                                StringBuilder builder = new StringBuilder();
-                                builder.Append("Failed to set ParentDatasetFile_ID on Original Parent in Dataset Management.");
-                                builder.Append($"DatasetFile_ID: {df_Orig.DatasetFileId}");
-                                builder.Append($"File_NME: {df_Orig.FileName}");
-                                builder.Append($"ParentDatasetFile_ID: {df_Orig.ParentDatasetFileId}");
-
-                                Sentry.Common.Logging.Logger.Error(builder.ToString(), ex);
-                            }
-                        }
-
-                        Event f = new Event()
-                        {
-                            EventType = _dscontext.EventTypes.Where(w => w.Description == "Created File").FirstOrDefault(),
-                            Status = _dscontext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                            TimeCreated = DateTime.Now,
-                            TimeNotified = DateTime.Now,
-                            IsProcessed = false,
-                            UserWhoStartedEvent = response.RequestInitiatorId,
-                            Dataset = response.DatasetID,
-                            DataConfig = response.DatasetFileConfigId,
-                            Reason = $"Successfully Uploaded file [<b>{Path.GetFileName(targetFileName)}</b>] to dataset [<b>{df_newParent.Dataset.DatasetName}</b>]",
-                            Parent_Event = response.RequestGuid
-                        };
-                        Task.Factory.StartNew(() => Utilities.CreateEventAsync(f), TaskCreationOptions.LongRunning);
-                    
+                        df_Orig = _dscontext.GetDatasetFile(df_id);
+                        df_newParent = CreateParentDatasetFile(ds, dfc, uplduser, targetFileName, df_Orig, isBundled);
                     }
+                    //If there are no datafiles for this DatasetFileConfig
                     else
                     {
-                        throw new NotImplementedException($"The Option of not Overwritting a DataFile is not implemented.  Change OverwriteDataFile_IND setting on Dataset_ID:{dfc.ParentDataset.DatasetId} Config_ID:{dfc.ConfigId} Config_Name:{dfc.Name}");
+                        df_newParent = CreateParentDatasetFile(ds, dfc, uplduser, targetFileName, null, isBundled);
                     }
+                                        
+                    df_newParent.IsBundled = true;
+                    df_newParent.UploadUserName = response.RequestInitiatorId;
+                    df_newParent.VersionId = response.TargetVersionId;
+                    df_newParent.FileLocation = response.TargetKey;
+                    
+
+                    //Register new Parent DatasetFile
+                    try
+                    {
+                        //Write dataset to database
+                        _dscontext.Merge(df_newParent);
+                        _dscontext.SaveChanges();
+                    }
+                    catch (Exception ex)
+                    {
+
+                        StringBuilder builder = new StringBuilder();
+                        builder.Append("Failed to record new Parent DatasetFile to Dataset Management.");
+                        builder.Append($"File_NME: {df_newParent.FileName}");
+                        builder.Append($"Dataset_ID: {df_newParent.Dataset.DatasetId}");
+                        builder.Append($"UploadUser_NME: {df_newParent.UploadUserName}");
+                        builder.Append($"Create_DTM: {df_newParent.CreateDTM}");
+                        builder.Append($"Modified_DTM: {df_newParent.ModifiedDTM}");
+                        builder.Append($"FileLocation: {df_newParent.FileLocation}");
+                        builder.Append($"Config_ID: {df_newParent.DatasetFileConfig.ConfigId}");
+                        builder.Append($"ParentDatasetFile_ID: {df_newParent.ParentDatasetFileId}");
+                        builder.Append($"Version_ID: {df_newParent.VersionId}");
+
+                        Sentry.Common.Logging.Logger.Error(builder.ToString(), ex);
+                        
+                        //Preserve the Stack Trace
+                        throw;
+                    }
+
+                    // If there were existing datasetfiles set parentdatasetFile_ID on old parent
+                    if (df_id != 0)
+                    {
+                        try
+                        {
+                            //Version the Old Parent DatasetFile
+                            int df_newParentId = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.ConfigId, isBundled);
+                            df_Orig.ParentDatasetFileId = df_newParentId;
+
+                            //Write dataset to database
+                            _dscontext.Merge(df_Orig);
+                            _dscontext.SaveChanges();
+
+                        }
+                        catch(Exception ex)
+                        {
+                            StringBuilder builder = new StringBuilder();
+                            builder.Append("Failed to set ParentDatasetFile_ID on Original Parent in Dataset Management.");
+                            builder.Append($"DatasetFile_ID: {df_Orig.DatasetFileId}");
+                            builder.Append($"File_NME: {df_Orig.FileName}");
+                            builder.Append($"ParentDatasetFile_ID: {df_Orig.ParentDatasetFileId}");
+
+                            Sentry.Common.Logging.Logger.Error(builder.ToString(), ex);
+                        }
+                    }
+
+                    Event f = new Event()
+                    {
+                        EventType = _dscontext.EventTypes.Where(w => w.Description == "Created File").FirstOrDefault(),
+                        Status = _dscontext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                        TimeCreated = DateTime.Now,
+                        TimeNotified = DateTime.Now,
+                        IsProcessed = false,
+                        UserWhoStartedEvent = response.RequestInitiatorId,
+                        Dataset = response.DatasetID,
+                        DataConfig = response.DatasetFileConfigId,
+                        Reason = $"Successfully Uploaded file [<b>{Path.GetFileName(targetFileName)}</b>] to dataset [<b>{df_newParent.Dataset.DatasetName}</b>]",
+                        Parent_Event = response.RequestGuid
+                    };
+                    Task.Factory.StartNew(() => Utilities.CreateEventAsync(f), TaskCreationOptions.LongRunning);
                 }
                 else if (!isBundled)
                 {

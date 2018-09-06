@@ -128,6 +128,14 @@ namespace Sentry.data.Core
             }
         }
 
+        public virtual Boolean AdminUser
+        {
+            get
+            {
+                return _extendedUserInfo.Permissions.Contains(PermissionNames.AdminUser);
+            }
+        }
+
         public DomainUser DomainUser
         {
             get

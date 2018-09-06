@@ -57,20 +57,8 @@ namespace Sentry.data.Web.Controllers
             public string Name { get; set; }
             public string Location { get; set; }
             public int JobId { get; set; }
+            public Boolean IsEnabled { get; set; }
         }
-        
-
-        public class SchemaRow
-        {
-            public string Name { get; set; }
-            public string Description { get; set; }
-            public string Type { get; set; }
-            public string Precision { get; set; }
-            public string Scale { get; set; }
-
-            public double LastUpdated { get; set; }
-        }
-
 
         [HttpGet]
         [Route("Get")]
@@ -114,89 +102,138 @@ namespace Sentry.data.Web.Controllers
                 if (config.RetrieverJobs.Any(x => !x.DataSource.Is<S3Basic>() && !x.DataSource.Is<DfsBasic>()))
                 {
                     m.OtherJobs = config.RetrieverJobs.Where(x => !x.DataSource.Is<S3Basic>() && !x.DataSource.Is<DfsBasic>()).OrderBy(x => x.Id)
-                        .Select(x => new DropLocation() { Location = x.Schedule, Name = x.DataSource.SourceType, JobId = x.Id }).ToList();
+                        .Select(x => new DropLocation() { Location = x.IsEnabled ? x.Schedule : "Disabled", Name = x.DataSource.SourceType, JobId = x.Id, IsEnabled = x.IsEnabled }).ToList();
                 }
 
 
                 return Ok(m);
 
             }
-            catch
+            catch(Exception ex)
             {
-                return NotFound();
+                return InternalServerError(ex);
             }
         }
-    
 
         [HttpGet]
         [Route("Get")]
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
-        public async Task<IHttpActionResult> GetColumnSchemaInformationFor(int DatasetConfigID)
+        public async Task<IHttpActionResult> GetPrimaryHiveTableFor(int DatasetConfigID, int SchemaID = 0)
+        {
+            DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
+
+            if (config.Schemas.Any(x => x.IsPrimary))
+            {
+                HiveTable ht = config.Schemas.FirstOrDefault(x => x.IsPrimary).HiveTables.Where(y => y.IsPrimary).FirstOrDefault();
+
+                return Ok(new { HiveDatabaseName = ht.HiveDatabase_NME, HiveTableName = ht.Hive_NME });
+            }
+            else {
+                return NotFound();
+            }
+        }
+
+
+
+
+
+        [HttpGet]
+        [Route("Get")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        public async Task<IHttpActionResult> GetColumnSchemaInformationFor(int DatasetConfigID, int SchemaID = 0)
         {
             try
             {
                 DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
-                var a = _dsContext.Schemas.ToList();
 
-                Schema schema = _dsContext.Schemas.Where(x => x.DatasetFileConfig.ConfigId == DatasetConfigID).OrderBy(x => x.Revision_ID).FirstOrDefault();
-                HiveTable ht = schema.HiveTables.Where(x => x.IsPrimary).FirstOrDefault();
-                DataObject dataObject = _dsContext.GetById<DataObject>(schema.DataObject_ID);
-
-                OutputSchema s = new OutputSchema();
-
-                s.rows = new List<SchemaRow>();
-
-                if (ht != null)
+                if (config.Schemas.Any())
                 {
-                    s.HiveDatabaseName = ht.HiveDatabase_NME;
-                    s.HiveTableName = ht.Hive_NME;
-                }
+                    var a = config.Schemas.ToList();
 
-                if (dataObject.DataObjectDetails.Any(x => x.DataObjectDetailType_CDE == "Row_CNT"))
-                {
-                    s.RowCount = Convert.ToInt32(dataObject.DataObjectDetails.FirstOrDefault(x => x.DataObjectDetailType_CDE == "Row_CNT").DataObjectDetailType_VAL);
-                }
+                    Schema schema = null;
 
-                foreach (DataObjectField b in dataObject.DataObjectFields)
-                {
-                    SchemaRow r = new SchemaRow()
+                    if (SchemaID != 0)
                     {
-                        Name = b.DataObjectField_NME,
-                        Description = b.DataObjectField_DSC,
-                        LastUpdated = b.LastUpdt_DTM.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds
-                    };
-
-                    if(b.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Datatype_TYP"))
-                    {
-                        r.Type = b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Datatype_TYP").DataObjectFieldDetailType_VAL;
+                        schema = config.Schemas.Where(x => x.DatasetFileConfig.ConfigId == DatasetConfigID && x.Schema_ID == SchemaID).OrderBy(x => x.Revision_ID).FirstOrDefault();
                     }
                     else
                     {
-                        r.Type = "VARCHAR";
+                        if(config.Schemas.Any(x => x.IsPrimary))
+                        {
+                            schema = config.Schemas.Where(x => x.DatasetFileConfig.ConfigId == DatasetConfigID && x.IsPrimary).OrderBy(x => x.Revision_ID).FirstOrDefault();
+                        }
+                        else
+                        {
+                            schema = config.Schemas.Where(x => x.DatasetFileConfig.ConfigId == DatasetConfigID).OrderBy(x => x.Revision_ID).FirstOrDefault();
+                        }
                     }
 
+                    DataObject dataObject = _dsContext.GetById<DataObject>(schema.DataObject_ID);
 
-                    if(b.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Precision_AMT"))
+                    if (schema.DataObject_ID != 0)
                     {
-                        r.Precision = b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Precision_AMT") != null ?
-                            b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Precision_AMT").DataObjectFieldDetailType_VAL :
-                            null;
-                    }
+                        OutputSchema s = new OutputSchema();
 
-                    if (b.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Scale_AMT"))
+                        s.rows = new List<SchemaRow>();
+
+                        if (dataObject.DataObjectDetails.Any(x => x.DataObjectDetailType_CDE == "Row_CNT"))
+                        {
+                            s.RowCount = Convert.ToInt32(dataObject.DataObjectDetails.FirstOrDefault(x => x.DataObjectDetailType_CDE == "Row_CNT").DataObjectDetailType_VAL);
+                        }
+
+                        foreach (DataObjectField b in dataObject.DataObjectFields)
+                        {
+                            SchemaRow r = new SchemaRow()
+                            {
+                                Name = b.DataObjectField_NME,
+                                DataObjectField_ID = b.DataObjectField_ID,
+                                Description = b.DataObjectField_DSC,
+                                LastUpdated = b.LastUpdt_DTM.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds
+                            };
+
+                            if (b.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Datatype_TYP"))
+                            {
+                                r.Type = b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Datatype_TYP").DataObjectFieldDetailType_VAL.ToUpper();
+                            }
+                            else
+                            {
+                                r.Type = "VARCHAR";
+                            }
+
+
+                            if (b.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Precision_AMT"))
+                            {
+                                r.Precision = b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Precision_AMT") != null ?
+                                    b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Precision_AMT").DataObjectFieldDetailType_VAL :
+                                    null;
+                            }
+
+                            if (b.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Scale_AMT"))
+                            {
+                                r.Scale = b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Scale_AMT") != null ?
+                                    b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Scale_AMT").DataObjectFieldDetailType_VAL :
+                                    null;
+                            }
+
+                            if (b.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Nullable_IND"))
+                            {
+                                r.Nullable = b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Nullable_IND").DataObjectFieldDetailType_VAL == "Y" ? true : false;
+                            }
+
+                            s.rows.Add(r);
+                        }
+
+                        return Ok(s);
+                    }
+                    else
                     {
-                        r.Scale = b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Scale_AMT") != null ?
-                            b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Scale_AMT").DataObjectFieldDetailType_VAL :
-                            null;
+                        return NotFound();
                     }
-
-                    s.rows.Add(r);
                 }
-
-                
-
-                return Ok(s);
-
+                else
+                {
+                    return NotFound();
+                }
             }
             catch(Exception ex)
             {

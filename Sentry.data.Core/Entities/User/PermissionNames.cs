@@ -23,5 +23,7 @@
         public const string QueryToolUser = "QueryToolUser";
         public const string QueryToolPowerUser = "QueryToolPowerUser";
         public const string QueryToolAdmin = "QueryToolAdmin";
+        public const string UseAssetAPI = "UseAssetAPI";
+        public const string AdminUser = "AdminUser";
     }
 }

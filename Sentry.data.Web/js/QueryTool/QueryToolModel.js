@@ -38,11 +38,10 @@ function Config(id, data) {
     this.extensions = ko.observableArray(data.extensions);
     this.primaryFileId = ko.observable(data.primaryFileId);
     this.fileCount = ko.observable(data.fileCount);
-    this.IsGeneric = ko.observable(data.IsGeneric);
     this.IsPowerUser = ko.observable(data.IsPowerUser);
 
     this.tableName = ko.computed(function () {
-        if (data.configName == 'Default') {
+        if (data.configName === 'Default') {
             return data.configName.replace(/ /g, "_") + '_' + id;
         } else {
             return data.configName.replace(/ /g, "_");
@@ -115,7 +114,7 @@ function ViewModel() {
         // Do something
         var data = e.params.data;
 
-        self.Datasets.remove(function (item) { return  item.id() == data.id; });
+        self.Datasets.remove(function (item) { return  item.id() === data.id; });
 
         self.Datasets.notifySubscribers();
     });
@@ -138,7 +137,7 @@ ko.bindingHandlers.select2 = {
         console.log(allBindings);
 
         if ("value" in allBindings) {
-            if ((allBindings.select2.multiple || el.multiple) && allBindings.value().constructor != Array) {
+            if ((allBindings.select2.multiple || el.multiple) && allBindings.value().constructor !== Array) {
                 $(el).val(allBindings.value().split(',')).trigger('change');
             }
             else {
@@ -153,8 +152,8 @@ ko.bindingHandlers.select2 = {
                     if ("optionsValue" in allBindings) {
                         valueAccessor = function (item) { return item[allBindings.optionsValue]; }
                     }
-                    var items = $.grep(allBindings.options(), function (e) { return valueAccessor(e) == value });
-                    if (items.length == 0 || items.length > 1) {
+                    var items = $.grep(allBindings.options(), function (e) { return valueAccessor(e) === value });
+                    if (items.length === 0 || items.length > 1) {
                         return "UNKNOWN";
                     }
                     return items[0][allBindings.optionsText];
@@ -195,11 +194,11 @@ function WriteSQLStatement() {
     var rules = $('#builder-basic_group_0').children('dd.rules-group-body').children('ul.rules-list').children().length;
     var sql_raw;
 
-    if (rules != 0) {
+    if (rules !== 0) {
         sql_raw = $('#builder-basic').queryBuilder('getSQL', false, true).sql.replace(/\'/g, "\\\\'").replace(/\n/g, " ");
     }
 
-    if (rules != 0) {
+    if (rules !== 0) {
         rawQuery += " WHERE " + sql_raw;
     }
 
@@ -237,7 +236,7 @@ function SelectColumns(rawQuery) {
     var renamed = $('#columnRenamerContainer').children('.rule-container').children().length / 4;
 
     if (!$('#selectNoneChk').is(':checked')) {
-        if (renamed == 0) {
+        if (renamed === 0) {
             rawQuery += ' * ';
         } else {
             for (var j = 0; j < renamed; j++) {
@@ -252,7 +251,7 @@ function SelectColumns(rawQuery) {
                     rawQuery += col;
                 }
 
-                if (j != renamed) {
+                if (j !== renamed) {
                     rawQuery += ", ";
                 }
             }
@@ -292,13 +291,13 @@ function GroupByColumns(rawQuery) {
     var groupBys = $('.groupBySelector').length;
 
     for (var i = 0; i < groupBys; i++) {
-        if ($($('.groupBySelector')[i]).val() != 0) {
+        if ($($('.groupBySelector')[i]).val() !== 0) {
 
-            if (i == 0) {
+            if (i === 0) {
                 rawQuery += " GROUP BY ";
             }
 
-            if (i == groupBys - 1) {
+            if (i === groupBys - 1) {
                 rawQuery += $($('.groupBySelector')[i]).val();
             } else {
                 rawQuery += $($('.groupBySelector')[i]).val() + ", ";
@@ -309,13 +308,13 @@ function GroupByColumns(rawQuery) {
 
     var havings = $("#havingContainer").children('.rule-container').children().length / 5;
 
-    for (var i = 0; i < havings; i++) {
-        var agg = $('#havingContainer').children('.rule-container').children()[(i * 5)].value;
-        var col = $('#havingContainer').children('.rule-container').children()[(i * 5) + 1].value;
-        var operand = $('#havingContainer').children('.rule-container').children()[(i * 5) + 2].value;
-        var aggValue = $('#havingContainer').children('.rule-container').children()[(i * 5) + 3].value;
+    for (var j = 0; j < havings; j++) {
+        var agg = $('#havingContainer').children('.rule-container').children()[(j * 5)].value;
+        var col = $('#havingContainer').children('.rule-container').children()[(j * 5) + 1].value;
+        var operand = $('#havingContainer').children('.rule-container').children()[(j * 5) + 2].value;
+        var aggValue = $('#havingContainer').children('.rule-container').children()[(j * 5) + 3].value;
 
-        if (i == 0) {
+        if (j === 0) {
             rawQuery += " HAVING " + agg + "(" + col + ") " + operand + " " + aggValue;
         } else {
             rawQuery += " AND " + agg + "(" + col + ") " + operand + " " + aggValue;
@@ -332,11 +331,11 @@ function OrderByColumns(rawQuery) {
     for (var i = 0; i < orderBys; i++) {
         if ($($('.orderBySelector')[i]).val()) {
 
-            if (i == 0) {
+            if (i === 0) {
                 rawQuery += " ORDER BY ";
             }
             var option = '#option' + $('.orderBySelector')[i].id;
-            if (i == orderBys - 1) {
+            if (i === orderBys - 1) {
                 rawQuery += $($('.orderBySelector')[i]).find(":selected").val() + " " + $(option).find(":selected").val();
             } else {
                 rawQuery += $($('.orderBySelector')[i]).find(":selected").val() + " " + $(option).find(":selected").val() + ", ";

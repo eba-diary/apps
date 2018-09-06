@@ -82,7 +82,8 @@ namespace Sentry.data.Infrastructure
             get
             {
                 //TODO: Revisit for solution to filter based on user (i.e. Admins can see all eventtypes)
-                return Query<AuthenticationType>().Cacheable();
+                IQueryable<AuthenticationType> qresult = Query<AuthenticationType>();
+                return qresult;
             }
         }
 
@@ -166,6 +167,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<MediaTypeExtension> MediaTypeExtensions
+        {
+            get
+            {
+                return Query<MediaTypeExtension>();  //QueryCacheRegion.MediumTerm
+            }
+        }
+
         public IEnumerable<Dataset> GetDatasetByCategoryID(int id)
         {
             return Query<Dataset>().Where(w => w.DatasetCategory.Id == id).Where(x => x.CanDisplay).AsEnumerable();
@@ -218,7 +227,7 @@ namespace Sentry.data.Infrastructure
                     x => x.Dataset.DatasetId == datasetId && 
                     x.ParentDatasetFileId == null
                 ).Where(where)
-                
+
                 .AsEnumerable();
 
             return list;
@@ -307,11 +316,6 @@ namespace Sentry.data.Infrastructure
         public DatasetFileConfig getDatasetFileConfigs(int configId)
         {
             return Query<DatasetFileConfig>().Where(w => w.ConfigId == configId).FirstOrDefault();
-        }
-        public DatasetFileConfig getDatasetDefaultConfig(int datasetId)
-        {
-            List<DatasetFileConfig> dfcList = Query<DatasetFileConfig>().Where(w => w.ParentDataset.DatasetId == datasetId && w.IsGeneric).ToList();
-            return dfcList.FirstOrDefault();
         }
 
 

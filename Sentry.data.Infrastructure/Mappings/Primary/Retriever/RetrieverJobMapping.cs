@@ -48,6 +48,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             
             this.Property((x) => x.IsGeneric, (m) => m.Column("IsGeneric_IND"));
 
+            this.Property((x) => x.IsEnabled, (m) => m.Column("IsEnabled"));
+
             Property(x => x.JobOptions, m =>
             {
                 m.Column("JobOptions");

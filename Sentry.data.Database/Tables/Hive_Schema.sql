@@ -9,5 +9,6 @@
     [IsForceMatch] BIT NOT NULL, 
 	[Created_DTM] [datetime] NOT NULL,
 	[Changed_DTM] [datetime] NOT NULL,
+    [IsPrimary] BIT NULL, 
     CONSTRAINT [FK_Schema_DatasetFileConfigs] FOREIGN KEY ([Config_ID]) REFERENCES [dbo].[DatasetFileConfigs] ([Config_ID]),
 )

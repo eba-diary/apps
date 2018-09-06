@@ -17,7 +17,6 @@ namespace Sentry.data.Core
         public virtual string Name { get; set; }
         public virtual string Description { get; set; }
         public virtual int FileTypeId { get; set; }
-        public virtual Boolean IsGeneric { get; set; }
         public virtual Dataset ParentDataset { get; set; }
         public virtual DatasetScopeType DatasetScopeType { get; set; }
 

@@ -136,7 +136,7 @@ namespace Sentry.data.Infrastructure
                                     foreach (ZipArchiveEntry entry in archive.Entries)
                                     {
                                         //Exclude file if name exists in ExclusionList or does not match job search criteria
-                                        if (!ExclusionList.Contains(entry.FullName) || !_job.FilterIncomingFile(entry.FullName))
+                                        if (!ExclusionList.Contains(entry.FullName) && !_job.FilterIncomingFile(entry.FullName))
                                         {
                                             //extract to DfsBasic drop location
                                             entry.ExtractToFile(Path.Combine(targetPath, entry.FullName));

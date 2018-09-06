@@ -20,6 +20,7 @@ namespace Sentry.data.Core
             // types are integrated, add the type to the list.
             ValidAuthTypes = new List<AuthenticationType>();
             ValidAuthTypes.Add(new AnonymousAuthentication());
+            ValidAuthTypes.Add(new TokenAuthentication());
 
             //Control compression types which can be chossen for this source type.  As new
             // types are integrated, add the type to the list.

@@ -24,6 +24,7 @@ namespace Sentry.data.Web
         public Boolean CanUpload { get; set; }
         public Boolean CanQueryTool { get; set; }
         public Boolean CanQueryToolPowerUser { get; set; }
+        public Boolean AdminUser { get; set; }
 
     }
 }

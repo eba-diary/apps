@@ -191,28 +191,32 @@ else
                             <li><a href="~/Dataset/Index">Home</a></li>
                             <li><a href="~/Search/Datasets">Search</a></li>
 
-                            @if (Model.CanManageConfigs || Model.CanEditDataset || Model.CanUpload)
+                            @if (Model.CanManageConfigs || Model.CanEditDataset || Model.CanUpload || Model.AdminUser)
                             {
                                 <li class="divider"></li>
                                 <li class="dropdown-header">Dataset Actions</li>
 
-                                if (Model.CanEditDataset)
+                                if (Model.CanEditDataset || Model.AdminUser)
                                 {
                                     <li><a href="#" onclick="data.Dataset.ViewUpload()">Create Dataset</a></li>
                                 }
 
-                                if (Model.CanUpload)
+                                if (Model.CanUpload || Model.AdminUser)
                                 {
                                     <li><a href="#" onclick="data.DatasetDetail.UploadFileModal(0)">Upload Data File</a></li>
                                 }
 
-                                if (Model.CanManageConfigs)
+                                if (Model.CanManageConfigs || Model.AdminUser)
                                 {
-                                    if (Model.CanManageConfigs)
+                                    if (Model.CanManageConfigs || Model.AdminUser)
                                     {
                                         <li class="divider"></li>
                                         <li class="dropdown-header">Dataset Administration</li>
                                         <li><a href="/Config/Manage">Manage Configs</a></li>
+                                    }
+                                    if (Model.AdminUser || Model.AdminUser)
+                                    {
+                                        <li><a href="/Config/Extension/Create">Manage Extension Mappings</a></li>
                                     }
 
                                 }

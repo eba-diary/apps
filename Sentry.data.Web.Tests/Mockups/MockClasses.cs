@@ -66,7 +66,6 @@ namespace Sentry.data.Web.Tests
                 Name = "Default",
                 Description = "Default Config for Dataset.  Uploaded files that do not match any configs will default to this config",
                 FileTypeId = (int)FileType.DataFile,
-                IsGeneric = true,
                 ParentDataset = ds != null ? ds : MockDataset(),
                 DatasetScopeType = MockScopeTypes()[0],
                 FileExtension = MockFileExtensions()[0],

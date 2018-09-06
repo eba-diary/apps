@@ -26,6 +26,7 @@ namespace Sentry.data.Core
         IQueryable<Schema> Schemas { get; }
         IQueryable<HiveTable> HiveTables { get; }
         IQueryable<LivyCreation> LivySessions { get; }
+        IQueryable<MediaTypeExtension> MediaTypeExtensions { get; }
 
         /** Datasets **/
 
@@ -38,7 +39,6 @@ namespace Sentry.data.Core
         IEnumerable<DatasetScopeType> GetAllDatasetScopeTypes();
         IEnumerable<DatasetFileConfig> getAllDatasetFileConfigs();
         DatasetFileConfig getDatasetFileConfigs(int configId);
-        DatasetFileConfig getDatasetDefaultConfig(int datasetId);
 
         IEnumerable<DatasetFile> GetDatasetFilesForDataset(int datasetId, Func<DatasetFile, bool> where);
         IEnumerable<DatasetFile> GetDatasetFilesForDatasetFileConfig(int configId, Func<DatasetFile, bool> where);

@@ -145,7 +145,7 @@
             <div class="form-group">
                 @Html.LabelFor(model => model.TargetFileName, htmlAttributes: new { @class = "control-label col-md-2 optional", @id = "targetfilenamelable" })
                 <div class="col-md-10">
-                    @Html.EditorFor(model => model.TargetFileName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                    @Html.EditorFor(model => model.TargetFileName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Exclude file extension" } })
                     @Html.ValidationMessageFor(model => model.TargetFileName, "", new { @class = "text-danger" })
                 </div>
             </div>

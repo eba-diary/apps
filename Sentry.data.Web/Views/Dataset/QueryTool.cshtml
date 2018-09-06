@@ -30,7 +30,7 @@
                 <a class="btn btn-primary" onclick="ToggleAdminControls()">Code History and Custom Code</a>
                 <a href="#/" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></a>
                 <ul class="dropdown-menu">
-                    <li><a onclick="CreateSession()">Re-Create Session</a></li>
+                    <li><a onclick="CreateSession(true)">Re-Create Session</a></li>
                     <li><a onclick="ResetHiveTables()">Reset Hive Tables</a></li>
                 </ul>
             </div>
@@ -115,7 +115,7 @@
                     <a href="#/" data-bind="click: function (d) { console.log(d); data.DatasetDetail.PreviewDatafileModal(d.primaryFileId()); }" class="table-row-icon row-filepreview-icon" title="Preview file">
                         <i class="glyphicon glyphicon-search text-primary"></i>
                     </a>
-                    <a href="#/" onclick="$(this).parent().children('.description').toggle()" class="table-row-icon row-filepreview-icon" title="Configuration Description">
+                    <a href="#/" onclick="$(this).parent().children('.description').toggle()" class="table-row-icon row-filepreview-icon" title="Information about Schema">
                         <i class="glyphicon glyphicon-info-sign"></i>
                     </a>
                     <br>
@@ -582,7 +582,14 @@ t1.createTempView("t1");
     <script src="~/Scripts/jQuery.extendext.min.js"></script>
     <script src="~/Scripts/query-builder.js"></script>
     @Scripts.Render("~/bundles/dataTables")
-    <script src="~/js/QueryToolModel.js"></script>
+
+    <script src="~/js/QueryTool/QueryToolModel.js"></script>
+    <script src="~/js/QueryTool/Startup.js"></script>
+    <script src="~/js/QueryTool/SaveTo.js"></script>
+    <script src="~/js/QueryTool/BannerControls.js"></script>
+    <script src="~/js/QueryTool/RenderTable.js"></script>
+    <script src="~/js/QueryTool/AddRule.js"></script>
+
     <script>
 
         var firstTableName = "";
@@ -604,7 +611,7 @@ t1.createTempView("t1");
             }
         });
 
-
+        //https://stackoverflow.com/questions/1250079/how-to-escape-single-quotes-within-single-quoted-strings
         String.prototype.escapeForJson = function () {
             return this
                 .replace(/\b/g, "")
@@ -778,13 +785,13 @@ t1.createTempView("t1");
         }
 
         $('body').on('click', '.ruleController', function () {
-            updateJoins();
+            //updateJoins();
             updateTables();
             updateBadges();
         });
 
         $('body').on('change', '.ruleController', function () {
-            updateJoins();
+            //updateJoins();
             updateTables();
             updateBadges();
         });
@@ -900,128 +907,6 @@ t1.createTempView("t1");
             }
         }
 
-        function HideBanner() {
-            $('#schemaWarningBanner').hide();
-            console.log(Banner);
-
-            if (AlertLevel != "Error" && AlertLevel != "Success") {
-                listOfDismissedBanners.push(Banner);
-            }
-        }
-
-        var AlertLevel = "";
-        var Banner = "";
-        var listOfDismissedBanners = [];
-
-        function PassHelpText(location, type, information) {
-
-            if (listOfDismissedBanners.indexOf(information) == -1) {
-
-                var banner;
-                var header;
-                var text;
-
-                if ($("#bannerContainer").children().length == 0) {
-                    $("#bannerContainer").append("<div id=\"schemaWarningBanner\" class=\"alert alert-dismissable alert-warning\">" +
-                        "<button type=\"button\" class=\"close\" data-dismiss=\"alert\">×</button>" +
-                        "<h4 id=\"schemaWarningHeader\">Warning!</h4>" +
-                        "<p id=\"schemaWarningText\"></p>" +
-                        "</div>");
-                }
-
-                banner = $('#schemaWarningBanner');
-                header = $('#schemaWarningHeader');
-                text = $('#schemaWarningText');
-
-                text.empty();
-
-                if (information.startsWith('u\'')) {
-                    information = information.substr(2, information.length - 1);
-                }
-
-                if (information.includes('cancelled job group')) {
-                    information = "Job successfully cancelled.";
-                    type = "Success";
-                }
-
-
-                text.append(information);
-                Banner = information;
-                AlertLevel = type;
-
-                if (type == "Warning") {
-                    banner.switchClass("alert-success", "alert-warning", 10);
-                    banner.switchClass("alert-info", "alert-warning", 10);
-                    header.text("Warning!");
-
-                } else if (type == "Success") {
-                    banner.switchClass("alert-warning", "alert-success", 10);
-                    banner.switchClass("alert-info", "alert-success", 10);
-                    header.text("Success");
-                } else if (type == "Error") {
-                    banner.switchClass("alert-warning", "alert-danger", 10);
-                    banner.switchClass("alert-info", "alert-danger", 10);
-                    header.text("Error");
-                } else {
-                    banner.switchClass("alert-warning", "alert-info", 10);
-                    banner.switchClass("alert-success", "alert-info", 10);
-                    header.text("Information");
-                }
-
-                banner.show();
-            }
-        }
-
-
-        function SavetoS3() {
-            var tableName = $('#s3FileName').val().escapeForJson();
-            var extension = $('#s3SaveAsFileExtension').val().escapeForJson();
-            var delimiter = $('#s3Delimiter').val();
-            var s3Location = $('#s3FileLocation').val().escapeForJson();
-
-            var table;
-            var valid = true;
-
-            if (extension) {
-                table = "queryResponse.coalesce(1).write";
-
-                if (extension == "csv" && delimiter) {
-                    table += ".option('sep', '" + delimiter + "')";
-                }
-
-
-                switch (extension) {
-                    case "csv":
-                        table += ".format('" + extension.trim() + "').option('header', 'true')";
-                        break;
-                    case "json":
-                        table += ".format('" + extension.trim() + "')";
-                        break;
-                    case "parquet":
-                        table += ".format('" + extension.trim() + "')";
-                        break;
-                    case "orc":
-                        table += ".format('" + extension.trim() + "')";
-                        break;
-                    default:
-                        valid = false;
-                        break;
-                }
-
-                table += ".mode('overwrite').save('s3a://" + s3Location + tableName + "');";
-
-            }
-
-            if (valid) {
-                var json = JSON.stringify(table);
-
-                console.log(json);
-
-                SendCode(json, 'Save to S3', (s3Location + tableName));
-            }
-        }
-
-
         function ToggleAdminControls() {
             $('#AdminControls').toggle();
             //$('#codeArea').toggle();
@@ -1039,7 +924,7 @@ t1.createTempView("t1");
 
         function generateSchema() {
 
-            updateJoins();
+            //updateJoins();
             updateTables();
             updateBadges();
 
@@ -1050,6 +935,7 @@ t1.createTempView("t1");
             var rows = $('#tableSelection').children('.rule-container').children().children().children('.configRow');
 
             var rules = rows.length;
+            var actualIncludedTables = 0;
             for (var i = 0; i < rules; i++) {
 
 
@@ -1065,8 +951,9 @@ t1.createTempView("t1");
 
                 if (include) {
                     if (extension) {
+                        actualIncludedTables++;
 
-                        if (i == 0) {
+                        if (actualIncludedTables == 1) {
                             firstTableName = tableName.trim();
                         }
 
@@ -1153,7 +1040,7 @@ t1.createTempView("t1");
             return false;
         });
 
-        //https://stackoverflow.com/questions/1250079/how-to-escape-single-quotes-within-single-quoted-strings
+        
         function runQuery(runNow) {
             var rawQuery = "queryResponse = spark.sql(" + WriteSQLStatement() + ");";
 
@@ -1170,14 +1057,14 @@ t1.createTempView("t1");
             }
         }
 
-
+        //This method will tell you wether or not the tables the user picked have valid extensions and etc.
         function updateTables() {
             var valid = true;
             var failureReason = "";
             $('#tablePython').val('');
 
             $('.extensionPicker').each(function (index, value) {
-                if ($(value).find(":selected").text() !== "csv"){
+                if ($(value).find(":selected").text() !== "csv") {
                     console.log($(value).siblings().children(".csvHeaderCheckbox").parent());
                     $(value).siblings().children(".csvHeaderCheckbox").parent().hide();
                 }
@@ -1288,29 +1175,29 @@ t1.createTempView("t1");
             SendCode(json, 'Reset Hive Tables');
         }
 
-        function updateJoins() {
-            var rules = $('#joinContainer').children('.rule-container').children('.ruleController').length / 6;
-            $('#joinPython').val('');
-            for (var i = 0; i < rules; i++) {
+        //function updateJoins() {
+        //    var rules = $('#joinContainer').children('.rule-container').children('.ruleController').length / 6;
+        //    $('#joinPython').val('');
+        //    for (var i = 0; i < rules; i++) {
 
-                var tableOne = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6)].value;
-                var joinType = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 1].value;
-                var tableTwo = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 2].value;
-                var tableOneCol = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 3].value;
-                var operand = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 4].value;
-                var tableTwoCol = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 5].value;
+        //        var tableOne = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6)].value;
+        //        var joinType = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 1].value;
+        //        var tableTwo = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 2].value;
+        //        var tableOneCol = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 3].value;
+        //        var operand = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 4].value;
+        //        var tableTwoCol = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 5].value;
 
 
-                var OnStatement = tableOneCol + ' ' + operand + ' ' + tableTwoCol;
+        //        var OnStatement = tableOneCol + ' ' + operand + ' ' + tableTwoCol;
 
-                var Join = tableOne.trim() + " = " + tableOne.trim() + ".join(" + tableTwo.trim() + "," + OnStatement.trim() + ");";
+        //        var Join = tableOne.trim() + " = " + tableOne.trim() + ".join(" + tableTwo.trim() + "," + OnStatement.trim() + ");";
 
-                Join = Join.replace(/`/g, '');
+        //        Join = Join.replace(/`/g, '');
 
-                $('#joinPython').val($('#joinPython').val() + Join + "\n");
-            }
+        //        $('#joinPython').val($('#joinPython').val() + Join + "\n");
+        //    }
 
-        }
+        //}
 
         function RemoveParent(e) {
             console.log($(e).parent().parent());
@@ -1344,278 +1231,20 @@ t1.createTempView("t1");
 
             $(e).parent().parent().remove();
 
-            updateJoins();
-            updateTables();
-            updateBadges();
-        }
-
-        function addAggregateRule() {
-
-            var length = $("#aggregateContainer").children().length;
-            var id = "aggT" + length;
-
-            $("#aggregateContainer").append("<div class=\"rule-container\"><select class=\"form-control\" style=\"width: 10%; display: inline-block; \">" +
-                "<option selected> Aggregate </option>" +
-                "<option>COUNT</option>" +
-                "<option>SUM</option> " +
-                "<option>AVG</option> " +
-                "<option>MAX</option> " +
-                "<option>MIN</option> " +
-                "</select >" +
-                "<select class=\"form-control aggSelector\" id=\"" + id + "\" style=\"width: 40%; display: inline-block;\"></select>" +
-                "<input class=\"form-control\" style= \"width: 18.4%; display: inline-block;\" placeholder=\"Renamed As ... (Leave blank if wanted)\" />" +
-                "<div class=\"btn-group pull-right rule-actions\">" +
-                "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
-                "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
-                "</button>" +
-                "</div>" +
-                "</div>");
-
-            var selector = "#" + id;
-
-            $(selector).append($('<option/>', {
-                value: 0,
-                disabled: true,
-                selected: true,
-                text: "Pick a Column"
-            }));
-
-            $(selector).append($('<option/>', {
-                value: '*',
-                text: "* (All Rows)"
-            }));
-
-            for (var i = 0; i < schemaList.length; i++) {
-                for (var j = 0; j < schemaList[i].schema.length; j++) {
-                    $(selector).append($('<option/>', {
-                        value: schemaList[i].schema[j].id,
-                        text: schemaList[i].schema[j].label
-                    }));
-                }
-            }
-
-            updateJoins();
-            updateTables();
-            updateBadges();
-        }
-
-
-        function addGroupByRule() {
-
-            var length = $("#groupByContainer").children().length;
-            var id = "groupByT" + length;
-
-            $("#groupByContainer").append("<div class=\"rule-container\">" +
-                "<select id=\"" + id + "\" class=\"form-control groupBySelector\" name=\"builder-basic_rule_0_filter\" style=\"width: 90%; display: inline-block;\"></select>" +
-                "<div class=\"btn-group pull-right rule-actions\">" +
-                "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
-                "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
-                "</button>" +
-                "</div>" +
-                "</div>");
-
-            var selector = "#" + id;
-
-            $(selector).append($('<option/>', {
-                value: 0,
-                disabled: true,
-                selected: true,
-                text: "Pick a Column"
-            }));
-
-            for (var i = 0; i < schemaList.length; i++) {
-                for (var j = 0; j < schemaList[i].schema.length; j++) {
-                    $(selector).append($('<option/>', {
-                        value: schemaList[i].schema[j].id,
-                        text: schemaList[i].schema[j].label
-                    }));
-                }
-            }
-
-            updateJoins();
-            updateTables();
-            updateBadges();
-        }
-
-        function addHavingRule() {
-
-            var length = $("#havingContainer").children().length;
-            var id = "havingT" + length;
-
-            $("#havingContainer").append("<div class=\"rule-container\"><select class=\"form-control\" style=\"width: 10%; display: inline-block; \">" +
-                "<option selected> Aggregate </option>" +
-                "<option>COUNT</option>" +
-                "<option>SUM</option> " +
-                "<option>AVG</option> " +
-                "<option>MAX</option> " +
-                "<option>MIN</option> " +
-                "</select >" +
-                "<select class=\"form-control havingSelector\" name=\"builder-basic_rule_0_filter\" id=\"" + id + "\" style=\"width: 40%; display: inline-block;\"></select>" +
-                "<select class=\"form-control ruleController\" style= \"width: 5%; display: inline-block; \"> " +
-                "<option value='!=' selected> ≠ </option > " +
-                "<option value='=='> = </option > " +
-                "<option value='<'> < </option > " +
-                "<option value='>'> > </option > " +
-                "<option value='<='> <= </option > " +
-                "<option value='>='> >= </option > " +
-                "</select>" +
-                "<input class=\"form-control\" style= \"width: 18.4%; display: inline-block;\" />" +
-                "<div class=\"btn-group pull-right rule-actions\">" +
-                "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
-                "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
-                "</button>" +
-                "</div>" +
-                "</div>");
-
-            var selector = "#" + id;
-
-            $(selector).append($('<option/>', {
-                value: 0,
-                disabled: true,
-                selected: true,
-                text: "Pick a Column"
-            }));
-
-            for (var i = 0; i < schemaList.length; i++) {
-                for (var j = 0; j < schemaList[i].schema.length; j++) {
-                    $(selector).append($('<option/>', {
-                        value: schemaList[i].schema[j].id,
-                        text: schemaList[i].schema[j].label
-                    }));
-                }
-            }
-
-            updateJoins();
-            updateTables();
-            updateBadges();
-        }
-
-        function addOrderByRule() {
-            var length = $("#orderByContainer").children().length;
-            var id = "orderBy" + length;
-
-            $("#orderByContainer").append("<div class=\"rule-container\">" +
-                "<select id=\"" + id + "\" class=\"form-control orderBySelector\" style=\"width: 75%; display: inline-block;\"></select>" +
-
-                "<select id=\"option" + id + "\" class=\"form-control \" style=\"width: 10%; display: inline-block;\">" +
-                "<option value='ASC'>" + "Ascending" + "</option>" +
-                "<option value='DESC'>" + "Descending" + "</option>" +
-                "</select>" +
-                "<div class=\"btn-group pull-right rule-actions\">" +
-                "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
-                "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
-                "</button>" +
-                "</div>" +
-                "</div>");
-
-            var selector = "#" + id;
-
-            $(selector).append($('<option/>', {
-                value: 0,
-                disabled: true,
-                selected: true,
-                text: "Pick a Column"
-            }));
-
-            for (var i = 0; i < schemaList.length; i++) {
-                for (var j = 0; j < schemaList[i].schema.length; j++) {
-                    $(selector).append($('<option/>', {
-                        value: schemaList[i].schema[j].id,
-                        text: schemaList[i].schema[j].label
-                    }));
-                }
-            }
-
-            updateJoins();
+            //updateJoins();
             updateTables();
             updateBadges();
         }
 
         var joins = 0;
-        function addJoinRule() {
-            var tableOptions = "";
-            for (var i = 0; i < tableList.length; i++) {
-                tableOptions += "<option value=\"" + tableList[i] + "\">" + tableList[i] + "</option>";
-            }
 
-            var length = joins;
-            joins++;
-            var id = "Join" + length;
-
-            $("#joinContainer").append("<div class=\"rule-container\">" +
-                "<select id=\"firstTable" + id + "\" class=\"form-control ruleController tableNameController\" style= \"width: 11%; display:inline-block; \">" +
-                "<option selected disabled>Table Name</option>" +
-                tableOptions +
-                "</select>" +
-                "<select class=\"form-control ruleController joinTypeController\" style= \"width: 12%; display: inline-block; \"> " +
-                "<option selected disabled>Join Type</option > " +
-                "<option value='INNER'> Inner Join</option> " +
-                "<option value='FULL'> Full Join</option> " +
-                "<option value='LEFT'> Left Join</option> " +
-                "<option value='RIGHT'> Right Join</option> " +
-                "</select>" +
-                "<select id=\"secondTable" + id + "\"class=\"form-control ruleController tableNameController\" style= \"width: 11%; display:inline-block; \">" +
-                "<option selected disabled>Table Name</option>" +
-                tableOptions +
-                "</select>" +
-                "<span> ON </span>" +
-                // "<select id=\"helpfirstTable" + id + "\" class=\"form-control ruleController\" style= \"width: 11%; display:inline-block; \" disabled>" +
-                //    "<option selected>Table Name</option>" +
-                //      tableOptions +
-                //  "</select>" +
-                "<select id=\"colfirstTable" + id + "\" class=\"form-control ruleController\" style= \"width: 15%; display:inline-block; \" disabled>" +
-                "</select>" +
-                "<select class=\"form-control ruleController\" style= \"width: 5%; display: inline-block; \"> " +
-                "<option value='==' selected> = </option > " +
-                "<option value='!='> ≠ </option > " +
-                "<option value='<'> < </option > " +
-                "<option value='>'> > </option > " +
-                "<option value='<='> <= </option > " +
-                "<option value='>='> >= </option > " +
-                "</select>" +
-                //    "<select id=\"helpsecondTable" + id + "\" class=\"form-control ruleController\" style= \"width: 11%; display:inline-block; \" disabled>" +
-                //       "<option selected>Table Name</option>" +
-                //         tableOptions +
-                //    "</select>" +
-                "<select id=\"colsecondTable" + id + "\" class=\"form-control ruleController\" style= \"width: 15%; display:inline-block; \" disabled>" +
-                "</select>" +
-                "<div class=\"btn-group pull-right rule-actions\">" +
-                "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
-                "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
-                "</button>" +
-                "</div>" +
-                "</div>");
-
-            updateJoins();
-            updateTables();
-            updateBadges();
-        }
-
-        function addOrRemoveColumnRename(text, selected) {
-            //I'm choosing triple Pipe single Underscore cause I don't think anybody would ever choose that.
-            var id = "renameT" + text.replace(' ', '|||_');
-            if (selected == true) {
-
-                $("#columnRenamerContainer").append("<div class=\"rule-container\"  id=\"" + id + "\">" +
-                    "<input class=\"form-control\" disabled value=\"" + text + "\" style=\"width: 25%; display:inline-block;\" />" +
-                    "<input class=\"form-control ruleController\" style=\"width: 45%; display:inline-block;\" placeholder=\"Renamed As... \">" +
-                    "<div class=\"btn-group pull-right rule-actions\">" +
-                    "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
-                    "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
-                    "</button>" +
-                    "</div>" +
-                    "</div>");
-
-            }
-            else {
-                id = "#" + id;
-                $(id).remove();
-            }
-
-            updateJoins();
-            updateTables();
-            updateBadges();
-        }
+        var locked = false;
+        var queryBuilderExists = false;
+        var schemaList = [];
+        var tableList = [];
+        var filterList = [];
+        var tasksRunning = [];
+        var table;
 
         var sessionStartInterval;
         var checkInterval;
@@ -1699,14 +1328,6 @@ t1.createTempView("t1");
             }
         }
 
-        var locked = false;
-        var queryBuilderExists = false;
-        var schemaList = [];
-        var tableList = [];
-        var filterList = [];
-        var table;
-        var tasksRunning = [];
-
         function GetStatus(sessionID, statementID, action, tableName) {
 
             $('#btnCancelJob').attr("disabled", false);
@@ -1755,10 +1376,10 @@ t1.createTempView("t1");
                                     break;
                                 case "Reset Hive Tables":
                                 case "Get Hive Table":
-                                    renderTable(filters);
+                                    renderTable(filters, true, false);
                                     break;
                                 case "Select Query":
-                                    renderTable(filters);
+                                    renderTable(filters, true, false);
                                     $('#btnRowCount').prop('disabled', false);
                                     $('#savePanel').show();
                                     break;
@@ -1939,129 +1560,6 @@ t1.createTempView("t1");
             }
         }
 
-        function renderTable(filters) {
-            if (filters[0].startsWith("+-")) {
-
-                if (table) {
-                    table.destroy();
-                }
-
-                //Column information
-                var columns = filters[1].split('|');
-                var parsedColumns = [];
-                var nullColumns = [];
-
-                $('#tableColumnIDs').empty();
-                $('#tableFirstRow').empty();
-                $('#datasetRowTable tbody').empty();
-
-                for (var i = 1; i < columns.length; i++) {
-                    if (columns[i]) {
-                        nullColumns.push(null);
-                        parsedColumns.push({ 'title': columns[i].trim(), 'width': "auto" });
-                        $('#tableColumnIDs').append("<th>" + columns[i].trim() + "</th>");
-                        $('#tableFirstRow').append("<td></td>");
-                    }
-                }
-
-                var parsedRows = [];
-
-                //Data for Each Row in the Result Set
-                for (var i = 3; i < filters.length; i++) {
-
-                    if (!filters[i].startsWith("+-")) {
-
-
-                        var cells = filters[i].split('|');
-                        var parsedCells = [];
-                        cells.splice(0, 1);
-                        cells.splice(cells.length, 1);
-                        for (var j = 0; j < cells.length - 1; j++) {
-                            parsedCells.push(cells[j].trim());
-                        }
-
-                        if (parsedCells.length >= 1) {
-                            parsedRows.push(parsedCells);
-                        }
-                    }
-                }
-
-                table = $('#datasetRowTable').DataTable({
-                    "scrollX": true,
-                    data: parsedRows,
-                    columns: parsedColumns,
-                });
-
-                // $("#datasetRowTable").dataTable({
-                //     "columnDefs": [{
-                //         "defaultContent": "-",
-                //         "targets": "_all"
-                //     }],
-                //     "columnFilter": [{
-                //         "sPlaceHolder": "head:after",
-                //         "aoColumns": nullColumns,
-                //     }]
-                // });
-
-
-                $(".dataTables_filter").parent().addClass("text-right");
-            }
-        }
-
-        function callFileDownload(s3Key) {
-            //Trim the Bucket
-            var bucket = s3Key.substring(0, s3Key.indexOf('/') + 1);
-            s3Key = s3Key.replace(bucket, '');
-
-            var s3FileName = $('#s3FileName').val() + "." + $('#s3SaveAsFileExtension').find(":selected").text();
-
-            console.log(s3Key);
-            $.ajax({
-                type: "GET",
-                url: "/api/QueryTool/GetDatasetFileDownloadURL?s3Key=" + s3Key + "&fileName=" + s3FileName,
-                dataType: "json",
-                success: function (msg) {
-                    $('#s3DownloadLocation').attr('href', msg);
-                    $('#s3DownloadKeyText').text(msg);
-                    var countDownDate = new Date(new Date().getTime() + 2 * 60000);
-
-                    // Update the count down every 1 second
-                    var x = setInterval(function () {
-
-                        // Get todays date and time
-                        var now = new Date().getTime();
-
-                        // Find the distance between now an the count down date
-                        var distance = countDownDate - now;
-
-                        // Time calculations for days, hours, minutes and seconds
-                        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-                        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-                        // Display the result in the element with id="demo"
-
-                        $('#spanTimeLeft').text("(Time Left : " + minutes + "m " + seconds + "s )");
-
-
-                        // If the count down is finished, write some text
-                        if (distance < 0) {
-                            clearInterval(x);
-                            $('#s3DownloadLocation').attr('href', "");
-                            $('#s3DownloadKeyText').text("");
-                            $('#spanTimeLeft').text("(Time Left : EXPIRED.  Please press download again.)");
-                        }
-                    }, 1000);
-
-                    var win = window.open(msg, '_blank');
-                    win.focus();
-                },
-                error: function (e) {
-                    console.log("Unavailable");
-                }
-            });
-        }
-
-
         $(document).ready(function () {
 
             $('[data-toggle="tooltip"]').tooltip();
@@ -2167,62 +1665,14 @@ t1.createTempView("t1");
 
 
             if (localStorage.getItem("SparkSession") === null) {
-
-                $.ajax({
-                    type: "POST",
-                    url: "/api/QueryTool/CreateSession?Language=" + $('#LanguageDropDown').val(),
-                    dataType: "json",
-                    success: function (msg) {
-                        json = JSON.parse(msg);
-                        sessionID = json.id;
-
-                        var obj = { 'id': sessionID, 'time': Date.now() };
-
-                        localStorage.setItem("SparkSession", JSON.stringify(obj));
-                    },
-                    error: function (e) {
-                        console.log("Unavailable");
-                    }
-                });
+                CreateSession(true);
             }
             else {
                 sessionID = JSON.parse(localStorage.getItem("SparkSession")).id;
-                console.log(sessionID);
+
+                //Check the Session to make sure it is still active.
+                CheckSession();
             }
-
-            //Check the Session to make sure it is still active.
-            $.ajax({
-                type: "GET",
-                url: "/api/QueryTool/GetSession?SessionID=" + sessionID,
-                dataType: "json",
-                success: function (msg) {
-                    json = JSON.parse(msg);
-                    $('#jobInfo').text("Your Session is currently " + json.state + ".");
-                    $('#sessionID').text(sessionID);
-                    UpdateLivyURL();
-                },
-                error: function (e) {
-                    $.ajax({
-                        type: "POST",
-                        url: "/api/QueryTool/CreateSession?Language=" + $('#LanguageDropDown').val(),
-                        dataType: "json",
-                        success: function (msg) {
-                            json = JSON.parse(msg);
-                            sessionID = json.id;
-                            $('#sessionID').text(sessionID);
-                            UpdateLivyURL();
-
-                            var obj = { 'id': sessionID, 'time': Date.now() };
-
-                            localStorage.setItem("SparkSession", JSON.stringify(obj));
-                            $('#jobInfo').text("Your Session is currently " + json.state + ".");
-                        },
-                        error: function (e) {
-                            console.log("Unavailable");
-                        }
-                    });
-                }
-            });
 
             $.ajax({
                 type: "GET",
@@ -2235,78 +1685,7 @@ t1.createTempView("t1");
                     console.log("Unavailable");
                 }
             });
-
-            sessionStartInterval = setInterval("CheckSession()", 1000);
-
         });
-
-        function UpdateLivyURL() {
-            var url = $("#LivyURL").attr('href') + sessionID;
-            var to = url.lastIndexOf('/')
-            to = to == -1 ? url.length : to + 1;
-            url = url.substring(0, to);
-            url = url + sessionID;
-            $("#LivyURL").attr("href", url);
-        }
-
-        function CreateSession() {
-            $.ajax({
-                type: "POST",
-                url: "/api/QueryTool/CreateSession?Language=" + $('#LanguageDropDown').val(),
-                dataType: "json",
-                success: function (msg) {
-                    json = JSON.parse(msg);
-                    sessionID = json.id;
-                    $('#sessionID').text(sessionID);
-                    UpdateLivyURL();
-
-                    var obj = { 'id': sessionID, 'time': Date.now() };
-
-                    localStorage.setItem("SparkSession", JSON.stringify(obj));
-                    $('#jobInfo').text("Your Session is currently " + json.state + ".");
-
-                    sessionStartInterval = setInterval("CheckSession()", 1000);
-                },
-                error: function (e) {
-                    console.log("Unavailable");
-                }
-            });
-        }
-
-        var sessionStartUpSpeed = 0;
-
-        function CheckSession() {
-            sessionStartUpSpeed++;
-            $('#sessionSpinner').show();
-            $('#panelSpinner').show();
-            $('#schemaInformationButton').hide();
-
-            $.ajax({
-                type: "GET",
-                url: "/api/QueryTool/GetSession?SessionID=" + sessionID,
-                dataType: "json",
-                success: function (msg) {
-                    json = JSON.parse(msg);
-                    $('#jobInfo').text("Your Session is currently " + json.state + ".");
-
-                    if (json.state === "idle") {
-                        clearInterval(sessionStartInterval);
-                        $('#sessionSpinner').hide();
-                        $('#panelSpinner').hide();
-                        $('#schemaInformationButton').show();
-                        $('#statementInfo').text("Apache Spark has created a new session in " + sessionStartUpSpeed + " second(s).");
-                        sessionStartUpSpeed = 0;
-
-                    } else {
-                        $('#statementInfo').text("Apache Spark is currently creating a new session for the last " + sessionStartUpSpeed + " second(s).");
-                    }
-                },
-                error: function (e) {
-                    clearInterval(sessionStartInterval);
-                    CreateSession();
-                }
-            });
-        }
 
         vm = new ViewModel();
         ko.applyBindings(vm);

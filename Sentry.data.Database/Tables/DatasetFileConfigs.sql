@@ -5,7 +5,6 @@
     [FileType_ID]           INT            NOT NULL,
     [Config_NME]            VARCHAR (250)  NOT NULL,
     [Config_DSC]            VARCHAR(MAX)  NULL,
-    [IsGeneric]             BIT            NOT NULL,
     [DatasetScopeType_ID]   INT            NOT NULL,
     [FileExtension_CDE] INT NOT NULL, 
     [DataElement_ID] INT NULL, 

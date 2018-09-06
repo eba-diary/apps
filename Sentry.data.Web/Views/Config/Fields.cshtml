@@ -1,0 +1,705 @@
+﻿@model Sentry.data.Web.BaseDatasetModel
+
+@{
+    ViewBag.Title = "Fields";
+    Sentry.data.Core.Entities.Metadata.Schema schema = ViewBag.Schema;
+    string color = Model.DatasetCategory.Color;
+}
+<a class="backToList" href="/Config/Dataset/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>  Back to Dataset Configuration</a>
+
+<div class="topBanner" style="height: 60px;
+    margin-top: 20px;
+    border-bottom: 1px #DDDDDD solid;">
+    <div class="relative hidden-sm hidden-xs">
+        <div>
+
+            <div class="no-overflow">
+                <h1 class="detailName leftFloat @color">
+                    @Model.DatasetName
+
+                    @if (Model.IsSensitive)
+                    {
+                        <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
+                    }
+                </h1>
+
+                @{
+                    foreach (string item in Model.DistinctFileExtensions())
+                    {
+                        <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
+                    }
+                }
+
+                <div style="margin-top:-29px;">
+                    <div class="btn-group rightFloat dataset-operation-button">
+                        <button type="button"
+                                class="btn btn-default borderdk_gray borderdk_@color dropdown"
+                                data-toggle="dropdown" data-placement="top" title="Additional Actions">
+                            <span class="glyphicon glyphicon-menu-hamburger @color"></span>
+                        </button>
+
+                        <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
+                            <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
+                                <a>
+                                    Subscribe
+                                </a>
+                            </li>
+
+                            @if (Model.CanQueryTool)
+                            {
+                                <li title="Query Dataset">
+                                    <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
+                                        Query this Dataset
+                                    </a>
+                                </li>
+                            }
+                            @if (Model.CanManageConfigs)
+                            {
+                                <li>
+                                    <a href="/Config/Dataset/@Model.DatasetId">
+                                        Manage Schemas
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+
+                    @if (Model.CanUpload)
+                    {
+                        <button type="button"
+                                class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                                id="UploadModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Upload File">
+                            <span class="glyphicon glyphicon-cloud-upload @color"></span>
+                        </button>
+                    }
+
+                    @if (Model.CanEditDataset)
+                    {
+                        <button type="button"
+                                class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                                id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
+                            <span class="glyphicon glyphicon-edit @color"></span>
+                        </button>
+                    }
+
+                    @*@if (((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive)) && Model.DatasetFiles.Count != 0)
+                        {
+                            <button type="button"
+                                    class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                                    id="DownloadLatest" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download Latest">
+                                <span class="glyphicon glyphicon-cloud-download @color"></span>
+                            </button>
+                        }
+
+                        @if ((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive))
+                        {
+                            <button type="button"
+                                    class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                                    id="PreviewLatestData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Preview Latest">
+                                <span class="glyphicon glyphicon-search @color"></span>
+                            </button>
+                        }*@
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br />
+
+    <div class="hidden-md hidden-lg">
+        <h1 class="detailName leftFloat @color">
+            @Model.DatasetName
+
+            @if (Model.IsSensitive)
+            {
+                <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
+            }
+        </h1>
+
+        <div>
+            <div class="btn-group rightFloat dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions" style="margin-top: 5px;">
+                <button type="button"
+                        class="btn btn-default borderdk_gray borderdk_@color dropdown"
+                        data-toggle="dropdown">
+                    <span class="glyphicon glyphicon-menu-hamburger @color"></span>
+                </button>
+
+                <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
+                    <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
+                        <a>
+                            Subscribe
+                        </a>
+                    </li>
+
+                    @if (Model.CanQueryTool)
+                    {
+                        <li title="Query Dataset">
+                            <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
+                                Query this Dataset
+                            </a>
+                        </li>
+                    }
+                    @if (Model.CanManageConfigs)
+                    {
+                        <li>
+                            <a href="/Config/Dataset/@Model.DatasetId">
+                                Manage Schemas
+                            </a>
+                        </li>
+                    }
+
+                    @if (Model.CanUpload)
+                    {
+                        <li id="UploadModal" data-id="@Model.DatasetId">
+                            <a>Upload Files</a>
+                        </li>
+                    }
+
+                    @if (Model.CanEditDataset)
+                    {
+                        <li id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId">
+                            <a>Edit Dataset</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+<br />
+
+@using (Html.BeginForm("Fields", "Config", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+    <h2 class="@color">Fields for @schema.Schema_NME</h2>
+    <hr />
+
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+    <div data-bind="visible: HiveDatabaseName() !== null" style="display:none;">
+        <h6 class="@color">This schema is currently tied to the Hive Table named <span data-bind="text: HiveDatabaseName"></span>.<span data-bind="text: HiveTableName"></span> with <span data-bind="text: RowCount"></span> rows.  <b>You cannot edit it.</b></h6>
+    </div>
+
+    <div id="panelSpinner">
+        <div class="sentry-spinner-container" style=" width: 1166px;">
+            <span class="sentry-spinner" style="height:100px"></span>
+        </div>
+    </div>
+    <div id="rowsContainer" style="display: none;">
+
+        <div data-bind="visible: Errors().length >= 1" style="display: none;">
+            <h6 style="color: red;">Errors:</h6>
+        </div>
+        <ul style="display: none; color: red;" data-bind="foreach: Errors().sort(function (l, r) { return (l.Id == r.Id) ? (l.Id > r.Id ? 1 : -1) : (l.Id > r.Id ? 1 : -1) }), visible: Errors().length >= 1">
+            <li>
+                <span>Row # <span data-bind="text: Id"></span></span> :
+                <span data-bind="text: Description"></span>
+            </li>
+        </ul>
+
+        <div id="tablePanel" class="col-lg-12">
+            <div class="rules-group-container row" id="tableSelection" data-bind="template: {name: 'RowTemplate' , foreach: Rows}">
+            </div>
+        </div>
+
+
+        <div style="margin-top: 10px;" class="col-lg-12">
+
+            <hr />
+
+            <button type="button" class="btn btn-sm btn-success" data-bind='click: addRow' style="margin-bottom: 8px;"><i class="glyphicon glyphicon-plus"></i> Add a Field</button>
+            <span style="
+                font-size: 25px;
+                color: lightgray;
+                line-height: 2;
+            ">|</span>
+            <span>
+                <label for="checkForErrors">Check for Errors</label>
+                <span>
+                    <input id="checkForErrors" type="checkbox" data-bind="checked: checkForErrors" />
+                </span>
+            </span>
+            <hr />
+            <button class="btn btn-success" data-bind='click: save'>Save</button>
+            <div id="buttonSpinner" style="
+                    display: inline-block;
+                    margin-bottom: 24px;
+                    margin-left: -20px;
+                    display: none;
+                ">
+                <div class="sentry-spinner-container" style="width: 100px;display: inline-block;">
+                    <span class="sentry-spinner" style="height: 10px;width: 10px;"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/html" id="RowTemplate">
+        <div class="col-lg-12 parentContainer">
+            <div class="row">
+                <div data-bind="style : { 'background-color' : RowColor }" style="padding: 2px">
+                    <h6 style="float: left; margin-right: 6px; line-height: 0.5; width: 15px;" data-bind="text: Id"></h6>
+                    <input class="col-lg-3" data-bind="value: Name" placeholder="Field Name..." />
+                    <input class="col-lg-3" data-bind="value: Description" placeholder="Description..." />
+                    <select class="typeSelect" data-bind="value: Type">
+                        <optgroup label="Numeric Data Types">
+                            <option title="A signed one-byte integer, from -128 to 127." value="TINYINT">
+                                TINYINT
+                            </option>
+                            <option title="A signed two-byte integer, from -32,768 to 32,767." value="SMALLINT">
+                                SMALLINT
+                            </option>
+                            <option title="A signed four-byte integer." value="INTEGER">
+                                INTEGER
+                            </option>
+                            <option title="A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807." value="BIGINT">
+                                BIGINT
+                            </option>
+                            <option title="A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807." value="LONG">
+                                LONG
+                            </option>
+                            <option title="A four-byte, single-precision floating-point number." value="FLOAT">
+                                FLOAT
+                            </option>
+                            <option title="An eight-byte, double-precision floating-point number." value="DOUBLE">
+                                DOUBLE
+                            </option>
+                            <option title="A fixed-point decimal number, with 38 digits precision." value="DECIMAL">
+                                DECIMAL
+                            </option>
+                        </optgroup>
+
+                        <optgroup label="String Data Types">
+                            <option title="A variable-length character string." value="STRING">
+                                STRING
+                            </option>
+                            <option title="A varying-length character string." value="VARCHAR">
+                                VARCHAR
+                            </option>
+                            <option title="A character string up to 255 characters." value="CHAR">
+                                CHAR
+                            </option>
+                        </optgroup>
+
+                        <optgroup label="Date/Time Data Types">
+                            <option title="An ANSI SQL date type. YYYY-MM-DD" value="DATE">
+                                DATE
+                            </option>
+                            <option title="A UNIX timestamp with optional nanosecond precision. YYYY-MM-DD HH:MM:SS.sss" value="TIMESTAMP">
+                                TIMESTAMP
+                            </option>
+                        </optgroup>
+
+                        <optgroup label="Misc. Data Types">
+                            <option title="A textual true or false value." value="BOOLEAN">
+                                BOOLEAN
+                            </option>
+                            <option title="A varying length binary string." value="BINARY">
+                                BINARY
+                            </option>
+                        </optgroup>
+
+                        @*<optgroup label="Complex Data Types">
+                            <option title="A complex data type that can represent an arbitrary number of ordered elements." value="ARRAY" disabled="disabled">
+                                ARRAY
+                            </option>
+                            <option title="A complex data type, representing multiple fields of a single item." value="STRUCT" disabled="disabled">
+                                STRUCT
+                            </option>
+                        </optgroup>*@
+                    </select>
+
+
+
+                    <div class="optionContainer">
+                        <div class="arrayTypeSelect" data-bind="visible: ShowArrayType">
+                            <select class="arrayTypeSelect" data-bind="value: ArrayType">
+                                <optgroup label="Numeric Data Types">
+                                    <option title="A signed one-byte integer, from -128 to 127." value="TINYINT">
+                                        TINYINT
+                                    </option>
+                                    <option title="A signed two-byte integer, from -32,768 to 32,767." value="SMALLINT">
+                                        SMALLINT
+                                    </option>
+                                    <option title="A signed four-byte integer." value="INTEGER">
+                                        INTEGER
+                                    </option>
+                                    <option title="A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807." value="BIGINT">
+                                        BIGINT
+                                    </option>
+                                    <option title="A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807." value="LONG">
+                                        LONG
+                                    </option>
+                                    <option title="A four-byte, single-precision floating-point number." value="FLOAT">
+                                        FLOAT
+                                    </option>
+                                    <option title="An eight-byte, double-precision floating-point number." value="DOUBLE">
+                                        DOUBLE
+                                    </option>
+                                    <option title="A fixed-point decimal number, with 38 digits precision." value="DECIMAL">
+                                        DECIMAL
+                                    </option>
+                                </optgroup>
+
+                                <optgroup label="String Data Types">
+                                    <option title="A variable-length character string." value="STRING">
+                                        STRING
+                                    </option>
+                                    <option title="A varying-length character string." value="VARCHAR">
+                                        VARCHAR
+                                    </option>
+                                    <option title="A character string up to 255 characters." value="CHAR">
+                                        CHAR
+                                    </option>
+                                </optgroup>
+
+                                <optgroup label="Date/Time Data Types">
+                                    <option title="An ANSI SQL date type. YYYY-MM-DD" value="DATE">
+                                        DATE
+                                    </option>
+                                    <option title="A UNIX timestamp with optional nanosecond precision. YYYY-MM-DD HH:MM:SS.sss" value="TIMESTAMP">
+                                        TIMESTAMP
+                                    </option>
+                                </optgroup>
+
+                                <optgroup label="Misc. Data Types">
+                                    <option title="A textual true or false value." value="BOOLEAN">
+                                        BOOLEAN
+                                    </option>
+                                    <option title="A varying length binary string." value="BINARY">
+                                        BINARY
+                                    </option>
+                                </optgroup>
+
+                                <optgroup label="Complex Data Types">
+                                    <option title="A complex data type that can represent an arbitrary number of ordered elements." value="ARRAY" disabled="disabled">
+                                        ARRAY
+                                    </option>
+                                    <option title="A complex data type, representing multiple fields of a single item." value="STRUCT" disabled="disabled">
+                                        STRUCT
+                                    </option>
+                                </optgroup>
+                            </select>
+
+                        </div>
+
+                        <div class="showPandS" data-bind="visible: ShowPandS">
+                            <input class="precision" data-bind="value: Precision" type="number" min="1" placeholder="Precision" />
+                            <input class="scale" data-bind="value: Scale" type="number" min="1" placeholder="Scale" />
+                        </div>
+
+                        <div class="options">
+                            <button class="rightButton" data-bind='click: addChild, visible: ShowAddChild'>Add a Child</button>
+
+                            <div class="rightButton" data-bind="visible: $parent.Name === undefined">
+
+                                <button type="button" class="btn btn-xs btn-danger" data-bind='click: $root.removeRow'>
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                    Delete
+                                </button>
+                            </div>
+                            <div class="rightButton" data-bind="visible: $parent.Name !== undefined">
+                                <button type="button" class="btn btn-xs btn-danger" data-bind='click: $parent.removeChild'>
+                                    <i class="glyphicon glyphicon-remove"></i>
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="childrenContainer" data-bind="template: {name: 'RowTemplate' , foreach: ChildRows}"></div>
+            </div>
+        </div>
+    </script>
+}
+
+<style>
+    .parentContainer {
+        margin-top: 10px;
+        background-color: rgba(0,0,0,0.05);
+        padding: 5px;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    .childrenContainer {
+        margin-left: 15px;
+    }
+
+    .typeSelect {
+        width: 100px;
+        height: 26px;
+        padding-left: 10px;
+    }
+
+    .showPandS {
+        display: inline;
+    }
+
+    .arrayTypeSelect {
+        display: inline;
+        width: 100px;
+        height: 26px;
+        padding-left: 10px;
+    }
+
+    .optionContainer {
+        float: right;
+    }
+
+    .rightButton {
+        display: inline;
+    }
+
+    .row {
+        margin-right: -20px;
+    }
+
+    .options {
+        display: inline;
+    }
+
+    .precision {
+        width: 80px;
+    }
+
+    .scale {
+        width: 60px;
+    }
+</style>
+
+
+@section Scripts {
+
+    <script>
+        var currentMax = 0;
+        var errorList = [];
+
+        function Row(id, data, parent) {
+            var self = this;
+            var parent = parent;
+
+            self.Id = ko.observable(id);
+            self.DataObjectField_ID = ko.observable(data.DataObjectField_ID);
+            self.Name = ko.observable(data.Name);
+            self.Description = ko.observable(data.Description);
+            self.Type = ko.observable(data.Type);
+            self.ArrayType = ko.observable(data.ArrayType);
+            self.Precision = ko.observable(data.Precision);
+            self.Scale = ko.observable(data.Scale);
+
+            self.RowColor = ko.computed(function () {
+                var hasError = false;
+
+                if (parent.Errors !== undefined) {
+                    parent.Errors.remove(function (item) { return item.Id === self.Id() && item.ErrorType == 'Type'; });
+                    parent.Errors.remove(function (item) { return item.Id === self.Id() && item.ErrorType == 'Name'; });
+                }
+
+
+                //Has no children.  Error
+                if ((self.Type() === 'STRUCT' || (self.Type() === 'ARRAY' && self.ArrayType() === 'STRUCT')) && self.ChildRows !== undefined && self.ChildRows().length === 0) {
+                    parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Type', 'Description': ' has no children.  Please add a child or change data types.' });
+                    hasError = true;
+                }
+                //Has children when it shouldn't
+                else if (self.Type() === 'ARRAY' && self.ArrayType() !== "STRUCT" && self.ChildRows !== undefined && self.ChildRows().length > 0) {
+                    parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to ARRAY<STRUCT>.' });
+                    hasError = true;
+                }
+                //Has children when it shouldn't
+                else if (self.Type() !== 'STRUCT' && (self.Type() !== 'ARRAY' && self.ArrayType() !== "STRUCT") && self.ChildRows !== undefined && self.ChildRows().length > 0) {
+                    parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to STRUCT.' });
+                    hasError = true;
+                }
+
+                if (parent.checkForErrors && (self.Name() === '' || self.Name() === undefined || self.Name() === null)) {
+                    parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Name', 'Description': ' has no name.' });
+                    hasError = true;
+                }
+
+                if (self.Name() === '' && self.Name() === undefined && self.Name() === null && self.Name().trim().includes(" ")) {
+                    parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Name', 'Description': ' Name cannot contain Spaces.' });
+                    hasError = true;
+                }
+
+
+                if (hasError) {
+                    return 'rgba(255, 0, 0, 0.8)';
+                }
+                else {
+                    return '';
+                }
+
+
+
+            });
+
+
+            self.ShowPandS = ko.computed(function () {
+                if (self.Type() === 'DECIMAL') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            });
+
+            self.ShowArrayType = ko.computed(function () {
+                if (self.Type() === 'ARRAY') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            });
+
+            self.ShowAddChild = ko.computed(function () {
+                if (self.Type() === 'STRUCT' || (self.Type() === 'ARRAY' && self.ArrayType() === 'STRUCT')) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            });
+
+            self.ChildRows = ko.observableArray(ko.utils.arrayMap(data.ChildRows, function (rowInfo) {
+                currentMax++;
+                return new Row(currentMax, rowInfo, parent);
+            }));
+
+            self.addChild = function () {
+                currentMax++;
+                self.ChildRows.push(new Row(currentMax, [{ DataObjectField_ID: "", Name: "", Description: "", Type: "", ArrayType: "", Precision: null, Scale: null }], parent));
+            };
+
+            self.removeChild = function (row) {
+                parent.Errors.remove(function (item) { return item.Id === row.Id(); });
+                self.ChildRows.remove(row);
+            };
+        }
+
+
+        var viewModel = function (incomingJson) {
+            var self = this;
+
+            self.Rows = ko.observableArray(ko.utils.arrayMap(incomingJson.rows, function (rowInfo) {
+                currentMax++;
+                return new Row(currentMax, rowInfo, self);
+            }));
+
+            self.HiveDatabaseName = ko.observable(incomingJson.HiveDatabaseName);
+            self.HiveTableName = ko.observable(incomingJson.HiveTableName);
+            self.RowCount = ko.observable(incomingJson.RowCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+
+            self.Errors = ko.observableArray();
+
+            self.checkForErrors = ko.observable(false);
+
+            self.addRow = function () {
+                currentMax++;
+                self.Rows.push(new Row(currentMax, [{ DataObjectField_ID: "", Name: "", Description: "", Type: "", ArrayType: "", Precision: null, Scale: null }], self));
+            };
+
+            self.removeRow = function (row) {
+                self.Errors.remove(function (item) { return item.Id === row.Id(); });
+                self.Rows.remove(row)
+            }
+
+            self.save = function () {
+                var a = JSON.stringify(ko.toJS(vm.Rows), ['Name', 'DataObjectField_ID', 'Description', 'Type', 'ArrayType', 'Precision', 'Scale', 'ChildRows']);
+                console.log(a);
+
+                var url_parts = window.location.href.replace(/\/\s*$/, '').split('/');
+                //since we do not need example.com
+                url_parts.shift();
+
+                $('#buttonSpinner').show();
+
+                $.ajax({
+                    type: "POST",
+                    url: "/Config/" + url_parts[3] + "/Schema/" + url_parts[5] + "/UpdateFields",
+                    data: a,
+                    dataType: "json",
+                    contentType: "application/json",
+                    success: function (returnedData) {
+                        $('#buttonSpinner').hide();
+                        console.log(returnedData);
+                        window.location.href = "/Config/Dataset/@Model.DatasetId";
+                    },
+                    error: function (error) {
+                        console.log(error);
+                        $('#buttonSpinner').hide();
+                    },
+                    async: false
+                });
+
+            };
+
+        };
+
+        var initialData = [
+            {
+                Name: "Parent1", Description: "LaRusso", Type: "ARRAY", ArrayType: "STRUCT", Precision: "", Scale: "",
+                ChildRows: [
+                    {
+                        Name: "Child1", Description: "LaRusso", Type: "STRUCT", ArrayType: "", Precision: "", Scale: "",
+                        ChildRows: [
+                            {
+                                Name: "Child11", Description: "LaRusso", Type: "INTEGER", ArrayType: "", Precision: "", Scale: "",
+                            },
+                            {
+                                Name: "Child12", Description: "LaRusso", Type: "STRUCT", ArrayType: "", Precision: "", Scale: "",
+                                ChildRows: [
+                                    { Name: "Child121", Description: "LaRusso", Type: "INTEGER", ArrayType: "", Precision: "", Scale: "" },
+                                    { Name: "Child122", Description: "LaRusso", Type: "INTEGER", ArrayType: "", Precision: "", Scale: "" }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                Name: "Parent2", Description: "LaRusso", Type: "INTEGER", ArrayType: "", Precision: "", Scale: ""
+            }
+        ];
+
+        var vm;
+        $(function () {
+
+            var url_parts = window.location.href.replace(/\/\s*$/, '').split('/');
+            //since we do not need example.com
+            url_parts.shift();
+
+
+
+            $.ajax({
+                type: "GET",
+                url: "/api/Schema/GetColumnSchemaInformationFor?DatasetConfigID=" + url_parts[3] + "&SchemaID=" + url_parts[5],
+                contentType: "application/json",
+                success: function (returnedData) {
+                    console.log(returnedData);
+                    $('#panelSpinner').hide();
+                    $('#rowsContainer').show();
+
+                    vm = new viewModel(returnedData);
+                    ko.applyBindings(vm);
+
+                    if (returnedData.RowCount >= 1 && returnedData.HiveDatabaseName != null && returnedData.HiveTableName != null) {
+                        $("button").prop("disabled", true);
+                        $("select").prop("disabled", true);
+                        $("input").prop("disabled", true);
+                    }
+                },
+                async: false
+            });
+        });
+
+
+    </script>
+
+}

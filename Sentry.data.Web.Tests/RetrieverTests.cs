@@ -62,5 +62,12 @@ namespace Sentry.data.Web.Tests
             Assert.IsTrue(vr == @"ftp://ftp.sentry.com/SourceFolder/CurrentDirectory/");
         }
 
+        [TestMethod]
+        public void RetrieverJob_Enabled_By_Default()
+        {
+            RetrieverJob rtjob = MockClasses.GetMockRetrieverJob(null, null, null);
+            var vr = rtjob.IsEnabled;
+            Assert.IsTrue(vr == true);
+        }
     }
 }

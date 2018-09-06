@@ -1,0 +1,82 @@
+﻿@model Sentry.data.Web.Models.Config.EditSchemaModel
+
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div class="topBanner">
+    <div>
+        <a class="backToList" href="/Config/Dataset/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>Back to Dataset Configuration</a>
+    </div>
+</div>
+
+@using (Html.BeginForm("EditSchema", "Config", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    @*Show the custom validation summary*@
+    @Html.DisplayFor((model) => ViewData.ModelState)
+
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+    @Html.HiddenFor(model => model.DatasetId)
+
+    <h1>Edit Schema Revision</h1>
+    <hr />
+    <div id="myTabContent" class="tab-content">
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.Name, new { @value = "", @class = "form-control edit-dataset-row" })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.Description, new { @value = "", @class = "form-control edit-dataset-row" })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.IsForceMatch, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.CheckBoxFor(model => model.IsForceMatch, new { @class = "" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.IsPrimary, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.CheckBoxFor(model => model.IsPrimary, new { @class = "" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DataObject_ID, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.DataObject_ID, new { @value = "", @class = "form-control edit-dataset-row" })
+                @Html.ValidationMessageFor(model => model.DataObject_ID, "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+
+    <hr />
+    <div class="form-group">
+        <span class="text-muted"><em>** Fields in <b>Bold</b> are Required</em></span>
+    </div>
+    <div class="form-group">
+        <div>
+            <input type="submit" id="btnCreateDataset" value="Update Schema" class="btn btn-primary" />
+            <a class="btn btn-warning" href="/Config/Dataset/@Model.DatasetId">Cancel</a>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+    </script>
+}

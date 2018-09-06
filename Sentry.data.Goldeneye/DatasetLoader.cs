@@ -53,8 +53,10 @@ namespace Sentry.data.Goldeneye
                         SingleFileProcessor(req.File, _datasetContext, req, job);
                     }
                     else
-                    {                        
-                        DatasetFileConfig fileconfig = _datasetContext.getDatasetDefaultConfig(req.DatasetID);
+                    {
+                        //need to determine way to return datafile config
+                        DatasetFileConfig fileconfig = null;
+                        //DatasetFileConfig fileconfig = _datasetContext.getDatasetDefaultConfig(req.DatasetID);
                         Dataset ds = _datasetContext.GetById<Dataset>(req.DatasetID);
                         
                         DatasetFile df = Utilities.ProcessInputFile(ds, fileconfig, true, req, null);

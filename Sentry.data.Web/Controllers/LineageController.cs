@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Sentry.Common.Logging;
 using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.Metadata;
@@ -85,8 +86,9 @@ namespace Sentry.data.Web.Controllers
                     return Ok();
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Error(ex.Message);
                 return NotFound();
             }
         }
@@ -105,8 +107,9 @@ namespace Sentry.data.Web.Controllers
 
                 return Ok(allLineage);
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Error(ex.Message);
                 return NotFound();
             }
         }
@@ -133,8 +136,9 @@ namespace Sentry.data.Web.Controllers
                     return Ok(doDesc);
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Error(ex.Message);
                 return NotFound();
             }
         }
@@ -152,8 +156,9 @@ namespace Sentry.data.Web.Controllers
                             
                 return Ok(allLineage);
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Error(ex.Message);
                 return NotFound();
             }
         }
@@ -173,8 +178,9 @@ namespace Sentry.data.Web.Controllers
 
                 return Ok(allLineage);
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Error(ex.Message);
                 return NotFound();
             }
         }
@@ -192,8 +198,9 @@ namespace Sentry.data.Web.Controllers
 
                 return Ok(businessTermDescription);
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Error(ex.Message);
                 return NotFound();
             }
         }
@@ -213,8 +220,9 @@ namespace Sentry.data.Web.Controllers
 
                 return Ok(businessTerms);
             }
-            catch
+            catch(Exception ex)
             {
+                Logger.Error(ex.Message);
                 return NotFound();
             }
         }
@@ -232,8 +240,9 @@ namespace Sentry.data.Web.Controllers
 
                 return Ok(layers);
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Error(ex.Message);
                 return NotFound();
             }
         }
@@ -251,8 +260,9 @@ namespace Sentry.data.Web.Controllers
 
                 return Ok(layers);
             }
-            catch
+            catch (Exception ex)
             {
+                Logger.Error(ex.Message);
                 return NotFound();
             }
         }

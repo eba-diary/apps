@@ -29,6 +29,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.DataObject_ID, (m) => m.Column("DataObject_ID"));
             this.Property((x) => x.Revision_ID, (m) => m.Column("Revision_ID"));
             this.Property((x) => x.IsForceMatch, (m) => m.Column("IsForceMatch"));
+            this.Property((x) => x.IsPrimary, (m) => m.Column("IsPrimary"));
             this.Property((x) => x.Created_DTM, (m) => m.Column("Created_DTM"));
             this.Property((x) => x.Changed_DTM, (m) => m.Column("Changed_DTM"));
 

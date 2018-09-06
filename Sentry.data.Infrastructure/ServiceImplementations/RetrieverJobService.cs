@@ -15,6 +15,7 @@ using Hangfire;
 using System.Threading;
 using Sentry.Core;
 using System.Net;
+using System.Net.Mime;
 
 namespace Sentry.data.Infrastructure
 {
@@ -427,7 +428,7 @@ namespace Sentry.data.Infrastructure
                     {                        
                         //set up HTTP Request
                         HTTPSProvider requestProvider = new HTTPSProvider(_job, null);
-                        HttpWebResponse resp = requestProvider.SendRequest();
+                        HttpWebResponse resp = requestProvider.SendRequest();                        
                         if (resp.StatusCode != HttpStatusCode.OK)
                         {
                             throw new WebException($"HTTPS call returned {resp.StatusCode} with description {resp.StatusDescription}");
@@ -440,7 +441,9 @@ namespace Sentry.data.Infrastructure
                         RetrieverJob targetJob = FindBasicJob();
 
                         //Get target path based on basic job found
-                        string targetFullPath = GetTargetPath(targetJob);
+                        string extension = ParseContentType(resp.ContentType);
+
+                        string targetFullPath = $"{GetTargetPath(targetJob)}.{extension}";
 
                         if (_job.JobOptions != null && _job.JobOptions.CompressionOptions.IsCompressed)
                         {
@@ -503,7 +506,7 @@ namespace Sentry.data.Infrastructure
                                 }
 
                                 S3ServiceProvider s3Service = new S3ServiceProvider();
-                                string targetkey = $"{targetJob.DataSource.GetDropPrefix(targetJob)}{_job.GetTargetFileName(Path.GetFileName(targetFullPath))}";
+                                string targetkey = targetFullPath;
                                 var versionId = s3Service.UploadDataFile(tempFile, targetkey);
 
                                 _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
@@ -563,22 +566,132 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        private string ParseContentType(string contentType)
+        {
+            //Mime types
+            //https://technet.microsoft.com/en-us/library/cc995276.aspx
+            //https://www.iana.org/assignments/media-types/media-types.xhtml
+
+            var content = new ContentType(contentType);
+
+            using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+            {
+                IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
+
+                MediaTypeExtension extensions = _datasetContext.MediaTypeExtensions.Where(w => w.Key == content.MediaType).FirstOrDefault();
+
+                if (extensions == null)
+                {
+                    _job.JobLoggerMessage("Warn", $"Detected new MediaType ({content.MediaType}), defaulting to txt");
+                    return "txt";
+                }
+
+                return extensions.Value;
+            }
+        }
+
+        public void DisableJob(int JobId)
+        {
+            RetrieverJob job = null;
+
+            try
+            {
+                using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                {
+                    //Goldeneye will monitor for modified jobs and perform necessary actions to ensure hangfire reflects job changes
+
+                    IRequestContext _requestContext = Container.GetInstance<IRequestContext>();
+
+                    job = _requestContext.GetById<RetrieverJob>(JobId);
+
+                    job.IsEnabled = false;
+                    job.Modified = DateTime.Now;
+
+                    _requestContext.SaveChanges();
+
+                    job.JobLoggerMessage("INFO", $"Job set to Disabled - JobId:{JobId} JobName:{job.JobName()}");
+                }
+            }
+            catch (Exception ex)
+            {
+                if (job == null)
+                {
+                    Logger.Error($"Failed Disabling Job - JobId:{JobId}", ex);
+                }
+                else
+                {
+                    job.JobLoggerMessage("ERROR", $"Failed Disabling Job - JobId:{JobId} JobName:{job.JobName()}", ex);
+                }                
+            }            
+        }
+
+        public void EnableJob(int JobId)
+        {
+            RetrieverJob job = null;
+
+            try
+            {
+                using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                {
+                    //Goldeneye will monitor for modified jobs and perform necessary actions to ensure hangfire reflects job changes
+
+                    IRequestContext _requestContext = Container.GetInstance<IRequestContext>();
+
+                    job = _requestContext.GetById<RetrieverJob>(JobId);
+
+                    job.IsEnabled = true;
+                    job.Modified = DateTime.Now;
+
+                    _requestContext.SaveChanges();                    
+
+                    job.JobLoggerMessage("INFO", $"Job set to Enabled - JobId:{JobId} JobName:{job.JobName()}");                    
+                }
+            }
+            catch (Exception ex)
+            {
+                if (job == null)
+                {
+                    Logger.Error($"Failed Enabling Job - JobId:{JobId}", ex);
+                }
+                else
+                {
+                    job.JobLoggerMessage("ERROR", $"Failed Enabling Job - JobId:{JobId} JobName:{job.JobName()}", ex);
+                }
+            }
+        }
+
         private string GetTargetPath(RetrieverJob basicJob)
         {
+            string basepath;
+            string filename;
             string targetPath = null;
             if (basicJob.DataSource.Is<DfsBasic>())
             {
-                targetPath = Path.Combine(basicJob.GetUri().LocalPath, _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString())));
+                basepath = basicJob.GetUri().LocalPath;                
             }
             else if (basicJob.DataSource.Is<S3Basic>())
-            {
-                targetPath = Path.Combine(basicJob.GetUri().AbsolutePath, _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString())));
+            {                
+                basepath = basicJob.DataSource.GetDropPrefix(basicJob);
             }
             else
             {
                 _job.JobLoggerMessage("Error", "Not Configured to determine target path for data source type");
                 throw new NotImplementedException("Not Configured to determine target path for data source type");
             }
+
+            if (_job.DataSource.Is<HTTPSSource>())
+            {
+                filename = _job.GetTargetFileName(_job.GetTargetFileName(String.Empty));
+                targetPath = $"{basepath}{_job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString()))}";
+            }
+            else
+            {
+                filename = _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString()));
+                targetPath = Path.Combine(basepath, _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString())));
+            }
+
+            
+
             return targetPath;
         }
 
@@ -613,7 +726,7 @@ namespace Sentry.data.Infrastructure
         /// <returns></returns>
         public string SetupTempWorkSpace()
         {
-            string tempFile = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Path.GetFileName(_job.GetUri().ToString()));
+            string tempFile = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), (Guid.NewGuid().ToString() + ".txt"));
 
             //Create temp directory if exists
             Directory.CreateDirectory(Path.GetDirectoryName(tempFile));

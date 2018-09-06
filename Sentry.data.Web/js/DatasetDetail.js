@@ -145,6 +145,34 @@ data.DatasetDetail = {
                 }
             });        
         });
+
+        $('body').on('click', '.jobstatus', function () {
+
+            if ($(this).hasClass('jobstatus_enabled')) {
+                var controllerurl = "/Dataset/DisableRetrieverJob/?id=";
+            }
+            else {
+                var controllerurl = "/Dataset/EnableRetrieverJob/?id=";                
+            }
+
+            var request = $.ajax({
+                url: controllerurl + $(this).attr('id'),
+                method: "POST",
+                dataType: 'json',
+                success: function (obj) {
+                    var modal = Sentry.ShowModalConfirmation(
+                        obj.Message, function () { location.reload(); })
+                },
+                failure: function (obj) {
+                    var modal = Sentry.ShowModalAlert(
+                        obj.Message, function () { location.reload(); })
+                },
+                error: function (obj) {
+                    var modal = Sentry.ShowModalAlert(
+                        obj.Message, function () { location.reload(); })
+                }
+            });
+        });
     },
 
     PushToBundler: function (dataSetID, listOfFilesToBundle) {

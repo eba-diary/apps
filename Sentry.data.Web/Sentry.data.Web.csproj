@@ -268,6 +268,7 @@
     <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\AssetController.cs" />
     <Compile Include="Controllers\DataAssetController.cs" />
     <Compile Include="Controllers\DatasetController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
@@ -282,6 +283,8 @@
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Filters\AuthorizationFilters\AuthorizeHangfireDashboard.cs" />
+    <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeAttribute.cs" />
+    <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeByPermissionAttribute.cs" />
     <Compile Include="Helpers\LivyHelper.cs" />
     <Compile Include="Helpers\BeginCollectionItem.cs" />
     <Compile Include="Helpers\PredicateBuilder.cs" />
@@ -310,9 +313,13 @@
     <Compile Include="Helpers\TimeSpanFormattingExtensions.cs" />
     <Compile Include="Helpers\WebCurrentUserIdProvider.cs" />
     <Compile Include="HttpExceptions\NotAuthorizedException.cs" />
+    <Compile Include="Models\Config\CreateExtensionMapModel.cs" />
+    <Compile Include="Models\Config\CreateSchemaModel.cs" />
     <Compile Include="Models\Config\CreateSourceModel.cs" />
     <Compile Include="Models\Config\EditJobModel.cs" />
+    <Compile Include="Models\Config\EditSchemaModel.cs" />
     <Compile Include="Models\Config\EditSourceModel.cs" />
+    <Compile Include="Models\Config\FieldModel.cs" />
     <Compile Include="Models\DataAsset\AssetUIModel.cs" />
     <Compile Include="Models\DataAsset\BaseAssetNotificationModel.cs" />
     <Compile Include="Models\DataAsset\CreateAssetNotificationModel.cs" />
@@ -355,10 +362,16 @@
     <Content Include="Images\SHO_Aerial_10-4-17.jpg" />
     <Content Include="Images\SHO_Aerial_10-4-17.png" />
     <Content Include="Images\SHO_SentryWorld_Aerial.jpg" />
+    <Content Include="js\Config.js" />
     <Content Include="js\DatasetDetail.js" />
     <Content Include="js\ManageAssetAlert.js" />
     <Content Include="js\ManageConfigs.js" />
-    <Content Include="js\QueryToolModel.js" />
+    <Content Include="js\QueryTool\AddRule.js" />
+    <Content Include="js\QueryTool\BannerControls.js" />
+    <Content Include="js\QueryTool\QueryToolModel.js" />
+    <Content Include="js\QueryTool\RenderTable.js" />
+    <Content Include="js\QueryTool\SaveTo.js" />
+    <Content Include="js\QueryTool\Startup.js" />
     <Content Include="Scripts\bootstrap-datetimepicker.js" />
     <Content Include="Scripts\bootstrap-datetimepicker.min.js" />
     <Content Include="Scripts\DataTables\moment-with-locales.js" />
@@ -1154,6 +1167,12 @@
     <Content Include="Views\Shared\_HomePageLayout.cshtml" />
     <Content Include="Views\Config\_Headers.cshtml" />
     <Content Include="Views\Shared\EditorTemplates\Collection.cshtml" />
+    <Content Include="Views\Config\Fields.cshtml" />
+    <Content Include="Views\Config\_Fields.cshtml" />
+    <Content Include="Views\Config\CreateSchema.cshtml" />
+    <Content Include="Views\Config\EditSchema.cshtml" />
+    <Content Include="Views\Config\_ExtensionMapping.cshtml" />
+    <Content Include="Views\Config\CreateExtensionMapping.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -1,0 +1,91 @@
+﻿@model Sentry.data.Web.Models.CreateSchemaModel
+@{
+    ViewBag.Title = "Create Schema Revision";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@using (Html.BeginForm("CreateSchema", "Config", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+    <br />
+    <h1>Create Schema Revision</h1>
+    <br />
+
+    @Html.DisplayFor((model) => ViewData.ModelState)
+
+    @Html.HiddenFor(model => model.DatasetId)
+
+    <hr />
+
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(model => model.Name, new { @class = "form-control edit-dataset-row" })
+            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(model => model.Description, new { @class = "form-control edit-dataset-row" })
+            @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.IsForceMatch, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.CheckBoxFor(model => model.IsForceMatch, new { @class = "" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.IsPrimary, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.CheckBoxFor(model => model.IsPrimary, new { @class = "" })
+        </div>
+    </div>
+
+    <div class="form-group">
+        @Html.LabelFor(model => model.DataObject_ID, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(model => model.DataObject_ID, new { @value = "", @class = "form-control edit-dataset-row" })
+            @Html.ValidationMessageFor(model => model.DataObject_ID, "", new { @class = "text-danger" })
+        </div>
+    </div>
+
+    <hr />
+    <div class="form-group">
+        <div>
+            <input type="submit" value="Save" class="btn btn-lg btn-success" />
+        </div>
+    </div>
+</div>
+}
+
+<div>
+    <a class="backToList" href="/Config/Dataset/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>Back to Dataset Configuration</a>
+</div>
+
+@section Scripts {
+    @*@Scripts.Render("~/bundles/jqueryval")*@
+    <script>
+        $(function () {
+            //data.Dataset.EditInit();
+        });
+    </script>
+}
+
+
+
+
+
+
+
+
+
+
