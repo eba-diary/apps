@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
 using Sentry.data.Core;
+using NHibernate;
 
 namespace Sentry.data.Infrastructure.Mappings.Primary
 {
@@ -186,6 +187,22 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             {
                 m.Column("RequestHeaders");
                 m.Access(Accessor.Field);
+            });
+        }
+    }
+
+    public class JavaAppSourceMapping : SubclassMapping<JavaAppSource>
+    {
+        public JavaAppSourceMapping()
+        {
+            DiscriminatorValue(@"JavaApp");
+
+            Property(x => x.Options, m =>
+            {
+                m.Column("Options");
+                m.Access(Accessor.Field);
+                //http://geekswithblogs.net/lszk/archive/2011/07/11/nhibernatemapping-a-string-field-as-nvarcharmax-in-sql-server-using.aspx
+                m.Type(NHibernateUtil.StringClob);
             });
         }
     }

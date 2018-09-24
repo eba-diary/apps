@@ -159,6 +159,7 @@
     <Build Include="Tables\Hive_Schema.sql" />
     <Build Include="Tables\Livy_Sessions.sql" />
     <Build Include="Tables\RetrieverJobs\MediaTypeExtension.sql" />
+    <Build Include="Tables\RetrieverJobs\JobHistory.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

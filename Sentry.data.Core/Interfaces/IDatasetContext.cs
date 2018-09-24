@@ -27,6 +27,7 @@ namespace Sentry.data.Core
         IQueryable<HiveTable> HiveTables { get; }
         IQueryable<LivyCreation> LivySessions { get; }
         IQueryable<MediaTypeExtension> MediaTypeExtensions { get; }
+        IQueryable<JobHistory> JobHistory { get; }
 
         /** Datasets **/
 

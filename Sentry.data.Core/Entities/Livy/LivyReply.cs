@@ -26,11 +26,15 @@ namespace Sentry.data.Core.Entities.Livy
     public class LivyReply
     {
         public int id { get; set; }
+        public string appId { get; set; }
         public string code { get; set; }
         public string state { get; set; }
         public LivyOutput output { get; set; }
         public float progress { get; set; }
         public string livyURL { get; set; }
+        public Dictionary<string,string> appInfo { get; set; }
+        public string[] log { get; set; }
+
     }
 
     public class LivyOutput

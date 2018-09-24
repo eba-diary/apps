@@ -182,6 +182,7 @@
     <Compile Include="Mappings\Primary\Retriever\AuthenticationTypeMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\DataSourceMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\DataSourceTypeMapping.cs" />
+    <Compile Include="Mappings\Primary\Retriever\JobHistoryMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\MediaTypeExtensionMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\RetrieverJobMapping.cs" />
     <Compile Include="Mappings\Subscriptions\DataAssetSubscriptionMapping.cs" />

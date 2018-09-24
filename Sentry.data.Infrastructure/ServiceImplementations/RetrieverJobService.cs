@@ -16,6 +16,7 @@ using System.Threading;
 using Sentry.Core;
 using System.Net;
 using System.Net.Mime;
+using System.Net.Http;
 
 namespace Sentry.data.Infrastructure
 {
@@ -27,7 +28,7 @@ namespace Sentry.data.Infrastructure
             new KeyValuePair<string, string>("ProcessingStatus","NotStarted")
         };
 
-        private IContainer Container { get; set; }
+        static private IContainer Container { get; set; }
 
         /// <summary>
         /// Implementation of core job logic for each DataSOurce type.
@@ -534,14 +535,6 @@ namespace Sentry.data.Infrastructure
                                 catch (WebException ex)
                                 {
                                     _job.JobLoggerMessage("Error", "Web request return error", ex);
-                                }
-                                catch (Exception ex)
-                                {
-                                    _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
-                                    _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
-                                }
-                                finally
-                                {
                                     _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
 
                                     //Cleanup target file if exists
@@ -549,6 +542,18 @@ namespace Sentry.data.Infrastructure
                                     {
                                         File.Delete(targetFullPath);
                                     }
+                                }
+                                catch (Exception ex)
+                                {
+                                    _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
+                                    _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
+
+                                    //Cleanup target file if exists
+                                    if (File.Exists(targetFullPath))
+                                    {
+                                        File.Delete(targetFullPath);
+                                    }
+
                                 }
                             }                        
                         }
@@ -563,6 +568,43 @@ namespace Sentry.data.Infrastructure
             catch (Exception ex)
             {
                 Logger.Error($"Retriever Job Failed to initialize", ex);
+            }
+        }
+
+        public static async Task UpdateJobStatesAsync()
+        {
+            try
+            {
+                using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                {
+                    IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
+
+                    ////Retrieve all Active states in Job History
+                    //IList<JobHistory> activeJobs = _datasetContext.JobHistory.Where(w => w.Active).ToList();
+                    
+                    //foreach (JobHistory job in activeJobs)
+                    //{
+                    using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
+                    using (var client = new HttpClient(handler))
+                    {
+
+                        var tasks = _datasetContext.JobHistory.Where(w => w.Active).ToList().Select(s => client.GetAsync($"{Configuration.Config.GetHostSetting("WebApiUrl")}/api/Job/GetBatchState?jobId={s.JobId.Id}&batchId={s.BatchId}"));
+
+                        var results = await Task.WhenAll(tasks);
+
+                        //HttpResponseMessage response = await client.GetAsync($"{Configuration.Config.GetHostSetting("WebApiUrl")}/api/Job/GetBatchState?jobId={job.JobId.Id}&batchId={job.BatchId}");
+
+                        //if (!response.IsSuccessStatusCode)
+                        //{
+                        //    Logger.Error($"Failed to update job status - JobID:{job.JobId.Id} BatchId:{job.BatchId}");
+                        //}
+                    }
+                    //}
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Fatal("Unable to update job state.", ex);
             }
         }
 
@@ -667,7 +709,7 @@ namespace Sentry.data.Infrastructure
             string targetPath = null;
             if (basicJob.DataSource.Is<DfsBasic>())
             {
-                basepath = basicJob.GetUri().LocalPath;                
+                basepath = basicJob.GetUri().LocalPath + '\\';                
             }
             else if (basicJob.DataSource.Is<S3Basic>())
             {                

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
 using Sentry.data.Core;
+using NHibernate;
 
 
 namespace Sentry.data.Infrastructure.Mappings.Primary
@@ -54,6 +55,9 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             {
                 m.Column("JobOptions");
                 m.Access(Accessor.Field);
+
+                //http://geekswithblogs.net/lszk/archive/2011/07/11/nhibernatemapping-a-string-field-as-nvarcharmax-in-sql-server-using.aspx
+                m.Type(NHibernateUtil.StringClob);
             });
 
             ManyToOne(x => x.DataSource, m =>
@@ -69,6 +73,20 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.ForeignKey("FK_RetrieverJob_DatasetFileConfigs");
                 m.Class(typeof(DatasetFileConfig));
             });
+
+            this.Bag(x => x.JobHistory, (m) =>
+            {
+                m.Lazy(CollectionLazy.Lazy);
+                m.Inverse(true);
+                m.Table("JobHistory");
+                m.Cascade(Cascade.All);
+                m.Cache(c => c.Usage(CacheUsage.ReadWrite));
+                m.Key((k) =>
+                {
+                    k.Column("Job_ID");
+                    k.ForeignKey("FK_JobHistory_RetrieverJob");
+                });
+            }, map => map.OneToMany(a => a.Class(typeof(JobHistory))));
         }
     }
 }

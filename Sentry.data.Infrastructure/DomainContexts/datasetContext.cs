@@ -175,6 +175,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<JobHistory> JobHistory
+        {
+            get
+            {
+                return Query<JobHistory>();
+            }
+        }
+
         public IEnumerable<Dataset> GetDatasetByCategoryID(int id)
         {
             return Query<Dataset>().Where(w => w.DatasetCategory.Id == id).Where(x => x.CanDisplay).AsEnumerable();

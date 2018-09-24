@@ -10,6 +10,9 @@ data.DatasetDetail = {
         /// <summary>
         /// Initialize the dataset detail page for data assets
         /// </summary>
+
+        var Id = $('#datasetConfigList').val();
+
         $("[id^='EditDataset_']").off('click').on('click', function (e) {
             e.preventDefault();
             data.Dataset.ViewEdit($(this).data("id"));

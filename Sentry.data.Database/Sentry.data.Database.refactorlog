@@ -497,4 +497,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="DriverCore_CNT" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="c5524863-d1c2-4769-b65a-72795547dab0" ChangeDateTime="09/14/2018 16:19:10">
+    <Property Name="ElementName" Value="[dbo].[JobHistory].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[JobHistory]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="History_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="7975ff4a-2f04-45d7-b949-4914646b9f2b" ChangeDateTime="09/17/2018 20:08:46">
+    <Property Name="ElementName" Value="[dbo].[JobHistory].[Active_IND]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[JobHistory]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Active" />
+  </Operation>
 </Operations>

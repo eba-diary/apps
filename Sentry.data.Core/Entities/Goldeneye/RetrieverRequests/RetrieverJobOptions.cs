@@ -10,6 +10,9 @@ namespace Sentry.data.Core
     [Serializable]
     public class RetrieverJobOptions
     {
+        private string _compressionOptions;
+        private string _javaAppOptions;
+
         //public RetrieverJobOptions()
         //{
         //    CompressionOptions = new Compression();
@@ -20,8 +23,6 @@ namespace Sentry.data.Core
         public Boolean CreateCurrentFile { get; set; }
         public Boolean IsRegexSearch { get; set; }
         public string SearchCriteria { get; set; }
-        private string _compressionOptions;
-
         public virtual Compression CompressionOptions
         {
             get
@@ -41,6 +42,26 @@ namespace Sentry.data.Core
                 _compressionOptions = JsonConvert.SerializeObject(value);
             }
         }
+        
+        public virtual JavaOptions JavaAppOptions
+        {
+            get
+            {
+                if (String.IsNullOrEmpty(_javaAppOptions))
+                {
+                    return null;
+                }
+                else
+                {
+                    JavaOptions a = JsonConvert.DeserializeObject<JavaOptions>(_javaAppOptions);
+                    return a;
+                }
+            }
+            set
+            {
+                _javaAppOptions = JsonConvert.SerializeObject(value);
+            }
+        }
 
         //All options pertaining to compression\decompression logic
         [Serializable]
@@ -49,6 +70,18 @@ namespace Sentry.data.Core
             public Boolean IsCompressed { get; set; }
             public string CompressionType { get; set; }
             public List<string> FileNameExclusionList { get; set; }
+        }
+
+        [Serializable]
+        public class JavaOptions
+        {
+            public string[] Arguments { get; set; }
+            public Dictionary<string, string> ConfigurationParameters { get; set; }
+            public string DriverMemory { get; set; }
+            public int? DriverCores { get; set; }
+            public string ExecutorMemory { get; set; }
+            public int? ExecutorCores { get; set; }
+            public int? NumExecutors { get; set; }
         }
     }
 }

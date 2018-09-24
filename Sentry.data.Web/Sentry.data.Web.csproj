@@ -275,6 +275,7 @@
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\ExternalFileController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\JobController.cs" />
     <Compile Include="Controllers\LayoutController.cs" />
     <Compile Include="Controllers\LineageController.cs" />
     <Compile Include="Controllers\QueryToolController.cs" />

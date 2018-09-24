@@ -17,6 +17,7 @@ namespace Sentry.data.Core
         public RetrieverJob()
         {
             IsEnabled = true;
+            JobHistory = new List<JobHistory>();
         }
 
         public virtual int Id { get; set; }
@@ -98,6 +99,7 @@ namespace Sentry.data.Core
                 _jobOptions = JsonConvert.SerializeObject(value);
             }
         }
+        public virtual IList<JobHistory> JobHistory { get; set; }
 
         public virtual Uri GetUri()
         {

@@ -17,6 +17,7 @@
     [AuthHeaderValue] NVARCHAR(MAX) NULL, 
     [IVKey] NVARCHAR(MAX) NULL, 
     [RequestHeaders] NVARCHAR(MAX) NULL, 
+    [Options] NVARCHAR(MAX) NULL, 
     PRIMARY KEY CLUSTERED ([DataSource_Id] ASC),
     CONSTRAINT [FK_DataSource_AuthenticationType] FOREIGN KEY ([SourceAuth_ID]) REFERENCES [dbo].[AuthenticationType] ([Auth_Id])
 );
