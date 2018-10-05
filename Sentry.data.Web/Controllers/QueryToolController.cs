@@ -572,10 +572,41 @@ namespace Sentry.data.Web.Controllers
                         qd.primaryFileId = ds.DatasetFiles.OrderBy(x => x.CreateDTM).FirstOrDefault(x => x.DatasetFileConfig.ConfigId == item.ConfigId).DatasetFileId.ToString();
                     }
                     qd.extensions = ds.DatasetFiles.Where(x => x.DatasetFileConfig.ConfigId == item.ConfigId).Select(x => Utilities.GetFileExtension(x.FileName)).Distinct().ToList();
-                    qd.description = item.Description;                   
+                    qd.description = item.Description;
+                    qd.HasSchema = item.Schemas.Any();
 
                     qd.IsPowerUser = _userService.GetCurrentUser().CanQueryToolPowerUser;
+                    qd.HasQueryableSchema = item.Schemas.Where(w => w.HiveTables.Any()).Any();
 
+                    if (item.Schemas.Any())
+                    {
+                        List<QueryableSchema> qslist = new List<QueryableSchema>();
+                        foreach (var sch in item.Schemas)
+                        {
+                            QueryableSchema qs = new QueryableSchema()
+                            {
+                                SchemaName = sch.Schema_NME,
+                                SchemaDSC = sch.Schema_DSC,
+                                SchemaID = sch.Schema_ID,
+                                RevisionID = sch.Revision_ID
+                            };
+
+                            //This is assuming only a single hive table per schema revision.
+                            if (sch.HiveTables.Any())
+                            {
+                                HiveTable table = sch.HiveTables.Where(w => w.IsPrimary).FirstOrDefault();
+                                qs.HiveDatabase = table.HiveDatabase_NME;
+                                qs.HiveTable = table.Hive_NME;
+                                qs.HasTable = true;
+                            }
+                            else
+                            {
+                                qs.HasTable = false;
+                            }
+                            qslist.Add(qs);
+                        }
+                        qd.Schemas = qslist;
+                    }
                     reply.Add(qd);
                 }
             }

@@ -17,7 +17,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
         {
             this.Lazy(false);
 
-            this.Table(Sentry.Configuration.Config.GetHostSetting("MetadataRepository") + ".dbo.DataObjectField");
+            this.Table("DataObjectField");
 
             this.Id(x => x.DataObjectField_ID, m => m.Generator(Generators.Identity));
 
@@ -41,7 +41,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             {
                 m.Lazy(CollectionLazy.NoLazy);
                 m.Inverse(false);
-                m.Table(Sentry.Configuration.Config.GetHostSetting("MetadataRepository") + ".dbo.DataObjectFieldDetail");
+                m.Table("DataObjectFieldDetail");
                 m.Cascade(Cascade.All);
                 m.Cache(c => c.Usage(CacheUsage.ReadWrite));
 

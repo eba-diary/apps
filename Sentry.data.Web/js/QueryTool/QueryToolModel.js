@@ -38,7 +38,12 @@ function Config(id, data) {
     this.extensions = ko.observableArray(data.extensions);
     this.primaryFileId = ko.observable(data.primaryFileId);
     this.fileCount = ko.observable(data.fileCount);
+    this.hasSchema = ko.observable(data.HasSchema);
+    this.IsGeneric = ko.observable(data.IsGeneric);
     this.IsPowerUser = ko.observable(data.IsPowerUser);
+    this.Schemas = ko.observableArray($.map(data.Schemas, function (item) { return new Schema(id, item); }));
+    this.schemaOverride = ko.observable(false);
+    this.hasQueryableSchema = ko.observable(data.HasQueryableSchema);
 
     this.tableName = ko.computed(function () {
         if (data.configName === 'Default') {
@@ -63,15 +68,44 @@ function Config(id, data) {
         }
     });
 
-
     this.rowsClass = ko.computed(function () {
 
-        if (data.fileCount > 0) {
-            return "configRow";
-        } else {
-            return "";
+        if (data.fileCount > 0 && (!data.HasQueryableSchema || this.schemaOverride)) {
+            var classes = {
+                'configRow': true,
+                'schemaRow': false
+            };
+            console.log("update classes: " + classes)
+            return classes;
+        }
+        else if (data.fileCount > 0 && data.HasQueryableSchema) {
+            var classes = {
+                'configRow': false,
+                'schemaRow': true
+            };
+            console.log("update classes: " + classes)
+            return classes;
+        }
+        else {
+            var classes = {
+                'configRow': false,
+                'schemaRow': false
+            };
+            console.log("update classes: " + classes)
+            return classes;
         }
     });
+}
+
+function Schema(id, data) {
+    this.id = ko.observable(id);
+    this.schemaName = ko.observable(data.SchemaName);
+    this.schemaDSC = ko.observable(data.SchemaDSC);
+    this.schemaID = ko.observable(data.SchemaID);
+    this.revisionID = ko.observable(data.RevisionID);
+    this.hiveDatabase = ko.observable(data.HiveDatabase);
+    this.hiveTable = ko.observable(data.HiveTable);
+    this.hasTable = ko.observable(data.HasTable);
 }
 
 function ViewModel() {
@@ -88,6 +122,15 @@ function ViewModel() {
         self.SelectedColumns.notifySubscribers();
         $('#columnRenamerSelect').trigger('change');
     }
+
+    self.schemaOverrideClick = function () {
+        console.log("hit view model click event");
+    }
+
+    //$('.schemaOverrideCheckbox').onclick = function () {
+        
+    //    self.Datasets.notifySubscribers();
+    //};
 
     $('#datasetList').on('select2:select', function (e) {
         $('#tablePanel').show();
@@ -117,7 +160,7 @@ function ViewModel() {
         self.Datasets.remove(function (item) { return  item.id() === data.id; });
 
         self.Datasets.notifySubscribers();
-    });
+    });    
 };
 
 ko.bindingHandlers.select2 = {

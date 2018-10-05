@@ -203,68 +203,32 @@
 
             function setSourceTypeDefaults(sourceType) {
                 if (sourceType == "SFTP" || sourceType == "FTP" || sourceType == "HTTPS") {
-                    //Assign Default values
+
+                    $('#portNumberPanel').show();
+                    $('#userPassPanel').hide();
+                    $('#authPanel').show();
+                    $('#tokenAuthPanel').hide();
+                    $('#requestHeaderPanel').hide();
+
+                    //User\Pass is required, so check and disable for changing
+                    var userpasschkbx = $('#IsUserPassRequired');
+                    userpasschkbx.prop('checked', false);
+                    userpasschkbx.attr('disabled', false);
+                    $('#AuthID').attr('readonly', false);
+
+                    //Assign Source specific default values
                     if (sourceType == "SFTP") {
 
                         //Setting default values for port number
                         $('#PortNumber').val('22');
-
-                        //User\Pass is required, so check and disable for changing
-                        var userpasschkbx = $('#IsUserPassRequired');
-                        userpasschkbx.prop('checked', true);
-                        userpasschkbx.attr('disabled', true);
-                        userpasschkbx.trigger("change");
-
-                        //Set Authentication to Basic and disable as this is the only choice
-                        $("#AuthID option").each(function () {
-                            if ($(this).text() == 'Basic Authentication') {
-                                $('#AuthID').val($(this).val()).trigger('change');
-                            }
-                            $('#AuthID').attr('readonly', true);
-                        });
-
-                        $('#portNumberPanel').show();
-                        $('#userPassPanel').show();
-                        $('#authPanel').show();
-                        $('#tokenAuthPanel').hide();
-                        $('#requestHeaderPanel').hide();
                     }
                     else if (sourceType == "FTP") {
                         //Setting default values for port number
                         $('#PortNumber').val('21');
-
-                        //User\Pass is not required, so uncheck and disable for changing
-                        var userpasschkbx = $('#IsUserPassRequired');
-                        userpasschkbx.prop('checked', false);
-                        userpasschkbx.attr('disabled', false);
-
-                        //Enable Auth picker and set to default value
-                        $('#AuthID').val('0').trigger('change'); //Defaulting selection
-                        $('#AuthID').attr('readonly', false); // enabling picker
-
-                        $('#portNumberPanel').show();
-                        $('#userPassPanel').show();
-                        $('#authPanel').show();
-                        $('#tokenAuthPanel').hide();
-                        $('#requestHeaderPanel').hide();
-
                     }
                     else if (sourceType == "HTTPS") {
                         //Setting default values for port number
                         $('#PortNumber').val('443');
-
-                        //User\Pass is not required, so uncheck and disable for changing
-                        var userpasschkbx = $('#IsUserPassRequired');
-                        userpasschkbx.prop('checked', false);
-                        userpasschkbx.attr('disabled', true);
-
-                        //Enable Auth picker and set to default value
-                        $('#AuthID').val('0').trigger('change'); //Defaulting selection
-                        $('#AuthID').attr('readonly', false); // enabling picker
-
-                        $('#portNumberPanel').show();
-                        $('#userPassPanel').hide();
-                        $('#authPanel').show();
                         $('#requestHeaderPanel').show();
                     }
                 }

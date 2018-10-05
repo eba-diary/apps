@@ -22,7 +22,7 @@ namespace Sentry.data.Infrastructure
             string sqlConnString = null;
             string sqlQueryString = null;
 
-            sqlConnString = Sentry.Configuration.Config.GetHostSetting("MetadataRepository_ConnectionString");
+            sqlConnString = Sentry.Configuration.Config.GetHostSetting("DatabaseConnectionString");
             sqlQueryString = $"SELECT  DataAsset_NME, MAX(AssetUpdt_DTM), SourceSystem_VAL FROM dbo.DataAssetHealth Where Cube_NME = '' and DataAsset_NME = '{assetName}' GROUP BY DataAsset_NME, SourceSystem_VAL";
             return ExecuteQuery(sqlConnString, sqlQueryString);
             

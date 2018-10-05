@@ -16,13 +16,17 @@ using System.Threading;
 using Sentry.Core;
 using System.Net;
 using System.Net.Mime;
+using WinSCP;
 using System.Net.Http;
+using System.Text.RegularExpressions;
 
 namespace Sentry.data.Infrastructure
 {
     public class RetrieverJobService
     {
         private RetrieverJob _job;
+        private IFtpProvider _ftpProvider;
+        private string _tempFile;
         private readonly List<KeyValuePair<string, string>> _dropLocationTags = new List<KeyValuePair<string, string>>()
         {
             new KeyValuePair<string, string>("ProcessingStatus","NotStarted")
@@ -50,144 +54,31 @@ namespace Sentry.data.Infrastructure
 
                     if (_job.DataSource.Is<FtpSource>())
                     {
-                        IFtpProvider _ftpProvider = Container.GetInstance<IFtpProvider>();
+                        _ftpProvider = Container.GetInstance<IFtpProvider>();
+                        _ftpProvider.SetCredentials(_job.DataSource.SourceAuthType.GetCredentials(_job));
 
                         //Setup temporary work space for job
                         var tempFile = SetupTempWorkSpace();
 
                         try
                         {
-                            //If source file is compressed, need to save to temp location and send job to JAWS
-                            if (_job.JobOptions != null && _job.JobOptions.CompressionOptions.IsCompressed)
+
+                            switch (_job.JobOptions.FtpPattern)
                             {
-                                _job.JobLoggerMessage("Debug", $"Compressed option is detected... Streaming to temp location");                                
-
-                                try
-                                {
-                                    //Stream file to work location
-                                    using (Stream ftpstream = _ftpProvider.GetJobStream(_job))
-                                    {
-                                        using (Stream filestream = new FileStream(tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-                                        {
-                                            ftpstream.CopyTo(filestream);
-                                        }
-                                    }
-
-                                    //Create a fire-forget Hangfire job to decompress the file and drop extracted file into drop locations
-                                    BackgroundJob.Enqueue<JawsService>(x => x.UncompressRetrieverJob(_job.Id, tempFile));
-                                }
-                                catch (Exception ex)
-                                {
-                                    _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
-                                    _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
-
-                                    //Cleanup target file if exists
-                                    if (File.Exists(tempFile)) {
-                                        File.Delete(tempFile);
-                                    }
-
-                                    throw;
-                                }                                
-                            }                            
-                            //Source file is not compressed, stream to drop path location.
-                            else
-                            {
-                                //Find appropriate drop location (S3Basic or DfsBasic)
-                                RetrieverJob targetJob = FindBasicJob();
-
-                                //Get target path based on basic job found
-                                string targetFullPath = GetTargetPath(targetJob);
-
-                                if (targetJob.DataSource.Is<S3Basic>())
-                                {
-                                    _job.JobLoggerMessage("Info", "Sending file to S3 drop location");
-
-                                    try
-                                    {
-                                        using (Stream ftpstream = _ftpProvider.GetJobStream(_job))
-                                        {
-                                            using (Stream filestream = new FileStream(tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
-                                            {
-                                                ftpstream.CopyTo(filestream);
-                                            }
-                                        }
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        _job.JobLoggerMessage("Error", "Retriever job failed streaming temp location.", ex);
-                                        _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
-
-                                        //Cleanup temp file if exists
-                                        if (File.Exists(tempFile))
-                                        {
-                                            File.Delete(tempFile);
-                                        }
-
-                                        throw;
-                                    }
-
-
-                                    S3ServiceProvider s3Service = new S3ServiceProvider();
-                                    string targetkey = $"{targetJob.DataSource.GetDropPrefix(targetJob)}{_job.GetTargetFileName(Path.GetFileName(targetFullPath))}";
-                                    var versionId = s3Service.UploadDataFile(tempFile, targetkey);
-
-                                    _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
-                                }
-                                else if (targetJob.DataSource.Is<DfsBasic>())
-                                {
-                                    _job.JobLoggerMessage("Info", "Sending file to DFS drop location");
-                                    try
-                                    {
-                                        using (Stream ftpstream = _ftpProvider.GetJobStream(_job))
-                                        {
-                                            using (Stream filestream = new FileStream(targetFullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
-                                            {
-                                                ftpstream.CopyTo(filestream);
-                                            }
-                                        }
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
-                                        _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
-
-                                        //Cleanup target file if exists
-                                        if (File.Exists(targetFullPath))
-                                        {
-                                            File.Delete(targetFullPath);
-                                        }
-
-                                        throw;
-                                    }
-                                }       
-
-                                //Short-Term establishes a new connection to the source and sends file to current files location
-                                if (_job.JobOptions.CreateCurrentFile)
-                                {
-                                    string targetFullpath = Path.Combine(_job.DatasetConfig.GetCurrentFileDir().LocalPath, _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString())));
-
-                                    try
-                                    {
-                                        using (Stream ftpstream = _ftpProvider.GetJobStream(_job))
-                                        {
-                                            //Using FileMode.Create will overwrite file if exists
-                                            using (Stream Currentfilestream = new FileStream(targetFullpath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
-                                            {
-                                                ftpstream.CopyTo(Currentfilestream);
-                                            }
-                                        }
-                                    }
-                                    catch(Exception ex)
-                                    {
-                                        _job.JobLoggerMessage("Error", "Retriever Job failed creating Current File for SAS.", ex);
-                                        _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
-
-                                        //Clean up target file if exists
-                                        if (File.Exists(targetFullpath)){
-                                            File.Delete(targetFullpath);
-                                        }
-                                    }                                    
-                                }
+                                case 
+                                FtpPattern.NoPattern:
+                                default:
+                                    RetrieveFTPFile(_job.GetUri().AbsoluteUri);                                    
+                                    break;
+                                case FtpPattern.SpecificFileNoDelete:
+                                    ProcessSpecificFileNoDelete();
+                                    break;
+                                case FtpPattern.RegexFileNoDelete:
+                                    ProcessRegexFileNoDelete();
+                                    break;
+                                case FtpPattern.SpecificFileArchive:
+                                    ProcessSpecificFileArchive();
+                                    break;
                             }
                         }
                         catch (Exception ex)
@@ -570,6 +461,233 @@ namespace Sentry.data.Infrastructure
                 Logger.Error($"Retriever Job Failed to initialize", ex);
             }
         }
+
+        #region FTP Processing
+        private void ProcessSpecificFileArchive()
+        {
+            throw new NotImplementedException();
+            //Process specific file
+            ProcessSpecificFileNoDelete();
+
+            //Archive specific file
+            ArchiveSpecificFile(_job.GetUri().AbsoluteUri);
+
+        }
+
+        private void ArchiveSpecificFile(string sourceUrl)
+        {
+            throw new NotImplementedException();
+            //Remove filename from job URI
+            string baseDir = sourceUrl.Replace(Path.GetFileName(sourceUrl), "");
+
+            //Add archive directory name to URI
+            string archiveDir = baseDir + "archive/";
+
+            //Determine if Archive directory exists
+            IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(baseDir, "directories");
+
+            if (!resultList.Where(w => w.Name == "archive").Any())
+            {
+                _job.JobLoggerMessage("Error", $"FTP archive directory does not exist, ask vendor to create archive directory in url - url:{archiveDir}");
+            }
+
+            _ftpProvider.RenameFile(sourceUrl, "ftp://ftp.cabfinancial.com/PublicData/PublicData20121231/ISS_History_Test.zip");
+        }
+
+        private void ProcessSpecificFileNoDelete()
+        {
+            string remoteDir = null;
+
+            string fileName = Path.GetFileName(_job.GetUri().AbsoluteUri);
+            if (fileName != "")
+            {
+                remoteDir = _job.GetUri().AbsoluteUri.Replace(fileName, "");
+            }
+            else
+            {
+                _job.JobLoggerMessage("Error", "Job terminating - Uri does not contain file name.");
+                throw new ArgumentNullException("RelativeUri", "Uri does not contain file name");
+            }
+
+            IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(remoteDir, "files");
+
+            if (resultList.Where(w => w.Name == fileName).Any())
+            {
+                RetrieveFTPFile(_job.GetUri().AbsoluteUri);
+            }
+            else
+            {
+                _job.JobLoggerMessage("Info", $"Remote file does not exist - FileName:{fileName}");
+                throw new FileNotFoundException($"Remote file does not exist - FileName:{fileName}");
+            }
+        }
+
+        private void ProcessRegexFileNoDelete()
+        {
+            string fileName = Path.GetFileName(_job.GetUri().AbsoluteUri);
+            if (fileName != "")
+            {
+                _job.JobLoggerMessage("Error", "Job terminating - Uri does not end with forward slash.");
+                return;
+            }
+
+            IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
+
+            var rx = new Regex(_job.JobOptions.SearchCriteria, RegexOptions.IgnoreCase);
+
+            _job.JobLoggerMessage("Info", $"Searching for file matching {_job.JobOptions.SearchCriteria} within {_job.GetUri().AbsoluteUri}");
+
+            List<RemoteFile> matchList = resultList.Where(w => rx.IsMatch(w.Name)).ToList();
+
+            _job.JobLoggerMessage("Info", $"Found {matchList.Count} matching files");
+
+            foreach (RemoteFile file in matchList)
+            {
+                string remoteUrl = _job.GetUri().AbsoluteUri + file.Name;
+                RetrieveFTPFile(remoteUrl);
+            }
+        }
+
+        private void RetrieveFTPFile(string absoluteUri)
+        {
+            //Setup temporary work space for job
+            var tempFile = SetupTempWorkSpace();
+
+            if (_job.JobOptions != null && _job.JobOptions.CompressionOptions.IsCompressed)
+            {
+                _job.JobLoggerMessage("Debug", $"Compressed option is detected... Streaming to temp location");
+
+                try
+                {
+                    //Stream file to work location
+                    using (Stream ftpstream = _ftpProvider.GetFileStream(absoluteUri))
+                    {
+                        using (Stream filestream = new FileStream(tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                        {
+                            ftpstream.CopyTo(filestream);
+                        }
+                    }
+
+                    //Create a fire-forget Hangfire job to decompress the file and drop extracted file into drop locations
+                    BackgroundJob.Enqueue<JawsService>(x => x.UncompressRetrieverJob(_job.Id, tempFile));
+                }
+                catch (Exception ex)
+                {
+                    _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
+                    _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
+
+                    //Cleanup target file if exists
+                    if (File.Exists(tempFile))
+                    {
+                        File.Delete(tempFile);
+                    }
+
+                    throw;
+                }
+            }
+            //Source file is not compressed, stream to drop path location.
+            else
+            {
+                //Find appropriate drop location (S3Basic or DfsBasic)
+                RetrieverJob targetJob = FindBasicJob();
+
+                //Get target path based on basic job found
+                string targetFullPath = GetTargetPath(targetJob);
+
+                if (targetJob.DataSource.Is<S3Basic>())
+                {
+                    _job.JobLoggerMessage("Info", "Sending file to S3 drop location");
+
+                    try
+                    {
+                        using (Stream ftpstream = _ftpProvider.GetFileStream(absoluteUri))
+                        {
+                            using (Stream filestream = new FileStream(tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
+                            {
+                                ftpstream.CopyTo(filestream);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _job.JobLoggerMessage("Error", "Retriever job failed streaming temp location.", ex);
+                        _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
+
+                        //Cleanup temp file if exists
+                        if (File.Exists(tempFile))
+                        {
+                            File.Delete(tempFile);
+                        }
+
+                        throw;
+                    }
+
+                    S3ServiceProvider s3Service = new S3ServiceProvider();
+                    string targetkey = $"{targetJob.DataSource.GetDropPrefix(targetJob)}{_job.GetTargetFileName(Path.GetFileName(targetFullPath))}";
+                    var versionId = s3Service.UploadDataFile(tempFile, targetkey);
+
+                    _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
+                }
+                else if (targetJob.DataSource.Is<DfsBasic>())
+                {
+                    _job.JobLoggerMessage("Info", "Sending file to DFS drop location");
+                    try
+                    {
+                        using (Stream ftpstream = _ftpProvider.GetFileStream(absoluteUri))
+                        {
+                            using (Stream filestream = new FileStream(targetFullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
+                            {
+                                ftpstream.CopyTo(filestream);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
+                        _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
+
+                        //Cleanup target file if exists
+                        if (File.Exists(targetFullPath))
+                        {
+                            File.Delete(targetFullPath);
+                        }
+
+                        throw;
+                    }
+                }
+
+                //Short-Term establishes a new connection to the source and sends file to current files location
+                if (_job.JobOptions.CreateCurrentFile)
+                {
+                    string targetFullpath = Path.Combine(_job.DatasetConfig.GetCurrentFileDir().LocalPath, _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString())));
+
+                    try
+                    {
+                        //using (Stream ftpstream = _ftpProvider.GetJobStream(_job))
+                        //{
+                        //    //Using FileMode.Create will overwrite file if exists
+                        //    using (Stream Currentfilestream = new FileStream(targetFullpath, FileMode.Create, FileAccess.ReadWrite, FileShare.Read))
+                        //    {
+                        //        ftpstream.CopyTo(Currentfilestream);
+                        //    }
+                        //}
+                    }
+                    catch (Exception ex)
+                    {
+                        _job.JobLoggerMessage("Error", "Retriever Job failed creating Current File for SAS.", ex);
+                        _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
+
+                        //Clean up target file if exists
+                        if (File.Exists(targetFullpath))
+                        {
+                            File.Delete(targetFullpath);
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
+
 
         public static async Task UpdateJobStatesAsync()
         {

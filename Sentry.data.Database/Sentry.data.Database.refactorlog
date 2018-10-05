@@ -511,4 +511,25 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Active" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="03ed8b64-050c-4f7e-a3d2-b2ab924de3d1" ChangeDateTime="09/25/2018 19:53:58">
+    <Property Name="ElementName" Value="[dbo].[BusinessTermDescriptions].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[BusinessTermDescriptions]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="BusTermDesc_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="90cf88c1-02c5-49d1-af55-1934ca974988" ChangeDateTime="09/25/2018 20:45:23">
+    <Property Name="ElementName" Value="[dbo].[LineageLoad].[Element_DSC]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[LineageLoad]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ElementDSC" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="7249f00a-22b0-4cf4-815f-61c297ad9a71" ChangeDateTime="09/25/2018 20:46:24">
+    <Property Name="ElementName" Value="[dbo].[LineageLoad].[LastUpdt_DTM]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[LineageLoad]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Modified" />
+  </Operation>
 </Operations>

@@ -107,6 +107,7 @@
     <Folder Include="Tables\RetrieverJobs" />
     <Folder Include="Security\" />
     <Folder Include="Tables\HangFire" />
+    <Folder Include="Tables\Metadata" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -160,6 +161,17 @@
     <Build Include="Tables\Livy_Sessions.sql" />
     <Build Include="Tables\RetrieverJobs\MediaTypeExtension.sql" />
     <Build Include="Tables\RetrieverJobs\JobHistory.sql" />
+    <Build Include="Tables\Metadata\BusinessTermDescriptions.sql" />
+    <Build Include="Tables\Metadata\DataAssetHealth.sql" />
+    <Build Include="Tables\Metadata\DataElement.sql" />
+    <Build Include="Tables\Metadata\DataElementDetail.sql" />
+    <Build Include="Tables\Metadata\DataObject.sql" />
+    <Build Include="Tables\Metadata\DataObjectDetail.sql" />
+    <Build Include="Tables\Metadata\DataObjectField.sql" />
+    <Build Include="Tables\Metadata\DataObjectFieldDetail.sql" />
+    <Build Include="Tables\Metadata\LineageLoad.sql" />
+    <Build Include="Tables\Metadata\STG_LineageLoad.sql" />
+    <Build Include="Tables\Metadata\vw_DataLineage.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

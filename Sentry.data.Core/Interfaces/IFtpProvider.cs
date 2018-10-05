@@ -10,6 +10,10 @@ namespace Sentry.data.Core
 {
     public interface IFtpProvider
     {
-        Stream GetJobStream(RetrieverJob Job);
+        void SetCredentials(NetworkCredential creds);
+        Stream GetFileStream(string url);
+        List<RemoteFile> ListDirectoryContent(string url, string filter);
+        void CreateDirectory(string url);
+        void RenameFile(string sourceUrl, string targetUrl);
     }
 }

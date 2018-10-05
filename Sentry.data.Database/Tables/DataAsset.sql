@@ -8,5 +8,7 @@
     [Guide_URL] VARCHAR(1024) NULL, 
     [Contact_EML] VARCHAR(128) NULL, 
     [DataAsset_DSC] VARCHAR(MAX) NULL, 
-    [MetadataRepositoryAsset_NME] VARCHAR(50) NULL 
+    [MetadataRepositoryAsset_NME] VARCHAR(50) NULL,
+	[Line_CDE] [varchar](5) NULL,
+	[Model_NME] [varchar](50) NULL
 )

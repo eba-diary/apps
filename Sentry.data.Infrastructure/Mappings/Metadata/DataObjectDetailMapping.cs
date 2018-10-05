@@ -16,7 +16,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
         {
             this.Lazy(false);
 
-            this.Table(Sentry.Configuration.Config.GetHostSetting("MetadataRepository") + ".dbo.DataObjectDetail");
+            this.Table("DataObjectDetail");
 
             this.Id(x => x.DataObjectDetail_ID, m => m.Generator(Generators.Identity));
 

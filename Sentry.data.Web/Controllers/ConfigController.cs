@@ -392,7 +392,7 @@ namespace Sentry.data.Web.Controllers
                 Disabled = true
             });
 
-            cjm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic").Where(x => x.Value != "S3Basic").OrderBy(x => x.Value);
+            cjm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic").Where(x => x.Value != "S3Basic" && x.Value != "JavaApp").OrderBy(x => x.Value);
 
             List<SelectListItem> temp2 = new List<SelectListItem>();
 
@@ -848,7 +848,7 @@ namespace Sentry.data.Web.Controllers
                 Disabled = true
             });
 
-            csm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic").OrderBy(x => x.Value);
+            csm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic" && x.Value != "S3Basic").OrderBy(x => x.Value);
 
             if (csm.SourceType == null)
             {
@@ -964,20 +964,23 @@ namespace Sentry.data.Web.Controllers
                                 }
                             }
 
-                            foreach (RequestHeader h in esm.Headers)
+                            if (esm.Headers != null && esm.Headers.Any())
                             {
-                                //Check each request header\value pair to ensure they each have values
-                                if (String.IsNullOrWhiteSpace(h.Key) || String.IsNullOrWhiteSpace(h.Value))
+                                foreach (RequestHeader h in esm.Headers)
                                 {
-                                    valid = false;
-                                    AddCoreValidationExceptionsToModel(new ValidationException("RequestHeader", "Request headers need to contain valid values"));
+                                    //Check each request header\value pair to ensure they each have values
+                                    if (String.IsNullOrWhiteSpace(h.Key) || String.IsNullOrWhiteSpace(h.Value))
+                                    {
+                                        valid = false;
+                                        AddCoreValidationExceptionsToModel(new ValidationException("RequestHeader", "Request headers need to contain valid values"));
+                                    }
                                 }
-                            }
+                            }                            
 
                             //Replace all headers on each save
-                            if (valid && esm.Headers.Any())
+                            if (valid)
                             {
-                                ((HTTPSSource)source).RequestHeaders = esm.Headers;
+                                ((HTTPSSource)source).RequestHeaders = (esm.Headers != null && esm.Headers.Any()) ? esm.Headers : null;
                             }
                             break;
                         default:
@@ -1097,7 +1100,7 @@ namespace Sentry.data.Web.Controllers
             //set selected for current value
             temp.ForEach(x => x.Selected = esm.SourceType.Equals(x.Value));
 
-            esm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic").OrderBy(x => x.Value);
+            esm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic" && x.Value != "S3Basic" && x.Value != "JavaApp").OrderBy(x => x.Value);
 
             int intvalue;
             var temp2 = AuthenticationTypesByType(esm.SourceType, Int32.TryParse(esm.AuthID, out intvalue) ? (int?)intvalue : null);
@@ -1124,6 +1127,17 @@ namespace Sentry.data.Web.Controllers
         private List<SelectListItem> AuthenticationTypesByType(string sourceType, int? selectedId)
         {
             List<SelectListItem> output = new List<SelectListItem>();
+
+            if (selectedId == null)
+            {
+                output.Add(new SelectListItem()
+                {
+                    Text = "Pick a Authentication Type",
+                    Value = "0",
+                    Selected = true,
+                    Disabled = true
+                });
+            }            
 
             switch (sourceType)
             {

@@ -24,7 +24,25 @@ namespace Sentry.data.Core.Entities.Livy
 
         public List<string> extensions { get; set; }
         public int fileCount { get; set; }
+        public Boolean HasSchema { get; set; }
+        public Boolean HasQueryableSchema { get; set; }
         public Boolean IsGeneric { get; set; }
         public Boolean IsPowerUser { get; set; }
+        public List<QueryableSchema> Schemas { get; set; }
+    }
+    
+    public class QueryableSchema
+    {
+        //This is assuming only a single hive table per schema revision.
+        //  The controller will filter to a single hive table based on
+        //  IsPrimary property on HiveTable.  Future expansion would need
+        //  add another class and expose the multiple hive tables.
+        public string SchemaName { get; set; }
+        public string SchemaDSC { get; set; }
+        public int SchemaID { get; set; }
+        public int RevisionID { get; set; }
+        public string HiveDatabase { get; set; }
+        public string HiveTable { get; set; }
+        public Boolean HasTable { get; set; }
     }
 }

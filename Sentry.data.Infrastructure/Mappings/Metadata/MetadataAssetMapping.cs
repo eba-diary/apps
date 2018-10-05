@@ -14,7 +14,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public MetadataAssetMapping()
         {
-            this.Table(Sentry.Configuration.Config.GetHostSetting("MetadataRepository") + ".dbo.DataAsset");
+            this.Table("DataAsset");
 
             this.Id(x => x.DataAsset_ID);
 
@@ -27,7 +27,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             {
                 m.Lazy(CollectionLazy.Lazy);
                 m.Inverse(true);
-                m.Table(Sentry.Configuration.Config.GetHostSetting("MetadataRepository") + ".dbo.DataElement");
+                m.Table("DataElement");
                 m.Cascade(Cascade.All);
                 m.Cache(c => c.Usage(CacheUsage.ReadWrite));
 

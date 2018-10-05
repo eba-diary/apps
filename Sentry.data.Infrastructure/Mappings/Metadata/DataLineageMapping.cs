@@ -15,7 +15,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public DataLineageMapping()
         {
-            this.Table(Sentry.Configuration.Config.GetHostSetting("MetadataRepository") + ".dbo.vw_DataLineage");
+            this.Table("vw_DataLineage");
 
             this.Id(x => x.DataLineage_ID);
 

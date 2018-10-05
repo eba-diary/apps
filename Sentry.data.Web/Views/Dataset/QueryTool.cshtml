@@ -107,12 +107,20 @@
                 <div data-bind="if: hasFiles() === true, visible: hasFiles() === true">
                     <h6 style='display:inline-block;margin-right: 15px;margin-left: 15px;' data-bind="text: config.configName"></h6>
                     <span style="display: none;" class="description" data-bind="text: description"></span>
-                    <div style="display: inline-block; float: right; margin-top: 10px;" data-bind="foreach: { data: extensions, as: 'extension'}">
-                        <div class="extension bg_gray" data-bind="css : extension">
-                            <span data-bind="text: extension"></span>
+                    <div style="float: right; margin-top:3px;" data-bind="if: hasQueryableSchema()">
+                        <label>
+                            <span>Raw File Query Override:</span>
+                            <input data-bind="checked: schemaOverride" style="margin-left: 5px;" type="checkbox" class="schemaOverrideCheckbox" />
+                        </label>
+                    </div>                    
+                    <div style="display: inline-block; float: right; margin-top: 10px;" data-bind="if: !hasSchema()">
+                        <div data-bind="foreach: { data: extensions, as: 'extension'}">
+                            <div class="extension bg_gray" data-bind="css : extension">
+                                <span data-bind="text: extension"></span>
+                            </div>
                         </div>
-                    </div>
-                    <a href="#/" data-bind="click: function (d) { console.log(d); data.DatasetDetail.PreviewDatafileModal(d.primaryFileId()); }" class="table-row-icon row-filepreview-icon" title="Preview file">
+                    </div>                    
+                    <a href="#/" data-bind="if: schemaOverride() || hasSchema() === false, visible: schemaOverride() || hasSchema() === false, click: function (d) { console.log(d); data.DatasetDetail.PreviewDatafileModal(d.primaryFileId()); }" class="table-row-icon row-filepreview-icon" title="Preview file">
                         <i class="glyphicon glyphicon-search text-primary"></i>
                     </a>
                     <a href="#/" onclick="$(this).parent().children('.description').toggle()" class="table-row-icon row-filepreview-icon" title="Information about Schema">
@@ -120,47 +128,77 @@
                     </a>
                     <br>
                 </div>
-                <div data-bind="if: hasFiles() === true, visible: hasFiles() === true, css: rowsClass">
+                <div data-bind="css: rowsClass(), if: hasFiles(), visible: hasFiles()">
+                    <div data-bind="if: schemaOverride() || config.hasQueryableSchema() === false">
+                        <input class="form-control tableNameController ruleController" data-bind="attr : { id: tableName }, value : tableName"
+                               data-toggle="tooltip" data-placement="bottom" style="width: 10%;display:inline-block; "
+                               title="This is the name of this Dataset in this instance of the Query Tool.  It represents all the files combined into one object like a Temporary Table.">
 
-                    <input class="form-control tableNameController ruleController" data-bind="attr : { id: tableName }, value : tableName"
-                           data-toggle="tooltip" data-placement="bottom" style="width: 10%;display:inline-block; "
-                           title="This is the name of this Dataset in this instance of the Query Tool.  It represents all the files combined into one object like a Temporary Table.">
+                        <input class="form-control ruleController" placeholder="Delimiter..." data-toggle="tooltip" data-placement="bottom"
+                               style="width: 8%;display:inline-block; " title="If you know the delmiter of your dataset please enter it.  Examples include , or ~">
 
-                    <input class="form-control ruleController" placeholder="Delimiter..." data-toggle="tooltip" data-placement="bottom"
-                           style="width: 8%;display:inline-block; " title="If you know the delmiter of your dataset please enter it.  Examples include , or ~">
+                        <input disabled="" class="form-control ruleController" data-toggle="tooltip" data-placement="bottom" data-bind="value : bucket"
+                               style="  width: 21%;display:none; " title="This is the bucket that this dataset resides in. You cannot modify this information.">
 
-                    <input disabled="" class="form-control ruleController" data-toggle="tooltip" data-placement="bottom" data-bind="value : bucket"
-                           style="  width: 21%;display:none; " title="This is the bucket that this dataset resides in. You cannot modify this information.">
+                        <input disabled="" class="form-control ruleController mainUrl" data-toggle="tooltip" data-placement="bottom" data-bind="value : s3Key"
+                               style="  width: 35%;display:none; " title="This is the location of this dataset. You cannot modify this information.">
 
-                    <input disabled="" class="form-control ruleController mainUrl" data-toggle="tooltip" data-placement="bottom" data-bind="value : s3Key"
-                           style="  width: 35%;display:none; " title="This is the location of this dataset. You cannot modify this information.">
-
-                    <input class="form-control ruleController" value="/*/*/*" data-html="true" data-toggle="tooltip" data-placement="bottom" style="
+                        <input class="form-control ruleController" value="/*/*/*" data-html="true" data-toggle="tooltip" data-placement="bottom" style="
                             width: 20%;display:inline-block; " title="<span>This is the search query you are making against our site.<span><br/><em>It is simply denoted as /Year/Month/Day/File Name.<em><br/><em>Example: To get everything type /*/*/* </em><br/><em>Example: To get a specific set of file names choose something like /*/*/*/FileNameWithNumber*. Where the Star is a wildcard grabbing all items with any character in the stars position.</em><br/><em>Example: To get everything from a specific month type /*/10/*">
 
-                    <select class="form-control ruleController extensionPicker" data-toggle="tooltip" data-placement="bottom" style="width: 8%; display:inline-block; "
-                            title="These are the file extensions that are available for this dataset.">
-                        <!-- ko foreach: extensions -->
-                        <option data-bind="value : $data, text: $data"></option>
-                        <!-- /ko -->
-                    </select>
+                        <select class="form-control ruleController extensionPicker" data-toggle="tooltip" data-placement="bottom" style="width: 8%; display:inline-block; "
+                                title="These are the file extensions that are available for this dataset.">
+                            <!-- ko foreach: extensions -->
+                            <option data-bind="value : $data, text: $data"></option>
+                            <!-- /ko -->
+                        </select>
 
-                    <label>
-                        <span>Has Header Row:</span>
-                        <input style="margin-left: 5px;" type="checkbox" checked="checked" class="ruleController csvHeaderCheckbox" />
-                    </label>
+                        <label>
+                            <span>Has Header Row:</span>
+                            <input style="margin-left: 5px;" type="checkbox" checked="checked" class="ruleController csvHeaderCheckbox" />
+                        </label>
 
-                    <label>
-                        <span>Is Multiline:</span>
-                        <input style="margin-left: 5px;" type="checkbox" checked="checked" class="ruleController jsonMultiline" />
-                    </label>
+                        <label>
+                            <span>Is Multiline:</span>
+                            <input style="margin-left: 5px;" type="checkbox" checked="checked" class="ruleController jsonMultiline" />
+                        </label>
 
-                    <label style="float: right; margin-top:3px;">
-                        <span>Include in Query:</span>
-                        <input style="margin-left: 5px;" type="checkbox" checked="checked" class="ruleController includeCheckbox" />
-                    </label>
+                        <label style="float: right; margin-top:3px;">
+                            <span>Include in Query:</span>
+                            <input style="margin-left: 5px;" type="checkbox" checked="checked" class="ruleController includeCheckbox" />
+                        </label>
+                    </div>
+                    
+                    <div data-bind="if: schemaOverride() === false && config.hasQueryableSchema()">
+                        <div data-bind="foreach: { data: Schemas, as: 'schema'}">
+                            <div style="border: 1px solid #EEE; border-radius: 5px; padding: 5px;">
+                                <h6 style='width: 10%;display:inline-block;margin-right: 15px;margin-left: 15px;' data-bind="text: schemaName"
+                                    data-toggle="tooltip" data-placement="bottom"
+                                    title="Schema Name"></h6>
+                                <div data-bind="if: hasTable()">
+                                    <div class="schemaRevisionRow" style="margin-left: 30px;">
+                                        <label style="margin-left: 5px">Table Alias:</label>
+                                        <input class="form-control tableNameController ruleController" data-toggle="tooltip"
+                                               data-placement="bottom" style="width: 10%;display:inline-block; "
+                                               title="This is the name of this schema revision in this instance of the Query Tool.  It represents the schema like a Temporary Table.  If left blank, table name will be used.">
+                                        <label style="margin-left: 5px">Database:</label>
+                                        <h6 style='display:inline-block; margin-left: 5px; margin-right: 15px;' data-bind="text: hiveDatabase()"></h6>
+                                        <label style="margin-left: 5px">Table:</label>
+                                        <h6 style='display:inline-block; margin-left: 5px; margin-right: 15px;' data-bind="text: hiveTable()"></h6>
+                                        <label style="float: right; margin-top:3px;">
+                                            <span>Include in Query:</span>
+                                            <input style="margin-left: 5px;" type="checkbox" checked="checked" class="ruleController includeCheckbox" />
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="emptyConfigRow" data-bind="if: hasTable() === false, visible: hasTable() === false ">
+                                    <span>There is no table associated with this schema.  To use this functionality, ensure there is a table associted.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>                    
+                </div>                    
 
-                </div>
                 <div data-bind="if: hasFiles() === false, visible: hasFiles() === false" style="margin-bottom: -15px;">
                     <h6 style='display:inline-block;margin-right: 15px;margin-left: 15px;' data-bind="text: config.configName"></h6>
                     <span style="display: none;" class="description" data-bind="text: description"></span>
@@ -487,13 +525,25 @@ t1.createTempView("t1");
     .datasetRow {
         margin-bottom: 5px;
     }
+    .schemaRow {
+        margin-left: 30px;
+        margin-bottom: 5px;
+    }
 
-        .datasetRow:nth-child(even) {
-        }
+    .datasetRow:nth-child(even) {
+    }
 
-        .datasetRow:nth-child(odd) {
-            background-color: rgba(250,240,210,.1);
-        }
+    .datasetRow:nth-child(odd) {
+        background-color: rgba(250,240,210,.1);
+    }
+
+    .schemaRow:nth-child(even) {
+        background-color: rgba(250,240,210,.1);
+    }
+
+    .schemaRow:nth-child(odd) {        
+    }
+
 
     .group-conditions > .btn-primary {
         color: black;
@@ -509,7 +559,7 @@ t1.createTempView("t1");
 
     .configRow {
         margin-left: 30px;
-        margin-bottom: -15px;
+        margin-bottom: 5px;
     }
 
     .emptyConfigRow {
@@ -788,10 +838,29 @@ t1.createTempView("t1");
             //updateJoins();
             updateTables();
             updateBadges();
+            console.log("ruleController click");
         });
 
         $('body').on('change', '.ruleController', function () {
             //updateJoins();
+            updateTables();
+            updateBadges();
+            console.log("ruleController change");
+        });
+
+        $('body').on('change', '.schemaOverrideCheckbox', function () {
+            console.log("schemaOverrideCheckbox change");
+            var check = $(this)[0].checked;
+            if (check) {
+                var schemas = $(this).closest('.datasetRow').find('.schemaRow')
+                schemas.addClass('configRow');
+                schemas.removeClass('schemaRow');
+            }
+            else {
+                var schemas = $(this).closest('.datasetRow').find('.configRow')
+                schemas.addClass('schemaRow');
+                schemas.removeClass('configRow');
+            }
             updateTables();
             updateBadges();
         });
@@ -938,16 +1007,17 @@ t1.createTempView("t1");
             var actualIncludedTables = 0;
             for (var i = 0; i < rules; i++) {
 
+                var row = $($(rows)[i]).children();
 
-                var tableName = $($(rows)[i]).children('input')[0].value;
-                var delimiter = $($(rows)[i]).children('input')[1].value;
-                var bucket = $($(rows)[i]).children('input')[2].value;
-                var s3Location = $($(rows)[i]).children('input')[3].value;
-                var query = $($(rows)[i]).children('input')[4].value;
-                var extension = $($($(rows)[i]).children('select')[0]).find(":selected").text();
-                var include = $($(rows)[i]).children().children('.includeCheckbox')[0].checked;
-                var csvHeader = $($(rows)[i]).children().children('.csvHeaderCheckbox')[0].checked;
-                var jsonMultiline = $($(rows)[i]).children().children('.jsonMultiline')[0].checked;
+                var tableName = row.children('input')[0].value;
+                var delimiter = row.children('input')[1].value;
+                var bucket = row.children('input')[2].value;
+                var s3Location = row.children('input')[3].value;
+                var query = row.children('input')[4].value;
+                var extension = $(row.children('select')[0]).find(":selected").text();
+                var include = row.children().children('.includeCheckbox')[0].checked;
+                var csvHeader = row.children().children('.csvHeaderCheckbox')[0].checked;
+                var jsonMultiline = row.children().children('.jsonMultiline')[0].checked;
 
                 if (include) {
                     if (extension) {
@@ -1010,6 +1080,48 @@ t1.createTempView("t1");
                 }
             }
 
+            var rows = $('#tableSelection').children('.rule-container').children().children().children('.schemaRow');
+            var rules = rows.length;
+            for (var i = 0; i < rules; i++) {
+
+                var schemaRevisionRows = $($(rows)[i]).children().children().children().children().children('.schemaRevisionRow');
+                var revisions = schemaRevisionRows.length;
+                for (var r = 0; r < revisions; r++) {
+
+                    var revision = $($(rows)[i]).children().children().children().children().children('.schemaRevisionRow')[r]
+
+                    //Take user specified tableName alias, otherwise use hive table name
+                    var alias = true;
+                    var tableAliasName = '';
+                    tableAliasName = $(revision).children('input')[0].value;
+                    tableName = $($(revision).children('h6')[1]).text();
+                    if (tableAliasName == null || !tableAliasName) {
+                        var alias = false;
+                    }
+                    
+                    var databaseName = $($(revision).children('h6')[0]).text();
+                    var include = $(revision).children().children('.includeCheckbox')[0].checked;
+
+                    if (include) {
+                        actualIncludedTables++;
+
+                        if (actualIncludedTables == 1) {
+                            firstTableName = tableName.trim();
+                        }
+
+                        if (alias) {
+                            tables += tableAliasName.trim() + " = spark.sql(\"Select * from " + databaseName.trim() + "." + tableName.trim() + "\").printSchema();";
+                            tableNames += tableAliasName.trim() + '|||';
+                        }
+                        else {
+                            tables += "spark.sql(\"Select * from " + databaseName.trim() + "." + tableName.trim() + "\").printSchema();";
+                            tableNames += tableName.trim() + '|||';
+                        }
+                    }
+                }
+            }
+
+
             if (valid) {
                 var json = JSON.stringify(tables.escapeForJson());
 
@@ -1065,12 +1177,12 @@ t1.createTempView("t1");
 
             $('.extensionPicker').each(function (index, value) {
                 if ($(value).find(":selected").text() !== "csv") {
-                    console.log($(value).siblings().children(".csvHeaderCheckbox").parent());
+                    //console.log($(value).siblings().children(".csvHeaderCheckbox").parent());
                     $(value).siblings().children(".csvHeaderCheckbox").parent().hide();
                 }
 
                 if ($(value).find(":selected").text() !== "json") {
-                    console.log($(value).siblings().children(".jsonMultiline").parent());
+                    //console.log($(value).siblings().children(".jsonMultiline").parent());
                     $(value).siblings().children(".jsonMultiline").parent().hide();
                 }
             });
@@ -1081,16 +1193,17 @@ t1.createTempView("t1");
             var rules = rows.length;
             for (var i = 0; i < rules; i++) {
 
+                var row = $($(rows)[i]).children();
 
-                var tableName = $($(rows)[i]).children('input')[0].value;
-                var delimiter = $($(rows)[i]).children('input')[1].value;
-                var bucket = $($(rows)[i]).children('input')[2].value;
-                var s3Location = $($(rows)[i]).children('input')[3].value;
-                var query = $($(rows)[i]).children('input')[4].value;
-                var extension = $($($(rows)[i]).children('select')[0]).find(":selected").text();
-                var include = $($(rows)[i]).children().children('.includeCheckbox')[0].checked;
-                var csvHeader = $($(rows)[i]).children().children('.csvHeaderCheckbox')[0].checked;
-                var jsonMultiline = $($(rows)[i]).children().children('.jsonMultiline')[0].checked;
+                var tableName = row.children('input')[0].value;
+                var delimiter = row.children('input')[1].value;
+                var bucket = row.children('input')[2].value;
+                var s3Location = row.children('input')[3].value;
+                var query = row.children('input')[4].value;
+                var extension = $(row.children('select')[0]).find(":selected").text();
+                var include = row.children().children('.includeCheckbox')[0].checked;
+                var csvHeader = row.children().children('.csvHeaderCheckbox')[0].checked;
+                var jsonMultiline = row.children().children('.jsonMultiline')[0].checked;
 
                 if (include) {
                     if (extension) {
@@ -1144,6 +1257,42 @@ t1.createTempView("t1");
                     } else {
                         valid = false;
                         failureReason = "No Extension Picked for " + tableName.trim();
+                    }
+                }                
+            }
+
+            var rows = $('#tableSelection').children('.rule-container').children().children().children('.schemaRow');
+            var rules = rows.length;
+            for (var i = 0; i < rules; i++) {
+
+                var schemaRevisionRows = $($(rows)[i]).children().children().children().children().children('.schemaRevisionRow');
+                var revisions = schemaRevisionRows.length;
+                for (var r = 0; r < revisions; r++) {
+
+                    var revision = $($(rows)[i]).children().children().children().children().children('.schemaRevisionRow')[r]
+
+                    //Take user specified tableName alias, otherwise use hive table name
+                    var alias = true;
+                    var tableAliasName = '';
+                    tableAliasName = $(revision).children('input')[0].value;
+                    tableName = $($(revision).children('h6')[1]).text();
+                    if (tableAliasName == null || !tableAliasName) {
+                        var alias = false;
+                    }
+
+                    var databaseName = $($(revision).children('h6')[0]).text();
+                    var include = $(revision).children().children('.includeCheckbox')[0].checked;
+
+                    if (include) {
+
+                        if (alias) {
+                            Join = tableAliasName.trim() + " = spark.sql(\"Select * from " + databaseName.trim() + "." + tableName.trim() + "\");";
+                        }
+                        else {
+                            Join = "spark.sql(\"Select * from " + databaseName.trim() + "." + tableName.trim() + "\").printSchema();";
+                        }
+
+                        $('#tablePython').val($('#tablePython').val() + Join + "\n");
                     }
                 }
             }
