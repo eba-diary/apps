@@ -5,6 +5,6 @@
 	[Server_NME] [varchar](50) NULL,
 	[Cube_NME] [varchar](50) NULL,
 	[SourceSystem_VAL] [varchar](50) NULL,
-	[LastUpdt_DTM] [datetime] NULL,
+	[LastUpdt_DTM] [datetime] NULL DEFAULT GETDATE(),
 	[DataAssetHealth_ID] [int] IDENTITY(1,1) NOT NULL
 )
