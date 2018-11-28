@@ -1246,11 +1246,11 @@
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>2487</DevelopmentServerPort>
+          <DevelopmentServerPort>2457</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost.sentry.com:2487</IISUrl>
+          <IISUrl>http://localhost.sentry.com:2457</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
-          <IISAppRootUrl>http://localhost.sentry.com:2487</IISAppRootUrl>
+          <IISAppRootUrl>http://localhost.sentry.com:2457</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
