@@ -30,6 +30,8 @@ namespace Sentry.data.Goldeneye
         private DateTime FileCounterStart { get; set; }
         private int DatasetFileConfigId { get; set; }
         private int RetrieverJobId { get; set; }
+        private CancellationTokenSource _internalTokenSource;
+        private CancellationToken _internalToken;
 
         /// <summary>
         /// Directory that is to be watched
@@ -221,15 +223,37 @@ namespace Sentry.data.Goldeneye
         /// The last thing it does is grabs all the files that currently in the directory and adds them to the file list.
         /// The Service will do the rest on it's periodic run.
         /// </summary>
+        /// <param name="jobId"></param>
         /// <param name="watchPath"></param>
+        /// <param name="token"></param>
         public void OnStart(int jobId, Uri watchPath, CancellationToken token)
         {
 
             try
             {
+                //Create watcher cancellation token
+                _internalTokenSource = new CancellationTokenSource();
+                _internalToken = _internalTokenSource.Token;
+
                 // Create a new FileSystemWatcher and set its properties.
                 watcher = new FileSystemWatcher();
-                watcher.Path = watchPath.LocalPath;
+                try
+                {
+                    watcher.Path = watchPath.LocalPath;
+                }
+                catch (ArgumentException ex)
+                {
+                    Logger.Error($"Watcher Path not found - Job:{jobId} ", ex);
+                    Logger.Info($"Attempting to self-heal... issuing create directory - Job:{jobId}");
+                    Logger.Info($"Attempting to create directory - Job:{jobId} Path:{watchPath.LocalPath}");
+                    System.IO.Directory.CreateDirectory(watchPath.LocalPath);
+                    Logger.Info($"Directory successfully created - Job:{jobId}");
+                    Logger.Info($"Second attempt to assign watcher.path - Job:{jobId}");
+                    watcher.Path = watchPath.LocalPath;
+                    Logger.Info($"Second attempt successful - Job:{jobId}");
+                    Logger.Info($"Self-heal successfull - Job:{jobId}");
+                }
+
                 FileCounterStart = DateTime.Now;
                 RetrieverJobId = jobId;
 
@@ -245,6 +269,7 @@ namespace Sentry.data.Goldeneye
                 watcher.Changed += new FileSystemEventHandler(OnChanged);
                 watcher.Created += new FileSystemEventHandler(OnCreated);
                 watcher.Deleted += new FileSystemEventHandler(OnDeleted);
+                watcher.Error += new ErrorEventHandler(OnError);
 
                 // Begin watching.
                 watcher.EnableRaisingEvents = true;
@@ -259,15 +284,18 @@ namespace Sentry.data.Goldeneye
                     Logger.Info("Found : " + a);
                     allFiles.Add(new FileProcess(a));
                 }
+
+                using (CancellationTokenSource linkedCts = CancellationTokenSource.CreateLinkedTokenSource(token, _internalToken))
+                {
+                    //Start directory monitor
+                    this.Run(WatchedDir, linkedCts.Token);
+                }
             }
             catch (Exception ex)
             {
                 Logger.Error($"Error initilizing watch for {watchPath}",ex);
             }
-            
 
-            //Start directory monitor
-            this.Run(WatchedDir, token);
         }
 
         //When a new file is created add the file path to the list of All Files.
@@ -307,6 +335,12 @@ namespace Sentry.data.Goldeneye
                     Logger.Info($"Watch detected delete for non-tracked file: {e.FullPath}");
                 }                
             }            
+        }
+        private void OnError(object source, ErrorEventArgs e)
+        {
+            Logger.Error($"Watcher Error - Cancelling watch job (JobId:{RetrieverJobId})", e.GetException());
+
+            _internalTokenSource.Cancel();
         }
 
         private Guid GenerateHash(string input)

@@ -324,7 +324,7 @@ namespace Sentry.data.Goldeneye
 
 
 
-                            rtjob = _requestContext.RetrieverJob.Where(w => (w.DataSource is DfsBasic || w.DataSource is DfsCustom) && w.Schedule == "Instant").ToList();
+                            rtjob = _requestContext.RetrieverJob.Where(w => (w.DataSource is DfsBasic || w.DataSource is DfsCustom) && w.Schedule == "Instant" && w.IsEnabled).ToList();
 
 
 
@@ -345,7 +345,7 @@ namespace Sentry.data.Goldeneye
                                                                 );
                                 }
                                 //Restart any completed tasks
-                                else if (tasks.Any(w => Int64.Parse(w.Name.Replace("Watch_", "")) == configID))
+                                else if (tasks.Any(w => Int64.Parse(w.Name.Split('_')[2]) == configID))
                                 {
                                     currentTasks.Add(new RunningTask(
                                         Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath, _token),
@@ -354,12 +354,12 @@ namespace Sentry.data.Goldeneye
                                                                         $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
                                     );
 
-                                    Logger.Info($"Resstarting Watch_{configID}");
+                                    Logger.Info($"Resstarting Watch_{job.Id}_{job.DatasetConfig.ConfigId}");
                                 }
                                 //Start any new directories added
                                 else if (!currentTasks.Any(x => x.Name.StartsWith("Watch") && x.Name.Replace("Watch_", "") == $"{job.Id}_{job.DatasetConfig.ConfigId}"))
                                 {
-                                    Logger.Info($"Detected new config ({configID}) to monitor ({configID})");
+                                    Logger.Info($"Detected new config ({configID}) to monitor ({watchPath})");
 
                                     currentTasks.Add(new RunningTask(
                                         Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath, _token),
