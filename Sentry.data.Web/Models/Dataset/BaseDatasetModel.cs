@@ -86,16 +86,30 @@ namespace Sentry.data.Web
             { this.IsPushToSASCompatible = true; }
             else
             { this.IsPushToSASCompatible = false; }
-
-            //if (ds.FileExtension == ".csv")
-            //{ this.IsPushToSASCompatible = true; }
-            //else
-            //{ this.IsPushToSASCompatible = false; }
+            
             if (this.DistinctFileExtensions().Where(w => Utilities.IsExtentionPreviewCompatible(w)).Count() > 0)
-            //if (ds.FileExtension == ".csv" || ds.FileExtension == ".txt" || ds.FileExtension == ".json")
             { this.IsPreviewCompatible = true; }
             else
             { this.IsPreviewCompatible = false; }
+
+            if(!String.IsNullOrWhiteSpace(ds.DatasetType) && ds.DatasetType == "RPT")
+            {
+                List<MetadataTag> tagList = new List<MetadataTag>();
+                foreach(MetadataTag tag in ds.Tags)
+                {
+                    tagList.Add(tag);
+                }
+                Tags = tagList;
+
+                UploadFrequency = Enum.GetName(typeof(ReportFrequency), ds.Metadata.ReportMetadata.Frequency) ?? "Not Specified";
+            }
+            else
+            {
+                Tags = new List<MetadataTag>();
+                UploadFrequency = null;
+            }
+
+
         }
 
         public List<string> DistinctFileExtensions()
@@ -242,5 +256,8 @@ namespace Sentry.data.Web
 
         public int Views { get; set; }
         public int Downloads { get; set; }
+        public string ObjectType { get; set; }
+        public List<MetadataTag> Tags { get; set; }
+        public string UploadFrequency { get; set; }
     }
 }

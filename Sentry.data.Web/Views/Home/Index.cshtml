@@ -13,7 +13,7 @@
     }
 </style>
 
-<div class="hero hero-media ReplaceSpecialChars" style="height: 275px;">
+<div class="hero hero-media ReplaceSpecialChars" style="height: 184px;">
 
     <div class="picture">
 
@@ -33,7 +33,7 @@
 
 
     <div class="container" style="">
-        <h1 class="frontPageh1">
+        <h1 class="frontPageh1" style="margin-top: -10px">
             Welcome to data.sentry.com.
             Please choose a section below to begin.
         </h1>
@@ -67,17 +67,16 @@
 
     <div class="container" style="    top: -50px;">
         <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8" id="leftPanel">
-            <a class="" href="/DataAsset/Index" style="background: white;">
-                <div class="borderdk_green tile assetTile" style="height:200px;">
+            <a class="" href="/BusinessIntelligence" style="background: white;">
+                <div class="borderdk_blue tile setTile" style="height:200px;">
 
                     <div class="text-center col-lg-6 ">
-                        <img src="~/Images/Icons/DataAssets.svg" class="tile-image">
-                        <div class="tile-header" style="color: #005844;">Data Assets</div>
+                        <img src="~/Images/Icons/Business Intelligence.svg" class="tile-image">
+                        <div class="tile-header" style="color: #003DA5;">Business Intelligence</div>
                     </div>
-                    <div class="text-center col-lg-5" style="margin-top:27px;">
-                        <h3 style="color: #005844;">Data Asset Health</h3>
-                        <h3 style="color: #005844;">Data Lineage</h3>
-                        <h3 style="color: #005844;">Data Asset Information</h3>
+                    <div class="text-center col-lg-5" style="margin-top:42px;">
+                        <h3 style="color: #003DA5;">Exhibits</h3>
+                        <h3 style="color: #003DA5;">Dashboards</h3>
                     </div>
 
                 </div>
@@ -85,21 +84,38 @@
             <div style="height:1px;">
             </div>
             <a class="" href="/Dataset/Index" style="background: white;">
-                <div class="borderdk_blue tile setTile" style="height:200px;">
+                <div class="borderdk_green tile setTile" style="height:200px;">
 
                     <div class="text-center col-lg-6 ">
                         <img src="~/Images/Icons/Datasets.svg" class="tile-image">
-                        <div class="tile-header" style="color: #285780;">Datasets</div>
+                        <div class="tile-header" style="color: #005844;">Datasets</div>
                     </div>
                     <div class="text-center col-lg-5" style="margin-top:42px;">
-                        <h3 style="color: #285780;">Internal Sentry Datasets</h3>
-                        <h3 style="color: #285780;">External Datasets</h3>
+                        <h3 style="color: #005844;">Internal Sentry Datasets</h3>
+                        <h3 style="color: #005844;">External Datasets</h3>
+                    </div>
+
+                </div>
+            </a>
+            <div style="height:1px;">
+            </div>
+            <a class="" href="/DataAsset/Index" style="background: white;">
+                <div class="borderdk_plum tile assetTile" style="height:200px;">
+
+                    <div class="text-center col-lg-6 ">
+                        <img src="~/Images/Icons/DataAssets.svg" class="tile-image">
+                        <div class="tile-header" style="color: #72246C;">Data Assets</div>
+                    </div>
+                    <div class="text-center col-lg-5" style="margin-top:27px;">
+                        <h3 style="color: #72246C;">Data Asset Health</h3>
+                        <h3 style="color: #72246C;">Data Lineage</h3>
+                        <h3 style="color: #72246C;">Data Asset Information</h3>
                     </div>
 
                 </div>
             </a>
 
-            <div>
+            @*<div>
                 <div style="margin-left: 30px; margin-right:30px;">
                     <div>
                         @{
@@ -116,7 +132,7 @@
                         }
                     </div>
                 </div>
-            </div>
+            </div>*@
         </div>
         <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
             <div class="col-lg-12 text-center">
@@ -176,13 +192,13 @@
 
     .feed {
         width: 100% !important;
-        height: 546px;
+        height: 680px;
         margin-left: 0px !important;
     }
 
     .feedBox {
         position: relative;
-        max-height: 90%;
+        max-height: 96%;
         margin-right: 2px;
     }
 
@@ -198,6 +214,11 @@
     .borderdk_green {
         border: 1.5px solid #005844;
         border-top: 6px solid #005844;
+    }
+
+    .borderdk_plum {
+        border: 1.5px solid #72246C;
+        border-top: 6px solid #72246C;
     }
 
     .dataset-operation-button {
@@ -239,6 +260,7 @@
         background: white;
         margin: 30px;
         cursor: pointer;
+        margin-bottom: 9px;
     }
 
          .tile a {

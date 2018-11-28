@@ -154,6 +154,7 @@
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="DomainContexts\datasetContext.cs" />
     <Compile Include="DomainContexts\dataAssetContext.cs" />
+    <Compile Include="DomainContexts\ReportContext.cs" />
     <Compile Include="DomainContexts\RequestContext.cs" />
     <Compile Include="HangfireFilters\DisableMultipleQueuedItemsFilter.cs" />
     <Compile Include="Mappings\Metadata\DataElementDetailMapping.cs" />
@@ -167,6 +168,7 @@
     <Compile Include="Mappings\Metadata\LivyCreationMapping.cs" />
     <Compile Include="Mappings\Metadata\MetadataAssetMapping.cs" />
     <Compile Include="Mappings\Metadata\SchemaMapping.cs" />
+    <Compile Include="Mappings\Metadata\MetadataTagMapping.cs" />
     <Compile Include="Mappings\Primary\AssetNotificationMapping.cs" />
     <Compile Include="Mappings\Primary\AssetSourceMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetFileConfigsMapping.cs" />

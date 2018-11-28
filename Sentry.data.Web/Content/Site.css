@@ -414,8 +414,8 @@ div[id*="filterType_"]:hover
     top: 0px;
     right: 0px;
     overflow: hidden;
-    height: 100px;
-    width: 140px;
+    height: 80px;
+    width: 80px;
 }
 
 .category-type {
@@ -1122,6 +1122,16 @@ tr.categoryBanner-blue th.sorting_desc {
     margin-right: 0.5em;
 }
 
+.tags-block {
+    color: white;
+    background-color: #003DA5;
+    display: inline-block;
+    padding: 5px 5px;
+    text-align: center;
+    border-radius: 5px;
+    margin: 5px;
+}
+
 .bg_gray { background-color: lightgray;}
 .txt { background-color: dodgerblue;}
 .csv { background-color: orange;}
@@ -1130,6 +1140,9 @@ tr.categoryBanner-blue th.sorting_desc {
 .sas7bdat { background-color: #285780;}
 .prn { background-color: #72246C; }
 .json {background-color: #74531C;}
+
+.Excel { background-color: dodgerblue;}
+.Tableau { background-color: orange;}
 
 .ext_txt {
     background-color: dodgerblue;
@@ -1764,9 +1777,8 @@ body { background-color: #f8f8f8; }
     height: 530px;
 }
 
-.feedBox 
-{
-    height: 460px;
+.feedBox {
+    height: 640px;
     overflow-y: auto;
 }
 

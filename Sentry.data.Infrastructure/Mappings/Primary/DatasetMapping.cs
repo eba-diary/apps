@@ -1,4 +1,5 @@
-﻿using NHibernate.Mapping.ByCode;
+﻿using NHibernate;
+using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
 using Sentry.data.Core;
 
@@ -31,6 +32,15 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.IsSensitive, (m) => m.Column("IsSensitive_IND"));
             this.Property((x) => x.CanDisplay, (m) => m.Column("Display_IND"));
             this.Property((x) => x.DatasetInformation, (m) => m.Column("Information_DSC"));
+            this.Property((x) => x.DatasetType, (m) => m.Column("Dataset_TYP"));
+            Property(x => x.Metadata, m =>
+            {
+                m.Column("Metadata");
+                m.Access(Accessor.Field);
+
+                //http://geekswithblogs.net/lszk/archive/2011/07/11/nhibernatemapping-a-string-field-as-nvarcharmax-in-sql-server-using.aspx
+                m.Type(NHibernateUtil.StringClob);
+            });
 
             this.ManyToOne(x => x.DatasetCategory, m =>
             {
@@ -66,6 +76,28 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                     k.ForeignKey("FK_DatasetFileConfigs_Dataset");
                 });
             }, map => map.OneToMany(a => a.Class(typeof(DatasetFileConfig))));
+
+            this.Bag(
+            (x) => x.Tags, 
+            (m) =>
+                {
+                m.Table("ObjectTag");
+                m.Inverse(false);
+                m.Key((k) =>
+                    {
+                        k.Column("DatasetId");
+                        k.ForeignKey("FK_ObjectTag_Dataset");
+                    });
+                },
+            map =>
+                {
+                map.ManyToMany(a =>
+                    {
+                        a.Column("TagId");
+                        a.ForeignKey("FK_ObjectTag_Tag");
+                    });
+                }
+            );
         }
     }
 }

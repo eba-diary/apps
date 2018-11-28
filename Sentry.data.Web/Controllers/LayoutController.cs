@@ -14,10 +14,12 @@ namespace Sentry.data.Web.Controllers
     public class LayoutController : BaseController
     {
         private readonly IDataAssetContext _dataAssetContext;
+        private readonly IDatasetContext _datasetContext;
 
-        public LayoutController(IDataAssetContext dataAssetContext)
+        public LayoutController(IDataAssetContext dataAssetContext, IDatasetContext dsContext)
         {
             _dataAssetContext = dataAssetContext;
+            _datasetContext = dsContext;
         }
 
         [ChildActionOnly()]
@@ -53,6 +55,7 @@ namespace Sentry.data.Web.Controllers
 
             var das = new List<DataAsset>(_dataAssetContext.GetDataAssets());
             ViewBag.DataAssets = das.Select(x => new Models.AssetUIModel(x)).ToList();
+            ViewBag.BusinessIntelligenceCategories = _datasetContext.Categories.ToList().Where(w => w.ObjectType == "RPT").OrderBy(o => o.Name).Select(x => new Models.BusinessIntelligenceUIModel(x)).ToList();
 
             return PartialView("_Header", headerModel);
         }

@@ -56,8 +56,11 @@ namespace Sentry.data.Web.Controllers
         {
             HomeModel hm = new HomeModel();
 
-            hm.DatasetCount = _datasetContext.GetDatasetCount();
-            hm.Categories = _datasetContext.Categories.ToList();
+            List<Dataset> dsList = _datasetContext.Datasets.ToList();
+            List<Category> cList = _datasetContext.Categories.ToList();
+
+            hm.DatasetCount = dsList.Count(w => w.DatasetType != "RPT");
+            hm.Categories = cList.Where(w => w.ObjectType != "RPT").ToList();
             hm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
             hm.CanUpload = SharedContext.CurrentUser.CanUpload;
 
@@ -421,42 +424,67 @@ namespace Sentry.data.Web.Controllers
         #region Detail Page
 
         [HttpGet]
+        [Route("{objectType}/Detail/{id}/")]
         [AuthorizeByPermission(PermissionNames.DatasetView)]
-        public ActionResult Detail(int id)
+        public ActionResult Detail(string objectType, int id)
         {
             Dataset ds = _datasetContext.GetById(id);
 
             BaseDatasetModel bdm = new BaseDatasetModel(ds, _associateInfoProvider, _datasetContext);
-            bdm.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
-            bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
-            bdm.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
-            bdm.CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
-            bdm.CanUpload = SharedContext.CurrentUser.CanUpload;
-            bdm.IsSubscribed = _datasetContext.IsUserSubscribedToDataset(_userService.GetCurrentUser().AssociateId, id);
-            bdm.AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, id).Count;
-            bdm.CanQueryTool = SharedContext.CurrentUser.CanQueryTool || SharedContext.CurrentUser.CanQueryToolPowerUser;
-
-            bdm.Views = _datasetContext.Events.Where(x => x.EventType.Description == "Viewed" && x.Dataset == ds.DatasetId).Count();
-            bdm.Downloads = _datasetContext.Events.Where(x => x.EventType.Description == "Downloaded Data File" && x.Dataset == ds.DatasetId).Count();
-
-            if (ds.DatasetFiles.Any())
-            {
-                bdm.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);
-            }
-            else
-            {
-                bdm.ChangedDtm = ds.ChangedDtm;
-            }
 
             Event e = new Event();
+
+            //Object specific settings
+            switch (objectType.ToLower())
+            {
+                case "dataset":
+                    //Model settings specific to Datasets
+                    bdm.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
+                    bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
+                    bdm.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
+                    bdm.CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
+                    bdm.CanUpload = SharedContext.CurrentUser.CanUpload;
+                    bdm.CanQueryTool = SharedContext.CurrentUser.CanQueryTool || SharedContext.CurrentUser.CanQueryToolPowerUser;
+                    bdm.Downloads = _datasetContext.Events.Where(x => x.EventType.Description == "Downloaded Data File" && x.Dataset == ds.DatasetId).Count();
+                    if (ds.DatasetFiles.Any())
+                    {
+                        bdm.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);
+                    }
+                    else
+                    {
+                        bdm.ChangedDtm = ds.ChangedDtm;
+                    }
+
+                    //Event reason tailored to Datasets
+                    e.Reason = "Viewed Dataset Detail Page";
+
+                    
+                    break;
+                case "businessintelligence":
+                    //Model settings specific to Business Intelligence
+                    bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
+                    bdm.ObjectType = ds.DatasetType;
+
+                    //Event reason tailored to Business Intelligence
+                    e.Reason = "Viewed Business Intelligence Detail Page";
+                    break;
+                default:
+                    break;
+            }
+            
+            bdm.IsSubscribed = _datasetContext.IsUserSubscribedToDataset(_userService.GetCurrentUser().AssociateId, id);
+            bdm.AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, id).Count;
+
+            bdm.Views = _datasetContext.Events.Where(x => x.EventType.Description == "Viewed" && x.Dataset == ds.DatasetId).Count();           
+
+            
             e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
             e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
             e.TimeCreated = DateTime.Now;
             e.TimeNotified = DateTime.Now;
             e.IsProcessed = false;
             e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-            e.Dataset = ds.DatasetId;
-            e.Reason = "Viewed Dataset Detail Page";
+            e.Dataset = ds.DatasetId;            
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
             return View(bdm);

@@ -280,6 +280,7 @@
     <Compile Include="Controllers\LineageController.cs" />
     <Compile Include="Controllers\QueryToolController.cs" />
     <Compile Include="Controllers\ConfigController.cs" />
+    <Compile Include="Controllers\BusinessIntelligenceController.cs" />
     <Compile Include="Controllers\SchemaController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\UserController.cs" />
@@ -289,6 +290,7 @@
     <Compile Include="Helpers\LivyHelper.cs" />
     <Compile Include="Helpers\BeginCollectionItem.cs" />
     <Compile Include="Helpers\PredicateBuilder.cs" />
+    <Compile Include="Helpers\Report\ReportUtility.cs" />
     <Compile Include="Helpers\Utility.cs" />
     <Compile Include="DependencyResolution\ControllerConvention.cs" />
     <Compile Include="DependencyResolution\StructureMapMvcDependencyResolver.cs" />
@@ -314,6 +316,7 @@
     <Compile Include="Helpers\TimeSpanFormattingExtensions.cs" />
     <Compile Include="Helpers\WebCurrentUserIdProvider.cs" />
     <Compile Include="HttpExceptions\NotAuthorizedException.cs" />
+    <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceUIModel.cs" />
     <Compile Include="Models\Config\CreateExtensionMapModel.cs" />
     <Compile Include="Models\Config\CreateSchemaModel.cs" />
     <Compile Include="Models\Config\CreateSourceModel.cs" />
@@ -343,6 +346,8 @@
     <Compile Include="Models\Dataset\BaseDatasetModel.cs" />
     <Compile Include="Models\Dataset\EditDatasetModel.cs" />
     <Compile Include="Models\Dataset\SearchModel.cs" />
+    <Compile Include="Models\BusinessIntelligence\CreateBusinessIntelligenceModel.cs" />
+    <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceHomeModel.cs" />
     <Compile Include="Models\User\SharedContextModel.cs" />
     <Compile Include="Models\Shared\SuccessModel.cs" />
     <Compile Include="Models\Subscription\SubscriptionModel.cs" />
@@ -355,11 +360,20 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\query-builder.default.css" />
     <Content Include="Content\query-builder.default.min.css" />
+    <Content Include="Images\Category\BusinessIntelligence\401k.svg" />
+    <Content Include="Images\Category\BusinessIntelligence\claims.svg" />
+    <Content Include="Images\Category\BusinessIntelligence\commercial lines.svg" />
+    <Content Include="Images\Category\BusinessIntelligence\it.svg" />
+    <Content Include="Images\Category\BusinessIntelligence\personal lines.svg" />
+    <Content Include="Images\Category\BusinessIntelligence\corporate.svg" />
     <Content Include="Images\Hole16_Summer_Flowers_14.jpg" />
     <Content Include="Images\Hole16_Summer_Flowers_14.png" />
     <Content Include="Images\Icons\bundle.png" />
+    <Content Include="Images\Icons\Business Intelligence.svg" />
+    <Content Include="Images\Icons\Business IntelligenceBlue.svg" />
     <Content Include="Images\Icons\details_close.png" />
     <Content Include="Images\Icons\details_open.png" />
+    <Content Include="Images\Icons\Exhibits.svg" />
     <Content Include="Images\SHO_Aerial_10-4-17.jpg" />
     <Content Include="Images\SHO_Aerial_10-4-17.png" />
     <Content Include="Images\SHO_SentryWorld_Aerial.jpg" />
@@ -373,6 +387,8 @@
     <Content Include="js\QueryTool\RenderTable.js" />
     <Content Include="js\QueryTool\SaveTo.js" />
     <Content Include="js\QueryTool\Startup.js" />
+    <Content Include="js\Report\BusinessIntelligenceDetail.js" />
+    <Content Include="js\Report\Report.js" />
     <Content Include="Scripts\bootstrap-datetimepicker.js" />
     <Content Include="Scripts\bootstrap-datetimepicker.min.js" />
     <Content Include="Scripts\DataTables\moment-with-locales.js" />
@@ -1174,6 +1190,8 @@
     <Content Include="Views\Config\EditSchema.cshtml" />
     <Content Include="Views\Config\_ExtensionMapping.cshtml" />
     <Content Include="Views\Config\CreateExtensionMapping.cshtml" />
+    <Content Include="Views\BusinessIntelligence\Index.cshtml" />
+    <Content Include="Views\BusinessIntelligence\Create.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1228,11 +1246,11 @@
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>2457</DevelopmentServerPort>
+          <DevelopmentServerPort>2487</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost.sentry.com:2457</IISUrl>
+          <IISUrl>http://localhost.sentry.com:2487</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
-          <IISAppRootUrl>http://localhost.sentry.com:2457</IISAppRootUrl>
+          <IISAppRootUrl>http://localhost.sentry.com:2487</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

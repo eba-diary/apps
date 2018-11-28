@@ -21,6 +21,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             this.Property((x) => x.Name);
             this.Property(x => x.Color);
+            this.Property((x) => x.ObjectType, (m) => m.Column("Object_TYP"));
+            this.Property((x) => x.AbbreviatedName);
 
         }
     }

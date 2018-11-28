@@ -111,9 +111,12 @@ namespace Sentry.data.Infrastructure
         public IList<DataFeedItem> SentryEvents()
         {
             List<DataFeedItem> items = new List<DataFeedItem>();
-            var events = Query<Event>().Where(x => x.Dataset != null && x.EventType.Description == "Created Dataset").OrderByDescending(x => x.TimeCreated).Take(50);
 
-            foreach(Event e in events)
+            var dsEvents = Query<Event>().Where(x => x.Dataset != null && (x.EventType.Description == "Created Dataset")).OrderByDescending(x => x.TimeCreated).Take(50);
+
+            //|| x.EventType.Description == "Created Report"
+
+            foreach (Event e in dsEvents)
             {
                 Dataset ds = Query<Dataset>().FirstOrDefault(y => y.DatasetId == e.Dataset);
 
@@ -126,8 +129,23 @@ namespace Sentry.data.Infrastructure
                 );
 
                 items.Add(dfi);
+            }
 
+            var rptEvents = Query<Event>().Where(x => x.Dataset != null && (x.EventType.Description == "Created Report")).OrderByDescending(x => x.TimeCreated).Take(50);
 
+            foreach (Event e in rptEvents)
+            {
+                Dataset ds = Query<Dataset>().FirstOrDefault(y => y.DatasetId == e.Dataset);
+
+                DataFeedItem dfi = new DataFeedItem(
+                    e.TimeCreated,
+                    e.Dataset.ToString(),
+                    ds.DatasetName + " - A New Exhibit was Created",
+                    ds.DatasetName + " - A New Exhibit was Created",
+                    new DataFeed() { Name = "Business Intelligence", Url = "/Exhibit/Index", Type = "Exhibits" }
+                );
+
+                items.Add(dfi);
             }
 
             return items;

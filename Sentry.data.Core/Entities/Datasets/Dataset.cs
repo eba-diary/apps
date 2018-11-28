@@ -7,11 +7,14 @@ using Sentry.Core;
 using Sentry.Common;
 using static Sentry.Common.SystemClock;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json;
 
 namespace Sentry.data.Core
 {
     public class Dataset : IValidatable
     {
+        private string _metadata;
+
         public Dataset(){ }
 
         public virtual int DatasetId { get; set; }
@@ -42,10 +45,32 @@ namespace Sentry.data.Core
         public virtual Boolean CanDisplay { get; set; }
 
         public virtual Category DatasetCategory { get; set; }
+        public virtual string DatasetType { get; set; }
 
         public virtual IList<DatasetFile> DatasetFiles { get; set; }
 
         public virtual IList<DatasetFileConfig> DatasetFileConfigs { get; set; }
+        public virtual IList<MetadataTag> Tags { get; set; }
+        public virtual DatasetMetadata Metadata
+        {
+            get
+            {
+                if (String.IsNullOrEmpty(_metadata))
+                {
+                    return null;
+                }
+                else
+                {
+                    DatasetMetadata a = JsonConvert.DeserializeObject<DatasetMetadata>(_metadata);
+                    return a;
+                }
+            }
+            set
+            {
+                _metadata = JsonConvert.SerializeObject(value);
+            }
+        }
+
 
         public virtual List<DatasetScopeType> DatasetScopeType
         {
@@ -96,6 +121,20 @@ namespace Sentry.data.Core
             {
                 vr.Add(ValidationErrors.datasetDescIsBlank, "The Dataset description is required");
             }
+
+            //Report specific checks
+            if(!string.IsNullOrEmpty(DatasetType) && DatasetType == "RPT")
+            {
+                if (string.IsNullOrWhiteSpace(Metadata.ReportMetadata.Location))
+                {
+                    vr.Add(ValidationErrors.locationIsBlank, "Report Location is required");
+                }
+                if (Metadata.ReportMetadata.LocationType.ToLower() == "file" && !Regex.IsMatch(Metadata.ReportMetadata.Location.ToLower(), "^\\\\(sentry.com\\share\\|sentry.com\\appfs)"))
+                {
+                    vr.Add(ValidationErrors.locationIsInvalid, "Report Location invalid, should begin with \\\\Sentry.com\\Share or \\\\Sentry.com\\appfs");
+                }
+            }
+            
             return vr;
         }
 
@@ -110,6 +149,10 @@ namespace Sentry.data.Core
             public const string datasetDescIsBlank = "descIsBlank";
             public const string sentryOwnerIsNotNumeric = "sentryOwnerIsNotNumeric";
             public const string numberOfFilesIsNegative = "numberOfFilesIsNegative";
+
+            //Report specific validation errors
+            public const string locationIsBlank = "locationIsBlank";
+            public const string locationIsInvalid = "locationIsInvalid";
         }
     }
 }

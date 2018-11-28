@@ -183,6 +183,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<MetadataTag> Tags
+        {
+            get
+            {
+                return Query<MetadataTag>().Cacheable();
+            }
+        }
+
         public IEnumerable<Dataset> GetDatasetByCategoryID(int id)
         {
             return Query<Dataset>().Where(w => w.DatasetCategory.Id == id).Where(x => x.CanDisplay).AsEnumerable();
@@ -196,7 +204,13 @@ namespace Sentry.data.Infrastructure
 
         public int GetDatasetCount()
         {
-            return Query<Dataset>().Where(x => x.CanDisplay).Cacheable().Count();
+
+            return Query<Dataset>().Count(x => x.CanDisplay && x.DatasetType == null);
+        }
+
+        public IEnumerable<Dataset> GetExhibits()
+        {
+            return Query<Dataset>().Where(x => x.DatasetType == "RPT").Cacheable().AsEnumerable();
         }
 
         public Dataset GetById(int id)

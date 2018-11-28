@@ -43,8 +43,10 @@ namespace Sentry.data.Web.Controllers
 
             HomeModel hm = new HomeModel();
 
-            hm.DatasetCount = _dsContext.GetDatasetCount();
-            hm.Categories = _dsContext.Categories.ToList();
+            List<Dataset> dsList = _dsContext.Datasets.ToList();
+
+            hm.DatasetCount = dsList.Count(w => w.DatasetType == null);
+            hm.Categories = _dsContext.Categories.Where(w => w.ObjectType == null).ToList();
             hm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
             hm.CanUpload = SharedContext.CurrentUser.CanUpload;
 

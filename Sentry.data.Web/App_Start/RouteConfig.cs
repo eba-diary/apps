@@ -101,9 +101,6 @@ namespace Sentry.data.Web
                url: "Dataset/Detail/{id}/Configuration/Create",
                defaults: new { controller = "Dataset", action = "CreateDataFileConfig", id = 0 }
            );
-
-
-
         }
     } 
 }

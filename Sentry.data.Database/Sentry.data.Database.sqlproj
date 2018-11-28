@@ -172,6 +172,8 @@
     <Build Include="Tables\Metadata\LineageLoad.sql" />
     <Build Include="Tables\Metadata\STG_LineageLoad.sql" />
     <Build Include="Tables\Metadata\vw_DataLineage.sql" />
+    <Build Include="Tables\Metadata\Tag.sql" />
+    <Build Include="Tables\Metadata\ObjectTag.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

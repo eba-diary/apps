@@ -72,7 +72,7 @@ namespace Sentry.data.Web.Tests
 
             DatasetController dc = MockControllers.MockDatasetController(ds, user);
 
-            var result = dc.Detail(ds.DatasetId) as ViewResult;
+            var result = dc.Detail("Dataset",ds.DatasetId) as ViewResult;
 
             Assert.IsInstanceOfType(result.Model, typeof(BaseDatasetModel));
 
@@ -109,7 +109,7 @@ namespace Sentry.data.Web.Tests
 
             DatasetController dc = MockControllers.MockDatasetController(ds, user);
 
-            var result = dc.Detail(ds.DatasetId) as ViewResult;
+            var result = dc.Detail("Dataset",ds.DatasetId) as ViewResult;
 
             Assert.IsInstanceOfType(result.Model, typeof(BaseDatasetModel));
 

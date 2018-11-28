@@ -78,6 +78,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IMetadataRepositoryProvider>().Use(() => new MetadataRepositoryProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IODCFileProvider>().Use(() => new ODCFileProvider(_defaultSessionFactory.OpenSession()));
             registry.For<IRequestContext>().Use(() => new RequestContext(_defaultSessionFactory.OpenSession()));
+            registry.For<IReportContext>().Use(() => new ReportContext(_defaultSessionFactory.OpenSession()));
 
             //Register other services
             Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider obsidianUserProvider = new Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider();

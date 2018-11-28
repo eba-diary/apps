@@ -59,10 +59,10 @@ namespace Sentry.data.Web.Controllers
         }
 
         // GET: Search/Datasets/searchParms
-        [Route("Search/Datasets/Index")]
-        [Route("Search/Datasets/")]
+        [Route("Search/{searchType?}/Index")]
+        [Route("Search/{searchType?}/")]
         [AuthorizeByPermission(PermissionNames.DatasetView)]
-        public ActionResult Index(string category, string searchPhrase, string ids)
+        public ActionResult Index(string searchType, string category, string searchPhrase, string ids)
         {
             return View();
         }
@@ -91,7 +91,8 @@ namespace Sentry.data.Web.Controllers
             e.Search = JsonConvert.SerializeObject(new SearchTerms()
             {
                 Category_Filters = categoryFilters.Split(',').Where(x => !String.IsNullOrWhiteSpace(x)).ToList(),
-                Sentry_Owners = sentryOwners.Split('|').Where(x => !String.IsNullOrWhiteSpace(x)).ToList(),
+
+                Sentry_Owners = (!String.IsNullOrWhiteSpace(sentryOwners)) ? sentryOwners.Split('|').Where(x => !String.IsNullOrWhiteSpace(x)).ToList() : null,
                 Extensions = extensions.Split(',').Where(x => !String.IsNullOrWhiteSpace(x)).ToList(),
                 Search_Term = searchTerm,
                 Results_Returned = resultsReturned
@@ -104,13 +105,29 @@ namespace Sentry.data.Web.Controllers
             return Json(true, JsonRequestBehavior.AllowGet);
         }
 
-
-        [Route("Search/DatasetList")]
-        public JsonResult DatasetList()
+        //[Route("Search/List")]
+        [Route("Search/{searchType?}/List")]
+        public JsonResult List(string searchType)
         {
-            List<SearchModel> models = new List<SearchModel>();
 
-            foreach (Dataset ds in _datasetContext.Datasets.ToList())
+            List<SearchModel> models = new List<SearchModel>();
+            List<Dataset> dsList;
+
+            switch (searchType)
+            {
+                case "BusinessIntelligence":
+                    dsList = _datasetContext.GetExhibits().ToList();
+                    break;
+                case "Datasets":
+                    dsList = _datasetContext.Datasets.ToList();
+                    dsList = dsList.Where(w => w.DatasetType != "RPT").ToList();
+                    break;
+                default:
+                    dsList = _datasetContext.Datasets.ToList();
+                    break;
+            }
+
+            foreach (Dataset ds in dsList)
             {
                 SearchModel sm = new SearchModel(ds, _associateInfoProvider);
                 models.Add(sm);

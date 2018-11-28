@@ -1,0 +1,279 @@
+﻿@model BusinessIntelligenceHomeModel
+
+@{
+    ViewBag.Title = "Business Intelligence at Sentry";
+}
+
+
+
+<center>
+    <h2 style="margin: 80px;">Welcome to the Sentry Business Intelligence Portal.  Please type below to search or choose a category.</h2>
+    
+    @{
+        var category = Model.Categories.ToList();
+        int c = category.Count();
+        string[] colors = new string[] { "blue", "green", "gold", "plum", "orange", "blueGray" };
+    }
+    <div class="container">
+        <div class="ds-grid col-md-12" style="margin-bottom: 40px;">
+            <div class="row">
+                @{
+                    var htmlAttrsObj = new { @class = "navbar-form navbar-center", @id = "DatasetSearch" };
+                    var htmlAttributes = HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttrsObj);
+                    using (Html.BeginForm(@"BusinessIntelligence", "Search", FormMethod.Get, htmlAttributes))
+                    {
+                    <div class="input-group" style="width: 50%; margin-bottom:5px; margin-top: 5px;">
+                        <span class="input-group-addon" style="width: 50px; height: 50px;" onclick="$(function() {$('#SearchText').focus();});"><i class="glyphicon glyphicon-search"></i></span>
+
+                        <input style="height: 50px;" type="text" id="SearchText" name="searchPhrase" class="form-control" placeholder="Search from @Model.DatasetCount Exhibits and Dashboards ..." />
+                    </div>
+                    }
+                }
+            </div>
+        </div>
+        <div class="ds-grid col-md-12">
+            @for (int i = 0; i < c; i++)
+            {
+                if (i % 3 == 0)
+                {
+                    @:<div class="row text-center">
+                }
+
+                var color = "";
+
+                //html classes should not start with numbers so prefix with underscore (_).
+                long number1 = 0;
+                if (long.TryParse(category[i].Name.Substring(0, 1), out number1))
+                {
+                    color = "_" + category[i].Name.ToLower().Replace(" ", "_") + "Tile";
+                }
+                else
+                {
+                    color = category[i].Name.ToLower().Replace(" ", "_") + "Tile";
+                }
+
+
+
+                <div class="col-md-3 tile border_@category[i].Color @color ">
+                    <a class="" href="~/Search/BusinessIntelligence/Index?category=@category[i].Name">
+                        <img src="/Images/Category/BusinessIntelligence/@{@category[i].Name}.svg" class="tile-image">
+                        <div class="tile-header" style="color: rgb(0, 0, 0);">@category[i].Name</div>
+                        <div class="tile-description" style="color: rgb(0, 0, 0); max-height: 4.5em; -webkit-line-clamp: 3;"></div>
+                    </a>
+                </div>
+
+
+                if (i % 3 == 2 || i + 1 == c)
+                {
+                    @:</div>
+                }
+            }
+
+        <div class="row text-center">
+            <div class="upload-row" style="background-color: rgba(255,255,255,0.2); padding: 10px;">
+
+                <button type="button" class="btn btn-default btn-lg dataset-operation-button" id="CreateDataset">
+                    <span class="glyphicon glyphicon-plus text-primary"></span> Create Exhibit
+                </button>
+
+            </div>
+        </div>
+    </div>
+    </div>
+    <div class="imageFooter"></div>
+</center>
+
+
+
+
+
+
+
+
+
+<style>
+    html {
+        /*overflow: scroll;
+        overflow-x: hidden;*/
+    }
+
+    .sentry-app-version{
+        display: none;
+    }
+
+    .col-md-3{
+        padding: 0;
+    }
+    
+    .dataset-operation-button {
+        font-size: 20px;
+    }
+
+    .row.text-center > div {
+        display: inline-block;
+        float: none;
+    }
+
+    body {
+        margin-top: -6px;
+        -moz-background-size: cover;
+        -webkit-background-size: cover;
+        -o-background-size: cover;
+    }
+
+
+    .imageFooter {
+        height: 150px;
+    }
+
+    .tile{
+        background: white;
+        margin: 30px;
+        opacity: 0.80;
+    }
+
+    .tile:hover
+    {
+        opacity: 0.95;
+        background: lightgray;
+    }
+
+        .tile a {
+            height: 100%;
+            width: 100%;
+            display: block;
+            text-decoration: none !important;
+
+        }
+
+    .claimTile:hover {
+        opacity: 0.95;
+        background-color: rgba(0, 163, 224, 0.05);
+        box-shadow: 2px 6px 10px #888888;
+    }
+
+    .industryTile:hover {
+        opacity: 0.95;
+        background-color: rgba(132, 189, 0, 0.05);
+        box-shadow: 2px 6px 10px #888888;
+    }
+
+    .governmentTile:hover {
+        opacity: 0.95;
+        background-color: rgba(234, 170, 0, 0.05);
+        box-shadow: 2px 6px 10px #888888;
+    }
+
+    .geographicTile:hover {
+        opacity: 0.95;
+        background-color: rgba(187, 133, 171, 0.05);
+        box-shadow: 2px 6px 10px #888888;
+    }
+
+    .weatherTile:hover {
+        opacity: 0.95;
+        background-color: rgba(229, 114, 0, 0.05);
+        box-shadow: 2px 6px 10px #888888;
+    }
+
+    .sentryTile:hover {
+        opacity: 0.95;
+        background-color: rgba(137, 171, 227, 0.05);
+        box-shadow: 2px 6px 10px #888888;
+    }
+
+    .commercial_linesTile:hover {
+        opacity: 0.95;
+        background-color: rgba(137, 171, 227, 0.05);
+        box-shadow: 2px 6px 10px #888888;
+    }
+
+    .personal_linesTile:hover {
+        opacity: 0.95;
+        background-color: rgba(229, 114, 0, 0.05);
+        box-shadow: 2px 6px 10px #888888;
+    }
+
+    .claimsTile:hover {
+        opacity: 0.95;
+        background-color: rgba(234, 170, 0, 0.05);
+        box-shadow: 2px 6px 10px #888888;
+    }
+
+    .corporateTile:hover {
+        opacity: 0.95;
+        background-color: rgba(132, 189, 0, 0.05);
+        box-shadow: 2px 6px 10px #888888;
+    }
+
+    ._401kTile:hover {
+        opacity: 0.95;
+        background-color: rgba(187, 133, 171, 0.05);
+        box-shadow: 2px 6px 10px #888888;
+    }
+
+    .itTile:hover {
+        opacity: 0.95;
+        background-color: rgba(0, 163, 224, 0.05);
+        box-shadow: 2px 6px 10px #888888;
+    }
+
+    .tile-image {
+        width: 100px;
+        padding: 10px;
+        filter: invert(100%);
+        height: 115px;
+    }
+
+    .tile-header{
+        font-size: 1.5em;
+    }
+
+    .tile-description{
+        font-size: .8em;
+        max-height: 4.5em;
+        display: flex;
+        justify-content: center;
+        padding-bottom: 15px;
+
+    }
+
+    .input-group-addon {
+        cursor: pointer;
+    }
+</style>
+
+
+@section Scripts {
+    <script>
+        $(function () {
+            data.Report.IndexInit();
+
+            $('.tile').click(function (e) {
+                var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
+
+                if (storedNames != null) {
+                    for (i = 0; i < storedNames.length; i++) {
+                        $('#' + storedNames[i]).prop('checked', false);
+                    }
+
+                    localStorage.removeItem("filteredIds");
+                }
+
+                localStorage.removeItem("searchText");
+            });
+
+            $('#DatasetSearch').submit(function (e) {
+                localStorage.removeItem("filteredIds");
+
+                localStorage.removeItem("searchText");
+
+                localStorage.setItem("searchText", $('#SearchText')[0].value);
+            });
+
+            $('.input-group-addon').click(function (e) {
+                $('#DatasetSearch').submit();
+            });
+        });
+    </script>
+}

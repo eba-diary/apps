@@ -28,11 +28,13 @@ namespace Sentry.data.Core
         IQueryable<LivyCreation> LivySessions { get; }
         IQueryable<MediaTypeExtension> MediaTypeExtensions { get; }
         IQueryable<JobHistory> JobHistory { get; }
+        IQueryable<MetadataTag> Tags { get; }
 
         /** Datasets **/
 
         Dataset GetById(int id);
         int GetDatasetCount();
+        IEnumerable<Dataset> GetExhibits();
         Boolean isDatasetNameDuplicate(string datasetName, string category);
         string GetPreviewKey(int id);
         IEnumerable<Dataset> GetDatasetByCategoryID(int id);

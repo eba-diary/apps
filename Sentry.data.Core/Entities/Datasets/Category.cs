@@ -10,5 +10,8 @@ namespace Sentry.data.Core
         public virtual string Name { get; set; }
         public virtual string Color { get; set; }
 
+        public virtual string ObjectType { get; set; }
+        public virtual string AbbreviatedName { get; set; }
+
     }
 }

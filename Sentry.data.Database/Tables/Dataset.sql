@@ -15,6 +15,8 @@
     [Category_ID] INT NOT NULL, 
     [Display_IND] BIT NOT NULL, 
     [Information_DSC] NVARCHAR(MAX) NULL, 
+    [Metadata] VARCHAR(MAX) NULL, 
+    [Dataset_TYP] CHAR(3) NULL, 
     PRIMARY KEY CLUSTERED 
 (
 	[Dataset_ID] ASC

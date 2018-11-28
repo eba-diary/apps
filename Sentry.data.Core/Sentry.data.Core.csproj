@@ -66,7 +66,10 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -76,7 +79,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DomainServices\MetadataRepositoryService.cs" />
+    <Compile Include="Entities\Datasets\DatasetMetadata.cs" />
     <Compile Include="Entities\Datasets\FileExtension.cs" />
+    <Compile Include="Entities\Datasets\ReportMetadata.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\JavaAppSource.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\JobHistory.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\FtpPattern.cs" />
@@ -104,6 +109,8 @@
     <Compile Include="Entities\Metadata\Metadata.cs" />
     <Compile Include="Entities\Metadata\MetadataAsset.cs" />
     <Compile Include="Entities\Metadata\Schema.cs" />
+    <Compile Include="Entities\Metadata\MetadataTag.cs" />
+    <Compile Include="Entities\Metadata\SearchableTag.cs" />
     <Compile Include="Entities\Release\Issue.cs" />
     <Compile Include="Entities\Release\Sprint.cs" />
     <Compile Include="Entities\Goldeneye\Request.cs" />
@@ -121,6 +128,8 @@
     <Compile Include="Entities\Goldeneye\RetrieverRequests\RetrieverJobOptions.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\S3Basic.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\S3Source.cs" />
+    <Compile Include="Entities\Report\ReportFrequency.cs" />
+    <Compile Include="Entities\Report\ReportType.cs" />
     <Compile Include="Entities\Subscriptions\DataAssetSubscription.cs" />
     <Compile Include="Entities\Subscriptions\DatasetSubscription.cs" />
     <Compile Include="Entities\Subscriptions\Event.cs" />
@@ -169,6 +178,7 @@
     <Compile Include="Interfaces\IRequestContext.cs" />
     <Compile Include="Interfaces\ISASService.cs" />
     <Compile Include="Interfaces\IODCFileProvider.cs" />
+    <Compile Include="Interfaces\Report\IReportContext.cs" />
     <Compile Include="Interfaces\Retriever\IAuthenticationType.cs" />
     <Compile Include="Interfaces\Retriever\IDataSource.cs" />
     <Compile Include="Interfaces\Retriever\IRetrieverJob.cs" />
@@ -182,9 +192,6 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="ClassDiagram1.cd" />
-    <None Include="ClassDiagram2.cd" />
-    <None Include="ClassDiagram3.cd" />
     <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
       <SubType>Designer</SubType>
     </None>
