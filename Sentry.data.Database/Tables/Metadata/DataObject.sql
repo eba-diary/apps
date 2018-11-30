@@ -7,7 +7,7 @@
 	[DataObject_NME] [varchar](256) NULL,
 	[DataObject_DSC] [varchar](max) NULL,
 	[DataObjectParent_ID] [int] NULL,
-	[DataObject_CDE] [char](1) NULL,
+	[DataObject_CDE] VARCHAR(50) NULL,
 	[DataObjectCode_DSC] [varchar](100) NULL,
 	[DataObjectCreate_DTM] [datetime] NULL,
 	[DataObjectChange_DTM] [datetime] NULL,
