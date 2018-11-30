@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
 using System.Web.SessionState;
 
 namespace Sentry.data.Web.Controllers
@@ -149,8 +150,15 @@ namespace Sentry.data.Web.Controllers
             {
                 _reportContext.Clear();
                 crm = (CreateBusinessIntelligenceModel)ReportUtility.setupLists(_reportContext, crm);
-                //cdm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext);
             }
+
+            List<SearchableTag> tagsToReturn = new List<SearchableTag>();
+            int[] json = new JavaScriptSerializer().Deserialize<int[]>(crm.TagString);
+            for (int i = 0; i < json.Length; i++)
+            {
+                tagsToReturn.Add(_dsContext.Tags.Where(x => x.TagId == json[i]).FirstOrDefault().GetSearchableTag());
+            }
+            crm.TagString = new JavaScriptSerializer().Serialize(tagsToReturn);
 
             return View(crm);
         }
@@ -193,9 +201,18 @@ namespace Sentry.data.Web.Controllers
                         LocationType = crm.LocationType,
                         Frequency = crm.FreqencyID
                     }
-                }
-                //,Tags = tagList
+                },
+                Tags = new List<MetadataTag>()
             };
+
+            int[] json = new JavaScriptSerializer().Deserialize<int[]>(crm.TagString);
+
+            ds.Tags = new List<MetadataTag>();
+
+            for (int i = 0; i < json.Length; i++)
+            {
+                ds.Tags.Add(_dsContext.Tags.Where(x => x.TagId == json[i]).FirstOrDefault());
+            }
 
             switch (Enum.GetName(typeof(ReportType),crm.FileTypeId))
             {

@@ -109,7 +109,6 @@ namespace Sentry.data.Web
 
         public IEnumerable<SelectListItem> ExtensionList { get; set; }
 
-        //[DisplayName("Dataset File")]
-        //public String DatasetFileName { get; set; }
+        public string TagString { get; set; }
     }
 }

@@ -24,6 +24,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             });
 
             this.Property(x => x.Name);
+            this.Property(x => x.Description);
             this.Property(x => x.Created);
             this.Property(x => x.CreatedBy);
             this.Bag(

@@ -164,22 +164,9 @@
                                             <span class=" textBold ownerDate" data-bind="css : Color">Update Frequency:&nbsp;</span>
                                             <span data-bind="text: UpdateFrequency"></span>
                                             <!-- /ko -->
-
-                                            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
-
-                                            <!-- ko ifnot: Type === "RPT" -->
-                                            <!-- ko if: ExternalLink !== undefined -->
-                                            <a class="textBold ownerDate" data-bind="attr: { href: ExternalLink, title: DatasetName }">
-                                                <span>Report Link</span>
-                                            </a>
-                                            <!-- /ko -->
-                                            <!-- ko if: ExternalLink === undefined -->
-                                            <a class="textBold ownerDate" data-bind="attr: { href: Link, title: DatasetName }">
-                                                <span>Report Link</span>
-                                            </a>
-                                            <!-- /ko -->
-                                            <!-- /ko -->
+                                            
                                             <!-- ko if: Type === "RPT" -->
+                                            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
                                             <!-- ko ifnot: (LocationType === "file") -->
                                             <a class="textBold ownerDate" target="_blank" data-bind="attr: { href: Location, title: DatasetName}">
                                                 <span>Report Link</span>
@@ -571,7 +558,7 @@
                 //First grab all the selected owner ID's
                 var selectedOwnerIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
 
-                    if (feature.substring(0, 3) == '1_1') {
+                    if (feature.substring(0, 3) == '2_1') {
                         return feature;
                     }
                 });
@@ -579,7 +566,7 @@
                 //First grab all the selected category ID's
                 var selectedExtensionIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
 
-                    if (feature.substring(0, 3) == '1_2') {
+                    if (feature.substring(0, 3) == '2_2') {
                         return feature;
                     }
                 });
@@ -618,7 +605,7 @@
                 //First grab all the selected tag ID's
                 var selectedTagIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
 
-                    if (feature.substring(0, 3) == '1_3') {
+                    if (feature.substring(0, 3) == '2_3') {
                         return feature;
                     }
                 });

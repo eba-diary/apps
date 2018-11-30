@@ -283,6 +283,7 @@
     <Compile Include="Controllers\BusinessIntelligenceController.cs" />
     <Compile Include="Controllers\SchemaController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
+    <Compile Include="Controllers\TagController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Filters\AuthorizationFilters\AuthorizeHangfireDashboard.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeAttribute.cs" />
@@ -1202,6 +1203,7 @@
     <Folder Include="Views\Lineage\" />
     <Folder Include="Views\Retriever\" />
     <Folder Include="Views\Subscription\" />
+    <Folder Include="Views\Tag\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

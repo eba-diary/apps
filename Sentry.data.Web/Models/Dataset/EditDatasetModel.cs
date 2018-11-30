@@ -24,5 +24,7 @@ namespace Sentry.data.Web
         [Required]
         [DisplayName("Sentry Owner")]
         public string OwnerID { get; set; }
+
+        public string TagString { get; set; }
     }
 }

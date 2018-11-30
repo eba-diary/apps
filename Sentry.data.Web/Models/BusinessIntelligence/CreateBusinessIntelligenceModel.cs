@@ -44,5 +44,7 @@ namespace Sentry.data.Web
 
         [DisplayName("Exhibit Type")]
         public int FileTypeId { get; set; }
+
+        public string TagString { get; set; }
     }
 }

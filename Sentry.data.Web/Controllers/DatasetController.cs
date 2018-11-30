@@ -28,6 +28,7 @@ using Sentry.Common.Logging;
 using Sentry.data.Core.Entities.Metadata;
 using static Sentry.data.Core.RetrieverJobOptions;
 using Hangfire;
+using System.Web.Script.Serialization;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -203,6 +204,14 @@ namespace Sentry.data.Web.Controllers
                 cdm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext);
             }
 
+            List<SearchableTag> tagsToReturn = new List<SearchableTag>();
+            int[] json = new JavaScriptSerializer().Deserialize<int[]>(cdm.TagString);
+            for (int i = 0; i < json.Length; i++)
+            {
+                tagsToReturn.Add(_datasetContext.Tags.Where(x => x.TagId == json[i]).FirstOrDefault().GetSearchableTag());
+            }
+            cdm.TagString = new JavaScriptSerializer().Serialize(tagsToReturn);
+
             return View(cdm);
         }
 
@@ -231,8 +240,18 @@ namespace Sentry.data.Web.Controllers
                 IsSensitive = false,
                 CanDisplay = true,
                 DatasetFiles = null,
-                DatasetFileConfigs = null
+                DatasetFileConfigs = null,
+                Tags = new List<MetadataTag>()
             };
+
+            int[] json = new JavaScriptSerializer().Deserialize<int[]>(cdm.TagString);
+
+            ds.Tags = new List<MetadataTag>();
+
+            for (int i = 0; i < json.Length; i++)
+            {
+                ds.Tags.Add(_datasetContext.Tags.Where(x => x.TagId == json[i]).FirstOrDefault());
+            }
 
             return ds;
         }
@@ -247,6 +266,9 @@ namespace Sentry.data.Web.Controllers
             EditDatasetModel item = new EditDatasetModel(ds, _associateInfoProvider);
 
             item = (EditDatasetModel) Utility.setupLists(_datasetContext,item);
+
+            var json = new JavaScriptSerializer().Serialize(ds.Tags.Select(x => x.GetSearchableTag()));
+            item.TagString = json;
 
             item.OwnerID = ds.SentryOwnerName;
 
@@ -266,14 +288,14 @@ namespace Sentry.data.Web.Controllers
         // POST: Dataset/Edit/5
         [HttpPost()]
         [AuthorizeByPermission(PermissionNames.DatasetEdit)]
-        public ActionResult Edit(int id, EditDatasetModel i)
+        public ActionResult Edit(int id, EditDatasetModel edm)
         {
             try
             {
                 Dataset item = _datasetContext.GetById<Dataset>(id);
                 if (ModelState.IsValid)
                 {
-                    item = UpdateDatasetFromModel(item, i);
+                    item = UpdateDatasetFromModel(item, edm);
                     _datasetContext.SaveChanges();
                     return RedirectToAction("Detail", new { id = id });
 
@@ -287,10 +309,18 @@ namespace Sentry.data.Web.Controllers
             {
                 _datasetContext.Clear();
 
-                i = (EditDatasetModel) Utility.setupLists(_datasetContext, i);
+                edm = (EditDatasetModel) Utility.setupLists(_datasetContext, edm);
             }
 
-            return View(i);
+            List<SearchableTag> tagsToReturn = new List<SearchableTag>();
+            int[] json = new JavaScriptSerializer().Deserialize<int[]>(edm.TagString);
+            for (int i = 0; i < json.Length; i++)
+            {
+                tagsToReturn.Add(_datasetContext.Tags.Where(x => x.TagId == json[i]).FirstOrDefault().GetSearchableTag());
+            }
+            edm.TagString = new JavaScriptSerializer().Serialize(tagsToReturn);
+
+            return View(edm);
         }
 
         [HttpPost]
@@ -342,6 +372,15 @@ namespace Sentry.data.Web.Controllers
                     }
                 }
 
+            }
+
+            int[] json = new JavaScriptSerializer().Deserialize<int[]>(eds.TagString);
+
+            ds.Tags = new List<MetadataTag>();
+
+            for (int i = 0; i < json.Length; i++)
+            {
+                ds.Tags.Add(_datasetContext.Tags.Where(x => x.TagId == json[i]).FirstOrDefault());
             }
 
             ds.S3Key = Utilities.GenerateDatasetStorageLocation(ds.Category, ds.DatasetName);

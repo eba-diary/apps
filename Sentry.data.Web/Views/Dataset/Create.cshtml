@@ -73,6 +73,27 @@
                 </div>
             </div>
 
+            @Html.HiddenFor(m => m.TagString)
+
+            <div class="form-group" style="display: none;">
+                <span class="control-label col-md-2">Tags</span>
+                <div class="col-md-8">
+                    <select id="TagSelector" style="width: 100%"></select>
+                </div>
+                <div class="col-md-2">
+                    <button id="addNewTagBtn" onclick="return false;" style="float: right;" class="btn-success btn"><span class="glyphicon glyphicon-plus"></span> Add New Tag</button>
+                </div>
+            </div>
+
+            <div class="form-group fieldDescription"  style="display: none;">
+                <label class="control-label col-md-2"></label>
+                <div class="col-md-10">
+                    <span class="text-muted">
+                        <em>We recommend that you limit the amount of Tags to five.</em>
+                    </span>
+                </div>
+            </div>
+
 
             <div class="form-group">
                 @Html.LabelFor(model => model.DatasetInformation, htmlAttributes: new { @class = "control-label col-md-2 optional" })
@@ -418,8 +439,49 @@
         font-weight: 100;
     }
 
+    #TagSelector li {
+        overflow: auto;
+    }
+
     input[type="checkbox"] {
         margin: 10px 0 0;
+    }
+
+    .info {
+        width: 100%;
+        float: right;
+    }
+
+    .clearfix {
+        width: 100%;
+        clear: both;
+        float: none;
+        content: '';
+    }
+
+    .s-tag {
+        display: inline-flex;
+        align-content: center;
+        justify-content: center;
+        min-width: 0;
+        padding-left: 4px;
+        padding-right: 4px;
+        border-style: solid;
+        border-width: 1px;
+        border-radius: 3px;
+        font-size: 12px;
+        line-height: 1.84615385;
+        text-decoration: none;
+        vertical-align: middle;
+        white-space: nowrap;
+        border-color: transparent;
+        background-color: #E1ECF4;
+        color: #2c5777;
+    }
+
+    .item-multiplier {
+        margin-right: 4px;
+        color: black;
     }
 </style>
 
@@ -431,6 +493,186 @@
 
         $(function () {
             data.Dataset.CreateInit();
+
+            $("#TagSelector").select2({
+                multiple: true,
+                allowClear: true,
+                ajax: {
+                    url: "/api/Tag/SearchTags",
+                    dataType: 'json',
+                    dropdownPosition: 'below',
+                    data: function (params) {
+                        return {
+                            query: params.term
+                        };
+                    },
+                    processResults: function (data) {
+                        // parse the results into the format expected by Select2.
+                        // since we are using custom formatting functions we do not need to
+                        // alter the remote JSON data
+
+                        return {
+                            results: data
+                        };
+                    },
+                    cache: true
+                },
+                escapeMarkup: function (markup) { return markup; },
+                minimumInputLength: 1,
+                //maximumSelectionLength: 5,
+                formatSelectionTooBig: function (limit) {
+                    return 'You can only select up to 5 tags.';
+                },
+                templateResult: formatTag,
+                templateSelection: formatTagSelection
+
+            })
+
+            //THIS MUST COME AFTER THE SELECT2 STARTUP
+            //THIS THIS THIS START
+            if ($('#TagString').val()) {
+                var selectedOptions = JSON.parse($('#TagString').val());
+                var selectedIDs = [];
+
+                for (var i = 0; i < selectedOptions.length; i++) {
+                    // Create a DOM Option and pre-select by default
+                    var newOption = new Option(selectedOptions[i].Name, selectedOptions[i].id, true, true);
+                    // Append it to the select
+                    $('#TagSelector').append(newOption).trigger('change');
+
+                    selectedIDs.push(selectedOptions[i].id);
+                }
+
+                $('#TagString').val(JSON.stringify($('#TagSelector').val()));
+            }
+            //THIS THIS THIS STOP
+
+            $('#TagSelector').on('select2:select', function (e) {
+                $('#TagString').val(JSON.stringify($('#TagSelector').val()));
+            });
+
+            $('#TagSelector').on('select2:unselect', function (e) {
+                $('#TagString').val(JSON.stringify($('#TagSelector').val()));
+            });
+
+            $('#TagSelector').on('select2:change', function (e) {
+                $('#TagString').val(JSON.stringify($('#TagSelector').val()));
+            });
+
+            function formatTag(tag) {
+                if (tag.loading) return tag.text;
+
+
+                if (tag.Description) {
+                    var markup =
+                        '<span class="s-tag" tooltip="' + tag.Description + '"> ' + tag.Name + '</span> ' +
+                        '<span class="item-multiplier">&nbsp; × &nbsp;' + tag.Count + '</span>'
+                        ;
+                    return markup;
+                }
+                else {
+                    var markup =
+
+                        '<span class="s-tag">' + tag.Name + '</span>' +
+                        '<span class="item-multiplier">&nbsp; × &nbsp;' + tag.Count + '</span>'
+                        ;
+
+                    return markup;
+                }
+            }
+
+            function formatTagSelection(tag) {
+                return tag.Name || tag.text;
+            }
+
+
+            function sendNewTagToDatabase() {
+                $.ajax({
+                    type: "GET",
+                    url: "/api/Tag/AddNewTag?name=" + $("#tagName").val() + "&description=" + $("#tagDescription").val(),
+                    dataType: "json",
+                    success: function (msg) {
+                        console.log(msg);
+                    },
+                    error: function (e) {
+                    }
+                });
+            }
+
+            function showModal() {
+                var modal = Sentry.ShowModalConfirmation("Create New Tag", function () { sendNewTagToDatabase(); });
+
+                var string =
+                    "<div>" +
+                        "<h2>Create New Tag</h2>" +
+                        "<hr/>" +
+                        "<div class='row'>" +
+                            "<div class='col-sm-3'>" +
+                                "<label id='tagNameLabel' for='tagName'>Tag Name</label>" +
+                            "</div>" +
+                            "<div class='col-sm-9'>" +
+                                "<input id='tagName' style='width:100%; padding-left: 5px;' />" +
+                            "</div>" +
+                        "</div>" +
+                        "<br/>" +
+                        "<div class='row'>" +
+                            "<div class='col-sm-3'>" +
+                        
+                            "</div>" +
+                            "<div class='col-sm-9'>" +
+                                "<span id='tagWarningText' />" +
+                            "</div>" +
+                        "</div>" +
+                        "<br/>" +
+                        "<div class='row'>" +
+                            "<div class='col-sm-3'>" +
+                                "<label for='tagDescription'>Tag Description</label>" +
+                            "</div>" +
+                            "<div class='col-sm-9'>" +
+                                "<textarea id='tagDescription' style='width:100%;  padding-left: 5px; resize:vertical; max-width: 100%' />" +
+                            "</div>" +
+                        "</div>" +
+                    "</div>";
+
+                modal.ReplaceModalBody(string);
+            }
+
+            $('body').on('click', '#addNewTagBtn', function () {
+                showModal();
+
+                return false;
+            });
+
+
+
+            $('body').on('change', '#tagName', function () {
+                console.log($(this).val());
+
+                $.ajax({
+                    type: "GET",
+                    url: "/api/Tag/CheckNewTagName?name=" + $("#tagName").val(),
+                    dataType: "json",
+                    success: function (msg) {
+                        console.log(msg);
+
+                        if (msg === false) {
+                            $("#tagName").css('border', '1px solid red');
+                            $("#tagName").css('color', 'red');
+                            $("#tagWarningText").show();
+                            $("#tagWarningText").css('color', 'red');
+                            $("#tagWarningText").text("This tag name is already taken.  If you would like to use it, press cancel and type it into the Tags Search box to the left of the Add New Tag button.");
+                        }
+                        else {
+                            $("#tagName").css('border', '1px solid rgb(169, 169, 169)');
+                            $("#tagName").css('color', 'black');
+                            $("#tagWarningText").hide();
+                        }
+                    },
+                    error: function (e) {
+                    }
+                });
+            });
+
 
             $('#cronDailyJobTimePicker').timepicker({
                 timeFormat: 'h:mm p',
