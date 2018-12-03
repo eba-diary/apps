@@ -71,11 +71,12 @@
 
         <div class="row text-center">
             <div class="upload-row" style="background-color: rgba(255,255,255,0.2); padding: 10px;">
-
-                <button type="button" class="btn btn-default btn-lg dataset-operation-button" id="CreateDataset">
-                    <span class="glyphicon glyphicon-plus text-primary"></span> Create Exhibit
-                </button>
-
+                @if (Model.CanManageReports)
+                {
+                    <button type="button" class="btn btn-default btn-lg dataset-operation-button" id="CreateDataset">
+                        <span class="glyphicon glyphicon-plus text-primary"></span> Create Exhibit
+                    </button>
+                }        
             </div>
         </div>
     </div>

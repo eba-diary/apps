@@ -35,7 +35,7 @@ namespace Sentry.data.Core
                     break;
                 case "Exhibits":
                     Img = "/Images/Icons/Business Intelligence.svg";
-                    Url = "/Report";
+                    Url = "/BusinessIntelligence/Detail/" + id;
                     break;
             }
         }

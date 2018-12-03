@@ -39,6 +39,8 @@ namespace Sentry.data.Core
         Boolean CanManageAssetAlerts { get; }
         Boolean CanViewDataset { get; }
         Boolean CanViewDataAsset { get; }
+        Boolean CanViewReports { get; }
+        Boolean CanManageReports { get; }
         Boolean AdminUser { get; }
         //Calculated values - may come from external data sources and/or our domain User object
         string DisplayName { get; }

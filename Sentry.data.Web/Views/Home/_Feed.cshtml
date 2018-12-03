@@ -35,12 +35,17 @@
             <h5 class="@color">@item.DisplayTitle()</h5>
         }
 
-        @if(item.Feed.Name == "Datasets")
+        @if (item.Feed.Name == "Datasets")
         {
             <a href="@item.Url" target="_blank" class="pointer">View this Dataset</a>
-        } else
+        }
+        else if (item.Feed.Name == "Business Intelligence")
         {
-            <a href="@item.Url" target="_blank" class="pointer">Read More</a>
+            <a href="@item.Url" target="_blank" class="pointer">View this Exhibit</a>
+        }
+        else
+        {
+            <a href = "@item.Url" target = "_blank" class="pointer">Read More</a>
         }
 
         <p class="rightFloat">@Sentry.data.Web.Helpers.Utility.TimeDisplay(item.PublishDate)</p>

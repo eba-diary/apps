@@ -467,6 +467,8 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult Detail(string objectType, int id)
         {
+            
+
             Dataset ds = _datasetContext.GetById(id);
 
             BaseDatasetModel bdm = new BaseDatasetModel(ds, _associateInfoProvider, _datasetContext);
@@ -475,9 +477,26 @@ namespace Sentry.data.Web.Controllers
 
             //Object specific settings
             switch (objectType.ToLower())
-            {
+            {                
+                case "businessintelligence":
+                    if (!SharedContext.CurrentUser.CanViewReports)
+                    {
+                        throw new NotAuthorizedException("User is authenticated but does not have permission");
+                    }
+                    //Model settings specific to Business Intelligence
+                    bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
+                    bdm.ObjectType = ds.DatasetType;
+
+                    //Event reason tailored to Business Intelligence
+                    e.Reason = "Viewed Business Intelligence Detail Page";
+                    break;
+
                 case "dataset":
-                    //Model settings specific to Datasets
+                default:
+                    if (!SharedContext.CurrentUser.CanViewDataset)
+                    {
+                        throw new NotAuthorizedException("User is authenticated but does not have permission");
+                    }
                     bdm.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
                     bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
                     bdm.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
@@ -496,18 +515,6 @@ namespace Sentry.data.Web.Controllers
 
                     //Event reason tailored to Datasets
                     e.Reason = "Viewed Dataset Detail Page";
-
-                    
-                    break;
-                case "businessintelligence":
-                    //Model settings specific to Business Intelligence
-                    bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
-                    bdm.ObjectType = ds.DatasetType;
-
-                    //Event reason tailored to Business Intelligence
-                    e.Reason = "Viewed Business Intelligence Detail Page";
-                    break;
-                default:
                     break;
             }
             

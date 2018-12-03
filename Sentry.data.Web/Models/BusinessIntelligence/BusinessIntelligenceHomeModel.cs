@@ -15,5 +15,6 @@ namespace Sentry.data.Web
         public List<Category> Categories { get; set; }
         public Boolean CanEditDataset { get; set; }
         public Boolean CanUpload { get; set; }
+        public Boolean CanManageReports { get; set; }
     }
 }

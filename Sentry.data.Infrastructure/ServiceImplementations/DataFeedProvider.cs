@@ -142,7 +142,7 @@ namespace Sentry.data.Infrastructure
                     e.Dataset.ToString(),
                     ds.DatasetName + " - A New Exhibit was Created",
                     ds.DatasetName + " - A New Exhibit was Created",
-                    new DataFeed() { Name = "Business Intelligence", Url = "/Exhibit/Index", Type = "Exhibits" }
+                    new DataFeed() { Name = "Business Intelligence", Url = "/BusinessIntelligence/Detail/" + e.Dataset, Type = "Exhibits" }
                 );
 
                 items.Add(dfi);

@@ -20,7 +20,9 @@ namespace Sentry.data.Web
         public Boolean CanViewOnly { get; set; }
         public Boolean CanViewDataset { get; set; }
         public Boolean CanViewDataAsset { get; set; }
+        public Boolean CanViewReports { get; set; }
         public Boolean CanEditDataset { get; set; }
+        public Boolean CanManageReports { get; set; }
         public Boolean CanUpload { get; set; }
         public Boolean CanQueryTool { get; set; }
         public Boolean CanQueryToolPowerUser { get; set; }

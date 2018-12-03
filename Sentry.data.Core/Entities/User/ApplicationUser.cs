@@ -190,5 +190,21 @@ namespace Sentry.data.Core
             }
         }
 
+        public virtual Boolean CanViewReports
+        {
+            get
+            {
+                return _extendedUserInfo.Permissions.Contains(PermissionNames.ReportView);
+            }
+        }
+
+        public virtual Boolean CanManageReports
+        {
+            get
+            {
+                return _extendedUserInfo.Permissions.Contains(PermissionNames.ManageReports);
+            }
+        }
+
     }
 }

@@ -97,7 +97,7 @@ else
         </div>
         <div class="navbar-collapse collapse" id="navbar-main">
             <ul class="nav navbar-nav text-right">
-                @if (Model.CanUseApp)
+                @if (Model.CanViewReports)
                 {
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown">Business Intelligence<b class="caret"></b></a>
@@ -113,15 +113,11 @@ else
                                     }
                                 </ul>
                             </li>
-                            @if (Model.CanManageConfigs || Model.CanEditDataset)
+                            @if (Model.CanManageReports)
                             {
                                 <li class="divider"></li>
-                                <li class="dropdown-header">Exhibit Actions</li>
-
-                                if (Model.CanEditDataset)
-                                {
-                                    <li><a href="#" onclick="data.Report.ViewUpload()">Create Exhibit</a></li>
-                                }
+                                <li class="dropdown-header">Exhibit Actions</li>                                
+                                <li><a href="#" onclick="data.Report.ViewUpload()">Create Exhibit</a></li>
                             }
                         </ul>
                     </li>
