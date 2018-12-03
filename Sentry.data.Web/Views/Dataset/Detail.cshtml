@@ -1,7 +1,7 @@
 ﻿@model Sentry.data.Web.BaseDatasetModel
 
 @{
-    ViewBag.Title = "View Dataset Details";
+    
     string color = Model.DatasetCategory.Color;
     string headerColor = "categoryBanner-" + Model.DatasetCategory.Color;
 }
@@ -59,7 +59,7 @@
                     }
 
                     <div style="margin-top:-29px;">
-                        <div class="btn-group rightFloat dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions">
+                        <div class="btn-group rightFloat dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">
                             <button type="button"
                                     class="btn btn-default borderdk_gray borderdk_@color dropdown"
                                     data-toggle="dropdown">
@@ -110,6 +110,17 @@
                                 <span class="glyphicon glyphicon-edit @color"></span>
                             </button>
                         }
+
+                        @if (Model.CanManageReport)
+                        {
+                            <button type="button"
+                                    class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                                    id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Report"
+                                    >
+                                <span class="glyphicon glyphicon-edit @color"></span>
+                            </button>
+                        }
+                        
 
                         @*@if (((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive)) && Model.DatasetFiles.Count != 0)
                             {

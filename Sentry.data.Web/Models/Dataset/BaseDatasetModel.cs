@@ -235,6 +235,7 @@ namespace Sentry.data.Web
         public Boolean IsPushToTableauCompatible { get; set; }
         public Boolean IsPreviewCompatible { get; set; }
         public Boolean CanQueryTool { get; set; }
+        public Boolean CanManageReport { get; set; }
 
         public Boolean IsSubscribed { get; set; }
         public Category DatasetCategory { get; set; } 

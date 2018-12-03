@@ -484,11 +484,13 @@ namespace Sentry.data.Web.Controllers
                         throw new NotAuthorizedException("User is authenticated but does not have permission");
                     }
                     //Model settings specific to Business Intelligence
-                    bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
+                    bdm.CanManageReport = SharedContext.CurrentUser.CanManageReports;
                     bdm.ObjectType = ds.DatasetType;
 
                     //Event reason tailored to Business Intelligence
                     e.Reason = "Viewed Business Intelligence Detail Page";
+
+                    ViewBag.Title = "View Report Details";
                     break;
 
                 case "dataset":
@@ -515,6 +517,8 @@ namespace Sentry.data.Web.Controllers
 
                     //Event reason tailored to Datasets
                     e.Reason = "Viewed Dataset Detail Page";
+
+                    ViewBag.Title = "View Dataset Details";
                     break;
             }
             
@@ -532,7 +536,7 @@ namespace Sentry.data.Web.Controllers
             e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
             e.Dataset = ds.DatasetId;            
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-
+            
             return View(bdm);
         }
 
