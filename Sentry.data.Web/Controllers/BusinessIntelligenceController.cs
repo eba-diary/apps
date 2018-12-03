@@ -7,6 +7,7 @@ using Sentry.data.Web.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
@@ -39,6 +40,7 @@ namespace Sentry.data.Web.Controllers
 
             rhm.DatasetCount = _reportContext.GetReportCount();
             rhm.Categories = _reportContext.Categories.ToList();
+            rhm.CanManageReports = SharedContext.CurrentUser.CanManageReports;
 
             Event e = new Event();
             e.EventType = _reportContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
@@ -102,6 +104,25 @@ namespace Sentry.data.Web.Controllers
                 AddCoreValidationExceptionsToModel(new ValidationException("Location", "Invalid location value"));
             }
 
+            switch (crm.FileTypeId)
+            {
+                case (int)ReportType.Tableau:
+                    if (!Regex.IsMatch(crm.Location.ToLower(), "^https:////tableau.sentry.com"))
+                    {
+                        AddCoreValidationExceptionsToModel(new ValidationException("Location", "Tableau exhibits should begin with \\\\Tableau.sentry.com"));
+                    }
+                    break;
+                case (int)ReportType.Excel:
+                    if (!Regex.IsMatch(crm.Location.ToLower(), "^\\\\\\\\(sentry.com\\\\share\\\\|sentry.com\\\\appfs)"))
+                    {
+                        AddCoreValidationExceptionsToModel(new ValidationException("Location", "Excel exhibits should begin with \\\\Sentry.com\\Share or \\\\Sentry.com\\appfs"));
+                    }
+                    break;
+                default:
+                    break;
+            }
+
+
             crm.CreationUserName = user.AssociateId;
             crm.DatasetDtm = DateTime.Now;
 
@@ -163,6 +184,169 @@ namespace Sentry.data.Web.Controllers
             return View(crm);
         }
 
+        [HttpGet]
+        [AuthorizeByPermission(PermissionNames.ManageReports)]
+        public ActionResult Edit(int id)
+        {
+            Dataset ds = _reportContext.GetById<Dataset>(id);
+
+            EditBusinessIntelligenceModel item = new EditBusinessIntelligenceModel(ds, _associateInfoProvider);
+
+            item = (EditBusinessIntelligenceModel)ReportUtility.setupLists(_reportContext, item);
+
+            Event e = new Event();
+            e.EventType = _reportContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+            e.Status = _reportContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+            e.TimeCreated = DateTime.Now;
+            e.TimeNotified = DateTime.Now;
+            e.IsProcessed = false;
+            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            e.Reason = "Viewed Report Edit Page";
+            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+
+
+            return View(item);
+        }
+
+        [HttpPost]
+        [AuthorizeByPermission(PermissionNames.ManageReports)]
+        //public ActionResult Edit(int id, EditBusinessIntelligenceModel ebim)
+        public ActionResult Edit(int id, EditBusinessIntelligenceModel ebim)
+        {
+            try
+            {
+                Dataset item = _reportContext.GetById<Dataset>(ebim.DatasetId);
+
+                //Determine schema of incoming file location (i.e. http, file, etc)
+                try
+                {
+                    Uri incomingPath = new Uri(ebim.Location);
+                    ebim.LocationType = incomingPath.Scheme;
+                }
+                catch (Exception)
+                {
+                    AddCoreValidationExceptionsToModel(new ValidationException("Location", "Invalid location value"));
+                }
+
+                switch (ebim.FileTypeId)
+                {
+                    case (int)ReportType.Tableau:
+                        if (!Regex.IsMatch(ebim.Location.ToLower(), "^https:////tableau.sentry.com"))
+                        {
+                            AddCoreValidationExceptionsToModel(new ValidationException("Location", "Tableau exhibits should begin with \\\\Tableau.sentry.com"));
+                        }
+                        break;
+                    case (int)ReportType.Excel:
+                        if (!Regex.IsMatch(ebim.Location.ToLower(), "^\\\\\\\\(sentry.com\\\\share\\\\|sentry.com\\\\appfs)"))
+                        {
+                            AddCoreValidationExceptionsToModel(new ValidationException("Location", "Excel exhibits should begin with \\\\Sentry.com\\Share or \\\\Sentry.com\\appfs"));
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                if (ModelState.IsValid)
+                {
+                    item = UpdateReportFromModel(item, ebim);
+                    _reportContext.SaveChanges();
+                    return RedirectToAction("Detail", new { id = ebim.DatasetId });
+                }
+            }
+            catch (Sentry.Core.ValidationException ex)
+            {
+                AddCoreValidationExceptionsToModel(ex);
+            }
+            finally
+            {
+                _reportContext.Clear();
+
+                ebim = (EditBusinessIntelligenceModel)ReportUtility.setupLists(_reportContext, ebim);
+            }
+
+
+
+            //List<SearchableTag> tagsToReturn = new List<SearchableTag>();
+            //int[] json = new JavaScriptSerializer().Deserialize<int[]>(ebim.TagString);
+            //for (int i = 0; i < json.Length; i++)
+            //{
+            //    tagsToReturn.Add(_reportContext.Tags.Where(x => x.TagId == json[i]).FirstOrDefault().GetSearchableTag());
+            //}
+            ebim.TagString = new JavaScriptSerializer().Serialize(_reportContext.GetById<Dataset>(ebim.DatasetId).Tags.Select(x => x.GetSearchableTag()));
+
+            return View(ebim);
+        }
+
+
+        //[HttpPost]
+        //[Route("{objectType}/Delete/{id}/")]
+        //public JsonResult Delete(string objectType, int id)
+        //{
+        //    switch (objectType.ToLower())
+        //    {
+        //        case "businessintelligence":
+        //            if (!SharedContext.CurrentUser.CanManageReports)
+        //            {
+        //                throw new NotAuthorizedException("User is authenticated but does not have permission");
+        //            }
+
+        //            try
+        //            {
+        //                _reportContext.RemoveById<Dataset>(id);
+        //                _reportContext.SaveChanges();
+        //                return Json(new { Success = true, Message = "Object was successfully deleted" });
+        //            }
+        //            catch (Exception ex)
+        //            {
+        //                Configuration.Logging.Logger.Logger.Error($"Failed to delete dataset - DatasetId:{id} RequestorId:{SharedContext.CurrentUser.AssociateId} RequestorName:{SharedContext.CurrentUser.DisplayName}", ex);
+        //                return Json(new { Success = false, Message = "We failed to delete object.  Please try again later." });
+        //            }
+        //        default:
+        //            return Json(new { Success = false, Message = "Delete not allowed for this type of object." });
+        //    }
+        //}
+
+        private Dataset UpdateReportFromModel(Dataset item, EditBusinessIntelligenceModel ebim)
+        {
+
+            item.Category = ebim.Category;
+            item.DatasetCategory = _reportContext.GetById<Category>(ebim.CategoryIDs);
+            item.DatasetDesc = ebim.DatasetDesc;
+
+            int[] json = new JavaScriptSerializer().Deserialize<int[]>(ebim.TagString);
+
+            item.Tags = new List<MetadataTag>();
+
+            for (int i = 0; i < json.Length; i++)
+            {
+                item.Tags.Add(_reportContext.Tags.Where(x => x.TagId == json[i]).FirstOrDefault());
+            }
+
+            item.DatasetFileConfigs.First().FileTypeId = ebim.FileTypeId;
+            item.Metadata.ReportMetadata.Frequency = ebim.FreqencyID;
+            item.Metadata.ReportMetadata.LocationType = ebim.LocationType;
+
+            if (null != ebim.SentryOwnerName && ebim.SentryOwnerName.Length > 0)
+            {
+                int n;
+                if (int.TryParse(ebim.SentryOwnerName, out n))
+                {
+                    item.SentryOwnerName = ebim.SentryOwnerName;
+                }
+                else
+                {
+                    var associate = _associateInfoProvider.GetAssociateInfoByName(ebim.SentryOwnerName);
+                    if (associate.FullName == ebim.SentryOwnerName)
+                    {
+                        item.SentryOwnerName = associate.Id;
+                    }
+                }
+            }
+
+            return item;
+
+        }
+
         private Dataset CreateReportFromModel(CreateBusinessIntelligenceModel crm)
         {
             DateTime CreateTime = DateTime.Now;
@@ -212,12 +396,6 @@ namespace Sentry.data.Web.Controllers
             for (int i = 0; i < json.Length; i++)
             {
                 ds.Tags.Add(_dsContext.Tags.Where(x => x.TagId == json[i]).FirstOrDefault());
-            }
-
-            switch (Enum.GetName(typeof(ReportType),crm.FileTypeId))
-            {
-                default:
-                    break;
             }
 
             return ds;

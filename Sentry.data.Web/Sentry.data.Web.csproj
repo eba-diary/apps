@@ -317,7 +317,9 @@
     <Compile Include="Helpers\TimeSpanFormattingExtensions.cs" />
     <Compile Include="Helpers\WebCurrentUserIdProvider.cs" />
     <Compile Include="HttpExceptions\NotAuthorizedException.cs" />
+    <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceModel.cs" />
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceUIModel.cs" />
+    <Compile Include="Models\BusinessIntelligence\EditBusinessIntelligenceModel.cs" />
     <Compile Include="Models\Config\CreateExtensionMapModel.cs" />
     <Compile Include="Models\Config\CreateSchemaModel.cs" />
     <Compile Include="Models\Config\CreateSourceModel.cs" />
@@ -1193,6 +1195,7 @@
     <Content Include="Views\Config\CreateExtensionMapping.cshtml" />
     <Content Include="Views\BusinessIntelligence\Index.cshtml" />
     <Content Include="Views\BusinessIntelligence\Create.cshtml" />
+    <Content Include="Views\BusinessIntelligence\Edit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

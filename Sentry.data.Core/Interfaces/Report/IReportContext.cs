@@ -15,6 +15,7 @@ namespace Sentry.data.Core
         IQueryable<Category> Categories { get; }
         IQueryable<DatasetScopeType> DatasetScopeTypes { get; }
         IQueryable<FileExtension> FileExtensions { get; }
+        IQueryable<MetadataTag> Tags { get; }
 
         int GetReportCount();
     }

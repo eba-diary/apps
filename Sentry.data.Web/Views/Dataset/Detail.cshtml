@@ -59,7 +59,7 @@
                     }
 
                     <div style="margin-top:-29px;">
-                        <div class="btn-group rightFloat dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">
+                        <div class="btn-group rightFloat dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions">
                             <button type="button"
                                     class="btn btn-default borderdk_gray borderdk_@color dropdown"
                                     data-toggle="dropdown">
@@ -67,7 +67,7 @@
                             </button>
 
                             <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
-                                <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
+                                <li id="SubscribeModal" style="cursor: pointer; display: none;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe"  data-bind="visible: IsShownForCurrentType('Dataset')">
                                     <a>
                                         Subscribe
                                     </a>
@@ -75,7 +75,7 @@
 
                                 @if (Model.CanQueryTool)
                                 {
-                                    <li title="Query Dataset">
+                                    <li title="Query Dataset" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">
                                         <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
                                             Query this Dataset
                                         </a>
@@ -84,8 +84,16 @@
                                 @if (Model.CanManageConfigs)
                                 {
                                     <li>
-                                        <a href="/Config/Dataset/@Model.DatasetId">
+                                        <a href="/Config/Dataset/@Model.DatasetId" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">
                                             Manage Schemas
+                                        </a>
+                                    </li>
+                                }
+                                @if (Model.CanManageReport)
+                                {
+                                    <li>
+                                        <a id="deleteLink" href="" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;">
+                                            Delete Exhibit
                                         </a>
                                     </li>
                                 }

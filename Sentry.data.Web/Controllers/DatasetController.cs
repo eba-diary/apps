@@ -387,6 +387,33 @@ namespace Sentry.data.Web.Controllers
             return ds;
         }
 
+        [HttpPost]
+        [Route("{objectType}/Delete/{id}/")]
+        public JsonResult Delete(string objectType, int id)
+        {
+            switch (objectType.ToLower())
+            {
+                case "businessintelligence":
+                    if (!SharedContext.CurrentUser.CanManageReports)
+                    {
+                        throw new NotAuthorizedException("User is authenticated but does not have permission");
+                    }
+
+                    try
+                    {
+                        _datasetContext.RemoveById<Dataset>(id);
+                        _datasetContext.SaveChanges();
+                        return Json(new { Success = true, Message = "Object was successfully deleted" });                        
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"Failed to delete dataset - DatasetId:{id} RequestorId:{SharedContext.CurrentUser.AssociateId} RequestorName:{SharedContext.CurrentUser.DisplayName}", ex);
+                        return Json(new { Success = false, Message = "We failed to delete object.  Please try again later." });
+                    }
+                default:
+                    return Json(new { Success = false, Message = "Delete not allowed for this type of object."});
+            }
+        }
         #endregion
 
         #region Dataset FILE Modification

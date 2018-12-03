@@ -10,41 +10,14 @@ using Sentry.data.Infrastructure;
 
 namespace Sentry.data.Web
 {
-    public class CreateBusinessIntelligenceModel : BaseDatasetModel
+    public class CreateBusinessIntelligenceModel : BusinessIntelligenceModel
     {
         public CreateBusinessIntelligenceModel()
         {
-            this.Category = "";
-            this.DatasetDesc = "";
-            this.DatasetName = "";
-            this.FileExtension = null;
-            this.DatasetId = 0;
-            this.S3Key = "";
-            this.SentryOwnerName = "";
-            this.UploadUserName = "";
-            this.CanDisplay = true;
         }
 
         [Required]
         [DisplayName("Categories")]
         public int CategoryIDs { get; set; }
-
-        [Required]
-        [DisplayName("Sentry Owner")]
-        public string OwnerID { get; set; }
-
-        [Required]
-        [DisplayName("Report Location")]
-        public string Location { get; set; }
-
-        public string LocationType { get; set; }
-
-        [DisplayName("Update Frequency")]
-        public int FreqencyID { get; set; }
-
-        [DisplayName("Exhibit Type")]
-        public int FileTypeId { get; set; }
-
-        public string TagString { get; set; }
     }
 }

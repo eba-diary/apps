@@ -66,6 +66,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<MetadataTag> Tags
+        {
+            get
+            {
+                return Query<MetadataTag>().Cacheable();
+            }
+        }
+
 
         public int GetReportCount()
         {

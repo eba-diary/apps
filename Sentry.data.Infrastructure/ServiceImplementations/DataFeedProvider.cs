@@ -136,18 +136,20 @@ namespace Sentry.data.Infrastructure
             foreach (Event e in rptEvents)
             {
                 Dataset ds = Query<Dataset>().FirstOrDefault(y => y.DatasetId == e.Dataset);
-
-                DataFeedItem dfi = new DataFeedItem(
+                
+                if(ds != null)
+                {
+                    DataFeedItem dfi = new DataFeedItem(
                     e.TimeCreated,
                     e.Dataset.ToString(),
                     ds.DatasetName + " - A New Exhibit was Created",
                     ds.DatasetName + " - A New Exhibit was Created",
                     new DataFeed() { Name = "Business Intelligence", Url = "/BusinessIntelligence/Detail/" + e.Dataset, Type = "Exhibits" }
-                );
+                    );
 
-                items.Add(dfi);
+                    items.Add(dfi);
+                }
             }
-
             return items;
         }
     }

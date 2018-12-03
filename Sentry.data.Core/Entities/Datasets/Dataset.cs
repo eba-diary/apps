@@ -129,10 +129,6 @@ namespace Sentry.data.Core
                 {
                     vr.Add(ValidationErrors.locationIsBlank, "Report Location is required");
                 }
-                if (Metadata.ReportMetadata.LocationType.ToLower() == "file" && !Regex.IsMatch(Metadata.ReportMetadata.Location.ToLower(), "^\\\\(sentry.com\\share\\|sentry.com\\appfs)"))
-                {
-                    vr.Add(ValidationErrors.locationIsInvalid, "Report Location invalid, should begin with \\\\Sentry.com\\Share or \\\\Sentry.com\\appfs");
-                }
             }
             
             return vr;

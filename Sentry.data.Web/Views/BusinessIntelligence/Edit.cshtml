@@ -1,6 +1,6 @@
-﻿@model CreateBusinessIntelligenceModel
+﻿@model EditBusinessIntelligenceModel
 @{
-    ViewData["Title"] = "Create Exhibit";
+    ViewData["Title"] = "Update Exhibit";
 }
 
 @*@{
@@ -8,10 +8,10 @@
         Layout = "~/Views/Shared/_Layout.cshtml";
     }*@
 
-<h2>Create Exhibit</h2>
+<h2>Update Exhibit</h2>
 <div></div>
 
-@using (Html.BeginForm(null, null, FormMethod.Post))
+@using (Html.BeginForm())
 {
     @Html.AntiForgeryToken()
 
@@ -20,7 +20,7 @@
     @*Show the custom validation summary*@
     @Html.DisplayFor((model) => ViewData.ModelState)
 
-    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+    @*@Html.ValidationSummary(false, "", new { @class = "text-danger" })*@
 
     <ul class="nav nav-tabs">
         <li class="active"><a href="#informationPanel" data-toggle="tab" aria-expanded="true">General Information <span id="infoBadge" class="badge badge-danger"></span></a></li>
@@ -34,6 +34,7 @@
             <h4>Information</h4>
             <br />
 
+            @Html.HiddenFor(model => model.Category)
             @Html.HiddenFor(model => model.DatasetId)
             @Html.HiddenFor(model => model.SentryOwnerName)
             @Html.HiddenFor(model => model.CreationUserName)
@@ -96,14 +97,14 @@
             <div class="form-group">
 
                 @{
-            foreach (var type in Model.AllDataFileTypes)
-            {
-                <div class="col-md-10 col-md-offset-2">
-                    @Html.Label(type.Text, htmlAttributes: new { @class = "col-md-2" })
-                    @*@Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2"})*@
-                    @Html.RadioButtonFor(model => model.FileTypeId, type.Value, new { @class = "col-md-1" })
-                </div>
-    }
+                    foreach (var type in Model.AllDataFileTypes)
+                    {
+                        <div class="col-md-10 col-md-offset-2">
+                            @Html.Label(type.Text, htmlAttributes: new { @class = "col-md-2" })
+                            @*@Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2"})*@
+                            @Html.RadioButtonFor(model => model.FileTypeId, type.Value, new { @class = "col-md-1" })
+                        </div>
+                    }
                 }
             </div>
 
@@ -145,14 +146,14 @@
             <h4>Security</h4>
             <br />
             @*<p>
-                Dataset Security is very important to this site and Sentry as a whole.
-                It is <b>imperative</b> that you know what you are uploading to this site and what the data is.
-                Data.Sentry.com uploads data to the cloud so no sensitive data can be uploaded through our site.
-                To find out what data is sensitive and what classification your data is <a target="_blank" href="http://sharepoint.sentry.com/Security/Security%20Architecture/Security%20Policies/Published/Policy-Data%20Classification%20and%20Handling.pdf">click here.</a>
-                Data that is sensitive can be uploaded after it has been tokenized by the information security web service.
-            </p>
+                    Dataset Security is very important to this site and Sentry as a whole.
+                    It is <b>imperative</b> that you know what you are uploading to this site and what the data is.
+                    Data.Sentry.com uploads data to the cloud so no sensitive data can be uploaded through our site.
+                    To find out what data is sensitive and what classification your data is <a target="_blank" href="http://sharepoint.sentry.com/Security/Security%20Architecture/Security%20Policies/Published/Policy-Data%20Classification%20and%20Handling.pdf">click here.</a>
+                    Data that is sensitive can be uploaded after it has been tokenized by the information security web service.
+                </p>
 
-            <br />*@
+                <br />*@
             <div class="form-group">
                 @Html.LabelFor(model => model.OwnerID, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
@@ -204,11 +205,11 @@
     </div>
     <div class="form-group">
         <div>
-            <input type="submit" id="btnCreateDataset" value="Create Exhibit" class="btn btn-primary" />
+            <input type="submit" id="btnCreateDataset" value="Update Exhibit" class="btn btn-primary" />
             <a class="btn btn-warning" href="~/BusinessIntelligence/Index">Cancel</a>
         </div>
     </div>
-}
+                    }
 <style>
     .fieldDescription {
         padding-bottom: 10px;
@@ -273,7 +274,7 @@
     <script>
 
         $(function () {
-            data.Dataset.CreateInit();
+            data.Dataset.EditInit();
             $("#TagSelector").select2({
                 multiple: true,
                 allowClear: true,
@@ -329,14 +330,17 @@
 
             $('#TagSelector').on('select2:select', function (e) {
                 $('#TagString').val(JSON.stringify($('#TagSelector').val()));
+                console.log('1');
             });
 
             $('#TagSelector').on('select2:unselect', function (e) {
                 $('#TagString').val(JSON.stringify($('#TagSelector').val()));
+                console.log('2');
             });
 
             $('#TagSelector').on('select2:change', function (e) {
                 $('#TagString').val(JSON.stringify($('#TagSelector').val()));
+                console.log('3');
             });
 
             function formatTag(tag) {
@@ -452,77 +456,7 @@
                     }
                 });
             });
-
-
-
-
-
-
-            $('#cronDailyJobTimePicker').timepicker({
-                timeFormat: 'h:mm p',
-                interval: 60,
-                minTime: '0',
-                maxTime: '23:59',
-                defaultTime: '11',
-                startTime: '0',
-                dynamic: false,
-                dropdown: true,
-                scrollbar: true
-            });
-
-            $('#cronWeeklyJobTimePicker').timepicker({
-                timeFormat: 'h:mm p',
-                interval: 60,
-                minTime: '0',
-                maxTime: '23:59',
-                defaultTime: '11',
-                startTime: '0',
-                dynamic: false,
-                dropdown: true,
-                scrollbar: true
-            });
-            $('#cronMonthlyJobTimePicker').timepicker({
-                timeFormat: 'h:mm p',
-                interval: 60,
-                minTime: '0',
-                maxTime: '23:59',
-                defaultTime: '11',
-                startTime: '0',
-                dynamic: false,
-                dropdown: true,
-                scrollbar: true
-            });
-            $('#cronYearlyJobTimePicker').timepicker({
-                timeFormat: 'h:mm p',
-                interval: 60,
-                minTime: '0',
-                maxTime: '23:59',
-                defaultTime: '11',
-                startTime: '0',
-                dynamic: false,
-                dropdown: true,
-                scrollbar: true
-            });
-
-            $("#cronJobDatePicker").datepicker();
-
-            $("#CustomDropPath").change(function () {
-                if (this.checked) {
-                    $("#DropPath").prop('disabled', '');
-                    $("#DropPath").prop('readonly', '');
-                } else {
-                    $("#DropPath").prop('disabled', 'disabled');
-                    $("#DropPath").prop('readonly', 'readonly');
-                }
-            });
-
-            if (!localStorage.getItem("DropPath")) {
-                var dropPathName = $("#DropPath").val();
-                if (dropPathName.substring(dropPathName.length - 1) !== "\\") {
-                    dropPathName += "\\";
-                }
-                localStorage.setItem("DropPath", dropPathName);
-            }
+            
 
             $("#CategoryIDs").change(function () {
                 console.log('cat');
@@ -537,27 +471,6 @@
                     $("#DropPath").val(newName);
                 }
             });
-
-            $('#DataSource_SourceType').change(function () {
-                $.ajax({
-                    type: "GET",
-                    url: "/dataset/GetSourceDescription?DiscrimatorValue=" + $("#DataSource_SourceType").val(),
-                    dataType: "json",
-                    success: function (msg) {
-                        $('#dataSourceText').text(msg);
-
-                    },
-                    error: function (e) {
-                    }
-                });
-            });
-
-
-
-
-
-
-
 
 
             $("#DataClassification").change(function () {
@@ -610,115 +523,6 @@
 
                 $(category).slideToggle();
                 $(icon).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
-            });
-
-            $("[id^='btnUploadFile']").off('click').on('click', function () {
-                $('#btnUploadFile').closest('.bootbox').hide();
-                $('.modal-backdrop').remove();
-
-                var modal = Sentry.ShowModalWithSpinner("Upload Results", {
-                    Confirm: {
-                        label: 'Confirm',
-                        className: 'btn-success'
-                    },
-                    Cancel:
-                        {
-                            label: 'Cancel',
-                            className: 'btn-cancel'
-                        }
-                });
-
-
-                $('.modal-footer btn-success').prop("disabled", true);
-
-                // This approach is from the following site:
-                // http://www.c-sharpcorner.com/UploadFile/manas1/upload-files-through-jquery-ajax-in-Asp-Net-mvc/
-                if (window.FormData !== undefined) {
-                    console.log('File Upload Process Started');
-                    var fileUpload = $("#DatasetFileUpload").get(0);
-                    var files = fileUpload.files;
-
-                    //Create FormData object
-                    var fileData = new FormData();
-
-                    fileData.append(files[0].name, files[0]);
-
-                    if ((files[0].size / 1000000) > 100) {
-
-                        var configID = $("#configList").find(":selected").val();
-                        var dropLocation
-
-                        for (i = 0; i < configs.length; i++) {
-                            if (configs[i].ConfigId == configID) {
-                                dropLocation = configs[i].DropPath;
-                                break;
-                            }
-                        }
-
-
-                        modal.ReplaceModalBody('<h3> The file you are attempting to upload to is too large to upload through the browser. </h3>' +
-                            '<p>Please include only a few hundred rows and try again. </p>'
-                        );
-
-                        $('.modal-footer button').prop("disabled", false);
-                    }
-                    else {
-                        var datasetID = window.location.pathname.substr(window.location.pathname.lastIndexOf('/') + 1);
-
-                        if (datasetID == "" || datasetID == null || datasetID == undefined || isNaN(datasetID)) {
-                            datasetID = $("[id^='btnUploadFile']").attr('data-id');
-                        }
-
-                        var configID = $("#configList").val();
-
-                        var token = $('input[name="__RequestVerificationToken"]').val();
-
-                        var xhr = new XMLHttpRequest();
-
-                        modal.ReplaceModalBody('<p> Large files may take a long time to upload through the browser. </p>' +
-                            '<p>Please do not close the window as your file is uploading. </p>' +
-                            '<p> Progress: <span id=\'progressKB\'/></p>' +
-                            '<h3><b><span id=\'percentTotal\'></span></b ></h3>' +
-                            '<div>' +
-                            '<div class="progress progress-striped active">' +
-                            '<div class="progress-bar" id="progressBar"></div>' +
-                            '</div>' +
-                            '</div>'
-                        );
-
-
-                        (xhr.upload || xhr).addEventListener('progress', function (e) {
-                            var done = e.position || e.loaded
-                            var total = e.totalSize || e.total;
-
-                            $('#percentTotal').text(Math.round(done / total * 100) + '%');
-                            $('#progressKB').text('(' + Math.round(done / 1024) + ' KB / ' + Math.round(total / 1024) + ' KB)');
-                            $('#progressBar').width(Math.round(done / total * 100) + '%');
-
-                            $('.btn-success').prop("disabled", true);
-                        });
-                        xhr.addEventListener('load', function (e) {
-                            $('.modal-footer button').prop("disabled", false);
-                            modal.ReplaceModalBody(e.currentTarget.response);
-                            console.log(e);
-                        });
-
-                        function cancelUpload() {
-                            xhr.abort();
-                            console.log('The Upload Process was aborted');
-                        }
-
-                        $('.btn-cancel')[0].addEventListener('click', cancelUpload, false);
-                        $('.bootbox-close-button').hide();
-                        //var url = '/Dataset/UploadDatafile/?id=' + encodeURI(datasetID) + "&configId=" + encodeURI(configID);
-                        //xhr.open('post', url, true);
-                        //xhr.setRequestHeader('__RequestVerificationToken', token);
-                        //xhr.send(fileData);
-                    }
-
-                } else {
-                    alert("FormData is not supported");
-                }
             });
         });
     </script>

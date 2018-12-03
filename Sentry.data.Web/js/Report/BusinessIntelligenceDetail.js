@@ -24,6 +24,16 @@ data.BusinessIntelligenceDetail = {
             data.BusinessIntelligenceDetail.SubscribeModal($(this).data("id"));
         });
 
+        $('#deleteLink').click(function (e) {
+            e.preventDefault();
+
+            var modal = Sentry.ShowModalConfirmation("Delete Exhibit", function () { data.BusinessIntelligenceDetail.deleteDataset("BusinessIntelligence", window.location.pathname.split('/')[3]); });
+            
+            modal.ReplaceModalBody("This will <u>permanently</u> delete this Exhibit (<b>not the object which it references</b>). </br></br> Do you wish to continue?");
+
+            modal.show();
+        });
+
         $("[id^='detailSectionHeader_']").click(function (e) {
             e.preventDefault();
 
@@ -53,6 +63,37 @@ data.BusinessIntelligenceDetail = {
         $.get(Url, function (e) {
             modal.ReplaceModalBody(e);
         });      
+    },
+
+    deleteDataset: function (objectType, id) {
+
+        var outUrl = "/" + objectType + "/Delete/" + encodeURI(id);
+        var returnUrl = "/" + objectType + "/Index";
+
+        var request = $.ajax({
+            url: outUrl,
+            method: "POST",
+            dataType: 'json',
+            success: function (obj) {
+                if (obj.Success) {
+                    var modal = Sentry.ShowModalConfirmation(
+                        obj.Message, function () { window.location = returnUrl })
+                }
+                else {
+                    var modal = Sentry.ShowModalAlert(
+                        obj.Message, function () { window.location = returnUrl })
+                }
+            },
+            failure: function (obj) {
+                var modal = Sentry.ShowModalAlert(
+                    obj.Message, function () { location.reload() })
+            },
+            error: function (obj) {
+                var modal = Sentry.ShowModalAlert(
+                    obj.Message, function () { location.reload() })
+            }
+        });
+
     },
 
     ViewEdit: function (id) {
