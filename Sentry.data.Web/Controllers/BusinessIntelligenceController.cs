@@ -325,10 +325,6 @@ namespace Sentry.data.Web.Controllers
             string cat = _reportContext.GetById<Category>(crm.CategoryIDs).Name;
             IApplicationUser user = _userService.GetCurrentUser();
 
-            //Mocked out for initial testing 
-            //List<MetadataTag> tagList = new List<MetadataTag>();
-            //tagList.Add(_dsContext.Tags.First());
-
             Dataset ds = new Dataset()
             {
                 DatasetId = 0,
@@ -361,7 +357,7 @@ namespace Sentry.data.Web.Controllers
                 Tags = new List<MetadataTag>()
             };
 
-            int[] json = new JavaScriptSerializer().Deserialize<int[]>(crm.TagString);
+            int[] json = new JavaScriptSerializer().Deserialize<int[]>(crm.TagString);                       
 
             ds.Tags = new List<MetadataTag>();
 

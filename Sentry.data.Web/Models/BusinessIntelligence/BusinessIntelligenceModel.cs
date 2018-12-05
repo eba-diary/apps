@@ -23,6 +23,7 @@ namespace Sentry.data.Web
             this.SentryOwnerName = "";
             this.UploadUserName = "";
             this.CanDisplay = true;
+            this.TagString = new JavaScriptSerializer().Serialize(new List<SearchableTag>());
 
         }
 
