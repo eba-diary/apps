@@ -294,9 +294,20 @@ namespace Sentry.data.Web.Controllers
             }
 
             item.DatasetFileConfigs.First().FileTypeId = ebim.FileTypeId;
-            item.Metadata.ReportMetadata.Frequency = ebim.FreqencyID;
-            item.Metadata.ReportMetadata.LocationType = ebim.LocationType;
-            item.Metadata.ReportMetadata.Location = ebim.Location;
+            if (item.Metadata.ReportMetadata.Frequency != ebim.FreqencyID || item.Metadata.ReportMetadata.LocationType != ebim.LocationType || item.Metadata.ReportMetadata.Location != ebim.Location)
+            {
+                DatasetMetadata newDSMetadata = new DatasetMetadata()
+                {
+                    ReportMetadata = new ReportMetadata()
+                    {
+                        Frequency = ebim.FreqencyID,
+                        LocationType = ebim.LocationType,
+                        Location = ebim.Location
+                    }
+                };
+
+                item.Metadata = newDSMetadata;
+            }
 
             if (null != ebim.SentryOwnerName && ebim.SentryOwnerName.Length > 0)
             {
