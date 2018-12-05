@@ -107,9 +107,9 @@ namespace Sentry.data.Web.Controllers
             switch (crm.FileTypeId)
             {
                 case (int)ReportType.Tableau:
-                    if (!Regex.IsMatch(crm.Location.ToLower(), "^https:////tableau.sentry.com"))
+                    if (!Regex.IsMatch(crm.Location.ToLower(), "^https://tableau.sentry.com"))
                     {
-                        AddCoreValidationExceptionsToModel(new ValidationException("Location", "Tableau exhibits should begin with \\\\Tableau.sentry.com"));
+                        AddCoreValidationExceptionsToModel(new ValidationException("Location", "Tableau exhibits should begin with https://Tableau.sentry.com"));
                     }
                     break;
                 case (int)ReportType.Excel:
@@ -231,9 +231,9 @@ namespace Sentry.data.Web.Controllers
                 switch (ebim.FileTypeId)
                 {
                     case (int)ReportType.Tableau:
-                        if (!Regex.IsMatch(ebim.Location.ToLower(), "^https:////tableau.sentry.com"))
+                        if (!Regex.IsMatch(ebim.Location.ToLower(), "^https://tableau.sentry.com"))
                         {
-                            AddCoreValidationExceptionsToModel(new ValidationException("Location", "Tableau exhibits should begin with \\\\Tableau.sentry.com"));
+                            AddCoreValidationExceptionsToModel(new ValidationException("Location", "Tableau exhibits should begin with https://Tableau.sentry.com"));
                         }
                         break;
                     case (int)ReportType.Excel:
@@ -277,35 +277,6 @@ namespace Sentry.data.Web.Controllers
             return View(ebim);
         }
 
-
-        //[HttpPost]
-        //[Route("{objectType}/Delete/{id}/")]
-        //public JsonResult Delete(string objectType, int id)
-        //{
-        //    switch (objectType.ToLower())
-        //    {
-        //        case "businessintelligence":
-        //            if (!SharedContext.CurrentUser.CanManageReports)
-        //            {
-        //                throw new NotAuthorizedException("User is authenticated but does not have permission");
-        //            }
-
-        //            try
-        //            {
-        //                _reportContext.RemoveById<Dataset>(id);
-        //                _reportContext.SaveChanges();
-        //                return Json(new { Success = true, Message = "Object was successfully deleted" });
-        //            }
-        //            catch (Exception ex)
-        //            {
-        //                Configuration.Logging.Logger.Logger.Error($"Failed to delete dataset - DatasetId:{id} RequestorId:{SharedContext.CurrentUser.AssociateId} RequestorName:{SharedContext.CurrentUser.DisplayName}", ex);
-        //                return Json(new { Success = false, Message = "We failed to delete object.  Please try again later." });
-        //            }
-        //        default:
-        //            return Json(new { Success = false, Message = "Delete not allowed for this type of object." });
-        //    }
-        //}
-
         private Dataset UpdateReportFromModel(Dataset item, EditBusinessIntelligenceModel ebim)
         {
 
@@ -325,6 +296,7 @@ namespace Sentry.data.Web.Controllers
             item.DatasetFileConfigs.First().FileTypeId = ebim.FileTypeId;
             item.Metadata.ReportMetadata.Frequency = ebim.FreqencyID;
             item.Metadata.ReportMetadata.LocationType = ebim.LocationType;
+            item.Metadata.ReportMetadata.Location = ebim.Location;
 
             if (null != ebim.SentryOwnerName && ebim.SentryOwnerName.Length > 0)
             {
