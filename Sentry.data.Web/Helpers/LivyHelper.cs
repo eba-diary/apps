@@ -74,32 +74,32 @@ namespace Sentry.data.Web.Helpers
             }
         }
 
-        public string GetDataFrameFromS3Key(Guid guid, string s3Key, int configID)
-        {
-            DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
+        //public string GetDataFrameFromS3Key(Guid guid, string s3Key, int configID)
+        //{
+        //    DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
 
-            /* Get the Basic Information from the Metadata Repository */
-            DataElement dataElement = _datasetContext.DataElements.Where(x => x.DataElement_ID == dfc.DataElement_ID).FirstOrDefault();
-            var dataObjectID = _datasetContext.Schemas.Where(x => x.DatasetFileConfig.ConfigId == dfc.ConfigId).FirstOrDefault().DataObject_ID;
-            DataObject dataObject = _datasetContext.GetById<DataObject>(dataObjectID);
+        //    /* Get the Basic Information from the Metadata Repository */
+        //    DataElement dataElement = _datasetContext.DataElements.Where(x => x.DataElement_ID == dfc.DataElement.DataElement_ID).FirstOrDefault();
+        //    var dataObjectID = _datasetContext.Schemas.Where(x => x.DatasetFileConfig.ConfigId == dfc.ConfigId).FirstOrDefault().DataObject_ID;
+        //    DataObject dataObject = _datasetContext.GetById<DataObject>(dataObjectID);
 
-            String delimiter = null;
-            if (dataElement.DataElementDetails.Any(x => x.DataElementDetailType_CDE == "FileDelimiter_TYP"))
-            {
-                delimiter = dataElement.DataElementDetails.Where(x => x.DataElementDetailType_CDE == "FileDelimiter_TYP").FirstOrDefault().DataElementDetailType_VAL;
-            }
+        //    String delimiter = null;
+        //    if (dataElement.DataElementDetails.Any(x => x.DataElementDetailType_CDE == "FileDelimiter_TYP"))
+        //    {
+        //        delimiter = dataElement.DataElementDetails.Where(x => x.DataElementDetailType_CDE == "FileDelimiter_TYP").FirstOrDefault().DataElementDetailType_VAL;
+        //    }
 
-            String fileFormat = dataElement.DataElementDetails.Where(x => x.DataElementDetailType_CDE == "FileFormat_TYP").FirstOrDefault().DataElementDetailType_VAL;
+        //    String fileFormat = dataElement.DataElementDetails.Where(x => x.DataElementDetailType_CDE == "FileFormat_TYP").FirstOrDefault().DataElementDetailType_VAL;
 
-            String headerRow = "false";
-            if (dataObject.DataObjectDetails.Any(x => x.DataObjectDetailType_CDE == "HeaderRow_IND"))
-            {
-                headerRow = dataObject.DataObjectDetails.Where(x => x.DataObjectDetailType_CDE == "HeaderRow_IND").FirstOrDefault().DataObjectDetailType_VAL == "Y" ? "true" : "false";
-            }
+        //    String headerRow = "false";
+        //    if (dataObject.DataObjectDetails.Any(x => x.DataObjectDetailType_CDE == "HeaderRow_IND"))
+        //    {
+        //        headerRow = dataObject.DataObjectDetails.Where(x => x.DataObjectDetailType_CDE == "HeaderRow_IND").FirstOrDefault().DataObjectDetailType_VAL == "Y" ? "true" : "false";
+        //    }
 
-            return CreateSparkDataFrame(guid, fileFormat, headerRow, delimiter, s3Key);
+        //    return CreateSparkDataFrame(guid, fileFormat, headerRow, delimiter, s3Key);
 
-        }
+        //}
 
         private string CreateSparkDataFrame(Guid guid, String fileFormat, String headerRow, String delimiter, String s3Key)
         {

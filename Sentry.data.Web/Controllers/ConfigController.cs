@@ -115,6 +115,9 @@ namespace Sentry.data.Web.Controllers
                 {
                     List<DatasetFileConfig> dfcList = parent.DatasetFileConfigs.ToList();
 
+                    List<DataElement> deList = new List<DataElement>();
+                    DataElement de = CreateNewDataElement(dfcm);
+
                     //Create Generic Data File Config for Dataset                    
                     DatasetFileConfig dfc = new DatasetFileConfig()
                     {
@@ -123,12 +126,16 @@ namespace Sentry.data.Web.Controllers
                         Description = dfcm.ConfigFileDesc,
                         //DropPath = dfcm.DropPath,
                         FileTypeId = dfcm.FileTypeId,
-                        DataElement_ID = dfcm.DataElement_ID,
                         //IsGeneric = false,
                         ParentDataset = parent,
                         FileExtension = _datasetContext.GetById<FileExtension>(dfcm.FileExtensionID),
-                        DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dfcm.DatasetScopeTypeID)
+                        DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dfcm.DatasetScopeTypeID),
+                        Schema = deList
                     };
+
+                    de.DatasetFileConfig = dfc;
+                    deList.Add(de);
+                    dfc.Schema = deList;
 
                     List<RetrieverJob> jobList = new List<RetrieverJob>();
 
@@ -182,6 +189,29 @@ namespace Sentry.data.Web.Controllers
             return View(dfcm);
         }
 
+        private DataElement CreateNewDataElement(DatasetFileConfigsModel dfcm)
+        {
+            List<DataElementDetail> details = new List<DataElementDetail>();
+
+            DataElement de = new DataElement()
+            {
+                DataElementCreate_DTM = DateTime.Now,
+                DataElementChange_DTM = DateTime.Now,
+                DataElement_CDE = "F",
+                DataElement_DSC = DataElementCode.DataFile,
+                DataElement_NME = dfcm.ConfigFileName,
+                LastUpdt_DTM = DateTime.Now,
+                SchemaIsPrimary = true,
+                SchemaDescription = dfcm.ConfigFileDesc,
+                SchemaName = dfcm.ConfigFileName,
+                SchemaRevision = 1,
+                SchemaIsForceMatch = false,
+                FileFormat = _datasetContext.GetById<FileExtension>(dfcm.FileExtensionID).Name.Trim()
+            };
+
+            return de;
+        }
+
         [HttpGet]
         [Route("Config/Manage")]
         [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
@@ -215,7 +245,6 @@ namespace Sentry.data.Web.Controllers
             edfc.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
             edfc.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, edfc.FileExtensionID);
-            edfc.DataElement_ID = dfc.DataElement_ID;
 
             ViewBag.ModifyType = "Edit";
 
@@ -241,7 +270,6 @@ namespace Sentry.data.Web.Controllers
             DatasetFileConfig dfc = _datasetContext.getDatasetFileConfigs(configId);
             EditDatasetFileConfigModel edfc = new EditDatasetFileConfigModel(dfc);
             edfc.DatasetId = dfc.ParentDataset.DatasetId;
-            edfc.DataElement_ID = dfc.DataElement_ID;
             edfc.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext, edfc.DatasetScopeTypeID);
             edfc.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
@@ -266,7 +294,6 @@ namespace Sentry.data.Web.Controllers
                     dfc.DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(edfc.DatasetScopeTypeID);
                     dfc.FileTypeId = edfc.FileTypeId;
                     dfc.Description = edfc.ConfigFileDesc;
-                    dfc.DataElement_ID = edfc.DataElement_ID;
                     dfc.FileExtension = _datasetContext.GetById<FileExtension>(edfc.FileExtensionID);
                     _datasetContext.SaveChanges();
 
@@ -1322,7 +1349,21 @@ namespace Sentry.data.Web.Controllers
             e.Reason = "Viewed Edit Fields";
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
-            ViewBag.Schema = _datasetContext.GetById<Schema>(schemaId);
+            //DataElement de = _datasetContext.GetById<DataElement>(schemaId);
+
+            //if (de.DataObjects.Count == 0)
+            //{
+            //    List<DataObject> dobjList = new List<DataObject>();
+            //    de.DataObjects = dobjList;
+            //    //ViewBag.Schema = _datasetContext.GetById<DataElement>(schemaId);
+            //    ViewBag.Schema = de;
+            //}
+            //else
+            //{
+                
+            //}
+
+            ViewBag.Schema = _datasetContext.GetById<DataElement>(schemaId);
 
             return View(bdm);
         }
@@ -1332,215 +1373,180 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
         public JsonResult UpdateFields(int configId, int schemaId, List<SchemaRow> schemaRows)
         {
-            DatasetFileConfig config = _datasetContext.GetById<DatasetFileConfig>(configId);
-            Schema schema = _datasetContext.GetById<Schema>(schemaId);
-
-            foreach (SchemaRow sr in schemaRows)
+            try
             {
-                DataObjectField dof = null;
-
-                //Update Row
-                if (sr.DataObjectField_ID != 0)
+                DatasetFileConfig config = _datasetContext.GetById<DatasetFileConfig>(configId);
+                DataElement schema = _datasetContext.GetById<DataElement>(schemaId);
+                DataElement newRevision = null;
+                DataObject DOBJ = null;
+                Boolean newRev = false;
+                if (schema.DataObjects.Count == 0)
                 {
-                    dof = _datasetContext.GetById<DataObjectField>(sr.DataObjectField_ID);
-                    dof.DataObjectField_NME = sr.Name;
-                    dof.DataObjectField_DSC = sr.Description;
-                    dof.LastUpdt_DTM = DateTime.Now;
-                    dof.DataObjectFieldChange_DTM = DateTime.Now;
+                    //This is a new configuration with no schema defined.
+                    DOBJ = new DataObject()
+                    {
+                        DataObjectCreate_DTM = DateTime.Now,
+                        DataObjectChange_DTM = DateTime.Now,
+                        LastUpdt_DTM = DateTime.Now,
+                        DataObject_NME = schema.SchemaName,
+                        DataObject_DSC = schema.SchemaDescription,
+                        DataObject_CDE = config.FileExtension.Id.ToString(),
+                        DataObjectCode_DSC = config.FileExtension.Name
+                    };
+
+                    schema.DataObjects.Add(DOBJ);
+                    //_datasetContext.Merge(DOBJ);
+                    //DOBJ = _datasetContext.SaveChanges();
                 }
-                //Add New Row
                 else
+                //else if(schema.DataObjects.Count == 1 && schema.DataObjects[0].DataObjectFields.Count == 0)
                 {
-                    dof = new DataObjectField();
-                    dof.DataObject_ID = _datasetContext.GetById<DataObject>(schema.DataObject_ID).DataObject_ID;
-
-                    dof.DataObjectFieldCreate_DTM = DateTime.Now;
-                    dof.DataObjectField_NME = sr.Name;
-                    dof.DataObjectField_DSC = sr.Description;
-                    dof.LastUpdt_DTM = DateTime.Now;
-                    dof.DataObjectFieldChange_DTM = DateTime.Now;
-
-                    dof.DataObjectFieldDetails = new List<DataObjectFieldDetail>();
+                    //Add fields to Existing Data Object
+                    DOBJ = schema.DataObjects.Single();
                 }
+                //else
+                //{
+                //    newRev = true;
+                //    DataElement maxRevision = config.Schema.OrderByDescending(o => o.SchemaRevision).Take(1).FirstOrDefault();
+                //    newRevision = new DataElement()
+                //    {
+                //        DataElementCreate_DTM = DateTime.Now,
+                //        DataElementChange_DTM = DateTime.Now,
+                //        LastUpdt_DTM = DateTime.Now,
+                //        DataElement_NME = maxRevision.DataElement_NME,
+                //        DataElement_DSC = maxRevision.DataElement_DSC,
+                //        DataElement_CDE = maxRevision.DataElement_CDE,
+                //        DataElementCode_DSC = maxRevision.DataElementCode_DSC,
+                //        DataElementDetails = maxRevision.DataElementDetails
+                //    };
 
-                dof = _datasetContext.Merge<DataObjectField>(dof);
+                //    //This is a new configuration with no schema defined.
+                //    DOBJ = new DataObject()
+                //    {
+                //        DataObjectCreate_DTM = DateTime.Now,
+                //        DataObjectChange_DTM = DateTime.Now,
+                //        LastUpdt_DTM = DateTime.Now,
+                //        DataObject_NME = schema.SchemaName,
+                //        DataObject_DSC = schema.SchemaDescription,
+                //        DataObject_CDE = config.FileExtension.Id.ToString(),
+                //        DataObjectCode_DSC = config.FileExtension.Name
+                //    };
+
+                //    List<DataObject> dobjList = new List<DataObject>
+                //    {
+                //        DOBJ
+                //    };
+                //    newRevision.DataObjects = dobjList;
+
+                //    newRevision.SchemaRevision += 1;
+                //    newRevision.SchemaIsPrimary = false;
+
+                //    DOBJ = newRevision.DataObjects.Single();
+
+                //    //Schema revision(s) exist, therefore, Create new schema revision
+                //    //  Retrieve max schema revision (data element)
+                //    //  Use Data Element values to create new data element and increment schema revision
+                //    //  Use Data Object values to create new data object for element created above
+                //    //  add Data Object Field \ Detail values from incoming data
+                //    //  
+                //}
+
+                List<DataObjectField> dofList = new List<DataObjectField>();
+
+                foreach (SchemaRow sr in schemaRows)
+                {
+                    DataObjectField dof = null;
+
+                    //Update Row
+                    if (sr.DataObjectField_ID != 0 && newRev == false)
+                    {
+                        dof = DOBJ.DataObjectFields.Where(w => w.DataObjectField_ID == sr.DataObjectField_ID).FirstOrDefault();
+                        dof.DataObjectField_NME = sr.Name;
+                        dof.DataObjectField_DSC = sr.Description;
+                        dof.LastUpdt_DTM = DateTime.Now;
+                        dof.DataObjectFieldChange_DTM = DateTime.Now;
+                    }
+                    //Add New Row
+                    else
+                    {
+                        dof = new DataObjectField();
+                        dof.DataObject = DOBJ;
+                        dof.DataObjectFieldCreate_DTM = DateTime.Now;
+                        dof.DataObjectField_NME = sr.Name;
+                        dof.DataObjectField_DSC = sr.Description;
+                        dof.LastUpdt_DTM = DateTime.Now;
+                        dof.DataObjectFieldChange_DTM = DateTime.Now;
+                    }
+
+
+                    if (sr.Type != "ARRAY")
+                    {
+                        dof.DataType = sr.Type;
+                    }
+                    else
+                    {
+                        dof.DataType = sr.Type + "<" + sr.ArrayType + ">";
+                    }
+
+                    if (sr.Nullable != null) { dof.Nullable = sr.Nullable ?? null; }
+                    if (sr.Precision != null)
+                    {
+                        if (sr.Type == "DECIMAL")
+                        {
+                            dof.Precision = sr.Precision;
+                        }
+                        else
+                        {
+                            dof.Precision = null;
+                        }
+                    }
+                    if (sr.Scale != null)
+                    {
+                        if (sr.Type == "DECIMAL")
+                        {
+                            dof.Scale = sr.Scale;
+                        }
+                        else
+                        {
+                            dof.Scale = null;
+                        }
+                    }
+
+                    dofList.Add(dof);
+
+                        //_datasetContext.Remove<DataObjectFieldDetail>(temp);
+                    }
+                
+
+                DOBJ.DataObjectFields = dofList;
+
+                _datasetContext.Merge(schema);
                 _datasetContext.SaveChanges();
 
-                if (dof.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Datatype_TYP"))
+                if (newRev == true)
                 {
-                    var temp = dof.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Datatype_TYP");
-
-                    if (sr.Type != "ARRAY")
-                    {
-                        temp.DataObjectFieldDetailType_VAL = sr.Type;
-                    }
-                    else
-                    {
-                        temp.DataObjectFieldDetailType_VAL = sr.Type + "<" + sr.ArrayType + ">";
-                    }
-
-                    temp.DataObjectFieldDetailChange_DTM = DateTime.Now;
-
-                    _datasetContext.Merge<DataObjectFieldDetail>(temp);
+                    _datasetContext.Merge(newRevision);
                     _datasetContext.SaveChanges();
                 }
-                else
-                {
-                    DataObjectFieldDetail dofd = new DataObjectFieldDetail()
-                    {
-                        DataObjectField = dof,
-                        DataObjectField_ID = dof.DataObjectField_ID,
-                        DataObjectFieldDetailCreate_DTM = DateTime.Now,
-                        DataObjectFieldDetailChange_DTM = DateTime.Now,
-                        LastUpdt_DTM = DateTime.Now,
-                        DataObjectFieldDetailType_CDE = "Datatype_TYP"
+                
 
-                    };
+                Event e = new Event();
+                e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+                e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+                e.TimeCreated = DateTime.Now;
+                e.TimeNotified = DateTime.Now;
+                e.IsProcessed = false;
+                e.DataConfig = config.ConfigId;
+                e.Dataset = config.ParentDataset.DatasetId;
+                e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+                e.Reason = "Viewed Edit Fields";
+                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
-                    if (sr.Type != "ARRAY")
-                    {
-                        dofd.DataObjectFieldDetailType_VAL = sr.Type;
-                    }
-                    else
-                    {
-                        dofd.DataObjectFieldDetailType_VAL = sr.Type + "<" + sr.ArrayType + ">";
-                    }
-
-                    _datasetContext.Merge<DataObjectFieldDetail>(dofd);
-                    _datasetContext.SaveChanges();
-                }
-
-                if (dof.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Nullable_IND"))
-                {
-                    var temp = dof.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Nullable_IND");
-
-                    temp.LastUpdt_DTM = DateTime.Now;
-                    temp.DataObjectFieldDetailType_VAL = sr.Nullable == true ? "Y" : "N";
-                    temp.DataObjectFieldDetailChange_DTM = DateTime.Now;
-
-                    _datasetContext.Merge<DataObjectFieldDetail>(temp);
-                    _datasetContext.SaveChanges();
-                }
-                else
-                {
-                    DataObjectFieldDetail dofd = new DataObjectFieldDetail()
-                    {
-                        DataObjectField = dof,
-                        DataObjectField_ID = dof.DataObjectField_ID,
-                        DataObjectFieldDetailCreate_DTM = DateTime.Now,
-                        DataObjectFieldDetailChange_DTM = DateTime.Now,
-                        DataObjectFieldDetailType_CDE = "Nullable_IND",
-                        LastUpdt_DTM = DateTime.Now
-
-                    };
-
-                    dofd.DataObjectFieldDetailType_VAL = sr.Nullable == true ? "Y" : "N";
-
-                    _datasetContext.Merge<DataObjectFieldDetail>(dofd);
-                    _datasetContext.SaveChanges();
-                }
-
-                if (dof.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Precision_AMT"))
-                {
-                    var temp = dof.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Precision_AMT");
-
-                    if (sr.Type == "DECIMAL")
-                    {
-                        temp.LastUpdt_DTM = DateTime.Now;
-                        temp.DataObjectFieldDetailType_VAL = sr.Precision;
-                        temp.DataObjectFieldDetailChange_DTM = DateTime.Now;
-
-                        _datasetContext.Merge<DataObjectFieldDetail>(temp);
-                    }
-                    else
-                    {
-                        dof.DataObjectFieldDetails.Remove(temp);
-
-                        //_datasetContext.Remove<DataObjectFieldDetail>(temp);
-                    }
-                    _datasetContext.SaveChanges();
-                }
-                else
-                {
-                    if (sr.Type == "DECIMAL")
-                    {
-                        DataObjectFieldDetail dofd = new DataObjectFieldDetail()
-                        {
-                            DataObjectField = dof,
-                            DataObjectField_ID = dof.DataObjectField_ID,
-                            DataObjectFieldDetailCreate_DTM = DateTime.Now,
-                            DataObjectFieldDetailChange_DTM = DateTime.Now,
-                            LastUpdt_DTM = DateTime.Now,
-                            DataObjectFieldDetailType_CDE = "Precision_AMT"
-                        };
-
-                        dofd.DataObjectFieldDetailType_VAL = sr.Precision;
-
-                        _datasetContext.Merge<DataObjectFieldDetail>(dofd);
-                        _datasetContext.SaveChanges();
-                    }
-                }
-
-
-                if (dof.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Scale_AMT"))
-                {
-                    var temp = dof.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Scale_AMT");
-
-                    if (sr.Type == "DECIMAL")
-                    {
-                        temp.LastUpdt_DTM = DateTime.Now;
-                        temp.DataObjectFieldDetailType_VAL = sr.Scale;
-                        temp.DataObjectFieldDetailChange_DTM = DateTime.Now;
-
-                        _datasetContext.Merge<DataObjectFieldDetail>(temp);
-                    }
-                    else
-                    {
-                        dof.DataObjectFieldDetails.Remove(temp);
-                        //_datasetContext.Remove<DataObjectFieldDetail>(temp);
-                    }
-
-                    _datasetContext.SaveChanges();
-                }
-                else
-                {
-                    if (sr.Type == "DECIMAL")
-                    {
-                        DataObjectFieldDetail dofd = new DataObjectFieldDetail()
-                        {
-                            DataObjectField = dof,
-                            DataObjectField_ID = dof.DataObjectField_ID,
-                            DataObjectFieldDetailCreate_DTM = DateTime.Now,
-                            DataObjectFieldDetailChange_DTM = DateTime.Now,
-                            DataObjectFieldDetailType_CDE = "Scale_AMT",
-                            LastUpdt_DTM = DateTime.Now
-
-                        };
-
-                        dofd.DataObjectFieldDetailType_VAL = sr.Scale;
-
-
-
-                        _datasetContext.Merge<DataObjectFieldDetail>(dofd);
-                        _datasetContext.SaveChanges();
-                    }
-                }
             }
-
-
-
-            Event e = new Event();
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.DataConfig = config.ConfigId;
-            e.Dataset = config.ParentDataset.DatasetId;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-            e.Reason = "Viewed Edit Fields";
-            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to update schema - ConfigId:{configId} DataElementId:{schemaId}", ex);
+            }
 
             return Json("Success", JsonRequestBehavior.AllowGet);
         }
@@ -1550,9 +1556,13 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
         public ActionResult CreateSchema(int configId)
         {
+            //throw new NotImplementedException();
+            //NEED To revisit with merging of metadata repository tables
+
             //Schema schema = _datasetContext.GetById<Schema>(schemaId);
 
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configId);
+                        
 
             CreateSchemaModel createSchemaModel = new CreateSchemaModel()
             {
@@ -1577,30 +1587,41 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
         public ActionResult CreateSchema(int configId, CreateSchemaModel csm)
         {
+            //throw new NotImplementedException();
+            //NEED To revisit with merging of metadata repository tables
+
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configId);
+
+            DataElement maxSchemaRevision = dfc.Schema.OrderByDescending(o => o.SchemaRevision).FirstOrDefault();
 
             try
             {
-                if(dfc.Schemas.Any(x => x.IsPrimary) && csm.IsPrimary)
-                {
-                }
-
-
-
                 if (ModelState.IsValid)
                 {
-                    Schema schema = new Schema() {
-                        Schema_NME = csm.Name,
-                        Schema_DSC = csm.Description,
-                        IsForceMatch = csm.IsForceMatch,
-                        IsPrimary = dfc.Schemas.Any(x => x.IsPrimary) == false ? true : csm.IsPrimary,
+                    DataElement de = new DataElement()
+                    {
+                        DataElementCreate_DTM = DateTime.Now,
+                        DataElementChange_DTM = DateTime.Now,
+                        LastUpdt_DTM = DateTime.Now,
+                        DataElement_CDE = "F",
+                        DataElementCode_DSC = DataElementCode.DataFile,
+                        DataElement_NME = csm.Name,
+                        DataElement_DSC = csm.Description,
                         DatasetFileConfig = dfc,
-                        Changed_DTM =DateTime.Now,
-                        Created_DTM = DateTime.Now,
-                        DataObject_ID = csm.DataObject_ID
+                        SchemaName = csm.Name,
+                        SchemaDescription = csm.Description,
+                        SchemaIsForceMatch = csm.IsForceMatch,
+                        SchemaIsPrimary = true,
+                        SchemaRevision = (maxSchemaRevision == null) ? 0 : maxSchemaRevision.SchemaRevision + 1
                     };
 
-                    _datasetContext.Merge<Schema>(schema);
+                    dfc.Schema.Add(de);
+
+                    if (maxSchemaRevision != null)
+                    {
+                        maxSchemaRevision.SchemaIsPrimary = false;
+                    }   
+
                     _datasetContext.SaveChanges();
 
                     return RedirectToAction("Index", new { id = csm.DatasetId });
@@ -1628,16 +1649,16 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
         public ActionResult EditSchema(int configId, int schemaId)
         {
-            Schema schema = _datasetContext.GetById<Schema>(schemaId);
+            DataElement schema = _datasetContext.GetById<DataElement>(schemaId);
 
             EditSchemaModel editSchemaModel = new EditSchemaModel()
             {
-                Name = schema.Schema_NME,
-                Description = schema.Schema_DSC,
-                IsForceMatch = schema.IsForceMatch,
-                IsPrimary = schema.IsPrimary,
+                Name = schema.SchemaName,
+                Description = schema.SchemaDescription,
+                IsForceMatch = schema.SchemaIsForceMatch,
+                IsPrimary = schema.SchemaIsPrimary,
                 DatasetId = schema.DatasetFileConfig.ParentDataset.DatasetId,
-                DataObject_ID = schema.DataObject_ID 
+                DataObject_ID = schema.DataElement_ID
             };
 
             Event e = new Event();
@@ -1658,20 +1679,19 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
         public ActionResult EditSchema(int configId, int schemaId, EditSchemaModel esm)
         {
-            Schema schema = _datasetContext.GetById<Schema>(schemaId);
+            DataElement schema = _datasetContext.GetById<DataElement>(schemaId);
 
             try
             {
                 if (ModelState.IsValid)
                 {
-                    schema.Schema_NME = esm.Name;
-                    schema.Schema_DSC = esm.Description;
-                    schema.IsForceMatch = esm.IsForceMatch;
-                    schema.IsPrimary = esm.IsPrimary;
-                    schema.Changed_DTM = DateTime.Now;
-                    schema.DataObject_ID = esm.DataObject_ID;
+                    schema.SchemaName = esm.Name;
+                    schema.SchemaDescription = esm.Description;
+                    schema.SchemaIsForceMatch = esm.IsForceMatch;
+                    schema.SchemaIsPrimary = esm.IsPrimary;
+                    schema.DataElementChange_DTM = DateTime.Now;
 
-                    _datasetContext.Merge<Schema>(schema);
+                    _datasetContext.Merge(schema);
                     _datasetContext.SaveChanges();
 
                     return RedirectToAction("Index", new { id = esm.DatasetId });

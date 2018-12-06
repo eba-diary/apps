@@ -57,6 +57,125 @@
     updateBadges();
 }
 
+
+function addJoinStart() {
+    var tableOptions = "";
+    for (var i = 0; i < tableList.length; i++) {
+        tableOptions += "<option value=\"" + tableList[i] + "\">" + tableList[i] + "</option>";
+    }
+
+    var length = joins;
+    joins++;
+    var id = "Join" + length;
+
+    $("#joinContainer").append(
+        "<div class=\"rule-container\">" +
+            "<select id=\"firstTable" + id + "\" class=\"form-control ruleController tableNameController\" style= \"width: 11%; display:inline-block; \">" +
+                "<option selected disabled>Table Name</option>" +
+                tableOptions +
+            "</select>" +
+        "</div>");
+}
+
+
+
+function addJoinFromTable() {
+
+
+    var tableOptions = "";
+    for (var i = 0; i < tableList.length; i++) {
+        tableOptions += "<option value=\"" + tableList[i] + "\">" + tableList[i] + "</option>";
+    }
+
+    var length = joins;
+    joins++;
+    var id = "Join" + length;
+
+    $("#joinContainer").append("<div class=\"rule-container\">" +
+        "<select id=\"firstTable" + id + "\" class=\"form-control ruleController tableNameController\" style= \"width: 11%; display:inline-block; \">" +
+        "<option selected disabled>Table Name</option>" +
+            tableOptions +
+        "</select>" +
+        "<select class=\"form-control ruleController joinTypeController\" style= \"width: 12%; display: inline-block; \"> " +
+        "<option selected disabled>Join Type</option > " +
+        "<option value='INNER'> Inner Join</option> " +
+        "<option value='FULL'> Full Join</option> " +
+        "<option value='LEFT'> Left Join</option> " +
+        "<option value='RIGHT'> Right Join</option> " +
+        "</select>" +
+        "<select id=\"secondTable" + id + "\"class=\"form-control ruleController tableNameController\" style= \"width: 11%; display:inline-block; \">" +
+            "<option selected disabled>Table Name</option>" +
+            tableOptions +
+        "</select>" +
+
+
+        "<div class=\"btn-group pull-right rule-actions\">" +
+        "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
+        "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
+        "</button>" +
+        "</div>" +
+        "</div>");
+
+
+
+
+
+
+
+}
+
+function addOnClause() {
+
+    var tableOptions = "";
+    for (var i = 0; i < tableList.length; i++) {
+        tableOptions += "<option value=\"" + tableList[i] + "\">" + tableList[i] + "</option>";
+    }
+
+    var length = joins;
+    joins++;
+    var id = "Join" + length;
+
+    $(this).append(
+        "<div class=\"rule-container\">" +
+            "<select id=\"secondTable" + id + "\"class=\"form-control ruleController tableNameController\" style= \"width: 11%; display:inline-block; \">" +
+            "<option selected disabled>Table Name</option>" +
+                tableOptions +
+            "</select>" +
+            "<span> ON </span>" +
+            "<select id=\"colfirstTable" + id + "\" class=\"form-control ruleController\" style= \"width: 15%; display:inline-block; \" disabled>" +
+            "</select>" +
+            "<select class=\"form-control ruleController\" style= \"width: 5%; display: inline-block; \"> " +
+                "<option value='==' selected> = </option > " +
+                "<option value='!='> ≠ </option > " +
+                "<option value='<'> < </option > " +
+                "<option value='>'> > </option > " +
+                "<option value='<='> <= </option > " +
+                "<option value='>='> >= </option > " +
+            "</select>" +
+            "<select id=\"colsecondTable" + id + "\" class=\"form-control ruleController\" style= \"width: 15%; display:inline-block; \" disabled>" +
+            "</select>" +
+            "<div class=\"btn-group pull-right rule-actions\">" +
+                "<button type=\"button\" class=\"btn btn-xs btn-danger\" onclick=\"RemoveParent(this)\">" +
+                "<i class=\"glyphicon glyphicon-remove\"></i> Delete" +
+                "</button>" +
+            "</div>" +
+        "</div>");
+
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
 function addOrRemoveColumnRename(text, selected) {
     //I'm choosing triple Pipe single Underscore cause I don't think anybody would ever choose that.
     var id = "renameT" + text.replace(' ', '|||_');

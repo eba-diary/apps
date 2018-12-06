@@ -38,7 +38,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             this.Bag(x => x.DataElementDetails, (m) =>
             {
-                m.Lazy(CollectionLazy.NoLazy);
+                m.Lazy(CollectionLazy.Lazy);
                 m.Inverse(false);
                 m.Table("DataElementDetail");
                 m.Cascade(Cascade.All);
@@ -52,7 +52,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             this.Bag(x => x.DataObjects, (m) =>
             {
-                m.Lazy(CollectionLazy.NoLazy);
+                m.Lazy(CollectionLazy.Lazy);
                 m.Inverse(false);
                 m.Table("DataObject");
                 m.Cascade(Cascade.All);
@@ -64,7 +64,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 });
             }, map => map.OneToMany(a => a.Class(typeof(DataObject))));
 
-
+            this.ManyToOne(x => x.DatasetFileConfig, m =>
+            {
+                m.Column("Config_ID");
+                m.Cascade(Cascade.All);
+                m.Class(typeof(DatasetFileConfig));
+            });
         }
     }
 }

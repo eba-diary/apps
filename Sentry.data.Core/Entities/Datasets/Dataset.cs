@@ -71,7 +71,6 @@ namespace Sentry.data.Core
             }
         }
 
-
         public virtual List<DatasetScopeType> DatasetScopeType
         {
             get

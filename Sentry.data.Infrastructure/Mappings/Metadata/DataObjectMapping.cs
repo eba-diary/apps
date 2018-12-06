@@ -44,7 +44,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Bag(x => x.DataObjectDetails, (m) =>
             {
 
-                m.Lazy(CollectionLazy.NoLazy);
+                m.Lazy(CollectionLazy.Lazy);
                 m.Inverse(false);
                 m.Table("DataObjectDetail");
                 m.Cascade(Cascade.All);
@@ -58,7 +58,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             this.Bag(x => x.DataObjectFields, (m) =>
             {
-                m.Lazy(CollectionLazy.NoLazy);
+                m.Lazy(CollectionLazy.Lazy);
                 m.Inverse(false);
                 m.Table("DataObjectField");
                 m.Cascade(Cascade.All);

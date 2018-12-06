@@ -51,6 +51,11 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.ForeignKey("FK_DatasetFile_DatasetFileConfigs");
                 m.Class(typeof(DatasetFileConfig));
             });
+            this.ManyToOne(x => x.Schema, m =>
+            {
+                m.Column("Schema_ID");
+                m.Class(typeof(DataElement));
+            });
         }
 
     }

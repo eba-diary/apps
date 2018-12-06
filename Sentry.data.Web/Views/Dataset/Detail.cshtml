@@ -1,7 +1,7 @@
 ﻿@model Sentry.data.Web.BaseDatasetModel
 
 @{
-    
+    ViewBag.Title = "View Dataset Details";
     string color = Model.DatasetCategory.Color;
     string headerColor = "categoryBanner-" + Model.DatasetCategory.Color;
 }
@@ -345,6 +345,7 @@
                         </div>
                         <hr />
                         <div class="row">
+
                             <div class="col-lg-12">
                                 <h5 class="@color">Sentry Owner</h5>
                                 <h6 class="@color">@Model.SentryOwner.FullName</h6>
@@ -1167,6 +1168,9 @@
                                 $('#dataSection').show();
                                 self.DataLoading(false);
                                 self.DataTableExists(true);
+
+                                $("#datasetRowTable").dataTable().fnAdjustColumnSizing();
+
                             }).fail(function () {
                                 $('#dataSection').hide();
                                 console.log('This hide data section: 3');
@@ -1199,16 +1203,23 @@
                         self.RowCount(0);
                     }             
 
-                    self.NoColumnsReturned(false);
-                    $('#schemaSection').show();
-                    $('#schemaHR').show();
+                    if (result.rows.length == 0) {
+                        self.NoColumnsReturned(true);
+                        $('#schemaSection').hide();
+                        $('#schemaHR').hide();
+                    }
+                    else {
+                        self.NoColumnsReturned(false);
+                        $('#schemaSection').show();
+                        $('#schemaHR').show();
 
-                    $.each(result.rows, function (i, val) {
-                        var item = new SchemaRow(val);
+                        $.each(result.rows, function (i, val) {
+                            var item = new SchemaRow(val);
 
-                        self.SchemaRows().push(item);
-                    });
-                    self.SchemaRows.notifySubscribers();
+                            self.SchemaRows().push(item);
+                        });
+                        self.SchemaRows.notifySubscribers();
+                    }
                     $('#panelSpinner').hide();
                 }).fail(function () {
                     self.RowCount(0);

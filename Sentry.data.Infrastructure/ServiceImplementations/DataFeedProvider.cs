@@ -111,6 +111,7 @@ namespace Sentry.data.Infrastructure
         public IList<DataFeedItem> SentryEvents()
         {
             List<DataFeedItem> items = new List<DataFeedItem>();
+            var events = Query<Event>().Where(x => x.Dataset != null && x.EventType.Description == "Created Dataset").OrderByDescending(x => x.TimeCreated).Take(50);
 
             var dsEvents = Query<Event>().Where(x => x.Dataset != null && (x.EventType.Description == "Created Dataset")).OrderByDescending(x => x.TimeCreated).Take(50);
 

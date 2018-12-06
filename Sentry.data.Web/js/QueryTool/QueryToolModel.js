@@ -23,8 +23,6 @@
 
         return 'dataset' + id;
     });
-
-
 }
 
 function Config(id, data) {
@@ -108,10 +106,55 @@ function Schema(id, data) {
     this.hasTable = ko.observable(data.HasTable);
 }
 
+function JoinPanel() {
+    this.PrimaryTableName = ko.observable();
+    this.Placeholder = ko.observable('This is a placeholder');
+
+    this.Joins = ko.observableArray([new Join()]);
+
+    this.RemoveJoin = function (item) {
+        this.Joins.remove(item);
+        this.Joins.notifySubscribers();
+    }
+
+    this.ListofTableNames = ko.computed(function () {
+        var tableOptions = [];
+
+        for (var i = 0; i < tableList.length; i++) {
+            tableOptions.push(tableList[i]);
+        }
+        return tableOptions;
+    });
+
+}
+
+function Join() {
+    this.JoinType = ko.observable();
+    this.TableName = ko.observable();
+
+    this.OnStatements = ko.observableArray([new OnStatement()]);
+
+    this.RemoveOn = function (item) {
+        this.OnStatements.remove(item);
+        this.OnStatements.notifySubscribers();
+    }
+}
+
+function OnStatement() {
+
+    this.ColumnOne = ko.observable();
+    this.Operand = ko.observable();
+    this.TableTwo = ko.observable();
+    this.ColumnTwo = ko.observable();
+    this.Conditional = ko.observable();
+}
+
 function ViewModel() {
     var self = this;
 
     self.Datasets = ko.observableArray();
+
+    self.Join = ko.observable([new JoinPanel()]);
 
     self.Columns = ko.observableArray();
     self.SelectedColumns = ko.observableArray();
@@ -311,7 +354,13 @@ function SelectColumns(rawQuery) {
 function FromColumns(rawQuery) {
     var joinRules = $('#joinContainer').children('.rule-container').children('.ruleController').length / 6;
 
-    rawQuery += " FROM " + firstTableName;
+    var firstNameSet = false;
+
+
+    if (joinRules === 0) {
+        rawQuery += " FROM " + firstTableName;
+        firstNameSet = true;
+    }
 
     for (var i = 0; i < joinRules; i++) {
 
@@ -321,6 +370,12 @@ function FromColumns(rawQuery) {
         var tableOneCol = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 3].value;
         var operand = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 4].value;
         var tableTwoCol = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 5].value;
+
+        if (firstNameSet === false) {
+            rawQuery += " FROM " + tableOne;
+            firstNameSet = true;
+        }
+
 
         var OnStatement = tableOneCol + ' ' + operand + ' ' + tableTwoCol;
 

@@ -16,6 +16,5 @@
     [Size_AMT] BIGINT NULL, 
     [Schema_ID] INT NULL, 
     CONSTRAINT [FK_DatasetFile_Dataset] FOREIGN KEY (Dataset_ID) REFERENCES Dataset(Dataset_ID), 
-    CONSTRAINT [FK_DatasetFile_DatasetFileConfigs] FOREIGN KEY ([DatasetFileConfig_ID]) REFERENCES [DatasetFileConfigs]([Config_ID]),
-	CONSTRAINT [FK_DatasetFile_Schema] FOREIGN KEY ([Schema_ID]) REFERENCES [Hive_Schema]([Schema_ID])
+    CONSTRAINT [FK_DatasetFile_DatasetFileConfigs] FOREIGN KEY ([DatasetFileConfig_ID]) REFERENCES [DatasetFileConfigs]([Config_ID])
 )

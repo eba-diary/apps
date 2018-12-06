@@ -10,7 +10,8 @@ namespace Sentry.data.Core.Entities.Metadata
     {
         public DataElement()
         {
-
+            DataElementDetails = new List<DataElementDetail>();
+            DataObjects = new List<DataObject>();
         }
 
         public virtual IList<DataElementDetail> DataElementDetails { get; set; }
@@ -30,6 +31,134 @@ namespace Sentry.data.Core.Entities.Metadata
         public virtual DateTime LastUpdt_DTM { get; set; }
         public virtual int DataAsset_ID{ get; set; }
         public virtual string BusElementKey { get; set; }
+        public virtual DatasetFileConfig DatasetFileConfig { get; set; }
+        public virtual string SchemaName
+        {
+            get
+            {
+                return GetElementDetail("Schema_NME").DataElementDetailType_VAL;
+            }
+            set
+            {
+                SetDataElementDetailValue("Schema_NME", value);
+            }
+        }
+        public virtual string SchemaDescription
+        {
+            get
+            {
+                return GetElementDetail("Schema_DSC").DataElementDetailType_VAL;
+            }
+            set
+            {
+                SetDataElementDetailValue("Schema_DSC", value);
+            }
+        }
+        public virtual string FileFormat
+        {
+            get
+            {
+                return GetElementDetail("FileFormat_TYP").DataElementDetailType_VAL;
+            }
+            set
+            {
+                SetDataElementDetailValue("FileFormat_TYP", value);
+            }
+        }
+        public virtual int SchemaRevision
+        {
+            get
+            {
+                return Int32.Parse(GetElementDetail("Revision_CDE").DataElementDetailType_VAL);
+            }
+            set
+            {
+                SetDataElementDetailValue("Revision_CDE", value.ToString());
+            }
+        }
+        public virtual Boolean SchemaIsForceMatch
+        {
+            get
+            {
+                return Boolean.Parse(GetElementDetail("ForceMatch_IND").DataElementDetailType_VAL);
+            }
+            set
+            {
+                SetDataElementDetailValue("ForceMatch_IND", (value) ? "True" : "False");
+            }
+        }
+        public virtual Boolean SchemaIsPrimary
+        {
+            get
+            {
+                string a = GetElementDetail("Primary_IND").DataElementDetailType_VAL;
+                Boolean x = Boolean.Parse(a);
+                //Boolean.Parse(GetElementDetail("Primary_IND").DataElementDetailType_VAL)
+                return x;
+            }
+            set
+            {
+                SetDataElementDetailValue("Primary_IND", (value) ? "True" : "False");
+            }
+        }
+        public virtual string HiveTable
+        {
+            get
+            {
+                DataElementDetail detail = GetElementDetail("HiveTable_NME");
+                return (detail == null) ? null : detail.DataElementDetailType_VAL;
+            }
+            set
+            {
+                SetDataElementDetailValue("HiveTable_NME", value);
+            }
+        }
+        public virtual string HiveDatabase
+        {
+            get
+            {
+                DataElementDetail detail = GetElementDetail("HiveDatabase_NME");
+                return (detail == null) ? null : detail.DataElementDetailType_VAL;
+            }
+            set
+            {
+                SetDataElementDetailValue("HiveDatabase_NME", value);
+            }
+        }
+
+        #region DataElementDetailHelpers
+        private DataElementDetail GetElementDetail(string typeCDE)
+        {
+            return DataElementDetails?.Where(w => w.DataElementDetailType_CDE == typeCDE).SingleOrDefault();  
+        }
+
+        private void SetDataElementDetailValue(string typeCDE, string val)
+        {
+            DataElementDetail item = GetElementDetail(typeCDE);
+            if (item != null)
+            {
+                item.DataElementDetailType_VAL = val;
+            }
+            else
+            {
+                AddDataElementDetail(typeCDE, val);
+            }
+        }
+
+        private void AddDataElementDetail(string typeCDE, string val)
+        {
+            DataElementDetails.Add(new DataElementDetail()
+            {
+                DataElement = this,
+                DataElementDetailCreate_DTM = DateTime.Now,
+                DataElementDetailChange_DTM = DateTime.Now,
+                DataElementDetailType_CDE = typeCDE,
+                DataElementDetailType_VAL = val,
+                LastUpdt_DTM = DateTime.Now
+            });
+        }
+        #endregion 
+
     }
 
     public class DataElementCode

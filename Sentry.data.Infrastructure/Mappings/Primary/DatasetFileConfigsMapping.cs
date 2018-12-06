@@ -26,8 +26,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             this.Property((x) => x.FileTypeId, (m) => m.Column("FileType_ID"));
             this.Property((x) => x.Name, (m) => m.Column("Config_NME"));
-            this.Property((x) => x.Description, (m) => m.Column("Config_DSC"));
-            this.Property((x) => x.DataElement_ID, (m) => m.Column("DataElement_ID"));
+            this.Property((x) => x.Description, (m) => m.Column("Config_DSC"));            
 
             this.ManyToOne(x => x.ParentDataset, m =>
             {
@@ -79,22 +78,18 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 });
             }, map => map.OneToMany(a => a.Class(typeof(DatasetFile))));
 
-
-            this.Bag((x) => x.Schemas, (m) =>
+            this.Bag(x => x.Schema, (m) =>
             {
-                m.Lazy(CollectionLazy.Lazy);
+                m.Lazy(CollectionLazy.NoLazy);
                 m.Inverse(true);
-                m.Table("Hive_Schema");
+                m.Table("DataElement");
                 m.Cascade(Cascade.All);
                 m.Cache(c => c.Usage(CacheUsage.ReadWrite));
                 m.Key((k) =>
                 {
                     k.Column("Config_ID");
-                    k.ForeignKey("FK_Schema_DatasetFileConfigs");
                 });
-            }, map => map.OneToMany(a => a.Class(typeof(Schema)))); 
- 
-
+            }, map => map.OneToMany(a => a.Class(typeof(DataElement))));
         }
     }
 }

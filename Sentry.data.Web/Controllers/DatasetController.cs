@@ -129,6 +129,9 @@ namespace Sentry.data.Web.Controllers
                     Dataset ds = CreateDatasetFromModel(cdm);
                     ds = _datasetContext.Merge<Dataset>(ds);
 
+                    List<DataElement> deList = new List<DataElement>();
+                    DataElement de = CreateNewDataElement(cdm);
+
                     //Create Generic Data File Config for Dataset            
                     DatasetFileConfig dfc = new DatasetFileConfig()
                     {
@@ -144,6 +147,10 @@ namespace Sentry.data.Web.Controllers
                         DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(cdm.DatasetScopeTypeID),
                         FileExtension = _datasetContext.GetById<FileExtension>(cdm.FileExtensionID)
                     };
+
+                    de.DatasetFileConfig = dfc;
+                    deList.Add(de);
+                    dfc.Schema = deList;
 
                     List<RetrieverJob> jobList =  new List<RetrieverJob>();
 
@@ -211,8 +218,28 @@ namespace Sentry.data.Web.Controllers
                 tagsToReturn.Add(_datasetContext.Tags.Where(x => x.TagId == json[i]).FirstOrDefault().GetSearchableTag());
             }
             cdm.TagString = new JavaScriptSerializer().Serialize(tagsToReturn);
-
             return View(cdm);
+        }
+
+        private DataElement CreateNewDataElement(CreateDatasetModel cdm)
+        {
+            DataElement de = new DataElement()
+            {
+                DataElementCreate_DTM = DateTime.Now,
+                DataElementChange_DTM = DateTime.Now,
+                DataElement_CDE = "F",
+                DataElement_DSC = DataElementCode.DataFile,
+                DataElement_NME = cdm.ConfigFileName,
+                LastUpdt_DTM = DateTime.Now,
+                SchemaIsPrimary = true,
+                SchemaDescription = cdm.ConfigFileDesc,
+                SchemaName = cdm.ConfigFileName,
+                SchemaRevision = 1,
+                SchemaIsForceMatch = false,
+                FileFormat = _datasetContext.GetById<FileExtension>(cdm.FileExtensionID).Name.ToUpper()
+            };
+
+            return de;
         }
 
         [AuthorizeByPermission(PermissionNames.DatasetEdit)]
@@ -494,8 +521,6 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult Detail(string objectType, int id)
         {
-            
-
             Dataset ds = _datasetContext.GetById(id);
 
             BaseDatasetModel bdm = new BaseDatasetModel(ds, _associateInfoProvider, _datasetContext);

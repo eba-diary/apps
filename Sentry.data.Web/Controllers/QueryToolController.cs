@@ -573,30 +573,29 @@ namespace Sentry.data.Web.Controllers
                     }
                     qd.extensions = ds.DatasetFiles.Where(x => x.DatasetFileConfig.ConfigId == item.ConfigId).Select(x => Utilities.GetFileExtension(x.FileName)).Distinct().ToList();
                     qd.description = item.Description;
-                    qd.HasSchema = item.Schemas.Any();
+                    qd.HasSchema = item.Schema.Any();
 
                     qd.IsPowerUser = _userService.GetCurrentUser().CanQueryToolPowerUser;
-                    qd.HasQueryableSchema = item.Schemas.Where(w => w.HiveTables.Any()).Any();
+                    qd.HasQueryableSchema = item.Schema.Where(w => w.HiveTable != null).Any();
 
-                    if (item.Schemas.Any())
+                    if (qd.HasSchema)
                     {
                         List<QueryableSchema> qslist = new List<QueryableSchema>();
-                        foreach (var sch in item.Schemas)
+                        foreach (var sch in item.Schema)
                         {
                             QueryableSchema qs = new QueryableSchema()
                             {
-                                SchemaName = sch.Schema_NME,
-                                SchemaDSC = sch.Schema_DSC,
-                                SchemaID = sch.Schema_ID,
-                                RevisionID = sch.Revision_ID
+                                SchemaName = sch.SchemaName,
+                                SchemaDSC = sch.SchemaDescription,
+                                SchemaID = sch.DataElement_ID,
+                                RevisionID = sch.SchemaRevision
                             };
 
                             //This is assuming only a single hive table per schema revision.
-                            if (sch.HiveTables.Any())
+                            if (sch.HiveTable != null)
                             {
-                                HiveTable table = sch.HiveTables.Where(w => w.IsPrimary).FirstOrDefault();
-                                qs.HiveDatabase = table.HiveDatabase_NME;
-                                qs.HiveTable = table.Hive_NME;
+                                qs.HiveDatabase = sch.HiveDatabase;
+                                qs.HiveTable = sch.HiveTable;
                                 qs.HasTable = true;
                             }
                             else
@@ -649,118 +648,118 @@ namespace Sentry.data.Web.Controllers
             return lr;
         }
 
-        [HttpGet]
-        [Route("Get")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
-        public async Task<IHttpActionResult> AddFileToHiveTable(int SessionID, string s3Key, int configID)
-        {
-            //Make sure that everything on that config is loaded into the Metadata Repository
-            IHttpActionResult stepOne = await (CreateDataElementandObject(configID));
+        //[HttpGet]
+        //[Route("Get")]
+        //[AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        //public async Task<IHttpActionResult> AddFileToHiveTable(int SessionID, string s3Key, int configID)
+        //{
+        //    //Make sure that everything on that config is loaded into the Metadata Repository
+        //    IHttpActionResult stepOne = await (CreateDataElementandObject(configID));
 
-            if (stepOne.GetType() != typeof(OkResult))
-            {
-                return BadRequest(stepOne.ToString());
-            }
+        //    if (stepOne.GetType() != typeof(OkResult))
+        //    {
+        //        return BadRequest(stepOne.ToString());
+        //    }
 
-            //Check the schema of the file against the metadata repository
-            IHttpActionResult stepTwo = await (CheckSchema(SessionID, s3Key, configID));
+        //    //Check the schema of the file against the metadata repository
+        //    IHttpActionResult stepTwo = await (CheckSchema(SessionID, s3Key, configID));
 
-            if (stepTwo.GetType() != typeof(OkNegotiatedContentResult<String>))
-            {
-                var result = stepTwo as BadRequestErrorMessageResult;
-                return BadRequest(result.Message);
-            }
+        //    if (stepTwo.GetType() != typeof(OkNegotiatedContentResult<String>))
+        //    {
+        //        var result = stepTwo as BadRequestErrorMessageResult;
+        //        return BadRequest(result.Message);
+        //    }
 
-            var a = stepTwo as OkNegotiatedContentResult<String>;
-            var guid = a.Content;
+        //    var a = stepTwo as OkNegotiatedContentResult<String>;
+        //    var guid = a.Content;
 
-            //Check to see if a Hive Table Exists for a given Config
-            IHttpActionResult stepThree = await (CreateHiveTable(SessionID, configID));
+        //    //Check to see if a Hive Table Exists for a given Config
+        //    IHttpActionResult stepThree = await (CreateHiveTable(SessionID, configID));
 
-            if (stepThree.GetType() != typeof(OkNegotiatedContentResult<String>))
-            {
-                return BadRequest(stepThree.ToString());
-            }
+        //    if (stepThree.GetType() != typeof(OkNegotiatedContentResult<String>))
+        //    {
+        //        return BadRequest(stepThree.ToString());
+        //    }
 
-            var b = stepThree as OkNegotiatedContentResult<String>;
-            var hiveTableName = b.Content;
+        //    var b = stepThree as OkNegotiatedContentResult<String>;
+        //    var hiveTableName = b.Content;
 
-            IHttpActionResult stepFour = await (CreateParquet(SessionID, guid, configID, true));
+        //    IHttpActionResult stepFour = await (CreateParquet(SessionID, guid, configID, true));
 
-            if (stepFour.GetType() != typeof(OkNegotiatedContentResult<String>))
-            {
-                return BadRequest(stepFour.ToString());
-            }
+        //    if (stepFour.GetType() != typeof(OkNegotiatedContentResult<String>))
+        //    {
+        //        return BadRequest(stepFour.ToString());
+        //    }
 
-            var c = stepFour as OkNegotiatedContentResult<String>;
-            var dropLocation = c.Content;
+        //    var c = stepFour as OkNegotiatedContentResult<String>;
+        //    var dropLocation = c.Content;
 
-            return Ok("Hive Table: " + hiveTableName + " - Drop Location: " + dropLocation);
-        }
+        //    return Ok("Hive Table: " + hiveTableName + " - Drop Location: " + dropLocation);
+        //}
 
 
-        /// <summary>
-        /// S3KEY COULD BE A FILE OR STAR PREFIX IN S3.
-        /// We need the Session ID to identify where that DataFrame is and the ConfigID to know where the Hive table is located and its Schema in the Metadata Repository.
-        /// </summary>
-        /// <param name="SessionID"></param>
-        /// <param name="s3Key"></param>
-        /// <param name="configID"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("Get")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
-        public async Task<IHttpActionResult> CheckSchema(int SessionID, string s3Key, int configID)
-        {
-            Guid guid = Guid.NewGuid();
+        ///// <summary>
+        ///// S3KEY COULD BE A FILE OR STAR PREFIX IN S3.
+        ///// We need the Session ID to identify where that DataFrame is and the ConfigID to know where the Hive table is located and its Schema in the Metadata Repository.
+        ///// </summary>
+        ///// <param name="SessionID"></param>
+        ///// <param name="s3Key"></param>
+        ///// <param name="configID"></param>
+        ///// <returns></returns>
+        //[HttpGet]
+        //[Route("Get")]
+        //[AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        //public async Task<IHttpActionResult> CheckSchema(int SessionID, string s3Key, int configID)
+        //{
+        //    Guid guid = Guid.NewGuid();
 
-            try
-            {                
-                IHttpActionResult response = await (SendCode(SessionID, _livy.GetDataFrameFromS3Key(guid, s3Key, configID)));
+        //    try
+        //    {                
+        //        IHttpActionResult response = await (SendCode(SessionID, _livy.GetDataFrameFromS3Key(guid, s3Key, configID)));
 
-                if (response.GetType() == typeof(OkNegotiatedContentResult<String>))
-                {
-                    //We can save this Schema back to the Database easily now that we have it.
-                    var a = response as OkNegotiatedContentResult<String>;
-                    LivyReply lr = JsonConvert.DeserializeObject<LivyReply>(a.Content);
+        //        if (response.GetType() == typeof(OkNegotiatedContentResult<String>))
+        //        {
+        //            //We can save this Schema back to the Database easily now that we have it.
+        //            var a = response as OkNegotiatedContentResult<String>;
+        //            LivyReply lr = JsonConvert.DeserializeObject<LivyReply>(a.Content);
 
-                    lr = await WaitForLivyReply(SessionID, lr.id);
+        //            lr = await WaitForLivyReply(SessionID, lr.id);
 
-                    DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
-                    var dataObjectID = _datasetContext.Schemas.Where(x => x.DatasetFileConfig.ConfigId == dfc.ConfigId).FirstOrDefault().DataObject_ID;
-                    DataObject dataObject = _datasetContext.GetById<DataObject>(dataObjectID);
+        //            DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
+        //            var dataObjectID = _datasetContext.Schemas.Where(x => x.DatasetFileConfig.ConfigId == dfc.ConfigId).FirstOrDefault().DataObject_ID;
+        //            DataObject dataObject = _datasetContext.GetById<DataObject>(dataObjectID);
 
-                    String output = "";
-                    if (dataObject.DataObjectFields.Any())
-                    {
-                        output = _livy.CompareSchemas(_livy.GetHiveColumns(lr), dataObject.DataObjectFields);
-                    }
-                    else
-                    {
-                        CreateDataObjectFields(configID, _livy.GetHiveColumns(lr));
-                    }
+        //            String output = "";
+        //            if (dataObject.DataObjectFields.Any())
+        //            {
+        //                output = _livy.CompareSchemas(_livy.GetHiveColumns(lr), dataObject.DataObjectFields);
+        //            }
+        //            else
+        //            {
+        //                CreateDataObjectFields(configID, _livy.GetHiveColumns(lr));
+        //            }
 
-                    if (output == "")
-                    {
-                        //If schema is the same happily give back the Ok and Guid so that the parquet can be created.
-                        return Ok("tmp_" + guid.ToString("N"));
-                    }
-                    else
-                    {
-                        //If the schema is not the same there is a lot of work that needs to be done.
-                        return BadRequest(output);
-                    }
-                }
-                else
-                {
-                    return response;
-                }
-            }
-            catch (Exception ex)
-            {
-                return InternalServerError();
-            }
-        }
+        //            if (output == "")
+        //            {
+        //                //If schema is the same happily give back the Ok and Guid so that the parquet can be created.
+        //                return Ok("tmp_" + guid.ToString("N"));
+        //            }
+        //            else
+        //            {
+        //                //If the schema is not the same there is a lot of work that needs to be done.
+        //                return BadRequest(output);
+        //            }
+        //        }
+        //        else
+        //        {
+        //            return response;
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return InternalServerError();
+        //    }
+        //}
 
         [HttpGet]
         [Route("Get")]
@@ -1031,152 +1030,152 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        [HttpGet]
-        [Route("Get")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
-        public async Task<IHttpActionResult> CreateDataElementandObject(int configID)
-        {
-            /*  DATA ELEMENT CREATION:
-            *    THIS CORRELATES TO A DATASET
-            */
-            DataElement de = null;
-            try
-            {
-                DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
+        //[HttpGet]
+        //[Route("Get")]
+        //[AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        //public async Task<IHttpActionResult> CreateDataElementandObject(int configID)
+        //{
+        //    /*  DATA ELEMENT CREATION:
+        //    *    THIS CORRELATES TO A DATASET
+        //    */
+        //    DataElement de = null;
+        //    try
+        //    {
+        //        DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
 
-                if (dfc.DataElement_ID != 0)
-                {
-                    de = _datasetContext.GetById<DataElement>(dfc.DataElement_ID);
-                }
-                else
-                {
-                    de = new DataElement()
-                    {
-                        MetadataAsset = null,
-                        DataElement_NME = dfc.Name,
-                        DataElement_DSC = dfc.Description,
-                        DataElement_CDE = "F",
-                        DataElementCode_DSC = "Data File",
-                        DataElementCreate_DTM = DateTime.Now,
-                        DataElementChange_DTM = DateTime.Now,
-                        LastUpdt_DTM = DateTime.Now
-                    };
+        //        if (dfc.DataElement != null)
+        //        {
+        //            de = dfc.DataElement;
+        //        }
+        //        else
+        //        {
+        //            de = new DataElement()
+        //            {
+        //                MetadataAsset = null,
+        //                DataElement_NME = dfc.Name,
+        //                DataElement_DSC = dfc.Description,
+        //                DataElement_CDE = "F",
+        //                DataElementCode_DSC = "Data File",
+        //                DataElementCreate_DTM = DateTime.Now,
+        //                DataElementChange_DTM = DateTime.Now,
+        //                LastUpdt_DTM = DateTime.Now
+        //            };
 
-                    _datasetContext.Add<DataElement>(de);
-                    _datasetContext.SaveChanges();
-                    de = _datasetContext.DataElements.FirstOrDefault(x => x.DataElement_NME == dfc.Name);
+        //            _datasetContext.Add<DataElement>(de);
+        //            _datasetContext.SaveChanges();
+        //            de = _datasetContext.DataElements.FirstOrDefault(x => x.DataElement_NME == dfc.Name);
 
-                    dfc.DataElement_ID = de.DataElement_ID;
-                    _datasetContext.Merge<DatasetFileConfig>(dfc);
-                    _datasetContext.SaveChanges();
-
-
-                    /*  DATA ELEMENT DETAIL CREATION:
-                     *   THESE ARE FIELDS THAT COULD BE STORED ON THE CONFIG
-                     */
-
-                    de.DataElementDetails = new List<DataElementDetail>();
-
-                    de.DataElementDetails.Add(new DataElementDetail()
-                    {
-                        DataElement = de,
-                        DataElementDetailType_CDE = "FileFormat_TYP",
-                        DataElementDetailType_VAL = "json",// ALREADY STORED ON THE CONFIG
-                        DataElementDetailCreate_DTM = DateTime.Now,
-                        DataElementDetailChange_DTM = DateTime.Now,
-                        LastUpdt_DTM = DateTime.Now
-                    });
-
-                    de.DataElementDetails.Add(new DataElementDetail()
-                    {
-                        DataElement = de,
-                        DataElementDetailType_CDE = "FileDelimiter_TYP",
-                        DataElementDetailType_VAL = ",",
-                        DataElementDetailCreate_DTM = DateTime.Now,
-                        DataElementDetailChange_DTM = DateTime.Now,
-                        LastUpdt_DTM = DateTime.Now
-                    });
-
-                    _datasetContext.Merge<DataElement>(de);
-                    _datasetContext.SaveChanges();
-
-                }
-            }catch(Exception ex)
-            {
-                return BadRequest();
-            }
+        //            dfc.DataElement = de;
+        //            _datasetContext.Merge<DatasetFileConfig>(dfc);
+        //            _datasetContext.SaveChanges();
 
 
-            /*  DATA OBJECT CREATION:
-            *    ESSENTIALLY THIS IS A SCHEMA.  THIS CORRELATES TO A DATA FILE CONFIG
-            */
-            try
-            {
-                DatasetFileConfig dfc2 = _datasetContext.GetById<DatasetFileConfig>(configID);
+        //            /*  DATA ELEMENT DETAIL CREATION:
+        //             *   THESE ARE FIELDS THAT COULD BE STORED ON THE CONFIG
+        //             */
 
-                Schema schema = dfc2.Schemas.OrderByDescending(x => x.Revision_ID).FirstOrDefault();
+        //            de.DataElementDetails = new List<DataElementDetail>();
 
-                DataObject dataObject;
+        //            de.DataElementDetails.Add(new DataElementDetail()
+        //            {
+        //                DataElement = de,
+        //                DataElementDetailType_CDE = "FileFormat_TYP",
+        //                DataElementDetailType_VAL = "json",// ALREADY STORED ON THE CONFIG
+        //                DataElementDetailCreate_DTM = DateTime.Now,
+        //                DataElementDetailChange_DTM = DateTime.Now,
+        //                LastUpdt_DTM = DateTime.Now
+        //            });
 
-                if (schema.DataObject_ID != 0)
-                {
-                    dataObject = _datasetContext.GetById<DataObject>(schema.DataObject_ID);
-                }
-                else
-                {
-                    dataObject = new DataObject()
-                    {
-                        DataElement = de,
-                        DataElement_ID = de.DataElement_ID,
-                        DataObject_NME = schema.Schema_NME,
-                        DataObject_DSC = schema.Schema_DSC,
-                        DataObject_CDE = "C",  //Duplicate of Data Element Detail.
-                        DataObjectCode_DSC = "CSV File",  //Duplicate of Data Element Detail. ALREADY STORED ON THE CONFIG.
-                        DataObjectCreate_DTM = DateTime.Now,
-                        DataObjectChange_DTM = DateTime.Now,
-                        LastUpdt_DTM = DateTime.Now
-                    };
+        //            de.DataElementDetails.Add(new DataElementDetail()
+        //            {
+        //                DataElement = de,
+        //                DataElementDetailType_CDE = "FileDelimiter_TYP",
+        //                DataElementDetailType_VAL = ",",
+        //                DataElementDetailCreate_DTM = DateTime.Now,
+        //                DataElementDetailChange_DTM = DateTime.Now,
+        //                LastUpdt_DTM = DateTime.Now
+        //            });
 
-                    _datasetContext.Add<DataObject>(dataObject);
-                    _datasetContext.SaveChanges();
-                    dataObject = _datasetContext.DataObjects.FirstOrDefault(x => x.DataElement == de && x.DataObject_NME == schema.Schema_NME);
+        //            _datasetContext.Merge<DataElement>(de);
+        //            _datasetContext.SaveChanges();
 
-                    //Cast the ID onto the Dataset File Config           
-                    schema.DataObject_ID = dataObject.DataObject_ID;
-                    _datasetContext.Merge<Schema>(schema);
-                    _datasetContext.SaveChanges();
+        //        }
+        //    }catch(Exception ex)
+        //    {
+        //        return BadRequest();
+        //    }
 
 
-                    /*  DATA OBJECT DETAIL CREATION:
-                     *   THESE ARE FIELDS THAT COULD BE STORED ON THE CONFIG
-                     */
+        //    /*  DATA OBJECT CREATION:
+        //    *    ESSENTIALLY THIS IS A SCHEMA.  THIS CORRELATES TO A DATA FILE CONFIG
+        //    */
+        //    try
+        //    {
+        //        DatasetFileConfig dfc2 = _datasetContext.GetById<DatasetFileConfig>(configID);
 
-                    List<DataObjectDetail> dataObjectDetails = new List<DataObjectDetail>();
+        //        Schema schema = dfc2.Schemas.OrderByDescending(x => x.Revision_ID).FirstOrDefault();
 
-                    DataObjectDetail dod = new DataObjectDetail()
-                    {
-                        DataObject = dataObject,
-                        DataObjectDetailType_CDE = "HeaderRow_IND",
-                        DataObjectDetailType_VAL = "Y",
-                        DataObjectDetailCreate_DTM = DateTime.Now,
-                        DataObjectDetailChange_DTM = DateTime.Now,
-                        LastUpdt_DTM = DateTime.Now
-                    };
-                    dataObjectDetails.Add(dod);
+        //        DataObject dataObject;
 
-                    dataObject.DataObjectDetails = dataObjectDetails;
+        //        if (schema.DataObject_ID != 0)
+        //        {
+        //            dataObject = _datasetContext.GetById<DataObject>(schema.DataObject_ID);
+        //        }
+        //        else
+        //        {
+        //            dataObject = new DataObject()
+        //            {
+        //                DataElement = de,
+        //                DataElement_ID = de.DataElement_ID,
+        //                DataObject_NME = schema.Schema_NME,
+        //                DataObject_DSC = schema.Schema_DSC,
+        //                DataObject_CDE = "C",  //Duplicate of Data Element Detail.
+        //                DataObjectCode_DSC = "CSV File",  //Duplicate of Data Element Detail. ALREADY STORED ON THE CONFIG.
+        //                DataObjectCreate_DTM = DateTime.Now,
+        //                DataObjectChange_DTM = DateTime.Now,
+        //                LastUpdt_DTM = DateTime.Now
+        //            };
 
-                    _datasetContext.Add<DataObject>(dataObject);
-                    _datasetContext.SaveChanges();
-                }
-            }
-            catch (Exception ex)
-            {
-                return BadRequest();
-            }
+        //            _datasetContext.Add<DataObject>(dataObject);
+        //            _datasetContext.SaveChanges();
+        //            dataObject = _datasetContext.DataObjects.FirstOrDefault(x => x.DataElement == de && x.DataObject_NME == schema.Schema_NME);
 
-            return Ok();
-        }
+        //            //Cast the ID onto the Dataset File Config           
+        //            schema.DataObject_ID = dataObject.DataObject_ID;
+        //            _datasetContext.Merge<Schema>(schema);
+        //            _datasetContext.SaveChanges();
+
+
+        //            /*  DATA OBJECT DETAIL CREATION:
+        //             *   THESE ARE FIELDS THAT COULD BE STORED ON THE CONFIG
+        //             */
+
+        //            List<DataObjectDetail> dataObjectDetails = new List<DataObjectDetail>();
+
+        //            DataObjectDetail dod = new DataObjectDetail()
+        //            {
+        //                DataObject = dataObject,
+        //                DataObjectDetailType_CDE = "HeaderRow_IND",
+        //                DataObjectDetailType_VAL = "Y",
+        //                DataObjectDetailCreate_DTM = DateTime.Now,
+        //                DataObjectDetailChange_DTM = DateTime.Now,
+        //                LastUpdt_DTM = DateTime.Now
+        //            };
+        //            dataObjectDetails.Add(dod);
+
+        //            dataObject.DataObjectDetails = dataObjectDetails;
+
+        //            _datasetContext.Add<DataObject>(dataObject);
+        //            _datasetContext.SaveChanges();
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest();
+        //    }
+
+        //    return Ok();
+        //}
 
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         private void CreateDataObjectFields(int configID, List<HiveColumn> hiveColumns)

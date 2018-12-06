@@ -309,22 +309,22 @@
                             <hr />
                             <h4 class="@color">Schemas (Sorted by Most Recent)</h4>
                             <hr />
-                            foreach (var schema in item.Schemas.OrderByDescending(x => x.Created_DTM))
+                            foreach (var schema in item.Schemas.OrderByDescending(x => x.DataElementCreate_DTM))
                             {
                                 <div class="retJob">
                                     <div class="jobHeader categoryBanner-@color">
-                                        <h6>@schema.Schema_NME</h6>
+                                        <h6>@schema.SchemaName</h6>
                                         <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
                                         
-                                        @if (schema.IsPrimary)
+                                        @if (schema.SchemaIsPrimary)
                                         {
                                             <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-ok"></span> This is the Primary Schema</span>
                                         }    
-                                        @if (schema.HiveTables.Any(x => x.IsPrimary))
+                                        @*@if (schema.HiveTable.Any(x => x.IsPrimary))
                                         {
                                             <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-ok"></span> This Schema has the Primary Hive Table</span>
-                                        }
-                                        @if (schema.IsForceMatch)
+                                        }*@
+                                        @if (schema.SchemaIsForceMatch)
                                         {
                                             <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-ok"></span> Force Match</span>
                                         }
@@ -335,26 +335,26 @@
                                     </div>
                                     <div class="jobContainer" style="display:none;">
 
-                                        <p>@schema.Schema_DSC</p>
+                                        <p>@schema.SchemaDescription</p>
 
-                                        @if(schema.DataObject_ID == 0)
+                                        @if(schema.DataObjects.Count() == 0)
                                         {
                                             <p>This schema is not currently tied to a Data Object in the Metadata Repoistory and thus you cannot update it's fields or columns.</p>
                                         }
                                         else
                                         {
-                                             <p>This schema has a Data Object ID of @schema.DataObject_ID.</p>
+                                             <p>This schema has a Data Element ID of @schema.DataElement_ID.</p>
                                         }
 
-                                        <p>Created on: @schema.Created_DTM</p>
-                                        <p>Last Modified on: @schema.Changed_DTM</p>
+                                        <p>Created on: @schema.DataElementCreate_DTM</p>
+                                        <p>Last Modified on: @schema.DataElementChange_DTM</p>
 
-                                        @if (schema.IsForceMatch)
+                                        @if (schema.SchemaIsForceMatch)
                                         {
                                             <p>This schema is currently set to force match for this data file config.</p>
                                         }
 
-                                        @if (schema.HiveTables.Any())
+                                        @*@if (schema.HiveTables.Any())
                                         {
                                             <br />
                                             <h4 class="@color">Hive Tables</h4>
@@ -379,14 +379,18 @@
                                                 </div>
                                             }
                                             <hr />
-                                        }
+                                        }*@
                                             <p>
-                                                <a class="backToList" href="/Config/@item.ConfigId/Schema/@schema.Schema_ID/Edit"><span class="glyphicon glyphicon-edit"></span>  Edit Schema Metadata</a>
+                                                <a class="backToList" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Edit"><span class="glyphicon glyphicon-edit"></span>  Edit Schema Metadata</a>
                                                 <br/>
 
-                                                @if(schema.DataObject_ID != 0)
+                                                @if(schema.DataObjects.Count() > 0)
                                                 {
-                                                <a class="backToList" href="/Config/@item.ConfigId/Schema/@schema.Schema_ID/Fields"><span class="glyphicon glyphicon-edit"></span>  Edit Schema's Columns and Fields</a>
+                                                <a class="backToList" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Fields"><span class="glyphicon glyphicon-edit"></span>  Edit Schema's Columns and Fields</a>
+                                                }
+                                                @if (schema.DataObjects.Count() == 0)
+                                                {
+                                                    <a class="backToList" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Fields"><span class="glyphicon glyphicon-edit"></span>  Add Columns and Fields to Schema</a>
                                                 }
                                             </p>
                                     </div>

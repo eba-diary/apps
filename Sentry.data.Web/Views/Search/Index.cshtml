@@ -135,6 +135,7 @@
                                     <span data-bind="text: DatasetName" style="font-size: larger; font-weight: bolder; color: #003DA5;"></span>
                                 <!-- /ko -->
 
+
                                 <!-- ko if: IsSensitive-->
                                 <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure" style="padding-left: 10px;"></i>
                                 <!-- /ko -->
@@ -1209,8 +1210,7 @@
                     if (getParameterByName('searchPhrase')) {
                         self.Query(getParameterByName('searchPhrase'));
                     }
-                    else if (getParameterByName('category'))
-                    {
+                    else if (getParameterByName('category')) {
                         self.Query('');
                     }
                     else {
@@ -1266,48 +1266,48 @@
                 queryResults = temp.map(x => x.dataset);
                 var selectedCategoryList = [];
 
-                if (self.SearchType() == "Datasets") {
-                    queryResults = self.FilterDatasets(queryResults);
-                } else if (self.SearchType() == "BusinessIntelligence") {
-                    queryResults = self.FilterExhibits(queryResults);
-                } else {
-                    queryResults = self.FilterGeneric(queryResults);
+                        if (self.SearchType() == "Datasets") {
+                            queryResults = self.FilterDatasets(queryResults);
+                        } else if (self.SearchType() == "BusinessIntelligence") {
+                            queryResults = self.FilterExhibits(queryResults);
+                        } else {
+                            queryResults = self.FilterGeneric(queryResults);
+                            }
+
+                        $("#SearchText").attr("placeholder", "Search " + queryResults.length + " Datasets...");
+
+                        return queryResults;
+                    });
+
+                    self.SelectedFilters.subscribe(function () {
+                        localStorage.setItem("filteredIds", ko.toJSON(self.SelectedFilters()));
+                        $('#filterSelector').val(self.SelectedFilters()).trigger('change');
+
+                    });
+
+                    self.GetFile = function (data) {
+
+                        $.ajax({
+                            url: '/ExternalFile/HasReadPermissions?pathAndFilename=' + encodeURIComponent(data.Location),
+                            method: "GET",
+                            dataType: 'json',
+                            success: function (obj) {
+                                if (obj.HasPermission) {
+                                    var url = '/ExternalFile/DownloadExternalFile?pathAndFilename=' + encodeURIComponent(data.Location);
+                                    window.open(url);
+                                }
+                                else {
+                                    Sentry.ShowModalAlert(
+                                        "User does not have sufficient permissions to selected file. </br></br>  Contact <b>" + data.SentryOwner + "</b> to request access to exhibit."
+                                    );
+                                }
+                            },
+                            error: function (obj) {
+                                Sentry.ShowModalAlert("Failed permissions check, please try again.  If problem persists, please contact <a mailto:DSCSupport@sentry.com></a>");
+                            }
+                        });
+                    };
                 }
-
-                $("#SearchText").attr("placeholder", "Search " + queryResults.length + " Datasets...");
-
-                return queryResults;
-            });
-
-            self.SelectedFilters.subscribe(function () {
-                localStorage.setItem("filteredIds", ko.toJSON(self.SelectedFilters()));
-                $('#filterSelector').val(self.SelectedFilters()).trigger('change');
-
-            });
-
-            self.GetFile = function (data) {
-
-                $.ajax({
-                    url: '/ExternalFile/HasReadPermissions?pathAndFilename=' + encodeURIComponent(data.Location),
-                    method: "GET",
-                    dataType: 'json',
-                    success: function (obj) {
-                        if (obj.HasPermission) {
-                            var url = '/ExternalFile/DownloadExternalFile?pathAndFilename=' + encodeURIComponent(data.Location);
-                            window.open(url);
-                        }
-                        else {
-                            Sentry.ShowModalAlert(
-                                "User does not have sufficient permissions to selected file. </br></br>  Contact <b>" + data.SentryOwner + "</b> to request access to exhibit."
-                            );
-                        }
-                    },
-                    error: function (obj) {
-                        Sentry.ShowModalAlert("Failed permissions check, please try again.  If problem persists, please contact <a mailto:DSCSupport@sentry.com></a>");                        
-                    }
-                });
-            };
-        }
 
 
         $(document).ready(function () {

@@ -44,9 +44,10 @@ namespace Sentry.data.Core.Entities.Metadata
         public string Description { get; set; }
         public string Type { get; set; }
         public string ArrayType { get; set; }
+        public string Length { get; set; }
         public string Precision { get; set; }
         public string Scale { get; set; }
-        public Boolean Nullable { get; set; }
+        public Boolean? Nullable { get; set; }
         public List<SchemaRow> ChildRows { get; set; }
         public double LastUpdated { get; set; }
     }

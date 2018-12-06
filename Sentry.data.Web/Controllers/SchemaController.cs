@@ -67,7 +67,8 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
-                DatasetFileConfig config = _dsContext.getDatasetFileConfigs(DatasetConfigID);
+                DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
+                //DatasetFileConfig config = _dsContext.getDatasetFileConfigs(DatasetConfigID);
 
                 Event e = new Event();
                 e.EventType = _dsContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
@@ -122,11 +123,19 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
 
-            if (config.Schemas.Any(x => x.IsPrimary))
+            if (config.Schema.Any(x => x.SchemaIsPrimary))
             {
-                HiveTable ht = config.Schemas.FirstOrDefault(x => x.IsPrimary).HiveTables.Where(y => y.IsPrimary).FirstOrDefault();
+                DataElement schemarev = config.Schema.FirstOrDefault(x => x.SchemaIsPrimary);
 
-                return Ok(new { HiveDatabaseName = ht.HiveDatabase_NME, HiveTableName = ht.Hive_NME });
+                if (schemarev.HiveTable != null)
+                {
+                    return Ok(new { HiveDatabaseName = schemarev.HiveDatabase, HiveTableName = schemarev.HiveTable });
+                }
+                else
+                {
+                    return NotFound();
+                }
+                
             }
             else {
                 return NotFound();
@@ -146,42 +155,40 @@ namespace Sentry.data.Web.Controllers
             {
                 DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
 
-                if (config.Schemas.Any())
+                if (config.Schema.Any())
                 {
-                    var a = config.Schemas.ToList();
+                    var a = config.Schema.ToList();
 
-                    Schema schema = null;
+                    DataElement schema = null;
 
                     if (SchemaID != 0)
                     {
-                        schema = config.Schemas.Where(x => x.DatasetFileConfig.ConfigId == DatasetConfigID && x.Schema_ID == SchemaID).OrderBy(x => x.Revision_ID).FirstOrDefault();
+                        schema = config.Schema.Where(x => x.DataElement_ID == SchemaID).FirstOrDefault();
                     }
                     else
                     {
-                        if(config.Schemas.Any(x => x.IsPrimary))
+                        if(config.Schema.Any(x => x.SchemaIsPrimary))
                         {
-                            schema = config.Schemas.Where(x => x.DatasetFileConfig.ConfigId == DatasetConfigID && x.IsPrimary).OrderBy(x => x.Revision_ID).FirstOrDefault();
+                            schema = config.Schema.Where(x => x.SchemaIsPrimary).OrderBy(x => x.SchemaRevision).FirstOrDefault();
                         }
                         else
                         {
-                            schema = config.Schemas.Where(x => x.DatasetFileConfig.ConfigId == DatasetConfigID).OrderBy(x => x.Revision_ID).FirstOrDefault();
+                            schema = config.Schema.OrderBy(x => x.SchemaRevision).FirstOrDefault();
                         }
                     }
 
-                    DataObject dataObject = _dsContext.GetById<DataObject>(schema.DataObject_ID);
-
-                    if (schema.DataObject_ID != 0)
+                    if (schema.DataObjects.Count > 0)
                     {
                         OutputSchema s = new OutputSchema();
 
                         s.rows = new List<SchemaRow>();
 
-                        if (dataObject.DataObjectDetails.Any(x => x.DataObjectDetailType_CDE == "Row_CNT"))
+                        if (schema.DataObjects.Any(x => x.RowCount != 0))
                         {
-                            s.RowCount = Convert.ToInt32(dataObject.DataObjectDetails.FirstOrDefault(x => x.DataObjectDetailType_CDE == "Row_CNT").DataObjectDetailType_VAL);
+                            s.RowCount = Convert.ToInt32(schema.DataObjects.FirstOrDefault().RowCount);
                         }
 
-                        foreach (DataObjectField b in dataObject.DataObjectFields)
+                        foreach (DataObjectField b in schema.DataObjects.FirstOrDefault().DataObjectFields)
                         {
                             SchemaRow r = new SchemaRow()
                             {
@@ -191,35 +198,13 @@ namespace Sentry.data.Web.Controllers
                                 LastUpdated = b.LastUpdt_DTM.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds
                             };
 
-                            if (b.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Datatype_TYP"))
-                            {
-                                r.Type = b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Datatype_TYP").DataObjectFieldDetailType_VAL.ToUpper();
-                            }
-                            else
-                            {
-                                r.Type = "VARCHAR";
-                            }
-
-
-                            if (b.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Precision_AMT"))
-                            {
-                                r.Precision = b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Precision_AMT") != null ?
-                                    b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Precision_AMT").DataObjectFieldDetailType_VAL :
-                                    null;
-                            }
-
-                            if (b.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Scale_AMT"))
-                            {
-                                r.Scale = b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Scale_AMT") != null ?
-                                    b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Scale_AMT").DataObjectFieldDetailType_VAL :
-                                    null;
-                            }
-
-                            if (b.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Nullable_IND"))
-                            {
-                                r.Nullable = b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Nullable_IND").DataObjectFieldDetailType_VAL == "Y" ? true : false;
-                            }
-
+                            r.Type = (!String.IsNullOrEmpty(b.DataType)) ? b.DataType.ToUpper() : "VARCHAR";
+                            if (b.Precision != null) { r.Precision = b.Precision ?? null; }
+                            if (b.Scale != null) { r.Scale = b.Scale ?? null; }
+                            //r.Precision = (b.Precision != null && !String.IsNullOrEmpty(b.Precision)) ? b.Precision : null;
+                            //r.Scale = (b.Scale != null && !String.IsNullOrEmpty(b.Scale)) ? b.Scale : null;
+                            if (b.Nullable != null) { r.Nullable = b.Nullable ?? null; }
+                            if (b.Length != null) { r.Length = b.Length ?? null; }
                             s.rows.Add(r);
                         }
 
@@ -227,7 +212,9 @@ namespace Sentry.data.Web.Controllers
                     }
                     else
                     {
-                        return NotFound();
+                        OutputSchema s = new OutputSchema();
+                        s.rows = new List<SchemaRow>();
+                        return Ok(s);
                     }
                 }
                 else

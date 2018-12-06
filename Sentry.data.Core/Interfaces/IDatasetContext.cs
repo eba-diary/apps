@@ -49,7 +49,7 @@ namespace Sentry.data.Core
         int GetLatestDatasetFileIdForDataset(int id);
         IEnumerable<DatasetFile> GetAllDatasetFiles();
         DatasetFile GetDatasetFile(int id);
-        int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId, bool isBundled, string targetFileName = null);
+        int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId, bool isBundled, string targetFileName = null, DataElement schema = null);
         Category GetCategoryById(int id);
 
 

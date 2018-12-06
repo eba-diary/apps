@@ -321,11 +321,11 @@ namespace Sentry.data.Infrastructure
             return dfcList;
         }
 
-        public int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId, bool isBundled, string targetFileName = null)
+        public int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId, bool isBundled, string targetFileName = null, DataElement schema = null)
         {
             int dfId = Query<DatasetFile>()
                 .Where(w => w.Dataset.DatasetId == datasetId  && w.DatasetFileConfig.ConfigId == dataFileConfigId && w.ParentDatasetFileId == null && w.IsBundled == isBundled)
-                .Where(w => (targetFileName != null && w.FileName == targetFileName) || (targetFileName == null))
+                .Where(w => ((targetFileName != null && w.FileName == targetFileName) || (targetFileName == null)) && ((schema != null && w.Schema == schema) || (schema == null)))
                 .GroupBy(x => x.Dataset.DatasetId)
                 .ToList()
                 .Select(s => s.OrderByDescending(g => g.CreateDTM).Take(1))

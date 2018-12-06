@@ -10,7 +10,8 @@ namespace Sentry.data.Core.Entities.Metadata
     {
         public DataObject()
         {
-
+            DataObjectDetails = new List<DataObjectDetail>();
+            DataObjectFields = new List<DataObjectField>();
         }
 
         public virtual IList<DataObjectDetail> DataObjectDetails { get; set; }
@@ -34,5 +35,50 @@ namespace Sentry.data.Core.Entities.Metadata
         public virtual DateTime LastUpdt_DTM { get; set; }
         public virtual string BusElementKey { get; set; }
         public virtual string BusObjectKey { get; set; }
+        public virtual Int64 RowCount
+        {
+            get
+            {
+                DataObjectDetail detail = GetObjectDetail("Row_CNT");
+                return (detail == null) ? 0 : Int64.Parse(detail.DataObjectDetailType_VAL);
+            }
+            set
+            {
+                SetDataGetObjectDetailValue("Row_CNT", value.ToString());
+            }
+        }
+
+        #region DataElementDetailHelpers
+        private DataObjectDetail GetObjectDetail(string typeCDE)
+        {
+            return DataObjectDetails.Where(w => w.DataObjectDetailType_CDE == typeCDE).SingleOrDefault();
+        }
+
+        private void SetDataGetObjectDetailValue(string typeCDE, string val)
+        {
+            DataObjectDetail item = GetObjectDetail(typeCDE);
+            if (item != null)
+            {
+                item.DataObjectDetailType_VAL = val;
+            }
+            else
+            {
+                AddDataGetObjectDetail(typeCDE, val);
+            }
+        }
+
+        private void AddDataGetObjectDetail(string typeCDE, string val)
+        {
+            DataObjectDetails.Add(new DataObjectDetail()
+            {
+                DataObject = this,
+                DataObjectDetailCreate_DTM = DateTime.Now,
+                DataObjectDetailChange_DTM = DateTime.Now,
+                DataObjectDetailType_CDE = typeCDE,
+                DataObjectDetailType_VAL = val,
+                LastUpdt_DTM = DateTime.Now
+            });
+        }
+        #endregion 
     }
 }

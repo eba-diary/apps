@@ -18,6 +18,7 @@ using Sentry.Common.Logging;
 using Newtonsoft.Json;
 using System.Linq.Expressions;
 using StructureMap;
+using Sentry.data.Core.Entities.Metadata;
 using System.Runtime.InteropServices;
 
 namespace Sentry.data.Common
@@ -252,6 +253,7 @@ namespace Sentry.data.Common
             int df_id = 0;
             RetrieverJob job = null;
             IContainer _container;
+            DataElement latestSchemaRevision = null;
 
             using (_container = Bootstrapper.Container.GetNestedContainer())
             {
@@ -265,6 +267,7 @@ namespace Sentry.data.Common
 
                 if (isBundled)
                 {
+                    latestSchemaRevision = dfc.GetLatestSchemaRevision();
                     Logger.Debug("ProcessFile: Detected Bundled file");
                     targetFileName = response.TargetFileName;
                     uplduser = response.RequestInitiatorId;
@@ -274,7 +277,7 @@ namespace Sentry.data.Common
                     Logger.Debug("ProcessFile: Data File Config OverwriteDatafile=true");
                     // RegexSearch requires passing targetFileName to esnure we get the correct related data file.
 
-                    df_id = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.ConfigId, isBundled, targetFileName);
+                    df_id = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.ConfigId, isBundled, targetFileName, latestSchemaRevision);
                     
                     //If datafiles exist for this DatasetFileConfig
                     if (df_id != 0)
@@ -328,7 +331,7 @@ namespace Sentry.data.Common
                         try
                         {
                             //Version the Old Parent DatasetFile
-                            int df_newParentId = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.ConfigId, isBundled);
+                            int df_newParentId = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.ConfigId, isBundled, null, latestSchemaRevision);
                             df_Orig.ParentDatasetFileId = df_newParentId;
 
                             //Write dataset to database
@@ -367,6 +370,7 @@ namespace Sentry.data.Common
                 {
                     Logger.Debug("ProcessFile: Detected Dataset file");
 
+                    latestSchemaRevision = job.DatasetConfig.GetLatestSchemaRevision();
                     //Should this file be loaded into this config
                     if (!job.FilterIncomingFile(filename))
                     {
@@ -384,11 +388,11 @@ namespace Sentry.data.Common
 
                             if (job.JobOptions.IsRegexSearch)
                             {
-                                df_id = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(job.DatasetConfig.ParentDataset.DatasetId, job.DatasetConfig.ConfigId, isBundled, targetFileName);
+                                df_id = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(job.DatasetConfig.ParentDataset.DatasetId, job.DatasetConfig.ConfigId, isBundled, targetFileName, latestSchemaRevision);
                             }
                             else
                             {
-                                df_id = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(job.DatasetConfig.ParentDataset.DatasetId, job.DatasetConfig.ConfigId, isBundled);
+                                df_id = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(job.DatasetConfig.ParentDataset.DatasetId, job.DatasetConfig.ConfigId, isBundled, null, latestSchemaRevision);
                             }
 
 
@@ -491,7 +495,7 @@ namespace Sentry.data.Common
                                 try
                                 {
                                     //Version the Old Parent DatasetFile
-                                    int df_newParentId = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(job.DatasetConfig.ParentDataset.DatasetId, job.DatasetConfig.ConfigId, isBundled);
+                                    int df_newParentId = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(job.DatasetConfig.ParentDataset.DatasetId, job.DatasetConfig.ConfigId, isBundled, null, latestSchemaRevision);
                                     df_Orig.ParentDatasetFileId = df_newParentId;
 
                                     //Write dataset to database
@@ -661,7 +665,8 @@ namespace Sentry.data.Common
                VersionId = null,
                IsBundled = isbundle,
                Size = 0,
-               IsUsable = true
+               IsUsable = true,
+               Schema = dfc.GetLatestSchemaRevision()
             };
 
             return out_df;

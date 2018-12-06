@@ -247,16 +247,16 @@
         <div id="primaryPanel">
 
             @*<div id="columnSelector" class="query-builder query-window-panel">
-                    <div id="columnSelectorContainer" class="rules-group-container">
+            <div id="columnSelectorContainer" class="rules-group-container">
 
-                        <h5>Column Selection</h5>
-                        <p>Click below to choose your columns from your dataset.  If you choose no columns all columns will be selected.</p>
+                <h5>Column Selection</h5>
+                <p>Click below to choose your columns from your dataset.  If you choose no columns all columns will be selected.</p>
 
-                        <select multiple="" class="form-control select2-hidden-accessible"
-                                id="columnSelectorSelect" name="columnSelector" tabindex="-1" aria-hidden="true"></select>
+                <select multiple="" class="form-control select2-hidden-accessible"
+                        id="columnSelectorSelect" name="columnSelector" tabindex="-1" aria-hidden="true"></select>
 
-                    </div>
-                </div>*@
+            </div>
+        </div>*@
 
             <div id="joinPanel" class="query-builder query-window-panel">
                 <div class="rules-group-container">
@@ -276,6 +276,60 @@
                     </div>
                 </div>
             </div>
+
+            @*<div id="joinPanel2" class="query-builder query-window-panel">
+                <div class="rules-group-container">
+                    <h5>Table Joining</h5>
+                    <p>Example :  t1 JOIN t2 ON t1.departmentID == t2.ID</p>
+                    <p>One join is required per two data sources you chose above.  Example: If you chose 3 data sources, 2 joins would be required.  Join t1 with t2 and then Join t1 with t3</p>
+                    
+                    <div>
+
+                    </div>
+                    
+                    
+                    <div class="btn-group pull-right group-actions">
+                        <button type="button" class="btn btn-xs ruleController btn-success" id="btnAddJoin" onclick="addJoinRule()">
+                            <i class="glyphicon glyphicon-plus"></i> Add rule
+                        </button>
+                    </div>
+                    <br />
+
+                    <br />
+                    <div id="joinContainer2" data-bind="foreach: { data: Join, as: 'panel'}">
+                        <select data-bind="selectedOption: PrimaryTableName, options: ListofTableNames"></select>
+
+                        <div class="rules-group-container" data-bind="template: {name: 'JoinTypeTemplate' , foreach: { data: panel.Joins, as: 'join'}}">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+
+            <script type="text/html" id="JoinTypeTemplate">
+                <div class="rule-container" id="">
+
+                    <select class="form-control ruleController joinTypeController" style="width: 12%; display: inline-block; "> 
+                        <option selected="" disabled="">Join Type</option> 
+                        <option value="INNER"> Inner Join</option> 
+                        <option value="FULL"> Full Join</option> 
+                        <option value="LEFT"> Left Join</option> 
+                        <option value="RIGHT"> Right Join</option> 
+                    </select>
+                    <select data-bind="selectedOption: TableName, options: $parent.ListofTableNames"></select>
+
+                    <div class="btn-group pull-right rule-actions">
+                        <button type="button" class="btn btn-xs btn-danger" data-bind="click: $parent.removeColumn">
+                            <i class="glyphicon glyphicon-remove"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            </script>*@
+
+
+
+
 
             <div id="columnRenamer" class="query-builder">
                 <div class="rules-group-container">
