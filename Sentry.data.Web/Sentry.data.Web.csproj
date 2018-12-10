@@ -281,7 +281,7 @@
     <Compile Include="Controllers\QueryToolController.cs" />
     <Compile Include="Controllers\ConfigController.cs" />
     <Compile Include="Controllers\BusinessIntelligenceController.cs" />
-    <Compile Include="Controllers\SchemaController.cs" />
+    <Compile Include="Controllers\MetadataController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\TagController.cs" />
     <Compile Include="Controllers\UserController.cs" />

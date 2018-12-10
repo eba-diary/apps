@@ -122,8 +122,6 @@ namespace Sentry.data.Core
 
             string outFileName = null;
             // Are we overwritting target file
-            if (JobOptions.OverwriteDataFile)
-            {
                 // Non-Regex and TargetFileName is null
                 // Use SearchCriteria value
                 if (!(JobOptions.IsRegexSearch) && String.IsNullOrWhiteSpace(JobOptions.TargetFileName))
@@ -152,12 +150,6 @@ namespace Sentry.data.Core
                 {
                     outFileName = incomingFileName;
                 }
-            }
-            else
-            {
-                JobLoggerMessage("Error", "OverwriteDataFile option is set to false. Change setting to true for job to work");
-                throw new NotImplementedException("OverwriteDataFile setting of false is not implemented.  Change setting to true.");
-            }
 
             return outFileName;
         }

@@ -56,6 +56,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<ApplicaitonConfiguration> ApplicaitonConfigurations
+        {
+            get
+            {
+                return Query<ApplicaitonConfiguration>();
+            }
+        }
+
         public IList<RTSourceTypes> GetSourceTypes()
         {
             return Query<RTSourceTypes>().ToList();

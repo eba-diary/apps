@@ -47,7 +47,13 @@ function Config(id, data) {
         if (data.configName === 'Default') {
             return data.configName.replace(/ /g, "_") + '_' + id;
         } else {
-            return data.configName.replace(/ /g, "_");
+
+            var name = data.configName;          
+            name = name.replace(/[\W]+/g, " ");  //Remove All Non Alpha Numeric Characters https://regex101.com/r/cW8jA6/2
+            name = name.replace(/ /g, "_");  //Replace the Spaces with Underscores
+            name = "table_" + name;
+
+            return name;
         }
     });
 
@@ -107,46 +113,131 @@ function Schema(id, data) {
 }
 
 function JoinPanel() {
-    this.PrimaryTableName = ko.observable();
-    this.Placeholder = ko.observable('This is a placeholder');
+    var self = this;
+    self.PrimaryTableName = ko.observable();
 
-    this.Joins = ko.observableArray([new Join()]);
+    self.Joins = ko.observableArray([new Join(self)]);
 
-    this.RemoveJoin = function (item) {
-        this.Joins.remove(item);
-        this.Joins.notifySubscribers();
+    self.RemoveJoin = function (item) {
+        self.Joins.remove(item);
+        self.Joins.notifySubscribers();
+
+        updateTables();
+        updateBadges();
+    }
+    self.AddJoin = function () {
+        self.Joins.push(new Join(self))
+        self.Joins.notifySubscribers();
+
+        updateTables();
+        updateBadges();
     }
 
-    this.ListofTableNames = ko.computed(function () {
-        var tableOptions = [];
+    self.ListofTableNames = ko.observableArray(tableList);
 
-        for (var i = 0; i < tableList.length; i++) {
-            tableOptions.push(tableList[i]);
+}
+
+function Join(parent) {
+    var self = this;
+    self.parent = ko.observable(parent);
+
+    self.JoinType = ko.observable();
+    self.TableName = ko.observable();
+
+    self.OnStatements = ko.observableArray([new OnStatement(self)]);
+
+    self.ConditionalShown = ko.computed(function () {
+        var count = self.OnStatements().length;
+
+        if (count > 1) {
+            return true;
+        } else {
+            return false;
         }
-        return tableOptions;
     });
 
-}
+    self.RemoveOn = function (item) {
+        self.OnStatements.remove(item);
+        self.OnStatements.notifySubscribers();
 
-function Join() {
-    this.JoinType = ko.observable();
-    this.TableName = ko.observable();
-
-    this.OnStatements = ko.observableArray([new OnStatement()]);
-
-    this.RemoveOn = function (item) {
-        this.OnStatements.remove(item);
-        this.OnStatements.notifySubscribers();
+        updateTables();
+        updateBadges();
     }
+
+    self.AddOn = function () {
+        self.OnStatements.push(new OnStatement(self))
+        self.OnStatements.notifySubscribers();
+
+        updateTables();
+        updateBadges();
+    }
+
+    self.Valid = ko.computed(function () {
+        ko.utils.arrayForEach(self.OnStatements(), function (statement) {
+            if (statement.Valid() === false) {
+                return false;
+            }
+        });
+
+        if (self.JoinType() === "0") {
+            return false;
+        } else if (self.TableName === undefined || self.TableName() === "0") {
+            return false;
+        }
+
+        return true;
+    });
 }
 
-function OnStatement() {
+function OnStatement(parent) {
+    var self = this;
+    self.parent = ko.observable(parent);
 
-    this.ColumnOne = ko.observable();
-    this.Operand = ko.observable();
-    this.TableTwo = ko.observable();
-    this.ColumnTwo = ko.observable();
-    this.Conditional = ko.observable();
+    self.ColumnOne = ko.observable();
+
+    self.FirstColumnNames = ko.computed(function () {
+        var tableOne = self.parent().TableName();
+        for (i = 0; i < schemaList.length; i++) {
+            if (schemaList[i].tableName === tableOne) {
+                var columns = jQuery.map(schemaList[i].schema, function (n, i) {
+                    return n.column;
+                });
+                return columns;
+            }
+        }
+    });
+
+    self.Operand = ko.observable();
+    self.TableTwo = ko.observable();
+    self.ColumnTwo = ko.observable();
+
+    self.SecondColumnNames = ko.computed(function () {
+        var tableTwo = self.TableTwo();
+        for (i = 0; i < schemaList.length; i++) {
+            if (schemaList[i].tableName === tableTwo) {
+                var columns = jQuery.map(schemaList[i].schema, function (n, i) {
+                    return n.column;
+                });
+                return columns;
+            }
+        }
+    });
+
+    self.Conditional = ko.observable();
+
+    self.Valid = ko.computed(function () {
+        if (self.ColumnOne === undefined) {
+            return false;
+        } else if (self.Operand === undefined) {
+            return false;
+        } else if (self.TableTwo === undefined) {
+            return false;
+        } else if (self.ColumnTwo === undefined) {
+            return false;
+        }
+
+        return true;
+    });
 }
 
 function ViewModel() {
@@ -154,7 +245,7 @@ function ViewModel() {
 
     self.Datasets = ko.observableArray();
 
-    self.Join = ko.observable([new JoinPanel()]);
+    self.JoinPanel = ko.observable(new JoinPanel());
 
     self.Columns = ko.observableArray();
     self.SelectedColumns = ko.observableArray();
@@ -352,38 +443,48 @@ function SelectColumns(rawQuery) {
 }
 
 function FromColumns(rawQuery) {
-    var joinRules = $('#joinContainer').children('.rule-container').children('.ruleController').length / 6;
+    console.log(vm.JoinPanel().Joins())
 
-    var firstNameSet = false;
+    var joinRules = vm.JoinPanel().Joins().length;
+    var primaryTableName = vm.JoinPanel().PrimaryTableName();
 
 
     if (joinRules === 0) {
         rawQuery += " FROM " + firstTableName;
-        firstNameSet = true;
+    } else {
+        rawQuery += " FROM " + primaryTableName;
     }
 
     for (var i = 0; i < joinRules; i++) {
 
-        var tableOne = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6)].value;
-        var joinType = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 1].value;
-        var tableTwo = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 2].value;
-        var tableOneCol = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 3].value;
-        var operand = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 4].value;
-        var tableTwoCol = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 5].value;
+        var joinType = vm.JoinPanel().Joins()[i].JoinType();
+        var tableName = vm.JoinPanel().Joins()[i].TableName();     
 
-        if (firstNameSet === false) {
-            rawQuery += " FROM " + tableOne;
-            firstNameSet = true;
+        var onStatements = vm.JoinPanel().Joins()[i].OnStatements().length;
+        var OnStatement = ''
+
+        for (var j = 0; j < onStatements; j++) {
+
+            var tableOneCol = vm.JoinPanel().Joins()[i].OnStatements()[j].ColumnOne();
+            var operand = vm.JoinPanel().Joins()[i].OnStatements()[j].Operand();
+            var tableTwo = vm.JoinPanel().Joins()[i].OnStatements()[j].TableTwo();
+            var tableTwoCol = vm.JoinPanel().Joins()[i].OnStatements()[j].ColumnTwo();
+
+            OnStatement += tableName + '.`' + tableOneCol + '` ' + operand + ' ' + tableTwo + '.`' + tableTwoCol + '`';
+
+            if (onStatements > 1 && onStatements - 1 != j) {
+                var conditional = vm.JoinPanel().Joins()[i].OnStatements()[j].Conditional();
+
+                OnStatement += ' ' + conditional + ' ';
+            }
         }
 
-
-        var OnStatement = tableOneCol + ' ' + operand + ' ' + tableTwoCol;
-
-        rawQuery += " " + joinType + " JOIN " + tableTwo + " ON " + OnStatement;
+        rawQuery += " " + joinType + " JOIN " + tableName + " ON " + OnStatement;
     }
 
     return rawQuery;
 }
+
 
 function GroupByColumns(rawQuery) {
     var groupBys = $('.groupBySelector').length;

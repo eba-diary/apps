@@ -34,7 +34,6 @@ namespace Sentry.data.Web
             this.ParentDataSetID = f.Dataset.DatasetId;
             this.IsBundled = f.IsBundled;
             this.Information = f.Information;
-            this.IsUsable = f.IsUsable;
         }
         public int Id { get; set; }
         public string Name { get; set; }
@@ -49,8 +48,8 @@ namespace Sentry.data.Web
                 Boolean correctFileTypeForPreview = (Path.GetExtension(Name).Contains("csv") || Path.GetExtension(Name).Contains("txt") || Path.GetExtension(Name).Contains("json"));
                 Boolean correctSensitivityForDownload = ((IsSensitive && CanDwnldSenstive) || (!IsSensitive && CanDwnldNonSensitive));
 
-                if (IsUsable)
-                {
+                //if (IsUsable)
+                //{
                     if (CanPreview && correctSensitivityForDownload && correctFileTypeForPreview)
                     {
                         href += "<a href = \"#\" onclick=\"data.DatasetDetail.PreviewDatafileModal(" + Id + ")\" class=\"table-row-icon row-filepreview-icon\" title=\"Preview file\"><i class='glyphicon glyphicon-search text-primary'></i></a>";
@@ -68,14 +67,14 @@ namespace Sentry.data.Web
                     {
                         href += "<a href = \"#\" onclick=\"data.DatasetDetail.DownloadDatasetFile(" + Id + ")\" class=\"table-row-icon row-filedownload-icon\" title=\"Download File\"><i class='glyphicon glyphicon-cloud-download text-primary'></i></a>";
                     }
-                }
+                //}
                 if (CanEdit)
                 {
                     href += "<a href = \"#\" onclick=\"data.DatasetDetail.EditDataFileInformation(" + Id + ")\" class=\"table-row-icon\" title=\"Edit File\"><i class='glyphicon glyphicon-edit text-primary'></i></a>";
                 }
 
-                if (IsUsable)
-                {
+                //if (IsUsable)
+                //{
                     if (correctSensitivityForDownload && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(Name)))
                     {
                         href += "<a href = \"#\" onclick=\"data.Dataset.FileNameModal(" + Id + ")\" title=\"Push to SAS\">" +
@@ -83,7 +82,7 @@ namespace Sentry.data.Web
                             "</a>";
 
                     }
-                }
+                //}
                 return href;
             }
         }
@@ -100,7 +99,6 @@ namespace Sentry.data.Web
         public Boolean CanPreview { get; set; }
         public int ParentDataSetID { get; set; }
         public Boolean IsBundled { get; set; }
-        public Boolean IsUsable { get; set; }
         public string Information { get; set; }
     }
 }

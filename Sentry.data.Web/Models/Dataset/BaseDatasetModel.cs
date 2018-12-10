@@ -43,7 +43,6 @@ namespace Sentry.data.Web
             this.FileExtension = null;
             this.DatasetDtm = ds.DatasetDtm;
             this.ChangedDtm = ds.ChangedDtm;
-            this.S3Key = ds.S3Key;
             this.IsSensitive = ds.IsSensitive;
             this.CanDisplay = ds.CanDisplay;
             this.DatasetInformation = ds.DatasetInformation; 

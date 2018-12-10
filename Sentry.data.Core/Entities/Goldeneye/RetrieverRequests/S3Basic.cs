@@ -27,22 +27,23 @@ namespace Sentry.data.Core
 
         public override Uri CalcRelativeUri(RetrieverJob Job)
         {
+            string storageCode = Job.DatasetConfig.GetStorageCode();
+            //string cat = Job.DatasetConfig.ParentDataset.DatasetCategory.Id.ToString();
+            //string dsname = Job.DatasetConfig.ParentDataset.DatasetId.ToString();
+            //string dfcname = Job.DatasetConfig.ConfigId.ToString();
 
-            string cat = Job.DatasetConfig.ParentDataset.DatasetCategory.Name.ToLower();
-            string dsname = Job.DatasetConfig.ParentDataset.DatasetName.Replace(' ', '_').ToLower();
-            string dfcname = Job.DatasetConfig.Name.Replace(' ', '_').ToLower();
-
-            Uri u = new Uri(Path.Combine(new string[] { BaseUri.ToString(), cat, dsname, dfcname }).ToString());
+            Uri u = new Uri(Path.Combine(new string[] { BaseUri.ToString(), storageCode }).ToString());
 
             return u;
         }
         public override string GetDropPrefix(RetrieverJob Job)
         {
-            string cat = Job.DatasetConfig.ParentDataset.DatasetCategory.Name.ToLower();
-            string dsname = Job.DatasetConfig.ParentDataset.DatasetName.Replace(' ', '_').ToLower();
-            string dfcname = Job.DatasetConfig.Name.Replace(' ', '_').ToLower();
+            string storageCode = Job.DatasetConfig.GetStorageCode();
+            //string cat = Job.DatasetConfig.ParentDataset.DatasetCategory.Id.ToString();
+            //string dsname = Job.DatasetConfig.ParentDataset.DatasetId.ToString();
+            //string dfcname = Job.DatasetConfig.ConfigId.ToString();
 
-            string url = $"{Configuration.Config.GetHostSetting("S3DataPrefix")}droplocation/{cat}/{dsname}/{dfcname}/";
+            string url = $"{Configuration.Config.GetHostSetting("S3DataPrefix")}droplocation/{storageCode}/";
 
             return url;
         }

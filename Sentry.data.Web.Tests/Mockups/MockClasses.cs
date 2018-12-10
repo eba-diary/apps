@@ -69,10 +69,40 @@ namespace Sentry.data.Web.Tests
                 ParentDataset = ds != null ? ds : MockDataset(),
                 DatasetScopeType = MockScopeTypes()[0],
                 FileExtension = MockFileExtensions()[0],
-                RetrieverJobs = new List<RetrieverJob>()
+                RetrieverJobs = new List<RetrieverJob>(),                
             };
 
+            List<DataElement> deList = new List<DataElement>();
+            deList.Add(MockDataElement(dfc));
+
+            dfc.Schema = deList;
+
             return dfc;
+        }
+
+        public static DataElement MockDataElement(DatasetFileConfig dfc = null)
+        {
+            DatasetFileConfig dsfc = dfc != null ? dfc : MockDataFileConfig();
+
+            DataElement de = new DataElement()
+            {
+                DataElementCreate_DTM = DateTime.Now,
+                DataElementChange_DTM = DateTime.Now,
+                DataElement_CDE = "F",
+                DataElement_DSC = DataElementCode.DataFile,
+                DataElement_NME = dsfc.Name,
+                LastUpdt_DTM = DateTime.Now,
+                SchemaIsPrimary = true,
+                SchemaDescription = dsfc.Description,
+                SchemaName = dsfc.Name,
+                SchemaRevision = 1,
+                SchemaIsForceMatch = false,
+                FileFormat = MockFileExtensions()[0].Name.ToUpper(),
+                StorageCode = "1000123",
+                DatasetFileConfig = dsfc
+            };
+
+            return de;
         }
 
         public static List<DatasetScopeType> MockScopeTypes()
@@ -199,8 +229,7 @@ namespace Sentry.data.Web.Tests
                 ModifiedDTM = System.DateTime.Now.AddYears(-12),
                 FileLocation = "data-dev/government/quarterly_census_of_employment_and_wages/235/2018/1/18/2014.annual.singlefile.csv",
                 DatasetFileConfig = dfc,
-                IsBundled = false,
-                IsUsable = true            
+                IsBundled = false         
             };
 
             return df;

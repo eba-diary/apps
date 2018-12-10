@@ -669,7 +669,6 @@
                                 <td></td>
                                 <td></td>
                                 <td id="configFilterName"></td>
-                                <td></td>
                             </tr>
                             <tr class="table-header_@color @headerColor">
                                 <th>Details</th>
@@ -679,7 +678,6 @@
                                 <th>Initial Upload Date</th>
                                 <th>Modified Date</th>
                                 <th>Schema</th>
-                                <th>Usable</th>
                             </tr>
 
                         </thead>
@@ -713,7 +711,6 @@
                             <td></td>
                             <td></td>
                             <td></td>
-                            <td></td>
                         </tr>
                         <tr class="table-header_@color">
                             <th>Details</th>
@@ -723,7 +720,6 @@
                             <th>Initial Upload Date</th>
                             <th>Modified Date</th>
                             <th>Config File Name</th>
-                            <th>Usable</th>
                         </tr>
 
                     </thead>
@@ -1033,7 +1029,7 @@
             });
 
             self.MetadataLastDT = ko.computed(function () {
-                if (self.SchemaRows().length > 1) {
+                if (self.SchemaRows().length >= 1) {
                     var d = new Date("September 13, 1989 12:15:00");
 
                     ko.utils.arrayForEach(self.SchemaRows(), function (feature) {
@@ -1120,7 +1116,7 @@
                     $('#datasetConfigList').val(getUrlParameter('configID')).trigger('change');
                 }
 
-                var metadataURL = "/api/Schema/GetBasicMetadataInformationFor?DatasetConfigID=" + $('#datasetConfigList').val();
+                var metadataURL = "/api/Metadata/GetBasicMetadataInformationFor?DatasetConfigID=" + $('#datasetConfigList').val();
                 $.get(metadataURL, function (result) {
                     self.Downloads(result.Downloads);
                     self.Views(result.Views);
@@ -1148,8 +1144,8 @@
             }
 
             function UpdateColumnSchema() {
-                var schemaURL = "/api/Schema/GetColumnSchemaInformationFor?DatasetConfigID=" + $('#datasetConfigList').val();
-                var hiveTableURL = "/api/Schema/GetPrimaryHiveTableFor?DatasetConfigID=" + $('#datasetConfigList').val();
+                var schemaURL = "/api/Metadata/GetColumnSchemaInformationFor?DatasetConfigID=" + $('#datasetConfigList').val();
+                var hiveTableURL = "/api/Metadata/GetPrimaryHiveTableFor?DatasetConfigID=" + $('#datasetConfigList').val();
                 self.DataLoading(true);
                 $('#dataSection').hide();
 
@@ -1218,9 +1214,10 @@
 
                             self.SchemaRows().push(item);
                         });
-                        self.SchemaRows.notifySubscribers();
+                        self.SchemaRows.notifySubscribers();                        
                     }
                     $('#panelSpinner').hide();
+                    
                 }).fail(function () {
                     self.RowCount(0);
                     self.SchemaRows([]);

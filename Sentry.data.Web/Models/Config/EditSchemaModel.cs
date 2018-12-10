@@ -23,7 +23,8 @@ namespace Sentry.data.Web.Models.Config
         public virtual Boolean IsForceMatch { get; set; }
         public virtual Boolean IsPrimary { get; set; }
 
-        public virtual int DataObject_ID { get; set; }
+        public virtual int DataElement_ID { get; set; }
+        public virtual string Delimiter { get; set; }
 
         public virtual int DatasetId { get; set; }
     }

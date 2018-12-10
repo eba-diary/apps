@@ -14,16 +14,6 @@ namespace Sentry.data.Web.Tests
     {
         [TestCategory("Dataset")]
         [TestMethod]
-        public void Can_prevent_dataset_with_no_s3Key()
-        {
-            Dataset dataset1 = MockClasses.MockDataset();
-            dataset1.S3Key = null;
-            var vr = dataset1.ValidateForSave();
-            Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.s3keyIsBlank));
-        }
-
-        [TestCategory("Dataset")]
-        [TestMethod]
         public void Can_prevent_dataset_with_no_Category()
         {
             Dataset dataset1 = MockClasses.MockDataset();

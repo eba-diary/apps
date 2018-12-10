@@ -72,6 +72,7 @@ namespace Sentry.data.Core
         List<DataAssetSubscription> GetSubscriptionsForDataAsset(int dataAssetID);
         List<DatasetSubscription> GetAllSubscriptions();
         List<Event> EventsSince(DateTime time, Boolean IsProcessed);
+        int GetNextStorageCDE();
     }
 
 }

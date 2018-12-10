@@ -10,7 +10,6 @@
     [DatasetFileConfig_ID] INT NULL, 
     [ParentDatasetFile_ID] INT NULL, 
     [Version_ID] NVARCHAR(250) NULL, 
-    [isUsable_IND] BIT NOT NULL, 
     [isBundled_IND] BIT NOT NULL, 
     [Information_DSC] NVARCHAR(MAX) NULL, 
     [Size_AMT] BIGINT NULL, 

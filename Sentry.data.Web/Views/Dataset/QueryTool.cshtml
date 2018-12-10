@@ -143,8 +143,8 @@
                         <input disabled="" class="form-control ruleController mainUrl" data-toggle="tooltip" data-placement="bottom" data-bind="value : s3Key"
                                style="  width: 35%;display:none; " title="This is the location of this dataset. You cannot modify this information.">
 
-                        <input class="form-control ruleController" value="/*/*/*" data-html="true" data-toggle="tooltip" data-placement="bottom" style="
-                            width: 20%;display:inline-block; " title="<span>This is the search query you are making against our site.<span><br/><em>It is simply denoted as /Year/Month/Day/File Name.<em><br/><em>Example: To get everything type /*/*/* </em><br/><em>Example: To get a specific set of file names choose something like /*/*/*/FileNameWithNumber*. Where the Star is a wildcard grabbing all items with any character in the stars position.</em><br/><em>Example: To get everything from a specific month type /*/10/*">
+                        <input class="form-control ruleController" value="*/*/*" data-html="true" data-toggle="tooltip" data-placement="bottom" style="
+                            width: 20%;display:inline-block; " title="<span>This is the search query you are making against our site.<span><br/><em>It is simply denoted as Year/Month/Day/File Name.<em><br/><em>Example: To get everything type */*/* </em><br/><em>Example: To get a specific set of file names choose something like */*/*/FileNameWithNumber*. Where the Star is a wildcard grabbing all items with any character in the stars position.</em><br/><em>Example: To get everything from a specific month type */10/*">
 
                         <select class="form-control ruleController extensionPicker" data-toggle="tooltip" data-placement="bottom" style="width: 8%; display:inline-block; "
                                 title="These are the file extensions that are available for this dataset.">
@@ -179,7 +179,7 @@
                                     <div class="schemaRevisionRow" style="margin-left: 30px;">
                                         <label style="margin-left: 5px">Table Alias:</label>
                                         <input class="form-control tableNameController ruleController" data-toggle="tooltip"
-                                               data-placement="bottom" style="width: 10%;display:inline-block; "
+                                               data-placement="bottom" style="width: 10%;display:inline-block; "  data-bind="value : hiveTable()"
                                                title="This is the name of this schema revision in this instance of the Query Tool.  It represents the schema like a Temporary Table.  If left blank, table name will be used.">
                                         <label style="margin-left: 5px">Database:</label>
                                         <h6 style='display:inline-block; margin-left: 5px; margin-right: 15px;' data-bind="text: hiveDatabase()"></h6>
@@ -258,7 +258,7 @@
             </div>
         </div>*@
 
-            <div id="joinPanel" class="query-builder query-window-panel">
+            @*<div id="joinPanel" class="query-builder query-window-panel">
                 <div class="rules-group-container">
                     <h5>Table Joining</h5>
                     <p>Example :  t1 JOIN t2 ON t1.departmentID == t2.ID</p>
@@ -275,57 +275,114 @@
 
                     </div>
                 </div>
-            </div>
+            </div>*@
 
-            @*<div id="joinPanel2" class="query-builder query-window-panel">
+            <div id="joinPanel" class="query-builder query-window-panel">
                 <div class="rules-group-container">
                     <h5>Table Joining</h5>
                     <p>Example :  t1 JOIN t2 ON t1.departmentID == t2.ID</p>
                     <p>One join is required per two data sources you chose above.  Example: If you chose 3 data sources, 2 joins would be required.  Join t1 with t2 and then Join t1 with t3</p>
-                    
-                    <div>
 
-                    </div>
-                    
-                    
-                    <div class="btn-group pull-right group-actions">
-                        <button type="button" class="btn btn-xs ruleController btn-success" id="btnAddJoin" onclick="addJoinRule()">
-                            <i class="glyphicon glyphicon-plus"></i> Add rule
-                        </button>
-                    </div>
-                    <br />
-
-                    <br />
-                    <div id="joinContainer2" data-bind="foreach: { data: Join, as: 'panel'}">
-                        <select data-bind="selectedOption: PrimaryTableName, options: ListofTableNames"></select>
-
-                        <div class="rules-group-container" data-bind="template: {name: 'JoinTypeTemplate' , foreach: { data: panel.Joins, as: 'join'}}">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <select class="form-control ruleController" data-bind="value: JoinPanel().PrimaryTableName, options: JoinPanel().ListofTableNames"></select>
                         </div>
+                        <div class="col-lg-2">
+                            <button type="button" class="btn btn-xs ruleController btn-success" id="btnAddJoin" data-bind="click: JoinPanel().AddJoin">
+                                <i class="glyphicon glyphicon-plus"></i> Add Join
+                            </button>
 
+                        </div>
+                        
+                        
+                    </div>
+
+                    <br />
+                    <div id="joinContainer2">
+                        <div class="rules-group-container" data-bind="template: {name: 'JoinTypeTemplate' , foreach: JoinPanel().Joins }">
+                        </div>
                     </div>
                 </div>
             </div>
 
 
             <script type="text/html" id="JoinTypeTemplate">
-                <div class="rule-container" id="">
+                <div class="rule-container row" id="">
 
-                    <select class="form-control ruleController joinTypeController" style="width: 12%; display: inline-block; "> 
-                        <option selected="" disabled="">Join Type</option> 
-                        <option value="INNER"> Inner Join</option> 
-                        <option value="FULL"> Full Join</option> 
-                        <option value="LEFT"> Left Join</option> 
-                        <option value="RIGHT"> Right Join</option> 
-                    </select>
-                    <select data-bind="selectedOption: TableName, options: $parent.ListofTableNames"></select>
+                    <div class="col-lg-2" style="margin-left: -10px;">
+                        <select class="form-control ruleController joinTypeController" style="display: inline-block; " data-bind="value: JoinType">
+                            <option value="0" selected="" disabled="">Select Join Type</option>
+                            <option value="INNER"> Inner Join</option>
+                            <option value="FULL"> Full Join</option>
+                            <option value="LEFT"> Left Join</option>
+                            <option value="RIGHT"> Right Join</option>
+                        </select>
+                    </div>
+                    <div class="col-lg-4">
+                        <select class="form-control ruleController" data-bind="value: TableName, options: parent().ListofTableNames"></select>
+                    </div>
 
-                    <div class="btn-group pull-right rule-actions">
-                        <button type="button" class="btn btn-xs btn-danger" data-bind="click: $parent.removeColumn">
+                    <div class="col-lg-1" style="top: 7px; position:relative;">
+                        <span>ON: </span>
+                    </div>
+
+                    <div class="col-lg-3" style="margin-top: 4px;">
+                        <button type="button" class="btn btn-xs ruleController btn-success" id="btnAddJoin" data-bind="click: AddOn">
+                            <i class="glyphicon glyphicon-plus"></i> Add On Statement
+                        </button>
+                        <button type="button" class="btn btn-xs btn-danger" data-bind="click: parent().RemoveJoin">
                             <i class="glyphicon glyphicon-remove"></i> Delete
                         </button>
                     </div>
+
+                    <br />
+                    
                 </div>
-            </script>*@
+                <div id="joinContainer3" style="margin-left: 8px;">
+                    <div class="rules-group-container onStatements" data-bind="template: {name: 'OnStatementTemplate', foreach: OnStatements}">
+                    </div>
+                </div>
+            </script>
+
+            <script type="text/html" id="OnStatementTemplate">
+                <div class="rule-container row" id="">
+
+                    <div class="col-lg-2" style="margin-left: -10px;">
+                        <select class="form-control ruleController" data-bind="value: ColumnOne, options: FirstColumnNames"></select>
+                    </div>
+
+                    <div class="col-lg-1">
+                        <select class="form-control ruleController" style="display: inline-block;" data-bind="value: Operand">
+                            <option selected="selected" value='=='> = </option>
+                            <option value='!='> ≠ </option>
+                            <option value='<'> < </option>
+                            <option value='>'> > </option>
+                            <option value='<='> <= </option>
+                            <option value='>='> >= </option>
+                        </select>
+                    </div>
+                    <div class="col-lg-4">
+                        <select class="form-control ruleController" data-bind="value: TableTwo, options: parent().parent().ListofTableNames"></select>
+                    </div>
+                    <div class="col-lg-2">
+                        <select class="form-control ruleController" data-bind="value: ColumnTwo, options: SecondColumnNames"></select>
+                    </div>
+                    <div class="col-lg-2" style="display:none;" data-bind="visible: $parent.ConditionalShown">
+                        <select class="form-control ruleController conditionalController" style="display: inline-block;" data-bind="value: Conditional">
+                            <option selected="selected" value='AND'> AND </option>
+                            <option value='OR'> OR </option>
+                        </select>
+                    </div>
+
+                    <div class="col-lg-1">
+                        <div class="btn-group pull-right rule-actions">
+                            <button type="button" class="btn btn-xs btn-danger" data-bind="click: $parent.RemoveOn">
+                                <i class="glyphicon glyphicon-remove"></i> Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </script>
 
 
 
@@ -414,8 +471,14 @@
             </div>
 
             <div id="whereClause" class="query-builder">
+
                 <div id="builder-basic">
                 </div>
+                <p style="
+                    margin-left: 15px;
+                    margin-top: 10px;">
+                    <b>Warning:</b> Where Queries in this Query Tool are <b>Case Sensitive</b>.
+                </p>
             </div>
 
             <div id="aggregate" class="query-builder">
@@ -479,6 +542,14 @@ t1.createTempView("t1");
                     <input type="checkbox" id="distinctChk" name="distinct">
 
                 </div>
+
+                <div style="
+                        display: inline-block;
+                        margin-left: 30px;
+                        position: relative;
+                        top: 1px;">
+                    <span id="lowerLevelWarning"></span>
+                </div>
             </div>
 
             <hr />
@@ -521,10 +592,10 @@ t1.createTempView("t1");
                         <option>csv</option>
                         <option>json</option>
                         @if (powerUser)
-                        {
-                            <option>parquet</option>
-                            <option>orc</option>
-                        }
+                {
+                    <option>parquet</option>
+                    <option>orc</option>
+        }
                     </select>
                     <button style="width: 10%; float:right; display:inline-block;" class="form-control btn btn-success" onclick="SavetoS3()">Download File</button>
 
@@ -715,6 +786,20 @@ t1.createTempView("t1");
             }
         });
 
+        $('body').on('keyup', '.tableNameController', function () {
+
+            var alphaNumeric = new RegExp(/\W+/g);
+
+            if (alphaNumeric.test($(this).val()) === true || ($(this).val().match(/^\d/))) {
+                $(this).css("color", "red");
+                $(this).css("border", "1px solid red");
+
+            } else {
+                $(this).css("color", "#53565a");
+                $(this).css("border", "1px solid #ccc");
+            }
+        });
+
         //https://stackoverflow.com/questions/1250079/how-to-escape-single-quotes-within-single-quoted-strings
         String.prototype.escapeForJson = function () {
             return this
@@ -752,10 +837,8 @@ t1.createTempView("t1");
 
 
         function updateBadges() {
-            var firstSet = true;
-            var secondSet = true;
-            var thirdSet = true;
-
+            var allGood = true;
+            
             var warningText = "";
 
             //Turn off the Join Tables Tab
@@ -829,6 +912,8 @@ t1.createTempView("t1");
                     $('#whereBadge').addClass('badge-danger');
                     $('#whereBadge').text('X');
                     warningText += "<p>There is something wrong with the syntax on the Where clause tab.</p>";
+                    $('#lowerLevelWarning').text("There is something wrong with the syntax on the Where clause tab.");
+                    allGood = false;
                 } else {
                     $('#whereBadge').removeClass('badge-danger');
                     $('#whereBadge').removeClass('badge-warning');
@@ -841,10 +926,29 @@ t1.createTempView("t1");
                 $('#whereBadge').addClass('badge-warning');
                 $('#whereBadge').text(0);
             }
+            
+            var rules = vm.JoinPanel().Joins().length;
+            var failed = 0;
 
+            if (tableList.length > 1) {
+                for (var i = 0; i < rules; i++) {
+                    if (!vm.JoinPanel().Joins()[i].Valid()) {
+                        failed++;
+                    }
+                }
+            }
+
+            //Make sure all the join fields are filled out.
+            if (failed >= 1 && tableList.length > 1) {
+                $('#tableCountBadge').removeClass('badge-success');
+                $('#tableCountBadge').addClass('badge-danger');
+                $('#tableCountBadge').text('X');
+                allGood = false;
+                //warningText += "<p>You have invalid fields or fields not filled out in your Join Panel.</p>";
+                $('#lowerLevelWarning').text("You have invalid fields or fields not filled out in your Join Panel.");
+            }
             //Make sure there are enough Join Rules based on the Amount of Tables
-            var rules = $('#joinContainer').children('.rule-container').length;
-            if (tableList.length - 1 != rules || $('.tableNameController option[disabled]:selected').length >= 1 || $('.joinTypeController option[disabled]:selected').length >= 1) {
+            else if (tableList.length - 1 != rules && tableList.length > 1) {
                 $('#tableCountBadge').removeClass('badge-success');
                 $('#tableCountBadge').addClass('badge-danger');
                 $('#tableCountBadge').text('X');
@@ -852,7 +956,7 @@ t1.createTempView("t1");
                 if (tableList.length > 1 && $('#datasetRowTable_wrapper').is(":visible")) {
                     warningText += "<p>If you do not join to the other tables on the 'Join Tables Tab' below then when you run a query you will only be running a query against your first table. Which in this instance is named : " + firstTableName + "</p > ";
                 }
-                secondSet = false;
+                allGood = false;
             }
             else {
                 $('#tableCountBadge').addClass('badge-success');
@@ -876,6 +980,8 @@ t1.createTempView("t1");
                 $('#aggBadge').removeClass('badge-success');
                 $('#aggBadge').addClass('badge-danger');
                 $('#aggBadge').text('X');
+                $('#lowerLevelWarning').text("There are invalid fields on the Aggregate Column Tab.");
+                allGood = false;
             } else {
                 $('#aggBadge').addClass('badge-success');
                 $('#aggBadge').removeClass('badge-warning');
@@ -883,8 +989,27 @@ t1.createTempView("t1");
                 $('#aggBadge').text(aggCount);
             }
 
-            if (warningText != "") {
-                PassHelpText("Schema", "Warning", warningText);
+            //Join Panel Updates
+            $.each($('.onStatements'), function (key1, value1) {
+                var count = $(value1).children().length;
+                $.each($(value1).children(), function (key2, value2) {
+                    console.log($(value2));
+                    if (key2 === count - 1) {
+                        $(value2).children().children('.conditionalController').hide();
+                    } else {
+                        $(value2).children().children('.conditionalController').show();
+                    }
+                });
+            });
+
+            if (!allGood) {
+                if (warningText != "") {
+                    PassHelpText("Schema", "Warning", warningText);                
+                }
+                return false;
+            } else {
+                $('#lowerLevelWarning').text('');
+                return true;
             }
         }
 
@@ -1049,7 +1174,10 @@ t1.createTempView("t1");
 
             //updateJoins();
             updateTables();
-            updateBadges();
+
+            if (!updateBadges()) {
+                return;
+            }
 
             var tables = "";
             var tableNames = "";
@@ -1057,9 +1185,9 @@ t1.createTempView("t1");
 
             var rows = $('#tableSelection').children('.rule-container').children().children().children('.configRow');
 
-            var rules = rows.length;
+            var configRules = rows.length;
             var actualIncludedTables = 0;
-            for (var i = 0; i < rules; i++) {
+            for (var i = 0; i < configRules; i++) {
 
                 var row = $($(rows)[i]).children();
 
@@ -1110,7 +1238,7 @@ t1.createTempView("t1");
 
                                 tables += ".format('" + extension.trim() + "')";
 
-                                if (csvHeader) {
+                                if (jsonMultiline) {
                                     tables += ".option('multiline', 'true')";
                                 } else {
                                     tables += ".option('multiline', 'false')";
@@ -1135,8 +1263,8 @@ t1.createTempView("t1");
             }
 
             var rows = $('#tableSelection').children('.rule-container').children().children().children('.schemaRow');
-            var rules = rows.length;
-            for (var i = 0; i < rules; i++) {
+            var schemaRules = rows.length;
+            for (var i = 0; i < schemaRules; i++) {
 
                 var schemaRevisionRows = $($(rows)[i]).children().children().children().children().children('.schemaRevisionRow');
                 var revisions = schemaRevisionRows.length;
@@ -1176,7 +1304,7 @@ t1.createTempView("t1");
             }
 
 
-            if (valid) {
+            if (valid && (configRules + schemaRules) >= 1) {
                 var json = JSON.stringify(tables.escapeForJson());
 
                 SendCode(json, 'Get Schema', tableNames);
@@ -1218,6 +1346,10 @@ t1.createTempView("t1");
 
             $('#sqlQueryOutput').val(rawQuery);
 
+            if (!updateBadges()) {
+                return;
+            }
+
             if (runNow) {
                 SendCode(json, 'Select Query');
             }
@@ -1244,8 +1376,9 @@ t1.createTempView("t1");
 
             var rows = $('#tableSelection').children('.rule-container').children().children().children('.configRow');
 
-            var rules = rows.length;
-            for (var i = 0; i < rules; i++) {
+            var includedDatasets = 0;
+            var configRules = rows.length;
+            for (var i = 0; i < configRules; i++) {
 
                 var row = $($(rows)[i]).children();
 
@@ -1273,7 +1406,8 @@ t1.createTempView("t1");
                         switch (extension) {
 
                             case "txt":
-                                Join += ".option('header', 'true').option('inferSchema', 'true').text('s3a://" + bucket.trim() + "/" + s3Location.trim() + "/" + query + "');";
+                                Join += ".option('header', 'true').option('inferSchema', 'true').text('s3a://" + bucket.trim() + "/" + s3Location.trim() + query + "');";
+                                includedDatasets++;
                                 break;
                             case "csv":
 
@@ -1284,22 +1418,23 @@ t1.createTempView("t1");
                                 } else {
                                     Join += ".option('header', 'false')";
                                 }
-                                Join += ".option('inferSchema', 'true').load('s3a://" + bucket.trim() + "/" + s3Location.trim() + "/" + query + "'); ";
-
+                                Join += ".option('inferSchema', 'true').load('s3a://" + bucket.trim() + "/" + s3Location.trim() + query + "'); ";
+                                includedDatasets++;
                                 break;
                             case "json":
                                 Join += ".format('" + extension.trim() + "')";
 
-                                if (csvHeader) {
+                                if (jsonMultiline) {
                                     Join += ".option('multiline', 'true')";
                                 } else {
                                     Join += ".option('multiline', 'false')";
                                 }
-                                Join += ".option('inferSchema', 'true').json('s3a://" + bucket.trim() + "/" + s3Location.trim() + "/" + query + "'); ";
-
+                                Join += ".option('inferSchema', 'true').json('s3a://" + bucket.trim() + "/" + s3Location.trim() + query + "'); ";
+                                includedDatasets++;
                                 break;
                             case "parquet":
-                                Join += ".format('" + extension.trim() + "').option('inferSchema', 'true').load('s3a://" + bucket.trim() + "/" + s3Location.trim() + "/" + query + "');";
+                                Join += ".format('" + extension.trim() + "').option('inferSchema', 'true').load('s3a://" + bucket.trim() + "/" + s3Location.trim() + query + "');";
+                                includedDatasets++;
                                 break;
                             default:
                                 valid = false;
@@ -1311,13 +1446,13 @@ t1.createTempView("t1");
                     } else {
                         valid = false;
                         failureReason = "No Extension Picked for " + tableName.trim();
-                    }
+                    }             
                 }                
             }
 
             var rows = $('#tableSelection').children('.rule-container').children().children().children('.schemaRow');
-            var rules = rows.length;
-            for (var i = 0; i < rules; i++) {
+            var schemaRules = rows.length;
+            for (var i = 0; i < schemaRules; i++) {
 
                 var schemaRevisionRows = $($(rows)[i]).children().children().children().children().children('.schemaRevisionRow');
                 var revisions = schemaRevisionRows.length;
@@ -1345,10 +1480,45 @@ t1.createTempView("t1");
                         else {
                             Join = "spark.sql(\"Select * from " + databaseName.trim() + "." + tableName.trim() + "\").printSchema();";
                         }
-
+                        includedDatasets++;
                         $('#tablePython').val($('#tablePython').val() + Join + "\n");
                     }
                 }
+            }
+
+            var tableAliasWrong = false;
+            $('.tableNameController').each(function (index) {
+
+                var alphaNumeric = new RegExp(/\W+/g);
+
+                if (alphaNumeric.test($(this).val()) === true || ($(this).val().match(/^\d/))) {
+                    tableAliasWrong = true;
+                    $(this).css("color", "red");
+                    $(this).css("border", "1px solid red");
+
+                } else {
+                    $(this).css("color", "#53565a");
+                    $(this).css("border", "1px solid #ccc");
+                }
+            });
+
+
+
+
+            if (tableAliasWrong) {
+                valid = false;
+                failureReason = "The highlighted aliases above do not meet the correct criteria.  Must start with a character and must only contain [A-Z][a-z][0-9] and underscores."
+            }
+
+            if ((schemaRules + configRules) == 0 ) {
+                valid = false;
+            }
+            else if (includedDatasets == 0)
+            {
+                if (failureReason == "") {
+                    failureReason = "You have not selected any valid datasets above.";
+                }
+                valid = false;
             }
 
             if (valid) {
@@ -1576,6 +1746,7 @@ t1.createTempView("t1");
                                 case "Get Schema":
                                 case "Rename Columns":
                                     renderSchema(filters, tableName);
+                                    vm.JoinPanel().ListofTableNames(tableList);
                                     break;
                                 case "Reset Hive Tables":
                                 case "Get Hive Table":
@@ -1694,11 +1865,15 @@ t1.createTempView("t1");
                         var type = filters[i].substring(filters[i].indexOf(": ") + 1, filters[i].indexOf("("));
 
                         //There is no long in Hive.
-                        if (type.trim() == "long") {
+                        if (type.trim() === "long") {
                             type = "double";
                         }
 
-                        internalFilterList.push({ 'id': tables[index] + '.`' + column.trim() + "`", 'type': type.trim(), 'label': tables[index] + '.' + column.trim() });
+                        if (type.trim() === "timestamp") {
+                            type = "string";
+                        }
+
+                        internalFilterList.push({ 'id': tables[index] + '.`' + column.trim() + "`", 'type': type.trim(), 'label': tables[index] + '.' + column.trim(), 'column' : column.trim() });
 
                         //$('#columnRenamerSelect').append($('<option/>', {
                         //    value: tables[index] + '.`' + column.trim() + "`",

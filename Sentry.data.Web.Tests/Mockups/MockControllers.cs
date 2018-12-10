@@ -49,6 +49,9 @@ namespace Sentry.data.Web.Tests
 
         public static DatasetController MockDatasetController(Dataset ds, IApplicationUser user, List<DatasetSubscription> datasetSubscriptions = null)
         {
+
+            Random r = new Random();
+
             var mockDatasetContext = MockRepository.GenerateStub<IDatasetContext>();
             var mockDataAssetContext = MockRepository.GenerateStub<IDataAssetContext>();
             var mockAssociateService = MockRepository.GenerateStub<IAssociateInfoProvider>();
@@ -98,6 +101,7 @@ namespace Sentry.data.Web.Tests
             mockDatasetContext.Stub(x => x.GetCategoryById(0)).Return(MockClasses.MockCategories()[0]);
             mockDatasetContext.Stub(x => x.GetAllDatasetScopeTypes()).Return(MockClasses.MockScopeTypes());
             mockDatasetContext.Stub(x => x.isDatasetNameDuplicate(ds.DatasetName, ds.Category)).Return(false);
+            mockDatasetContext.Stub(x => x.GetNextStorageCDE()).Return(r.Next(0, 1000000));
 
             mockUserService.Stub(x => x.GetCurrentUser()).Return(user);
 

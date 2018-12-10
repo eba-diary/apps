@@ -532,6 +532,13 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Modified" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="e6e43e42-f4da-433c-a79e-78c4e1813f57" ChangeDateTime="10/09/2018 22:14:51">
+    <Property Name="ElementName" Value="[dbo].[ApplicationConfiguration].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ApplicationConfiguration]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="AppConfig_Id" />
+  </Operation>
   <Operation Name="Rename Refactor" Key="7ebd6840-6903-45ac-afa7-8e1a27360aef" ChangeDateTime="11/14/2018 15:20:53">
     <Property Name="ElementName" Value="[dbo].[Tag].[Id]" />
     <Property Name="ElementType" Value="SqlSimpleColumn" />

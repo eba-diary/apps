@@ -65,6 +65,18 @@ namespace Sentry.data.Core.Entities.Metadata
                 SetDataElementDetailValue("FileFormat_TYP", value);
             }
         }
+        public virtual string Delimiter
+        {
+            get
+            {
+                DataElementDetail detail = GetElementDetail("Delimiter_TYP");
+                return (detail == null) ? null : detail.DataElementDetailType_VAL;
+            }
+            set
+            {
+                SetDataElementDetailValue("Delimiter_TYP", value);
+            }
+        }
         public virtual int SchemaRevision
         {
             get
@@ -125,6 +137,18 @@ namespace Sentry.data.Core.Entities.Metadata
                 SetDataElementDetailValue("HiveDatabase_NME", value);
             }
         }
+        public virtual string StorageCode
+        {
+            get
+            {
+                DataElementDetail detail = GetElementDetail("Storage_CDE");
+                return detail?.DataElementDetailType_VAL;
+            }
+            set
+            {
+                SetDataElementDetailValue("Storage_CDE", value);
+            }
+        }
 
         #region DataElementDetailHelpers
         private DataElementDetail GetElementDetail(string typeCDE)
@@ -137,11 +161,21 @@ namespace Sentry.data.Core.Entities.Metadata
             DataElementDetail item = GetElementDetail(typeCDE);
             if (item != null)
             {
-                item.DataElementDetailType_VAL = val;
+                //if we only want to set the tyepCDE value on initialization, then when tyepCDE exists
+                // we do nothing with the value. Otherwise, we set it to the incoming value
+                switch (typeCDE)
+                {
+                    case "Storage_CDE":
+                        //only set value on initialization
+                        break;
+                    default:
+                        item.DataElementDetailType_VAL = val;
+                        break;
+                }                
             }
             else
             {
-                AddDataElementDetail(typeCDE, val);
+                AddDataElementDetail(typeCDE, val);                
             }
         }
 

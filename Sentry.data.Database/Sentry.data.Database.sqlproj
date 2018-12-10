@@ -108,6 +108,7 @@
     <Folder Include="Security\" />
     <Folder Include="Tables\HangFire" />
     <Folder Include="Tables\Metadata" />
+    <Folder Include="Views" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -172,6 +173,8 @@
     <Build Include="Tables\Metadata\LineageLoad.sql" />
     <Build Include="Tables\Metadata\STG_LineageLoad.sql" />
     <Build Include="Tables\Metadata\vw_DataLineage.sql" />
+    <Build Include="Tables\ApplicationConfiguration.sql" />
+    <Build Include="Views\vw_Schema.sql" />
     <Build Include="Tables\Metadata\Tag.sql" />
     <Build Include="Tables\Metadata\ObjectTag.sql" />
   </ItemGroup>

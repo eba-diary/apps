@@ -270,10 +270,6 @@ data.DatasetDetail = {
             //stateSave: true,
             //stateDuration: -1  // indicates session storage, not local storage
             "createdRow": function (row, data, dataIndex) {
-                if (data["IsUsable"] === false)
-                {
-                    $(row).css('background-color', '#ffd1d1');
-                }
             }
             
         });
@@ -976,19 +972,6 @@ data.DatasetDetail = {
                 { data: "CreateDTM", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
                 { data: "ModifiedDTM", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
                 { data: "ConfigFileName", className: "ConfigFileName" },
-                {
-                    data: "IsUsable",
-                    width: "65px",
-                    render: function (data, type, row) {
-                        if (data === true) {
-                            return '<input type=\"checkbox\" disabled checked value="' + data + '">';
-                        } else {
-                            return '<input type=\"checkbox\" disabled value="' + data + '">';
-                        }
-                        //return data;
-                    },
-                    className: "dt-body-center"
-                },
             ],
             language: {
                 search: "<div class='input-group'><span class='input-group-addon'><i class='glyphicon glyphicon-search'></i></span>_INPUT_</div>",
@@ -999,9 +982,6 @@ data.DatasetDetail = {
             stateSave: true,
             //stateDuration: -1  // indicates session storage, not local storage
             "createdRow": function (row, data, dataIndex) {
-                if (data["IsUsable"] == false) {
-                    $(row).addClass('unUsable');
-                }
             }
         });
 
@@ -1016,8 +996,7 @@ data.DatasetDetail = {
                 { type: "text" },
                 { type: "date-range" },
                 { type: "date-range" },
-                { type: "text" },
-                { type: "select", values: values }
+                { type: "text" }
             ],
         });
 
@@ -1085,19 +1064,6 @@ data.DatasetDetail = {
                 { data: "CreateDTM", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
                 { data: "ModifiedDTM", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
                 { data: "ConfigFileName", className: "ConfigFileName" },
-                {
-                    data: "IsUsable",
-                    width: "65px",
-                    render: function (data, type, row) {
-                        if (data === true) {
-                            return '<input type=\"checkbox\" disabled checked value="' + data + '">';
-                        } else {
-                            return '<input type=\"checkbox\" disabled value="' + data + '">';
-                        }
-                        //return data;
-                    },
-                    className: "dt-body-center"
-                },
             ],
             language: {
                 search: "<div class='input-group'><span class='input-group-addon'><i class='glyphicon glyphicon-search'></i></span>_INPUT_</div>",
@@ -1108,9 +1074,6 @@ data.DatasetDetail = {
             stateSave: true,
             //stateDuration: -1  // indicates session storage, not local storage
             "createdRow": function (row, data, dataIndex) {
-                if (data["IsUsable"] == false) {
-                    $(row).addClass('unUsable');
-                }
             }
         });
 
@@ -1125,8 +1088,7 @@ data.DatasetDetail = {
                 { type: "text" },
                 { type: "date-range" },
                 { type: "date-range" },
-                { type: "text" },
-                { type: "select", values: values }
+                { type: "text" }
             ],
         });
 
@@ -1396,15 +1358,6 @@ data.DatasetDetail = {
                 '<tr>' +
                 '<td><b>Information</b>: </td>' +
                 '<td>' + d.Information + '</td>' +
-                '</tr>';
-        }
-
-        if (d.IsUsable !== undefined)
-        {
-            table +=
-                '<tr>' +
-                    '<td><b>Usable</b>: </td>' +
-                    '<td>' + d.IsUsable + '</td>' +
                 '</tr>';
         }
 

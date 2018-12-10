@@ -12,14 +12,14 @@ using System.Web.Http;
 
 namespace Sentry.data.Web.Controllers
 {
-    public class SchemaController : ApiController
+    public class MetadataController : ApiController
     {
         private MetadataRepositoryService _metadataRepositoryService;
         private IDatasetContext _dsContext;
         private IAssociateInfoProvider _associateInfoService;
         private UserService _userService;
 
-        public SchemaController(MetadataRepositoryService metadataRepositoryService, IDatasetContext dsContext, IAssociateInfoProvider associateInfoService, UserService userService)
+        public MetadataController(MetadataRepositoryService metadataRepositoryService, IDatasetContext dsContext, IAssociateInfoProvider associateInfoService, UserService userService)
         {
             _metadataRepositoryService = metadataRepositoryService;
             _dsContext = dsContext;
@@ -63,13 +63,28 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         [Route("Get")]
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        public async Task<IHttpActionResult> GetBasicMetadataInformationForSchema(int SchemaID)
+        {
+            DataElement schema = _dsContext.GetById<DataElement>(SchemaID);
+
+            return await GetMetadata(schema.DatasetFileConfig);
+        }
+
+
+        [HttpGet]
+        [Route("Get")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> GetBasicMetadataInformationFor(int DatasetConfigID)
+        {
+            DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
+
+            return await GetMetadata(config);
+        }
+
+        private async Task<IHttpActionResult> GetMetadata(DatasetFileConfig config)
         {
             try
             {
-                DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
-                //DatasetFileConfig config = _dsContext.getDatasetFileConfigs(DatasetConfigID);
-
                 Event e = new Event();
                 e.EventType = _dsContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
                 e.Status = _dsContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
@@ -144,17 +159,30 @@ namespace Sentry.data.Web.Controllers
 
 
 
-
-
         [HttpGet]
         [Route("Get")]
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> GetColumnSchemaInformationFor(int DatasetConfigID, int SchemaID = 0)
         {
-            try
-            {
-                DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
+            DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
 
+            return await GetColumnSchema(config, SchemaID);
+        }
+
+        [HttpGet]
+        [Route("Get")]
+        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        public async Task<IHttpActionResult> GetColumnSchemaInformationForSchema(int SchemaID)
+        {
+            DataElement schema = _dsContext.GetById<DataElement>(SchemaID);
+
+            return await GetColumnSchema(schema.DatasetFileConfig, SchemaID);
+        }
+
+        private async Task<IHttpActionResult> GetColumnSchema(DatasetFileConfig config, int SchemaID)
+        { 
+            try
+            {       
                 if (config.Schema.Any())
                 {
                     var a = config.Schema.ToList();

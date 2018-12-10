@@ -105,6 +105,8 @@ namespace Sentry.data.Web
         
         public string TargetFileType { get; set; }
 
+        public string Delimiter { get; set; }
+
         public IEnumerable<SelectListItem> SourceTypes { get; set; }
 
         public IEnumerable<SelectListItem> ExtensionList { get; set; }

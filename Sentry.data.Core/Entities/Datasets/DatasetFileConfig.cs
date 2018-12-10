@@ -46,13 +46,13 @@ namespace Sentry.data.Core
               
         }
 
-        public virtual string GetSchema()
-        {
-            return null;
-        }
         public virtual DataElement GetLatestSchemaRevision()
         {
             return Schema.OrderByDescending(o => o.SchemaRevision).Take(1).SingleOrDefault();
+        }
+        public virtual string GetStorageCode()
+        {
+            return GetLatestSchemaRevision().StorageCode;
         }
     }
 }

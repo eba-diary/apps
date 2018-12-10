@@ -679,7 +679,7 @@
 
             $.ajax({
                 type: "GET",
-                url: "/api/Schema/GetColumnSchemaInformationFor?DatasetConfigID=" + url_parts[3] + "&SchemaID=" + url_parts[5],
+                url: "/api/Metadata/GetColumnSchemaInformationFor?DatasetConfigID=" + url_parts[3] + "&SchemaID=" + url_parts[5],
                 contentType: "application/json",
                 success: function (returnedData) {
                     console.log(returnedData);

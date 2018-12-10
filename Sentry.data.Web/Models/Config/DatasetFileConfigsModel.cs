@@ -27,6 +27,7 @@ namespace Sentry.data.Web
             this.FileExtensionID = dsfc.FileExtension.Id;
             this.FileExtension = dsfc.FileExtension;
             this.Schemas = dsfc.Schema;
+            this.RawStorageId = dsfc.GetStorageCode();
 
             try
             {
@@ -66,6 +67,7 @@ namespace Sentry.data.Web
             this.FileExtensionID = dsfc.FileExtension.Id;
             this.FileExtension = dsfc.FileExtension;
             this.Schemas = dsfc.Schema;
+            this.RawStorageId = dsfc.GetStorageCode();
 
             try
             {
@@ -121,6 +123,8 @@ namespace Sentry.data.Web
         [DisplayName("Description")]
         public string ConfigFileDesc { get; set; }
 
+        public string Delimiter { get; set; }
+
         public int DatasetId { get; set; }
         public string EditHref
         {
@@ -141,6 +145,7 @@ namespace Sentry.data.Web
 
         public FileExtension FileExtension { get; set; }
         public int FileExtensionID { get; set; }
+        public string RawStorageId { get; set; }
 
         public IList<RetrieverJob> RetrieverJobs { get; set; }
 

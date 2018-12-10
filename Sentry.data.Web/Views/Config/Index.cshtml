@@ -209,8 +209,8 @@
                             <p style="margin-top: 15px;">@item.ConfigFileDesc</p>
                         }
 
+                        <p>Raw storage location id: @item.RawStorageId</p>
                         <p>This configuration is classified as a @item.FileType</p>
-                        <p>This configuration has a Data Element ID of @item.DataElement_ID</p>
                         <p>This configuration Data Scope is @item.ScopeType.Name which means : </p>
                         <p style="margin-left: 25px;">@item.ScopeType.Description</p>
                         @if (item.FileExtension.Name.Trim() == "ANY")
@@ -318,7 +318,7 @@
                                         
                                         @if (schema.SchemaIsPrimary)
                                         {
-                                            <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-ok"></span> This is the Primary Schema</span>
+                                            <span style="float: right; margin-top: 10px;margin-righ t: 10px;"><span class="glyphicon glyphicon-ok"></span> This is the Primary Schema</span>
                                         }    
                                         @*@if (schema.HiveTable.Any(x => x.IsPrimary))
                                         {
@@ -332,14 +332,19 @@
                                         {
                                             <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-remove"></span> Force Match</span>
                                         }
+
+                                        
+
                                     </div>
                                     <div class="jobContainer" style="display:none;">
 
                                         <p>@schema.SchemaDescription</p>
+                                        <p>This schema's current Delimiter is <b>@schema.Delimiter</b></p>
 
                                         @if(schema.DataObjects.Count() == 0)
                                         {
-                                            <p>This schema is not currently tied to a Data Object in the Metadata Repoistory and thus you cannot update it's fields or columns.</p>
+                                            <p>This schema has a Data Element ID of @schema.DataElement_ID.</p>
+                                            <p>This schema is not currently does not yet have any columns associated to it.</p>
                                         }
                                         else
                                         {

@@ -88,10 +88,6 @@ namespace Sentry.data.Core
         {
             ValidationResults vr = new ValidationResults();
 
-            if (string.IsNullOrWhiteSpace(S3Key))
-            {
-                vr.Add(ValidationErrors.s3keyIsBlank, "The Dataset S3 Key is required");
-            }
             if (string.IsNullOrWhiteSpace(Category))
             {
                 vr.Add(ValidationErrors.categoryIsBlank, "The Dataset Category is required");

@@ -206,7 +206,9 @@ namespace Sentry.data.Web.Controllers
                 SchemaName = dfcm.ConfigFileName,
                 SchemaRevision = 1,
                 SchemaIsForceMatch = false,
-                FileFormat = _datasetContext.GetById<FileExtension>(dfcm.FileExtensionID).Name.Trim()
+                Delimiter = dfcm.Delimiter,
+                FileFormat = _datasetContext.GetById<FileExtension>(dfcm.FileExtensionID).Name.Trim(),
+                StorageCode = _datasetContext.GetNextStorageCDE().ToString()
             };
 
             return de;
@@ -1514,9 +1516,8 @@ namespace Sentry.data.Web.Controllers
 
                     dofList.Add(dof);
 
-                        //_datasetContext.Remove<DataObjectFieldDetail>(temp);
-                    }
-                
+
+                }
 
                 DOBJ.DataObjectFields = dofList;
 
@@ -1528,7 +1529,8 @@ namespace Sentry.data.Web.Controllers
                     _datasetContext.Merge(newRevision);
                     _datasetContext.SaveChanges();
                 }
-                
+
+
 
                 Event e = new Event();
                 e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
@@ -1593,6 +1595,8 @@ namespace Sentry.data.Web.Controllers
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configId);
 
             DataElement maxSchemaRevision = dfc.Schema.OrderByDescending(o => o.SchemaRevision).FirstOrDefault();
+            //Get raw file storage code
+            string storageCode = dfc.GetStorageCode();
 
             try
             {
@@ -1608,11 +1612,13 @@ namespace Sentry.data.Web.Controllers
                         DataElement_NME = csm.Name,
                         DataElement_DSC = csm.Description,
                         DatasetFileConfig = dfc,
+                        Delimiter = csm.Delimiter,
                         SchemaName = csm.Name,
                         SchemaDescription = csm.Description,
                         SchemaIsForceMatch = csm.IsForceMatch,
                         SchemaIsPrimary = true,
-                        SchemaRevision = (maxSchemaRevision == null) ? 0 : maxSchemaRevision.SchemaRevision + 1
+                        SchemaRevision = (maxSchemaRevision == null) ? 0 : maxSchemaRevision.SchemaRevision + 1,
+                        StorageCode = storageCode
                     };
 
                     dfc.Schema.Add(de);
@@ -1620,7 +1626,7 @@ namespace Sentry.data.Web.Controllers
                     if (maxSchemaRevision != null)
                     {
                         maxSchemaRevision.SchemaIsPrimary = false;
-                    }   
+                    }
 
                     _datasetContext.SaveChanges();
 
@@ -1658,7 +1664,8 @@ namespace Sentry.data.Web.Controllers
                 IsForceMatch = schema.SchemaIsForceMatch,
                 IsPrimary = schema.SchemaIsPrimary,
                 DatasetId = schema.DatasetFileConfig.ParentDataset.DatasetId,
-                DataObject_ID = schema.DataElement_ID
+                Delimiter = schema.Delimiter,
+                DataElement_ID = schema.DataElement_ID
             };
 
             Event e = new Event();
@@ -1689,6 +1696,7 @@ namespace Sentry.data.Web.Controllers
                     schema.SchemaDescription = esm.Description;
                     schema.SchemaIsForceMatch = esm.IsForceMatch;
                     schema.SchemaIsPrimary = esm.IsPrimary;
+                    schema.Delimiter = esm.Delimiter;
                     schema.DataElementChange_DTM = DateTime.Now;
 
                     _datasetContext.Merge(schema);

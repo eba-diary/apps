@@ -875,7 +875,7 @@ namespace Sentry.data.Infrastructure
             {
                 // Get a list of objects
                 listResponse = S3Client.ListObjects(listRequest);
-                foreach (S3Object obj in listResponse.S3Objects)
+                foreach (S3Object obj in listResponse.S3Objects.OrderBy(o => o.LastModified))
                 {
                     //Remove prefix object (folder)
                     if (obj.Key != prefix)

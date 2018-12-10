@@ -217,8 +217,11 @@ namespace Sentry.data.Web.Tests
             var dfc = MockClasses.MockDataFileConfig(ds);
             var job = MockClasses.GetMockRetrieverJob(dfc);
             var df = MockClasses.MockDataFile(ds, dfc, user);
+            var de = MockClasses.MockDataElement(dfc);
 
+            dfc.Schema.Add(de);
             dfc.RetrieverJobs.Add(job);
+
             ds.DatasetFileConfigs.Add(dfc);
             ds.DatasetFiles.Add(df);
 

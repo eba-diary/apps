@@ -188,7 +188,7 @@ namespace Sentry.data.Web.Controllers
                 
 
 
-                json += ", \"conf\": { \"spark.hadoop.fs.s3a.security.credntial.provider.path\" : \"" + Config.GetHostSetting("SparkS3AKeyLocation") + "\"}";
+                json += ", \"conf\": { \"spark.hadoop.fs.s3a.security.credential.provider.path\" : \"" + Config.GetHostSetting("SparkS3AKeyLocation") + "\"}";
                 json += "}";
 
 
@@ -499,7 +499,7 @@ namespace Sentry.data.Web.Controllers
 
             var obj = new
             {
-                s3Key = Sentry.Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + Utilities.GenerateDatasetStorageLocation("QueryTool/Bundle", user.AssociateId)
+                s3Key = Sentry.Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + Utilities.GenerateCustomStorageLocation(new string[] { "QueryTool/Bundle", user.AssociateId })
             };
 
             return Ok(obj);
@@ -562,7 +562,7 @@ namespace Sentry.data.Web.Controllers
 
                     qd.configName = item.Name;
                     qd.bucket = Sentry.Configuration.Config.GetHostSetting("AWSRootBucket");
-                    qd.s3Key = ds.S3Key + item.ConfigId;
+                    qd.s3Key = Utilities.GenerateLocationKey(item);
                     
 
                     qd.fileCount = ds.DatasetFiles.Where(x => x.DatasetFileConfig.ConfigId == item.ConfigId && x.ParentDatasetFileId == null).ToList().Count;

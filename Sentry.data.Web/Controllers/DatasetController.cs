@@ -145,7 +145,7 @@ namespace Sentry.data.Web.Controllers
                         FileTypeId = (int)FileType.DataFile,
                         ParentDataset = ds,
                         DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(cdm.DatasetScopeTypeID),
-                        FileExtension = _datasetContext.GetById<FileExtension>(cdm.FileExtensionID)
+                        FileExtension = _datasetContext.GetById<FileExtension>(cdm.FileExtensionID),                        
                     };
 
                     de.DatasetFileConfig = dfc;
@@ -236,7 +236,9 @@ namespace Sentry.data.Web.Controllers
                 SchemaName = cdm.ConfigFileName,
                 SchemaRevision = 1,
                 SchemaIsForceMatch = false,
-                FileFormat = _datasetContext.GetById<FileExtension>(cdm.FileExtensionID).Name.ToUpper()
+                FileFormat = _datasetContext.GetById<FileExtension>(cdm.FileExtensionID).Name.ToUpper(),
+                Delimiter = cdm.Delimiter,
+                StorageCode = _datasetContext.GetNextStorageCDE().ToString()
             };
 
             return de;
@@ -246,13 +248,13 @@ namespace Sentry.data.Web.Controllers
         private Dataset CreateDatasetFromModel(CreateDatasetModel cdm)
         {
             DateTime CreateTime = DateTime.Now;
-            string cat = _datasetContext.GetCategoryById(cdm.CategoryIDs).Name;
+            Category cat = _datasetContext.GetById<Category>(cdm.CategoryIDs);
             IApplicationUser user = _userService.GetCurrentUser();
 
             Dataset ds = new Dataset()
             {
                 DatasetId = 0,
-                Category = cat,
+                Category = cat.Name,
                 DatasetCategory = _datasetContext.GetCategoryById(cdm.CategoryIDs),
                 DatasetName = cdm.DatasetName,
                 DatasetDesc = cdm.DatasetDesc,
@@ -263,7 +265,6 @@ namespace Sentry.data.Web.Controllers
                 OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), cdm.OriginationID),
                 DatasetDtm = CreateTime,
                 ChangedDtm = CreateTime,
-                S3Key = Utilities.GenerateDatasetStorageLocation(cat, cdm.DatasetName),
                 IsSensitive = false,
                 CanDisplay = true,
                 DatasetFiles = null,
@@ -410,7 +411,6 @@ namespace Sentry.data.Web.Controllers
                 ds.Tags.Add(_datasetContext.Tags.Where(x => x.TagId == json[i]).FirstOrDefault());
             }
 
-            ds.S3Key = Utilities.GenerateDatasetStorageLocation(ds.Category, ds.DatasetName);
             return ds;
         }
 
@@ -495,8 +495,6 @@ namespace Sentry.data.Web.Controllers
             DateTime now = DateTime.Now;
 
             df.Information = dfgm.Information;
-            
-            df.IsUsable = dfgm.IsUsable;
 
             df.ModifiedDTM = now;
         }
@@ -1171,7 +1169,6 @@ namespace Sentry.data.Web.Controllers
             Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
 
             Boolean bundlingSensitive = files.Any(x => x.Dataset.IsSensitive);
-            Boolean bundlingUnUsable = files.Any(x => !x.IsUsable);
 
             if(newName == "" || newName == null)
             {
@@ -1206,12 +1203,6 @@ namespace Sentry.data.Web.Controllers
             {
                 errorsFound = true;
                 errorString += "<p>The files did not have the same file extension. Bundling requires that all files have the same extension.  Please filter by putting the file extension in either the Name Column or the Search Box provided at the top right of the table.</p>";
-            }
-
-            if(bundlingUnUsable)
-            {
-                errorsFound = true;
-                errorString += "<p>The files were not all labeled usable. Bundling requires that all files be labeled usable.  Please filter using the Usable Column.</p>";
             }
 
             try
@@ -1590,29 +1581,7 @@ namespace Sentry.data.Web.Controllers
 
             return Json(obj, JsonRequestBehavior.AllowGet);
         }
-
-
-        public JsonResult GetS3Key(int datasetID)
-        {
-            Dataset ds = _datasetContext.GetById<Dataset>(datasetID);
-
-            List<string> extensions = new List<string>();
-
-            foreach (var item in ds.DatasetFiles)
-            {
-                extensions.Add(Utilities.GetFileExtension(item.FileName));
-            }
-
-
-            var obj = new
-            {
-                s3Key = ds.S3Key,
-                fileExtensions = extensions.Distinct()
-            };
-
-            return Json(obj, JsonRequestBehavior.AllowGet);
-        }
-
+        
         [AuthorizeByPermission(PermissionNames.QueryToolPowerUser)]
         public ActionResult QueryTool()
         {

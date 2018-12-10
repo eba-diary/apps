@@ -38,8 +38,6 @@ namespace Sentry.data.Core
 
         public virtual Boolean IsBundled { get; set; }
 
-        public virtual Boolean IsUsable { get; set; }
-
         public virtual string Information { get; set; }
 
         public virtual long Size { get; set; }

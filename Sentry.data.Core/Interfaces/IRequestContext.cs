@@ -17,6 +17,8 @@ namespace Sentry.data.Core
 
         IQueryable<DataSourceType> DataSourceTypes { get; }
 
+        IQueryable<ApplicaitonConfiguration> ApplicaitonConfigurations { get; }
+
         IList<RTSourceTypes> GetSourceTypes();
 
         IList<RTRequest> GetEnabledRequests();

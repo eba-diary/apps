@@ -12,6 +12,7 @@ using System.Collections;
 using System.Web;
 using System.Linq.Expressions;
 using Sentry.data.Core.Entities;
+using System.Data.SqlClient;
 
 namespace Sentry.data.Infrastructure
 {
@@ -428,5 +429,58 @@ namespace Sentry.data.Infrastructure
             return Query<Event>().Cacheable().Where(e => e.TimeCreated >= time && e.IsProcessed == IsProcessed && e.EventType.Display).ToList();
         }
 
+        /// <summary>
+        /// Generates unique value for storage location
+        /// </summary>
+        /// <returns></returns>
+        public int GetNextStorageCDE()
+        {
+            string sqlConnString = null;
+            string sqlQueryString = null;
+
+            sqlConnString = Sentry.Configuration.Config.GetHostSetting("DatabaseConnectionString");
+            sqlQueryString = $"SELECT NEXT VALUE FOR seq_StorageCDE";
+            int result = ExecuteQuery(sqlConnString, sqlQueryString);
+
+            //Reversing the order of the number for additional randomness in storage pattern.
+            char[] charArray = result.ToString().ToCharArray();
+            Array.Reverse(charArray);
+
+            return Int32.Parse(new string(charArray));
+        }
+
+        private int ExecuteQuery(string sqlConnStr, string sqlQueryStr)
+        {
+            SqlConnection sqlConn = null;
+            List<DataAssetHealth> healthList = new List<DataAssetHealth>();
+            try
+            {
+                sqlConn = new SqlConnection(sqlConnStr);
+                sqlConn.Open();
+                SqlCommand sqlCmd = new SqlCommand(sqlQueryStr, sqlConn);
+                SqlDataReader reader = sqlCmd.ExecuteReader();
+
+                int result = 0;
+                while (reader.Read())
+                {
+                    result = Int32.Parse(reader[0].ToString());                    
+                }
+                return result;
+            }
+            catch (Exception ex)
+            {
+                // TODO: log the exception... for now it's being eaten...
+                Sentry.Common.Logging.Logger.Error("Unable to execute query (" + sqlQueryStr + ") against (" + sqlConnStr + ")", ex);
+                throw;
+            }
+            finally
+            {
+                if (sqlConn != null)
+                {   // close connection
+                    sqlConn.Close();
+                    sqlConn.Dispose();
+                }
+            }
+        }
     }
 }

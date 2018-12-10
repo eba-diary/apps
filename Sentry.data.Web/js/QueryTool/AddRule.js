@@ -52,7 +52,6 @@
         "</div>" +
         "</div>");
 
-    updateJoins();
     updateTables();
     updateBadges();
 }
@@ -196,8 +195,6 @@ function addOrRemoveColumnRename(text, selected) {
         id = "#" + id;
         $(id).remove();
     }
-
-    updateJoins();
     updateTables();
     updateBadges();
 }
@@ -238,7 +235,6 @@ function addOrderByRule() {
         }
     }
 
-    updateJoins();
     updateTables();
     updateBadges();
 }
@@ -291,7 +287,6 @@ function addHavingRule() {
         }
     }
 
-    updateJoins();
     updateTables();
     updateBadges();
 }
@@ -328,7 +323,6 @@ function addGroupByRule() {
         }
     }
 
-    updateJoins();
     updateTables();
     updateBadges();
 }
@@ -378,7 +372,6 @@ function addAggregateRule() {
         }
     }
 
-    updateJoins();
     updateTables();
     updateBadges();
 }

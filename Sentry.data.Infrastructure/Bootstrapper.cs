@@ -89,6 +89,7 @@ namespace Sentry.data.Infrastructure
             registry.For<ISASService>().Singleton().Use<SASServiceProvider>();
             registry.For<IFtpProvider>().Singleton().Use<FtpProvider>();
             registry.For<IDatasetService>().Singleton().Use<S3ServiceProvider>();
+            registry.For<IMessagePublisher>().Singleton().Use<KafkaMessagePublisher>();
             
             //Create the StructureMap container
             _container = new StructureMap.Container(registry);

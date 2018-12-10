@@ -56,10 +56,10 @@
         </div>
 
         <div class="form-group">
-            @Html.LabelFor(model => model.DataObject_ID, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.Delimiter, htmlAttributes: new { @class = "control-label col-md-2 optional" })
             <div class="col-md-10">
-                @Html.TextBoxFor(model => model.DataObject_ID, new { @value = "", @class = "form-control edit-dataset-row" })
-                @Html.ValidationMessageFor(model => model.DataObject_ID, "", new { @class = "text-danger" })
+                @Html.TextBoxFor(model => model.Delimiter, new { @value = "", @class = "form-control edit-dataset-row" })
+                @Html.ValidationMessageFor(model => model.Delimiter, "", new { @class = "text-danger" })
             </div>
         </div>
     </div>
