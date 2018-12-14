@@ -15,6 +15,7 @@ namespace Sentry.data.Core
         }
         public virtual int HistoryId { get; set; }
         public virtual RetrieverJob JobId { get; set; }
+        public virtual Guid JobGuid { get; set; }
         public virtual int BatchId { get; set; }
         public virtual string State { get; set; }
         public virtual string LivyAppId { get; set; }

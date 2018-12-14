@@ -176,6 +176,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<RetrieverJob> Jobs
+        {
+            get
+            {
+                return Query<RetrieverJob>();
+            }
+        }
+
         public IQueryable<JobHistory> JobHistory
         {
             get

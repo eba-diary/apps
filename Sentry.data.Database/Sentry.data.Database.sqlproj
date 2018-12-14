@@ -177,6 +177,8 @@
     <Build Include="Views\vw_Schema.sql" />
     <Build Include="Tables\Metadata\Tag.sql" />
     <Build Include="Tables\Metadata\ObjectTag.sql" />
+    <Build Include="Tables\RetrieverJobs\Submission.sql" />
+    <Build Include="Tables\RetrieverJobs\RetrieverJobArchive.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

@@ -1,25 +1,24 @@
-﻿using System;
+﻿using NHibernate;
+using NHibernate.Mapping.ByCode;
+using NHibernate.Mapping.ByCode.Conformist;
+using Sentry.data.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using NHibernate.Mapping.ByCode;
-using NHibernate.Mapping.ByCode.Conformist;
-using Sentry.data.Core;
-using NHibernate;
-
 
 namespace Sentry.data.Infrastructure.Mappings.Primary
 {
-    public class RetrieverJobMapping : ClassMapping<RetrieverJob>
+     public class RetrieverJobArchiveMapping : ClassMapping<RetrieverJobArchive>
     {
-        public RetrieverJobMapping()
+        public RetrieverJobArchiveMapping()
         {
-            Table("RetrieverJob");
+            Table("RetrieverJobArchive");
 
-            Id(x => x.Id, m =>
+            Id(x => x.Archive_Id, m =>
             {
-                m.Column("Job_ID");
+                m.Column("Archive_Id");
                 m.Generator(Generators.Identity);
             });
 
@@ -46,7 +45,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Column("Modified_DTM");
                 m.NotNullable(false);
             });
-            
+
             this.Property((x) => x.IsGeneric, (m) => m.Column("IsGeneric_IND"));
 
             this.Property((x) => x.IsEnabled, (m) => m.Column("IsEnabled"));
@@ -74,33 +73,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Class(typeof(DatasetFileConfig));
             });
 
-            this.Bag(x => x.JobHistory, (m) =>
-            {
-                m.Lazy(CollectionLazy.Lazy);
-                m.Inverse(true);
-                m.Table("JobHistory");
-                m.Cascade(Cascade.All);
-                m.Cache(c => c.Usage(CacheUsage.ReadWrite));
-                m.Key((k) =>
-                {
-                    k.Column("Job_ID");
-                    k.ForeignKey("FK_JobHistory_RetrieverJob");
-                });
-            }, map => map.OneToMany(a => a.Class(typeof(JobHistory))));
-
-            this.Bag(x => x.Submissions, (m) =>
-            {
-                m.Lazy(CollectionLazy.Lazy);
-                m.Inverse(true);
-                m.Table("Submission");
-                m.Cascade(Cascade.All);
-                m.Cache(c => c.Usage(CacheUsage.ReadWrite));
-                m.Key((k) =>
-                {
-                    k.Column("Job_ID");
-                    k.ForeignKey("FK_Submission_RetrieverJob");
-                });
-            }, map => map.OneToMany(a => a.Class(typeof(Submission))));
         }
     }
 }

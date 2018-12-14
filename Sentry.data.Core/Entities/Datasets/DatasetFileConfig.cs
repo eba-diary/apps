@@ -52,7 +52,14 @@ namespace Sentry.data.Core
         }
         public virtual string GetStorageCode()
         {
-            return GetLatestSchemaRevision().StorageCode;
+            if (ParentDataset.DatasetType != "RPT")
+            {
+                return GetLatestSchemaRevision().StorageCode;
+            }
+            else
+            {
+                return null;
+            }
         }
     }
 }

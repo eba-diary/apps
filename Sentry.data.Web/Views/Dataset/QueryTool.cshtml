@@ -1873,6 +1873,10 @@ t1.createTempView("t1");
                             type = "string";
                         }
 
+                        if (type.trim() === "decimal") {
+                            type = "string";
+                        }
+
                         internalFilterList.push({ 'id': tables[index] + '.`' + column.trim() + "`", 'type': type.trim(), 'label': tables[index] + '.' + column.trim(), 'column' : column.trim() });
 
                         //$('#columnRenamerSelect').append($('<option/>', {

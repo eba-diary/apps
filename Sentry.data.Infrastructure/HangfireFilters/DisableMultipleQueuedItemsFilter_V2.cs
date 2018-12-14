@@ -18,13 +18,20 @@ namespace Sentry.data.Infrastructure
     /// (i.e two RetrieverJobService.Run(24) method will not run concurrently)
     /// https://gist.github.com/odinserj/a8332a3f486773baa009
     /// </summary>
-    public class DisableMultipleQueuedItemsFilter : JobFilterAttribute, IClientFilter, IServerFilter
+    public class DisableMultipleQueuedItemsFilter_V2 : JobFilterAttribute, IClientFilter, IServerFilter
     {
         private static readonly TimeSpan LockTimeout = TimeSpan.FromSeconds(5);
-        private static readonly TimeSpan FingerprintTimeout = TimeSpan.FromHours(1);
+        private static readonly TimeSpan FingerprintTimeout = TimeSpan.FromMinutes(10);
 
         public void OnCreating(CreatingContext filterContext)
         {
+            //var entries = filterContext.Connection.GetAllEntriesFromHash(GetJobKey(filterContext.Job));
+            //if (entries != null && entries.ContainsKey("jobId"))
+            //{
+            //    // this job was already created once, cancel creation
+            //    filterContext.Canceled = true;
+            //}
+
             if (!AddFingerprintIfNotExists(filterContext.Connection, filterContext.Job))
             {
                 filterContext.Canceled = true;
@@ -49,8 +56,9 @@ namespace Sentry.data.Infrastructure
 
                 if (fingerprint != null &&
                     fingerprint.ContainsKey("Timestamp") &&
-                    DateTimeOffset.TryParse(fingerprint["Timestamp"], null, DateTimeStyles.RoundtripKind, out timestamp) &&
-                    DateTimeOffset.UtcNow <= timestamp.Add(FingerprintTimeout))
+                    DateTimeOffset.TryParse(fingerprint["Timestamp"], null, DateTimeStyles.RoundtripKind, out timestamp) //&&
+                    //DateTimeOffset.UtcNow <= timestamp.Add(FingerprintTimeout)
+                    )
                 {
                     // Actual fingerprint found, returning.
                     return false;
@@ -69,11 +77,33 @@ namespace Sentry.data.Infrastructure
 
         private static void RemoveFingerprint(IStorageConnection connection, Job job)
         {
-            using (connection.AcquireDistributedLock(GetFingerprintLockKey(job), LockTimeout))
+            using (connection.AcquireDistributedLock(GetJobKey(job), LockTimeout))
             using (var transaction = connection.CreateWriteTransaction())
             {
-                transaction.RemoveHash(GetFingerprintKey(job));
+                transaction.RemoveHash(GetJobKey(job));
                 transaction.Commit();
+            }
+        }
+
+        public void OnCreated(CreatedContext filterContext)
+        {
+            if (!filterContext.Canceled)
+            {
+                // job created, mark it as such
+                filterContext.Connection.SetRangeInHash(GetJobKey(filterContext.Job),
+                    new[] { new KeyValuePair<string, string>("jobId", filterContext.BackgroundJob.Id) });
+            }
+        }
+
+        void IServerFilter.OnPerforming(PerformingContext filterContext)
+        {
+        }
+
+        private static string GetJobKey(Job job)
+        {
+            using (var sha512 = SHA512.Create())
+            {
+                return Convert.ToBase64String(sha512.ComputeHash(Encoding.UTF8.GetBytes("execute-once:" + JsonConvert.SerializeObject(job))));
             }
         }
 
@@ -84,34 +114,7 @@ namespace Sentry.data.Infrastructure
 
         private static string GetFingerprintKey(Job job)
         {
-            return String.Format("fingerprint:{0}", GetFingerprint(job));
-        }
-
-        private static string GetFingerprint(Job job)
-        {
-            var parameters = string.Empty;
-            if (job?.Arguments != null)
-            {
-                parameters = string.Join(".", job.Arguments);
-            }
-            if (job?.Type == null || job.Method == null)
-            {
-                return string.Empty;
-            }
-            var payload = $"{job.Type.FullName}.{job.Method.Name}.{parameters}";
-            var hash = SHA256.Create().ComputeHash(System.Text.Encoding.UTF8.GetBytes(payload));
-            var fingerprint = Convert.ToBase64String(hash);
-            return fingerprint;
-        }
-
-        void IClientFilter.OnCreated(CreatedContext filterContext)
-        {
-            throw new NotSupportedException();
-        }
-
-        void IServerFilter.OnPerforming(PerformingContext filterContext)
-        {
-            throw new NotSupportedException();
+            return String.Format("fingerprint:{0}", GetJobKey(job));
         }
     }
 }

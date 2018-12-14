@@ -44,26 +44,28 @@ namespace Sentry.data.Core
                 _compressionOptions = JsonConvert.SerializeObject(value);
             }
         }
-        
-        public virtual JavaOptions JavaAppOptions
-        {
-            get
-            {
-                if (String.IsNullOrEmpty(_javaAppOptions))
-                {
-                    return null;
-                }
-                else
-                {
-                    JavaOptions a = JsonConvert.DeserializeObject<JavaOptions>(_javaAppOptions);
-                    return a;
-                }
-            }
-            set
-            {
-                _javaAppOptions = JsonConvert.SerializeObject(value);
-            }
-        }
+
+        public virtual JavaOptions JavaAppOptions { get; set; }
+
+        //public virtual JavaOptions JavaAppOptions
+        //{
+        //    get
+        //    {
+        //        if (String.IsNullOrEmpty(_javaAppOptions))
+        //        {
+        //            return null;
+        //        }
+        //        else
+        //        {
+        //            JavaOptions a = JsonConvert.DeserializeObject<JavaOptions>(_javaAppOptions);
+        //            return a;
+        //        }
+        //    }
+        //    set
+        //    {
+        //        _javaAppOptions = JsonConvert.SerializeObject(value);
+        //    }
+        //}
 
         //All options pertaining to compression\decompression logic
         [Serializable]
@@ -77,8 +79,8 @@ namespace Sentry.data.Core
         [Serializable]
         public class JavaOptions
         {
-            public string[] Arguments { get; set; }
-            public Dictionary<string, string> ConfigurationParameters { get; set; }
+            public string Arguments { get; set; }
+            public string ConfigurationParameters { get; set; }
             public string DriverMemory { get; set; }
             public int? DriverCores { get; set; }
             public string ExecutorMemory { get; set; }

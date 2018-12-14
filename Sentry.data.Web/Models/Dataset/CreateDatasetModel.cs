@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Mvc;
 using Sentry.data.Core;
 using Sentry.data.Infrastructure;
+using System.Web.Script.Serialization;
 
 namespace Sentry.data.Web
 {
@@ -28,6 +29,7 @@ namespace Sentry.data.Web
             this.UploadUserName = "";
             this.IsSensitive = false;
             this.CanDisplay = true;
+            this.TagString = new JavaScriptSerializer().Serialize(new List<SearchableTag>());
         }
 
         //[DisplayName("File Upload")]

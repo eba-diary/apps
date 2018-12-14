@@ -11,5 +11,6 @@
     [Modified] DATETIME NOT NULL, 
     [BatchId] INT NOT NULL, 
     [ActiveInd] BIT NOT NULL, 
+    [Job_Guid] UNIQUEIDENTIFIER NULL, 
     CONSTRAINT [FK_JobHistory_RetrieverJob] FOREIGN KEY ([Job_ID]) REFERENCES [RetrieverJob]([Job_Id])
 )

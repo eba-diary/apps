@@ -121,15 +121,18 @@ namespace Sentry.data.Infrastructure
             {
                 Dataset ds = Query<Dataset>().FirstOrDefault(y => y.DatasetId == e.Dataset);
 
-                DataFeedItem dfi = new DataFeedItem(
+                if (ds != null)
+                {
+                    DataFeedItem dfi = new DataFeedItem(
                     e.TimeCreated,
                     e.Dataset.ToString(),
                     ds.DatasetName + " - A New Dataset was Created in the " + ds.Category + " Category",
                     ds.DatasetName + " - A New Dataset was Created in the " + ds.Category + " Category",
                     new DataFeed() { Name = "Datasets", Url = "/Datasets/Detail/" + e.Dataset, Type = "Datasets" }
-                );
+                    );
 
-                items.Add(dfi);
+                    items.Add(dfi);
+                }                
             }
 
             var rptEvents = Query<Event>().Where(x => x.Dataset != null && (x.EventType.Description == "Created Report")).OrderByDescending(x => x.TimeCreated).Take(50);

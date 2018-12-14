@@ -75,6 +75,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.NotNullable(true);
             });
 
+            Property(x => x.JobGuid, m =>
+            {
+                m.Column("Job_Guid");
+                m.NotNullable(true);
+            });
+
             this.ManyToOne(x => x.JobId, m =>
             {
                 m.Column("Job_ID");

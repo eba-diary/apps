@@ -173,6 +173,8 @@ namespace Sentry.data.Web.Controllers
                 crm = (CreateBusinessIntelligenceModel)ReportUtility.setupLists(_reportContext, crm);
             }
 
+            ModelState.Remove("TagString");
+
             List<SearchableTag> tagsToReturn = new List<SearchableTag>();
             int[] json = new JavaScriptSerializer().Deserialize<int[]>(crm.TagString);
             for (int i = 0; i < json.Length; i++)
@@ -266,13 +268,15 @@ namespace Sentry.data.Web.Controllers
 
 
 
-            //List<SearchableTag> tagsToReturn = new List<SearchableTag>();
-            //int[] json = new JavaScriptSerializer().Deserialize<int[]>(ebim.TagString);
-            //for (int i = 0; i < json.Length; i++)
-            //{
-            //    tagsToReturn.Add(_reportContext.Tags.Where(x => x.TagId == json[i]).FirstOrDefault().GetSearchableTag());
-            //}
-            ebim.TagString = new JavaScriptSerializer().Serialize(_reportContext.GetById<Dataset>(ebim.DatasetId).Tags.Select(x => x.GetSearchableTag()));
+            List<SearchableTag> tagsToReturn = new List<SearchableTag>();
+            int[] json = new JavaScriptSerializer().Deserialize<int[]>(ebim.TagString);
+            for (int i = 0; i < json.Length; i++)
+            {
+                tagsToReturn.Add(_reportContext.Tags.Where(x => x.TagId == json[i]).FirstOrDefault().GetSearchableTag());
+            }
+            ebim.TagString = new JavaScriptSerializer().Serialize(tagsToReturn);
+
+            ModelState.Remove("TagString");
 
             return View(ebim);
         }

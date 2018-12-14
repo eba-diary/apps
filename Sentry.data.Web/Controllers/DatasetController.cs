@@ -218,6 +218,7 @@ namespace Sentry.data.Web.Controllers
                 tagsToReturn.Add(_datasetContext.Tags.Where(x => x.TagId == json[i]).FirstOrDefault().GetSearchableTag());
             }
             cdm.TagString = new JavaScriptSerializer().Serialize(tagsToReturn);
+            ModelState.Remove("TagString");
             return View(cdm);
         }
 
@@ -347,6 +348,7 @@ namespace Sentry.data.Web.Controllers
                 tagsToReturn.Add(_datasetContext.Tags.Where(x => x.TagId == json[i]).FirstOrDefault().GetSearchableTag());
             }
             edm.TagString = new JavaScriptSerializer().Serialize(tagsToReturn);
+            ModelState.Remove("TagString");
 
             return View(edm);
         }

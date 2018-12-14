@@ -194,7 +194,9 @@
     <Compile Include="Mappings\Primary\Retriever\DataSourceTypeMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\JobHistoryMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\MediaTypeExtensionMapping.cs" />
+    <Compile Include="Mappings\Primary\Retriever\RetrieverJobArchiveMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\RetrieverJobMapping.cs" />
+    <Compile Include="Mappings\Primary\Retriever\SubmissionMapping.cs" />
     <Compile Include="Mappings\Subscriptions\DataAssetSubscriptionMapping.cs" />
     <Compile Include="Mappings\Subscriptions\DatasetSubscriptionMapping.cs" />
     <Compile Include="Mappings\Subscriptions\EventMapping.cs" />

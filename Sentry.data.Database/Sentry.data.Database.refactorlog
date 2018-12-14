@@ -546,4 +546,25 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="TagId" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="4a3694aa-cd41-4a27-95bc-c8f5c74dba91" ChangeDateTime="12/11/2018 15:49:21">
+    <Property Name="ElementName" Value="[dbo].[Submissions].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Submissions]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Submission_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="ca7661c7-12ba-40d5-ba6d-dc701529c38f" ChangeDateTime="12/11/2018 15:58:21">
+    <Property Name="ElementName" Value="[dbo].[RetrieverJobArchive].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[RetrieverJobArchive]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Archive_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="b11c5ce7-824d-4143-847e-1d5cf7f45fae" ChangeDateTime="12/11/2018 16:33:05">
+    <Property Name="ElementName" Value="[dbo].[Submission].[Job_Options]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Submission]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Serialized_Job_Options" />
+  </Operation>
 </Operations>

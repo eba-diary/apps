@@ -27,6 +27,11 @@ namespace Sentry.data.Core
         public virtual string ReadableSchedule {
             get {
 
+                if(Schedule == null)
+                {
+                    return "";
+                }
+
                 var cronParts = Schedule.Split(' ');
 
                 if(cronParts.Length == 1)
@@ -100,6 +105,8 @@ namespace Sentry.data.Core
             }
         }
         public virtual IList<JobHistory> JobHistory { get; set; }
+
+        public virtual IList<Submission> Submissions { get; set; }
 
         public virtual Uri GetUri()
         {

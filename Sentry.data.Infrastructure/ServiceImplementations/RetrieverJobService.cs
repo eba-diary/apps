@@ -19,6 +19,8 @@ using System.Net.Mime;
 using WinSCP;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using Newtonsoft.Json.Linq;
+using Sentry.data.Infrastructure.ServiceImplementations;
 
 namespace Sentry.data.Infrastructure
 {
@@ -465,7 +467,7 @@ namespace Sentry.data.Infrastructure
         #region FTP Processing
         private void ProcessSpecificFileArchive()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
             //Process specific file
             ProcessSpecificFileNoDelete();
 
@@ -476,7 +478,7 @@ namespace Sentry.data.Infrastructure
 
         private void ArchiveSpecificFile(string sourceUrl)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
             //Remove filename from job URI
             string baseDir = sourceUrl.Replace(Path.GetFileName(sourceUrl), "");
 
