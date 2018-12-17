@@ -138,7 +138,7 @@ namespace Sentry.data.Web.Controllers
                         ConfigId = 0,
                         Name = cdm.ConfigFileName,
                         Description = cdm.ConfigFileDesc,
-                        //SearchCriteria = cdm.SearchCriteria,
+                        //SearchCriteria = cdm.SearchCriteria, 
                         //DropPath = cdm.DropPath + "default\\",
                         //IsRegexSearch = cdm.IsRegexSearch,
                         //OverwriteDatafile = true,
