@@ -40,7 +40,7 @@ pipeline {
             steps {
                 // Use defaults (MSBuild_2017, configuration: Release, platform: Any CPU, generateProjectSpecificOutputFolder: false)
                 // You can repeat the following line if you have multiple solution files to build
-                dotNetBuild 'Sentry.data.sln'
+                dotNetBuild 'Sentry.data.sln', generateProjectSpecificOutputFolder: 'True'
             }
         }
  
