@@ -40,7 +40,7 @@ pipeline {
             steps {
                 // Use defaults (MSBuild_2017, configuration: Release, platform: Any CPU, generateProjectSpecificOutputFolder: false)
                 // You can repeat the following line if you have multiple solution files to build
-                dotNetBuild 'Sentry.data.sln'
+                dotNetBuild 'Sentry.data.sln', generateProjectSpecificOutputFolder: 'True'
             }
         }
  
@@ -48,7 +48,7 @@ pipeline {
             // This stage includes all steps related to running tests against your code.  Typically these are unit tests written using MSTest.
             steps {
                 // Use defaults.  You can repeat the following line if you have multiple unit test assemblies to run unit tests from
-                dotNetRunTests 'Sentry.data.Web.Tests.dll'
+                dotNetRunTests 'Sentry.data.Web.Tests\\Sentry.data.Web.Tests.dll'
  
                 // Gather up the test results and process them so they can be used by Sonar
                 dotNetGatherTestResults()
