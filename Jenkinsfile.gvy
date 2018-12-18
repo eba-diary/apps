@@ -23,9 +23,8 @@ pipeline {
                     currentBuild.displayName = new Date().format( "yyyy.MM.dd" ) + "." + "${BUILD_NUMBER}"
                 }
                 // Delete the existing build artifacts.  Repeat for any other folders that may get in the way of the new build
-                //dir('build') { deleteDir() }
-                //dir('TestResults') { deleteDir() }
-				deleteDir()
+                dir('build') { deleteDir() }
+                dir('TestResults') { deleteDir() }
  
                 // Restore Nuget packages
                 dotNetNuGetRestore()
