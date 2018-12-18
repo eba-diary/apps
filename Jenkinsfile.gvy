@@ -30,7 +30,7 @@ pipeline {
                 dotNetNuGetRestore()
  
                 // Begin the Sonar Scanner, using defaults (version: 1.0, language: cs)
-                dotNetBeginSonarScanner key: 'DATA:Data.Sentry.Com', name: 'Data.Sentry.Com', version: "${currentBuild.displayName}"
+                dotNetBeginSonarScanner key: 'DATA:Data.Sentry.Com', name: 'Data.Sentry.Com', version: "${currentBuild.displayName}", environment: 'SonarProd'
             }
         }
  
