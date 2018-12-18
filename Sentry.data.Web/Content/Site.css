@@ -178,7 +178,15 @@ ul.list-group-indented {
     width: 100%;
 }
 
-.filterHead { font-size: 17px; }
+.btnFavorite{
+    font-size: 194%;
+    float: right;
+    color: blue;
+}
+
+.filterHead {
+    font-size: 17px;
+}
 
 .filterBorder_blue { border: 1px solid #003DA5; }
 

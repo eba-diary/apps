@@ -108,10 +108,12 @@
                     <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults">
                         <li class="ul-dataset-list-item borderSide_gray boxShadowSm" data-bind="css : BorderColor">
                             <div class="category-type-wrap">
+                                <div class="glyphicon glyphicon-star btnFavorite" id="btnFavorite" data-bind="attr: {data: DatasetId}"></div>
                                 <div class="category-type" data-bind="css: BannerColor">
                                     <span data-bind="text: AbbreviatedCategory" />
                                 </div>
                             </div>
+                            <div></div>
                             <div class="dataset-list-content">
                                 <!-- ko foreach: DistinctFileExtensions -->
                                 <div class="extension bg_gray" data-bind="css : $data">
@@ -330,6 +332,7 @@
         function Dataset(data) {
             this.DatasetDesc = data.DatasetDesc;
             this.SentryOwner = data.SentryOwnerName;
+            this.DatasetId = data.DatasetId;
 
             this.DatasetInformation = data.DatasetInformation;
             this.DatasetName = data.DatasetName;
@@ -1351,6 +1354,23 @@
                 else {
                     $(txt).text("Show Less");
                 }
+            });
+
+            $(document).on("click", "[id^='btnFavorite']", function (e) {
+                e.preventDefault();
+
+                var button = $(this);
+                var id = button.attr("data");
+
+                if (button.hasClass("glyphicon-star")) {
+                    alert("remove favorite: " + id);
+                }
+                else if (button.hasClass("glyphicon-star-empty")) {
+                    alert("add favorite: " + id);
+                }
+
+                $(this).toggleClass("glyphicon-star glyphicon-star-empty");
+
             });
         });
 
