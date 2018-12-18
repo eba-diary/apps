@@ -17,6 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.data.DatabaseGenerat
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{9E622421-1970-4955-8B4D-D06A01A6457F}"
 	ProjectSection(SolutionItems) = preProject
+		Jenkinsfile.gvy = Jenkinsfile.gvy
 		Local.testsettings = Local.testsettings
 		ReferenceAppRemoval.xml = ReferenceAppRemoval.xml
 	EndProjectSection
@@ -83,38 +84,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0D1FAF12-93B8-4B73-A66B-99806CB91657}
-	EndGlobalSection
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 10
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = http://tfs.sentry.com/tfsversioncontrol
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = Sentry.data.Core\\Sentry.data.Core.csproj
-		SccProjectName1 = Sentry.data.Core
-		SccLocalPath1 = Sentry.data.Core
-		SccProjectUniqueName2 = Sentry.data.Database\\Sentry.data.Database.sqlproj
-		SccProjectName2 = Sentry.data.Database
-		SccLocalPath2 = Sentry.data.Database
-		SccProjectUniqueName3 = Sentry.data.DatabaseGenerator\\Sentry.data.DatabaseGenerator.csproj
-		SccProjectName3 = Sentry.data.DatabaseGenerator
-		SccLocalPath3 = Sentry.data.DatabaseGenerator
-		SccProjectUniqueName4 = Sentry.data.Infrastructure\\Sentry.data.Infrastructure.csproj
-		SccProjectName4 = Sentry.data.Infrastructure
-		SccLocalPath4 = Sentry.data.Infrastructure
-		SccProjectUniqueName5 = Sentry.data.Web\\Sentry.data.Web.csproj
-		SccProjectName5 = Sentry.data.Web
-		SccLocalPath5 = Sentry.data.Web
-		SccProjectUniqueName6 = Sentry.data.Web.Tests\\Sentry.data.Web.Tests.csproj
-		SccProjectName6 = Sentry.data.Web.Tests
-		SccLocalPath6 = Sentry.data.Web.Tests
-		SccProjectUniqueName7 = Sentry.data.Common\\Sentry.data.Common.csproj
-		SccProjectName7 = Sentry.data.Common
-		SccLocalPath7 = Sentry.data.Common
-		SccProjectUniqueName8 = Sentry.data.Goldeneye\\Sentry.data.Goldeneye.csproj
-		SccProjectName8 = Sentry.data.Goldeneye
-		SccLocalPath8 = Sentry.data.Goldeneye
-		SccProjectUniqueName9 = Sentry.data.Bundler\\Sentry.data.Bundler.csproj
-		SccProjectName9 = Sentry.data.Bundler
-		SccLocalPath9 = Sentry.data.Bundler
 	EndGlobalSection
 EndGlobal
