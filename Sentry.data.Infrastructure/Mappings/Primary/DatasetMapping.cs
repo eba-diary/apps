@@ -104,7 +104,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Lazy(CollectionLazy.Lazy);
                 m.Inverse(true);
                 m.Table("Favorites");
-                m.Cascade(Cascade.All);
+                m.Cascade(Cascade.None);
                 m.Key((k) =>
                 {
                     k.Column("DatasetId");

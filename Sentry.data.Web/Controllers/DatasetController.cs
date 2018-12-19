@@ -1605,28 +1605,41 @@ namespace Sentry.data.Web.Controllers
 
         public JsonResult SetFavorite(int datasetId)
         {
-            Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
-
-            if (ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId))
+            try
             {
-                Favorite f = new Favorite()
+                Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+
+                if (!ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId))
                 {
-                    DatasetId = ds.DatasetId,
-                    UserId = SharedContext.CurrentUser.AssociateId,
-                    Created = DateTime.Now
-                };
+                    Favorite f = new Favorite()
+                    {
+                        DatasetId = ds.DatasetId,
+                        UserId = SharedContext.CurrentUser.AssociateId,
+                        Created = DateTime.Now
+                    };
 
-                ds.Favorities.Add(f);
+                    _datasetContext.Merge(f);
+                    _datasetContext.SaveChanges();
+
+                    Response.StatusCode = (int)HttpStatusCode.OK;
+                    return Json(new { message = "Successfully added favorite." }, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    _datasetContext.Remove(ds.Favorities.First(w => w.UserId == SharedContext.CurrentUser.AssociateId));
+                    _datasetContext.SaveChanges();
+
+                    Response.StatusCode = (int)HttpStatusCode.OK;
+                    return Json(new { message = "Successfully removed favorite." }, JsonRequestBehavior.AllowGet);
+                }
             }
-            else
+            catch (Exception)
             {
-                ds.Favorities.Remove(ds.Favorities.First(w => w.UserId == SharedContext.CurrentUser.AssociateId));                
+                _datasetContext.Clear();
+                Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return Json(new { message = "Failed to modify favorite." }, JsonRequestBehavior.AllowGet);
             }
-
-            _datasetContext.Merge(ds);
-            _datasetContext.SaveChanges();
-
-            return AjaxSuccessJson();
+            
         }
     }
 }
