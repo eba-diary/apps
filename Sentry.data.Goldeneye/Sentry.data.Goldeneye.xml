@@ -1,0 +1,115 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>GoldenEye</name>
+    </assembly>
+    <members>
+        <member name="T:Sentry.data.Goldeneye.Core">
+            <summary>
+            This class represents where you should run your application logic
+            </summary>
+        </member>
+        <member name="M:Sentry.data.Goldeneye.Core.OnStart">
+            <summary>
+            Start the core worker
+            </summary>
+        </member>
+        <member name="T:Sentry.data.Goldeneye.Core.Configuration">
+            <summary>
+            Start the core worker
+            </summary>
+        </member>
+        <member name="T:Sentry.data.Goldeneye.Core.RunningTask">
+            <summary>
+            Task!
+            </summary>
+        </member>
+        <member name="M:Sentry.data.Goldeneye.Core.RunningTask.#ctor(System.Threading.Tasks.Task,System.String)">
+            <summary>
+            Task!
+            </summary>
+        </member>
+        <member name="M:Sentry.data.Goldeneye.Core.DoWork">
+            <summary>
+            Loop until cancellation is requested, doing the primary work of this service
+            </summary>
+        </member>
+        <member name="M:Sentry.data.Goldeneye.Core.OnStop">
+            <summary>
+            Request the core worker to stop
+            </summary>
+        </member>
+        <member name="M:Sentry.data.Goldeneye.Core.TaskException(System.Threading.Tasks.Task)">
+            <summary>
+            An exception occurred on the main task; log it and shut down the service with an error exit code
+            </summary>
+            <param name="t">The main thread task</param>
+        </member>
+        <member name="M:Sentry.data.Goldeneye.Program.Main(System.String[])">
+            <summary>
+            The entry point into the Windows Service.  You can also run this program
+            as a console app if you pass "-console" as the first parameter.
+            </summary>
+            <remarks>
+            Setup the Debug command line arguments in your Project properties
+            to include "-console" so that you can debug your service.
+            </remarks>
+        </member>
+        <member name="M:Sentry.data.Goldeneye.Scheduler.#ctor">
+            <summary>
+            Initialize the HangFire Scheuler server
+            </summary>
+        </member>
+        <member name="P:Sentry.data.Goldeneye.Watch.WatchedDir">
+            <summary>
+            Directory that is to be watched
+            </summary>
+        </member>
+        <member name="M:Sentry.data.Goldeneye.Watch.Run(System.String,System.Threading.CancellationToken)">
+            <summary>
+            
+            </summary>
+            <param name="path"></param>
+            <param name="token"></param>
+        </member>
+        <member name="M:Sentry.data.Goldeneye.Watch.OnStart(System.Int32,System.Uri,System.Threading.CancellationToken)">
+            <summary>
+            This method is called when the Windows Process is started in Core and Program.cs
+            First it creates a file watcher, gives it a directory from app.config, then assigns it events to watch.
+            The last thing it does is grabs all the files that currently in the directory and adds them to the file list.
+            The Service will do the rest on it's periodic run.
+            </summary>
+            <param name="jobId"></param>
+            <param name="watchPath"></param>
+            <param name="token"></param>
+        </member>
+        <member name="M:Sentry.data.Goldeneye.Watch.GetCount">
+            <summary>
+            Returns current processed file count
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Sentry.data.Goldeneye.Watch.GetCountStart">
+            <summary>
+            Returns start datetime of file counter
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:SentryWindowsServiceTemplateCSharp.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:SentryWindowsServiceTemplateCSharp.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:SentryWindowsServiceTemplateCSharp.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+    </members>
+</doc>

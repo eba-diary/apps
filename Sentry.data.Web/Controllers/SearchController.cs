@@ -130,6 +130,7 @@ namespace Sentry.data.Web.Controllers
             foreach (Dataset ds in dsList)
             {
                 SearchModel sm = new SearchModel(ds, _associateInfoProvider);
+                sm.IsFavorite = ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId);
                 models.Add(sm);
             }
 

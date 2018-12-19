@@ -1602,5 +1602,31 @@ namespace Sentry.data.Web.Controllers
 
             return View("QueryTool");
         }
+
+        public JsonResult SetFavorite(int datasetId)
+        {
+            Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+
+            if (ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId))
+            {
+                Favorite f = new Favorite()
+                {
+                    DatasetId = ds.DatasetId,
+                    UserId = SharedContext.CurrentUser.AssociateId,
+                    Created = DateTime.Now
+                };
+
+                ds.Favorities.Add(f);
+            }
+            else
+            {
+                ds.Favorities.Remove(ds.Favorities.First(w => w.UserId == SharedContext.CurrentUser.AssociateId));                
+            }
+
+            _datasetContext.Merge(ds);
+            _datasetContext.SaveChanges();
+
+            return AjaxSuccessJson();
+        }
     }
 }

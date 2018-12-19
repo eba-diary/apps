@@ -108,7 +108,8 @@
                     <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults">
                         <li class="ul-dataset-list-item borderSide_gray boxShadowSm" data-bind="css : BorderColor">
                             <div class="category-type-wrap">
-                                <div class="glyphicon glyphicon-star btnFavorite" id="btnFavorite" data-bind="attr: {data: DatasetId}"></div>
+                                <div class="glyphicon glyphicon-star btnFavorite" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none"></div>
+                                <div class="glyphicon glyphicon-star-empty btnFavorite" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite == false" style="display: none"></div>
                                 <div class="category-type" data-bind="css: BannerColor">
                                     <span data-bind="text: AbbreviatedCategory" />
                                 </div>
@@ -360,6 +361,7 @@
             this.Tags = data.Tags;
             this.UpdateFrequency = data.UpdateFrequency;
             this.CanEditDataset = data.CanEditDataset;
+            this.IsFavorite = data.IsFavorite;
 
             this.CanSeeDetails = ko.computed(function () {
                 if ((this.Type === "RPT" && this.CanEditDataset) || this.Type !== "RPT") {
@@ -1364,6 +1366,25 @@
 
                 if (button.hasClass("glyphicon-star")) {
                     alert("remove favorite: " + id);
+
+                    $.ajax({
+                        url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent(id),
+                        method: "GET",
+                        dataType: 'json',
+                        success: function (obj) {
+                            if (obj.success) {
+                                Sentry.ShowModalAlert("Favorite has been updated."
+                                );
+                            }
+                            else {
+                                Sentry.ShowModalAlert("Something went awry!"
+                                );
+                            }
+                        },
+                        error: function (obj) {
+                            Sentry.ShowModalAlert("Failed to update favorite.");
+                        }
+                    });
                 }
                 else if (button.hasClass("glyphicon-star-empty")) {
                     alert("add favorite: " + id);

@@ -182,6 +182,7 @@ ul.list-group-indented {
     font-size: 194%;
     float: right;
     color: blue;
+    cursor: pointer;
 }
 
 .filterHead {
