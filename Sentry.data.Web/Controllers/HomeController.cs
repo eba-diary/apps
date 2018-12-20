@@ -160,5 +160,13 @@ namespace Sentry.data.Web.Controllers
             List<DataFeedItem> tempList = cache.GetOrAdd("feedSentry", () => _feedContext.GetSentryFeedItems().ToList()).Skip(skip).Take(5).ToList();
             return PartialView("_Feed", tempList);
         }
+
+
+        public ActionResult GetFavorites()
+        {
+            List<DataFeedItem> favList = _feedContext.GetAllFavorites(SharedContext.CurrentUser.AssociateId).ToList();           
+            ViewBag.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
+            return PartialView("_Favorites", favList);
+        }
     }
 }
