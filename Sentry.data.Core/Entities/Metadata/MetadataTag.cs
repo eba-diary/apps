@@ -15,6 +15,7 @@ namespace Sentry.data.Core
         public virtual string CreatedBy { get; set; }
         public virtual string Description { get; set; }
         public virtual IList<Dataset> Datasets { get; set; }
+        public virtual TagGroup Group { get; set; }
         public SearchableTag GetSearchableTag()
         {
             return new SearchableTag(this);

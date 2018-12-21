@@ -179,6 +179,7 @@
     <Build Include="Tables\Metadata\ObjectTag.sql" />
     <Build Include="Tables\RetrieverJobs\Submission.sql" />
     <Build Include="Tables\RetrieverJobs\RetrieverJobArchive.sql" />
+    <Build Include="Tables\Metadata\TagGroup.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />
