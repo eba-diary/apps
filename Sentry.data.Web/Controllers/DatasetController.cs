@@ -525,6 +525,8 @@ namespace Sentry.data.Web.Controllers
 
             BaseDatasetModel bdm = new BaseDatasetModel(ds, _associateInfoProvider, _datasetContext);
 
+            bdm.IsFavorite = ds.Favorities.Where(w => w.UserId == SharedContext.CurrentUser.AssociateId).Any();
+            
             Event e = new Event();
 
             //Object specific settings
