@@ -164,7 +164,7 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult GetFavorites()
         {
-            List<DataFeedItem> favList = _feedContext.GetAllFavorites(SharedContext.CurrentUser.AssociateId).ToList();           
+            List<DataFeedItem> favList = _feedContext.GetAllFavorites(SharedContext.CurrentUser.AssociateId).OrderBy(o => o.Title).ToList();           
             ViewBag.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
             return PartialView("_Favorites", favList);
         }

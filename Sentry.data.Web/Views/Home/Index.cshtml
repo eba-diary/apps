@@ -383,9 +383,7 @@
                 dataType: 'json',
                 success: function () {
                     $(".favoriteSpinner").show();
-                    parentRow.remove();
-                    Sentry.ShowModalAlert("Favorite has been removed."
-                    );
+                    //parentRow.remove();
                 },
                 error: function () {
                     Sentry.ShowModalAlert("Failed to remove favorite.");
