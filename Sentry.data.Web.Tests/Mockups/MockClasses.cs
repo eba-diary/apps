@@ -31,7 +31,8 @@ namespace Sentry.data.Web.Tests
                 IsSensitive = false,
                 CanDisplay = true,
                 DatasetFiles = new List<DatasetFile>(),
-                DatasetFileConfigs = new List<DatasetFileConfig>()
+                DatasetFileConfigs = new List<DatasetFileConfig>(),
+                Favorities = new List<Favorite>()
             };
 
             if (addConfig)

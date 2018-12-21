@@ -1,0 +1,90 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Sentry.data.Bundler</name>
+    </assembly>
+    <members>
+        <member name="M:Sentry.data.Bundler.Bundle.AssembleParts(System.String,System.Collections.Generic.List{Sentry.data.Bundler.Bundle.BundlePart})">
+            <summary>
+            
+            </summary>
+            <param name="result_filepath"></param>
+            <param name="parts_list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sentry.data.Bundler.Bundle.Chunk_By_Size(System.Collections.Generic.List{Sentry.data.Bundler.Bundle.BundlePart},System.Int64)">
+            <summary>
+            Groups parts based on max file size
+            </summary>
+            <param name="parts_list"></param>
+            <param name="max_filesize"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sentry.data.Bundler.Bundle.Chunk_By_Size(System.Collections.Generic.List{Sentry.data.Bundler.Bundle.BundlePart})">
+            <summary>
+            Creates single group of all parts
+            </summary>
+            <param name="parts_list"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Sentry.data.Bundler.Bundle.Collect_Parts(System.Collections.Generic.List{System.Tuple{System.String,System.String}})">
+            <summary>
+            Returns list of s3 object keys with ContentLength metadata
+            </summary>
+            <param name="sourceKeys"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Sentry.data.Bundler.Core">
+            <summary>
+            This class represents where you should run your application logic
+            </summary>
+        </member>
+        <member name="M:Sentry.data.Bundler.Core.OnStart">
+            <summary>
+            Start the core worker
+            </summary>
+        </member>
+        <member name="M:Sentry.data.Bundler.Core.DoWork">
+            <summary>
+            Loop until cancellation is requested, doing the primary work of this service
+            </summary>
+        </member>
+        <member name="M:Sentry.data.Bundler.Core.OnStop">
+            <summary>
+            Request the core worker to stop
+            </summary>
+        </member>
+        <member name="M:Sentry.data.Bundler.Core.TaskException(System.Threading.Tasks.Task)">
+            <summary>
+            An exception occurred on the main task; log it and shut down the service with an error exit code
+            </summary>
+            <param name="t">The main thread task</param>
+        </member>
+        <member name="M:Sentry.data.Bundler.Program.Main(System.String[])">
+            <summary>
+            The entry point into the Windows Service.  You can also run this program
+            as a console app if you pass "-console" as the first parameter.
+            </summary>
+            <remarks>
+            Setup the Debug command line arguments in your Project properties
+            to include "-console" so that you can debug your service.
+            </remarks>
+        </member>
+        <member name="T:SentryWindowsServiceTemplateCSharp.Resources">
+            <summary>
+              A strongly-typed resource class, for looking up localized strings, etc.
+            </summary>
+        </member>
+        <member name="P:SentryWindowsServiceTemplateCSharp.Resources.ResourceManager">
+            <summary>
+              Returns the cached ResourceManager instance used by this class.
+            </summary>
+        </member>
+        <member name="P:SentryWindowsServiceTemplateCSharp.Resources.Culture">
+            <summary>
+              Overrides the current thread's CurrentUICulture property for all
+              resource lookups using this strongly typed resource class.
+            </summary>
+        </member>
+    </members>
+</doc>
