@@ -152,6 +152,8 @@
         width: 100% !important;
         height: 680px;
         margin-left: 0px !important;
+        border: 1.5px solid #00A3E0;
+        border-top: 6px solid #00A3E0;
     }
 
     .nav-tabs {
@@ -162,7 +164,7 @@
     }*/
 
     .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
-        background-color: #EAAA00;
+        background-color: #00A3E0;
         border-bottom-color: transparent;
     }
 
@@ -339,37 +341,9 @@
                 $('#DatasetSearch').submit();
             });
 
-            $('#favoriteDeleteIcon').click(function (e) {
-                e.preventDefault();
-                alert("hit delete call");
-                $.ajax({
-                    url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent(e),
-                    method: "GET",
-                    dataType: 'json',
-                    success: function () {
-                        Sentry.ShowModalAlert("Favorite has been removed."
-                        );
-                    },
-                    error: function () {
-                        Sentry.ShowModalAlert("Failed to remove favorite.");
-                    }
-                });
-
-                $.ajax({
-                    url: '/Home/GetFavorites',
-                    dataType: 'html',
-                    success: function (html) {
-                        $(".favoriteSpinner").hide();
-                        $("#favoritePanel").append(html);
-                        //data.Home.SentrySkipTotal += 10;
-                        data.Home.AjaxStatus = true;
-                    },
-                    error: function (e) {
-                        data.Home.AjaxStatus = true;
-                    }
-                });
-            });
+            
         });
+      
 
         function GetFile(location) {
 
@@ -393,27 +367,41 @@
                 }
             });
         }
-        function RemoveFavorite(id) {
-            alert("hit delete call");
+        async function RemoveFavorite(e) {
+            //current delete button
+            var button = $(e);
+
+            //find parent row, then remove
+            var parentRow = button.parent().parent();
+
+            //remove entry from database
+            //upon success remove row from UI
+
             $.ajax({
-                url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent(id),
+                url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent(button.data('id')),
                 method: "GET",
                 dataType: 'json',
                 success: function () {
-                    Sentry.ShowModalAlert("Favorite has been removed."                        
+                    $(".favoriteSpinner").show();
+                    parentRow.remove();
+                    Sentry.ShowModalAlert("Favorite has been removed."
                     );
                 },
                 error: function () {
                     Sentry.ShowModalAlert("Failed to remove favorite.");
+                    $(".favoriteSpinner").hide();
                 }
             });
 
-            $("div").remove(".favorite");
+            //need to sleep to ensure database call will return changes from above
+            await sleep(2000);
+
 
             $.ajax({
                 url: '/Home/GetFavorites',
                 dataType: 'html',
                 success: function (html) {
+                    $("div").remove(".favorite");
                     $(".favoriteSpinner").hide();
                     $("#favoritePanel").append(html);
                     //data.Home.SentrySkipTotal += 10;
@@ -423,7 +411,13 @@
                     data.Home.AjaxStatus = true;
                 }
             });
+
         }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
     </script>
 }
 

@@ -56,10 +56,8 @@
             }
         }
         </div>
-        <div class="col-sm-1 col-lg-1">
-            <a onclick='RemoveFavorite(@item.Feed.Id)'>
-                <i class="glyphicon glyphicon-remove"></i>
-            </a>
+        <div style="float: right; font-size: 1.5em">            
+            <i class="glyphicon glyphicon-remove" onclick="RemoveFavorite(this)" id="deleteFavorite" data-id="@item.Feed.Id"></i>
         </div>
     </div>
 }
