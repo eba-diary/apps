@@ -25,6 +25,20 @@ data.Home = {
                     data.Home.AjaxStatus = true;
                 }
             });
+
+            $.ajax({
+                url: '/Home/GetFavorites',
+                dataType: 'html',
+                success: function (html) {
+                    $(".favoriteSpinner").hide();
+                    $("#favoritePanel").append(html);
+                    //data.Home.SentrySkipTotal += 10;
+                    data.Home.AjaxStatus = true;
+                },
+                error: function (e) {
+                    data.Home.AjaxStatus = true;
+                }
+            });
         }
 
         $("body").tooltip({ selector: '[data-toggle=tooltip]' });
@@ -32,6 +46,9 @@ data.Home = {
         //$("#sentryFeed").bind('scroll', data.Home.ScrollBottom);
         //$("#chbx").change(data.Home.ChangeFeeds);
     },
+
+    
+
 
     ScrollBottom: function (e) {
         var elem = $(e.currentTarget);

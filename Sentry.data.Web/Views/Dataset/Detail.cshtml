@@ -58,96 +58,135 @@
                         }
                     }
 
-                    <div style="margin-top:-29px;">
-                        <div class="btn-group rightFloat dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions">
-                            <button type="button"
-                                    class="btn btn-default borderdk_gray borderdk_@color dropdown"
-                                    data-toggle="dropdown">
-                                <span class="glyphicon glyphicon-menu-hamburger @color"></span>
-                            </button>
+                            <div style="margin-top:-30px;" class="col-md-offset-9 col-md-4 col-lg-offset-10 col-lg-3">
 
-                            <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
-                                <li id="SubscribeModal" style="cursor: pointer; display: none;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe"  data-bind="visible: IsShownForCurrentType('Dataset')">
-                                    <a>
-                                        Subscribe
-                                    </a>
-                                </li>
+                                @if (Model.IsFavorite)
+                                {
+                                    @*<div class="col-md-1 col-lg-1">
+                <div class="glyphicon glyphicon-star @color" id="btnFavorite" data-bind="attr: {data: @Model.DatasetId}" style="font-size:xx-large; width: 50%; margin: 0 auto;"></div>
+            </div>*@
+                                    <div class="col-md-2 col-lg-2 ">
+                                        <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Favorite">
+                                            <button type="button"
+                                                    class="btn btn-default borderdk_gray borderdk_@color"
+                                                    id="btnFavorite" data-bind="attr: {data: @Model.DatasetId}" data-toggle="tooltip" data-placement="top" title="Favorite">
+                                                <span class="glyphicon glyphicon-star @color" id="favoriteIcon"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    @*<div class="col-md-1 col-lg-1">
+                <div class="glyphicon glyphicon-star-empty @color" id="btnFavorite" data-bind="attr: {data: @Model.DatasetId}" style="font-size:xx-large; width: 50%; margin: 0 auto;"></div>
+            </div>*@
 
-                                @if (Model.CanQueryTool)
-                                {
-                                    <li title="Query Dataset" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">
-                                        <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
-                                            Query this Dataset
-                                        </a>
-                                    </li>
+                                    <div class="col-md-2 col-lg-2 ">
+                                        <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Favorite">
+                                            <button type="button"
+                                                    class="btn btn-default borderdk_gray borderdk_@color"
+                                                    id="btnFavorite" data-bind="attr: {data: @Model.DatasetId}" data-toggle="tooltip" data-placement="top" title="Favorite">
+                                                <span class="glyphicon glyphicon-star-empty @color" id="favoriteIcon"></span>
+                                            </button>
+                                        </div>
+                                    </div>
+
                                 }
-                                @if (Model.CanManageConfigs)
+                                @if (Model.CanUpload)
                                 {
-                                    <li>
-                                        <a href="/Config/Dataset/@Model.DatasetId" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">
-                                            Manage Schemas
-                                        </a>
-                                    </li>
+                                    <div class="col-md-2 col-lg-2 ">
+                                        <button type="button"
+                                                class="btn btn-default dataset-operation-button borderdk_gray borderdk_@color"
+                                                id="UploadModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Upload File">
+                                            <span class="glyphicon glyphicon-cloud-upload @color"></span>
+                                        </button>
+                                    </div>
                                 }
+
+                                @if (Model.CanEditDataset)
+                                {
+                                    <div class="col-md-2 col-lg-2">
+                                        <button type="button"
+                                                class="btn btn-default btn dataset-operation-button borderdk_gray borderdk_@color"
+                                                id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
+                                            <span class="glyphicon glyphicon-edit @color"></span>
+                                        </button>
+                                    </div>
+                                }
+
                                 @if (Model.CanManageReport)
                                 {
-                                    <li>
-                                        <a id="deleteLink" href="" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;">
-                                            Delete Exhibit
-                                        </a>
-                                    </li>
+                                    <div class="col-md-2 col-lg-2 dataset-operation-button ">
+                                        <button type="button"
+                                                class="btn btn-default btn borderdk_gray borderdk_@color"
+                                                id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Report">
+                                            <span class="glyphicon glyphicon-edit @color"></span>
+                                        </button>
+                                    </div>
                                 }
-                            </ul>
-                        </div>
 
-                        @if (Model.CanUpload)
-                        {
-                            <button type="button"
-                                    class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                                    id="UploadModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Upload File">
-                                <span class="glyphicon glyphicon-cloud-upload @color"></span>
-                            </button>
-                        }
+                                <div class="col-md-2 col-lg-2">
+                                    <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions">
 
-                        @if (Model.CanEditDataset)
-                        {
-                            <button type="button"
-                                    class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                                    id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset"
-                                    >
-                                <span class="glyphicon glyphicon-edit @color"></span>
-                            </button>
-                        }
+                                        <button type="button"
+                                                class="btn btn-default borderdk_gray borderdk_@color dropdown"
+                                                data-toggle="dropdown">
+                                            <span class="glyphicon glyphicon-menu-hamburger @color"></span>
+                                        </button>
+                                        <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
+                                            <li id="SubscribeModal" style="cursor: pointer; display: none;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe" data-bind="visible: IsShownForCurrentType('Dataset')">
+                                                <a>
+                                                    Subscribe
+                                                </a>
+                                            </li>
 
-                        @if (Model.CanManageReport)
-                        {
-                            <button type="button"
-                                    class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                                    id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Report"
-                                    >
-                                <span class="glyphicon glyphicon-edit @color"></span>
-                            </button>
-                        }
-                        
+                                            @if (Model.CanQueryTool)
+                                            {
+                                                <li title="Query Dataset" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">
+                                                    <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
+                                                        Query this Dataset
+                                                    </a>
+                                                </li>
+                                            }
+                                            @if (Model.CanManageConfigs)
+                                            {
+                                                <li>
+                                                    <a href="/Config/Dataset/@Model.DatasetId" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">
+                                                        Manage Schemas
+                                                    </a>
+                                                </li>
+                                            }
+                                            @if (Model.CanManageReport)
+                                            {
+                                                <li>
+                                                    <a id="deleteLink" href="" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;">
+                                                        Delete Exhibit
+                                                    </a>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </div>
 
-                        @*@if (((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive)) && Model.DatasetFiles.Count != 0)
-                            {
-                                <button type="button"
-                                        class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                                        id="DownloadLatest" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download Latest">
-                                    <span class="glyphicon glyphicon-cloud-download @color"></span>
-                                </button>
-                            }
 
-                            @if ((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive))
-                            {
-                                <button type="button"
-                                        class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                                        id="PreviewLatestData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Preview Latest">
-                                    <span class="glyphicon glyphicon-search @color"></span>
-                                </button>
-                            }*@
-                    </div>
+                                @*@if (((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive)) && Model.DatasetFiles.Count != 0)
+        {
+            <button type="button"
+                    class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                    id="DownloadLatest" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download Latest">
+                <span class="glyphicon glyphicon-cloud-download @color"></span>
+            </button>
+        }
+
+        @if ((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive))
+        {
+            <button type="button"
+                    class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                    id="PreviewLatestData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Preview Latest">
+                <span class="glyphicon glyphicon-search @color"></span>
+            </button>
+        }*@
+                            </div>
                 </div>
             </div>
         </div>
@@ -742,6 +781,9 @@
 </div>
 
 <style>
+    .dataset-operation-button{
+        margin-left:0px;
+    }
     .schema-table {
         margin-top: 1em;
     }
@@ -917,6 +959,44 @@
                             obj.Message, function () { })
                     }
                 });
+
+            });
+
+            $(document).on("click", "[id^='btnFavorite']", function (e) {
+                e.preventDefault();
+
+                var button = $(this);
+                var id = button.attr("data");
+                var icon = button.children();
+
+                if (icon.hasClass("glyphicon-star")) {
+
+                    $.ajax({
+                        url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent(id),
+                        method: "GET",
+                        dataType: 'json',
+                        success: function () {
+                        },
+                        error: function () {
+                            Sentry.ShowModalAlert("Failed to remove favorite.");
+                        }
+                    });
+                }
+                else if (icon.hasClass("glyphicon-star-empty")) {
+
+                    $.ajax({
+                        url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent(id),
+                        method: "GET",
+                        dataType: 'json',
+                        success: function () {
+                        },
+                        error: function () {
+                            Sentry.ShowModalAlert("Failed to set favorite.");
+                        }
+                    });
+                }
+
+                icon.toggleClass("glyphicon-star glyphicon-star-empty");
 
             });
         });

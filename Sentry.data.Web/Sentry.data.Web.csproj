@@ -1196,6 +1196,7 @@
     <Content Include="Views\BusinessIntelligence\Index.cshtml" />
     <Content Include="Views\BusinessIntelligence\Create.cshtml" />
     <Content Include="Views\BusinessIntelligence\Edit.cshtml" />
+    <Content Include="Views\Home\_Favorites.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

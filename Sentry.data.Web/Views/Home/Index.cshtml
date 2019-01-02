@@ -13,59 +13,14 @@
     }
 </style>
 
-<div class="hero hero-media ReplaceSpecialChars" style="height: 184px;">
-
-    <div class="picture">
-
-        <picture>
-            @*<source srcset="~/Images/SHO_SentryWorld_Aerial.jpg" media="(min-width: 768px)">
-                <img src="~/Images/SHO_SentryWorld_Aerial.jpg" style="top: -200px !important;" alt="" title="">*@
-
-            @*<source srcset="~/Images/Hole16_Summer_Flowers_14.png" media="(min-width: 768px)">
-            <img src="~/Images/Hole16_Summer_Flowers_14.png" class="backgroundImage" style="top: -450px !important;" alt="" title="">*@
-
-            @*<source srcset="~/Images/SHO_Aerial_10-4-17.png" media="(min-width: 768px)">
-                <img src="~/Images/SHO_Aerial_10-4-17.png" style="top: -200px !important;" alt="" title="">*@
-
-        </picture>
-    </div>
 
 
+<h1 class="frontPageh1" style="margin: 80px;">
+    Welcome to data.sentry.com.
+    Please choose a section below to begin.
+</h1>
 
-    <div class="container" style="">
-        <h1 class="frontPageh1" style="margin-top: -10px">
-            Welcome to data.sentry.com.
-            Please choose a section below to begin.
-        </h1>
-        @*<section class="bar" style="">
-                <div id="searchBar" >
-                    <div class="col-lg-2"></div>
-                    <div class="col-lg-8">
-                        <div class="row">
-                            @{
-                        var htmlAttrsObj = new { @class = "navbar-form navbar-center", @id = "DatasetSearch" };
-                        var htmlAttributes = HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttrsObj);
-                        using (Html.BeginForm(@"Datasets", "Search", FormMethod.Get, htmlAttributes))
-                        {
-                            <div class="input-group" style="width: 100%; margin-bottom:5px; margin-top: 5px;">
-                                <span class="input-group-addon" style="width: 50px; height: 50px;" onclick="$(function() {$('#SearchText').focus();});"><i class="glyphicon glyphicon-search"></i></span>
-
-                                <input style="height: 50px;" type="text" id="SearchText" name="searchPhrase" class="form-control" placeholder="Search from @Model.DatasetCount datasets ..." />
-                            </div>
-                        }
-                            }
-                        </div>
-                    </div>
-                    <div class="col-lg-2"></div>
-                </div>
-            </section>*@
-
-    </div>
-</div>
-
-<div class="hero hero-media ReplaceSpecialChars">
-
-    <div class="container" style="    top: -50px;">
+    <div class="container body-content" style="    top: -50px;">
         <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8" id="leftPanel">
             <a class="" href="/BusinessIntelligence" style="background: white;">
                 <div class="borderdk_blue tile setTile" style="height:200px;">
@@ -136,23 +91,31 @@
         </div>
         <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
             <div class="col-lg-12 text-center">
-                <div class="feed hidden-xs hidden-sm border_@color2" style="width: 100%; margin-top: 30px;">
-                    <div class="row_@color2 topFeed">
-                        <h2 class="@color2 leftFloat feedHeader">Feed</h2>
-
-                        @*<div class="feedCheckbox rightFloat">
-                        <label>
-                            <input type="checkbox" id="chbx" />
-                            <span>Sentry feeds only</span>
-                        </label>
+                <div class="feed hidden-xs hidden-sm border_@color2 tab-pane fade in form-horizontal" style="width: 100%; margin-top: 30px;">
+                    <!-- Nav tabs -->
+                    @*<div class="tabs-wrapper">
+                        <ul class="nav classic-tabs" role="tablist">
+                            <li class="nav-item"><a class="nav-link active" href="#informationPanel" data-toggle="tab" aria-expanded="true">Favorites</a></li>
+                            <li class="nav-item"><a class="nav-link" href="#securityPanel" data-toggle="tab" aria-expanded="false">Feed </a></li>
+                        </ul>
                     </div>*@
-                    </div>
-
-                    <div class="feedBox clearFloat" id="feed">
-                        <div class="feedSpinner">
-                            <span class="sentry-spinner"></span>
+                    <ul class="nav nav-pills" style="width: 95%; margin-bottom: 20px;">
+                        <li class="active"><a href="#favoritePanel" data-toggle="tab" aria-expanded="true"><h5>Favorites</h5></a></li>
+                        <li class=""><a href="#feed" data-toggle="tab" aria-expanded="false"><h5>Feed</h5></a></li>
+                    </ul>
+                    <div id="tabContent" class="tab-content">
+                        <div class="clearFloat tab-pane fade active in form-horizontal" id="favoritePanel">
+                            <div class="favoriteSpinner">
+                                <span class="sentry-spinner"></span>
+                            </div>
+                            @*@Html.Action("GetFeed", "Home")*@
                         </div>
-                        @*@Html.Action("GetFeed", "Home")*@
+                        <div class="feedBox clearFloat tab-pane fade in form-horizontal" id="feed">
+                            <div class="feedSpinner">
+                                <span class="sentry-spinner"></span>
+                            </div>
+                            @*@Html.Action("GetFeed", "Home")*@
+                        </div>
                     </div>
 
                     <div class="feedBox clearFloat hidden" id="sentryFeed">
@@ -161,19 +124,14 @@
                 </div>
             </div>
         </div>
+        @*<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+            <div class="col-lg-12 text-center">
+                <div class="feed hidden-xs hidden-sm border_@color2" style="width: 100%; margin-top: 30px;"></div>
+            </div>
+        </div>*@
 
 
     </div>
-</div>
-
-
-
-
-
-
-
-
-
 
 <style>
     /*html {
@@ -194,12 +152,27 @@
         width: 100% !important;
         height: 680px;
         margin-left: 0px !important;
+        border: 1.5px solid #00A3E0;
+        border-top: 6px solid #00A3E0;
+    }
+
+    .nav-tabs {
+        border-bottom: 1px solid #d45500;
+    }
+    /*.nav-pills > li {
+        background-color: #EAAA00;
+    }*/
+
+    .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+        background-color: #00A3E0;
+        border-bottom-color: transparent;
     }
 
     .feedBox {
         position: relative;
         max-height: 96%;
         margin-right: 2px;
+        margin-top: 15px;
     }
 
     .col-lg-4 {
@@ -367,7 +340,82 @@
             $('.input-group-addon').click(function (e) {
                 $('#DatasetSearch').submit();
             });
+
+            
         });
+      
+
+        function GetFile(location) {
+
+            $.ajax({
+                url: '/ExternalFile/HasReadPermissions?pathAndFilename=' + encodeURIComponent(location),
+                method: "GET",
+                dataType: 'json',
+                success: function (obj) {
+                    if (obj.HasPermission) {
+                        var url = '/ExternalFile/DownloadExternalFile?pathAndFilename=' + encodeURIComponent(location);
+                        window.open(url);
+                    }
+                    else {
+                        Sentry.ShowModalAlert(
+                            "User does not have sufficient permissions to selected file."
+                        );
+                    }
+                },
+                error: function (obj) {
+                    Sentry.ShowModalAlert("Failed permissions check, please try again.  If problem persists, please contact <a mailto:DSCSupport@sentry.com></a>");
+                }
+            });
+        }
+        async function RemoveFavorite(e) {
+            //current delete button
+            var button = $(e);
+
+            //find parent row, then remove
+            var parentRow = button.parent().parent();
+
+            //remove entry from database
+            //upon success remove row from UI
+
+            $.ajax({
+                url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent(button.data('id')),
+                method: "GET",
+                dataType: 'json',
+                success: function () {
+                    $(".favoriteSpinner").show();
+                    //parentRow.remove();
+                },
+                error: function () {
+                    Sentry.ShowModalAlert("Failed to remove favorite.");
+                    $(".favoriteSpinner").hide();
+                }
+            });
+
+            //need to sleep to ensure database call will return changes from above
+            await sleep(2000);
+
+
+            $.ajax({
+                url: '/Home/GetFavorites',
+                dataType: 'html',
+                success: function (html) {
+                    $("div").remove(".favorite");
+                    $(".favoriteSpinner").hide();
+                    $("#favoritePanel").append(html);
+                    //data.Home.SentrySkipTotal += 10;
+                    data.Home.AjaxStatus = true;
+                },
+                error: function (e) {
+                    data.Home.AjaxStatus = true;
+                }
+            });
+
+        }
+
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
     </script>
 }
 

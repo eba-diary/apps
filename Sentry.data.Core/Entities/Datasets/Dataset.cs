@@ -70,6 +70,7 @@ namespace Sentry.data.Core
                 _metadata = JsonConvert.SerializeObject(value);
             }
         }
+        public virtual IList<Favorite> Favorities { get; set; }
 
         public virtual List<DatasetScopeType> DatasetScopeType
         {

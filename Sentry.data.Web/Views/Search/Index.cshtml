@@ -108,10 +108,13 @@
                     <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults">
                         <li class="ul-dataset-list-item borderSide_gray boxShadowSm" data-bind="css : BorderColor">
                             <div class="category-type-wrap">
+                                <div class="glyphicon glyphicon-star btnFavorite" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none"></div>
+                                <div class="glyphicon glyphicon-star-empty btnFavorite" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite == false" style="display: none"></div>
                                 <div class="category-type" data-bind="css: BannerColor">
                                     <span data-bind="text: AbbreviatedCategory" />
                                 </div>
                             </div>
+                            <div></div>
                             <div class="dataset-list-content">
                                 <!-- ko foreach: DistinctFileExtensions -->
                                 <div class="extension bg_gray" data-bind="css : $data">
@@ -330,6 +333,7 @@
         function Dataset(data) {
             this.DatasetDesc = data.DatasetDesc;
             this.SentryOwner = data.SentryOwnerName;
+            this.DatasetId = data.DatasetId;
 
             this.DatasetInformation = data.DatasetInformation;
             this.DatasetName = data.DatasetName;
@@ -357,6 +361,7 @@
             this.Tags = data.Tags;
             this.UpdateFrequency = data.UpdateFrequency;
             this.CanEditDataset = data.CanEditDataset;
+            this.IsFavorite = data.IsFavorite;
 
             this.CanSeeDetails = ko.computed(function () {
                 if ((this.Type === "RPT" && this.CanEditDataset) || this.Type !== "RPT") {
@@ -1393,6 +1398,43 @@
                 else {
                     $(txt).text("Show Less");
                 }
+            });
+
+            $(document).on("click", "[id^='btnFavorite']", function (e) {
+                e.preventDefault();
+
+                var button = $(this);
+                var id = button.attr("data");
+
+                if (button.hasClass("glyphicon-star")) {
+
+                    $.ajax({
+                        url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent(id),
+                        method: "GET",
+                        dataType: 'json',
+                        success: function () {
+                        },
+                        error: function () {
+                            Sentry.ShowModalAlert("Failed to remove favorite.");
+                        }
+                    });
+                }
+                else if (button.hasClass("glyphicon-star-empty")) {
+
+                    $.ajax({
+                        url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent(id),
+                        method: "GET",
+                        dataType: 'json',
+                        success: function () {
+                        },
+                        error: function () {
+                            Sentry.ShowModalAlert("Failed to set favorite.");
+                        }
+                    });
+                }
+
+                $(this).toggleClass("glyphicon-star glyphicon-star-empty");
+
             });
         });
 
