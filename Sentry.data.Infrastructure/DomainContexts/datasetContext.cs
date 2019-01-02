@@ -200,6 +200,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<TagGroup> TagGroups
+        {
+            get
+            {
+                return Query<TagGroup>();
+            }
+        }        
+
         public IEnumerable<Dataset> GetDatasetByCategoryID(int id)
         {
             return Query<Dataset>().Where(w => w.DatasetCategory.Id == id).Where(x => x.CanDisplay).AsEnumerable();
