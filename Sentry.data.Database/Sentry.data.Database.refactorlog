@@ -567,4 +567,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Serialized_Job_Options" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="1083caa0-2bf8-40b2-b95d-d6f637258e2e" ChangeDateTime="12/18/2018 22:43:31">
+    <Property Name="ElementName" Value="[dbo].[Favorites].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Favorites]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FavoriteId" />
+  </Operation>
 </Operations>

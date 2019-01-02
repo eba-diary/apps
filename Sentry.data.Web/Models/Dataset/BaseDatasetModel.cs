@@ -259,5 +259,6 @@ namespace Sentry.data.Web
         public string ObjectType { get; set; }
         public List<MetadataTag> Tags { get; set; }
         public string UploadFrequency { get; set; }
+        public Boolean IsFavorite { get; set; }
     }
 }
