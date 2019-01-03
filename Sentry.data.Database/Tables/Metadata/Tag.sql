@@ -4,5 +4,7 @@
     [Name] VARCHAR(100) NOT NULL, 
     [Created] DATETIME NOT NULL, 
     [CreatedBy] CHAR(10) NOT NULL, 
-    [Description] VARCHAR(250) NULL
+    [Description] VARCHAR(250) NULL, 
+    [TagGroupId] INT NULL, 
+    CONSTRAINT [FK_Tag_TagGroup] FOREIGN KEY ([TagGroupId]) REFERENCES [TagGroup]([TagGroupId])
 )

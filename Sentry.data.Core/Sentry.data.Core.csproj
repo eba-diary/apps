@@ -115,6 +115,7 @@
     <Compile Include="Entities\Metadata\Schema.cs" />
     <Compile Include="Entities\Metadata\MetadataTag.cs" />
     <Compile Include="Entities\Metadata\SearchableTag.cs" />
+    <Compile Include="Entities\Metadata\TagGroup.cs" />
     <Compile Include="Entities\Release\Issue.cs" />
     <Compile Include="Entities\Release\Sprint.cs" />
     <Compile Include="Entities\Goldeneye\Request.cs" />
