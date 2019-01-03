@@ -14,10 +14,12 @@ namespace Sentry.data.Core
             Name = tag.Name;
             Description = tag.Description;
             Count = tag.Datasets.Count();
+            Group = tag.Group.Name;
         }
         public int id { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public int Count { get; set; }
+        public string Group { get; set; }
     }
 }

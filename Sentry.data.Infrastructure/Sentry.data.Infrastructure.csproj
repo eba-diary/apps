@@ -176,6 +176,7 @@
     <Compile Include="Mappings\Metadata\MetadataAssetMapping.cs" />
     <Compile Include="Mappings\Metadata\SchemaMapping.cs" />
     <Compile Include="Mappings\Metadata\MetadataTagMapping.cs" />
+    <Compile Include="Mappings\Metadata\TagGroupMapping.cs" />
     <Compile Include="Mappings\Primary\AssetNotificationMapping.cs" />
     <Compile Include="Mappings\Primary\AssetSourceMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetFileConfigsMapping.cs" />
@@ -187,6 +188,7 @@
     <Compile Include="Mappings\Primary\DataFeedMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetScopeTypeMapping.cs" />
+    <Compile Include="Mappings\Primary\FavoriteMapping.cs" />
     <Compile Include="Mappings\Primary\FileExtensionMapping.cs" />
     <Compile Include="Mappings\Primary\ApplicationConfigurationMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\AuthenticationTypeMapping.cs" />

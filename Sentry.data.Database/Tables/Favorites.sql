@@ -1,0 +1,12 @@
+﻿CREATE TABLE [dbo].[Favorites]
+(
+	[FavoriteId] INT NOT NULL PRIMARY KEY IDENTITY, 
+    [DatasetId] INT NOT NULL, 
+    [UserId] CHAR(6) NOT NULL, 
+    [Created] DATETIME NOT NULL, 
+    CONSTRAINT [FK_Favorites_Dataset] FOREIGN KEY ([DatasetId]) REFERENCES [Dataset]([Dataset_Id])
+)
+
+GO
+
+CREATE INDEX [IX_Favorites_Column] ON [dbo].[Favorites] ([DatasetId])

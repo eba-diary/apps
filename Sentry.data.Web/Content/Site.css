@@ -3,6 +3,9 @@
 /***********************************/
 /*body {background-color: #eff0f2;}*/
 
+
+/*#region TemplateSettings*/
+
 .item-list-image {
     max-height: 150px;
 }
@@ -49,9 +52,28 @@ ul.list-group-indented {
     background-color: white !important;
 }
 
+/*#endregion TemplateSettings*/
+
+
 /*****************************/
 /* Custom Settings Start Here*/
 /*****************************/
+
+/*#region MainPage - Favorites*/
+
+.favoriteDeleteIcon {
+    padding-left: 1px;
+    cursor:pointer;
+}
+
+.favoriteTypeIcon {
+    margin-top: 9px;
+    margin-left: -20px;
+    margin-right: 10px;    
+}
+
+
+/*#endregion MainPage - Favorites*/
 /* Width of search buttons, all over. */
 .input-group-addon {
     width: 30px;
@@ -99,6 +121,7 @@ ul.list-group-indented {
 /**********************/
 /* Dataset Index page */
 /**********************/
+
 .dataset-search {
     width: 50% !important;
 }
@@ -178,7 +201,16 @@ ul.list-group-indented {
     width: 100%;
 }
 
-.filterHead { font-size: 17px; }
+.btnFavorite{
+    font-size: 194%;
+    float: right;
+    color: blue;
+    cursor: pointer;
+}
+
+.filterHead {
+    font-size: 17px;
+}
 
 .filterBorder_blue { border: 1px solid #003DA5; }
 
@@ -1778,7 +1810,7 @@ body { background-color: #f8f8f8; }
 }
 
 .feedBox {
-    height: 640px;
+    height: 577px;
     overflow-y: auto;
 }
 

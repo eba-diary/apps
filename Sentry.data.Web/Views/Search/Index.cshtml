@@ -108,10 +108,13 @@
                     <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults">
                         <li class="ul-dataset-list-item borderSide_gray boxShadowSm" style="background-color: white;" data-bind="css : BorderColor, click: TileClicked, attr: { title: PrimaryTitle }">
                             <div class="category-type-wrap">
+                                <div class="glyphicon glyphicon-star btnFavorite" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none"></div>
+                                <div class="glyphicon glyphicon-star-empty btnFavorite" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite == false" style="display: none"></div>
                                 <div class="category-type" data-bind="css: BannerColor">
                                     <span data-bind="text: AbbreviatedCategory" />
                                 </div>
                             </div>
+                            <div></div>
                             <div class="dataset-list-content">
                                 <!-- ko foreach: DistinctFileExtensions -->
                                 <div class="extension bg_gray" data-bind="css : $data">
@@ -301,7 +304,7 @@
                             }
                         }
                     }
-                    else if (Category == 'Tag') {
+                    else {
                         if (prod.Tags != null) {
                             for (var i = 0; i < prod.Tags.length; i++) {
                                 if (prod.Tags[i].Name == Title) {
@@ -410,11 +413,12 @@
             self.PageViews = data.PageViews;
             self.Downloads = data.Downloads;
 
-            self.Location = data.Location;
-            self.LocationType = data.LocationType;
-            self.Tags = data.Tags;
-            self.UpdateFrequency = data.UpdateFrequency;
-            self.CanEditDataset = data.CanEditDataset;
+            this.Location = data.Location;
+            this.LocationType = data.LocationType;
+            this.Tags = data.Tags;
+            this.UpdateFrequency = data.UpdateFrequency;
+            this.CanEditDataset = data.CanEditDataset;
+            this.IsFavorite = data.IsFavorite;
 
             self.CanSeeDetails = ko.computed(function () {
                 if ((self.Type === "RPT" && self.CanEditDataset) || self.Type !== "RPT") {
@@ -1043,33 +1047,75 @@
                 temp = [];
 
                 //TAG FILTER
-                counter = 0; //Needs seperate counter as multiple objects can appear per iteration
-                for (var item, i = 0; item = exhibits[i++];) {
-                    if (item.Tags != null) {
-                        var Tags = item.Tags;
-                        //Loop through list of Tags on each item
-                        for (var tag, j = 0; tag = Tags[j++];) {
-                            if (!(tag.Name in tagLookup)) {
-                                tagLookup[tag.Name] = 1;
-                                self.TagFilters.push(new Filter(pageType + '3_' + counter, tag.Name, 'Tag'));
+                //Retrieve unique list of tag groups across tags that exist on exhibits
+                // and alfa sort the list
+                var tagGroups = $.unique($.map(exhibits, function (nested) {
+                        return $.map(nested.Tags, function (element) {
+                            return element.Group;
+                        });
+                    })
+                ).sort();
 
-                                temp.push(new Filter(pageType + '3_' + counter, tag.Name, 'Tag'));
-                                counter++;
+                //Move "Other" group to end of array if exists for display purposes
+                function array_move(arr, old_index, new_index) {
+                    if (new_index >= arr.length) {
+                        var k = new_index - arr.length + 1;
+                        while (k--) {
+                            arr.push(undefined);
+                        }
+                    }
+                    arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
+                    //return arr; //For testing
+                };
+
+                array_move(tagGroups, tagGroups.indexOf('Other'), tagGroups.length - 1)
+
+
+                counter = 0; //Needs seperate counter as multiple objects can appear per iteration
+                //Loop through each tag group, add all tags for the group which are associated
+                // with each exhibit
+                for (var group, g = 0; group = tagGroups[g++];) {
+                    for (var item, i = 0; item = exhibits[i++];) {
+                        if (item.Tags != null) {
+                            var Tags = item.Tags;
+                            //Loop through list of Tags on each item
+                            for (var tag, j = 0; tag = Tags[j++];) {
+                                if (tag.Group == group && !(tag.Name in tagLookup)) {
+                                    tagLookup[tag.Name] = 1;
+                                    self.TagFilters.push(new Filter(pageType + '3_' + counter, tag.Name, group));
+
+                                    temp.push(new Filter(pageType + '3_' + counter, tag.Name, group));
+                                    counter++;
+                                }
                             }
                         }
                     }
-                }
-                ko.utils.arrayForEach(self.AllFilters(), function (v) {
-                    if (v.Name == 'Tag') {
-                        item = v;
+                    ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                        if (v.Name == group) {
+                            item = v;
+                        }
+                    });
+                    if (item !== undefined) {
+                        temp = item.Filters().concat(temp);
+                        ko.utils.arrayRemoveItem(self.AllFilters(), item);
                     }
-                });
-                if (item !== undefined) {
-                    temp = item.Filters().concat(temp);
-                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                    self.AllFilters.push(new FilterCategory(group, temp, 'gold'));
+
+                    temp = [];
                 }
-                self.AllFilters.push(new FilterCategory('Tag', temp, 'gold'));
-                temp = [];
+
+               
+
+                //var xyz = exhibits.map(item => item.tags.Group).reduce((prev, curr) => prev.concat(curr), []).filter((item, i, arr) => arr.indexOf(item) === i);
+
+                //console.log(xyz);                
+
+                //for (var group, i = 0; group = tagGroups[i++];) {
+                //    self.AllFilters.push(new FilterCategory(group, temp, 'gold'));
+                //}
+                //self.AllFilters.push(new FilterCategory('Blah', temp, 'gold'));
+
+                
 
             };
             self.PopulateGenericFilters = function (allObjects) {
@@ -1409,6 +1455,43 @@
                 else {
                     $(txt).text("Show Less");
                 }
+            });
+
+            $(document).on("click", "[id^='btnFavorite']", function (e) {
+                e.preventDefault();
+
+                var button = $(this);
+                var id = button.attr("data");
+
+                if (button.hasClass("glyphicon-star")) {
+
+                    $.ajax({
+                        url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent(id),
+                        method: "GET",
+                        dataType: 'json',
+                        success: function () {
+                        },
+                        error: function () {
+                            Sentry.ShowModalAlert("Failed to remove favorite.");
+                        }
+                    });
+                }
+                else if (button.hasClass("glyphicon-star-empty")) {
+
+                    $.ajax({
+                        url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent(id),
+                        method: "GET",
+                        dataType: 'json',
+                        success: function () {
+                        },
+                        error: function () {
+                            Sentry.ShowModalAlert("Failed to set favorite.");
+                        }
+                    });
+                }
+
+                $(this).toggleClass("glyphicon-star glyphicon-star-empty");
+
             });
         });
 

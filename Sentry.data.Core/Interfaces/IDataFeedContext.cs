@@ -12,6 +12,7 @@ namespace Sentry.data.Core
         IList<DataFeedItem> GetSentryFeedItems();
         IList<DataFeedItem> GoGetItems(List<DataFeed> dataFeeds);
         IList<DataFeedItem> GetFeedItems(DataFeed feed);
+        IList<DataFeedItem> GetAllFavorites(string associateId);
     }
 
 }

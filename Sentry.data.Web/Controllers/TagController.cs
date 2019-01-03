@@ -77,7 +77,8 @@ namespace Sentry.data.Web.Controllers
                     Name = name,
                     Description = description,
                     CreatedBy = RequestContext.Principal.Identity.Name,
-                    Created = DateTime.Now
+                    Created = DateTime.Now,
+                    Group = _dsContext.TagGroups.Where(w => w.Name == "Other").First()
                 });
 
             _dsContext.SaveChanges();
