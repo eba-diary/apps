@@ -378,7 +378,7 @@
                     //And you did not click on a button.
                     if ($(e.target).hasClass("disregardParentClick") === false) {
                         if (self.LocationType === "file") {
-                            vm.GetFile(data);
+                            vm.GetFile(self);
                         }
                         else {
                             var win = window.open(data.Location, '_blank');
