@@ -108,8 +108,8 @@
                     <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults">
                         <li class="ul-dataset-list-item borderSide_gray boxShadowSm" style="background-color: white;" data-bind="css : BorderColor, click: TileClicked, attr: { title: PrimaryTitle }">
                             <div class="category-type-wrap">
-                                <div class="glyphicon glyphicon-star btnFavorite" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none"></div>
-                                <div class="glyphicon glyphicon-star-empty btnFavorite" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite == false" style="display: none"></div>
+                                <div class="glyphicon glyphicon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none"></div>
+                                <div class="glyphicon glyphicon-star-empty btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite == false" style="display: none"></div>
                                 <div class="category-type" data-bind="css: BannerColor">
                                     <span data-bind="text: AbbreviatedCategory" />
                                 </div>
@@ -349,6 +349,7 @@
 
             self.DatasetDesc = data.DatasetDesc;
             self.SentryOwner = data.SentryOwnerName;
+            self.DatasetId = data.DatasetId;
 
             self.DatasetInformation = data.DatasetInformation;
             self.DatasetName = data.DatasetName;
@@ -369,9 +370,12 @@
                 console.log(e);
                 console.log(self.Type);
 
-                if (self.Type === "RPT") {
+                if ($(e.target).hasClass("btnFavorite") === true) {
+                    return false;
+                }
+                else if (self.Type === "RPT") {
                     //What is the primary function of clicking on the tile if its a Report
-                    //And you did not click on the button.
+                    //And you did not click on a button.
                     if ($(e.target).hasClass("disregardParentClick") === false) {
                         if (self.LocationType === "file") {
                             vm.GetFile(data);
