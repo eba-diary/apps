@@ -10,8 +10,8 @@
         <div class="listHeadGroup">
             <img src="~/Images/Icons/DatasetsBlue.svg" class="datasetImg leftFloat" data-bind="visible: IsShownForCurrentType('Datasets')" style="display: none;" />
             <img src="~/Images/Icons/Business IntelligenceBlue.svg" class="datasetImg leftFloat" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;" />
-            <h1 class="htCenter datasetHeader" data-bind="visible: IsShownForCurrentType('Datasets')" style="display: none;" >Datasets</h1>
-            <h1 class="htCenter datasetHeader" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;">Business Intelligence</h1>            
+            <h1 class="htCenter datasetHeader" data-bind="visible: IsShownForCurrentType('Datasets')" style="display: none;">Datasets</h1>
+            <h1 class="htCenter datasetHeader" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;">Business Intelligence</h1>
         </div>
     </div>
     <div class="navbar-form navbar-center">
@@ -45,10 +45,10 @@
                                 <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6">
                                     <label data-bind="attr: { id: id }" style="display: block; font-weight: normal;">
                                         <input type="checkbox" class="filterChbx"
-                                               data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }"/>
+                                               data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }" />
                                         <span data-bind="text : Title"></span>
                                         <span class="badge badge-info" data-bind="text : Count, css : $parent.BannerColor"></span>
-                                     </label>
+                                    </label>
                                 </li>
 
                                 <!-- /ko -->
@@ -103,13 +103,13 @@
                         </select>
 
                         @*<select multiple="multiple" id="activeFilters " class="form-control select2-hidden-accessible"
-                        data-bind="select2: { options: SearchFilters, width: '100%', selectedOptions: Select2Filters, optionsText: 'Title' }"></select>*@
+                            data-bind="select2: { options: SearchFilters, width: '100%', selectedOptions: Select2Filters, optionsText: 'Title' }"></select>*@
                     </div>
                     <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults">
-                        <li class="ul-dataset-list-item borderSide_gray boxShadowSm" data-bind="css : BorderColor">
+                        <li class="ul-dataset-list-item borderSide_gray boxShadowSm" style="background-color: white;" data-bind="css : BorderColor, click: TileClicked, attr: { title: PrimaryTitle }">
                             <div class="category-type-wrap">
-                                <div class="glyphicon glyphicon-star btnFavorite" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none"></div>
-                                <div class="glyphicon glyphicon-star-empty btnFavorite" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite == false" style="display: none"></div>
+                                <div class="glyphicon glyphicon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none"></div>
+                                <div class="glyphicon glyphicon-star-empty btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite == false" style="display: none"></div>
                                 <div class="category-type" data-bind="css: BannerColor">
                                     <span data-bind="text: AbbreviatedCategory" />
                                 </div>
@@ -121,24 +121,7 @@
                                     <span data-bind="text: $data" />
                                 </div>
                                 <!-- /ko -->
-                                <!-- ko if: CanSeeDetails() -->   
-                                    <!-- ko if: ExternalLink !== undefined -->
-                                    <a class="dataset-list-dataset-name" data-bind="attr: { href: ExternalLink, title: DatasetName }">
-                                        <span data-bind="text: DatasetName" />
-                                    </a>
-                                    <!-- /ko -->
-                                    <!-- ko if: ExternalLink === undefined -->
-                                    <a class="dataset-list-dataset-name" data-bind="attr: { href: Link, title: DatasetName }">
-                                        <span data-bind="text: DatasetName" />
-                                    </a>
-                                    <!-- /ko -->
-                                <!-- /ko -->
-                                
-                                <!-- ko ifnot: CanSeeDetails() -->
-                                    <span data-bind="text: DatasetName" style="font-size: larger; font-weight: bolder; color: #003DA5;"></span>
-                                <!-- /ko -->
-
-
+                                <span data-bind="text: DatasetName" style="font-size: larger; font-weight: bolder; color: #003DA5;"></span>
                                 <!-- ko if: IsSensitive-->
                                 <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure" style="padding-left: 10px;"></i>
                                 <!-- /ko -->
@@ -154,7 +137,7 @@
                                 <span class="custom-glyphiconz" aria-hidden="true" />
                                 <div class="dataset-list-content-label">
                                     <div>
-                                        <div class="ownerDate" style="text-align : left;">                                            
+                                        <div class="ownerDate" style="text-align : left;">
                                             <span class="textBold ownerDate" data-bind="css : Color">Sentry Owner:&nbsp;</span>
                                             <span data-bind="text: SentryOwner"></span>
 
@@ -167,27 +150,17 @@
                                             <!-- ko if: Type === "RPT" -->
                                             <span class=" textBold ownerDate" data-bind="css : Color">Update Frequency:&nbsp;</span>
                                             <span data-bind="text: UpdateFrequency"></span>
-                                            <!-- /ko -->
-                                            
-                                            <!-- ko if: Type === "RPT" -->
-                                            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 
-                                            <!-- ko ifnot: (LocationType === "file") -->
-                                            <a class="textBold ownerDate" target="_blank" data-bind="attr: { href: Location, title: DatasetName}">
-                                                <span>Report Link</span>
-                                            </a>
-                                            <!-- /ko -->
-                                            <!-- ko if: LocationType === "file" -->
-                                            <a class="textBold ownerDate" data-bind="click: $parent.GetFile">
-                                                <span>Report Link</span>
-                                            </a>
-                                            <!-- /ko -->
+
+                                            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                            <span class="textBold ownerDate link-btn btn btn-sm btn-info disregardParentClick" title="Go the Report Details Page.">
+                                                <span class="disregardParentClick">Report Details</span>
+                                            </span>
                                             <!-- /ko -->
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </li>
-
                     </ul>
                     <hr>
                     <!-- ko if: searchResults().length == 0 -->
@@ -203,6 +176,27 @@
     </div>
 </div>
 
+<style>
+
+    .disregardParentClick{
+        float: right;
+        margin-top: -3px;
+        margin-right: 1px;
+    }
+
+    .link-btn {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+    .ul-dataset-list-item:hover {
+        opacity: 0.95;
+
+        box-shadow: 2px 6px 10px #888888;
+        cursor: pointer;
+    }
+</style>
+
 @section Scripts {
     <script>
         $(function () {
@@ -215,6 +209,26 @@
                 selectOnClose: false,
                 closeOnSelect: false,
                 placeholder: "There are no active filters.  Pick an option to the left or click here to begin filtering.",
+            });
+
+            //$('body').on('click', ".ul-dataset-list-item", function (e) {
+            //    //console.log($(e.target).hasClass("disregardParentClick"));
+            //    //console.log($(e.target).closest("a").attr('href'));
+            //    //console.log($(e.target).closest(".ul-dataset-list-item").attr('href'));
+
+            //    if ($(e.target).hasClass("disregardParentClick") === false) {
+            //        window.location.replace($(this).closest(".ul-dataset-list-item").attr('href'));
+            //    } else {
+            //        //window.location.replace($(e.target).closest("a").attr('href'));
+            //    }
+            //});
+
+            $('body').on('mouseenter', ".ul-dataset-list-item", function (e) {
+                $(this).css('background-color', $(this).css("border-color").slice(0, -1) + ', 0.1)')
+            });
+
+            $('body').on('mouseleave', ".ul-dataset-list-item", function (e) {
+                $(this).css('background-color', 'white')
             });
 
             $('.select2-container--default').css('width', '100%');
@@ -297,7 +311,7 @@
                                     return prod;
                                 }
                             }
-                        }                        
+                        }
                     }
                 });
 
@@ -331,30 +345,77 @@
         }
 
         function Dataset(data) {
-            this.DatasetDesc = data.DatasetDesc;
-            this.SentryOwner = data.SentryOwnerName;
-            this.DatasetId = data.DatasetId;
+            var self = this;
 
-            this.DatasetInformation = data.DatasetInformation;
-            this.DatasetName = data.DatasetName;
-            this.Category = data.Category;
-            this.AbbreviatedCategory = data.AbbreviatedCategory;
-            this.IsSensitive = data.IsSensitive;
-            this.Type = data.Type;
+            self.DatasetDesc = data.DatasetDesc;
+            self.SentryOwner = data.SentryOwnerName;
+            self.DatasetId = data.DatasetId;
 
-            this.Link = "/Dataset/Detail/" + data.DatasetId;
-            this.ExternalLink = data.Link;
+            self.DatasetInformation = data.DatasetInformation;
+            self.DatasetName = data.DatasetName;
+            self.Category = data.Category;
+            self.AbbreviatedCategory = data.AbbreviatedCategory;
+            self.IsSensitive = data.IsSensitive;
+            self.Type = data.Type;
 
-            this.ChangedDtm = data.ChangedDtm;
-            this.Color = data.Color;
+            self.PrimaryTitle = ko.computed(function () {
+                if (self.Type === "RPT") {
+                    return "Click here to go to this Report.";
+                } else {
+                    return "Click here to go to the Dataset Detail Page.";
+                }
+            });
 
-            this.BannerColor = data.BannerColor;
-            this.BorderColor = data.BorderColor;
+            self.TileClicked = function (item, e) {
+                console.log(e);
+                console.log(self.Type);
 
-            this.DistinctFileExtensions = data.DistinctFileExtensions;
+                if ($(e.target).hasClass("btnFavorite") === true) {
+                    return false;
+                }
+                else if (self.Type === "RPT") {
+                    //What is the primary function of clicking on the tile if its a Report
+                    //And you did not click on a button.
+                    if ($(e.target).hasClass("disregardParentClick") === false) {
+                        if (self.LocationType === "file") {
+                            vm.GetFile(self);
+                        }
+                        else {
+                            var win = window.open(data.Location, '_blank');
+                            if (win) {
+                                //Browser has allowed it to be opened
+                                win.focus();
+                            } else {
+                                //Browser has blocked it
+                                alert('Please allow popups for this website');
+                            }
+                        }
+                    }
+                    //And you did click on the button
+                    else {
+                        
+                        window.location.href = "/BusinessIntelligence/Detail/" + data.DatasetId;
+                    }
 
-            this.PageViews = data.PageViews;
-            this.Downloads = data.Downloads;
+
+                } else {
+                     //What is the primary function of clicking on the tile if its a Dataset.
+                    window.location.href = "/Dataset/Detail/" + data.DatasetId;
+                }
+
+                return false;
+            };
+
+            self.ChangedDtm = data.ChangedDtm;
+            self.Color = data.Color;
+
+            self.BannerColor = data.BannerColor;
+            self.BorderColor = data.BorderColor;
+
+            self.DistinctFileExtensions = data.DistinctFileExtensions;
+
+            self.PageViews = data.PageViews;
+            self.Downloads = data.Downloads;
 
             this.Location = data.Location;
             this.LocationType = data.LocationType;
@@ -363,8 +424,8 @@
             this.CanEditDataset = data.CanEditDataset;
             this.IsFavorite = data.IsFavorite;
 
-            this.CanSeeDetails = ko.computed(function () {
-                if ((this.Type === "RPT" && this.CanEditDataset) || this.Type !== "RPT") {
+            self.CanSeeDetails = ko.computed(function () {
+                if ((self.Type === "RPT" && self.CanEditDataset) || self.Type !== "RPT") {
                     return true;
                 }
                 else {
@@ -643,7 +704,7 @@
                                     }
                                 }
                             }
-                        }                        
+                        }
                         return false;
                     });
                 }
@@ -654,10 +715,10 @@
                         contentType: "application/json; charset=utf-8",
                         type: 'POST',
                         url: '/Search/SearchEvent?categoryFilters=' + selectedCategoryList +
-                        //'&sentryOwners=' + selectedOwnerList +
-                        '&extensions=' + selectedExtensionsList +
-                        '&searchTerm=' + self.Query() +
-                        '&resultsReturned=' + queryResults.length
+                            //'&sentryOwners=' + selectedOwnerList +
+                            '&extensions=' + selectedExtensionsList +
+                            '&searchTerm=' + self.Query() +
+                            '&resultsReturned=' + queryResults.length
                     });
                 }
 
@@ -823,10 +884,10 @@
                         contentType: "application/json; charset=utf-8",
                         type: 'POST',
                         url: '/Search/SearchEvent?categoryFilters=' + selectedCategoryList +
-                        '&sentryOwners=' + selectedOwnerList +
-                        '&extensions=' + selectedExtensionsList +
-                        '&searchTerm=' + self.Query() +
-                        '&resultsReturned=' + queryResults.length
+                            '&sentryOwners=' + selectedOwnerList +
+                            '&extensions=' + selectedExtensionsList +
+                            '&searchTerm=' + self.Query() +
+                            '&resultsReturned=' + queryResults.length
                     });
                 }
 
@@ -1064,7 +1125,7 @@
             self.PopulateGenericFilters = function (allObjects) {
                 var temp = [];
                 var pageType = '3_'
-                 
+
                 //CATEGORY FILTER
                 var param = getParameterByName('category');
 
@@ -1220,7 +1281,7 @@
                 } else {
                     self.PopulateGenericFilters(allData);
                 }
-                
+
             };
 
             // Load initial state from server, convert it to Dataset instances, then populate self.datasets
@@ -1313,48 +1374,48 @@
                 queryResults = temp.map(x => x.dataset);
                 var selectedCategoryList = [];
 
-                        if (self.SearchType() == "Datasets") {
-                            queryResults = self.FilterDatasets(queryResults);
-                        } else if (self.SearchType() == "BusinessIntelligence") {
-                            queryResults = self.FilterExhibits(queryResults);
-                        } else {
-                            queryResults = self.FilterGeneric(queryResults);
-                            }
-
-                        $("#SearchText").attr("placeholder", "Search " + queryResults.length + " Datasets...");
-
-                        return queryResults;
-                    });
-
-                    self.SelectedFilters.subscribe(function () {
-                        localStorage.setItem("filteredIds", ko.toJSON(self.SelectedFilters()));
-                        $('#filterSelector').val(self.SelectedFilters()).trigger('change');
-
-                    });
-
-                    self.GetFile = function (data) {
-
-                        $.ajax({
-                            url: '/ExternalFile/HasReadPermissions?pathAndFilename=' + encodeURIComponent(data.Location),
-                            method: "GET",
-                            dataType: 'json',
-                            success: function (obj) {
-                                if (obj.HasPermission) {
-                                    var url = '/ExternalFile/DownloadExternalFile?pathAndFilename=' + encodeURIComponent(data.Location);
-                                    window.open(url);
-                                }
-                                else {
-                                    Sentry.ShowModalAlert(
-                                        "User does not have sufficient permissions to selected file. </br></br>  Contact <b>" + data.SentryOwner + "</b> to request access to exhibit."
-                                    );
-                                }
-                            },
-                            error: function (obj) {
-                                Sentry.ShowModalAlert("Failed permissions check, please try again.  If problem persists, please contact <a mailto:DSCSupport@sentry.com></a>");
-                            }
-                        });
-                    };
+                if (self.SearchType() == "Datasets") {
+                    queryResults = self.FilterDatasets(queryResults);
+                } else if (self.SearchType() == "BusinessIntelligence") {
+                    queryResults = self.FilterExhibits(queryResults);
+                } else {
+                    queryResults = self.FilterGeneric(queryResults);
                 }
+
+                $("#SearchText").attr("placeholder", "Search " + queryResults.length + " Datasets...");
+
+                return queryResults;
+            });
+
+            self.SelectedFilters.subscribe(function () {
+                localStorage.setItem("filteredIds", ko.toJSON(self.SelectedFilters()));
+                $('#filterSelector').val(self.SelectedFilters()).trigger('change');
+
+            });
+
+            self.GetFile = function (data) {
+
+                $.ajax({
+                    url: '/ExternalFile/HasReadPermissions?pathAndFilename=' + encodeURIComponent(data.Location),
+                    method: "GET",
+                    dataType: 'json',
+                    success: function (obj) {
+                        if (obj.HasPermission) {
+                            var url = '/ExternalFile/DownloadExternalFile?pathAndFilename=' + encodeURIComponent(data.Location);
+                            window.open(url);
+                        }
+                        else {
+                            Sentry.ShowModalAlert(
+                                "User does not have sufficient permissions to selected file. </br></br>  Contact <b>" + data.SentryOwner + "</b> to request access to exhibit."
+                            );
+                        }
+                    },
+                    error: function (obj) {
+                        Sentry.ShowModalAlert("Failed permissions check, please try again.  If problem persists, please contact <a mailto:DSCSupport@sentry.com></a>");
+                    }
+                });
+            };
+        }
 
 
         $(document).ready(function () {
@@ -1367,7 +1428,7 @@
             else {
                 window.vm.clearFilters();
             }
-            
+
 
 
             $(document).on("click", "[id^='filterType_']", function (e) {
