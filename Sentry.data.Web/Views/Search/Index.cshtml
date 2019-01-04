@@ -152,8 +152,8 @@
                                             <span data-bind="text: UpdateFrequency"></span>
 
                                             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                                            <span class="textBold ownerDate link-btn btn btn-sm btn-info disregardParentClick" title="Go the Report Details Page.">
-                                                <span class="disregardParentClick">Report Details</span>
+                                            <span class="textBold ownerDate link-btn btn btn-sm btn-info disregardParentClick" title="Go the Detail Page.">
+                                                <span class="disregardParentClick">Detail</span>
                                             </span>
                                             <!-- /ko -->
                                         </div>
@@ -360,7 +360,7 @@
 
             self.PrimaryTitle = ko.computed(function () {
                 if (self.Type === "RPT") {
-                    return "Click here to go to this Report.";
+                    return "Click here to open.";
                 } else {
                     return "Click here to go to the Dataset Detail Page.";
                 }
@@ -417,12 +417,12 @@
             self.PageViews = data.PageViews;
             self.Downloads = data.Downloads;
 
-            this.Location = data.Location;
-            this.LocationType = data.LocationType;
-            this.Tags = data.Tags;
-            this.UpdateFrequency = data.UpdateFrequency;
-            this.CanEditDataset = data.CanEditDataset;
-            this.IsFavorite = data.IsFavorite;
+            self.Location = data.Location;
+            self.LocationType = data.LocationType;
+            self.Tags = data.Tags;
+            self.UpdateFrequency = data.UpdateFrequency;
+            self.CanEditDataset = data.CanEditDataset;
+            self.IsFavorite = data.IsFavorite;
 
             self.CanSeeDetails = ko.computed(function () {
                 if ((self.Type === "RPT" && self.CanEditDataset) || self.Type !== "RPT") {
