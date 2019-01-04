@@ -35,11 +35,12 @@
                     <div class="panel panel-default dataset-list-filters boxShadow" data-bind="css : BorderColor">
                         <div class="panel-heading filterHead white" data-bind="css : BannerColor, attr: { id: HeadId }">
                             <span data-bind="text : Name"></span>
-                            <span class="glyphicon glyphicon-chevron-up rightFloat filterViewIcon" data-bind="css : Color, attr: { id: HeadIcon }"></span>
+                            <span class="glyphicon glyphicon-chevron-up rightFloat filterViewIcon" data-bind="css : Color, visible:  OrderedFilters().length > 0, attr: { id: HeadIcon }"></span>
                         </div>
 
                         <!-- FOREACH OF THE CATEGORY FILTERS-->
                         <div class="dataset-list-filter-category panel-body" data-bind="attr: {id : HeadHide }">
+                            <!-- ko if: OrderedFilters().length > 0 -->
                             <ul class="list-unstyled ul-filter-list">
                                 <!-- ko foreach: OrderedFilters -->
                                 <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6">
@@ -69,6 +70,7 @@
                                 </li>
 
                             </ul>
+                            <!-- /ko -->
 
                             <!-- ko if: OrderedFilters().length > 6 -->
                             <a href="#" class="filterMore" data-bind="attr: { id:  HiddenId}">
@@ -320,28 +322,58 @@
         }
 
         function FilterCategory(Name, Filters, Color) {
-            this.Name = Name;
-            this.Filters = ko.observableArray(Filters);
+            var self = this;
 
-            this.OrderedFilters = ko.computed(function () {
-                return Filters.sort(function (left, right) {
+            self.Name = Name;
+
+            self.Filters = ko.observableArray(Filters);
+
+            self.Color = Color;
+
+            self.BannerColor = 'filterHead_' + Color;
+            self.BorderColor = 'filterBorder_' + Color;
+
+            self.HiddenId = 'filterMore_' + Name.replace(' ', '_');
+            self.HiddenMore = 'hidden_filterMore_' + Name.replace(' ', '_');
+            self.IconMore = 'icon_filterMore_' + Name.replace(' ', '_');
+            self.TxtMore = 'txt_filterMore_' + Name.replace(' ', '_');
+
+            self.HeadId = 'filterType_' + Name.replace(' ', '_');
+            self.HeadIcon = 'icon_filterType_' + Name.replace(' ', '_');
+            self.HeadHide = 'hide_filterType_' + Name.replace(' ', '_');
+
+            self.OrderedFilters = ko.computed(function () {
+                //First filter the list so that we only have filters that have a count greater than 0
+                var list = ko.utils.arrayFilter(self.Filters(), function (prod) {
+                    return prod.Count() !== 0;
+                });
+                
+                //If the count is 0, hide the section.
+                if (list.length === 0) {
+                    $("#" + self.HeadHide).hide();
+                    $("#" + self.HeadIcon).hide();
+                }
+                //If the count is not zero, meaning there are available filters.
+                else
+                {
+                    //The user has closed this section and it should not open back up.
+                    if ($("#" + self.HeadIcon).hasClass("glyphicon-chevron-down"))
+                    {
+                        $("#" + self.HeadIcon).show();                
+                    }
+                    else
+                    //The user has this section open and it should show back up.
+                    {
+                        $("#" + self.HeadIcon).show();
+                        $("#" + self.HeadHide).show();
+                    }
+                }
+
+                //Sort the remaining list alphabetically and show them to the user.
+                return list.sort(function (left, right) {
                     return left.Title == right.Title ? 0 : (left.Title < right.Title ? -1 : 1)
                 });
             });
-
-            this.Color = Color;
-
-            this.BannerColor = 'filterHead_' + Color;
-            this.BorderColor = 'filterBorder_' + Color;
-
-            this.HiddenId = 'filterMore_' + Name.replace(' ', '_');
-            this.HiddenMore = 'hidden_filterMore_' + Name.replace(' ', '_');
-            this.IconMore = 'icon_filterMore_' + Name.replace(' ', '_');
-            this.TxtMore = 'txt_filterMore_' + Name.replace(' ', '_');
-
-            this.HeadId = 'filterType_' + Name.replace(' ', '_');
-            this.HeadIcon = 'icon_filterType_' + Name.replace(' ', '_');
-            this.HeadHide = 'hide_filterType_' + Name.replace(' ', '_');
         }
 
         function Dataset(data) {
