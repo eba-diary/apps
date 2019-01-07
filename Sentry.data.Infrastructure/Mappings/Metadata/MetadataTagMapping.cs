@@ -48,6 +48,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                     });
                 }
             );
+            this.ManyToOne(x => x.Group, m =>
+            {
+                m.Column("TagGroupId");
+                m.ForeignKey("FK_Tag_TagGroup");
+                m.Class(typeof(TagGroup));
+            });
         }
     }
 }
