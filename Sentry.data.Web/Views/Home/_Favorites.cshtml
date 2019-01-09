@@ -29,7 +29,7 @@
         {
             if (item.Feed.Name == "Business Intelligence" && item.Feed.UrlType == "file")
             {
-                <a onclick='GetFile("@item.Feed.Url");event.preventDefault();' href="#" class="pointer"><h5 data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle()</h5></a>
+                <a onclick='GetFile("@item.Feed.Url.Replace(@"\",@"\\")");event.preventDefault();' href="#" class="pointer"><h5 data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle()</h5></a>
             }
             else if (item.Feed.Name == "Business Intelligence" && item.Feed.UrlType != "file")
             {
@@ -44,7 +44,7 @@
         {
             if (item.Feed.Name == "Business Intelligence" && item.Feed.UrlType == "file")
             {
-                <a onclick='GetFile("@item.Feed.Url");event.preventDefault();' href="#" class="pointer"><h5>@item.DisplayTitle()</h5></a>
+                <a onclick='GetFile("@item.Feed.Url.Replace(@"\",@"\\")");event.preventDefault();' href="#" class="pointer"><h5>@item.DisplayTitle()</h5></a>
             }
             else if (item.Feed.Name == "Business Intelligence" && item.Feed.UrlType != "file")
             {
