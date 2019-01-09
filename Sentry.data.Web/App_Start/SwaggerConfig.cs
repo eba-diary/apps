@@ -1,14 +1,7 @@
-using System;
-using System.Linq;
-using System.Web;
 using System.Web.Http;
-using System.Web.Http.Description;
-using System.Web.Http.Routing.Constraints;
-using System.Collections.Generic;
-
+using WebActivatorEx;
 using Sentry.data.Web;
-using Swagger.Net.Application;
-using Swagger.Net;
+using Swashbuckle.Application;
 
 [assembly: PreApplicationStartMethod(typeof(SwaggerConfig), "Register")]
 
@@ -41,16 +34,12 @@ namespace Sentry.data.Web
                         //
                         c.SingleApiVersion("v1", "Sentry.data.Web");
 
-                        // Taking to long to load the swagger docs? Enable this option to start caching it
-                        //
-                        //c.AllowCachingSwaggerDoc();
-
                         // If you want the output Swagger docs to be indented properly, enable the "PrettyPrint" option.
                         //
                         //c.PrettyPrint();
 
                         // If your API has multiple versions, use "MultipleApiVersions" instead of "SingleApiVersion".
-                        // In this case, you must provide a lambda that tells Swagger-Net which actions should be
+                        // In this case, you must provide a lambda that tells Swashbuckle which actions should be
                         // included in the docs for a given API version. Like "SingleApiVersion", each call to "Version"
                         // returns an "Info" builder so you can provide additional metadata per API version.
                         //
@@ -58,8 +47,8 @@ namespace Sentry.data.Web
                         //    (apiDesc, targetApiVersion) => ResolveVersionSupportByRouteConstraint(apiDesc, targetApiVersion),
                         //    (vc) =>
                         //    {
-                        //        vc.Version("v2", "Swagger-Net Dummy API V2");
-                        //        vc.Version("v1", "Swagger-Net Dummy API V1");
+                        //        vc.Version("v2", "Swashbuckle Dummy API V2");
+                        //        vc.Version("v1", "Swashbuckle Dummy API V1");
                         //    });
 
                         // You can use "BasicAuth", "ApiKey" or "OAuth2" options to describe security schemes for the API.
@@ -69,9 +58,14 @@ namespace Sentry.data.Web
                         // you'll need to implement a custom IDocumentFilter and/or IOperationFilter to set these properties
                         // according to your specific authorization implementation
                         //
-                        c.BasicAuth("basic").Description("Basic HTTP Authentication");
+                        //c.BasicAuth("basic")
+                        //    .Description("Basic HTTP Authentication");
                         //
-                        //c.ApiKey("apiKey", "header", "API Key Authentication");
+						// NOTE: You must also configure 'EnableApiKeySupport' below in the SwaggerUI section
+                        //c.ApiKey("apiKey")
+                        //    .Description("API Key Authentication")
+                        //    .Name("apiKey")
+                        //    .In("header");
                         //
                         //c.OAuth2("oauth2")
                         //    .Description("OAuth2 Implicit Grant")
@@ -86,9 +80,6 @@ namespace Sentry.data.Web
 
                         // Set this flag to omit descriptions for any actions decorated with the Obsolete attribute
                         //c.IgnoreObsoleteActions();
-
-                        // Comment this setting to disable Access-Control-Allow-Origin
-                        //c.AccessControlAllowOrigin("*");
 
                         // Each operation be assigned one or more tags which are then used by consumers for various reasons.
                         // For example, the swagger-ui groups operations according to the first tag of each operation.
@@ -105,17 +96,14 @@ namespace Sentry.data.Web
                         //
                         //c.OrderActionGroupsBy(new DescendingAlphabeticComparer());
 
-                        // If you annotate Controllers and API Types with Xml comments:
-                        // http://msdn.microsoft.com/en-us/library/b2s063f7(v=vs.110).aspx
-                        // those comments will be incorporated into the generated docs and UI.
-                        // Just make sure your comment file(s) have extension .XML
-                        // You can add individual files by providing the path to one or
+                        // If you annotate Controllers and API Types with
+                        // Xml comments (http://msdn.microsoft.com/en-us/library/b2s063f7(v=vs.110).aspx), you can incorporate
+                        // those comments into the generated docs and UI. You can enable this by providing the path to one or
                         // more Xml comment files.
                         //
-                        //c.IncludeXmlComments(AppDomain.CurrentDomain.BaseDirectory + "file.ext");
-                        c.IncludeAllXmlComments(thisAssembly, AppDomain.CurrentDomain.BaseDirectory);
+                        //c.IncludeXmlComments(GetXmlCommentsPath());
 
-                        // Swagger-Net makes a best attempt at generating Swagger compliant JSON schemas for the various types
+                        // Swashbuckle makes a best attempt at generating Swagger compliant JSON schemas for the various types
                         // exposed in your API. However, there may be occasions when more control of the output is needed.
                         // This is supported through the "MapType" and "SchemaFilter" options:
                         //
@@ -134,7 +122,7 @@ namespace Sentry.data.Web
                         //c.SchemaFilter<ApplySchemaVendorExtensions>();
 
                         // In a Swagger 2.0 document, complex types are typically declared globally and referenced by unique
-                        // Schema Id. By default, Swagger-Net does NOT use the full type name in Schema Ids. In most cases, this
+                        // Schema Id. By default, Swashbuckle does NOT use the full type name in Schema Ids. In most cases, this
                         // works well because it prevents the "implementation detail" of type namespaces from leaking into your
                         // Swagger docs and UI. However, if you have multiple types in your API with the same class name, you'll
                         // need to opt out of this behavior to avoid Schema Id conflicts.
@@ -150,14 +138,14 @@ namespace Sentry.data.Web
                         // Obsolete attribute
                         //c.IgnoreObsoleteProperties();
 
-                        // In accordance with the built in JsonSerializer, if disabled Swagger-Net will describe enums as integers.
+                        // In accordance with the built in JsonSerializer, Swashbuckle will, by default, describe enums as integers.
                         // You can change the serializer behavior by configuring the StringToEnumConverter globally or for a given
-                        // enum type. Swagger-Net will honor this change out-of-the-box. However, if you use a different
-                        // approach to serialize enums as strings, you can also force Swagger-Net to describe them as strings.
+                        // enum type. Swashbuckle will honor this change out-of-the-box. However, if you use a different
+                        // approach to serialize enums as strings, you can also force Swashbuckle to describe them as strings.
                         //
-                        c.DescribeAllEnumsAsStrings(camelCase: false);
+                        //c.DescribeAllEnumsAsStrings();
 
-                        // Similar to Schema filters, Swagger-Net also supports Operation and Document filters:
+                        // Similar to Schema filters, Swashbuckle also supports Operation and Document filters:
                         //
                         // Post-modify Operation descriptions once they've been generated by wiring up one or more
                         // Operation filters.
@@ -178,7 +166,7 @@ namespace Sentry.data.Web
                         //c.DocumentFilter<ApplyDocumentVendorExtensions>();
 
                         // In contrast to WebApi, Swagger 2.0 does not include the query string component when mapping a URL
-                        // to an action. As a result, Swagger-Net will raise an exception if it encounters multiple actions
+                        // to an action. As a result, Swashbuckle will raise an exception if it encounters multiple actions
                         // with the same path (sans query string) and HTTP method. You can workaround this by providing a
                         // custom strategy to pick a winner or merge the descriptions for the purposes of the Swagger docs
                         //
@@ -200,13 +188,13 @@ namespace Sentry.data.Web
                         // The file must be included in your project as an "Embedded Resource", and then the resource's
                         // "Logical Name" is passed to the method as shown below.
                         //
-                        //c.InjectStylesheet(thisAssembly, "Swagger.Net.Dummy.SwaggerExtensions.testStyles1.css");
+                        //c.InjectStylesheet(containingAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testStyles1.css");
 
                         // Use the "InjectJavaScript" option to invoke one or more custom JavaScripts after the swagger-ui
                         // has loaded. The file must be included in your project as an "Embedded Resource", and then the resource's
                         // "Logical Name" is passed to the method as shown above.
                         //
-                        //c.InjectJavaScript(thisAssembly, "Swagger.Net.Dummy.SwaggerExtensions.testScript1.js");
+                        //c.InjectJavaScript(thisAssembly, "Swashbuckle.Dummy.SwaggerExtensions.testScript1.js");
 
                         // The swagger-ui renders boolean data types as a dropdown. By default, it provides "true" and "false"
                         // strings as the possible choices. You can use this option to change these to something else,
@@ -217,7 +205,7 @@ namespace Sentry.data.Web
                         // By default, swagger-ui will validate specs against swagger.io's online validator and display the result
                         // in a badge at the bottom of the page. Use these options to set a different validator URL or to disable the
                         // feature entirely.
-                        c.SetValidatorUrl("https://online.swagger.io/validator");
+                        //c.SetValidatorUrl("http://localhost/validator");
                         //c.DisableValidator();
 
                         // Use this option to control how the Operation listing is displayed.
@@ -226,36 +214,18 @@ namespace Sentry.data.Web
                         //
                         //c.DocExpansion(DocExpansion.List);
 
-                        // Controls how models are shown when the API is first rendered. (The user can always switch
-                        // the rendering for a given model by clicking the 'Model' and 'Example Value' links.) It can be
-                        // set to 'model' or 'example', and the default is 'example'.
-                        //
-                        //c.DefaultModelRendering(DefaultModelRender.Model);
-
-                        // Use this option to control the expansion depth for models.
-                        //
-                        //c.DefaultModelExpandDepth(0);
-
-                        // Limit the number of operations shown to a smaller value
-                        //
-                        c.UImaxDisplayedTags(100);
-
-                        // Filter the operations works as a search, to disable set to "null"
-                        //
-                        c.UIfilter("''");
-
-                        // Specify which HTTP operations will have the 'Try it out!' option. An empty parameter list disables
+                        // Specify which HTTP operations will have the 'Try it out!' option. An empty paramter list disables
                         // it for all operations.
                         //
                         //c.SupportedSubmitMethods("GET", "HEAD");
 
                         // Use the CustomAsset option to provide your own version of assets used in the swagger-ui.
-                        // It's typically used to instruct Swagger-Net to return your version instead of the default
+                        // It's typically used to instruct Swashbuckle to return your version instead of the default
                         // when a request is made for "index.html". As with all custom content, the file must be included
                         // in your project as an "Embedded Resource", and then the resource's "Logical Name" is passed to
                         // the method as shown below.
                         //
-                        //c.CustomAsset("index", thisAssembly, "YourWebApiProject.SwaggerExtensions.index.html");
+                        //c.CustomAsset("index", containingAssembly, "YourWebApiProject.SwaggerExtensions.index.html");
 
                         // If your API has multiple versions and you've applied the MultipleApiVersions setting
                         // as described above, you can also enable a select box in the swagger-ui, that displays
@@ -274,72 +244,12 @@ namespace Sentry.data.Web
                         //    appName: "Swagger UI"
                         //    //additionalQueryStringParams: new Dictionary<string, string>() { { "foo", "bar" } }
                         //);
+
+                        // If your API supports ApiKey, you can override the default values.
+                        // "apiKeyIn" can either be "query" or "header"
+                        //
+                        //c.EnableApiKeySupport("apiKey", "header");
                     });
-        }
-
-        public static bool ResolveVersionSupportByRouteConstraint(ApiDescription apiDesc, string targetApiVersion)
-        {
-            return (apiDesc.Route.RouteTemplate.ToLower().Contains(targetApiVersion.ToLower()));
-        }
-
-        private class ApplyDocumentVendorExtensions : IDocumentFilter
-        {
-            public void Apply(SwaggerDocument swaggerDoc, SchemaRegistry schemaRegistry, IApiExplorer apiExplorer)
-            {
-                // Include the given data type in the final SwaggerDocument
-                //
-                //schemaRegistry.GetOrRegister(typeof(ExtraType));
-            }
-        }
-
-        public class AssignOAuth2SecurityRequirements : IOperationFilter
-        {
-            public void Apply(Operation operation, SchemaRegistry schemaRegistry, ApiDescription apiDescription)
-            {
-                // Correspond each "Authorize" role to an oauth2 scope
-                var scopes = apiDescription.ActionDescriptor.GetFilterPipeline()
-                    .Select(filterInfo => filterInfo.Instance)
-                    .OfType<AuthorizeAttribute>()
-                    .SelectMany(attr => attr.Roles.Split(','))
-                    .Distinct();
-
-                if (scopes.Any())
-                {
-                    if (operation.security == null)
-                        operation.security = new List<IDictionary<string, IEnumerable<string>>>();
-
-                    var oAuthRequirements = new Dictionary<string, IEnumerable<string>>
-                    {
-                        { "oauth2", scopes }
-                    };
-
-                    operation.security.Add(oAuthRequirements);
-                }
-            }
-        }
-
-        private class ApplySchemaVendorExtensions : ISchemaFilter
-        {
-            public void Apply(Schema schema, SchemaRegistry schemaRegistry, Type type)
-            {
-                // Modify the example values in the final SwaggerDocument
-                //
-                if (schema.properties != null)
-                {
-                    foreach (var p in schema.properties)
-                    {
-                        switch (p.Value.format)
-                        {
-                            case "int32":
-                                p.Value.example = 123;
-                                break;
-                            case "double":
-                                p.Value.example = 9858.216;
-                                break;
-                        }
-                    }
-                }
-            }
         }
     }
 }

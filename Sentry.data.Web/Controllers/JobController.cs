@@ -11,8 +11,6 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Sentry.data.Core.Entities.Livy;
-using System.Web.Http.Results;
-using Swagger.Net.Annotations;
 
 namespace Sentry.data.Web.Controllers
 {
