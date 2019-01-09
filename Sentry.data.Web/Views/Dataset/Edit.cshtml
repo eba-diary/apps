@@ -414,6 +414,43 @@
     input[type="checkbox"] {
         margin: 10px 0 0;
     }
+
+    .info {
+        width: 100%;
+        float: right;
+    }
+
+    .clearfix {
+        width: 100%;
+        clear: both;
+        float: none;
+        content: '';
+    }
+
+    .s-tag {
+        display: inline-flex;
+        align-content: center;
+        justify-content: center;
+        min-width: 0;
+        padding-left: 4px;
+        padding-right: 4px;
+        border-style: solid;
+        border-width: 1px;
+        border-radius: 3px;
+        font-size: 12px;
+        line-height: 1.84615385;
+        text-decoration: none;
+        vertical-align: middle;
+        white-space: nowrap;
+        border-color: transparent;
+        background-color: #E1ECF4;
+        color: #2c5777;
+    }
+
+    .item-multiplier {
+        margin-right: 4px;
+        color: black;
+    }
 </style>
 
 @section Scripts {
@@ -422,58 +459,63 @@
         $(function () {
             data.Dataset.EditInit();
 
-            $("#TagSelector").select2({
-                multiple: true,
-                allowClear: true,
-                ajax: {
+            $(document).ready(function () {
+
+                $.ajax({
                     url: "/api/Tag/SearchTags",
                     dataType: 'json',
-                    dropdownPosition: 'below',
-                    data: function (params) {
-                        return {
-                            query: params.term
-                        };
+                    type: "GET",
+                    success: function (msg) {
+                        $("#TagSelector").select2({
+                            multiple: true,
+                            allowClear: true,
+                            data: msg,
+                            ajax: {
+                                url: "/api/Tag/SearchTags",
+                                dataType: 'json',
+                                dropdownPosition: 'below',
+                                data: function (params) {
+                                    return {
+                                        query: params.term
+                                    };
+                                },
+                                processResults: function (data) {
+                                    // parse the results into the format expected by Select2.
+                                    // since we are using custom formatting functions we do not need to
+                                    // alter the remote JSON data
+
+                                    return {
+                                        results: data
+                                    };
+                                },
+                                cache: true
+                            },
+                            dropdownPosition: 'below',
+                            templateResult: formatTag,
+                            escapeMarkup: function (markup) { return markup; },
+                            templateSelection: formatTagSelection
+                        });
+
+                        if ($('#TagString').val()) {
+                            console.log('this ran')
+                            var selectedOptions = JSON.parse($('#TagString').val());
+                            var selectedIDs = [];
+
+                            for (var i = 0; i < selectedOptions.length; i++) {
+                                selectedIDs.push(selectedOptions[i].id);
+                            }
+
+                            $('#TagSelector').val(selectedIDs);
+                            $('#TagSelector').trigger('change');
+
+                            $('#TagString').val(JSON.stringify($('#TagSelector').val()));
+                        }
                     },
-                    processResults: function (data) {
-                        // parse the results into the format expected by Select2.
-                        // since we are using custom formatting functions we do not need to
-                        // alter the remote JSON data
-
-                        return {
-                            results: data
-                        };
-                    },
-                    cache: true
-                },
-                escapeMarkup: function (markup) { return markup; },
-                minimumInputLength: 1,
-                //maximumSelectionLength: 5,
-                formatSelectionTooBig: function (limit) {
-                    return 'You can only select up to 5 tags.';
-                },
-                templateResult: formatTag,
-                templateSelection: formatTagSelection
-
-            })
-
-            //THIS MUST COME AFTER THE SELECT2 STARTUP
-            //THIS THIS THIS START
-            if ($('#TagString').val()) {
-                var selectedOptions = JSON.parse($('#TagString').val());
-                var selectedIDs = [];
-
-                for (var i = 0; i < selectedOptions.length; i++) {
-                    // Create a DOM Option and pre-select by default
-                    var newOption = new Option(selectedOptions[i].Name, selectedOptions[i].id, true, true);
-                    // Append it to the select
-                    $('#TagSelector').append(newOption).trigger('change');
-
-                    selectedIDs.push(selectedOptions[i].id);
-                }
-
-                $('#TagString').val(JSON.stringify($('#TagSelector').val()));
-            }
-            //THIS THIS THIS STOP
+                    error: function (e) {
+                        console.log(e);
+                    }
+                });
+            });
 
             $('#TagSelector').on('select2:select', function (e) {
                 $('#TagString').val(JSON.stringify($('#TagSelector').val()));
