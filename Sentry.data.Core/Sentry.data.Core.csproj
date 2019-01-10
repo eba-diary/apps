@@ -82,6 +82,7 @@
     <Compile Include="Entities\Datasets\DatasetMetadata.cs" />
     <Compile Include="Entities\Datasets\FileExtension.cs" />
     <Compile Include="Entities\Datasets\ReportMetadata.cs" />
+    <Compile Include="Entities\Datasets\Favorite.cs" />
     <Compile Include="Entities\Goldeneye\ApplicationConfiguration.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\JavaAppSource.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\JobHistory.cs" />
@@ -114,6 +115,7 @@
     <Compile Include="Entities\Metadata\Schema.cs" />
     <Compile Include="Entities\Metadata\MetadataTag.cs" />
     <Compile Include="Entities\Metadata\SearchableTag.cs" />
+    <Compile Include="Entities\Metadata\TagGroup.cs" />
     <Compile Include="Entities\Release\Issue.cs" />
     <Compile Include="Entities\Release\Sprint.cs" />
     <Compile Include="Entities\Goldeneye\Request.cs" />

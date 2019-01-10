@@ -98,6 +98,19 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                     });
                 }
             );
+
+            this.Bag(x => x.Favorities, (m) =>
+            {
+                m.Lazy(CollectionLazy.Lazy);
+                m.Inverse(true);
+                m.Table("Favorites");
+                m.Cascade(Cascade.None);
+                m.Key((k) =>
+                {
+                    k.Column("DatasetId");
+                    k.ForeignKey("FK_DatasetFile_Dataset");
+                });
+            }, map => map.OneToMany(a => a.Class(typeof(Favorite))));
         }
     }
 }

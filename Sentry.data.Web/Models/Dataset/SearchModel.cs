@@ -11,6 +11,8 @@ namespace Sentry.data.Web
     {
         public SearchModel(Dataset ds, IAssociateInfoProvider _associateInfoProvider)
         {
+
+
             this.Category = ds.DatasetCategory.Name;            
             this.AbbreviatedCategory = (String.IsNullOrWhiteSpace(ds.DatasetCategory.AbbreviatedName)) ? ds.DatasetCategory.Name : ds.DatasetCategory.AbbreviatedName;
             this.DatasetName = ds.DatasetName;
@@ -73,6 +75,7 @@ namespace Sentry.data.Web
         public string Type { get; set; }
         public string Link { get; set; }
         public List<SearchableTag> Tags { get; set; }
+        public Boolean IsFavorite { get; set; }
         public Boolean CanEditDataset { get; set; }
 
     }

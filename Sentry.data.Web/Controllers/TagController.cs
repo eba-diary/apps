@@ -29,17 +29,29 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         [Route("Get")]
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
-        public async Task<IHttpActionResult> SearchTags(string query)
+        public async Task<IHttpActionResult> SearchTags(string query = null)
         {
             List<SearchableTag> reply = new List<SearchableTag>();
 
             try
             {
-                var tempReply = _dsContext.Tags.Where(x => x.Name.ToLower().Contains(query.ToLower()));
-
-                foreach (var temp in tempReply)
+                if (query != null)
                 {
-                    reply.Add(temp.GetSearchableTag());
+                    var tempReply = _dsContext.Tags.Where(x => x.Name.ToLower().Contains(query.ToLower()));
+
+                    foreach (var temp in tempReply)
+                    {
+                        reply.Add(temp.GetSearchableTag());
+                    }
+                }
+                else
+                {
+                    var tempReply = _dsContext.Tags;
+
+                    foreach (var temp in tempReply)
+                    {
+                        reply.Add(temp.GetSearchableTag());
+                    }
                 }
             }
             catch (Exception ex)
@@ -77,7 +89,8 @@ namespace Sentry.data.Web.Controllers
                     Name = name,
                     Description = description,
                     CreatedBy = RequestContext.Principal.Identity.Name,
-                    Created = DateTime.Now
+                    Created = DateTime.Now,
+                    Group = _dsContext.TagGroups.Where(w => w.Name == "Other").First()
                 });
 
             _dsContext.SaveChanges();

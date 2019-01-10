@@ -525,6 +525,8 @@ namespace Sentry.data.Web.Controllers
 
             BaseDatasetModel bdm = new BaseDatasetModel(ds, _associateInfoProvider, _datasetContext);
 
+            bdm.IsFavorite = ds.Favorities.Where(w => w.UserId == SharedContext.CurrentUser.AssociateId).Any();
+            
             Event e = new Event();
 
             //Object specific settings
@@ -1601,6 +1603,45 @@ namespace Sentry.data.Web.Controllers
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
             return View("QueryTool");
+        }
+
+        public JsonResult SetFavorite(int datasetId)
+        {
+            try
+            {
+                Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+
+                if (!ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId))
+                {
+                    Favorite f = new Favorite()
+                    {
+                        DatasetId = ds.DatasetId,
+                        UserId = SharedContext.CurrentUser.AssociateId,
+                        Created = DateTime.Now
+                    };
+
+                    _datasetContext.Merge(f);
+                    _datasetContext.SaveChanges();
+
+                    Response.StatusCode = (int)HttpStatusCode.OK;
+                    return Json(new { message = "Successfully added favorite." }, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    _datasetContext.Remove(ds.Favorities.First(w => w.UserId == SharedContext.CurrentUser.AssociateId));
+                    _datasetContext.SaveChanges();
+
+                    Response.StatusCode = (int)HttpStatusCode.OK;
+                    return Json(new { message = "Successfully removed favorite." }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception)
+            {
+                _datasetContext.Clear();
+                Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return Json(new { message = "Failed to modify favorite." }, JsonRequestBehavior.AllowGet);
+            }
+            
         }
     }
 }
