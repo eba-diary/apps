@@ -1,0 +1,36 @@
+﻿.dataset-operation-button {
+    margin-left: 0px;
+}
+
+.schema-table {
+    margin-top: 1em;
+}
+
+.column-name {
+    width: auto;
+    font-weight: 600;
+    word-break: break-all;
+}
+
+.mini-sentry-spinner-container {
+    margin-left: -295px;
+    margin-top: -9px;
+    border-top: none !important;
+}
+
+.leftSectionHeaderDiv {
+    margin-left: -15px;
+}
+
+.pagination > .active > a {
+    background-color: #74531C !important;
+    border-color: #74531C !important;
+}
+
+.spanContainer {
+    font-size: 0;
+}
+
+    .spanContainer span {
+        font-size: 14px;
+    }

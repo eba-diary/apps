@@ -88,6 +88,7 @@ namespace Sentry.data.Web
                  Include("~/Content/bootstrap-datetimepicker.css", new CssRewriteUrlTransform()).
                         Include("~/Content/sentry-internal.min.css", new CssRewriteUrlTransform()).
                         Include("~/Content/query-builder.default.min.css").
+                        Include("~/Content/dataset-detail.css").
                         Include("~/Content/site.css"));
 
             /* If you want to see content bundled/minimized when running locally, uncomment the EnableOptimizations 
