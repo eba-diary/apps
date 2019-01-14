@@ -364,6 +364,7 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\query-builder.default.css" />
     <Content Include="Content\query-builder.default.min.css" />
+    <Content Include="Content\query-tool.css" />
     <Content Include="Images\Category\BusinessIntelligence\401k.svg" />
     <Content Include="Images\Category\BusinessIntelligence\claims.svg" />
     <Content Include="Images\Category\BusinessIntelligence\commercial lines.svg" />
@@ -387,6 +388,7 @@
     <Content Include="js\ManageConfigs.js" />
     <Content Include="js\QueryTool\AddRule.js" />
     <Content Include="js\QueryTool\BannerControls.js" />
+    <Content Include="js\QueryTool\QueryTool.js" />
     <Content Include="js\QueryTool\QueryToolModel.js" />
     <Content Include="js\QueryTool\RenderTable.js" />
     <Content Include="js\QueryTool\SaveTo.js" />

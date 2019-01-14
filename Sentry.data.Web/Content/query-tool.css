@@ -1,0 +1,105 @@
+﻿.datasetRow {
+    margin-bottom: 5px;
+}
+
+.schemaRow {
+    margin-left: 30px;
+    margin-bottom: 5px;
+}
+
+.datasetRow:nth-child(even) {
+}
+
+.datasetRow:nth-child(odd) {
+    background-color: rgba(250,240,210,.1);
+}
+
+.schemaRow:nth-child(even) {
+    background-color: rgba(250,240,210,.1);
+}
+
+.schemaRow:nth-child(odd) {
+}
+
+.group-conditions > .btn-primary {
+    color: black;
+    background-color: white;
+    border-color: #00348c;
+}
+
+    .group-conditions > .btn-primary.active {
+        color: #fff;
+        background-color: #002a72;
+        border-color: #001d4e;
+    }
+
+.configRow {
+    margin-left: 30px;
+    margin-bottom: 5px;
+}
+
+.emptyConfigRow {
+    margin-left: 30px;
+    margin-bottom: 0px;
+}
+
+.rcorners1 {
+    border-radius: 1px;
+    background-color: white;
+    padding: 20px;
+}
+
+.select2-selection--multiple .select2-search--inline .select2-search__field {
+    width: auto !important;
+}
+
+.statement {
+    padding-left: 15px;
+}
+
+#columnCountBadge {
+    padding-bottom: 6px;
+}
+
+.tracker-header {
+    background-color: #555;
+    color: #fff;
+    display: inline-block;
+    width: 100%;
+    padding: 7px;
+    cursor: pointer;
+    border-radius: 5px 5px 0 0;
+    font-weight: 700;
+}
+
+.deployment-tracker {
+    background-color: #fff;
+    float: left;
+    position: relative;
+    bottom: 0;
+    right: 0;
+    width: 450px;
+    margin: 10px;
+    box-shadow: -5px 5px 5px -5px rgba(0,0,0,.75);
+    pointer-events: all;
+}
+
+.deployment-tracker-container {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 9999;
+    width: 100%;
+    pointer-events: none;
+}
+
+#sessionPanel {
+    margin-bottom: 100px;
+}
+#primaryOptions {
+}
+
+    #primaryOptions li {
+        z-index: 100;
+        cursor: pointer;
+    }
