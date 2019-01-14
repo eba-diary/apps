@@ -63,8 +63,8 @@
                                 @if (Model.IsFavorite)
                                 {
                                     @*<div class="col-md-1 col-lg-1">
-                <div class="glyphicon glyphicon-star @color" id="btnFavorite" data-bind="attr: {data: @Model.DatasetId}" style="font-size:xx-large; width: 50%; margin: 0 auto;"></div>
-            </div>*@
+                                        <div class="glyphicon glyphicon-star @color" id="btnFavorite" data-bind="attr: {data: @Model.DatasetId}" style="font-size:xx-large; width: 50%; margin: 0 auto;"></div>
+                                    </div>*@
                                     <div class="col-md-2 col-lg-2 ">
                                         <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Favorite">
                                             <button type="button"
@@ -78,8 +78,8 @@
                                 else
                                 {
                                     @*<div class="col-md-1 col-lg-1">
-                <div class="glyphicon glyphicon-star-empty @color" id="btnFavorite" data-bind="attr: {data: @Model.DatasetId}" style="font-size:xx-large; width: 50%; margin: 0 auto;"></div>
-            </div>*@
+                                        <div class="glyphicon glyphicon-star-empty @color" id="btnFavorite" data-bind="attr: {data: @Model.DatasetId}" style="font-size:xx-large; width: 50%; margin: 0 auto;"></div>
+                                    </div>*@
 
                                     <div class="col-md-2 col-lg-2 ">
                                         <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Favorite">
@@ -170,22 +170,22 @@
 
 
                                 @*@if (((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive)) && Model.DatasetFiles.Count != 0)
-        {
-            <button type="button"
-                    class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                    id="DownloadLatest" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download Latest">
-                <span class="glyphicon glyphicon-cloud-download @color"></span>
-            </button>
-        }
+                                {
+                                    <button type="button"
+                                            class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                                            id="DownloadLatest" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download Latest">
+                                        <span class="glyphicon glyphicon-cloud-download @color"></span>
+                                    </button>
+                                }
 
-        @if ((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive))
-        {
-            <button type="button"
-                    class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                    id="PreviewLatestData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Preview Latest">
-                <span class="glyphicon glyphicon-search @color"></span>
-            </button>
-        }*@
+                                @if ((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive))
+                                {
+                                    <button type="button"
+                                            class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
+                                            id="PreviewLatestData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Preview Latest">
+                                        <span class="glyphicon glyphicon-search @color"></span>
+                                    </button>
+                                }*@
                             </div>
                 </div>
             </div>
@@ -372,30 +372,14 @@
                         <div class="row" style="min-height: 60px; display: none;" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')">
                             <div class="col-lg-6">
                                 <h5 class="@color">Refresh Frequency</h5>
-                                <h6 class="@color">Dataset Scope Type</h6>
-                                @foreach (var dst in Model.DatasetScopeType)
-                                {
-                                    <span title="@dst.Description">@dst.Name</span><br />
-                                }
-
-                                <div style="display: none;" data-bind="if: DFSDropLocation(), visible: DFSDropLocation != undefined">
-                                    <br />
-                                    <h6 class="@color">DFS Drop Location</h6>
-                                    <span data-bind="text: DFSDropLocation().Location()"></span>
-                                </div>
-
-                                <div style="display: none;" data-bind="if: S3DropLocation(), visible: S3DropLocation != undefined">
-                                    <br />
-                                    <h6 class="@color">S3 Drop Location</h6>
-                                    <span data-bind="text: S3DropLocation().Location("></span>
-                                </div>
+                                <h6 class="@color">@Model.UploadFrequency</h6>
                             </div>
                         </div>
 
                         <div class="row" style="min-height: 60px; display: none;" data-bind="visible: IsShownForCurrentType('Dataset')">
                             <div class="col-lg-6">
                                 <h5 class="@color">Last Activity Date</h5>
-                                <h6 class="@color" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">@Model.ChangedDtm.ToString("MMMM d, yyyy")</h6>
+                                <h6 class="@color">@Model.ChangedDtm.ToString("MMMM d, yyyy")</h6>
                             </div>
                             <div class="col-lg-6">
                                 <h5 class="@color">Date Created</h5>

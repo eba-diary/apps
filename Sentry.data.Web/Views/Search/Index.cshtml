@@ -150,7 +150,7 @@
                                             <span data-bind="text: ChangedDtm"></span>
                                             <!-- /ko -->
                                             <!-- ko if: Type === "RPT" -->
-                                            <span class=" textBold ownerDate" data-bind="css : Color">Update Frequency:&nbsp;</span>
+                                            <span class=" textBold ownerDate" data-bind="css : Color">Refresh Frequency:&nbsp;</span>
                                             <span data-bind="text: UpdateFrequency"></span>
 
                                             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
@@ -399,8 +399,6 @@
             });
 
             self.TileClicked = function (item, e) {
-                console.log(e);
-                console.log(self.Type);
 
                 if ($(e.target).hasClass("btnFavorite") === true) {
                     return false;
