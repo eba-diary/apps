@@ -369,25 +369,46 @@
                 <div class="col-lg-4">
                     <div class="row" style="border: 1px #DDDDDD solid; background: white; padding: 20px;">
 
-                        <div class="row" style="min-height: 60px;">
+                        <div class="row" style="min-height: 60px; display: none;" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')">
                             <div class="col-lg-6">
-                                <h5 class="@color" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">Last Activity Date</h5>
-                                <h6 class="@color" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">@Model.ChangedDtm.ToString("MMMM d, yyyy")</h6>
+                                <h5 class="@color">Refresh Frequency</h5>
+                                <h6 class="@color">Dataset Scope Type</h6>
+                                @foreach (var dst in Model.DatasetScopeType)
+                                {
+                                    <span title="@dst.Description">@dst.Name</span><br />
+                                }
 
-                                <h5 class="@color" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;">Upload Frequency</h5>
-                                <h6 class="@color" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;">@Model.UploadFrequency</h6>
+                                <div style="display: none;" data-bind="if: DFSDropLocation(), visible: DFSDropLocation != undefined">
+                                    <br />
+                                    <h6 class="@color">DFS Drop Location</h6>
+                                    <span data-bind="text: DFSDropLocation().Location()"></span>
+                                </div>
+
+                                <div style="display: none;" data-bind="if: S3DropLocation(), visible: S3DropLocation != undefined">
+                                    <br />
+                                    <h6 class="@color">S3 Drop Location</h6>
+                                    <span data-bind="text: S3DropLocation().Location("></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" style="min-height: 60px; display: none;" data-bind="visible: IsShownForCurrentType('Dataset')">
+                            <div class="col-lg-6">
+                                <h5 class="@color">Last Activity Date</h5>
+                                <h6 class="@color" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">@Model.ChangedDtm.ToString("MMMM d, yyyy")</h6>
                             </div>
                             <div class="col-lg-6">
                                 <h5 class="@color">Date Created</h5>
                                 <h6 class="@color">@Model.DatasetDtm.ToString("MMMM d, yyyy")</h6>
                             </div>
                         </div>
+
                         <hr />
                         <div class="row">
 
                             <div class="col-lg-12">
                                 <h5 class="@color">Sentry Owner</h5>
-                                <h6 class="@color">@Model.SentryOwner.FullName</h6>
+                                <h6 class="@color">@Model.AssociateCommonName</h6>
                             </div>
 
                         </div>
@@ -495,62 +516,64 @@
                         </tbody>
                     </table>
                     <br />
-                    <h5 class="@color">Refresh Frequency:</h5>
-                    <table class="table table-striped table-hover detailTable" style="margin-left: 0px;">
-                        <tbody>
-                            <tr>
-                                <td class="borderMeta_@color colOneMeta">Dataset Scope Type</td>
-                                <td class="borderMeta_@color ">
-                                    @foreach (var dst in @Model.DatasetScopeType)
+                    <div data-bind="visible: IsShownForCurrentType('Dataset')" style="display:none;">
+                        <h5 class="@color">Refresh Frequency:</h5>
+                        <table class="table table-striped table-hover detailTable" style="margin-left: 0px;">
+                            <tbody>
+                                <tr>
+                                    <td class="borderMeta_@color colOneMeta">Dataset Scope Type</td>
+                                    <td class="borderMeta_@color ">
+                                        @foreach (var dst in @Model.DatasetScopeType)
+                                        {
+                                            <span class="comma" title='@dst.Description'>@dst.Name</span>
+                                        }
+                                    </td>
+                                    <td class="borderMeta_@color"></td>
+                                </tr>
+
+                                <tr data-bind="if: DFSDropLocation(), visible: DFSDropLocation != undefined" style="display:none;">
+                                    <td class="borderMeta_@color colOneMeta">DFS Drop Location</td>
+                                    <td class="borderMeta_@color" data-bind="text: DFSDropLocation().Location()"></td>
+                                </tr>
+
+                                <tr data-bind="if: S3DropLocation(), visible: S3DropLocation != undefined" style="display:none;">
+                                    <td class="borderMeta_@color colOneMeta">S3 Drop Location</td>
+                                    <td class="borderMeta_@color" data-bind="text: S3DropLocation().Location()"></td>
+                                </tr>
+
+                                <!-- ko if: OtherJobs != undefined-->
+                                <!-- ko foreach: OtherJobs -->
+                                <tr>
+                                    <td class="borderMeta_@color colOneMeta" data-bind="text: Name()"></td>
+                                    @if (Model.CanManageConfigs)
                                     {
-                                        <span class="comma" title='@dst.Description'>@dst.Name</span>
-                                    }
-                                </td>
-                                <td class="borderMeta_@color"></td>
-                            </tr>
-
-                            <tr data-bind="if: DFSDropLocation(), visible: DFSDropLocation != undefined" style="display:none;">
-                                <td class="borderMeta_@color colOneMeta">DFS Drop Location</td>
-                                <td class="borderMeta_@color" data-bind="text: DFSDropLocation().Location()"></td>
-                            </tr>
-
-                            <tr data-bind="if: S3DropLocation(), visible: S3DropLocation != undefined" style="display:none;">
-                                <td class="borderMeta_@color colOneMeta">S3 Drop Location</td>
-                                <td class="borderMeta_@color" data-bind="text: S3DropLocation().Location()"></td>
-                            </tr>
-
-                            <!-- ko if: OtherJobs != undefined-->
-                            <!-- ko foreach: OtherJobs -->
-                            <tr data-bind="visible: IsShownForCurrentType('Dataset')" display: none;>
-                                <td class="borderMeta_@color colOneMeta" data-bind="text: Name()"></td>
-                                @if (Model.CanManageConfigs)
-                                {
-                                    <!-- ko if: IsEnabled-->
+                                        <!-- ko if: IsEnabled-->
                                         <td class="borderMeta_@color" data-bind="text: Location()"></td>
                                         <td class="borderMeta_@color">
                                             <button style="float:right; margin-left: 30px;" class="btn btn-default on-demand-run" data-bind="attr: { id: JobId }">On-Demand Run</button>
                                             <button style="float:right; margin-left: 30px;" class="btn btn-default jobstatus jobstatus_enabled" data-bind="attr: { id: JobId }">Disable</button>
                                         </td>
-                                    <!-- /ko -->
-                                    <!-- ko ifnot: IsEnabled-->
-                                    <td class="borderMeta_@color"> Disabled</td>
-                                    <td class="borderMeta_@color">
-                                        <button style="float:right; margin-left: 30px;" class="btn btn-default on-demand-run" disabled="disabled" data-toggle="tooltip" data-placement="top" title="Job is disabled" data-bind="attr: { id: JobId }">On-Demand Run</button>
-                                        <button style="float:right; margin-left: 30px;" class="btn btn-default jobstatus jobstatus_disabled" data-bind="attr: { id: JobId }">Enable</button>
-                                    </td>
-                                    <!-- /ko -->                                    
-                                }
-                                else
-                                {
-                                    <td class="borderMeta_@color"></td>
-                                }
+                                        <!-- /ko -->
+                                        <!-- ko ifnot: IsEnabled-->
+                                        <td class="borderMeta_@color"> Disabled</td>
+                                        <td class="borderMeta_@color">
+                                            <button style="float:right; margin-left: 30px;" class="btn btn-default on-demand-run" disabled="disabled" data-toggle="tooltip" data-placement="top" title="Job is disabled" data-bind="attr: { id: JobId }">On-Demand Run</button>
+                                            <button style="float:right; margin-left: 30px;" class="btn btn-default jobstatus jobstatus_disabled" data-bind="attr: { id: JobId }">Enable</button>
+                                        </td>
+                                        <!-- /ko -->
+                                    }
+                                    else
+                                    {
+                                        <td class="borderMeta_@color"></td>
+                                    }
 
-                            </tr>
-                            <!-- /ko -->
-                            <!-- /ko -->
+                                </tr>
+                                <!-- /ko -->
+                                <!-- /ko -->
 
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -779,44 +802,6 @@
 
     </div>
 </div>
-
-<style>
-    .dataset-operation-button{
-        margin-left:0px;
-    }
-    .schema-table {
-        margin-top: 1em;
-    }
-
-    .column-name {
-        width: auto;
-        font-weight: 600;
-        word-break: break-all;
-    }
-
-    .mini-sentry-spinner-container {
-        margin-left: -295px;
-        margin-top: -9px;
-        border-top: none !important;
-    }
-
-    .leftSectionHeaderDiv {
-        margin-left: -15px;
-    }
-
-    .pagination > .active > a {
-        background-color: #74531C !important;
-        border-color: #74531C !important;
-    }
-
-    .spanContainer {
-        font-size: 0;
-    }
-
-        .spanContainer span {
-            font-size: 14px;
-        }
-</style>
 
 @section Scripts {
     @Scripts.Render("~/bundles/prettyCron")
