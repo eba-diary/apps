@@ -1196,7 +1196,7 @@
                     $('#datasetConfigList').val(getUrlParameter('configID')).trigger('change');
                 }
 
-                var metadataURL = "/api/Metadata/GetBasicMetadataInformationFor?DatasetConfigID=" + $('#datasetConfigList').val();
+                var metadataURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val();
                 $.get(metadataURL, function (result) {
                     self.Downloads(result.Downloads);
                     self.Views(result.Views);
@@ -1224,18 +1224,19 @@
             }
 
             function UpdateColumnSchema() {
-                var schemaURL = "/api/Metadata/GetColumnSchemaInformationFor?DatasetConfigID=" + $('#datasetConfigList').val();
-                var hiveTableURL = "/api/Metadata/GetPrimaryHiveTableFor?DatasetConfigID=" + $('#datasetConfigList').val();
+                var schemaURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val() + "/schemas/0/columns";
+                var hiveTableURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val() + "/schemas/0";
                 self.DataLoading(true);
                 $('#dataSection').hide();
 
                 $.get(hiveTableURL, function (result) {
                     $.ajax({
                         type: "GET",
-                        url: "/api/QueryTool/GetPrimarySessionID",
+                        url: "/api/v1/queryTool/sessions/primary",
                         dataType: "json",
                         success: function (msg) {
-                            $.get("/api/QueryTool/GetHiveTable?SessionID=" + msg.id + "&configID=" + $('#datasetConfigList').val() + "&rows=20&skip=0&hiveTableName=" + result.HiveTableName + "&hiveDatabaseName=" + result.HiveDatabaseName, function (result2) {
+                            var getHiveTableUrl = "/api/v1/queryTool/sessions/sessions/" + msg.id + "/hives/" + result.HiveDatabaseName + "/" + result.HiveTableName + "/" + $('#datasetConfigList').val() + "/20/0";
+                            $.get(getHiveTableUrl, function (result2) {
                                 $('#dataSection').hide();
                                 console.log('found a table');
 
