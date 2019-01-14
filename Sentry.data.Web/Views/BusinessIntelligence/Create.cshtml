@@ -282,6 +282,7 @@
                     dataType: 'json',
                     type: "GET",
                     success: function (msg) {
+
                         $("#TagSelector").select2({
                             multiple: true,
                             allowClear: true,
@@ -296,6 +297,7 @@
                                     };
                                 },
                                 processResults: function (data) {
+
                                     // parse the results into the format expected by Select2.
                                     // since we are using custom formatting functions we do not need to
                                     // alter the remote JSON data
@@ -303,6 +305,7 @@
                                     return {
                                         results: data
                                     };
+
                                 },
                                 cache: true
                             },
@@ -313,7 +316,7 @@
                         });
 
                         if ($('#TagString').val()) {
-                            console.log('this ran')
+
                             var selectedOptions = JSON.parse($('#TagString').val());
                             var selectedIDs = [];
 
@@ -348,7 +351,6 @@
             function formatTag(tag) {
                 if (tag.loading) return tag.text;
 
-
                 if (tag.Description) {
                     var markup =
                         '<span class="s-tag" tooltip="' + tag.Description + '"> ' + tag.Name + '</span> ' +
@@ -365,6 +367,12 @@
 
                     return markup;
                 }
+
+                $('.select2-results__options li').each(function () {
+                    if ($(this).attr("aria-selected") === 'true') {
+                        $(this).hide();
+                    }
+                });
             }
 
             function formatTagSelection(tag) {
