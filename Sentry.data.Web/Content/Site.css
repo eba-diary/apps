@@ -2376,14 +2376,6 @@ tr.shown td.details-control {
     }
 }
 
-#primaryOptions{
-
-}
-
-#primaryOptions li{
-    z-index: 100;
-}
-
 #primaryPanel {
     margin-top: -1px;
 }

@@ -17,17 +17,17 @@
 </div>
 <br />
 <div class="row">
-    <div class="col-lg-7">
+    <div class="col-lg-6">
         <h1>Query Tool</h1>
     </div>
     @if (powerUser)
     {
-        <div class="col-lg-2">
-            <h3 style="margin-top: 22px;"><a href="@livyURL" id="LivyURL">Spark Session: <span id="sessionID"></span></a></h3>
+        <div class="col-lg-3">
+            <h3><a href="@livyURL" target="_blank" id="LivyURL">Spark Session: <span id="sessionID"></span></a></h3>
         </div>
         <div class="col-lg-3" id="adminToolsButtons">
             <div class="btn-group">
-                <a class="btn btn-primary" onclick="ToggleAdminControls()">Code History and Custom Code</a>
+                <a class="btn btn-primary" onclick="data.QueryTool.ToggleAdminControls()">Code History and Custom Code</a>
                 <a href="#/" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></a>
                 <ul class="dropdown-menu">
                     <li><a onclick="CreateSession(true)">Re-Create Session</a></li>
@@ -57,12 +57,12 @@
         <textarea id="previousQueries" style="width: 100%; max-width: 100%; height: 100px;"></textarea>
         <hr />
         <h4>Custom Code</h4>
-        <p>Type your custom Python code below.  Currently only python is enabled. </p>
+        <p>Type your custom Python code below. Currently only python is enabled. </p>
         <textarea id="codeArea" style="width: 100%; max-width: 100%; height: 400px; display: none;"></textarea>
         <hr />
         <p>The following button will send the Python code above directly to Apache Livy then Spark and then to Sentry Datasets and Various Systems.</p>
         <p>If you are not careful with what you send you may break something.</p>
-        <p>With great power comes great responsibility.  You are being monitored.</p>
+        <p>With great power comes great responsibility. You are being monitored.</p>
         <div class="btn-group">
             <a class="btn btn-primary" onclick="SendCode()">Send Code to Spark</a>
             <a class="btn btn-success" onclick="SendCode(null, 'Get Hive Table')">HiveQL Query</a>
@@ -165,7 +165,7 @@
 
                         <label style="float: right; margin-top:3px;">
                             <span>Include in Query:</span>
-                            <input style="margin-left: 5px;" type="checkbox" checked="checked" class="ruleController includeCheckbox" />
+                            <input style="margin-left: 5px;" type="checkbox" class="ruleController includeCheckbox" />
                         </label>
                     </div>
                     
@@ -187,7 +187,7 @@
                                         <h6 style='display:inline-block; margin-left: 5px; margin-right: 15px;' data-bind="text: hiveTable()"></h6>
                                         <label style="float: right; margin-top:3px;">
                                             <span>Include in Query:</span>
-                                            <input style="margin-left: 5px;" type="checkbox" checked="checked" class="ruleController includeCheckbox" />
+                                            <input style="margin-left: 5px;" type="checkbox" class="ruleController includeCheckbox" />
                                         </label>
                                     </div>
                                 </div>
@@ -208,7 +208,7 @@
                 </div>
                 <br>
                 <div class="emptyConfigRow" data-bind="if: hasFiles() === false, visible: hasFiles() === false ">
-                    <span>There are no files associated to this dataset configuration.  To use this functionality, please upload at least one file to this dataset configuration.</span>
+                    <span>There are no files associated to this dataset configuration. To use this functionality, please upload at least one file to this dataset configuration.</span>
                 </div>
             </div>
         </div>
@@ -238,10 +238,10 @@
             @*<li id="tab1" class="active"><a>Column Selection <span id="columnCountBadge" class="badge badge-success"></span></a></li>*@
             <li id="tab3" class="active"><a>Column Selection <span id="columnRenameCountBadge" class="badge badge-warning" data-bind="text: SelectedColumns().length"></span></a></li>
             <li id="tab2"><a>Join Tables <span id="tableCountBadge" class="badge badge-success"></span></a></li>
-            <li id="tab4"><a>Order By <span id="orderByBadge" class="badge badge-warning"></span></a></li>
-            <li id="tab5"><a>Group By / Having <span id="groupByBadge" class="badge badge-warning"></span></a></li>
             <li id="tab6"><a>Where Clause <span id="whereBadge" class="badge badge-warning"></span></a></li>
-            <li id="tab7"><a>Aggregate Columns  <span id="aggBadge" class="badge badge-warning"></span></a></li>
+            <li id="tab5"><a>Group By / Having <span id="groupByBadge" class="badge badge-warning"></span></a></li>
+            <li id="tab4"><a>Order By <span id="orderByBadge" class="badge badge-warning"></span></a></li>
+            <li id="tab7"><a>Aggregate Columns <span id="aggBadge" class="badge badge-warning"></span></a></li>
         </ul>
 
         <div id="primaryPanel">
@@ -280,8 +280,8 @@
             <div id="joinPanel" class="query-builder query-window-panel">
                 <div class="rules-group-container">
                     <h5>Table Joining</h5>
-                    <p>Example :  t1 JOIN t2 ON t1.departmentID == t2.ID</p>
-                    <p>One join is required per two data sources you chose above.  Example: If you chose 3 data sources, 2 joins would be required.  Join t1 with t2 and then Join t1 with t3</p>
+                    <p>Example:  t1 JOIN t2 ON t1.departmentID == t2.ID</p>
+                    <p>One join is required per two data sources you chose above. Example: If you chose 3 data sources, 2 joins would be required. Join t1 with t2 and then Join t1 with t3.</p>
 
                     <div class="row">
                         <div class="col-lg-4">
@@ -291,10 +291,7 @@
                             <button type="button" class="btn btn-xs ruleController btn-success" id="btnAddJoin" data-bind="click: JoinPanel().AddJoin">
                                 <i class="glyphicon glyphicon-plus"></i> Add Join
                             </button>
-
                         </div>
-                        
-                        
                     </div>
 
                     <br />
@@ -513,13 +510,13 @@
 
             <textarea id="joinPython" style="width: 100%; max-width: 100%; height: 100px;" disabled></textarea>
             <textarea id="additionalCode" style="width: 100%; max-width: 100%; height: 100px;" disabled>
-t1.printSchema();
-spark.catalog.dropTempView("t1");
-t1.createTempView("t1");
-        </textarea>
+                t1.printSchema();
+                spark.catalog.dropTempView("t1");
+                t1.createTempView("t1");
+            </textarea>
             <textarea id="sqlQueryOutput" style="width: 100%; max-width: 100%; height: 100px;" disabled>
 
-        </textarea>
+            </textarea>
 
             <h3 id="rowCount"></h3>
 
@@ -557,7 +554,6 @@ t1.createTempView("t1");
                 <thead>
                     <tr id="tableFirstRow" class="filter-row"></tr>
                     <tr id="tableColumnIDs" class="table-header"></tr>
-
                 </thead>
                 <tbody></tbody>
             </table>
@@ -578,7 +574,7 @@ t1.createTempView("t1");
                 </div>
                 <br />
                 <div>
-                    <span class="text-muted">Please choose a name for your dataset below.  When saving is complete you will be prompted to rename the single file to download to your computer.</span>
+                    <span class="text-muted">Please choose a name for your dataset below. When saving is complete you will be prompted to rename the single file to download to your computer.</span>
                     <span class="text-muted">When completed the download link will be available for 2 minutes.</span>
                 </div>
                 <br />
@@ -592,10 +588,10 @@ t1.createTempView("t1");
                         <option>csv</option>
                         <option>json</option>
                         @if (powerUser)
-                {
-                    <option>parquet</option>
-                    <option>orc</option>
-        }
+                        {
+                            <option>parquet</option>
+                            <option>orc</option>
+                        }
                     </select>
                     <button style="width: 10%; float:right; display:inline-block;" class="form-control btn btn-success" onclick="SavetoS3()">Download File</button>
 
@@ -614,12 +610,9 @@ t1.createTempView("t1");
 
             <textarea id="replyArea" style="width: 100%; max-width: 100%; height: 200px;" disabled>
 
-        </textarea>
+            </textarea>
         </div>
     </div>
-</div>
-<div style="height: 100px;">
-
 </div>
 
 <div class="deployment-tracker-container">
@@ -646,111 +639,6 @@ t1.createTempView("t1");
     </div>
 </div>
 
-<style>
-    .datasetRow {
-        margin-bottom: 5px;
-    }
-    .schemaRow {
-        margin-left: 30px;
-        margin-bottom: 5px;
-    }
-
-    .datasetRow:nth-child(even) {
-    }
-
-    .datasetRow:nth-child(odd) {
-        background-color: rgba(250,240,210,.1);
-    }
-
-    .schemaRow:nth-child(even) {
-        background-color: rgba(250,240,210,.1);
-    }
-
-    .schemaRow:nth-child(odd) {        
-    }
-
-
-    .group-conditions > .btn-primary {
-        color: black;
-        background-color: white;
-        border-color: #00348c;
-    }
-
-        .group-conditions > .btn-primary.active {
-            color: #fff;
-            background-color: #002a72;
-            border-color: #001d4e;
-        }
-
-    .configRow {
-        margin-left: 30px;
-        margin-bottom: 5px;
-    }
-
-    .emptyConfigRow {
-        margin-left: 30px;
-        margin-bottom: 0px;
-    }
-
-
-
-    .rcorners1 {
-        border-radius: 1px;
-        background-color: white;
-        padding: 20px;
-    }
-
-    .select2-selection--multiple .select2-search--inline .select2-search__field {
-        width: auto !important;
-    }
-
-    .statement {
-        padding-left: 15px;
-    }
-
-    #columnCountBadge {
-        padding-bottom: 6px;
-    }
-
-
-    .tracker-header {
-        background-color: #555;
-        color: #fff;
-        display: inline-block;
-        width: 100%;
-        padding: 7px;
-        cursor: pointer;
-        border-radius: 5px 5px 0 0;
-        font-weight: 700;
-    }
-
-    .deployment-tracker {
-        background-color: #fff;
-        float: left;
-        position: relative;
-        bottom: 0;
-        right: 0;
-        width: 450px;
-        margin: 10px;
-        box-shadow: -5px 5px 5px -5px rgba(0,0,0,.75);
-        pointer-events: all;
-    }
-
-    .deployment-tracker-container {
-        position: fixed;
-        bottom: 0;
-        right: 0;
-        z-index: 9999;
-        width: 100%;
-        pointer-events: none;
-    }
-</style>
-
-
-
-
-
-
 
 @section Scripts {
     <script src="~/Scripts/dot.js"></script>
@@ -766,25 +654,9 @@ t1.createTempView("t1");
     <script src="~/js/QueryTool/AddRule.js"></script>
 
     <script>
+        data.QueryTool.Init();
 
         var firstTableName = "";
-
-        $('body').on('click', '#datasetsHeader', function () {
-
-            if ($(this).children('.tracker-menu-icon').hasClass('glyphicon-menu-down')) {
-                $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-down', 'glyphicon-menu-up');
-            } else {
-                $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-up', 'glyphicon-menu-down');
-            }
-            $(this).next('#datasetsContainer').toggle();
-
-            if ($(this).next('#datasetsContainer:visible').length == 0) {
-                // action when all are hidden
-                $(this).css('border-radius', '5px 5px 5px 5px');
-            } else {
-                $(this).css('border-radius', '5px 5px 0px 0px');
-            }
-        });
 
         $('body').on('keyup', '.tableNameController', function () {
 
@@ -1071,57 +943,6 @@ t1.createTempView("t1");
 
         });
 
-        $('body').on('click', '.tracker-header', function () {
-            $('#tracker-menu-icon').switchClass('glyphicon-menu-down', 'glyphicon-menu-up');
-            $('.tracker-content').toggle();
-        });
-
-
-
-        $('#primaryOptions li').on('click', function () {
-
-            $('#primaryOptions').children('li').each(function () {
-                if ($(this).hasClass('active')) {
-                    $(this).removeClass('active');
-                }
-            });
-
-            $(this).addClass('active');
-
-
-            $('#joinPanel').hide();
-            $('#columnRenamer').hide();
-            $('#columnSelector').hide();
-            $('#orderBy').hide();
-            $('#groupBy').hide();
-            $('#whereClause').hide();
-            $('#aggregate').hide();
-
-            switch ($(this)[0].id) {
-                case "tab1":
-                    //$('#columnSelector').show();
-                    break;
-                case "tab2":
-                    $('#joinPanel').show();
-                    break;
-                case "tab3":
-                    $('#columnRenamer').show();
-                    break;
-                case "tab4":
-                    $('#orderBy').show();
-                    break;
-                case "tab5":
-                    $('#groupBy').show();
-                    break;
-                case "tab6":
-                    $('#whereClause').show();
-                    break;
-                case "tab7":
-                    $('#aggregate').show();
-                    break;
-            }
-        });
-
 
         $('body').on('keydown', "#columnRenamerContainer.rule - container input", function () {
             var oldvalue = $(this).val();
@@ -1153,12 +974,6 @@ t1.createTempView("t1");
 
 
             }
-        }
-
-        function ToggleAdminControls() {
-            $('#AdminControls').toggle();
-            //$('#codeArea').toggle();
-            $('textarea').toggle();
         }
 
         function DeleteSessions() {
@@ -1326,16 +1141,9 @@ t1.createTempView("t1");
 
             SendCode(json, 'Count Rows');
         }
-
-        $('#runQueryBtn').click(function (e) {
-            // Cancel the default action
-            e.preventDefault();
-            e.stopPropagation();
-            return false;
-        });
-
-        
+  
         function runQuery(runNow) {
+
             var rawQuery = "queryResponse = spark.sql(" + WriteSQLStatement() + ");";
 
             rawQuery += "queryResponse.show(" + $('#txtAmountOfRows').val() + "); ".escapeForJson();
@@ -2027,8 +1835,8 @@ t1.createTempView("t1");
 
                 select.append(optgroup);
 
-                var id = getParameterByName("DatasetID");
-                console.log(id);
+                var id = data.QueryTool.GetParameterByName('DatasetID');
+                
                 $("#datasetList option").each(function () {
                     // Add $(this).val() to your list
                     if ($(this).val() == id) {
@@ -2042,8 +1850,6 @@ t1.createTempView("t1");
                     }
                 });
             });
-
-
 
 
             if (localStorage.getItem("SparkSession") === null) {
@@ -2071,16 +1877,6 @@ t1.createTempView("t1");
 
         vm = new ViewModel();
         ko.applyBindings(vm);
-
-        function getParameterByName(name, url) {
-            if (!url) url = window.location.href;
-            name = name.replace(/[\[\]]/g, "\\$&");
-            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-                results = regex.exec(url);
-            if (!results) return null;
-            if (!results[2]) return '';
-            return decodeURIComponent(results[2].replace(/\+/g, " "));
-        }
 
     </script>
 

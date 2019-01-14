@@ -443,43 +443,41 @@ function SelectColumns(rawQuery) {
 }
 
 function FromColumns(rawQuery) {
-    console.log(vm.JoinPanel().Joins())
-
     var joinRules = vm.JoinPanel().Joins().length;
     var primaryTableName = vm.JoinPanel().PrimaryTableName();
 
-
-    if (joinRules === 0) {
+    if (joinRules === 0 || vm.JoinPanel().ListofTableNames().length === 1) {
         rawQuery += " FROM " + firstTableName;
     } else {
+
         rawQuery += " FROM " + primaryTableName;
-    }
 
-    for (var i = 0; i < joinRules; i++) {
+        for (var i = 0; i < joinRules; i++) {
 
-        var joinType = vm.JoinPanel().Joins()[i].JoinType();
-        var tableName = vm.JoinPanel().Joins()[i].TableName();     
+            var joinType = vm.JoinPanel().Joins()[i].JoinType();
+            var tableName = vm.JoinPanel().Joins()[i].TableName();
 
-        var onStatements = vm.JoinPanel().Joins()[i].OnStatements().length;
-        var OnStatement = ''
+            var onStatements = vm.JoinPanel().Joins()[i].OnStatements().length;
+            var OnStatement = ''
 
-        for (var j = 0; j < onStatements; j++) {
+            for (var j = 0; j < onStatements; j++) {
 
-            var tableOneCol = vm.JoinPanel().Joins()[i].OnStatements()[j].ColumnOne();
-            var operand = vm.JoinPanel().Joins()[i].OnStatements()[j].Operand();
-            var tableTwo = vm.JoinPanel().Joins()[i].OnStatements()[j].TableTwo();
-            var tableTwoCol = vm.JoinPanel().Joins()[i].OnStatements()[j].ColumnTwo();
+                var tableOneCol = vm.JoinPanel().Joins()[i].OnStatements()[j].ColumnOne();
+                var operand = vm.JoinPanel().Joins()[i].OnStatements()[j].Operand();
+                var tableTwo = vm.JoinPanel().Joins()[i].OnStatements()[j].TableTwo();
+                var tableTwoCol = vm.JoinPanel().Joins()[i].OnStatements()[j].ColumnTwo();
 
-            OnStatement += tableName + '.`' + tableOneCol + '` ' + operand + ' ' + tableTwo + '.`' + tableTwoCol + '`';
+                OnStatement += tableName + '.`' + tableOneCol + '` ' + operand + ' ' + tableTwo + '.`' + tableTwoCol + '`';
 
-            if (onStatements > 1 && onStatements - 1 != j) {
-                var conditional = vm.JoinPanel().Joins()[i].OnStatements()[j].Conditional();
+                if (onStatements > 1 && onStatements - 1 != j) {
+                    var conditional = vm.JoinPanel().Joins()[i].OnStatements()[j].Conditional();
 
-                OnStatement += ' ' + conditional + ' ';
+                    OnStatement += ' ' + conditional + ' ';
+                }
             }
-        }
 
-        rawQuery += " " + joinType + " JOIN " + tableName + " ON " + OnStatement;
+            rawQuery += " " + joinType + " JOIN " + tableName + " ON " + OnStatement;
+        }
     }
 
     return rawQuery;
