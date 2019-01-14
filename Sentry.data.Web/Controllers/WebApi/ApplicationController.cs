@@ -19,7 +19,7 @@ namespace Sentry.data.Web.Controllers
         [Route("")]
         public IHttpActionResult GetApplications()
         {
-            return StatusCode(HttpStatusCode.NoContent);
+            return NoContent();
         }
 
         /// <summary>
@@ -32,7 +32,7 @@ namespace Sentry.data.Web.Controllers
         [Route("{appId}")]
         public IHttpActionResult GetApplication(int appId)
         {
-            return StatusCode(HttpStatusCode.NoContent);
+            return NoContent();
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace Sentry.data.Web.Controllers
         [Route("{appId}")]
         public IHttpActionResult CreateApplication(int appId)
         {
-            return StatusCode(HttpStatusCode.NoContent);
+            return NoContent();
         }
 
         /// <summary>
@@ -58,10 +58,8 @@ namespace Sentry.data.Web.Controllers
         [Route("{appId}")]
         public IHttpActionResult UpdateApplication(int appId)
         {
-            return StatusCode(HttpStatusCode.NoContent);
+            return NoContent();
         }
-
-
 
 
     }
