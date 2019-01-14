@@ -66,7 +66,7 @@ namespace Sentry.data.Web.Controllers
                 return InternalServerError(ex);
             }
 
-            return Ok(reply.Distinct().OrderBy(x => x.Name).OrderByDescending(x => x.Count));
+            return Ok(reply.Distinct().OrderBy(x => x.Name).ThenByDescending(x => x.Count));
         }
 
         /// <summary>
