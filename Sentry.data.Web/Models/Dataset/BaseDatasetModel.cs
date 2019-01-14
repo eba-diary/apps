@@ -246,6 +246,19 @@ namespace Sentry.data.Web
         public List<DatasetScopeType> DatasetScopeType { get; set; }
 
         public Associate SentryOwner { get; set; }
+        public string AssociateCommonName
+        {
+            get
+            {
+                // determine whether to use the associate's first or familiar name
+                var assocName = (string.IsNullOrWhiteSpace(this.SentryOwner.FamiliarName)) ? this.SentryOwner.FirstName : this.SentryOwner.FamiliarName;
+
+                // tack on a space and the associate's last name
+                assocName += " " + this.SentryOwner.LastName;
+
+                return assocName;
+            }
+        }
 
         public IList<DatasetFileConfigsModel> DatasetFileConfigs { get; set; }
 
