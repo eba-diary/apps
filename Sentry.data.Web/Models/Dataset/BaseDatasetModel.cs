@@ -250,13 +250,7 @@ namespace Sentry.data.Web
         {
             get
             {
-                // determine whether to use the associate's first or familiar name
-                var assocName = (string.IsNullOrWhiteSpace(this.SentryOwner.FamiliarName)) ? this.SentryOwner.FirstName : this.SentryOwner.FamiliarName;
-
-                // tack on a space and the associate's last name
-                assocName += " " + this.SentryOwner.LastName;
-
-                return assocName;
+                return Sentry.data.Core.Helpers.DisplayFormatter.FormatAssociateName(this.SentryOwner);
             }
         }
 
