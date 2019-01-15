@@ -55,9 +55,9 @@ ul.list-group-indented {
 /*#endregion TemplateSettings*/
 
 
-/*****************************/
-/* Custom Settings Start Here*/
-/*****************************/
+/******************************/
+/* Custom Settings Start Here */
+/******************************/
 
 /*#region MainPage - Favorites*/
 
@@ -72,8 +72,13 @@ ul.list-group-indented {
     margin-right: 10px;    
 }
 
-
 /*#endregion MainPage - Favorites*/
+
+/* hide selected select2 tags, all over */
+.select2-results__option[aria-selected=true] {
+    display: none;
+}
+
 /* Width of search buttons, all over. */
 .input-group-addon {
     width: 30px;
