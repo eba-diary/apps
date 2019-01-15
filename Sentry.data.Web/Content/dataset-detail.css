@@ -34,3 +34,11 @@
     .spanContainer span {
         font-size: 14px;
     }
+
+.detailNameLink {
+    cursor: pointer;
+    text-decoration: underline;
+}
+.detailNameLink:hover {
+    opacity: 0.7;
+}
