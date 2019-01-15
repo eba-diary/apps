@@ -32,23 +32,23 @@ namespace Sentry.data.Core.Entities.Metadata
         public virtual DateTime Changed_DTM { get; set; }
     }
 
-    public class SchemaRow
-    {
-        public SchemaRow()
-        {
+    //public class SchemaRow
+    //{
+    //    public SchemaRow()
+    //    {
 
-        }
+    //    }
 
-        public int DataObjectField_ID { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string Type { get; set; }
-        public string ArrayType { get; set; }
-        public string Length { get; set; }
-        public string Precision { get; set; }
-        public string Scale { get; set; }
-        public Boolean? Nullable { get; set; }
-        public List<SchemaRow> ChildRows { get; set; }
-        public double LastUpdated { get; set; }
-    }
+    //    public int DataObjectField_ID { get; set; }
+    //    public string Name { get; set; }
+    //    public string Description { get; set; }
+    //    public string Type { get; set; }
+    //    public string ArrayType { get; set; }
+    //    public string Length { get; set; }
+    //    public string Precision { get; set; }
+    //    public string Scale { get; set; }
+    //    public Boolean? Nullable { get; set; }
+    //    public List<SchemaRow> ChildRows { get; set; }
+    //    public double LastUpdated { get; set; }
+    //}
 }

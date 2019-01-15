@@ -218,6 +218,7 @@
     <Compile Include="ServiceImplementations\CubeProvider.cs" />
     <Compile Include="ServiceImplementations\DatafileBundleProvider.cs" />
     <Compile Include="ServiceImplementations\EncryptionService.cs" />
+    <Compile Include="ServiceImplementations\EventService.cs" />
     <Compile Include="ServiceImplementations\FtpProvider.cs" />
     <Compile Include="ServiceImplementations\HTTPSProvider.cs" />
     <Compile Include="ServiceImplementations\JawsService.cs" />
