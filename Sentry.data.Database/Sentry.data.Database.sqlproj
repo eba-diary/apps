@@ -109,6 +109,12 @@
     <Folder Include="Tables\HangFire" />
     <Folder Include="Tables\Metadata" />
     <Folder Include="Views" />
+    <Folder Include="Scripts" />
+    <Folder Include="Scripts\Post-Deploy" />
+    <Folder Include="Scripts\Post-Deploy\SupportingScripts" />
+    <Folder Include="Scripts\Post-Deploy\StaticData" />
+    <Folder Include="Scripts\Post-Deploy\SupportingScripts\MTP_2019_01_15" />
+    <Folder Include="Functions" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -181,11 +187,16 @@
     <Build Include="Tables\RetrieverJobs\RetrieverJobArchive.sql" />
     <Build Include="Tables\Favorites.sql" />
     <Build Include="Tables\Metadata\TagGroup.sql" />
+    <PostDeploy Include="Scripts\Post-Deploy\_PostDeployment.sql" />
+    <Build Include="Tables\Version.sql" />
+    <None Include="Scripts\Post-Deploy\StaticData\Category.sql" />
+    <Build Include="Scripts\Post-Deploy\SupportingScripts\MTP_2019_01_15\UpdateSomeRow.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />
     <None Include="Sentry.data.Database.sqlproj.user" />
     <None Include="Sentry_1.data.Database.publish.xml" />
+    <None Include="Sentry.data.Database.publish_Local.xml" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Sentry.data.Database.refactorlog" />
