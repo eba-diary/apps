@@ -278,7 +278,7 @@
             $(document).ready(function () {
 
                 $.ajax({
-                    url: "/api/Tag/SearchTags",
+                    url: "/api/v1/tags",
                     dataType: 'json',
                     type: "GET",
                     success: function (msg) {
@@ -288,7 +288,7 @@
                             allowClear: true,
                             data: msg,
                             ajax: {
-                                url: "/api/Tag/SearchTags",
+                                url: "/api/v1/tags",
                                 dataType: 'json',
                                 dropdownPosition: 'below',
                                 data: function (params) {
@@ -382,8 +382,8 @@
 
             function sendNewTagToDatabase() {
                 $.ajax({
-                    type: "GET",
-                    url: "/api/Tag/AddNewTag?name=" + $("#tagName").val() + "&description=" + $("#tagDescription").val(),
+                    type: "POST",
+                    url: "/api/v1/tags/" + $("#tagName").val() + "/" + $("#tagDescription").val(),
                     dataType: "json",
                     success: function (msg) {
                         console.log(msg);
@@ -444,7 +444,7 @@
 
                 $.ajax({
                     type: "GET",
-                    url: "/api/Tag/CheckNewTagName?name=" + $("#tagName").val(),
+                    url: "/api/v1/tags/" + $("#tagName").val(),
                     dataType: "json",
                     success: function (msg) {
                         console.log(msg);
