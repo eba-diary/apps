@@ -20,11 +20,11 @@ namespace Sentry.data.Web
         protected void Application_Start()
         {
             AreaRegistration.RegisterAllAreas();
+
+            GlobalConfiguration.Configure(WebApiConfig.Register);
+            //WebApiConfig.Register(GlobalConfiguration.Configuration);
+
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
-
-            //GlobalConfiguration.Configure(WebApiConfig.Register);
-            WebApiConfig.Register(GlobalConfiguration.Configuration);
-
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
             MiniProfilerConfig.RegisterMiniProfilerSettings();

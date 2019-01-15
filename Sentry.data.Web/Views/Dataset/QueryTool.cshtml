@@ -690,7 +690,7 @@
             for (var i = 0; i < tasksRunning.length; i++) {
                 $.ajax({
                     type: "POST",
-                    url: "/api/QueryTool/CancelStatement?SessionID=" + sessionID + "&StatementID=" + tasksRunning[i],
+                    url: "/api/v1/queryTool/sessions/" + sessionID + "/statements/" + tasksRunning[i],
                     dataType: "json",
                     success: function (msg) {
                     },
@@ -980,7 +980,7 @@
             for (var i = 0; i < 50; i++) {
                 $.ajax({
                     type: "DELETE",
-                    url: "/api/QueryTool/DeleteSession?SessionID=" + i
+                    url: "/api/v1/queryTool/sessions/" + i
                 });
             }
         }
@@ -1452,7 +1452,7 @@
 
                 $.ajax({
                     type: "POST",
-                    url: "/api/QueryTool/SendCode?SessionID=" + sessionID,
+                    url: "/api/v1/queryTool/sessions/" + sessionID + "/sendCode",
                     data: json,
                     //headers: { 'Access-Control-Allow-Origin': '*' },
                     contentType: "application/json; charset=utf-8",
@@ -1516,7 +1516,7 @@
 
             $.ajax({
                 type: "GET",
-                url: "/api/QueryTool/GetStatement?SessionID=" + sessionID + "&StatementID=" + statementID,
+                url: "/api/v1/queryTool/sessions/" + sessionID + "/statements/" + statementID,
                 contentType: "application/json; charset=utf-8",
                 success: function (msg) {
                     // console.log(msg);
@@ -1864,7 +1864,7 @@
 
             $.ajax({
                 type: "GET",
-                url: "/api/QueryTool/FileDropLocation",
+                url: "/api/v1/queryTool/files/fileDropLocation",
                 dataType: "json",
                 success: function (msg) {
                     $('#s3FileLocation').val(msg.s3Key);

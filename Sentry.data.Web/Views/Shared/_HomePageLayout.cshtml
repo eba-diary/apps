@@ -42,7 +42,7 @@
 
             $.ajax({
                 type: "GET",
-                url: "/api/QueryTool/GetPrimarySessionID",
+                url: "/api/v1/queryTool/sessions/primary",
                 dataType: "json",
                 success: function (msg) {
                     console.log(msg);
