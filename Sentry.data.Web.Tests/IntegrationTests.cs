@@ -55,7 +55,7 @@ namespace Sentry.data.Web.Tests
             Assert.AreSame(df.DatasetFileConfig, dfc);
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         [TestCategory("Dataset Controller")]
         public void DatasetController_Detail_Correct_View_Normal_User()
         {
@@ -92,7 +92,7 @@ namespace Sentry.data.Web.Tests
             Assert.IsTrue(model.CanQueryTool == false);
         }
 
-        [TestMethod]
+        [TestMethod, Ignore]
         [TestCategory("Dataset Controller")]
         public void DatasetController_Detail_Correct_View_Manage_Dataset_User()
         {
