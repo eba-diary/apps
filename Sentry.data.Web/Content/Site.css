@@ -30,6 +30,14 @@ ul.list-group-indented {
     cursor: pointer;
 }
 
+.float-l {
+    float: left;
+}
+
+.float-r {
+    float: right;
+}
+
 @media (min-width: 768px) {
     .collapse-sm {
         display: block;

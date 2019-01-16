@@ -1,4 +1,4 @@
-﻿@model List<Sentry.data.Core.DataFeedItem>
+﻿@model List<FavoriteItemModel>
 
 @{ 
     Boolean CanEditDataset = ViewBag.CanEditDataset;
@@ -11,11 +11,11 @@
     </div>
 }
 
-@foreach (Sentry.data.Core.DataFeedItem item in Model)
+@foreach (FavoriteItemModel item in Model)
 {
     <div class="col-sm-12 col-lg-12 favorite" style="width:95%;">
         <div class="col-lg-1 favoriteTypeIcon">
-            @if (item.Feed.Name == "Datasets" || item.Feed.Name == "Data Assets" || item.Feed.Name == "Business Intelligence")
+            @if (item.FeedName == "Datasets" || item.FeedName == "Data Assets" || item.FeedName == "Business Intelligence")
             {
                 <img src="@item.Img" class="feedImg" style="width: 20px; filter: invert(100%); opacity: 0.999" />
             }
@@ -25,39 +25,39 @@
             }
         </div>
         <div class="col-sm-9 col-lg-10">
-        @if (item.Title.Length > 50)
-        {
-            if (item.Feed.Name == "Business Intelligence" && item.Feed.UrlType == "file")
+            @if (item.Title.Length > 50)
             {
-                <a onclick='GetFile("@item.Feed.Url.Replace(@"\",@"\\")");event.preventDefault();' href="#" class="pointer"><h5 data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle()</h5></a>
-            }
-            else if (item.Feed.Name == "Business Intelligence" && item.Feed.UrlType != "file")
-            {
-                <a href="@item.Feed.Url" target="_blank" class="pointer"><h5 data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle()</h5></a>
-            }
-            else
-            {
-                <a href="@item.Url" target="_blank" class="pointer"><h5 data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle()</h5></a>
-            }
-        }
-        else
-        {
-            if (item.Feed.Name == "Business Intelligence" && item.Feed.UrlType == "file")
-            {
-                <a onclick='GetFile("@item.Feed.Url.Replace(@"\",@"\\")");event.preventDefault();' href="#" class="pointer"><h5>@item.DisplayTitle()</h5></a>
-            }
-            else if (item.Feed.Name == "Business Intelligence" && item.Feed.UrlType != "file")
-            {
-                <a href="@item.Feed.Url" target="_blank" class="pointer"><h5>@item.DisplayTitle()</h5></a>
+                if (item.FeedName == "Business Intelligence" && item.FeedUrlType == "file")
+                {
+                    <a onclick='GetFile("@item.FeedUrl.Replace(@"\",@"\\")");event.preventDefault();' href="#" class="pointer"><h5 data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle</h5></a>
+                }
+                else if (item.FeedName == "Business Intelligence" && item.FeedUrlType != "file")
+                {
+                    <a href="@item.FeedUrl" target="_blank" class="pointer"><h5 data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle</h5></a>
+                }
+                else
+                {
+                    <a href="@item.Url" target="_blank" class="pointer"><h5 data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle</h5></a>
+                }
             }
             else
             {
-                <a href="@item.Url" target="_blank" class="pointer"><h5>@item.DisplayTitle()</h5></a>
+                if (item.FeedName == "Business Intelligence" && item.FeedUrlType == "file")
+                {
+                    <a onclick='GetFile("@item.FeedUrl.Replace(@"\",@"\\")");event.preventDefault();' href="#" class="pointer"><h5>@item.DisplayTitle</h5></a>
+                }
+                else if (item.FeedName == "Business Intelligence" && item.FeedUrlType != "file")
+                {
+                    <a href="@item.FeedUrl" target="_blank" class="pointer"><h5>@item.DisplayTitle</h5></a>
+                }
+                else
+                {
+                    <a href="@item.Url" target="_blank" class="pointer"><h5>@item.DisplayTitle</h5></a>
+                }
             }
-        }
         </div>
         <div style="float: right; font-size: 1.5em">            
-            <i class="glyphicon glyphicon-remove" onclick="RemoveFavorite(this)" id="deleteFavorite" data-id="@item.Feed.Id"></i>
+            <i class="glyphicon glyphicon-remove" onclick="RemoveFavorite(this)" id="deleteFavorite" data-id="@item.FeedId"></i>
         </div>
     </div>
 }

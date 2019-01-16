@@ -283,6 +283,7 @@
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\FavoritesController.cs" />
     <Compile Include="Controllers\WebApi\ApplicationController.cs" />
     <Compile Include="Controllers\WebApi\AssetController.cs" />
     <Compile Include="Controllers\DataAssetController.cs" />
@@ -359,6 +360,8 @@
     <Compile Include="Models\Dataset\PushToDatasetModel.cs" />
     <Compile Include="Models\Dataset\CreateDatasetModel.cs" />
     <Compile Include="Models\Dataset\_DatasetMetadataModel.cs" />
+    <Compile Include="Models\Favorites\FavoriteItemModel.cs" />
+    <Compile Include="Models\Favorites\FavoritesModel.cs" />
     <Compile Include="Models\Feed\DataFeedItemModel.cs" />
     <Compile Include="Models\Layout\HomeModel.cs" />
     <Compile Include="Models\Layout\FooterModel.cs" />

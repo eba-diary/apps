@@ -581,4 +581,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="FavoriteId" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="9f03c7cc-d68f-4ddb-8c6e-42d0d7b168cd" ChangeDateTime="01/15/2019 18:40:43">
+    <Property Name="ElementName" Value="[dbo].[Favorites].[Order]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Favorites]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Sequence" />
+  </Operation>
 </Operations>

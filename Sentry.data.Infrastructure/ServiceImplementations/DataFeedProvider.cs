@@ -157,12 +157,12 @@ namespace Sentry.data.Infrastructure
             return items;
         }
 
-        public IList<DataFeedItem> GetAllFavorites(string associateId)
+        public IList<FavoriteItem> GetUserFavorites(string associateId)
         {
-            List<DataFeedItem> items = new List<DataFeedItem>();
+            List<FavoriteItem> items = new List<FavoriteItem>();
             List<Favorite> favsList = Query<Favorite>().Where(w => w.UserId == associateId).ToList();
 
-            foreach(Favorite fav in favsList)
+            foreach (Favorite fav in favsList)
             {
                 Dataset ds = Query<Dataset>().Where(w => w.DatasetId == fav.DatasetId).FetchMany(w => w.DatasetFileConfigs).FirstOrDefault();
 
@@ -171,7 +171,8 @@ namespace Sentry.data.Infrastructure
                     DataFeed df = null;
                     if (ds.DatasetType != null && ds.DatasetType == "RPT")
                     {
-                        df = new DataFeed() {
+                        df = new DataFeed()
+                        {
                             Id = ds.DatasetId,
                             Name = "Business Intelligence",
                             Url = (!String.IsNullOrWhiteSpace(ds.Metadata.ReportMetadata.Location)) ? ds.Metadata.ReportMetadata.Location : null,
@@ -181,7 +182,8 @@ namespace Sentry.data.Infrastructure
                     }
                     else
                     {
-                        df = new DataFeed() {
+                        df = new DataFeed()
+                        {
                             Id = ds.DatasetId,
                             Name = "Datasets",
                             Url = "/Datasets/Detail/" + ds.DatasetId,
@@ -190,15 +192,13 @@ namespace Sentry.data.Infrastructure
                         };
                     }
 
-                    DataFeedItem dfi = new DataFeedItem(
-                    fav.Created,
-                    fav.DatasetId.ToString(),
-                    ds.DatasetName,
-                    ds.DatasetName,
-                    df
-                    );  
-
-                    items.Add(dfi);
+                    items.Add(new FavoriteItem(
+                        fav.DatasetId.ToString(),
+                        ds.DatasetName,
+                        df,
+                        fav.Sequence
+                        )
+                    );
                 }
             }
 
