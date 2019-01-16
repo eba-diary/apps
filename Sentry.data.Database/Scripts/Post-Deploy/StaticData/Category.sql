@@ -9,8 +9,12 @@
 									(4, 'Geographic', NULL, 'green', 'DS', NULL),
 									(5, 'Weather', NULL, 'plum', 'DS', NULL),
 									(6, 'Sentry', NULL, 'blue', 'DS', NULL),
-									(7, 'IT', NULL, 'plum', 'RPT', NULL),
-									(8, '401k', NULL, 'blue', 'RPT', NULL)
+									(7, 'Commercial Lines', NULL, 'blueGray', 'RPT', 'CL'),
+									(8, 'Personal Lines', NULL, 'orange', 'RPT', 'PL'),
+									(9, 'Claims', NULL, 'gold', 'RPT', NULL),
+									(10, 'Corporate', NULL, 'green', 'RPT', NULL),
+									(11, 'IT', NULL, 'plum', 'RPT', NULL),
+									(12, '401k', NULL, 'blue', 'RPT', NULL)
 								)
 								AS Source ([Id], [Name], ParentCategory, Color, Object_TYP, AbbreviatedName) 
 

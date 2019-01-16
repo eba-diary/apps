@@ -36,6 +36,7 @@ BEGIN TRY
   INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 
 
 END TRY 
+
 BEGIN CATCH 
     DECLARE @ErrorMessage NVARCHAR(4000); 
     DECLARE @ErrorSeverity INT; 
