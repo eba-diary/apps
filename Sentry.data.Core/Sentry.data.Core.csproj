@@ -183,6 +183,7 @@
     <Compile Include="Interfaces\IDataAssetContext.cs" />
     <Compile Include="Interfaces\IDatasetService.cs" />
     <Compile Include="Interfaces\IFtpProvider.cs" />
+    <Compile Include="Interfaces\IMessageConsumer.cs" />
     <Compile Include="Interfaces\IMessagePublisher.cs" />
     <Compile Include="Interfaces\IMetadataRepositoryProvider.cs" />
     <Compile Include="Interfaces\IRequestContext.cs" />
