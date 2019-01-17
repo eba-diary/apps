@@ -239,8 +239,6 @@
                 // Do something
                 var data = e.params.data;
 
-                console.log(data);
-
                 window.vm.SelectedFilters.push(data.id);
 
                 //$('#' + data.id).prop('checked', true);
@@ -1424,7 +1422,6 @@
             });
 
             self.GetFile = function (data) {
-
                 $.ajax({
                     url: '/ExternalFile/HasReadPermissions?pathAndFilename=' + encodeURIComponent(data.Location),
                     method: "GET",
