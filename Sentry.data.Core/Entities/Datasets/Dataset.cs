@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Sentry.Core;
-using Sentry.Common;
-using static Sentry.Common.SystemClock;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 
@@ -18,7 +14,6 @@ namespace Sentry.data.Core
         public Dataset(){ }
 
         public virtual int DatasetId { get; set; }
-        public virtual string Category { get; set; }
 
         public virtual Boolean IsSensitive { get; set; }
 
@@ -44,7 +39,7 @@ namespace Sentry.data.Core
 
         public virtual Boolean CanDisplay { get; set; }
 
-        public virtual Category DatasetCategory { get; set; }
+        public virtual List<Category> DatasetCategories { get; set; }
         public virtual string DatasetType { get; set; }
 
         public virtual IList<DatasetFile> DatasetFiles { get; set; }
@@ -89,62 +84,47 @@ namespace Sentry.data.Core
         {
             ValidationResults vr = new ValidationResults();
 
-            if (string.IsNullOrWhiteSpace(Category))
+            if (DatasetCategories?.Count == 0)
             {
-                vr.Add(ValidationErrors.categoryIsBlank, "The Dataset Category is required");
+                vr.Add(GlobalConstants.ValidationErrors.CATEGORY_IS_BLANK, "The Dataset Category is required");
             }
             if (string.IsNullOrWhiteSpace(DatasetName))
             {
-                vr.Add(ValidationErrors.nameIsBlank, "The Dataset Name is required");
+                vr.Add(GlobalConstants.ValidationErrors.NAME_IS_BLANK, "The Dataset Name is required");
             }
             if (string.IsNullOrWhiteSpace(CreationUserName))
             {
-                vr.Add(ValidationErrors.creationUserNameIsBlank, "The Dataset Creation User Name is required");
+                vr.Add(GlobalConstants.ValidationErrors.CREATION_USER_NAME_IS_BLANK, "The Dataset Creation User Name is required");
             }
             if (string.IsNullOrWhiteSpace(UploadUserName))
             {
-                vr.Add(ValidationErrors.uploadUserNameIsBlank, "The Dataset UPload User Name is required");
+                vr.Add(GlobalConstants.ValidationErrors.UPLOAD_USER_NAME_IS_BLANK, "The Dataset UPload User Name is required");
             }
             if (!Regex.IsMatch(SentryOwnerName, "(^[0-9]{6,6}$)"))
             {
-                vr.Add(ValidationErrors.sentryOwnerIsNotNumeric, "The Sentry Owner ID should contain owners Sentry ID");
+                vr.Add(GlobalConstants.ValidationErrors.SENTRY_OWNER_IS_NOT_NUMERIC, "The Sentry Owner ID should contain owners Sentry ID");
             }
             if (DatasetDtm < new DateTime(1800, 1, 1)) // null dates are ancient; this suffices to check for null dates
             {
-                vr.Add(ValidationErrors.datasetDateIsOld, "The Dataset Date is required");
+                vr.Add(GlobalConstants.ValidationErrors.DATASET_DATE_IS_OLD, "The Dataset Date is required");
             }
             if (string.IsNullOrWhiteSpace(DatasetDesc))
             {
-                vr.Add(ValidationErrors.datasetDescIsBlank, "The Dataset description is required");
+                vr.Add(GlobalConstants.ValidationErrors.DATASET_DESC_IS_BLANK, "The Dataset description is required");
             }
 
             //Report specific checks
-            if(!string.IsNullOrEmpty(DatasetType) && DatasetType == "RPT")
+            if (!string.IsNullOrEmpty(DatasetType) && DatasetType == "RPT")
             {
                 if (string.IsNullOrWhiteSpace(Metadata.ReportMetadata.Location))
                 {
-                    vr.Add(ValidationErrors.locationIsBlank, "Report Location is required");
+                    vr.Add(GlobalConstants.ValidationErrors.LOCATION_IS_BLANK, "Report Location is required");
                 }
             }
-            
+
             return vr;
         }
 
-        public class ValidationErrors
-        {
-            public const string s3keyIsBlank = "keyIsBlank";
-            public const string categoryIsBlank = "categoryIsBlank";
-            public const string nameIsBlank = "nameIsBlank";
-            public const string creationUserNameIsBlank = "creationUserNameIsBlank";
-            public const string uploadUserNameIsBlank = "uploadUserNameIsBlank";
-            public const string datasetDateIsOld = "datasetDateIsOld";
-            public const string datasetDescIsBlank = "descIsBlank";
-            public const string sentryOwnerIsNotNumeric = "sentryOwnerIsNotNumeric";
-            public const string numberOfFilesIsNegative = "numberOfFilesIsNegative";
 
-            //Report specific validation errors
-            public const string locationIsBlank = "locationIsBlank";
-            public const string locationIsInvalid = "locationIsInvalid";
-        }
     }
 }

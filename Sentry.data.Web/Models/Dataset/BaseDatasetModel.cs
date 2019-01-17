@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using Sentry.data.Core;
 using System.ComponentModel.DataAnnotations;
@@ -19,49 +18,49 @@ namespace Sentry.data.Web
 
         }
 
-        public BaseDatasetModel(Dataset ds, IAssociateInfoProvider associateInfoService, IDatasetContext datasetContext = null)
+        public BaseDatasetModel(BaseEntityDto dto, IAssociateInfoProvider associateInfoService)
         {
-            this.SentryOwner = associateInfoService.GetAssociateInfo(ds.SentryOwnerName);
+            this.SentryOwner = associateInfoService.GetAssociateInfo(dto.SentryOwnerName);
             this.SentryOwnerName = this.SentryOwner.FullName;
-            this.DatasetId = ds.DatasetId;
-            this.Category = ds.Category;
-            this.DatasetName = ds.DatasetName;
-            this.DatasetDesc = ds.DatasetDesc;
-            this.CreationUserName = ds.CreationUserName;
+            this.DatasetId = dto.DatasetId;
+            //this.Category = ds.Category;
+            this.DatasetName = dto.DatasetName;
+            this.DatasetDesc = dto.DatasetDesc;
+            this.CreationUserName = dto.CreationUserName;
 
             int n;
-            if (!string.IsNullOrEmpty(ds.UploadUserName) && int.TryParse(ds.UploadUserName, out n))
+            if (!string.IsNullOrEmpty(dto.UploadUserName) && int.TryParse(dto.UploadUserName, out n))
             {
-                this.UploadUserName = associateInfoService.GetAssociateInfo(ds.UploadUserName).FullName;
+                this.UploadUserName = associateInfoService.GetAssociateInfo(dto.UploadUserName).FullName;
             }
             else
             {
-                this.UploadUserName = ds.UploadUserName;
+                this.UploadUserName = dto.UploadUserName;
             }
 
-            this.OriginationCode = ds.OriginationCode;
+            this.OriginationCode = dto.OriginationCode;
             this.FileExtension = null;
-            this.DatasetDtm = ds.DatasetDtm;
-            this.ChangedDtm = ds.ChangedDtm;
-            this.IsSensitive = ds.IsSensitive;
-            this.CanDisplay = ds.CanDisplay;
-            this.DatasetInformation = ds.DatasetInformation; 
+            this.DatasetDtm = dto.DatasetDtm;
+            this.ChangedDtm = dto.ChangedDtm;
+            this.IsSensitive = dto.IsSensitive;
+            this.CanDisplay = dto.CanDisplay;
+            this.DatasetInformation = dto.DatasetInformation; 
 
             this.IsPushToTableauCompatible = false;
-            this.DatasetCategory = ds.DatasetCategory; 
+            this.DatasetCategoryIds = dto.DatasetCategories.Select(x=> x.Id).ToList(); 
             this.DatasetFiles = new List<BaseDatasetFileModel>();
 
-            foreach (DatasetFile df in ds.DatasetFiles.OrderByDescending(x => x.CreateDTM))
+            foreach (DatasetFile df in dto.DatasetFiles.OrderByDescending(x => x.CreateDTM))
             {
                 this.DatasetFiles.Add(new BaseDatasetFileModel(df));
             }
 
-            this.DatasetScopeType = ds.DatasetScopeType;
+            this.DatasetScopeType = dto.DatasetScopeType;
 
             
             this.DatasetFileConfigs = new List<DatasetFileConfigsModel>();
             List<string> locations = new List<string>();
-            foreach (DatasetFileConfig dfc in ds.DatasetFileConfigs)
+            foreach (DatasetFileConfig dfc in dto.DatasetFileConfigs)
             {
                 if(datasetContext != null)
                 {
@@ -91,24 +90,6 @@ namespace Sentry.data.Web
             else
             { this.IsPreviewCompatible = false; }
 
-            if(!String.IsNullOrWhiteSpace(ds.DatasetType) && ds.DatasetType == "RPT")
-            {
-                List<MetadataTag> tagList = new List<MetadataTag>();
-                foreach(MetadataTag tag in ds.Tags)
-                {
-                    tagList.Add(tag);
-                }
-                Tags = tagList;
-
-                UploadFrequency = Enum.GetName(typeof(ReportFrequency), ds.Metadata.ReportMetadata.Frequency) ?? "Not Specified";
-            }
-            else
-            {
-                Tags = new List<MetadataTag>();
-                UploadFrequency = null;
-            }
-
-
         }
 
         public List<string> DistinctFileExtensions()
@@ -119,32 +100,6 @@ namespace Sentry.data.Web
                 extensions.Add(Utilities.GetFileExtension(item.FileName));
             }
             return extensions.Distinct().ToList();
-        }
-
-        [DisplayName("Creation Frequency")]
-        public List<string> DistinctFrequencies()
-        {
-            List<string> frequencies = new List<string>();
-
-            foreach(var item in this.DatasetFileConfigs)
-            {
-                if (item.RetrieverJobs != null)
-                {
-                    if(item.RetrieverJobs.Count == 1)
-                    {
-                        frequencies.Add(item.RetrieverJobs.First().ReadableSchedule);
-                    }
-                    else
-                    {
-                        foreach (var job in item.RetrieverJobs.Where(x => !x.IsGeneric))
-                        {
-                            frequencies.Add(job.ReadableSchedule);
-                        }
-                    }
-                }
-            }
-
-            return frequencies.Distinct().ToList();
         }
 
 
@@ -163,9 +118,9 @@ namespace Sentry.data.Web
         public IEnumerable<SelectListItem> AllDataClassifications { get; set; }
 
         //[Required()]
-        [MaxLength(64)]
-        [DisplayName("Category")]
-        public string Category { get; set; }
+        //[MaxLength(64)]
+        //[DisplayName("Category")]
+        //public string Category { get; set; }
 
         [Required()]
         [MaxLength(1024)]
@@ -237,7 +192,10 @@ namespace Sentry.data.Web
         public Boolean CanManageReport { get; set; }
 
         public Boolean IsSubscribed { get; set; }
-        public Category DatasetCategory { get; set; } 
+
+        [Required]
+        [DisplayName("Category")]
+        public List<int> DatasetCategoryIds { get; set; } 
 
 
         public IList<BaseDatasetFileModel> DatasetFiles { get; set; }
@@ -264,8 +222,6 @@ namespace Sentry.data.Web
         public int Views { get; set; }
         public int Downloads { get; set; }
         public string ObjectType { get; set; }
-        public List<MetadataTag> Tags { get; set; }
-        public string UploadFrequency { get; set; }
         public Boolean IsFavorite { get; set; }
     }
 }

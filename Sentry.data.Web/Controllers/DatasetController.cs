@@ -255,8 +255,7 @@ namespace Sentry.data.Web.Controllers
             Dataset ds = new Dataset()
             {
                 DatasetId = 0,
-                Category = cat.Name,
-                DatasetCategory = _datasetContext.GetCategoryById(cdm.CategoryIDs),
+                DatasetCategories = _datasetContext.GetCategoryById(cdm.CategoryIDs),
                 DatasetName = cdm.DatasetName,
                 DatasetDesc = cdm.DatasetDesc,
                 DatasetInformation = cdm.DatasetInformation,

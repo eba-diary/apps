@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
 using Sentry.data.Core;
-using Sentry.data.Infrastructure;
-using System.Web.Script.Serialization;
 
 namespace Sentry.data.Web
 {
@@ -14,45 +9,31 @@ namespace Sentry.data.Web
     {
         public BusinessIntelligenceModel()
         {
-            this.Category = "";
-            this.DatasetDesc = "";
-            this.DatasetName = "";
-            this.FileExtension = null;
-            this.DatasetId = 0;
-            this.S3Key = "";
-            this.SentryOwnerName = "";
-            this.UploadUserName = "";
             this.CanDisplay = true;
-            this.TagString = new JavaScriptSerializer().Serialize(new List<SearchableTag>());
-
+            this.TagIds = new List<int>();
         }
 
-        public BusinessIntelligenceModel(Dataset ds, IAssociateInfoProvider associateService) : base(ds, associateService)
+        public BusinessIntelligenceModel(BusinessIntelligenceDto dto) : base(dto, null)
         {
-            OwnerID = ds.SentryOwnerName;
-            Location = ds.Metadata.ReportMetadata.Location;
-            LocationType = ds.Metadata.ReportMetadata.LocationType;
-            FreqencyID = ds.Metadata.ReportMetadata.Frequency;
-            FileTypeId = ds.DatasetFileConfigs.First().FileTypeId;
-            TagString = new JavaScriptSerializer().Serialize(ds.Tags.Select(x => x.GetSearchableTag()));
+            Location = dto.Location;
+            FileTypeId = dto.FileTypeId;
+            FrequencyId = dto.FrequencyId;
+            TagIds = dto.TagIds;
         }
 
-        [Required]
-        [DisplayName("Sentry Owner")]
-        public string OwnerID { get; set; }
+
 
         [Required]
         [DisplayName("Report Location")]
         public string Location { get; set; }
 
-        public string LocationType { get; set; }
-
-        [DisplayName("Update Frequency")]
-        public int FreqencyID { get; set; }
-
         [DisplayName("Exhibit Type")]
         public int FileTypeId { get; set; }
 
-        public string TagString { get; set; }
+        [DisplayName("Frequency")]
+        public int? FrequencyId { get; set; }
+
+        public List<int> TagIds { get; set; } //selected values
+        public string TagString { get; set; } //how the tags are displayed.
     }
 }

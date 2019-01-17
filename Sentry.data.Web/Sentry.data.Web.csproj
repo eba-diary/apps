@@ -302,6 +302,8 @@
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\WebApi\TagController.cs" />
     <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Extensions\BusinessIntelligenceExtensions.cs" />
+    <Compile Include="Extensions\SharedExtensions.cs" />
     <Compile Include="Filters\AuthorizationFilters\AuthorizeHangfireDashboard.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeAttribute.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeByPermissionAttribute.cs" />
@@ -336,7 +338,6 @@
     <Compile Include="HttpExceptions\NotAuthorizedException.cs" />
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceModel.cs" />
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceUIModel.cs" />
-    <Compile Include="Models\BusinessIntelligence\EditBusinessIntelligenceModel.cs" />
     <Compile Include="Models\Config\CreateExtensionMapModel.cs" />
     <Compile Include="Models\Config\CreateSchemaModel.cs" />
     <Compile Include="Models\Config\CreateSourceModel.cs" />
@@ -366,8 +367,8 @@
     <Compile Include="Models\Dataset\BaseDatasetModel.cs" />
     <Compile Include="Models\Dataset\EditDatasetModel.cs" />
     <Compile Include="Models\Dataset\SearchModel.cs" />
-    <Compile Include="Models\BusinessIntelligence\CreateBusinessIntelligenceModel.cs" />
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceHomeModel.cs" />
+    <Compile Include="Models\Shared\CategoryModel.cs" />
     <Compile Include="Models\User\SharedContextModel.cs" />
     <Compile Include="Models\Shared\SuccessModel.cs" />
     <Compile Include="Models\Subscription\SubscriptionModel.cs" />

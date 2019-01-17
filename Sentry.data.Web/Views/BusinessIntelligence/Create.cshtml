@@ -1,4 +1,4 @@
-﻿@model CreateBusinessIntelligenceModel
+﻿@model BusinessIntelligenceModel
 @{
     ViewData["Title"] = "Create Exhibit";
 }
@@ -39,10 +39,10 @@
             @Html.HiddenFor(model => model.CreationUserName)
 
             <div class="form-group">
-                @Html.LabelFor((model) => model.CategoryIDs, new { @class = "control-label col-md-2" })
+                @Html.LabelFor((model) => model.DatasetCategoryIds, new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.DropDownListFor((model) => model.CategoryIDs, Model.AllCategories, new { @class = "form-control edit-dataset-row" })
-                    @Html.ValidationMessageFor((model) => model.CategoryIDs, "", new { @class = "text-danger" })
+                    @Html.DropDownListFor((model) => model.DatasetCategoryIds, Model.AllCategories, new { @class = "form-control edit-dataset-row" })
+                    @Html.ValidationMessageFor((model) => model.DatasetCategoryIds, "", new { @class = "text-danger" })
                 </div>
             </div>
 
@@ -71,6 +71,7 @@
                 </div>
             </div>
 
+            @Html.HiddenFor(m => m.TagIds)
             @Html.HiddenFor(m => m.TagString)
 
             <div class="form-group">
@@ -96,14 +97,14 @@
             <div class="form-group">
 
                 @{
-            foreach (var type in Model.AllDataFileTypes)
-            {
-                <div class="col-md-10 col-md-offset-2">
-                    @Html.Label(type.Text, htmlAttributes: new { @class = "col-md-2" })
-                    @*@Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2"})*@
-                    @Html.RadioButtonFor(model => model.FileTypeId, type.Value, new { @class = "col-md-1" })
-                </div>
-    }
+                    foreach (var type in Model.AllDataFileTypes)
+                    {
+                        <div class="col-md-10 col-md-offset-2">
+                            @Html.Label(type.Text, htmlAttributes: new { @class = "col-md-2" })
+                            @*@Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2"})*@
+                            @Html.RadioButtonFor(model => model.FileTypeId, type.Value, new { @class = "col-md-1" })
+                        </div>
+                    }
                 }
             </div>
 
@@ -130,10 +131,10 @@
                 </div>
             </div>
             <div class="form-group">
-                @Html.LabelFor((model) => model.FreqencyID, new { @class = "control-label col-md-2" })
+                @Html.LabelFor((model) => model.FrequencyId, new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.DropDownListFor((model) => model.FreqencyID, Model.AllFrequencies, new { @class = "form-control edit-dataset-row" })
-                    @Html.ValidationMessageFor((model) => model.FreqencyID, "", new { @class = "text-danger" })
+                    @Html.DropDownListFor((model) => model.FrequencyId, Model.AllFrequencies, new { @class = "form-control edit-dataset-row" })
+                    @Html.ValidationMessageFor((model) => model.FrequencyId, "", new { @class = "text-danger" })
                 </div>
             </div>
 
@@ -154,10 +155,10 @@
 
             <br />*@
             <div class="form-group">
-                @Html.LabelFor(model => model.OwnerID, htmlAttributes: new { @class = "control-label col-md-2" })
+                @Html.LabelFor(model => model.SentryOwnerName, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.EditorFor(model => model.OwnerID, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
-                    @Html.ValidationMessageFor(model => model.OwnerID, "", new { @class = "text-danger" })
+                    @Html.EditorFor(model => model.SentryOwnerName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
+                    @Html.ValidationMessageFor(model => model.SentryOwnerName, "", new { @class = "text-danger" })
                 </div>
             </div>
         </div>

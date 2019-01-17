@@ -81,7 +81,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DomainServices\BusinessIntelligenceService.cs" />
     <Compile Include="DomainServices\MetadataRepositoryService.cs" />
+    <Compile Include="DTO\BaseEntityDTO.cs" />
+    <Compile Include="DTO\BusinessIntelligenceDTO.cs" />
+    <Compile Include="DTO\BusinessIntelligenceHomeDTO.cs" />
+    <Compile Include="DTO\DatasetDTO.cs" />
     <Compile Include="Entities\Datasets\DatasetMetadata.cs" />
     <Compile Include="Entities\Datasets\FileExtension.cs" />
     <Compile Include="Entities\Datasets\ReportMetadata.cs" />
@@ -172,8 +177,10 @@
     <Compile Include="Entities\Goldeneye\RetrieverRequests\RTRequest.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\RTRequestParameters.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\RTSourceTypes.cs" />
+    <Compile Include="GlobalConstants.cs" />
     <Compile Include="Helpers\DisplayFormatter.cs" />
     <Compile Include="Interfaces\IApplicationUser.cs" />
+    <Compile Include="Interfaces\IBusinessIntelligenceService.cs" />
     <Compile Include="Interfaces\ICurrentUserIdProvider.cs" />
     <Compile Include="Interfaces\IDatasetContext.cs" />
     <Compile Include="Interfaces\IDataFeedContext.cs" />

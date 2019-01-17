@@ -75,7 +75,7 @@ namespace Sentry.data.Web.Helpers
 
             return result;
         }
-        public static BaseDatasetModel setupLists(IReportContext _reportContext, BaseDatasetModel model)
+        public static void SetupLists(IReportContext _reportContext, BaseDatasetModel model)
         {
             var temp = GetCategoryList(_reportContext).ToList();
 
@@ -104,11 +104,10 @@ namespace Sentry.data.Web.Helpers
             model.AllDataFileTypes = Enum.GetValues(typeof(ReportType)).Cast<ReportType>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
 
-            return model;
         }
         public static IEnumerable<SelectListItem> GetCategoryList(IReportContext _reportContext)
         {
-            IEnumerable<SelectListItem> var = _reportContext.Categories.ToList().Select((c) => new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
+            IEnumerable<SelectListItem> var = _reportContext.Categories.Select((c) => new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
 
             return var;
         }
@@ -173,7 +172,7 @@ namespace Sentry.data.Web.Helpers
                 dFileExtensions = _datasetContext.FileExtensions
                     .Select((c) => new SelectListItem
                     {
-                        Selected = c.Name.Contains("ANY") ? true : false,
+                        Selected = c.Name.Contains("ANY"),
                         Text = c.Name.Trim(),
                         Value = c.Id.ToString()
                     });
@@ -183,7 +182,7 @@ namespace Sentry.data.Web.Helpers
                 dFileExtensions = _datasetContext.FileExtensions
                     .Select((c) => new SelectListItem
                     {
-                        Selected = c.Id == id ? true : false,
+                        Selected = c.Id == id,
                         Text = c.Name.Trim(),
                         Value = c.Id.ToString()
                     });

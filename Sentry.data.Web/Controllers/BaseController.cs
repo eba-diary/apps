@@ -1,4 +1,5 @@
 ﻿using Sentry.Core;
+using System.Collections.Generic;
 using System.Web.Mvc;
 
 namespace Sentry.data.Web.Controllers
@@ -22,6 +23,11 @@ namespace Sentry.data.Web.Controllers
             {
                 ModelState.AddModelError(string.Empty, vr.Description);
             }
+        }
+
+        protected virtual void AddCoreValidationExceptionsToModel(List<string> errors)
+        {
+            errors.ForEach(x => ModelState.AddModelError(string.Empty, x));
         }
 
         protected JsonResult AjaxSuccessJson()
