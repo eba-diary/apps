@@ -304,6 +304,7 @@
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Extensions\BusinessIntelligenceExtensions.cs" />
     <Compile Include="Extensions\SharedExtensions.cs" />
+    <Compile Include="Extensions\ExtensionMethods.cs" />
     <Compile Include="Filters\AuthorizationFilters\AuthorizeHangfireDashboard.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeAttribute.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeByPermissionAttribute.cs" />
@@ -1285,9 +1286,9 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>2457</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost.sentry.com:24444</IISUrl>
+          <IISUrl>http://localhost.sentry.com:2457</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
-          <IISAppRootUrl>http://localhost.sentry.com:24444</IISAppRootUrl>
+          <IISAppRootUrl>http://localhost.sentry.com:2457</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

@@ -174,7 +174,6 @@
     <Compile Include="Mappings\Metadata\HiveTableMapping.cs" />
     <Compile Include="Mappings\Metadata\LivyCreationMapping.cs" />
     <Compile Include="Mappings\Metadata\MetadataAssetMapping.cs" />
-    <Compile Include="Mappings\Metadata\SchemaMapping.cs" />
     <Compile Include="Mappings\Metadata\MetadataTagMapping.cs" />
     <Compile Include="Mappings\Metadata\TagGroupMapping.cs" />
     <Compile Include="Mappings\Primary\AssetNotificationMapping.cs" />
@@ -218,6 +217,7 @@
     <Compile Include="ServiceImplementations\CubeProvider.cs" />
     <Compile Include="ServiceImplementations\DatafileBundleProvider.cs" />
     <Compile Include="ServiceImplementations\EncryptionService.cs" />
+    <Compile Include="ServiceImplementations\EventService.cs" />
     <Compile Include="ServiceImplementations\FtpProvider.cs" />
     <Compile Include="ServiceImplementations\HTTPSProvider.cs" />
     <Compile Include="ServiceImplementations\JawsService.cs" />
