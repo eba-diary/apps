@@ -247,9 +247,8 @@ namespace Sentry.data.Core
 
             _messagePublisher.Publish(eventTopic, schema.StorageCode, JsonConvert.SerializeObject(hiveCreate));
 
-            UpdateHiveTableStatus(schema, HiveTableStatusEnum.Requested);
+            UpdateHiveTableStatus(schema, HiveTableStatusEnum.Requested);           
             
-            Task.Factory.StartNew(() => _eventService.CreateViewedSuccessEvent(config.ConfigId, config.ParentDataset.DatasetId, _userService.GetCurrentUser().AssociateId, "Viewed Edit Fields"), TaskCreationOptions.LongRunning);
         }
 
         private void UpdateHiveTableStatus(DataElement schema, HiveTableStatusEnum requested)

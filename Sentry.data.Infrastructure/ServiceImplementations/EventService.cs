@@ -38,8 +38,10 @@ namespace Sentry.data.Infrastructure
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS4014")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS1998")]
-        public async Task CreateViewedSuccessEvent(int configId, int datasetId, string userId, string reason)
+        public async Task CreateViewSchemaEditSuccessEvent(int configId, string userId, string reason)
         {
+            DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configId);
+
             Event e = new Event();
             e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
             e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
@@ -47,7 +49,7 @@ namespace Sentry.data.Infrastructure
             e.TimeNotified = DateTime.Now;
             e.IsProcessed = false;
             e.DataConfig = configId;
-            e.Dataset = datasetId;
+            e.Dataset = dfc.ParentDataset.DatasetId;
             e.UserWhoStartedEvent = userId;
             e.Reason = reason;
 

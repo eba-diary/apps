@@ -28,9 +28,12 @@ namespace Sentry.data.Web.Controllers
         private S3ServiceProvider _s3Service;
         private ISASService _sasService;
         private IAppCache _cache;
+        public IEventService _eventService;
 
 
-        public ConfigController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, ISASService sasService, IAssociateInfoProvider associateInfoService, IConfigService configService)
+        public ConfigController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, 
+            ISASService sasService, IAssociateInfoProvider associateInfoService, IConfigService configService,
+            IEventService eventService)
         {
             _cache = new CachingService();
             _datasetContext = dsCtxt;
@@ -39,6 +42,7 @@ namespace Sentry.data.Web.Controllers
             _sasService = sasService;
             _associateInfoProvider = associateInfoService;
             _configService = configService;
+            _eventService = eventService;
         }
 
         [HttpGet]
@@ -1386,6 +1390,8 @@ namespace Sentry.data.Web.Controllers
             try
             {
                 _configService.UpdateFields(configId, schemaId, schemaRows);
+
+                Task.Factory.StartNew(() => _eventService.CreateViewSchemaEditSuccessEvent(configId, SharedContext.CurrentUser.AssociateId, "Viewed Edit Fields"), TaskCreationOptions.LongRunning);
             }
             catch (Exception ex)
             {
