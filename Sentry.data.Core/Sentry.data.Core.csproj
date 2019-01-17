@@ -82,6 +82,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DomainServices\ConfigService.cs" />
+    <Compile Include="Entities\HiveTableStatusEnum.cs" />
+    <Compile Include="Entities\MessageFormats\HiveTableCreateModel.cs" />
+    <Compile Include="Entities\Metadata\ColumnModel.cs" />
     <Compile Include="Interfaces\IConfigService.cs" />
     <Compile Include="Interfaces\IEventService.cs" />
     <Compile Include="Interfaces\IUserService.cs" />
@@ -119,7 +122,7 @@
     <Compile Include="Entities\Goldeneye\LoaderRequest.cs" />
     <Compile Include="Entities\Metadata\Metadata.cs" />
     <Compile Include="Entities\Metadata\MetadataAsset.cs" />
-    <Compile Include="Entities\Metadata\Schema.cs" />
+    <Compile Include="Entities\Metadata\SchemaModel.cs" />
     <Compile Include="Entities\Metadata\MetadataTag.cs" />
     <Compile Include="Entities\Metadata\SchemaRow.cs" />
     <Compile Include="Entities\Metadata\SearchableTag.cs" />

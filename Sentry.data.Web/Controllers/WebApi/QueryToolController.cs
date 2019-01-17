@@ -641,10 +641,10 @@ namespace Sentry.data.Web.Controllers
                     }
                     qd.extensions = ds.DatasetFiles.Where(x => x.DatasetFileConfig.ConfigId == item.ConfigId).Select(x => Utilities.GetFileExtension(x.FileName)).Distinct().ToList();
                     qd.description = item.Description;
-                    qd.HasSchema = item.Schema.Any();
+                    qd.HasSchema = item.Schema.FirstOrDefault().DataObjects.Any();
 
                     qd.IsPowerUser = _userService.GetCurrentUser().CanQueryToolPowerUser;
-                    qd.HasQueryableSchema = item.Schema.Where(w => w.HiveTable != null).Any();
+                    qd.HasQueryableSchema = item.Schema.FirstOrDefault().DataObjects.Any();
 
                     if (qd.HasSchema)
                     {
@@ -660,10 +660,12 @@ namespace Sentry.data.Web.Controllers
                             };
 
                             //This is assuming only a single hive table per schema revision.
+                            // Checking status to ensure table is ready for querying.
                             if (sch.HiveTable != null)
                             {
                                 qs.HiveDatabase = sch.HiveDatabase;
                                 qs.HiveTable = sch.HiveTable;
+                                qs.HiveTableStatus = sch.HiveTableStatus;
                                 qs.HasTable = true;
                             }
                             else
@@ -881,57 +883,58 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> SaveRowCount(int SessionID, String guid, int configID)
         {
-            String python;
+            return StatusCode(HttpStatusCode.NoContent);
+            //String python;
 
-            python = guid + ".count()";
+            //python = guid + ".count()";
 
-            String quoted = System.Web.Helpers.Json.Encode(python);
-            quoted = quoted.Substring(1, quoted.Length - 2);
+            //String quoted = System.Web.Helpers.Json.Encode(python);
+            //quoted = quoted.Substring(1, quoted.Length - 2);
 
-            IHttpActionResult response = await (SendCode(SessionID, quoted));
+            //IHttpActionResult response = await (SendCode(SessionID, quoted));
 
-            if (response.GetType() == typeof(OkNegotiatedContentResult<String>))
-            {
-                //We can save this Schema back to the Database easily now that we have it.
-                var a = response as OkNegotiatedContentResult<String>;
-                LivyReply lr = JsonConvert.DeserializeObject<LivyReply>(a.Content);
+            //if (response.GetType() == typeof(OkNegotiatedContentResult<String>))
+            //{
+            //    //We can save this Schema back to the Database easily now that we have it.
+            //    var a = response as OkNegotiatedContentResult<String>;
+            //    LivyReply lr = JsonConvert.DeserializeObject<LivyReply>(a.Content);
 
-                lr = await WaitForLivyReply(SessionID, lr.id);
+            //    lr = await WaitForLivyReply(SessionID, lr.id);
 
-                DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
-                var dataObjectID = _datasetContext.Schemas.Where(x => x.DatasetFileConfig.ConfigId == dfc.ConfigId).FirstOrDefault().DataObject_ID;
-                DataObject dataObject = _datasetContext.GetById<DataObject>(dataObjectID);
+            //    DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
+            //    var dataObjectID = _datasetContext.Schemas.Where(x => x.DatasetFileConfig.ConfigId == dfc.ConfigId).FirstOrDefault().DataObject_ID;
+            //    DataObject dataObject = _datasetContext.GetById<DataObject>(dataObjectID);
 
-                if (dataObject.DataObjectDetails.Any(x => x.DataObjectDetailType_CDE == "Row_CNT"))
-                {
-                    var detail = dataObject.DataObjectDetails.FirstOrDefault(x => x.DataObjectDetailType_CDE == "Row_CNT");
-                    detail.DataObjectDetailType_VAL = (Convert.ToInt32(detail.DataObjectDetailType_VAL) + Convert.ToInt32(lr.output.data.text)).ToString();
+            //    if (dataObject.DataObjectDetails.Any(x => x.DataObjectDetailType_CDE == "Row_CNT"))
+            //    {
+            //        var detail = dataObject.DataObjectDetails.FirstOrDefault(x => x.DataObjectDetailType_CDE == "Row_CNT");
+            //        detail.DataObjectDetailType_VAL = (Convert.ToInt32(detail.DataObjectDetailType_VAL) + Convert.ToInt32(lr.output.data.text)).ToString();
 
-                    _datasetContext.Merge<DataObjectDetail>(detail);
-                    _datasetContext.SaveChanges();
-                }
-                else
-                {
-                    dataObject.DataObjectDetails.Add(
-                        new DataObjectDetail()
-                        {
-                            DataObject = dataObject,
-                            DataObjectDetailType_CDE = "Row_CNT",
-                            DataObjectDetailType_VAL = lr.output.data.text,
-                            DataObjectDetailCreate_DTM = DateTime.Now,
-                            DataObjectDetailChange_DTM = DateTime.Now,
-                            LastUpdt_DTM = DateTime.Now
-                        });
-                    _datasetContext.Merge<DataObject>(dataObject);
-                    _datasetContext.SaveChanges();
-                }
+            //        _datasetContext.Merge<DataObjectDetail>(detail);
+            //        _datasetContext.SaveChanges();
+            //    }
+            //    else
+            //    {
+            //        dataObject.DataObjectDetails.Add(
+            //            new DataObjectDetail()
+            //            {
+            //                DataObject = dataObject,
+            //                DataObjectDetailType_CDE = "Row_CNT",
+            //                DataObjectDetailType_VAL = lr.output.data.text,
+            //                DataObjectDetailCreate_DTM = DateTime.Now,
+            //                DataObjectDetailChange_DTM = DateTime.Now,
+            //                LastUpdt_DTM = DateTime.Now
+            //            });
+            //        _datasetContext.Merge<DataObject>(dataObject);
+            //        _datasetContext.SaveChanges();
+            //    }
 
-                return Ok(lr.output.data.text);
-            }
-            else
-            {
-                return response;
-            }
+            //    return Ok(lr.output.data.text);
+            //}
+            //else
+            //{
+            //    return response;
+            //}
 
 
         }
@@ -1034,83 +1037,84 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> CreateHiveTable(int SessionID, int configID)
         {
-            DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
+            return StatusCode(HttpStatusCode.NoContent);
+            //DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
 
-            String bucket = Sentry.Configuration.Config.GetHostSetting("AWSRootBucket");
-            String s3Prefix = Sentry.Configuration.Config.GetHostSetting("S3DataPrefix");
+            //String bucket = Sentry.Configuration.Config.GetHostSetting("AWSRootBucket");
+            //String s3Prefix = Sentry.Configuration.Config.GetHostSetting("S3DataPrefix");
 
-            String dropLocation = "s3a://"
-                + bucket + "/"
-                + s3Prefix + "/"
-                + "parquet" + "/"
-                + dfc.ParentDataset.DatasetCategory.Id + "/"
-                + dfc.ParentDataset.DatasetId + "/"
-                + dfc.ConfigId + "/"
-                //Schema Revision
-                ;
+            //String dropLocation = "s3a://"
+            //    + bucket + "/"
+            //    + s3Prefix + "/"
+            //    + "parquet" + "/"
+            //    + dfc.ParentDataset.DatasetCategory.Id + "/"
+            //    + dfc.ParentDataset.DatasetId + "/"
+            //    + dfc.ConfigId + "/"
+            //    //Schema Revision
+            //    ;
 
-            //Yes Python -> Livy -> Spark -> Hive seriously needs triple quotes.
+            ////Yes Python -> Livy -> Spark -> Hive seriously needs triple quotes.
 
-            String python = @"spark.sql(""""""CREATE TABLE IF NOT EXISTS";
+            //String python = @"spark.sql(""""""CREATE TABLE IF NOT EXISTS";
 
-            String hiveTableName = dfc.ParentDataset.DatasetId + "_" + dfc.ConfigId + "_" + dfc.Name.Replace(' ', '_').Replace('-', '_');
+            //String hiveTableName = dfc.ParentDataset.DatasetId + "_" + dfc.ConfigId + "_" + dfc.Name.Replace(' ', '_').Replace('-', '_');
 
-            python += "`" + hiveTableName + "`";
+            //python += "`" + hiveTableName + "`";
 
-            var dataObjectID = _datasetContext.Schemas.Where(x => x.DatasetFileConfig.ConfigId == dfc.ConfigId).FirstOrDefault().DataObject_ID;
-            DataObject dataObject = _datasetContext.GetById<DataObject>(dataObjectID);
+            //var dataObjectID = _datasetContext.Schemas.Where(x => x.DatasetFileConfig.ConfigId == dfc.ConfigId).FirstOrDefault().DataObject_ID;
+            //DataObject dataObject = _datasetContext.GetById<DataObject>(dataObjectID);
 
-            if (dataObject != null)
-            {
-                python += " (";
+            //if (dataObject != null)
+            //{
+            //    python += " (";
 
-                foreach (DataObjectField b in dataObject.DataObjectFields)
-                {
-                    String sqlServerDataType = null;
-                    if (b.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Datatype_TYP"))
-                    {
-                        sqlServerDataType = LivyHelper.SQLServerDataTypeToHive(b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Datatype_TYP").DataObjectFieldDetailType_VAL);
-                    }
-                    else
-                    {
-                        sqlServerDataType = LivyHelper.SQLServerDataTypeToHive("NVARCHAR");
-                    }
+            //    foreach (DataObjectField b in dataObject.DataObjectFields)
+            //    {
+            //        String sqlServerDataType = null;
+            //        if (b.DataObjectFieldDetails.Any(x => x.DataObjectFieldDetailType_CDE == "Datatype_TYP"))
+            //        {
+            //            sqlServerDataType = LivyHelper.SQLServerDataTypeToHive(b.DataObjectFieldDetails.FirstOrDefault(x => x.DataObjectFieldDetailType_CDE == "Datatype_TYP").DataObjectFieldDetailType_VAL);
+            //        }
+            //        else
+            //        {
+            //            sqlServerDataType = LivyHelper.SQLServerDataTypeToHive("NVARCHAR");
+            //        }
 
-                    python += $"`{b.DataObjectField_NME}` {sqlServerDataType},";
+            //        python += $"`{b.DataObjectField_NME}` {sqlServerDataType},";
 
-                }
+            //    }
 
-                python = python.TrimEnd(',');
-                python += ")";
+            //    python = python.TrimEnd(',');
+            //    python += ")";
 
-                //IT WILL LOOK LIKE THIS
-                // "(`area_fips` string,`own_code` int,`industry_code` string,`agglvl_code` int,`size_code` int,`year` int)"
-            }
-            else
-            {
-                //THERE IS NOTHING IN THE METADATA REPOSITORY FOR THIS FILE.
-            }
-            //PARTITIONED BY (THING DATATYPE)
+            //    //IT WILL LOOK LIKE THIS
+            //    // "(`area_fips` string,`own_code` int,`industry_code` string,`agglvl_code` int,`size_code` int,`year` int)"
+            //}
+            //else
+            //{
+            //    //THERE IS NOTHING IN THE METADATA REPOSITORY FOR THIS FILE.
+            //}
+            ////PARTITIONED BY (THING DATATYPE)
 
-            python += "STORED AS PARQUET LOCATION '" + dropLocation + @"'"""""")";
-
-
+            //python += "STORED AS PARQUET LOCATION '" + dropLocation + @"'"""""")";
 
 
-            String quoted = System.Web.Helpers.Json.Encode(python);
-            quoted = quoted.Substring(1, quoted.Length - 2);
 
-            IHttpActionResult response = await (SendCode(SessionID, quoted));
-            var type = response.GetType();
 
-            if (type == typeof(OkResult))
-            {
-                return Ok(hiveTableName);
-            }
-            else
-            {
-                return response;
-            }
+            //String quoted = System.Web.Helpers.Json.Encode(python);
+            //quoted = quoted.Substring(1, quoted.Length - 2);
+
+            //IHttpActionResult response = await (SendCode(SessionID, quoted));
+            //var type = response.GetType();
+
+            //if (type == typeof(OkResult))
+            //{
+            //    return Ok(hiveTableName);
+            //}
+            //else
+            //{
+            //    return response;
+            //}
         }
 
         //[HttpGet][Route("get")]
@@ -1260,61 +1264,61 @@ namespace Sentry.data.Web.Controllers
         //    return Ok();
         //}
 
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
-        private void CreateDataObjectFields(int configID, List<HiveColumn> hiveColumns)
-        {
-            DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
-            var dataObjectID = _datasetContext.Schemas.Where(x => x.DatasetFileConfig.ConfigId == dfc.ConfigId).FirstOrDefault().DataObject_ID;
-            DataObject dataObject = _datasetContext.GetById<DataObject>(dataObjectID);
+        //[AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        //private void CreateDataObjectFields(int configID, List<HiveColumn> hiveColumns)
+        //{
+        //    DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
+        //    var dataObjectID = _datasetContext.Schemas.Where(x => x.DatasetFileConfig.ConfigId == dfc.ConfigId).FirstOrDefault().DataObject_ID;
+        //    DataObject dataObject = _datasetContext.GetById<DataObject>(dataObjectID);
 
-            /*  DATA OBJECT FIELDS CREATION:
-            *    THESE ARE THE COLUMNS IN THE SCHEMA / DATA OBJECT
-            */
+        //    /*  DATA OBJECT FIELDS CREATION:
+        //    *    THESE ARE THE COLUMNS IN THE SCHEMA / DATA OBJECT
+        //    */
 
-            if (dataObject != null)
-            {
-                foreach (HiveColumn hc in hiveColumns)
-                {
+        //    if (dataObject != null)
+        //    {
+        //        foreach (HiveColumn hc in hiveColumns)
+        //        {
 
 
-                    DataObjectField dof = new DataObjectField()
-                    {
-                        DataObject = dataObject,
-                        DataObjectField_NME = hc.name,
-                        DataObjectFieldCreate_DTM = DateTime.Now,
-                        DataObjectFieldChange_DTM = DateTime.Now,
-                        LastUpdt_DTM = DateTime.Now
-                    };
+        //            DataObjectField dof = new DataObjectField()
+        //            {
+        //                DataObject = dataObject,
+        //                DataObjectField_NME = hc.name,
+        //                DataObjectFieldCreate_DTM = DateTime.Now,
+        //                DataObjectFieldChange_DTM = DateTime.Now,
+        //                LastUpdt_DTM = DateTime.Now
+        //            };
 
-                    dof.DataObjectFieldDetails = new List<DataObjectFieldDetail>();
+        //            dof.DataObjectFieldDetails = new List<DataObjectFieldDetail>();
 
-                    dof.DataObjectFieldDetails.Add(new DataObjectFieldDetail()
-                    {
-                        DataObjectField = dof,
-                        DataObjectFieldDetailType_VAL = hc.datatype,
-                        DataObjectFieldDetailType_CDE = "Datatype_TYP",
-                        DataObjectFieldDetailCreate_DTM = DateTime.Now,
-                        DataObjectFieldDetailChange_DTM = DateTime.Now,
-                        LastUpdt_DTM = DateTime.Now
-                    });
+        //            dof.DataObjectFieldDetails.Add(new DataObjectFieldDetail()
+        //            {
+        //                DataObjectField = dof,
+        //                DataObjectFieldDetailType_VAL = hc.datatype,
+        //                DataObjectFieldDetailType_CDE = "Datatype_TYP",
+        //                DataObjectFieldDetailCreate_DTM = DateTime.Now,
+        //                DataObjectFieldDetailChange_DTM = DateTime.Now,
+        //                LastUpdt_DTM = DateTime.Now
+        //            });
 
-                    dof.DataObjectFieldDetails.Add(new DataObjectFieldDetail()
-                    {
-                        DataObjectField = dof,
-                        DataObjectFieldDetailType_VAL = hc.nullable == true ? "Y" : "N",
-                        DataObjectFieldDetailType_CDE = "Nullable_IND",
-                        DataObjectFieldDetailCreate_DTM = DateTime.Now,
-                        DataObjectFieldDetailChange_DTM = DateTime.Now,
-                        LastUpdt_DTM = DateTime.Now
-                    });
+        //            dof.DataObjectFieldDetails.Add(new DataObjectFieldDetail()
+        //            {
+        //                DataObjectField = dof,
+        //                DataObjectFieldDetailType_VAL = hc.nullable == true ? "Y" : "N",
+        //                DataObjectFieldDetailType_CDE = "Nullable_IND",
+        //                DataObjectFieldDetailCreate_DTM = DateTime.Now,
+        //                DataObjectFieldDetailChange_DTM = DateTime.Now,
+        //                LastUpdt_DTM = DateTime.Now
+        //            });
 
-                    dataObject.DataObjectFields.Add(dof);
+        //            dataObject.DataObjectFields.Add(dof);
 
-                    _datasetContext.Add<DataObjectField>(dof);
-                    _datasetContext.SaveChanges();
+        //            _datasetContext.Add<DataObjectField>(dof);
+        //            _datasetContext.SaveChanges();
 
-                }
-            }
-        }
+        //        }
+        //    }
+        //}
     }
 }

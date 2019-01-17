@@ -196,6 +196,8 @@ namespace Sentry.data.Web.Controllers
         {
             List<DataElementDetail> details = new List<DataElementDetail>();
 
+            Dataset ds = _datasetContext.GetById<Dataset>(dfcm.DatasetId);
+
             DataElement de = new DataElement()
             {
                 DataElementCreate_DTM = DateTime.Now,
@@ -211,7 +213,10 @@ namespace Sentry.data.Web.Controllers
                 SchemaIsForceMatch = false,
                 Delimiter = dfcm.Delimiter,
                 FileFormat = _datasetContext.GetById<FileExtension>(dfcm.FileExtensionID).Name.Trim(),
-                StorageCode = _datasetContext.GetNextStorageCDE().ToString()
+                StorageCode = _datasetContext.GetNextStorageCDE().ToString(),
+                HiveDatabase = "Default",
+                HiveTable = ds.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dfcm.ConfigFileName.Replace(" ", "").ToUpper(),
+                HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString()
             };
 
             return de;
@@ -1455,7 +1460,10 @@ namespace Sentry.data.Web.Controllers
                         SchemaIsForceMatch = csm.IsForceMatch,
                         SchemaIsPrimary = true,
                         SchemaRevision = (maxSchemaRevision == null) ? 0 : maxSchemaRevision.SchemaRevision + 1,
-                        StorageCode = storageCode
+                        StorageCode = storageCode,
+                        HiveDatabase = "Default",
+                        HiveTable = dfc.ParentDataset.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dfc.Name.Replace(" ", "").ToUpper(),
+                        HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString()
                     };
 
                     dfc.Schema.Add(de);

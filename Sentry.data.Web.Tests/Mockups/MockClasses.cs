@@ -412,23 +412,23 @@ namespace Sentry.data.Web.Tests
             return e;
         }
 
-        public static List<Schema> MockSchemas(DatasetFileConfig dfc = null)
-        {
-            Schema schema = new Schema()
-            {
-                Schema_NME = "Mock Schema",
-                Schema_ID = 11000,
-                Schema_DSC = "Mock Schema",
-                Created_DTM = DateTime.Now,
-                DatasetFileConfig = dfc
-            };
+        //public static List<Schema> MockSchemas(DatasetFileConfig dfc = null)
+        //{
+        //    Schema schema = new Schema()
+        //    {
+        //        Schema_NME = "Mock Schema",
+        //        Schema_ID = 11000,
+        //        Schema_DSC = "Mock Schema",
+        //        Created_DTM = DateTime.Now,
+        //        DatasetFileConfig = dfc
+        //    };
 
-            var schemas = new List<Schema>();
+        //    var schemas = new List<Schema>();
 
-            schemas.Add(schema);
+        //    schemas.Add(schema);
 
-            return schemas;
+        //    return schemas;
            
-        }
+        //}
     }
 }

@@ -174,7 +174,6 @@
     <Compile Include="Mappings\Metadata\HiveTableMapping.cs" />
     <Compile Include="Mappings\Metadata\LivyCreationMapping.cs" />
     <Compile Include="Mappings\Metadata\MetadataAssetMapping.cs" />
-    <Compile Include="Mappings\Metadata\SchemaMapping.cs" />
     <Compile Include="Mappings\Metadata\MetadataTagMapping.cs" />
     <Compile Include="Mappings\Metadata\TagGroupMapping.cs" />
     <Compile Include="Mappings\Primary\AssetNotificationMapping.cs" />

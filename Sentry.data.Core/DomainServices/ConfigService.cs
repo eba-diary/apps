@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace Sentry.data.Core
 {
@@ -14,13 +15,16 @@ namespace Sentry.data.Core
         public IMessagePublisher _publisher;
         public IUserService _userService;
         public IEventService _eventService;
+        public IMessagePublisher _messagePublisher;
 
-        public ConfigService(IDatasetContext dsCtxt, IMessagePublisher publisher, IUserService userService, IEventService eventService)
+        public ConfigService(IDatasetContext dsCtxt, IMessagePublisher publisher, 
+            IUserService userService, IEventService eventService, IMessagePublisher messagePublisher)
         {
             _datasetContext = dsCtxt;
             _publisher = publisher;
             _userService = userService;
             _eventService = eventService;
+            _messagePublisher = messagePublisher;
         }
 
         public void UpdateFields(int configId, int schemaId, List<SchemaRow> schemaRows)
@@ -198,26 +202,62 @@ namespace Sentry.data.Core
             //    msg1.SourceKey = df_newParent.FileLocation;
             //    msg1.SourceVersionId = df_newParent.VersionId;
 
-            //    _publisher.Publish(eventTopic, df_newParent.Schema.DataElement_ID.ToString(), msg1.ToString());
+            //    _messagePublisher.Publish(eventTopic, df_newParent.Schema.DataElement_ID.ToString(), msg1.ToString());
             //}
             //catch (Exception ex)
             //{
             //    job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{schema.DataElement_ID.ToString()} | topic:{eventTopic} | message:{msg1.ToString()})", ex);
             //}
 
+            HiveTableCreateModel hiveCreate = new HiveTableCreateModel();
 
+            SchemaModel sm = new SchemaModel();
+            sm.SchemaID = schema.StorageCode;
+            sm.Format = schema.FileFormat;
+            sm.Header = "true";
+            sm.Delimiter = schema.Delimiter;
+            sm.HiveDatabase = schema.HiveDatabase;
+            sm.HiveTable = schema.HiveTable;
 
-            Event e = new Event();
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.DataConfig = config.ConfigId;
-            e.Dataset = config.ParentDataset.DatasetId;
-            e.UserWhoStartedEvent = _userService.GetCurrentUser().AssociateId;
-            e.Reason = "Viewed Edit Fields";
-            Task.Factory.StartNew(() => _eventService.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+            DataObject dObj = schema.DataObjects.FirstOrDefault();
+
+            List<ColumnModel> ColumnModelList = new List<ColumnModel>();
+
+            if (dObj != null)
+            {
+                foreach (DataObjectField dof in dObj.DataObjectFields)
+                {
+                    ColumnModel cm = new ColumnModel();
+                    cm.Name = dof.DataObjectField_NME;
+                    cm.DataType = dof.DataType;
+                    cm.Nullable = dof.Nullable.ToString();
+                    cm.Length = dof.Length;
+                    cm.Precision = dof.Precision;
+                    cm.Scale = dof.Scale;
+
+                    ColumnModelList.Add(cm);
+                }
+            }
+
+            sm.Columns = ColumnModelList;
+
+            hiveCreate.Schema = sm;
+
+            string eventTopic = $"{Configuration.Config.GetSetting("SAIDKey").ToLower()}-{Configuration.Config.GetHostSetting("EnvironmentName").ToLower()}-{Configuration.Config.GetHostSetting("DSCEventTopic").ToLower()}";
+
+            _messagePublisher.Publish(eventTopic, schema.StorageCode, JsonConvert.SerializeObject(hiveCreate));
+
+            UpdateHiveTableStatus(schema, HiveTableStatusEnum.Requested);
+            
+            Task.Factory.StartNew(() => _eventService.CreateViewedSuccessEvent(config.ConfigId, config.ParentDataset.DatasetId, _userService.GetCurrentUser().AssociateId, "Viewed Edit Fields"), TaskCreationOptions.LongRunning);
+        }
+
+        private void UpdateHiveTableStatus(DataElement schema, HiveTableStatusEnum requested)
+        {
+            schema.HiveTableStatus = requested.ToString();
+
+            _datasetContext.Merge(schema);
+            _datasetContext.SaveChanges();
         }
     }
 }

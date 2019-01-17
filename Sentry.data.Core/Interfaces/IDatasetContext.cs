@@ -23,7 +23,6 @@ namespace Sentry.data.Core
         IQueryable<DataObject> DataObjects { get; }
         IQueryable<FileExtension> FileExtensions { get; }
         IQueryable<Category> Categories { get; }
-        IQueryable<Schema> Schemas { get; }
         IQueryable<HiveTable> HiveTables { get; }
         IQueryable<LivyCreation> LivySessions { get; }
         IQueryable<MediaTypeExtension> MediaTypeExtensions { get; }
