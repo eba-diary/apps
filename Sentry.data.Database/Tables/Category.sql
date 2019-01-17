@@ -1,5 +1,5 @@
 ﻿CREATE TABLE [dbo].[Category] (
-    [Id]             INT           IDENTITY (1, 1) NOT NULL,
+    [Id]             INT          NOT NULL,
     [Name]           VARCHAR (255) NULL,
     [ParentCategory] INT           NULL,
     [Color] VARCHAR(50) NOT NULL, 
