@@ -352,6 +352,7 @@
     <Compile Include="Models\Dataset\CreateDataFileModel.cs" />
     <Compile Include="Models\Config\CreateJobModel.cs" />
     <Compile Include="Models\Config\DatasetFileConfigsModel.cs" />
+    <Compile Include="Models\Dataset\DatasetDetailModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileGridModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileVersionsModel.cs" />
     <Compile Include="Models\Config\EditDatasetFileConfigModel.cs" />
