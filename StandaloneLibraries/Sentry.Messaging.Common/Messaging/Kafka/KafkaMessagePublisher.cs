@@ -148,7 +148,7 @@ namespace Sentry.Messaging.Common
         #region "constructors"
         public KafkaMessagePublisher(KafkaSettings settings)
         {
-            _statTracker = settings.StatTracker.Invoke();
+            //_statTracker = settings.StatTracker.Invoke();
             _settings = settings;
         }
 

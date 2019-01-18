@@ -84,6 +84,9 @@
     <Compile Include="Messaging\Kafka\KafkaMessagePublisher.cs" />
     <Compile Include="Messaging\Kafka\KafkaSettings.cs" />
     <Compile Include="Messaging\Kafka\RawMessageKafkaConsumer.cs" />
+    <Compile Include="TransactionTracking\BaseEventMessage.cs" />
+    <Compile Include="TransactionTracking\Implementations\HiveMetadataEvent.cs" />
+    <Compile Include="TransactionTracking\Streaming\MetadataProcessorKafkaConsumer.cs" />
     <Compile Include="TransactionTracking\Streaming\MessageTransactionMongoConsumer.cs" />
     <Compile Include="Messaging\RawMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -108,6 +111,7 @@
     <Compile Include="TransactionTracking\Interfaces\ITrackableMessage.cs" />
     <Compile Include="TransactionTracking\MessageTrackingCodes.cs" />
     <Compile Include="TransactionTracking\Streaming\MessageTransactionKafkaConsumer.cs" />
+    <Compile Include="TransactionTracking\Streaming\MetadataProcessorService.cs" />
     <Compile Include="TransactionTracking\Streaming\TransactionConsumptionService.cs" />
     <Compile Include="Utility.cs" />
   </ItemGroup>

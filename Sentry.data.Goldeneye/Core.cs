@@ -208,6 +208,11 @@ namespace Sentry.data.Goldeneye
                                     Job.JobLoggerMessage("Error", "Failed to remove disabled job on Goldeneye initialization", ex);
                                 }
                             }
+
+
+                            //Start MetadataProcessor
+                            MetadataProcessor metaProcessor = new MetadataProcessor();
+                            metaProcessor.Run();
                         }
 
                         ////Dataset Loader

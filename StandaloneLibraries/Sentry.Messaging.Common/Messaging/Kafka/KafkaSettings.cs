@@ -12,7 +12,7 @@ namespace Sentry.Messaging.Common
         public bool UseLogging { get; set; }
         public string CertPath { get; set; }
         public int TopicPartitions { get; set; }
-        public Func<AsyncCommandProcessor.AsyncCommandProcessor> StatTracker { get; set; } = () => new EmptyQueueStatCommandProcessor();
+        //public Func<AsyncCommandProcessor.AsyncCommandProcessor> StatTracker { get; set; } = () => new EmptyQueueStatCommandProcessor();
 
         public KafkaSettings(string groupId, 
                             string bootstrapServers, 
@@ -20,8 +20,9 @@ namespace Sentry.Messaging.Common
                             string env, 
                             bool useLogging, 
                             string certPath, 
-                            int partitions, 
-                            Func<AsyncCommandProcessor.AsyncCommandProcessor> statTracker)
+                            int partitions//, 
+                            //,Func<AsyncCommandProcessor.AsyncCommandProcessor> statTracker
+                            )
         {
             GroupId = groupId;
             BootstrapServers = bootstrapServers;
@@ -31,7 +32,7 @@ namespace Sentry.Messaging.Common
             UseLogging = useLogging;
             CertPath = certPath;
             TopicPartitions = partitions;
-            StatTracker = statTracker;
+            //StatTracker = statTracker;
         }
     }
 }

@@ -15,7 +15,7 @@ namespace Sentry.Messaging.Common
         #region "declarations"
         protected readonly KafkaSettings _settings;
         Consumer<keyT, String> _consumer;
-        private readonly AsyncCommandProcessor.AsyncCommandProcessor _statTracker;
+        //private readonly AsyncCommandProcessor.AsyncCommandProcessor _statTracker;
         bool _stop = false;
         #endregion
 
@@ -72,11 +72,11 @@ namespace Sentry.Messaging.Common
             _consumer.OnOffsetsCommitted += _consumer_OnOffsetsCommitted;
             _consumer.OnPartitionsAssigned += _consumer_OnPartitionsAssigned;
             _consumer.OnPartitionsRevoked += _consumer_OnPartitionsRevoked;
-            _consumer.OnStatistics += _consumer_OnStatistics;
+            //_consumer.OnStatistics += _consumer_OnStatistics;
             _consumer.OnLog += _consumer_OnLog;
             _consumer.Subscribe(_settings.TopicName);
 
-            _statTracker.StartPolling();
+            //_statTracker.StartPolling();
 
             Task.Factory.StartNew(() =>
             {
@@ -86,7 +86,7 @@ namespace Sentry.Messaging.Common
                 }
 
                 Logger.Debug("Run Completed Beginning RunOff");
-                _statTracker.RunOff();
+                //_statTracker.RunOff();
                 Logger.Debug("Run Completed Ending RunOff");
             });
         }
@@ -96,64 +96,64 @@ namespace Sentry.Messaging.Common
             if (_settings.UseLogging) Logger.Info(e.Message);
         }
 
-        private void _consumer_OnStatistics(object sender, string e)
-        {
-            var json = JsonConvert.DeserializeObject<JObject>(e);
+        //private void _consumer_OnStatistics(object sender, string e)
+        //{
+        //    var json = JsonConvert.DeserializeObject<JObject>(e);
 
-            JToken topics_tkn = null;
-            json.TryGetValue("topics", out topics_tkn);
+        //    JToken topics_tkn = null;
+        //    json.TryGetValue("topics", out topics_tkn);
 
-            if (topics_tkn != null && typeof(JObject) == topics_tkn.GetType())
-            {
-                JObject topics = (JObject)(topics_tkn);
+        //    if (topics_tkn != null && typeof(JObject) == topics_tkn.GetType())
+        //    {
+        //        JObject topics = (JObject)(topics_tkn);
 
-                if (topics.HasValues)
-                {
-                    JObject topic = (JObject)((JProperty)topics.First).Value;
-                    if (topic != null)
-                    {
-                        JToken partitions_tkn = null;
-                        topic.TryGetValue("partitions", out partitions_tkn);
+        //        if (topics.HasValues)
+        //        {
+        //            JObject topic = (JObject)((JProperty)topics.First).Value;
+        //            if (topic != null)
+        //            {
+        //                JToken partitions_tkn = null;
+        //                topic.TryGetValue("partitions", out partitions_tkn);
 
-                        if (partitions_tkn != null)
-                        {
+        //                if (partitions_tkn != null)
+        //                {
 
-                            IList<JProperty> partitions = partitions_tkn.Children<JProperty>().ToList();
-                            foreach (JProperty jp in partitions)
-                            {
-                                if (jp.Value != null && typeof(JObject) == jp.Value.GetType())
-                                {
-                                    QueueConsumerStatistic stats = new QueueConsumerStatistic();
-                                    stats.Environment = _settings.Environment;
-                                    stats.QueueName = _settings.TopicName;
-                                    stats.QueueType = "KAFKA";
+        //                    IList<JProperty> partitions = partitions_tkn.Children<JProperty>().ToList();
+        //                    foreach (JProperty jp in partitions)
+        //                    {
+        //                        if (jp.Value != null && typeof(JObject) == jp.Value.GetType())
+        //                        {
+        //                            QueueConsumerStatistic stats = new QueueConsumerStatistic();
+        //                            stats.Environment = _settings.Environment;
+        //                            stats.QueueName = _settings.TopicName;
+        //                            stats.QueueType = "KAFKA";
 
 
-                                    JObject p = (JObject)jp.Value;
-                                    int partition = p.Value<int>("partition");
-                                    int committedOffset = p.Value<int>("committed_offset");
-                                    int loOffset = p.Value<int>("lo_offset");
-                                    int hiOffset = p.Value<int>("hi_offset");
-                                    int byteSize = p.Value<int>("msgq_bytes");
+        //                            JObject p = (JObject)jp.Value;
+        //                            int partition = p.Value<int>("partition");
+        //                            int committedOffset = p.Value<int>("committed_offset");
+        //                            int loOffset = p.Value<int>("lo_offset");
+        //                            int hiOffset = p.Value<int>("hi_offset");
+        //                            int byteSize = p.Value<int>("msgq_bytes");
 
-                                    if (loOffset >= 0)
-                                    {
-                                        stats.ConsumerName = _settings.GroupId;
-                                        stats.TotalMessagesAvailable = hiOffset - loOffset;
-                                        stats.MessagesLeftToConsume = hiOffset - committedOffset;
-                                        if (stats.MessagesLeftToConsume > stats.TotalMessagesAvailable) stats.MessagesLeftToConsume = stats.TotalMessagesAvailable;
-                                        stats.TotalMessageByteSize = byteSize;
-                                        stats.QueueSection = partition.ToString();
+        //                            if (loOffset >= 0)
+        //                            {
+        //                                stats.ConsumerName = _settings.GroupId;
+        //                                stats.TotalMessagesAvailable = hiOffset - loOffset;
+        //                                stats.MessagesLeftToConsume = hiOffset - committedOffset;
+        //                                if (stats.MessagesLeftToConsume > stats.TotalMessagesAvailable) stats.MessagesLeftToConsume = stats.TotalMessagesAvailable;
+        //                                stats.TotalMessageByteSize = byteSize;
+        //                                stats.QueueSection = partition.ToString();
 
-                                        if (_statTracker.IsStarted()) _statTracker.QueueCommand(stats);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        //                                //if (_statTracker.IsStarted()) _statTracker.QueueCommand(stats);
+        //                            }
+        //                        }
+        //                    }
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
         private void _consumer_OnPartitionsRevoked(object sender, List<TopicPartition> e)
         {
@@ -231,7 +231,7 @@ namespace Sentry.Messaging.Common
         #region "constructors"
         protected BaseKafkaConsumer(KafkaSettings settings)
         {
-            _statTracker = settings.StatTracker.Invoke();
+            //_statTracker = settings.StatTracker.Invoke();
             _settings = settings;
         }
 
