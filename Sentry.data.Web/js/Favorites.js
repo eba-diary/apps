@@ -15,11 +15,6 @@ data.Favorites = {
                 }
             });
 
-            $(".fav-delete").click(function () {
-                // capture the Id of the Favorite to delete
-                $("#hidDeleteFavoriteId").val($(this).data("favid"));
-            });
-
             $("#btnDeleteFav").click(function () {
                 data.Favorites.DeleteFavorite($("#hidDeleteFavoriteId").val());
             });
