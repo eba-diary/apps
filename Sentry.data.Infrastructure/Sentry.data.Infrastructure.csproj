@@ -221,9 +221,7 @@
     <Compile Include="ServiceImplementations\FtpProvider.cs" />
     <Compile Include="ServiceImplementations\HTTPSProvider.cs" />
     <Compile Include="ServiceImplementations\JawsService.cs" />
-    <Compile Include="ServiceImplementations\KafkaConsumer.cs" />
     <Compile Include="ServiceImplementations\KafkaMessagePublisher.cs" />
-    <Compile Include="ServiceImplementations\MetadataConsumerService.cs" />
     <Compile Include="ServiceImplementations\MetadataRepositoryProvider.cs" />
     <Compile Include="ServiceImplementations\ODCFileProvider.cs" />
     <Compile Include="ServiceImplementations\RestAPIProvider.cs" />
