@@ -26,5 +26,9 @@ namespace Sentry.data.Web
         public string OwnerID { get; set; }
 
         public string TagString { get; set; }
+
+        [Required]
+        [DisplayName("Data Classification")]
+        public int DataClassification { get; set; }
     }
 }

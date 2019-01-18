@@ -270,7 +270,8 @@ namespace Sentry.data.Web.Controllers
                 CanDisplay = true,
                 DatasetFiles = null,
                 DatasetFileConfigs = null,
-                Tags = new List<MetadataTag>()
+                Tags = new List<MetadataTag>(),
+                DataClassification = cdm.DataClassification
             };
 
             int[] json = new JavaScriptSerializer().Deserialize<int[]>(cdm.TagString);
@@ -300,6 +301,7 @@ namespace Sentry.data.Web.Controllers
             item.TagString = json;
 
             item.OwnerID = ds.SentryOwnerName;
+            item.DataClassification = ds.DataClassification;
 
             Event e = new Event();
             e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
@@ -360,6 +362,7 @@ namespace Sentry.data.Web.Controllers
             ds.DatasetInformation = eds.DatasetInformation;
             ds.OriginationCode = eds.OriginationCode;
             ds.ChangedDtm = DateTime.Now;
+            ds.DataClassification = eds.DataClassification;
 
             if (null != eds.Category && eds.Category.Length > 0)
             {
