@@ -374,49 +374,6 @@
                 }
             });
         }
-        async function RemoveFavorite(e) {
-            //current delete button
-            var button = $(e);
-
-            //find parent row, then remove
-            var parentRow = button.parent().parent();
-
-            //remove entry from database
-            //upon success remove row from UI
-
-            $.ajax({
-                url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent(button.data('id')),
-                method: "GET",
-                dataType: 'json',
-                success: function () {
-                    $(".favoriteSpinner").show();
-                    //parentRow.remove();
-                },
-                error: function () {
-                    Sentry.ShowModalAlert("Failed to remove favorite.");
-                    $(".favoriteSpinner").hide();
-                }
-            });
-
-            //need to sleep to ensure database call will return changes from above
-            await sleep(2000);
-
-
-            $.ajax({
-                url: '/Home/GetFavorites',
-                dataType: 'html',
-                success: function (html) {
-                    $("div").remove(".favorite");
-                    $(".favoriteSpinner").hide();
-                    $("#favoritePanel").append(html);
-                    //data.Home.SentrySkipTotal += 10;
-                    data.Home.AjaxStatus = true;
-                },
-                error: function (e) {
-                    data.Home.AjaxStatus = true;
-                }
-            });
-        }
 
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));

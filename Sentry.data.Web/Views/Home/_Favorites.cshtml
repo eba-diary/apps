@@ -7,13 +7,13 @@
 @if (Model.Count == 0)
 {
     <div class="noFavoriteBox favoriteCenter">
-        <div class="noFavoriteMessage"><h5>There are no favorites to list. <br /><br />  Be a data adventurer... start exploring!</h5></div>
+        <div class="noFavoriteMessage"><h5>There are no favorites to list.<br /><br />Be a data adventurer... start exploring!</h5></div>
     </div>
 }
 
 @foreach (FavoriteItemModel item in Model)
 {
-    <div class="col-sm-12 col-lg-12 favorite" style="width:95%;">
+    <div class="col-sm-12 col-lg-12 favorite">
         <div class="col-lg-1 favoriteTypeIcon">
             @if (item.FeedName == "Datasets" || item.FeedName == "Data Assets" || item.FeedName == "Business Intelligence")
             {
@@ -24,7 +24,7 @@
                 <img src="@item.Img" class="feedImg favoriteTypeIcon" />
             }
         </div>
-        <div class="col-sm-9 col-lg-10">
+        <div class="col-sm-9 col-lg-11">
             @if (item.Title.Length > 50)
             {
                 if (item.FeedName == "Business Intelligence" && item.FeedUrlType == "file")
@@ -55,9 +55,6 @@
                     <a href="@item.Url" target="_blank" class="pointer"><h5>@item.DisplayTitle</h5></a>
                 }
             }
-        </div>
-        <div style="float: right; font-size: 1.5em">            
-            <i class="glyphicon glyphicon-remove" onclick="RemoveFavorite(this)" id="deleteFavorite" data-id="@item.FeedId"></i>
         </div>
     </div>
 }

@@ -39,7 +39,7 @@
 </div>
 
 @* simple form needed to post the list of ordered Favorite Ids to the server *@
-@using (Html.BeginForm("SortFavorites", "Favorites", FormMethod.Post, new { @id = "frmSubmitOrderedIds" }))
+@using (Html.BeginForm("Sort", "Favorites", FormMethod.Post, new { @id = "frmSubmitOrderedIds" }))
 {
     @Html.AntiForgeryToken()
 

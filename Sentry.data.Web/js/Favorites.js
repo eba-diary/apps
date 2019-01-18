@@ -86,16 +86,21 @@ data.Favorites = {
 
     SaveOrder: function () {
 
+        data.Favorites.HideFavorites();
+
         // ajax form post
         $.ajax({
             type: 'POST',
             data: $("#frmSubmitOrderedIds").serialize(),
-            url: '/Favorites/SortFavorites',
+            url: '/Favorites/Sort',
             success: function (data) {
                 // do nothing; screen shows the new order, user does not need to see any confirmation
             },
             error: function (data) {
                 $("#favorites-wrapper").html("<br /><br /><div class='alert alert-danger'><strong>Error!</strong> There was a problem re-ordering Favorites.</div>");
+            },
+            complete: function () {
+                data.Favorites.ShowFavorites();
             }
         });
 

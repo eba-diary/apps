@@ -34,7 +34,7 @@ namespace Sentry.data.Web.Controllers
             return PartialView("_FavoritesList", BuildFavoritesModel());
         }
 
-        public ActionResult SortFavorites(FavoritesModel model)
+        public ActionResult Sort(FavoritesModel model)
         {
             // create a list of integers that contain the Ids of the Favorites in the specified order
             List<int> sortedIds = model.OrderedFavoriteIds.Split(',').Select(Int32.Parse).ToList();
