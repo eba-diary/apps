@@ -9,8 +9,9 @@ namespace Sentry.data.Core
 {
     public class FavoriteItem
     {
-        public FavoriteItem(string id, string title, DataFeed feed, int sequence)
+        public FavoriteItem(int favId, string datasetId, string title, DataFeed feed, int sequence)
         {
+            Id = favId;
             Title = title;
             Sequence = sequence;
             FeedName = feed.Name;
@@ -22,6 +23,7 @@ namespace Sentry.data.Core
             Url = Helpers.DataFeedHelper.GetUrl(feed.Type, feed.Id.ToString());
         }
 
+        public int Id { get; set; }
         public string Title { get; set; }
         public string Url { get; set; }
         public int Sequence { get; set; }

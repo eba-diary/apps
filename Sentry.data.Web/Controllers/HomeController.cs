@@ -171,6 +171,7 @@ namespace Sentry.data.Web.Controllers
             foreach (FavoriteItem fi in favList) {
                 favItems.Add(new FavoriteItemModel()
                 {
+                    Id = fi.Id,
                     FeedId = fi.FeedId,
                     FeedName = fi.FeedName,
                     FeedUrl = fi.FeedUrl,

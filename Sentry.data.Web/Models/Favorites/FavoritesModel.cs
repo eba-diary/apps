@@ -8,5 +8,6 @@ namespace Sentry.data.Web
     public class FavoritesModel
     {
         public List<FavoriteItemModel> Favorites { get; set; }
+        public string OrderedFavoriteIds { get; set; }
     }
 }

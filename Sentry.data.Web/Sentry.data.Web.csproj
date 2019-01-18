@@ -384,6 +384,7 @@
     <Content Include="Content\css\select2.css" />
     <Content Include="Content\css\select2.min.css" />
     <Content Include="Content\dataset-detail.css" />
+    <Content Include="Content\favorites.css" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\query-builder.default.css" />
     <Content Include="Content\query-builder.default.min.css" />
@@ -407,6 +408,7 @@
     <Content Include="Images\SHO_SentryWorld_Aerial.jpg" />
     <Content Include="js\Config.js" />
     <Content Include="js\DatasetDetail.js" />
+    <Content Include="js\Favorites.js" />
     <Content Include="js\ManageAssetAlert.js" />
     <Content Include="js\ManageConfigs.js" />
     <Content Include="js\QueryTool\AddRule.js" />
@@ -1230,6 +1232,8 @@
     <Content Include="Views\BusinessIntelligence\Create.cshtml" />
     <Content Include="Views\BusinessIntelligence\Edit.cshtml" />
     <Content Include="Views\Home\_Favorites.cshtml" />
+    <Content Include="Views\Favorites\EditFavorites.cshtml" />
+    <Content Include="Views\Favorites\_FavoritesList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

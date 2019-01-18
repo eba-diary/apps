@@ -1822,6 +1822,10 @@ body { background-color: #f8f8f8; }
     height: 530px;
 }
 
+.feed .nav-pills {
+    margin-bottom: 15px;
+}
+
 .feedBox {
     height: 577px;
     overflow-y: auto;
