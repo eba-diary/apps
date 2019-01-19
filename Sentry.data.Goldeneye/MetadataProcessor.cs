@@ -13,7 +13,7 @@ namespace Sentry.data.Goldeneye
         public void Run()
         {
             ConsumptionConfig cfg = new ConsumptionConfig();
-            cfg.ForceSingleThread = true;
+            cfg.ForceSingleThread = false;
             cfg.UseKillFile = true;
             cfg.KillFileLocation = Configuration.Config.GetHostSetting("GoldenEyeWorkDir") + "MetadataProcessKill.txt";
             cfg.RunMinutes = 2;

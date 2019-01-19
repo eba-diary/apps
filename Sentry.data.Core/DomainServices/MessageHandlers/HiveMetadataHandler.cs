@@ -26,7 +26,7 @@ namespace Sentry.data.Core
 
         void IMessageHandler<HiveMetadataEvent>.Init()
         {
-            throw new NotImplementedException();
+            //do nothing
         }
 
         

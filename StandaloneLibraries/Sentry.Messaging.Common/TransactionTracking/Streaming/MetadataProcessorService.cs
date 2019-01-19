@@ -16,21 +16,31 @@ namespace Sentry.Messaging.Common
 
         protected override void CloseHandler()
         {
-            throw new NotImplementedException();
+            if (!_handlers.HandleComplete())
+            {
+                Logger.Info(_handlers.ToString() + ": Waiting for handling to complete...");
+            }
+
+            while (!_handlers.HandleComplete())
+            {
+                //sleep while any async publishing gets finished up
+                System.Threading.Thread.Sleep(100);
+            }
+
+            Logger.Info(_handlers.ToString() + ": Handling completed.");
         }
 
         protected override void InitHandler()
         {
-            throw new NotImplementedException();
+            _handlers.Init();
         }
 
         protected override void _consumer_MessageReady(object sender, HiveMetadataEvent msg)
         {
             switch (msg.EventType)
             {
-                case "HIVE-TABLE-CREATE":
-                    HiveMetadataEvent evt = (HiveMetadataEvent)msg;
-                    Logger.Debug(evt.ToString());
+                case "HIVE-TABLE-CREATE":                    
+                    Logger.Debug(msg.ToString());
                     break;
                 default:
                     break;
