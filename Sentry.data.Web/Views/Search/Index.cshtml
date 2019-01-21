@@ -197,6 +197,7 @@
         box-shadow: 2px 6px 10px #888888;
         cursor: pointer;
     }
+
 </style>
 
 @section Scripts {
@@ -205,13 +206,46 @@
             var $selector = $("#filterSelector").select2({
                 selectOnClose: false,
                 closeOnSelect: false,
+                templateSelection: formatTag,
                 placeholder: "There are no active filters.  Pick an option to the left or click here to begin filtering.",
             });
             $selector.select2({
                 selectOnClose: false,
                 closeOnSelect: false,
+                templateSelection: formatTag,
                 placeholder: "There are no active filters.  Pick an option to the left or click here to begin filtering.",
             });
+
+            //This is fed into the Select2 Box to format tags.
+            function formatTag(tag) {     
+                var cat = "";
+
+                for (var i = 0; i < vm.AllFilters().length; i++) {
+                    for (var j = 0; j < vm.AllFilters()[i].Filters().length; j++) {
+                        if (vm.AllFilters()[i].Filters()[j].id === tag.id) {
+                            cat = vm.AllFilters()[i].Filters()[j].Category;
+                            break;
+                        }
+                    }
+                    if (cat !== "") {
+                        break;
+                    }
+                }
+
+                var $state = $(
+                    '<span class="' + cat.split(" ").join("_").toLowerCase() + '_filter">' + cat + " : " + tag.text + '</span>'
+                );
+
+                //if you want to turn on color.
+                //$('.other_filter').parent().css('background-color', 'gold');
+                //$('.measure_group_filter').parent().css('background-color', 'gold');
+                //$('.business_group_filter').parent().css('background-color', 'gold');
+                //$('.attribute_group_filter').parent().css('background-color', 'gold');
+                //$('.report_type_filter').parent().css('background-color', 'plum');
+                //$('.category_filter').parent().css('background-color', '#00A3E0');
+
+                return $state;
+            };
 
             //$('body').on('click', ".ul-dataset-list-item", function (e) {
             //    //console.log($(e.target).hasClass("disregardParentClick"));
@@ -239,8 +273,6 @@
                 // Do something
                 var data = e.params.data;
 
-                console.log(data);
-
                 window.vm.SelectedFilters.push(data.id);
 
                 //$('#' + data.id).prop('checked', true);
@@ -266,8 +298,8 @@
             $('#filterSelector').on('select2:unselect', function (e) {
                 // Do something
                 var data = e.params.data;
-                console.log('UNSELECT');
-                console.log(data);
+                //console.log('UNSELECT');
+                //console.log(data);
 
                 window.vm.RemoveSelection(data.id);
 
@@ -1424,7 +1456,6 @@
             });
 
             self.GetFile = function (data) {
-
                 $.ajax({
                     url: '/ExternalFile/HasReadPermissions?pathAndFilename=' + encodeURIComponent(data.Location),
                     method: "GET",

@@ -353,6 +353,7 @@
     <Compile Include="Models\Dataset\CreateDataFileModel.cs" />
     <Compile Include="Models\Config\CreateJobModel.cs" />
     <Compile Include="Models\Config\DatasetFileConfigsModel.cs" />
+    <Compile Include="Models\Dataset\DatasetDetailModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileGridModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileVersionsModel.cs" />
     <Compile Include="Models\Config\EditDatasetFileConfigModel.cs" />
@@ -1291,9 +1292,9 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>2457</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost.sentry.com:24444</IISUrl>
+          <IISUrl>http://localhost.sentry.com:2457</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
-          <IISAppRootUrl>http://localhost.sentry.com:24444</IISAppRootUrl>
+          <IISAppRootUrl>http://localhost.sentry.com:2457</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

@@ -523,11 +523,31 @@ namespace Sentry.data.Web.Controllers
         {
             Dataset ds = _datasetContext.GetById(id);
 
-            BaseDatasetModel bdm = new BaseDatasetModel(ds, _associateInfoProvider, _datasetContext);
+            DatasetDetailModel ddm = new DatasetDetailModel(ds, _associateInfoProvider, _datasetContext)
+            {
+                IsFavorite = ds.Favorities.Any(x => x.UserId == SharedContext.CurrentUser.AssociateId),
+                IsSubscribed = _datasetContext.IsUserSubscribedToDataset(_userService.GetCurrentUser().AssociateId, id),
+                AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, id).Count,
+                Views = _datasetContext.Events.Where(x => x.EventType.Description == "Viewed" && x.Dataset == ds.DatasetId).Count(),
+                MailtoLink = "mailto:?Subject="
+            };
 
-            bdm.IsFavorite = ds.Favorities.Where(w => w.UserId == SharedContext.CurrentUser.AssociateId).Any();
-            
-            Event e = new Event();
+            if (ds.Metadata != null)
+            {
+                ddm.ArtifactLink = ds.Metadata.ReportMetadata.Location;
+                ddm.LocationType = ds.Metadata.ReportMetadata.LocationType;
+            }
+
+            Event e = new Event()
+            {
+                EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
+                Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                TimeCreated = DateTime.Now,
+                TimeNotified = DateTime.Now,
+                IsProcessed = false,
+                UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
+                Dataset = ds.DatasetId
+            };
 
             //Object specific settings
             switch (objectType.ToLower())
@@ -538,8 +558,10 @@ namespace Sentry.data.Web.Controllers
                         throw new NotAuthorizedException("User is authenticated but does not have permission");
                     }
                     //Model settings specific to Business Intelligence
-                    bdm.CanManageReport = SharedContext.CurrentUser.CanManageReports;
-                    bdm.ObjectType = ds.DatasetType;
+                    ddm.CanManageReport = SharedContext.CurrentUser.CanManageReports;
+                    ddm.ObjectType = ds.DatasetType;
+
+                    ddm.MailtoLink += "Business%20Intelligence%20Exhibit%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/BusinessIntelligence/Detail/" + ds.DatasetId;
 
                     //Event reason tailored to Business Intelligence
                     e.Reason = "Viewed Business Intelligence Detail Page";
@@ -553,21 +575,23 @@ namespace Sentry.data.Web.Controllers
                     {
                         throw new NotAuthorizedException("User is authenticated but does not have permission");
                     }
-                    bdm.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
-                    bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
-                    bdm.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
-                    bdm.CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
-                    bdm.CanUpload = SharedContext.CurrentUser.CanUpload;
-                    bdm.CanQueryTool = SharedContext.CurrentUser.CanQueryTool || SharedContext.CurrentUser.CanQueryToolPowerUser;
-                    bdm.Downloads = _datasetContext.Events.Where(x => x.EventType.Description == "Downloaded Data File" && x.Dataset == ds.DatasetId).Count();
+                    ddm.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
+                    ddm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
+                    ddm.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
+                    ddm.CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
+                    ddm.CanUpload = SharedContext.CurrentUser.CanUpload;
+                    ddm.CanQueryTool = SharedContext.CurrentUser.CanQueryTool || SharedContext.CurrentUser.CanQueryToolPowerUser;
+                    ddm.Downloads = _datasetContext.Events.Where(x => x.EventType.Description == "Downloaded Data File" && x.Dataset == ds.DatasetId).Count();
                     if (ds.DatasetFiles.Any())
                     {
-                        bdm.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);
+                        ddm.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);
                     }
                     else
                     {
-                        bdm.ChangedDtm = ds.ChangedDtm;
+                        ddm.ChangedDtm = ds.ChangedDtm;
                     }
+
+                    ddm.MailtoLink += "Dataset%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/Dataset/Detail/" + ds.DatasetId;
 
                     //Event reason tailored to Datasets
                     e.Reason = "Viewed Dataset Detail Page";
@@ -575,23 +599,10 @@ namespace Sentry.data.Web.Controllers
                     ViewBag.Title = "View Dataset Details";
                     break;
             }
-            
-            bdm.IsSubscribed = _datasetContext.IsUserSubscribedToDataset(_userService.GetCurrentUser().AssociateId, id);
-            bdm.AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, id).Count;
-
-            bdm.Views = _datasetContext.Events.Where(x => x.EventType.Description == "Viewed" && x.Dataset == ds.DatasetId).Count();           
-
-            
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-            e.Dataset = ds.DatasetId;            
+           
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
             
-            return View(bdm);
+            return View(ddm);
         }
 
         [Route("Dataset/Detail/{id}/Configuration")]
