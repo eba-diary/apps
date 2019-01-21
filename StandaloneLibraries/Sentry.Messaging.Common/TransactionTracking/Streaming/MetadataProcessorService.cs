@@ -3,52 +3,52 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using Sentry.Common.Logging;
 
 namespace Sentry.Messaging.Common
 {
-    public class MetadataProcessorService : BaseConsumptionService<HiveMetadataEvent>
+    public class MetadataProcessorService : BaseConsumptionService<string>
     {
         #region Declarations
-        private readonly IMessageHandler<HiveMetadataEvent> _handlers;
+        private readonly IList<IMessageHandler<string>> _handlers;
         #endregion
 
 
         protected override void CloseHandler()
         {
-            if (!_handlers.HandleComplete())
+            foreach (IMessageHandler<string> handler in _handlers)
             {
-                Logger.Info(_handlers.ToString() + ": Waiting for handling to complete...");
-            }
+                if (!handler.HandleComplete())
+                {
+                    Logger.Info(handler.ToString() + ": Waiting for handling to complete...");
+                }
 
-            while (!_handlers.HandleComplete())
-            {
-                //sleep while any async publishing gets finished up
-                System.Threading.Thread.Sleep(100);
-            }
+                while (!handler.HandleComplete())
+                {
+                    //sleep while any async publishing gets finished up
+                    System.Threading.Thread.Sleep(100);
+                }
 
-            Logger.Info(_handlers.ToString() + ": Handling completed.");
+                Logger.Info(handler.ToString() + ": Handling completed.");
+            }            
         }
 
         protected override void InitHandler()
         {
-            _handlers.Init();
-        }
-
-        protected override void _consumer_MessageReady(object sender, HiveMetadataEvent msg)
-        {
-            switch (msg.EventType)
+            foreach(IMessageHandler<string> handler in _handlers)
             {
-                case "HIVE-TABLE-CREATE":                    
-                    Logger.Debug(msg.ToString());
-                    break;
-                default:
-                    break;
-            }
+                handler.Init();
+            }            
         }
 
-        public MetadataProcessorService(IMessageConsumer<HiveMetadataEvent> consumer,
-                                             IMessageHandler<HiveMetadataEvent> handler,
+        protected override void _consumer_MessageReady(object sender, string msg)
+        {
+            Parallel.ForEach(_handlers, (h) => h.Handle(msg));
+        }
+
+        public MetadataProcessorService(IMessageConsumer<string> consumer,
+                                             IList<IMessageHandler<string>> handler,
                                              ConsumptionConfig config) : base(consumer, config)
         {
             _handlers = handler;

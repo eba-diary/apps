@@ -18,26 +18,25 @@ namespace Sentry.data.Goldeneye
             cfg.KillFileLocation = Configuration.Config.GetHostSetting("GoldenEyeWorkDir") + "MetadataProcessKill.txt";
             cfg.RunMinutes = 2;
 
-            IMessageConsumer<HiveMetadataEvent> consumer;
-            IList<IMessageHandler<HiveMetadataEvent>> handlers = new List<IMessageHandler<HiveMetadataEvent>>();
-            IMessageHandler<HiveMetadataEvent> handler;
-
-            handler = GetMessageHandlers();
+            IMessageConsumer<string> consumer;
 
             consumer = GetKafkamessageConsumer("jcg-dotnet-group-99");
 
-            MetadataProcessorService service = new MetadataProcessorService(consumer, handler, cfg);
+            MetadataProcessorService service = new MetadataProcessorService(consumer, GetMessageHandlers(), cfg);
             service.ConsumeMessages();
         }
 
-        private IMessageHandler<HiveMetadataEvent> GetMessageHandlers()
+        private IList<IMessageHandler<string>> GetMessageHandlers()
         {
-            return new HiveMetadataHandler();
-            //handlerList.Add(new HiveMetadataHandler());
+            IList<IMessageHandler<string>> handlers = new List<IMessageHandler<string>>
+            {
+                new HiveMetadataHandler();
+            };
 
+            return handlers;
         }
 
-        private IMessageConsumer<HiveMetadataEvent> GetKafkamessageConsumer(string groupId)
+        private IMessageConsumer<string> GetKafkamessageConsumer(string groupId)
         {
             KafkaSettings settings = new KafkaSettings(groupId, "awe-t-apspml-01.sentry.com:6667,awe-t-apspml-02.sentry.com:6667,awe-t-apspml-03.sentry.com:6667", "data-nrdev-goldeneye-000000", "nrdev", false, "", 3);
 

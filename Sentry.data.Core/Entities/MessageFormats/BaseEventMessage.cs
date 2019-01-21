@@ -2,10 +2,10 @@
 using System.Runtime.InteropServices;
 using Sentry.Common;
 
-namespace Sentry.Messaging.Common
+namespace Sentry.data.Core
 {
     public class BaseEventMessage
     {
-        public string EventType { get; protected set; }
+        public string EventType { get; set; }
     }
 }

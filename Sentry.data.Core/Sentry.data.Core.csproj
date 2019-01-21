@@ -105,6 +105,8 @@
     <Compile Include="Entities\Livy\LivySession.cs" />
     <Compile Include="Entities\Livy\QueryableDataset.cs" />
     <Compile Include="Entities\Goldeneye\RequestHeader.cs" />
+    <Compile Include="Entities\MessageFormats\BaseEventMessage.cs" />
+    <Compile Include="Entities\MessageFormats\HiveMetadataEvent.cs" />
     <Compile Include="Entities\Metadata\DataElement.cs" />
     <Compile Include="Entities\Metadata\DataElementDetail.cs" />
     <Compile Include="Entities\Metadata\DataObject.cs" />

@@ -10,17 +10,17 @@ using System.Threading.Tasks;
 
 namespace Sentry.Messaging.Common
 {
-    public class MetadataProcessorKafkaConsumer : BaseKafkaConsumer<Null, HiveMetadataEvent>
+    public class MetadataProcessorKafkaConsumer : BaseKafkaConsumer<string, string>
     {
         #region BaseKafkaConsumer Overrides
-        protected override void _consumer_OnMessage(object sender, Message<Null, string> e)
+        protected override void _consumer_OnMessage(object sender, Message<string, string> e)
         {
-            HiveMetadataEvent msg = null;
+            BaseEventMessage msg = null;
             try
             {
-                msg = JsonConvert.DeserializeObject<HiveMetadataEvent>(e.Value);
+                msg = JsonConvert.DeserializeObject<BaseEventMessage>(e.Value);
                 Logger.Debug(msg.EventType + " consumed from topic.");
-                ProcessMessage(msg);
+                ProcessMessage(e.Value);
             }
             catch (Exception ex)
             {
@@ -30,12 +30,11 @@ namespace Sentry.Messaging.Common
                     Logger.Info("Message Skipped due to unknown reason: " + ex.ToString());
                 }
             }
-
         }
 
-        protected override IDeserializer<Null> GetKeyDeserializer()
+        protected override IDeserializer<string> GetKeyDeserializer()
         {
-            return null;
+            return new Confluent.Kafka.Serialization.StringDeserializer(Encoding.UTF8);
         }
         #endregion
 
