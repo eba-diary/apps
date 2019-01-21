@@ -303,6 +303,7 @@
     <Compile Include="Controllers\SearchController.cs" />
     <Compile Include="Controllers\WebApi\TagController.cs" />
     <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Extensions\ExtensionMethods.cs" />
     <Compile Include="Filters\AuthorizationFilters\AuthorizeHangfireDashboard.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeAttribute.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeByPermissionAttribute.cs" />

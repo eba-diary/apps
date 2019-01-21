@@ -239,7 +239,10 @@ namespace Sentry.data.Web.Controllers
                 SchemaIsForceMatch = false,
                 FileFormat = _datasetContext.GetById<FileExtension>(cdm.FileExtensionID).Name.ToUpper(),
                 Delimiter = cdm.Delimiter,
-                StorageCode = _datasetContext.GetNextStorageCDE().ToString()
+                StorageCode = _datasetContext.GetNextStorageCDE().ToString(),
+                HiveDatabase = "Default",
+                HiveTable = cdm.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + cdm.ConfigFileName.Replace(" ", "").ToUpper(),
+                HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString()
             };
 
             return de;

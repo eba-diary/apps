@@ -144,14 +144,6 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public IQueryable<Schema> Schemas
-        {
-            get
-            {
-                return Query<Schema>();  //QueryCacheRegion.MediumTerm
-            }
-        }
-
         public IQueryable<HiveTable> HiveTables
         {
             get

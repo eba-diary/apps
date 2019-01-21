@@ -175,11 +175,11 @@
                                 <h6 style='width: 10%;display:inline-block;margin-right: 15px;margin-left: 15px;' data-bind="text: schemaName"
                                     data-toggle="tooltip" data-placement="bottom"
                                     title="Schema Name"></h6>
-                                <div data-bind="if: hasTable()">
+                                <div data-bind="if: hasTable() && hiveTableStatus() === 'Available'">
                                     <div class="schemaRevisionRow" style="margin-left: 30px;">
                                         <label style="margin-left: 5px">Table Alias:</label>
                                         <input class="form-control tableNameController ruleController" data-toggle="tooltip"
-                                               data-placement="bottom" style="width: 10%;display:inline-block; "  data-bind="value : hiveTable()"
+                                               data-placement="bottom" style="width: 10%;display:inline-block; " data-bind="value : hiveTable()"
                                                title="This is the name of this schema revision in this instance of the Query Tool.  It represents the schema like a Temporary Table.  If left blank, table name will be used.">
                                         <label style="margin-left: 5px">Database:</label>
                                         <h6 style='display:inline-block; margin-left: 5px; margin-right: 15px;' data-bind="text: hiveDatabase()"></h6>
@@ -190,6 +190,9 @@
                                             <input style="margin-left: 5px;" type="checkbox" class="ruleController includeCheckbox" />
                                         </label>
                                     </div>
+                                </div>
+                                <div class="emptyConfigRow" data-bind="if: hasTable() && hiveTableStatus() != 'Available', visible: hasTable() && hiveTableStatus() != 'Available'">
+                                    <span>Maintenance is being performed on the table.  Please to use the <b>Raw File Query Override</b> option or try back at a later time.</span>
                                 </div>
                                 <div class="emptyConfigRow" data-bind="if: hasTable() === false, visible: hasTable() === false ">
                                     <span>There is no table associated with this schema.  To use this functionality, ensure there is a table associted.</span>

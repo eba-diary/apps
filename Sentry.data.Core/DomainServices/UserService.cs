@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Sentry.data.Core
 {
-    public class UserService
+    public class UserService : IUserService
     {
         private IExtendedUserInfoProvider _extendedUserInfoProvider;
         private IDataAssetContext _domainContext;

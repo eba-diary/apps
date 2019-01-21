@@ -23,12 +23,17 @@ namespace Sentry.data.Web.Controllers
     {
         public IAssociateInfoProvider _associateInfoProvider;
         public IDatasetContext _datasetContext;
+        public IConfigService _configService;
         private UserService _userService;
         private S3ServiceProvider _s3Service;
         private ISASService _sasService;
         private IAppCache _cache;
+        public IEventService _eventService;
 
-        public ConfigController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, ISASService sasService, IAssociateInfoProvider associateInfoService)
+
+        public ConfigController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, 
+            ISASService sasService, IAssociateInfoProvider associateInfoService, IConfigService configService,
+            IEventService eventService)
         {
             _cache = new CachingService();
             _datasetContext = dsCtxt;
@@ -36,6 +41,8 @@ namespace Sentry.data.Web.Controllers
             _userService = userService;
             _sasService = sasService;
             _associateInfoProvider = associateInfoService;
+            _configService = configService;
+            _eventService = eventService;
         }
 
         [HttpGet]
@@ -193,6 +200,8 @@ namespace Sentry.data.Web.Controllers
         {
             List<DataElementDetail> details = new List<DataElementDetail>();
 
+            Dataset ds = _datasetContext.GetById<Dataset>(dfcm.DatasetId);
+
             DataElement de = new DataElement()
             {
                 DataElementCreate_DTM = DateTime.Now,
@@ -208,7 +217,10 @@ namespace Sentry.data.Web.Controllers
                 SchemaIsForceMatch = false,
                 Delimiter = dfcm.Delimiter,
                 FileFormat = _datasetContext.GetById<FileExtension>(dfcm.FileExtensionID).Name.Trim(),
-                StorageCode = _datasetContext.GetNextStorageCDE().ToString()
+                StorageCode = _datasetContext.GetNextStorageCDE().ToString(),
+                HiveDatabase = "Default",
+                HiveTable = ds.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dfcm.ConfigFileName.Replace(" ", "").ToUpper(),
+                HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString()
             };
 
             return de;
@@ -1377,173 +1389,9 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
-                DatasetFileConfig config = _datasetContext.GetById<DatasetFileConfig>(configId);
-                DataElement schema = _datasetContext.GetById<DataElement>(schemaId);
-                DataElement newRevision = null;
-                DataObject DOBJ = null;
-                Boolean newRev = false;
-                if (schema.DataObjects.Count == 0)
-                {
-                    //This is a new configuration with no schema defined.
-                    DOBJ = new DataObject()
-                    {
-                        DataObjectCreate_DTM = DateTime.Now,
-                        DataObjectChange_DTM = DateTime.Now,
-                        LastUpdt_DTM = DateTime.Now,
-                        DataObject_NME = schema.SchemaName,
-                        DataObject_DSC = schema.SchemaDescription,
-                        DataObject_CDE = config.FileExtension.Id.ToString(),
-                        DataObjectCode_DSC = config.FileExtension.Name
-                    };
+                _configService.UpdateFields(configId, schemaId, schemaRows);
 
-                    schema.DataObjects.Add(DOBJ);
-                    //_datasetContext.Merge(DOBJ);
-                    //DOBJ = _datasetContext.SaveChanges();
-                }
-                else
-                //else if(schema.DataObjects.Count == 1 && schema.DataObjects[0].DataObjectFields.Count == 0)
-                {
-                    //Add fields to Existing Data Object
-                    DOBJ = schema.DataObjects.Single();
-                }
-                //else
-                //{
-                //    newRev = true;
-                //    DataElement maxRevision = config.Schema.OrderByDescending(o => o.SchemaRevision).Take(1).FirstOrDefault();
-                //    newRevision = new DataElement()
-                //    {
-                //        DataElementCreate_DTM = DateTime.Now,
-                //        DataElementChange_DTM = DateTime.Now,
-                //        LastUpdt_DTM = DateTime.Now,
-                //        DataElement_NME = maxRevision.DataElement_NME,
-                //        DataElement_DSC = maxRevision.DataElement_DSC,
-                //        DataElement_CDE = maxRevision.DataElement_CDE,
-                //        DataElementCode_DSC = maxRevision.DataElementCode_DSC,
-                //        DataElementDetails = maxRevision.DataElementDetails
-                //    };
-
-                //    //This is a new configuration with no schema defined.
-                //    DOBJ = new DataObject()
-                //    {
-                //        DataObjectCreate_DTM = DateTime.Now,
-                //        DataObjectChange_DTM = DateTime.Now,
-                //        LastUpdt_DTM = DateTime.Now,
-                //        DataObject_NME = schema.SchemaName,
-                //        DataObject_DSC = schema.SchemaDescription,
-                //        DataObject_CDE = config.FileExtension.Id.ToString(),
-                //        DataObjectCode_DSC = config.FileExtension.Name
-                //    };
-
-                //    List<DataObject> dobjList = new List<DataObject>
-                //    {
-                //        DOBJ
-                //    };
-                //    newRevision.DataObjects = dobjList;
-
-                //    newRevision.SchemaRevision += 1;
-                //    newRevision.SchemaIsPrimary = false;
-
-                //    DOBJ = newRevision.DataObjects.Single();
-
-                //    //Schema revision(s) exist, therefore, Create new schema revision
-                //    //  Retrieve max schema revision (data element)
-                //    //  Use Data Element values to create new data element and increment schema revision
-                //    //  Use Data Object values to create new data object for element created above
-                //    //  add Data Object Field \ Detail values from incoming data
-                //    //  
-                //}
-
-                List<DataObjectField> dofList = new List<DataObjectField>();
-
-                foreach (SchemaRow sr in schemaRows)
-                {
-                    DataObjectField dof = null;
-
-                    //Update Row
-                    if (sr.DataObjectField_ID != 0 && newRev == false)
-                    {
-                        dof = DOBJ.DataObjectFields.Where(w => w.DataObjectField_ID == sr.DataObjectField_ID).FirstOrDefault();
-                        dof.DataObjectField_NME = sr.Name;
-                        dof.DataObjectField_DSC = sr.Description;
-                        dof.LastUpdt_DTM = DateTime.Now;
-                        dof.DataObjectFieldChange_DTM = DateTime.Now;
-                    }
-                    //Add New Row
-                    else
-                    {
-                        dof = new DataObjectField();
-                        dof.DataObject = DOBJ;
-                        dof.DataObjectFieldCreate_DTM = DateTime.Now;
-                        dof.DataObjectField_NME = sr.Name;
-                        dof.DataObjectField_DSC = sr.Description;
-                        dof.LastUpdt_DTM = DateTime.Now;
-                        dof.DataObjectFieldChange_DTM = DateTime.Now;
-                    }
-
-
-                    if (sr.Type != "ARRAY")
-                    {
-                        dof.DataType = sr.Type;
-                    }
-                    else
-                    {
-                        dof.DataType = sr.Type + "<" + sr.ArrayType + ">";
-                    }
-
-                    if (sr.Nullable != null) { dof.Nullable = sr.Nullable ?? null; }
-                    if (sr.Precision != null)
-                    {
-                        if (sr.Type == "DECIMAL")
-                        {
-                            dof.Precision = sr.Precision;
-                        }
-                        else
-                        {
-                            dof.Precision = null;
-                        }
-                    }
-                    if (sr.Scale != null)
-                    {
-                        if (sr.Type == "DECIMAL")
-                        {
-                            dof.Scale = sr.Scale;
-                        }
-                        else
-                        {
-                            dof.Scale = null;
-                        }
-                    }
-
-                    dofList.Add(dof);
-
-
-                }
-
-                DOBJ.DataObjectFields = dofList;
-
-                _datasetContext.Merge(schema);
-                _datasetContext.SaveChanges();
-
-                if (newRev == true)
-                {
-                    _datasetContext.Merge(newRevision);
-                    _datasetContext.SaveChanges();
-                }
-
-
-
-                Event e = new Event();
-                e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-                e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-                e.TimeCreated = DateTime.Now;
-                e.TimeNotified = DateTime.Now;
-                e.IsProcessed = false;
-                e.DataConfig = config.ConfigId;
-                e.Dataset = config.ParentDataset.DatasetId;
-                e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-                e.Reason = "Viewed Edit Fields";
-                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-
+                Task.Factory.StartNew(() => _eventService.CreateViewSchemaEditSuccessEvent(configId, SharedContext.CurrentUser.AssociateId, "Viewed Edit Fields"), TaskCreationOptions.LongRunning);
             }
             catch (Exception ex)
             {
@@ -1618,7 +1466,10 @@ namespace Sentry.data.Web.Controllers
                         SchemaIsForceMatch = csm.IsForceMatch,
                         SchemaIsPrimary = true,
                         SchemaRevision = (maxSchemaRevision == null) ? 0 : maxSchemaRevision.SchemaRevision + 1,
-                        StorageCode = storageCode
+                        StorageCode = storageCode,
+                        HiveDatabase = "Default",
+                        HiveTable = dfc.ParentDataset.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dfc.Name.Replace(" ", "").ToUpper(),
+                        HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString()
                     };
 
                     dfc.Schema.Add(de);
