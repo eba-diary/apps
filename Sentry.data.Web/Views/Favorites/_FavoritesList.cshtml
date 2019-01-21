@@ -1,0 +1,38 @@
+﻿@model FavoritesModel
+
+
+@* variable used to keep track of iteration in the loop *@
+@{ int i = 1; }
+
+
+@* loop through each favorite, creating a <li> element *@
+@foreach (FavoriteItemModel fav in Model.Favorites)
+{
+    <li class="clickable" data-favid="@fav.Id">
+        <span class="fav-sort-order">@i.ToString()</span>
+        <span class="fav-sort-image"><img src="@fav.Img" alt="" /></span>
+        <span class="fav-sort-item">@fav.Title</span>
+        <a class="float-r fav-delete" href="#fav-delete-confirmation" data-toggle="modal" data-favid="@fav.Id">
+            <span class="glyphicon glyphicon-remove" data-toggle="tooltip" data-placement="top" data-original-title="Delete Favorite"></span>
+        </a>
+    </li>
+
+    @* increment the count *@
+    i += 1;
+}
+
+@* the following JavaScript is needed inside this partial view
+    the DOM elements are "lost" resulting in an error if the user attempts to delete a second favorite
+*@
+<script type="text/javascript">
+
+    $(function () {
+
+        $(".fav-delete").click(function () {
+            // capture the Id of the Favorite to delete
+            $("#hidDeleteFavoriteId").val($(this).data("favid"));
+        });
+
+    });
+
+</script>

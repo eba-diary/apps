@@ -43,6 +43,11 @@ data.Home = {
 
         $("body").tooltip({ selector: '[data-toggle=tooltip]' });
         $("#feed").bind('scroll', data.Home.ScrollBottom);
+
+        $("#edit-favorites-icon").click(function () {
+            window.location = '/Favorites/EditFavorites';
+        });
+
         //$("#sentryFeed").bind('scroll', data.Home.ScrollBottom);
         //$("#chbx").change(data.Home.ChangeFeeds);
     },

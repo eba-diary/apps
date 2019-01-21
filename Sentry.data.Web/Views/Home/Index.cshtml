@@ -99,10 +99,11 @@
                             <li class="nav-item"><a class="nav-link" href="#securityPanel" data-toggle="tab" aria-expanded="false">Feed </a></li>
                         </ul>
                     </div>*@
-                    <ul class="nav nav-pills" style="width: 95%; margin-bottom: 20px;">
-                        <li class="active"><a href="#favoritePanel" data-toggle="tab" aria-expanded="true"><h5>Favorites</h5></a></li>
-                        <li class=""><a href="#feed" data-toggle="tab" aria-expanded="false"><h5>Feed</h5></a></li>
+                    <ul class="nav nav-pills float-l">
+                        <li class="active" data-tab="fav"><a href="#favoritePanel" data-toggle="tab" aria-expanded="true"><h5>Favorites</h5></a></li>
+                        <li data-tab="feed"><a href="#feed" data-toggle="tab" aria-expanded="false"><h5>Feed</h5></a></li>
                     </ul>
+                    <div id="edit-favorites-icon" class="float-r clickable" data-toggle="tooltip" data-placement="top" title="Edit Favorites"><span class="glyphicon glyphicon-pencil"></span></div>
                     <div id="tabContent" class="tab-content">
                         <div class="clearFloat tab-pane fade active in form-horizontal" id="favoritePanel">
                             <div class="favoriteSpinner">
@@ -341,7 +342,13 @@
                 $('#DatasetSearch').submit();
             });
 
-            
+            $(".feed .nav-pills li").click(function () {
+                if ($(this).data("tab") === "feed") {
+                    $("#edit-favorites-icon").addClass("hidden");
+                } else {
+                    $("#edit-favorites-icon").removeClass("hidden");
+                }
+            });
         });
       
 
@@ -367,50 +374,6 @@
                 }
             });
         }
-        async function RemoveFavorite(e) {
-            //current delete button
-            var button = $(e);
-
-            //find parent row, then remove
-            var parentRow = button.parent().parent();
-
-            //remove entry from database
-            //upon success remove row from UI
-
-            $.ajax({
-                url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent(button.data('id')),
-                method: "GET",
-                dataType: 'json',
-                success: function () {
-                    $(".favoriteSpinner").show();
-                    //parentRow.remove();
-                },
-                error: function () {
-                    Sentry.ShowModalAlert("Failed to remove favorite.");
-                    $(".favoriteSpinner").hide();
-                }
-            });
-
-            //need to sleep to ensure database call will return changes from above
-            await sleep(2000);
-
-
-            $.ajax({
-                url: '/Home/GetFavorites',
-                dataType: 'html',
-                success: function (html) {
-                    $("div").remove(".favorite");
-                    $(".favoriteSpinner").hide();
-                    $("#favoritePanel").append(html);
-                    //data.Home.SentrySkipTotal += 10;
-                    data.Home.AjaxStatus = true;
-                },
-                error: function (e) {
-                    data.Home.AjaxStatus = true;
-                }
-            });
-
-        }
 
         function sleep(ms) {
             return new Promise(resolve => setTimeout(resolve, ms));
@@ -418,5 +381,3 @@
 
     </script>
 }
-
-

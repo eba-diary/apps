@@ -445,6 +445,16 @@ namespace Sentry.data.Infrastructure
             return Query<Event>().Cacheable().Where(e => e.TimeCreated >= time && e.IsProcessed == IsProcessed && e.EventType.Display).ToList();
         }
 
+        public Favorite GetFavorite(int favoriteId)
+        {
+            return Query<Favorite>().Single(x => x.FavoriteId == favoriteId);
+        }
+
+        public List<Favorite> GetFavorites(List<int> favoriteIds)
+        {
+            return Query<Favorite>().Where(x => favoriteIds.Contains(x.FavoriteId)).ToList();
+        }
+
         /// <summary>
         /// Generates unique value for storage location
         /// </summary>

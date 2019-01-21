@@ -290,8 +290,6 @@ namespace Sentry.data.Web.Helpers
                 throw new NotImplementedException("This method does not support this type of Data Source");
             }
 
-
-
             return rj;
         }
 

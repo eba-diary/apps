@@ -75,6 +75,13 @@ namespace Sentry.data.Core
         List<DatasetSubscription> GetAllSubscriptions();
         List<Event> EventsSince(DateTime time, Boolean IsProcessed);
         int GetNextStorageCDE();
+
+
+        /** Favorites **/
+
+        Favorite GetFavorite(int favoriteId);
+        List<Favorite> GetFavorites(List<int> favoriteIds);
+        
     }
 
 }
