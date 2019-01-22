@@ -1818,7 +1818,6 @@ body { background-color: #f8f8f8; }
     vertical-align: top;
     background-color: white;
     box-shadow: 2px 6px 10px #888888;
-    height: 530px;
 }
 
 .feed .nav-pills {
@@ -2095,8 +2094,11 @@ body { background-color: #f8f8f8; }
 
     .feed 
     {  
-        width: 20%; 
-        height: 545px;
+        width: 100%;
+        margin-left: 0px;
+        border: 1.5px solid #00a3e0;
+        border-top: 6px solid #00a3e0;
+        min-height: 680px;
     }
 
     .detailDesc
@@ -2125,7 +2127,6 @@ body { background-color: #f8f8f8; }
     .asset, .feed
     { 
         margin-top: 2em;
-        height: 545px; 
     }
     .assetlastUpdt{
         margin-top: 2em;
