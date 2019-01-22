@@ -29,6 +29,6 @@ namespace Sentry.data.Web
 
         [Required]
         [DisplayName("Data Classification")]
-        public int DataClassification { get; set; }
+        public int? DataClassification { get; set; }
     }
 }

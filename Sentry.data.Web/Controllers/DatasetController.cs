@@ -301,7 +301,11 @@ namespace Sentry.data.Web.Controllers
             item.TagString = json;
 
             item.OwnerID = ds.SentryOwnerName;
-            item.DataClassification = ds.DataClassification;
+
+            if (ds.DataClassification.HasValue)
+            {
+                item.DataClassification = ds.DataClassification.Value;
+            }
 
             Event e = new Event();
             e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();

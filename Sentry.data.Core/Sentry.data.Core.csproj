@@ -173,6 +173,7 @@
     <Compile Include="Entities\Goldeneye\RetrieverRequests\RTRequestParameters.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\RTSourceTypes.cs" />
     <Compile Include="Helpers\DisplayFormatter.cs" />
+    <Compile Include="Helpers\EnumExtensionMethods.cs" />
     <Compile Include="Interfaces\IApplicationUser.cs" />
     <Compile Include="Interfaces\ICurrentUserIdProvider.cs" />
     <Compile Include="Interfaces\IDatasetContext.cs" />

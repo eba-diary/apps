@@ -5,12 +5,24 @@ using System.Web;
 using Sentry.data.Core;
 using System.Text;
 using System.Web.Mvc;
+using System.ComponentModel;
 using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Web.Helpers
 {
     public static class Utility
     {
+        public enum DatasetDataClassification
+        {
+            [Description("Restricted")]
+            Restricted = 1,
+            [Description("Highly Sensitive")]
+            HighlySensitive = 2,
+            [Description("Internal Use Only")]
+            InternalUseOnly = 3,
+            [Description("Public")]
+            Public = 4
+        }
         public static List<T> IntersectAllIfEmpty<T>(params IEnumerable<T>[] lists)
         {
             IEnumerable<T> results = null;
@@ -129,33 +141,7 @@ namespace Sentry.data.Web.Helpers
             model.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
 
-            List<string> obj = new List<string>();
-            obj.Add("Restricted");
-            obj.Add("Highly Sensitive");
-            obj.Add("Internal Use Only");
-            obj.Add("Public");
-
-            List<SelectListItem> dataClassifications = new List<SelectListItem>();
-
-            dataClassifications.Add(new SelectListItem()
-            {
-                Text = "Pick a Classification",
-                Value = "0",
-                Selected = true,
-                Disabled = true
-            });
-
-            int index = 1;
-            foreach (String classification in obj)
-            {
-                dataClassifications.Add(new SelectListItem()
-                {
-                    Text = classification,
-                    Value = index.ToString()
-                });
-                index++;
-            }
-
+            List<SelectListItem> dataClassifications = BuildDataClassificationSelectList();
 
             model.AllDataClassifications = dataClassifications;
 
@@ -290,11 +276,56 @@ namespace Sentry.data.Web.Helpers
                 throw new NotImplementedException("This method does not support this type of Data Source");
             }
 
-
-
             return rj;
         }
 
+        private static List<SelectListItem> BuildDataClassificationSelectList()
+        {
+            List<SelectListItem> classifications = new List<SelectListItem>();
+
+            classifications.Add(new SelectListItem()
+            {
+                Text = "Pick a data classification",
+                Value = "0",
+                Selected = true,
+                Disabled = true
+            });
+
+            // declare enumVal variable; initially set Restricted enum value
+            int enumVal = (int)DatasetDataClassification.Restricted;
+
+            classifications.Add(new SelectListItem()
+            {
+                Text = DatasetDataClassification.Restricted.GetDescription(),
+                Value = enumVal.ToString()
+            });
+
+            // set HighlySensitive enum value
+            enumVal = (int)DatasetDataClassification.HighlySensitive;
+            classifications.Add(new SelectListItem()
+            {
+                Text = DatasetDataClassification.HighlySensitive.GetDescription(),
+                Value = enumVal.ToString()
+            });
+
+            // set InternalUseOnly enum value
+            enumVal = (int)DatasetDataClassification.InternalUseOnly;
+            classifications.Add(new SelectListItem()
+            {
+                Text = DatasetDataClassification.InternalUseOnly.GetDescription(),
+                Value = enumVal.ToString()
+            });
+
+            // set Public enum value
+            enumVal = (int)DatasetDataClassification.Public;
+            classifications.Add(new SelectListItem()
+            {
+                Text = DatasetDataClassification.Public.GetDescription(),
+                Value = enumVal.ToString()
+            });
+
+            return classifications;
+        }
     }
 
 }

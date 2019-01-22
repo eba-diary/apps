@@ -46,7 +46,7 @@ namespace Sentry.data.Core
 
         public virtual Category DatasetCategory { get; set; }
         public virtual string DatasetType { get; set; }
-        public virtual int DataClassification { get; set; }
+        public virtual int? DataClassification { get; set; }
 
         public virtual IList<DatasetFile> DatasetFiles { get; set; }
 
