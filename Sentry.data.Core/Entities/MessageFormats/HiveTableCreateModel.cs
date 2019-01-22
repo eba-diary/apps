@@ -3,16 +3,22 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Sentry.Messaging.Common;
 
 namespace Sentry.data.Core
 {
-    public class HiveTableCreateModel
+    public class HiveTableCreateModel : BaseEventMessage
     {
         public HiveTableCreateModel()
         {
-            EventType = "HIVE-TABLE-CREATE";
+            EventType = "HIVE-TABLE-REQUESTED";
         }
-        public string EventType { get; set; }
+
         public SchemaModel Schema { get; set; }
+
+        public void UpdateStatus(HiveTableStatusEnum status)
+        {
+            this.Schema.HiveStatus = status.ToString();
+        }
     }
 }

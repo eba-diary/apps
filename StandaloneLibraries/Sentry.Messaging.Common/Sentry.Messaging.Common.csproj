@@ -76,6 +76,7 @@
   <ItemGroup>
     <Compile Include="Class1.cs" />
     <Compile Include="Messaging\BaseConsumptionService.cs" />
+    <Compile Include="Messaging\BaseEventMessage.cs" />
     <Compile Include="Messaging\Interfaces\IMessageConsumer.cs" />
     <Compile Include="Messaging\Interfaces\IMessageHandler.cs" />
     <Compile Include="Messaging\Interfaces\IPublishable.cs" />

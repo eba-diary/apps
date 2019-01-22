@@ -198,7 +198,15 @@ namespace Sentry.data.Infrastructure
             {
                 return Query<TagGroup>();
             }
-        }        
+        } 
+        
+        public IQueryable<ApplicaitonConfiguration> ApplicationConfigurations
+        {
+            get
+            {
+                return Query<ApplicaitonConfiguration>();
+            }
+        }
 
         public IEnumerable<Dataset> GetDatasetByCategoryID(int id)
         {

@@ -13,29 +13,47 @@ namespace Sentry.data.Core
 {
     public class HiveMetadataHandler : IMessageHandler<string>
     {
-        IContainer _container;
+        #region Declarations
+        private IDatasetContext _dsContext;
+        #endregion
 
-        public HiveMetadataHandler()
+        #region Constructor
+        public HiveMetadataHandler(IDatasetContext dsContext)
         {
-
+            _dsContext = dsContext;
         }
+        #endregion
+
         void IMessageHandler<string>.Handle(string msg)
         {
             BaseEventMessage baseEvent = JsonConvert.DeserializeObject<BaseEventMessage>(msg);
-            switch (baseEvent.EventType)
+            DataElement de = null;
+            switch (baseEvent.EventType.ToUpper())
             {
-                case "HIVE-TABLE-CREATE":
-                    HiveMetadataEvent hiveEvent = JsonConvert.DeserializeObject<HiveMetadataEvent>(msg);
-                    Logger.Debug("HiveMetadataHandler processing HIVE-TABLE-CREATE message: " + JsonConvert.SerializeObject(hiveEvent));
+                case "HIVE-TABLE-CREATED":
+                    HiveTableCreateModel hiveEvent = JsonConvert.DeserializeObject<HiveTableCreateModel>(msg);
+                    Logger.Debug("HiveMetadataHandler processing HIVE-TABLE-CREATED message: " + JsonConvert.SerializeObject(hiveEvent));
 
-                    using (_container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                    switch (hiveEvent.Schema.HiveStatus.ToUpper())
                     {
-                    }
-                        DataElement de = _dsContext.GetById<DataElement>(hiveEvent);
+                        case "CREATED":
+                        case "EXISTED":
+                            de = _dsContext.GetById<DataElement>(hiveEvent);
+                            de.HiveTableStatus = HiveTableStatusEnum.Available.ToString();
+                            break;
+                        case "FAILED":
+                        default:
+                            de = _dsContext.GetById<DataElement>(hiveEvent);
+                            de.HiveTableStatus = HiveTableStatusEnum.Pending.ToString();
+                            break;
+                    }                    
+
+                    _dsContext.Merge(de);
+                    _dsContext.SaveChanges();
 
                     break;
                 default:
-                    //do nothing
+                    Logger.Debug($"HiveMetadataHandler not configured to handle {baseEvent.EventType.ToUpper()} event type, skipping event.");
                     break;
             }            
         }

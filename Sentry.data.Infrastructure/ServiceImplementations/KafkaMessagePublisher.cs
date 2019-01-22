@@ -71,7 +71,7 @@ namespace Sentry.data.Infrastructure
                     IList<KeyValuePair<String, Object>> configuration = new List<KeyValuePair<String, Object>>();
 
                     //Adding Production options from database
-                    foreach (var item in config.OptionsObject["ProducerOptions"])
+                    foreach (string item in config.OptionsObject["ProducerOptions"])
                     {
                         foreach (JProperty prop in item)
                         {

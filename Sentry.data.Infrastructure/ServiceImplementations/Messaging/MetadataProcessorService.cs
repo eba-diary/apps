@@ -6,10 +6,22 @@ using System.Threading.Tasks;
 using Sentry.Messaging.Common;
 using Sentry.data.Core;
 
-namespace Sentry.data.Goldeneye
+namespace Sentry.data.Infrastructure
 {
-    public class MetadataProcessor
+    public class MetadataProcessorService : IMetadataProcessorService
     {
+        #region Declarations
+        private IDatasetContext _dsContext;
+        #endregion
+
+        #region Constructor
+        public MetadataProcessorService(IDatasetContext dsContext)
+        {
+            _dsContext = dsContext;
+        }
+        #endregion
+
+
         public void Run()
         {
             ConsumptionConfig cfg = new ConsumptionConfig();
@@ -22,7 +34,7 @@ namespace Sentry.data.Goldeneye
 
             consumer = GetKafkamessageConsumer("jcg-dotnet-group-99");
 
-            MetadataProcessorService service = new MetadataProcessorService(consumer, GetMessageHandlers(), cfg);
+            Messaging.Common.MetadataProcessorService service = new Messaging.Common.MetadataProcessorService(consumer, GetMessageHandlers(), cfg);
             service.ConsumeMessages();
         }
 
@@ -30,7 +42,8 @@ namespace Sentry.data.Goldeneye
         {
             IList<IMessageHandler<string>> handlers = new List<IMessageHandler<string>>
             {
-                new HiveMetadataHandler();
+                //new HiveMetadataHandler(_dsContext)
+                new HiveMetadataService()
             };
 
             return handlers;
@@ -38,6 +51,9 @@ namespace Sentry.data.Goldeneye
 
         private IMessageConsumer<string> GetKafkamessageConsumer(string groupId)
         {
+            //ApplicaitonConfiguration config = _dsContext.ApplicationConfigurations.Where(w => w.Application == "MetadataProcessor").FirstOrDefault();
+
+            //domain context needed to retrieve config
             KafkaSettings settings = new KafkaSettings(groupId, "awe-t-apspml-01.sentry.com:6667,awe-t-apspml-02.sentry.com:6667,awe-t-apspml-03.sentry.com:6667", "data-nrdev-goldeneye-000000", "nrdev", false, "", 3);
 
             return new MetadataProcessorKafkaConsumer(settings);

@@ -82,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DomainServices\ConfigService.cs" />
+    <Compile Include="Interfaces\IMetadataProcessorService.cs" />
     <Compile Include="Entities\HiveTableStatusEnum.cs" />
     <Compile Include="Entities\MessageFormats\HiveTableCreateModel.cs" />
     <Compile Include="Entities\Metadata\ColumnModel.cs" />
@@ -114,7 +115,6 @@
     <Compile Include="Entities\Livy\LivySession.cs" />
     <Compile Include="Entities\Livy\QueryableDataset.cs" />
     <Compile Include="Entities\Goldeneye\RequestHeader.cs" />
-    <Compile Include="Entities\MessageFormats\BaseEventMessage.cs" />
     <Compile Include="Entities\MessageFormats\HiveMetadataEvent.cs" />
     <Compile Include="Entities\Metadata\DataElement.cs" />
     <Compile Include="Entities\Metadata\DataElementDetail.cs" />

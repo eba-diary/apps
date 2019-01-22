@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Sentry.Messaging.Common;
 
 namespace Sentry.data.Core
 {
     public class HiveMetadataEvent : BaseEventMessage
     {
-        string SchemaId { get; set; }
-        
+        public SchemaModel Schema { get; set; }
     }
 }

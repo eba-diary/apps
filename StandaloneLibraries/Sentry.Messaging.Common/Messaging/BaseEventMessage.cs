@@ -2,7 +2,7 @@
 using System.Runtime.InteropServices;
 using Sentry.Common;
 
-namespace Sentry.data.Core
+namespace Sentry.Messaging.Common
 {
     public class BaseEventMessage
     {
