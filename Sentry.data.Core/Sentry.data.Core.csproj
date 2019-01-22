@@ -81,11 +81,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DomainServices\ConfigService.cs" />
+    <Compile Include="Entities\HiveTableStatusEnum.cs" />
+    <Compile Include="Entities\MessageFormats\HiveTableCreateModel.cs" />
+    <Compile Include="Entities\Metadata\ColumnModel.cs" />
+    <Compile Include="Interfaces\IConfigService.cs" />
+    <Compile Include="Interfaces\IEventService.cs" />
+    <Compile Include="Interfaces\IUserService.cs" />
     <Compile Include="DomainServices\MetadataRepositoryService.cs" />
+    <Compile Include="Entities\DataFeeds\DataFeedConstants.cs" />
     <Compile Include="Entities\Datasets\DatasetMetadata.cs" />
     <Compile Include="Entities\Datasets\FileExtension.cs" />
     <Compile Include="Entities\Datasets\ReportMetadata.cs" />
     <Compile Include="Entities\Datasets\Favorite.cs" />
+    <Compile Include="Entities\Favorites\FavoriteItem.cs" />
     <Compile Include="Entities\Goldeneye\ApplicationConfiguration.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\JavaAppSource.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\JobHistory.cs" />
@@ -115,8 +124,9 @@
     <Compile Include="Entities\Goldeneye\LoaderRequest.cs" />
     <Compile Include="Entities\Metadata\Metadata.cs" />
     <Compile Include="Entities\Metadata\MetadataAsset.cs" />
-    <Compile Include="Entities\Metadata\Schema.cs" />
+    <Compile Include="Entities\Metadata\SchemaModel.cs" />
     <Compile Include="Entities\Metadata\MetadataTag.cs" />
+    <Compile Include="Entities\Metadata\SchemaRow.cs" />
     <Compile Include="Entities\Metadata\SearchableTag.cs" />
     <Compile Include="Entities\Metadata\TagGroup.cs" />
     <Compile Include="Entities\Release\Issue.cs" />
@@ -172,6 +182,7 @@
     <Compile Include="Entities\Goldeneye\RetrieverRequests\RTRequest.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\RTRequestParameters.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\RTSourceTypes.cs" />
+    <Compile Include="Helpers\DataFeedHelper.cs" />
     <Compile Include="Helpers\DisplayFormatter.cs" />
     <Compile Include="Helpers\EnumExtensionMethods.cs" />
     <Compile Include="Interfaces\IApplicationUser.cs" />

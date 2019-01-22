@@ -144,14 +144,6 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public IQueryable<Schema> Schemas
-        {
-            get
-            {
-                return Query<Schema>();  //QueryCacheRegion.MediumTerm
-            }
-        }
-
         public IQueryable<HiveTable> HiveTables
         {
             get
@@ -443,6 +435,16 @@ namespace Sentry.data.Infrastructure
         public List<Event> EventsSince(DateTime time, Boolean IsProcessed)
         {
             return Query<Event>().Cacheable().Where(e => e.TimeCreated >= time && e.IsProcessed == IsProcessed && e.EventType.Display).ToList();
+        }
+
+        public Favorite GetFavorite(int favoriteId)
+        {
+            return Query<Favorite>().Single(x => x.FavoriteId == favoriteId);
+        }
+
+        public List<Favorite> GetFavorites(List<int> favoriteIds)
+        {
+            return Query<Favorite>().Where(x => favoriteIds.Contains(x.FavoriteId)).ToList();
         }
 
         /// <summary>

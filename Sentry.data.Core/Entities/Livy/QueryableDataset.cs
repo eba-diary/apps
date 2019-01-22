@@ -43,6 +43,7 @@ namespace Sentry.data.Core.Entities.Livy
         public int RevisionID { get; set; }
         public string HiveDatabase { get; set; }
         public string HiveTable { get; set; }
+        public string HiveTableStatus { get; set; }
         public Boolean HasTable { get; set; }
     }
 }
