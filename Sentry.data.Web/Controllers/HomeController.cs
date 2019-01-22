@@ -164,9 +164,27 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult GetFavorites()
         {
-            List<DataFeedItem> favList = _feedContext.GetAllFavorites(SharedContext.CurrentUser.AssociateId).OrderBy(o => o.Title).ToList();           
+            List<FavoriteItem> favList = _feedContext.GetUserFavorites(SharedContext.CurrentUser.AssociateId).OrderBy(x => x.Sequence).ThenBy(y => y.Title).ToList();
+            List<FavoriteItemModel> favItems = new List<FavoriteItemModel>();
+
+            // convert the list of FavoriteItem to a list of FavoriteItemModel
+            foreach (FavoriteItem fi in favList) {
+                favItems.Add(new FavoriteItemModel()
+                {
+                    Id = fi.Id,
+                    FeedId = fi.FeedId,
+                    FeedName = fi.FeedName,
+                    FeedUrl = fi.FeedUrl,
+                    FeedUrlType = fi.FeedUrlType,
+                    Img = fi.Img,
+                    Sequence = fi.Sequence,
+                    Title = fi.Title,
+                    Url = fi.Url
+                });
+            }
+
             ViewBag.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
-            return PartialView("_Favorites", favList);
+            return PartialView("_Favorites", favItems);
         }
     }
 }

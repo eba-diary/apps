@@ -14,30 +14,8 @@ namespace Sentry.data.Core
             Title = shortDesc;
             Description = longDesc;
             Feed = type;
-
-            switch (Feed.Type)
-            {
-                case "SAS":
-                    Img = "/Images/sas_logo_min.png";
-                    Url = id;
-                    break;
-                case "TAB":
-                    Img = "/Images/tableau-icon_min.png";
-                    Url = id;
-                    break;
-                case "Datasets":
-                    Img = "/Images/Icons/Datasets.svg";
-                    Url = "/Dataset/Detail/" + id;
-                    break;
-                case "Data Assets":
-                    Img = "/Images/Icons/DataAssets.svg";
-                    Url = id;
-                    break;
-                case "Exhibits":
-                    Img = "/Images/Icons/Business Intelligence.svg";
-                    Url = "/BusinessIntelligence/Detail/" + id;
-                    break;
-            }
+            Img = Helpers.DataFeedHelper.GetImage(Feed.Type);
+            Url = Helpers.DataFeedHelper.GetUrl(Feed.Type, Feed.Id.ToString());
         }
 
         public string DisplayTitle()

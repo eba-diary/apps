@@ -22,6 +22,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.DatasetId, (m) => m.Column("DatasetId"));
             this.Property((x) => x.UserId, (m) => m.Column("UserId"));
             this.Property((x) => x.Created, (m) => m.Column("Created"));
+            this.Property((x) => x.Sequence, (m) => m.Column("Sequence"));
         }
     }
 }

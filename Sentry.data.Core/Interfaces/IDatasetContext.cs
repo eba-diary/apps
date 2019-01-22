@@ -23,7 +23,6 @@ namespace Sentry.data.Core
         IQueryable<DataObject> DataObjects { get; }
         IQueryable<FileExtension> FileExtensions { get; }
         IQueryable<Category> Categories { get; }
-        IQueryable<Schema> Schemas { get; }
         IQueryable<HiveTable> HiveTables { get; }
         IQueryable<LivyCreation> LivySessions { get; }
         IQueryable<MediaTypeExtension> MediaTypeExtensions { get; }
@@ -75,6 +74,13 @@ namespace Sentry.data.Core
         List<DatasetSubscription> GetAllSubscriptions();
         List<Event> EventsSince(DateTime time, Boolean IsProcessed);
         int GetNextStorageCDE();
+
+
+        /** Favorites **/
+
+        Favorite GetFavorite(int favoriteId);
+        List<Favorite> GetFavorites(List<int> favoriteIds);
+        
     }
 
 }

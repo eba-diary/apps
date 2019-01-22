@@ -137,6 +137,18 @@ namespace Sentry.data.Core.Entities.Metadata
                 SetDataElementDetailValue("HiveDatabase_NME", value);
             }
         }
+        public virtual string HiveTableStatus
+        {
+            get
+            {
+                DataElementDetail detail = GetElementDetail("HiveTableStatus");
+                return (detail == null) ? null : detail.DataElementDetailType_VAL;
+            }
+            set
+            {
+                SetDataElementDetailValue("HiveTableStatus", value);
+            }
+        }
         public virtual string StorageCode
         {
             get

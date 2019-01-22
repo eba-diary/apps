@@ -109,6 +109,7 @@ function Schema(id, data) {
     this.revisionID = ko.observable(data.RevisionID);
     this.hiveDatabase = ko.observable(data.HiveDatabase);
     this.hiveTable = ko.observable(data.HiveTable);
+    this.hiveTableStatus = ko.observable(data.HiveTableStatus);
     this.hasTable = ko.observable(data.HasTable);
 }
 
