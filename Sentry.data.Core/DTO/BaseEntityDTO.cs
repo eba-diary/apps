@@ -19,7 +19,6 @@ namespace Sentry.data.Core
         public bool IsSensitive { get; set; }
         public string CreationUserName { get; set; }
         public string UploadUserName { get; set; }
-        public string CategoryColor { get; set; }
         public List<string> TagIds { get; set; }
 
 
@@ -31,6 +30,8 @@ namespace Sentry.data.Core
         public int AmountOfSubscriptions { get; set; }
         public bool CanDisplay { get; set; }
         public string MailtoLink { get; set; }
+        public string CategoryColor { get; set; }
+        public List<string> CategoryNames { get; set; }
 
 
     }

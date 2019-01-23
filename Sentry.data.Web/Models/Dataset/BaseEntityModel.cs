@@ -21,13 +21,12 @@ namespace Sentry.data.Web
             this.DatasetDtm = dto.DatasetDtm;
             this.ChangedDtm = dto.ChangedDtm;
             this.DatasetCategoryIds = dto.DatasetCategoryIds;
-            this.UploadUserName = dto.UploadUserName;
             TagIds = string.Join(",", dto.TagIds);
 
             //hidden properties
             this.DatasetId = dto.DatasetId;
             this.SentryOwnerId = dto.SentryOwnerId;
-            this.CategoryColor = dto.CategoryColor;
+            this.UploadUserName = dto.UploadUserName;
 
 
             //details
@@ -37,6 +36,8 @@ namespace Sentry.data.Web
             this.Views = dto.Views;
             this.ObjectType = dto.ObjectType;
             this.IsSensitive = dto.IsSensitive;
+            this.CategoryColor = dto.CategoryColor;
+            this.CategoryNames = dto.CategoryNames;
         }
 
 
@@ -83,10 +84,8 @@ namespace Sentry.data.Web
 
         //hidden properties
         public int DatasetId { get; set; }
-        public string CategoryColor { get; set; }
         public string SentryOwnerId { get; set; }
         public string UploadUserName { get; set; }
-
 
 
         //shared details
@@ -97,6 +96,8 @@ namespace Sentry.data.Web
         public bool IsFavorite { get; set; }
         public bool IsSensitive { get; set; }
         public string MailtoLink { get; set; }
+        public List<string> CategoryNames { get; set; }
+        public string CategoryColor { get; set; }
 
     }
 }

@@ -186,7 +186,6 @@ namespace Sentry.data.Core
                 FrequencyId = ds.Metadata.ReportMetadata.Frequency,
                 TagIds = ds.Tags.Select(x => x.TagId.ToString()).ToList(),
                 FileTypeId = ds.DatasetFileConfigs.First().FileTypeId,
-                CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "gray",
                 CanDisplay = ds.CanDisplay,
                 MailtoLink = "mailto:?Subject=Business%20Intelligence%20Exhibit%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/BusinessIntelligence/Detail/" + ds.DatasetId
         };
@@ -204,7 +203,8 @@ namespace Sentry.data.Core
                 dto.FrequencyDescription = Enum.GetName(typeof(ReportFrequency), ds.Metadata.ReportMetadata.Frequency) ?? "Not Specified";
                 dto.TagNames = ds.Tags.Select(x => x.Name).ToList();
                 dto.CanManageReport = user.CanManageReports;
-
+                dto.CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "gray";
+                dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
             }
 
             return dto;

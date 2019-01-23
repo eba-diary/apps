@@ -13,8 +13,23 @@ namespace Sentry.data.Web
 
             Sentry.Associates.Associate sentryAssociate = _associateInfoProvider.GetAssociateInfo(ds.SentryOwnerName);
 
-            this.Category = ds.DatasetCategories.First().Name;            
-            this.AbbreviatedCategory = (String.IsNullOrWhiteSpace(ds.DatasetCategories.First().AbbreviatedName)) ? ds.DatasetCategories.First().Name : ds.DatasetCategories.First().AbbreviatedName;
+            if(ds.DatasetCategories.Count > 1)
+            {
+                this.Color = "gray";
+                this.Category = "Multiple";
+                this.AbbreviatedCategory = "Multiple";
+                this.BannerColor = "categoryBanner-" + this.Color;
+                this.BorderColor = "borderSide_" + this.Color;
+            }
+            else
+            {
+                this.Color = ds.DatasetCategories.First().Color;
+                this.Category = ds.DatasetCategories.First().Name;
+                this.AbbreviatedCategory = (!String.IsNullOrWhiteSpace(ds.DatasetCategories.First().AbbreviatedName)) ? ds.DatasetCategories.First().AbbreviatedName : ds.DatasetCategories.First().Name;
+                this.BannerColor = "categoryBanner-" + this.Color;
+                this.BorderColor = "borderSide_" + this.Color;
+            }
+
             this.DatasetName = ds.DatasetName;
             this.DatasetId = ds.DatasetId;
             this.DatasetDesc = ds.DatasetDesc;
@@ -32,9 +47,6 @@ namespace Sentry.data.Web
                 this.ChangedDtm = ds.ChangedDtm.ToShortDateString();
             }
             this.ChangedDtm = ds.ChangedDtm.ToShortDateString();
-            this.BannerColor = "categoryBanner-" + ds.DatasetCategories.First().Color;
-            this.BorderColor = "borderSide_" + ds.DatasetCategories.First().Color;
-            this.Color = ds.DatasetCategories.First().Color;
             this.Type = ds.DatasetType;
 
             if (ds.DatasetType == GlobalConstants.DataEntityTypes.REPORT)

@@ -114,7 +114,13 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <div>
-                                    <h6 class="@Model.CategoryColor">Categories:</h6><br />
+                                    <div class="col-lg-4">
+                                        <h5 class="@Model.CategoryColor">Categories:</h5>
+                                        @foreach (var item in Model.CategoryNames)
+                                        {
+                                            <div class="tags-block categoryBanner-@Model.CategoryColor htCenter tag_@item">@item</div>
+                                        }
+                                    </div>
                                 </div>
                             </div>
                         </div>

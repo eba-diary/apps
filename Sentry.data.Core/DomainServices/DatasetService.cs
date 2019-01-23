@@ -316,6 +316,8 @@ namespace Sentry.data.Core
                 dto.DatasetFileCount = ds.DatasetFiles.Count();
                 dto.OriginationCode = ds.OriginationCode;
                 dto.DataClassificationDescription = ds.DataClassification.GetDescription();
+                dto.CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "gray";
+                dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
                 if (ds.DatasetFiles.Any())
                 {
                     dto.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);
