@@ -36,5 +36,8 @@ namespace Sentry.data.Web
         public Dictionary<string, string> DatasetScopeTypeNames { get; set; }
         public List<string> DistinctFileExtensions { get; set; }
 
+        public string ArtifactLink { get; set; }
+        public string LocationType { get; set; }
+        public string MailtoLink { get; set; }
     }
 }

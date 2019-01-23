@@ -442,6 +442,16 @@ namespace Sentry.data.Infrastructure
             return Query<Dataset>().Where(x => x.DatasetType == GlobalConstants.DataEntityTypes.REPORT).Cacheable().Count();
         }
 
+        public Favorite GetFavorite(int favoriteId)
+        {
+            return Query<Favorite>().Single(x => x.FavoriteId == favoriteId);
+        }
+
+        public List<Favorite> GetFavorites(List<int> favoriteIds)
+        {
+            return Query<Favorite>().Where(x => favoriteIds.Contains(x.FavoriteId)).ToList();
+        }
+
         /// <summary>
         /// Generates unique value for storage location
         /// </summary>

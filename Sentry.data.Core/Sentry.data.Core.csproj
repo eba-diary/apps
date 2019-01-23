@@ -99,10 +99,12 @@
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceDTO.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceHomeDTO.cs" />
     <Compile Include="DTO\Dataset\DatasetDTO.cs" />
+    <Compile Include="Entities\DataFeeds\DataFeedConstants.cs" />
     <Compile Include="Entities\Datasets\DatasetMetadata.cs" />
     <Compile Include="Entities\Datasets\FileExtension.cs" />
     <Compile Include="Entities\Datasets\ReportMetadata.cs" />
     <Compile Include="Entities\Datasets\Favorite.cs" />
+    <Compile Include="Entities\Favorites\FavoriteItem.cs" />
     <Compile Include="Entities\Goldeneye\ApplicationConfiguration.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\JavaAppSource.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\JobHistory.cs" />
@@ -191,7 +193,9 @@
     <Compile Include="Entities\Goldeneye\RetrieverRequests\RTRequestParameters.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\RTSourceTypes.cs" />
     <Compile Include="GlobalConstants.cs" />
+    <Compile Include="Helpers\DataFeedHelper.cs" />
     <Compile Include="Helpers\DisplayFormatter.cs" />
+    <Compile Include="Helpers\EnumExtensionMethods.cs" />
     <Compile Include="Interfaces\IApplicationUser.cs" />
     <Compile Include="Interfaces\IBusinessIntelligenceService.cs" />
     <Compile Include="Interfaces\ICurrentUserIdProvider.cs" />

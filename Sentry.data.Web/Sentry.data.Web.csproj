@@ -284,6 +284,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Content Include="Content\creat-edit-datasets.css" />
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\FavoritesController.cs" />
     <Compile Include="Controllers\WebApi\ApplicationController.cs" />
     <Compile Include="Controllers\WebApi\AssetController.cs" />
     <Compile Include="Controllers\DataAssetController.cs" />
@@ -366,6 +367,8 @@
     <Compile Include="Models\Dataset\PushToDatasetModel.cs" />
     <Compile Include="Models\Dataset\DatasetModel.cs" />
     <Compile Include="Models\Dataset\_DatasetMetadataModel.cs" />
+    <Compile Include="Models\Favorites\FavoriteItemModel.cs" />
+    <Compile Include="Models\Favorites\FavoritesModel.cs" />
     <Compile Include="Models\Feed\DataFeedItemModel.cs" />
     <Compile Include="Models\Layout\HomeModel.cs" />
     <Compile Include="Models\Layout\FooterModel.cs" />
@@ -387,6 +390,7 @@
     <Content Include="Content\css\select2.css" />
     <Content Include="Content\css\select2.min.css" />
     <Content Include="Content\dataset-detail.css" />
+    <Content Include="Content\favorites.css" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\query-builder.default.css" />
     <Content Include="Content\query-builder.default.min.css" />
@@ -410,6 +414,7 @@
     <Content Include="Images\SHO_Aerial_10-4-17.png" />
     <Content Include="Images\SHO_SentryWorld_Aerial.jpg" />
     <Content Include="js\Config.js" />
+    <Content Include="js\Favorites.js" />
     <Content Include="js\ManageAssetAlert.js" />
     <Content Include="js\ManageConfigs.js" />
     <Content Include="js\QueryTool\AddRule.js" />
@@ -1233,6 +1238,8 @@
     <Content Include="Views\Home\_Favorites.cshtml" />
     <Content Include="Views\BusinessIntelligence\Detail.cshtml" />
     <Content Include="Views\Shared\_Tags.cshtml" />
+    <Content Include="Views\Favorites\EditFavorites.cshtml" />
+    <Content Include="Views\Favorites\_FavoritesList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

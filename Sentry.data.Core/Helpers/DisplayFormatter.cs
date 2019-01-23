@@ -23,5 +23,10 @@ namespace Sentry.data.Core.Helpers
 
             return assocName;
         }
+
+        public static string FormatFavoriteTitle(string favoriteTitle)
+        {
+            return (favoriteTitle.Length > 50) ? favoriteTitle.Substring(0, 47).Trim() + "..." : favoriteTitle;
+        }
     }
 }

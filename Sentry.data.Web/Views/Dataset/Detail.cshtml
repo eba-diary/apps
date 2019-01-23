@@ -96,27 +96,30 @@
                                     <span class="glyphicon glyphicon-menu-hamburger @color"></span>
                                 </button>
                                 <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
+                                    @if (Model.CanManageConfigs)
+                                    {
+                                    <li>
+                                        <a href="/Config/Dataset/@Model.DatasetId">
+                                            Manage Schemas
+                                        </a>
+                                    </li>
+                                    }
+                                    @if (Model.CanQueryTool)
+                                    {
+                                    <li title="Query Dataset">
+                                        <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
+                                            Query this Dataset
+                                        </a>
+                                    </li>
+                                    }
+                                    <li>
+                                        <a href="@Model.MailtoLink">Share Dataset</a>
+                                    </li>
                                     <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
                                         <a>
                                             Subscribe
                                         </a>
                                     </li>
-                                    @if (Model.CanQueryTool)
-                                    {
-                                        <li title="Query Dataset">
-                                            <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
-                                                Query this Dataset
-                                            </a>
-                                        </li>
-                                    }
-                                    @if (Model.CanManageConfigs)
-                                    {
-                                        <li>
-                                            <a href="/Config/Dataset/@Model.DatasetId">
-                                                Manage Schemas
-                                            </a>
-                                        </li>
-                                    }
                                 </ul>
                             </div>
                         </div>
@@ -127,7 +130,16 @@
 
         <div class="hidden-md hidden-lg">
             <div>
-                <h1 class="detailName leftFloat @color">
+                @* show different h1 elements for Exhibit vs. Dataset (title for Dataset should not be clickable) *@
+                <h1 class="detailName detailNameLink leftFloat @color" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')">
+                    @Model.DatasetName
+
+                    @if (Model.IsSensitive)
+                    {
+                        <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
+                    }
+                </h1>
+                <h1 class="detailName leftFloat @color" data-bind="visible: IsShownForCurrentType('Dataset')">
                     @Model.DatasetName
 
                     @if (Model.IsSensitive)
@@ -151,14 +163,13 @@
                                 </a>
                             </li>
 
-                            @if (Model.CanQueryTool)
+                            @if (Model.CanEditDataset)
                             {
-                                <li title="Query Dataset">
-                                    <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
-                                        Query this Dataset
-                                    </a>
-                                </li>
+                            <li>
+                                <a href="/Dataset/Edit/@Model.DatasetId">Edit Dataset</a>
+                            </li>
                             }
+
                             @if (Model.CanManageConfigs)
                             {
                                 <li>
@@ -168,17 +179,30 @@
                                 </li>
                             }
 
+                            @if (Model.CanQueryTool)
+                            {
+                                <li title="Query Dataset">
+                                    <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
+                                        Query this Dataset
+                                    </a>
+                                </li>
+                            }
+
+                            <li >
+                                <a href="@Model.MailtoLink">Share Dataset</a>
+                            </li>
+
+
+                            <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
+                                <a>
+                                    Subscribe
+                                </a>
+                            </li>
+
                             @if (Model.CanUpload)
                             {
                                 <li id="UploadModal" data-id="@Model.DatasetId">
                                     <a>Upload Files</a>
-                                </li>
-                            }
-
-                            @if (Model.CanEditDataset)
-                            {
-                                <li>
-                                    <a href="/Dataset/Edit/@Model.DatasetId">Edit Dataset</a>
                                 </li>
                             }
                         </ul>
@@ -301,7 +325,6 @@
                                 <h6 class="@color">@Model.DatasetDtm.ToString("MMMM d, yyyy")</h6>
                             </div>
                         </div>
-
                         <hr />
                         <div class="row">
                             <div class="col-lg-12">
@@ -309,8 +332,16 @@
                                 <h6 class="@color">@Model.SentryOwnerName</h6>
                             </div>
                         </div>
-
                         <hr />
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <h5 class="@color">Data Classification</h5>
+                                    <h6 class="@color">@Model.DataClassificationDescription</h6>
+                                </div>
+                            </div>
+                            <hr />
+
                         <div class="row">
                             <div class="col-lg-6">
                                 <h5 class="@color">Dataset Views</h5>
@@ -727,6 +758,13 @@
                 $(".dataTables_filter").parent().addClass("text-right");
             }
         }
+
+                icon.toggleClass("glyphicon-star glyphicon-star-empty");
+
+            });
+
+            
+        });
 
         var getUrlParameter = function getUrlParameter(sParam) {
             var sPageURL = decodeURIComponent(window.location.search.substring(1)),
