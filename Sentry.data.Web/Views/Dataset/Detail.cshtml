@@ -432,17 +432,27 @@
                                 <h6 class="@color">@Model.DatasetDtm.ToString("MMMM d, yyyy")</h6>
                             </div>
                         </div>
-
                         <hr />
                         <div class="row">
-
                             <div class="col-lg-12">
                                 <h5 class="@color">Sentry Owner</h5>
                                 <h6 class="@color">@Model.AssociateCommonName</h6>
                             </div>
-
                         </div>
                         <hr />
+
+                        @* show the Data Classification if one exists *@
+                        @if (!string.IsNullOrWhiteSpace(Model.DataClassification))
+                        {
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <h5 class="@color">Data Classification</h5>
+                                    <h6 class="@color">@Model.DataClassification</h6>
+                                </div>
+                            </div>
+                            <hr />
+                        }
+
                         <div class="row">
                             <div class="col-lg-6">
                                 <h5 class="@color" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">Dataset Views</h5>
