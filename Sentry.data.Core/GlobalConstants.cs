@@ -65,5 +65,14 @@
             public const string DEFAULT_S3_DROP_LOCATION = "Default S3 Drop Location";
         }
 
+        public static class DataFeedType
+        {
+            public const string SAS = "SAS";
+            public const string Tab = "TAB";
+            public const string Datasets = "Datasets";
+            public const string DataAssets = "Data Assets";
+            public const string Exhibits = "Exhibits";
+        }
+
     }
 }

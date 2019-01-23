@@ -34,7 +34,7 @@
                 @Html.LabelFor((model) => model.DatasetCategoryIds, new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
                     <select id="DatasetCategoryIds" name="DatasetCategoryIds" multiple="multiple" class="form-control edit-dataset-row">
-                        @foreach( var item in Model.AllCategories)
+                        @foreach (var item in Model.AllCategories)
                         {
                             <option selected="@item.Selected" value="@item.Value">@item.Text</option>
                         }

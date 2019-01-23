@@ -21,6 +21,7 @@ namespace Sentry.data.Web
             DatasetScopeTypeNames = dto.DatasetScopeTypeNames;
             OriginationCode = dto.OriginationCode;
             DistinctFileExtensions = dto.DistinctFileExtensions;
+            DataClassificationDescription = dto.DataClassificationDescription;
         }
 
         public bool CanDwnldSenstive { get; set; }
@@ -36,8 +37,6 @@ namespace Sentry.data.Web
         public Dictionary<string, string> DatasetScopeTypeNames { get; set; }
         public List<string> DistinctFileExtensions { get; set; }
 
-        public string ArtifactLink { get; set; }
-        public string LocationType { get; set; }
-        public string MailtoLink { get; set; }
+        public string DataClassificationDescription { get; set; }
     }
 }

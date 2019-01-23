@@ -38,7 +38,8 @@
                 <div class="col-md-10">
                     <select id="DatasetCategoryIds" name="DatasetCategoryIds" class="form-control edit-dataset-row">
                         @foreach (var item in Model.AllCategories)
-                        {<option selected="@item.Selected" value="@item.Value">@item.Text</option>}
+                        {
+                            <option selected="@item.Selected" value="@item.Value">@item.Text</option>}
                     </select>
                     @Html.ValidationMessageFor((model) => model.DatasetCategoryIds, "", new { @class = "text-danger" })
                 </div>
@@ -108,6 +109,20 @@
                 <div class="col-md-10">
                     @Html.DropDownListFor((model) => model.OriginationID, Model.AllOriginationCodes, new { @class = "form-control edit-dataset-row" })
                     @Html.ValidationMessageFor((model) => model.OriginationID, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor((model) => model.DataClassification, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor((model) => model.DataClassification, Model.AllDataClassifications, new { @class = "form-control edit-dataset-row" })
+                    @Html.ValidationMessageFor((model) => model.DataClassification, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="control-label col-md-2"></label>
+                <div class="col-md-10">
+                    <span class="text-muted"><em id="dataClassInfo"></em></span>
                 </div>
             </div>
 

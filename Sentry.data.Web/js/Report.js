@@ -63,6 +63,15 @@ data.Report = {
             window.location = data.Report.CancelLink($(this).data("id"));
         });
 
+        $(".detailNameLink").click(function () {
+            var artifactLink = $(this).data('ArtifactLink');
+            var locationType = $(this).data('LocationType');
+            if (locationType === 'file') {
+                artifactLink = encodeURI(artifactLink);
+            }
+            data.Report.OpenReport(locationType, artifactLink);
+        });
+
         data.Tags.initTags();
     },
 
@@ -125,11 +134,46 @@ data.Report = {
         /// link to create report
         return "/BusinessIntelligence/Create";
     },
+
     CancelLink: function (id) {
         if (id === undefined || id === 0) {
             return "/BusinessIntelligence/Index";
         } else {
             return "/BusinessIntelligence/Detail/" + encodeURIComponent(id);
+        }
+    },
+
+    OpenReport: function (artifactType, artifactPath) {
+        // check what type we're working with
+        if (artifactType === 'file') {
+
+            // check if the user has permission and if so, download the file
+            $.ajax({
+                url: '/ExternalFile/HasReadPermissions?pathAndFilename=' + artifactPath,
+                method: "GET",
+                dataType: 'json',
+                success: function (obj) {
+                    if (obj.HasPermission) {
+                        var url = '/ExternalFile/DownloadExternalFile?pathAndFilename=' + artifactPath;
+                        window.open(url);
+                    } else {
+                        Sentry.ShowModalAlert("User does not have sufficient permissions to selected file.");
+                    }
+                },
+                error: function (obj) {
+                    Sentry.ShowModalAlert("Failed permissions check, please try again. If problem persists, please contact <a mailto:DSCSupport@sentry.com></a>");
+                }
+            });
+
+        } else {
+            var win = window.open(artifactPath, '_blank');
+            if (win) {
+                //Browser has allowed it to be opened
+                win.focus();
+            } else {
+                //Browser has blocked it
+                alert('Please allow popups for this website');
+            }
         }
     }
 

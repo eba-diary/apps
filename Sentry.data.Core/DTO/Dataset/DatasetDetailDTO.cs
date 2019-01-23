@@ -17,7 +17,6 @@ namespace Sentry.data.Core
         public List<string> DistinctFileExtensions { get; set; }
         public int DatasetFileCount { get; set; }
         public string OriginationCode { get; set; }
-
-
+        public string DataClassificationDescription { get; set; }
     }
 }

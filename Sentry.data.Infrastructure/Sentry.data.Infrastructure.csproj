@@ -274,13 +274,13 @@
     <WebReferences Include="Web References\" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Interfaces\" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
       <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
       <Name>Sentry.data.Core</Name>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\WinSCP.5.13.2\build\WinSCP.targets" Condition="Exists('..\packages\WinSCP.5.13.2\build\WinSCP.targets')" />

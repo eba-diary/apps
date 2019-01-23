@@ -311,9 +311,6 @@ data.Dataset = {
             returnUrl = returnUrl.replace(/,\s*$/, "");
         }
         returnLink.attr('href', returnUrl);
-        //----
-
-
 
 
         $('body').on('click', '.on-demand-run', function () {
@@ -1468,4 +1465,5 @@ data.Dataset = {
             modal.ReplaceModalBody(result);
         });
     }
+
 };

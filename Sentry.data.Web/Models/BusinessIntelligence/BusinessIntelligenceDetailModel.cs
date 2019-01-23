@@ -11,11 +11,12 @@ namespace Sentry.data.Web
             FrequencyDescription = dto.FrequencyDescription;
             TagNames = dto.TagNames;
             CanManageReport = dto.CanManageReport;
+            LocationType = dto.LocationType;
         }
 
         public string FrequencyDescription { get; set; }
         public List<string> TagNames { get; set; }
-
         public bool CanManageReport { get; set; }
+        public string LocationType { get; set; }
     }
 }

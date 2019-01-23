@@ -88,6 +88,7 @@
     <Compile Include="Entities\HiveTableStatusEnum.cs" />
     <Compile Include="Entities\MessageFormats\HiveTableCreateModel.cs" />
     <Compile Include="Entities\Metadata\ColumnModel.cs" />
+    <Compile Include="GlobalEnums\DataClassificationType.cs" />
     <Compile Include="Interfaces\IAssociateInfoProvider.cs" />
     <Compile Include="Interfaces\IConfigService.cs" />
     <Compile Include="Interfaces\IDatasetService.cs" />
@@ -99,7 +100,6 @@
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceDTO.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceHomeDTO.cs" />
     <Compile Include="DTO\Dataset\DatasetDTO.cs" />
-    <Compile Include="Entities\DataFeeds\DataFeedConstants.cs" />
     <Compile Include="Entities\Datasets\DatasetMetadata.cs" />
     <Compile Include="Entities\Datasets\FileExtension.cs" />
     <Compile Include="Entities\Datasets\ReportMetadata.cs" />

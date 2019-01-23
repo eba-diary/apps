@@ -107,10 +107,9 @@ namespace Sentry.data.Web
                 UploadFrequency = null;
             }
 
-            if (ds.DataClassification.HasValue)
+            if (ds.DataClassification > 0)
             {
-                var datasetClassEnum = (Helpers.Utility.DatasetDataClassification)ds.DataClassification;
-                this.DataClassification = datasetClassEnum.GetDescription();
+                this.DataClassification = ds.DataClassification.GetDescription();
             }
 
         }

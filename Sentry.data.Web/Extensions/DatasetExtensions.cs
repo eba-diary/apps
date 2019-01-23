@@ -26,7 +26,8 @@ namespace Sentry.data.Web
                 ConfigFileDesc = model.ConfigFileDesc,
                 FileExtensionId = model.FileExtensionId,
                 Delimiter = model.Delimiter,
-                DatasetScopeTypeId = model.DatasetScopeTypeId
+                DatasetScopeTypeId = model.DatasetScopeTypeId,
+                DataClassification = model.DataClassification
             };
         }
 

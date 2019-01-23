@@ -15,7 +15,7 @@
     [Information_DSC] NVARCHAR(MAX) NULL, 
     [Metadata] VARCHAR(MAX) NULL, 
     [Dataset_TYP] CHAR(3) NULL, 
-    [DataClassification_CDE] INT NULL, 
+    [DataClassification_CDE] INT NOT NULL DEFAULT 0 , 
     PRIMARY KEY CLUSTERED 
 (
 	[Dataset_ID] ASC

@@ -96,5 +96,7 @@ namespace Sentry.data.Web
         public bool IsSubscribed { get; set; }
         public bool IsFavorite { get; set; }
         public bool IsSensitive { get; set; }
+        public string MailtoLink { get; set; }
+
     }
 }

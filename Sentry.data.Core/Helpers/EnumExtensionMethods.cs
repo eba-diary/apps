@@ -22,5 +22,6 @@ namespace Sentry.data.Core
             }
             return myEnum.ToString();
         }
+
     }
 }

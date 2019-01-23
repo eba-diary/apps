@@ -10,7 +10,7 @@
         <div class="relative hidden-sm hidden-xs">
             <div>
                 <div class="no-overflow">
-                    <h1 class="detailName leftFloat @Model.CategoryColor">
+                    <h1 class="detailName detailNameLink leftFloat @Model.CategoryColor" data-ArtifactLink="@Model.Location" data-LocationType="@Model.LocationType">
                         @Model.DatasetName
 
                         @if (Model.IsSensitive)
@@ -28,7 +28,9 @@
                                     @if (Model.IsFavorite)
                                     {
                                         <span class="glyphicon glyphicon-star @Model.CategoryColor" id="favoriteIcon"></span>
-                                    }else{
+                                    }
+                                    else
+                                    {
                                         <span class="glyphicon glyphicon-star-empty @Model.CategoryColor" id="favoriteIcon"></span>
                                     }
                                 </button>
@@ -54,9 +56,12 @@
                                     @if (Model.CanManageReport)
                                     {
                                         <li>
-                                            <a id="deleteLink" href="" data-id="@Model.DatasetId">Delete Report</a>
+                                            <a id="deleteLink" href="" data-id="@Model.DatasetId">Delete Exhibit</a>
                                         </li>
                                     }
+                                    <li>
+                                        <a href="@Model.MailtoLink">Share Exhibit</a>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -103,6 +108,18 @@
                         }
                     </div>
                     <hr />
+                    @if (Model.DatasetCategoryIds.Count > 1)
+                    {
+                    <div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div>
+                                    <h6 class="@Model.CategoryColor">Categories:</h6><br />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    }
                 </div>
 
                 <div class="col-lg-4">
@@ -126,7 +143,7 @@
                         <hr />
                         <div class="row">
                             <div class="col-lg-6">
-                                <h5 class="@Model.CategoryColor" >Exhibit Views</h5>
+                                <h5 class="@Model.CategoryColor">Exhibit Views</h5>
                                 <h6 class="@Model.CategoryColor" style="font-feature-settings: 'lnum';">@Model.Views</h6>
                             </div>
                         </div>
@@ -142,10 +159,10 @@
     <div class="row">
         <div class="col-lg-12">
             <div id="aboutThisSchema" class="metadataHeader">
-                <h3 class="@Model.CategoryColor" >About this Exhibit</h3>
+                <h3 class="@Model.CategoryColor">About this Exhibit</h3>
             </div>
             <div class="metadataBody container row" style="border: 1px #DDDDDD solid; background: white; padding: 10px;">
-                <div class="col-lg-4" >
+                <div class="col-lg-4">
                     <h5 class="@Model.CategoryColor">Tags:</h5>
                     @foreach (var item in Model.TagNames)
                     {
@@ -173,5 +190,5 @@
 @section Scripts {
     @Scripts.Render("~/bundles/prettyCron")
     @Scripts.Render("~/bundles/dataTables")
-    <script> $(function () { data.Report.DetailInit(); }); </script>
+    <script>$(function () { data.Report.DetailInit(); });</script>
 }

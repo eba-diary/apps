@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Web
 {
@@ -17,6 +18,7 @@ namespace Sentry.data.Web
             Delimiter = dto.Delimiter;
             FileExtensionId = dto.FileExtensionId;
             DatasetInformation = dto.DatasetInformation;
+            DataClassification = dto.DataClassification;
         }
 
 
@@ -45,6 +47,9 @@ namespace Sentry.data.Web
         [DisplayName("Usage Information")]
         public string DatasetInformation { get; set; }
 
+        [Required]
+        [DisplayName("Data Classification")]
+        public DataClassificationType DataClassification { get; set; }
     }
 
 

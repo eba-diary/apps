@@ -1,4 +1,5 @@
-﻿
+﻿using Sentry.data.Core.GlobalEnums;
+
 namespace Sentry.data.Core
 {
     public class DatasetDto : BaseEntityDto
@@ -12,5 +13,6 @@ namespace Sentry.data.Core
         public int DatasetScopeTypeId { get; set; }
         public string DatasetInformation { get; set; }
         public string CategoryName { get; set; }
+        public DataClassificationType DataClassification { get; set; }
     }
 }

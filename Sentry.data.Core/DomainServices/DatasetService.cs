@@ -13,12 +13,10 @@ namespace Sentry.data.Core
     {
         private readonly IDatasetContext _datasetContext;
         private readonly IUserService _userService;
-        private readonly IAssociateInfoProvider _associateInfoProvider;
-        public DatasetService(IDatasetContext datasetContext, IUserService userService, IAssociateInfoProvider associateInfoProvider)
+        public DatasetService(IDatasetContext datasetContext, IUserService userService)
         {
             _datasetContext = datasetContext;
             _userService = userService;
-            _associateInfoProvider = associateInfoProvider;
         }
 
 
@@ -35,7 +33,7 @@ namespace Sentry.data.Core
         public int CreateAndSaveNewDataset(DatasetDto dto)
         {
             Dataset ds = CreateDataset(dto);
-            ds = _datasetContext.Merge(ds);
+             _datasetContext.Add(ds);
 
             DataElement de = CreateDataElement(dto);
             DatasetFileConfig dfc = CreateDatasetFileConfig(dto, ds);
@@ -89,9 +87,11 @@ namespace Sentry.data.Core
             if (null != dto.SentryOwnerId && dto.SentryOwnerId.Length > 0)
             {
                 ds.SentryOwnerName = dto.SentryOwnerId;
-
             }
-
+            if(dto.DataClassification > 0)
+            {
+                ds.DataClassification = dto.DataClassification;
+            }
             _datasetContext.SaveChanges();
         }
 
@@ -99,7 +99,7 @@ namespace Sentry.data.Core
         public List<string> Validate(DatasetDto dto)
         {
             List<string> errors = new List<string>();
-            if (_datasetContext.Datasets.Where(w => w.DatasetName == dto.DatasetName &&
+            if (dto.DatasetId == 0 && _datasetContext.Datasets.Where(w => w.DatasetName == dto.DatasetName &&
                                                                          w.DatasetCategories.Any(x => dto.DatasetCategoryIds.Contains(x.Id)) &&
                                                                          w.DatasetType == GlobalConstants.DataEntityTypes.DATASET).Count() > 0)
             {
@@ -126,6 +126,7 @@ namespace Sentry.data.Core
                 DatasetDtm = dto.DatasetDtm,
                 ChangedDtm = dto.ChangedDtm,
                 DatasetType = GlobalConstants.DataEntityTypes.DATASET,
+                DataClassification = dto.DataClassification,
                 IsSensitive = false,
                 CanDisplay = true,
                 DatasetFiles = null,
@@ -273,6 +274,7 @@ namespace Sentry.data.Core
                 DatasetDesc = ds.DatasetDesc,
                 DatasetInformation = ds.DatasetInformation,
                 DatasetType = ds.DatasetType,
+                DataClassification = ds.DataClassification,
                 CreationUserName = ds.CreationUserName,
                 SentryOwnerName = (string.IsNullOrWhiteSpace(userDisplayname) ? ds.SentryOwnerName : userDisplayname),
                 SentryOwnerId = ds.SentryOwnerName,
@@ -288,8 +290,9 @@ namespace Sentry.data.Core
                 Delimiter = ds.DatasetFileConfigs?.First()?.Schema?.First()?.Delimiter,
                 FileExtensionId = ds.DatasetFileConfigs.First().FileExtension.Id,
                 DatasetScopeTypeId = ds.DatasetFileConfigs.First().DatasetScopeType.ScopeTypeId,
-                CategoryName = ds.DatasetCategories.First().Name
-            };
+                CategoryName = ds.DatasetCategories.First().Name,
+                MailtoLink = "mailto:?Subject=Dataset%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/Dataset/Detail/" + ds.DatasetId
+        };
 
             if (mapDetails)
             {
@@ -312,6 +315,7 @@ namespace Sentry.data.Core
                 dto.DistinctFileExtensions = ds.DatasetFiles.Select(x => Path.GetExtension(x.FileName).TrimStart('.').ToLower()).ToList();
                 dto.DatasetFileCount = ds.DatasetFiles.Count();
                 dto.OriginationCode = ds.OriginationCode;
+                dto.DataClassificationDescription = ds.DataClassification.GetDescription();
                 if (ds.DatasetFiles.Any())
                 {
                     dto.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);

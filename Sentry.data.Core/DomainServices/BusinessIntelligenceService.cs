@@ -46,10 +46,10 @@ namespace Sentry.data.Core
             try
             {
                 Dataset ds = CreatDataset(dto);
-                ds = _reportContext.Merge(ds); //setting it back to ds so we can use the datasetId.
+                _reportContext.Add(ds); //setting it back to ds so we can use the datasetId.
 
                 DatasetFileConfig dfc = CreateDatasetFileConig(dto, ds);
-                _reportContext.Merge(dfc);
+                _reportContext.Add(dfc);
 
                 //pull the save here last just incase anything happens while "merging", it will not commit.
                 _reportContext.SaveChanges();
@@ -187,8 +187,9 @@ namespace Sentry.data.Core
                 TagIds = ds.Tags.Select(x => x.TagId.ToString()).ToList(),
                 FileTypeId = ds.DatasetFileConfigs.First().FileTypeId,
                 CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "gray",
-                CanDisplay = ds.CanDisplay
-            };
+                CanDisplay = ds.CanDisplay,
+                MailtoLink = "mailto:?Subject=Business%20Intelligence%20Exhibit%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/BusinessIntelligence/Detail/" + ds.DatasetId
+        };
 
 
             //Details
@@ -203,6 +204,7 @@ namespace Sentry.data.Core
                 dto.FrequencyDescription = Enum.GetName(typeof(ReportFrequency), ds.Metadata.ReportMetadata.Frequency) ?? "Not Specified";
                 dto.TagNames = ds.Tags.Select(x => x.Name).ToList();
                 dto.CanManageReport = user.CanManageReports;
+
             }
 
             return dto;

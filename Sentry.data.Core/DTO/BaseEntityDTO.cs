@@ -30,6 +30,8 @@ namespace Sentry.data.Core
         public int Views { get; set; }
         public int AmountOfSubscriptions { get; set; }
         public bool CanDisplay { get; set; }
+        public string MailtoLink { get; set; }
+
 
     }
 }
