@@ -488,6 +488,7 @@
     <Content Include="Scripts\jquery-ui.js" />
     <Content Include="Scripts\jQuery.extendext.min.js" />
     <Content Include="Scripts\knockout-3.4.2.js" />
+    <Content Include="Scripts\knockout-paging.js" />
     <Content Include="Scripts\knockout-sortable.min.js" />
     <Content Include="Scripts\later.js" />
     <Content Include="Scripts\prettycron.js" />
