@@ -17,7 +17,7 @@
     <div class="navbar-form navbar-center">
         <div class="col-md-9 textCenter">
             <div class="searchBoxDS  has-feedback has-feedback-left">
-                <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Datasets..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('Datasets')" autocomplete="off" style="display: none;">
+                <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Datasets..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('Datasets'), event: {'keyup': searchResults.toFirstPage }" autocomplete="off" style="display: none;">
                 <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Exhibits and Dashboards..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('BusinessIntelligence')" autocomplete="off" style="display: none;">
                 <i class="form-control-feedback glyphicon glyphicon-search"></i>
             </div>
@@ -107,8 +107,38 @@
                         @*<select multiple="multiple" id="activeFilters " class="form-control select2-hidden-accessible"
                             data-bind="select2: { options: SearchFilters, width: '100%', selectedOptions: Select2Filters, optionsText: 'Title' }"></select>*@
                     </div>
-                    <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults">
+
+                    @* pagination controls *@
+                    <ul class="pagination">
+                        @* button to take you directly to the first page *@
+                        <li data-bind="css: { disabled: searchResults.isFirstPage() }" class="previous disabled">
+                            <a href="#" aria-label="First" data-bind="click: searchResults.toFirstPage" title="First">&laquo;</a>
+                        </li>
+                        @* button to take you to the prevoius page *@
+                        <li data-bind="css: { disabled: !searchResults.hasPreviousPage() }" class="previous disabled">
+                            <a href="#" aria-label="Previous" data-bind="click: searchResults.toPreviousPage" title="Previous">&lt;</a>
+                        </li>
+                        
+                        @* loop through the pages, building a button for each *@
+                        <!-- ko foreach: searchResults.pages -->
+                        <li data-bind="css: { active: $data == $parent.searchResults.pageNumber() }">
+                            <a href="#" data-bind="text: $data, click: $parent.searchResults.pageNumber.bind($data)"></a>
+                        </li>
+                        <!-- /ko -->
+
+                        @* button to take you to the next page*@
+                        <li data-bind="css: { disabled: !searchResults.hasNextPage() }" class="next disabled">
+                            <a href="#" aria-label="Next" data-bind="click: searchResults.toNextPage" title="Next">&gt;</a>
+                        </li>
+                        @* button to take you directly to the last page *@
+                        <li data-bind="css: { disabled: searchResults.isLastPage() }" class="next disabled">
+                            <a href="#" aria-label="Last" data-bind="click: searchResults.toLastPage" title="Last">&raquo;</a>
+                        </li>
+                    </ul>
+
+                    <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults.pageItems">
                         <li class="ul-dataset-list-item borderSide_gray boxShadowSm" style="background-color: white;" data-bind="css : BorderColor, click: TileClicked, attr: { title: PrimaryTitle }">
+                            <div data-bind="if: $index > 20"></div>
                             <div class="category-type-wrap">
                                 <div class="glyphicon glyphicon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none"></div>
                                 <div class="glyphicon glyphicon-star-empty btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite == false" style="display: none"></div>
@@ -163,7 +193,9 @@
                                 </div>
                             </div>
                         </li>
+
                     </ul>
+                    
                     <hr>
                     <!-- ko if: searchResults().length == 0 -->
                     <div>
@@ -646,6 +678,7 @@
 
                 return datasets;
             };
+
             self.FilterExhibits = function (exhibits) {
                 //First grab all the selected category ID's
                 var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
@@ -786,6 +819,7 @@
 
                 return exhibits;
             };
+
             self.FilterGeneric = function (allObjects) {
                 //First grab all the selected category ID's
                 var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
@@ -955,6 +989,7 @@
 
                 return allObjects;
             };
+
             self.PopulateDatasetFilters = function (datasets) {
                 var temp = [];
                 var pageType = '1_'
@@ -1045,6 +1080,7 @@
                 }
                 self.AllFilters.push(new FilterCategory('Extension', temp, 'plum'));
             };
+
             self.PopulateExhibitFilters = function (exhibits) {
                 var temp = [];
                 var pageType = '2_'
@@ -1184,6 +1220,7 @@
                 
 
             };
+
             self.PopulateGenericFilters = function (allObjects) {
                 var temp = [];
                 var pageType = '3_'
@@ -1398,10 +1435,10 @@
 
                 var searchQuery = self.Query().split(" ");
 
-
                 var temp = [];
 
                 for (var i = 0; i < self.datasets().length; i++) {
+
                     var keywordFound = false;
                     var count = 0;
                     var dataset = self.datasets()[i];
@@ -1447,7 +1484,8 @@
                 $("#SearchText").attr("placeholder", "Search " + queryResults.length + " Datasets...");
 
                 return queryResults;
-            });
+            }).extend({ paged: {pageSize: 20}});  // .extend() is for the knockout-paging plugin
+
 
             self.SelectedFilters.subscribe(function () {
                 localStorage.setItem("filteredIds", ko.toJSON(self.SelectedFilters()));
@@ -1489,8 +1527,6 @@
             else {
                 window.vm.clearFilters();
             }
-
-
 
             $(document).on("click", "[id^='filterType_']", function (e) {
                 e.preventDefault();

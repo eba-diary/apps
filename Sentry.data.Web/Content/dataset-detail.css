@@ -22,10 +22,13 @@
     margin-left: -15px;
 }
 
-.pagination > .active > a {
-    background-color: #74531C !important;
-    border-color: #74531C !important;
+#DatasetItemList .pagination {
+    font-feature-settings: "lnum";
 }
+
+    #DatasetItemList .pagination > .active > a {
+        background-color: #00a3e0 !important;
+    }
 
 .spanContainer {
     font-size: 0;
