@@ -120,7 +120,7 @@
                             </div>
                         </div>
                     </div>                    
-                    <a href="#/" data-bind="if: schemaOverride() || hasSchema() === false, visible: schemaOverride() || hasSchema() === false, click: function (d) { console.log(d); data.DatasetDetail.PreviewDatafileModal(d.primaryFileId()); }" class="table-row-icon row-filepreview-icon" title="Preview file">
+                    <a href="#/" data-bind="if: schemaOverride() || hasSchema() === false, visible: schemaOverride() || hasSchema() === false, click: function (d) { data.Dataset.PreviewDatafileModal(d.primaryFileId()); }" class="table-row-icon row-filepreview-icon" title="Preview file">
                         <i class="glyphicon glyphicon-search text-primary"></i>
                     </a>
                     <a href="#/" onclick="$(this).parent().children('.description').toggle()" class="table-row-icon row-filepreview-icon" title="Information about Schema">

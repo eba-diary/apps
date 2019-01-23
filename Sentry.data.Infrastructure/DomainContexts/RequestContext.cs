@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Sentry.NHibernate;
 using Sentry.data.Core;
 using NHibernate;
 
 namespace Sentry.data.Infrastructure
 {
+    [Obsolete("Merge everything here into a common DomainContext")]
     public class RequestContext : NHWritableDomainContext, IRequestContext
     {
         public RequestContext(ISession session) : base(session)

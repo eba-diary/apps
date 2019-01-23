@@ -4,6 +4,7 @@ namespace Sentry.data.Core
 {
     public interface IEventService
     {
-        Task CreateViewSchemaEditSuccessEvent(int configId, string userId, string reason);
+        void PublishSuccessEventByConfigId(string eventType, string userId, string reason, int configId);
+        void PublishSuccessEvent(string eventType, string userId, string reason, int datasetId);
     }
 }

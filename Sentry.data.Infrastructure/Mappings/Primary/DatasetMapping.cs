@@ -46,28 +46,19 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Bag<Category>(x => x.DatasetCategories, (b) =>
             {
                 b.Table("DatasetCategory");
-                b.Inverse(true);
-                b.Cascade(Cascade.All.Include(Cascade.DeleteOrphans));
+                b.Inverse(false);
                 b.Key((k) =>
                 {
                     k.Column("Dataset_Id");
                     k.ForeignKey("FK_DatasetCategory_Dataset");
                 });
-
             },
-            map => map.ManyToMany((n) =>
+            map => map.ManyToMany(n =>
             {
                 n.Column("Category_Id");
                 n.ForeignKey("FK_DatasetCategory_Category");
             }));
 
-            //old mapping to be deleted
-            //this.ManyToOne(x => x.DatasetCategories, m =>
-            //{
-            //    m.Column("Category_ID");
-            //    m.ForeignKey("FK_Dataset_Category");
-            //    m.Class(typeof(Category));
-            //});
 
             this.Bag(x => x.DatasetFiles, (m) =>
             {

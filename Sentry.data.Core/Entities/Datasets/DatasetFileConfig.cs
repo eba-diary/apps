@@ -37,7 +37,7 @@ namespace Sentry.data.Core
             var path = System.IO.Path.Combine(
                     Configuration.Config.GetHostSetting("PushToSASTargetPath"),
                     "current_files",
-                    ParentDataset.DatasetCategory.Name.ToLower(),
+                    ParentDataset.DatasetCategories.First().Name.ToLower(),
                     ParentDataset.DatasetName.Replace(' ', '_').ToLower(),
                     Name.Replace(' ', '_').ToLower()
                     );
@@ -52,7 +52,7 @@ namespace Sentry.data.Core
         }
         public virtual string GetStorageCode()
         {
-            if (ParentDataset.DatasetType != "RPT")
+            if (ParentDataset.DatasetType == GlobalConstants.DataEntityTypes.DATASET)
             {
                 return GetLatestSchemaRevision().StorageCode;
             }

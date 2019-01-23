@@ -24,7 +24,7 @@ namespace Sentry.data.Bundler
 
         public static IContainer _container;
         public static IDatasetContext _datasetContext;
-        public static IDatasetService _datasetService;
+        public static IS3ServiceProvider _datasetService;
 
         private class FileProcess {
 
@@ -87,7 +87,7 @@ namespace Sentry.data.Bundler
                             using (_container = Bootstrapper.Container.GetNestedContainer())
                             {
                                 _datasetContext = _container.GetInstance<IDatasetContext>();
-                                _datasetService = _container.GetInstance<IDatasetService>();
+                                _datasetService = _container.GetInstance<IS3ServiceProvider>();
                                 Bundle bundleProcess = _container.GetInstance<Bundle>();
 
                                 bundleProcess.RequestFilePath = file.fileName;

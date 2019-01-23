@@ -1,9 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using Sentry.data.Core;
-using Sentry.data.Web.Tests;
 using System.Web.Mvc;
-using Sentry.data.Web;
 using System.Linq;
 using Sentry.data.Web.Helpers;
 
@@ -17,9 +15,9 @@ namespace Sentry.data.Web.Tests
         public void Can_prevent_dataset_with_no_Category()
         {
             Dataset dataset1 = MockClasses.MockDataset();
-            dataset1.Category = null;
+            dataset1.DatasetCategories = null;
             var vr = dataset1.ValidateForSave();
-            Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.categoryIsBlank));
+            Assert.IsTrue(vr.Contains(GlobalConstants.ValidationErrors.CATEGORY_IS_BLANK));
         }
 
         [TestCategory("Dataset")]
@@ -30,7 +28,7 @@ namespace Sentry.data.Web.Tests
             Dataset dataset1 = MockClasses.MockDataset();
             dataset1.DatasetDesc = "";
             var vr = dataset1.ValidateForSave();
-            Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.datasetDescIsBlank));
+            Assert.IsTrue(vr.Contains(GlobalConstants.ValidationErrors.DATASET_DESC_IS_BLANK));
         }
 
         [TestCategory("Dataset")]
@@ -40,7 +38,7 @@ namespace Sentry.data.Web.Tests
             Dataset dataset1 = MockClasses.MockDataset();
             dataset1.DatasetName = null;
             var vr = dataset1.ValidateForSave();
-            Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.nameIsBlank));
+            Assert.IsTrue(vr.Contains(GlobalConstants.ValidationErrors.NAME_IS_BLANK));
         }
 
         [TestCategory("Dataset")]
@@ -50,7 +48,7 @@ namespace Sentry.data.Web.Tests
             Dataset dataset1 = MockClasses.MockDataset();
             dataset1.CreationUserName = null;
             var vr = dataset1.ValidateForSave();
-            Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.creationUserNameIsBlank));
+            Assert.IsTrue(vr.Contains(GlobalConstants.ValidationErrors.CREATION_USER_NAME_IS_BLANK));
         }
 
         [TestCategory("Dataset")]
@@ -60,7 +58,7 @@ namespace Sentry.data.Web.Tests
             Dataset dataset1 = MockClasses.MockDataset();
             dataset1.UploadUserName = null;
             var vr = dataset1.ValidateForSave();
-            Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.uploadUserNameIsBlank));
+            Assert.IsTrue(vr.Contains(GlobalConstants.ValidationErrors.UPLOAD_USER_NAME_IS_BLANK));
         }
 
         [TestCategory("Dataset")]
@@ -70,7 +68,7 @@ namespace Sentry.data.Web.Tests
             Dataset dataset1 = MockClasses.MockDataset();
             dataset1.DatasetDtm = new DateTime(1799, 1, 1);
             var vr = dataset1.ValidateForSave();
-            Assert.IsTrue(vr.Contains(Dataset.ValidationErrors.datasetDateIsOld));
+            Assert.IsTrue(vr.Contains(GlobalConstants.ValidationErrors.DATASET_DATE_IS_OLD));
         }
 
         [TestMethod]
@@ -101,10 +99,8 @@ namespace Sentry.data.Web.Tests
 
             var model = (result.Model as HomeModel);
 
-            Assert.IsTrue(model.DatasetCount == 1);
-            Assert.IsTrue(model.Categories.Count == 1);
-            Assert.IsTrue(model.CanEditDataset == false);
-            Assert.IsTrue(model.CanUpload == true);
+            Assert.IsFalse(model.CanEditDataset);
+            Assert.IsTrue(model.CanUpload);
         }
 
         [TestMethod]
@@ -121,10 +117,8 @@ namespace Sentry.data.Web.Tests
 
             var model = (result.Model as HomeModel);
 
-            Assert.IsTrue(model.DatasetCount == 1);
-            Assert.IsTrue(model.Categories.Count == 1);
-            Assert.IsTrue(model.CanEditDataset == true);
-            Assert.IsTrue(model.CanUpload == true);
+            Assert.IsTrue(model.CanEditDataset);
+            Assert.IsTrue(model.CanUpload);
         }
 
         [TestMethod]
@@ -138,44 +132,9 @@ namespace Sentry.data.Web.Tests
             var result = dac.Create() as ViewResult;
 
             //We don't want to see Index in the URL
-            Assert.AreEqual("", result.ViewName);
+            Assert.AreEqual("DatasetForm", result.ViewName);
         }
 
-        [TestMethod]
-        [TestCategory("Dataset Controller")]
-        public void Dataset_Controller_Create_Without_Model_Check_Default_User()
-        {
-            var user = MockUsers.App_DataMgmt_Upld();
-            var ds = MockClasses.MockDataset();
-            var dac = MockControllers.MockDatasetController(ds, user);
-
-            var result = dac.Create() as ViewResult;
-
-            Assert.IsTrue(result.Model.GetType() == typeof(CreateDatasetModel));
-
-            var model = (result.Model as CreateDatasetModel);
-
-            Assert.IsTrue(model.CanEditDataset == false);
-            Assert.IsTrue(model.CanUpload == true);
-        }
-
-        [TestMethod]
-        [TestCategory("Dataset Controller")]
-        public void Dataset_Controller_Create_Without_Model_Check_Manage_Dataset_User()
-        {
-            var user = MockUsers.App_DataMgmt_MngDS();
-            var ds = MockClasses.MockDataset();
-            var dsc = MockControllers.MockDatasetController(ds, user);
-
-            var result = dsc.Create() as ViewResult;
-
-            Assert.IsTrue(result.Model.GetType() == typeof(CreateDatasetModel));
-
-            var model = (result.Model as CreateDatasetModel);
-
-            Assert.IsTrue(model.CanEditDataset == true);
-            Assert.IsTrue(model.CanUpload == true);
-        }
 
         [TestMethod]
         [TestCategory("Dataset Controller")]
@@ -236,8 +195,8 @@ namespace Sentry.data.Web.Tests
 
             var model = (result.Model as SubscriptionModel);
 
-            Assert.IsTrue(model.CurrentSubscriptions.Count == MockClasses.MockEventTypes().Where(x => x.Display).Count());
-            Assert.IsTrue(model.AllEventTypes.Count() == MockClasses.MockEventTypes().Where(x => x.Display).Count());
+            Assert.IsTrue(model.CurrentSubscriptions.Count == MockClasses.MockEventTypes().Count(x => x.Display));
+            Assert.IsTrue(model.AllEventTypes.Count() == MockClasses.MockEventTypes().Count(x => x.Display));
             Assert.IsTrue(model.AllIntervals.Count() == MockClasses.MockIntervals().Count);
 
             Assert.IsTrue(model.datasetID == ds.DatasetId);

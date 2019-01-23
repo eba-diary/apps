@@ -9,15 +9,12 @@ using System.Collections.Generic;
 using NHibernate.Linq;
 using System.Threading.Tasks;
 using System.Net;
-using System.Configuration;
 using System.IO;
 
 namespace Sentry.data.Infrastructure
 {
     public class DataFeedProvider : NHReadableStatelessDomainContext, IDataFeedContext
     {
-        private readonly IDatasetContext _datasetContext;
-
 
         public DataFeedProvider(IStatelessSession session) : base(session)
         {
@@ -126,8 +123,8 @@ namespace Sentry.data.Infrastructure
                     DataFeedItem dfi = new DataFeedItem(
                     e.TimeCreated,
                     e.Dataset.ToString(),
-                    ds.DatasetName + " - A New Dataset was Created in the " + ds.Category + " Category",
-                    ds.DatasetName + " - A New Dataset was Created in the " + ds.Category + " Category",
+                    ds.DatasetName + " - A New Dataset was Created in the " + ds.DatasetCategories.First().Name + " Category",
+                    ds.DatasetName + " - A New Dataset was Created in the " + ds.DatasetCategories.First().Name + " Category",
                     new DataFeed() { Name = "Datasets", Url = "/Datasets/Detail/" + e.Dataset, Type = "Datasets" }
                     );
 
@@ -169,7 +166,7 @@ namespace Sentry.data.Infrastructure
                 if (ds != null)
                 {
                     DataFeed df = null;
-                    if (ds.DatasetType != null && ds.DatasetType == "RPT")
+                    if (ds.DatasetType == GlobalConstants.DataEntityTypes.REPORT)
                     {
                         df = new DataFeed() {
                             Id = ds.DatasetId,

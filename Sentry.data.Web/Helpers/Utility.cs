@@ -75,17 +75,24 @@ namespace Sentry.data.Web.Helpers
 
             return result;
         }
-        public static BaseDatasetModel setupLists(IDatasetContext _datasetContext, BaseDatasetModel model)
+        public static void SetupLists(IDatasetContext _datasetContext, BaseEntityModel model)
         {
             var temp = GetCategoryList(_datasetContext).ToList();
 
-            temp.Add(new SelectListItem()
+            if(model.DatasetCategoryIds?.Count == 1)
             {
-                Text = "Pick a Category",
-                Value = "0",
-                Selected = true,
-                Disabled = true
-            });
+                temp.First(x => x.Value == model.DatasetCategoryIds.First().ToString()).Selected = true;
+            }
+            else
+            {
+                temp.Add(new SelectListItem()
+                {
+                    Text = "Pick a Category",
+                    Value = "0",
+                    Selected = true,
+                    Disabled = true
+                });
+            }
 
             model.AllCategories = temp.OrderBy(x => x.Value);
 
@@ -156,14 +163,22 @@ namespace Sentry.data.Web.Helpers
                 index++;
             }
 
-
             model.AllDataClassifications = dataClassifications;
 
-            return model;
+            IEnumerable<SelectListItem> dFileExtensions;
+            dFileExtensions = _datasetContext.FileExtensions.Select((c) => new SelectListItem
+                {
+                    Selected = c.Name.Contains("ANY"),
+                    Text = c.Name.Trim(),
+                    Value = c.Id.ToString()
+                });
+
+            model.AllExtensions = dFileExtensions.OrderByDescending(x => x.Selected);
+
         }
         public static IEnumerable<SelectListItem> GetCategoryList(IDatasetContext _datasetContext)
         {
-            IEnumerable<SelectListItem> var = _datasetContext.Categories.Where(w => w.ObjectType == "DS").Select((c) => new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
+            IEnumerable<SelectListItem> var = _datasetContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityTypes.DATASET).Select((c) => new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
 
             return var;
         }

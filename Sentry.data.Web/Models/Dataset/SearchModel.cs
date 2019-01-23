@@ -1,6 +1,5 @@
 ﻿using Sentry.data.Common;
 using Sentry.data.Core;
-using Sentry.data.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +13,8 @@ namespace Sentry.data.Web
 
             Sentry.Associates.Associate sentryAssociate = _associateInfoProvider.GetAssociateInfo(ds.SentryOwnerName);
 
-            this.Category = ds.DatasetCategory.Name;            
-            this.AbbreviatedCategory = (String.IsNullOrWhiteSpace(ds.DatasetCategory.AbbreviatedName)) ? ds.DatasetCategory.Name : ds.DatasetCategory.AbbreviatedName;
+            this.Category = ds.DatasetCategories.First().Name;            
+            this.AbbreviatedCategory = (String.IsNullOrWhiteSpace(ds.DatasetCategories.First().AbbreviatedName)) ? ds.DatasetCategories.First().Name : ds.DatasetCategories.First().AbbreviatedName;
             this.DatasetName = ds.DatasetName;
             this.DatasetId = ds.DatasetId;
             this.DatasetDesc = ds.DatasetDesc;
@@ -24,12 +23,12 @@ namespace Sentry.data.Web
             this.DistinctFileExtensions = ds.DatasetFiles.Select(x => Utilities.GetFileExtension(x.FileName).ToLower()).Distinct().ToList();
             this.Frequencies = null;
             this.ChangedDtm = ds.ChangedDtm.ToShortDateString();
-            this.BannerColor = "categoryBanner-" + ds.DatasetCategory.Color;
-            this.BorderColor = "borderSide_" + ds.DatasetCategory.Color;
-            this.Color = ds.DatasetCategory.Color;
+            this.BannerColor = "categoryBanner-" + ds.DatasetCategories.First().Color;
+            this.BorderColor = "borderSide_" + ds.DatasetCategories.First().Color;
+            this.Color = ds.DatasetCategories.First().Color;
             this.Type = ds.DatasetType;
 
-            if (ds.DatasetType == "RPT")
+            if (ds.DatasetType == GlobalConstants.DataEntityTypes.REPORT)
             {
                 ReportType type = (ReportType)ds.DatasetFileConfigs.First().FileTypeId;
                 this.DistinctFileExtensions = new List<string> { type.ToString() };

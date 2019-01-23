@@ -82,18 +82,23 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DomainServices\ConfigService.cs" />
+    <Compile Include="DomainServices\DatasetService.cs" />
+    <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceDetailDTO.cs" />
+    <Compile Include="DTO\Dataset\DatasetDetailDTO.cs" />
     <Compile Include="Entities\HiveTableStatusEnum.cs" />
     <Compile Include="Entities\MessageFormats\HiveTableCreateModel.cs" />
     <Compile Include="Entities\Metadata\ColumnModel.cs" />
+    <Compile Include="Interfaces\IAssociateInfoProvider.cs" />
     <Compile Include="Interfaces\IConfigService.cs" />
+    <Compile Include="Interfaces\IDatasetService.cs" />
     <Compile Include="Interfaces\IEventService.cs" />
     <Compile Include="Interfaces\IUserService.cs" />
     <Compile Include="DomainServices\BusinessIntelligenceService.cs" />
     <Compile Include="DomainServices\MetadataRepositoryService.cs" />
     <Compile Include="DTO\BaseEntityDTO.cs" />
-    <Compile Include="DTO\BusinessIntelligenceDTO.cs" />
-    <Compile Include="DTO\BusinessIntelligenceHomeDTO.cs" />
-    <Compile Include="DTO\DatasetDTO.cs" />
+    <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceDTO.cs" />
+    <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceHomeDTO.cs" />
+    <Compile Include="DTO\Dataset\DatasetDTO.cs" />
     <Compile Include="Entities\Datasets\DatasetMetadata.cs" />
     <Compile Include="Entities\Datasets\FileExtension.cs" />
     <Compile Include="Entities\Datasets\ReportMetadata.cs" />
@@ -196,14 +201,13 @@
     <Compile Include="Interfaces\IExtendedUserInfo.cs" />
     <Compile Include="Interfaces\IExtendedUserInfoProvider.cs" />
     <Compile Include="Interfaces\IDataAssetContext.cs" />
-    <Compile Include="Interfaces\IDatasetService.cs" />
+    <Compile Include="Interfaces\IS3ServiceProvider.cs" />
     <Compile Include="Interfaces\IFtpProvider.cs" />
     <Compile Include="Interfaces\IMessagePublisher.cs" />
     <Compile Include="Interfaces\IMetadataRepositoryProvider.cs" />
     <Compile Include="Interfaces\IRequestContext.cs" />
     <Compile Include="Interfaces\ISASService.cs" />
     <Compile Include="Interfaces\IODCFileProvider.cs" />
-    <Compile Include="Interfaces\Report\IReportContext.cs" />
     <Compile Include="Interfaces\Retriever\IAuthenticationType.cs" />
     <Compile Include="Interfaces\Retriever\IDataSource.cs" />
     <Compile Include="Interfaces\Retriever\IRetrieverJob.cs" />

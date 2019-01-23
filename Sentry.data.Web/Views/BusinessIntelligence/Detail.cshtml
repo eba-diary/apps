@@ -1,0 +1,177 @@
+﻿@model Sentry.data.Web.BusinessIntelligenceDetailModel
+
+@{ViewBag.Title = "View Report Details";}
+
+<a href="@Url.Action("BusinessIntelligence", "Search")" class="backToList" id="linkReturnToBusinessIntelligenceList"><span class="glyphicon glyphicon-chevron-left"></span>Back to list</a>
+
+<div style="font-feature-settings: 'lnum';">
+    <div class="topBanner" style="height: 60px;margin-top: 20px;border-bottom: 1px #DDDDDD solid;">
+
+        <div class="relative hidden-sm hidden-xs">
+            <div>
+                <div class="no-overflow">
+                    <h1 class="detailName leftFloat @Model.CategoryColor">
+                        @Model.DatasetName
+
+                        @if (Model.IsSensitive)
+                        {
+                            <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
+                        }
+                    </h1>
+
+                    <div style="margin-top:-30px;" class="col-md-offset-9 col-md-4 col-lg-offset-10 col-lg-3">
+
+                        <div class="col-md-2 col-lg-2 ">
+                            <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Favorite">
+                                <button type="button" class="btn btn-default borderdk_gray borderdk_@Model.CategoryColor"
+                                        id="btnFavorite" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Favorite">
+                                    @if (Model.IsFavorite)
+                                    {
+                                        <span class="glyphicon glyphicon-star @Model.CategoryColor" id="favoriteIcon"></span>
+                                    }else{
+                                        <span class="glyphicon glyphicon-star-empty @Model.CategoryColor" id="favoriteIcon"></span>
+                                    }
+                                </button>
+                            </div>
+                        </div>
+                        @if (Model.CanManageReport)
+                        {
+                            <div class="col-md-2 col-lg-2">
+                                <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Edit Report">
+                                    <button type="button" class="btn btn-default btn borderdk_gray borderdk_@Model.CategoryColor"
+                                            id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Report">
+                                        <span class="glyphicon glyphicon-edit @Model.CategoryColor"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        }
+                        <div class="col-md-2 col-lg-2" style="margin-left:0px;">
+                            <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions">
+                                <button type="button" class="btn btn-default borderdk_gray borderdk_@Model.CategoryColor dropdown" data-toggle="dropdown">
+                                    <span class="glyphicon glyphicon-menu-hamburger @Model.CategoryColor"></span>
+                                </button>
+                                <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
+                                    @if (Model.CanManageReport)
+                                    {
+                                        <li>
+                                            <a id="deleteLink" href="" data-id="@Model.DatasetId">Delete Report</a>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br />
+
+    <div class="row" style="margin-top: 15px;">
+        <div class="col-lg-12">
+            <div class="row">
+                <div class="col-lg-8 col-sm-6">
+                    <div style="margin-top: 15px;">
+                        @if (!String.IsNullOrWhiteSpace(Model.DatasetDesc))
+                        {
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div>
+                                        <h6 class="@Model.CategoryColor">Description:</h6><br />
+
+                                        @if (Model.DatasetDesc.Length >= 500)
+                                        {
+                                            int last = Model.DatasetDesc.Substring(0, 500).LastIndexOf(" ");
+                                            <p class="spanContainer">
+                                                <span style="margin-top: 15px;">@Model.DatasetDesc.Substring(0, last)</span>
+                                                <span id="descSeeMoreEllipsis">...&nbsp;</span>
+                                                <span id="descSeeMorePanel" style="display: none;">@Model.DatasetDesc.Substring(last) </span>
+                                                <span id="descSeeMoreButton" style="cursor: pointer;"><a onclick="$('#descSeeMorePanel').show(); $(this).parent().hide(); $('#descShowLessButton').show(); $('#descSeeMoreEllipsis').hide();">See More</a></span>
+                                                <span id="descShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#descSeeMorePanel').hide(); $(this).parent().hide(); $('#descSeeMoreButton').show(); $('#descSeeMoreEllipsis').show();">Show Less</a></span>
+                                            </p>
+                                        }
+                                        else
+                                        {
+                                            <p>@Model.DatasetDesc</p>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                            <br />
+                        }
+                    </div>
+                    <hr />
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="row" style="border: 1px #DDDDDD solid; background: white; padding: 20px;">
+
+                        <div class="row" style="min-height: 60px;">
+                            <div class="col-lg-6">
+                                <h5 class="@Model.CategoryColor">Refresh Frequency</h5>
+                                <h6 class="@Model.CategoryColor">@Model.FrequencyDescription</h6>
+                            </div>
+                        </div>
+
+                        <hr />
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <h5 class="@Model.CategoryColor">Sentry Owner</h5>
+                                <h6 class="@Model.CategoryColor">@Model.SentryOwnerName</h6>
+                            </div>
+                        </div>
+
+                        <hr />
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <h5 class="@Model.CategoryColor" >Exhibit Views</h5>
+                                <h6 class="@Model.CategoryColor" style="font-feature-settings: 'lnum';">@Model.Views</h6>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div id="aboutThisSchema" class="metadataHeader">
+                <h3 class="@Model.CategoryColor" >About this Exhibit</h3>
+            </div>
+            <div class="metadataBody container row" style="border: 1px #DDDDDD solid; background: white; padding: 10px;">
+                <div class="col-lg-4" >
+                    <h5 class="@Model.CategoryColor">Tags:</h5>
+                    @foreach (var item in Model.TagNames)
+                    {
+                        <div class="tags-block htCenter tag_@item">@item</div>
+                    }
+                </div>
+                <div class="col-lg-8">
+                    <h5 class="@Model.CategoryColor">Data Ownership:</h5>
+                    <table class="table table-striped table-hover detailTable" style="margin-left: 0px;">
+                        <tbody>
+                            <tr class="borderMeta_@Model.CategoryColor">
+                                <td class="borderMeta_@Model.CategoryColor colOneMeta">Dataset Creator</td>
+                                <td class="borderMeta_@Model.CategoryColor">@Model.CreationUserName</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br />
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/prettyCron")
+    @Scripts.Render("~/bundles/dataTables")
+    <script> $(function () { data.Report.DetailInit(); }); </script>
+}

@@ -52,7 +52,7 @@ namespace Sentry.data.Web
                 //{
                     if (CanPreview && correctSensitivityForDownload && correctFileTypeForPreview)
                     {
-                        href += "<a href = \"#\" onclick=\"data.DatasetDetail.PreviewDatafileModal(" + Id + ")\" class=\"table-row-icon row-filepreview-icon\" title=\"Preview file\"><i class='glyphicon glyphicon-search text-primary'></i></a>";
+                        href += "<a href = \"#\" onclick=\"data.Dataset.PreviewDatafileModal(" + Id + ")\" class=\"table-row-icon row-filepreview-icon\" title=\"Preview file\"><i class='glyphicon glyphicon-search text-primary'></i></a>";
                     }
                     else if(!correctFileTypeForPreview)
                     {
@@ -65,12 +65,12 @@ namespace Sentry.data.Web
 
                     if (correctSensitivityForDownload)
                     {
-                        href += "<a href = \"#\" onclick=\"data.DatasetDetail.DownloadDatasetFile(" + Id + ")\" class=\"table-row-icon row-filedownload-icon\" title=\"Download File\"><i class='glyphicon glyphicon-cloud-download text-primary'></i></a>";
+                        href += "<a href = \"#\" onclick=\"data.Dataset.DownloadDatasetFile(" + Id + ")\" class=\"table-row-icon row-filedownload-icon\" title=\"Download File\"><i class='glyphicon glyphicon-cloud-download text-primary'></i></a>";
                     }
                 //}
                 if (CanEdit)
                 {
-                    href += "<a href = \"#\" onclick=\"data.DatasetDetail.EditDataFileInformation(" + Id + ")\" class=\"table-row-icon\" title=\"Edit File\"><i class='glyphicon glyphicon-edit text-primary'></i></a>";
+                    href += "<a href = \"#\" onclick=\"data.Dataset.EditDataFileInformation(" + Id + ")\" class=\"table-row-icon\" title=\"Edit File\"><i class='glyphicon glyphicon-edit text-primary'></i></a>";
                 }
 
                 //if (IsUsable)

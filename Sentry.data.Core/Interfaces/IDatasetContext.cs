@@ -15,6 +15,7 @@ namespace Sentry.data.Core
         IQueryable<Dataset> Datasets { get; }
         IQueryable<DataSourceType> DataSourceTypes { get; }
         IQueryable<DataSource> DataSources { get; }
+        IQueryable<DatasetScopeType> DatasetScopeTypes { get; }
         IQueryable<AuthenticationType> AuthTypes { get; }
         IQueryable<EventType> EventTypes { get; }
         IQueryable<Event> Events { get; }
@@ -35,7 +36,6 @@ namespace Sentry.data.Core
 
         Dataset GetById(int id);
         int GetDatasetCount();
-        IEnumerable<Dataset> GetExhibits();
         Boolean isDatasetNameDuplicate(string datasetName, string category);
         string GetPreviewKey(int id);
         IEnumerable<Dataset> GetDatasetByCategoryID(int id);
@@ -74,6 +74,7 @@ namespace Sentry.data.Core
         List<DatasetSubscription> GetAllSubscriptions();
         List<Event> EventsSince(DateTime time, Boolean IsProcessed);
         int GetNextStorageCDE();
+        int GetReportCount();
     }
 
 }

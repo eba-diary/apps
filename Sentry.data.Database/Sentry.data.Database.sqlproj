@@ -203,6 +203,7 @@
     <Build Include="Tables\DatasetCategory.sql" />
     <PreDeploy Include="Scripts\Pre-Deploy\_PreDeployment.sql" />
     <None Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_19_2_1\InsertCategoriesToTemp.sql" />
+    <None Include="Scripts\Post-Deploy\StaticData\EventType.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Sentry.data.Database.refactorlog" />

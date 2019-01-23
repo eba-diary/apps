@@ -1,24 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 using Sentry.data.Core;
 
 namespace Sentry.data.Web
 {
-    public class BusinessIntelligenceModel : BaseDatasetModel
+    public class BusinessIntelligenceModel : BaseEntityModel
     {
-        public BusinessIntelligenceModel()
-        {
-            this.CanDisplay = true;
-            this.TagIds = new List<int>();
-        }
+        public BusinessIntelligenceModel() { }
 
-        public BusinessIntelligenceModel(BusinessIntelligenceDto dto) : base(dto, null)
+        public BusinessIntelligenceModel(BusinessIntelligenceDto dto) : base(dto)
         {
             Location = dto.Location;
             FileTypeId = dto.FileTypeId;
             FrequencyId = dto.FrequencyId;
-            TagIds = dto.TagIds;
         }
 
 
@@ -30,10 +27,40 @@ namespace Sentry.data.Web
         [DisplayName("Exhibit Type")]
         public int FileTypeId { get; set; }
 
+        [Required]
         [DisplayName("Frequency")]
         public int? FrequencyId { get; set; }
 
-        public List<int> TagIds { get; set; } //selected values
-        public string TagString { get; set; } //how the tags are displayed.
+
+
+
+        public List<string> Validate()
+        {
+            List<string> errors = new List<string>();
+
+            if (!Uri.TryCreate(this.Location, UriKind.Absolute, out Uri temp))
+            {
+                errors.Add("Invalid report location value");
+            }
+
+            switch (this.FileTypeId)
+            {
+                case (int)ReportType.Tableau:
+                    if (!Regex.IsMatch(this.Location.ToLower(), "^https://tableau.sentry.com"))
+                    {
+                        errors.Add("Tableau exhibits should begin with https://Tableau.sentry.com");
+                    }
+                    break;
+                case (int)ReportType.Excel:
+                    if (!Regex.IsMatch(this.Location.ToLower(), "^\\\\\\\\(sentry.com\\\\share\\\\|sentry.com\\\\appfs)"))
+                    {
+                        errors.Add("Excel exhibits should begin with \\\\Sentry.com\\Share or \\\\Sentry.com\\appfs");
+                    }
+                    break;
+            }
+
+            return errors;
+        }
+
     }
 }

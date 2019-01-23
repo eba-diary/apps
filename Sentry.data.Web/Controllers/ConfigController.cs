@@ -51,12 +51,14 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Index(int id)
         {
             Dataset ds = _datasetContext.GetById(id);
-            BaseDatasetModel bdm = new BaseDatasetModel(ds, _associateInfoProvider, _datasetContext);
-            bdm.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
-            bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
-            bdm.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
-            bdm.CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
-            bdm.CanUpload = SharedContext.CurrentUser.CanUpload;
+            ObsoleteDatasetModel bdm = new ObsoleteDatasetModel(ds, _associateInfoProvider, _datasetContext)
+            {
+                CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive,
+                CanEditDataset = SharedContext.CurrentUser.CanEditDataset,
+                CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs,
+                CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive,
+                CanUpload = SharedContext.CurrentUser.CanUpload
+            };
 
             Event e = new Event();
             e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
@@ -207,7 +209,7 @@ namespace Sentry.data.Web.Controllers
                 DataElementCreate_DTM = DateTime.Now,
                 DataElementChange_DTM = DateTime.Now,
                 DataElement_CDE = "F",
-                DataElement_DSC = DataElementCode.DataFile,
+                DataElement_DSC = GlobalConstants.DataElementDescription.DATA_FILE,
                 DataElement_NME = dfcm.ConfigFileName,
                 LastUpdt_DTM = DateTime.Now,
                 SchemaIsPrimary = true,
@@ -1314,16 +1316,16 @@ namespace Sentry.data.Web.Controllers
             {
                 switch (vr.Id)
                 {
-                    case Dataset.ValidationErrors.s3keyIsBlank:
+                    case GlobalConstants.ValidationErrors.S3KEY_IS_BLANK:
                         ModelState.AddModelError("Key", vr.Description);
                         break;
-                    case Dataset.ValidationErrors.nameIsBlank:
+                    case GlobalConstants.ValidationErrors.NAME_IS_BLANK:
                         ModelState.AddModelError("Name", vr.Description);
                         break;
-                    case Dataset.ValidationErrors.creationUserNameIsBlank:
+                    case GlobalConstants.ValidationErrors.CREATION_USER_NAME_IS_BLANK:
                         ModelState.AddModelError("CreationUserName", vr.Description);
                         break;
-                    case Dataset.ValidationErrors.datasetDateIsOld:
+                    case GlobalConstants.ValidationErrors.DATASET_DATE_IS_OLD:
                         ModelState.AddModelError("DatasetDate", vr.Description);
                         break;
                     case SFtpSource.ValidationErrors.portNumberValueNonZeroValue:
@@ -1344,12 +1346,14 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetFileConfig config = _datasetContext.GetById<DatasetFileConfig>(configId);
 
-            BaseDatasetModel bdm = new BaseDatasetModel(config.ParentDataset, _associateInfoProvider, _datasetContext);
-            bdm.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
-            bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
-            bdm.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
-            bdm.CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
-            bdm.CanUpload = SharedContext.CurrentUser.CanUpload;
+            ObsoleteDatasetModel bdm = new ObsoleteDatasetModel(config.ParentDataset, _associateInfoProvider, _datasetContext)
+            {
+                CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive,
+                CanEditDataset = SharedContext.CurrentUser.CanEditDataset,
+                CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs,
+                CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive,
+                CanUpload = SharedContext.CurrentUser.CanUpload
+            };
 
             Event e = new Event();
             e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
@@ -1391,7 +1395,7 @@ namespace Sentry.data.Web.Controllers
             {
                 _configService.UpdateFields(configId, schemaId, schemaRows);
 
-                Task.Factory.StartNew(() => _eventService.CreateViewSchemaEditSuccessEvent(configId, SharedContext.CurrentUser.AssociateId, "Viewed Edit Fields"), TaskCreationOptions.LongRunning);
+                //Task.Factory.StartNew(() => _eventService.PublishSuccessEventByConfigId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Edit Fields", configId), TaskCreationOptions.LongRunning);
             }
             catch (Exception ex)
             {
@@ -1456,7 +1460,7 @@ namespace Sentry.data.Web.Controllers
                         DataElementChange_DTM = DateTime.Now,
                         LastUpdt_DTM = DateTime.Now,
                         DataElement_CDE = "F",
-                        DataElementCode_DSC = DataElementCode.DataFile,
+                        DataElementCode_DSC = GlobalConstants.DataElementDescription.DATA_FILE,
                         DataElement_NME = csm.Name,
                         DataElement_DSC = csm.Description,
                         DatasetFileConfig = dfc,

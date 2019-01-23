@@ -6,6 +6,8 @@
 INSERT INTO DatasetCategory (Dataset_Id, Category_Id)
 SELECT Dataset_ID, Category_ID FROM #TempDatasetCategory
 
+UPDATE Dataset SET Dataset_TYP = 'DS' WHERE Dataset_TYP IS NULL;
+
 If(OBJECT_ID('tempdb..#TempDatasetCategory') Is Not Null)
 Begin
     Drop Table #TempDatasetCategory

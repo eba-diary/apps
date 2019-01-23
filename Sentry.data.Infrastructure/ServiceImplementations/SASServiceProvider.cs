@@ -55,7 +55,7 @@ namespace Sentry.data.Infrastructure
                         throw new ArgumentException($"No DatasetFile Found - ID:{datafileId}");
                     }
 
-                    StringBuilder url = GernerateSASURL(filename, df.Dataset.DatasetCategory.Name, delimiter, guessingrows);
+                    StringBuilder url = GernerateSASURL(filename, df.Dataset.DatasetCategories.First().Name, delimiter, guessingrows);
 
                 
                     //JCG TODO: Revisit after SAS fixes issue around initial logon attempt fails, additional attempts succeed.

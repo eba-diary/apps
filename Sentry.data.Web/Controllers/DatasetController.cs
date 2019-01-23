@@ -1,8 +1,5 @@
-﻿using Sentry.Core;
-using Sentry.data.Core;
-using Amazon;
+﻿using Sentry.data.Core;
 using Amazon.S3;
-using Amazon.S3.Model;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -22,13 +19,8 @@ using Sentry.DataTables.Mvc;
 using Sentry.DataTables.QueryableAdapter;
 using Sentry.data.Common;
 using System.Diagnostics;
-using LazyCache;
-using StackExchange.Profiling;
 using Sentry.Common.Logging;
-using Sentry.data.Core.Entities.Metadata;
-using static Sentry.data.Core.RetrieverJobOptions;
 using Hangfire;
-using System.Web.Script.Serialization;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -42,7 +34,9 @@ namespace Sentry.data.Web.Controllers
         private readonly ISASService _sasService;
         private readonly IRequestContext _requestContext;
 
-        public DatasetController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, ISASService sasService, IAssociateInfoProvider associateInfoService, IRequestContext requestContext)
+        private readonly IDatasetService _datasetService;
+        private readonly IEventService _eventService;
+        public DatasetController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, ISASService sasService, IAssociateInfoProvider associateInfoService, IRequestContext requestContext, IDatasetService datasetService, IEventService eventService)
         {
             _datasetContext = dsCtxt;
             _s3Service = dsSvc;
@@ -50,31 +44,22 @@ namespace Sentry.data.Web.Controllers
             _sasService = sasService;
             _associateInfoProvider = associateInfoService;
             _requestContext = requestContext;
+            _datasetService = datasetService;
+            _eventService = eventService;
         }
 
         [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult Index()
         {
-            HomeModel hm = new HomeModel();
+            HomeModel hm = new HomeModel
+            {
+                DatasetCount = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityTypes.DATASET).Count(),
+                Categories = _datasetContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityTypes.DATASET).ToList(),
+                CanEditDataset = SharedContext.CurrentUser.CanEditDataset,
+                CanUpload = SharedContext.CurrentUser.CanUpload
+            };
 
-            List<Dataset> dsList = _datasetContext.Datasets.ToList();
-            List<Category> cList = _datasetContext.Categories.ToList();
-
-            hm.DatasetCount = dsList.Count(w => w.DatasetType != "RPT");
-            hm.Categories = cList.Where(w => w.ObjectType != "RPT").ToList();
-            hm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
-            hm.CanUpload = SharedContext.CurrentUser.CanUpload;
-
-            Event e = new Event();
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-            e.Reason = "Viewed Dataset Home Page";
-            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-
+            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Home Page", 0);
             return View(hm);
         }
 
@@ -85,366 +70,83 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.DatasetEdit)]
         public ActionResult Create()
         {
-            CreateDatasetModel cdm = new CreateDatasetModel();
-
-            cdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
-            cdm.CanUpload = SharedContext.CurrentUser.CanUpload;
-
-            cdm.DatasetFileConfigs = new List<DatasetFileConfigsModel>();
-            cdm.DatasetFileConfigs.Add(new DatasetFileConfigsModel() { ConfigFileName = "Default", ConfigFileDesc = "Default Config for Dataset.  Uploaded files that do not match any configs will default to this config" });
-
-            cdm.SearchCriteria = "\\.";           
-
-            cdm = (CreateDatasetModel) Utility.setupLists(_datasetContext, cdm);
-            cdm.IsRegexSearch = true;
-
-            cdm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext);
-
-            Event e = new Event();
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-            e.Reason = "Viewed Dataset Creation Page";
-            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-
-            return View(cdm);
-        }
-
-        [HttpPost]
-        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
-        public ActionResult Create(CreateDatasetModel cdm)
-        {
-
-            if (_datasetContext.isDatasetNameDuplicate(cdm.DatasetName, _datasetContext.GetCategoryById(cdm.CategoryIDs).Name))
+            DatasetModel cdm = new DatasetModel()
             {
-                AddCoreValidationExceptionsToModel(new ValidationException("DatasetName", "Dataset name already exists within category"));
-            }
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    Dataset ds = CreateDatasetFromModel(cdm);
-                    ds = _datasetContext.Merge<Dataset>(ds);
-
-                    List<DataElement> deList = new List<DataElement>();
-                    DataElement de = CreateNewDataElement(cdm);
-
-                    //Create Generic Data File Config for Dataset            
-                    DatasetFileConfig dfc = new DatasetFileConfig()
-                    {
-                        ConfigId = 0,
-                        Name = cdm.ConfigFileName,
-                        Description = cdm.ConfigFileDesc,
-                        //SearchCriteria = cdm.SearchCriteria, 
-                        //DropPath = cdm.DropPath + "default\\",
-                        //IsRegexSearch = cdm.IsRegexSearch,
-                        //OverwriteDatafile = true,
-                        FileTypeId = (int)FileType.DataFile,
-                        ParentDataset = ds,
-                        DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(cdm.DatasetScopeTypeID),
-                        FileExtension = _datasetContext.GetById<FileExtension>(cdm.FileExtensionID),                        
-                    };
-
-                    de.DatasetFileConfig = dfc;
-                    deList.Add(de);
-                    dfc.Schema = deList;
-
-                    List<RetrieverJob> jobList =  new List<RetrieverJob>();
-
-                    //Store this one so that the local drop location can be created.
-                    RetrieverJob rj = Utility.InstantiateJobsForCreation(dfc, _datasetContext.DataSources.First(x => x.Name.Contains("Default Drop Location")));
-                    jobList.Add(rj);
-
-                    jobList.Add(Utility.InstantiateJobsForCreation(dfc, _datasetContext.DataSources.First(x => x.Name.Contains("Default S3 Drop Location"))));
-
-                    dfc.RetrieverJobs = jobList;
-
-                    _datasetContext.Merge<DatasetFileConfig>(dfc);
-                    _datasetContext.SaveChanges();
-
-                    Event e = new Event();
-                    e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Created Dataset").FirstOrDefault();
-                    e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-                    e.TimeCreated = DateTime.Now;
-                    e.TimeNotified = DateTime.Now;
-                    e.IsProcessed = false;
-                    e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-                    e.Dataset = (_datasetContext.Datasets.ToList()).FirstOrDefault(x => x.DatasetName == cdm.DatasetName).DatasetId;
-                    e.Reason = cdm.DatasetName + " was created.";
-                    Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-
-                    //create drop locations
-                    try
-                    {
-                        //Config Drop location
-                        if (!Directory.Exists(rj.GetUri().LocalPath))
-                        {
-                            Directory.CreateDirectory(rj.GetUri().LocalPath);
-                        }
-
-                    }
-                    catch (Exception ex)
-                    {
-                        StringBuilder errmsg = new StringBuilder();
-                        errmsg.AppendLine("Failed to Create Drop Location:");
-                        errmsg.AppendLine($"DatasetId: {ds.DatasetId}");
-                        errmsg.AppendLine($"DatasetName: {ds.DatasetName}");
-                        errmsg.AppendLine($"DropLocation: {rj.GetUri().LocalPath}");
-
-                        Logger.Error(errmsg.ToString(), ex);
-                    }
-
-                    return RedirectToAction("Detail", new { id = (_datasetContext.Datasets.ToList()).FirstOrDefault(x => x.DatasetName == cdm.DatasetName).DatasetId });
-                }
-            }
-            catch (Sentry.Core.ValidationException ex)
-            {
-                AddCoreValidationExceptionsToModel(ex);
-            }
-            finally
-            {
-                _datasetContext.Clear();
-                cdm = (CreateDatasetModel) Utility.setupLists(_datasetContext, cdm);
-                cdm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext);
-            }
-
-            List<SearchableTag> tagsToReturn = new List<SearchableTag>();
-            int[] json = new JavaScriptSerializer().Deserialize<int[]>(cdm.TagString);
-            for (int i = 0; i < json.Length; i++)
-            {
-                tagsToReturn.Add(_datasetContext.Tags.Where(x => x.TagId == json[i]).FirstOrDefault().GetSearchableTag());
-            }
-            cdm.TagString = new JavaScriptSerializer().Serialize(tagsToReturn);
-            ModelState.Remove("TagString");
-            return View(cdm);
-        }
-
-        private DataElement CreateNewDataElement(CreateDatasetModel cdm)
-        {
-            DataElement de = new DataElement()
-            {
-                DataElementCreate_DTM = DateTime.Now,
-                DataElementChange_DTM = DateTime.Now,
-                DataElement_CDE = "F",
-                DataElement_DSC = DataElementCode.DataFile,
-                DataElement_NME = cdm.ConfigFileName,
-                LastUpdt_DTM = DateTime.Now,
-                SchemaIsPrimary = true,
-                SchemaDescription = cdm.ConfigFileDesc,
-                SchemaName = cdm.ConfigFileName,
-                SchemaRevision = 1,
-                SchemaIsForceMatch = false,
-                FileFormat = _datasetContext.GetById<FileExtension>(cdm.FileExtensionID).Name.ToUpper(),
-                Delimiter = cdm.Delimiter,
-                StorageCode = _datasetContext.GetNextStorageCDE().ToString(),
-                HiveDatabase = "Default",
-                HiveTable = cdm.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + cdm.ConfigFileName.Replace(" ", "").ToUpper(),
-                HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString()
+                //these are defaluted for now and disbled on UI but will change to open field.
+                ConfigFileName = "Default",
+                ConfigFileDesc = "Default Config for Dataset.  Uploaded files that do not match any configs will default to this config",
+                UploadUserName = SharedContext.CurrentUser.AssociateId,
             };
 
-            return de;
+            Utility.SetupLists(_datasetContext, cdm);
+
+            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Creation Page", cdm.DatasetId);
+
+            return View("DatasetForm", cdm);
         }
 
-        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
-        private Dataset CreateDatasetFromModel(CreateDatasetModel cdm)
-        {
-            DateTime CreateTime = DateTime.Now;
-            Category cat = _datasetContext.GetById<Category>(cdm.CategoryIDs);
-            IApplicationUser user = _userService.GetCurrentUser();
-
-            Dataset ds = new Dataset()
-            {
-                DatasetId = 0,
-                DatasetCategories = _datasetContext.GetCategoryById(cdm.CategoryIDs),
-                DatasetName = cdm.DatasetName,
-                DatasetDesc = cdm.DatasetDesc,
-                DatasetInformation = cdm.DatasetInformation,
-                CreationUserName = user.DisplayName,
-                SentryOwnerName = cdm.SentryOwnerName,
-                UploadUserName = user.AssociateId,
-                OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), cdm.OriginationID),
-                DatasetDtm = CreateTime,
-                ChangedDtm = CreateTime,
-                IsSensitive = false,
-                CanDisplay = true,
-                DatasetFiles = null,
-                DatasetFileConfigs = null,
-                Tags = new List<MetadataTag>()
-            };
-
-            int[] json = new JavaScriptSerializer().Deserialize<int[]>(cdm.TagString);
-
-            ds.Tags = new List<MetadataTag>();
-
-            for (int i = 0; i < json.Length; i++)
-            {
-                ds.Tags.Add(_datasetContext.Tags.Where(x => x.TagId == json[i]).FirstOrDefault());
-            }
-
-            return ds;
-        }
-
-        // GET: DatasetFileVersion/Edit/5
         [HttpGet()]
         [AuthorizeByPermission(PermissionNames.DatasetEdit)]
         public ActionResult Edit(int id)
         {
-            Dataset ds = _datasetContext.GetById<Dataset>(id);
+            DatasetDto dto = _datasetService.GetDatasetDto(id);
+            DatasetModel model = new DatasetModel(dto);
 
-            EditDatasetModel item = new EditDatasetModel(ds, _associateInfoProvider);
+            Utility.SetupLists(_datasetContext, model);
 
-            item = (EditDatasetModel) Utility.setupLists(_datasetContext,item);
-
-            var json = new JavaScriptSerializer().Serialize(ds.Tags.Select(x => x.GetSearchableTag()));
-            item.TagString = json;
-
-            item.OwnerID = ds.SentryOwnerName;
-
-            Event e = new Event();
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-            e.Reason = "Viewed Dataset Edit Page";
-            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-
-            return View(item);
-        }
-
-        // POST: Dataset/Edit/5
-        [HttpPost()]
-        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
-        public ActionResult Edit(int id, EditDatasetModel edm)
-        {
-            try
-            {
-                Dataset item = _datasetContext.GetById<Dataset>(id);
-                if (ModelState.IsValid)
-                {
-                    item = UpdateDatasetFromModel(item, edm);
-                    _datasetContext.SaveChanges();
-                    return RedirectToAction("Detail", new { id = id });
-
-                }
-            }
-            catch (Sentry.Core.ValidationException ex)
-            {
-                AddCoreValidationExceptionsToModel(ex);
-            }
-            finally
-            {
-                _datasetContext.Clear();
-
-                edm = (EditDatasetModel) Utility.setupLists(_datasetContext, edm);
-            }
-
-            List<SearchableTag> tagsToReturn = new List<SearchableTag>();
-            int[] json = new JavaScriptSerializer().Deserialize<int[]>(edm.TagString);
-            for (int i = 0; i < json.Length; i++)
-            {
-                tagsToReturn.Add(_datasetContext.Tags.Where(x => x.TagId == json[i]).FirstOrDefault().GetSearchableTag());
-            }
-            edm.TagString = new JavaScriptSerializer().Serialize(tagsToReturn);
-            ModelState.Remove("TagString");
-
-            return View(edm);
+            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Edit Page", id);
+            return View("DatasetForm", model);
         }
 
         [HttpPost]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
-        private Dataset UpdateDatasetFromModel(Dataset ds, EditDatasetModel eds)
+        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
+        public ActionResult DatasetForm(DatasetModel model)
         {
-            ds.DatasetInformation = eds.DatasetInformation;
-            ds.OriginationCode = eds.OriginationCode;
-            ds.ChangedDtm = DateTime.Now;
+            DatasetDto dto = model.ToDto();
 
-            if (null != eds.Category && eds.Category.Length > 0)
+            AddCoreValidationExceptionsToModel(_datasetService.Validate(dto));
+            if (ModelState.IsValid)
             {
-                ds.Category = eds.Category;
-            }
 
-            if (null != eds.CreationUserName && eds.CreationUserName.Length > 0)
-            {
-                ds.CreationUserName = eds.CreationUserName;
-            }
-
-            if (null != eds.DatasetDesc && eds.DatasetDesc.Length > 0)
-            {
-                ds.DatasetDesc = eds.DatasetDesc;
-            }
-
-            if (eds.DatasetDtm > DateTime.MinValue)
-            {
-                ds.DatasetDtm = eds.DatasetDtm;
-            }
-
-            if (null != eds.DatasetName && eds.DatasetName.Length > 0)
-            {
-                ds.DatasetName = eds.DatasetName;
-            }
-
-            if (null != eds.SentryOwnerName && eds.SentryOwnerName.Length > 0)
-            {
-                int n;
-                if(int.TryParse(eds.SentryOwnerName, out n))
+                if(dto.DatasetId == 0)
                 {
-                    ds.SentryOwnerName = eds.SentryOwnerName;
+                    int datasetId = _datasetService.CreateAndSaveNewDataset(dto);
+
+                    _eventService.PublishSuccessEvent(GlobalConstants.EventType.CREATED_DATASET, SharedContext.CurrentUser.AssociateId, dto.DatasetName + " was created.", datasetId);
+                    return RedirectToAction("Detail", new { id = datasetId });
                 }
                 else
                 {
-                    var associate = _associateInfoProvider.GetAssociateInfoByName(eds.SentryOwnerName);
-                    if (associate.FullName == eds.SentryOwnerName)
-                    {
-                        ds.SentryOwnerName = associate.Id;
-                    }
+                    _datasetService.UpdateAndSaveDataset(dto);
+
+                    _eventService.PublishSuccessEvent(GlobalConstants.EventType.UPDATED_DATASET, SharedContext.CurrentUser.AssociateId, dto.DatasetName + " was created.", dto.DatasetId);
+                    return RedirectToAction("Detail", new { id = dto.DatasetId });
                 }
-
+                
             }
 
-            int[] json = new JavaScriptSerializer().Deserialize<int[]>(eds.TagString);
+            Utility.SetupLists(_datasetContext, model);
 
-            ds.Tags = new List<MetadataTag>();
-
-            for (int i = 0; i < json.Length; i++)
-            {
-                ds.Tags.Add(_datasetContext.Tags.Where(x => x.TagId == json[i]).FirstOrDefault());
-            }
-
-            return ds;
+            return View(model);
         }
 
-        [HttpPost]
-        [Route("{objectType}/Delete/{id}/")]
-        public JsonResult Delete(string objectType, int id)
+
+        [HttpGet]
+        [Route("Dataset/Detail/{id}/")]
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        public ActionResult Detail(int id)
         {
-            switch (objectType.ToLower())
+            if (!SharedContext.CurrentUser.CanViewDataset)
             {
-                case "businessintelligence":
-                    if (!SharedContext.CurrentUser.CanManageReports)
-                    {
-                        throw new NotAuthorizedException("User is authenticated but does not have permission");
-                    }
-
-                    try
-                    {
-                        _datasetContext.RemoveById<Dataset>(id);
-                        _datasetContext.SaveChanges();
-                        return Json(new { Success = true, Message = "Object was successfully deleted" });                        
-                    }
-                    catch (Exception ex)
-                    {
-                        Logger.Error($"Failed to delete dataset - DatasetId:{id} RequestorId:{SharedContext.CurrentUser.AssociateId} RequestorName:{SharedContext.CurrentUser.DisplayName}", ex);
-                        return Json(new { Success = false, Message = "We failed to delete object.  Please try again later." });
-                    }
-                default:
-                    return Json(new { Success = false, Message = "Delete not allowed for this type of object."});
+                throw new NotAuthorizedException("User is authenticated but does not have permission");
             }
+            DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
+            DatasetDetailModel model = new DatasetDetailModel(dto);
+
+            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Page", dto.DatasetId);
+            return View(model);
         }
+
         #endregion
 
         #region Dataset FILE Modification
@@ -518,110 +220,19 @@ namespace Sentry.data.Web.Controllers
 
         #region Detail Page
 
-        [HttpGet]
-        [Route("{objectType}/Detail/{id}/")]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
-        public ActionResult Detail(string objectType, int id)
-        {
-            Dataset ds = _datasetContext.GetById(id);
 
-            BaseDatasetModel bdm = new BaseDatasetModel(ds, _associateInfoProvider, _datasetContext);
-
-            bdm.IsFavorite = ds.Favorities.Where(w => w.UserId == SharedContext.CurrentUser.AssociateId).Any();
-            
-            Event e = new Event();
-
-            //Object specific settings
-            switch (objectType.ToLower())
-            {                
-                case "businessintelligence":
-                    if (!SharedContext.CurrentUser.CanViewReports)
-                    {
-                        throw new NotAuthorizedException("User is authenticated but does not have permission");
-                    }
-                    //Model settings specific to Business Intelligence
-                    bdm.CanManageReport = SharedContext.CurrentUser.CanManageReports;
-                    bdm.ObjectType = ds.DatasetType;
-
-                    //Event reason tailored to Business Intelligence
-                    e.Reason = "Viewed Business Intelligence Detail Page";
-
-                    ViewBag.Title = "View Report Details";
-                    break;
-
-                case "dataset":
-                default:
-                    if (!SharedContext.CurrentUser.CanViewDataset)
-                    {
-                        throw new NotAuthorizedException("User is authenticated but does not have permission");
-                    }
-                    bdm.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
-                    bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
-                    bdm.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
-                    bdm.CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
-                    bdm.CanUpload = SharedContext.CurrentUser.CanUpload;
-                    bdm.CanQueryTool = SharedContext.CurrentUser.CanQueryTool || SharedContext.CurrentUser.CanQueryToolPowerUser;
-                    bdm.Downloads = _datasetContext.Events.Where(x => x.EventType.Description == "Downloaded Data File" && x.Dataset == ds.DatasetId).Count();
-                    if (ds.DatasetFiles.Any())
-                    {
-                        bdm.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);
-                    }
-                    else
-                    {
-                        bdm.ChangedDtm = ds.ChangedDtm;
-                    }
-
-                    //Event reason tailored to Datasets
-                    e.Reason = "Viewed Dataset Detail Page";
-
-                    ViewBag.Title = "View Dataset Details";
-                    break;
-            }
-            
-            bdm.IsSubscribed = _datasetContext.IsUserSubscribedToDataset(_userService.GetCurrentUser().AssociateId, id);
-            bdm.AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, id).Count;
-
-            bdm.Views = _datasetContext.Events.Where(x => x.EventType.Description == "Viewed" && x.Dataset == ds.DatasetId).Count();           
-
-            
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-            e.Dataset = ds.DatasetId;            
-            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-            
-            return View(bdm);
-        }
 
         [Route("Dataset/Detail/{id}/Configuration")]
         [HttpGet]
         [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
         public ActionResult DatasetConfiguration(int id)
         {
-            Dataset ds = _datasetContext.GetById(id);
-            BaseDatasetModel bdm = new BaseDatasetModel(ds, _associateInfoProvider);
-            bdm.CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
-            bdm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
-            bdm.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
-            bdm.CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
-            bdm.CanUpload = SharedContext.CurrentUser.CanUpload;
-            bdm.IsSubscribed = _datasetContext.IsUserSubscribedToDataset(_userService.GetCurrentUser().AssociateId, id);
-            bdm.AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, id).Count;
+            DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
+            DatasetDetailModel model = new DatasetDetailModel(dto);
 
-            Event e = new Event();
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-            e.Reason = "Viewed Dataset Configuration Page";
-            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(() => _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Configuration Page", dto.DatasetId), TaskCreationOptions.LongRunning);
 
-            return View("Configuration", bdm);
+            return View("Configuration", model);
         }
 
         [HttpGet]
@@ -643,7 +254,7 @@ namespace Sentry.data.Web.Controllers
 
             foreach (Core.EventType et in _datasetContext.EventTypes.Where(w => w.Display))
             {
-                if(!sm.CurrentSubscriptions.Any(x => x.EventType.Type_ID == et.Type_ID))
+                if (!sm.CurrentSubscriptions.Any(x => x.EventType.Type_ID == et.Type_ID))
                 {
                     DatasetSubscription subscription = new DatasetSubscription();
                     subscription.Dataset = ds;
@@ -681,7 +292,7 @@ namespace Sentry.data.Web.Controllers
                     }
                 }
 
-                if(!found)
+                if (!found)
                 {
                     _datasetContext.Merge<DatasetSubscription>(
                         new DatasetSubscription(
@@ -837,6 +448,8 @@ namespace Sentry.data.Web.Controllers
 
         #endregion
 
+
+        //TODO-Dan: Check out the PushToSAS to make sure the category is being done right.
         #region Helpers
 
         [HttpGet()]
@@ -847,7 +460,7 @@ namespace Sentry.data.Web.Controllers
 
             Event e = new Event();
             e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Downloaded Data File").FirstOrDefault();
-            
+
             e.TimeCreated = DateTime.Now;
             e.TimeNotified = DateTime.Now;
             e.DataFile = df.DatasetFileId;
@@ -855,11 +468,11 @@ namespace Sentry.data.Web.Controllers
             e.DataConfig = df.DatasetFileConfig.ConfigId;
             e.IsProcessed = false;
             e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-           
+
             try
-            {                
+            {
                 //Testing if object exists in S3, response is not used.
-                _s3Service.GetObjectMetadata(df.FileLocation);              
+                _s3Service.GetObjectMetadata(df.FileLocation);
 
                 JsonResult jr = new JsonResult();
                 jr.Data = _s3Service.GetDatasetDownloadURL(df.FileLocation, df.VersionId);
@@ -871,7 +484,7 @@ namespace Sentry.data.Web.Controllers
 
                 return jr;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 e.Reason = "Failed to Download Data File";
                 e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Error").FirstOrDefault();
@@ -881,36 +494,11 @@ namespace Sentry.data.Web.Controllers
 
                 Logger.Fatal($"S3 Data File Not Found - DatasetID:{datasetId} DatasetFile_ID:{id}", ex);
                 return Json(new { message = "Encountered Error Retrieving File.<br />If this problem persists, please contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a>" }, JsonRequestBehavior.AllowGet);
-            }   
-            
-
-        }
-
-
-        protected override void AddCoreValidationExceptionsToModel(Sentry.Core.ValidationException ex)
-        {
-            foreach (ValidationResult vr in ex.ValidationResults.GetAll())
-            {
-                switch (vr.Id)
-                {
-                    case Dataset.ValidationErrors.s3keyIsBlank:
-                        ModelState.AddModelError("Key", vr.Description);
-                        break;
-                    case Dataset.ValidationErrors.nameIsBlank:
-                        ModelState.AddModelError("Name", vr.Description);
-                        break;
-                    case Dataset.ValidationErrors.creationUserNameIsBlank:
-                        ModelState.AddModelError("CreationUserName", vr.Description);
-                        break;
-                    case Dataset.ValidationErrors.datasetDateIsOld:
-                        ModelState.AddModelError("DatasetDate", vr.Description);
-                        break;
-                    default:
-                        ModelState.AddModelError(string.Empty, vr.Description);
-                        break;
-                }
             }
+
+
         }
+
 
         [HttpPost]
         [AuthorizeByPermission(PermissionNames.DatasetView)]
@@ -970,13 +558,14 @@ namespace Sentry.data.Web.Controllers
 
                 string BaseTargetPath = Configuration.Config.GetHostSetting("PushToSASTargetPath");
 
+                string category = ds.Dataset.DatasetCategories.First().Name;
                 //creates category directory if does not exist, otherwise does nothing.
-                System.IO.Directory.CreateDirectory(BaseTargetPath + ds.Dataset.Category);
+                System.IO.Directory.CreateDirectory(BaseTargetPath + category);
 
                 try
                 {
 
-                    _s3Service.TransferUtilityDownload(BaseTargetPath, ds.Dataset.Category, filename, ds.FileLocation, ds.VersionId);
+                    _s3Service.TransferUtilityDownload(BaseTargetPath, category, filename, ds.FileLocation, ds.VersionId);
 
                 }
                 catch (Exception e)
@@ -1026,7 +615,7 @@ namespace Sentry.data.Web.Controllers
         public PartialViewResult PushToFileNameOverride(int id)
         {
             PushToDatasetModel model = new PushToDatasetModel();
-            
+
             DatasetFile datafile = _datasetContext.GetById<DatasetFile>(id);
             model.DatasetFileId = datafile.DatasetFileId;
             model.DatasetFileName = datafile.FileName;
@@ -1045,7 +634,7 @@ namespace Sentry.data.Web.Controllers
             e.TimeNotified = DateTime.Now;
             e.IsProcessed = false;
             e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-           
+
             try
             {
                 DatasetFile df = _datasetContext.GetDatasetFile(id);
@@ -1069,7 +658,7 @@ namespace Sentry.data.Web.Controllers
 
                 return PartialView("_Success", new SuccessModel("Error Retrieving Preview", ex.Message, false));
             }
-            
+
         }
 
         [HttpGet()]
@@ -1108,7 +697,7 @@ namespace Sentry.data.Web.Controllers
 
                 return PartialView("_Success", new SuccessModel("Error Retrieving Preview", ex.Message, false));
             }
-           
+
         }
 
         private PreviewDataModel PreviewFile(string previewKey)
@@ -1146,10 +735,10 @@ namespace Sentry.data.Web.Controllers
             model.DatasetFileId = id;
 
             return PartialView("_DatasetFileVersions", model);
-            
+
         }
 
-       
+
         [HttpPost]
         [AuthorizeByPermission(PermissionNames.DatasetView)]
         public async Task<ActionResult> BundleFiles(string listOfIds, string newName, int datasetID)
@@ -1176,19 +765,19 @@ namespace Sentry.data.Web.Controllers
 
             Boolean bundlingSensitive = files.Any(x => x.Dataset.IsSensitive);
 
-            if(newName == "" || newName == null)
+            if (newName == "" || newName == null)
             {
                 errorsFound = true;
                 errorString += "<p>Please supply a new name to give to your bundled file.</p>";
             }
 
-            if(!allDataFiles)
+            if (!allDataFiles)
             {
                 errorsFound = true;
                 errorString += "<p>You cannot bundle files that are labeled as supplementary files, help documents, or usage manuals.</p>";
             }
 
-            if(files.Count == 1)
+            if (files.Count == 1)
             {
                 errorsFound = true;
                 errorString += "<p>You cannot bundle just one file.</p>";
@@ -1205,7 +794,7 @@ namespace Sentry.data.Web.Controllers
                 errorString += "<p>You do not have permission to download or bundle these files.</p>";
             }
 
-            if(!sameExtension)
+            if (!sameExtension)
             {
                 errorsFound = true;
                 errorString += "<p>The files did not have the same file extension. Bundling requires that all files have the same extension.  Please filter by putting the file extension in either the Name Column or the Search Box provided at the top right of the table.</p>";
@@ -1276,7 +865,7 @@ namespace Sentry.data.Web.Controllers
                     e.Reason = $"Submitted bundle request for dataset [<b>{_datasetContext.GetById(_request.DatasetID).DatasetName}</b>] targeting file name [<b>{_request.TargetFileName}</b>]";
                     e.Parent_Event = _request.RequestGuid;
                     Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-                    
+
                     return Json(new { Success = true, Message = "Successfully sent request to Dataset Bundler.  You will recieve notification when completed." });
                 }
                 else
@@ -1285,7 +874,7 @@ namespace Sentry.data.Web.Controllers
                     return Json(new { Success = false, Message = errorString });
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.Error("Error Processing Bundle Request", ex);
                 return Json(new { Success = false, Message = "An error occurred, please try later! : " + ex.Message });
@@ -1430,7 +1019,7 @@ namespace Sentry.data.Web.Controllers
                 {
                     Logger.Error("Error occurred", e);
                     return Json("Error occurred: " + e.Message);
-                }                
+                }
             }
             else
             {
@@ -1443,7 +1032,7 @@ namespace Sentry.data.Web.Controllers
                 {
                     Logger.Debug("No files selected");
                     return Json("No files selected");
-                }                
+                }
             }
         }
 
@@ -1455,9 +1044,9 @@ namespace Sentry.data.Web.Controllers
             //If a value was passed, load appropriate information
             if (datasetId != 0)
             {
-                cd = new CreateDataFileModel(_datasetContext.GetById(datasetId), _associateInfoProvider);
+                cd = new CreateDataFileModel(_datasetService.GetDatasetDto(datasetId));
             }
-            
+
             ViewBag.Categories = Utility.GetCategoryList(_datasetContext);
 
             return PartialView("_UploadDataFile", cd);
@@ -1473,7 +1062,7 @@ namespace Sentry.data.Web.Controllers
             {
                 BackgroundJob.Enqueue<RetrieverJobService>(RetrieverJobService => RetrieverJobService.RunRetrieverJob(id, JobCancellationToken.Null, null));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.Error($"Error Enqueing Retriever Job ({id}).", ex);
                 return Json(new { Success = false, Message = "Failed to queue job, please try later! Contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a> if problem persists." });
@@ -1525,7 +1114,7 @@ namespace Sentry.data.Web.Controllers
         {
             IEnumerable<Dataset> dfList = Utility.GetDatasetByCategoryId(_datasetContext, id);
 
-            SelectListGroup group = new SelectListGroup(){ Name = _datasetContext.GetCategoryById(id).Name };
+            SelectListGroup group = new SelectListGroup() { Name = _datasetContext.GetCategoryById(id).Name };
 
             IEnumerable<SelectListItem> sList = dfList.Select(m => new SelectListItem()
             {
@@ -1535,7 +1124,7 @@ namespace Sentry.data.Web.Controllers
             });
 
             return Json(sList, JsonRequestBehavior.AllowGet);
-        }       
+        }
 
         [HttpGet()]
         [AuthorizeByPermission(PermissionNames.DwnldNonSensitive)]
@@ -1587,7 +1176,7 @@ namespace Sentry.data.Web.Controllers
 
             return Json(obj, JsonRequestBehavior.AllowGet);
         }
-        
+
         [AuthorizeByPermission(PermissionNames.QueryToolPowerUser)]
         public ActionResult QueryTool()
         {
@@ -1607,6 +1196,7 @@ namespace Sentry.data.Web.Controllers
             return View("QueryTool");
         }
 
+        [Obsolete("This should be placed in the favorites controller that was created.")]
         public JsonResult SetFavorite(int datasetId)
         {
             try
@@ -1643,7 +1233,7 @@ namespace Sentry.data.Web.Controllers
                 Response.StatusCode = (int)HttpStatusCode.BadRequest;
                 return Json(new { message = "Failed to modify favorite." }, JsonRequestBehavior.AllowGet);
             }
-            
+
         }
     }
 }

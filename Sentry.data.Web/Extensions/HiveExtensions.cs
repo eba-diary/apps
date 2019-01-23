@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.Metadata;
 
-namespace Sentry.data.Web.Extensions
+namespace Sentry.data.Web
 {
-    public static class ExtensionMethods
+    public static class HiveExtensions
     {
         public static HiveTableCreateModel ToHiveTableCreateMsg(this DataElement dataElement)
         {

@@ -75,17 +75,24 @@ namespace Sentry.data.Web.Helpers
 
             return result;
         }
-        public static void SetupLists(IReportContext _reportContext, BaseDatasetModel model)
+        public static void SetupLists(IDatasetContext _datasetContext, BaseEntityModel model)
         {
-            var temp = GetCategoryList(_reportContext).ToList();
+            var temp = GetCategoryList(_datasetContext).ToList();
 
-            temp.Add(new SelectListItem()
+            if(model.DatasetCategoryIds?.Count > 0)
             {
-                Text = "Pick a Category",
-                Value = "0",
-                Selected = true,
-                Disabled = true
-            });
+                foreach (var cat in model.DatasetCategoryIds)
+                {
+                   foreach(var t in temp)
+                    {
+                        if(t.Value == cat.ToString())
+                        {
+                            t.Selected = true;
+                        }
+                    }
+                }
+            }
+
 
             model.AllCategories = temp.OrderBy(x => x.Value);
 
@@ -105,9 +112,10 @@ namespace Sentry.data.Web.Helpers
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
 
         }
-        public static IEnumerable<SelectListItem> GetCategoryList(IReportContext _reportContext)
+        public static IEnumerable<SelectListItem> GetCategoryList(IDatasetContext _datasetContext)
         {
-            IEnumerable<SelectListItem> var = _reportContext.Categories.Select((c) => new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
+            IEnumerable<SelectListItem> var = _datasetContext.Categories.Where(x=> x.ObjectType == GlobalConstants.DataEntityTypes.REPORT).
+                                                                                            Select((c) => new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
 
             return var;
         }

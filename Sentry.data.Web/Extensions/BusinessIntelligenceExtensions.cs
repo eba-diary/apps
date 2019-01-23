@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace Sentry.data.Web
 {
@@ -15,19 +16,18 @@ namespace Sentry.data.Web
                 DatasetCategoryIds = model.DatasetCategoryIds,
                 DatasetName = model.DatasetName,
                 DatasetDesc = model.DatasetDesc,
-                DatasetInformation = model.DatasetInformation,
-                SentryOwnerName = model.SentryOwnerName,
+                SentryOwnerId = model.SentryOwnerId,
+                CreationUserName = model.CreationUserName,
+                UploadUserName = model.UploadUserName,
                 DatasetDtm = CreateTime,
                 ChangedDtm = CreateTime,
-                S3Key = "Blank S3 Key", //why do this vs having a null value?
-                IsSensitive = false,
-                CanDisplay = true,
                 DatasetType = Core.GlobalConstants.DataEntityTypes.REPORT,
+                ObjectType = Core.GlobalConstants.DataEntityTypes.REPORT, //whats the difference here?
                 Location = model.Location,
-                LocationType = new Uri(model.Location).Scheme,
+                LocationType = new Uri(model.Location)?.Scheme,
                 FrequencyId = model.FrequencyId.Value,
                 FileTypeId = model.FileTypeId,
-                TagIds = model.TagIds
+                TagIds = model.TagIds?.Split(',').ToList()
             };
         }
 

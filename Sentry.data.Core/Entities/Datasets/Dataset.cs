@@ -39,7 +39,7 @@ namespace Sentry.data.Core
 
         public virtual Boolean CanDisplay { get; set; }
 
-        public virtual List<Category> DatasetCategories { get; set; }
+        public virtual IList<Category> DatasetCategories { get; set; }
         public virtual string DatasetType { get; set; }
 
         public virtual IList<DatasetFile> DatasetFiles { get; set; }
@@ -84,7 +84,7 @@ namespace Sentry.data.Core
         {
             ValidationResults vr = new ValidationResults();
 
-            if (DatasetCategories?.Count == 0)
+            if (DatasetCategories == null || DatasetCategories.Count == 0)
             {
                 vr.Add(GlobalConstants.ValidationErrors.CATEGORY_IS_BLANK, "The Dataset Category is required");
             }
@@ -114,12 +114,9 @@ namespace Sentry.data.Core
             }
 
             //Report specific checks
-            if (!string.IsNullOrEmpty(DatasetType) && DatasetType == "RPT")
+            if (DatasetType == GlobalConstants.DataEntityTypes.REPORT && string.IsNullOrWhiteSpace(Metadata.ReportMetadata.Location))
             {
-                if (string.IsNullOrWhiteSpace(Metadata.ReportMetadata.Location))
-                {
-                    vr.Add(GlobalConstants.ValidationErrors.LOCATION_IS_BLANK, "Report Location is required");
-                }
+                vr.Add(GlobalConstants.ValidationErrors.LOCATION_IS_BLANK, "Report Location is required");
             }
 
             return vr;

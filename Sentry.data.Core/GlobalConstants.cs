@@ -3,7 +3,6 @@
     public static class GlobalConstants
     {
 
-
         public static class ValidationErrors
         {
             public const string S3KEY_IS_BLANK = "keyIsBlank";
@@ -25,9 +24,46 @@
         public static class DataEntityTypes
         {
             public const string REPORT = "RPT";
-            public const string DATASET = "DTS"; //currently not being used becuase datasets have a type = null
+            public const string DATASET = "DS"; 
         }
 
+        public static class EventType
+        {
+            public const string VIEWED = "Viewed";
+            public const string DOWNLOAD = "Downloaded Data File";
+            public const string EDITED_DATA_FILE = "Edited Data File";
+
+            public const string VIEWED_REPORT = "Viewed Report";
+            public const string CREATED_REPORT = "Created Report";
+            public const string UPDATED_REPORT = "Updated Report";
+
+            public const string VIEWED_DATASET = "Viewed Dataset";
+            public const string CREATED_DATASET = "Created Dataset";
+            public const string UPDATED_DATASET = "Updated Dataset";
+        }
+
+        public static class Statuses
+        {
+            public const string SUCCESS = "Success";
+        }
+
+        public static class DataElementCode
+        {
+            public const string DATA_FILE = "f";
+        }
+
+        public static class DataElementDescription
+        {
+            public const string BUSINESS_TERM = "Business Term";
+            public const string LINEAGE = "Lineage";
+            public const string DATA_FILE = "Data File";
+        }
+
+        public static class DataSourceName
+        {
+            public const string DEFAULT_DROP_LOCATION = "Default Drop Location";
+            public const string DEFAULT_S3_DROP_LOCATION = "Default S3 Drop Location";
+        }
 
     }
 }

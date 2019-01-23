@@ -1,163 +1,142 @@
-﻿using Sentry.Core;
-using Sentry.data.Common;
+﻿using Sentry.Common.Logging;
 using Sentry.data.Core;
-using Sentry.data.Core.Entities.Metadata;
-using Sentry.data.Infrastructure;
 using Sentry.data.Web.Helpers;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Web;
 using System.Web.Mvc;
-using System.Web.Script.Serialization;
 using System.Web.SessionState;
 
 namespace Sentry.data.Web.Controllers
 {
     [SessionState(SessionStateBehavior.ReadOnly)]
+    [AuthorizeByPermission(PermissionNames.ManageReports)]
     public class BusinessIntelligenceController : BaseController
     {
 
-        private readonly IAssociateInfoProvider _associateInfoProvider;
-        private readonly IReportContext _reportContext;
-        private readonly UserService _userService;
+        private readonly IDatasetContext _datasetContext;
         private readonly IBusinessIntelligenceService _businessIntelligenceService;
+        private readonly IEventService _eventService;
 
         public BusinessIntelligenceController(
-            IReportContext rptCtxt, 
-            IAssociateInfoProvider associateInfoService,
+            IDatasetContext datasetContext,
             IBusinessIntelligenceService businessIntelligenceService,
-            UserService userService)
+            IEventService eventService)
         {
-            _reportContext = rptCtxt;
-            _associateInfoProvider = associateInfoService;
-            _userService = userService;
+            _datasetContext = datasetContext;
             _businessIntelligenceService = businessIntelligenceService;
+            _eventService = eventService;
         }
 
 
-
-        // GET: Report
-        [AuthorizeByPermission(PermissionNames.ReportView)]
         public ActionResult Index()
         {
             BusinessIntelligenceHomeModel rhm = _businessIntelligenceService.GetHomeDto().ToModel();
 
-            Event e = new Event
-            {
-                EventType = _reportContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
-                Status = _reportContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                TimeCreated = DateTime.Now,
-                TimeNotified = DateTime.Now,
-                IsProcessed = false,
-                UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
-                Reason = "Viewed Business Intelligence Home Page"
-            };
-            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-
+            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Business Intelligence Home Page", 0);
             return View(rhm);
         }
 
+
         [HttpGet]
-        [AuthorizeByPermission(PermissionNames.ManageReports)]
         public ActionResult Create()
         {
             BusinessIntelligenceModel cdm = new BusinessIntelligenceModel
             {
                 DatasetId = 0,
-                CanEditDataset = SharedContext.CurrentUser.CanEditDataset,
-                CanUpload = SharedContext.CurrentUser.CanUpload,
-                CreationUserName = SharedContext.CurrentUser.AssociateId
+                CreationUserName = SharedContext.CurrentUser.AssociateId,
+                UploadUserName = SharedContext.CurrentUser.AssociateId,
             };
 
-            ReportUtility.SetupLists(_reportContext, cdm);
+            ReportUtility.SetupLists(_datasetContext, cdm);
 
-            //Update this to use Jereds new Eventing Service so this whole call is done async.
-            Event e = new Event
-            {
-                EventType = _reportContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
-                Status = _reportContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                TimeCreated = DateTime.Now,
-                TimeNotified = DateTime.Now,
-                IsProcessed = false,
-                UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
-                Reason = "Viewed Report Creation Page"
-            };
-            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-
-            return View(cdm);
+            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Report Creation Page", cdm.DatasetId);
+            return View("BusinessIntelligenceForm",cdm);
         }
 
+
         [HttpGet]
-        [AuthorizeByPermission(PermissionNames.ManageReports)]
         public ActionResult Edit(int id)
         {
             BusinessIntelligenceDto dto = _businessIntelligenceService.GetBusinessIntelligenceDto(id);
 
             BusinessIntelligenceModel model = new BusinessIntelligenceModel(dto);
 
-            ReportUtility.SetupLists(_reportContext, model);
+            ReportUtility.SetupLists(_datasetContext, model);
 
-            Event e = new Event
-            {
-                EventType = _reportContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
-                Status = _reportContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
-                TimeCreated = DateTime.Now,
-                TimeNotified = DateTime.Now,
-                IsProcessed = false,
-                UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
-                Reason = "Viewed Report Edit Page"
-            };
-            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-
-
-            return View(model);
+            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Report Edit Page", dto.DatasetId);
+            return View("BusinessIntelligenceForm",model);
         }
 
-        [HttpPost]
-        [AuthorizeByPermission(PermissionNames.ManageReports)]
-        public ActionResult Create(BusinessIntelligenceModel crm) //update the name of this to Submit or something
-        {
-            BusinessIntelligenceDto dto = crm.ToDto();
 
-            AddCoreValidationExceptionsToModel(_businessIntelligenceService.Validate(dto));
+        [HttpPost]
+        public ActionResult BusinessIntelligenceForm(BusinessIntelligenceModel crm) //update the name of this to Submit or something
+        {
+            AddCoreValidationExceptionsToModel(crm.Validate());
 
             if (ModelState.IsValid)
             {
-                bool IsSucessful = _businessIntelligenceService.CreateAndSaveBusinessIntelligenceDataset(dto);
+                BusinessIntelligenceDto dto = crm.ToDto();
 
-                if (IsSucessful)
-                {
-                    Event e = new Event();
-                    e.EventType = _reportContext.EventTypes.Where(w => w.Description == "Created Report").FirstOrDefault();
-                    e.Status = _reportContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-                    e.TimeCreated = DateTime.Now;
-                    e.TimeNotified = DateTime.Now;
-                    e.IsProcessed = false;
-                    e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-                    e.Dataset = (_reportContext.Datasets.ToList()).FirstOrDefault(x => x.DatasetName == crm.DatasetName).DatasetId;
-                    e.Reason = crm.DatasetName + " was created.";
-                    Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-
-                    if (dto.DatasetId == 0)
+                if(dto.DatasetId == 0)
+                { //REATE A REPORT
+                    AddCoreValidationExceptionsToModel(_businessIntelligenceService.Validate(dto));
+                    if (ModelState.IsValid)
                     {
-                        return RedirectToAction("Index");
+                        bool IsSucessful = _businessIntelligenceService.CreateAndSaveBusinessIntelligence(dto);
+                        if (IsSucessful)
+                        {
+                            _eventService.PublishSuccessEvent(GlobalConstants.EventType.CREATED_REPORT, SharedContext.CurrentUser.AssociateId, crm.DatasetName + " was created.", dto.DatasetId);
+                            return RedirectToAction("Index");
+                        }
                     }
-                    else
+                }
+                else
+                { //EDIT A REPORT
+                    bool IsSucessful = _businessIntelligenceService.UpdateAndSaveBusinessIntelligence(dto);
+                    if (IsSucessful)
                     {
+                        _eventService.PublishSuccessEvent(GlobalConstants.EventType.UPDATED_REPORT, SharedContext.CurrentUser.AssociateId, crm.DatasetName + " was updated.", dto.DatasetId);
                         return RedirectToAction("Detail", new { id = dto.DatasetId });
                     }
                 }
+
             }
 
-            ReportUtility.SetupLists(_reportContext, crm);
-
+            ReportUtility.SetupLists(_datasetContext, crm);
             return View(crm);
         }
 
+        [HttpPost]
+        [Route("BusinessIntelligence/Delete/{id}/")]
+        public JsonResult Delete(int id)
+        {
+            try
+            {
+                _businessIntelligenceService.Delete(id);
+                return Json(new { Success = true, Message = "Exhibit was successfully deleted" });
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to delete dataset - DatasetId:{id} RequestorId:{SharedContext.CurrentUser.AssociateId} RequestorName:{SharedContext.CurrentUser.DisplayName}", ex);
+                return Json(new { Success = false, Message = "We failed to delete exhibit.  Please try again later." });
+            }
 
+        }
+
+        [HttpGet]
+        [Route("BusinessIntelligence/Detail/{id}/")]
+        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        public ActionResult Detail(int id)
+        {
+            if (!SharedContext.CurrentUser.CanViewReports)
+            {
+                throw new NotAuthorizedException("User is authenticated but does not have permission");
+            }
+            BusinessIntelligenceDetailDto dto = _businessIntelligenceService.GetBusinessIntelligenceDetailDto(id);
+            BusinessIntelligenceDetailModel model = new BusinessIntelligenceDetailModel(dto);
+
+            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Business Intelligence Detail Page", dto.DatasetId);
+            return View(model);
+        }
 
     }
 }
