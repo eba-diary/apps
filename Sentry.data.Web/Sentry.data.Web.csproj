@@ -410,7 +410,6 @@
     <Content Include="Images\SHO_Aerial_10-4-17.png" />
     <Content Include="Images\SHO_SentryWorld_Aerial.jpg" />
     <Content Include="js\Config.js" />
-    <Content Include="js\DatasetDetail.js" />
     <Content Include="js\ManageAssetAlert.js" />
     <Content Include="js\ManageConfigs.js" />
     <Content Include="js\QueryTool\AddRule.js" />
@@ -420,7 +419,7 @@
     <Content Include="js\QueryTool\RenderTable.js" />
     <Content Include="js\QueryTool\SaveTo.js" />
     <Content Include="js\QueryTool\Startup.js" />
-    <Content Include="js\Report\Report.js" />
+    <Content Include="js\Report.js" />
     <Content Include="js\Shared\Tags.js" />
     <Content Include="readme.txt" />
     <Content Include="Scripts\bootstrap-datetimepicker.js" />
