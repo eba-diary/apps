@@ -57,7 +57,7 @@ namespace Sentry.data.Infrastructure
             {
                 Sentry.Common.Logging.Logger.Info("Initializing goldeneye-producer");
 
-                ApplicaitonConfiguration config = null;
+                ApplicationConfiguration config = null;
 
                 try
                 {
@@ -71,9 +71,9 @@ namespace Sentry.data.Infrastructure
                     IList<KeyValuePair<String, Object>> configuration = new List<KeyValuePair<String, Object>>();
 
                     //Adding Production options from database
-                    foreach (string item in config.OptionsObject["ProducerOptions"])
+                    foreach (JObject item in config.OptionsObject["ProducerOptions"])
                     {
-                        foreach (JProperty prop in item)
+                        foreach (JProperty prop in item.Properties())
                         {
                             configuration.Add(new KeyValuePair<String, Object>(prop.Name, prop.Value));
                         }
@@ -187,6 +187,11 @@ namespace Sentry.data.Infrastructure
                     throw e;
                 }
             }
+        }
+
+        public void PublishDSCEvent(string key, string value)
+        {
+            Publish(Sentry.data.Infrastructure.TopicHelper.GetDSCEventTopic(), key, value);
         }
         #endregion
 

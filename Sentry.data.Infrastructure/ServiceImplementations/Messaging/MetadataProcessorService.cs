@@ -8,26 +8,15 @@ using Sentry.data.Core;
 
 namespace Sentry.data.Infrastructure
 {
-    public class MetadataProcessorService : IMetadataProcessorService
+    public class MetadataProcessorService
     {
-        #region Declarations
-        private IDatasetContext _dsContext;
-        #endregion
-
-        #region Constructor
-        public MetadataProcessorService(IDatasetContext dsContext)
-        {
-            _dsContext = dsContext;
-        }
-        #endregion
-
-
+        
         public void Run()
         {
             ConsumptionConfig cfg = new ConsumptionConfig();
             cfg.ForceSingleThread = false;
             cfg.UseKillFile = true;
-            cfg.KillFileLocation = Configuration.Config.GetHostSetting("GoldenEyeWorkDir") + "MetadataProcessKill.txt";
+            cfg.KillFileLocation = Configuration.Config.GetHostSetting("GoldenEyeWorkDir") + "MetadataProcesserKill.txt";
             cfg.RunMinutes = 2;
 
             IMessageConsumer<string> consumer;
@@ -51,10 +40,15 @@ namespace Sentry.data.Infrastructure
 
         private IMessageConsumer<string> GetKafkamessageConsumer(string groupId)
         {
-            //ApplicaitonConfiguration config = _dsContext.ApplicationConfigurations.Where(w => w.Application == "MetadataProcessor").FirstOrDefault();
-
             //domain context needed to retrieve config
-            KafkaSettings settings = new KafkaSettings(groupId, "awe-t-apspml-01.sentry.com:6667,awe-t-apspml-02.sentry.com:6667,awe-t-apspml-03.sentry.com:6667", "data-nrdev-goldeneye-000000", "nrdev", false, "", 3);
+            KafkaSettings settings = new KafkaSettings(groupId,
+                                            Configuration.Config.GetHostSetting("KafkaBootstrapServers"),
+                                            Sentry.data.Infrastructure.TopicHelper.GetDSCEventTopic(),
+                                            Configuration.Config.GetHostSetting("EnvironmentName").ToUpper(),
+                                            (Configuration.Config.GetHostSetting("KafkaDebugLogging").ToLower() == "true") ? true : false, 
+                                            null, 
+                                            0 /*This is not used for consumers*/
+                                            );
 
             return new MetadataProcessorKafkaConsumer(settings);
         }

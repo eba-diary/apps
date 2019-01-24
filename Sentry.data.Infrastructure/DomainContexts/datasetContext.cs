@@ -116,7 +116,7 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                return Query<DataElement>().Cacheable();
+                return Query<DataElement>();
             }
         }
 
@@ -200,11 +200,11 @@ namespace Sentry.data.Infrastructure
             }
         } 
         
-        public IQueryable<ApplicaitonConfiguration> ApplicationConfigurations
+        public IQueryable<ApplicationConfiguration> ApplicationConfigurations
         {
             get
             {
-                return Query<ApplicaitonConfiguration>();
+                return Query<ApplicationConfiguration>();
             }
         }
 

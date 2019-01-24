@@ -243,20 +243,18 @@ namespace Sentry.data.Core
 
             hiveCreate.Schema = sm;
 
-            string eventTopic = $"{Configuration.Config.GetSetting("SAIDKey").ToLower()}-{Configuration.Config.GetHostSetting("EnvironmentName").ToLower()}-{Configuration.Config.GetHostSetting("DSCEventTopic").ToLower()}";
+            _messagePublisher.PublishDSCEvent(schema.StorageCode, JsonConvert.SerializeObject(hiveCreate));
 
-            _messagePublisher.Publish(eventTopic, schema.StorageCode, JsonConvert.SerializeObject(hiveCreate));
-
-            UpdateHiveTableStatus(schema, HiveTableStatusEnum.Requested);           
+            //UpdateHiveTableStatus(schema, HiveTableStatusEnum.Requested);           
             
         }
 
-        private void UpdateHiveTableStatus(DataElement schema, HiveTableStatusEnum requested)
-        {
-            schema.HiveTableStatus = requested.ToString();
+        //private void UpdateHiveTableStatus(DataElement schema, HiveTableStatusEnum requested)
+        //{
+        //    schema.HiveTableStatus = requested.ToString();
 
-            _datasetContext.Merge(schema);
-            _datasetContext.SaveChanges();
-        }
+        //    _datasetContext.Merge(schema);
+        //    _datasetContext.SaveChanges();
+        //}
     }
 }

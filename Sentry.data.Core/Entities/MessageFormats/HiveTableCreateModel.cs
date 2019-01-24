@@ -11,7 +11,7 @@ namespace Sentry.data.Core
     {
         public HiveTableCreateModel()
         {
-            EventType = "HIVE-TABLE-REQUESTED";
+            EventType = "HIVE-TABLE-CREATE-REQUESTED";
         }
 
         public SchemaModel Schema { get; set; }

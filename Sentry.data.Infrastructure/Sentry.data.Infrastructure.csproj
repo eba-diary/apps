@@ -164,6 +164,7 @@
     <Compile Include="DomainContexts\ReportContext.cs" />
     <Compile Include="DomainContexts\RequestContext.cs" />
     <Compile Include="HangfireFilters\DisableMultipleQueuedItemsFilter.cs" />
+    <Compile Include="Helpers\TopicHelper.cs" />
     <Compile Include="Mappings\Metadata\DataElementDetailMapping.cs" />
     <Compile Include="Mappings\Metadata\DataElementMapping.cs" />
     <Compile Include="Mappings\Metadata\DataLineageMapping.cs" />

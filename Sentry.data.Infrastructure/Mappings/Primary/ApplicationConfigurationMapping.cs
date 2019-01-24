@@ -9,7 +9,7 @@ using Sentry.data.Core;
 
 namespace Sentry.data.Infrastructure.Mappings.Primary
 {
-    public class ApplicationConfigurationMapping : ClassMapping<ApplicaitonConfiguration>
+    public class ApplicationConfigurationMapping : ClassMapping<ApplicationConfiguration>
     {
         public ApplicationConfigurationMapping()
         {

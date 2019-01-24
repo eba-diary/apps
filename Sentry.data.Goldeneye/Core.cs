@@ -26,7 +26,6 @@ namespace Sentry.data.Goldeneye
         private CancellationToken _token;
         private IContainer _container;
         private IRequestContext _requestContext;
-        private IMetadataProcessorService _metadataProcessorService;
         private Scheduler _backgroundJobServer;
         private List<RunningTask> currentTasks = new List<RunningTask>();
 
@@ -210,12 +209,10 @@ namespace Sentry.data.Goldeneye
                                 }
                             }
 
-
-                            //Start MetadataProcessor
-                            _metadataProcessorService = _container.GetInstance<IMetadataProcessorService>();                            
-                            //MetadataProcessorService metaProcessor = new MetadataProcessorService();
+                            //Starting MetadataProcessor Consumer
+                            MetadataProcessorService metaProcessor = new MetadataProcessorService();
                             currentTasks.Add(new RunningTask(
-                                            Task.Factory.StartNew(() => _metadataProcessorService.Run(), TaskCreationOptions.LongRunning), "metadataProcessor"));                            
+                                            Task.Factory.StartNew(() => metaProcessor.Run(), TaskCreationOptions.LongRunning), "metadataProcessor"));                            
                         }
 
                         ////Dataset Loader

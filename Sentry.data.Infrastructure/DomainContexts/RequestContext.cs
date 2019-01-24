@@ -56,11 +56,11 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public IQueryable<ApplicaitonConfiguration> ApplicaitonConfigurations
+        public IQueryable<ApplicationConfiguration> ApplicaitonConfigurations
         {
             get
             {
-                return Query<ApplicaitonConfiguration>();
+                return Query<ApplicationConfiguration>();
             }
         }
 
