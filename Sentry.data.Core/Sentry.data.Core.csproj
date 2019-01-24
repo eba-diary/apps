@@ -82,6 +82,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DomainServices\ConfigService.cs" />
+    <Compile Include="Entities\ColumnDTO.cs" />
+    <Compile Include="Entities\SchemaDTO.cs" />
     <Compile Include="Entities\HiveTableStatusEnum.cs" />
     <Compile Include="Entities\MessageFormats\HiveTableCreateModel.cs" />
     <Compile Include="Entities\Metadata\ColumnModel.cs" />

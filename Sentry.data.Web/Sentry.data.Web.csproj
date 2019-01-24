@@ -351,6 +351,7 @@
     <Compile Include="Models\DataAsset\CreateAssetNotificationModel.cs" />
     <Compile Include="Models\DataAsset\EditAssetNotificationModel.cs" />
     <Compile Include="Models\Dataset\BaseDatasetFileModel.cs" />
+    <Compile Include="Models\Dataset\ColumnModel.cs" />
     <Compile Include="Models\Dataset\CreateDataFileModel.cs" />
     <Compile Include="Models\Config\CreateJobModel.cs" />
     <Compile Include="Models\Config\DatasetFileConfigsModel.cs" />
@@ -361,6 +362,7 @@
     <Compile Include="Models\Dataset\PreviewDataModel.cs" />
     <Compile Include="Models\Dataset\PushToDatasetModel.cs" />
     <Compile Include="Models\Dataset\CreateDatasetModel.cs" />
+    <Compile Include="Models\Dataset\SchemaModel.cs" />
     <Compile Include="Models\Dataset\_DatasetMetadataModel.cs" />
     <Compile Include="Models\Favorites\FavoriteItemModel.cs" />
     <Compile Include="Models\Favorites\FavoritesModel.cs" />
