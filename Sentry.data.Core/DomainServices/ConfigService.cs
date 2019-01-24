@@ -212,7 +212,7 @@ namespace Sentry.data.Core
             HiveTableCreateModel hiveCreate = new HiveTableCreateModel();
 
             SchemaModel sm = new SchemaModel();
-            sm.SchemaID = schema.StorageCode;
+            sm.SchemaID = schema.DataElement_ID;
             sm.Format = schema.FileFormat;
             sm.Header = "true";
             sm.Delimiter = schema.Delimiter;
@@ -243,7 +243,7 @@ namespace Sentry.data.Core
 
             hiveCreate.Schema = sm;
 
-            _messagePublisher.PublishDSCEvent(schema.StorageCode, JsonConvert.SerializeObject(hiveCreate));
+            _messagePublisher.PublishDSCEvent(schema.DataElement_ID.ToString(), JsonConvert.SerializeObject(hiveCreate));
 
             //UpdateHiveTableStatus(schema, HiveTableStatusEnum.Requested);           
             

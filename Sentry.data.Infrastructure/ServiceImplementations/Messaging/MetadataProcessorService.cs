@@ -17,7 +17,7 @@ namespace Sentry.data.Infrastructure
             cfg.ForceSingleThread = false;
             cfg.UseKillFile = true;
             cfg.KillFileLocation = Configuration.Config.GetHostSetting("GoldenEyeWorkDir") + "MetadataProcesserKill.txt";
-            cfg.RunMinutes = 2;
+            cfg.RunMinutes = null;
 
             IMessageConsumer<string> consumer;
 

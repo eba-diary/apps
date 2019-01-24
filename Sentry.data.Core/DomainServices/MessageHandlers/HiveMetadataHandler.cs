@@ -58,7 +58,7 @@ namespace Sentry.data.Core
                     HiveTableCreateModel hiveReqeustedEvent = JsonConvert.DeserializeObject<HiveTableCreateModel>(msg);
                     Logger.Debug("HiveMetadataHandler processing HIVE-TABLE-CREATE-REQUESTED message: " + JsonConvert.SerializeObject(hiveReqeustedEvent));
 
-                    de = _dsContext.DataElements.Where(w => w.DataElementDetails.Any(i => i.DataElementDetailType_CDE == "Storage_CDE" && i.DataElementDetailType_VAL == hiveReqeustedEvent.Schema.SchemaID)).FirstOrDefault();
+                    de = _dsContext.GetById<DataElement>(hiveReqeustedEvent.Schema.SchemaID);
                     de.HiveTableStatus = HiveTableStatusEnum.Requested.ToString();
 
                     _dsContext.Merge(de);
