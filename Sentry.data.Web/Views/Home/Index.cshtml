@@ -6,155 +6,152 @@
 }
 
 
-<style>
-    .frontPageh1 {
-        text-align:center;
+<div class="container body-content">
 
-    }
-</style>
+    <div class="row">
 
+        @* left column for the tiles *@
+        <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
 
+            @* row for the first two tiles *@
+            <div class="row">
 
-<h1 class="frontPageh1" style="margin: 80px;">
-    Welcome to data.sentry.com.
-    Please choose a section below to begin.
-</h1>
-
-    <div class="container body-content" style="    top: -50px;">
-        <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8" id="leftPanel">
-            <a class="" href="/BusinessIntelligence" style="background: white;">
-                <div class="borderdk_blue tile setTile" style="height:200px;">
-
-                    <div class="text-center col-lg-6 ">
-                        <img src="~/Images/Icons/Business Intelligence.svg" class="tile-image">
-                        <div class="tile-header" style="color: #003DA5;">Business Intelligence</div>
+                <div id="bi-wrapper" class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
+                    <h2>Business Intelligence</h2>
+                    <div class="home-photo bg-photo-bi border-btm-bi"></div>
+                    <div id="bi-content-wrapper" class="home-tile">
+                        <p>
+                            Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                            Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
+                            when an unknown printer took a galley of type and scrambled it to make a type
+                            specimen book.
+                        </p>
+                        <a href="/BusinessIntelligence" class="home-tile-link-bi">View Business Intelligence &gt;</a>
                     </div>
-                    <div class="text-center col-lg-5" style="margin-top:42px;">
-                        <h3 style="color: #003DA5;">Exhibits</h3>
-                        <h3 style="color: #003DA5;">Dashboards</h3>
-                    </div>
-
                 </div>
-            </a>
-            <div style="height:1px;">
+
+                <div class="col-xs-12 col-sm-1 col-md-1 col-lg-1"></div>
+
+                <div id="ds-wrapper" class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
+                    <h2 class="green">Datasets</h2>
+                    <div class="home-photo bg-photo-ds border-btm-ds"></div>
+                    <div id="ds-content-wrapper" class="home-tile">
+                        <p>
+                            Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots
+                            in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
+                        </p>
+                        <a href="/Dataset" class="home-tile-link-ds">View Datasets &gt;</a>
+                    </div>
+                </div>
+
             </div>
-            <a class="" href="/Dataset/Index" style="background: white;">
-                <div class="borderdk_green tile setTile" style="height:200px;">
 
-                    <div class="text-center col-lg-6 ">
-                        <img src="~/Images/Icons/Datasets.svg" class="tile-image">
-                        <div class="tile-header" style="color: #005844;">Datasets</div>
-                    </div>
-                    <div class="text-center col-lg-5" style="margin-top:42px;">
-                        <h3 style="color: #005844;">Internal Sentry Datasets</h3>
-                        <h3 style="color: #005844;">External Datasets</h3>
-                    </div>
+            @* second row for additional tiles (only 2 per row) *@
+            <div class="row">
 
+                <div id="da-wrapper" class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
+                    <h2 class="plum">Data Assets</h2>
+                    <div class="home-photo bg-photo-da border-btm-da"></div>
+                    <div id="da-conent-wrapper" class="home-tile">
+                        <p>
+                            There are many variations of passages of Lorem Ipsum available, but the majority have
+                            suffered alteration in some form, by injected humour, or randomised words which don't
+                            look even slightly believable. If you are going to use a passage of Lorem Ipsum, you
+                            need to be sure there isn't anything embarrassing hidden in the middle of text.
+                        </p>
+                        <a href="/DataAsset/Index" class="home-tile-link-da">View Data Assets &gt;</a>
+                    </div>
                 </div>
-            </a>
-            <div style="height:1px;">
+
             </div>
-            <a class="" href="/DataAsset/Index" style="background: white;">
-                <div class="borderdk_plum tile assetTile" style="height:200px;">
 
-                    <div class="text-center col-lg-6 ">
-                        <img src="~/Images/Icons/DataAssets.svg" class="tile-image">
-                        <div class="tile-header" style="color: #72246C;">Data Assets</div>
-                    </div>
-                    <div class="text-center col-lg-5" style="margin-top:27px;">
-                        <h3 style="color: #72246C;">Data Asset Health</h3>
-                        <h3 style="color: #72246C;">Data Lineage</h3>
-                        <h3 style="color: #72246C;">Data Asset Information</h3>
-                    </div>
 
-                </div>
-            </a>
 
-            @*<div>
-                <div style="margin-left: 30px; margin-right:30px;">
-                    <div>
-                        @{
-                    var htmlAttrsObj = new { @class = "navbar-form navbar-center", @id = "DatasetSearch" };
-                    var htmlAttributes = HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttrsObj);
-                    using (Html.BeginForm(@"Datasets", "Search", FormMethod.Get, htmlAttributes))
-                    {
-                        <div class="input-group" style="width: 100%; margin-bottom:5px; margin-top: 5px;">
-                            <span class="input-group-addon" style="width: 50px; height: 50px;" onclick="$(function() {$('#SearchText').focus();});"><i class="glyphicon glyphicon-search"></i></span>
+            @*<a class="" href="/BusinessIntelligence" style="background: white;">
+                    <div class="borderdk_blue tile setTile" style="height:200px;">
 
-                            <input style="height: 50px;" type="text" id="SearchText" name="searchPhrase" class="form-control" placeholder="Search from @Model.DatasetCount Datasets ..." />
+                        <div class="text-center col-lg-6 ">
+                            <img src="~/Images/Icons/Business Intelligence.svg" class="tile-image">
+                            <div class="tile-header" style="color: #003DA5;">Business Intelligence</div>
                         </div>
-            }
-                        }
+                        <div class="text-center col-lg-5" style="margin-top:42px;">
+                            <h3 style="color: #003DA5;">Exhibits</h3>
+                            <h3 style="color: #003DA5;">Dashboards</h3>
+                        </div>
+
                     </div>
+                </a>
+                <div style="height:1px;">
                 </div>
-            </div>*@
+                <a class="" href="/Dataset/Index" style="background: white;">
+                    <div class="borderdk_green tile setTile" style="height:200px;">
+
+                        <div class="text-center col-lg-6 ">
+                            <img src="~/Images/Icons/Datasets.svg" class="tile-image">
+                            <div class="tile-header" style="color: #005844;">Datasets</div>
+                        </div>
+                        <div class="text-center col-lg-5" style="margin-top:42px;">
+                            <h3 style="color: #005844;">Internal Sentry Datasets</h3>
+                            <h3 style="color: #005844;">External Datasets</h3>
+                        </div>
+
+                    </div>
+                </a>
+                <div style="height:1px;">
+                </div>
+                <a class="" href="/DataAsset/Index" style="background: white;">
+                    <div class="borderdk_plum tile assetTile" style="height:200px;">
+
+                        <div class="text-center col-lg-6 ">
+                            <img src="~/Images/Icons/DataAssets.svg" class="tile-image">
+                            <div class="tile-header" style="color: #72246C;">Data Assets</div>
+                        </div>
+                        <div class="text-center col-lg-5" style="margin-top:27px;">
+                            <h3 style="color: #72246C;">Data Asset Health</h3>
+                            <h3 style="color: #72246C;">Data Lineage</h3>
+                            <h3 style="color: #72246C;">Data Asset Information</h3>
+                        </div>
+
+                    </div>
+                </a>*@
         </div>
-        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+
+        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4 hidden-xs hidden-sm">
             <div class="col-lg-12 text-center">
-                <div class="feed hidden-xs hidden-sm border_@color2 tab-pane fade in form-horizontal" style="width: 100%; margin-top: 30px;">
-                    <!-- Nav tabs -->
-                    @*<div class="tabs-wrapper">
-                        <ul class="nav classic-tabs" role="tablist">
-                            <li class="nav-item"><a class="nav-link active" href="#informationPanel" data-toggle="tab" aria-expanded="true">Favorites</a></li>
-                            <li class="nav-item"><a class="nav-link" href="#securityPanel" data-toggle="tab" aria-expanded="false">Feed </a></li>
-                        </ul>
-                    </div>*@
+                <div class="feed border_@color2 tab-pane fade in form-horizontal">
                     <ul class="nav nav-pills float-l">
                         <li class="active" data-tab="fav"><a href="#favoritePanel" data-toggle="tab" aria-expanded="true"><h5>Favorites</h5></a></li>
                         <li data-tab="feed"><a href="#feed" data-toggle="tab" aria-expanded="false"><h5>Feed</h5></a></li>
                     </ul>
                     <div id="edit-favorites-icon" class="float-r clickable" data-toggle="tooltip" data-placement="top" title="Edit Favorites"><span class="glyphicon glyphicon-pencil"></span></div>
+
                     <div id="tabContent" class="tab-content">
                         <div class="clearFloat tab-pane fade active in form-horizontal" id="favoritePanel">
                             <div class="favoriteSpinner">
                                 <span class="sentry-spinner"></span>
                             </div>
-                            @*@Html.Action("GetFeed", "Home")*@
                         </div>
                         <div class="feedBox clearFloat tab-pane fade in form-horizontal" id="feed">
                             <div class="feedSpinner">
                                 <span class="sentry-spinner"></span>
                             </div>
-                            @*@Html.Action("GetFeed", "Home")*@
                         </div>
                     </div>
 
-                    <div class="feedBox clearFloat hidden" id="sentryFeed">
-                        @*@Html.Action("GetSentryFeed", "Home")*@
-                    </div>
+                    <div class="feedBox clearFloat hidden" id="sentryFeed"></div>
                 </div>
             </div>
         </div>
-        @*<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
-            <div class="col-lg-12 text-center">
-                <div class="feed hidden-xs hidden-sm border_@color2" style="width: 100%; margin-top: 30px;"></div>
-            </div>
-        </div>*@
-
 
     </div>
 
+
+</div>
+
 <style>
-    /*html {
-        overflow: scroll;
-        overflow-x: hidden;
-    }
-
-    ::-webkit-scrollbar {
-        width: 0px;  
-    }
-
-    /* optional: show position indicator in red
-    ::-webkit-scrollbar-thumb {
-        background: #FF0000;
-    } */
-
     .nav-tabs {
         border-bottom: 1px solid #d45500;
     }
-    /*.nav-pills > li {
-        background-color: #EAAA00;
-    }*/
 
     .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
         background-color: #00A3E0;
@@ -191,10 +188,6 @@
         font-size: 20px;
     }
 
-    /*body {
-        overflow-y: hidden;
-        height: 100%;
-    }*/
 
     .row.text-center > div {
         display: inline-block;
@@ -203,20 +196,10 @@
 
     body {
         margin-top: -6px;
-        /*background: url(../../Images/SHO_SentryWorld_Aerial.jpg) no-repeat center center fixed;*/
         -moz-background-size: cover;
         -webkit-background-size: cover;
         -o-background-size: cover;
-        /*background-size: cover;
-        background-image: url(../../Images/SHO_SentryWorld_Aerial.jpg);
-        background-size: contain;
-        background-repeat: no-repeat;
-        background-position: bottom;*/
-        /*overflow-x: hidden;
-        overflow-y: hidden;*/
-        /* background-color: transparent; */
     }
-
 
     .imageFooter {
         height: 400px;
@@ -229,7 +212,7 @@
         margin-bottom: 9px;
     }
 
-         .tile a {
+        .tile a {
             height: 100%;
             width: 100%;
             display: block;
@@ -253,7 +236,7 @@
         padding: 10px;
         filter: invert(100%);
         height: 115px;
-        margin-top:20px;
+        margin-top: 20px;
     }
 
     .tile-header {
@@ -264,7 +247,7 @@
         font-size: 1em;
         max-height: 4.5em;
         display: flex;
-        padding-top:3px;
+        padding-top: 3px;
         justify-content: center;
         padding-bottom: 15px;
     }
@@ -342,7 +325,7 @@
                 }
             });
         });
-      
+
 
         function GetFile(location) {
 

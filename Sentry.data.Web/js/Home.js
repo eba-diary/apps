@@ -8,8 +8,7 @@ data.Home = {
     AjaxStatus: true,
 
     Init: function () {
-        if (data.Home.AjaxStatus)
-        {
+        if (data.Home.AjaxStatus) {
             data.Home.AjaxStatus = false;
 
             $.ajax({
@@ -48,12 +47,7 @@ data.Home = {
             window.location = '/Favorites/EditFavorites';
         });
 
-        //$("#sentryFeed").bind('scroll', data.Home.ScrollBottom);
-        //$("#chbx").change(data.Home.ChangeFeeds);
     },
-
-    
-
 
     ScrollBottom: function (e) {
         var elem = $(e.currentTarget);
@@ -61,16 +55,13 @@ data.Home = {
         //var isSentryFeed = $("#chbx").is(':checked');
         var isSentryFeed = false;
 
-        if(data.Home.AllSkipTotal < 100 && data.Home.SentrySkipTotal < 100)
-        {
-            if (elem[0].scrollHeight - elem[0].scrollTop <= startLoadHt && data.Home.AjaxStatus)
-            {
+        if (data.Home.AllSkipTotal < 100 && data.Home.SentrySkipTotal < 100) {
+            if (elem[0].scrollHeight - elem[0].scrollTop <= startLoadHt && data.Home.AjaxStatus) {
                 data.Home.AjaxStatus = false;
 
-                if (isSentryFeed)
-                {
+                if (isSentryFeed) {
                     var skipThese = data.Home.SentrySkipTotal;
-                
+
                     $.ajax({
                         url: '/Home/GetMoreSentryFeeds',
                         dataType: 'html',
@@ -85,8 +76,7 @@ data.Home = {
                         }
                     });
                 }
-                else
-                {
+                else {
                     var skipThese = data.Home.AllSkipTotal;
 
                     $.ajax({
@@ -112,5 +102,4 @@ data.Home = {
         $("#feed").toggleClass("hidden");
         $("#sentryFeed").toggleClass("hidden");
     }
-}
-
+};
