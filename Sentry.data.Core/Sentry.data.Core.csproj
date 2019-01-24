@@ -195,7 +195,7 @@
     <Compile Include="GlobalConstants.cs" />
     <Compile Include="Helpers\DataFeedHelper.cs" />
     <Compile Include="Helpers\DisplayFormatter.cs" />
-    <Compile Include="Helpers\EnumExtensionMethods.cs" />
+    <Compile Include="GlobalEnums\EnumExtensionMethods.cs" />
     <Compile Include="Interfaces\IApplicationUser.cs" />
     <Compile Include="Interfaces\IBusinessIntelligenceService.cs" />
     <Compile Include="Interfaces\ICurrentUserIdProvider.cs" />
