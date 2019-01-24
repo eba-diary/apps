@@ -278,16 +278,17 @@
             $(document).ready(function () {
 
                 $.ajax({
-                    url: "/api/Tag/SearchTags",
+                    url: "/api/v1/tags",
                     dataType: 'json',
                     type: "GET",
                     success: function (msg) {
+
                         $("#TagSelector").select2({
                             multiple: true,
                             allowClear: true,
                             data: msg,
                             ajax: {
-                                url: "/api/Tag/SearchTags",
+                                url: "/api/v1/tags",
                                 dataType: 'json',
                                 dropdownPosition: 'below',
                                 data: function (params) {
@@ -296,6 +297,7 @@
                                     };
                                 },
                                 processResults: function (data) {
+
                                     // parse the results into the format expected by Select2.
                                     // since we are using custom formatting functions we do not need to
                                     // alter the remote JSON data
@@ -303,6 +305,7 @@
                                     return {
                                         results: data
                                     };
+
                                 },
                                 cache: true
                             },
@@ -313,7 +316,7 @@
                         });
 
                         if ($('#TagString').val()) {
-                            console.log('this ran')
+
                             var selectedOptions = JSON.parse($('#TagString').val());
                             var selectedIDs = [];
 
@@ -348,7 +351,6 @@
             function formatTag(tag) {
                 if (tag.loading) return tag.text;
 
-
                 if (tag.Description) {
                     var markup =
                         '<span class="s-tag" tooltip="' + tag.Description + '"> ' + tag.Name + '</span> ' +
@@ -365,6 +367,12 @@
 
                     return markup;
                 }
+
+                $('.select2-results__options li').each(function () {
+                    if ($(this).attr("aria-selected") === 'true') {
+                        $(this).hide();
+                    }
+                });
             }
 
             function formatTagSelection(tag) {
@@ -374,8 +382,8 @@
 
             function sendNewTagToDatabase() {
                 $.ajax({
-                    type: "GET",
-                    url: "/api/Tag/AddNewTag?name=" + $("#tagName").val() + "&description=" + $("#tagDescription").val(),
+                    type: "POST",
+                    url: "/api/v1/tags/" + $("#tagName").val() + "/" + $("#tagDescription").val(),
                     dataType: "json",
                     success: function (msg) {
                         console.log(msg);
@@ -436,7 +444,7 @@
 
                 $.ajax({
                     type: "GET",
-                    url: "/api/Tag/CheckNewTagName?name=" + $("#tagName").val(),
+                    url: "/api/v1/tags/" + $("#tagName").val(),
                     dataType: "json",
                     success: function (msg) {
                         console.log(msg);

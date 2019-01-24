@@ -30,6 +30,14 @@ ul.list-group-indented {
     cursor: pointer;
 }
 
+.float-l {
+    float: left;
+}
+
+.float-r {
+    float: right;
+}
+
 @media (min-width: 768px) {
     .collapse-sm {
         display: block;
@@ -55,9 +63,9 @@ ul.list-group-indented {
 /*#endregion TemplateSettings*/
 
 
-/*****************************/
-/* Custom Settings Start Here*/
-/*****************************/
+/******************************/
+/* Custom Settings Start Here */
+/******************************/
 
 /*#region MainPage - Favorites*/
 
@@ -72,8 +80,13 @@ ul.list-group-indented {
     margin-right: 10px;    
 }
 
-
 /*#endregion MainPage - Favorites*/
+
+/* hide selected select2 tags, all over */
+.select2-results__option[aria-selected=true] {
+    display: none;
+}
+
 /* Width of search buttons, all over. */
 .input-group-addon {
     width: 30px;
@@ -701,7 +714,6 @@ tr.categoryBanner-blue th.sorting_desc {
 .detailName
 {
     margin: 0;
-    /*padding-left: 2.25em;*/
     margin-top: 10px;
 }
 
@@ -1806,7 +1818,10 @@ body { background-color: #f8f8f8; }
     vertical-align: top;
     background-color: white;
     box-shadow: 2px 6px 10px #888888;
-    height: 530px;
+}
+
+.feed .nav-pills {
+    margin-bottom: 15px;
 }
 
 .feedBox {
@@ -2079,8 +2094,11 @@ body { background-color: #f8f8f8; }
 
     .feed 
     {  
-        width: 20%; 
-        height: 545px;
+        width: 100%;
+        margin-left: 0px;
+        border: 1.5px solid #00a3e0;
+        border-top: 6px solid #00a3e0;
+        min-height: 680px;
     }
 
     .detailDesc
@@ -2109,7 +2127,6 @@ body { background-color: #f8f8f8; }
     .asset, .feed
     { 
         margin-top: 2em;
-        height: 545px; 
     }
     .assetlastUpdt{
         margin-top: 2em;
@@ -2374,14 +2391,6 @@ tr.shown td.details-control {
     #assetMenu {
         display: none;
     }
-}
-
-#primaryOptions{
-
-}
-
-#primaryOptions li{
-    z-index: 100;
 }
 
 #primaryPanel {

@@ -109,6 +109,7 @@ function Schema(id, data) {
     this.revisionID = ko.observable(data.RevisionID);
     this.hiveDatabase = ko.observable(data.HiveDatabase);
     this.hiveTable = ko.observable(data.HiveTable);
+    this.hiveTableStatus = ko.observable(data.HiveTableStatus);
     this.hasTable = ko.observable(data.HasTable);
 }
 
@@ -271,7 +272,7 @@ function ViewModel() {
 
         var data = e.params.data;
 
-        var controllerURL = "/api/QueryTool/GetS3Key?datasetID=" + encodeURI(data.id);
+        var controllerURL = "/api/v1/queryTool/datasets/" + encodeURI(data.id);
         $.get(controllerURL, function (result) {
 
             console.log(result);

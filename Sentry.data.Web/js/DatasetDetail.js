@@ -106,7 +106,7 @@ data.DatasetDetail = {
             $.ajax({
                 url: "/Dataset/GetDatasetFileInfoForGrid/?Id=" + Id + "&bundle=" + true,
                 method: "POST",
-                data:  params,
+                data: params,
                 dataType: 'json',
                 success: function (obj) {
                     //console.log('success');
@@ -116,12 +116,10 @@ data.DatasetDetail = {
                     var configName = obj.data[0].ConfigFileName;
                     var multipleConfigs = false;
 
-                    for (i = 0; i < obj.data.length; i++)
-                    {
+                    for (i = 0; i < obj.data.length; i++) {
                         listOfFilesToBundle.push(obj.data[i].Id);
 
-                        if (obj.data[i].ConfigFileName != configName)
-                        {
+                        if (obj.data[i].ConfigFileName != configName) {
                             multipleConfigs = true;
                         }
                     }
@@ -141,12 +139,11 @@ data.DatasetDetail = {
                     //console.log('failed');
                     //console.log(obj);
                 },
-                error: function (obj)
-                {
+                error: function (obj) {
                     //console.log('error');
                     //console.log(obj);
                 }
-            });        
+            });
         });
 
         $('body').on('click', '.jobstatus', function () {
@@ -155,7 +152,7 @@ data.DatasetDetail = {
                 var controllerurl = "/Dataset/DisableRetrieverJob/?id=";
             }
             else {
-                var controllerurl = "/Dataset/EnableRetrieverJob/?id=";                
+                var controllerurl = "/Dataset/EnableRetrieverJob/?id=";
             }
 
             var request = $.ajax({
@@ -205,7 +202,7 @@ data.DatasetDetail = {
                     //console.log(e);
                     //console.log(xhr);
                 }
-            });        
+            });
         }
 
         Sentry.ShowModalCustom(
@@ -220,8 +217,7 @@ data.DatasetDetail = {
             e.preventDefault();
 
             //console.log($('#inputNewName').val());
-            if ($('#inputNewName').val() !== "" && $('#inputNewName').val() !== undefined && $('#inputNewName').val() != null)
-            {
+            if ($('#inputNewName').val() !== "" && $('#inputNewName').val() !== undefined && $('#inputNewName').val() != null) {
                 $('.btn-primary').prop("disabled", false);
             }
             else {
@@ -229,7 +225,7 @@ data.DatasetDetail = {
             }
 
         });
-        
+
     },
 
     ///<summary>
@@ -243,7 +239,7 @@ data.DatasetDetail = {
     },
 
     VersionsModalInit: function (Id) {
-        $('.modal-dialog').css('width','900px');
+        $('.modal-dialog').css('width', '900px');
 
         $("#datasetFilesVersionsTable").DataTable({
             autoWidth: true,
@@ -256,35 +252,35 @@ data.DatasetDetail = {
                 type: "POST"
             },
             columns: [
-                        { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px" },
-                        { data: "ActionLinks", className: "downloadFile", width: "auto" },
-                        //{ data: "PreviewHref", className: "previewFile", width: "20px" },
-                        //{ data: "Id", width: "40px", type: "num", className: "datasetfileid" },
-                        { data: "Name", width: "40%", className: "Name" },
-                        { data: "ConfigFileName", className: "configFileName" },
-                        { data: "UploadUserName", className: "UploadUserName" },
-                        { data: "CreateDTM", className: "createdtm", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null;}},
-                        { data: "ModifiedDTM", type: "date", className: "modifieddtm", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null;}}
+                { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px" },
+                { data: "ActionLinks", className: "downloadFile", width: "auto" },
+                //{ data: "PreviewHref", className: "previewFile", width: "20px" },
+                //{ data: "Id", width: "40px", type: "num", className: "datasetfileid" },
+                { data: "Name", width: "40%", className: "Name" },
+                { data: "ConfigFileName", className: "configFileName" },
+                { data: "UploadUserName", className: "UploadUserName" },
+                { data: "CreateDTM", className: "createdtm", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
+                { data: "ModifiedDTM", type: "date", className: "modifieddtm", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } }
             ],
             order: [6, 'desc'],
             //stateSave: true,
             //stateDuration: -1  // indicates session storage, not local storage
             "createdRow": function (row, data, dataIndex) {
             }
-            
+
         });
 
         $("#datasetFilesVersionsTable").dataTable().columnFilter({
             sPlaceHolder: "head:after",
             aoColumns: [
-                    null,
-                    null,
-                    null,
-                    //{ type: "number-range" },
-                    { type: "text" },
-                    { type: "text" },
-                    { type: "text" },
-                    { type: "text" }
+                null,
+                null,
+                null,
+                //{ type: "number-range" },
+                { type: "text" },
+                { type: "text" },
+                { type: "text" },
+                { type: "text" }
             ]
         });
 
@@ -342,7 +338,7 @@ data.DatasetDetail = {
             $(this).val(i);
         });
 
-        $('#btnUploadFile').prop("disabled", true);  
+        $('#btnUploadFile').prop("disabled", true);
 
         if (id == 0 || id == 1) {
             //Hide Create Button
@@ -379,15 +375,15 @@ data.DatasetDetail = {
             $('.modal-backdrop').remove();
 
             var modal = Sentry.ShowModalWithSpinner("Upload Results", {
-                    Confirm: {
-                        label: 'Confirm',
-                        className: 'btn-success'
+                Confirm: {
+                    label: 'Confirm',
+                    className: 'btn-success'
                 },
-                    Cancel:
-                    {
-                        label: 'Cancel',
-                        className: 'btn-cancel'
-                    }
+                Cancel:
+                {
+                    label: 'Cancel',
+                    className: 'btn-cancel'
+                }
             });
 
 
@@ -420,11 +416,11 @@ data.DatasetDetail = {
 
                     modal.ReplaceModalBody('<h3> The file you are attempting to upload to is too large to upload through the browser. </h3>' +
                         '<p>Please use the following location to drop files for this dataset. </p>' +
-                        '<br />' + 
+                        '<br />' +
                         '<p>' + dropLocation + '</p>' +
-                        '<br />' + 
+                        '<br />' +
                         '<p>If you don\'t have access to this drop location please contact <a href="mailto:DSCSupport@sentry.com"> Data.sentry.com Administration </a> for further assistance </p>'
-                        );
+                    );
 
                     $('.modal-footer button').prop("disabled", false);
                 }
@@ -448,9 +444,9 @@ data.DatasetDetail = {
                         '<p> Progress: <span id=\'progressKB\'/></p>' +
                         '<h3><b><span id=\'percentTotal\'></span></b ></h3>' +
                         '<div>' +
-                            '<div class="progress progress-striped active">' +
-                                '<div class="progress-bar" id="progressBar"></div>' +
-                            '</div>' +
+                        '<div class="progress progress-striped active">' +
+                        '<div class="progress-bar" id="progressBar"></div>' +
+                        '</div>' +
                         '</div>'
                     );
 
@@ -468,7 +464,7 @@ data.DatasetDetail = {
                     xhr.addEventListener('load', function (e) {
                         $('.modal-footer button').prop("disabled", false);
                         //modal.ReplaceModalBody('Successful');
-                        modal.ReplaceModalBody(e.currentTarget.response.replace(/"/g,''));
+                        modal.ReplaceModalBody(e.currentTarget.response.replace(/"/g, ''));
                         //console.log(e);
                     });
 
@@ -551,8 +547,7 @@ data.DatasetDetail = {
                 $('#configList').parent().parent().hide();
                 $("#configDescription").hide();
             }
-            else if ($("#datasetList option:selected").text("Select Dataset"))
-            {
+            else if ($("#datasetList option:selected").text("Select Dataset")) {
                 //Hide Upload Button
                 $("[id^='btnUploadFile']").prop("disabled", true);
 
@@ -609,10 +604,9 @@ data.DatasetDetail = {
             if (files.length > 0) {
 
                 //console.log('File Upload Change Loop');
-                getConfigs();              
-            }   
-            else
-            {
+                getConfigs();
+            }
+            else {
                 //Hide Configuration List
                 $('#configList').parent().parent().hide();
                 $("#configDescription").hide();
@@ -620,8 +614,7 @@ data.DatasetDetail = {
         });
 
         $("#datasetList").change(function () {
-            if ($('#datasetList').find(":selected").val() == 0)
-            {
+            if ($('#datasetList').find(":selected").val() == 0) {
                 //Hide Create Button
                 $("#btnCreateDatasetAtUpload").prop("disabled", true);
                 $("#btnCreateDatasetAtUpload").hide();
@@ -634,8 +627,7 @@ data.DatasetDetail = {
                 $('#configList').parent().parent().hide();
                 $("#configDescription").hide();
             }
-            else if ($('#datasetList').find(":selected").val() == 1)
-            {
+            else if ($('#datasetList').find(":selected").val() == 1) {
                 //Show Create Button
                 $("#btnCreateDatasetAtUpload").prop("disabled", false);
                 $("#btnCreateDatasetAtUpload").show();
@@ -648,8 +640,7 @@ data.DatasetDetail = {
                 $('#configList').parent().parent().hide();
                 $("#configDescription").hide();
             }
-            else
-            {
+            else {
 
                 //Hide Create Button
                 $("#btnCreateDatasetAtUpload").prop("disabled", true);
@@ -691,7 +682,7 @@ data.DatasetDetail = {
             } else {
                 dID = idFromSelectList;
             }
-            
+
             var controllerURL = "/Dataset/GetDatasetFileConfigInfo/?id=" + encodeURI(dID);
             $.get(controllerURL, function (result) {
                 configs = result;
@@ -703,7 +694,7 @@ data.DatasetDetail = {
                 var files = fileUpload.files;
 
                 if (files.length > 0) {
-                   
+
                     var matchFound = false;
                     var indexes = [];
                     var matchIndex;
@@ -732,7 +723,7 @@ data.DatasetDetail = {
 
                                         indexes.push(i);
                                         amountMatched++;
-                                    }                               
+                                    }
                                 }
                                 else if (!configs[i].IsRegexSearch[j] && files[0].name === configs[i].SearchCriteria[j]) {
                                     if (indexes.indexOf(i) == -1) {
@@ -759,9 +750,9 @@ data.DatasetDetail = {
                         $("#configDescription").html(configs[matchIndex].ConfigFileDesc);
 
                         if (amountMatched > 1) {
-                            $("#configList").prop('disabled',false);
+                            $("#configList").prop('disabled', false);
                         }
-                        $('#btnUploadFile').prop("disabled", false);                      
+                        $('#btnUploadFile').prop("disabled", false);
                     }
                     else {
                         select.append($('<option/>', {
@@ -774,8 +765,8 @@ data.DatasetDetail = {
                         $("#configDescription").html(configs[0].ConfigFileDesc);
                     }
                 } else {
-                    $("#configList").prop('disabled',true);
-                    $('#btnUploadFile').prop("disabled", true);       
+                    $("#configList").prop('disabled', true);
+                    $('#btnUploadFile').prop("disabled", true);
                     $("#configDescription").html("Please choose a file from the Choose File button.");
                 }
 
@@ -785,10 +776,8 @@ data.DatasetDetail = {
         $("#configList").change(function () {
             var configID = $(this).val();
 
-            for (i = 0; i < configs.length; i++)
-            {
-                if (configs[i].ConfigId == configID)
-                {
+            for (i = 0; i < configs.length; i++) {
+                if (configs[i].ConfigId == configID) {
                     $("#configDescription").html(configs[i].ConfigFileDesc);
                     break;
                 }
@@ -808,25 +797,24 @@ data.DatasetDetail = {
             if (result.message && result.message.startsWith('Encountered Error Retrieving File')) {
                 Sentry.ShowModalCustom("Error", result.message, {
                     Cancel:
-                        {
-                            label: 'Ok',
-                            className: 'btn-Ok'
-                        }
+                    {
+                        label: 'Ok',
+                        className: 'btn-Ok'
+                    }
                 });
             } else {
                 window.open(result, "_blank");
             }
         })
-        .fail(function (jqXHR, textStatus, errorThrown)
-        {
-            Sentry.ShowModalCustom("Error", jqXHR.responseJSON.message, {
-                Cancel:
-                {
-                    label: 'Ok',
-                    className: 'btn-Ok'
-                }
+            .fail(function (jqXHR, textStatus, errorThrown) {
+                Sentry.ShowModalCustom("Error", jqXHR.responseJSON.message, {
+                    Cancel:
+                    {
+                        label: 'Ok',
+                        className: 'btn-Ok'
+                    }
+                });
             });
-        });
     },
 
     DownloadLatestDatasetFile: function (id) {
@@ -841,15 +829,15 @@ data.DatasetDetail = {
             $.get(controllerURL, function (result) {
                 window.open(result, "_blank");
             })
-            .fail(function (jqXHR, textStatus, errorThrown) {
-                Sentry.ShowModalCustom("Error", jqXHR.responseJSON.message, {
-                    Cancel:
-                    {
-                        label: 'Ok',
-                        className: 'btn-Ok'
-                    }
+                .fail(function (jqXHR, textStatus, errorThrown) {
+                    Sentry.ShowModalCustom("Error", jqXHR.responseJSON.message, {
+                        Cancel:
+                        {
+                            label: 'Ok',
+                            className: 'btn-Ok'
+                        }
+                    });
                 });
-            });
         });
     },
 
@@ -879,17 +867,17 @@ data.DatasetDetail = {
         });
     },
 
-    EditDataFileInformation: function(id){
-        var modal = Sentry.ShowModalWithSpinner("Edit Data File");   
+    EditDataFileInformation: function (id) {
+        var modal = Sentry.ShowModalWithSpinner("Edit Data File");
 
         $.get("/Dataset/EditDatasetFile/" + id, function (result) {
             modal.ReplaceModalBody(result);
-           // data.DatasetDetail.VersionsModalInit(id);
+            // data.DatasetDetail.VersionsModalInit(id);
         })
     },
 
     GetDatasetFileVersions: function (id) {
-        var modal = Sentry.ShowModalWithSpinner("Versions");   
+        var modal = Sentry.ShowModalWithSpinner("Versions");
 
         $.get("/Dataset/GetDatasetFileVersions/" + id, function (result) {
             modal.ReplaceModalBody(result);
@@ -908,7 +896,7 @@ data.DatasetDetail = {
         $.get(createDatafileUrl, function (e) {
             modal.ReplaceModalBody(e);
             data.DatasetDetail.UploadModalInit(id);
-        });       
+        });
     },
 
     SubscribeModal: function (id) {
@@ -918,7 +906,7 @@ data.DatasetDetail = {
 
         $.get(Url, function (e) {
             modal.ReplaceModalBody(e);
-        });      
+        });
     },
 
 
@@ -945,7 +933,7 @@ data.DatasetDetail = {
     },
 
     DatasetBundingFileTableInit: function (Id) {
-         $("#bundledDatasetFilesTable").DataTable({
+        $("#bundledDatasetFilesTable").DataTable({
             width: "100%",
             serverSide: true,
             //responsive: true,
@@ -1028,8 +1016,8 @@ data.DatasetDetail = {
     },
 
 
-    DatasetFileTableInit: function(Id) {
-       
+    DatasetFileTableInit: function (Id) {
+
         data.Dataset.DatasetFilesTable = $("#datasetFilesTable").DataTable({
             //$("#datasetFilesTable").dataTable({
             width: "100%",
@@ -1053,8 +1041,7 @@ data.DatasetDetail = {
                 { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px", searchable: false },
                 { data: "ActionLinks", className: "downloadFile", width: "100px", searchable: false, orderable: false },
                 {
-                    data: "Name", width: "40%", className: "Name", render: function (data, type, row)
-                    {
+                    data: "Name", width: "40%", className: "Name", render: function (data, type, row) {
                         return "<a href = \"#\" onclick=\"data.DatasetDetail.GetDatasetFileVersions(" + row.Id
                             + ")\" title=\"View File Versions\">" + row.Name
                             + "</a>"
@@ -1187,16 +1174,14 @@ data.DatasetDetail = {
             $('#bundleCountSelected').html(0);
             localStorage.setItem("listOfFilesToBundle", JSON.stringify([]));
 
-            if (data.Dataset.DatasetFilesTable.page.info().recordsDisplay < 2)
-            {
+            if (data.Dataset.DatasetFilesTable.page.info().recordsDisplay < 2) {
                 $('#bundle_allFiltered').attr("disabled", true);
             }
             else {
                 $('#bundle_allFiltered').attr("disabled", false);
             }
 
-            if (parseInt($('#bundleCountSelected').html(), 10) < 2)
-            {
+            if (parseInt($('#bundleCountSelected').html(), 10) < 2) {
                 $('#bundle_selected').attr("disabled", true);
             }
             else {
@@ -1204,7 +1189,7 @@ data.DatasetDetail = {
             }
         });
     },
-    
+
     formatDatasetFileDetails: function (d) {
         // `d` is the original data object for the row
         var table = '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">';
@@ -1212,27 +1197,27 @@ data.DatasetDetail = {
         if (d.Information !== null) {
             table +=
                 '<tr>' +
-                    '<td><b>Information</b>: </td>' +
-                    '<td>' + d.Information + '</td>' +
+                '<td><b>Information</b>: </td>' +
+                '<td>' + d.Information + '</td>' +
                 '</tr>';
         }
 
         table +=
             '<tr>' +
-                '<td><b>File ID</b>: </td>' +
-                '<td>' + d.Id + '</td>' +
+            '<td><b>File ID</b>: </td>' +
+            '<td>' + d.Id + '</td>' +
             '</tr>' +
             '<tr>' +
-                '<td><b>S3 Location</b>:</td>' +
-                '<td>' + d.s3Key + '</td>' +
+            '<td><b>S3 Location</b>:</td>' +
+            '<td>' + d.s3Key + '</td>' +
             '</tr>' +
             '<tr>' +
-                '<td><b>Version ID</b>: </td>' +
-                '<td>' + d.VersionId + '</td>' +
+            '<td><b>Version ID</b>: </td>' +
+            '<td>' + d.VersionId + '</td>' +
             '</tr>' +
             '<tr>' +
-                '<td><b>ConfigFileDesc</b>: </td>' +
-                '<td>' + d.ConfigFileDesc + '</td>' +
+            '<td><b>ConfigFileDesc</b>: </td>' +
+            '<td>' + d.ConfigFileDesc + '</td>' +
             '</tr>' +
             '</table>';
 
@@ -1246,27 +1231,27 @@ data.DatasetDetail = {
         if (d.Information !== null) {
             table +=
                 '<tr>' +
-                    '<td><b>Information</b>: </td>' +
-                    '<td>' + d.Information + '</td>' +
+                '<td><b>Information</b>: </td>' +
+                '<td>' + d.Information + '</td>' +
                 '</tr>';
         }
 
         table +=
             '<tr>' +
-                '<td><b>File ID</b>: </td>' +
-                '<td>' + d.Id + '</td>' +
+            '<td><b>File ID</b>: </td>' +
+            '<td>' + d.Id + '</td>' +
             '</tr>' +
             '<tr>' +
-                '<td><b>S3 Location</b>:</td>' +
-                '<td>' + d.s3Key + '</td>' +
+            '<td><b>S3 Location</b>:</td>' +
+            '<td>' + d.s3Key + '</td>' +
             '</tr>' +
             '<tr>' +
-                '<td><b>Version ID</b>: </td>' +
-                '<td>' + d.VersionId + '</td>' +
+            '<td><b>Version ID</b>: </td>' +
+            '<td>' + d.VersionId + '</td>' +
             '</tr>' +
             '<tr>' +
-                '<td><b>ConfigFileDesc</b>: </td>' +
-                '<td>' + d.ConfigFileDesc + '</td>' +
+            '<td><b>ConfigFileDesc</b>: </td>' +
+            '<td>' + d.ConfigFileDesc + '</td>' +
             '</tr>' +
             '</table>';
 
@@ -1301,15 +1286,15 @@ data.DatasetDetail = {
                 type: "POST"
             },
             columns: [
-                        { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px" },
-                        { data: "EditHref", className: "editConfig", width: "20px" },
-                        { data: "ConfigFileName", className: "configFileName" },
-                        { data: "SearchCriteria", className: "searchCriteria"},
-                        { data: "TargetFileName", className: "targetFileName" },
-                        { data: "IsRegexSearch", className: "isRegexSearch", render: function (data, type, row) { return (data == true) ? '<span class="glyphicon glyphicon-ok"> </span>' : '<span class="glyphicon glyphicon-remove"></span>';} },
-                        { data: "OverwriteDatasetFile", type: "date", className: "overwriteDatsetFile", render: function (data, type, row) { return (data == true) ? '<span class="glyphicon glyphicon-ok"> </span>' : '<span class="glyphicon glyphicon-remove"></span>'; } },
-                        { data: "FileType", className: "fileType", },
-                        { data: "DatasetScopeTypeID", className: "DatasetScopeTypeID"}
+                { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px" },
+                { data: "EditHref", className: "editConfig", width: "20px" },
+                { data: "ConfigFileName", className: "configFileName" },
+                { data: "SearchCriteria", className: "searchCriteria" },
+                { data: "TargetFileName", className: "targetFileName" },
+                { data: "IsRegexSearch", className: "isRegexSearch", render: function (data, type, row) { return (data == true) ? '<span class="glyphicon glyphicon-ok"> </span>' : '<span class="glyphicon glyphicon-remove"></span>'; } },
+                { data: "OverwriteDatasetFile", type: "date", className: "overwriteDatsetFile", render: function (data, type, row) { return (data == true) ? '<span class="glyphicon glyphicon-ok"> </span>' : '<span class="glyphicon glyphicon-remove"></span>'; } },
+                { data: "FileType", className: "fileType", },
+                { data: "DatasetScopeTypeID", className: "DatasetScopeTypeID" }
             ],
             order: [1, 'asc']
             //stateSave: true,
@@ -1325,11 +1310,11 @@ data.DatasetDetail = {
 
         $('#datasetFileConfigsTable tbody').on('click', 'tr', function () {
             if ($(this).hasClass('active')) {
-              //  $(this).removeClass('active');
+                //  $(this).removeClass('active');
             }
             else {
                 //table.$('tr.active').removeClass('active');
-             //   $(this).addClass('active');
+                //   $(this).addClass('active');
             }
         });
 
@@ -1337,16 +1322,16 @@ data.DatasetDetail = {
 
     formatDatasetFileConfigDetails: function (d) {
         // `d` is the original data object for the row
-    return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
-        '<tr>' +
+        return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
+            '<tr>' +
             '<td><b>Description</b>:</td>' +
             '<td>' + d.ConfigFileDesc + '</td>' +
-        '</tr>' +
-        '<tr>' +
+            '</tr>' +
+            '<tr>' +
             '<td><b>Drop Path</b>: </td>' +
             '<td>' + d.DropPath + '</td>' +
-        '</tr>' +
-    '</table>';
+            '</tr>' +
+            '</table>';
     },
 
     formatDatasetFileVersionDetails: function (d) {
@@ -1363,23 +1348,69 @@ data.DatasetDetail = {
 
         table +=
             '<tr>' +
-                '<td><b>File ID</b>: </td>' +
-                '<td>' + d.Id + '</td>' +
+            '<td><b>File ID</b>: </td>' +
+            '<td>' + d.Id + '</td>' +
             '</tr>' +
             '<tr>' +
-                '<td><b>S3 Location</b>:</td>' +
-                '<td>' + d.s3Key + '</td>' +
+            '<td><b>S3 Location</b>:</td>' +
+            '<td>' + d.s3Key + '</td>' +
             '</tr>' +
             '<tr>' +
-                '<td><b>Version ID</b>: </td>' +
-                '<td>' + d.VersionId + '</td>' +
+            '<td><b>Version ID</b>: </td>' +
+            '<td>' + d.VersionId + '</td>' +
             '</tr>' +
             '<tr>' +
-                '<td><b>ConfigFileDesc</b>: </td>' +
-                '<td>' + d.ConfigFileDesc + '</td>' +
+            '<td><b>ConfigFileDesc</b>: </td>' +
+            '<td>' + d.ConfigFileDesc + '</td>' +
             '</tr>' +
             '</table>';
 
         return table;
     },
-}
+
+    OpenReport: function (artifactType, artifactPath) {
+
+        // check what type we're working with
+        if (artifactType === 'file') {
+
+            // check if the user has permission and if so, download the file
+            $.ajax({
+                url: '/ExternalFile/HasReadPermissions?pathAndFilename=' + artifactPath,
+                method: "GET",
+                dataType: 'json',
+                success: function (obj) {
+                    if (obj.HasPermission) {
+                        var url = '/ExternalFile/DownloadExternalFile?pathAndFilename=' + artifactPath;
+                        window.open(url);
+                    }
+                    else {
+                        Sentry.ShowModalAlert(
+                            "User does not have sufficient permissions to selected file."
+                        );
+                    }
+                },
+                error: function (obj) {
+                    Sentry.ShowModalAlert("Failed permissions check, please try again. If problem persists, please contact <a mailto:DSCSupport@sentry.com></a>");
+                }
+            });
+
+        } else {
+
+            console.log('type: ' + artifactType);
+            console.log('path: ' + artifactPath);
+
+            // open the link in a new window
+            var win = window.open(artifactPath, '_blank');
+            if (win) {
+                //Browser has allowed it to be opened
+                win.focus();
+            } else {
+                //Browser has blocked it
+                alert('Please allow popups for this website');
+            }
+
+        }
+
+        
+    }
+};

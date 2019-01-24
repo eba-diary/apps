@@ -166,7 +166,6 @@
                 </div>
             </div>
 
-            @*
             <div class="form-group">
                 @Html.LabelFor((model) => model.DataClassification, new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
@@ -175,13 +174,13 @@
                 </div>
             </div>
 
-            <div class="form-group fieldDescription">
+            <div class="form-group">
                 <label class="control-label col-md-2"></label>
                 <div class="col-md-10">
                     <span class="text-muted"><em id="dataClassInfo"></em></span>
                 </div>
             </div>
-            *@
+            
         </div>
         @*
         <div id="retrievalPanel" class="tab-pane fade in form-horizontal">
@@ -462,7 +461,7 @@
             $(document).ready(function () {
 
                 $.ajax({
-                    url: "/api/Tag/SearchTags",
+                    url: "/api/v1/tags",
                     dataType: 'json',
                     type: "GET",
                     success: function (msg) {
@@ -471,7 +470,7 @@
                             allowClear: true,
                             data: msg,
                             ajax: {
-                                url: "/api/Tag/SearchTags",
+                                url: "/api/v1/tags",
                                 dataType: 'json',
                                 dropdownPosition: 'below',
                                 data: function (params) {
@@ -497,7 +496,6 @@
                         });
 
                         if ($('#TagString').val()) {
-                            console.log('this ran')
                             var selectedOptions = JSON.parse($('#TagString').val());
                             var selectedIDs = [];
 
@@ -515,6 +513,47 @@
                         console.log(e);
                     }
                 });
+
+                $("#DataClassification").change(function () {
+                    switch ($("#DataClassification").val()) {
+                        case "1":
+                            $('#dataClassInfo').text('“Restricted” information is proprietary and has significant business value for Sentry. ' +
+                                'Unauthorized disclosure or dissemination could result in severe damage to Sentry.  Examples of restricted data include secret contracts or trade secrets.  ' +
+                                'This information must be limited to only the few associates that require access to it.  If it is shared, accessed, or altered without the permission ' +
+                                'of the Information Owner, Information Security must be notified immediately.  Designating information as Restricted involves significant ' +
+                                'costs to Sentry.  For this reason, Information Owners making classification decisions must balance the damage that could result from ' +
+                                'unauthorized access to or disclosure of the information against the cost of additional hardware, software or services required to protect it.');
+                            break;
+                        case "2":
+                            $('#dataClassInfo').text('“Highly Sensitive” information is highly confidential, typically includes personally ' +
+                                'identifiable information, and is intended for limited, specific use by a workgroup, ' +
+                                'department, or group of individuals with a legitimate need to know. Disclosure or ' +
+                                'dissemination of this information could result in significant damage to Sentry. ' +
+                                'Examples of highly sensitive data include medical records, financial account or ' +
+                                'bank account numbers, credit card numbers, individuals’ government-issued ' +
+                                'identification numbers (for example driver’s license numbers, social security ' +
+                                'numbers), and user passwords. This information must be limited to need to know ' +
+                                'access. If it is shared, accessed, or altered without the permission of the ' +
+                                'Information Owner, Information Security must be notified immediately.');
+                            break;
+                        case "3":
+                            $('#dataClassInfo').text('“Internal Use Only” information can be disclosed or disseminated to Sentry ' +
+                                'associates, but will only be shared with other individuals or organizations when a ' +
+                                'non - disclosure agreement is in place and management has approved for legitimate ' +
+                                'business reasons.  Examples include items such as email correspondence, internal ' +
+                                'documentation that is available to all associates.');
+                            break;
+                        case "4":
+                            $('#dataClassInfo').text('“Public” information can be disclosed or disseminated without any restrictions on ' +
+                                'content, audience, or time of publication.  Examples are datasets that were generated by the Federal or State Governments like the Federal Motor Carrier Safety Administration or NOAA Weather Data.  ' +
+                                'These datasets can be freely shared throughout Sentry.');
+                            break;
+                    }
+                });
+
+                @* trigger the select change event so the description is displayed *@
+                $("#DataClassification").trigger('change');
+
             });
 
             $('#TagSelector').on('select2:select', function (e) {
@@ -558,8 +597,8 @@
 
             function sendNewTagToDatabase() {
                 $.ajax({
-                    type: "GET",
-                    url: "/api/Tag/AddNewTag?name=" + $("#tagName").val() + "&description=" + $("#tagDescription").val(),
+                    type: "POST",
+                    url: "/api/v1/tags/" + $("#tagName").val() + "/" + $("#tagDescription").val(),
                     dataType: "json",
                     success: function (msg) {
                         console.log(msg);
@@ -620,7 +659,7 @@
 
                 $.ajax({
                     type: "GET",
-                    url: "/api/Tag/CheckNewTagName?name=" + $("#tagName").val(),
+                    url: "/api/v1/tags/" + $("#tagName").val(),
                     dataType: "json",
                     success: function (msg) {
                         console.log(msg);
@@ -642,47 +681,6 @@
                     }
                 });
             });
-
-            $("#DataClassification").change(function () {
-                switch ($("#DataClassification").val()) {
-                    case "1":
-                        $('#dataClassInfo').text('“Restricted” information is proprietary and has significant business value for Sentry. ' +
-                            'Unauthorized disclosure or dissemination could result in severe damage to Sentry.  Examples of restricted data include secret contracts or trade secrets.  ' +
-                            'This information must be limited to only the few associates that require access to it.  If it is shared, accessed, or altered without the permission ' +
-                            'of the Information Owner, Information Security must be notified immediately.  Designating information as Restricted involves significant ' +
-                            'costs to Sentry.  For this reason, Information Owners making classification decisions must balance the damage that could result from ' +
-                            'unauthorized access to or disclosure of the information against the cost of additional hardware, software or services required to protect it.');
-                        break;
-                    case "2":
-                        $('#dataClassInfo').text('“Highly Sensitive” information is highly confidential, typically includes personally ' +
-                            'identifiable information, and is intended for limited, specific use by a workgroup, ' +
-                            'department, or group of individuals with a legitimate need to know. Disclosure or ' +
-                            'dissemination of this information could result in significant damage to Sentry. ' +
-                            'Examples of highly sensitive data include medical records, financial account or ' +
-                            'bank account numbers, credit card numbers, individuals’ government-issued ' +
-                            'identification numbers (for example driver’s license numbers, social security ' +
-                            'numbers), and user passwords. This information must be limited to need to know ' +
-                            'access. If it is shared, accessed, or altered without the permission of the ' +
-                            'Information Owner, Information Security must be notified immediately.');
-                        break;
-                    case "3":
-                        $('#dataClassInfo').text('“Internal Use Only” information can be disclosed or disseminated to Sentry ' +
-                            'associates, but will only be shared with other individuals or organizations when a ' +
-                            'non - disclosure agreement is in place and management has approved for legitimate ' +
-                            'business reasons.  Examples include items such as email correspondence, internal ' +
-                            'documentation that is available to all associates.');
-                        break;
-                    case "4":
-                        $('#dataClassInfo').text('“Public” information can be disclosed or disseminated without any restrictions on ' +
-                            'content, audience, or time of publication.  Examples are datasets that were generated by the Federal or State Governments like the Federal Motor Carrier Safety Administration or NOAA Weather Data.  ' +
-                            'These datasets can be freely shared throughout Sentry.');
-                        break;
-                }
-            });
-
-
-
-
 
             $("[id^='detailSectionHeader_']").click(function (e) {
                 e.preventDefault();

@@ -108,6 +108,11 @@ namespace Sentry.data.Web
                 UploadFrequency = null;
             }
 
+            if (ds.DataClassification.HasValue)
+            {
+                var datasetClassEnum = (Helpers.Utility.DatasetDataClassification)ds.DataClassification;
+                this.DataClassification = datasetClassEnum.GetDescription();
+            }
 
         }
 
@@ -222,6 +227,9 @@ namespace Sentry.data.Web
         [DisplayName("Sensitive")]
         public Boolean IsSensitive { get; set; }
 
+        [DisplayName("Data Classification")]
+        public string DataClassification { get; set; }
+
         public Boolean CanDisplay { get; set; }
 
 
@@ -246,6 +254,13 @@ namespace Sentry.data.Web
         public List<DatasetScopeType> DatasetScopeType { get; set; }
 
         public Associate SentryOwner { get; set; }
+        public string AssociateCommonName
+        {
+            get
+            {
+                return Sentry.data.Core.Helpers.DisplayFormatter.FormatAssociateName(this.SentryOwner);
+            }
+        }
 
         public IList<DatasetFileConfigsModel> DatasetFileConfigs { get; set; }
 
