@@ -9,7 +9,7 @@ using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Core
 {
-    public class DatasetService :IDatasetService
+    public class DatasetService : IDatasetService
     {
         private readonly IDatasetContext _datasetContext;
         private readonly UserService _userService;
@@ -23,18 +23,26 @@ namespace Sentry.data.Core
 
         public DatasetDto GetDatasetDto(int id)
         {
-            return MapToDto(_datasetContext.GetById<Dataset>(id));
+            Dataset ds = _datasetContext.GetById<Dataset>(id);
+            DatasetDto dto = new DatasetDto();
+            MapToDto(ds, dto);
+
+            return dto;
         }
 
         public DatasetDetailDto GetDatesetDetailDto(int id)
         {
-            return MapToDetailDto(_datasetContext.GetById<Dataset>(id));
+            Dataset ds = _datasetContext.GetById<Dataset>(id);
+            DatasetDetailDto dto = new DatasetDetailDto();
+            MapToDetailDto(ds, dto);
+
+            return dto;
         }
 
         public int CreateAndSaveNewDataset(DatasetDto dto)
         {
             Dataset ds = CreateDataset(dto);
-             _datasetContext.Add(ds);
+            _datasetContext.Add(ds);
 
             DataElement de = CreateDataElement(dto);
             DatasetFileConfig dfc = CreateDatasetFileConfig(dto, ds);
@@ -67,7 +75,7 @@ namespace Sentry.data.Core
 
             if (dto.DatasetCategoryIds?.Count() > 0)
             {
-                ds.DatasetCategories = _datasetContext.Categories.Where(x=> dto.DatasetCategoryIds.Contains(x.Id)).ToList();
+                ds.DatasetCategories = _datasetContext.Categories.Where(x => dto.DatasetCategoryIds.Contains(x.Id)).ToList();
             }
             if (null != dto.CreationUserName && dto.CreationUserName.Length > 0)
             {
@@ -89,7 +97,7 @@ namespace Sentry.data.Core
             {
                 ds.SentryOwnerName = dto.SentryOwnerId;
             }
-            if(dto.DataClassification > 0)
+            if (dto.DataClassification > 0)
             {
                 ds.DataClassification = dto.DataClassification;
             }
@@ -116,7 +124,7 @@ namespace Sentry.data.Core
             Dataset ds = new Dataset()
             {
                 DatasetId = dto.DatasetId,
-                DatasetCategories = _datasetContext.Categories.Where(x=> x.Id == dto.DatasetCategoryIds.First()).ToList(),
+                DatasetCategories = _datasetContext.Categories.Where(x => x.Id == dto.DatasetCategoryIds.First()).ToList(),
                 DatasetName = dto.DatasetName,
                 DatasetDesc = dto.DatasetDesc,
                 DatasetInformation = dto.DatasetInformation,
@@ -244,7 +252,7 @@ namespace Sentry.data.Core
                     Directory.CreateDirectory(path);
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 StringBuilder errmsg = new StringBuilder();
                 errmsg.AppendLine("Failed to Create Drop Location:");
@@ -257,75 +265,67 @@ namespace Sentry.data.Core
         }
 
 
-        private DatasetDto MapToDto(Dataset ds)
-        {
-            if (ds == null) { return new DatasetDto(); }
-            return MapToDetailDto(ds, false);
-        }
-
-        private DatasetDetailDto MapToDetailDto(Dataset ds, bool mapDetails = true)
+        private void MapToDto(Dataset ds, DatasetDto dto)
         {
             string userDisplayname = _userService.GetByAssociateId(ds.SentryOwnerName)?.DisplayName;
-            //base level info
-            DatasetDetailDto dto = new DatasetDetailDto()
-            {
-                DatasetId = ds.DatasetId,
-                DatasetCategoryIds = ds.DatasetCategories.Select(x => x.Id).ToList(),
-                DatasetName = ds.DatasetName,
-                DatasetDesc = ds.DatasetDesc,
-                DatasetInformation = ds.DatasetInformation,
-                DatasetType = ds.DatasetType,
-                DataClassification = ds.DataClassification,
-                CreationUserName = ds.CreationUserName,
-                SentryOwnerName = (string.IsNullOrWhiteSpace(userDisplayname) ? ds.SentryOwnerName : userDisplayname),
-                SentryOwnerId = ds.SentryOwnerName,
-                UploadUserName = ds.UploadUserName,
-                DatasetDtm = ds.DatasetDtm,
-                ChangedDtm = ds.ChangedDtm,
-                IsSensitive = ds.IsSensitive,
-                CanDisplay = ds.CanDisplay,
-                TagIds = new List<string>(),
-                OriginationId = (int)Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode),
-                ConfigFileDesc = ds.DatasetFileConfigs?.First()?.Description,
-                ConfigFileName = ds.DatasetFileConfigs?.First()?.Name,
-                Delimiter = ds.DatasetFileConfigs?.First()?.Schema?.First()?.Delimiter,
-                FileExtensionId = ds.DatasetFileConfigs.First().FileExtension.Id,
-                DatasetScopeTypeId = ds.DatasetFileConfigs.First().DatasetScopeType.ScopeTypeId,
-                CategoryName = ds.DatasetCategories.First().Name,
-                MailtoLink = "mailto:?Subject=Dataset%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/Dataset/Detail/" + ds.DatasetId
-        };
+            dto.DatasetId = ds.DatasetId;
+            dto.DatasetCategoryIds = ds.DatasetCategories.Select(x => x.Id).ToList();
+            dto.DatasetName = ds.DatasetName;
+            dto.DatasetDesc = ds.DatasetDesc;
+            dto.DatasetInformation = ds.DatasetInformation;
+            dto.DatasetType = ds.DatasetType;
+            dto.DataClassification = ds.DataClassification;
+            dto.CreationUserName = ds.CreationUserName;
+            dto.SentryOwnerName = (string.IsNullOrWhiteSpace(userDisplayname) ? ds.SentryOwnerName : userDisplayname);
+            dto.SentryOwnerId = ds.SentryOwnerName;
+            dto.UploadUserName = ds.UploadUserName;
+            dto.DatasetDtm = ds.DatasetDtm;
+            dto.ChangedDtm = ds.ChangedDtm;
+            dto.IsSensitive = ds.IsSensitive;
+            dto.CanDisplay = ds.CanDisplay;
+            dto.TagIds = new List<string>();
+            dto.OriginationId = (int)Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode);
+            dto.ConfigFileDesc = ds.DatasetFileConfigs?.First()?.Description;
+            dto.ConfigFileName = ds.DatasetFileConfigs?.First()?.Name;
+            dto.Delimiter = ds.DatasetFileConfigs?.First()?.Schema?.First()?.Delimiter;
+            dto.FileExtensionId = ds.DatasetFileConfigs.First().FileExtension.Id;
+            dto.DatasetScopeTypeId = ds.DatasetFileConfigs.First().DatasetScopeType.ScopeTypeId;
+            dto.CategoryName = ds.DatasetCategories.First().Name;
+            dto.MailtoLink = "mailto:?Subject=Dataset%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/Dataset/Detail/" + ds.DatasetId;
+        }
 
-            if (mapDetails)
+
+
+        private void MapToDetailDto(Dataset ds, DatasetDetailDto dto)
+        {
+            MapToDto(ds, dto);
+            
+            IApplicationUser user = _userService.GetCurrentUser();
+
+            dto.CanDwnldSenstive = user.CanDwnldSenstive;
+            dto.CanEditDataset = user.CanEditDataset;
+            dto.CanManageConfigs = user.CanManageConfigs;
+            dto.CanDwnldNonSensitive = user.CanDwnldNonSensitive;
+            dto.CanEditDataset = user.CanEditDataset;
+            dto.CanUpload = user.CanUpload;
+            dto.CanQueryTool = user.CanQueryTool || user.CanQueryToolPowerUser;
+            dto.Downloads = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.DOWNLOAD && x.Dataset == ds.DatasetId).Count();
+            dto.IsSubscribed = _datasetContext.IsUserSubscribedToDataset(_userService.GetCurrentUser().AssociateId, dto.DatasetId);
+            dto.AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, dto.DatasetId).Count;
+            dto.Views = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset == ds.DatasetId).Count();
+            dto.IsFavorite = ds.Favorities.Any(w => w.UserId == user.AssociateId);
+            dto.DatasetFileConfigNames = ds.DatasetFileConfigs.ToDictionary(x => x.ConfigId.ToString(), y => y.Name);
+            dto.DatasetScopeTypeNames = ds.DatasetScopeType.ToDictionary(x => x.Name, y => y.Description);
+            dto.DistinctFileExtensions = ds.DatasetFiles.Select(x => Path.GetExtension(x.FileName).TrimStart('.').ToLower()).ToList();
+            dto.DatasetFileCount = ds.DatasetFiles.Count();
+            dto.OriginationCode = ds.OriginationCode;
+            dto.DataClassificationDescription = ds.DataClassification.GetDescription();
+            dto.CategoryColor = ds.DatasetCategories.First().Color;
+            dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
+            if (ds.DatasetFiles.Any())
             {
-                //Details
-                IApplicationUser user = _userService.GetCurrentUser();
-                dto.CanDwnldSenstive = user.CanDwnldSenstive;
-                dto.CanEditDataset = user.CanEditDataset;
-                dto.CanManageConfigs = user.CanManageConfigs;
-                dto.CanDwnldNonSensitive = user.CanDwnldNonSensitive;
-                dto.CanEditDataset = user.CanEditDataset;
-                dto.CanUpload = user.CanUpload;
-                dto.CanQueryTool = user.CanQueryTool || user.CanQueryToolPowerUser;
-                dto.Downloads = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.DOWNLOAD && x.Dataset == ds.DatasetId).Count();
-                dto.IsSubscribed = _datasetContext.IsUserSubscribedToDataset(_userService.GetCurrentUser().AssociateId, dto.DatasetId);
-                dto.AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, dto.DatasetId).Count;
-                dto.Views = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset == ds.DatasetId).Count();
-                dto.IsFavorite = ds.Favorities.Any(w => w.UserId == user.AssociateId);
-                dto.DatasetFileConfigNames = ds.DatasetFileConfigs.ToDictionary(x => x.ConfigId.ToString(), y => y.Name);
-                dto.DatasetScopeTypeNames = ds.DatasetScopeType.ToDictionary(x => x.Name, y => y.Description);
-                dto.DistinctFileExtensions = ds.DatasetFiles.Select(x => Path.GetExtension(x.FileName).TrimStart('.').ToLower()).ToList();
-                dto.DatasetFileCount = ds.DatasetFiles.Count();
-                dto.OriginationCode = ds.OriginationCode;
-                dto.DataClassificationDescription = ds.DataClassification.GetDescription();
-                dto.CategoryColor = ds.DatasetCategories.First().Color;
-                dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
-                if (ds.DatasetFiles.Any())
-                {
-                    dto.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);
-                }
+                dto.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);
             }
-
-            return dto;
         }
 
 

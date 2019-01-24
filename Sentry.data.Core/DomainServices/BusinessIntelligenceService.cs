@@ -24,11 +24,19 @@ namespace Sentry.data.Core
 
         public BusinessIntelligenceDto GetBusinessIntelligenceDto(int datasetId)
         {
-            return MapToDto(_reportContext.GetById<Dataset>(datasetId));
+            BusinessIntelligenceDto dto = new BusinessIntelligenceDto();
+            Dataset ds = _reportContext.GetById<Dataset>(datasetId);
+            MapToDto(ds, dto);
+            return dto;
         }
         public BusinessIntelligenceDetailDto GetBusinessIntelligenceDetailDto(int datasetId)
         {
-            return MapToDetailDto(_reportContext.GetById<Dataset>(datasetId));
+            BusinessIntelligenceDetailDto dto = new BusinessIntelligenceDetailDto();
+            Dataset ds = _reportContext.GetById<Dataset>(datasetId);
+
+            MapToDetailDto(ds, dto);
+
+            return dto;
         }
 
         public BusinessIntelligenceHomeDto GetHomeDto()
@@ -45,13 +53,8 @@ namespace Sentry.data.Core
         {
             try
             {
-                Dataset ds = CreatDataset(dto);
-                _reportContext.Add(ds); //setting it back to ds so we can use the datasetId.
+                CreateDataset(dto);
 
-                DatasetFileConfig dfc = CreateDatasetFileConig(dto, ds);
-                _reportContext.Add(dfc);
-
-                //pull the save here last just incase anything happens while "merging", it will not commit.
                 _reportContext.SaveChanges();
             }
             catch (Exception ex)
@@ -68,11 +71,9 @@ namespace Sentry.data.Core
             {
                 Dataset ds = _reportContext.GetById<Dataset>(dto.DatasetId);
 
-                Dataset dsToSave = CreatDataset(dto, ds);
-                DatasetFileConfig dfc = CreateDatasetFileConig(dto, ds);
+                UpdateDataset(dto, ds);
+                UpdateDatasetFileConfig(dto, ds);
 
-                _reportContext.Merge(dsToSave);
-                _reportContext.Merge(dfc);
                 _reportContext.SaveChanges();
             }
             catch (Exception ex)
@@ -94,9 +95,9 @@ namespace Sentry.data.Core
         {
             List<string> errors = new List<string>();
 
-            if (_reportContext.Datasets.Where(w => w.DatasetName == dto.DatasetName && 
-                                                                        w.DatasetCategories.Any(x=> dto.DatasetCategoryIds.Contains(x.Id)) &&
-                                                                        w.DatasetType == GlobalConstants.DataEntityTypes.REPORT)?.Count() > 0 )
+            if (_reportContext.Datasets.Where(w => w.DatasetName == dto.DatasetName &&
+                                                                        w.DatasetCategories.Any(x => dto.DatasetCategoryIds.Contains(x.Id)) &&
+                                                                        w.DatasetType == GlobalConstants.DataEntityTypes.REPORT)?.Count() > 0)
             {
                 errors.Add("Dataset name already exists within category");
             }
@@ -108,28 +109,43 @@ namespace Sentry.data.Core
 
         #region "Private Functions"
 
-        private DatasetFileConfig CreateDatasetFileConig(BusinessIntelligenceDto dto, Dataset ds)
+        private void UpdateDatasetFileConfig(BusinessIntelligenceDto dto, Dataset ds)
         {
-            DatasetFileConfig dfc = new DatasetFileConfig();
-            if (ds.DatasetFileConfigs?.Count > 0)
-            {
-                dfc = ds.DatasetFileConfigs.First();
-            }
-
-            dfc.Name = dto.DatasetName;
-            dfc.Description = dto.DatasetDesc;
-            dfc.FileTypeId = dto.FileTypeId;
-            dfc.ParentDataset = ds;
-            dfc.DatasetScopeType = _reportContext.DatasetScopeTypes.Where(w => w.Name == "Point-in-Time").FirstOrDefault();
-            dfc.FileExtension = _reportContext.FileExtensions.Where(w => w.Name == "ANY").FirstOrDefault();
-
-            return dfc;
+            MapDatasetFileConig(dto, ds);
+        }
+        private void CreateDatasetFileConfig(BusinessIntelligenceDto dto, Dataset ds)
+        {
+            ds.DatasetFileConfigs = new List<DatasetFileConfig> { new DatasetFileConfig() };
+            MapDatasetFileConig(dto, ds);
         }
 
-        private Dataset CreatDataset(BusinessIntelligenceDto dto, Dataset ds = null)
+        private DatasetFileConfig MapDatasetFileConig(BusinessIntelligenceDto dto, Dataset ds)
         {
-            if(ds == null) { ds = new Dataset(); }
 
+            ds.DatasetFileConfigs.First().Name = dto.DatasetName;
+            ds.DatasetFileConfigs.First().Description = dto.DatasetDesc;
+            ds.DatasetFileConfigs.First().FileTypeId = dto.FileTypeId;
+            ds.DatasetFileConfigs.First().ParentDataset = ds;
+            ds.DatasetFileConfigs.First().DatasetScopeType = _reportContext.DatasetScopeTypes.Where(w => w.Name == "Point-in-Time").FirstOrDefault();
+            ds.DatasetFileConfigs.First().FileExtension = _reportContext.FileExtensions.Where(w => w.Name == "ANY").FirstOrDefault();
+
+            return ds.DatasetFileConfigs.First();
+        }
+
+        private void CreateDataset(BusinessIntelligenceDto dto)
+        {
+            Dataset ds = MapDataset(dto, new Dataset());
+            CreateDatasetFileConfig(dto, ds);
+            _reportContext.Add(ds);
+        }
+
+        private void UpdateDataset(BusinessIntelligenceDto dto, Dataset ds)
+        {
+            MapDataset(dto, ds);
+        }
+
+        private Dataset MapDataset(BusinessIntelligenceDto dto, Dataset ds)
+        {
             ds.DatasetCategories = _reportContext.Categories.Where(x => dto.DatasetCategoryIds.Contains(x.Id)).ToList();
             ds.DatasetName = dto.DatasetName;
             ds.DatasetDesc = dto.DatasetDesc;
@@ -153,61 +169,55 @@ namespace Sentry.data.Core
             };
             ds.Tags = _reportContext.Tags.Where(x => dto.TagIds.Contains(x.TagId.ToString())).ToList();
 
-             return ds;
+            return ds;
         }
 
         //could probably be an extension.
-        private BusinessIntelligenceDto MapToDto(Dataset ds)
-        {
-            if (ds is null) { return new BusinessIntelligenceDto(); }
-            return MapToDetailDto(ds, false);
-        }
-
-        private BusinessIntelligenceDetailDto MapToDetailDto(Dataset ds, bool mapDetails = true)
+        private void MapToDto(Dataset ds, BusinessIntelligenceDto dto)
         {
             string userDisplayname = _userService.GetByAssociateId(ds.SentryOwnerName)?.DisplayName;
-            BusinessIntelligenceDetailDto dto = new BusinessIntelligenceDetailDto()
-            {
-                DatasetId = ds.DatasetId,
-                DatasetCategoryIds = ds.DatasetCategories.Select(x => x.Id).ToList(),
-                DatasetName = ds.DatasetName,
-                DatasetDesc = ds.DatasetDesc,
-                SentryOwnerName = (string.IsNullOrWhiteSpace(userDisplayname) ? ds.SentryOwnerName : userDisplayname),
-                SentryOwnerId = ds.SentryOwnerName,
-                CreationUserName = ds.CreationUserName,
-                UploadUserName = ds.UploadUserName,
-                DatasetDtm = ds.DatasetDtm,
-                ChangedDtm = ds.ChangedDtm,
-                S3Key = ds.S3Key,
-                IsSensitive = ds.IsSensitive,
-                DatasetType = ds.DatasetType,
-                Location = ds.Metadata.ReportMetadata.Location,
-                LocationType = ds.Metadata.ReportMetadata.LocationType,
-                FrequencyId = ds.Metadata.ReportMetadata.Frequency,
-                TagIds = ds.Tags.Select(x => x.TagId.ToString()).ToList(),
-                FileTypeId = ds.DatasetFileConfigs.First().FileTypeId,
-                CanDisplay = ds.CanDisplay,
-                MailtoLink = "mailto:?Subject=Business%20Intelligence%20Exhibit%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/BusinessIntelligence/Detail/" + ds.DatasetId
-        };
+           
+                dto.DatasetId = ds.DatasetId;
+                dto.DatasetCategoryIds = ds.DatasetCategories.Select(x => x.Id).ToList();
+                dto.DatasetName = ds.DatasetName;
+                dto.DatasetDesc = ds.DatasetDesc;
+                dto.SentryOwnerName = (string.IsNullOrWhiteSpace(userDisplayname) ? ds.SentryOwnerName : userDisplayname);
+                dto.SentryOwnerId = ds.SentryOwnerName;
+                dto.CreationUserName = ds.CreationUserName;
+                dto.UploadUserName = ds.UploadUserName;
+                dto.DatasetDtm = ds.DatasetDtm;
+                dto.ChangedDtm = ds.ChangedDtm;
+                dto.S3Key = ds.S3Key;
+                dto.IsSensitive = ds.IsSensitive;
+                dto.DatasetType = ds.DatasetType;
+                dto.Location = ds.Metadata.ReportMetadata.Location;
+                dto.LocationType = ds.Metadata.ReportMetadata.LocationType;
+                dto.FrequencyId = ds.Metadata.ReportMetadata.Frequency;
+                dto.TagIds = ds.Tags.Select(x => x.TagId.ToString()).ToList();
+                dto.FileTypeId = ds.DatasetFileConfigs.First().FileTypeId;
+                dto.CanDisplay = ds.CanDisplay;
+            dto.MailtoLink = "mailto:?Subject=Business%20Intelligence%20Exhibit%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/BusinessIntelligence/Detail/" + ds.DatasetId;
 
+           // return dto;
+        }
 
-            //Details
-            if (mapDetails)
-            {
-                IApplicationUser user = _userService.GetCurrentUser();
-                dto.IsFavorite = ds.Favorities.Any(w => w.UserId == user.AssociateId);
-                dto.ObjectType = dto.DatasetType;
-                dto.IsSubscribed = _reportContext.IsUserSubscribedToDataset(user.AssociateId, ds.DatasetId);
-                dto.AmountOfSubscriptions = _reportContext.GetAllUserSubscriptionsForDataset(user.AssociateId, ds.DatasetId).Count;
-                dto.Views = _reportContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset == ds.DatasetId).Count();
-                dto.FrequencyDescription = Enum.GetName(typeof(ReportFrequency), ds.Metadata.ReportMetadata.Frequency) ?? "Not Specified";
-                dto.TagNames = ds.Tags.Select(x => x.Name).ToList();
-                dto.CanManageReport = user.CanManageReports;
-                dto.CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "gray";
-                dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
-            }
+        private void MapToDetailDto(Dataset ds, BusinessIntelligenceDetailDto dto)
+        {
+            MapToDto(ds, dto);
 
-            return dto;
+            IApplicationUser user = _userService.GetCurrentUser();
+            dto.IsFavorite = ds.Favorities.Any(w => w.UserId == user.AssociateId);
+            dto.ObjectType = dto.DatasetType;
+            dto.IsSubscribed = _reportContext.IsUserSubscribedToDataset(user.AssociateId, ds.DatasetId);
+            dto.AmountOfSubscriptions = _reportContext.GetAllUserSubscriptionsForDataset(user.AssociateId, ds.DatasetId).Count;
+            dto.Views = _reportContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset == ds.DatasetId).Count();
+            dto.FrequencyDescription = Enum.GetName(typeof(ReportFrequency), ds.Metadata.ReportMetadata.Frequency) ?? "Not Specified";
+            dto.TagNames = ds.Tags.Select(x => x.Name).ToList();
+            dto.CanManageReport = user.CanManageReports;
+            dto.CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "gray";
+            dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
+
+            //return dto;
         }
 
         #endregion
