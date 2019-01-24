@@ -53,6 +53,7 @@ namespace Sentry.data.Web.Controllers
         }
 
 
+
         [HttpGet]
         public ActionResult Edit(int id)
         {
@@ -67,8 +68,9 @@ namespace Sentry.data.Web.Controllers
         }
 
 
+
         [HttpPost]
-        public ActionResult BusinessIntelligenceForm(BusinessIntelligenceModel crm) //update the name of this to Submit or something
+        public ActionResult BusinessIntelligenceForm(BusinessIntelligenceModel crm) 
         {
             AddCoreValidationExceptionsToModel(crm.Validate());
 
@@ -77,7 +79,7 @@ namespace Sentry.data.Web.Controllers
                 BusinessIntelligenceDto dto = crm.ToDto();
 
                 if(dto.DatasetId == 0)
-                { //REATE A REPORT
+                { //CREATE A REPORT
                     AddCoreValidationExceptionsToModel(_businessIntelligenceService.Validate(dto));
                     if (ModelState.IsValid)
                     {
@@ -98,12 +100,13 @@ namespace Sentry.data.Web.Controllers
                         return RedirectToAction("Detail", new { id = dto.DatasetId });
                     }
                 }
-
             }
 
             ReportUtility.SetupLists(_datasetContext, crm);
             return View(crm);
         }
+
+
 
         [HttpPost]
         [Route("BusinessIntelligence/Delete/{id}/")]
@@ -121,6 +124,8 @@ namespace Sentry.data.Web.Controllers
             }
 
         }
+
+
 
         [HttpGet]
         [Route("BusinessIntelligence/Detail/{id}/")]

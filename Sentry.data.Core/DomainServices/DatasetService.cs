@@ -12,8 +12,9 @@ namespace Sentry.data.Core
     public class DatasetService :IDatasetService
     {
         private readonly IDatasetContext _datasetContext;
-        private readonly IUserService _userService;
-        public DatasetService(IDatasetContext datasetContext, IUserService userService)
+        private readonly UserService _userService;
+
+        public DatasetService(IDatasetContext datasetContext, UserService userService)
         {
             _datasetContext = datasetContext;
             _userService = userService;
@@ -316,7 +317,7 @@ namespace Sentry.data.Core
                 dto.DatasetFileCount = ds.DatasetFiles.Count();
                 dto.OriginationCode = ds.OriginationCode;
                 dto.DataClassificationDescription = ds.DataClassification.GetDescription();
-                dto.CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "gray";
+                dto.CategoryColor = ds.DatasetCategories.First().Color;
                 dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
                 if (ds.DatasetFiles.Any())
                 {

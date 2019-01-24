@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Sentry.data.Core;
-using System.Text;
 using System.Web.Mvc;
 using static Sentry.data.Core.RetrieverJobOptions;
 
@@ -75,6 +73,9 @@ namespace Sentry.data.Web.Helpers
 
             return result;
         }
+
+        
+        [Obsolete("The function is fine but I wanted that this should not use the domain context and these should all be Enums")]
         public static void SetupLists(IDatasetContext _datasetContext, BaseEntityModel model)
         {
             var temp = GetCategoryList(_datasetContext).ToList();
@@ -108,6 +109,9 @@ namespace Sentry.data.Web.Helpers
             });
 
             model.AllFrequencies = temp.OrderBy(x => x.Value);
+
+
+
             model.AllDataFileTypes = Enum.GetValues(typeof(ReportType)).Cast<ReportType>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
 
