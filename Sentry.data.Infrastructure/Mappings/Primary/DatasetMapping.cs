@@ -33,6 +33,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.CanDisplay, (m) => m.Column("Display_IND"));
             this.Property((x) => x.DatasetInformation, (m) => m.Column("Information_DSC"));
             this.Property((x) => x.DatasetType, (m) => m.Column("Dataset_TYP"));
+            this.Property((x) => x.DataClassification, (m) => m.Column("DataClassification_CDE"));
             Property(x => x.Metadata, m =>
             {
                 m.Column("Metadata");

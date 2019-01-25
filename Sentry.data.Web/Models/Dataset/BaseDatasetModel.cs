@@ -108,6 +108,11 @@ namespace Sentry.data.Web
                 UploadFrequency = null;
             }
 
+            if (ds.DataClassification.HasValue)
+            {
+                var datasetClassEnum = (Helpers.Utility.DatasetDataClassification)ds.DataClassification;
+                this.DataClassification = datasetClassEnum.GetDescription();
+            }
 
         }
 
@@ -221,6 +226,9 @@ namespace Sentry.data.Web
 
         [DisplayName("Sensitive")]
         public Boolean IsSensitive { get; set; }
+
+        [DisplayName("Data Classification")]
+        public string DataClassification { get; set; }
 
         public Boolean CanDisplay { get; set; }
 

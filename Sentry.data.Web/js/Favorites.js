@@ -8,6 +8,9 @@ data.Favorites = {
 
         $(function () {
 
+            // initialize the delete favorite click event
+            data.Favorites.InitDeleteClick();
+
             // makes the <ul> be draggable/droppable; stop event is when you stop dragging the <li>
             $("#sortable-favorites").sortable({
                 stop: function (event, ui) {
@@ -23,6 +26,15 @@ data.Favorites = {
             $("#fav-delete-confirmation").on("hidden.bs.modal", function () {
                 $("#hidDeleteFavoriteId").val("");
             });
+        });
+
+    },
+
+    InitDeleteClick: function () {
+
+        $(".fav-delete").click(function () {
+            // capture the Id of the Favorite to delete
+            $("#hidDeleteFavoriteId").val($(this).data("favid"));
         });
 
     },
@@ -74,6 +86,10 @@ data.Favorites = {
                 $("#favorites-wrapper").html("<br /><br /><div class='alert alert-danger'><strong>Error!</strong> There was a problem attempting to delete the Favorite.</div>");
 
                 data.Favorites.ShowFavorites();
+            },
+            complete: function () {
+                // make sure the delete Favorite click event is wired up
+                data.Favorites.InitDeleteClick();
             }
         });
 

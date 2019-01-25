@@ -23,7 +23,16 @@ namespace Sentry.data.Web
             this.SentryOwnerName = Sentry.data.Core.Helpers.DisplayFormatter.FormatAssociateName(sentryAssociate);
             this.DistinctFileExtensions = ds.DatasetFiles.Select(x => Utilities.GetFileExtension(x.FileName).ToLower()).Distinct().ToList();
             this.Frequencies = null;
-            this.ChangedDtm = ds.ChangedDtm.ToShortDateString();
+
+            if (ds.DatasetFiles.Any())
+            {
+                this.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM).ToShortDateString();
+            }
+            else
+            {
+                this.ChangedDtm = ds.ChangedDtm.ToShortDateString();
+            }
+
             this.BannerColor = "categoryBanner-" + ds.DatasetCategory.Color;
             this.BorderColor = "borderSide_" + ds.DatasetCategory.Color;
             this.Color = ds.DatasetCategory.Color;

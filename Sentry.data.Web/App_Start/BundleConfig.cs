@@ -22,6 +22,7 @@ namespace Sentry.data.Web
                         Include("~/Scripts/ladda.js").
                         Include("~/Scripts/knockout-3.4.2.js").
                         Include("~/Scripts/knockout-sortable.min.js").
+                        Include("~/Scripts/knockout-paging.js").
                         Include("~/Scripts/jQuery.extendext.min.js").
                         Include("~/Scripts/jquery.validate.js").
                         Include("~/Scripts/jquery.validate.unobtrusive.js").
