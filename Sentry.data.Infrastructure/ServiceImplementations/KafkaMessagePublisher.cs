@@ -174,6 +174,11 @@ namespace Sentry.data.Infrastructure
 
         public void Publish(string topic, string key, string value)
         {
+            if (_producer_str_str == null)
+            {
+                Producer p = Producer;
+            }
+
             //var task = Producer.ProduceAsync(topic, Encoding.ASCII.GetBytes(key), Encoding.ASCII.GetBytes(value));
             var task = _producer_str_str.ProduceAsync(topic, key, value);
 
