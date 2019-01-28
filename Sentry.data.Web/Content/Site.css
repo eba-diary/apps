@@ -42,6 +42,10 @@ ul.list-group-indented {
     float: right;
 }
 
+.text-middle {
+    vertical-align: middle;
+}
+
 @media (min-width: 768px) {
     .collapse-sm {
         display: block;
@@ -76,12 +80,6 @@ ul.list-group-indented {
 .favoriteDeleteIcon {
     padding-left: 1px;
     cursor: pointer;
-}
-
-.favoriteTypeIcon {
-    margin-top: 9px;
-    margin-left: -20px;
-    margin-right: 10px;
 }
 
 /*#endregion MainPage - Favorites*/
@@ -1616,11 +1614,8 @@ tr.categoryBanner-blue th.sorting_desc {
     border-top: 6px solid #89ABE3;
 }
 
-body {
-    background-color: #f8f8f8;
-}
 
-CSS for Data Asset with Status and Last Updated
+/* CSS for Data Asset with Status and Last Updated */
 
 .indexUpdate {
     margin-top: 1.25em;
@@ -1907,7 +1902,7 @@ CSS for Data Asset with Status and Last Updated
     }
 
 .feedBox {
-    height: 577px;
+    height: 362px;
     overflow-y: auto;
 }
 
@@ -1972,9 +1967,17 @@ CSS for Data Asset with Status and Last Updated
     margin-right: 0.5em;
 }
 
+.feed-date {
+    font-feature-settings: 'lnum';
+    font-size: 12px;
+    margin-top: 6px;
+}
+
 .feedImg {
     float: left;
-    margin-right: 0.75em;
+    margin-right: 0.6em;
+    filter: brightness(0.55) sepia(1) hue-rotate(34deg) saturate(5);
+    width: 16px;
 }
 
 .feedName {
@@ -2105,6 +2108,14 @@ CSS for Data Asset with Status and Last Updated
 
 .clearFloat {
     clear: both;
+}
+
+.display-table {
+    display: table;
+}
+
+.display-tablecell {
+    display: table-cell;
 }
 
 .see {

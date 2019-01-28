@@ -1,7 +1,6 @@
 ﻿@model HomeModel
 @{
     ViewData["Title"] = "Data at Sentry";
-    string color2 = "gold";
     Layout = "~/Views/Shared/_HomePageLayout.cshtml";
 }
 
@@ -11,14 +10,14 @@
     <div class="row">
 
         @* left column for the tiles *@
-        <div class="col-xs-12 col-sm-6 col-md-8 col-lg-8">
+        <div class="col-xs-12 col-sm-7 col-md-9 col-lg-9">
 
-            @* row for the first two tiles *@
+            @* row for the first Business Intelligence (spans entire row) *@
             <div class="row">
 
-                <div id="bi-wrapper" class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
+                <div id="bi-wrapper" class="col-xs-12 col-sm-12 col-md-11 col-lg-11">
                     <h2>Business Intelligence</h2>
-                    <div class="home-photo bg-photo-bi border-btm-bi"></div>
+                    <div class="home-photo bg-photo-bi border-btm-blue"></div>
                     <div id="bi-content-wrapper" class="home-tile">
                         <p>
                             Lorem Ipsum is simply dummy text of the printing and typesetting industry.
@@ -30,11 +29,16 @@
                     </div>
                 </div>
 
-                <div class="col-xs-12 col-sm-1 col-md-1 col-lg-1"></div>
+            </div>
+
+            <p>&nbsp;</p>
+
+            @* second row for Datasets and Data Assets *@
+            <div class="row">
 
                 <div id="ds-wrapper" class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
                     <h2 class="green">Datasets</h2>
-                    <div class="home-photo bg-photo-ds border-btm-ds"></div>
+                    <div class="home-photo bg-photo-ds border-btm-green"></div>
                     <div id="ds-content-wrapper" class="home-tile">
                         <p>
                             Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots
@@ -44,14 +48,11 @@
                     </div>
                 </div>
 
-            </div>
-
-            @* second row for additional tiles (only 2 per row) *@
-            <div class="row">
+                <div class="col-xs-12 col-sm-1 col-md-1 col-lg-1"></div>
 
                 <div id="da-wrapper" class="col-xs-12 col-sm-12 col-md-5 col-lg-5">
                     <h2 class="plum">Data Assets</h2>
-                    <div class="home-photo bg-photo-da border-btm-da"></div>
+                    <div class="home-photo bg-photo-da border-btm-plum"></div>
                     <div id="da-conent-wrapper" class="home-tile">
                         <p>
                             There are many variations of passages of Lorem Ipsum available, but the majority have
@@ -65,231 +66,47 @@
 
             </div>
 
-
-
-            @*<a class="" href="/BusinessIntelligence" style="background: white;">
-                    <div class="borderdk_blue tile setTile" style="height:200px;">
-
-                        <div class="text-center col-lg-6 ">
-                            <img src="~/Images/Icons/Business Intelligence.svg" class="tile-image">
-                            <div class="tile-header" style="color: #003DA5;">Business Intelligence</div>
-                        </div>
-                        <div class="text-center col-lg-5" style="margin-top:42px;">
-                            <h3 style="color: #003DA5;">Exhibits</h3>
-                            <h3 style="color: #003DA5;">Dashboards</h3>
-                        </div>
-
-                    </div>
-                </a>
-                <div style="height:1px;">
-                </div>
-                <a class="" href="/Dataset/Index" style="background: white;">
-                    <div class="borderdk_green tile setTile" style="height:200px;">
-
-                        <div class="text-center col-lg-6 ">
-                            <img src="~/Images/Icons/Datasets.svg" class="tile-image">
-                            <div class="tile-header" style="color: #005844;">Datasets</div>
-                        </div>
-                        <div class="text-center col-lg-5" style="margin-top:42px;">
-                            <h3 style="color: #005844;">Internal Sentry Datasets</h3>
-                            <h3 style="color: #005844;">External Datasets</h3>
-                        </div>
-
-                    </div>
-                </a>
-                <div style="height:1px;">
-                </div>
-                <a class="" href="/DataAsset/Index" style="background: white;">
-                    <div class="borderdk_plum tile assetTile" style="height:200px;">
-
-                        <div class="text-center col-lg-6 ">
-                            <img src="~/Images/Icons/DataAssets.svg" class="tile-image">
-                            <div class="tile-header" style="color: #72246C;">Data Assets</div>
-                        </div>
-                        <div class="text-center col-lg-5" style="margin-top:27px;">
-                            <h3 style="color: #72246C;">Data Asset Health</h3>
-                            <h3 style="color: #72246C;">Data Lineage</h3>
-                            <h3 style="color: #72246C;">Data Asset Information</h3>
-                        </div>
-
-                    </div>
-                </a>*@
         </div>
 
-        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4 hidden-xs hidden-sm">
-            <div class="col-lg-12 text-center">
-                <div class="feed border_@color2 tab-pane fade in form-horizontal">
-                    <ul class="nav nav-pills float-l">
-                        <li class="active" data-tab="fav"><a href="#favoritePanel" data-toggle="tab" aria-expanded="true"><h5>Favorites</h5></a></li>
-                        <li data-tab="feed"><a href="#feed" data-toggle="tab" aria-expanded="false"><h5>Feed</h5></a></li>
-                    </ul>
-                    <div id="edit-favorites-icon" class="float-r clickable" data-toggle="tooltip" data-placement="top" title="Edit Favorites"><span class="glyphicon glyphicon-pencil"></span></div>
+        <div class="col-xs-12 col-sm-5 col-md-3 col-lg-3">
 
-                    <div id="tabContent" class="tab-content">
-                        <div class="clearFloat tab-pane fade active in form-horizontal" id="favoritePanel">
-                            <div class="favoriteSpinner">
-                                <span class="sentry-spinner"></span>
-                            </div>
-                        </div>
-                        <div class="feedBox clearFloat tab-pane fade in form-horizontal" id="feed">
-                            <div class="feedSpinner">
-                                <span class="sentry-spinner"></span>
-                            </div>
-                        </div>
-                    </div>
+            <h2 class="float-l">My Favorites</h2>
+            <div id="edit-favorites-icon" class="float-r clickable" data-toggle="tooltip" data-placement="top" title="Edit Favorites"><span class="glyphicon glyphicon-pencil"></span></div>
+            <div class="border-btm-blue clearFloat"></div>
 
-                    <div class="feedBox clearFloat hidden" id="sentryFeed"></div>
+            <div id="favoritePanel">
+                <div class="favoriteSpinner text-center">
+                    <span class="sentry-spinner"></span>
                 </div>
             </div>
+
+
+            @* commenting out feed until there's a better home for it
+                <h2 class="green">Feed</h2>
+                <div class="border-btm-green"></div>
+
+                <div id="feed" class="feedBox">
+                    <div class="feedSpinner text-center">
+                        <span class="sentry-spinner"></span>
+                    </div>
+                </div>
+            *@
+
+            @* is this needed??
+                <div class="feedBox clearFloat hidden" id="sentryFeed"></div>
+            *@
+
         </div>
 
     </div>
 
-
 </div>
-
-<style>
-    .nav-tabs {
-        border-bottom: 1px solid #d45500;
-    }
-
-    .nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
-        background-color: #00A3E0;
-        border-bottom-color: transparent;
-    }
-
-    .feedBox {
-        position: relative;
-        max-height: 96%;
-        margin-right: 2px;
-        margin-top: 15px;
-    }
-
-    .col-lg-4 {
-        padding: 0;
-    }
-
-    .borderdk_blue {
-        border: 1.5px solid #285780;
-        border-top: 6px solid #285780;
-    }
-
-    .borderdk_green {
-        border: 1.5px solid #005844;
-        border-top: 6px solid #005844;
-    }
-
-    .borderdk_plum {
-        border: 1.5px solid #72246C;
-        border-top: 6px solid #72246C;
-    }
-
-    .dataset-operation-button {
-        font-size: 20px;
-    }
-
-
-    .row.text-center > div {
-        display: inline-block;
-        float: none;
-    }
-
-    body {
-        margin-top: -6px;
-        -moz-background-size: cover;
-        -webkit-background-size: cover;
-        -o-background-size: cover;
-    }
-
-    .imageFooter {
-        height: 400px;
-    }
-
-    .tile {
-        background: white;
-        margin: 30px;
-        cursor: pointer;
-        margin-bottom: 9px;
-    }
-
-        .tile a {
-            height: 100%;
-            width: 100%;
-            display: block;
-            text-decoration: none !important;
-        }
-
-    .assetTile:hover {
-        opacity: 0.95;
-        background-color: rgba(0, 88, 68, 0.05);
-        box-shadow: 2px 6px 10px #888888;
-    }
-
-    .setTile:hover {
-        opacity: 0.95;
-        background-color: rgba(0, 61, 165, 0.05);
-        box-shadow: 2px 6px 10px #888888;
-    }
-
-    .tile-image {
-        width: 100px;
-        padding: 10px;
-        filter: invert(100%);
-        height: 115px;
-        margin-top: 20px;
-    }
-
-    .tile-header {
-        font-size: 2em;
-    }
-
-    .tile-description {
-        font-size: 1em;
-        max-height: 4.5em;
-        display: flex;
-        padding-top: 3px;
-        justify-content: center;
-        padding-bottom: 15px;
-    }
-</style>
 
 @section Scripts {
     <script>
         $(function () {
             data.Home.Init();
             data.Dataset.IndexInit();
-
-            ////Does not work for less then 100% magnifcation. DO NOT ZOOM OUT.  div.scrollTop is not happy with floating point pixels.
-            var div = $('div.feedBox');
-            var scroller = setInterval(function () {
-                var pos = div.scrollTop();
-                pos = Number((pos).toFixed(0));
-                div.scrollTop(++pos);
-            }, 50);
-
-
-            $('body').on('DOMNodeInserted', function (e) {
-                var target = e.target; //inserted element;
-
-                if ($(target).hasClass('noFeedBox')) {
-                    $('.noFeedBox').remove();
-                }
-            });
-
-            $(document).on("mouseenter", ".feedItem", function () {
-                // hover starts code here
-                clearInterval(scroller);
-            });
-
-            $(document).on("mouseleave", ".feedItem", function () {
-                // hover ends code here
-                scroller = setInterval(function () {
-                    var pos = div.scrollTop();
-                    pos = Number((pos).toFixed(0));
-                    div.scrollTop(++pos);
-                }, 50);
-            });
-
 
             $('.browse-category-card').click(function (e) {
                 var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
@@ -317,13 +134,6 @@
                 $('#DatasetSearch').submit();
             });
 
-            $(".feed .nav-pills li").click(function () {
-                if ($(this).data("tab") === "feed") {
-                    $("#edit-favorites-icon").addClass("hidden");
-                } else {
-                    $("#edit-favorites-icon").removeClass("hidden");
-                }
-            });
         });
 
 
@@ -345,7 +155,7 @@
                     }
                 },
                 error: function (obj) {
-                    Sentry.ShowModalAlert("Failed permissions check, please try again.  If problem persists, please contact <a mailto:DSCSupport@sentry.com></a>");
+                    Sentry.ShowModalAlert("Failed permissions check, please try again.  If problem persists, please contact <a mailto:DSCSupport@sentry.com>DSCSupport@sentry.com</a>");
                 }
             });
         }

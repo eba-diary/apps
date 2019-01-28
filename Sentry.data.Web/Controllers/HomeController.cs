@@ -44,8 +44,8 @@ namespace Sentry.data.Web.Controllers
 
             HomeModel hm = new HomeModel()
             {
-                DatasetCount = dsList.Count(w => w.DatasetType == null),
-                Categories = _dsContext.Categories.Where(w => w.ObjectType == null).ToList(),
+                DatasetCount = dsList.Count(w => w.DatasetType == GlobalConstants.DataEntityTypes.DATASET),
+                Categories = _dsContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityTypes.DATASET).ToList(),
                 CanEditDataset = SharedContext.CurrentUser.CanEditDataset,
                 CanUpload = SharedContext.CurrentUser.CanUpload
             };
@@ -148,8 +148,9 @@ namespace Sentry.data.Web.Controllers
 
         public async Task<ActionResult> GetFeed()
         {
-            List<DataFeedItem> allDatafeedItems = await Task.Factory.StartNew(() => cache.GetOrAdd("feedAll", () => _feedContext.GetAllFeedItems().ToList(), TimeSpan.FromHours(1)));
+            List<DataFeedItem> allDatafeedItems = cache.GetOrAdd("feedAll", () => _feedContext.GetAllFeedItems().ToList(), TimeSpan.FromHours(1));
             return PartialView("_Feed", allDatafeedItems.Take(10).ToList());
+            //return PartialView("_Feed", new List<DataFeedItem>());
         }
 
         public ActionResult GetMoreFeeds(int skip)
