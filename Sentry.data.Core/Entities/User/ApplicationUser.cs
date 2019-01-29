@@ -11,8 +11,8 @@ namespace Sentry.data.Core
     /// <remarks></remarks>
     public class ApplicationUser : IApplicationUser
     {
-        private Lazy<DomainUser> _domainUser;
-        private IExtendedUserInfo _extendedUserInfo;
+        private readonly Lazy<DomainUser> _domainUser;
+        private readonly IExtendedUserInfo _extendedUserInfo;
         
         internal ApplicationUser(Lazy<DomainUser> domainUser, IExtendedUserInfo extendedUserInfo)
         {
@@ -27,50 +27,6 @@ namespace Sentry.data.Core
                 return _extendedUserInfo.EmailAddress;
             }
         }
-
-        //###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific
-        public virtual Boolean CanApproveItems
-        {
-            get
-            {
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.ApproveItems);
-            }
-        }
-
-        public virtual Boolean CanDwnldSenstive
-        {
-            get
-            {
-                //return true;
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.DwnldSensitive);
-            }
-        }
-
-        public virtual Boolean CanEditDataset
-        {
-            get
-            {
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.DatasetEdit);
-            }
-        }
-
-        public virtual Boolean CanUpload
-        {
-            get
-            {
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.Upload);
-            }
-        }
-
-        public virtual Boolean CanDwnldNonSensitive
-        {
-            get
-            {
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.DwnldNonSensitive);
-            }
-        }
-
-        //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
 
         public virtual Boolean CanUseApp
         {
@@ -88,37 +44,6 @@ namespace Sentry.data.Core
             }
         }
 
-        public virtual Boolean CanQueryTool
-        {
-            get
-            {
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.QueryToolUser) || _extendedUserInfo.Permissions.Contains(PermissionNames.QueryToolPowerUser);
-            }
-        }
-
-        public virtual Boolean CanQueryToolPowerUser
-        {
-            get
-            {
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.QueryToolPowerUser);
-            }
-        }
-
-        public virtual Boolean CanQueryToolAdmin
-        {
-            get
-            {
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.QueryToolAdmin);
-            }
-        }
-
-        public virtual Boolean CanManageConfigs
-        {
-            get
-            {
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.ManageDataFileConfigs);
-            }
-        }
 
         public virtual Boolean CanManageAssetAlerts
         {
@@ -134,6 +59,11 @@ namespace Sentry.data.Core
             {
                 return _extendedUserInfo.Permissions.Contains(PermissionNames.AdminUser);
             }
+        }
+
+        public virtual bool IsInGroup(string group)
+        {
+            return _extendedUserInfo.IsInGroup(group);
         }
 
         public DomainUser DomainUser
@@ -179,6 +109,14 @@ namespace Sentry.data.Core
             get
             {
                 return _extendedUserInfo.Permissions.Contains(PermissionNames.DatasetView);
+            }
+        }
+
+        public virtual Boolean CanModifyDataset
+        {
+            get
+            {
+                return _extendedUserInfo.Permissions.Contains(PermissionNames.DatasetEdit);
             }
         }
 

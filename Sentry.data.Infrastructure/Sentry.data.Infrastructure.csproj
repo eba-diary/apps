@@ -197,6 +197,7 @@
     <Compile Include="Mappings\Primary\Retriever\RetrieverJobArchiveMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\RetrieverJobMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\SubmissionMapping.cs" />
+    <Compile Include="Mappings\Primary\SecurityMapping.cs" />
     <Compile Include="Mappings\Subscriptions\DataAssetSubscriptionMapping.cs" />
     <Compile Include="Mappings\Subscriptions\DatasetSubscriptionMapping.cs" />
     <Compile Include="Mappings\Subscriptions\EventMapping.cs" />
@@ -213,6 +214,7 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
+    <Compile Include="ServiceImplementations\HpsmProvider.cs" />
     <Compile Include="ServiceImplementations\CubeProvider.cs" />
     <Compile Include="ServiceImplementations\DatafileBundleProvider.cs" />
     <Compile Include="ServiceImplementations\EncryptionService.cs" />
@@ -242,6 +244,11 @@
     <Compile Include="ServiceImplementations\S3ServiceProvider.cs" />
     <Compile Include="ServiceImplementations\SASProvider.cs" />
     <Compile Include="ServiceImplementations\SASServiceProvider.cs" />
+    <Compile Include="Web References\HpsmChangeManagement\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
@@ -258,6 +265,206 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <None Include="Sentry.data.Infrastructure.ruleset" />
+    <None Include="Web References\HpsmChangeManagement\ApproveChangeIIAResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\ApproveChangeRCResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\ApproveChangeResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\ApproveChangeTaskRCResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\ApproveChangeTaskResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\ChangeManagement.wsdl" />
+    <None Include="Web References\HpsmChangeManagement\CloseChangeIIAResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\CloseChangeRCResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\CloseChangeResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\CloseChangeTaskRCResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\CloseChangeTaskResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\Common.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\CreateChangeIIAResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\CreateChangeRCResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\CreateChangeResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\CreateChangeTaskRCResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\CreateChangeTaskResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\DenyChangeIIAResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\DenyChangeRCResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\DenyChangeResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\DenyChangeTaskRCResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\DenyChangeTaskResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\GetChangeOperatorInformationResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\GetChangeTaskOperatorInformationResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\MoveToNextPhaseChangeIIAResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\MoveToNextPhaseChangeRCResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\MoveToNextPhaseChangeResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\MoveToNextPhaseChangeTaskRCResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\MoveToNextPhaseChangeTaskResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\ReopenChangeIIAResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\ReopenChangeRCResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\ReopenChangeResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\ReopenChangeTaskRCResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\ReopenChangeTaskResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetractChangeIIAResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetractChangeRCResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetractChangeResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetractChangeTaskRCResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetractChangeTaskResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeIIAKeysListResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeIIAListResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeIIAResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeKeysListResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeListResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeOperatorInformationKeysListResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeOperatorInformationListResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeOperatorInformationResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeRCKeysListResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeRCListResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeRCResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeTaskKeysListResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeTaskListResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeTaskOperatorInformationKeysListResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeTaskOperatorInformationListResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeTaskOperatorInformationResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeTaskRCKeysListResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeTaskRCListResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeTaskRCResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\RetrieveChangeTaskResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\UpdateChangeIIAResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\UpdateChangeRCResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\UpdateChangeResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\UpdateChangeTaskRCResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\UpdateChangeTaskResponse.datasource">
+      <DependentUpon>Reference.map</DependentUpon>
+    </None>
+    <None Include="Web References\HpsmChangeManagement\xmlmime.xsd">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Analyzer Include="..\packages\AWSSDK.S3.3.3.5.10\analyzers\dotnet\cs\AWSSDK.S3.CodeAnalysis.dll" />
@@ -281,6 +488,19 @@
       <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
       <Name>Sentry.data.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WebReferenceUrl Include="http://dix-q-smrapp-01.sentry.com:15098/SM/7/ChangeManagement.wsdl">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\HpsmChangeManagement\</RelPath>
+      <UpdateFromURL>http://dix-q-smrapp-01.sentry.com:15098/SM/7/ChangeManagement.wsdl</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>Sentry_data_Infrastructure_HpsmChangeManagement_ChangeManagement</CachedSettingsPropName>
+    </WebReferenceUrl>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\WinSCP.5.13.2\build\WinSCP.targets" Condition="Exists('..\packages\WinSCP.5.13.2\build\WinSCP.targets')" />

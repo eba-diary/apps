@@ -2,6 +2,13 @@
 {
     public static class GlobalConstants
     {
+        
+        public static class System
+        {
+            public const string NAME = "Data.Sentry.Com";
+            public const string ABBREVIATED_NAME = "DSC";
+            public const string PROD = "PROD";
+        }
 
         public static class ValidationErrors
         {
@@ -21,7 +28,7 @@
         }
 
 
-        public static class DataEntityTypes
+        public static class DataEntityCodes
         {
             public const string REPORT = "RPT";
             public const string DATASET = "DS"; 
@@ -72,6 +79,28 @@
             public const string Datasets = "Datasets";
             public const string DataAssets = "Data Assets";
             public const string Exhibits = "Exhibits";
+        }
+
+        public static class HpsmTicketStatus
+        {
+            public const string PENDING = "Pending";
+            public const string COMPLETED = "Completed";
+            public const string APPROVED = "Approved";
+            public const string REJECTED = "Rejected";
+        }
+
+        public static class SecurableEntityName
+        {
+            public const string DATASET = "DATASET";
+        }
+
+        public static class SecurityPermissions
+        {
+            public const string CAN_PREVIEW_DATASET = "CanPreviewDataset";
+            public const string CAN_VIEW_FULL_DATASET = "CanViewFullDataset";
+            public const string CAN_QUERY_DATASET = "CanQueryDataset";
+            public const string CAN_CONNECT_TO_DATASET = "CanConnectToDataset";
+            public const string CAN_UPLOAD_TO_DATASET = "CanUploadToDataset";
         }
 
     }

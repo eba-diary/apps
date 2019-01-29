@@ -14,5 +14,8 @@ namespace Sentry.data.Core
         public string DatasetInformation { get; set; }
         public string CategoryName { get; set; }
         public DataClassificationType DataClassification { get; set; }
+        public string SecondaryOwnerId { get; set; }
+        public string SecondaryOwnerName { get; set; }
+        public bool IsSecured { get; set; }
     }
 }

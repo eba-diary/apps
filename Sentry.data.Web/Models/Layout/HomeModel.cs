@@ -14,6 +14,5 @@ namespace Sentry.data.Web
         public int DatasetCount { get; set; }
         public List<Category> Categories { get; set; }
         public Boolean CanEditDataset { get; set; }
-        public Boolean CanUpload { get; set; }
     }
 }

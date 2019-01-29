@@ -9,8 +9,8 @@ namespace Sentry.data.Core
         public int DatasetId { get; set; }
         public string DatasetName { get; set; }
         public string DatasetDesc { get; set; }
-        public string SentryOwnerName { get; set; }
-        public string SentryOwnerId { get; set; }
+        public string PrimaryOwnerName { get; set; }
+        public string PrimaryOwnerId { get; set; }
         public DateTime DatasetDtm { get; set; }
         public DateTime ChangedDtm { get; set; }
         public string S3Key { get; set; }

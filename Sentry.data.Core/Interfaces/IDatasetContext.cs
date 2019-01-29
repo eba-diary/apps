@@ -13,6 +13,9 @@ namespace Sentry.data.Core
         /** IQueryables **/
 
         IQueryable<Dataset> Datasets { get; }
+
+        IQueryable<SecurityTicket> HpsmTickets { get; }
+        IQueryable<Security> Security { get; }
         IQueryable<DataSourceType> DataSourceTypes { get; }
         IQueryable<DataSource> DataSources { get; }
         IQueryable<DatasetScopeType> DatasetScopeTypes { get; }

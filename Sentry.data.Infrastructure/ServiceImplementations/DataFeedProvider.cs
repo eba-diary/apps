@@ -166,7 +166,7 @@ namespace Sentry.data.Infrastructure
                 if (ds != null)
                 {
                     DataFeed df = null;
-                    if (ds.DatasetType == GlobalConstants.DataEntityTypes.REPORT)
+                    if (ds.DatasetType == GlobalConstants.DataEntityCodes.REPORT)
                     {
                         df = new DataFeed()
                         {

@@ -36,7 +36,16 @@ namespace Sentry.data.Web.Controllers
 
         private readonly IDatasetService _datasetService;
         private readonly IEventService _eventService;
-        public DatasetController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, ISASService sasService, IAssociateInfoProvider associateInfoService, IRequestContext requestContext, IDatasetService datasetService, IEventService eventService)
+
+        public DatasetController(
+            IDatasetContext dsCtxt, 
+            S3ServiceProvider dsSvc, 
+            UserService userService, 
+            ISASService sasService, 
+            IAssociateInfoProvider associateInfoService, 
+            IRequestContext requestContext, 
+            IDatasetService datasetService, 
+            IEventService eventService)
         {
             _datasetContext = dsCtxt;
             _s3Service = dsSvc;
@@ -53,10 +62,9 @@ namespace Sentry.data.Web.Controllers
         {
             HomeModel hm = new HomeModel
             {
-                DatasetCount = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityTypes.DATASET).Count(),
-                Categories = _datasetContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityTypes.DATASET).ToList(),
-                CanEditDataset = SharedContext.CurrentUser.CanEditDataset,
-                CanUpload = SharedContext.CurrentUser.CanUpload
+                DatasetCount = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET).Count(),
+                Categories = _datasetContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityCodes.DATASET).ToList(),
+                CanEditDataset = SharedContext.CurrentUser.CanModifyDataset
             };
 
             _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Home Page", 0);
@@ -317,7 +325,7 @@ namespace Sentry.data.Web.Controllers
             List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
             Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
             Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
-            Boolean CanEdit = SharedContext.CurrentUser.CanEditDataset;
+            Boolean CanEdit = SharedContext.CurrentUser.CanModifyDataset;
 
             //Query the Dataset for the following information:
             foreach (DatasetFile df in _datasetContext.GetDatasetFilesForDatasetFileConfig(Id, x => !x.IsBundled).ToList())
@@ -350,19 +358,19 @@ namespace Sentry.data.Web.Controllers
         {
             //IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
             List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
-            Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
-            Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
-            Boolean CanEdit = SharedContext.CurrentUser.CanEditDataset;
+            UserSecurity us = _datasetService.GetUserSecurityForConfig(Id);
 
             List<DatasetFile> bundledList = _datasetContext.GetDatasetFilesForDatasetFileConfig(Id, w => w.IsBundled).ToList();
 
             foreach (DatasetFile df in bundledList)
             {
-                DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider);
-                dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
-                dfgm.CanDwnldSenstive = CanDwnldSenstive;
-                dfgm.CanEdit = CanEdit;
-                dfgm.CanPreview = true;
+                DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider)
+                {
+                    CanDwnldNonSensitive = CanDwnldNonSensitive,
+                    CanDwnldSenstive = CanDwnldSenstive,
+                    CanEdit = CanEdit,
+                    CanPreview = true
+                };
                 files.Add(dfgm);
             }
 
@@ -380,7 +388,7 @@ namespace Sentry.data.Web.Controllers
             List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
             Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
             Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
-            Boolean CanEdit = SharedContext.CurrentUser.CanEditDataset;
+            Boolean CanEdit = SharedContext.CurrentUser.CanModifyDataset;
 
             foreach (DatasetFile dfversion in _datasetContext.GetDatasetFilesVersions(df.Dataset.DatasetId, df.DatasetFileConfig.ConfigId, df.FileName).ToList())
             {

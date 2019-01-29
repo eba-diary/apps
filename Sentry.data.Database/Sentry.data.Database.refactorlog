@@ -588,4 +588,39 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Sequence" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="0657ffed-0d03-4547-8f35-1a832b0298fb" ChangeDateTime="01/28/2019 17:05:02">
+    <Property Name="ElementName" Value="[dbo].[Dataset].[SentryOwner_NME]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Dataset]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[PrimarySentryOwner_ID]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="8fb71d89-d39f-4892-9165-45d6d3a92409" ChangeDateTime="01/28/2019 17:05:28">
+    <Property Name="ElementName" Value="[dbo].[Dataset].[PrimarySentryOwner_ID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Dataset]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[PrimaryOwner_ID]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="1859249c-4bf4-434a-b4fd-c860e8396487" ChangeDateTime="01/28/2019 22:00:31">
+    <Property Name="ElementName" Value="[dbo].[Dataset].[IsSecured]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Dataset]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[IsSecured_IND]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6543ce41-6118-41e8-8c5b-2bbb2afacb56" ChangeDateTime="01/29/2019 15:00:28">
+    <Property Name="ElementName" Value="[dbo].[Security].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Security]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Security_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="79d9aa9e-0605-4b6a-bd86-26999e34224e" ChangeDateTime="01/29/2019 17:34:02">
+    <Property Name="ElementName" Value="[dbo].[Security].[Object_TYP]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Security]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[Table_NME]" />
+  </Operation>
 </Operations>

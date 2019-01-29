@@ -49,11 +49,9 @@ data.Report = {
         //Set Secure HREmp service URL for associate picker
         $.assocSetup({ url: "https://hrempsecure.sentry.com/api/associates" });
 
-        var picker = $("#SentryOwnerName");
-
-        picker.assocAutocomplete({
+        $("#PrimaryOwnerName").assocAutocomplete({
             associateSelected: function (associate) {
-                $('#SentryOwnerId').val(associate.Id);
+                $('#PrimaryOwnerId').val(associate.Id);
             }
         });
 

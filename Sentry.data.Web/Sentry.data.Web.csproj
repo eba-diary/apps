@@ -285,6 +285,7 @@
     <Content Include="Content\creat-edit-datasets.css" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\FavoritesController.cs" />
+    <Compile Include="Controllers\SecurityController.cs" />
     <Compile Include="Controllers\WebApi\ApplicationController.cs" />
     <Compile Include="Controllers\WebApi\AssetController.cs" />
     <Compile Include="Controllers\DataAssetController.cs" />
@@ -306,7 +307,8 @@
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Extensions\BusinessIntelligenceExtensions.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
-    <Compile Include="Extensions\SharedExtensions.cs" />
+    <Compile Include="Extensions\Security\RequestAccessExtension.cs" />
+    <Compile Include="Extensions\CategoryExtensions.cs" />
     <Compile Include="Extensions\HiveExtensions.cs" />
     <Compile Include="Filters\AuthorizationFilters\AuthorizeHangfireDashboard.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeAttribute.cs" />
@@ -376,6 +378,7 @@
     <Compile Include="Models\Dataset\BaseEntityModel.cs" />
     <Compile Include="Models\Dataset\SearchModel.cs" />
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceHomeModel.cs" />
+    <Compile Include="Models\Security\RequestAccessModel.cs" />
     <Compile Include="Models\Shared\CategoryModel.cs" />
     <Compile Include="Models\User\SharedContextModel.cs" />
     <Compile Include="Models\Shared\SuccessModel.cs" />
@@ -1250,6 +1253,7 @@
     <Folder Include="Views\ExternalFile\" />
     <Folder Include="Views\Lineage\" />
     <Folder Include="Views\Retriever\" />
+    <Folder Include="Views\Security\" />
     <Folder Include="Views\Subscription\" />
     <Folder Include="Views\Tag\" />
   </ItemGroup>

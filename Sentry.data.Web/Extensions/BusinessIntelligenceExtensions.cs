@@ -16,13 +16,13 @@ namespace Sentry.data.Web
                 DatasetCategoryIds = model.DatasetCategoryIds,
                 DatasetName = model.DatasetName,
                 DatasetDesc = model.DatasetDesc,
-                SentryOwnerId = model.SentryOwnerId,
+                PrimaryOwnerId = model.PrimaryOwnerId,
                 CreationUserName = model.CreationUserName,
                 UploadUserName = model.UploadUserName,
                 DatasetDtm = CreateTime,
                 ChangedDtm = CreateTime,
-                DatasetType = Core.GlobalConstants.DataEntityTypes.REPORT,
-                ObjectType = Core.GlobalConstants.DataEntityTypes.REPORT, //whats the difference here?
+                DatasetType = Core.GlobalConstants.DataEntityCodes.REPORT,
+                ObjectType = Core.GlobalConstants.DataEntityCodes.REPORT, //whats the difference here?
                 Location = model.Location,
                 LocationType = new Uri(model.Location)?.Scheme,
                 FrequencyId = model.FrequencyId.Value,

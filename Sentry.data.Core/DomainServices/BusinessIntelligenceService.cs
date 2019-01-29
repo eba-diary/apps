@@ -44,7 +44,7 @@ namespace Sentry.data.Core
             return new BusinessIntelligenceHomeDto()
             {
                 DatasetCount = _reportContext.GetReportCount(),
-                Categories = _reportContext.Categories.Where(x => x.ObjectType == GlobalConstants.DataEntityTypes.REPORT).ToList(),
+                Categories = _reportContext.Categories.Where(x => x.ObjectType == GlobalConstants.DataEntityCodes.REPORT).ToList(),
                 CanManageReports = _userService.GetCurrentUser().CanManageReports
             };
         }
@@ -97,7 +97,7 @@ namespace Sentry.data.Core
 
             if (_reportContext.Datasets.Where(w => w.DatasetName == dto.DatasetName &&
                                                                         w.DatasetCategories.Any(x => dto.DatasetCategoryIds.Contains(x.Id)) &&
-                                                                        w.DatasetType == GlobalConstants.DataEntityTypes.REPORT)?.Count() > 0)
+                                                                        w.DatasetType == GlobalConstants.DataEntityCodes.REPORT)?.Count() > 0)
             {
                 errors.Add("Dataset name already exists within category");
             }
@@ -150,12 +150,12 @@ namespace Sentry.data.Core
             ds.DatasetName = dto.DatasetName;
             ds.DatasetDesc = dto.DatasetDesc;
             ds.CreationUserName = dto.CreationUserName;
-            ds.SentryOwnerName = dto.SentryOwnerId; //done on purpose since namming flipped.
+            ds.PrimaryOwnerId = dto.PrimaryOwnerId; //done on purpose since namming flipped.
             ds.UploadUserName = dto.UploadUserName;
             ds.OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), 1);  //All reports are internal
             ds.DatasetDtm = dto.DatasetDtm;
             ds.ChangedDtm = dto.ChangedDtm;
-            ds.DatasetType = GlobalConstants.DataEntityTypes.REPORT;
+            ds.DatasetType = GlobalConstants.DataEntityCodes.REPORT;
             ds.IsSensitive = false;
             ds.CanDisplay = true;
             ds.Metadata = new DatasetMetadata()
@@ -175,14 +175,14 @@ namespace Sentry.data.Core
         //could probably be an extension.
         private void MapToDto(Dataset ds, BusinessIntelligenceDto dto)
         {
-            string userDisplayname = _userService.GetByAssociateId(ds.SentryOwnerName)?.DisplayName;
+            string userDisplayname = _userService.GetByAssociateId(ds.PrimaryOwnerId)?.DisplayName;
            
                 dto.DatasetId = ds.DatasetId;
                 dto.DatasetCategoryIds = ds.DatasetCategories.Select(x => x.Id).ToList();
                 dto.DatasetName = ds.DatasetName;
                 dto.DatasetDesc = ds.DatasetDesc;
-                dto.SentryOwnerName = (string.IsNullOrWhiteSpace(userDisplayname) ? ds.SentryOwnerName : userDisplayname);
-                dto.SentryOwnerId = ds.SentryOwnerName;
+                dto.PrimaryOwnerName = (string.IsNullOrWhiteSpace(userDisplayname) ? ds.PrimaryOwnerId : userDisplayname);
+                dto.PrimaryOwnerId = ds.PrimaryOwnerId;
                 dto.CreationUserName = ds.CreationUserName;
                 dto.UploadUserName = ds.UploadUserName;
                 dto.DatasetDtm = ds.DatasetDtm;

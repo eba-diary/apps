@@ -53,7 +53,7 @@
                                     </a>
                                 </li>
                             }
-                            @if (Model.CanManageConfigs)
+                            @if (Model.CanEditDataset)
                             {
                                 <li>
                                     <a href="/Config/Dataset/@Model.DatasetId">
@@ -139,7 +139,7 @@
                             </a>
                         </li>
                     }
-                    @if (Model.CanManageConfigs)
+                    @if (Model.CanEditDataset)
                     {
                         <li>
                             <a href="/Config/Dataset/@Model.DatasetId">
@@ -174,7 +174,7 @@
 <p>Click any section header to begin:</p>
 
 @{
-    if (Model.CanManageConfigs)
+    if (Model.CanEditDataset)
     {
         <div id="configs">
 

@@ -59,11 +59,15 @@ data.Dataset = {
         //Set Secure HREmp service URL for associate picker
         $.assocSetup({ url: "https://hrempsecure.sentry.com/api/associates" });
 
-        var picker = $("#SentryOwnerName");
-
-        picker.assocAutocomplete({
+        $("#PrimaryOwnerName").assocAutocomplete({
             associateSelected: function (associate) {
-                $('#SentryOwnerId').val(associate.Id);
+                $('#PrimaryOwnerId').val(associate.Id);
+            }
+        });
+
+        $("#SecondaryOwnerName").assocAutocomplete({
+            associateSelected: function (associate) {
+                $('#SecondaryOwnerId').val(associate.Id);
             }
         });
 
@@ -95,6 +99,7 @@ data.Dataset = {
                         'non - disclosure agreement is in place and management has approved for legitimate ' +
                         'business reasons.  Examples include items such as email correspondence, internal ' +
                         'documentation that is available to all associates.');
+                    $("#IsSecured").parents('.form-group').show();
                     break;
                 case "4":
                     $('#dataClassInfo').text('“Public” information can be disclosed or disseminated without any restrictions on ' +
@@ -102,7 +107,7 @@ data.Dataset = {
                         'These datasets can be freely shared throughout Sentry.');
                     break;
             }
-        });
+        }).change();
 
         //determine the cancel button url
         $("[id^='CancelButton']").off('click').on('click', function (e) {

@@ -54,8 +54,8 @@ namespace Sentry.data.Web.Controllers
             ObsoleteDatasetModel bdm = new ObsoleteDatasetModel(ds, _associateInfoProvider, _datasetContext)
             {
                 CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive,
-                CanEditDataset = SharedContext.CurrentUser.CanEditDataset,
-                CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs,
+                CanEditDataset = SharedContext.CurrentUser.CanModifyDataset,
+                CanEditDataset = SharedContext.CurrentUser.CanModifyDataset,
                 CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive,
                 CanUpload = SharedContext.CurrentUser.CanUpload
             };
@@ -1349,8 +1349,8 @@ namespace Sentry.data.Web.Controllers
             ObsoleteDatasetModel bdm = new ObsoleteDatasetModel(config.ParentDataset, _associateInfoProvider, _datasetContext)
             {
                 CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive,
-                CanEditDataset = SharedContext.CurrentUser.CanEditDataset,
-                CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs,
+                CanEditDataset = SharedContext.CurrentUser.CanModifyDataset,
+                CanEditDataset = SharedContext.CurrentUser.CanModifyDataset,
                 CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive,
                 CanUpload = SharedContext.CurrentUser.CanUpload
             };

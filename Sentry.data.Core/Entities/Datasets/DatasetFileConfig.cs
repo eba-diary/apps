@@ -52,7 +52,7 @@ namespace Sentry.data.Core
         }
         public virtual string GetStorageCode()
         {
-            if (ParentDataset.DatasetType == GlobalConstants.DataEntityTypes.DATASET)
+            if (ParentDataset.DatasetType == GlobalConstants.DataEntityCodes.DATASET)
             {
                 return GetLatestSchemaRevision().StorageCode;
             }

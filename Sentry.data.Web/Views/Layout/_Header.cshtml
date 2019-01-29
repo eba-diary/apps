@@ -131,7 +131,7 @@ else
                             <li><a href="~/Dataset/Index">Home</a></li>
                             <li><a href="~/Search/Datasets">Search</a></li>
 
-                            @if (Model.CanManageConfigs || Model.CanEditDataset || Model.CanUpload)
+                            @if (Model.CanEditDataset || Model.CanEditDataset || Model.CanUpload)
                             {
                                 <li class="divider"></li>
                                 <li class="dropdown-header">Dataset Actions</li>
@@ -146,9 +146,9 @@ else
                                     <li><a href="#" onclick="data.Dataset.UploadFileModal(0)">Upload Data File</a></li>
                                 }
 
-                                if (Model.CanManageConfigs)
+                                if (Model.CanEditDataset)
                                 {
-                                    if (Model.CanManageConfigs)
+                                    if (Model.CanEditDataset)
                                     {
                                         <li class="divider"></li>
                                         <li class="dropdown-header">Dataset Administration</li>

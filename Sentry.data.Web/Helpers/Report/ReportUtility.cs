@@ -118,7 +118,7 @@ namespace Sentry.data.Web.Helpers
         }
         public static IEnumerable<SelectListItem> GetCategoryList(IDatasetContext _datasetContext)
         {
-            IEnumerable<SelectListItem> var = _datasetContext.Categories.Where(x=> x.ObjectType == GlobalConstants.DataEntityTypes.REPORT).
+            IEnumerable<SelectListItem> var = _datasetContext.Categories.Where(x=> x.ObjectType == GlobalConstants.DataEntityCodes.REPORT).
                                                                                             Select((c) => new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
 
             return var;

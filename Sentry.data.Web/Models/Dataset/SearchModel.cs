@@ -11,7 +11,7 @@ namespace Sentry.data.Web
         public SearchModel(Dataset ds, IAssociateInfoProvider _associateInfoProvider)
         {
 
-            Sentry.Associates.Associate sentryAssociate = _associateInfoProvider.GetAssociateInfo(ds.SentryOwnerName);
+            Sentry.Associates.Associate sentryAssociate = _associateInfoProvider.GetAssociateInfo(ds.PrimaryOwnerId);
 
             if(ds.DatasetCategories.Count > 1)
             {
@@ -49,7 +49,7 @@ namespace Sentry.data.Web
             this.ChangedDtm = ds.ChangedDtm.ToShortDateString();
             this.Type = ds.DatasetType;
 
-            if (ds.DatasetType == GlobalConstants.DataEntityTypes.REPORT)
+            if (ds.DatasetType == GlobalConstants.DataEntityCodes.REPORT)
             {
                 ReportType type = (ReportType)ds.DatasetFileConfigs.First().FileTypeId;
                 this.DistinctFileExtensions = new List<string> { type.ToString() };

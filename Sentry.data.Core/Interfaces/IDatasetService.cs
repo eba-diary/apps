@@ -10,5 +10,8 @@ namespace Sentry.data.Core
         DatasetDetailDto GetDatesetDetailDto(int id);
 
         void UpdateAndSaveDataset(DatasetDto dto);
+
+        UserSecurity GetUserSecurityForDataset(int datasetId);
+        UserSecurity GetUserSecurityForConfig(int configId);
     }
 }

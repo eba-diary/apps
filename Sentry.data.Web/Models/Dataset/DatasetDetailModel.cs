@@ -10,7 +10,7 @@ namespace Sentry.data.Web
         public DatasetDetailModel(DatasetDetailDto dto) : base(dto)
         {
             CanDwnldSenstive = dto.CanDwnldSenstive;
-            CanManageConfigs = dto.CanManageConfigs;
+            CanEditDataset = dto.CanEditDataset;
             CanDwnldNonSensitive = dto.CanDwnldNonSensitive;
             CanQueryTool = dto.CanQueryTool;
             CanUpload = dto.CanUpload;
@@ -25,7 +25,7 @@ namespace Sentry.data.Web
         }
 
         public bool CanDwnldSenstive { get; set; }
-        public bool CanManageConfigs { get; set; }
+        public bool CanEditDataset { get; set; }
         public bool CanDwnldNonSensitive { get; set; }
         public bool CanQueryTool { get; set; }
         public bool CanUpload { get; set; }

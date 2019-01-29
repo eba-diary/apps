@@ -17,7 +17,7 @@ namespace Sentry.data.Web
             this.DatasetName = dto.DatasetName;
             this.DatasetDesc = dto.DatasetDesc;
             this.CreationUserName = dto.CreationUserName;
-            this.SentryOwnerName = dto.SentryOwnerName;
+            this.PrimaryOwnerName = dto.PrimaryOwnerName;
             this.DatasetDtm = dto.DatasetDtm;
             this.ChangedDtm = dto.ChangedDtm;
             this.DatasetCategoryIds = dto.DatasetCategoryIds;
@@ -25,7 +25,7 @@ namespace Sentry.data.Web
 
             //hidden properties
             this.DatasetId = dto.DatasetId;
-            this.SentryOwnerId = dto.SentryOwnerId;
+            this.PrimaryOwnerId = dto.PrimaryOwnerId;
             this.UploadUserName = dto.UploadUserName;
 
 
@@ -56,8 +56,8 @@ namespace Sentry.data.Web
         [DisplayName("Originating Creator")]
         public string CreationUserName { get; set; }
         [Required]
-        [DisplayName("Sentry Owner")]
-        public string SentryOwnerName { get; set; }
+        [DisplayName("Primary Owner")]
+        public string PrimaryOwnerName { get; set; }
         [Required]
         [DisplayName("Creation Date")]
         [DataType(System.ComponentModel.DataAnnotations.DataType.Date)]
@@ -84,7 +84,7 @@ namespace Sentry.data.Web
 
         //hidden properties
         public int DatasetId { get; set; }
-        public string SentryOwnerId { get; set; }
+        public string PrimaryOwnerId { get; set; }
         public string UploadUserName { get; set; }
 
 

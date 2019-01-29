@@ -20,7 +20,7 @@
                 else
                 {
                     <strong class="alertHeading">Info: </strong>
-                    <span>This dataset has no files attached to it yet.  Please contact the Sentry Owner: @Model.SentryOwnerName</span>
+                    <span>This dataset has no files attached to it yet.  Please contact the Sentry Owner: @Model.PrimaryOwnerName</span>
                 }
             </div>
         </div>
@@ -96,7 +96,7 @@
                                     <span class="glyphicon glyphicon-menu-hamburger @color"></span>
                                 </button>
                                 <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
-                                    @if (Model.CanManageConfigs)
+                                    @if (Model.CanEditDataset)
                                     {
                                     <li>
                                         <a href="/Config/Dataset/@Model.DatasetId">
@@ -170,7 +170,7 @@
                             </li>
                             }
 
-                            @if (Model.CanManageConfigs)
+                            @if (Model.CanEditDataset)
                             {
                                 <li>
                                     <a href="/Config/Dataset/@Model.DatasetId">
@@ -327,9 +327,13 @@
                         </div>
                         <hr />
                         <div class="row">
-                            <div class="col-lg-12">
-                                <h5 class="@color">Sentry Owner</h5>
-                                <h6 class="@color">@Model.SentryOwnerName</h6>
+                            <div class="col-lg-6">
+                                <h5 class="@color">Primary Owner</h5>
+                                <h6 class="@color">@Model.PrimaryOwnerName</h6>
+                            </div>
+                            <div class="col-lg-6">
+                                <h5 class="@color">Secondary Owner</h5>
+                                <h6 class="@color">@Model.SecondaryOwnerName</h6>
                             </div>
                         </div>
                         <hr />
@@ -453,7 +457,7 @@
                                 <!-- ko foreach: OtherJobs -->
                                 <tr>
                                     <td class="borderMeta_@color colOneMeta" data-bind="text: Name()"></td>
-                                    @if (Model.CanManageConfigs)
+                                    @if (Model.CanEditDataset)
                                     {
                                         <!-- ko if: IsEnabled-->
                                         <td class="borderMeta_@color" data-bind="text: Location()"></td>

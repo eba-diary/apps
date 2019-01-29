@@ -117,6 +117,22 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<SecurityTicket> HpsmTickets
+        {
+            get
+            {
+                return Query<SecurityTicket>();
+            }
+        }
+
+        public IQueryable<Security> Security
+        {
+            get
+            {
+                return Query<Security>();
+            }
+        }
+
         public IQueryable<DataElement> DataElements
         {
             get
@@ -219,7 +235,7 @@ namespace Sentry.data.Infrastructure
         public int GetDatasetCount()
         {
 
-            return Query<Dataset>().Count(x => x.CanDisplay && x.DatasetType == GlobalConstants.DataEntityTypes.DATASET);
+            return Query<Dataset>().Count(x => x.CanDisplay && x.DatasetType == GlobalConstants.DataEntityCodes.DATASET);
         }
 
         public Dataset GetById(int id)
@@ -439,7 +455,7 @@ namespace Sentry.data.Infrastructure
 
         public int GetReportCount()
         {
-            return Query<Dataset>().Where(x => x.DatasetType == GlobalConstants.DataEntityTypes.REPORT).Cacheable().Count();
+            return Query<Dataset>().Where(x => x.DatasetType == GlobalConstants.DataEntityCodes.REPORT).Cacheable().Count();
         }
 
         public Favorite GetFavorite(int favoriteId)

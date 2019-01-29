@@ -7,7 +7,7 @@ IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion)
 BEGIN TRY 
 
   --insert one off script files here
-  :r ..\Pre-Deploy\SupportingScripts\Sprint_19_2_1\InsertCategoriesToTemp.sql
+  --:r ..\Pre-Deploy\SupportingScripts\Sprint_19_2_1\InsertCategoriesToTemp.sql
 
   --insert into the verision table so these scripts do not run again.
   INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 
