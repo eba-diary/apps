@@ -116,7 +116,7 @@ namespace Sentry.data.Infrastructure
 
             foreach (Event e in dsEvents)
             {
-                Dataset ds = Query<Dataset>().Where(y => y.DatasetId == e.Dataset).FetchMany(x=> x.DatasetCategories).FirstOrDefault();
+                Dataset ds = Query<Dataset>().Where(y => y.DatasetId == e.Dataset).FetchMany(x => x.DatasetCategories).FirstOrDefault();
 
                 if (ds != null)
                 {
