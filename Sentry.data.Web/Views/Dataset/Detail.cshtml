@@ -131,15 +131,7 @@
         <div class="hidden-md hidden-lg">
             <div>
                 @* show different h1 elements for Exhibit vs. Dataset (title for Dataset should not be clickable) *@
-                <h1 class="detailName detailNameLink leftFloat @color" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')">
-                    @Model.DatasetName
-
-                    @if (Model.IsSensitive)
-                    {
-                        <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
-                    }
-                </h1>
-                <h1 class="detailName leftFloat @color" data-bind="visible: IsShownForCurrentType('Dataset')">
+                <h1 class="detailName leftFloat @color">
                     @Model.DatasetName
 
                     @if (Model.IsSensitive)
