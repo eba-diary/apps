@@ -60,6 +60,22 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 n.ForeignKey("FK_DatasetCategory_Category");
             }));
 
+            this.Bag<BusinessUnit>(x => x.BusinessUnits, (b) =>
+            {
+                b.Table("DatasetBusinessUnit");
+                b.Inverse(false);
+                b.Key((k) =>
+                {
+                    k.Column("Dataset_Id");
+                    k.ForeignKey("FK_DatasetBusinessUnit_Dataset");
+                });
+            },
+            map => map.ManyToMany(n =>
+            {
+                n.Column("BusinessUnit_Id");
+                n.ForeignKey("FK_DatasetBusinessUnit_BusinessUnit");
+            }));
+
 
             this.Bag(x => x.DatasetFiles, (m) =>
             {

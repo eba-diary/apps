@@ -330,8 +330,6 @@
             $('#filterSelector').on('select2:unselect', function (e) {
                 // Do something
                 var data = e.params.data;
-                //console.log('UNSELECT');
-                //console.log(data);
 
                 window.vm.RemoveSelection(data.id);
 
@@ -366,6 +364,13 @@
                     else if (Category == 'Report Type') {
                         for (var i = 0; i < prod.DistinctFileExtensions.length; i++) {
                             if (prod.DistinctFileExtensions[i] == Title) {
+                                return prod;
+                            }
+                        }
+                    }
+                    else if (Category === 'Business Unit') {
+                        for (var i = 0; i < prod.BusinessUnits.length; i++) {
+                            if (prod.BusinessUnits[i] === Title) {
                                 return prod;
                             }
                         }
@@ -407,11 +412,12 @@
             self.HeadHide = 'hide_filterType_' + Name.replace(' ', '_');
 
             self.OrderedFilters = ko.computed(function () {
+
                 //First filter the list so that we only have filters that have a count greater than 0
                 var list = ko.utils.arrayFilter(self.Filters(), function (prod) {
                     return prod.Count() !== 0;
                 });
-                
+
                 //If the count is 0, hide the section.
                 if (list.length === 0) {
                     $("#" + self.HeadHide).hide();
@@ -507,6 +513,7 @@
             self.BorderColor = data.BorderColor;
 
             self.DistinctFileExtensions = data.DistinctFileExtensions;
+            self.BusinessUnits = data.BusinessUnits;
 
             self.PageViews = data.PageViews;
             self.Downloads = data.Downloads;
@@ -545,6 +552,7 @@
             self.SelectedFilters = ko.observableArray([]);
 
             self.CategoryFilters = ko.observableArray([]);
+            self.BusinessUnitFilters = ko.observableArray([]);
             self.OwnerFilters = ko.observableArray([]);
             self.ExtensionFilters = ko.observableArray([]);
             self.TagFilters = ko.observableArray([]);
@@ -716,6 +724,47 @@
                         return false;
                     });
                 }
+
+
+                // now grab any selected business units
+                var selectedBusinessUnitIds = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
+                    if (feature.substring(0, 3) === '2_5') {
+                        return feature;
+                    }
+                });
+
+                var selectedBusinessUnitsList = [];
+                if (selectedBusinessUnitIds.length > 0) {
+                    var selectedBusinessUnits = ko.utils.arrayFilter(self.BusinessUnitFilters(), function (feature) {
+
+                        for (var i = 0; i < selectedBusinessUnitIds.length; i++) {
+                            if (feature.id === selectedBusinessUnitIds[i]) {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    });
+
+                    for (var i = 0; i < selectedBusinessUnits.length; i++) {
+                        selectedBusinessUnitsList.push(selectedBusinessUnits[i].Title);
+                    }
+
+                    // now apply the filter
+                    exhibits = exhibits.filter(function (item) {
+
+                        for (var i = 0; i < selectedBusinessUnits.length; i++) {
+                            for (var j = 0; j < item.BusinessUnits.length; j++) {
+                                if (item.BusinessUnits[j] === selectedBusinessUnits[i].Title) {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        return false;
+                    });
+                }
+                
 
                 //First grab all the selected owner ID's
                 var selectedOwnerIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
@@ -992,7 +1041,7 @@
 
             self.PopulateDatasetFilters = function (datasets) {
                 var temp = [];
-                var pageType = '1_'
+                var pageType = '1_';
 
                 //CATEGORY FILTER
                 var param = getParameterByName('category');
@@ -1026,7 +1075,6 @@
 
                 self.AllFilters.push(new FilterCategory('Category', temp, 'blue'));
                 temp = [];
-
 
 
                 //SENTRYOWNER FILTER
@@ -1107,7 +1155,6 @@
 
                 var item;
 
-
                 ko.utils.arrayForEach(self.AllFilters(), function (v) {
                     if (v.Name == 'Category') {
                         item = v;
@@ -1119,6 +1166,31 @@
                 }
 
                 self.AllFilters.push(new FilterCategory('Category', temp, 'blue'));
+                temp = [];
+
+                //BUSINESS UNIT FILTER
+                counter = 0; //reset counter
+                for (var item, i = 0; item = exhibits[i++];) {
+                    for (var bu, j = 0; bu = item.BusinessUnits[j++];) {
+                        if (!(bu in businessUnitLookup)) {
+                            businessUnitLookup[bu] = 1;
+                            self.BusinessUnitFilters.push(new Filter(pageType + '5_' + counter, bu, 'Business Unit'));
+
+                            temp.push(new Filter(pageType + '5_' + counter, bu, 'Business Unit'));
+                            counter++;
+                        }
+                    }
+                }
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name == 'Business Unit') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
+                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'orange'));
                 temp = [];
 
 
@@ -1206,18 +1278,6 @@
                     temp = [];
                 }
 
-               
-
-                //var xyz = exhibits.map(item => item.tags.Group).reduce((prev, curr) => prev.concat(curr), []).filter((item, i, arr) => arr.indexOf(item) === i);
-
-                //console.log(xyz);                
-
-                //for (var group, i = 0; group = tagGroups[i++];) {
-                //    self.AllFilters.push(new FilterCategory(group, temp, 'gold'));
-                //}
-                //self.AllFilters.push(new FilterCategory('Blah', temp, 'gold'));
-
-                
 
             };
 
@@ -1258,6 +1318,29 @@
                 self.AllFilters.push(new FilterCategory('Category', temp, 'blue'));
                 temp = [];
 
+
+                //BUSINESS UNIT FILTER
+                for (var item, i = 0; item = allObjects[i++];) {
+                    for (var bu, j = 0; bu = item.BusinessUnits[j++];) {
+                        if (!(bu in businessUnitLookup)) {
+                            businessUnitLookup[bu] = 1;
+                            self.BusinessUnitFilters.push(new Filter(pagetype + '5_' + counter, bu, 'Business Unit'));
+
+                            temp.push(new Filter(pageType + '5_' + counter, bu, 'Business Unit'));
+                            counter++;
+                        }
+                    }
+                }
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name === 'Business Unit') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
+                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'orange'));
 
 
                 //SENTRYOWNER FILTER
@@ -1365,6 +1448,7 @@
             var loaded = false;
 
             var categoryLookup = {};
+            var businessUnitLookup = {};
             var ownerLookup = {};
             var extensionLookup = {};
             var tagLookup = {};

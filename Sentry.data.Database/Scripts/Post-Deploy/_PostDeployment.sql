@@ -23,7 +23,7 @@ All new files added for staic data or scripts should have it's properties update
 --ALTER THE SCRIPT VERSION BELOW FOR EVERY NEW SCRIPT 
 --SCRIPT VERSION should be in format yyyy.MM.dd_rr where rr is 2-digit revision number for day. 
 DECLARE @ScriptVersion AS VARCHAR(50) 
-SET @ScriptVersion = '2019.01.16_01_PostDeploy'
+SET @ScriptVersion = '2019.01.29_01_PostDeploy'
 
 BEGIN TRAN 
   
@@ -32,6 +32,7 @@ BEGIN TRY
 
   --insert one off script files here
   :r ..\Post-Deploy\SupportingScripts\Sprint_19_2_1\InsertDatasetCategories.sql
+  :r ..\Post-Deploy\SupportingScripts\Sprint_19_2_2\BusinessUnitChanges.sql
 
   --insert into the verision table so these scripts do not run again.
   INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 

@@ -37,6 +37,7 @@ namespace Sentry.data.Web
             this.SentryOwnerName = Sentry.data.Core.Helpers.DisplayFormatter.FormatAssociateName(sentryAssociate);
             this.DistinctFileExtensions = ds.DatasetFiles.Select(x => Utilities.GetFileExtension(x.FileName).ToLower()).Distinct().ToList();
             this.Frequencies = null;
+            this.BusinessUnits = ds.BusinessUnits.Select(x => x.Name).ToList();
 
             if (ds.DatasetFiles.Any())
             {
@@ -98,6 +99,7 @@ namespace Sentry.data.Web
         public List<SearchableTag> Tags { get; set; }
         public Boolean IsFavorite { get; set; }
         public Boolean CanEditDataset { get; set; }
+        public List<string> BusinessUnits { get; set; }
 
     }
 }
