@@ -147,6 +147,7 @@ namespace Sentry.data.Core
         private Dataset MapDataset(BusinessIntelligenceDto dto, Dataset ds)
         {
             ds.DatasetCategories = _datasetContext.Categories.Where(x => dto.DatasetCategoryIds.Contains(x.Id)).ToList();
+            ds.BusinessUnits = _datasetContext.BusinessUnits.Where(x => dto.DatasetBusinessUnitIds.Contains(x.Id)).ToList();
             ds.DatasetName = dto.DatasetName;
             ds.DatasetDesc = dto.DatasetDesc;
             ds.CreationUserName = dto.CreationUserName;

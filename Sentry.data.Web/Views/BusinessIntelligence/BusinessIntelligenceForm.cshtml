@@ -30,19 +30,7 @@
             @Html.HiddenFor(model => model.CreationUserName)
             @Html.HiddenFor(model => model.UploadUserName)
 
-            <div class="form-group">
-                @Html.LabelFor((model) => model.DatasetCategoryIds, new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    <select id="DatasetCategoryIds" name="DatasetCategoryIds" multiple="multiple" class="form-control edit-dataset-row">
-                        @foreach (var item in Model.AllCategories)
-                        {
-                            <option selected="@item.Selected" value="@item.Value">@item.Text</option>
-                        }
-                    </select>
-                    @Html.ValidationMessageFor((model) => model.DatasetCategoryIds, "", new { @class = "text-danger" })
-                </div>
-            </div>
-
+            @* Name *@
             <div class="form-group">
                 @Html.Label("Exhibit Name", htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
@@ -51,6 +39,7 @@
                 </div>
             </div>
 
+            @* Description *@
             <div class="form-group">
                 @Html.LabelFor(model => model.DatasetDesc, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
@@ -67,6 +56,37 @@
                     </span>
                 </div>
             </div>
+
+            @* Categories *@
+            <div class="form-group">
+                @Html.LabelFor((model) => model.DatasetCategoryIds, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <select id="DatasetCategoryIds" name="DatasetCategoryIds" multiple="multiple" class="form-control edit-dataset-row">
+                        @foreach (var item in Model.AllCategories)
+                        {
+                            <option selected="@item.Selected" value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                    @Html.ValidationMessageFor((model) => model.DatasetCategoryIds, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            @* Business Unit *@
+            <div class="form-group">
+                @Html.LabelFor((model) => model.DatasetBusinessUnitIds, new  { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <select id="DatasetBusinessUnitIds" name="DatasetBusinessUnitIds" multiple="multiple" class="form-control edit-dataset-row">
+                        @foreach (var li in Model.AllBusinessUnits)
+                        {
+                            <option selected="@li.Selected" value="@li.Value">@li.Text</option>
+                        }
+                    </select>
+                    @Html.ValidationMessageFor((model) => model.DatasetBusinessUnitIds, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            @* Function *@
+
 
             @Html.Partial("_Tags", Model)
 

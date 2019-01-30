@@ -44,8 +44,10 @@ data.Report = {
         $("#DatasetCategoryIds").select2({
             placeholder:"Select Categories"
         });
-
-        /// Initialize the Create Dataset view
+        $("#DatasetBusinessUnitIds").select2({
+            placeholder: "Select Business Units"
+        });
+        
         //Set Secure HREmp service URL for associate picker
         $.assocSetup({ url: "https://hrempsecure.sentry.com/api/associates" });
 

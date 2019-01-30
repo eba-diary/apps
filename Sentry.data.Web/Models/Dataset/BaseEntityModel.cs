@@ -68,11 +68,15 @@ namespace Sentry.data.Web
         [DisplayName("Category")]
         public List<int> DatasetCategoryIds { get; set; }
         public string TagIds { get; set; }
+        [Required]
+        [DisplayName("Business Unit")]
+        public List<int> DatasetBusinessUnitIds { get; set; }
 
 
 
         //Dropdown Lists
         public IEnumerable<SelectListItem> AllCategories { get; set; }
+        public IEnumerable<SelectListItem> AllBusinessUnits { get; set; }
         public IEnumerable<SelectListItem> AllFrequencies { get; set; }
         public IEnumerable<SelectListItem> AllOriginationCodes { get; set; }
         public IEnumerable<SelectListItem> AllDatasetScopeTypes { get; set; }

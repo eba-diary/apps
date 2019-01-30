@@ -94,8 +94,27 @@ namespace Sentry.data.Web.Helpers
                 }
             }
 
-
             model.AllCategories = temp.OrderBy(x => x.Value);
+
+
+            //Business Units
+            temp = GetBusinessUnits(_datasetContext).ToList();
+
+            if (model.DatasetBusinessUnitIds?.Count > 0)
+            {
+                foreach (var bu in model.DatasetBusinessUnitIds)
+                {
+                    foreach(var t in temp)
+                    {
+                        if(t.Value == bu.ToString())
+                        {
+                            t.Selected = true;
+                        }
+                    }
+                }
+            }
+
+            model.AllBusinessUnits = temp;
 
             //Business Intelligence Frequency
             temp = GetDatasetFrequencyListItems().ToList();
@@ -122,6 +141,13 @@ namespace Sentry.data.Web.Helpers
                                                                                             Select((c) => new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
 
             return var;
+        }
+        public static IEnumerable<SelectListItem> GetBusinessUnits(IDatasetContext dsContext)
+        {
+            return dsContext.BusinessUnits.
+                OrderBy(o => o.Sequence).
+                ThenBy(t => t.Name).
+                Select((x) => new SelectListItem { Text = x.Name, Value = x.Id.ToString() });
         }
         public static IEnumerable<Dataset> GetDatasetByCategoryId(IDatasetContext _datasetContext, int id)
         {
