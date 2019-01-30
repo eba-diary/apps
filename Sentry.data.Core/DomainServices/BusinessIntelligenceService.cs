@@ -156,7 +156,6 @@ namespace Sentry.data.Core
             ds.DatasetDtm = dto.DatasetDtm;
             ds.ChangedDtm = dto.ChangedDtm;
             ds.DatasetType = GlobalConstants.DataEntityCodes.REPORT;
-            ds.IsSensitive = false;
             ds.CanDisplay = true;
             ds.Metadata = new DatasetMetadata()
             {
@@ -188,7 +187,6 @@ namespace Sentry.data.Core
                 dto.DatasetDtm = ds.DatasetDtm;
                 dto.ChangedDtm = ds.ChangedDtm;
                 dto.S3Key = ds.S3Key;
-                dto.IsSensitive = ds.IsSensitive;
                 dto.DatasetType = ds.DatasetType;
                 dto.Location = ds.Metadata.ReportMetadata.Location;
                 dto.LocationType = ds.Metadata.ReportMetadata.LocationType;

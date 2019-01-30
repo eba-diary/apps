@@ -16,8 +16,6 @@ namespace Sentry.data.Core
 
         public virtual int DatasetId { get; set; }
 
-        public virtual Boolean IsSensitive { get; set; }
-
         public virtual string S3Key { get; set; }
 
         public virtual string DatasetName { get; set; }
@@ -41,9 +39,9 @@ namespace Sentry.data.Core
 
         public virtual Boolean CanDisplay { get; set; }
 
-        public virtual bool IsSecured { get; set; }
         public virtual Security Security { get; set; }
 
+        public virtual bool IsSecured { get; set; }
 
         public virtual IList<Category> DatasetCategories { get; set; }
         public virtual string DatasetType { get; set; }

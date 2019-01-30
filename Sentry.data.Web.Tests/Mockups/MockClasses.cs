@@ -27,7 +27,6 @@ namespace Sentry.data.Web.Tests
                 DatasetDtm = System.DateTime.Now.AddYears(-13),
                 ChangedDtm = System.DateTime.Now.AddYears(-12),
                 S3Key = "data-dev/government/quarterly_census_of_employment_and_wages/",
-                IsSensitive = false,
                 CanDisplay = true,
                 DatasetFiles = new List<DatasetFile>(),
                 DatasetFileConfigs = new List<DatasetFileConfig>(),

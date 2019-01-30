@@ -10,7 +10,6 @@
 	[FileChanged_DTM] [datetime] NOT NULL,
 	[FileUploaded_DTM] [datetime] NULL,
 	[S3_KEY] [varchar](1024) NULL,
-    [IsSensitive_IND] BIT NOT NULL, 
     [Display_IND] BIT NOT NULL, 
     [Information_DSC] NVARCHAR(MAX) NULL, 
     [Metadata] VARCHAR(MAX) NULL, 

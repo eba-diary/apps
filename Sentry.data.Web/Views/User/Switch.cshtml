@@ -35,23 +35,9 @@
                         <h2>Dataset Management</h2>
                         <h3 style="margin-left: 15px;">Download</h3>
                         <p style="margin-left: 30px;">Can View Datasets : @Model.ImpersonatedUser.CanViewDataset</p>                      
-                        <p style="margin-left: 30px;">Can Download Non-Sensitive : @Model.ImpersonatedUser.CanDwnldNonSensitive</p>
-                        <p style="margin-left: 30px;">Can Download Sensitive : @Model.ImpersonatedUser.CanDwnldSenstive</p>
-                        <p style="margin-left: 30px;">Can Edit Datasets : @Model.ImpersonatedUser.CanEditDataset</p>
-                        <p style="margin-left: 30px;">
-                            Can Upload :@Model.ImpersonatedUser.CanUpload
-                        </p>
-                        <p style="margin-left: 30px;">
-                            Can Manage Configs : @Model.ImpersonatedUser.CanEditDataset
-                        </p>
+                        <p style="margin-left: 30px;">Can Edit Datasets : @Model.ImpersonatedUser.CanModifyDataset</p>
+                        <p style="margin-left: 30px;">Can Manage Configs : @Model.ImpersonatedUser.CanModifyDataset</p>
 
-                        <h3 style="margin-left: 15px;">Query Tool</h3>
-                        <p style="margin-left: 30px;">
-                            Can Use Query Tool : @Model.ImpersonatedUser.CanQueryTool
-                        </p>
-                        <p style="margin-left: 30px;">
-                            Can Power Query : @Model.ImpersonatedUser.CanQueryToolPowerUser
-                        </p>
                     </div>
                     <div class="col-lg-6">
                         <h2>Data Asset Management</h2>
@@ -62,7 +48,6 @@
                         <hr />
                         <h2>Additional Controls</h2>
                         <h3 style="margin-left: 15px;">Admin Controls</h3>
-                        <p style="margin-left: 30px;">Can Approve Items : @Model.ImpersonatedUser.CanApproveItems</p>
                         <p style="margin-left: 30px;">Can User Switch : @Model.ImpersonatedUser.CanUserSwitch</p>
                     </div>
                 </div>

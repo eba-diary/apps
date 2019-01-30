@@ -48,7 +48,6 @@ namespace Sentry.data.Web.Controllers
             hm.DatasetCount = dsList.Count(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET);
             hm.Categories = _dsContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityCodes.DATASET).ToList();
             hm.CanEditDataset = SharedContext.CurrentUser.CanModifyDataset;
-            hm.CanUpload = SharedContext.CurrentUser.CanUpload;
 
             Event e = new Event();
             e.EventType = _dsContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();

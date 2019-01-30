@@ -193,7 +193,6 @@ namespace Sentry.data.Core
                 DatasetType = GlobalConstants.DataEntityCodes.DATASET,
                 DataClassification = dto.DataClassification,
                 IsSecured = dto.IsSecured,
-                IsSensitive = false,
                 CanDisplay = true,
                 DatasetFiles = null,
                 DatasetFileConfigs = null
@@ -370,7 +369,6 @@ namespace Sentry.data.Core
             dto.UploadUserName = ds.UploadUserName;
             dto.DatasetDtm = ds.DatasetDtm;
             dto.ChangedDtm = ds.ChangedDtm;
-            dto.IsSensitive = ds.IsSensitive;
             dto.CanDisplay = ds.CanDisplay;
             dto.TagIds = new List<string>();
             dto.OriginationId = (int)Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode);

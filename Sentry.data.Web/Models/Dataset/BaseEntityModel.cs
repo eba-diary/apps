@@ -35,7 +35,6 @@ namespace Sentry.data.Web
             this.AmountOfSubscriptions = dto.AmountOfSubscriptions;
             this.Views = dto.Views;
             this.ObjectType = dto.ObjectType;
-            this.IsSensitive = dto.IsSensitive;
             this.CategoryColor = dto.CategoryColor;
             this.CategoryNames = dto.CategoryNames;
         }
@@ -94,7 +93,6 @@ namespace Sentry.data.Web
         public string ObjectType { get; set; }
         public bool IsSubscribed { get; set; }
         public bool IsFavorite { get; set; }
-        public bool IsSensitive { get; set; }
         public string MailtoLink { get; set; }
         public List<string> CategoryNames { get; set; }
         public string CategoryColor { get; set; }

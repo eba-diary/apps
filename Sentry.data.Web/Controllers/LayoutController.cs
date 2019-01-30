@@ -1,12 +1,10 @@
 ﻿using System.Web.Mvc;
 using System.Web.SessionState;
 using Sentry.data.Core;
-using Sentry.data.Infrastructure;
 using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Reflection;
-using System.Diagnostics;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -35,12 +33,8 @@ namespace Sentry.data.Web.Controllers
             headerModel.CanViewDataset = SharedContext.CurrentUser.CanViewDataset;
             headerModel.CanViewDataAsset = SharedContext.CurrentUser.CanViewDataAsset;
             headerModel.CanEditDataset = SharedContext.CurrentUser.CanModifyDataset;
-            headerModel.CanUpload = SharedContext.CurrentUser.CanUpload;
-            headerModel.CanQueryTool = SharedContext.CurrentUser.CanQueryTool;
-            headerModel.CanQueryToolPowerUser = SharedContext.CurrentUser.CanQueryToolPowerUser;
             headerModel.CanViewReports = SharedContext.CurrentUser.CanViewReports;
             headerModel.CanManageReports = SharedContext.CurrentUser.CanManageReports;
-            //headerModel.AdminUser = SharedContext.CurrentUser.AdminUser;
 
             if (SharedContext.CurrentUser.GetType() == typeof(ImpersonatedApplicationUser))
             {

@@ -100,7 +100,6 @@ namespace Sentry.data.Web.Tests
             var model = (result.Model as HomeModel);
 
             Assert.IsFalse(model.CanEditDataset);
-            Assert.IsTrue(model.CanUpload);
         }
 
         [TestMethod]
@@ -118,7 +117,6 @@ namespace Sentry.data.Web.Tests
             var model = (result.Model as HomeModel);
 
             Assert.IsTrue(model.CanEditDataset);
-            Assert.IsTrue(model.CanUpload);
         }
 
         [TestMethod]

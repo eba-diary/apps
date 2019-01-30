@@ -643,7 +643,6 @@ namespace Sentry.data.Web.Controllers
                     qd.description = item.Description;
                     qd.HasSchema = item.Schema.FirstOrDefault().DataObjects.Any();
 
-                    qd.IsPowerUser = _userService.GetCurrentUser().CanQueryToolPowerUser;
                     qd.HasQueryableSchema = item.Schema.FirstOrDefault().DataObjects.Any();
 
                     if (qd.HasSchema)

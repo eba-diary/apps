@@ -323,18 +323,17 @@ namespace Sentry.data.Web.Controllers
             //IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
 
             List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
-            Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
-            Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
-            Boolean CanEdit = SharedContext.CurrentUser.CanModifyDataset;
+
+            UserSecurity us = _datasetService.GetUserSecurityForConfig(Id);
+
 
             //Query the Dataset for the following information:
             foreach (DatasetFile df in _datasetContext.GetDatasetFilesForDatasetFileConfig(Id, x => !x.IsBundled).ToList())
             {
                 DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider);
-                dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
-                dfgm.CanDwnldSenstive = CanDwnldSenstive;
-                dfgm.CanEdit = CanEdit;
-                dfgm.CanPreview = true;
+                dfgm.CanViewFullDataset = us.CanViewFullDataset;
+                dfgm.CanEditDataset = us.CanEditDataset;
+                dfgm.CanPreviewDataset = us.CanPreviewDataset;
                 files.Add(dfgm);
             }
 
@@ -358,6 +357,7 @@ namespace Sentry.data.Web.Controllers
         {
             //IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
             List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
+
             UserSecurity us = _datasetService.GetUserSecurityForConfig(Id);
 
             List<DatasetFile> bundledList = _datasetContext.GetDatasetFilesForDatasetFileConfig(Id, w => w.IsBundled).ToList();
@@ -366,10 +366,9 @@ namespace Sentry.data.Web.Controllers
             {
                 DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider)
                 {
-                    CanDwnldNonSensitive = CanDwnldNonSensitive,
-                    CanDwnldSenstive = CanDwnldSenstive,
-                    CanEdit = CanEdit,
-                    CanPreview = true
+                    CanViewFullDataset = us.CanViewFullDataset,
+                    CanEditDataset = us.CanEditDataset,
+                    CanPreviewDataset = us.CanPreviewDataset
                 };
                 files.Add(dfgm);
             }
@@ -386,17 +385,17 @@ namespace Sentry.data.Web.Controllers
             DatasetFile df = _datasetContext.GetDatasetFile(Id);
 
             List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
-            Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
-            Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
-            Boolean CanEdit = SharedContext.CurrentUser.CanModifyDataset;
+
+            UserSecurity us = _datasetService.GetUserSecurityForConfig(Id);
 
             foreach (DatasetFile dfversion in _datasetContext.GetDatasetFilesVersions(df.Dataset.DatasetId, df.DatasetFileConfig.ConfigId, df.FileName).ToList())
             {
-                DatasetFileGridModel dfgm = new DatasetFileGridModel(dfversion, _associateInfoProvider);
-                dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
-                dfgm.CanDwnldSenstive = CanDwnldSenstive;
-                dfgm.CanEdit = CanEdit;
-                dfgm.CanPreview = false;
+                DatasetFileGridModel dfgm = new DatasetFileGridModel(dfversion, _associateInfoProvider)
+                {
+                    CanViewFullDataset = us.CanViewFullDataset,
+                    CanEditDataset = us.CanEditDataset,
+                    CanPreviewDataset = us.CanPreviewDataset
+                };
                 files.Add(dfgm);
             }
 
@@ -768,10 +767,8 @@ namespace Sentry.data.Web.Controllers
             //Get the users permissions
             Boolean errorsFound = false;
             string errorString = "";
-            Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
-            Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
 
-            Boolean bundlingSensitive = files.Any(x => x.Dataset.IsSensitive);
+            UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetID);
 
             if (newName == "" || newName == null)
             {
@@ -796,7 +793,7 @@ namespace Sentry.data.Web.Controllers
                 errorString += "<p>You selected no files.</p>";
             }
 
-            if ((bundlingSensitive && !CanDwnldSenstive) || (!bundlingSensitive && !CanDwnldNonSensitive))
+            if (us.CanViewFullDataset)
             {
                 errorsFound = true;
                 errorString += "<p>You do not have permission to download or bundle these files.</p>";
@@ -919,7 +916,7 @@ namespace Sentry.data.Web.Controllers
 
                 try
                 {
-                    if (user.CanUpload)
+                    if (_datasetService.GetUserSecurityForConfig(configId).CanUploadToDataset)
                     {
                         HttpFileCollectionBase files = Request.Files;
 
@@ -1188,7 +1185,7 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.QueryToolPowerUser)]
         public ActionResult QueryTool()
         {
-            ViewBag.PowerUser = SharedContext.CurrentUser.CanQueryToolPowerUser;
+            ViewBag.PowerUser = SharedContext.CurrentUser.AdminUser;
             ViewBag.LivyURL = Sentry.Configuration.Config.GetHostSetting("ApacheLivy");
 
             Event e = new Event();

@@ -14,7 +14,6 @@ namespace Sentry.data.Web
             CanDwnldNonSensitive = dto.CanDwnldNonSensitive;
             CanQueryTool = dto.CanQueryTool;
             CanUpload = dto.CanUpload;
-            CanEditDataset = dto.CanEditDataset;
             Downloads = dto.Downloads;
             DatasetFileCount = dto.DatasetFileCount;
             DatasetFileConfigNames = dto.DatasetFileConfigNames;
@@ -29,7 +28,6 @@ namespace Sentry.data.Web
         public bool CanDwnldNonSensitive { get; set; }
         public bool CanQueryTool { get; set; }
         public bool CanUpload { get; set; }
-        public bool CanEditDataset { get; set; }
         public int Downloads { get; set; }
         public string OriginationCode { get; set; }
         public int DatasetFileCount { get; set; }

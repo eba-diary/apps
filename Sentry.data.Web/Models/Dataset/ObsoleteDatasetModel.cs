@@ -42,7 +42,7 @@ namespace Sentry.data.Web
             this.FileExtension = null;
             this.DatasetDtm = ds.DatasetDtm;
             this.ChangedDtm = ds.ChangedDtm;
-            this.IsSensitive = ds.IsSensitive;
+            this.IsSecured = ds.IsSecured;
             this.CanDisplay = ds.CanDisplay;
             this.DatasetInformation = ds.DatasetInformation;
 
@@ -223,7 +223,7 @@ namespace Sentry.data.Web
         public string S3Key { get; set; }
 
         [DisplayName("Sensitive")]
-        public Boolean IsSensitive { get; set; }
+        public Boolean IsSecured { get; set; }
 
         [DisplayName("Data Classification")]
         public string DataClassification { get; set; }
@@ -231,11 +231,8 @@ namespace Sentry.data.Web
         public Boolean CanDisplay { get; set; }
 
 
-        public Boolean CanDwnldSenstive { get; set; }
-        public Boolean CanEditDataset { get; set; }
         public Boolean CanEditDataset { get; set; }
         public Boolean CanUpload { get; set; }
-        public Boolean CanDwnldNonSensitive { get; set; }
         public Boolean IsPushToSASCompatible { get; set; }
         public Boolean IsPushToTableauCompatible { get; set; }
         public Boolean IsPreviewCompatible { get; set; }

@@ -29,11 +29,11 @@ namespace Sentry.data.Web.Controllers
         private ISASService _sasService;
         private IAppCache _cache;
         public IEventService _eventService;
-
+        public IDatasetService _DatasetService;
 
         public ConfigController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, 
             ISASService sasService, IAssociateInfoProvider associateInfoService, IConfigService configService,
-            IEventService eventService)
+            IEventService eventService, IDatasetService datasetService)
         {
             _cache = new CachingService();
             _datasetContext = dsCtxt;
@@ -43,6 +43,7 @@ namespace Sentry.data.Web.Controllers
             _associateInfoProvider = associateInfoService;
             _configService = configService;
             _eventService = eventService;
+            _DatasetService = datasetService;
         }
 
         [HttpGet]
@@ -51,13 +52,13 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Index(int id)
         {
             Dataset ds = _datasetContext.GetById(id);
+
+            UserSecurity us = _DatasetService.GetUserSecurityForDataset(id);
+
             ObsoleteDatasetModel bdm = new ObsoleteDatasetModel(ds, _associateInfoProvider, _datasetContext)
             {
-                CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive,
-                CanEditDataset = SharedContext.CurrentUser.CanModifyDataset,
-                CanEditDataset = SharedContext.CurrentUser.CanModifyDataset,
-                CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive,
-                CanUpload = SharedContext.CurrentUser.CanUpload
+                CanEditDataset = us.CanEditDataset,
+                CanUpload = us.CanUploadToDataset
             };
 
             Event e = new Event();
@@ -200,7 +201,6 @@ namespace Sentry.data.Web.Controllers
 
         private DataElement CreateNewDataElement(DatasetFileConfigsModel dfcm)
         {
-            List<DataElementDetail> details = new List<DataElementDetail>();
 
             Dataset ds = _datasetContext.GetById<Dataset>(dfcm.DatasetId);
 
@@ -581,7 +581,7 @@ namespace Sentry.data.Web.Controllers
                    {
                        Text = v.Name,
                        Value = v.DiscrimatorValue,
-                       Disabled = v.DiscrimatorValue == "DFSBasic" ? true : false
+                       Disabled = v.DiscrimatorValue == "DFSBasic"
                    }).ToList();
 
                 temp2 = DataSourcesByType(ejm.SelectedSourceType, ejm.SelectedDataSource).Where(x => x.Text == retrieverJob.DataSource.Name).ToList();
@@ -593,7 +593,7 @@ namespace Sentry.data.Web.Controllers
                    {
                        Text = v.Name,
                        Value = v.DiscrimatorValue,
-                       Disabled = v.DiscrimatorValue == "S3Basic" ? true : false
+                       Disabled = v.DiscrimatorValue == "S3Basic"
                    }).ToList();
 
                 temp2 = DataSourcesByType(ejm.SelectedSourceType, ejm.SelectedDataSource).Where(x => x.Text == retrieverJob.DataSource.Name).ToList();
@@ -605,7 +605,7 @@ namespace Sentry.data.Web.Controllers
                    {
                        Text = v.Name,
                        Value = v.DiscrimatorValue,
-                       Disabled = v.DiscrimatorValue == "DFSBasic" || v.DiscrimatorValue == "S3Basic" ? true : false
+                       Disabled = v.DiscrimatorValue == "DFSBasic" || v.DiscrimatorValue == "S3Basic"
                    }).ToList();
 
                 temp.Add(new SelectListItem()
@@ -649,7 +649,7 @@ namespace Sentry.data.Web.Controllers
                 {
                     Text = s,
                     Value = counter.ToString(),
-                    Selected = retrieverJob.ReadableSchedule == s ? true : false,
+                    Selected = retrieverJob.ReadableSchedule == s,
                     Disabled = false
                 });
 
@@ -665,9 +665,6 @@ namespace Sentry.data.Web.Controllers
 
             ejm.CompressionTypesDropdown = Enum.GetValues(typeof(CompressionTypes)).Cast<CompressionTypes>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
-
-
-            List<string> a = new List<string>();
 
 
 
@@ -1225,17 +1222,17 @@ namespace Sentry.data.Web.Controllers
             if (authtype.Is<BasicAuthentication>())
             {
                 AuthenticationType auth = _datasetContext.AuthTypes.Where(w => w is BasicAuthentication).First();
-                return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID ? true : false };
+                return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID };
             }
             else if (authtype.Is<AnonymousAuthentication>())
             {
                 AuthenticationType auth = _datasetContext.AuthTypes.Where(w => w is AnonymousAuthentication).First();
-                return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID ? true : false };
+                return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID };
             }
             else if (authtype.Is<TokenAuthentication>())
             {
                 AuthenticationType auth = _datasetContext.AuthTypes.Where(w => w is TokenAuthentication).First();
-                return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID ? true : false };
+                return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID };
             }
             else
             {
@@ -1253,32 +1250,32 @@ namespace Sentry.data.Web.Controllers
                 case "FTP":
                     List<DataSource> fTpList = _datasetContext.DataSources.Where(x => x is FtpSource).ToList();
                     output = fTpList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
                     break;
                 case "SFTP":
                     List<DataSource> sfTpList = _datasetContext.DataSources.Where(x => x is SFtpSource).ToList();
                     output = sfTpList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
                     break;
                 case "DFSBasic":
                     List<DataSource> dfsBasicList = _datasetContext.DataSources.Where(x => x is DfsBasic).ToList();
                     output = dfsBasicList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
                     break;
                 case "DFSCustom":
                     List<DataSource> dfsCustomList = _datasetContext.DataSources.Where(x => x is DfsCustom).ToList();
                     output = dfsCustomList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
                     break;
                 case "S3Basic":
                     List<DataSource> s3BasicList = _datasetContext.DataSources.Where(x => x is S3Basic).ToList();
                     output = s3BasicList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
                     break;
                 case "HTTPS":
                     List<DataSource> HttpsList = _datasetContext.DataSources.Where(x => x is HTTPSSource).ToList();
                     output = HttpsList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
                     break;
                 default:
                     throw new NotImplementedException();
@@ -1346,13 +1343,13 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetFileConfig config = _datasetContext.GetById<DatasetFileConfig>(configId);
 
+            UserSecurity us = _DatasetService.GetUserSecurityForConfig(configId);
+
+
             ObsoleteDatasetModel bdm = new ObsoleteDatasetModel(config.ParentDataset, _associateInfoProvider, _datasetContext)
             {
-                CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive,
-                CanEditDataset = SharedContext.CurrentUser.CanModifyDataset,
-                CanEditDataset = SharedContext.CurrentUser.CanModifyDataset,
-                CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive,
-                CanUpload = SharedContext.CurrentUser.CanUpload
+                CanEditDataset = us.CanEditDataset,
+                CanUpload =us.CanUploadToDataset
             };
 
             Event e = new Event();
@@ -1366,20 +1363,6 @@ namespace Sentry.data.Web.Controllers
             e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
             e.Reason = "Viewed Edit Fields";
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-
-            //DataElement de = _datasetContext.GetById<DataElement>(schemaId);
-
-            //if (de.DataObjects.Count == 0)
-            //{
-            //    List<DataObject> dobjList = new List<DataObject>();
-            //    de.DataObjects = dobjList;
-            //    //ViewBag.Schema = _datasetContext.GetById<DataElement>(schemaId);
-            //    ViewBag.Schema = de;
-            //}
-            //else
-            //{
-                
-            //}
 
             ViewBag.Schema = _datasetContext.GetById<DataElement>(schemaId);
 
