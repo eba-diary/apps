@@ -17,6 +17,7 @@ namespace Sentry.data.Web
                 DatasetId = model.DatasetId,
                 DatasetCategoryIds = model.DatasetCategoryIds,
                 DatasetBusinessUnitIds = model.DatasetBusinessUnitIds,
+                DatasetFunctionIds = model.DatasetFunctionIds,
                 DatasetName = model.DatasetName,
                 DatasetDesc = model.DatasetDesc,
                 SentryOwnerId = model.SentryOwnerId,

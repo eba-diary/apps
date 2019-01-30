@@ -38,6 +38,7 @@ namespace Sentry.data.Web
             this.DistinctFileExtensions = ds.DatasetFiles.Select(x => Utilities.GetFileExtension(x.FileName).ToLower()).Distinct().ToList();
             this.Frequencies = null;
             this.BusinessUnits = ds.BusinessUnits.Select(x => x.Name).ToList();
+            this.DatasetFunctions = ds.DatasetFunctions.Select(x => x.Name).ToList();
 
             if (ds.DatasetFiles.Any())
             {
@@ -100,6 +101,6 @@ namespace Sentry.data.Web
         public Boolean IsFavorite { get; set; }
         public Boolean CanEditDataset { get; set; }
         public List<string> BusinessUnits { get; set; }
-
+        public List<string> DatasetFunctions { get; set; }
     }
 }

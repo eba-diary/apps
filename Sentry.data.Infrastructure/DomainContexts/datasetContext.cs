@@ -157,6 +157,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<DatasetFunction> DatasetFunctions
+        {
+            get
+            {
+                return Query<DatasetFunction>().Cacheable();
+            }
+        }
+
         public IQueryable<HiveTable> HiveTables
         {
             get

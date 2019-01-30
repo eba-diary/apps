@@ -73,7 +73,7 @@
 
             @* Business Unit *@
             <div class="form-group">
-                @Html.LabelFor((model) => model.DatasetBusinessUnitIds, new  { @class = "control-label col-md-2" })
+                @Html.LabelFor((model) => model.DatasetBusinessUnitIds, new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
                     <select id="DatasetBusinessUnitIds" name="DatasetBusinessUnitIds" multiple="multiple" class="form-control edit-dataset-row">
                         @foreach (var li in Model.AllBusinessUnits)
@@ -86,6 +86,18 @@
             </div>
 
             @* Function *@
+            <div class="form-group">
+                @Html.LabelFor((model) => model.DatasetFunctionIds, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <select id="DatasetFunctionIds" name="DatasetFunctionIds" multiple="multiple" class="form-control edit-dataset-row">
+                        @foreach (var li in Model.AllDatasetFunctions)
+                        {
+                            <option selected="@li.Selected" value="@li.Value">@li.Text</option>
+                        }
+                    </select>
+                    @Html.ValidationMessageFor((model) => model.DatasetFunctionIds, "", new { @class = "text-danger" })
+                </div>
+            </div>
 
 
             @Html.Partial("_Tags", Model)
