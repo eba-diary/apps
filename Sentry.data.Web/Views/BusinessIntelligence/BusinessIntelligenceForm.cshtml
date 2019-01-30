@@ -73,7 +73,7 @@
 
             @* Business Unit *@
             <div class="form-group">
-                @Html.LabelFor((model) => model.DatasetBusinessUnitIds, new  { @class = "control-label col-md-2" })
+                @Html.LabelFor((model) => model.DatasetBusinessUnitIds, new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
                     <select id="DatasetBusinessUnitIds" name="DatasetBusinessUnitIds" multiple="multiple" class="form-control edit-dataset-row">
                         @foreach (var li in Model.AllBusinessUnits)
@@ -90,17 +90,15 @@
 
             @Html.Partial("_Tags", Model)
 
-            @Html.LabelFor(model => model.FileTypeId, htmlAttributes: new { @class = "control-label col-md-2" })
+            
             <div class="form-group">
-                @{foreach (var type in Model.AllDataFileTypes)
-                    {
-                        <div class="col-md-10 col-md-offset-2">
-                            @Html.Label(type.Text, htmlAttributes: new { @class = "col-md-2" })
-                            @Html.RadioButtonFor(model => model.FileTypeId, type.Value, new { @class = "col-md-1" })
-                        </div>
-                    }
-                }
+                @Html.LabelFor(model => model.FileTypeId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">      
+                    @Html.DropDownListFor((model) => model.FileTypeId, Model.AllDataFileTypes, new { @class = "form-control edit-dataset-row" })
+                    @Html.ValidationMessageFor((model) => model.FileTypeId, "", new { @class = "text-danger" })
+                </div>
             </div>
+
 
             <div id="UrlPanel" class="tab-pane fade in form-horizontal">
                 <div class="form-group">

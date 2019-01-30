@@ -129,10 +129,10 @@ namespace Sentry.data.Web.Helpers
 
             model.AllFrequencies = temp.OrderBy(x => x.Value);
 
-
-
-            model.AllDataFileTypes = Enum.GetValues(typeof(ReportType)).Cast<ReportType>().Select(v
-                => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+            model.AllDataFileTypes = default(ReportType).ToEnumSelectList(((BusinessIntelligenceModel)model).FileTypeId.ToString());
+            
+            //model.AllDataFileTypes = Enum.GetValues(typeof(ReportType)).Cast<ReportType>().Select(v
+            //    => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
 
         }
         public static IEnumerable<SelectListItem> GetCategoryList(IDatasetContext _datasetContext)
@@ -174,6 +174,9 @@ namespace Sentry.data.Web.Helpers
             }
             return items;
         }
+
+        
+
         public static IEnumerable<SelectListItem> GetDatasetOriginationListItems()
         {
             List<SelectListItem> items = Enum.GetValues(typeof(DatasetOriginationCode)).Cast<DatasetOriginationCode>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();

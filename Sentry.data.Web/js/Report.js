@@ -47,6 +47,9 @@ data.Report = {
         $("#DatasetBusinessUnitIds").select2({
             placeholder: "Select Business Units"
         });
+        $("#DatasetFileTypeId").select2({
+            placeholder: "Select Exhibit Type"
+        });
         
         //Set Secure HREmp service URL for associate picker
         $.assocSetup({ url: "https://hrempsecure.sentry.com/api/associates" });
