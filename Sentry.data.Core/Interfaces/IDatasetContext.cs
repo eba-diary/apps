@@ -25,6 +25,7 @@ namespace Sentry.data.Core
         IQueryable<FileExtension> FileExtensions { get; }
         IQueryable<Category> Categories { get; }
         IQueryable<BusinessUnit> BusinessUnits { get; }
+        IQueryable<DatasetFunction> DatasetFunctions { get; }
         IQueryable<HiveTable> HiveTables { get; }
         IQueryable<LivyCreation> LivySessions { get; }
         IQueryable<MediaTypeExtension> MediaTypeExtensions { get; }

@@ -116,6 +116,27 @@ namespace Sentry.data.Web.Helpers
 
             model.AllBusinessUnits = temp;
 
+
+            //Functions
+            temp = GetDatasetFunctions(_datasetContext).ToList();
+
+            if (model.DatasetFunctionIds?.Count > 0)
+            {
+                foreach (var id in model.DatasetFunctionIds)
+                {
+                    foreach (var t in temp)
+                    {
+                        if (t.Value == id.ToString())
+                        {
+                            t.Selected = true;
+                        }
+                    }
+                }
+            }
+
+            model.AllDatasetFunctions = temp;
+
+
             //Business Intelligence Frequency
             temp = GetDatasetFrequencyListItems().ToList();
 
@@ -148,6 +169,13 @@ namespace Sentry.data.Web.Helpers
                 OrderBy(o => o.Sequence).
                 ThenBy(t => t.Name).
                 Select((x) => new SelectListItem { Text = x.Name, Value = x.Id.ToString() });
+        }
+        public static IEnumerable<SelectListItem> GetDatasetFunctions(IDatasetContext dsContext)
+        {
+            return dsContext.DatasetFunctions.
+                OrderBy(o => o.Sequence).
+                ThenBy(t => t.Name).
+                Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() });
         }
         public static IEnumerable<Dataset> GetDatasetByCategoryId(IDatasetContext _datasetContext, int id)
         {

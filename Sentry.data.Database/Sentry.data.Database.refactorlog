@@ -595,4 +595,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Dataset_Id" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="d235be63-2219-45cd-ac1a-df33bab66527" ChangeDateTime="01/30/2019 14:14:48">
+    <Property Name="ElementName" Value="[dbo].[DatasetFunction].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetFunction]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Dataset_Id" />
+  </Operation>
 </Operations>

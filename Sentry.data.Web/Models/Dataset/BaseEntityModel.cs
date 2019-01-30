@@ -21,6 +21,8 @@ namespace Sentry.data.Web
             this.DatasetDtm = dto.DatasetDtm;
             this.ChangedDtm = dto.ChangedDtm;
             this.DatasetCategoryIds = dto.DatasetCategoryIds;
+            this.DatasetBusinessUnitIds = dto.DatasetBusinessUnitIds;
+            this.DatasetFunctionIds = dto.DatasetFunctionIds;
             TagIds = string.Join(",", dto.TagIds);
 
             //hidden properties
@@ -71,12 +73,16 @@ namespace Sentry.data.Web
         [Required]
         [DisplayName("Business Unit")]
         public List<int> DatasetBusinessUnitIds { get; set; }
+        [Required]
+        [DisplayName("Function")]
+        public List<int> DatasetFunctionIds { get; set; }
 
 
 
         //Dropdown Lists
         public IEnumerable<SelectListItem> AllCategories { get; set; }
         public IEnumerable<SelectListItem> AllBusinessUnits { get; set; }
+        public IEnumerable<SelectListItem> AllDatasetFunctions { get; set; }
         public IEnumerable<SelectListItem> AllFrequencies { get; set; }
         public IEnumerable<SelectListItem> AllOriginationCodes { get; set; }
         public IEnumerable<SelectListItem> AllDatasetScopeTypes { get; set; }

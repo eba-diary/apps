@@ -47,6 +47,9 @@ data.Report = {
         $("#DatasetBusinessUnitIds").select2({
             placeholder: "Select Business Units"
         });
+        $("#DatasetFunctionIds").select2({
+            placeholder: "Select Functions"
+        });
         $("#DatasetFileTypeId").select2({
             placeholder: "Select Exhibit Type"
         });
