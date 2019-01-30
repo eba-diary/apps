@@ -21,7 +21,6 @@ pipeline {
                 // This makes the name of the build a bit more like what you may be used to in TFS
                 script {
                     currentBuild.displayName = new Date().format( "yyyy.MM.dd" ) + "." + "${BUILD_NUMBER}"
-					env.SonarBranchName = "${BRANCH_NAME}".replace("/","_")
                 }
                 // Delete the existing build artifacts.  Repeat for any other folders that may get in the way of the new build
                 dir('build') { deleteDir() }
@@ -31,7 +30,7 @@ pipeline {
                 dotNetNuGetRestore()
  
                 // Begin the Sonar Scanner, using defaults (version: 1.0, language: cs)
-                dotNetBeginSonarScanner key: "DATA:Data.Sentry.Com:${env.SonarBranchName}", name: 'Data.Sentry.Com', version: "${currentBuild.displayName}", environment: 'SonarProd'
+                dotNetBeginSonarScanner key: "DATA:Data.Sentry.Com", name: 'Data.Sentry.Com', version: "${currentBuild.displayName}"
             }
         }
  
@@ -60,7 +59,7 @@ pipeline {
             // This stage includes steps that take the results of this build and archive and publish them for analysis, deployment, etc.
             steps {
                 // Send the results to Sonar
-                dotNetEndSonarScanner environment: 'SonarProd'
+                dotNetEndSonarScanner()
  
                 // Repeat the next two steps (dotNetArchiveArtifact and recordArtificateToQuartermaster) if you have multiple applications to archive/record
                  
