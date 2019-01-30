@@ -59,7 +59,7 @@ pipeline {
             // This stage includes steps that take the results of this build and archive and publish them for analysis, deployment, etc.
             steps {
                 // Send the results to Sonar
-                dotNetEndSonarScanner environment: 'SonarProd'
+                dotNetEndSonarScanner
  
                 // Repeat the next two steps (dotNetArchiveArtifact and recordArtificateToQuartermaster) if you have multiple applications to archive/record
                  
