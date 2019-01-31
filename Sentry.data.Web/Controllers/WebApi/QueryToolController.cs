@@ -682,8 +682,8 @@ namespace Sentry.data.Web.Controllers
 
             QueryableDataset output = new QueryableDataset() { Configs = reply };
 
-            output.datasetCategory = ds.DatasetCategory.Name;
-            output.datasetColor = ds.DatasetCategory.Color;
+            output.datasetCategory = ds.DatasetCategories.First().Name;
+            output.datasetColor = ds.DatasetCategories.First().Color;
 
             return Ok(output);
         }
@@ -995,7 +995,7 @@ namespace Sentry.data.Web.Controllers
                     + bucket + "/"
                     + s3Prefix + "/"
                     + "parquet" + "/"
-                    + dfc.ParentDataset.DatasetCategory.Id + "/"
+                    + dfc.ParentDataset.DatasetCategories.First().Id + "/"
                     + dfc.ParentDataset.DatasetId + "/"
                     + dfc.ConfigId + "/"
                     //Schema Revision

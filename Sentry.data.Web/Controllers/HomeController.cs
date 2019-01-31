@@ -45,8 +45,8 @@ namespace Sentry.data.Web.Controllers
 
             List<Dataset> dsList = _dsContext.Datasets.ToList();
 
-            hm.DatasetCount = dsList.Count(w => w.DatasetType == null);
-            hm.Categories = _dsContext.Categories.Where(w => w.ObjectType == null).ToList();
+            hm.DatasetCount = dsList.Count(w => w.DatasetType == GlobalConstants.DataEntityTypes.DATASET);
+            hm.Categories = _dsContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityTypes.DATASET).ToList();
             hm.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
             hm.CanUpload = SharedContext.CurrentUser.CanUpload;
 

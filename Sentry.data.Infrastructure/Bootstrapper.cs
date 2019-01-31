@@ -61,7 +61,7 @@ namespace Sentry.data.Infrastructure
             {
                 scanner.AssemblyContainingType<dataAssetContext>();
                 scanner.AssemblyContainingType<IDataAssetContext>();
-                scanner.AssemblyContainingType<datasetContext>();
+                scanner.AssemblyContainingType<DatasetContext>();
                 scanner.AssemblyContainingType<IDatasetContext>();
                 scanner.AssemblyContainingType<DataFeedProvider>();
                 scanner.AssemblyContainingType<IDataFeedContext>();
@@ -73,12 +73,11 @@ namespace Sentry.data.Infrastructure
 
             //Repeat the following line once per database / domain context
             registry.For<IDataAssetContext>().Use(() => new dataAssetContext(_defaultSessionFactory.OpenSession()));
-            registry.For<IDatasetContext>().Use(() => new datasetContext(_defaultSessionFactory.OpenSession()));
+            registry.For<IDatasetContext>().Use(() => new DatasetContext(_defaultSessionFactory.OpenSession()));
             registry.For<IDataFeedContext>().Use(() => new DataFeedProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IMetadataRepositoryProvider>().Use(() => new MetadataRepositoryProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IODCFileProvider>().Use(() => new ODCFileProvider(_defaultSessionFactory.OpenSession()));
             registry.For<IRequestContext>().Use(() => new RequestContext(_defaultSessionFactory.OpenSession()));
-            registry.For<IReportContext>().Use(() => new ReportContext(_defaultSessionFactory.OpenSession()));
 
             //Register other services
             Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider obsidianUserProvider = new Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider();
@@ -88,7 +87,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IExtendedUserInfoProvider>().Singleton().Use<ExtendedUserInfoProvider>();
             registry.For<ISASService>().Singleton().Use<SASServiceProvider>();
             registry.For<IFtpProvider>().Singleton().Use<FtpProvider>();
-            registry.For<IDatasetService>().Singleton().Use<S3ServiceProvider>();
+            registry.For<IS3ServiceProvider>().Singleton().Use<S3ServiceProvider>();
             registry.For<IMessagePublisher>().Singleton().Use<KafkaMessagePublisher>();
             
             //Create the StructureMap container

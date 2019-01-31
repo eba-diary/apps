@@ -63,7 +63,7 @@ namespace Sentry.data.Web.Controllers
             {
                 if (!String.IsNullOrWhiteSpace(DataElement_NME) || !String.IsNullOrWhiteSpace(DataObject_NME) || !String.IsNullOrWhiteSpace(DataObjectField_NME))
                 {
-                    var allLineage = _dataAssetContext.Lineage(DataElementCode.Lineage, DataAsset_ID, DataElement_NME, DataObject_NME, DataObjectField_NME, LineCDE);
+                    var allLineage = _dataAssetContext.Lineage(GlobalConstants.DataElementDescription.LINEAGE, DataAsset_ID, DataElement_NME, DataObject_NME, DataObjectField_NME, LineCDE);
 
 
                     Event e = new Event();
@@ -118,7 +118,7 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
-                var allLineage = _dataAssetContext.Lineage(DataElementCode.Lineage, DataAsset_ID, DataElement_NME, DataObject_NME, DataObjectField_NME)
+                var allLineage = _dataAssetContext.Lineage(GlobalConstants.DataElementDescription.LINEAGE, DataAsset_ID, DataElement_NME, DataObject_NME, DataObjectField_NME)
                     .GroupBy(x => new { x.DataElement_NME, x.DataObject_NME, x.DataObjectField_NME }).Select(x => x.First()).ToList();
 
                 return Ok(allLineage);
@@ -187,7 +187,7 @@ namespace Sentry.data.Web.Controllers
         {
             try
             { 
-                var allLineage = _dataAssetContext.Lineage(DataElementCode.Lineage, DataAsset_ID, DataElement_NME, DataObject_NME, DataObjectField_NME, LineCDE).Select(x => x.DataElement_NME).Distinct().OrderBy(x => x);
+                var allLineage = _dataAssetContext.Lineage(GlobalConstants.DataElementDescription.LINEAGE, DataAsset_ID, DataElement_NME, DataObject_NME, DataObjectField_NME, LineCDE).Select(x => x.DataElement_NME).Distinct().OrderBy(x => x);
                             
                 return Ok(allLineage);
             }
@@ -217,7 +217,7 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
-                var allLineage = _dataAssetContext.Lineage(DataElementCode.Lineage, DataAsset_ID, DataElement_NME, DataObject_NME, DataObjectField_NME, LineCDE).Select(x => x.DataObject_NME).Distinct().OrderBy(x => x);
+                var allLineage = _dataAssetContext.Lineage(GlobalConstants.DataElementDescription.LINEAGE, DataAsset_ID, DataElement_NME, DataObject_NME, DataObjectField_NME, LineCDE).Select(x => x.DataObject_NME).Distinct().OrderBy(x => x);
 
                 return Ok(allLineage);
             }
@@ -244,7 +244,7 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
-                var businessTermDescription = _dataAssetContext.BusinessTermDescription(DataElementCode.BusinessTerm, DataAsset_ID, DataObjectField_NME, LineCDE).Distinct().First();
+                var businessTermDescription = _dataAssetContext.BusinessTermDescription(GlobalConstants.DataElementDescription.BUSINESS_TERM, DataAsset_ID, DataObjectField_NME, LineCDE).Distinct().First();
 
                 return Ok(businessTermDescription);
             }
@@ -274,7 +274,7 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
-                var businessTerms = _dataAssetContext.BusinessTerms(DataElementCode.Lineage, DataAsset_ID, DataElement_NME, DataObject_NME, DataObjectField_NME, LineCDE).Distinct().Where(x => x.Length > 1).OrderBy(x => x);
+                var businessTerms = _dataAssetContext.BusinessTerms(GlobalConstants.DataElementDescription.LINEAGE, DataAsset_ID, DataElement_NME, DataObject_NME, DataObjectField_NME, LineCDE).Distinct().Where(x => x.Length > 1).OrderBy(x => x);
 
                 return Ok(businessTerms);
             }
@@ -303,7 +303,7 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
-                var layers = _dataAssetContext.ConsumptionLayers(DataElementCode.Lineage, DataAsset_ID, DataElement_NME, DataObject_NME, DataObjectField_NME, LineCDE).Distinct().Where(x => x.Length > 1).OrderBy(x => x);
+                var layers = _dataAssetContext.ConsumptionLayers(GlobalConstants.DataElementDescription.LINEAGE, DataAsset_ID, DataElement_NME, DataObject_NME, DataObjectField_NME, LineCDE).Distinct().Where(x => x.Length > 1).OrderBy(x => x);
 
                 return Ok(layers);
             }
@@ -332,7 +332,7 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
-                var layers = _dataAssetContext.LineageTables(DataElementCode.Lineage, DataAsset_ID, DataElement_NME, DataObject_NME, DataObjectField_NME, LineCDE).Distinct().Where(x => x.Length > 1).OrderBy(x => x);
+                var layers = _dataAssetContext.LineageTables(GlobalConstants.DataElementDescription.LINEAGE, DataAsset_ID, DataElement_NME, DataObject_NME, DataObjectField_NME, LineCDE).Distinct().Where(x => x.Length > 1).OrderBy(x => x);
 
                 return Ok(layers);
             }

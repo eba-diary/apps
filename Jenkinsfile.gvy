@@ -4,7 +4,7 @@ pipeline {
             // Let the build run on any node.
             label ''
             // Define a custom workspace, removing all spaces from the path.  Also trims the length to avoid too-long paths
-            customWorkspace "${JENKINS_HOME}\\workspace\\${JOB_NAME}".replace('%2F', '_').take(100)
+            customWorkspace "${JENKINS_HOME}\\workspace\\${JOB_NAME}".replace('%2F', '_').take(50)
         }
     }
     options {

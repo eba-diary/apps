@@ -5,7 +5,7 @@ using System.Web;
 
 namespace Sentry.data.Web
 {
-    public class PreviewDataModel : BaseDatasetModel
+    public class PreviewDataModel : BaseEntityModel
     {
         public PreviewDataModel()
         {

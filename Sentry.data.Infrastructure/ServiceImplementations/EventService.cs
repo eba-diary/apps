@@ -1,59 +1,66 @@
 ﻿using Sentry.Common.Logging;
 using Sentry.data.Core;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+
 
 namespace Sentry.data.Infrastructure
 {
     public class EventService : IEventService
     {
-        public IDatasetContext _datasetContext;
-
-        public EventService(IDatasetContext datasetContext)
+        public void PublishSuccessEventByConfigId(string eventType, string userId, string reason, int configId)
         {
-            _datasetContext = datasetContext;
+            Task.Factory.StartNew(() => PublishSuccessEvent(eventType, userId, reason, 0, configId), TaskCreationOptions.RunContinuationsAsynchronously);
         }
 
-        /// <summary>
-        /// Logs events to the Event table
-        /// </summary>
-        /// <param name="e"></param>
-        /// <returns></returns>        
-        private void CreateEvent(Event e)
+
+        public void PublishSuccessEvent(string eventType, string userId, string reason, int datasetId)
         {
-            try
+            Task.Factory.StartNew(() => PublishSuccessEvent(eventType, userId, reason, datasetId, 0), TaskCreationOptions.RunContinuationsAsynchronously);
+        }
+
+
+
+
+        private void PublishSuccessEvent(string eventType, string userId, string reason, int? datasetId = 0, int? configId = 0)
+        {
+            using (IDatasetContext _datasetContext = Bootstrapper.Container.GetNestedContainer().GetInstance<IDatasetContext>())
             {
-                _datasetContext.Merge<Event>(e);
+                EventType et = _datasetContext.EventTypes.Where(w => w.Description == eventType).FirstOrDefault();
+                Status status = _datasetContext.EventStatus.Where(w => w.Description == GlobalConstants.Statuses.SUCCESS).FirstOrDefault();
+
+                    if ((datasetId == null || datasetId == 0) && configId != null && configId != 0)
+                    {
+                        datasetId = _datasetContext.GetById<DatasetFileConfig>(configId)?.ParentDataset?.DatasetId;
+                    }
+                    if ((configId == null || configId == 0) && datasetId != null && datasetId != 0)
+                    {
+                        configId = _datasetContext.GetById<Dataset>(datasetId)?.DatasetFileConfigs?.First()?.ConfigId;
+                    }
+
+                Event evt = CreateAndSaveEvent(et, status, userId, reason, datasetId, configId);
+
+                _datasetContext.Add(evt);
                 _datasetContext.SaveChanges();
             }
-            catch (Exception ex)
-            {
-                Logger.Error("Failed to save event", ex);
-            }
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS4014")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS1998")]
-        public async Task CreateViewSchemaEditSuccessEvent(int configId, string userId, string reason)
+        private Event CreateAndSaveEvent(EventType eventType, Status status, string userId, string reason, int? datasetId, int? configId)
         {
-            DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configId);
-
-            Event e = new Event();
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.DataConfig = configId;
-            e.Dataset = dfc.ParentDataset.DatasetId;
-            e.UserWhoStartedEvent = userId;
-            e.Reason = reason;
-
-            CreateEvent(e);
+            return new Event()
+            {
+                EventType = eventType,
+                Status = status,
+                TimeCreated = DateTime.Now,
+                TimeNotified = DateTime.Now,
+                IsProcessed = false,
+                DataConfig = configId,
+                Dataset = datasetId,
+                UserWhoStartedEvent = userId,
+                Reason = reason
+            };
         }
+
     }
 }

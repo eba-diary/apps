@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Sentry.data.Core.Helpers
 {
     public static class DataFeedHelper
@@ -14,19 +9,19 @@ namespace Sentry.data.Core.Helpers
 
             switch (feedType)
             {
-                case DataFeedConstants.FeedType.SAS:
+                case GlobalConstants.DataFeedType.SAS:
                     feedImg = "/Images/sas_logo_min.png";
                     break;
-                case DataFeedConstants.FeedType.Tab:
+                case GlobalConstants.DataFeedType.Tab:
                     feedImg = "/Images/tableau-icon_min.png";
                     break;
-                case DataFeedConstants.FeedType.Datasets:
+                case GlobalConstants.DataFeedType.Datasets:
                     feedImg = "/Images/Icons/Datasets.svg";
                     break;
-                case DataFeedConstants.FeedType.DataAssets:
+                case GlobalConstants.DataFeedType.DataAssets:
                     feedImg = "/Images/Icons/DataAssets.svg";
                     break;
-                case DataFeedConstants.FeedType.Exhibits:
+                case GlobalConstants.DataFeedType.Exhibits:
                     feedImg = "/Images/Icons/Business Intelligence.svg";
                     break;
             }
@@ -40,19 +35,19 @@ namespace Sentry.data.Core.Helpers
 
             switch (feedType)
             {
-                case DataFeedConstants.FeedType.SAS:
+                case GlobalConstants.DataFeedType.SAS:
                     feedUrl = feedId;
                     break;
-                case DataFeedConstants.FeedType.Tab:
+                case GlobalConstants.DataFeedType.Tab:
                     feedUrl = feedId;
                     break;
-                case DataFeedConstants.FeedType.Datasets:
+                case GlobalConstants.DataFeedType.Datasets:
                     feedUrl = "/Dataset/Detail/" + feedId;
                     break;
-                case DataFeedConstants.FeedType.DataAssets:
+                case GlobalConstants.DataFeedType.DataAssets:
                     feedUrl = feedId;
                     break;
-                case DataFeedConstants.FeedType.Exhibits:
+                case GlobalConstants.DataFeedType.Exhibits:
                     feedUrl = "/BusinessIntelligence/Detail/" + feedId;
                     break;
             }

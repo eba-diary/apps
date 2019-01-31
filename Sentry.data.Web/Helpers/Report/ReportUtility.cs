@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Sentry.data.Core;
-using System.Text;
 using System.Web.Mvc;
 using static Sentry.data.Core.RetrieverJobOptions;
 
@@ -75,17 +73,27 @@ namespace Sentry.data.Web.Helpers
 
             return result;
         }
-        public static BaseDatasetModel setupLists(IReportContext _reportContext, BaseDatasetModel model)
-        {
-            var temp = GetCategoryList(_reportContext).ToList();
 
-            temp.Add(new SelectListItem()
+        
+        [Obsolete("The function is fine but I wanted that this should not use the domain context and these should all be Enums")]
+        public static void SetupLists(IDatasetContext _datasetContext, BaseEntityModel model)
+        {
+            var temp = GetCategoryList(_datasetContext).ToList();
+
+            if(model.DatasetCategoryIds?.Count > 0)
             {
-                Text = "Pick a Category",
-                Value = "0",
-                Selected = true,
-                Disabled = true
-            });
+                foreach (var cat in model.DatasetCategoryIds)
+                {
+                   foreach(var t in temp)
+                    {
+                        if(t.Value == cat.ToString())
+                        {
+                            t.Selected = true;
+                        }
+                    }
+                }
+            }
+
 
             model.AllCategories = temp.OrderBy(x => x.Value);
 
@@ -101,14 +109,17 @@ namespace Sentry.data.Web.Helpers
             });
 
             model.AllFrequencies = temp.OrderBy(x => x.Value);
+
+
+
             model.AllDataFileTypes = Enum.GetValues(typeof(ReportType)).Cast<ReportType>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
 
-            return model;
         }
-        public static IEnumerable<SelectListItem> GetCategoryList(IReportContext _reportContext)
+        public static IEnumerable<SelectListItem> GetCategoryList(IDatasetContext _datasetContext)
         {
-            IEnumerable<SelectListItem> var = _reportContext.Categories.ToList().Select((c) => new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
+            IEnumerable<SelectListItem> var = _datasetContext.Categories.Where(x=> x.ObjectType == GlobalConstants.DataEntityTypes.REPORT).
+                                                                                            Select((c) => new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
 
             return var;
         }
@@ -173,7 +184,7 @@ namespace Sentry.data.Web.Helpers
                 dFileExtensions = _datasetContext.FileExtensions
                     .Select((c) => new SelectListItem
                     {
-                        Selected = c.Name.Contains("ANY") ? true : false,
+                        Selected = c.Name.Contains("ANY"),
                         Text = c.Name.Trim(),
                         Value = c.Id.ToString()
                     });
@@ -183,7 +194,7 @@ namespace Sentry.data.Web.Helpers
                 dFileExtensions = _datasetContext.FileExtensions
                     .Select((c) => new SelectListItem
                     {
-                        Selected = c.Id == id ? true : false,
+                        Selected = c.Id == id,
                         Text = c.Name.Trim(),
                         Value = c.Id.ToString()
                     });
