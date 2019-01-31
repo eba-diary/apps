@@ -214,7 +214,7 @@ namespace Sentry.data.Core
             dto.FrequencyDescription = Enum.GetName(typeof(ReportFrequency), ds.Metadata.ReportMetadata.Frequency) ?? "Not Specified";
             dto.TagNames = ds.Tags.Select(x => x.Name).ToList();
             dto.CanManageReport = user.CanManageReports;
-            dto.CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "gray";
+            dto.CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "darkgray";
             dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
 
             //return dto;
