@@ -238,6 +238,13 @@ ul.list-group-indented {
 
 .filterBorder_blueGray { border: 1px solid #285780; }
 
+.filterBorder_darkblue { border: 1px solid #003da5; }
+
+.filterHead_darkblue {
+    border-bottom: 1px solid #003da5 !important;
+    background-color: #003da5 !important;
+}
+
 .filterHead_blue
 { 
     border-bottom: 1px solid #003DA5 !important;
@@ -592,6 +599,28 @@ tr.categoryBanner-blue th.sorting_asc {
 
 tr.categoryBanner-blue th.sorting_desc {
     background-color: #00A3E0 !important;
+}
+
+.categoryBanner-darkgray {
+    background-color: #53565a !important;
+    color: #fff;
+}
+
+    .categoryBanner-darkgray span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 70px;
+        display: block;
+        margin: auto;
+    }
+
+tr.categoryBanner-darkgray th.sorting_asc {
+    background-color: #9e9fa1 !important;
+}
+
+tr.categoryBanner-darkgray th.sorting_desc {
+    background-color: #9e9fa1 !important;
 }
 
 /*.category-claim {
@@ -1250,6 +1279,11 @@ tr.categoryBanner-blue th.sorting_desc {
     border-left: 6px solid #9E9FA1;
 }
 
+.borderSide_darkgray {
+    border: 1.5px solid #53565a;
+    border-left: 6px solid #53565a;
+}
+
 .borderSide_blue 
 {
     border: 1.5px solid #00A3E0;
@@ -1477,6 +1511,8 @@ tr.categoryBanner-blue th.sorting_desc {
 .white { color: white !important; }
 
 .gray { color: gray; }
+
+.darkgray { color: #53565a; }
 
 .blue{ color: #003DA5; }
 

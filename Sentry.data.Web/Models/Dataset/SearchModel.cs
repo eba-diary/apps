@@ -13,11 +13,19 @@ namespace Sentry.data.Web
 
             Sentry.Associates.Associate sentryAssociate = _associateInfoProvider.GetAssociateInfo(ds.SentryOwnerName);
 
-            if(ds.DatasetCategories.Count > 1)
+            if (ds.DatasetCategories.Count > 1)
             {
-                this.Color = "gray";
-                this.Category = "Multiple";
-                this.AbbreviatedCategory = "Multiple";
+                List<string> catNameList = new List<string>();
+
+                foreach (Category cat in ds.DatasetCategories)
+                {
+                    // add either Name or Abbreviated Name (if exists)
+                    catNameList.Add((!string.IsNullOrWhiteSpace(cat.AbbreviatedName)) ? cat.AbbreviatedName : cat.Name);
+                }
+
+                this.Color = "darkgray";
+                this.Category = string.Join(", ", catNameList);
+                this.AbbreviatedCategory = this.Category;
                 this.BannerColor = "categoryBanner-" + this.Color;
                 this.BorderColor = "borderSide_" + this.Color;
             }
@@ -30,6 +38,8 @@ namespace Sentry.data.Web
                 this.BorderColor = "borderSide_" + this.Color;
             }
 
+            this.Categories = ds.DatasetCategories.Select(x => x.Name).ToList();
+            this.CategoryNames = string.Join(", ", this.Categories);
             this.DatasetName = ds.DatasetName;
             this.DatasetId = ds.DatasetId;
             this.DatasetDesc = ds.DatasetDesc;
@@ -67,7 +77,9 @@ namespace Sentry.data.Web
         }
 
         public string Category { get; set; }
+        public List<string> Categories { get; set; }
         public string AbbreviatedCategory { get; set; }
+        public string CategoryNames { get; set; }
 
         public string DatasetName { get; set; }
 

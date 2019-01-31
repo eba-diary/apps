@@ -268,28 +268,9 @@
                     '<span class="' + cat.split(" ").join("_").toLowerCase() + '_filter">' + cat + " : " + tag.text + '</span>'
                 );
 
-                //if you want to turn on color.
-                //$('.other_filter').parent().css('background-color', 'gold');
-                //$('.measure_group_filter').parent().css('background-color', 'gold');
-                //$('.business_group_filter').parent().css('background-color', 'gold');
-                //$('.attribute_group_filter').parent().css('background-color', 'gold');
-                //$('.report_type_filter').parent().css('background-color', 'plum');
-                //$('.category_filter').parent().css('background-color', '#00A3E0');
-
                 return $state;
             };
 
-            //$('body').on('click', ".ul-dataset-list-item", function (e) {
-            //    //console.log($(e.target).hasClass("disregardParentClick"));
-            //    //console.log($(e.target).closest("a").attr('href'));
-            //    //console.log($(e.target).closest(".ul-dataset-list-item").attr('href'));
-
-            //    if ($(e.target).hasClass("disregardParentClick") === false) {
-            //        window.location.replace($(this).closest(".ul-dataset-list-item").attr('href'));
-            //    } else {
-            //        //window.location.replace($(e.target).closest("a").attr('href'));
-            //    }
-            //});
 
             $('body').on('mouseenter', ".ul-dataset-list-item", function (e) {
                 $(this).css('background-color', $(this).css("border-color").slice(0, -1) + ', 0.1)')
@@ -330,8 +311,6 @@
             $('#filterSelector').on('select2:unselect', function (e) {
                 // Do something
                 var data = e.params.data;
-                //console.log('UNSELECT');
-                //console.log(data);
 
                 window.vm.RemoveSelection(data.id);
 
@@ -350,8 +329,12 @@
 
             this.Count = ko.computed(function () {
                 var items = ko.utils.arrayFilter(window.vm.searchResults(), function (prod) {
-                    if (Title == prod.Category && Category == 'Category') {
-                        return prod;
+                    if (Category == 'Category') {
+                        for (var i = 0; i < prod.Categories.length; i++) {
+                            if (prod.Categories[i] === Title) {
+                                return prod;
+                            }
+                        }
                     }
                     else if (Title == prod.SentryOwner && Category == 'Sentry Owner') {
                         return prod;
@@ -506,6 +489,7 @@
             self.BannerColor = data.BannerColor;
             self.BorderColor = data.BorderColor;
 
+            self.Categories = data.Categories;
             self.DistinctFileExtensions = data.DistinctFileExtensions;
 
             self.PageViews = data.PageViews;
@@ -682,7 +666,6 @@
             self.FilterExhibits = function (exhibits) {
                 //First grab all the selected category ID's
                 var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
                     if (feature.substring(0, 3) == '2_0') {
                         return feature;
                     }
@@ -709,10 +692,13 @@
                     exhibits = exhibits.filter(function (item) {
 
                         for (var i = 0; i < selectedCategories.length; i++) {
-                            if (item.Category == selectedCategories[i].Title) {
-                                return true;
+                            for (var j = 0; j < item.Categories.length; j++) {
+                                if (item.Categories[j] === selectedCategories[i].Title) {
+                                    return true;
+                                }
                             }
                         }
+
                         return false;
                     });
                 }
@@ -1024,7 +1010,7 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new FilterCategory('Category', temp, 'blue'));
+                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
                 temp = [];
 
 
@@ -1051,7 +1037,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'green'));
+                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'darkblue'));
                 temp = [];
 
 
@@ -1062,7 +1048,6 @@
                         if (!(ext in extensionLookup)) {
                             extensionLookup[ext] = 1;
                             self.ExtensionFilters.push(new Filter(pageType + '3_' + counter, ext, 'Extension'));
-                            //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
 
                             temp.push(new Filter(pageType + '3_' + counter, ext, 'Extension'));
                             counter++;
@@ -1078,36 +1063,25 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Extension', temp, 'plum'));
+                self.AllFilters.push(new FilterCategory('Extension', temp, 'darkblue'));
             };
 
             self.PopulateExhibitFilters = function (exhibits) {
                 var temp = [];
                 var pageType = '2_'
-
-                //CATEGORY FILTER
-                var param = getParameterByName('category');
-
-                for (var item, i = 0; item = exhibits[i++];) {
-                    var category = item.Category;
-
-                    if (!(category in categoryLookup)) {
-                        categoryLookup[category] = 1;
-                        self.CategoryFilters.push(new Filter(pageType + '0_' + i, category, 'Category'));
-                        //self.SearchFilters.push(new Filter('0_' + i, category, 10));
-
-                        temp.push(new Filter(pageType + '0_' + i, category, 'Category'));
-
-                        if (category == param) {
-                            self.SelectedFilters.push(pageType + '0_' + i);
-                        }
-
-                    }
-                }
-
                 var item;
 
+                //CATEGORY FILTER
+                for (var item, i = 0; item = exhibits[i++];) {
+                    for (var cat, j = 0; cat = item.Categories[j++];) {
+                        if (!(cat in categoryLookup)) {
+                            categoryLookup[cat] = 1;
+                            self.CategoryFilters.push(new Filter(pageType + '0_' + i, cat, 'Category'));
 
+                            temp.push(new Filter(pageType + '0_' + i, cat, 'Category'));
+                        }
+                    }
+                }
                 ko.utils.arrayForEach(self.AllFilters(), function (v) {
                     if (v.Name == 'Category') {
                         item = v;
@@ -1117,8 +1091,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-
-                self.AllFilters.push(new FilterCategory('Category', temp, 'blue'));
+                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
                 temp = [];
 
 
@@ -1145,7 +1118,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Report Type', temp, 'plum'));
+                self.AllFilters.push(new FilterCategory('Report Type', temp, 'darkblue'));
                 temp = [];
 
                 //TAG FILTER
@@ -1201,23 +1174,10 @@
                         temp = item.Filters().concat(temp);
                         ko.utils.arrayRemoveItem(self.AllFilters(), item);
                     }
-                    self.AllFilters.push(new FilterCategory(group, temp, 'gold'));
+                    self.AllFilters.push(new FilterCategory(group, temp, 'darkblue'));
 
                     temp = [];
                 }
-
-               
-
-                //var xyz = exhibits.map(item => item.tags.Group).reduce((prev, curr) => prev.concat(curr), []).filter((item, i, arr) => arr.indexOf(item) === i);
-
-                //console.log(xyz);                
-
-                //for (var group, i = 0; group = tagGroups[i++];) {
-                //    self.AllFilters.push(new FilterCategory(group, temp, 'gold'));
-                //}
-                //self.AllFilters.push(new FilterCategory('Blah', temp, 'gold'));
-
-                
 
             };
 
@@ -1255,7 +1215,7 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new FilterCategory('Category', temp, 'blue'));
+                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
                 temp = [];
 
 
@@ -1282,7 +1242,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'green'));
+                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'darkblue'));
                 temp = [];
 
 
@@ -1309,7 +1269,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Extension', temp, 'plum'));
+                self.AllFilters.push(new FilterCategory('Extension', temp, 'darkblue'));
 
                 //TAG FILTER
                 counter = 0; //Needs seperate counter as multiple objects can appear per iteration
@@ -1337,7 +1297,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Tag', temp, 'gold'));
+                self.AllFilters.push(new FilterCategory('Tag', temp, 'darkblue'));
                 temp = [];
             };
 
@@ -1389,9 +1349,6 @@
                 var mappedTasks = $.map(allData, function (item) { return new Dataset(item) });
 
                 self.datasets(self.datasets().concat(mappedTasks));
-
-                //request.send();
-                //request2.send();
 
                 self.populateFilters();
 
@@ -1516,8 +1473,8 @@
             };
         }
 
-
         $(document).ready(function () {
+
             window.vm = new ListViewModel();
             ko.applyBindings(vm);
 
