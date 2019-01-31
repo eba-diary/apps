@@ -348,8 +348,12 @@
 
             this.Count = ko.computed(function () {
                 var items = ko.utils.arrayFilter(window.vm.searchResults(), function (prod) {
-                    if (Title == prod.Category && Category == 'Category') {
-                        return prod;
+                    if (Category == 'Category') {
+                        for (var i = 0; i < prod.Categories.length; i++) {
+                            if (prod.Categories[i] === Title) {
+                                return prod;
+                            }
+                        }
                     }
                     else if (Title == prod.SentryOwner && Category == 'Sentry Owner') {
                         return prod;
@@ -519,6 +523,7 @@
             self.BannerColor = data.BannerColor;
             self.BorderColor = data.BorderColor;
 
+            self.Categories = data.Categories;
             self.DistinctFileExtensions = data.DistinctFileExtensions;
             self.BusinessUnits = data.BusinessUnits;
             self.DatasetFunctions = data.DatasetFunctions;
@@ -699,7 +704,6 @@
             self.FilterExhibits = function (exhibits) {
                 //First grab all the selected category ID's
                 var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
                     if (feature.substring(0, 3) == '2_0') {
                         return feature;
                     }
@@ -726,10 +730,13 @@
                     exhibits = exhibits.filter(function (item) {
 
                         for (var i = 0; i < selectedCategories.length; i++) {
-                            if (item.Category == selectedCategories[i].Title) {
-                                return true;
+                            for (var j = 0; j < item.Categories.length; j++) {
+                                if (item.Categories[j] === selectedCategories[i].Title) {
+                                    return true;
+                                }
                             }
                         }
+
                         return false;
                     });
                 }
@@ -1181,29 +1188,19 @@
             self.PopulateExhibitFilters = function (exhibits) {
                 var temp = [];
                 var pageType = '2_'
-
-                //CATEGORY FILTER
-                var param = getParameterByName('category');
-
-                for (var item, i = 0; item = exhibits[i++];) {
-                    var category = item.Category;
-
-                    if (!(category in categoryLookup)) {
-                        categoryLookup[category] = 1;
-                        self.CategoryFilters.push(new Filter(pageType + '0_' + i, category, 'Category'));
-                        //self.SearchFilters.push(new Filter('0_' + i, category, 10));
-
-                        temp.push(new Filter(pageType + '0_' + i, category, 'Category'));
-
-                        if (category == param) {
-                            self.SelectedFilters.push(pageType + '0_' + i);
-                        }
-
-                    }
-                }
-
                 var item;
 
+                //CATEGORY FILTER
+                for (var item, i = 0; item = exhibits[i++];) {
+                    for (var cat, j = 0; cat = item.Categories[j++];) {
+                        if (!(cat in categoryLookup)) {
+                            categoryLookup[cat] = 1;
+                            self.CategoryFilters.push(new Filter(pageType + '0_' + i, cat, 'Category'));
+
+                            temp.push(new Filter(pageType + '0_' + i, cat, 'Category'));
+                        }
+                    }
+                }
                 ko.utils.arrayForEach(self.AllFilters(), function (v) {
                     if (v.Name == 'Category') {
                         item = v;
@@ -1213,7 +1210,6 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-
                 self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
                 temp = [];
 

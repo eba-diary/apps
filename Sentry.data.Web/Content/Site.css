@@ -602,6 +602,27 @@ tr.categoryBanner-blue th.sorting_desc {
     background-color: #00A3E0 !important;
 }
 
+.categoryBanner-darkgray {
+    background-color: #53565a !important;
+    color: #fff;
+}
+    .categoryBanner-darkgray span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: 70px;
+        display: block;
+        margin: auto;
+    }
+
+tr.categoryBanner-darkgray th.sorting_asc {
+    background-color: #9e9fa1 !important;
+}
+
+tr.categoryBanner-darkgray th.sorting_desc {
+    background-color: #9e9fa1 !important;
+}
+
 /*.category-claim {
     background-color: #005844;
     color: #FFFFFF;
@@ -1259,6 +1280,11 @@ tr.categoryBanner-blue th.sorting_desc {
     border-left: 6px solid lightgrey;
 }
 
+.borderSide_darkgray {
+    border: 1.5px solid #53565a;
+    border-left: 6px solid #53565a;
+}
+
 .borderSide_blue {
     border: 1.5px solid #00A3E0;
     border-left: 6px solid #00A3E0;
@@ -1507,6 +1533,9 @@ tr.categoryBanner-blue th.sorting_desc {
 
 .gray {
     color: gray;
+}
+.darkgray {
+    color: #53565a;
 }
 
 .blue {
