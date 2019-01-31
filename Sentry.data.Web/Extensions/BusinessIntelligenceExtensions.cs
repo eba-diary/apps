@@ -28,6 +28,7 @@ namespace Sentry.data.Web
                 LocationType = new Uri(model.Location)?.Scheme,
                 FrequencyId = model.FrequencyId.Value,
                 FileTypeId = model.FileTypeId,
+                GetLatest = model.GetLatest,
                 TagIds = (model.TagIds == null) ? new List<string>() : model.TagIds?.Split(',').ToList()
             };
         }

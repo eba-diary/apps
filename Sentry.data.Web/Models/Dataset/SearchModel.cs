@@ -54,7 +54,16 @@ namespace Sentry.data.Web
                 ReportType type = (ReportType)ds.DatasetFileConfigs.First().FileTypeId;
                 this.DistinctFileExtensions = new List<string> { type.ToString() };
                 this.Tags = ds.Tags.Select(s => s.GetSearchableTag()).ToList();
-                Location = (!String.IsNullOrWhiteSpace(ds.Metadata.ReportMetadata.Location)) ? ds.Metadata.ReportMetadata.Location : null;
+                
+                if (!String.IsNullOrWhiteSpace(ds.Metadata.ReportMetadata.Location))
+                {
+                    Location = (ds.Metadata.ReportMetadata.GetLatest) ?ds.Metadata.ReportMetadata.Location + GlobalConstants.BusinessObjectExhibit.GET_LATEST_URL_PARAMETER : ds.Metadata.ReportMetadata.Location;
+                }
+                else
+                {
+                    Location = null;
+                }
+                //Location = (!String.IsNullOrWhiteSpace(ds.Metadata.ReportMetadata.Location)) ? ds.Metadata.ReportMetadata.Location : null;
                 LocationType = (!String.IsNullOrWhiteSpace(ds.Metadata.ReportMetadata.LocationType)) ? ds.Metadata.ReportMetadata.LocationType : null;
                 this.UpdateFrequency = (Enum.GetName(typeof(ReportFrequency), ds.Metadata.ReportMetadata.Frequency) != null) ? Enum.GetName(typeof(ReportFrequency), ds.Metadata.ReportMetadata.Frequency) : "Not Specified";
                 this.Link = "/BusinessIntelligence/Detail/" + ds.DatasetId;

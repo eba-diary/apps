@@ -9,6 +9,7 @@ namespace Sentry.data.Core
         public string LocationType { get; set; }
         public int FileTypeId { get; set; }
         public int FrequencyId { get; set; }
-
+        public bool GetLatest { get; set; }
+        public string ReportLink { get; set; }
     }
 }
