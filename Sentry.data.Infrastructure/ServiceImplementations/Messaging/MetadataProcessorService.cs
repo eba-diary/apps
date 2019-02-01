@@ -21,7 +21,7 @@ namespace Sentry.data.Infrastructure
 
             IMessageConsumer<string> consumer;
 
-            consumer = GetKafkamessageConsumer("jcg-dotnet-group-99");
+            consumer = GetKafkamessageConsumer(Configuration.Config.GetHostSetting("KafkaConsumerGroup"));
 
             Messaging.Common.MetadataProcessorService service = new Messaging.Common.MetadataProcessorService(consumer, GetMessageHandlers(), cfg);
             service.ConsumeMessages();
