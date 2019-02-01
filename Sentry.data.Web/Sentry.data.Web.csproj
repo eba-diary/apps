@@ -394,6 +394,7 @@
     <Content Include="Content\dataset-detail.css" />
     <Content Include="Content\favorites.css" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Content\home.css" />
     <Content Include="Content\query-builder.default.css" />
     <Content Include="Content\query-builder.default.min.css" />
     <Content Include="Content\query-tool.css" />
@@ -412,6 +413,9 @@
     <Content Include="Images\Icons\details_close.png" />
     <Content Include="Images\Icons\details_open.png" />
     <Content Include="Images\Icons\Exhibits.svg" />
+    <Content Include="Images\photo-businessintelligence.jpg" />
+    <Content Include="Images\photo-dataassets.jpg" />
+    <Content Include="Images\photo-datasets.jpg" />
     <Content Include="Images\SHO_Aerial_10-4-17.jpg" />
     <Content Include="Images\SHO_Aerial_10-4-17.png" />
     <Content Include="Images\SHO_SentryWorld_Aerial.jpg" />
