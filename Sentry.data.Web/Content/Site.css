@@ -1527,6 +1527,10 @@ tr.categoryBanner-darkgray th.sorting_desc {
     border-bottom: 2px solid #285780 !important;
 }
 
+.darkgray { color: #53565a; }
+
+.blue{ color: #003DA5; }
+
 .white {
     color: white !important;
 }

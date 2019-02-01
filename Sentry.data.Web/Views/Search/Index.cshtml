@@ -268,28 +268,9 @@
                     '<span class="' + cat.split(" ").join("_").toLowerCase() + '_filter">' + cat + " : " + tag.text + '</span>'
                 );
 
-                //if you want to turn on color.
-                //$('.other_filter').parent().css('background-color', 'gold');
-                //$('.measure_group_filter').parent().css('background-color', 'gold');
-                //$('.business_group_filter').parent().css('background-color', 'gold');
-                //$('.attribute_group_filter').parent().css('background-color', 'gold');
-                //$('.report_type_filter').parent().css('background-color', 'plum');
-                //$('.category_filter').parent().css('background-color', '#00A3E0');
-
                 return $state;
             };
 
-            //$('body').on('click', ".ul-dataset-list-item", function (e) {
-            //    //console.log($(e.target).hasClass("disregardParentClick"));
-            //    //console.log($(e.target).closest("a").attr('href'));
-            //    //console.log($(e.target).closest(".ul-dataset-list-item").attr('href'));
-
-            //    if ($(e.target).hasClass("disregardParentClick") === false) {
-            //        window.location.replace($(this).closest(".ul-dataset-list-item").attr('href'));
-            //    } else {
-            //        //window.location.replace($(e.target).closest("a").attr('href'));
-            //    }
-            //});
 
             $('body').on('mouseenter', ".ul-dataset-list-item", function (e) {
                 $(this).css('background-color', $(this).css("border-color").slice(0, -1) + ', 0.1)')
@@ -1166,7 +1147,6 @@
                         if (!(ext in extensionLookup)) {
                             extensionLookup[ext] = 1;
                             self.ExtensionFilters.push(new Filter(pageType + '3_' + counter, ext, 'Extension'));
-                            //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
 
                             temp.push(new Filter(pageType + '3_' + counter, ext, 'Extension'));
                             counter++;
@@ -1547,9 +1527,6 @@
 
                 self.datasets(self.datasets().concat(mappedTasks));
 
-                //request.send();
-                //request2.send();
-
                 self.populateFilters();
 
                 $('#dataColumn').show();
@@ -1673,8 +1650,8 @@
             };
         }
 
-
         $(document).ready(function () {
+
             window.vm = new ListViewModel();
             ko.applyBindings(vm);
 
