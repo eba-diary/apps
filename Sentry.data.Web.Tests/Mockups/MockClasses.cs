@@ -16,8 +16,7 @@ namespace Sentry.data.Web.Tests
             Dataset ds = new Dataset()
             {
                 DatasetId = 1000,
-                Category = "Claim",
-                DatasetCategory = MockCategories()[0],
+                DatasetCategories = MockCategories(),
                 DatasetName = "Claim Dataset",
                 DatasetDesc = "Test Claim Dataset",
                 DatasetInformation = "Specific Information regarding datasetfile consumption",
@@ -90,7 +89,7 @@ namespace Sentry.data.Web.Tests
                 DataElementCreate_DTM = DateTime.Now,
                 DataElementChange_DTM = DateTime.Now,
                 DataElement_CDE = "F",
-                DataElement_DSC = DataElementCode.DataFile,
+                DataElement_DSC = GlobalConstants.DataElementDescription.DATA_FILE,
                 DataElement_NME = dsfc.Name,
                 LastUpdt_DTM = DateTime.Now,
                 SchemaIsPrimary = true,

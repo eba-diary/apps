@@ -32,7 +32,7 @@ namespace Sentry.data.Web.Tests
             var vr = rtjob.GetUri().ToString();
 
             Assert.IsTrue(vr == new Uri(Path.Combine("file:///", Config.GetHostSetting("FileShare"), "DatasetLoader/")).ToString()
-                + rtjob.DatasetConfig.ParentDataset.Category.ToLower() + "/" 
+                + rtjob.DatasetConfig.ParentDataset.DatasetCategories.First().Name.ToLower() + "/" 
                 + rtjob.DatasetConfig.ParentDataset.DatasetName.ToLower().Replace(' ', '_') + "/default");
         }
 

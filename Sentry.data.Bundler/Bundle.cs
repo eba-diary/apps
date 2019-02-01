@@ -16,12 +16,12 @@ namespace Sentry.data.Bundler
     class Bundle
     {
         private BundleRequest _request = null;
-        private IDatasetService _s3Service;
+        private IS3ServiceProvider _s3Service;
         private string _baseWorkingDir;
         private IDatasetContext _dscontext;
         private Event e;
 
-        public Bundle(IDatasetContext dscontext, IDatasetService dsService)
+        public Bundle(IDatasetContext dscontext, IS3ServiceProvider dsService)
         {
             //_s3Service = new S3ServiceProvider();
             _baseWorkingDir = Configuration.Config.GetHostSetting("BundleBaseWorkDirectory");

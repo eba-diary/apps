@@ -207,10 +207,4 @@ namespace Sentry.data.Core.Entities.Metadata
 
     }
 
-    public class DataElementCode
-    {
-        public const String BusinessTerm = "Business Term";
-        public const String Lineage = "Lineage";
-        public const String DataFile = "Data File";
-    }
 }

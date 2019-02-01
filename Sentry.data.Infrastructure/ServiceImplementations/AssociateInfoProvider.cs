@@ -1,15 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
 using Sentry.Associates;
 using System.Linq;
+using Sentry.data.Core;
 
 namespace Sentry.data.Infrastructure
 {
     public class AssociateInfoProvider : IAssociateInfoProvider
     {
-        private IAssociatesServiceClient _associateService;
-        private Boolean _localCacheProcessing = false;
-        private Object _lockObject = new Object();
+        private readonly IAssociatesServiceClient _associateService;
+        private bool _localCacheProcessing = false;
+        private object _lockObject = new object();
 
 
         public AssociateInfoProvider()

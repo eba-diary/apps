@@ -1,6 +1,6 @@
 ﻿@model List<Sentry.data.Core.DataFeedItem>
 
-@{ 
+@{
     string color = "green";
 }
 
@@ -16,39 +16,35 @@
 {
     <div class="feedItem">
 
-        @if(item.Feed.Name == "Datasets" || item.Feed.Name == "Data Assets" || item.Feed.Name == "Business Intelligence")
-        {
-            <img src="@item.Img" class="feedImg" style="width: 20px; filter: invert(100%); opacity: 0.999" />
-        } else
-        {
-            <img src="@item.Img" class="feedImg" />
-        }
+        <div class="display-table">
+            <div class="display-tablecell text-middle">
+                <img src="@item.Img" class="feedImg" />
+            </div>
+            <div class="display-tablecell text-middle">
+                <div class="feedName lt_@color">@item.Feed.Name</div>
+            </div>
+        </div>
 
-        <div class="feedName lt_@color">@item.Feed.Name</div>
+        <p class="feed-date">@Sentry.data.Web.Helpers.Utility.TimeDisplay(item.PublishDate)</p>
 
         @if (item.Title.Length > 50)
         {
-            <h5 class="@color" data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle()</h5>
+            <h6 class="@color" data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle()</h6>
         }
         else
         {
-            <h5 class="@color">@item.DisplayTitle()</h5>
+            <h6 class="@color">@item.DisplayTitle()</h6>
         }
 
-        @if (item.Feed.Name == "Datasets")
+        @if (item.Feed.Name == "Datasets" || item.Feed.Name == "Business Intelligence")
         {
-            <a href="@item.Url" target="_blank" class="pointer">View this Dataset</a>
-        }
-        else if (item.Feed.Name == "Business Intelligence")
-        {
-            <a href="@item.Url" target="_blank" class="pointer">View this Exhibit</a>
+            <a href="@item.Url" target="_blank" class="pointer">View &gt;</a>
         }
         else
         {
-            <a href = "@item.Url" target = "_blank" class="pointer">Read More</a>
+            <a href="@item.Url" target="_blank" class="pointer">Read more&hellip;</a>
         }
 
-        <p class="rightFloat">@Sentry.data.Web.Helpers.Utility.TimeDisplay(item.PublishDate)</p>
     </div>
 }
 

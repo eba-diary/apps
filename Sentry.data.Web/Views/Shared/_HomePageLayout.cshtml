@@ -1,9 +1,4 @@
-﻿@{
-    //bool isSubPage = (ViewData["menu"] == null || (bool)ViewData["menu"] == true) ? true : false;
-    bool isFluid = (ViewData["fluid"] == null || (bool)ViewData["fluid"] == false) ? false : true;
-}
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -17,7 +12,7 @@
 </head>
 <body class="prevent-animation">
     <!-- BEGIN SENTRY COMMON HEADER -->
-    @Html.Action("GetHeader", "Layout"@*, new { hasMenu = isSubPage }*@)
+    @Html.Action("GetHeader", "Layout")
     <!-- END SENTRY COMMON HEADER -->
     @*used for ajax $.ajaxSetup() in _Shared.js*@
     <form id="__AjaxAntiForgeryForm" action="#" method="post">@Html.AntiForgeryToken()</form>
@@ -45,7 +40,6 @@
                 url: "/api/v1/queryTool/sessions/primary",
                 dataType: "json",
                 success: function (msg) {
-                    console.log(msg);
                     $('#dscSession').attr("href", msg.livyURL + "/ui/session/" + msg.id);
                 }
             });

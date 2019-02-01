@@ -161,7 +161,6 @@
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="DomainContexts\datasetContext.cs" />
     <Compile Include="DomainContexts\dataAssetContext.cs" />
-    <Compile Include="DomainContexts\ReportContext.cs" />
     <Compile Include="DomainContexts\RequestContext.cs" />
     <Compile Include="HangfireFilters\DisableMultipleQueuedItemsFilter.cs" />
     <Compile Include="Helpers\TopicHelper.cs" />
@@ -234,7 +233,6 @@
     <Compile Include="ServiceImplementations\BOProvider.cs" />
     <Compile Include="ServiceImplementations\CLPFactory.cs" />
     <Compile Include="ServiceImplementations\DataFeedProvider.cs" />
-    <Compile Include="Interfaces\IAssociateInfoProvider.cs" />
     <Compile Include="Mappings\Primary\CategoryMapping.cs" />
     <Compile Include="Mappings\Primary\UserMapping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -286,6 +284,9 @@
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Interfaces\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\WinSCP.5.13.2\build\WinSCP.targets" Condition="Exists('..\packages\WinSCP.5.13.2\build\WinSCP.targets')" />

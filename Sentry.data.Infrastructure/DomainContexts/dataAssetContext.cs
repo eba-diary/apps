@@ -11,6 +11,8 @@ using Sentry.data.Core.Entities.Metadata;
 
 namespace Sentry.data.Infrastructure
 {
+    [Obsolete("Merge everything here into a common DomainContext")]
+
     public class dataAssetContext : NHWritableDomainContext, IDataAssetContext
     {
 
@@ -75,7 +77,7 @@ namespace Sentry.data.Infrastructure
 
             if(!string.IsNullOrWhiteSpace(dataElementCode))
             {
-                rawQuery = rawQuery.Where(x => x.DataElement_TYP == DataElementCode.BusinessTerm);
+                rawQuery = rawQuery.Where(x => x.DataElement_TYP == GlobalConstants.DataElementDescription.BUSINESS_TERM);
             }
             if (DataAsset_ID != null)
             {
@@ -123,7 +125,7 @@ namespace Sentry.data.Infrastructure
                 var predicate = PredicateBuilder.False<Lineage>();
 
                 var BusinessTermSources = Query<Lineage>()
-                    .Where(x => x.DataElement_TYP == DataElementCode.BusinessTerm)
+                    .Where(x => x.DataElement_TYP == GlobalConstants.DataElementDescription.BUSINESS_TERM)
                     .Where(x => x.DataElement_NME == DataObjectField_NME);
 
                 if (DataAsset_ID != null)
