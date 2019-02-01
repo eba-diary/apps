@@ -91,6 +91,8 @@ namespace Sentry.data.Web
                         Include("~/Content/query-builder.default.min.css").
                         Include("~/Content/query-tool.css").
                         Include("~/Content/dataset-detail.css").
+                        Include("~/Content/tags.css").
+                        Include("~/Content/create-edit-datasets.css").
                         Include("~/Content/favorites.css").
                         Include("~/Content/site.css"));
 

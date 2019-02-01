@@ -116,11 +116,10 @@ namespace Sentry.data.Web.Controllers
             switch (searchType)
             {
                 case "BusinessIntelligence":
-                    dsList = _datasetContext.GetExhibits().ToList();
+                    dsList = _datasetContext.Datasets.Where(x => x.DatasetType == GlobalConstants.DataEntityTypes.REPORT).ToList();
                     break;
                 case "Datasets":
-                    dsList = _datasetContext.Datasets.ToList();
-                    dsList = dsList.Where(w => w.DatasetType != "RPT").ToList();
+                    dsList = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityTypes.DATASET).ToList();
                     break;
                 default:
                     dsList = _datasetContext.Datasets.ToList();

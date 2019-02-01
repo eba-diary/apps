@@ -7,17 +7,13 @@ using Amazon;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Sentry.data.Core;
-using Sentry.NHibernate;
-using NHibernate;
 using System.IO;
-using Amazon.S3.Transfer;
 using Sentry.Common.Logging;
 using Amazon.S3.IO;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure
 {
-    public class S3ServiceProvider : IDatasetService
+    public class S3ServiceProvider : IS3ServiceProvider
     {
         private static S3ServiceProvider instance = null;
         private static readonly object padlock = new object();

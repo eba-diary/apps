@@ -29,7 +29,7 @@ namespace Sentry.data.Core
         }
         public override Uri CalcRelativeUri(RetrieverJob Job)
         {
-            string cat = Job.DatasetConfig.ParentDataset.DatasetCategory.Name.ToLower();
+            string cat = Job.DatasetConfig.ParentDataset.DatasetCategories.First().Name.ToLower();
             string dsname = Job.DatasetConfig.ParentDataset.DatasetName.Replace(' ', '_').ToLower();
             string dfcname = Job.DatasetConfig.Name.Replace(' ', '_').ToLower();
 

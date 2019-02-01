@@ -66,6 +66,10 @@ namespace Sentry.data.Web.Tests
             var mockUserService = MockRepository.GenerateStub<UserService>(mockDataAssetContext, mockExtendedUserInfoProvider, mockCurrentUserIdProvider);
             var mockSharedContextModel = MockRepository.GenerateStub<SharedContextModel>();
 
+            var mockDatasetService = MockRepository.GenerateStub<IDatasetService>();
+            
+            var mockEventService = MockRepository.GenerateStub<IEventService>();
+
             mockSharedContextModel.CurrentUser = user;
             mockUserService.Stub(x => x.GetCurrentUser()).Return(user != null ? user : MockUsers.App_DataMgmt_Admin_User());
 
@@ -100,12 +104,12 @@ namespace Sentry.data.Web.Tests
             mockDatasetContext.Stub(x => x.Categories).Return(MockClasses.MockCategories().AsQueryable());
             mockDatasetContext.Stub(x => x.GetCategoryById(0)).Return(MockClasses.MockCategories()[0]);
             mockDatasetContext.Stub(x => x.GetAllDatasetScopeTypes()).Return(MockClasses.MockScopeTypes());
-            mockDatasetContext.Stub(x => x.isDatasetNameDuplicate(ds.DatasetName, ds.Category)).Return(false);
+            mockDatasetContext.Stub(x => x.isDatasetNameDuplicate(ds.DatasetName, ds.DatasetCategories.First().Name)).Return(false);
             mockDatasetContext.Stub(x => x.GetNextStorageCDE()).Return(r.Next(0, 1000000));
 
             mockUserService.Stub(x => x.GetCurrentUser()).Return(user);
 
-            var dsc = new DatasetController(mockDatasetContext, mockS3Provider, mockUserService, mockSasProvider, mockAssociateService, mockRequestService);
+            var dsc = new DatasetController(mockDatasetContext, mockS3Provider, mockUserService, mockSasProvider, mockAssociateService, mockRequestService, mockDatasetService, mockEventService);
             dsc.SharedContext = mockSharedContextModel;
 
             return dsc;
