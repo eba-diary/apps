@@ -17,7 +17,7 @@
     <div class="navbar-form navbar-center">
         <div class="col-md-9 textCenter">
             <div class="searchBoxDS  has-feedback has-feedback-left">
-                <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Datasets..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('Datasets')" autocomplete="off" style="display: none;">
+                <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Datasets..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('Datasets'), event: {'keyup': searchResults.toFirstPage }" autocomplete="off" style="display: none;">
                 <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Exhibits and Dashboards..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('BusinessIntelligence')" autocomplete="off" style="display: none;">
                 <i class="form-control-feedback glyphicon glyphicon-search"></i>
             </div>
@@ -107,8 +107,38 @@
                         @*<select multiple="multiple" id="activeFilters " class="form-control select2-hidden-accessible"
                             data-bind="select2: { options: SearchFilters, width: '100%', selectedOptions: Select2Filters, optionsText: 'Title' }"></select>*@
                     </div>
-                    <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults">
+
+                    @* pagination controls *@
+                    <ul class="pagination">
+                        @* button to take you directly to the first page *@
+                        <li data-bind="css: { disabled: searchResults.isFirstPage() }" class="previous disabled">
+                            <a href="#" aria-label="First" data-bind="click: searchResults.toFirstPage" title="First">&laquo;</a>
+                        </li>
+                        @* button to take you to the prevoius page *@
+                        <li data-bind="css: { disabled: !searchResults.hasPreviousPage() }" class="previous disabled">
+                            <a href="#" aria-label="Previous" data-bind="click: searchResults.toPreviousPage" title="Previous">&lt;</a>
+                        </li>
+                        
+                        @* loop through the pages, building a button for each *@
+                        <!-- ko foreach: searchResults.pages -->
+                        <li data-bind="css: { active: $data == $parent.searchResults.pageNumber() }">
+                            <a href="#" data-bind="text: $data, click: $parent.searchResults.pageNumber.bind($data)"></a>
+                        </li>
+                        <!-- /ko -->
+
+                        @* button to take you to the next page*@
+                        <li data-bind="css: { disabled: !searchResults.hasNextPage() }" class="next disabled">
+                            <a href="#" aria-label="Next" data-bind="click: searchResults.toNextPage" title="Next">&gt;</a>
+                        </li>
+                        @* button to take you directly to the last page *@
+                        <li data-bind="css: { disabled: searchResults.isLastPage() }" class="next disabled">
+                            <a href="#" aria-label="Last" data-bind="click: searchResults.toLastPage" title="Last">&raquo;</a>
+                        </li>
+                    </ul>
+
+                    <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults.pageItems">
                         <li class="ul-dataset-list-item borderSide_gray boxShadowSm" style="background-color: white;" data-bind="css : BorderColor, click: TileClicked, attr: { title: PrimaryTitle }">
+                            <div data-bind="if: $index > 20"></div>
                             <div class="category-type-wrap">
                                 <div class="glyphicon glyphicon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none"></div>
                                 <div class="glyphicon glyphicon-star-empty btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite == false" style="display: none"></div>
@@ -150,7 +180,7 @@
                                             <span data-bind="text: ChangedDtm"></span>
                                             <!-- /ko -->
                                             <!-- ko if: Type === "RPT" -->
-                                            <span class=" textBold ownerDate" data-bind="css : Color">Update Frequency:&nbsp;</span>
+                                            <span class=" textBold ownerDate" data-bind="css : Color">Refresh Frequency:&nbsp;</span>
                                             <span data-bind="text: UpdateFrequency"></span>
 
                                             &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
@@ -163,7 +193,9 @@
                                 </div>
                             </div>
                         </li>
+
                     </ul>
+                    
                     <hr>
                     <!-- ko if: searchResults().length == 0 -->
                     <div>
@@ -197,6 +229,7 @@
         box-shadow: 2px 6px 10px #888888;
         cursor: pointer;
     }
+
 </style>
 
 @section Scripts {
@@ -205,25 +238,39 @@
             var $selector = $("#filterSelector").select2({
                 selectOnClose: false,
                 closeOnSelect: false,
+                templateSelection: formatTag,
                 placeholder: "There are no active filters.  Pick an option to the left or click here to begin filtering.",
             });
             $selector.select2({
                 selectOnClose: false,
                 closeOnSelect: false,
+                templateSelection: formatTag,
                 placeholder: "There are no active filters.  Pick an option to the left or click here to begin filtering.",
             });
 
-            //$('body').on('click', ".ul-dataset-list-item", function (e) {
-            //    //console.log($(e.target).hasClass("disregardParentClick"));
-            //    //console.log($(e.target).closest("a").attr('href'));
-            //    //console.log($(e.target).closest(".ul-dataset-list-item").attr('href'));
+            //This is fed into the Select2 Box to format tags.
+            function formatTag(tag) {     
+                var cat = "";
 
-            //    if ($(e.target).hasClass("disregardParentClick") === false) {
-            //        window.location.replace($(this).closest(".ul-dataset-list-item").attr('href'));
-            //    } else {
-            //        //window.location.replace($(e.target).closest("a").attr('href'));
-            //    }
-            //});
+                for (var i = 0; i < vm.AllFilters().length; i++) {
+                    for (var j = 0; j < vm.AllFilters()[i].Filters().length; j++) {
+                        if (vm.AllFilters()[i].Filters()[j].id === tag.id) {
+                            cat = vm.AllFilters()[i].Filters()[j].Category;
+                            break;
+                        }
+                    }
+                    if (cat !== "") {
+                        break;
+                    }
+                }
+
+                var $state = $(
+                    '<span class="' + cat.split(" ").join("_").toLowerCase() + '_filter">' + cat + " : " + tag.text + '</span>'
+                );
+
+                return $state;
+            };
+
 
             $('body').on('mouseenter', ".ul-dataset-list-item", function (e) {
                 $(this).css('background-color', $(this).css("border-color").slice(0, -1) + ', 0.1)')
@@ -238,8 +285,6 @@
             $('#filterSelector').on('select2:select', function (e) {
                 // Do something
                 var data = e.params.data;
-
-                console.log(data);
 
                 window.vm.SelectedFilters.push(data.id);
 
@@ -266,8 +311,6 @@
             $('#filterSelector').on('select2:unselect', function (e) {
                 // Do something
                 var data = e.params.data;
-                console.log('UNSELECT');
-                console.log(data);
 
                 window.vm.RemoveSelection(data.id);
 
@@ -286,8 +329,12 @@
 
             this.Count = ko.computed(function () {
                 var items = ko.utils.arrayFilter(window.vm.searchResults(), function (prod) {
-                    if (Title == prod.Category && Category == 'Category') {
-                        return prod;
+                    if (Category == 'Category') {
+                        for (var i = 0; i < prod.Categories.length; i++) {
+                            if (prod.Categories[i] === Title) {
+                                return prod;
+                            }
+                        }
                     }
                     else if (Title == prod.SentryOwner && Category == 'Sentry Owner') {
                         return prod;
@@ -302,6 +349,20 @@
                     else if (Category == 'Report Type') {
                         for (var i = 0; i < prod.DistinctFileExtensions.length; i++) {
                             if (prod.DistinctFileExtensions[i] == Title) {
+                                return prod;
+                            }
+                        }
+                    }
+                    else if (Category === 'Business Unit') {
+                        for (var i = 0; i < prod.BusinessUnits.length; i++) {
+                            if (prod.BusinessUnits[i] === Title) {
+                                return prod;
+                            }
+                        }
+                    }
+                    else if (Category === 'Function') {
+                        for (var i = 0; i < prod.DatasetFunctions.length; i++) {
+                            if (prod.DatasetFunctions[i] === Title) {
                                 return prod;
                             }
                         }
@@ -343,11 +404,12 @@
             self.HeadHide = 'hide_filterType_' + Name.replace(' ', '_');
 
             self.OrderedFilters = ko.computed(function () {
+
                 //First filter the list so that we only have filters that have a count greater than 0
                 var list = ko.utils.arrayFilter(self.Filters(), function (prod) {
                     return prod.Count() !== 0;
                 });
-                
+
                 //If the count is 0, hide the section.
                 if (list.length === 0) {
                     $("#" + self.HeadHide).hide();
@@ -399,8 +461,6 @@
             });
 
             self.TileClicked = function (item, e) {
-                console.log(e);
-                console.log(self.Type);
 
                 if ($(e.target).hasClass("btnFavorite") === true) {
                     return false;
@@ -444,7 +504,10 @@
             self.BannerColor = data.BannerColor;
             self.BorderColor = data.BorderColor;
 
+            self.Categories = data.Categories;
             self.DistinctFileExtensions = data.DistinctFileExtensions;
+            self.BusinessUnits = data.BusinessUnits;
+            self.DatasetFunctions = data.DatasetFunctions;
 
             self.PageViews = data.PageViews;
             self.Downloads = data.Downloads;
@@ -483,6 +546,8 @@
             self.SelectedFilters = ko.observableArray([]);
 
             self.CategoryFilters = ko.observableArray([]);
+            self.BusinessUnitFilters = ko.observableArray([]);
+            self.DatasetFunctionFilters = ko.observableArray([]);
             self.OwnerFilters = ko.observableArray([]);
             self.ExtensionFilters = ko.observableArray([]);
             self.TagFilters = ko.observableArray([]);
@@ -616,10 +681,10 @@
 
                 return datasets;
             };
+
             self.FilterExhibits = function (exhibits) {
                 //First grab all the selected category ID's
                 var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
                     if (feature.substring(0, 3) == '2_0') {
                         return feature;
                     }
@@ -646,13 +711,97 @@
                     exhibits = exhibits.filter(function (item) {
 
                         for (var i = 0; i < selectedCategories.length; i++) {
-                            if (item.Category == selectedCategories[i].Title) {
-                                return true;
+                            for (var j = 0; j < item.Categories.length; j++) {
+                                if (item.Categories[j] === selectedCategories[i].Title) {
+                                    return true;
+                                }
                             }
                         }
+
                         return false;
                     });
                 }
+
+
+                // now grab any selected business units
+                var selectedBusinessUnitIds = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
+                    if (feature.substring(0, 3) === '2_5') {
+                        return feature;
+                    }
+                });
+
+                var selectedBusinessUnitsList = [];
+                if (selectedBusinessUnitIds.length > 0) {
+                    var selectedBusinessUnits = ko.utils.arrayFilter(self.BusinessUnitFilters(), function (feature) {
+
+                        for (var i = 0; i < selectedBusinessUnitIds.length; i++) {
+                            if (feature.id === selectedBusinessUnitIds[i]) {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    });
+
+                    for (var i = 0; i < selectedBusinessUnits.length; i++) {
+                        selectedBusinessUnitsList.push(selectedBusinessUnits[i].Title);
+                    }
+
+                    // now apply the filter
+                    exhibits = exhibits.filter(function (item) {
+
+                        for (var i = 0; i < selectedBusinessUnits.length; i++) {
+                            for (var j = 0; j < item.BusinessUnits.length; j++) {
+                                if (item.BusinessUnits[j] === selectedBusinessUnits[i].Title) {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        return false;
+                    });
+                }
+
+
+                // next grab any selected Dataset Functions
+                var selectedDatasetFunctionIds = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
+                    if (feature.substring(0, 3) === '2_6') {
+                        return feature;
+                    }
+                });
+
+                var selectedDatasetFunctionsList = [];
+                if (selectedDatasetFunctionIds.length > 0) {
+                    var selectedDatasetFunctions = ko.utils.arrayFilter(self.DatasetFunctionFilters(), function (feature) {
+
+                        for (var i = 0; i < selectedDatasetFunctionIds.length; i++) {
+                            if (feature.id === selectedDatasetFunctionIds[i]) {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    });
+
+                    for (var i = 0; i < selectedDatasetFunctions.length; i++) {
+                        selectedDatasetFunctionsList.push(selectedDatasetFunctions[i].Title);
+                    }
+
+                    // now apply the filter
+                    exhibits = exhibits.filter(function (item) {
+
+                        for (var i = 0; i < selectedDatasetFunctions.length; i++) {
+                            for (var j = 0; j < item.DatasetFunctions.length; j++) {
+                                if (item.DatasetFunctions[j] === selectedDatasetFunctions[i].Title) {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        return false;
+                    });
+                }
+                
 
                 //First grab all the selected owner ID's
                 var selectedOwnerIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
@@ -756,6 +905,7 @@
 
                 return exhibits;
             };
+
             self.FilterGeneric = function (allObjects) {
                 //First grab all the selected category ID's
                 var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
@@ -925,9 +1075,10 @@
 
                 return allObjects;
             };
+
             self.PopulateDatasetFilters = function (datasets) {
                 var temp = [];
-                var pageType = '1_'
+                var pageType = '1_';
 
                 //CATEGORY FILTER
                 var param = getParameterByName('category');
@@ -959,9 +1110,8 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new FilterCategory('Category', temp, 'blue'));
+                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
                 temp = [];
-
 
 
                 //SENTRYOWNER FILTER
@@ -986,7 +1136,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'green'));
+                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'darkblue'));
                 temp = [];
 
 
@@ -997,7 +1147,6 @@
                         if (!(ext in extensionLookup)) {
                             extensionLookup[ext] = 1;
                             self.ExtensionFilters.push(new Filter(pageType + '3_' + counter, ext, 'Extension'));
-                            //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
 
                             temp.push(new Filter(pageType + '3_' + counter, ext, 'Extension'));
                             counter++;
@@ -1013,35 +1162,25 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Extension', temp, 'plum'));
+                self.AllFilters.push(new FilterCategory('Extension', temp, 'darkblue'));
             };
+
             self.PopulateExhibitFilters = function (exhibits) {
                 var temp = [];
                 var pageType = '2_'
-
-                //CATEGORY FILTER
-                var param = getParameterByName('category');
-
-                for (var item, i = 0; item = exhibits[i++];) {
-                    var category = item.Category;
-
-                    if (!(category in categoryLookup)) {
-                        categoryLookup[category] = 1;
-                        self.CategoryFilters.push(new Filter(pageType + '0_' + i, category, 'Category'));
-                        //self.SearchFilters.push(new Filter('0_' + i, category, 10));
-
-                        temp.push(new Filter(pageType + '0_' + i, category, 'Category'));
-
-                        if (category == param) {
-                            self.SelectedFilters.push(pageType + '0_' + i);
-                        }
-
-                    }
-                }
-
                 var item;
 
+                //CATEGORY FILTER
+                for (var item, i = 0; item = exhibits[i++];) {
+                    for (var cat, j = 0; cat = item.Categories[j++];) {
+                        if (!(cat in categoryLookup)) {
+                            categoryLookup[cat] = 1;
+                            self.CategoryFilters.push(new Filter(pageType + '0_' + i, cat, 'Category'));
 
+                            temp.push(new Filter(pageType + '0_' + i, cat, 'Category'));
+                        }
+                    }
+                }
                 ko.utils.arrayForEach(self.AllFilters(), function (v) {
                     if (v.Name == 'Category') {
                         item = v;
@@ -1051,8 +1190,59 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
+                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
+                temp = [];
 
-                self.AllFilters.push(new FilterCategory('Category', temp, 'blue'));
+
+                //BUSINESS UNIT FILTER
+                counter = 0; //reset counter
+                for (var item, i = 0; item = exhibits[i++];) {
+                    for (var bu, j = 0; bu = item.BusinessUnits[j++];) {
+                        if (!(bu in businessUnitLookup)) {
+                            businessUnitLookup[bu] = 1;
+                            self.BusinessUnitFilters.push(new Filter(pageType + '5_' + counter, bu, 'Business Unit'));
+
+                            temp.push(new Filter(pageType + '5_' + counter, bu, 'Business Unit'));
+                            counter++;
+                        }
+                    }
+                }
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name == 'Business Unit') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
+                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'darkblue'));
+                temp = [];
+
+
+                //DATASET FUNCTION FILTER
+                counter = 0; //reset counter
+                for (var item, i = 0; item = exhibits[i++];) {
+                    for (var fn, j = 0; fn = item.DatasetFunctions[j++];) {
+                        if (!(fn in datasetFunctionLookup)) {
+                            datasetFunctionLookup[fn] = 1;
+                            self.DatasetFunctionFilters.push(new Filter(pageType + '6_' + counter, fn, 'Function'));
+
+                            temp.push(new Filter(pageType + '6_' + counter, fn, 'Function'));
+                            counter++;
+                        }
+                    }
+                }
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name == 'Function') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
+                self.AllFilters.push(new FilterCategory('Function', temp, 'darkblue'));
                 temp = [];
 
 
@@ -1079,7 +1269,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Report Type', temp, 'plum'));
+                self.AllFilters.push(new FilterCategory('Report Type', temp, 'darkblue'));
                 temp = [];
 
                 //TAG FILTER
@@ -1135,25 +1325,14 @@
                         temp = item.Filters().concat(temp);
                         ko.utils.arrayRemoveItem(self.AllFilters(), item);
                     }
-                    self.AllFilters.push(new FilterCategory(group, temp, 'gold'));
+                    self.AllFilters.push(new FilterCategory(group, temp, 'darkblue'));
 
                     temp = [];
                 }
 
-               
-
-                //var xyz = exhibits.map(item => item.tags.Group).reduce((prev, curr) => prev.concat(curr), []).filter((item, i, arr) => arr.indexOf(item) === i);
-
-                //console.log(xyz);                
-
-                //for (var group, i = 0; group = tagGroups[i++];) {
-                //    self.AllFilters.push(new FilterCategory(group, temp, 'gold'));
-                //}
-                //self.AllFilters.push(new FilterCategory('Blah', temp, 'gold'));
-
-                
 
             };
+
             self.PopulateGenericFilters = function (allObjects) {
                 var temp = [];
                 var pageType = '3_'
@@ -1188,9 +1367,32 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new FilterCategory('Category', temp, 'blue'));
+                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
                 temp = [];
 
+
+                //BUSINESS UNIT FILTER
+                for (var item, i = 0; item = allObjects[i++];) {
+                    for (var bu, j = 0; bu = item.BusinessUnits[j++];) {
+                        if (!(bu in businessUnitLookup)) {
+                            businessUnitLookup[bu] = 1;
+                            self.BusinessUnitFilters.push(new Filter(pagetype + '5_' + counter, bu, 'Business Unit'));
+
+                            temp.push(new Filter(pageType + '5_' + counter, bu, 'Business Unit'));
+                            counter++;
+                        }
+                    }
+                }
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name === 'Business Unit') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
+                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'darkblue'));
 
 
                 //SENTRYOWNER FILTER
@@ -1215,7 +1417,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'green'));
+                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'darkblue'));
                 temp = [];
 
 
@@ -1242,7 +1444,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Extension', temp, 'plum'));
+                self.AllFilters.push(new FilterCategory('Extension', temp, 'darkblue'));
 
                 //TAG FILTER
                 counter = 0; //Needs seperate counter as multiple objects can appear per iteration
@@ -1270,7 +1472,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Tag', temp, 'gold'));
+                self.AllFilters.push(new FilterCategory('Tag', temp, 'darkblue'));
                 temp = [];
             };
 
@@ -1298,6 +1500,8 @@
             var loaded = false;
 
             var categoryLookup = {};
+            var businessUnitLookup = {};
+            var datasetFunctionLookup = {};
             var ownerLookup = {};
             var extensionLookup = {};
             var tagLookup = {};
@@ -1322,9 +1526,6 @@
                 var mappedTasks = $.map(allData, function (item) { return new Dataset(item) });
 
                 self.datasets(self.datasets().concat(mappedTasks));
-
-                //request.send();
-                //request2.send();
 
                 self.populateFilters();
 
@@ -1368,10 +1569,10 @@
 
                 var searchQuery = self.Query().split(" ");
 
-
                 var temp = [];
 
                 for (var i = 0; i < self.datasets().length; i++) {
+
                     var keywordFound = false;
                     var count = 0;
                     var dataset = self.datasets()[i];
@@ -1417,7 +1618,8 @@
                 $("#SearchText").attr("placeholder", "Search " + queryResults.length + " Datasets...");
 
                 return queryResults;
-            });
+            }).extend({ paged: {pageSize: 20}});  // .extend() is for the knockout-paging plugin
+
 
             self.SelectedFilters.subscribe(function () {
                 localStorage.setItem("filteredIds", ko.toJSON(self.SelectedFilters()));
@@ -1426,7 +1628,6 @@
             });
 
             self.GetFile = function (data) {
-
                 $.ajax({
                     url: '/ExternalFile/HasReadPermissions?pathAndFilename=' + encodeURIComponent(data.Location),
                     method: "GET",
@@ -1449,8 +1650,8 @@
             };
         }
 
-
         $(document).ready(function () {
+
             window.vm = new ListViewModel();
             ko.applyBindings(vm);
 
@@ -1460,8 +1661,6 @@
             else {
                 window.vm.clearFilters();
             }
-
-
 
             $(document).on("click", "[id^='filterType_']", function (e) {
                 e.preventDefault();

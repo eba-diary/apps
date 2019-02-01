@@ -19,7 +19,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Generator(Generators.Identity);
             });
 
-            this.Property((x) => x.Category, (m) => m.Column("Category_CDE"));
+            //this.Property((x) => x.Category, (m) => m.Column("Category_CDE"));
             this.Property((x) => x.DatasetName, (m) => m.Column("Dataset_NME"));
             this.Property((x) => x.DatasetDesc, (m) => m.Column("Dataset_DSC"));
             this.Property((x) => x.CreationUserName, (m) => m.Column("FileCreator_NME"));
@@ -33,6 +33,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.CanDisplay, (m) => m.Column("Display_IND"));
             this.Property((x) => x.DatasetInformation, (m) => m.Column("Information_DSC"));
             this.Property((x) => x.DatasetType, (m) => m.Column("Dataset_TYP"));
+            this.Property((x) => x.DataClassification, (m) => m.Column("DataClassification_CDE"));
             Property(x => x.Metadata, m =>
             {
                 m.Column("Metadata");
@@ -42,12 +43,55 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Type(NHibernateUtil.StringClob);
             });
 
-            this.ManyToOne(x => x.DatasetCategory, m =>
+            //new mapping
+            this.Bag<Category>(x => x.DatasetCategories, (b) =>
             {
-                m.Column("Category_ID");
-                m.ForeignKey("FK_Dataset_Category");
-                m.Class(typeof(Category));
-            });
+                b.Table("DatasetCategory");
+                b.Inverse(false);
+                b.Key((k) =>
+                {
+                    k.Column("Dataset_Id");
+                    k.ForeignKey("FK_DatasetCategory_Dataset");
+                });
+            },
+            map => map.ManyToMany(n =>
+            {
+                n.Column("Category_Id");
+                n.ForeignKey("FK_DatasetCategory_Category");
+            }));
+
+            this.Bag<BusinessUnit>(x => x.BusinessUnits, (b) =>
+            {
+                b.Table("DatasetBusinessUnit");
+                b.Inverse(false);
+                b.Key((k) =>
+                {
+                    k.Column("Dataset_Id");
+                    k.ForeignKey("FK_DatasetBusinessUnit_Dataset");
+                });
+            },
+            map => map.ManyToMany(n =>
+            {
+                n.Column("BusinessUnit_Id");
+                n.ForeignKey("FK_DatasetBusinessUnit_BusinessUnit");
+            }));
+
+            this.Bag<DatasetFunction>(x => x.DatasetFunctions, (b) =>
+            {
+                b.Table("Dataset_DatasetFunction");
+                b.Inverse(false);
+                b.Key((k) =>
+                {
+                    k.Column("Dataset_Id");
+                    k.ForeignKey("FK_Dataset_Function_Dataset");
+                });
+            },
+            map => map.ManyToMany(n =>
+            {
+                n.Column("Function_Id");
+                n.ForeignKey("FK_Dataset_Function_DatasetFunction");
+            }));
+
 
             this.Bag(x => x.DatasetFiles, (m) =>
             {
@@ -78,24 +122,24 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             }, map => map.OneToMany(a => a.Class(typeof(DatasetFileConfig))));
 
             this.Bag(
-            (x) => x.Tags, 
+            (x) => x.Tags,
             (m) =>
                 {
-                m.Table("ObjectTag");
-                m.Inverse(false);
-                m.Key((k) =>
-                    {
-                        k.Column("DatasetId");
-                        k.ForeignKey("FK_ObjectTag_Dataset");
-                    });
+                    m.Table("ObjectTag");
+                    m.Inverse(false);
+                    m.Key((k) =>
+                        {
+                            k.Column("DatasetId");
+                            k.ForeignKey("FK_ObjectTag_Dataset");
+                        });
                 },
             map =>
                 {
-                map.ManyToMany(a =>
-                    {
-                        a.Column("TagId");
-                        a.ForeignKey("FK_ObjectTag_Tag");
-                    });
+                    map.ManyToMany(a =>
+                        {
+                            a.Column("TagId");
+                            a.ForeignKey("FK_ObjectTag_Tag");
+                        });
                 }
             );
 

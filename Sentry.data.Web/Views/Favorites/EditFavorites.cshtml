@@ -1,0 +1,57 @@
+﻿@model FavoritesModel
+
+@{
+    ViewBag.Title = "Favorites";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>Edit Favorites</h2>
+
+@* simple hidden input used to store the Id of the Favorite chosen to be deleted;
+    needed so we have the Id when user clicks the Yes button in the confirmation modal *@
+<input id="hidDeleteFavoriteId" type="hidden" />
+
+<div id="favorites-wrapper">
+    <p>Drag and drop to reorder favorites</p>
+
+    <ul id="sortable-favorites" class="sortable-ul">
+        @{ Html.RenderPartial("_FavoritesList", Model); }
+    </ul>
+</div>
+<div id="spinner-wrapper" class="hidden"><span class="sentry-spinner"></span></div>
+
+<div id="fav-delete-confirmation" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Delete confirmation</h4>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you wish to delete this favorite?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">No</button>
+                <button id="btnDeleteFav" type="button" class="btn btn-primary">Yes, delete Favorite</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@* simple form needed to post the list of ordered Favorite Ids to the server *@
+@using (Html.BeginForm("Sort", "Favorites", FormMethod.Post, new { @id = "frmSubmitOrderedIds" }))
+{
+    @Html.AntiForgeryToken()
+
+    @Html.HiddenFor(model => model.OrderedFavoriteIds, new { @id = "hidFavoriteIds"})
+}
+
+@section Scripts {
+ 
+    <script type="text/javascript">
+
+        data.Favorites.Init();
+
+    </script>
+    
+}

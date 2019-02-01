@@ -57,7 +57,7 @@ namespace Sentry.data.Web.Controllers
 
             var das = new List<DataAsset>(_dataAssetContext.GetDataAssets());
             ViewBag.DataAssets = das.Select(x => new Models.AssetUIModel(x)).ToList();
-            ViewBag.BusinessIntelligenceCategories = _datasetContext.Categories.ToList().Where(w => w.ObjectType == "RPT").OrderBy(o => o.Name).Select(x => new Models.BusinessIntelligenceUIModel(x)).ToList();
+            ViewBag.BusinessIntelligenceCategories = _datasetContext.Categories.ToList().Where(w => w.ObjectType == GlobalConstants.DataEntityTypes.REPORT).OrderBy(o => o.Name).Select(x => new Models.BusinessIntelligenceUIModel(x)).ToList();
 
             return PartialView("_Header", headerModel);
         }

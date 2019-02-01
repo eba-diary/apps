@@ -161,7 +161,6 @@
     <Compile Include="Bootstrapper.cs" />
     <Compile Include="DomainContexts\datasetContext.cs" />
     <Compile Include="DomainContexts\dataAssetContext.cs" />
-    <Compile Include="DomainContexts\ReportContext.cs" />
     <Compile Include="DomainContexts\RequestContext.cs" />
     <Compile Include="HangfireFilters\DisableMultipleQueuedItemsFilter.cs" />
     <Compile Include="Mappings\Metadata\DataElementDetailMapping.cs" />
@@ -174,11 +173,11 @@
     <Compile Include="Mappings\Metadata\HiveTableMapping.cs" />
     <Compile Include="Mappings\Metadata\LivyCreationMapping.cs" />
     <Compile Include="Mappings\Metadata\MetadataAssetMapping.cs" />
-    <Compile Include="Mappings\Metadata\SchemaMapping.cs" />
     <Compile Include="Mappings\Metadata\MetadataTagMapping.cs" />
     <Compile Include="Mappings\Metadata\TagGroupMapping.cs" />
     <Compile Include="Mappings\Primary\AssetNotificationMapping.cs" />
     <Compile Include="Mappings\Primary\AssetSourceMapping.cs" />
+    <Compile Include="Mappings\Primary\BusinessUnitMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetFileConfigsMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetFileMapping.cs" />
     <Compile Include="Mappings\Primary\ComponentElementMapping.cs" />
@@ -191,6 +190,7 @@
     <Compile Include="Mappings\Primary\FavoriteMapping.cs" />
     <Compile Include="Mappings\Primary\FileExtensionMapping.cs" />
     <Compile Include="Mappings\Primary\ApplicationConfigurationMapping.cs" />
+    <Compile Include="Mappings\Primary\DatasetFunctionMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\AuthenticationTypeMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\DataSourceMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\DataSourceTypeMapping.cs" />
@@ -218,6 +218,7 @@
     <Compile Include="ServiceImplementations\CubeProvider.cs" />
     <Compile Include="ServiceImplementations\DatafileBundleProvider.cs" />
     <Compile Include="ServiceImplementations\EncryptionService.cs" />
+    <Compile Include="ServiceImplementations\EventService.cs" />
     <Compile Include="ServiceImplementations\FtpProvider.cs" />
     <Compile Include="ServiceImplementations\HTTPSProvider.cs" />
     <Compile Include="ServiceImplementations\JawsService.cs" />
@@ -232,7 +233,6 @@
     <Compile Include="ServiceImplementations\BOProvider.cs" />
     <Compile Include="ServiceImplementations\CLPFactory.cs" />
     <Compile Include="ServiceImplementations\DataFeedProvider.cs" />
-    <Compile Include="Interfaces\IAssociateInfoProvider.cs" />
     <Compile Include="Mappings\Primary\CategoryMapping.cs" />
     <Compile Include="Mappings\Primary\UserMapping.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -244,12 +244,6 @@
     <Compile Include="ServiceImplementations\S3ServiceProvider.cs" />
     <Compile Include="ServiceImplementations\SASProvider.cs" />
     <Compile Include="ServiceImplementations\SASServiceProvider.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
-      <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
-      <Name>Sentry.data.Core</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
@@ -280,6 +274,15 @@
   </ItemGroup>
   <ItemGroup>
     <WebReferences Include="Web References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Interfaces\" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
+      <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
+      <Name>Sentry.data.Core</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\WinSCP.5.13.2\build\WinSCP.targets" Condition="Exists('..\packages\WinSCP.5.13.2\build\WinSCP.targets')" />

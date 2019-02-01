@@ -40,6 +40,8 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Sentry.data.Web.xml</DocumentationFile>
+    <NoWarn>1591,S125</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -50,6 +52,8 @@
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>
     </CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Sentry.data.Web.xml</DocumentationFile>
+    <NoWarn>1591,S125</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Antlr3.Runtime, Version=3.5.0.2, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
@@ -117,6 +121,12 @@
       <HintPath>..\packages\Microsoft.AspNet.SignalR.SystemWeb.2.2.1\lib\net45\Microsoft.AspNet.SignalR.SystemWeb.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Microsoft.AspNet.WebApi.Versioning, Version=3.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Versioning.3.0.1\lib\net45\Microsoft.AspNet.WebApi.Versioning.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.AspNet.WebApi.Versioning.ApiExplorer, Version=3.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Versioning.ApiExplorer.3.0.1\lib\net45\Microsoft.AspNet.WebApi.Versioning.ApiExplorer.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="Microsoft.Owin, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.3.0.0\lib\net45\Microsoft.Owin.dll</HintPath>
@@ -177,12 +187,15 @@
       <HintPath>..\packages\Sentry.Web.5.0.2\lib\net40\Sentry.Web.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Sentry.WebAPI.Versioning, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Sentry.WebAPI.Versioning.2.0.0\lib\net461\Sentry.WebAPI.Versioning.dll</HintPath>
+    </Reference>
     <Reference Include="StructureMap, Version=4.3.0.449, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\StructureMap.4.4.0\lib\net45\StructureMap.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Swagger.Net, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cd1bb07a5ac7c7bc, processorArchitecture=MSIL">
-      <HintPath>..\packages\Swagger-Net.8.3.5.2\lib\net45\Swagger.Net.dll</HintPath>
+    <Reference Include="Swashbuckle.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=cd1bb07a5ac7c7bc, processorArchitecture=MSIL">
+      <HintPath>..\packages\Swashbuckle.Core.5.6.0\lib\net40\Swashbuckle.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -253,6 +266,9 @@
       <HintPath>..\packages\Microsoft.AspNet.Web.Optimization.1.1.3\lib\net40\System.Web.Optimization.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
+    <Reference Include="WebActivatorEx, Version=2.0.0.0, Culture=neutral, PublicKeyToken=7b26dc2a43f6a0d4, processorArchitecture=MSIL">
+      <HintPath>..\packages\WebActivatorEx.2.0\lib\net40\WebActivatorEx.dll</HintPath>
+    </Reference>
     <Reference Include="WebGrease, Version=1.6.5135.21930, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\WebGrease.1.6.0\lib\WebGrease.dll</HintPath>
@@ -265,26 +281,33 @@
     <Compile Include="App_Start\ProfilingViewEngine.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.cs" />
-    <Compile Include="App_Start\SwaggerConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Content Include="Content\creat-edit-datasets.css" />
     <Compile Include="Controllers\AdminController.cs" />
-    <Compile Include="Controllers\AssetController.cs" />
+    <Compile Include="Controllers\FavoritesController.cs" />
+    <Compile Include="Controllers\WebApi\ApplicationController.cs" />
+    <Compile Include="Controllers\WebApi\AssetController.cs" />
     <Compile Include="Controllers\DataAssetController.cs" />
     <Compile Include="Controllers\DatasetController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
     <Compile Include="Controllers\ErrorController.cs" />
     <Compile Include="Controllers\ExternalFileController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
-    <Compile Include="Controllers\JobController.cs" />
+    <Compile Include="Controllers\WebApi\BaseWebApiController.cs" />
+    <Compile Include="Controllers\WebApi\JobController.cs" />
     <Compile Include="Controllers\LayoutController.cs" />
-    <Compile Include="Controllers\LineageController.cs" />
-    <Compile Include="Controllers\QueryToolController.cs" />
+    <Compile Include="Controllers\WebApi\LineageController.cs" />
+    <Compile Include="Controllers\WebApi\QueryToolController.cs" />
     <Compile Include="Controllers\ConfigController.cs" />
     <Compile Include="Controllers\BusinessIntelligenceController.cs" />
-    <Compile Include="Controllers\MetadataController.cs" />
+    <Compile Include="Controllers\WebApi\MetadataController.cs" />
     <Compile Include="Controllers\SearchController.cs" />
-    <Compile Include="Controllers\TagController.cs" />
+    <Compile Include="Controllers\WebApi\TagController.cs" />
     <Compile Include="Controllers\UserController.cs" />
+    <Compile Include="Extensions\BusinessIntelligenceExtensions.cs" />
+    <Compile Include="Extensions\DatasetExtensions.cs" />
+    <Compile Include="Extensions\SharedExtensions.cs" />
+    <Compile Include="Extensions\HiveExtensions.cs" />
     <Compile Include="Filters\AuthorizationFilters\AuthorizeHangfireDashboard.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeAttribute.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeByPermissionAttribute.cs" />
@@ -317,9 +340,9 @@
     <Compile Include="Helpers\TimeSpanFormattingExtensions.cs" />
     <Compile Include="Helpers\WebCurrentUserIdProvider.cs" />
     <Compile Include="HttpExceptions\NotAuthorizedException.cs" />
+    <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceDetailModel.cs" />
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceModel.cs" />
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceUIModel.cs" />
-    <Compile Include="Models\BusinessIntelligence\EditBusinessIntelligenceModel.cs" />
     <Compile Include="Models\Config\CreateExtensionMapModel.cs" />
     <Compile Include="Models\Config\CreateSchemaModel.cs" />
     <Compile Include="Models\Config\CreateSourceModel.cs" />
@@ -332,25 +355,30 @@
     <Compile Include="Models\DataAsset\CreateAssetNotificationModel.cs" />
     <Compile Include="Models\DataAsset\EditAssetNotificationModel.cs" />
     <Compile Include="Models\Dataset\BaseDatasetFileModel.cs" />
+    <Compile Include="Models\Dataset\ColumnModel.cs" />
     <Compile Include="Models\Dataset\CreateDataFileModel.cs" />
     <Compile Include="Models\Config\CreateJobModel.cs" />
     <Compile Include="Models\Config\DatasetFileConfigsModel.cs" />
+    <Compile Include="Models\Dataset\DatasetDetailModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileGridModel.cs" />
     <Compile Include="Models\Dataset\DatasetFileVersionsModel.cs" />
     <Compile Include="Models\Config\EditDatasetFileConfigModel.cs" />
+    <Compile Include="Models\Dataset\ObsoleteDatasetModel.cs" />
     <Compile Include="Models\Dataset\PreviewDataModel.cs" />
     <Compile Include="Models\Dataset\PushToDatasetModel.cs" />
-    <Compile Include="Models\Dataset\CreateDatasetModel.cs" />
+    <Compile Include="Models\Dataset\SchemaModel.cs" />
+    <Compile Include="Models\Dataset\DatasetModel.cs" />
     <Compile Include="Models\Dataset\_DatasetMetadataModel.cs" />
+    <Compile Include="Models\Favorites\FavoriteItemModel.cs" />
+    <Compile Include="Models\Favorites\FavoritesModel.cs" />
     <Compile Include="Models\Feed\DataFeedItemModel.cs" />
     <Compile Include="Models\Layout\HomeModel.cs" />
     <Compile Include="Models\Layout\FooterModel.cs" />
     <Compile Include="Models\Layout\HeaderModel.cs" />
-    <Compile Include="Models\Dataset\BaseDatasetModel.cs" />
-    <Compile Include="Models\Dataset\EditDatasetModel.cs" />
+    <Compile Include="Models\Dataset\BaseEntityModel.cs" />
     <Compile Include="Models\Dataset\SearchModel.cs" />
-    <Compile Include="Models\BusinessIntelligence\CreateBusinessIntelligenceModel.cs" />
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceHomeModel.cs" />
+    <Compile Include="Models\Shared\CategoryModel.cs" />
     <Compile Include="Models\User\SharedContextModel.cs" />
     <Compile Include="Models\Shared\SuccessModel.cs" />
     <Compile Include="Models\Subscription\SubscriptionModel.cs" />
@@ -359,10 +387,18 @@
     <Compile Include="Models\User\UserSwitchModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Smarts_Resources\CustomSmartsResources.cs" />
+    <Compile Include="WebConstants.cs" />
     <Content Include="Content\bootstrap-datetimepicker.css" />
+    <Content Include="Content\css\select2.css" />
+    <Content Include="Content\css\select2.min.css" />
+    <Content Include="Content\dataset-detail.css" />
+    <Content Include="Content\favorites.css" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="Content\home.css" />
     <Content Include="Content\query-builder.default.css" />
     <Content Include="Content\query-builder.default.min.css" />
+    <Content Include="Content\query-tool.css" />
+    <Content Include="Content\tags.css" />
     <Content Include="Images\Category\BusinessIntelligence\401k.svg" />
     <Content Include="Images\Category\BusinessIntelligence\claims.svg" />
     <Content Include="Images\Category\BusinessIntelligence\commercial lines.svg" />
@@ -377,21 +413,26 @@
     <Content Include="Images\Icons\details_close.png" />
     <Content Include="Images\Icons\details_open.png" />
     <Content Include="Images\Icons\Exhibits.svg" />
+    <Content Include="Images\photo-businessintelligence.jpg" />
+    <Content Include="Images\photo-dataassets.jpg" />
+    <Content Include="Images\photo-datasets.jpg" />
     <Content Include="Images\SHO_Aerial_10-4-17.jpg" />
     <Content Include="Images\SHO_Aerial_10-4-17.png" />
     <Content Include="Images\SHO_SentryWorld_Aerial.jpg" />
     <Content Include="js\Config.js" />
-    <Content Include="js\DatasetDetail.js" />
+    <Content Include="js\Favorites.js" />
     <Content Include="js\ManageAssetAlert.js" />
     <Content Include="js\ManageConfigs.js" />
     <Content Include="js\QueryTool\AddRule.js" />
     <Content Include="js\QueryTool\BannerControls.js" />
+    <Content Include="js\QueryTool\QueryTool.js" />
     <Content Include="js\QueryTool\QueryToolModel.js" />
     <Content Include="js\QueryTool\RenderTable.js" />
     <Content Include="js\QueryTool\SaveTo.js" />
     <Content Include="js\QueryTool\Startup.js" />
-    <Content Include="js\Report\BusinessIntelligenceDetail.js" />
-    <Content Include="js\Report\Report.js" />
+    <Content Include="js\Report.js" />
+    <Content Include="js\Shared\Tags.js" />
+    <Content Include="readme.txt" />
     <Content Include="Scripts\bootstrap-datetimepicker.js" />
     <Content Include="Scripts\bootstrap-datetimepicker.min.js" />
     <Content Include="Scripts\DataTables\moment-with-locales.js" />
@@ -400,14 +441,71 @@
     <Content Include="Scripts\DataTables\moment.min.js" />
     <Content Include="Scripts\doT.js" />
     <Content Include="Scripts\doT.min.js" />
+    <Content Include="Scripts\i18n\af.js" />
+    <Content Include="Scripts\i18n\ar.js" />
+    <Content Include="Scripts\i18n\az.js" />
+    <Content Include="Scripts\i18n\bg.js" />
+    <Content Include="Scripts\i18n\bs.js" />
+    <Content Include="Scripts\i18n\ca.js" />
+    <Content Include="Scripts\i18n\cs.js" />
+    <Content Include="Scripts\i18n\da.js" />
+    <Content Include="Scripts\i18n\de.js" />
+    <Content Include="Scripts\i18n\dsb.js" />
+    <Content Include="Scripts\i18n\el.js" />
+    <Content Include="Scripts\i18n\en.js" />
+    <Content Include="Scripts\i18n\es.js" />
+    <Content Include="Scripts\i18n\et.js" />
+    <Content Include="Scripts\i18n\eu.js" />
+    <Content Include="Scripts\i18n\fa.js" />
+    <Content Include="Scripts\i18n\fi.js" />
+    <Content Include="Scripts\i18n\fr.js" />
+    <Content Include="Scripts\i18n\gl.js" />
+    <Content Include="Scripts\i18n\he.js" />
+    <Content Include="Scripts\i18n\hi.js" />
+    <Content Include="Scripts\i18n\hr.js" />
+    <Content Include="Scripts\i18n\hsb.js" />
+    <Content Include="Scripts\i18n\hu.js" />
+    <Content Include="Scripts\i18n\hy.js" />
+    <Content Include="Scripts\i18n\id.js" />
+    <Content Include="Scripts\i18n\is.js" />
+    <Content Include="Scripts\i18n\it.js" />
+    <Content Include="Scripts\i18n\ja.js" />
+    <Content Include="Scripts\i18n\km.js" />
+    <Content Include="Scripts\i18n\ko.js" />
+    <Content Include="Scripts\i18n\lt.js" />
+    <Content Include="Scripts\i18n\lv.js" />
+    <Content Include="Scripts\i18n\mk.js" />
+    <Content Include="Scripts\i18n\ms.js" />
+    <Content Include="Scripts\i18n\nb.js" />
+    <Content Include="Scripts\i18n\nl.js" />
+    <Content Include="Scripts\i18n\pl.js" />
+    <Content Include="Scripts\i18n\ps.js" />
+    <Content Include="Scripts\i18n\pt-BR.js" />
+    <Content Include="Scripts\i18n\pt.js" />
+    <Content Include="Scripts\i18n\ro.js" />
+    <Content Include="Scripts\i18n\ru.js" />
+    <Content Include="Scripts\i18n\sk.js" />
+    <Content Include="Scripts\i18n\sl.js" />
+    <Content Include="Scripts\i18n\sr-Cyrl.js" />
+    <Content Include="Scripts\i18n\sr.js" />
+    <Content Include="Scripts\i18n\sv.js" />
+    <Content Include="Scripts\i18n\th.js" />
+    <Content Include="Scripts\i18n\tr.js" />
+    <Content Include="Scripts\i18n\uk.js" />
+    <Content Include="Scripts\i18n\vi.js" />
+    <Content Include="Scripts\i18n\zh-CN.js" />
+    <Content Include="Scripts\i18n\zh-TW.js" />
     <Content Include="Scripts\jquery-ui.js" />
     <Content Include="Scripts\jQuery.extendext.min.js" />
     <Content Include="Scripts\knockout-3.4.2.js" />
+    <Content Include="Scripts\knockout-paging.js" />
     <Content Include="Scripts\knockout-sortable.min.js" />
     <Content Include="Scripts\later.js" />
     <Content Include="Scripts\prettycron.js" />
     <Content Include="Scripts\query-builder.js" />
     <Content Include="Scripts\query-builder.min.js" />
+    <Content Include="Scripts\select2.js" />
+    <Content Include="Scripts\select2.min.js" />
     <Content Include="Views\Dataset\_PreviewData.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -415,7 +513,6 @@
     <Content Include="Content\bootstrap-datepicker3.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
-    <Content Include="Content\css\select2.css" />
     <Content Include="Content\DataTables\css\autoFill.bootstrap.css" />
     <Content Include="Content\DataTables\css\autoFill.bootstrap.min.css" />
     <Content Include="Content\DataTables\css\autoFill.dataTables.css" />
@@ -958,53 +1055,6 @@
     <Content Include="Scripts\DataTables\responsive.foundation.min.js" />
     <Content Include="Scripts\DataTables\responsive.jqueryui.js" />
     <Content Include="Scripts\DataTables\responsive.jqueryui.min.js" />
-    <Content Include="Scripts\i18n\ar.js" />
-    <Content Include="Scripts\i18n\az.js" />
-    <Content Include="Scripts\i18n\bg.js" />
-    <Content Include="Scripts\i18n\ca.js" />
-    <Content Include="Scripts\i18n\cs.js" />
-    <Content Include="Scripts\i18n\da.js" />
-    <Content Include="Scripts\i18n\de.js" />
-    <Content Include="Scripts\i18n\el.js" />
-    <Content Include="Scripts\i18n\en.js" />
-    <Content Include="Scripts\i18n\es.js" />
-    <Content Include="Scripts\i18n\et.js" />
-    <Content Include="Scripts\i18n\eu.js" />
-    <Content Include="Scripts\i18n\fa.js" />
-    <Content Include="Scripts\i18n\fi.js" />
-    <Content Include="Scripts\i18n\fr.js" />
-    <Content Include="Scripts\i18n\gl.js" />
-    <Content Include="Scripts\i18n\he.js" />
-    <Content Include="Scripts\i18n\hi.js" />
-    <Content Include="Scripts\i18n\hr.js" />
-    <Content Include="Scripts\i18n\hu.js" />
-    <Content Include="Scripts\i18n\id.js" />
-    <Content Include="Scripts\i18n\is.js" />
-    <Content Include="Scripts\i18n\it.js" />
-    <Content Include="Scripts\i18n\ja.js" />
-    <Content Include="Scripts\i18n\km.js" />
-    <Content Include="Scripts\i18n\ko.js" />
-    <Content Include="Scripts\i18n\lt.js" />
-    <Content Include="Scripts\i18n\lv.js" />
-    <Content Include="Scripts\i18n\mk.js" />
-    <Content Include="Scripts\i18n\ms.js" />
-    <Content Include="Scripts\i18n\nb.js" />
-    <Content Include="Scripts\i18n\nl.js" />
-    <Content Include="Scripts\i18n\pl.js" />
-    <Content Include="Scripts\i18n\pt-BR.js" />
-    <Content Include="Scripts\i18n\pt.js" />
-    <Content Include="Scripts\i18n\ro.js" />
-    <Content Include="Scripts\i18n\ru.js" />
-    <Content Include="Scripts\i18n\sk.js" />
-    <Content Include="Scripts\i18n\sr-Cyrl.js" />
-    <Content Include="Scripts\i18n\sr.js" />
-    <Content Include="Scripts\i18n\sv.js" />
-    <Content Include="Scripts\i18n\th.js" />
-    <Content Include="Scripts\i18n\tr.js" />
-    <Content Include="Scripts\i18n\uk.js" />
-    <Content Include="Scripts\i18n\vi.js" />
-    <Content Include="Scripts\i18n\zh-CN.js" />
-    <Content Include="Scripts\i18n\zh-TW.js" />
     <Content Include="Scripts\jquery-3.1.0.min.map" />
     <Content Include="Scripts\jquery-3.1.0.slim.min.map" />
     <None Include="Scripts\jquery.validate-vsdoc.js" />
@@ -1091,8 +1141,6 @@
     <Content Include="Scripts\respond.matchmedia.addListener.js" />
     <Content Include="Scripts\respond.matchmedia.addListener.min.js" />
     <Content Include="Scripts\respond.min.js" />
-    <Content Include="Scripts\select2.js" />
-    <Content Include="Scripts\select2.min.js" />
     <Content Include="Scripts\sentry.associates.js" />
     <Content Include="Scripts\sentry.common.js" />
     <Content Include="Scripts\spin.js" />
@@ -1143,13 +1191,12 @@
     <Content Include="Views\Shared\_DataFeedItemList.cshtml" />
     <Content Include="Views\Home\_NewsFeed.cshtml" />
     <Content Include="Views\Shared\_AssetList.cshtml" />
-    <Content Include="Views\Dataset\Create.cshtml" />
+    <Content Include="Views\Dataset\DatasetForm.cshtml" />
     <Content Include="Views\Dataset\Index.cshtml" />
     <Content Include="Views\Home\_AssetOverview - Copy.cshtml" />
     <Content Include="Views\Dataset\_hoverPopup.cshtml" />
     <Content Include="Views\Dataset\_ListItem.cshtml" />
     <Content Include="Views\Dataset\Detail.cshtml" />
-    <Content Include="Views\Dataset\Edit.cshtml" />
     <Content Include="_status\web.config" />
     <Content Include="Views\Dataset\_PushToFilenameOverride.cshtml" />
     <Content Include="Views\Dataset\_Success.cshtml" />
@@ -1194,9 +1241,12 @@
     <Content Include="Views\Config\_ExtensionMapping.cshtml" />
     <Content Include="Views\Config\CreateExtensionMapping.cshtml" />
     <Content Include="Views\BusinessIntelligence\Index.cshtml" />
-    <Content Include="Views\BusinessIntelligence\Create.cshtml" />
-    <Content Include="Views\BusinessIntelligence\Edit.cshtml" />
+    <Content Include="Views\BusinessIntelligence\BusinessIntelligenceForm.cshtml" />
     <Content Include="Views\Home\_Favorites.cshtml" />
+    <Content Include="Views\BusinessIntelligence\Detail.cshtml" />
+    <Content Include="Views\Shared\_Tags.cshtml" />
+    <Content Include="Views\Favorites\EditFavorites.cshtml" />
+    <Content Include="Views\Favorites\_FavoritesList.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

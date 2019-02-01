@@ -1,0 +1,172 @@
+﻿@model Sentry.data.Web.BusinessIntelligenceModel
+@{ViewData["Title"] = "Create Exhibit";}
+
+<h2>Create Exhibit</h2>
+<div></div>
+
+@using (Html.BeginForm("BusinessIntelligenceForm", "BusinessIntelligence", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <p>Please fill out the following fields describing your Exhibit or Dashboard.  Before starting check to see if your exhibit or dashboard is not already on this site by using our <a href="~/Search/BusinessIntelligence/Index?searchPhrase=">search tool.</a></p>
+
+    @*Show the custom validation summary*@
+    @Html.DisplayFor((model) => ViewData.ModelState)
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+    <ul class="nav nav-tabs">
+        <li class="active"><a href="#informationPanel" data-toggle="tab" aria-expanded="true">General Information <span id="infoBadge" class="badge badge-danger"></span></a></li>
+    </ul>
+
+    <div id="myTabContent" class="tab-content">
+        <div id="informationPanel" class="tab-pane fade active in form-horizontal">
+
+            <br />
+            <h4>Information</h4>
+            <br />
+
+            @Html.HiddenFor(model => model.DatasetId)
+            @Html.HiddenFor(model => model.SentryOwnerId)
+            @Html.HiddenFor(model => model.CreationUserName)
+            @Html.HiddenFor(model => model.UploadUserName)
+
+            @* Name *@
+            <div class="form-group">
+                @Html.Label("Exhibit Name", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.DatasetName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                    @Html.ValidationMessageFor(model => model.DatasetName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            @* Description *@
+            <div class="form-group">
+                @Html.LabelFor(model => model.DatasetDesc, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextAreaFor(model => model.DatasetDesc, new { @class = "form-control edit-dataset-row", @style = "min-width: 100%; max-width: 100%; width: 100%;" })
+                    @Html.ValidationMessageFor(model => model.DatasetDesc, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group fieldDescription">
+                <label class="control-label col-md-2"></label>
+                <div class="col-md-10">
+                    <span class="text-muted">
+                        <em>This description will be shown on the Exhibit Search Page.</em>
+                    </span>
+                </div>
+            </div>
+
+            @* Categories *@
+            <div class="form-group">
+                @Html.LabelFor((model) => model.DatasetCategoryIds, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <select id="DatasetCategoryIds" name="DatasetCategoryIds" multiple="multiple" class="form-control edit-dataset-row">
+                        @foreach (var item in Model.AllCategories)
+                        {
+                            <option selected="@item.Selected" value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                    @Html.ValidationMessageFor((model) => model.DatasetCategoryIds, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            @* Business Unit *@
+            <div class="form-group">
+                @Html.LabelFor((model) => model.DatasetBusinessUnitIds, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <select id="DatasetBusinessUnitIds" name="DatasetBusinessUnitIds" multiple="multiple" class="form-control edit-dataset-row">
+                        @foreach (var li in Model.AllBusinessUnits)
+                        {
+                            <option selected="@li.Selected" value="@li.Value">@li.Text</option>
+                        }
+                    </select>
+                    @Html.ValidationMessageFor((model) => model.DatasetBusinessUnitIds, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            @* Function *@
+            <div class="form-group">
+                @Html.LabelFor((model) => model.DatasetFunctionIds, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <select id="DatasetFunctionIds" name="DatasetFunctionIds" multiple="multiple" class="form-control edit-dataset-row">
+                        @foreach (var li in Model.AllDatasetFunctions)
+                        {
+                            <option selected="@li.Selected" value="@li.Value">@li.Text</option>
+                        }
+                    </select>
+                    @Html.ValidationMessageFor((model) => model.DatasetFunctionIds, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+
+            @Html.Partial("_Tags", Model)
+
+            
+            <div class="form-group">
+                @Html.LabelFor(model => model.FileTypeId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">      
+                    @Html.DropDownListFor((model) => model.FileTypeId, Model.AllDataFileTypes, new { @class = "form-control edit-dataset-row" })
+                    @Html.ValidationMessageFor((model) => model.FileTypeId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+
+            <div id="UrlPanel" class="tab-pane fade in form-horizontal">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.Location, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                    </div>
+                </div>
+                <div class="form-group urlDescription">
+                    <label class="control-label col-md-2"></label>
+                    <div class="col-md-10">
+                        <span class="text-muted">
+                            <em>If the report has a url (Tableau and Sharepoint locations), specify the URL to the report. See example below</em><br />
+                            <em>     (i.e. https://tableau.sentry.com/#/site/SentryInsurance/views/WorkflowPayloads/WorkflowPayloads?:iid=1 )</em><br />
+                            <br />
+                            <em>If the report resides on a network location, please specify the UNC path.  See examples below</em><br />
+                            <em>     N: Drive location - (\\Sentry.com\Share\O_IS\... instead of N:\O_IS\...)</em><br />
+                            <em>     DFS location - (\\Sentry.com\appfs\...)</em>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor((model) => model.FrequencyId, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor((model) => model.FrequencyId, Model.AllFrequencies, new { @class = "form-control edit-dataset-row" })
+                    @Html.ValidationMessageFor((model) => model.FrequencyId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.SentryOwnerName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.SentryOwnerName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
+                    @Html.ValidationMessageFor(model => model.SentryOwnerName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr />
+    <div class="form-group">
+        <span class="text-muted"><em>** Fields in <b>Bold</b> are Required</em></span>
+    </div>
+    <div class="form-group">
+        <div>
+            <input type="submit" value="Submit" class="btn btn-primary" />
+            <a id="CancelButton" class="btn btn-warning" data-id="@Model.DatasetId" href="">Cancel</a>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        $(function () {
+            data.Report.FormInit();
+        });
+    </script>
+}

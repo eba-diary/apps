@@ -28,7 +28,7 @@ namespace Sentry.data.Web.Tests
 
             var result = cc.Index(dfc.ParentDataset.DatasetId) as ViewResult;
 
-            Assert.IsInstanceOfType(result.Model, typeof(BaseDatasetModel));
+            Assert.IsInstanceOfType(result.Model, typeof(ObsoleteDatasetModel));
 
             Assert.AreEqual("", result.ViewName);
         }

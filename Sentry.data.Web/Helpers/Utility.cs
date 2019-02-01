@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Sentry.data.Core;
-using System.Text;
 using System.Web.Mvc;
+using System.ComponentModel;
 using static Sentry.data.Core.RetrieverJobOptions;
+using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Web.Helpers
 {
     public static class Utility
     {
+
         public static List<T> IntersectAllIfEmpty<T>(params IEnumerable<T>[] lists)
         {
             IEnumerable<T> results = null;
@@ -75,17 +76,26 @@ namespace Sentry.data.Web.Helpers
 
             return result;
         }
-        public static BaseDatasetModel setupLists(IDatasetContext _datasetContext, BaseDatasetModel model)
+
+        [Obsolete("The function is fine but I wanted that this should not use the domain context and these should all be Enums")]
+        public static void SetupLists(IDatasetContext _datasetContext, DatasetModel model)
         {
             var temp = GetCategoryList(_datasetContext).ToList();
 
-            temp.Add(new SelectListItem()
+            if(model.DatasetCategoryIds?.Count == 1)
             {
-                Text = "Pick a Category",
-                Value = "0",
-                Selected = true,
-                Disabled = true
-            });
+                temp.First(x => x.Value == model.DatasetCategoryIds.First().ToString()).Selected = true;
+            }
+            else
+            {
+                temp.Add(new SelectListItem()
+                {
+                    Text = "Pick a Category",
+                    Value = "0",
+                    Selected = true,
+                    Disabled = true
+                });
+            }
 
             model.AllCategories = temp.OrderBy(x => x.Value);
 
@@ -126,44 +136,38 @@ namespace Sentry.data.Web.Helpers
                 Disabled = true
             });
             model.AllDatasetScopeTypes = temp.OrderBy(x => x.Value);
-            model.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
-                => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+            model.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
 
-            List<string> obj = new List<string>();
-            obj.Add("Restricted");
-            obj.Add("Highly Sensitive");
-            obj.Add("Internal Use Only");
-            obj.Add("Public");
+            model.AllDataClassifications = BuildDataClassificationSelectList(model.DataClassification);
 
-            List<SelectListItem> dataClassifications = new List<SelectListItem>();
-
-            dataClassifications.Add(new SelectListItem()
+            IEnumerable<SelectListItem> dFileExtensions;
+            if (model.FileExtensionId == 0)
             {
-                Text = "Pick a Classification",
-                Value = "0",
-                Selected = true,
-                Disabled = true
-            });
-
-            int index = 1;
-            foreach (String classification in obj)
-            {
-                dataClassifications.Add(new SelectListItem()
-                {
-                    Text = classification,
-                    Value = index.ToString()
-                });
-                index++;
+                dFileExtensions = _datasetContext.FileExtensions
+                    .Select((c) => new SelectListItem
+                    {
+                        Selected = c.Name.Contains("ANY"),
+                        Text = c.Name.Trim(),
+                        Value = c.Id.ToString()
+                    });
             }
+            else
+            {
+                dFileExtensions = _datasetContext.FileExtensions
+                    .Select((c) => new SelectListItem
+                    {
+                        Selected = c.Id == model.FileExtensionId,
+                        Text = c.Name.Trim(),
+                        Value = c.Id.ToString()
+                    });
+            }
+            model.AllExtensions = dFileExtensions.OrderByDescending(x => x.Selected);
 
 
-            model.AllDataClassifications = dataClassifications;
-
-            return model;
         }
         public static IEnumerable<SelectListItem> GetCategoryList(IDatasetContext _datasetContext)
         {
-            IEnumerable<SelectListItem> var = _datasetContext.Categories.Where(w => w.ObjectType == "DS").Select((c) => new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
+            IEnumerable<SelectListItem> var = _datasetContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityTypes.DATASET).Select((c) => new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
 
             return var;
         }
@@ -290,11 +294,36 @@ namespace Sentry.data.Web.Helpers
                 throw new NotImplementedException("This method does not support this type of Data Source");
             }
 
-
-
             return rj;
         }
 
+        private static List<SelectListItem> BuildDataClassificationSelectList(DataClassificationType selectedType)
+        {
+            List<SelectListItem> classifications = new List<SelectListItem>();
+
+            if (selectedType == DataClassificationType.None)
+            {
+                classifications.Add(new SelectListItem()
+                {
+                    Text = "Pick a data classification",
+                    Value = "0",
+                    Selected = true,
+                    Disabled = true
+                });
+            }
+
+            foreach(DataClassificationType item in Enum.GetValues(typeof(DataClassificationType)))
+            {
+                classifications.Add(new SelectListItem()
+                {
+                    Text = item.GetDescription(),
+                    Value = ((int)item).ToString(),
+                    Selected = selectedType == item
+                });
+            }
+
+            return classifications;
+        }
     }
 
 }

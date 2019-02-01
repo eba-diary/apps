@@ -9,15 +9,12 @@ using System.Collections.Generic;
 using NHibernate.Linq;
 using System.Threading.Tasks;
 using System.Net;
-using System.Configuration;
 using System.IO;
 
 namespace Sentry.data.Infrastructure
 {
     public class DataFeedProvider : NHReadableStatelessDomainContext, IDataFeedContext
     {
-        private readonly IDatasetContext _datasetContext;
-
 
         public DataFeedProvider(IStatelessSession session) : base(session)
         {
@@ -119,15 +116,15 @@ namespace Sentry.data.Infrastructure
 
             foreach (Event e in dsEvents)
             {
-                Dataset ds = Query<Dataset>().FirstOrDefault(y => y.DatasetId == e.Dataset);
+                Dataset ds = Query<Dataset>().Where(y => y.DatasetId == e.Dataset).FetchMany(x=> x.DatasetCategories).FirstOrDefault();
 
                 if (ds != null)
                 {
                     DataFeedItem dfi = new DataFeedItem(
                     e.TimeCreated,
                     e.Dataset.ToString(),
-                    ds.DatasetName + " - A New Dataset was Created in the " + ds.Category + " Category",
-                    ds.DatasetName + " - A New Dataset was Created in the " + ds.Category + " Category",
+                    ds.DatasetName + " - A New Dataset was Created in the " + ds.DatasetCategories.First().Name + " Category",
+                    ds.DatasetName + " - A New Dataset was Created in the " + ds.DatasetCategories.First().Name + " Category",
                     new DataFeed() { Name = "Datasets", Url = "/Datasets/Detail/" + e.Dataset, Type = "Datasets" }
                     );
 
@@ -157,21 +154,22 @@ namespace Sentry.data.Infrastructure
             return items;
         }
 
-        public IList<DataFeedItem> GetAllFavorites(string associateId)
+        public IList<FavoriteItem> GetUserFavorites(string associateId)
         {
-            List<DataFeedItem> items = new List<DataFeedItem>();
+            List<FavoriteItem> items = new List<FavoriteItem>();
             List<Favorite> favsList = Query<Favorite>().Where(w => w.UserId == associateId).ToList();
 
-            foreach(Favorite fav in favsList)
+            foreach (Favorite fav in favsList)
             {
                 Dataset ds = Query<Dataset>().Where(w => w.DatasetId == fav.DatasetId).FetchMany(w => w.DatasetFileConfigs).FirstOrDefault();
 
                 if (ds != null)
                 {
                     DataFeed df = null;
-                    if (ds.DatasetType != null && ds.DatasetType == "RPT")
+                    if (ds.DatasetType == GlobalConstants.DataEntityTypes.REPORT)
                     {
-                        df = new DataFeed() {
+                        df = new DataFeed()
+                        {
                             Id = ds.DatasetId,
                             Name = "Business Intelligence",
                             Url = (!String.IsNullOrWhiteSpace(ds.Metadata.ReportMetadata.Location)) ? ds.Metadata.ReportMetadata.Location : null,
@@ -181,7 +179,8 @@ namespace Sentry.data.Infrastructure
                     }
                     else
                     {
-                        df = new DataFeed() {
+                        df = new DataFeed()
+                        {
                             Id = ds.DatasetId,
                             Name = "Datasets",
                             Url = "/Datasets/Detail/" + ds.DatasetId,
@@ -190,19 +189,67 @@ namespace Sentry.data.Infrastructure
                         };
                     }
 
-                    DataFeedItem dfi = new DataFeedItem(
-                    fav.Created,
-                    fav.DatasetId.ToString(),
-                    ds.DatasetName,
-                    ds.DatasetName,
-                    df
-                    );  
-
-                    items.Add(dfi);
+                    items.Add(new FavoriteItem(
+                        fav.FavoriteId,
+                        fav.DatasetId.ToString(),
+                        ds.DatasetName,
+                        df,
+                        fav.Sequence
+                        )
+                    );
                 }
             }
 
             return items;
+        }
+
+        public FavoriteItem GetFavorite(int favoriteId)
+        {
+            Favorite fav = Query<Favorite>().Where(x => x.FavoriteId == favoriteId).SingleOrDefault();
+
+            if (fav != null)
+            {
+                Dataset ds = Query<Dataset>().Where(w => w.DatasetId == fav.DatasetId).FetchMany(w => w.DatasetFileConfigs).FirstOrDefault();
+
+                if (ds != null)
+                {
+                    DataFeed df = null;
+                    if (ds.DatasetType != null && ds.DatasetType == "RPT")
+                    {
+                        df = new DataFeed()
+                        {
+                            Id = ds.DatasetId,
+                            Name = "Business Intelligence",
+                            Url = (!String.IsNullOrWhiteSpace(ds.Metadata.ReportMetadata.Location)) ? ds.Metadata.ReportMetadata.Location : null,
+                            UrlType = (!String.IsNullOrWhiteSpace(ds.Metadata.ReportMetadata.LocationType)) ? ds.Metadata.ReportMetadata.LocationType : null,
+                            Type = "Exhibits"
+                        };
+                    }
+                    else
+                    {
+                        df = new DataFeed()
+                        {
+                            Id = ds.DatasetId,
+                            Name = "Datasets",
+                            Url = "/Datasets/Detail/" + ds.DatasetId,
+                            UrlType = ds.DatasetType,
+                            Type = "Datasets"
+                        };
+                    }
+
+                    return new FavoriteItem(
+                        fav.FavoriteId,
+                        fav.DatasetId.ToString(),
+                        ds.DatasetName,
+                        df,
+                        fav.Sequence
+                    );
+                }
+
+            }
+
+            // last resort return null
+            return null;
         }
     }
 }

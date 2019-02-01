@@ -40,7 +40,6 @@
                 }
 
                 var color = "";
-
                 //html classes should not start with numbers so prefix with underscore (_).
                 long number1 = 0;
                 if (long.TryParse(category[i].Name.Substring(0, 1), out number1))
@@ -52,8 +51,6 @@
                     color = category[i].Name.ToLower().Replace(" ", "_") + "Tile";
                 }
 
-
-
                 <div class="col-md-3 tile border_@category[i].Color @color ">
                     <a class="" href="~/Search/BusinessIntelligence/Index?category=@category[i].Name">
                         <img src="/Images/Category/BusinessIntelligence/@{@category[i].Name}.svg" class="tile-image">
@@ -61,8 +58,6 @@
                         <div class="tile-description" style="color: rgb(0, 0, 0); max-height: 4.5em; -webkit-line-clamp: 3;"></div>
                     </a>
                 </div>
-
-
                 if (i % 3 == 2 || i + 1 == c)
                 {
                     @:</div>
@@ -249,32 +244,6 @@
     <script>
         $(function () {
             data.Report.IndexInit();
-
-            $('.tile').click(function (e) {
-                var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
-
-                if (storedNames != null) {
-                    for (i = 0; i < storedNames.length; i++) {
-                        $('#' + storedNames[i]).prop('checked', false);
-                    }
-
-                    localStorage.removeItem("filteredIds");
-                }
-
-                localStorage.removeItem("searchText");
-            });
-
-            $('#DatasetSearch').submit(function (e) {
-                localStorage.removeItem("filteredIds");
-
-                localStorage.removeItem("searchText");
-
-                localStorage.setItem("searchText", $('#SearchText')[0].value);
-            });
-
-            $('.input-group-addon').click(function (e) {
-                $('#DatasetSearch').submit();
-            });
         });
     </script>
 }

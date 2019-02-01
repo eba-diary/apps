@@ -1,16 +1,14 @@
-﻿@model Sentry.data.Web.BaseDatasetModel
+﻿@model Sentry.data.Web.DatasetDetailModel
 
 @{
     ViewBag.Title = "View Dataset Details";
-    string color = Model.DatasetCategory.Color;
-    string headerColor = "categoryBanner-" + Model.DatasetCategory.Color;
+    string color = Model.CategoryColor;
+    string headerColor = "categoryBanner-" + Model.CategoryColor;
 }
 
-
-
-@if (@Model.DatasetFiles.Count == 0)
+@if (@Model.DatasetFileCount == 0)
 {
-    <div data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">
+    <div>
         <div id="alertInfoBanner" class="alert alert-dismissable alert-info">
             <button type="button" class="close" data-dismiss="alert">×</button>
             <div>
@@ -22,25 +20,20 @@
                 else
                 {
                     <strong class="alertHeading">Info: </strong>
-                    <span>This dataset has no files attached to it yet.  Please contact the Sentry Owner: @Model.SentryOwner.FullName.</span>
+                    <span>This dataset has no files attached to it yet.  Please contact the Sentry Owner: @Model.SentryOwnerName</span>
                 }
             </div>
         </div>
     </div>
 }
 
-<a href="@Url.Action("Datasets", "Search")" class="backToList" id="linkReturnToDatasetList" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;"><span class="glyphicon glyphicon-chevron-left"></span>Back to list</a>
-<a href="@Url.Action("BusinessIntelligence", "Search")" class="backToList" id="linkReturnToBusinessIntelligenceList" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;"><span class="glyphicon glyphicon-chevron-left"></span>Back to list</a>
+<a href="@Url.Action("Datasets", "Search")" class="backToList" id="linkReturnToDatasetList"><span class="glyphicon glyphicon-chevron-left"></span>Back to list</a>
 
 <div style="font-feature-settings: 'lnum';">
-    <div class="topBanner" style="height: 60px;
-    margin-top: 20px;
-    border-bottom: 1px #DDDDDD solid;">
-
+    <div class="topBanner" style="height: 60px; margin-top: 20px;border-bottom: 1px #DDDDDD solid;">
 
         <div class="relative hidden-sm hidden-xs">
             <div>
-
                 <div class="no-overflow">
                     <h1 class="detailName leftFloat @color">
                         @Model.DatasetName
@@ -50,149 +43,94 @@
                             <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
                         }
                     </h1>
-
                     @{
-                        foreach (string item in Model.DistinctFileExtensions())
+                        foreach (string item in Model.DistinctFileExtensions)
                         {
                             <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
                         }
                     }
 
-                            <div style="margin-top:-30px;" class="col-md-offset-9 col-md-4 col-lg-offset-10 col-lg-3">
+                    <div style="margin-top:-30px;" class="col-md-offset-9 col-md-4 col-lg-offset-10 col-lg-3">
 
-                                @if (Model.IsFavorite)
-                                {
-                                    @*<div class="col-md-1 col-lg-1">
-                <div class="glyphicon glyphicon-star @color" id="btnFavorite" data-bind="attr: {data: @Model.DatasetId}" style="font-size:xx-large; width: 50%; margin: 0 auto;"></div>
-            </div>*@
-                                    <div class="col-md-2 col-lg-2 ">
-                                        <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Favorite">
-                                            <button type="button"
-                                                    class="btn btn-default borderdk_gray borderdk_@color"
-                                                    id="btnFavorite" data-bind="attr: {data: @Model.DatasetId}" data-toggle="tooltip" data-placement="top" title="Favorite">
-                                                <span class="glyphicon glyphicon-star @color" id="favoriteIcon"></span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                }
-                                else
-                                {
-                                    @*<div class="col-md-1 col-lg-1">
-                <div class="glyphicon glyphicon-star-empty @color" id="btnFavorite" data-bind="attr: {data: @Model.DatasetId}" style="font-size:xx-large; width: 50%; margin: 0 auto;"></div>
-            </div>*@
-
-                                    <div class="col-md-2 col-lg-2 ">
-                                        <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Favorite">
-                                            <button type="button"
-                                                    class="btn btn-default borderdk_gray borderdk_@color"
-                                                    id="btnFavorite" data-bind="attr: {data: @Model.DatasetId}" data-toggle="tooltip" data-placement="top" title="Favorite">
-                                                <span class="glyphicon glyphicon-star-empty @color" id="favoriteIcon"></span>
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                }
-                                @if (Model.CanUpload)
-                                {
-                                    <div class="col-md-2 col-lg-2 ">
-                                        <button type="button"
-                                                class="btn btn-default dataset-operation-button borderdk_gray borderdk_@color"
-                                                id="UploadModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Upload File">
-                                            <span class="glyphicon glyphicon-cloud-upload @color"></span>
-                                        </button>
-                                    </div>
-                                }
-
-                                @if (Model.CanEditDataset)
-                                {
-                                    <div class="col-md-2 col-lg-2">
-                                        <button type="button"
-                                                class="btn btn-default btn dataset-operation-button borderdk_gray borderdk_@color"
-                                                id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
-                                            <span class="glyphicon glyphicon-edit @color"></span>
-                                        </button>
-                                    </div>
-                                }
-
-                                @if (Model.CanManageReport)
-                                {
-                                    <div class="col-md-2 col-lg-2 dataset-operation-button ">
-                                        <button type="button"
-                                                class="btn btn-default btn borderdk_gray borderdk_@color"
-                                                id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Report">
-                                            <span class="glyphicon glyphicon-edit @color"></span>
-                                        </button>
-                                    </div>
-                                }
-
-                                <div class="col-md-2 col-lg-2">
-                                    <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions">
-
-                                        <button type="button"
-                                                class="btn btn-default borderdk_gray borderdk_@color dropdown"
-                                                data-toggle="dropdown">
-                                            <span class="glyphicon glyphicon-menu-hamburger @color"></span>
-                                        </button>
-                                        <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
-                                            <li id="SubscribeModal" style="cursor: pointer; display: none;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe" data-bind="visible: IsShownForCurrentType('Dataset')">
-                                                <a>
-                                                    Subscribe
-                                                </a>
-                                            </li>
-
-                                            @if (Model.CanQueryTool)
-                                            {
-                                                <li title="Query Dataset" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">
-                                                    <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
-                                                        Query this Dataset
-                                                    </a>
-                                                </li>
-                                            }
-                                            @if (Model.CanManageConfigs)
-                                            {
-                                                <li>
-                                                    <a href="/Config/Dataset/@Model.DatasetId" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">
-                                                        Manage Schemas
-                                                    </a>
-                                                </li>
-                                            }
-                                            @if (Model.CanManageReport)
-                                            {
-                                                <li>
-                                                    <a id="deleteLink" href="" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;">
-                                                        Delete Exhibit
-                                                    </a>
-                                                </li>
-                                            }
-                                        </ul>
-                                    </div>
-                                </div>
-
-
-                                @*@if (((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive)) && Model.DatasetFiles.Count != 0)
-        {
-            <button type="button"
-                    class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                    id="DownloadLatest" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Download Latest">
-                <span class="glyphicon glyphicon-cloud-download @color"></span>
-            </button>
-        }
-
-        @if ((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive))
-        {
-            <button type="button"
-                    class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                    id="PreviewLatestData" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Preview Latest">
-                <span class="glyphicon glyphicon-search @color"></span>
-            </button>
-        }*@
+                        <div class="col-md-2 col-lg-2 ">
+                            <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Favorite">
+                                <button type="button" class="btn btn-default borderdk_gray borderdk_@Model.CategoryColor"
+                                        id="btnFavorite" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Favorite">
+                                    @if (Model.IsFavorite)
+                                    {
+                                        <span class="glyphicon glyphicon-star @Model.CategoryColor" id="favoriteIcon"></span>
+                                    }
+                                    else
+                                    {
+                                        <span class="glyphicon glyphicon-star-empty @Model.CategoryColor" id="favoriteIcon"></span>
+                                    }
+                                </button>
                             </div>
+                        </div>
+                        @if (Model.CanUpload)
+                        {
+                            <div class="col-md-2 col-lg-2 ">
+                                <button type="button"
+                                        class="btn btn-default dataset-operation-button borderdk_gray borderdk_@color"
+                                        id="UploadModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Upload File">
+                                    <span class="glyphicon glyphicon-cloud-upload @color"></span>
+                                </button>
+                            </div>
+                        }
+                        @if (Model.CanEditDataset)
+                        {
+                            <div class="col-md-2 col-lg-2">
+                                <button type="button"
+                                        class="btn btn-default btn dataset-operation-button borderdk_gray borderdk_@color"
+                                        id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
+                                    <span class="glyphicon glyphicon-edit @color"></span>
+                                </button>
+                            </div>
+                        }
+                        <div class="col-md-2 col-lg-2">
+                            <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions">
+
+                                <button type="button"
+                                        class="btn btn-default borderdk_gray borderdk_@color dropdown"
+                                        data-toggle="dropdown">
+                                    <span class="glyphicon glyphicon-menu-hamburger @color"></span>
+                                </button>
+                                <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
+                                    @if (Model.CanManageConfigs)
+                                    {
+                                    <li>
+                                        <a href="/Config/Dataset/@Model.DatasetId">
+                                            Manage Schemas
+                                        </a>
+                                    </li>
+                                    }
+                                    @if (Model.CanQueryTool)
+                                    {
+                                    <li title="Query Dataset">
+                                        <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
+                                            Query this Dataset
+                                        </a>
+                                    </li>
+                                    }
+                                    <li>
+                                        <a href="@Model.MailtoLink">Share Dataset</a>
+                                    </li>
+                                    <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
+                                        <a>
+                                            Subscribe
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="hidden-md hidden-lg">
             <div>
+                @* show different h1 elements for Exhibit vs. Dataset (title for Dataset should not be clickable) *@
                 <h1 class="detailName leftFloat @color">
                     @Model.DatasetName
 
@@ -217,14 +155,13 @@
                                 </a>
                             </li>
 
-                            @if (Model.CanQueryTool)
+                            @if (Model.CanEditDataset)
                             {
-                                <li title="Query Dataset">
-                                    <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
-                                        Query this Dataset
-                                    </a>
-                                </li>
+                            <li>
+                                <a href="/Dataset/Edit/@Model.DatasetId">Edit Dataset</a>
+                            </li>
                             }
+
                             @if (Model.CanManageConfigs)
                             {
                                 <li>
@@ -234,31 +171,44 @@
                                 </li>
                             }
 
+                            @if (Model.CanQueryTool)
+                            {
+                                <li title="Query Dataset">
+                                    <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
+                                        Query this Dataset
+                                    </a>
+                                </li>
+                            }
+
+                            <li >
+                                <a href="@Model.MailtoLink">Share Dataset</a>
+                            </li>
+
+
+                            <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
+                                <a>
+                                    Subscribe
+                                </a>
+                            </li>
+
                             @if (Model.CanUpload)
                             {
                                 <li id="UploadModal" data-id="@Model.DatasetId">
                                     <a>Upload Files</a>
                                 </li>
                             }
-
-                            @if (Model.CanEditDataset)
-                            {
-                                <li id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-bind="visible: IsShownForCurrentType('Dataset')">
-                                    <a>Edit Dataset</a>
-                                </li>
-                            }
                         </ul>
                     </div>
                 </div>
             </div>
-            
+
         </div>
-        
+
     </div>
 
     <br />
 
-    <div class="row" style="margin-top: 15px;" >
+    <div class="row" style="margin-top: 15px;">
         <div class="col-lg-12">
             <div class="row">
                 <div class="col-lg-8 col-sm-6">
@@ -269,12 +219,10 @@
                                 <div class="col-lg-12">
                                     <div>
                                         <h6 class="@color">Description:</h6><br />
-
                                         @if (Model.DatasetDesc.Length >= 500)
                                         {
 
                                             int last = Model.DatasetDesc.Substring(0, 500).LastIndexOf(" ");
-
                                             <p class="spanContainer">
                                                 <span style="margin-top: 15px;">@Model.DatasetDesc.Substring(0, last)</span>
                                                 <span id="descSeeMoreEllipsis">...&nbsp;</span>
@@ -298,56 +246,47 @@
                                 <div class="col-lg-12">
                                     <div class="spanContainer">
                                         <h6 class="@color">Usage Information:</h6><br />
-
-
-
                                         @if (Model.DatasetInformation.Length >= 300)
                                         {
 
                                             int lastInfo = Model.DatasetInformation.Substring(0, 300).LastIndexOf(" ");
-
                                             <span style="margin-top: 15px;">@Model.DatasetInformation.Substring(0, lastInfo)</span>
                                             <span id="usageSeeMoreEllipsis">...&nbsp;</span>
                                             <span id="usageSeeMorePanel" style="display: none;">@Model.DatasetInformation.Substring(lastInfo)</span>
                                             <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
                                             <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
-
                                         }
                                         else
                                         {
                                             <span style="margin-top: 15px;">@Model.DatasetInformation</span>
                                         }
-
                                     </div>
                                 </div>
                             </div>
                         }
                     </div>
                     <hr />
-                    <div data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">
+                    <div>
                         <h3 class="@color">
                             Schemas
                         </h3>
                     </div>
-                    <div data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">
 
+                    <div>
                         <div class="row">
                             <div class="col-lg-12" style="margin-left: 20px; margin-top: 10px;">
                                 <select class="form-control" style="margin:1em !important;"
                                         id="datasetConfigList" name="filterSelector">
-                                    @foreach (var a in Model.DatasetFileConfigs)
+                                    @foreach (var a in Model.DatasetFileConfigNames)
                                     {
-                                        <option value="@a.ConfigId">@a.ConfigFileName</option>
+                                        <option value="@a.Key">@a.Value</option>
                                     }
                                 </select>
                             </div>
                         </div>
 
-
-
                         <div class="row">
                             <div class="col-lg-12">
-
                                 <br />
                                 <div style="margin-left: 35px;" data-bind="visible: Description() != null" class="spanContainer">
                                     <h6 class="@color">Schema Description:</h6><br />
@@ -361,7 +300,6 @@
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
                 </div>
@@ -371,11 +309,8 @@
 
                         <div class="row" style="min-height: 60px;">
                             <div class="col-lg-6">
-                                <h5 class="@color" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">Last Activity Date</h5>
-                                <h6 class="@color" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">@Model.ChangedDtm.ToString("MMMM d, yyyy")</h6>
-
-                                <h5 class="@color" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;">Upload Frequency</h5>
-                                <h6 class="@color" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;">@Model.UploadFrequency</h6>
+                                <h5 class="@color">Last Activity Date</h5>
+                                <h6 class="@color">@Model.ChangedDtm.ToString("MMMM d, yyyy")</h6>
                             </div>
                             <div class="col-lg-6">
                                 <h5 class="@color">Date Created</h5>
@@ -384,21 +319,27 @@
                         </div>
                         <hr />
                         <div class="row">
-
                             <div class="col-lg-12">
                                 <h5 class="@color">Sentry Owner</h5>
-                                <h6 class="@color">@Model.SentryOwner.FullName</h6>
+                                <h6 class="@color">@Model.SentryOwnerName</h6>
                             </div>
-
                         </div>
                         <hr />
+
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <h5 class="@color">Data Classification</h5>
+                                <h6 class="@color">@Model.DataClassificationDescription</h6>
+                            </div>
+                        </div>
+                        <hr />
+
                         <div class="row">
                             <div class="col-lg-6">
-                                <h5 class="@color" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">Dataset Views</h5>
-                                <h5 class="@color" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;">Exhibit Views</h5>
+                                <h5 class="@color">Dataset Views</h5>
                                 <h6 class="@color" style="font-feature-settings: 'lnum';">@Model.Views</h6>
                             </div>
-                            <div class="col-lg-6" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">
+                            <div class="col-lg-6">
                                 <h5 class="@color">Dataset Downloads</h5>
                                 <h6 class="@color" style="font-feature-settings: 'lnum';">@Model.Downloads</h6>
                             </div>
@@ -415,12 +356,10 @@
     <div class="row">
         <div class="col-lg-12">
             <div id="aboutThisSchema" class="metadataHeader">
-                <h3 class="@color" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">About this Schema</h3>
-                <h3 class="@color" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;">About this Exhibit</h3>
+                <h3 class="@color">About this Schema</h3>
             </div>
-
             <div class="metadataBody container row" style="border: 1px #DDDDDD solid; background: white; padding: 10px;">
-                <div class="col-lg-4"  data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">
+                <div class="col-lg-4">
                     <div class="row">
                         <div class="col-lg-12">
                             <h5 class="@color">Last Updated:</h5>
@@ -442,25 +381,15 @@
                             </p>
                         </div>
                     </div>
-                    @*<hr />
-                        <div class="row">
-                            <div class="col-lg-6">
-                                <h6 class="@color">Schema Views</h6>
-                                <h2 class="@color" style="font-feature-settings: 'lnum';" data-bind="text: Views"></h2>
-                            </div>
-                            <div class="col-lg-6">
-                                <h6 class="@color">Schema Downloads</h6>
-                                <h2 class="@color" style="font-feature-settings: 'lnum';" data-bind="text: Downloads"></h2>
-                            </div>
-                        </div>*@
+
                     <div class="row" data-bind="visible: SchemaRows().length > 0">
                         <hr />
                         <div class="col-lg-12">
                             <h5 class="@color">In this Schema:</h5>
                         </div>
                     </div>
-                    <div class="row" data-bind="visible: SchemaRows().length > 0">
 
+                    <div class="row" data-bind="visible: SchemaRows().length > 0">
                         <div class="col-lg-6">
                             <h5 class="@color">Rows</h5>
                             <h6 class="@color" id="rowCount" data-bind="text: RowCount"></h6>
@@ -471,15 +400,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;">
-                    <h5 class="@color">Tags:</h5>
-                    @{
-                        foreach (var item in Model.Tags)
-                        {
-                            <div class="tags-block htCenter tag_@item.Name">@item.Name</div>
-                        }
-                    }
-                </div>
+
                 <div class="col-lg-8">
                     <h5 class="@color">Data Ownership:</h5>
                     <table class="table table-striped table-hover detailTable" style="margin-left: 0px;">
@@ -488,76 +409,78 @@
                                 <td class="borderMeta_@color colOneMeta">Dataset Creator</td>
                                 <td class="borderMeta_@color">@Model.CreationUserName</td>
                             </tr>
-                            <tr class="borderMeta_@color" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">
+                            <tr class="borderMeta_@color">
                                 <td class="borderMeta_@color colOneMeta">Dataset Origination</td>
                                 <td class="borderMeta_@color">@Model.OriginationCode</td>
                             </tr>
                         </tbody>
                     </table>
                     <br />
-                    <h5 class="@color">Refresh Frequency:</h5>
-                    <table class="table table-striped table-hover detailTable" style="margin-left: 0px;">
-                        <tbody>
-                            <tr>
-                                <td class="borderMeta_@color colOneMeta">Dataset Scope Type</td>
-                                <td class="borderMeta_@color ">
-                                    @foreach (var dst in @Model.DatasetScopeType)
+                    <div>
+                        <h5 class="@color">Refresh Frequency:</h5>
+                        <table class="table table-striped table-hover detailTable" style="margin-left: 0px;">
+                            <tbody>
+                                <tr>
+                                    <td class="borderMeta_@color colOneMeta">Dataset Scope Type</td>
+                                    <td class="borderMeta_@color ">
+                                        @foreach (var dst in @Model.DatasetScopeTypeNames)
+                                        {
+                                            <span class="comma" title='@dst.Value'>@dst.Key</span>
+                                        }
+                                    </td>
+                                    <td class="borderMeta_@color"></td>
+                                </tr>
+
+                                <tr data-bind="if: DFSDropLocation(), visible: DFSDropLocation != undefined" style="display:none;">
+                                    <td class="borderMeta_@color colOneMeta">DFS Drop Location</td>
+                                    <td class="borderMeta_@color" data-bind="text: DFSDropLocation().Location()"></td>
+                                </tr>
+
+                                <tr data-bind="if: S3DropLocation(), visible: S3DropLocation != undefined" style="display:none;">
+                                    <td class="borderMeta_@color colOneMeta">S3 Drop Location</td>
+                                    <td class="borderMeta_@color" data-bind="text: S3DropLocation().Location()"></td>
+                                </tr>
+
+                                <!-- ko if: OtherJobs != undefined-->
+                                <!-- ko foreach: OtherJobs -->
+                                <tr>
+                                    <td class="borderMeta_@color colOneMeta" data-bind="text: Name()"></td>
+                                    @if (Model.CanManageConfigs)
                                     {
-                                        <span class="comma" title='@dst.Description'>@dst.Name</span>
-                                    }
-                                </td>
-                                <td class="borderMeta_@color"></td>
-                            </tr>
-
-                            <tr data-bind="if: DFSDropLocation(), visible: DFSDropLocation != undefined" style="display:none;">
-                                <td class="borderMeta_@color colOneMeta">DFS Drop Location</td>
-                                <td class="borderMeta_@color" data-bind="text: DFSDropLocation().Location()"></td>
-                            </tr>
-
-                            <tr data-bind="if: S3DropLocation(), visible: S3DropLocation != undefined" style="display:none;">
-                                <td class="borderMeta_@color colOneMeta">S3 Drop Location</td>
-                                <td class="borderMeta_@color" data-bind="text: S3DropLocation().Location()"></td>
-                            </tr>
-
-                            <!-- ko if: OtherJobs != undefined-->
-                            <!-- ko foreach: OtherJobs -->
-                            <tr data-bind="visible: IsShownForCurrentType('Dataset')" display: none;>
-                                <td class="borderMeta_@color colOneMeta" data-bind="text: Name()"></td>
-                                @if (Model.CanManageConfigs)
-                                {
-                                    <!-- ko if: IsEnabled-->
+                                        <!-- ko if: IsEnabled-->
                                         <td class="borderMeta_@color" data-bind="text: Location()"></td>
                                         <td class="borderMeta_@color">
                                             <button style="float:right; margin-left: 30px;" class="btn btn-default on-demand-run" data-bind="attr: { id: JobId }">On-Demand Run</button>
                                             <button style="float:right; margin-left: 30px;" class="btn btn-default jobstatus jobstatus_enabled" data-bind="attr: { id: JobId }">Disable</button>
                                         </td>
-                                    <!-- /ko -->
-                                    <!-- ko ifnot: IsEnabled-->
-                                    <td class="borderMeta_@color"> Disabled</td>
-                                    <td class="borderMeta_@color">
-                                        <button style="float:right; margin-left: 30px;" class="btn btn-default on-demand-run" disabled="disabled" data-toggle="tooltip" data-placement="top" title="Job is disabled" data-bind="attr: { id: JobId }">On-Demand Run</button>
-                                        <button style="float:right; margin-left: 30px;" class="btn btn-default jobstatus jobstatus_disabled" data-bind="attr: { id: JobId }">Enable</button>
-                                    </td>
-                                    <!-- /ko -->                                    
-                                }
-                                else
-                                {
-                                    <td class="borderMeta_@color"></td>
-                                }
+                                        <!-- /ko -->
+                                        <!-- ko ifnot: IsEnabled-->
+                                        <td class="borderMeta_@color"> Disabled</td>
+                                        <td class="borderMeta_@color">
+                                            <button style="float:right; margin-left: 30px;" class="btn btn-default on-demand-run" disabled="disabled" data-toggle="tooltip" data-placement="top" title="Job is disabled" data-bind="attr: { id: JobId }">On-Demand Run</button>
+                                            <button style="float:right; margin-left: 30px;" class="btn btn-default jobstatus jobstatus_disabled" data-bind="attr: { id: JobId }">Enable</button>
+                                        </td>
+                                        <!-- /ko -->
+                                    }
+                                    else
+                                    {
+                                        <td class="borderMeta_@color"></td>
+                                    }
 
-                            </tr>
-                            <!-- /ko -->
-                            <!-- /ko -->
+                                </tr>
+                                <!-- /ko -->
+                                <!-- /ko -->
 
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
 
-    <div class="row" id="schemaSection" data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">
+    <div class="row" id="schemaSection">
 
         <div class="col-lg-12">
             <hr />
@@ -566,7 +489,6 @@
                     <h3 class="detailSection @color">Columns</h3>
                 </div>
                 <div class="section-content collapsed" id="hide_detailSectionHeader_Columns">
-
                     <div class="table-wrapper">
                         <table class="table table-bordered table-striped schema-table">
                             <thead>
@@ -634,7 +556,7 @@
 
     <hr id="schemaHR" />
 
-    <div data-bind="visible: IsShownForCurrentType('Dataset') && DataLoading() == true && DataTableExists() == true" style="display: none;">
+    <div data-bind="visible: DataLoading() == true && DataTableExists() == true" style="display: none;">
         <div class="row">
             <div class="col-lg-12">
                 <div>
@@ -652,7 +574,7 @@
             </div>
         </div>
     </div>
-    <div id="dataSection" data-bind="visible: IsShownForCurrentType('Dataset') && DataLoading() == false  && DataTableExists() == true" style="display: none;">
+    <div id="dataSection" data-bind="visible: DataLoading() == false  && DataTableExists() == true" style="display: none;">
         <div class="row">
             <div class="col-lg-12">
                 <div>
@@ -670,20 +592,18 @@
                     <tbody></tbody>
                 </table>
             </div>
-
             <hr />
         </div>
     </div>
 
     <div class="row">
         <div class="col-lg-12">
-            <div data-bind="visible: IsShownForCurrentType('Dataset') && ShowDataFileTable() == true" style="display: none;">
+            <div data-bind="visible: ShowDataFileTable() == true" style="display: none;">
                 <div>
                     <h3 class="@color">Data Files</h3>
                 </div>
                 <div id="hide_detailSectionHeader_DataFiles">
-
-                    @if (((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive)) && Model.DatasetFiles.Count >= 2)
+                    @if (((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive)) && Model.DatasetFileCount >= 2)
                     {
                         <div id="userToolbar">
                             <button id="bundle_selected" type="button" class="btn btn-link" title="Bundle Selected Files">
@@ -696,8 +616,6 @@
                             </button>
                         </div>
                     }
-
-
                     <table class="table table-striped table-bordered @color" id="datasetFilesTable">
                         <thead>
                             <tr class="filter-row">
@@ -718,23 +636,14 @@
                                 <th>Modified Date</th>
                                 <th>Schema</th>
                             </tr>
-
                         </thead>
-                        @*<tfoot>
-                                <tr>
-                                    <td></td>
-                                    <td></td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>*@
                         <tbody></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-
-        <div data-bind="visible: IsShownForCurrentType('Dataset')" style="display: none;">
+        <div>
             <div id="detailSectionHeader_BundledFiles" style="display: none;" class="leftSectionHeaderDiv">
                 <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_BundledFiles"></span>
                 <h2 class="detailSection @color">Bundled Files</h2>
@@ -760,74 +669,28 @@
                             <th>Modified Date</th>
                             <th>Config File Name</th>
                         </tr>
-
                     </thead>
-                    @*<tfoot>
-                            <tr>
-                                <td></td>
-                                <td></td>
-                                <td></td>
-                            </tr>
-                        </tfoot>*@
                     <tbody></tbody>
                 </table>
             </div>
         </div>
     </div>
 
-    <div style="height: 150px;">
-
-    </div>
 </div>
-
-<style>
-    .dataset-operation-button{
-        margin-left:0px;
-    }
-    .schema-table {
-        margin-top: 1em;
-    }
-
-    .column-name {
-        width: auto;
-        font-weight: 600;
-        word-break: break-all;
-    }
-
-    .mini-sentry-spinner-container {
-        margin-left: -295px;
-        margin-top: -9px;
-        border-top: none !important;
-    }
-
-    .leftSectionHeaderDiv {
-        margin-left: -15px;
-    }
-
-    .pagination > .active > a {
-        background-color: #74531C !important;
-        border-color: #74531C !important;
-    }
-
-    .spanContainer {
-        font-size: 0;
-    }
-
-        .spanContainer span {
-            font-size: 14px;
-        }
-</style>
 
 @section Scripts {
     @Scripts.Render("~/bundles/prettyCron")
     @Scripts.Render("~/bundles/dataTables")
 
     <script>
-        //var Id = $('#datasetConfigList').val();
+
+        $(function () {
+            data.Dataset.DetailInit();
+        });
+
         var table;
 
         function renderTable(input, push) {
-
             var filters = input.split("\n");
 
             if (filters[0].startsWith("+-")) {
@@ -835,7 +698,6 @@
                 if (table) {
                     table.destroy();
                 }
-
                 //Column information
                 var columns = filters[1].split('|');
                 var parsedColumns = [];
@@ -855,12 +717,10 @@
                 }
 
                 var parsedRows = [];
-
                 //Data for Each Row in the Result Set
                 for (var i = 3; i < filters.length; i++) {
 
                     if (!filters[i].startsWith("+-")) {
-
 
                         var cells = filters[i].split('|');
                         var parsedCells = [];
@@ -887,119 +747,9 @@
                     $($('#datasetRowTable_info').children()[2]).text($('#rowCount').text());
                 }
 
-
                 $(".dataTables_filter").parent().addClass("text-right");
             }
         }
-
-        function getDetailType() {
-            return window.location.pathname.split("/")[1];
-        }
-
-        $(function () {
-
-            var returnUrl;
-            var returnLink;
-
-            if (getDetailType() == "Dataset") {
-                data.DatasetDetail.Init();
-                returnUrl = "/Search/Datasets";
-                returnLink = $('#linkReturnToDatasetList');
-            }
-            else if (getDetailType() == "BusinessIntelligence") {
-                data.BusinessIntelligenceDetail.Init();
-                returnUrl = "/Search/BusinessIntelligence";
-                returnLink = $('#linkReturnToBusinessIntelligenceList');
-            }
-
-            $('#datasetConfigList').select2({ width: '85%' });
-            
-
-            if (localStorage.getItem("searchText") !== null) {
-                var text = localStorage.getItem("searchText");
-                returnUrl += "?searchPhrase=" + text;
-
-                if (localStorage.getItem("filteredIds") !== null) {
-                    var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
-                    returnUrl += "&ids=";
-
-                    for (i = 0; i < storedNames.length; i++) {
-                        returnUrl += storedNames[i] + ',';
-                    }
-                    returnUrl = returnUrl.replace(/,\s*$/, "");
-                }
-            }
-            else if (localStorage.getItem("filteredIds") !== null) {
-                var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
-                returnUrl += "?ids=";
-
-                for (i = 0; i < storedNames.length; i++) {
-                    returnUrl += storedNames[i] + ',';
-                }
-                returnUrl = returnUrl.replace(/,\s*$/, "");
-            }
-
-            returnLink.attr('href', returnUrl);
-
-            $('body').on('click', '.on-demand-run', function () {
-                var request = $.ajax({
-                    url: "/Dataset/RunRetrieverJob/?id=" + $(this).attr('id'),
-                    method: "POST",
-                    dataType: 'json',
-                    success: function (obj) {
-                        var modal = Sentry.ShowModalConfirmation(
-                            obj.Message, function () { })
-                    },
-                    failure: function (obj) {
-                        var modal = Sentry.ShowModalAlert(
-                            obj.Message, function () { })
-                    },
-                    error: function (obj) {
-                        var modal = Sentry.ShowModalAlert(
-                            obj.Message, function () { })
-                    }
-                });
-
-            });
-
-            $(document).on("click", "[id^='btnFavorite']", function (e) {
-                e.preventDefault();
-
-                var button = $(this);
-                var id = button.attr("data");
-                var icon = button.children();
-
-                if (icon.hasClass("glyphicon-star")) {
-
-                    $.ajax({
-                        url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent(id),
-                        method: "GET",
-                        dataType: 'json',
-                        success: function () {
-                        },
-                        error: function () {
-                            Sentry.ShowModalAlert("Failed to remove favorite.");
-                        }
-                    });
-                }
-                else if (icon.hasClass("glyphicon-star-empty")) {
-
-                    $.ajax({
-                        url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent(id),
-                        method: "GET",
-                        dataType: 'json',
-                        success: function () {
-                        },
-                        error: function () {
-                            Sentry.ShowModalAlert("Failed to set favorite.");
-                        }
-                    });
-                }
-
-                icon.toggleClass("glyphicon-star glyphicon-star-empty");
-
-            });
-        });
 
         var getUrlParameter = function getUrlParameter(sParam) {
             var sPageURL = decodeURIComponent(window.location.search.substring(1)),
@@ -1038,14 +788,10 @@
             self.NoColumnsReturned = ko.observable();
             self.DataLoading = ko.observable(false);
             self.DataTableExists = ko.observable(false);
-
             self.RowCount = ko.observableArray();
             self.SchemaRows = ko.observableArray();
-
             self.DataLastUpdated = ko.observable();
-
             self.Description = ko.observable();
-
             self.LessDescription = ko.computed(function () {
                 if (self.Description() != null && self.Description().length > 300) {
 
@@ -1074,30 +820,17 @@
             self.DFSDropLocation = ko.observable();
             self.S3DropLocation = ko.observable();
             self.OtherJobs = ko.observableArray();
-
             self.DFSCronJob = ko.observable();
             self.S3CronJob = ko.observable();
             self.CronJobs = ko.observableArray();
-
             self.Views = ko.observable();
             self.Downloads = ko.observable();
-
-            self.IsShownForCurrentType = function (what) {
-                return what === getDetailType();
-            };
-
-            self.ObjectType = ko.computed(function () {
-                return getDetailType();
-            })
-
             self.ShowDataFileTable = ko.computed(function () {
                 if (self.DataLastUpdated() === 'No Data Files Exist') {
                     return false;
-                }
-                else {
+                }else {
                     return true;
                 }
-
             });
 
             self.FooterRow = ko.computed(function () {
@@ -1130,7 +863,6 @@
             });
 
             self.AnyLastUpdated = ko.computed(function () {
-
                 var d1 = Date.parse(self.DataLastUpdated());
                 var d2 = Date.parse(self.MetadataLastDT());
 
@@ -1138,7 +870,6 @@
 
                     var d1 = new Date(d1);
                     var d2 = new Date(d2);
-
                     $('#updatedSpinner').hide();
                     if (d1 > d2) {
                         return d1.toLocaleString("en-us", { month: "long" }) + ' ' + d1.getDate() + ', ' + d1.getFullYear();
@@ -1160,7 +891,6 @@
                     $('#updatedSpinner').hide();
                     return $('#datasetInfoLastUpdated').text();
                 }
-
             });
 
             $('#datasetConfigList').on('select2:select', function (e) {
@@ -1189,14 +919,14 @@
 
             $('#panelSpinner').show();
             UpdateColumnSchema();
-            
+
 
             function UpdateMetadata() {
                 if (!isNaN(getUrlParameter('configID'))) {
                     $('#datasetConfigList').val(getUrlParameter('configID')).trigger('change');
                 }
 
-                var metadataURL = "/api/Metadata/GetBasicMetadataInformationFor?DatasetConfigID=" + $('#datasetConfigList').val();
+                var metadataURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val();
                 $.get(metadataURL, function (result) {
                     self.Downloads(result.Downloads);
                     self.Views(result.Views);
@@ -1210,9 +940,7 @@
                     });
                     self.OtherJobs.notifySubscribers();
 
-
                     var d = new Date(result.DataLastUpdated);
-
                     if (d < new Date('1990-01-01')) {
                         self.DataLastUpdated('No Data Files Exist');
                     } else {
@@ -1224,18 +952,19 @@
             }
 
             function UpdateColumnSchema() {
-                var schemaURL = "/api/Metadata/GetColumnSchemaInformationFor?DatasetConfigID=" + $('#datasetConfigList').val();
-                var hiveTableURL = "/api/Metadata/GetPrimaryHiveTableFor?DatasetConfigID=" + $('#datasetConfigList').val();
+                var schemaURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val() + "/schemas/0/columns";
+                var hiveTableURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val() + "/schemas/0/hive";
                 self.DataLoading(true);
                 $('#dataSection').hide();
 
                 $.get(hiveTableURL, function (result) {
                     $.ajax({
                         type: "GET",
-                        url: "/api/QueryTool/GetPrimarySessionID",
+                        url: "/api/v1/queryTool/sessions/primary",
                         dataType: "json",
                         success: function (msg) {
-                            $.get("/api/QueryTool/GetHiveTable?SessionID=" + msg.id + "&configID=" + $('#datasetConfigList').val() + "&rows=20&skip=0&hiveTableName=" + result.HiveTableName + "&hiveDatabaseName=" + result.HiveDatabaseName, function (result2) {
+                            var getHiveTableUrl = "/api/v1/queryTool/sessions/" + msg.id + "/hives/" + result.HiveDatabaseName + "/" + result.HiveTableName + "/" + $('#datasetConfigList').val() + "/20/0";
+                            $.get(getHiveTableUrl, function (result2) {
                                 $('#dataSection').hide();
                                 console.log('found a table');
 
@@ -1271,13 +1000,12 @@
                     self.DataLoading.notifySubscribers();
                 });
 
-
                 $.get(schemaURL, function (result) {
                     if (result.RowCount) {
                         self.RowCount(result.RowCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
                     } else {
                         self.RowCount(0);
-                    }             
+                    }
 
                     if (result.rows.length == 0) {
                         self.NoColumnsReturned(true);
@@ -1294,10 +1022,10 @@
 
                             self.SchemaRows().push(item);
                         });
-                        self.SchemaRows.notifySubscribers();                        
+                        self.SchemaRows.notifySubscribers();
                     }
                     $('#panelSpinner').hide();
-                    
+
                 }).fail(function () {
                     self.RowCount(0);
                     self.SchemaRows([]);

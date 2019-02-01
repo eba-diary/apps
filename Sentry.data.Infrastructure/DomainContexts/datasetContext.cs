@@ -43,11 +43,12 @@ namespace Sentry.data.Infrastructure
         }
     }
 
-    public class datasetContext : NHWritableDomainContext, IDatasetContext
+    
+    public class DatasetContext : NHWritableDomainContext, IDatasetContext
     {
-        public datasetContext(ISession session) : base(session)
+        public DatasetContext(ISession session) : base(session)
         {
-            NHQueryableExtensionProvider.RegisterQueryableExtensionsProvider<datasetContext>();
+            NHQueryableExtensionProvider.RegisterQueryableExtensionsProvider<DatasetContext>();
         }
 
 
@@ -55,7 +56,6 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                //TODO: Revisit for solution to filter based on user (i.e. Admins can see all eventtypes)
                 return Query<EventType>().Cacheable();
             }
         }
@@ -64,7 +64,6 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                //TODO: Revisit for solution to filter based on user (i.e. Admins can see all eventtypes)
                 return Query<DataSourceType>().Cacheable();
             }
         }
@@ -73,8 +72,15 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                //TODO: Revisit for solution to filter based on user (i.e. Admins can see all eventtypes)
                 return Query<DataSource>().Cacheable();
+            }
+        }
+
+        public IQueryable<DatasetScopeType> DatasetScopeTypes
+        {
+            get
+            {
+                return Query<DatasetScopeType>().Cacheable();
             }
         }
 
@@ -82,7 +88,6 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                //TODO: Revisit for solution to filter based on user (i.e. Admins can see all eventtypes)
                 IQueryable<AuthenticationType> qresult = Query<AuthenticationType>();
                 return qresult;
             }
@@ -108,7 +113,7 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                return Query<Dataset>().Where(x => x.CanDisplay).Cacheable();
+                return Query<Dataset>().Where(x => x.CanDisplay);
             }
         }
 
@@ -144,11 +149,19 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public IQueryable<Schema> Schemas
+        public IQueryable<BusinessUnit> BusinessUnits
         {
             get
             {
-                return Query<Schema>();  //QueryCacheRegion.MediumTerm
+                return Query<BusinessUnit>().Cacheable();
+            }
+        }
+
+        public IQueryable<DatasetFunction> DatasetFunctions
+        {
+            get
+            {
+                return Query<DatasetFunction>().Cacheable();
             }
         }
 
@@ -210,7 +223,7 @@ namespace Sentry.data.Infrastructure
 
         public IEnumerable<Dataset> GetDatasetByCategoryID(int id)
         {
-            return Query<Dataset>().Where(w => w.DatasetCategory.Id == id).Where(x => x.CanDisplay).AsEnumerable();
+            return Query<Dataset>().Where(w => w.DatasetCategories.Any(y=> y.Id == id)).Where(x => x.CanDisplay).AsEnumerable();
         }
 
         public Category GetCategoryById(int id)
@@ -222,12 +235,7 @@ namespace Sentry.data.Infrastructure
         public int GetDatasetCount()
         {
 
-            return Query<Dataset>().Count(x => x.CanDisplay && x.DatasetType == null);
-        }
-
-        public IEnumerable<Dataset> GetExhibits()
-        {
-            return Query<Dataset>().Where(x => x.DatasetType == "RPT").Cacheable().AsEnumerable();
+            return Query<Dataset>().Count(x => x.CanDisplay && x.DatasetType == GlobalConstants.DataEntityTypes.DATASET);
         }
 
         public Dataset GetById(int id)
@@ -238,7 +246,7 @@ namespace Sentry.data.Infrastructure
 
         public Boolean isDatasetNameDuplicate(string datasetName, string category)
         {
-            if (Query<Dataset>().Where(x => x.DatasetName == datasetName && x.Category == category).Count() == 0)
+            if (Query<Dataset>().Where(x => x.DatasetName == datasetName && x.DatasetCategories.Any(y=> y.Name == category)).Count() == 0)
             {
                 return false;
             }
@@ -445,6 +453,21 @@ namespace Sentry.data.Infrastructure
             return Query<Event>().Cacheable().Where(e => e.TimeCreated >= time && e.IsProcessed == IsProcessed && e.EventType.Display).ToList();
         }
 
+        public int GetReportCount()
+        {
+            return Query<Dataset>().Where(x => x.DatasetType == GlobalConstants.DataEntityTypes.REPORT).Cacheable().Count();
+        }
+
+        public Favorite GetFavorite(int favoriteId)
+        {
+            return Query<Favorite>().Single(x => x.FavoriteId == favoriteId);
+        }
+
+        public List<Favorite> GetFavorites(List<int> favoriteIds)
+        {
+            return Query<Favorite>().Where(x => favoriteIds.Contains(x.FavoriteId)).ToList();
+        }
+
         /// <summary>
         /// Generates unique value for storage location
         /// </summary>
@@ -468,7 +491,6 @@ namespace Sentry.data.Infrastructure
         private int ExecuteQuery(string sqlConnStr, string sqlQueryStr)
         {
             SqlConnection sqlConn = null;
-            List<DataAssetHealth> healthList = new List<DataAssetHealth>();
             try
             {
                 sqlConn = new SqlConnection(sqlConnStr);
@@ -485,7 +507,6 @@ namespace Sentry.data.Infrastructure
             }
             catch (Exception ex)
             {
-                // TODO: log the exception... for now it's being eaten...
                 Sentry.Common.Logging.Logger.Error("Unable to execute query (" + sqlQueryStr + ") against (" + sqlConnStr + ")", ex);
                 throw;
             }

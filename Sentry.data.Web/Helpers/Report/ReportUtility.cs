@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
 using Sentry.data.Core;
-using System.Text;
 using System.Web.Mvc;
 using static Sentry.data.Core.RetrieverJobOptions;
 
@@ -75,19 +73,69 @@ namespace Sentry.data.Web.Helpers
 
             return result;
         }
-        public static BaseDatasetModel setupLists(IReportContext _reportContext, BaseDatasetModel model)
-        {
-            var temp = GetCategoryList(_reportContext).ToList();
 
-            temp.Add(new SelectListItem()
+        
+        [Obsolete("The function is fine but I wanted that this should not use the domain context and these should all be Enums")]
+        public static void SetupLists(IDatasetContext _datasetContext, BaseEntityModel model)
+        {
+            var temp = GetCategoryList(_datasetContext).ToList();
+
+            if(model.DatasetCategoryIds?.Count > 0)
             {
-                Text = "Pick a Category",
-                Value = "0",
-                Selected = true,
-                Disabled = true
-            });
+                foreach (var cat in model.DatasetCategoryIds)
+                {
+                   foreach(var t in temp)
+                    {
+                        if(t.Value == cat.ToString())
+                        {
+                            t.Selected = true;
+                        }
+                    }
+                }
+            }
 
             model.AllCategories = temp.OrderBy(x => x.Value);
+
+
+            //Business Units
+            temp = GetBusinessUnits(_datasetContext).ToList();
+
+            if (model.DatasetBusinessUnitIds?.Count > 0)
+            {
+                foreach (var bu in model.DatasetBusinessUnitIds)
+                {
+                    foreach(var t in temp)
+                    {
+                        if(t.Value == bu.ToString())
+                        {
+                            t.Selected = true;
+                        }
+                    }
+                }
+            }
+
+            model.AllBusinessUnits = temp;
+
+
+            //Functions
+            temp = GetDatasetFunctions(_datasetContext).ToList();
+
+            if (model.DatasetFunctionIds?.Count > 0)
+            {
+                foreach (var id in model.DatasetFunctionIds)
+                {
+                    foreach (var t in temp)
+                    {
+                        if (t.Value == id.ToString())
+                        {
+                            t.Selected = true;
+                        }
+                    }
+                }
+            }
+
+            model.AllDatasetFunctions = temp;
+
 
             //Business Intelligence Frequency
             temp = GetDatasetFrequencyListItems().ToList();
@@ -101,16 +149,33 @@ namespace Sentry.data.Web.Helpers
             });
 
             model.AllFrequencies = temp.OrderBy(x => x.Value);
-            model.AllDataFileTypes = Enum.GetValues(typeof(ReportType)).Cast<ReportType>().Select(v
-                => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
 
-            return model;
+            model.AllDataFileTypes = default(ReportType).ToEnumSelectList(((BusinessIntelligenceModel)model).FileTypeId.ToString());
+            
+            //model.AllDataFileTypes = Enum.GetValues(typeof(ReportType)).Cast<ReportType>().Select(v
+            //    => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+
         }
-        public static IEnumerable<SelectListItem> GetCategoryList(IReportContext _reportContext)
+        public static IEnumerable<SelectListItem> GetCategoryList(IDatasetContext _datasetContext)
         {
-            IEnumerable<SelectListItem> var = _reportContext.Categories.ToList().Select((c) => new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
+            IEnumerable<SelectListItem> var = _datasetContext.Categories.Where(x=> x.ObjectType == GlobalConstants.DataEntityTypes.REPORT).
+                                                                                            Select((c) => new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
 
             return var;
+        }
+        public static IEnumerable<SelectListItem> GetBusinessUnits(IDatasetContext dsContext)
+        {
+            return dsContext.BusinessUnits.
+                OrderBy(o => o.Sequence).
+                ThenBy(t => t.Name).
+                Select((x) => new SelectListItem { Text = x.Name, Value = x.Id.ToString() });
+        }
+        public static IEnumerable<SelectListItem> GetDatasetFunctions(IDatasetContext dsContext)
+        {
+            return dsContext.DatasetFunctions.
+                OrderBy(o => o.Sequence).
+                ThenBy(t => t.Name).
+                Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() });
         }
         public static IEnumerable<Dataset> GetDatasetByCategoryId(IDatasetContext _datasetContext, int id)
         {
@@ -137,6 +202,9 @@ namespace Sentry.data.Web.Helpers
             }
             return items;
         }
+
+        
+
         public static IEnumerable<SelectListItem> GetDatasetOriginationListItems()
         {
             List<SelectListItem> items = Enum.GetValues(typeof(DatasetOriginationCode)).Cast<DatasetOriginationCode>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
@@ -173,7 +241,7 @@ namespace Sentry.data.Web.Helpers
                 dFileExtensions = _datasetContext.FileExtensions
                     .Select((c) => new SelectListItem
                     {
-                        Selected = c.Name.Contains("ANY") ? true : false,
+                        Selected = c.Name.Contains("ANY"),
                         Text = c.Name.Trim(),
                         Value = c.Id.ToString()
                     });
@@ -183,7 +251,7 @@ namespace Sentry.data.Web.Helpers
                 dFileExtensions = _datasetContext.FileExtensions
                     .Select((c) => new SelectListItem
                     {
-                        Selected = c.Id == id ? true : false,
+                        Selected = c.Id == id,
                         Text = c.Name.Trim(),
                         Value = c.Id.ToString()
                     });

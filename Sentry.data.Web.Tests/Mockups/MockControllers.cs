@@ -66,6 +66,10 @@ namespace Sentry.data.Web.Tests
             var mockUserService = MockRepository.GenerateStub<UserService>(mockDataAssetContext, mockExtendedUserInfoProvider, mockCurrentUserIdProvider);
             var mockSharedContextModel = MockRepository.GenerateStub<SharedContextModel>();
 
+            var mockDatasetService = MockRepository.GenerateStub<IDatasetService>();
+            
+            var mockEventService = MockRepository.GenerateStub<IEventService>();
+
             mockSharedContextModel.CurrentUser = user;
             mockUserService.Stub(x => x.GetCurrentUser()).Return(user != null ? user : MockUsers.App_DataMgmt_Admin_User());
 
@@ -82,11 +86,11 @@ namespace Sentry.data.Web.Tests
                 mockDatasetContext.Stub(x => x.IsUserSubscribedToDataset(ds.SentryOwnerName, ds.DatasetId)).Return(true);
                 mockDatasetContext.Stub(x => x.GetAllUserSubscriptionsForDataset(user.AssociateId, ds.DatasetId)).Return(datasetSubscriptions == null ? new List<DatasetSubscription>() : datasetSubscriptions);
 
-                if (ds.DatasetFileConfigs.Any())
-                {
-                    mockDatasetContext.Stub(x => x.Schemas).Return(MockClasses.MockSchemas(ds.DatasetFileConfigs[0]).AsQueryable());
-                    mockDatasetContext.Stub(x => x.Merge<DatasetFileConfig>(ds.DatasetFileConfigs[0])).Return(ds.DatasetFileConfigs[0]);
-                }
+                //if (ds.DatasetFileConfigs.Any())
+                //{
+                //    mockDatasetContext.Stub(x => x.Schemas).Return(MockClasses.MockSchemas(ds.DatasetFileConfigs[0]).AsQueryable());
+                //    mockDatasetContext.Stub(x => x.Merge<DatasetFileConfig>(ds.DatasetFileConfigs[0])).Return(ds.DatasetFileConfigs[0]);
+                //}
             }
 
             mockDatasetContext.Stub(x => x.Merge<Dataset>(ds)).Return(ds);
@@ -100,12 +104,12 @@ namespace Sentry.data.Web.Tests
             mockDatasetContext.Stub(x => x.Categories).Return(MockClasses.MockCategories().AsQueryable());
             mockDatasetContext.Stub(x => x.GetCategoryById(0)).Return(MockClasses.MockCategories()[0]);
             mockDatasetContext.Stub(x => x.GetAllDatasetScopeTypes()).Return(MockClasses.MockScopeTypes());
-            mockDatasetContext.Stub(x => x.isDatasetNameDuplicate(ds.DatasetName, ds.Category)).Return(false);
+            mockDatasetContext.Stub(x => x.isDatasetNameDuplicate(ds.DatasetName, ds.DatasetCategories.First().Name)).Return(false);
             mockDatasetContext.Stub(x => x.GetNextStorageCDE()).Return(r.Next(0, 1000000));
 
             mockUserService.Stub(x => x.GetCurrentUser()).Return(user);
 
-            var dsc = new DatasetController(mockDatasetContext, mockS3Provider, mockUserService, mockSasProvider, mockAssociateService, mockRequestService);
+            var dsc = new DatasetController(mockDatasetContext, mockS3Provider, mockUserService, mockSasProvider, mockAssociateService, mockRequestService, mockDatasetService, mockEventService);
             dsc.SharedContext = mockSharedContextModel;
 
             return dsc;
@@ -121,6 +125,8 @@ namespace Sentry.data.Web.Tests
 
             var mockS3Provider = MockRepository.GenerateStub<S3ServiceProvider>();
             var mockSasProvider = MockRepository.GenerateStub<ISASService>();
+            var mockConfigService = MockRepository.GenerateStub<IConfigService>();
+            var mockEvensService = MockRepository.GenerateStub<IEventService>();
 
             var mockUserService = MockRepository.GenerateStub<UserService>(mockDataAssetContext, mockExtendedUserInfoProvider, mockCurrentUserIdProvider);
             var mockSharedContextModel = MockRepository.GenerateStub<SharedContextModel>();
@@ -147,11 +153,11 @@ namespace Sentry.data.Web.Tests
             mockDatasetContext.Stub(x => x.EventTypes).Return(MockClasses.MockEventTypes().AsQueryable());
             mockDatasetContext.Stub(x => x.EventStatus).Return(MockClasses.MockEventStatuses().AsQueryable());
             mockDatasetContext.Stub(x => x.FileExtensions).Return(MockClasses.MockFileExtensions().AsQueryable());
-            mockDatasetContext.Stub(x => x.Schemas).Return(MockClasses.MockSchemas(dfc).AsQueryable());
+            //mockDatasetContext.Stub(x => x.Schemas).Return(MockClasses.MockSchemas(dfc).AsQueryable());
 
             mockUserService.Stub(x => x.GetCurrentUser()).Return(user != null ? user : MockUsers.App_DataMgmt_Admin_User());
 
-            var cc = new ConfigController(mockDatasetContext, mockS3Provider, mockUserService, mockSasProvider, mockAssociateService);
+            var cc = new ConfigController(mockDatasetContext, mockS3Provider, mockUserService, mockSasProvider, mockAssociateService, mockConfigService, mockEvensService);
             cc.SharedContext = mockSharedContextModel;
 
             return cc;

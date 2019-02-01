@@ -1,0 +1,47 @@
+﻿.dataset-operation-button {
+    margin-left: 0px;
+}
+
+.schema-table {
+    margin-top: 1em;
+}
+
+.column-name {
+    width: auto;
+    font-weight: 600;
+    word-break: break-all;
+}
+
+.mini-sentry-spinner-container {
+    margin-left: -295px;
+    margin-top: -9px;
+    border-top: none !important;
+}
+
+.leftSectionHeaderDiv {
+    margin-left: -15px;
+}
+
+#DatasetItemList .pagination {
+    font-feature-settings: "lnum";
+}
+
+    #DatasetItemList .pagination > .active > a {
+        background-color: #00a3e0 !important;
+    }
+
+.spanContainer {
+    font-size: 0;
+}
+
+    .spanContainer span {
+        font-size: 14px;
+    }
+
+.detailNameLink {
+    cursor: pointer;
+    text-decoration: underline;
+}
+.detailNameLink:hover {
+    opacity: 0.7;
+}

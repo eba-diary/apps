@@ -15,7 +15,7 @@ function UpdateLivyURL() {
 function CreateSession(careAboutInterval) {
     $.ajax({
         type: "POST",
-        url: "/api/QueryTool/CreateSession?Language=" + $('#LanguageDropDown').val() + "&lc=null",
+        url: "/api/v1/queryTool/sessions/" + $('#LanguageDropDown').val(),
         dataType: "json",
         success: function (msg) {
             json = JSON.parse(msg);
@@ -47,7 +47,7 @@ function CheckSession() {
 
     $.ajax({
         type: "GET",
-        url: "/api/QueryTool/GetSession?SessionID=" + sessionID,
+        url: "/api/v1/queryTool/sessions/" + sessionID,
         dataType: "json",
         success: function (msg) {
             json = JSON.parse(msg);

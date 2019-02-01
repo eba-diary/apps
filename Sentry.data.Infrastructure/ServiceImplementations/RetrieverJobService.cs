@@ -708,11 +708,11 @@ namespace Sentry.data.Infrastructure
                     using (var client = new HttpClient(handler))
                     {
 
-                        var tasks = _datasetContext.JobHistory.Where(w => w.Active).ToList().Select(s => client.GetAsync($"{Configuration.Config.GetHostSetting("WebApiUrl")}/api/Job/GetBatchState?jobId={s.JobId.Id}&batchId={s.BatchId}"));
+                        var tasks = _datasetContext.JobHistory.Where(w => w.Active).ToList().Select(s => client.GetAsync($"{Configuration.Config.GetHostSetting("WebApiUrl")}/api/v1/jobs/{s.JobId.Id}/batches/{s.BatchId}"));
 
                         var results = await Task.WhenAll(tasks);
 
-                        //HttpResponseMessage response = await client.GetAsync($"{Configuration.Config.GetHostSetting("WebApiUrl")}/api/Job/GetBatchState?jobId={job.JobId.Id}&batchId={job.BatchId}");
+                        //HttpResponseMessage response = await client.GetAsync($"{Configuration.Config.GetHostSetting("WebApiUrl")}/api/v1/jobs/{job.JobId.Id}/batches/{job.BatchId}");
 
                         //if (!response.IsSuccessStatusCode)
                         //{
@@ -865,12 +865,12 @@ namespace Sentry.data.Infrastructure
             {
                 IRequestContext _requestContext = Container.GetInstance<IRequestContext>();
                 
-                basicJob = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).ThenFetch(d => d.ParentDataset).ThenFetch(c => c.DatasetCategory).Fetch(f => f.DataSource).FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is S3Basic);
+                basicJob = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).ThenFetch(d => d.ParentDataset).Fetch(f => f.DataSource).FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is S3Basic);
                 
                 if (basicJob == null)
                 {
                     _job.JobLoggerMessage("Info", "No S3Basic job found for Schema... Finding DfsBasic job");
-                    basicJob = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).ThenFetch(d => d.ParentDataset).ThenFetch(c => c.DatasetCategory).Fetch(f => f.DataSource).FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is DfsBasic);
+                    basicJob = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).ThenFetch(d => d.ParentDataset).Fetch(f => f.DataSource).FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is DfsBasic);
 
                     if (basicJob == null)
                     {
