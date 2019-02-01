@@ -14,7 +14,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             this.Id(x => x.Id, m =>
             {
-                m.Column("Id");
+                m.Column("BusinessUnit_Id");
                 m.Generator(Generators.Identity);
             });
 
