@@ -94,8 +94,48 @@ namespace Sentry.data.Web.Helpers
                 }
             }
 
-
             model.AllCategories = temp.OrderBy(x => x.Value);
+
+
+            //Business Units
+            temp = GetBusinessUnits(_datasetContext).ToList();
+
+            if (model.DatasetBusinessUnitIds?.Count > 0)
+            {
+                foreach (var bu in model.DatasetBusinessUnitIds)
+                {
+                    foreach(var t in temp)
+                    {
+                        if(t.Value == bu.ToString())
+                        {
+                            t.Selected = true;
+                        }
+                    }
+                }
+            }
+
+            model.AllBusinessUnits = temp;
+
+
+            //Functions
+            temp = GetDatasetFunctions(_datasetContext).ToList();
+
+            if (model.DatasetFunctionIds?.Count > 0)
+            {
+                foreach (var id in model.DatasetFunctionIds)
+                {
+                    foreach (var t in temp)
+                    {
+                        if (t.Value == id.ToString())
+                        {
+                            t.Selected = true;
+                        }
+                    }
+                }
+            }
+
+            model.AllDatasetFunctions = temp;
+
 
             //Business Intelligence Frequency
             temp = GetDatasetFrequencyListItems().ToList();
@@ -110,10 +150,10 @@ namespace Sentry.data.Web.Helpers
 
             model.AllFrequencies = temp.OrderBy(x => x.Value);
 
-
-
-            model.AllDataFileTypes = Enum.GetValues(typeof(ReportType)).Cast<ReportType>().Select(v
-                => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+            model.AllDataFileTypes = default(ReportType).ToEnumSelectList(((BusinessIntelligenceModel)model).FileTypeId.ToString());
+            
+            //model.AllDataFileTypes = Enum.GetValues(typeof(ReportType)).Cast<ReportType>().Select(v
+            //    => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
 
         }
         public static IEnumerable<SelectListItem> GetCategoryList(IDatasetContext _datasetContext)
@@ -122,6 +162,20 @@ namespace Sentry.data.Web.Helpers
                                                                                             Select((c) => new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
 
             return var;
+        }
+        public static IEnumerable<SelectListItem> GetBusinessUnits(IDatasetContext dsContext)
+        {
+            return dsContext.BusinessUnits.
+                OrderBy(o => o.Sequence).
+                ThenBy(t => t.Name).
+                Select((x) => new SelectListItem { Text = x.Name, Value = x.Id.ToString() });
+        }
+        public static IEnumerable<SelectListItem> GetDatasetFunctions(IDatasetContext dsContext)
+        {
+            return dsContext.DatasetFunctions.
+                OrderBy(o => o.Sequence).
+                ThenBy(t => t.Name).
+                Select(x => new SelectListItem { Text = x.Name, Value = x.Id.ToString() });
         }
         public static IEnumerable<Dataset> GetDatasetByCategoryId(IDatasetContext _datasetContext, int id)
         {
@@ -148,6 +202,9 @@ namespace Sentry.data.Web.Helpers
             }
             return items;
         }
+
+        
+
         public static IEnumerable<SelectListItem> GetDatasetOriginationListItems()
         {
             List<SelectListItem> items = Enum.GetValues(typeof(DatasetOriginationCode)).Cast<DatasetOriginationCode>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();

@@ -588,4 +588,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Sequence" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="6d422808-95c4-4143-970d-061acbad1eed" ChangeDateTime="01/28/2019 20:19:00">
+    <Property Name="ElementName" Value="[dbo].[DatasetBusinessUnit].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetBusinessUnit]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Dataset_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d235be63-2219-45cd-ac1a-df33bab66527" ChangeDateTime="01/30/2019 14:14:48">
+    <Property Name="ElementName" Value="[dbo].[DatasetFunction].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetFunction]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Dataset_Id" />
+  </Operation>
 </Operations>
