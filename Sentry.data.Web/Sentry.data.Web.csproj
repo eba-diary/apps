@@ -379,6 +379,7 @@
     <Compile Include="Models\Dataset\SearchModel.cs" />
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceHomeModel.cs" />
     <Compile Include="Models\Shared\CategoryModel.cs" />
+    <Compile Include="Models\Shared\SearchIndexModel.cs" />
     <Compile Include="Models\User\SharedContextModel.cs" />
     <Compile Include="Models\Shared\SuccessModel.cs" />
     <Compile Include="Models\Subscription\SubscriptionModel.cs" />
