@@ -131,15 +131,7 @@
         <div class="hidden-md hidden-lg">
             <div>
                 @* show different h1 elements for Exhibit vs. Dataset (title for Dataset should not be clickable) *@
-                <h1 class="detailName detailNameLink leftFloat @color" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')">
-                    @Model.DatasetName
-
-                    @if (Model.IsSensitive)
-                    {
-                        <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
-                    }
-                </h1>
-                <h1 class="detailName leftFloat @color" data-bind="visible: IsShownForCurrentType('Dataset')">
+                <h1 class="detailName leftFloat @color">
                     @Model.DatasetName
 
                     @if (Model.IsSensitive)
@@ -961,7 +953,7 @@
 
             function UpdateColumnSchema() {
                 var schemaURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val() + "/schemas/0/columns";
-                var hiveTableURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val() + "/schemas/0";
+                var hiveTableURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val() + "/schemas/0/hive";
                 self.DataLoading(true);
                 $('#dataSection').hide();
 
@@ -971,7 +963,7 @@
                         url: "/api/v1/queryTool/sessions/primary",
                         dataType: "json",
                         success: function (msg) {
-                            var getHiveTableUrl = "/api/v1/queryTool/sessions/sessions/" + msg.id + "/hives/" + result.HiveDatabaseName + "/" + result.HiveTableName + "/" + $('#datasetConfigList').val() + "/20/0";
+                            var getHiveTableUrl = "/api/v1/queryTool/sessions/" + msg.id + "/hives/" + result.HiveDatabaseName + "/" + result.HiveTableName + "/" + $('#datasetConfigList').val() + "/20/0";
                             $.get(getHiveTableUrl, function (result2) {
                                 $('#dataSection').hide();
                                 console.log('found a table');

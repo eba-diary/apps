@@ -268,28 +268,9 @@
                     '<span class="' + cat.split(" ").join("_").toLowerCase() + '_filter">' + cat + " : " + tag.text + '</span>'
                 );
 
-                //if you want to turn on color.
-                //$('.other_filter').parent().css('background-color', 'gold');
-                //$('.measure_group_filter').parent().css('background-color', 'gold');
-                //$('.business_group_filter').parent().css('background-color', 'gold');
-                //$('.attribute_group_filter').parent().css('background-color', 'gold');
-                //$('.report_type_filter').parent().css('background-color', 'plum');
-                //$('.category_filter').parent().css('background-color', '#00A3E0');
-
                 return $state;
             };
 
-            //$('body').on('click', ".ul-dataset-list-item", function (e) {
-            //    //console.log($(e.target).hasClass("disregardParentClick"));
-            //    //console.log($(e.target).closest("a").attr('href'));
-            //    //console.log($(e.target).closest(".ul-dataset-list-item").attr('href'));
-
-            //    if ($(e.target).hasClass("disregardParentClick") === false) {
-            //        window.location.replace($(this).closest(".ul-dataset-list-item").attr('href'));
-            //    } else {
-            //        //window.location.replace($(e.target).closest("a").attr('href'));
-            //    }
-            //});
 
             $('body').on('mouseenter', ".ul-dataset-list-item", function (e) {
                 $(this).css('background-color', $(this).css("border-color").slice(0, -1) + ', 0.1)')
@@ -348,8 +329,12 @@
 
             this.Count = ko.computed(function () {
                 var items = ko.utils.arrayFilter(window.vm.searchResults(), function (prod) {
-                    if (Title == prod.Category && Category == 'Category') {
-                        return prod;
+                    if (Category == 'Category') {
+                        for (var i = 0; i < prod.Categories.length; i++) {
+                            if (prod.Categories[i] === Title) {
+                                return prod;
+                            }
+                        }
                     }
                     else if (Title == prod.SentryOwner && Category == 'Sentry Owner') {
                         return prod;
@@ -371,6 +356,13 @@
                     else if (Category === 'Business Unit') {
                         for (var i = 0; i < prod.BusinessUnits.length; i++) {
                             if (prod.BusinessUnits[i] === Title) {
+                                return prod;
+                            }
+                        }
+                    }
+                    else if (Category === 'Function') {
+                        for (var i = 0; i < prod.DatasetFunctions.length; i++) {
+                            if (prod.DatasetFunctions[i] === Title) {
                                 return prod;
                             }
                         }
@@ -512,8 +504,10 @@
             self.BannerColor = data.BannerColor;
             self.BorderColor = data.BorderColor;
 
+            self.Categories = data.Categories;
             self.DistinctFileExtensions = data.DistinctFileExtensions;
             self.BusinessUnits = data.BusinessUnits;
+            self.DatasetFunctions = data.DatasetFunctions;
 
             self.PageViews = data.PageViews;
             self.Downloads = data.Downloads;
@@ -553,6 +547,7 @@
 
             self.CategoryFilters = ko.observableArray([]);
             self.BusinessUnitFilters = ko.observableArray([]);
+            self.DatasetFunctionFilters = ko.observableArray([]);
             self.OwnerFilters = ko.observableArray([]);
             self.ExtensionFilters = ko.observableArray([]);
             self.TagFilters = ko.observableArray([]);
@@ -690,7 +685,6 @@
             self.FilterExhibits = function (exhibits) {
                 //First grab all the selected category ID's
                 var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
                     if (feature.substring(0, 3) == '2_0') {
                         return feature;
                     }
@@ -717,10 +711,13 @@
                     exhibits = exhibits.filter(function (item) {
 
                         for (var i = 0; i < selectedCategories.length; i++) {
-                            if (item.Category == selectedCategories[i].Title) {
-                                return true;
+                            for (var j = 0; j < item.Categories.length; j++) {
+                                if (item.Categories[j] === selectedCategories[i].Title) {
+                                    return true;
+                                }
                             }
                         }
+
                         return false;
                     });
                 }
@@ -756,6 +753,46 @@
                         for (var i = 0; i < selectedBusinessUnits.length; i++) {
                             for (var j = 0; j < item.BusinessUnits.length; j++) {
                                 if (item.BusinessUnits[j] === selectedBusinessUnits[i].Title) {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        return false;
+                    });
+                }
+
+
+                // next grab any selected Dataset Functions
+                var selectedDatasetFunctionIds = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
+                    if (feature.substring(0, 3) === '2_6') {
+                        return feature;
+                    }
+                });
+
+                var selectedDatasetFunctionsList = [];
+                if (selectedDatasetFunctionIds.length > 0) {
+                    var selectedDatasetFunctions = ko.utils.arrayFilter(self.DatasetFunctionFilters(), function (feature) {
+
+                        for (var i = 0; i < selectedDatasetFunctionIds.length; i++) {
+                            if (feature.id === selectedDatasetFunctionIds[i]) {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    });
+
+                    for (var i = 0; i < selectedDatasetFunctions.length; i++) {
+                        selectedDatasetFunctionsList.push(selectedDatasetFunctions[i].Title);
+                    }
+
+                    // now apply the filter
+                    exhibits = exhibits.filter(function (item) {
+
+                        for (var i = 0; i < selectedDatasetFunctions.length; i++) {
+                            for (var j = 0; j < item.DatasetFunctions.length; j++) {
+                                if (item.DatasetFunctions[j] === selectedDatasetFunctions[i].Title) {
                                     return true;
                                 }
                             }
@@ -1073,7 +1110,7 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new FilterCategory('Category', temp, 'blue'));
+                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
                 temp = [];
 
 
@@ -1099,7 +1136,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'green'));
+                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'darkblue'));
                 temp = [];
 
 
@@ -1110,7 +1147,6 @@
                         if (!(ext in extensionLookup)) {
                             extensionLookup[ext] = 1;
                             self.ExtensionFilters.push(new Filter(pageType + '3_' + counter, ext, 'Extension'));
-                            //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
 
                             temp.push(new Filter(pageType + '3_' + counter, ext, 'Extension'));
                             counter++;
@@ -1126,35 +1162,25 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Extension', temp, 'plum'));
+                self.AllFilters.push(new FilterCategory('Extension', temp, 'darkblue'));
             };
 
             self.PopulateExhibitFilters = function (exhibits) {
                 var temp = [];
                 var pageType = '2_'
-
-                //CATEGORY FILTER
-                var param = getParameterByName('category');
-
-                for (var item, i = 0; item = exhibits[i++];) {
-                    var category = item.Category;
-
-                    if (!(category in categoryLookup)) {
-                        categoryLookup[category] = 1;
-                        self.CategoryFilters.push(new Filter(pageType + '0_' + i, category, 'Category'));
-                        //self.SearchFilters.push(new Filter('0_' + i, category, 10));
-
-                        temp.push(new Filter(pageType + '0_' + i, category, 'Category'));
-
-                        if (category == param) {
-                            self.SelectedFilters.push(pageType + '0_' + i);
-                        }
-
-                    }
-                }
-
                 var item;
 
+                //CATEGORY FILTER
+                for (var item, i = 0; item = exhibits[i++];) {
+                    for (var cat, j = 0; cat = item.Categories[j++];) {
+                        if (!(cat in categoryLookup)) {
+                            categoryLookup[cat] = 1;
+                            self.CategoryFilters.push(new Filter(pageType + '0_' + i, cat, 'Category'));
+
+                            temp.push(new Filter(pageType + '0_' + i, cat, 'Category'));
+                        }
+                    }
+                }
                 ko.utils.arrayForEach(self.AllFilters(), function (v) {
                     if (v.Name == 'Category') {
                         item = v;
@@ -1164,9 +1190,9 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-
-                self.AllFilters.push(new FilterCategory('Category', temp, 'blue'));
+                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
                 temp = [];
+
 
                 //BUSINESS UNIT FILTER
                 counter = 0; //reset counter
@@ -1190,7 +1216,33 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'orange'));
+                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'darkblue'));
+                temp = [];
+
+
+                //DATASET FUNCTION FILTER
+                counter = 0; //reset counter
+                for (var item, i = 0; item = exhibits[i++];) {
+                    for (var fn, j = 0; fn = item.DatasetFunctions[j++];) {
+                        if (!(fn in datasetFunctionLookup)) {
+                            datasetFunctionLookup[fn] = 1;
+                            self.DatasetFunctionFilters.push(new Filter(pageType + '6_' + counter, fn, 'Function'));
+
+                            temp.push(new Filter(pageType + '6_' + counter, fn, 'Function'));
+                            counter++;
+                        }
+                    }
+                }
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name == 'Function') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
+                self.AllFilters.push(new FilterCategory('Function', temp, 'darkblue'));
                 temp = [];
 
 
@@ -1217,7 +1269,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Report Type', temp, 'plum'));
+                self.AllFilters.push(new FilterCategory('Report Type', temp, 'darkblue'));
                 temp = [];
 
                 //TAG FILTER
@@ -1273,7 +1325,7 @@
                         temp = item.Filters().concat(temp);
                         ko.utils.arrayRemoveItem(self.AllFilters(), item);
                     }
-                    self.AllFilters.push(new FilterCategory(group, temp, 'gold'));
+                    self.AllFilters.push(new FilterCategory(group, temp, 'darkblue'));
 
                     temp = [];
                 }
@@ -1315,7 +1367,7 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new FilterCategory('Category', temp, 'blue'));
+                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
                 temp = [];
 
 
@@ -1340,7 +1392,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'orange'));
+                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'darkblue'));
 
 
                 //SENTRYOWNER FILTER
@@ -1365,7 +1417,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'green'));
+                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'darkblue'));
                 temp = [];
 
 
@@ -1392,7 +1444,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Extension', temp, 'plum'));
+                self.AllFilters.push(new FilterCategory('Extension', temp, 'darkblue'));
 
                 //TAG FILTER
                 counter = 0; //Needs seperate counter as multiple objects can appear per iteration
@@ -1420,7 +1472,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Tag', temp, 'gold'));
+                self.AllFilters.push(new FilterCategory('Tag', temp, 'darkblue'));
                 temp = [];
             };
 
@@ -1449,6 +1501,7 @@
 
             var categoryLookup = {};
             var businessUnitLookup = {};
+            var datasetFunctionLookup = {};
             var ownerLookup = {};
             var extensionLookup = {};
             var tagLookup = {};
@@ -1473,9 +1526,6 @@
                 var mappedTasks = $.map(allData, function (item) { return new Dataset(item) });
 
                 self.datasets(self.datasets().concat(mappedTasks));
-
-                //request.send();
-                //request2.send();
 
                 self.populateFilters();
 
@@ -1600,8 +1650,8 @@
             };
         }
 
-
         $(document).ready(function () {
+
             window.vm = new ListViewModel();
             ko.applyBindings(vm);
 

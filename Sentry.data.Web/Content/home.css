@@ -1,16 +1,16 @@
 ﻿/* styles used on the DSC home page */
 
 .home-tile {
-    min-height: 240px;
+    min-height: 210px;
     padding: 15px;
     position: relative;
     border: 1px solid #f0f0f0;
+    font-size: 16px;
 }
     .home-tile a {
         font-weight: bold;
         position: absolute;
         bottom: 18px;
-        font-size: 16px;
     }
 
 .home-photo {

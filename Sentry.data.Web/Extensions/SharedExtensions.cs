@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web.Mvc;
 
 namespace Sentry.data.Web
 {
@@ -28,6 +31,26 @@ namespace Sentry.data.Web
             return models;
         }
 
+        public static IEnumerable<SelectListItem> ToEnumSelectList<TEnum>(this TEnum value, string selectedVal = null)
+        {
+            List<SelectListItem> items;
 
+            if (selectedVal == null)
+            {
+                items = Enum.GetValues(typeof(TEnum)).Cast<TEnum>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((Enum)(object)v).ToString() }).ToList();
+            }
+            else
+            {
+                items = Enum.GetValues(typeof(TEnum)).Cast<TEnum>().Select(v =>
+                   new SelectListItem
+                   {
+                       Selected = (((int)(object)v).ToString() == selectedVal),
+                       Text = v.ToString(),
+                       Value = ((int)(object)v).ToString()
+                   }).ToList();
+            }
+
+            return items;
+        }
     }
 }
