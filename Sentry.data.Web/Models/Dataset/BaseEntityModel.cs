@@ -21,8 +21,6 @@ namespace Sentry.data.Web
             this.DatasetDtm = dto.DatasetDtm;
             this.ChangedDtm = dto.ChangedDtm;
             this.DatasetCategoryIds = dto.DatasetCategoryIds;
-            this.DatasetBusinessUnitIds = dto.DatasetBusinessUnitIds;
-            this.DatasetFunctionIds = dto.DatasetFunctionIds;
             TagIds = string.Join(",", dto.TagIds);
 
             //hidden properties
@@ -70,12 +68,6 @@ namespace Sentry.data.Web
         [DisplayName("Category")]
         public List<int> DatasetCategoryIds { get; set; }
         public string TagIds { get; set; }
-        [Required]
-        [DisplayName("Business Unit")]
-        public List<int> DatasetBusinessUnitIds { get; set; }
-        [Required]
-        [DisplayName("Function")]
-        public List<int> DatasetFunctionIds { get; set; }
 
 
 

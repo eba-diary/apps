@@ -10,5 +10,7 @@ namespace Sentry.data.Core
         public int FileTypeId { get; set; }
         public int FrequencyId { get; set; }
 
+        public List<int> DatasetBusinessUnitIds { get; set; }
+        public List<int> DatasetFunctionIds { get; set; }
     }
 }
