@@ -131,6 +131,24 @@ data.Dataset = {
             }
         });
 
+        $("#FileExtensionId").change(function () {
+            $('#Delimiter').val('');
+            switch ($('#FileExtensionId option:selected').text()) {
+
+                case "CSV":
+                    $('#Delimiter').val(',');
+                    $('#Delimiter').prop('disabled', true);
+                    break;
+                case "DELIMITED":
+                    $('#Delimiter').prop('disabled', false);
+                    break;
+                default:
+                    $('#Delimiter').prop('disabled', true);
+                    break;
+                 
+            }
+        });
+
     },
 
     DetailInit: function () {
