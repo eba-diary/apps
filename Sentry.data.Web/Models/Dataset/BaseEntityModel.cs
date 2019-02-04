@@ -37,6 +37,7 @@ namespace Sentry.data.Web
             this.ObjectType = dto.ObjectType;
             this.CategoryColor = dto.CategoryColor;
             this.CategoryNames = dto.CategoryNames;
+            this.Security =dto.Security.ToModel();
         }
 
 
@@ -59,7 +60,7 @@ namespace Sentry.data.Web
         public string PrimaryOwnerName { get; set; }
         [Required]
         [DisplayName("Creation Date")]
-        [DataType(System.ComponentModel.DataAnnotations.DataType.Date)]
+        [DataType(DataType.Date)]
         public DateTime DatasetDtm { get; set; }
         [DisplayName("Last Modified")]
         public DateTime ChangedDtm { get; set; }
@@ -97,5 +98,6 @@ namespace Sentry.data.Web
         public List<string> CategoryNames { get; set; }
         public string CategoryColor { get; set; }
 
+        public UserSecurityModel Security { get; set; }
     }
 }

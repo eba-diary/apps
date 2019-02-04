@@ -76,6 +76,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<DatasetFile> DatasetFile
+        {
+            get
+            {
+                return Query<DatasetFile>();
+            }
+        }
+
         public IQueryable<DatasetScopeType> DatasetScopeTypes
         {
             get
@@ -130,6 +138,14 @@ namespace Sentry.data.Infrastructure
             get
             {
                 return Query<Security>();
+            }
+        }
+
+        public IQueryable<Permission> Permission
+        {
+            get
+            {
+                return Query<Permission>();
             }
         }
 
@@ -297,31 +313,6 @@ namespace Sentry.data.Infrastructure
                 .AsEnumerable();
 
             return list;
-        }
-
-        /// <summary>
-        /// Returns all versions of a datasetfile, including current.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public IEnumerable<DatasetFile> GetDatasetFilesVersions(int datasetId, int dataFileConfigId, string filename)
-        {
-            IEnumerable<DatasetFile> list = Query<DatasetFile>().Where(x => x.Dataset.DatasetId == datasetId && x.DatasetFileConfig.ConfigId == dataFileConfigId && x.FileName == filename).Fetch(x => x.DatasetFileConfig).AsEnumerable();
-
-            return list;
-        }
-
-        public IEnumerable<DatasetFile> GetAllDatasetFiles()
-        {
-            IEnumerable<DatasetFile> list = Query<DatasetFile>().Where(x => x.ParentDatasetFileId == null).Fetch(x => x.DatasetFileConfig).AsEnumerable();
-
-            return list;
-        }
-
-        public DatasetFile GetDatasetFile(int id)
-        {
-            DatasetFile df = Query<DatasetFile>().Where(x => x.DatasetFileId == id).Fetch(x=> x.DatasetFileConfig).FirstOrDefault();
-            return df;
         }
 
         public int GetLatestDatasetFileIdForDataset(int id)

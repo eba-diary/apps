@@ -8,20 +8,25 @@ namespace Sentry.data.Core
     {
 
         public Security() {}
-        public Security(string objectType)
+        public Security(string securableEntityName)
         {
-            ObjectType = objectType;
+            SecurableEntityName = securableEntityName;
             CreatedDate = DateTime.Now;
             EnabledDate = DateTime.Now;
         }
 
         public virtual Guid SecurityId { get; set; }
-        public virtual string ObjectType { get; set; }
+        public virtual string SecurableEntityName { get; set; }
         public virtual DateTime CreatedDate { get; set; }
         public virtual DateTime? RemovedDate { get; set; }
         public virtual DateTime EnabledDate { get; set; }
         public virtual string UpdatedById { get; set; }
-        public virtual List<SecurityTicket> HpsmTicket { get; set; }
+        public virtual string CreatedById { get; set; }
+        public virtual IList<SecurityTicket> Tickets { get; set; }
+
+
+
+
 
         public virtual ValidationResults ValidateForDelete()
         { //We should never delete this record.
@@ -40,7 +45,7 @@ namespace Sentry.data.Core
             {
                 vr.Add("EnabledDate", "The Enabled Date is required");
             }
-            if (string.IsNullOrWhiteSpace(ObjectType))
+            if (string.IsNullOrWhiteSpace(SecurableEntityName))
             {
                 vr.Add("ObjectType", "The Object Type is required");
             }

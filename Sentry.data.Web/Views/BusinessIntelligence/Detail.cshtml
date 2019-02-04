@@ -12,11 +12,6 @@
                 <div class="no-overflow">
                     <h1 class="detailName detailNameLink leftFloat @Model.CategoryColor" data-ArtifactLink="@Model.Location" data-LocationType="@Model.LocationType">
                         @Model.DatasetName
-
-                        @if (Model.IsSensitive)
-                        {
-                            <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
-                        }
                     </h1>
 
                     <div style="margin-top:-30px;" class="col-md-offset-9 col-md-4 col-lg-offset-10 col-lg-3">
@@ -36,7 +31,7 @@
                                 </button>
                             </div>
                         </div>
-                        @if (Model.CanManageReport)
+                        @if (Model.Security.CanEditReport)
                         {
                             <div class="col-md-2 col-lg-2">
                                 <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Edit Report">
@@ -53,7 +48,7 @@
                                     <span class="glyphicon glyphicon-menu-hamburger @Model.CategoryColor"></span>
                                 </button>
                                 <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
-                                    @if (Model.CanManageReport)
+                                    @if (Model.Security.CanEditReport)
                                     {
                                         <li>
                                             <a id="deleteLink" href="" data-id="@Model.DatasetId">Delete Exhibit</a>

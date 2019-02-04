@@ -61,7 +61,7 @@ namespace Sentry.data.Web.Controllers
         // GET: Search/Datasets/searchParms
         [Route("Search/{searchType?}/Index")]
         [Route("Search/{searchType?}/")]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_VIEW)]
         public ActionResult Index(string searchType, string category, string searchPhrase, string ids)
         {
             return View();

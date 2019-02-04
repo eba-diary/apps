@@ -22,15 +22,5 @@ namespace Sentry.data.Infrastructure.Properties {
                 return defaultInstance;
             }
         }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.WebServiceUrl)]
-        [global::System.Configuration.DefaultSettingValueAttribute("http://dix-q-smrapp-01.sentry.com:15098/SM/7/ws")]
-        public string Sentry_data_Infrastructure_HpsmChangeManagement_ChangeManagement {
-            get {
-                return ((string)(this["Sentry_data_Infrastructure_HpsmChangeManagement_ChangeManagement"]));
-            }
-        }
     }
 }

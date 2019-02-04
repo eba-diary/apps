@@ -9,6 +9,7 @@ using Sentry.data.Web.Filters.AuthorizationFilters;
 namespace Sentry.data.Web.Controllers
 {
     [RoutePrefix(WebConstants.Routes.VERSION_ASSET)]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.DATA_ASSET_VIEW)]
     public class AssetController : BaseWebApiController
     {
         private IDataAssetContext _dataAssetContext;
@@ -27,7 +28,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("isAlive")]
-        [WebApiAuthorizeByPermission(PermissionNames.UseAssetAPI)]
         public IHttpActionResult IsAlive()
         {            
             return Ok("Alive");
@@ -43,7 +43,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("{assetName}/users/{userName}/{message}/{severity}")]
-        [WebApiAuthorizeByPermission(PermissionNames.UseAssetAPI)]
         public IHttpActionResult CreateAlert(string message, int severity, string assetName, string userName = null)
         {
 
@@ -102,7 +101,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("expireAlerts/users/{userName}")]
-        [WebApiAuthorizeByPermission(PermissionNames.UseAssetAPI)]
         public IHttpActionResult ExpireAlertsByUser(string userName)
         {
             List<AssetNotifications> userAlerts = _dataAssetContext.GetAllAssetNotifications().Where(w => w.CreateUser == userName && w.ExpirationTime > DateTime.Now).ToList();
@@ -125,7 +123,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("{assetName}/expireAlerts")]
-        [WebApiAuthorizeByPermission(PermissionNames.UseAssetAPI)]
         public IHttpActionResult ExpireAlertsByAsset(string assetName)
         {
             DataAsset asset;

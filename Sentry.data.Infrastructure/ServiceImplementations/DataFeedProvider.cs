@@ -10,6 +10,7 @@ using NHibernate.Linq;
 using System.Threading.Tasks;
 using System.Net;
 using System.IO;
+using Sentry.Core;
 
 namespace Sentry.data.Infrastructure
 {

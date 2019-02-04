@@ -1,9 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Sentry.data.Infrastructure.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)">
   <Profiles />
-  <Settings>
-    <Setting Name="Sentry_data_Infrastructure_HpsmChangeManagement_ChangeManagement" Type="(Web Service URL)" Scope="Application">
-      <Value Profile="(Default)">http://dix-q-smrapp-01.sentry.com:15098/SM/7/ws</Value>
-    </Setting>
-  </Settings>
+  <Settings />
 </SettingsFile>

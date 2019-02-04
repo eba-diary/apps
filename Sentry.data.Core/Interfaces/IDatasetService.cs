@@ -13,5 +13,7 @@ namespace Sentry.data.Core
 
         UserSecurity GetUserSecurityForDataset(int datasetId);
         UserSecurity GetUserSecurityForConfig(int configId);
+        AccessRequest GetAccessRequest(int datasetId);
+        string RequestAccessToDataset(AccessRequest request);
     }
 }

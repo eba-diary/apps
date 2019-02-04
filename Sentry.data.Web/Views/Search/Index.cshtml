@@ -154,7 +154,7 @@
                                 </div>
                                 <!-- /ko -->
                                 <span data-bind="text: DatasetName" style="font-size: larger; font-weight: bolder; color: #003DA5;"></span>
-                                <!-- ko if: IsSensitive-->
+                                <!-- ko if: IsSecured-->
                                 <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure" style="padding-left: 10px;"></i>
                                 <!-- /ko -->
                             </div>
@@ -451,7 +451,7 @@
             self.DatasetName = data.DatasetName;
             self.Category = data.Category;
             self.AbbreviatedCategory = data.AbbreviatedCategory;
-            self.IsSensitive = data.IsSensitive;
+            self.IsSecured = data.IsSecured;
             self.Type = data.Type;
 
             self.PrimaryTitle = ko.computed(function () {

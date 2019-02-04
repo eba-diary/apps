@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace Sentry.data.Core
 {
     public class Permission
@@ -11,11 +6,11 @@ namespace Sentry.data.Core
 
         public Permission() { }
 
-        public int PermissionId { get; set; }
-        public string PermissionCode { get; set; }
-        public string PermissionName { get; set; }
-        public string PermissionDescription { get; set; }
-        public string SecurableObject { get; set; }
+        public virtual int PermissionId { get; set; }
+        public virtual string PermissionCode { get; set; }
+        public virtual string PermissionName { get; set; }
+        public virtual string PermissionDescription { get; set; }
+        public virtual string SecurableObject { get; set; }
 
     }
 }

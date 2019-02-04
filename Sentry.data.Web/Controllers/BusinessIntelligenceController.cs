@@ -8,7 +8,7 @@ using System.Web.SessionState;
 namespace Sentry.data.Web.Controllers
 {
     [SessionState(SessionStateBehavior.ReadOnly)]
-    [AuthorizeByPermission(PermissionNames.ManageReports)]
+    [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_VIEW)]
     public class BusinessIntelligenceController : BaseController
     {
 
@@ -37,6 +37,7 @@ namespace Sentry.data.Web.Controllers
 
 
         [HttpGet]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_MODIFY)]
         public ActionResult Create()
         {
             BusinessIntelligenceModel cdm = new BusinessIntelligenceModel
@@ -55,6 +56,7 @@ namespace Sentry.data.Web.Controllers
 
 
         [HttpGet]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_MODIFY)]
         public ActionResult Edit(int id)
         {
             BusinessIntelligenceDto dto = _businessIntelligenceService.GetBusinessIntelligenceDto(id);
@@ -70,6 +72,7 @@ namespace Sentry.data.Web.Controllers
 
 
         [HttpPost]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_MODIFY)]
         public ActionResult BusinessIntelligenceForm(BusinessIntelligenceModel crm) 
         {
             AddCoreValidationExceptionsToModel(crm.Validate());
@@ -110,6 +113,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("BusinessIntelligence/Delete/{id}/")]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_MODIFY)]
         public JsonResult Delete(int id)
         {
             try
@@ -129,13 +133,8 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("BusinessIntelligence/Detail/{id}/")]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult Detail(int id)
         {
-            if (!SharedContext.CurrentUser.CanViewReports)
-            {
-                throw new NotAuthorizedException("User is authenticated but does not have permission");
-            }
             BusinessIntelligenceDetailDto dto = _businessIntelligenceService.GetBusinessIntelligenceDetailDto(id);
             BusinessIntelligenceDetailModel model = new BusinessIntelligenceDetailModel(dto);
 

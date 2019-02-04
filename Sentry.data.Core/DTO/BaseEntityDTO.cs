@@ -31,7 +31,7 @@ namespace Sentry.data.Core
         public string MailtoLink { get; set; }
         public string CategoryColor { get; set; }
         public List<string> CategoryNames { get; set; }
-
+        public UserSecurity Security { get; set; }
 
     }
 }

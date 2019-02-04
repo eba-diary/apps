@@ -32,32 +32,14 @@ namespace Sentry.data.Core
         {
             get
             {
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.UseApp);
+                return _extendedUserInfo.Permissions.Contains(GlobalConstants.PermissionCodes.USE_APP);
             }
         }
-
         public virtual Boolean CanUserSwitch
         {
             get
             {
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.UserSwitch);
-            }
-        }
-
-
-        public virtual Boolean CanManageAssetAlerts
-        {
-            get
-            {
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.ManageAssetNotifications);
-            }
-        }
-
-        public virtual Boolean AdminUser
-        {
-            get
-            {
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.AdminUser);
+                return _extendedUserInfo.Permissions.Contains(GlobalConstants.PermissionCodes.USER_SWITCH);
             }
         }
 
@@ -108,39 +90,42 @@ namespace Sentry.data.Core
         {
             get
             {
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.DatasetView);
+                return _extendedUserInfo.Permissions.Contains(GlobalConstants.PermissionCodes.DATASET_VIEW);
             }
         }
-
         public virtual Boolean CanModifyDataset
         {
             get
             {
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.DatasetEdit);
+                return _extendedUserInfo.Permissions.Contains(GlobalConstants.PermissionCodes.DATASET_MODIFY);
             }
         }
-
         public virtual Boolean CanViewDataAsset
         {
             get
             {
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.DataAssetView);
+                return _extendedUserInfo.Permissions.Contains(GlobalConstants.PermissionCodes.DATA_ASSET_VIEW);
             }
         }
-
+        public virtual Boolean CanManageAssetAlerts
+        {
+            get
+            {
+                return _extendedUserInfo.Permissions.Contains(GlobalConstants.PermissionCodes.DATA_ASSET_MODIFY);
+            }
+        }
         public virtual Boolean CanViewReports
         {
             get
             {
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.ReportView);
+                return _extendedUserInfo.Permissions.Contains(GlobalConstants.PermissionCodes.REPORT_VIEW);
             }
         }
-
         public virtual Boolean CanManageReports
         {
             get
             {
-                return _extendedUserInfo.Permissions.Contains(PermissionNames.ManageReports);
+                return _extendedUserInfo.Permissions.Contains(GlobalConstants.PermissionCodes.REPORT_MODIFY);
             }
         }
 

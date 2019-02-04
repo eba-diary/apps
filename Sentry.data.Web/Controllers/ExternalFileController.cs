@@ -12,6 +12,7 @@ using Sentry.data.Common;
 
 namespace Sentry.data.Web.Controllers
 {
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.USE_APP)]
     public class ExternalFileController : BaseController
     {
         private IODCFileProvider _odcFileProvider;
@@ -35,7 +36,6 @@ namespace Sentry.data.Web.Controllers
             return File(Encoding.UTF8.GetBytes(xml), "text/xml", string.Format("{0}.odc", file));
         }
 
-        [AuthorizeByPermission(PermissionNames.UseApp)]
         public ActionResult External(string filePath, string fileName)
         {
             string filenameAndPath = filePath;
@@ -49,7 +49,6 @@ namespace Sentry.data.Web.Controllers
         //  Instead, we need to get Javascript to call this groovy helper class which loads such a file, then sends it to the stream.  
         //      window.open("/DownloadExternalFile?filename=//SomeNetworkPath/ExcelFile/QExcelFile.xls");
         //
-        [AuthorizeByPermission(PermissionNames.UseApp)]
         public void DownloadExternalFile(string pathAndFilename)
         {
 
@@ -86,7 +85,6 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        [AuthorizeByPermission(PermissionNames.UseApp)]
         public JsonResult HasReadPermissions(string pathAndFilename)
         {
             List<DirectoryUtilities.AccessRights> expectedRights = new List<DirectoryUtilities.AccessRights>()

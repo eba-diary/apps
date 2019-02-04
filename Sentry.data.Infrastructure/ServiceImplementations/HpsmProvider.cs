@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
+using System.ServiceModel;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
-using Sentry.data.Infrastructure.HpsmChangeManagement;
+using Sentry.data.Infrastructure.HPMSChangeManagement;
 
 namespace Sentry.data.Infrastructure
 {
@@ -12,26 +13,19 @@ namespace Sentry.data.Infrastructure
 
         public HpsmProvider(){}
 
-        private ChangeManagement _service;
-        public ChangeManagement Service
+        private ChangeManagementClient _service;
+        public ChangeManagementClient Service
         {
             get
             {
                 if (_service is null)
                 {
-                    NetworkCredential nc = new NetworkCredential()
-                    {
-                        UserName = Configuration.Config.GetHostSetting("HpsmServiceId"),
-                        Password = Configuration.Config.GetHostSetting("HpsmServicePassword"),
-                        Domain = "SHOESD01" //is this needed?
-                    };
-
-                    _service = new ChangeManagement
-                    {
-                        Credentials = nc,
-                        Url = Configuration.Config.GetHostSetting("HpsmServiceUrl"),
-                        ConnectionGroupName = GlobalConstants.System.ABBREVIATED_NAME,
-                    };
+                    _service = new ChangeManagementClient();
+                    _service.ClientCredentials.UserName.UserName = Configuration.Config.GetHostSetting("HpsmServiceId");
+                    _service.ClientCredentials.UserName.Password = Configuration.Config.GetHostSetting("HpsmServicePassword");
+                    _service.ClientCredentials.UseIdentityConfiguration = true;
+                    _service.Endpoint.Address = new EndpointAddress(Configuration.Config.GetHostSetting("HpsmServiceUrl"));
+                     
                 }
                 return _service;
             }
@@ -40,82 +34,25 @@ namespace Sentry.data.Infrastructure
         /// <summary>
         /// Creates a new HPSM Change ticket.
         /// </summary>
-        public string CreateHpsmTicket(RequestAccess model)
+        public string CreateHpsmTicket(AccessRequest model)
         {
-            CreateChangeRequest request = new CreateChangeRequest()
+            try
             {
-                model = new ChangeModelType()
-                {
-                    
-                    instance = new ChangeInstanceType()
-                    {
-                        header = new ChangeInstanceTypeHeader()
-                        {
-                            AssignmentGroup = GetHpsmString("DSC"),
-                            AssignedTo = GetHpsmString("DSC_User"),
-                            Category = GetHpsmString("Standard Change"),
-                            RequestedStart = GetHpsmDate(model.RequestedDate.ToString()),
-                            RequestedEnd = GetHpsmDate(model.RequestedDate.ToString()),
-                            InitiatedBy = GetHpsmString(model.RequestorsId.ToString()),
-                            ApprovalStatus = GetHpsmString("pending"),
-                            Title = GetHpsmString("Access Request for AD Group " + model.AdGroupName)
-                        },
-                        BackoutTime = GetHpsmString("No"),
-                        NoCI = GetHpsmBoolean(true),
-                        CriticalSys = GetHpsmString("No"),
-                        TestingCompleted = GetHpsmString("Testing is not required for this change"),
-                        ImplementationStart = GetHpsmDate(model.RequestedDate.ToString()),
-                        ImplementationEnd = GetHpsmDate(model.RequestedDate.ToString()),
-                        Urgency = GetHpsmString("Routine"),
-                        ConfigState = GetHpsmString("Up"),
-                        ProdWindow = GetHpsmString("Yes"),
-                        ImpactUrgency = GetHpsmString("Routine"),
-                        ReleaseType = GetHpsmString("Server Builds/Build_VM"),
-                        Preapproved = GetHpsmBoolean(false),
-                        ApprovalOperator = new ChangeInstanceTypeApprovalOperator()
-                        {
-                            ApprovalOperator = GetHpsmStringArr(model.PrimaryApproverId.ToString())
-                        },
-                        ApprovalComments = new ChangeInstanceTypeApprovalComments()
-                        {
-                            ApprovalComments = GetHpsmStringArr(model.BusinessReason)
-                        },
-                        descriptionstructure = new ChangeInstanceTypeDescriptionstructure()
-                        {
-                            ImplementationPlan = new ChangeInstanceTypeDescriptionstructureImplementationPlan()
-                            {
-                                ImplementationPlan = GetHpsmStringArr("Request access to datasets within Data.sentry.com")
-                            },
-                            BackoutMethod = new ChangeInstanceTypeDescriptionstructureBackoutMethod()
-                            {
-                                BackoutMethod = GetHpsmStringArr("Close this ticket if not already approved. If approved, remove permissions through admin screen in Data.sentry.com")
-                            },
-                            Description = new ChangeInstanceTypeDescriptionstructureDescription()
-                            {
-                                Description = GetHpsmStringArr(model.BusinessReason)
-                            }
-                        }
-                    }
-                },
-                ignoreEmptyElements = true
-            };
+                CreateChangeRequest createRequest = GetCreateRequest(model);
+                CreateChangeResponse createResponse = Service.CreateChange(createRequest);
 
-            if (!model.IsProd)
-            {  //just approve it everytime for non-prod....for now.
-                request.model.instance.Preapproved = GetHpsmBoolean(true);
-                request.model.instance.ApprovalOperator = null;
-                request.model.instance.ApprovalComments = null;
+                //now lets move it to the next phase.
+                MoveToNextPhaseChangeRequest moveRequest = GetMoveRequest(createResponse.model.keys.ChangeID.Value);
+                MoveToNextPhaseChangeResponse moveResponse = Service.MoveToNextPhaseChange(moveRequest);
+
+                return moveResponse.model.keys.ChangeID.Value;
             }
-
-
-            CreateChangeResponse response = Service.CreateChange(request);
-
-
-            if (response.status == StatusType.SUCCESS)
+            catch(Exception ex)
             {
-                return response.model.keys.ChangeID.ToString();
+                Logger.Error("Could not submit access request", ex);
+                return string.Empty;
             }
-            return string.Empty;
+           
         }
 
 
@@ -127,6 +64,7 @@ namespace Sentry.data.Infrastructure
             {
                 model = new ChangeModelType()
                 {
+                    instance = new ChangeInstanceType(),
                     keys = new ChangeKeysType()
                     {
                         ChangeID = GetHpsmString(hpsmChangeId)
@@ -146,8 +84,9 @@ namespace Sentry.data.Infrastructure
         }
 
 
-        public bool CloseHpsmTicket(string hpsmChangeId, bool wasTicketDenied = false)
+        public void CloseHpsmTicket(string hpsmChangeId, bool wasTicketDenied = false)
         {
+            string message = wasTicketDenied ? "Denied" : "Successful";
 
             CloseChangeRequest request = new CloseChangeRequest()
             {
@@ -157,10 +96,9 @@ namespace Sentry.data.Infrastructure
                     {
                         ClosureComments = new ChangeInstanceTypeClosureComments()
                         {
-                            ClosureComments = wasTicketDenied ? GetHpsmStringArr("Permissions Denied") : GetHpsmStringArr("Permissions Granted"),
-                            //TODO: Check that the denied type is okay.
-                            type = wasTicketDenied ? "Denied" : "Successful"
+                            type = message
                         },
+                        ImplementationResult = GetHpsmString(message)
                     },
                     keys = new ChangeKeysType()
                     {
@@ -170,25 +108,123 @@ namespace Sentry.data.Infrastructure
                 ignoreEmptyElements = true
             };
             
-            CloseChangeResponse response = Service.CloseChange(request);
+            Service.CloseChange(request);
 
-            if (response.status == StatusType.SUCCESS)
-            {
-                return true;
-            }
-            return false;
         }
 
 
 
+        private CreateChangeRequest GetCreateRequest(AccessRequest model)
+        {
+            CreateChangeRequest request = new CreateChangeRequest()
+            {
+                model = new ChangeModelType()
+                {
+
+                    instance = new ChangeInstanceType()
+                    {
+                        header = new ChangeInstanceTypeHeader()
+                        {
+                            AssignmentGroup = GetHpsmString("data.sentry.com"),
+                            Category = GetHpsmString("Standard Change"),
+                            RequestedStart = GetHpsmDate(model.RequestedDate.ToString()),
+                            RequestedEnd = GetHpsmDate(model.RequestedDate.ToString()),
+                            InitiatedBy = GetHpsmString(model.RequestorsId.ToString()),
+                            ApprovalStatus = GetHpsmString("pending"),
+                            Title = GetHpsmString("Access Request for AD Group " + model.AdGroupName)
+                        },
+                        NoCI = GetHpsmBoolean(true),
+                        CriticalSys = GetHpsmString("No"),
+                        TestingCompleted = GetHpsmString("Testing is not required for this change"),
+                        ImplementationStart = GetHpsmDate(model.RequestedDate.ToString()),
+                        ImplementationEnd = GetHpsmDate(model.RequestedDate.ToString()),
+                        Urgency = GetHpsmString("Routine"),
+                        ConfigState = GetHpsmString("Up"),
+                        BackoutTime = GetHpsmString("No"),
+                        ProdWindow = GetHpsmString("Yes"),
+                        ImpactUrgency = GetHpsmString("Routine"),
+                        ReleaseType = GetHpsmString("Server Builds/Build_VM"),
+                        descriptionstructure = new ChangeInstanceTypeDescriptionstructure()
+                        {
+                            ImplementationPlan = new ChangeInstanceTypeDescriptionstructureImplementationPlan()
+                            {
+                                ImplementationPlan = GetHpsmStringArr("Request access to datasets within Data.sentry.com")
+                            },
+                            BackoutMethod = new ChangeInstanceTypeDescriptionstructureBackoutMethod()
+                            {
+                                BackoutMethod = GetHpsmStringArr("Close this ticket if not already approved. If approved, remove permissions through admin screen in Data.sentry.com")
+                            },
+                            Description = new ChangeInstanceTypeDescriptionstructureDescription()
+                            {
+                                Description = GetHpsmStringArr(model.BusinessReason)
+                            }
+                        }
+                    },
+                    keys = new ChangeKeysType()
+                },
+                ignoreEmptyElements = true
+            };
+
+            if (model.IsProd)
+            {
+                request.model.instance.Preapproved = GetHpsmBoolean(false);
+                request.model.instance.ApprovalOperator = new ChangeInstanceTypeApprovalOperator()
+                {
+                    ApprovalOperator = GetHpsmStringArr(model.ApproverId)
+                };
+
+            }
+            else
+            {
+                //just approve it everytime for non-prod....for now.
+                request.model.instance.Preapproved = GetHpsmBoolean(true);
+            }
+
+            return request;
+        }
+
+        private MoveToNextPhaseChangeRequest GetMoveRequest(string changeId)
+        {
+            MoveToNextPhaseChangeRequest request = new MoveToNextPhaseChangeRequest()
+            {
+                model = new ChangeModelType()
+                {
+                    instance = new ChangeInstanceType()
+                    {
+                        header = new ChangeInstanceTypeHeader()
+                    },
+                    keys = new ChangeKeysType()
+                    {
+                        ChangeID = GetHpsmString(changeId)
+                    }
+                },
+                ignoreEmptyElements = true
+            };
+
+            return request;
+        }
+
+
         private HpsmTicket MapToTicket(ChangeInstanceType ticket)
         {
+            string status = "";
+            if(ticket.header.ApprovalStatus.Value == GlobalConstants.HpsmTicketStatus.APPROVED &&
+                            ticket.header.Phase.Value == GlobalConstants.HpsmTicketStatus.IMPLEMENTATION)
+            {
+                status = GlobalConstants.HpsmTicketStatus.APPROVED;
+            }
+            //if it is closed.
+            else if(ticket.header.ApprovalStatus.Value == GlobalConstants.HpsmTicketStatus.APPROVED &&
+                            ticket.header.Phase.Value == GlobalConstants.HpsmTicketStatus.CLOSED)
+            {
+                status = GlobalConstants.HpsmTicketStatus.REJECTED;
+            }
+
             return new HpsmTicket()
             {
-                //how do i get the approval date?
-                ApprovedById = ticket.ApprovalOperator.ApprovalOperator.GetValue(0).ToString(),
-                RejectedById = ticket.ApprovalOperator.ApprovalOperator.GetValue(0).ToString(),
-                TicketStatus = ticket.header.ApprovalStatus.Value.ToUpper()
+                ApprovedById = ticket.ApprovalOperator.ApprovalOperator[0].ToString(),
+                RejectedById = ticket.ApprovalOperator.ApprovalOperator[0].ToString(),
+                TicketStatus = status
             };
         }
 

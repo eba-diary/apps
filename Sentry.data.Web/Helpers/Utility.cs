@@ -12,29 +12,7 @@ namespace Sentry.data.Web.Helpers
     public static class Utility
     {
 
-        public static List<T> IntersectAllIfEmpty<T>(params IEnumerable<T>[] lists)
-        {
-            IEnumerable<T> results = null;
 
-            lists = lists.Where(l => l.Any()).ToArray();
-
-            if (lists.Length > 0)
-            {
-                results = lists[0];
-
-                for (int i = 1; i < lists.Length; i++)
-                    results = results.Intersect(lists[i]);
-            }
-            else
-            {
-                results = new T[0];
-            }
-
-            List<T> var = results.ToList();
-
-            //return results;
-            return var;
-        }
         public static string TimeDisplay(DateTime dt)
         {
             string result;
@@ -295,6 +273,20 @@ namespace Sentry.data.Web.Helpers
             }
 
             return rj;
+        }
+
+        public static List<SelectListItem> BuildSelectListitem(List<KeyValuePair<string,string>> list, string defaultText)
+        {
+            List<SelectListItem> items = new List<SelectListItem>();
+
+            if (!string.IsNullOrWhiteSpace(defaultText))
+            {
+                items.Add(new SelectListItem() { Text = defaultText, Value = "", Selected = true });
+            }
+
+            list.ForEach(x => items.Add(new SelectListItem() { Text = x.Value, Value = x.Key }));
+
+            return items;
         }
 
         private static List<SelectListItem> BuildDataClassificationSelectList(DataClassificationType selectedType)

@@ -34,7 +34,7 @@ var Sentry = Sentry || new function () {
         /// <param name="height" type="Number">If the element that you pass has no height, pass a 
         /// height to this function to temporarily assign it a height.</param>
         if (element.height() > 0) {
-            height = element.height()
+            height = element.height();
         } else {
             element.css('min-height', height);
         };

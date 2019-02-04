@@ -30,6 +30,7 @@ namespace Sentry.data.Web
                 this.BorderColor = "borderSide_" + this.Color;
             }
 
+            this.IsSecured = ds.IsSecured;
             this.DatasetName = ds.DatasetName;
             this.DatasetId = ds.DatasetId;
             this.DatasetDesc = ds.DatasetDesc;
@@ -84,7 +85,7 @@ namespace Sentry.data.Web
         public List<string> Frequencies { get; set; }
         public string UpdateFrequency { get; set; }
 
-        public Boolean IsSensitive { get; set; }
+        public bool IsSecured { get; set; }
 
         public string ChangedDtm { get; set; }
 

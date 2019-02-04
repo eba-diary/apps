@@ -8,7 +8,7 @@ using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Core
 {
-    public class Dataset : IValidatable
+    public class Dataset : IValidatable, ISecurable
     {
         private string _metadata;
 
@@ -26,9 +26,6 @@ namespace Sentry.data.Core
 
         public virtual string CreationUserName { get; set; }
 
-        public virtual string PrimaryOwnerId { get; set; }
-        public virtual string SecondaryOwnerId { get; set; }
-
         public virtual string UploadUserName { get; set; }
 
         public virtual string OriginationCode { get; set; }
@@ -37,11 +34,7 @@ namespace Sentry.data.Core
 
         public virtual DateTime ChangedDtm { get; set; }
 
-        public virtual Boolean CanDisplay { get; set; }
-
-        public virtual Security Security { get; set; }
-
-        public virtual bool IsSecured { get; set; }
+        public virtual bool CanDisplay { get; set; }
 
         public virtual IList<Category> DatasetCategories { get; set; }
         public virtual string DatasetType { get; set; }
@@ -55,7 +48,7 @@ namespace Sentry.data.Core
         {
             get
             {
-                if (String.IsNullOrEmpty(_metadata))
+                if (string.IsNullOrEmpty(_metadata))
                 {
                     return null;
                 }
@@ -79,6 +72,15 @@ namespace Sentry.data.Core
                 return DatasetFileConfigs.Select(x => x.DatasetScopeType).GroupBy(x => x.Name).Select(x => x.First()).ToList();
             }
         }
+
+
+        //ISecurable Impl.
+        public virtual string PrimaryOwnerId { get; set; }
+        public virtual string SecondaryOwnerId { get; set; }
+        public virtual bool IsSecured { get; set; }
+        public virtual Security Security { get; set; }
+        
+
 
         public virtual ValidationResults ValidateForDelete()
         {

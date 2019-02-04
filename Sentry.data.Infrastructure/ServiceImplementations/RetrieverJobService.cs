@@ -13,7 +13,6 @@ using System.Security.Principal;
 using Newtonsoft.Json;
 using Hangfire;
 using System.Threading;
-using Sentry.Core;
 using System.Net;
 using System.Net.Mime;
 using WinSCP;

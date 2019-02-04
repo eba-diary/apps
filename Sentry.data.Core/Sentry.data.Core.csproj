@@ -96,12 +96,14 @@
     <Compile Include="Entities\Security\RequestAccess.cs" />
     <Compile Include="Entities\Security\Security.cs" />
     <Compile Include="Entities\Security\UserSecurity.cs" />
+    <Compile Include="Extensions\QueryableExtensions.cs" />
     <Compile Include="GlobalEnums\DataClassificationType.cs" />
     <Compile Include="Interfaces\IHpsmProvider.cs" />
     <Compile Include="Interfaces\IAssociateInfoProvider.cs" />
     <Compile Include="Interfaces\IConfigService.cs" />
     <Compile Include="Interfaces\IDatasetService.cs" />
     <Compile Include="Interfaces\IEventService.cs" />
+    <Compile Include="Interfaces\ISecurable.cs" />
     <Compile Include="Interfaces\ISecurityService.cs" />
     <Compile Include="Interfaces\IUserService.cs" />
     <Compile Include="DomainServices\BusinessIntelligenceService.cs" />
@@ -229,7 +231,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Entities\User\ApplicationUser.cs" />
     <Compile Include="Entities\User\ImpersonatedApplicationUser.cs" />
-    <Compile Include="Entities\User\PermissionNames.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">

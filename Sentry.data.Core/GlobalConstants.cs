@@ -86,21 +86,36 @@
             public const string PENDING = "Pending";
             public const string COMPLETED = "Completed";
             public const string APPROVED = "Approved";
+            public const string IMPLEMENTATION = "Implementation";
             public const string REJECTED = "Rejected";
+            public const string CLOSED = "Closed";
         }
 
         public static class SecurableEntityName
         {
-            public const string DATASET = "DATASET";
+            public const string DATASET = "Dataset";
         }
 
-        public static class SecurityPermissions
+        public static class PermissionCodes
         {
             public const string CAN_PREVIEW_DATASET = "CanPreviewDataset";
             public const string CAN_VIEW_FULL_DATASET = "CanViewFullDataset";
             public const string CAN_QUERY_DATASET = "CanQueryDataset";
             public const string CAN_CONNECT_TO_DATASET = "CanConnectToDataset";
             public const string CAN_UPLOAD_TO_DATASET = "CanUploadToDataset";
+
+            public const string USE_APP = "UseApp";
+
+            public const string DATASET_VIEW = "DatasetView";
+            public const string DATA_ASSET_VIEW = "DataAssetView";
+            public const string REPORT_VIEW = "ReportView";
+
+            public const string DATASET_MODIFY = "DatasetModify";
+            public const string DATA_ASSET_MODIFY = "DataAssetMngAlert";
+            public const string REPORT_MODIFY = "ReportMng";
+
+            public const string USER_SWITCH = "UserSwitch";
+            public const string ADMIN_USER = "AdminUser";
         }
 
     }

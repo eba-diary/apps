@@ -172,7 +172,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("sessions/{Language}")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> CreateSession(string Language)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -233,7 +232,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("internalSessions/{Language}")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> CreateInternalSession(string Language = "", [FromBody] LivyCreation lc = null)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -328,7 +326,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("sessions/{SessionID}/sendCode")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> SendCode(int SessionID, [FromBody] string Code)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -371,7 +368,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("sessions/name/{name}")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> GetSessions(String name = null)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -410,7 +406,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("sessions/{SessionID}")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> GetSession(int SessionID)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -444,7 +439,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("sessions/{SessionID}/statements/{StatementID}")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> GetStatement(int SessionID, int StatementID)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -478,7 +472,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("sessions/{SessionID}/statements/{StatementID}")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> CancelStatement(int SessionID, int StatementID)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -511,7 +504,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpDelete]
         [Route("sessions/{SessionID}")]
-        [AuthorizeByPermission(PermissionNames.QueryToolAdmin)]
         public async Task<IHttpActionResult> DeleteSession(int SessionID)
         {
             using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
@@ -543,7 +535,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("files/fileDropLocation")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> FileDropLocation()
         {
             IApplicationUser user = _userService.GetCurrentUser();
@@ -563,7 +554,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("files/{s3Key}/fileCount")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> FileCount(string s3Key)
         {
             try
@@ -584,7 +574,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("files/{s3Key}/{fileName}")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> GetDatasetFileDownloadURL(string s3Key, string fileName)
         {
             try
@@ -615,7 +604,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("datasets/{datasetID}")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> GetS3Key(int datasetID)
         {
             Dataset ds = _datasetContext.GetById<Dataset>(datasetID);
@@ -688,7 +676,6 @@ namespace Sentry.data.Web.Controllers
         }
 
 
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         private async Task<LivyReply> WaitForLivyReply(int SessionID, int StatementID)
         {
             LivyReply lr = new LivyReply();
@@ -841,7 +828,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("sessions/{SessionID}/hives/{hiveDatabaseName}/{hiveTableName}/{configID}/{rows}/{skip}")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> GetHiveTable(int SessionID, int configID, int rows, int skip, string hiveTableName, string hiveDatabaseName)
         {
             String python;
@@ -879,7 +865,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("sessions/{SessionID}/hives/{configID}/{guid}")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> SaveRowCount(int SessionID, String guid, int configID)
         {
             return StatusCode(HttpStatusCode.NoContent);
@@ -950,7 +935,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("sessions/{SessionID}/hives/{hiveTableExists}/{configID}/{guid}")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> CreateParquet(int SessionID, String guid, int configID, Boolean hiveTableExists)
         {
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configID);
@@ -1033,7 +1017,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("sessions/{SessionID}/hives/{configID}")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> CreateHiveTable(int SessionID, int configID)
         {
             return StatusCode(HttpStatusCode.NoContent);

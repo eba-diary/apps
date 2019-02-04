@@ -28,7 +28,6 @@ namespace Sentry.data.Core
         Boolean CanManageReports { get; } //DSC_Report_Modify - ReportModify
         Boolean CanViewDataAsset { get; } //DSC_Asset_View - DataAssetView
         Boolean CanManageAssetAlerts { get; } //DSC_Asset_Modify - DataAssetModify
-        Boolean AdminUser { get; }
         bool IsInGroup(string group);
         //Calculated values - may come from external data sources and/or our domain User object
         DomainUser DomainUser { get; }

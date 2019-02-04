@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 
 namespace Sentry.data.Core
 {
@@ -7,9 +8,8 @@ namespace Sentry.data.Core
     {
 
         void CheckHpsmTicketStatus();
-        bool RequestPermission(RequestAccess model);
-        void RemovePermissions(Guid hpsmTicketId);
+        string RequestPermission(AccessRequest model);
 
-        UserSecurity GetUserSecurity(Security security);
+        UserSecurity GetUserSecurity(ISecurable securable, IApplicationUser user);
     }
 }

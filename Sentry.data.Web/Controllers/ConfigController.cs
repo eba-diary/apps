@@ -48,7 +48,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/Dataset/{id}")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Index(int id)
         {
             Dataset ds = _datasetContext.GetById(id);
@@ -77,7 +77,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/Dataset/{id}/Create")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Create(int id)
         {
             Dataset parent = _datasetContext.GetById<Dataset>(id);
@@ -107,7 +107,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/Dataset/{id}/Create")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Create(DatasetFileConfigsModel dfcm)
         {
 
@@ -230,7 +230,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/Manage")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Manage()
         {
             DatasetFileConfigsModel edfc = new DatasetFileConfigsModel();
@@ -250,7 +250,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/Edit/{configId}")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Edit(int configId)
         {
             DatasetFileConfig dfc = _datasetContext.getDatasetFileConfigs(configId);
@@ -280,7 +280,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult GetEditConfigPartialView(int configId)
         {
             DatasetFileConfig dfc = _datasetContext.getDatasetFileConfigs(configId);
@@ -298,7 +298,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/Edit/{configId}")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Edit(EditDatasetFileConfigModel edfc)
         {
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(edfc.ConfigId);
@@ -327,7 +327,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/{configId}/Job/Create")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult CreateRetrievalJob(int configId)
         {
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configId);
@@ -355,7 +355,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/{configId}/Job/Create")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult CreateRetrievalJob(CreateJobModel cjm)
         {
             try
@@ -474,7 +474,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/{configId}/Job/Edit/{jobId}")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditRetrievalJob(int configId, int jobId)
         {
             RetrieverJob retrieverJob = _datasetContext.GetById<RetrieverJob>(jobId);
@@ -502,7 +502,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/{configId}/Job/Edit/{jobId}")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditRetrievalJob(EditJobModel ejm)
         {
             RetrieverJob rj = _datasetContext.GetById<RetrieverJob>(ejm.JobID);
@@ -695,7 +695,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/Source/Create")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult CreateSource()
         {
             CreateSourceModel csm = new CreateSourceModel();
@@ -717,7 +717,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/Source/Create")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult CreateSource(CreateSourceModel csm)
         {
             DataSource source = null;
@@ -925,7 +925,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/Source/Edit/{sourceID}")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditSource(int sourceID)
         {
             DataSource ds = _datasetContext.GetById<DataSource>(sourceID);
@@ -948,7 +948,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/Source/Edit/{sourceID}")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditSource(EditSourceModel esm)
         {
             try
@@ -1072,7 +1072,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/Extension/Create")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult CreateExtensionMapping()
         {
             CreateExtensionMapModel cem = new CreateExtensionMapModel();
@@ -1083,7 +1083,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/Extension/Create")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult CreateExtensionMapping(CreateExtensionMapModel cem)
         {
             int changeCnt = 0;
@@ -1151,7 +1151,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public JsonResult SourcesByType(string sourceType)
         {
             return Json(DataSourcesByType(sourceType, null), JsonRequestBehavior.AllowGet);
@@ -1338,7 +1338,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/{configId}/Schema/{schemaId}/Fields")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Fields(int configId, int schemaId)
         {
             DatasetFileConfig config = _datasetContext.GetById<DatasetFileConfig>(configId);
@@ -1371,7 +1371,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/{configId}/Schema/{schemaId}/UpdateFields")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public JsonResult UpdateFields(int configId, int schemaId, List<SchemaRow> schemaRows)
         {
             try
@@ -1390,7 +1390,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/{configId}/Schema/Create")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult CreateSchema(int configId)
         {
             //throw new NotImplementedException();
@@ -1421,7 +1421,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/{configId}/Schema/Create")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult CreateSchema(int configId, CreateSchemaModel csm)
         {
             //throw new NotImplementedException();
@@ -1490,7 +1490,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/{configId}/Schema/{schemaId}/Edit")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditSchema(int configId, int schemaId)
         {
             DataElement schema = _datasetContext.GetById<DataElement>(schemaId);
@@ -1521,7 +1521,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/{configId}/Schema/{schemaId}/Edit")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditSchema(int configId, int schemaId, EditSchemaModel esm)
         {
             DataElement schema = _datasetContext.GetById<DataElement>(schemaId);

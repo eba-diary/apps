@@ -4,8 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Sentry.Common.Logging;
-using Sentry.data.Core.Entities.Metadata;
-using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Core
 {
@@ -34,7 +32,12 @@ namespace Sentry.data.Core
 
         public DatasetDetailDto GetDatesetDetailDto(int id)
         {
-            Dataset ds = _datasetContext.GetById<Dataset>(id);
+            Dataset ds = _datasetContext.Datasets.Where(x=> x.DatasetId == id).
+                                                                                        Fetch(x=> x.Security).
+                                                                                        ThenFetchMany(x=> x.Tickets).
+                                                                                        ThenFetchMany(x=> x.Permissions).
+                                                                                        ThenFetch(x=> x.Permission).FirstOrDefault();
+
             DatasetDetailDto dto = new DatasetDetailDto();
             MapToDetailDto(ds, dto);
 
@@ -44,25 +47,66 @@ namespace Sentry.data.Core
         public UserSecurity GetUserSecurityForDataset(int datasetId)
         {
             Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
-            UserSecurity us = GetUserSecurity(ds);
-            return us;
+
+            return _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
         }
 
         public UserSecurity GetUserSecurityForConfig(int configId)
         {
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configId);
-            if(dfc.ParentDataset != null)
+            if (dfc.ParentDataset != null)
             {
-                return GetUserSecurity(dfc.ParentDataset);
+                return _securityService.GetUserSecurity(dfc.ParentDataset, _userService.GetCurrentUser());
             }
             return new UserSecurity();
         }
 
-        public UserSecurity GetUserSecurity()
+        public AccessRequest GetAccessRequest(int datasetId)
         {
-            return GetUserSecurity(null);
+            Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+
+            AccessRequest ar = new AccessRequest()
+            {
+                Permissions = _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList(),
+                ApproverList = new List<KeyValuePair<string, string>>(),
+                DatasetId = ds.DatasetId,
+                DatasetName = ds.DatasetName
+            };
+
+
+            IApplicationUser primaryUser = _userService.GetByAssociateId(ds.PrimaryOwnerId);
+            ar.ApproverList.Add(new KeyValuePair<string, string>(ds.PrimaryOwnerId, primaryUser.DisplayName + " (Primary Owner)"));
+
+            if (!string.IsNullOrWhiteSpace(ds.SecondaryOwnerId))
+            {
+                IApplicationUser secondaryUser = _userService.GetByAssociateId(ds.SecondaryOwnerId);
+                ar.ApproverList.Add(new KeyValuePair<string, string>(ds.SecondaryOwnerId, secondaryUser.DisplayName + " (Secondary Owner)"));
+            }
+
+            return ar;
         }
 
+        public string RequestAccessToDataset(AccessRequest request)
+        {
+
+            Dataset ds = _datasetContext.GetById<Dataset>(request.DatasetId);
+            if (ds != null)
+            {
+                IApplicationUser user = _userService.GetCurrentUser();
+                request.DatasetName = ds.DatasetName;
+                request.SecurityId = ds.Security.SecurityId;
+                request.RequestorsId = user.AssociateId;
+                request.RequestorsName = user.DisplayName;
+                request.IsProd = bool.Parse(Configuration.Config.GetHostSetting("PreApproveHPSMTickets"));
+                request.RequestedDate = DateTime.Now;
+                request.ApproverId = request.SelectedApprover;
+                request.Permissions = _datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
+                                                                                                                x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
+                return _securityService.RequestPermission(request);
+            }
+
+            return string.Empty;
+        }
         public int CreateAndSaveNewDataset(DatasetDto dto)
         {
             Dataset ds = CreateDataset(dto);
@@ -130,21 +174,42 @@ namespace Sentry.data.Core
                 ds.DataClassification = dto.DataClassification;
             }
 
-            if(ds.IsSecured != dto.IsSecured)
+            //override the Dto.IsSecured for certain classifications.
+            switch (dto.DataClassification)
             {
-                if(ds.Security == null)
-                {
-                    ds.Security = new Security(GlobalConstants.SecurableEntityName.DATASET);
-                }
+                case GlobalEnums.DataClassificationType.HighlySensitive:
+                    dto.IsSecured = true;
+                    break;
+                case GlobalEnums.DataClassificationType.InternalUseOnly:
+                    //don't override as it should flow from the form.
+                    break;
+                default:
+                    dto.IsSecured = false;
+                    break;
+            }
 
-                if(ds.IsSecured && !dto.IsSecured){
-                    ds.Security.RemovedDate = DateTime.Now;
-                }else{
-                    ds.Security.EnabledDate = DateTime.Now;
+            if (!ds.IsSecured && dto.IsSecured)
+            {
+                if (ds.Security == null)
+                {
+                    ds.Security = new Security(GlobalConstants.SecurableEntityName.DATASET)
+                    {
+                        CreatedById = _userService.GetCurrentUser().AssociateId
+                    };
                 }
-                ds.IsSecured = dto.IsSecured;
+                else
+                {
+                    ds.Security.EnabledDate = DateTime.Now;
+                    ds.Security.UpdatedById = _userService.GetCurrentUser().AssociateId;
+                }
+            }
+            else if (ds.IsSecured && !dto.IsSecured)
+            {
+                ds.Security.RemovedDate = DateTime.Now;
                 ds.Security.UpdatedById = _userService.GetCurrentUser().AssociateId;
             }
+
+            ds.IsSecured = dto.IsSecured;
 
 
             _datasetContext.SaveChanges();
@@ -161,7 +226,7 @@ namespace Sentry.data.Core
                 errors.Add("Dataset name already exists within category");
             }
 
-            if(dto.DataClassification == GlobalEnums.DataClassificationType.HighlySensitive && string.IsNullOrWhiteSpace(dto.SecondaryOwnerId))
+            if (dto.DataClassification == GlobalEnums.DataClassificationType.HighlySensitive && string.IsNullOrWhiteSpace(dto.SecondaryOwnerId))
             {
                 errors.Add("Secondary owner is required");
             }
@@ -196,12 +261,10 @@ namespace Sentry.data.Core
                 CanDisplay = true,
                 DatasetFiles = null,
                 DatasetFileConfigs = null
-                
             };
 
             switch (dto.DataClassification)
             {
-                //case GlobalEnums.DataClassificationType.Restricted:
                 case GlobalEnums.DataClassificationType.HighlySensitive:
                     ds.IsSecured = true;
                     break;
@@ -215,7 +278,10 @@ namespace Sentry.data.Core
 
             if (ds.IsSecured)
             {
-                ds.Security = new Security(GlobalConstants.SecurableEntityName.DATASET);
+                ds.Security = new Security(GlobalConstants.SecurableEntityName.DATASET)
+                {
+                    CreatedById = _userService.GetCurrentUser().AssociateId
+                };
             }
 
             return ds;
@@ -265,7 +331,7 @@ namespace Sentry.data.Core
 
         private RetrieverJob CreateRetrieverJob(DatasetFileConfig dfc, string dataSourceName)
         {
-            Compression compression = new Compression()
+            RetrieverJobOptions.Compression compression = new RetrieverJobOptions.Compression()
             {
                 IsCompressed = false,
                 CompressionType = null,
@@ -344,7 +410,13 @@ namespace Sentry.data.Core
         private void MapToDto(Dataset ds, DatasetDto dto)
         {
             IApplicationUser primaryOwner = _userService.GetByAssociateId(ds.PrimaryOwnerId);
-            
+
+            //map the ISecurable properties
+            dto.Security = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+            dto.PrimaryOwnerId = ds.PrimaryOwnerId;
+            dto.SecondaryOwnerId = ds.SecondaryOwnerId;
+            dto.IsSecured = ds.IsSecured;
+
             dto.DatasetId = ds.DatasetId;
             dto.DatasetCategoryIds = ds.DatasetCategories.Select(x => x.Id).ToList();
             dto.DatasetName = ds.DatasetName;
@@ -353,19 +425,19 @@ namespace Sentry.data.Core
             dto.DatasetType = ds.DatasetType;
             dto.DataClassification = ds.DataClassification;
             dto.CreationUserName = ds.CreationUserName;
-            dto.PrimaryOwnerId = ds.PrimaryOwnerId;
             dto.PrimaryOwnerName = (primaryOwner != null ? primaryOwner.DisplayName : ds.PrimaryOwnerId);
-            dto.SecondaryOwnerId = ds.SecondaryOwnerId;
-            if(ds.SecondaryOwnerId != null){
+            if (ds.SecondaryOwnerId != null)
+            {
                 IApplicationUser secondaryOwner = _userService.GetByAssociateId(ds.SecondaryOwnerId);
-                if(secondaryOwner != null && secondaryOwner.DisplayName != null)
+                if (secondaryOwner != null && secondaryOwner.DisplayName != null)
                 {
                     dto.SecondaryOwnerName = secondaryOwner.DisplayName;
-                }else{
+                }
+                else
+                {
                     dto.SecondaryOwnerName = ds.SecondaryOwnerId;
                 }
             }
-            dto.IsSecured = ds.IsSecured;
             dto.UploadUserName = ds.UploadUserName;
             dto.DatasetDtm = ds.DatasetDtm;
             dto.ChangedDtm = ds.ChangedDtm;
@@ -386,10 +458,9 @@ namespace Sentry.data.Core
         private void MapToDetailDto(Dataset ds, DatasetDetailDto dto)
         {
             MapToDto(ds, dto);
-            
+
             IApplicationUser user = _userService.GetCurrentUser();
 
-            dto.CanEditDataset = user.CanModifyDataset && (ds.PrimaryOwnerId == user.AssociateId || ds.SecondaryOwnerId == user.AssociateId);
             dto.Downloads = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.DOWNLOAD && x.Dataset == ds.DatasetId).Count();
             dto.IsSubscribed = _datasetContext.IsUserSubscribedToDataset(_userService.GetCurrentUser().AssociateId, dto.DatasetId);
             dto.AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, dto.DatasetId).Count;
@@ -407,48 +478,6 @@ namespace Sentry.data.Core
             {
                 dto.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);
             }
-        }
-
-
-        private UserSecurity GetUserSecurity(Dataset ds)
-        {
-            UserSecurity us = new UserSecurity();
-            IApplicationUser user = _userService.GetCurrentUser();
-
-            if (ds != null) {
-                if (ds.IsSecured)
-                {
-                    //if it is secured, call out to the secure service to get the user approved permissions.
-                    us = _securityService.GetUserSecurity(ds.Security);
-                }
-                else
-                {
-                    //if it is not secure, it is public and open except for upload - this should only be allowed for one of the owners.
-                    us = new UserSecurity()
-                    {
-                        CanConnectToDataset = true,
-                        CanPreviewDataset = true,
-                        CanQueryDataset = true,
-                        CanViewFullDataset = true,
-                        CanUploadToDataset = false
-                    };
-                }
-
-                //they may not be approved to upload to this dataset, but if they are one of the owners they still should be able to.
-                if (!us.CanUploadToDataset)
-                { 
-                    us.CanUploadToDataset = user.AssociateId == ds.PrimaryOwnerId || user.AssociateId == ds.SecondaryOwnerId;
-                }
-
-                //user must have permission to modify dataset AND must be one of the owners.
-                us.CanEditDataset = user.CanModifyDataset && (user.AssociateId == ds.PrimaryOwnerId || user.AssociateId == ds.SecondaryOwnerId);
-            }
-
-            //this is only for the creation of a new dataset.
-            us.CanCreateDataset = user.CanModifyDataset;
-
-
-            return us;
         }
 
         #endregion
