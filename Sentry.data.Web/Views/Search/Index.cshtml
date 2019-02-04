@@ -353,6 +353,20 @@
                             }
                         }
                     }
+                    else if (Category === 'Business Unit') {
+                        for (var i = 0; i < prod.BusinessUnits.length; i++) {
+                            if (prod.BusinessUnits[i] === Title) {
+                                return prod;
+                            }
+                        }
+                    }
+                    else if (Category === 'Function') {
+                        for (var i = 0; i < prod.DatasetFunctions.length; i++) {
+                            if (prod.DatasetFunctions[i] === Title) {
+                                return prod;
+                            }
+                        }
+                    }
                     else {
                         if (prod.Tags != null) {
                             for (var i = 0; i < prod.Tags.length; i++) {
@@ -390,11 +404,12 @@
             self.HeadHide = 'hide_filterType_' + Name.replace(' ', '_');
 
             self.OrderedFilters = ko.computed(function () {
+
                 //First filter the list so that we only have filters that have a count greater than 0
                 var list = ko.utils.arrayFilter(self.Filters(), function (prod) {
                     return prod.Count() !== 0;
                 });
-                
+
                 //If the count is 0, hide the section.
                 if (list.length === 0) {
                     $("#" + self.HeadHide).hide();
@@ -491,6 +506,8 @@
 
             self.Categories = data.Categories;
             self.DistinctFileExtensions = data.DistinctFileExtensions;
+            self.BusinessUnits = data.BusinessUnits;
+            self.DatasetFunctions = data.DatasetFunctions;
 
             self.PageViews = data.PageViews;
             self.Downloads = data.Downloads;
@@ -529,6 +546,8 @@
             self.SelectedFilters = ko.observableArray([]);
 
             self.CategoryFilters = ko.observableArray([]);
+            self.BusinessUnitFilters = ko.observableArray([]);
+            self.DatasetFunctionFilters = ko.observableArray([]);
             self.OwnerFilters = ko.observableArray([]);
             self.ExtensionFilters = ko.observableArray([]);
             self.TagFilters = ko.observableArray([]);
@@ -702,6 +721,87 @@
                         return false;
                     });
                 }
+
+
+                // now grab any selected business units
+                var selectedBusinessUnitIds = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
+                    if (feature.substring(0, 3) === '2_5') {
+                        return feature;
+                    }
+                });
+
+                var selectedBusinessUnitsList = [];
+                if (selectedBusinessUnitIds.length > 0) {
+                    var selectedBusinessUnits = ko.utils.arrayFilter(self.BusinessUnitFilters(), function (feature) {
+
+                        for (var i = 0; i < selectedBusinessUnitIds.length; i++) {
+                            if (feature.id === selectedBusinessUnitIds[i]) {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    });
+
+                    for (var i = 0; i < selectedBusinessUnits.length; i++) {
+                        selectedBusinessUnitsList.push(selectedBusinessUnits[i].Title);
+                    }
+
+                    // now apply the filter
+                    exhibits = exhibits.filter(function (item) {
+
+                        for (var i = 0; i < selectedBusinessUnits.length; i++) {
+                            for (var j = 0; j < item.BusinessUnits.length; j++) {
+                                if (item.BusinessUnits[j] === selectedBusinessUnits[i].Title) {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        return false;
+                    });
+                }
+
+
+                // next grab any selected Dataset Functions
+                var selectedDatasetFunctionIds = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
+                    if (feature.substring(0, 3) === '2_6') {
+                        return feature;
+                    }
+                });
+
+                var selectedDatasetFunctionsList = [];
+                if (selectedDatasetFunctionIds.length > 0) {
+                    var selectedDatasetFunctions = ko.utils.arrayFilter(self.DatasetFunctionFilters(), function (feature) {
+
+                        for (var i = 0; i < selectedDatasetFunctionIds.length; i++) {
+                            if (feature.id === selectedDatasetFunctionIds[i]) {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    });
+
+                    for (var i = 0; i < selectedDatasetFunctions.length; i++) {
+                        selectedDatasetFunctionsList.push(selectedDatasetFunctions[i].Title);
+                    }
+
+                    // now apply the filter
+                    exhibits = exhibits.filter(function (item) {
+
+                        for (var i = 0; i < selectedDatasetFunctions.length; i++) {
+                            for (var j = 0; j < item.DatasetFunctions.length; j++) {
+                                if (item.DatasetFunctions[j] === selectedDatasetFunctions[i].Title) {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        return false;
+                    });
+                }
+                
 
                 //First grab all the selected owner ID's
                 var selectedOwnerIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
@@ -978,7 +1078,7 @@
 
             self.PopulateDatasetFilters = function (datasets) {
                 var temp = [];
-                var pageType = '1_'
+                var pageType = '1_';
 
                 //CATEGORY FILTER
                 var param = getParameterByName('category');
@@ -1012,7 +1112,6 @@
 
                 self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
                 temp = [];
-
 
 
                 //SENTRYOWNER FILTER
@@ -1095,22 +1194,21 @@
                 temp = [];
 
 
-                //EXTENSION FILTER
-                counter = 0; //Needs seperate counter as multiple objects can appear per iteration
+                //BUSINESS UNIT FILTER
+                counter = 0; //reset counter
                 for (var item, i = 0; item = exhibits[i++];) {
-                    for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
-                        if (!(ext in extensionLookup)) {
-                            extensionLookup[ext] = 1;
-                            self.ExtensionFilters.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
-                            //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
+                    for (var bu, j = 0; bu = item.BusinessUnits[j++];) {
+                        if (!(bu in businessUnitLookup)) {
+                            businessUnitLookup[bu] = 1;
+                            self.BusinessUnitFilters.push(new Filter(pageType + '5_' + counter, bu, 'Business Unit'));
 
-                            temp.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
+                            temp.push(new Filter(pageType + '5_' + counter, bu, 'Business Unit'));
                             counter++;
                         }
                     }
                 }
                 ko.utils.arrayForEach(self.AllFilters(), function (v) {
-                    if (v.Name == 'Report Type') {
+                    if (v.Name == 'Business Unit') {
                         item = v;
                     }
                 });
@@ -1118,8 +1216,35 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Report Type', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'darkblue'));
                 temp = [];
+
+
+                //DATASET FUNCTION FILTER
+                counter = 0; //reset counter
+                for (var item, i = 0; item = exhibits[i++];) {
+                    for (var fn, j = 0; fn = item.DatasetFunctions[j++];) {
+                        if (!(fn in datasetFunctionLookup)) {
+                            datasetFunctionLookup[fn] = 1;
+                            self.DatasetFunctionFilters.push(new Filter(pageType + '6_' + counter, fn, 'Function'));
+
+                            temp.push(new Filter(pageType + '6_' + counter, fn, 'Function'));
+                            counter++;
+                        }
+                    }
+                }
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name == 'Function') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
+                self.AllFilters.push(new FilterCategory('Function', temp, 'darkblue'));
+                temp = [];
+
 
                 //TAG FILTER
                 //Retrieve unique list of tag groups across tags that exist on exhibits
@@ -1140,7 +1265,6 @@
                         }
                     }
                     arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
-                    //return arr; //For testing
                 };
 
                 array_move(tagGroups, tagGroups.indexOf('Other'), tagGroups.length - 1)
@@ -1178,6 +1302,33 @@
 
                     temp = [];
                 }
+
+
+                //REPORT TYPE FILTER
+                counter = 0; //Needs seperate counter as multiple objects can appear per iteration
+                for (var item, i = 0; item = exhibits[i++];) {
+                    for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
+                        if (!(ext in extensionLookup)) {
+                            extensionLookup[ext] = 1;
+                            self.ExtensionFilters.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
+                            //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
+
+                            temp.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
+                            counter++;
+                        }
+                    }
+                }
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name == 'Report Type') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
+                self.AllFilters.push(new FilterCategory('Report Type', temp, 'darkblue'));
+                temp = [];
 
             };
 
@@ -1218,6 +1369,29 @@
                 self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
                 temp = [];
 
+
+                //BUSINESS UNIT FILTER
+                for (var item, i = 0; item = allObjects[i++];) {
+                    for (var bu, j = 0; bu = item.BusinessUnits[j++];) {
+                        if (!(bu in businessUnitLookup)) {
+                            businessUnitLookup[bu] = 1;
+                            self.BusinessUnitFilters.push(new Filter(pagetype + '5_' + counter, bu, 'Business Unit'));
+
+                            temp.push(new Filter(pageType + '5_' + counter, bu, 'Business Unit'));
+                            counter++;
+                        }
+                    }
+                }
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name === 'Business Unit') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
+                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'darkblue'));
 
 
                 //SENTRYOWNER FILTER
@@ -1302,9 +1476,6 @@
             };
 
             self.RemoveSelection = function (id) {
-                console.log('Removing : ' + id);
-
-
                 self.SelectedFilters.remove(function (feature) {
                     return feature == id;
                 });
@@ -1325,6 +1496,8 @@
             var loaded = false;
 
             var categoryLookup = {};
+            var businessUnitLookup = {};
+            var datasetFunctionLookup = {};
             var ownerLookup = {};
             var extensionLookup = {};
             var tagLookup = {};

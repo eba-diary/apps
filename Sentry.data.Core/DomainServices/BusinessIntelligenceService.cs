@@ -147,6 +147,8 @@ namespace Sentry.data.Core
         private Dataset MapDataset(BusinessIntelligenceDto dto, Dataset ds)
         {
             ds.DatasetCategories = _datasetContext.Categories.Where(x => dto.DatasetCategoryIds.Contains(x.Id)).ToList();
+            ds.BusinessUnits = _datasetContext.BusinessUnits.Where(x => dto.DatasetBusinessUnitIds.Contains(x.Id)).ToList();
+            ds.DatasetFunctions = _datasetContext.DatasetFunctions.Where(x => dto.DatasetFunctionIds.Contains(x.Id)).ToList();
             ds.DatasetName = dto.DatasetName;
             ds.DatasetDesc = dto.DatasetDesc;
             ds.CreationUserName = dto.CreationUserName;
@@ -177,25 +179,27 @@ namespace Sentry.data.Core
         {
             string userDisplayname = _userService.GetByAssociateId(ds.SentryOwnerName)?.DisplayName;
            
-                dto.DatasetId = ds.DatasetId;
-                dto.DatasetCategoryIds = ds.DatasetCategories.Select(x => x.Id).ToList();
-                dto.DatasetName = ds.DatasetName;
-                dto.DatasetDesc = ds.DatasetDesc;
-                dto.SentryOwnerName = (string.IsNullOrWhiteSpace(userDisplayname) ? ds.SentryOwnerName : userDisplayname);
-                dto.SentryOwnerId = ds.SentryOwnerName;
-                dto.CreationUserName = ds.CreationUserName;
-                dto.UploadUserName = ds.UploadUserName;
-                dto.DatasetDtm = ds.DatasetDtm;
-                dto.ChangedDtm = ds.ChangedDtm;
-                dto.S3Key = ds.S3Key;
-                dto.IsSensitive = ds.IsSensitive;
-                dto.DatasetType = ds.DatasetType;
-                dto.Location = ds.Metadata.ReportMetadata.Location;
-                dto.LocationType = ds.Metadata.ReportMetadata.LocationType;
-                dto.FrequencyId = ds.Metadata.ReportMetadata.Frequency;
-                dto.TagIds = ds.Tags.Select(x => x.TagId.ToString()).ToList();
-                dto.FileTypeId = ds.DatasetFileConfigs.First().FileTypeId;
-                dto.CanDisplay = ds.CanDisplay;
+            dto.DatasetId = ds.DatasetId;
+            dto.DatasetCategoryIds = ds.DatasetCategories.Select(x => x.Id).ToList();
+            dto.DatasetBusinessUnitIds = ds.BusinessUnits.Select(x => x.Id).ToList();
+            dto.DatasetFunctionIds = ds.DatasetFunctions.Select(x => x.Id).ToList();
+            dto.DatasetName = ds.DatasetName;
+            dto.DatasetDesc = ds.DatasetDesc;
+            dto.SentryOwnerName = (string.IsNullOrWhiteSpace(userDisplayname) ? ds.SentryOwnerName : userDisplayname);
+            dto.SentryOwnerId = ds.SentryOwnerName;
+            dto.CreationUserName = ds.CreationUserName;
+            dto.UploadUserName = ds.UploadUserName;
+            dto.DatasetDtm = ds.DatasetDtm;
+            dto.ChangedDtm = ds.ChangedDtm;
+            dto.S3Key = ds.S3Key;
+            dto.IsSensitive = ds.IsSensitive;
+            dto.DatasetType = ds.DatasetType;
+            dto.Location = ds.Metadata.ReportMetadata.Location;
+            dto.LocationType = ds.Metadata.ReportMetadata.LocationType;
+            dto.FrequencyId = ds.Metadata.ReportMetadata.Frequency;
+            dto.TagIds = ds.Tags.Select(x => x.TagId.ToString()).ToList();
+            dto.FileTypeId = ds.DatasetFileConfigs.First().FileTypeId;
+            dto.CanDisplay = ds.CanDisplay;
             dto.MailtoLink = "mailto:?Subject=Business%20Intelligence%20Exhibit%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/BusinessIntelligence/Detail/" + ds.DatasetId;
 
            // return dto;
