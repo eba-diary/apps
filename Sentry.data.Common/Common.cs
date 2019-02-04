@@ -20,6 +20,7 @@ using System.Linq.Expressions;
 using StructureMap;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
+using Sentry.Core;
 
 namespace Sentry.data.Common
 {

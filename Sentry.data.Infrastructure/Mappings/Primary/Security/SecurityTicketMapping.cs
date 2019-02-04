@@ -33,7 +33,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.TicketStatus, (m) => m.Column("TicketStatus_DSC"));
 
 
-            this.Bag(x => x.Permissions, (m) =>
+            this.Set(x => x.Permissions, (m) =>
             {
                 m.Inverse(true);
                 m.Table("SecurityPermission");

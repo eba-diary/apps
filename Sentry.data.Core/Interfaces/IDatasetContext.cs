@@ -14,6 +14,7 @@ namespace Sentry.data.Core
 
         IQueryable<SecurityTicket> HpsmTickets { get; }
         IQueryable<Security> Security { get; }
+        IQueryable<SecurityPermission> SecurityPermission { get; }
         IQueryable<Permission> Permission { get; }
         IQueryable<DataSourceType> DataSourceTypes { get; }
         IQueryable<DataSource> DataSources { get; }

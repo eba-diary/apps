@@ -22,7 +22,7 @@ namespace Sentry.data.Core
         public virtual DateTime EnabledDate { get; set; }
         public virtual string UpdatedById { get; set; }
         public virtual string CreatedById { get; set; }
-        public virtual IList<SecurityTicket> Tickets { get; set; }
+        public virtual ISet<SecurityTicket> Tickets { get; set; }
 
 
 

@@ -25,7 +25,7 @@ namespace Sentry.data.Core
 
         public virtual Security ParentSecurity { get; set; }
 
-        public virtual IList<SecurityPermission> Permissions { get; set; }
+        public virtual ISet<SecurityPermission> Permissions { get; set; }
 
 
 

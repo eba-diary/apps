@@ -20,6 +20,7 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using Sentry.data.Infrastructure.ServiceImplementations;
+using Sentry.Core;
 
 namespace Sentry.data.Infrastructure
 {

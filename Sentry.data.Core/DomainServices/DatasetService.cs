@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Sentry.Common.Logging;
+using Sentry.Core;
 
 namespace Sentry.data.Core
 {
@@ -32,10 +33,16 @@ namespace Sentry.data.Core
 
         public DatasetDetailDto GetDatesetDetailDto(int id)
         {
-            Dataset ds = _datasetContext.Datasets.Where(x=> x.DatasetId == id).
-                                                                                        Fetch(x=> x.Security).
-                                                                                        ThenFetchMany(x=> x.Tickets).
-                                                                                        ThenFetchMany(x=> x.Permissions).
+
+            //List<SecurityPermission> tickets = _datasetContext.SecurityPermission.//Where(x => x.Permission.PermissionCode == GlobalConstants.PermissionCodes.CAN_QUERY_DATASET).
+            //                                                                                                        Fetch(x => x.Permission).
+            //                                                                                                        Fetch(x => x.AddedFromTicket).ToList();
+
+
+            Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id).
+                                                                                        Fetch(s => s.Security).
+                                                                                        ThenFetchMany(t=> t.Tickets).
+                                                                                        ThenFetchMany(p=> p.Permissions).
                                                                                         ThenFetch(x=> x.Permission).FirstOrDefault();
 
             DatasetDetailDto dto = new DatasetDetailDto();

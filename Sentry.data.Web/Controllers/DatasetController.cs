@@ -21,6 +21,7 @@ using Sentry.data.Common;
 using System.Diagnostics;
 using Sentry.Common.Logging;
 using Hangfire;
+using Sentry.Core;
 
 namespace Sentry.data.Web.Controllers
 {

@@ -140,6 +140,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<SecurityPermission> SecurityPermission
+        {
+            get
+            {
+                return Query<SecurityPermission>();
+            }
+        }
+
         public IQueryable<Permission> Permission
         {
             get

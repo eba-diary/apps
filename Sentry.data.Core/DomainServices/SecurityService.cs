@@ -76,7 +76,7 @@ namespace Sentry.data.Core.DomainServices
                     RequestedDate = model.RequestedDate,
                     IsAddingPermission = true,
                     ParentSecurity = security,
-                    Permissions = new List<SecurityPermission>()
+                    Permissions = new HashSet<SecurityPermission>()
                 };
 
                 foreach (Permission perm in model.Permissions)

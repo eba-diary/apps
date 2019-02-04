@@ -10,7 +10,6 @@ using NHibernate.Linq;
 using System.Threading.Tasks;
 using System.Net;
 using System.IO;
-using Sentry.Core;
 
 namespace Sentry.data.Infrastructure
 {
@@ -215,7 +214,7 @@ namespace Sentry.data.Infrastructure
                 if (ds != null)
                 {
                     DataFeed df = null;
-                    if (ds.DatasetType != null && ds.DatasetType == "RPT")
+                    if (ds.DatasetType != null && ds.DatasetType == GlobalConstants.DataEntityCodes.REPORT)
                     {
                         df = new DataFeed()
                         {
