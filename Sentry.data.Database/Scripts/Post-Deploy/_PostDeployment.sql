@@ -21,7 +21,7 @@ All new files added for staic data or scripts should have it's properties update
 
 
 
---Now only run these scritps if the versioning allows us.
+--Now only run these scripts if the versioning allows us.
 --ALTER THE SCRIPT VERSION BELOW FOR EVERY NEW SCRIPT 
 --SCRIPT VERSION should be in format yyyy.MM.dd_rr where rr is 2-digit revision number for day. 
 DECLARE @ScriptVersion AS VARCHAR(50) 
@@ -62,3 +62,42 @@ END CATCH
   
 COMMIT TRAN
 
+--Now only run these scripts if the versioning allows us.
+--ALTER THE SCRIPT VERSION BELOW FOR EVERY NEW SCRIPT 
+--SCRIPT VERSION should be in format yyyy.MM.dd_rr where rr is 2-digit revision number for day. 
+DECLARE @ScriptVersion2 AS VARCHAR(50) 
+SET @ScriptVersion2 = '2019.02.4_01_PostDeploy'
+
+BEGIN TRAN 
+  
+IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion2) 
+BEGIN TRY 
+
+  --insert one off script files here
+  :r ..\Post-Deploy\SupportingScripts\Sprint_19_2_2\AddFileExtension.sql
+
+  --insert into the verision table so these scripts do not run again.
+  INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion2, GETDATE() ) 
+
+END TRY 
+
+BEGIN CATCH 
+    DECLARE @ErrorMessage2 NVARCHAR(4000); 
+    DECLARE @ErrorSeverity2 INT; 
+    DECLARE @ErrorState2 INT; 
+  
+    SELECT 
+        @ErrorMessage2 = ERROR_MESSAGE(), 
+        @ErrorSeverity2 = ERROR_SEVERITY(), 
+        @ErrorState2 = ERROR_STATE(); 
+  
+    RAISERROR (@ErrorMessage2, 
+               @ErrorSeverity2, 
+               @ErrorState2 
+               ); 
+  
+    ROLLBACK TRAN 
+    RETURN
+END CATCH 
+
+COMMIT TRAN

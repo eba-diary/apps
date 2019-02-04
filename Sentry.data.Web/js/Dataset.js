@@ -131,6 +131,27 @@ data.Dataset = {
             }
         });
 
+        $('#Delimiter').prop("readonly", "readonly");
+
+        $("#FileExtensionId").change(function () {
+            switch ($('#FileExtensionId option:selected').text()) {
+                case "CSV":
+                    $('#Delimiter').text(',');
+                    $('#Delimiter').val(',');
+                    $('#Delimiter').prop("readonly", "readonly");
+                    break;
+                case "DELIMITED":
+                    $('#Delimiter').val('');
+                    $('#Delimiter').prop("readonly", "");
+                    break;
+                default:
+                    $('#Delimiter').val('');
+                    $('#Delimiter').prop("readonly", "readonly");
+                    break;
+                 
+            }
+        });
+
     },
 
     DetailInit: function () {
