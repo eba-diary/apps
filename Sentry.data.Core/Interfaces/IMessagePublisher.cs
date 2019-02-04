@@ -9,6 +9,19 @@ namespace Sentry.data.Core
 {
     public interface IMessagePublisher
     {
+        /// <summary>
+        /// Publish a message to topic supplied
+        /// </summary>
+        /// <param name="topic"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
         void Publish(string topic, string key, string value);
+
+        /// <summary>
+        /// Publish message to data.sentry.com event topic
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        void PublishDSCEvent(string key, string value);
     }
 }

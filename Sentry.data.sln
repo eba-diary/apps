@@ -36,6 +36,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SonarQube", "SonarQube", "{
 		SonarQube\SolutionBinding.sqconfig = SonarQube\SolutionBinding.sqconfig
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.Messaging.Common", "StandaloneLibraries\Sentry.Messaging.Common\Sentry.Messaging.Common.csproj", "{BD4B0624-03A2-4896-B46E-4EB35E9EFE6C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StandaloneLibraries", "StandaloneLibraries", "{9E1450B3-AC37-4476-8CBA-C6834F9E8B2E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.AsyncCommandProcessor", "StandaloneLibraries\Sentry.AsyncCommandProcessor\Sentry.AsyncCommandProcessor.csproj", "{1995839B-6107-45DF-84BE-4BC4606DC530}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,9 +83,21 @@ Global
 		{647FD2CD-F82C-4CA3-BCBA-79CB22C179E3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{647FD2CD-F82C-4CA3-BCBA-79CB22C179E3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{647FD2CD-F82C-4CA3-BCBA-79CB22C179E3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BD4B0624-03A2-4896-B46E-4EB35E9EFE6C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BD4B0624-03A2-4896-B46E-4EB35E9EFE6C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BD4B0624-03A2-4896-B46E-4EB35E9EFE6C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BD4B0624-03A2-4896-B46E-4EB35E9EFE6C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1995839B-6107-45DF-84BE-4BC4606DC530}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1995839B-6107-45DF-84BE-4BC4606DC530}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1995839B-6107-45DF-84BE-4BC4606DC530}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1995839B-6107-45DF-84BE-4BC4606DC530}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{BD4B0624-03A2-4896-B46E-4EB35E9EFE6C} = {9E1450B3-AC37-4476-8CBA-C6834F9E8B2E}
+		{1995839B-6107-45DF-84BE-4BC4606DC530} = {9E1450B3-AC37-4476-8CBA-C6834F9E8B2E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0D1FAF12-93B8-4B73-A66B-99806CB91657}

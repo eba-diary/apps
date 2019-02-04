@@ -33,6 +33,7 @@ namespace Sentry.data.Core
         IQueryable<RetrieverJob> Jobs { get; }
         IQueryable<MetadataTag> Tags { get; }
         IQueryable<TagGroup> TagGroups { get; }
+        IQueryable<ApplicationConfiguration> ApplicationConfigurations { get; }
 
         /** Datasets **/
 
