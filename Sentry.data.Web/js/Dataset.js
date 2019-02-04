@@ -131,10 +131,11 @@ data.Dataset = {
             }
         });
 
+        $('#Delimiter').prop('disabled', true);
+
         $("#FileExtensionId").change(function () {
             $('#Delimiter').val('');
             switch ($('#FileExtensionId option:selected').text()) {
-
                 case "CSV":
                     $('#Delimiter').val(',');
                     $('#Delimiter').prop('disabled', true);
