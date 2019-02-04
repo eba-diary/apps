@@ -76,7 +76,7 @@ namespace Sentry.data.Web.Helpers
 
         
         [Obsolete("The function is fine but I wanted that this should not use the domain context and these should all be Enums")]
-        public static void SetupLists(IDatasetContext _datasetContext, BaseEntityModel model)
+        public static void SetupLists(IDatasetContext _datasetContext, BusinessIntelligenceModel model)
         {
             var temp = GetCategoryList(_datasetContext).ToList();
 

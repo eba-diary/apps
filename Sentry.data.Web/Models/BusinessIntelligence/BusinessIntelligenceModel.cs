@@ -16,6 +16,8 @@ namespace Sentry.data.Web
             Location = dto.Location;
             FileTypeId = dto.FileTypeId;
             FrequencyId = dto.FrequencyId;
+            DatasetBusinessUnitIds = dto.DatasetBusinessUnitIds;
+            DatasetFunctionIds = dto.DatasetFunctionIds;
         }
 
 
@@ -31,7 +33,13 @@ namespace Sentry.data.Web
         [DisplayName("Frequency")]
         public int? FrequencyId { get; set; }
 
+        [Required]
+        [DisplayName("Business Unit")]
+        public List<int> DatasetBusinessUnitIds { get; set; }
 
+        [Required]
+        [DisplayName("Function")]
+        public List<int> DatasetFunctionIds { get; set; }
 
 
         public List<string> Validate()

@@ -15,6 +15,8 @@ All new files added for staic data or scripts should have it's properties update
 --Execute scripts to insert/delete/merge static data
 :r ..\Post-Deploy\StaticData\Category.sql
 :r ..\Post-Deploy\StaticData\EventType.sql
+:r ..\Post-Deploy\StaticData\BusinessUnit.sql
+:r ..\Post-Deploy\StaticData\DatasetFunction.sql
 
 
 
