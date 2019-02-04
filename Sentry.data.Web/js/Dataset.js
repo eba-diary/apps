@@ -131,20 +131,22 @@ data.Dataset = {
             }
         });
 
-        $('#Delimiter').prop('disabled', true);
+        $('#Delimiter').prop("readonly", "readonly");
 
         $("#FileExtensionId").change(function () {
-            $('#Delimiter').val('');
             switch ($('#FileExtensionId option:selected').text()) {
                 case "CSV":
+                    $('#Delimiter').text(',');
                     $('#Delimiter').val(',');
-                    $('#Delimiter').prop('disabled', true);
+                    $('#Delimiter').prop("readonly", "readonly");
                     break;
                 case "DELIMITED":
-                    $('#Delimiter').prop('disabled', false);
+                    $('#Delimiter').val('');
+                    $('#Delimiter').prop("readonly", "");
                     break;
                 default:
-                    $('#Delimiter').prop('disabled', true);
+                    $('#Delimiter').val('');
+                    $('#Delimiter').prop("readonly", "readonly");
                     break;
                  
             }
