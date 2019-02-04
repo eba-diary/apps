@@ -41,6 +41,8 @@ namespace Sentry.data.Core
         public virtual Boolean CanDisplay { get; set; }
 
         public virtual IList<Category> DatasetCategories { get; set; }
+        public virtual IList<BusinessUnit> BusinessUnits { get; set; }
+        public virtual IList<DatasetFunction> DatasetFunctions { get; set; }
         public virtual string DatasetType { get; set; }
         public virtual DataClassificationType DataClassification { get; set; }
 

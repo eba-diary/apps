@@ -149,6 +149,22 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<BusinessUnit> BusinessUnits
+        {
+            get
+            {
+                return Query<BusinessUnit>().Cacheable();
+            }
+        }
+
+        public IQueryable<DatasetFunction> DatasetFunctions
+        {
+            get
+            {
+                return Query<DatasetFunction>().Cacheable();
+            }
+        }
+
         public IQueryable<HiveTable> HiveTables
         {
             get

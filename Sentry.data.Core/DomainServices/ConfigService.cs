@@ -26,7 +26,17 @@ namespace Sentry.data.Core
             _eventService = eventService;
             _messagePublisher = messagePublisher;
         }
+        public SchemaDTO GetSchemaDTO(int id)
+        {
+            return MapToDto(_datasetContext.GetById<DataElement>(id));
+        }
 
+        public IList<ColumnDTO> GetColumnDTO(int id)
+        {
+            return MapToDto(_datasetContext.GetById<DataElement>(id).DataObjects);
+        }
+
+        
         public void UpdateFields(int configId, int schemaId, List<SchemaRow> schemaRows)
         {
             DatasetFileConfig config = _datasetContext.GetById<DatasetFileConfig>(configId);
@@ -257,6 +267,42 @@ namespace Sentry.data.Core
 
             _datasetContext.Merge(schema);
             _datasetContext.SaveChanges();
+        }
+        private SchemaDTO MapToDto(DataElement dataElement)
+        {
+            SchemaDTO dto = new SchemaDTO()
+            {
+                SchemaID = dataElement.DataElement_ID,
+                Format = dataElement.FileFormat,
+                Delimiter = dataElement.Delimiter,
+                Header = true,
+                HiveDatabase = dataElement.HiveDatabase,
+                HiveTable = dataElement.HiveTable,
+                HiveStatus = dataElement.HiveTableStatus
+            };
+
+            return dto;
+        }
+        private IList<ColumnDTO> MapToDto(IList<DataObject> objects)
+        {
+            IList<ColumnDTO> dtoList = new List<ColumnDTO>();
+            foreach (DataObject table in objects)
+            {
+                foreach (DataObjectField field in table.DataObjectFields)
+                {
+                    ColumnDTO dto = new ColumnDTO()
+                    {
+                        Name = field.DataObjectField_NME,
+                        DataType = field.DataType,
+                        Length = field.Length,
+                        Nullable = field.Nullable,
+                        Precision = field.Precision,
+                        Scale = field.Scale
+                    };
+                    dtoList.Add(dto);
+                }
+            }
+            return dtoList;
         }
     }
 }
