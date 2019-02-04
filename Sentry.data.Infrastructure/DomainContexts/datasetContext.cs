@@ -6,7 +6,6 @@ using NHibernate.Linq;
 using Sentry.NHibernate;
 using Sentry.data.Core;
 using System.Threading.Tasks;
-using Sentry.data.Core.Entities.Metadata;
 using System.Reflection;
 using System.Collections;
 using System.Web;

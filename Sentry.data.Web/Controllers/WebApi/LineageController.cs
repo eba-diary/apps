@@ -2,7 +2,6 @@
 using Sentry.Common.Logging;
 using Sentry.data.Common;
 using Sentry.data.Core;
-using Sentry.data.Core.Entities.Metadata;
 using Sentry.data.Infrastructure;
 using System;
 using System.Linq;

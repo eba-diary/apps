@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json.Linq;
-using Sentry.data.Core.Entities.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -67,7 +67,7 @@ namespace Sentry.data.Web.Controllers
                 CanEditDataset = SharedContext.CurrentUser.CanModifyDataset
             };
 
-            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Home Page", 0);
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Home Page", 0);
             return View(hm);
         }
 
@@ -88,7 +88,7 @@ namespace Sentry.data.Web.Controllers
 
             Utility.SetupLists(_datasetContext, cdm);
 
-            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Creation Page", cdm.DatasetId);
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Creation Page", cdm.DatasetId);
 
             return View("DatasetForm", cdm);
         }
@@ -102,7 +102,7 @@ namespace Sentry.data.Web.Controllers
 
             Utility.SetupLists(_datasetContext, model);
 
-            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Edit Page", id);
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Edit Page", id);
             return View("DatasetForm", model);
         }
 
@@ -120,14 +120,14 @@ namespace Sentry.data.Web.Controllers
                 {
                     int datasetId = _datasetService.CreateAndSaveNewDataset(dto);
 
-                    _eventService.PublishSuccessEvent(GlobalConstants.EventType.CREATED_DATASET, SharedContext.CurrentUser.AssociateId, dto.DatasetName + " was created.", datasetId);
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.CREATED_DATASET, SharedContext.CurrentUser.AssociateId, dto.DatasetName + " was created.", datasetId);
                     return RedirectToAction("Detail", new { id = datasetId });
                 }
                 else
                 {
                     _datasetService.UpdateAndSaveDataset(dto);
 
-                    _eventService.PublishSuccessEvent(GlobalConstants.EventType.UPDATED_DATASET, SharedContext.CurrentUser.AssociateId, dto.DatasetName + " was created.", dto.DatasetId);
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.UPDATED_DATASET, SharedContext.CurrentUser.AssociateId, dto.DatasetName + " was created.", dto.DatasetId);
                     return RedirectToAction("Detail", new { id = dto.DatasetId });
                 }
                 
@@ -146,7 +146,7 @@ namespace Sentry.data.Web.Controllers
             DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
             DatasetDetailModel model = new DatasetDetailModel(dto);
 
-            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Page", dto.DatasetId);
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Page", dto.DatasetId);
             return View(model);
         }
 
@@ -254,7 +254,7 @@ namespace Sentry.data.Web.Controllers
             DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
             DatasetDetailModel model = new DatasetDetailModel(dto);
 
-            Task.Factory.StartNew(() => _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Configuration Page", dto.DatasetId), TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(() => _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Configuration Page", dto.DatasetId), TaskCreationOptions.LongRunning);
 
             return View("Configuration", model);
         }
@@ -1203,60 +1203,12 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult QueryTool()
         {
-            ViewBag.PowerUser = SharedContext.CurrentUser.CanModifyDataset;
             ViewBag.LivyURL = Sentry.Configuration.Config.GetHostSetting("ApacheLivy");
 
-            Event e = new Event();
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-            e.Reason = "Viewed Query Tool Page";
-            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Query Tool Page");
 
             return View("QueryTool");
         }
 
-        [Obsolete("This should be placed in the favorites controller that was created.")]
-        public JsonResult SetFavorite(int datasetId)
-        {
-            try
-            {
-                Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
-
-                if (!ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId))
-                {
-                    Favorite f = new Favorite()
-                    {
-                        DatasetId = ds.DatasetId,
-                        UserId = SharedContext.CurrentUser.AssociateId,
-                        Created = DateTime.Now
-                    };
-
-                    _datasetContext.Merge(f);
-                    _datasetContext.SaveChanges();
-
-                    Response.StatusCode = (int)HttpStatusCode.OK;
-                    return Json(new { message = "Successfully added favorite." }, JsonRequestBehavior.AllowGet);
-                }
-                else
-                {
-                    _datasetContext.Remove(ds.Favorities.First(w => w.UserId == SharedContext.CurrentUser.AssociateId));
-                    _datasetContext.SaveChanges();
-
-                    Response.StatusCode = (int)HttpStatusCode.OK;
-                    return Json(new { message = "Successfully removed favorite." }, JsonRequestBehavior.AllowGet);
-                }
-            }
-            catch (Exception)
-            {
-                _datasetContext.Clear();
-                Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                return Json(new { message = "Failed to modify favorite." }, JsonRequestBehavior.AllowGet);
-            }
-
-        }
     }
 }

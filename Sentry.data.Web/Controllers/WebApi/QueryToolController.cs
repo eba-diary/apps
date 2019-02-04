@@ -14,7 +14,6 @@ using System.Web.Http.Results;
 using Sentry.data.Common;
 using Newtonsoft.Json;
 using System.Threading;
-using Sentry.data.Core.Entities.Metadata;
 using Sentry.data.Core.Entities.Livy;
 using Sentry.data.Web.Helpers;
 using Sentry.data.Core.Entities;

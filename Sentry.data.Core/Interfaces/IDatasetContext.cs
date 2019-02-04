@@ -2,8 +2,6 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Sentry.data.Core.Entities.Metadata;
 using Sentry.data.Core.Entities;
 
 namespace Sentry.data.Core

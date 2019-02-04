@@ -25,7 +25,6 @@ using System.Diagnostics;
 using LazyCache;
 using StackExchange.Profiling;
 using Sentry.Common.Logging;
-using Sentry.data.Core.Entities.Metadata;
 using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Web.Controllers

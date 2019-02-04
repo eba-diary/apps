@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Sentry.data.Core;
-using Sentry.data.Core.Entities.Metadata;
 
 namespace Sentry.data.Web
 {

@@ -2,7 +2,6 @@
 using Sentry.Core;
 using Sentry.data.Common;
 using Sentry.data.Core;
-using Sentry.data.Core.Entities.Metadata;
 using Sentry.data.Infrastructure;
 using Sentry.data.Web.Helpers;
 using Sentry.data.Web.Models;

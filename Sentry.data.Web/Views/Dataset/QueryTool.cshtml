@@ -1,6 +1,5 @@
 ﻿@{
     Layout = "~/Views/Shared/_Layout.cshtml";
-    Boolean powerUser = ViewBag.PowerUser;
     String livyURL = ViewBag.LivyURL + "/ui/session/";
 }
 
@@ -20,56 +19,46 @@
     <div class="col-lg-6">
         <h1>Query Tool</h1>
     </div>
-    @if (powerUser)
-    {
-        <div class="col-lg-3">
-            <h3><a href="@livyURL" target="_blank" id="LivyURL">Spark Session: <span id="sessionID"></span></a></h3>
+    <div class="col-lg-3">
+        <h3><a href="@livyURL" target="_blank" id="LivyURL">Spark Session: <span id="sessionID"></span></a></h3>
+    </div>
+    <div class="col-lg-3" id="adminToolsButtons">
+        <div class="btn-group">
+            <a class="btn btn-primary" onclick="data.QueryTool.ToggleAdminControls()">Code History and Custom Code</a>
+            <a href="#/" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></a>
+            <ul class="dropdown-menu">
+                <li><a onclick="CreateSession(true)">Re-Create Session</a></li>
+                <li><a onclick="ResetHiveTables()">Reset Hive Tables</a></li>
+            </ul>
         </div>
-        <div class="col-lg-3" id="adminToolsButtons">
-            <div class="btn-group">
-                <a class="btn btn-primary" onclick="data.QueryTool.ToggleAdminControls()">Code History and Custom Code</a>
-                <a href="#/" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></a>
-                <ul class="dropdown-menu">
-                    <li><a onclick="CreateSession(true)">Re-Create Session</a></li>
-                    <li><a onclick="ResetHiveTables()">Reset Hive Tables</a></li>
-                </ul>
-            </div>
-        </div>
-    }
-    else
-    {
-        <div style="display:none;">
-            <a href="@livyURL" id="LivyURL"></a>
-        </div>
-    }
+    </div>
 </div>
 
 
-@if (powerUser)
-{
-    <hr />
-    <div id="AdminControls" style="display: none;">
-        <h4>Administrative and Power User Controls</h4>
-        <hr />
 
-        <h4>Code History</h4>
-        <p>Below is the history of code sent to Apache Spark and Livy in this Session.</p>
-        <textarea id="previousQueries" style="width: 100%; max-width: 100%; height: 100px;"></textarea>
-        <hr />
-        <h4>Custom Code</h4>
-        <p>Type your custom Python code below. Currently only python is enabled. </p>
-        <textarea id="codeArea" style="width: 100%; max-width: 100%; height: 400px; display: none;"></textarea>
-        <hr />
-        <p>The following button will send the Python code above directly to Apache Livy then Spark and then to Sentry Datasets and Various Systems.</p>
-        <p>If you are not careful with what you send you may break something.</p>
-        <p>With great power comes great responsibility. You are being monitored.</p>
-        <div class="btn-group">
-            <a class="btn btn-primary" onclick="SendCode()">Send Code to Spark</a>
-            <a class="btn btn-success" onclick="SendCode(null, 'Get Hive Table')">HiveQL Query</a>
-        </div>
-        <hr />
+<hr />
+<div id="AdminControls" style="display: none;">
+    <h4>Administrative and Power User Controls</h4>
+    <hr />
+
+    <h4>Code History</h4>
+    <p>Below is the history of code sent to Apache Spark and Livy in this Session.</p>
+    <textarea id="previousQueries" style="width: 100%; max-width: 100%; height: 100px;"></textarea>
+    <hr />
+    <h4>Custom Code</h4>
+    <p>Type your custom Python code below. Currently only python is enabled. </p>
+    <textarea id="codeArea" style="width: 100%; max-width: 100%; height: 400px; display: none;"></textarea>
+    <hr />
+    <p>The following button will send the Python code above directly to Apache Livy then Spark and then to Sentry Datasets and Various Systems.</p>
+    <p>If you are not careful with what you send you may break something.</p>
+    <p>With great power comes great responsibility. You are being monitored.</p>
+    <div class="btn-group">
+        <a class="btn btn-primary" onclick="SendCode()">Send Code to Spark</a>
+        <a class="btn btn-success" onclick="SendCode(null, 'Get Hive Table')">HiveQL Query</a>
     </div>
-}
+    <hr />
+</div>
+
 
 <div id="datasetsHeader">
     <h4>Selected Datasets</h4>
@@ -112,14 +101,14 @@
                             <span>Raw File Query Override:</span>
                             <input data-bind="checked: schemaOverride" style="margin-left: 5px;" type="checkbox" class="schemaOverrideCheckbox" />
                         </label>
-                    </div>                    
+                    </div>
                     <div style="display: inline-block; float: right; margin-top: 10px;" data-bind="if: !hasSchema()">
                         <div data-bind="foreach: { data: extensions, as: 'extension'}">
                             <div class="extension bg_gray" data-bind="css : extension">
                                 <span data-bind="text: extension"></span>
                             </div>
                         </div>
-                    </div>                    
+                    </div>
                     <a href="#/" data-bind="if: schemaOverride() || hasSchema() === false, visible: schemaOverride() || hasSchema() === false, click: function (d) { data.Dataset.PreviewDatafileModal(d.primaryFileId()); }" class="table-row-icon row-filepreview-icon" title="Preview file">
                         <i class="glyphicon glyphicon-search text-primary"></i>
                     </a>
@@ -168,7 +157,7 @@
                             <input style="margin-left: 5px;" type="checkbox" class="ruleController includeCheckbox" />
                         </label>
                     </div>
-                    
+
                     <div data-bind="if: schemaOverride() === false && config.hasQueryableSchema()">
                         <div data-bind="foreach: { data: Schemas, as: 'schema'}">
                             <div style="border: 1px solid #EEE; border-radius: 5px; padding: 5px;">
@@ -199,8 +188,8 @@
                                 </div>
                             </div>
                         </div>
-                    </div>                    
-                </div>                    
+                    </div>
+                </div>
 
                 <div data-bind="if: hasFiles() === false, visible: hasFiles() === false" style="margin-bottom: -15px;">
                     <h6 style='display:inline-block;margin-right: 15px;margin-left: 15px;' data-bind="text: config.configName"></h6>
@@ -250,35 +239,35 @@
         <div id="primaryPanel">
 
             @*<div id="columnSelector" class="query-builder query-window-panel">
-            <div id="columnSelectorContainer" class="rules-group-container">
+                    <div id="columnSelectorContainer" class="rules-group-container">
 
-                <h5>Column Selection</h5>
-                <p>Click below to choose your columns from your dataset.  If you choose no columns all columns will be selected.</p>
+                        <h5>Column Selection</h5>
+                        <p>Click below to choose your columns from your dataset.  If you choose no columns all columns will be selected.</p>
 
-                <select multiple="" class="form-control select2-hidden-accessible"
-                        id="columnSelectorSelect" name="columnSelector" tabindex="-1" aria-hidden="true"></select>
+                        <select multiple="" class="form-control select2-hidden-accessible"
+                                id="columnSelectorSelect" name="columnSelector" tabindex="-1" aria-hidden="true"></select>
 
-            </div>
-        </div>*@
+                    </div>
+                </div>*@
 
             @*<div id="joinPanel" class="query-builder query-window-panel">
-                <div class="rules-group-container">
-                    <h5>Table Joining</h5>
-                    <p>Example :  t1 JOIN t2 ON t1.departmentID == t2.ID</p>
-                    <p>One join is required per two data sources you chose above.  Example: If you chose 3 data sources, 2 joins would be required.  Join t1 with t2 and then Join t1 with t3</p>
-                    <div class="btn-group pull-right group-actions">
-                        <button type="button" class="btn btn-xs ruleController btn-success" id="btnAddJoin" onclick="addJoinRule()">
-                            <i class="glyphicon glyphicon-plus"></i> Add rule
-                        </button>
-                    </div>
-                    <br />
+                    <div class="rules-group-container">
+                        <h5>Table Joining</h5>
+                        <p>Example :  t1 JOIN t2 ON t1.departmentID == t2.ID</p>
+                        <p>One join is required per two data sources you chose above.  Example: If you chose 3 data sources, 2 joins would be required.  Join t1 with t2 and then Join t1 with t3</p>
+                        <div class="btn-group pull-right group-actions">
+                            <button type="button" class="btn btn-xs ruleController btn-success" id="btnAddJoin" onclick="addJoinRule()">
+                                <i class="glyphicon glyphicon-plus"></i> Add rule
+                            </button>
+                        </div>
+                        <br />
 
-                    <br />
-                    <div id="joinContainer">
+                        <br />
+                        <div id="joinContainer">
 
+                        </div>
                     </div>
-                </div>
-            </div>*@
+                </div>*@
 
             <div id="joinPanel" class="query-builder query-window-panel">
                 <div class="rules-group-container">
@@ -336,7 +325,7 @@
                     </div>
 
                     <br />
-                    
+
                 </div>
                 <div id="joinContainer3" style="margin-left: 8px;">
                     <div class="rules-group-container onStatements" data-bind="template: {name: 'OnStatementTemplate', foreach: OnStatements}">
@@ -590,11 +579,8 @@
                         <option selected disabled>File Extensions: </option>
                         <option>csv</option>
                         <option>json</option>
-                        @if (powerUser)
-                        {
-                            <option>parquet</option>
-                            <option>orc</option>
-                        }
+                        <option>parquet</option>
+                        <option>orc</option>
                     </select>
                     <button style="width: 10%; float:right; display:inline-block;" class="form-control btn btn-success" onclick="SavetoS3()">Download File</button>
 
@@ -713,7 +699,7 @@
 
         function updateBadges() {
             var allGood = true;
-            
+
             var warningText = "";
 
             //Turn off the Join Tables Tab
@@ -801,7 +787,7 @@
                 $('#whereBadge').addClass('badge-warning');
                 $('#whereBadge').text(0);
             }
-            
+
             var rules = vm.JoinPanel().Joins().length;
             var failed = 0;
 
@@ -879,7 +865,7 @@
 
             if (!allGood) {
                 if (warningText != "") {
-                    PassHelpText("Schema", "Warning", warningText);                
+                    PassHelpText("Schema", "Warning", warningText);
                 }
                 return false;
             } else {
@@ -1098,7 +1084,7 @@
                     if (tableAliasName == null || !tableAliasName) {
                         var alias = false;
                     }
-                    
+
                     var databaseName = $($(revision).children('h6')[0]).text();
                     var include = $(revision).children().children('.includeCheckbox')[0].checked;
 
@@ -1144,7 +1130,7 @@
 
             SendCode(json, 'Count Rows');
         }
-  
+
         function runQuery(runNow) {
 
             var rawQuery = "queryResponse = spark.sql(" + WriteSQLStatement() + ");";
@@ -1257,8 +1243,8 @@
                     } else {
                         valid = false;
                         failureReason = "No Extension Picked for " + tableName.trim();
-                    }             
-                }                
+                    }
+                }
             }
 
             var rows = $('#tableSelection').children('.rule-container').children().children().children('.schemaRow');
@@ -1321,11 +1307,10 @@
                 failureReason = "The highlighted aliases above do not meet the correct criteria.  Must start with a character and must only contain [A-Z][a-z][0-9] and underscores."
             }
 
-            if ((schemaRules + configRules) == 0 ) {
+            if ((schemaRules + configRules) == 0) {
                 valid = false;
             }
-            else if (includedDatasets == 0)
-            {
+            else if (includedDatasets == 0) {
                 if (failureReason == "") {
                     failureReason = "You have not selected any valid datasets above.";
                 }
@@ -1688,7 +1673,7 @@
                             type = "string";
                         }
 
-                        internalFilterList.push({ 'id': tables[index] + '.`' + column.trim() + "`", 'type': type.trim(), 'label': tables[index] + '.' + column.trim(), 'column' : column.trim() });
+                        internalFilterList.push({ 'id': tables[index] + '.`' + column.trim() + "`", 'type': type.trim(), 'label': tables[index] + '.' + column.trim(), 'column': column.trim() });
 
                         //$('#columnRenamerSelect').append($('<option/>', {
                         //    value: tables[index] + '.`' + column.trim() + "`",
@@ -1839,7 +1824,7 @@
                 select.append(optgroup);
 
                 var id = data.QueryTool.GetParameterByName('DatasetID');
-                
+
                 $("#datasetList option").each(function () {
                     // Add $(this).val() to your list
                     if ($(this).val() == id) {

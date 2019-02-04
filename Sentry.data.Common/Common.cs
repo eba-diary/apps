@@ -18,7 +18,6 @@ using Sentry.Common.Logging;
 using Newtonsoft.Json;
 using System.Linq.Expressions;
 using StructureMap;
-using Sentry.data.Core.Entities.Metadata;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
 
