@@ -1,0 +1,90 @@
+﻿/* styles used on the DSC home page */
+
+.home-tile {
+    min-height: 210px;
+    padding: 15px;
+    position: relative;
+    border: 1px solid #f0f0f0;
+    font-size: 16px;
+}
+    .home-tile a {
+        font-weight: bold;
+        position: absolute;
+        bottom: 18px;
+    }
+
+.home-photo {
+    background-repeat: no-repeat;
+    height: 125px;
+}
+
+#bi-content-wrapper {
+    min-height: 160px;
+}
+
+.border-btm-blue {
+    border-bottom: 4px solid #00a3e0;
+}
+
+.border-btm-green {
+    border-bottom: 4px solid #84bd00;
+}
+
+.border-btm-plum {
+    border-bottom: 4px solid #bb85ab;
+}
+
+#feed {
+    background-color: #fff;
+    padding: 9px 15px;
+    font-size: 16px;
+    min-height: 362px;
+}
+
+/* business intelligence */
+.bg-photo-bi {
+    background-image: url('/Images/photo-businessintelligence.jpg');
+    background-position: 50% 48%;
+}
+
+.home-tile-link-bi {
+    text-decoration: none;
+    color: #003da5;
+}
+    .home-tile-link-bi:hover {
+        color: #00a3e0;
+        text-decoration: none;
+    }
+
+
+
+/* datasets */
+.bg-photo-ds {
+    background-image: url('/Images/photo-datasets.jpg');
+    background-position: 55% 10%;
+}
+
+.home-tile-link-ds {
+    text-decoration: none;
+    color: #005844;
+}
+    .home-tile-link-ds:hover {
+        color: #84bd00;
+        text-decoration: none;
+    }
+
+
+/* data assets */
+.bg-photo-da {
+    background-image: url('/Images/photo-dataassets.jpg');
+    background-position: 46% 50%;
+}
+
+.home-tile-link-da {
+    text-decoration: none;
+    color: #72246c;
+}
+    .home-tile-link-da:hover {
+        color: #bb85ab;
+        text-decoration: none;
+    }

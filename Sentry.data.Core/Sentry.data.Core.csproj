@@ -85,6 +85,10 @@
     <Compile Include="DomainServices\DatasetService.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceDetailDTO.cs" />
     <Compile Include="DTO\Dataset\DatasetDetailDTO.cs" />
+    <Compile Include="Entities\ColumnDTO.cs" />
+    <Compile Include="Entities\SchemaDTO.cs" />
+    <Compile Include="Entities\Datasets\BusinessUnit.cs" />
+    <Compile Include="Entities\Datasets\DatasetFunction.cs" />
     <Compile Include="Entities\HiveTableStatusEnum.cs" />
     <Compile Include="Entities\MessageFormats\HiveTableCreateModel.cs" />
     <Compile Include="Entities\Metadata\ColumnModel.cs" />

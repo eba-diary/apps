@@ -147,6 +147,8 @@ namespace Sentry.data.Core
         private Dataset MapDataset(BusinessIntelligenceDto dto, Dataset ds)
         {
             ds.DatasetCategories = _datasetContext.Categories.Where(x => dto.DatasetCategoryIds.Contains(x.Id)).ToList();
+            ds.BusinessUnits = _datasetContext.BusinessUnits.Where(x => dto.DatasetBusinessUnitIds.Contains(x.Id)).ToList();
+            ds.DatasetFunctions = _datasetContext.DatasetFunctions.Where(x => dto.DatasetFunctionIds.Contains(x.Id)).ToList();
             ds.DatasetName = dto.DatasetName;
             ds.DatasetDesc = dto.DatasetDesc;
             ds.CreationUserName = dto.CreationUserName;
@@ -180,6 +182,8 @@ namespace Sentry.data.Core
            
             dto.DatasetId = ds.DatasetId;
             dto.DatasetCategoryIds = ds.DatasetCategories.Select(x => x.Id).ToList();
+            dto.DatasetBusinessUnitIds = ds.BusinessUnits.Select(x => x.Id).ToList();
+            dto.DatasetFunctionIds = ds.DatasetFunctions.Select(x => x.Id).ToList();
             dto.DatasetName = ds.DatasetName;
             dto.DatasetDesc = ds.DatasetDesc;
             dto.SentryOwnerName = (string.IsNullOrWhiteSpace(userDisplayname) ? ds.SentryOwnerName : userDisplayname);
@@ -217,7 +221,7 @@ namespace Sentry.data.Core
             dto.FrequencyDescription = Enum.GetName(typeof(ReportFrequency), ds.Metadata.ReportMetadata.Frequency) ?? "Not Specified";
             dto.TagNames = ds.Tags.Select(x => x.Name).ToList();
             dto.CanManageReport = user.CanManageReports;
-            dto.CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "gray";
+            dto.CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "darkgray";
             dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
 
             //return dto;
