@@ -83,14 +83,14 @@
 
             <div class="form-group">
                 @Html.LabelFor((model) => model.FileExtensionID, new { @class = "control-label col-md-2" })
-                <div class="col-md-2">
+                <div class="col-md-10">
                     @Html.DropDownListFor(model => model.FileExtensionID, Model.ExtensionList, new { @class = "form-control edit-dataset-row" })
                 </div>
             </div>
 
             <div class="form-group">
                 @Html.LabelFor((model) => model.Delimiter, new { @class = "control-label col-md-2 optional" })
-                <div class="col-md-2">
+                <div class="col-md-10">
                     @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control edit-dataset-row" })
                 </div>
             </div>
@@ -155,6 +155,27 @@
     <script>
         $(function () {
             //data.Dataset.EditInit();
+
+            $('#Delimiter').prop("readonly", "readonly");
+
+            $("#FileExtensionID").change(function () {
+                switch ($('#FileExtensionID option:selected').text()) {
+                    case "CSV":
+                        $('#Delimiter').text(',');
+                        $('#Delimiter').val(',');
+                        $('#Delimiter').prop("readonly", "readonly");
+                        break;
+                    case "DELIMITED":
+                        $('#Delimiter').val('');
+                        $('#Delimiter').prop("readonly", "");
+                        break;
+                    default:
+                        $('#Delimiter').val('');
+                        $('#Delimiter').prop("readonly", "readonly");
+                        break;
+
+                }
+            });
 
             var dropPathName = $("#DropPath").val();
 
