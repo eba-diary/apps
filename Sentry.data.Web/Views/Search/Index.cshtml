@@ -111,7 +111,7 @@
                     <div id="sort-option-wrapper" style="text-align: right; margin-top: 12px;">
                         <div style="display:inline-block;">Sort by</div>
                         <div style="display:inline-block;">
-                            <select id="sort-results" class="form-control">
+                            <select id="sort-results" class="form-control" data-bind="event: { change: sortExhibits }">
                                 @foreach (SelectListItem sortOption in Model.SortByOptions)
                                 {
                                     <option value="@sortOption.Value">@sortOption.Text</option>
@@ -1506,6 +1506,10 @@
 
             self.IsShownForCurrentType = function (what) {
                 return what === getDetailType();
+            };
+
+            self.sortExhibits = function (whathere) {
+                console.log(whathere);
             };
 
             var loaded = false;
