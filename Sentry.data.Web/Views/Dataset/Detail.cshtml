@@ -919,7 +919,7 @@
                         url: "/api/v1/queryTool/sessions/primary",
                         dataType: "json",
                         success: function (msg) {
-                            var getHiveTableUrl = "/api/v1/queryTool/sessions/sessions/" + msg.id + "/hives/" + result.HiveDatabaseName + "/" + result.HiveTableName + "/" + $('#datasetConfigList').val() + "/20/0";
+                            var getHiveTableUrl = "/api/v1/queryTool/sessions/" + msg.id + "/hives/" + result.HiveDatabaseName + "/" + result.HiveTableName + "/" + $('#datasetConfigList').val() + "/20/0";
                             $.get(getHiveTableUrl, function (result2) {
                                 $('#dataSection').hide();
                                 console.log('found a table');

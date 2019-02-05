@@ -162,7 +162,7 @@ namespace Sentry.data.Goldeneye
                         {
                             _backgroundJobServer = new Scheduler();
                             currentTasks.Add(new RunningTask(
-                                Task.Factory.StartNew(() => _backgroundJobServer.Run(_token), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),"BackgroundJobServer")
+                                Task.Factory.StartNew(() => _backgroundJobServer.Run(_token), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted), "BackgroundJobServer")
                             );
 
                             //https://crontab.guru/
@@ -213,6 +213,11 @@ namespace Sentry.data.Goldeneye
                                     Job.JobLoggerMessage("Error", "Failed to remove disabled job on Goldeneye initialization", ex);
                                 }
                             }
+
+                            //Starting MetadataProcessor Consumer
+                            MetadataProcessorService metaProcessor = new MetadataProcessorService();
+                            currentTasks.Add(new RunningTask(
+                                            Task.Factory.StartNew(() => metaProcessor.Run(), TaskCreationOptions.LongRunning), "metadataProcessor"));                            
                         }
 
                         ////Dataset Loader

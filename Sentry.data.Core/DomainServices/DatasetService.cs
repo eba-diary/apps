@@ -260,6 +260,19 @@ namespace Sentry.data.Core
             {
                 errors.Add("Secondary owner can not be the same as the primery owner");
             }
+
+            var currentFileExtension = _datasetContext.FileExtensions.FirstOrDefault(x => x.Id == dto.FileExtensionId).Name.ToLower();
+
+            if (currentFileExtension == "csv" && dto.Delimiter != ",")
+            {
+                errors.Add("File Extension CSV and it's delimiter do not match.");
+            }
+
+            if (currentFileExtension == "delimited" && String.IsNullOrWhiteSpace(dto.Delimiter))
+            {
+                errors.Add("File Extension Delimited is missing it's delimiter.");
+            }
+            
             return errors;
         }
 
@@ -494,7 +507,7 @@ namespace Sentry.data.Core
             dto.IsFavorite = ds.Favorities.Any(w => w.UserId == user.AssociateId);
             dto.DatasetFileConfigNames = ds.DatasetFileConfigs.ToDictionary(x => x.ConfigId.ToString(), y => y.Name);
             dto.DatasetScopeTypeNames = ds.DatasetScopeType.ToDictionary(x => x.Name, y => y.Description);
-            dto.DistinctFileExtensions = ds.DatasetFiles.Select(x => Path.GetExtension(x.FileName).TrimStart('.').ToLower()).ToList();
+            dto.DistinctFileExtensions = ds.DatasetFiles.Select(x => Path.GetExtension(x.FileName).TrimStart('.').ToLower()).Distinct().ToList();
             dto.DatasetFileCount = ds.DatasetFiles.Count();
             dto.OriginationCode = ds.OriginationCode;
             dto.DataClassificationDescription = ds.DataClassification.GetDescription();

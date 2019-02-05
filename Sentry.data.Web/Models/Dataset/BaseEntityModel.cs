@@ -73,6 +73,8 @@ namespace Sentry.data.Web
 
         //Dropdown Lists
         public IEnumerable<SelectListItem> AllCategories { get; set; }
+        public IEnumerable<SelectListItem> AllBusinessUnits { get; set; }
+        public IEnumerable<SelectListItem> AllDatasetFunctions { get; set; }
         public IEnumerable<SelectListItem> AllFrequencies { get; set; }
         public IEnumerable<SelectListItem> AllOriginationCodes { get; set; }
         public IEnumerable<SelectListItem> AllDatasetScopeTypes { get; set; }

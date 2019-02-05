@@ -34,17 +34,14 @@ namespace Sentry.data.Infrastructure
                 EventType et = _datasetContext.EventTypes.Where(w => w.Description == eventType).FirstOrDefault();
                 Status status = _datasetContext.EventStatus.Where(w => w.Description == GlobalConstants.Statuses.SUCCESS).FirstOrDefault();
 
-                if (datasetId != 0 || configId != 0)
-                {
-                    if (datasetId == 0)
+                    if (datasetId == 0 && configId != 0)
                     {
-                        datasetId = _datasetContext.GetById<DatasetFileConfig>(configId).ParentDataset.DatasetId;
+                        datasetId = _datasetContext.GetById<DatasetFileConfig>(configId)?.ParentDataset?.DatasetId;
                     }
-                    if (configId == 0)
+                    if (configId == 0  datasetId != 0)
                     {
-                        configId = _datasetContext.GetById<Dataset>(datasetId).DatasetFileConfigs.First().ConfigId;
+                        configId = _datasetContext.GetById<Dataset>(datasetId)?.DatasetFileConfigs?.First()?.ConfigId;
                     }
-                }
 
                 Event evt = CreateAndSaveEvent(et, status, userId, reason, datasetId, configId);
 

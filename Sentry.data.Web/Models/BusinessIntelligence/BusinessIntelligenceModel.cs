@@ -16,6 +16,10 @@ namespace Sentry.data.Web
             Location = dto.Location;
             FileTypeId = dto.FileTypeId;
             FrequencyId = dto.FrequencyId;
+            DatasetBusinessUnitIds = dto.DatasetBusinessUnitIds;
+            DatasetFunctionIds = dto.DatasetFunctionIds;
+            GetLatest = dto.GetLatest;
+            ReportLink = dto.ReportLink;
         }
 
 
@@ -30,8 +34,18 @@ namespace Sentry.data.Web
         [Required]
         [DisplayName("Frequency")]
         public int? FrequencyId { get; set; }
+        
+        [DisplayName("Get Latest")]
+        public bool GetLatest { get; set; }
 
+        [Required]
+        [DisplayName("Business Unit")]
+        public List<int> DatasetBusinessUnitIds { get; set; }
 
+        [Required]
+        [DisplayName("Function")]
+        public List<int> DatasetFunctionIds { get; set; }
+        public string ReportLink { get; set; }
 
 
         public List<string> Validate()
@@ -55,6 +69,12 @@ namespace Sentry.data.Web
                     if (!Regex.IsMatch(this.Location.ToLower(), "^\\\\\\\\(sentry.com\\\\share\\\\|sentry.com\\\\appfs)"))
                     {
                         errors.Add("Excel exhibits should begin with \\\\Sentry.com\\Share or \\\\Sentry.com\\appfs");
+                    }
+                    break;
+                case (int)ReportType.BusinessObjects:
+                    if (!Regex.IsMatch(this.Location.ToLower(), "^https://busobj.sentry.com"))
+                    {
+                        errors.Add("Business Objects exhibits should begin with https://busobj.sentry.com");
                     }
                     break;
             }

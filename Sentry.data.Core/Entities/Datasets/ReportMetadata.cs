@@ -12,5 +12,6 @@ namespace Sentry.data.Core
         public virtual string Location { get; set; }
         public virtual string LocationType { get; set; }
         public virtual int Frequency { get; set; }
+        public bool GetLatest { get; set; }
     }
 }

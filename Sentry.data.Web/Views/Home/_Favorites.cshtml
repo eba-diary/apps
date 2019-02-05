@@ -1,8 +1,5 @@
 ﻿@model List<FavoriteItemModel>
 
-@{ 
-    Boolean CanEditDataset = ViewBag.CanEditDataset;
-}
 
 @if (Model.Count == 0)
 {
@@ -13,46 +10,39 @@
 
 @foreach (FavoriteItemModel item in Model)
 {
-    <div class="col-sm-12 col-lg-12 favorite">
-        <div class="col-lg-1 favoriteTypeIcon">
-            @if (item.FeedName == "Datasets" || item.FeedName == "Data Assets" || item.FeedName == "Business Intelligence")
-            {
-                <img src="@item.Img" class="feedImg" style="width: 20px; filter: invert(100%); opacity: 0.999" />
-            }
-            else
-            {
-                <img src="@item.Img" class="feedImg favoriteTypeIcon" />
-            }
+    <div class="display-table">
+        <div class="display-tablecell text-middle">
+            <img src="@item.Img" />
         </div>
-        <div class="col-sm-9 col-lg-11">
+        <div class="display-tablecell text-middle">
             @if (item.Title.Length > 50)
             {
                 if (item.FeedName == "Business Intelligence" && item.FeedUrlType == "file")
                 {
-                    <a onclick='GetFile("@item.FeedUrl.Replace(@"\",@"\\")");event.preventDefault();' href="#" class="pointer"><h5 data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle</h5></a>
+                    <a onclick='GetFile("@item.FeedUrl.Replace(@"\",@"\\")");event.preventDefault();' href="#" data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle</a>
                 }
                 else if (item.FeedName == "Business Intelligence" && item.FeedUrlType != "file")
                 {
-                    <a href="@item.FeedUrl" target="_blank" class="pointer"><h5 data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle</h5></a>
+                    <a href="@item.FeedUrl" target="_blank" data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle</a>
                 }
                 else
                 {
-                    <a href="@item.Url" target="_blank" class="pointer"><h5 data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle</h5></a>
+                    <a href="@item.Url" target="_blank" data-toggle="tooltip" data-placement="top" title="" data-original-title="@item.Title">@item.DisplayTitle</a>
                 }
             }
             else
             {
                 if (item.FeedName == "Business Intelligence" && item.FeedUrlType == "file")
                 {
-                    <a onclick='GetFile("@item.FeedUrl.Replace(@"\",@"\\")");event.preventDefault();' href="#" class="pointer"><h5>@item.DisplayTitle</h5></a>
+                    <a onclick='GetFile("@item.FeedUrl.Replace(@"\",@"\\")");event.preventDefault();' href="#">@item.DisplayTitle</a>
                 }
                 else if (item.FeedName == "Business Intelligence" && item.FeedUrlType != "file")
                 {
-                    <a href="@item.FeedUrl" target="_blank" class="pointer"><h5>@item.DisplayTitle</h5></a>
+                    <a href="@item.FeedUrl" target="_blank">@item.DisplayTitle</a>
                 }
                 else
                 {
-                    <a href="@item.Url" target="_blank" class="pointer"><h5>@item.DisplayTitle</h5></a>
+                    <a href="@item.Url" target="_blank">@item.DisplayTitle</a>
                 }
             }
         </div>

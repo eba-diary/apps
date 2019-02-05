@@ -176,7 +176,7 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                return Query<DataElement>().Cacheable();
+                return Query<DataElement>();
             }
         }
 
@@ -201,6 +201,22 @@ namespace Sentry.data.Infrastructure
             get
             {
                 return Query<Category>().Cacheable();  //QueryCacheRegion.MediumTerm
+            }
+        }
+
+        public IQueryable<BusinessUnit> BusinessUnits
+        {
+            get
+            {
+                return Query<BusinessUnit>().Cacheable();
+            }
+        }
+
+        public IQueryable<DatasetFunction> DatasetFunctions
+        {
+            get
+            {
+                return Query<DatasetFunction>().Cacheable();
             }
         }
 
@@ -265,6 +281,16 @@ namespace Sentry.data.Infrastructure
             get
             {
                 return Query<RetrieverJob>();
+            }
+        }
+
+        } 
+        
+        public IQueryable<ApplicationConfiguration> ApplicationConfigurations
+        {
+            get
+            {
+                return Query<ApplicationConfiguration>();
             }
         }
 

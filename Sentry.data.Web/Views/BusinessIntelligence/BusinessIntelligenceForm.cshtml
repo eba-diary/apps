@@ -30,19 +30,7 @@
             @Html.HiddenFor(model => model.CreationUserName)
             @Html.HiddenFor(model => model.UploadUserName)
 
-            <div class="form-group">
-                @Html.LabelFor((model) => model.DatasetCategoryIds, new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    <select id="DatasetCategoryIds" name="DatasetCategoryIds" multiple="multiple" class="form-control edit-dataset-row">
-                        @foreach (var item in Model.AllCategories)
-                        {
-                            <option selected="@item.Selected" value="@item.Value">@item.Text</option>
-                        }
-                    </select>
-                    @Html.ValidationMessageFor((model) => model.DatasetCategoryIds, "", new { @class = "text-danger" })
-                </div>
-            </div>
-
+            @* Name *@
             <div class="form-group">
                 @Html.Label("Exhibit Name", htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
@@ -51,6 +39,7 @@
                 </div>
             </div>
 
+            @* Description *@
             <div class="form-group">
                 @Html.LabelFor(model => model.DatasetDesc, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
@@ -68,19 +57,60 @@
                 </div>
             </div>
 
+            @* Categories *@
+            <div class="form-group">
+                @Html.LabelFor((model) => model.DatasetCategoryIds, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <select id="DatasetCategoryIds" name="DatasetCategoryIds" multiple="multiple" class="form-control edit-dataset-row">
+                        @foreach (var item in Model.AllCategories)
+                        {
+                            <option selected="@item.Selected" value="@item.Value">@item.Text</option>
+                        }
+                    </select>
+                    @Html.ValidationMessageFor((model) => model.DatasetCategoryIds, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            @* Business Unit *@
+            <div class="form-group">
+                @Html.LabelFor((model) => model.DatasetBusinessUnitIds, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <select id="DatasetBusinessUnitIds" name="DatasetBusinessUnitIds" multiple="multiple" class="form-control edit-dataset-row">
+                        @foreach (var li in Model.AllBusinessUnits)
+                        {
+                            <option selected="@li.Selected" value="@li.Value">@li.Text</option>
+                        }
+                    </select>
+                    @Html.ValidationMessageFor((model) => model.DatasetBusinessUnitIds, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            @* Function *@
+            <div class="form-group">
+                @Html.LabelFor((model) => model.DatasetFunctionIds, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <select id="DatasetFunctionIds" name="DatasetFunctionIds" multiple="multiple" class="form-control edit-dataset-row">
+                        @foreach (var li in Model.AllDatasetFunctions)
+                        {
+                            <option selected="@li.Selected" value="@li.Value">@li.Text</option>
+                        }
+                    </select>
+                    @Html.ValidationMessageFor((model) => model.DatasetFunctionIds, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+
             @Html.Partial("_Tags", Model)
 
-            @Html.LabelFor(model => model.FileTypeId, htmlAttributes: new { @class = "control-label col-md-2" })
+            
             <div class="form-group">
-                @{foreach (var type in Model.AllDataFileTypes)
-                    {
-                        <div class="col-md-10 col-md-offset-2">
-                            @Html.Label(type.Text, htmlAttributes: new { @class = "col-md-2" })
-                            @Html.RadioButtonFor(model => model.FileTypeId, type.Value, new { @class = "col-md-1" })
-                        </div>
-                    }
-                }
+                @Html.LabelFor(model => model.FileTypeId, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">      
+                    @Html.DropDownListFor((model) => model.FileTypeId, Model.AllDataFileTypes, new { @class = "form-control edit-dataset-row" })
+                    @Html.ValidationMessageFor((model) => model.FileTypeId, "", new { @class = "text-danger" })
+                </div>
             </div>
+
 
             <div id="UrlPanel" class="tab-pane fade in form-horizontal">
                 <div class="form-group">
@@ -99,6 +129,22 @@
                             <em>If the report resides on a network location, please specify the UNC path.  See examples below</em><br />
                             <em>     N: Drive location - (\\Sentry.com\Share\O_IS\... instead of N:\O_IS\...)</em><br />
                             <em>     DFS location - (\\Sentry.com\appfs\...)</em>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div id="BOGetLatestPanel">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.GetLatest, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.CheckBoxFor(model => model.GetLatest, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                    </div>
+                </div>
+                <div class="form-group BOGetLatestDescription">
+                    <label class="control-label col-md-2"></label>
+                    <div class="col-md-10">
+                        <span class="text-muted">
+                            <em>This will ensure users are linked to the latest revision of the report specified above</em>
                         </span>
                     </div>
                 </div>

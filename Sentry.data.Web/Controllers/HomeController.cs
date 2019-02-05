@@ -28,7 +28,6 @@ namespace Sentry.data.Web.Controllers
         private readonly IDataFeedContext _feedContext;
         private readonly IDatasetContext _dsContext;
         private readonly IAppCache cache;
-        private List<DataFeedItem> dfisAll;
 
         public HomeController(IDataFeedContext feedContext, IDatasetContext datasetContext, IDataAssetContext dataAssetContext)
         {
@@ -41,22 +40,26 @@ namespace Sentry.data.Web.Controllers
         {
             ViewData["fluid"] = true;
 
-            HomeModel hm = new HomeModel();
-
             List<Dataset> dsList = _dsContext.Datasets.ToList();
 
-            hm.DatasetCount = dsList.Count(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET);
-            hm.Categories = _dsContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityCodes.DATASET).ToList();
-            hm.CanEditDataset = SharedContext.CurrentUser.CanModifyDataset;
+            HomeModel hm = new HomeModel()
+            {
+                DatasetCount = dsList.Count(w => w.DatasetType == GlobalConstants.DataEntityTypes.DATASET),
+                Categories = _dsContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityTypes.DATASET).ToList(),
+                CanEditDataset = SharedContext.CurrentUser.CanModifyDataset
+            };
 
-            Event e = new Event();
-            e.EventType = _dsContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _dsContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-            e.Reason = "Viewed Home Page";
+            Event e = new Event()
+            {
+                EventType = _dsContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault(),
+                Status = _dsContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault(),
+                TimeCreated = DateTime.Now,
+                TimeNotified = DateTime.Now,
+                IsProcessed = false,
+                UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId,
+                Reason = "Viewed Home Page"
+            };
+
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
             return View(hm);
@@ -133,7 +136,7 @@ namespace Sentry.data.Web.Controllers
 
             var sr = new StreamReader(response.GetResponseStream());
 
-            var joResponse = JObject.Parse(sr.ReadToEnd());         
+            var joResponse = JObject.Parse(sr.ReadToEnd());
 
             List<Issue> issues = joResponse["issues"].ToObject<List<Issue>>();
 
@@ -144,8 +147,9 @@ namespace Sentry.data.Web.Controllers
 
         public async Task<ActionResult> GetFeed()
         {
-            dfisAll = await Task.Factory.StartNew(() => cache.GetOrAdd("feedAll", () => _feedContext.GetAllFeedItems().ToList(), TimeSpan.FromHours(1)));
-            return PartialView("_Feed", dfisAll.Take(10).ToList());
+            List<DataFeedItem> allDatafeedItems = cache.GetOrAdd("feedAll", () => _feedContext.GetAllFeedItems().ToList(), TimeSpan.FromHours(1));
+            return PartialView("_Feed", allDatafeedItems.Take(10).ToList());
+            //return PartialView("_Feed", new List<DataFeedItem>());
         }
 
         public ActionResult GetMoreFeeds(int skip)
@@ -167,7 +171,8 @@ namespace Sentry.data.Web.Controllers
             List<FavoriteItemModel> favItems = new List<FavoriteItemModel>();
 
             // convert the list of FavoriteItem to a list of FavoriteItemModel
-            foreach (FavoriteItem fi in favList) {
+            foreach (FavoriteItem fi in favList)
+            {
                 favItems.Add(new FavoriteItemModel()
                 {
                     Id = fi.Id,

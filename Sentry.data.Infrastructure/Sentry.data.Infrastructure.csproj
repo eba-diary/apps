@@ -164,6 +164,7 @@
     <Compile Include="DomainContexts\dataAssetContext.cs" />
     <Compile Include="DomainContexts\RequestContext.cs" />
     <Compile Include="HangfireFilters\DisableMultipleQueuedItemsFilter.cs" />
+    <Compile Include="Helpers\TopicHelper.cs" />
     <Compile Include="Mappings\Metadata\DataElementDetailMapping.cs" />
     <Compile Include="Mappings\Metadata\DataElementMapping.cs" />
     <Compile Include="Mappings\Metadata\DataLineageMapping.cs" />
@@ -178,6 +179,7 @@
     <Compile Include="Mappings\Metadata\TagGroupMapping.cs" />
     <Compile Include="Mappings\Primary\AssetNotificationMapping.cs" />
     <Compile Include="Mappings\Primary\AssetSourceMapping.cs" />
+    <Compile Include="Mappings\Primary\BusinessUnitMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetFileConfigsMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetFileMapping.cs" />
     <Compile Include="Mappings\Primary\ComponentElementMapping.cs" />
@@ -190,6 +192,7 @@
     <Compile Include="Mappings\Primary\FavoriteMapping.cs" />
     <Compile Include="Mappings\Primary\FileExtensionMapping.cs" />
     <Compile Include="Mappings\Primary\ApplicationConfigurationMapping.cs" />
+    <Compile Include="Mappings\Primary\DatasetFunctionMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\AuthenticationTypeMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\DataSourceMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\DataSourceTypeMapping.cs" />
@@ -232,8 +235,9 @@
     <Compile Include="ServiceImplementations\FtpProvider.cs" />
     <Compile Include="ServiceImplementations\HTTPSProvider.cs" />
     <Compile Include="ServiceImplementations\JawsService.cs" />
-    <Compile Include="ServiceImplementations\KafkaConsumer.cs" />
     <Compile Include="ServiceImplementations\KafkaMessagePublisher.cs" />
+    <Compile Include="ServiceImplementations\Messaging\HiveMetadataService.cs" />
+    <Compile Include="ServiceImplementations\Messaging\MetadataProcessorService.cs" />
     <Compile Include="ServiceImplementations\MetadataRepositoryProvider.cs" />
     <Compile Include="ServiceImplementations\ObsidianService.cs" />
     <Compile Include="ServiceImplementations\ODCFileProvider.cs" />
@@ -255,6 +259,16 @@
     <Compile Include="ServiceImplementations\S3ServiceProvider.cs" />
     <Compile Include="ServiceImplementations\SASProvider.cs" />
     <Compile Include="ServiceImplementations\SASServiceProvider.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
+      <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>
+      <Name>Sentry.data.Core</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\StandaloneLibraries\Sentry.Messaging.Common\Sentry.Messaging.Common.csproj">
+      <Project>{bd4b0624-03a2-4896-b46e-4eb35e9efe6c}</Project>
+      <Name>Sentry.Messaging.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
@@ -686,9 +700,7 @@
       <Name>Sentry.data.Core</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <WCFMetadataStorage Include="Service References\HPMSChangeManagement\" />
-  </ItemGroup>
+
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\WinSCP.5.13.2\build\WinSCP.targets" Condition="Exists('..\packages\WinSCP.5.13.2\build\WinSCP.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

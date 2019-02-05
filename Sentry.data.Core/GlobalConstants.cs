@@ -81,6 +81,11 @@
             public const string Exhibits = "Exhibits";
         }
 
+        public static class BusinessObjectExhibit
+        {
+            public const string GET_LATEST_URL_PARAMETER = "&sInstance=Last";
+        }
+
         public static class HpsmTicketStatus
         {
             //DSC

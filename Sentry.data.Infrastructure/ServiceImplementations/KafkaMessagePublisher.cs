@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Sentry.data.Core;
 using StructureMap;
+using Sentry.Common.Logging;
 
 namespace Sentry.data.Infrastructure
 {
@@ -57,7 +58,7 @@ namespace Sentry.data.Infrastructure
             {
                 Sentry.Common.Logging.Logger.Info("Initializing goldeneye-producer");
 
-                ApplicaitonConfiguration config = null;
+                ApplicationConfiguration config = null;
 
                 try
                 {
@@ -71,9 +72,9 @@ namespace Sentry.data.Infrastructure
                     IList<KeyValuePair<String, Object>> configuration = new List<KeyValuePair<String, Object>>();
 
                     //Adding Production options from database
-                    foreach (var item in config.OptionsObject["ProducerOptions"])
+                    foreach (JObject item in config.OptionsObject["ProducerOptions"])
                     {
-                        foreach (JProperty prop in item)
+                        foreach (JProperty prop in item.Properties())
                         {
                             configuration.Add(new KeyValuePair<String, Object>(prop.Name, prop.Value));
                         }
@@ -174,19 +175,35 @@ namespace Sentry.data.Infrastructure
 
         public void Publish(string topic, string key, string value)
         {
-            //var task = Producer.ProduceAsync(topic, Encoding.ASCII.GetBytes(key), Encoding.ASCII.GetBytes(value));
-            var task = _producer_str_str.ProduceAsync(topic, key, value);
-
-            task.Wait(TimeSpan.FromSeconds(10));
-
-            if(task.Exception != null)
+            try
             {
-                foreach (Exception e in task.Exception.Flatten().InnerExceptions)
+                if (_producer_str_str == null)
                 {
-                    Console.WriteLine($"Failed to execute kafka producer ProduceAsync");
-                    throw e;
+                    Producer p = Producer;
+                }
+
+                //var task = Producer.ProduceAsync(topic, Encoding.ASCII.GetBytes(key), Encoding.ASCII.GetBytes(value));
+                var task = _producer_str_str.ProduceAsync(topic, key, value);
+
+                task.Wait(TimeSpan.FromSeconds(10));
+
+                if (task.Exception != null)
+                {
+                    foreach (Exception e in task.Exception.Flatten().InnerExceptions)
+                    {
+                        Logger.Error($"Failed to execute kafka producer ProduceAsync", e);
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                Logger.Error("Kafka Producer failed to send message", ex);
+            }            
+        }
+
+        public void PublishDSCEvent(string key, string value)
+        {
+            Publish(Sentry.data.Infrastructure.TopicHelper.GetDSCEventTopic(), key, value);
         }
         #endregion
 

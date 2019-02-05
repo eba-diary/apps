@@ -29,6 +29,8 @@ namespace Sentry.data.Core
         IQueryable<DatasetFile> DatasetFile { get; }
         IQueryable<FileExtension> FileExtensions { get; }
         IQueryable<Category> Categories { get; }
+        IQueryable<BusinessUnit> BusinessUnits { get; }
+        IQueryable<DatasetFunction> DatasetFunctions { get; }
         IQueryable<HiveTable> HiveTables { get; }
         IQueryable<LivyCreation> LivySessions { get; }
         IQueryable<MediaTypeExtension> MediaTypeExtensions { get; }
@@ -36,6 +38,8 @@ namespace Sentry.data.Core
         IQueryable<RetrieverJob> Jobs { get; }
         IQueryable<MetadataTag> Tags { get; }
         IQueryable<TagGroup> TagGroups { get; }
+        IQueryable<ApplicationConfiguration> ApplicationConfigurations { get; }
+
         IQueryable<RetrieverJob> RetrieverJob { get; }
         /** Datasets **/
 

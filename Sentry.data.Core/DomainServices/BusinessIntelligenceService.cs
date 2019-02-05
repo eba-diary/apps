@@ -144,6 +144,8 @@ namespace Sentry.data.Core
         private Dataset MapDataset(BusinessIntelligenceDto dto, Dataset ds)
         {
             ds.DatasetCategories = _datasetContext.Categories.Where(x => dto.DatasetCategoryIds.Contains(x.Id)).ToList();
+            ds.BusinessUnits = _datasetContext.BusinessUnits.Where(x => dto.DatasetBusinessUnitIds.Contains(x.Id)).ToList();
+            ds.DatasetFunctions = _datasetContext.DatasetFunctions.Where(x => dto.DatasetFunctionIds.Contains(x.Id)).ToList();
             ds.DatasetName = dto.DatasetName;
             ds.DatasetDesc = dto.DatasetDesc;
             ds.CreationUserName = dto.CreationUserName;
@@ -160,7 +162,8 @@ namespace Sentry.data.Core
                 {
                     Location = dto.Location,
                     LocationType = dto.LocationType,
-                    Frequency = dto.FrequencyId
+                    Frequency = dto.FrequencyId,
+                    GetLatest = dto.GetLatest
                 }
             };
             ds.Tags = _datasetContext.Tags.Where(x => dto.TagIds.Contains(x.TagId.ToString())).ToList();
@@ -178,6 +181,8 @@ namespace Sentry.data.Core
 
             dto.DatasetId = ds.DatasetId;
             dto.DatasetCategoryIds = ds.DatasetCategories.Select(x => x.Id).ToList();
+            dto.DatasetBusinessUnitIds = ds.BusinessUnits.Select(x => x.Id).ToList();
+            dto.DatasetFunctionIds = ds.DatasetFunctions.Select(x => x.Id).ToList();
             dto.DatasetName = ds.DatasetName;
             dto.DatasetDesc = ds.DatasetDesc;
             dto.PrimaryOwnerName = (string.IsNullOrWhiteSpace(userDisplayname) ? ds.PrimaryOwnerId : userDisplayname);
@@ -186,14 +191,17 @@ namespace Sentry.data.Core
             dto.DatasetDtm = ds.DatasetDtm;
             dto.ChangedDtm = ds.ChangedDtm;
             dto.S3Key = ds.S3Key;
+            dto.IsSensitive = ds.IsSensitive;
             dto.DatasetType = ds.DatasetType;
             dto.Location = ds.Metadata.ReportMetadata.Location;
             dto.LocationType = ds.Metadata.ReportMetadata.LocationType;
             dto.FrequencyId = ds.Metadata.ReportMetadata.Frequency;
             dto.TagIds = ds.Tags.Select(x => x.TagId.ToString()).ToList();
             dto.FileTypeId = ds.DatasetFileConfigs.First().FileTypeId;
+            dto.GetLatest = ds.Metadata.ReportMetadata.GetLatest;
             dto.CanDisplay = ds.CanDisplay;
             dto.MailtoLink = "mailto:?Subject=Business%20Intelligence%20Exhibit%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/BusinessIntelligence/Detail/" + ds.DatasetId;
+            dto.ReportLink = (ds.DatasetFileConfigs.First().FileTypeId == (int)ReportType.BusinessObjects && ds.Metadata.ReportMetadata.GetLatest) ? ds.Metadata.ReportMetadata.Location + GlobalConstants.BusinessObjectExhibit.GET_LATEST_URL_PARAMETER : ds.Metadata.ReportMetadata.Location;
         }
 
         private void MapToDetailDto(Dataset ds, BusinessIntelligenceDetailDto dto)
@@ -208,7 +216,7 @@ namespace Sentry.data.Core
             dto.Views = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset == ds.DatasetId).Count();
             dto.FrequencyDescription = Enum.GetName(typeof(ReportFrequency), ds.Metadata.ReportMetadata.Frequency) ?? "Not Specified";
             dto.TagNames = ds.Tags.Select(x => x.Name).ToList();
-            dto.CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "gray";
+            dto.CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "darkgray";
             dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
         }
 

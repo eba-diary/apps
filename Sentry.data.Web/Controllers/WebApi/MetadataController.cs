@@ -16,13 +16,17 @@ namespace Sentry.data.Web.Controllers
         private IDatasetContext _dsContext;
         private IAssociateInfoProvider _associateInfoService;
         private UserService _userService;
+        private IConfigService _configService;
 
-        public MetadataController(MetadataRepositoryService metadataRepositoryService, IDatasetContext dsContext, IAssociateInfoProvider associateInfoService, UserService userService)
+        public MetadataController(MetadataRepositoryService metadataRepositoryService, IDatasetContext dsContext, 
+                                IAssociateInfoProvider associateInfoService, UserService userService,
+                                IConfigService configService)
         {
             _metadataRepositoryService = metadataRepositoryService;
             _dsContext = dsContext;
             _associateInfoService = associateInfoService;
             _userService = userService;
+            _configService = configService;
         }
 
         public class OutputSchema
@@ -67,9 +71,9 @@ namespace Sentry.data.Web.Controllers
         [Route("schemas/{SchemaID}")]
         public async Task<IHttpActionResult> GetBasicMetadataInformationForSchema(int SchemaID)
         {
-            DataElement schema = _dsContext.GetById<DataElement>(SchemaID);
-
-            return await GetMetadata(schema.DatasetFileConfig);
+            SchemaDTO dto = _configService.GetSchemaDTO(SchemaID);
+            SchemaModel sm = new SchemaModel(dto);
+            return Ok(sm);            
         }
 
         /// <summary>
@@ -194,9 +198,19 @@ namespace Sentry.data.Web.Controllers
         [Route("schemas/{SchemaID}/columns")]
         public async Task<IHttpActionResult> GetColumnSchemaInformationForSchema(int SchemaID)
         {
-            DataElement schema = _dsContext.GetById<DataElement>(SchemaID);
 
-            return await GetColumnSchema(schema.DatasetFileConfig, SchemaID);
+            IList<ColumnDTO> dto = _configService.GetColumnDTO(SchemaID);
+            IList<ColumnModel> modelList = new List<ColumnModel>();
+            foreach (ColumnDTO column in dto)
+            {
+                modelList.Add(new ColumnModel(column));
+            }
+            
+            return Ok(modelList);
+
+            //DataElement schema = _dsContext.GetById<DataElement>(SchemaID);
+
+            //return await GetColumnSchema(schema.DatasetFileConfig, SchemaID);
         }
 
 

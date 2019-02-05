@@ -13,7 +13,7 @@
     [Display_IND] BIT NOT NULL, 
     [Information_DSC] NVARCHAR(MAX) NULL, 
     [Metadata] VARCHAR(MAX) NULL, 
-    [Dataset_TYP] CHAR(3) NULL, 
+    [Dataset_TYP] VARCHAR(3) NULL, 
     [DataClassification_CDE] INT NOT NULL DEFAULT 0 , 
     [SecondaryOwner_ID] VARCHAR(8) NULL, 
     [IsSecured_IND] BIT NOT NULL DEFAULT 0 , 
