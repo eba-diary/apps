@@ -340,15 +340,16 @@
 
                                         <p>@schema.SchemaDescription</p>
                                         <p>This schema's current Delimiter is <b>@schema.Delimiter</b></p>
+                                        <p>Raw files contain headers: <b>@schema.HasHeader</b></p>
 
                                         @if(schema.DataObjects.Count() == 0)
                                         {
-                                            <p>This schema has a Data Element ID of @schema.DataElement_ID.</p>
+                                            <p>This schema Id is @schema.DataElement_ID.</p>
                                             <p>This schema is not currently does not yet have any columns associated to it.</p>
                                         }
                                         else
                                         {
-                                             <p>This schema has a Data Element ID of @schema.DataElement_ID.</p>
+                                            <p>This schema Id is @schema.DataElement_ID.</p>
                                         }
 
                                         <p>Created on: @schema.DataElementCreate_DTM</p>

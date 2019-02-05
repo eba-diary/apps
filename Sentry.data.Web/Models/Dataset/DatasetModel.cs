@@ -16,6 +16,7 @@ namespace Sentry.data.Web
             ConfigFileName = dto.ConfigFileName;
             ConfigFileDesc = dto.ConfigFileDesc;
             Delimiter = dto.Delimiter;
+            HasHeader = dto.HasHeader;
             FileExtensionId = dto.FileExtensionId;
             DatasetInformation = dto.DatasetInformation;
             DataClassification = dto.DataClassification;
@@ -39,6 +40,9 @@ namespace Sentry.data.Web
 
         [DisplayName("Delimiter")]
         public string Delimiter { get; set; }
+
+        [DisplayName("Has Header")]
+        public bool HasHeader { get; set; }
 
         [DisplayName("File Extension")]
         public int FileExtensionId { get; set; }
