@@ -104,6 +104,7 @@ COMMIT TRAN
 --Now only run these scritps if the versioning allows us.
 --ALTER THE SCRIPT VERSION BELOW FOR EVERY NEW SCRIPT 
 --SCRIPT VERSION should be in format yyyy.MM.dd_rr where rr is 2-digit revision number for day. 
+DECLARE @ScriptVersion3 AS VARCHAR(50) 
 SET @ScriptVersion3 = '2019.02.13_01_PostDeploy'
 
 BEGIN TRAN 
