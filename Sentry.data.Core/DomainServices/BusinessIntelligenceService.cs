@@ -166,7 +166,8 @@ namespace Sentry.data.Core
                 {
                     Location = dto.Location,
                     LocationType = dto.LocationType,
-                    Frequency = dto.FrequencyId
+                    Frequency = dto.FrequencyId,
+                    GetLatest = dto.GetLatest
                 }
             };
             ds.Tags = _datasetContext.Tags.Where(x => dto.TagIds.Contains(x.TagId.ToString())).ToList();
@@ -199,8 +200,10 @@ namespace Sentry.data.Core
             dto.FrequencyId = ds.Metadata.ReportMetadata.Frequency;
             dto.TagIds = ds.Tags.Select(x => x.TagId.ToString()).ToList();
             dto.FileTypeId = ds.DatasetFileConfigs.First().FileTypeId;
+            dto.GetLatest = ds.Metadata.ReportMetadata.GetLatest;
             dto.CanDisplay = ds.CanDisplay;
             dto.MailtoLink = "mailto:?Subject=Business%20Intelligence%20Exhibit%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/BusinessIntelligence/Detail/" + ds.DatasetId;
+            dto.ReportLink = (ds.DatasetFileConfigs.First().FileTypeId == (int)ReportType.BusinessObjects && ds.Metadata.ReportMetadata.GetLatest) ? ds.Metadata.ReportMetadata.Location + GlobalConstants.BusinessObjectExhibit.GET_LATEST_URL_PARAMETER : ds.Metadata.ReportMetadata.Location;
 
            // return dto;
         }

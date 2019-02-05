@@ -54,6 +54,13 @@ data.Report = {
             placeholder: "Select Exhibit Type"
         });
         
+
+        function setPanelDefaults() {
+            var fileTypeVal = $("#FileTypeId").find(":selected").text();
+            data.Report.SetGetLatestPanel(fileTypeVal);
+        }
+
+        /// Initialize the Create Dataset view
         //Set Secure HREmp service URL for associate picker
         $.assocSetup({ url: "https://hrempsecure.sentry.com/api/associates" });
 
@@ -79,6 +86,11 @@ data.Report = {
             }
             data.Report.OpenReport(locationType, artifactLink);
         });
+
+        $("#FileTypeId").change(function () {
+            var txt = $(this).find(":selected").text();
+            data.Report.SetGetLatestPanel(txt);
+        })
 
         data.Tags.initTags();
     },
@@ -183,8 +195,17 @@ data.Report = {
                 alert('Please allow popups for this website');
             }
         }
-    }
+    },
 
-    
+    SetGetLatestPanel: function (fileType) {
+        if (fileType == 'BusinessObjects') {
+            $('#BOGetLatestPanel').show();
+        }
+        else {
+            $('#BOGetLatestPanel').hide();
+            $('#GetLatest').prop('checked', false);
+            $('#GetLatest').prop('disabled', true);
+        }
+    }    
 };
 

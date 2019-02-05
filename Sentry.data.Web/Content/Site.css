@@ -1246,7 +1246,9 @@ tr.categoryBanner-darkgray th.sorting_desc {
 .Tableau {
     background-color: orange;
 }
-
+.BusinessObjects {
+    background-color: green;
+}
 .ext_txt {
     background-color: dodgerblue;
 }
