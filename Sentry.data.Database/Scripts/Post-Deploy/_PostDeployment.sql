@@ -101,3 +101,42 @@ BEGIN CATCH
 END CATCH 
 
 COMMIT TRAN
+--Now only run these scritps if the versioning allows us.
+--ALTER THE SCRIPT VERSION BELOW FOR EVERY NEW SCRIPT 
+--SCRIPT VERSION should be in format yyyy.MM.dd_rr where rr is 2-digit revision number for day. 
+DECLARE @ScriptVersion3 AS VARCHAR(50) 
+SET @ScriptVersion3 = '2019.02.13_01_PostDeploy'
+
+BEGIN TRAN 
+  
+IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion3) 
+BEGIN TRY 
+
+  --insert one off script files here
+  :r ..\Post-Deploy\SupportingScripts\Sprint_19_2_1\InitializeGetLatest.sql
+
+  --insert into the verision table so these scripts do not run again.
+  INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion3, GETDATE() ) 
+
+END TRY 
+
+BEGIN CATCH 
+    DECLARE @ErrorMessage3 NVARCHAR(4000); 
+    DECLARE @ErrorSeverity3 INT; 
+    DECLARE @ErrorState3 INT; 
+  
+    SELECT 
+        @ErrorMessage3 = ERROR_MESSAGE(), 
+        @ErrorSeverity3 = ERROR_SEVERITY(), 
+        @ErrorState3 = ERROR_STATE(); 
+  
+    RAISERROR (@ErrorMessage3, 
+               @ErrorSeverity3, 
+               @ErrorState3 
+               ); 
+  
+    ROLLBACK TRAN 
+    RETURN
+END CATCH 
+  
+COMMIT TRAN
