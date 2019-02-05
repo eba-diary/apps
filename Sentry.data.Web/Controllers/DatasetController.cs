@@ -1148,7 +1148,7 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.DatasetView)]
         public JsonResult GetAllDatasets()
         {
-            var list = _datasetContext.Categories;
+            var list = _datasetContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityTypes.DATASET);
 
             List<SelectListItem> sList = new List<SelectListItem>();
 
