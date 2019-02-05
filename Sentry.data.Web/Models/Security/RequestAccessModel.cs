@@ -34,6 +34,7 @@ namespace Sentry.data.Web
 
         public List<PermissionModel> AllPermissions { get; set; }
         public List<SelectListItem> AllApprovers { get; set; }
+        public List<SelectListItem> AllAdGroups { get; set; }
 
     }
 }

@@ -6,10 +6,9 @@ namespace Sentry.data.Core
 {
     public interface ISecurityService
     {
-
-        void CheckHpsmTicketStatus();
         string RequestPermission(AccessRequest model);
-
         UserSecurity GetUserSecurity(ISecurable securable, IApplicationUser user);
+        void ApproveTicket(SecurityTicket ticket, string approveId);
+        void CloseTicket(SecurityTicket ticket, string RejectorId, string rejectedReason, string status);
     }
 }

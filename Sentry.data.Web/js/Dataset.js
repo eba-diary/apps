@@ -360,8 +360,14 @@ data.Dataset = {
     AccessRequest: function (datasetId) {
         var modal = Sentry.ShowModalWithSpinner("Request Dataset Access");
         var createRequestUrl = "/Dataset/AccessRequest/?datasetId=" + encodeURI(datasetId);
+
         $.get(createRequestUrl, function (e) {
             modal.ReplaceModalBody(e);
+
+            //auto check the preview 
+            $("input[data-code='CanPreviewDataset']").prop('checked', true).attr('disabled', 'disabled');
+            $("#SelectedPermissions").val($("input[type='checkbox']").first().data('code'));
+
             $("input[type='checkbox']").change(function () {
                 var selectedPermissions = [];
                 $("input[type='checkbox']:checked").each(function () {
@@ -370,12 +376,33 @@ data.Dataset = {
                 $("#SelectedPermissions").val(selectedPermissions);
             });
 
+            var isRealAdGroup = false;
+
+            $("#AdGroupName").change(function () {
+                $.ajax({
+                    url: '/Dataset/CheckAdGroup?adGroup=' + encodeURIComponent($(this).val()),
+                    method: "GET",
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data) {
+                            $("#AccessRequesrErrorBox").hide();
+                        } else {
+                            $("#AccessRequesrErrorBox").html("<div>AD Group is not a vaild group</div>").show();
+                        }
+                        isRealAdGroup = data;
+                    }
+                });
+            });
+
             $("[id^='SubmitAccessRequestButton']").off('click').on('click', function (e) {
                 e.preventDefault();
                 //check validation
                 var errors = "";
                 if ($("#AdGroupName").val() === undefined || $("#AdGroupName").val() === "") {
                     errors += "<div>AD Group is required</div>";
+                }
+                if (!isRealAdGroup) {
+                    errors += "<div>AD Group is not a vaild group</div>";
                 }
                 if ($("#BusinessReason").val() === undefined || $("#BusinessReason").val() === "") {
                     errors += "<div>Business Reason is required</div>";

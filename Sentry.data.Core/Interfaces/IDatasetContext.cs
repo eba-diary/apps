@@ -11,10 +11,11 @@ namespace Sentry.data.Core
         /** IQueryables **/
 
         IQueryable<Dataset> Datasets { get; }
-
+        IQueryable<DatasetFileConfig> DatasetFileConfigs { get; }
         IQueryable<SecurityTicket> HpsmTickets { get; }
         IQueryable<Security> Security { get; }
         IQueryable<SecurityPermission> SecurityPermission { get; }
+        IQueryable<SecurityTicket> SecurityTicket { get; }
         IQueryable<Permission> Permission { get; }
         IQueryable<DataSourceType> DataSourceTypes { get; }
         IQueryable<DataSource> DataSources { get; }
@@ -35,7 +36,7 @@ namespace Sentry.data.Core
         IQueryable<RetrieverJob> Jobs { get; }
         IQueryable<MetadataTag> Tags { get; }
         IQueryable<TagGroup> TagGroups { get; }
-
+        IQueryable<RetrieverJob> RetrieverJob { get; }
         /** Datasets **/
 
         Dataset GetById(int id);

@@ -18,39 +18,6 @@ namespace Sentry.data.Core.DomainServices
         }
 
 
-        /// <summary>
-        /// re-occuring service call that will check if the hpsm ticket has been approved.
-        /// </summary>
-        public void CheckHpsmTicketStatus()
-        {
-            List<SecurityTicket> tickets = _datasetContext.HpsmTickets.Where(x => x.TicketStatus == GlobalConstants.HpsmTicketStatus.PENDING).ToList();
-
-            foreach (SecurityTicket ticket in tickets)
-            {
-                HpsmTicket st = _hpsmProvider.RetrieveTicket(ticket.TicketId);
-                switch (st.TicketStatus)
-                {
-                    case GlobalConstants.HpsmTicketStatus.APPROVED:
-                        EnablePermissions(ticket.Permissions.ToList());
-                        _hpsmProvider.CloseHpsmTicket(ticket.TicketId);
-                        ticket.ApprovedById = st.ApprovedById;
-                        ticket.ApprovedDate = DateTime.Now;
-                        ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.COMPLETED;
-                        break;
-                    case GlobalConstants.HpsmTicketStatus.REJECTED: //or Denied?  find out those statuses.
-                        _hpsmProvider.CloseHpsmTicket(ticket.TicketId, true);
-                        ticket.RejectedById = st.RejectedById;
-                        ticket.RejectedDate = DateTime.Now;
-                        ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.REJECTED;
-                        break;
-                    default:
-                        break;  //do nothing, we will check again in 15 min.
-                }
-            }
-
-        }
-
-
         public string RequestPermission(AccessRequest model)
         {
             //Lets format the business reason here before passing it into the hpsm service.
@@ -76,7 +43,7 @@ namespace Sentry.data.Core.DomainServices
                     RequestedDate = model.RequestedDate,
                     IsAddingPermission = true,
                     ParentSecurity = security,
-                    Permissions = new HashSet<SecurityPermission>()
+                    Permissions = new List<SecurityPermission>()
                 };
 
                 foreach (Permission perm in model.Permissions)
@@ -127,15 +94,15 @@ namespace Sentry.data.Core.DomainServices
             //if no tickets have been requested, then there should be no permission given.
             if (securable?.Security?.Tickets != null && securable.Security.Tickets.Count > 0)
             {
-                //build a dictionary of AD group and Permissions.
-                Dictionary<string, List<SecurityPermission>> dic = securable.Security.Tickets.ToDictionary(x => x.AdGroupName, y => y.Permissions.Where(x => x.IsEnabled).Select(z => z).ToList());
+                //build a group permissionCode anonymous obj.
+                var groups = securable.Security.Tickets.Select(x => new { adGroup = x.AdGroupName, permissions = x.Permissions.Where(y => y.IsEnabled).ToList() }).ToList();
 
                 //loop through the dictionary to see if the user is part of the group, if so grab only the enabled permissions.
-                foreach (var item in dic)
+                foreach (var item in groups)
                 {
-                    if (user.IsInGroup(item.Key))
+                    if (user.IsInGroup(item.adGroup))
                     {
-                        userPermissions.AddRange(item.Value.Select(x => x.Permission.PermissionCode).ToList());
+                        userPermissions.AddRange(item.permissions.Select(x => x.Permission.PermissionCode).ToList());
                     }
                 }
             }
@@ -150,17 +117,26 @@ namespace Sentry.data.Core.DomainServices
         }
 
 
-        private void EnablePermissions(List<SecurityPermission> permissions)
+        public void ApproveTicket(SecurityTicket ticket, string approveId)
         {
-            permissions.ForEach(x =>
+            ticket.ApprovedById = approveId;
+            ticket.ApprovedDate = DateTime.Now;
+            ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.COMPLETED;
+
+            ticket.Permissions.ToList().ForEach(x =>
             {
                 x.IsEnabled = true;
                 x.EnabledDate = DateTime.Now;
             });
-
-            _datasetContext.SaveChanges();
         }
 
+        public void CloseTicket(SecurityTicket ticket, string RejectorId, string rejectedReason, string status)
+        {
+            ticket.RejectedById = RejectorId;
+            ticket.RejectedDate = DateTime.Now;
+            ticket.RejectedReason = rejectedReason;
+            ticket.TicketStatus = status;
+        }
 
     }
 }

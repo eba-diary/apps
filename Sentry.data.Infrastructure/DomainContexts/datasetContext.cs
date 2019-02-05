@@ -120,7 +120,15 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                return Query<Dataset>().Where(x => x.CanDisplay);
+                return Query<Dataset>();
+            }
+        }
+
+        public IQueryable<DatasetFileConfig> DatasetFileConfigs
+        {
+            get
+            {
+                return Query<DatasetFileConfig>();
             }
         }
 
@@ -145,6 +153,14 @@ namespace Sentry.data.Infrastructure
             get
             {
                 return Query<SecurityPermission>();
+            }
+        }
+
+        public IQueryable<SecurityTicket> SecurityTicket
+        {
+            get
+            {
+                return Query<SecurityTicket>();
             }
         }
 
@@ -242,7 +258,15 @@ namespace Sentry.data.Infrastructure
             {
                 return Query<TagGroup>();
             }
-        }        
+        }
+
+        public IQueryable<RetrieverJob> RetrieverJob
+        {
+            get
+            {
+                return Query<RetrieverJob>();
+            }
+        }
 
         public IEnumerable<Dataset> GetDatasetByCategoryID(int id)
         {

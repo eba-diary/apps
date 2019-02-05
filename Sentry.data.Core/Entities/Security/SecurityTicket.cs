@@ -18,6 +18,7 @@ namespace Sentry.data.Core
         public virtual DateTime RequestedDate { get; set; }
         public virtual DateTime? ApprovedDate { get; set; }
         public virtual DateTime? RejectedDate { get; set; }
+        public virtual string RejectedReason { get; set; }
         public virtual string TicketStatus { get; set; }
         public virtual bool IsAddingPermission { get; set; }
         public virtual bool IsRemovingPermission { get; set; }
@@ -25,7 +26,7 @@ namespace Sentry.data.Core
 
         public virtual Security ParentSecurity { get; set; }
 
-        public virtual ISet<SecurityPermission> Permissions { get; set; }
+        public virtual IList<SecurityPermission> Permissions { get; set; }
 
 
 

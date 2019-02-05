@@ -96,13 +96,15 @@
     <Compile Include="Entities\Security\RequestAccess.cs" />
     <Compile Include="Entities\Security\Security.cs" />
     <Compile Include="Entities\Security\UserSecurity.cs" />
-    <Compile Include="Extensions\QueryableExtensions.cs" />
+    <Compile Include="Extensions\DatasetQueryExtensions.cs" />
     <Compile Include="GlobalEnums\DataClassificationType.cs" />
+    <Compile Include="Interfaces\IHpsmMonitoringService.cs" />
     <Compile Include="Interfaces\IHpsmProvider.cs" />
     <Compile Include="Interfaces\IAssociateInfoProvider.cs" />
     <Compile Include="Interfaces\IConfigService.cs" />
     <Compile Include="Interfaces\IDatasetService.cs" />
     <Compile Include="Interfaces\IEventService.cs" />
+    <Compile Include="Interfaces\IObsidianService.cs" />
     <Compile Include="Interfaces\ISecurable.cs" />
     <Compile Include="Interfaces\ISecurityService.cs" />
     <Compile Include="Interfaces\IUserService.cs" />

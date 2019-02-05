@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ServiceModel;
+using System.Text.RegularExpressions;
 using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Infrastructure.HPMSChangeManagement;
@@ -11,7 +12,7 @@ namespace Sentry.data.Infrastructure
     {
 
 
-        public HpsmProvider(){}
+        public HpsmProvider() { }
 
         private ChangeManagementClient _service;
         public ChangeManagementClient Service
@@ -25,7 +26,7 @@ namespace Sentry.data.Infrastructure
                     _service.ClientCredentials.UserName.Password = Configuration.Config.GetHostSetting("HpsmServicePassword");
                     _service.ClientCredentials.UseIdentityConfiguration = true;
                     _service.Endpoint.Address = new EndpointAddress(Configuration.Config.GetHostSetting("HpsmServiceUrl"));
-                     
+
                 }
                 return _service;
             }
@@ -47,12 +48,12 @@ namespace Sentry.data.Infrastructure
 
                 return moveResponse.model.keys.ChangeID.Value;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logger.Error("Could not submit access request", ex);
                 return string.Empty;
             }
-           
+
         }
 
 
@@ -107,10 +108,11 @@ namespace Sentry.data.Infrastructure
                 },
                 ignoreEmptyElements = true
             };
-            
+
             Service.CloseChange(request);
 
         }
+
 
 
 
@@ -205,27 +207,45 @@ namespace Sentry.data.Infrastructure
         }
 
 
-        private HpsmTicket MapToTicket(ChangeInstanceType ticket)
+        private HpsmTicket MapToTicket(ChangeInstanceType instance)
         {
-            string status = "";
-            if(ticket.header.ApprovalStatus.Value == GlobalConstants.HpsmTicketStatus.APPROVED &&
-                            ticket.header.Phase.Value == GlobalConstants.HpsmTicketStatus.IMPLEMENTATION)
+            HpsmTicket ticket = new HpsmTicket()
             {
-                status = GlobalConstants.HpsmTicketStatus.APPROVED;
+                PreApproved = instance.Preapproved.Value,
+                ApprovedById = instance.ApprovalOperator.ApprovalOperator[0].Value,
+                RejectedById = instance.ApprovalOperator.ApprovalOperator[0].Value
+            };
+
+            if (instance.header.ApprovalStatus.Value == GlobalConstants.HpsmTicketStatus.APPROVED &&
+                            instance.header.Phase.Value == GlobalConstants.HpsmTicketStatus.IMPLEMENTATION)
+            {
+                ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.APPROVED;
             }
             //if it is closed.
-            else if(ticket.header.ApprovalStatus.Value == GlobalConstants.HpsmTicketStatus.APPROVED &&
-                            ticket.header.Phase.Value == GlobalConstants.HpsmTicketStatus.CLOSED)
+            else if (instance.header.ApprovalStatus.Value == GlobalConstants.HpsmTicketStatus.APPROVED &&
+                            instance.header.Phase.Value == GlobalConstants.HpsmTicketStatus.LOG_AND_PREP)
+            { //since it was moved back to log and prep, it was probably declined...who knows.
+                ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.DENIED;
+                ticket.RejectedReason = "Ticket approval was denied";
+            }
+            else if(instance.header.Status.Value == GlobalConstants.HpsmTicketStatus.CLOSED)
             {
-                status = GlobalConstants.HpsmTicketStatus.REJECTED;
+                ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.WIDHTDRAWN;
+                ticket.RejectedReason = instance.Comments.Comments[0].Value;
+
+                //Lets try to parse an ID from the withdrawn comment.
+                string[] words = ticket.RejectedReason.Split(' ');
+                foreach( string word in words)
+                {
+                    var w = word.Trim().Replace(".","");
+                    if (Regex.IsMatch(w, "^[0-9]{6}$"))
+                    {
+                        ticket.RejectedById = w;
+                    }
+                }
             }
 
-            return new HpsmTicket()
-            {
-                ApprovedById = ticket.ApprovalOperator.ApprovalOperator[0].ToString(),
-                RejectedById = ticket.ApprovalOperator.ApprovalOperator[0].ToString(),
-                TicketStatus = status
-            };
+            return ticket;
         }
 
 
@@ -251,13 +271,14 @@ namespace Sentry.data.Infrastructure
 
         private DateTimeType GetHpsmDate(string hpsmDate)
         {
-            return new DateTimeType{Value = DateTime.Parse(hpsmDate)};
+            return new DateTimeType { Value = DateTime.Parse(hpsmDate) };
         }
 
         private BooleanType GetHpsmBoolean(bool HPSMBool)
         {
-            return new BooleanType{Value = HPSMBool};
+            return new BooleanType { Value = HPSMBool };
         }
-        
+
+
     }
 }

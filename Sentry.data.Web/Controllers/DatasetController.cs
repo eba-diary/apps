@@ -34,19 +34,18 @@ namespace Sentry.data.Web.Controllers
         private readonly UserService _userService;
         private readonly S3ServiceProvider _s3Service;
         private readonly ISASService _sasService;
-        private readonly IRequestContext _requestContext;
-
+        private readonly IObsidianService _obsidianService;
         private readonly IDatasetService _datasetService;
         private readonly IEventService _eventService;
 
         public DatasetController(
-            IDatasetContext dsCtxt, 
-            S3ServiceProvider dsSvc, 
-            UserService userService, 
-            ISASService sasService, 
-            IAssociateInfoProvider associateInfoService, 
-            IRequestContext requestContext, 
-            IDatasetService datasetService, 
+            IDatasetContext dsCtxt,
+            S3ServiceProvider dsSvc,
+            UserService userService,
+            ISASService sasService,
+            IAssociateInfoProvider associateInfoService,
+            IObsidianService obsidianService,
+            IDatasetService datasetService,
             IEventService eventService)
         {
             _datasetContext = dsCtxt;
@@ -54,7 +53,7 @@ namespace Sentry.data.Web.Controllers
             _userService = userService;
             _sasService = sasService;
             _associateInfoProvider = associateInfoService;
-            _requestContext = requestContext;
+            _obsidianService = obsidianService;
             _datasetService = datasetService;
             _eventService = eventService;
         }
@@ -117,7 +116,7 @@ namespace Sentry.data.Web.Controllers
             if (ModelState.IsValid)
             {
 
-                if(dto.DatasetId == 0)
+                if (dto.DatasetId == 0)
                 {
                     int datasetId = _datasetService.CreateAndSaveNewDataset(dto);
 
@@ -131,7 +130,7 @@ namespace Sentry.data.Web.Controllers
                     _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.UPDATED_DATASET, SharedContext.CurrentUser.AssociateId, dto.DatasetName + " was created.", dto.DatasetId);
                     return RedirectToAction("Detail", new { id = dto.DatasetId });
                 }
-                
+
             }
 
             Utility.SetupLists(_datasetContext, model);
@@ -155,7 +154,8 @@ namespace Sentry.data.Web.Controllers
         public ActionResult AccessRequest(int datasetId)
         {
             AccessRequestModel model = _datasetService.GetAccessRequest(datasetId).ToModel();
-            return PartialView("_AccessRequest",model);
+            model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
+            return PartialView("_AccessRequest", model);
         }
 
         [HttpPost]
@@ -172,6 +172,12 @@ namespace Sentry.data.Web.Controllers
             {
                 return PartialView("_Success", new SuccessModel("Dataset access was successfully requested.", "HPSM Change Id: " + ticketId, true));
             }
+        }
+
+        [HttpGet]
+        public ActionResult CheckAdGroup(string adGroup)
+        {
+            return Json(_obsidianService.DoesGroupExist(adGroup), JsonRequestBehavior.AllowGet);
         }
 
         #endregion
@@ -401,8 +407,8 @@ namespace Sentry.data.Web.Controllers
             List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
 
             UserSecurity us = _datasetService.GetUserSecurityForConfig(Id);
-            List<DatasetFile> datasetFiles = _datasetContext.DatasetFile.Where(x => x.Dataset.DatasetId == df.Dataset.DatasetId && 
-                                                                                                                        x.DatasetFileConfig.ConfigId == df.DatasetFileConfig.ConfigId && 
+            List<DatasetFile> datasetFiles = _datasetContext.DatasetFile.Where(x => x.Dataset.DatasetId == df.Dataset.DatasetId &&
+                                                                                                                        x.DatasetFileConfig.ConfigId == df.DatasetFileConfig.ConfigId &&
                                                                                                                         x.FileName == df.FileName).
                                                                                                     Fetch(x => x.DatasetFileConfig).ToList();
             foreach (DatasetFile dfversion in datasetFiles)
@@ -950,7 +956,7 @@ namespace Sentry.data.Web.Controllers
                             //Create Dataset Loader request
                             //Find job DFSBasic generic job associated with this config and add ID to request.
                             RetrieverJob dfsBasicJob = null;
-                            List<RetrieverJob> jobList = _requestContext.RetrieverJob.Where(w => w.DatasetConfig.ConfigId == configId).ToList();
+                            List<RetrieverJob> jobList = _datasetContext.RetrieverJob.Where(w => w.DatasetConfig.ConfigId == configId).ToList();
                             bool jobFound = false;
                             foreach (RetrieverJob job in jobList)
                             {
@@ -1171,23 +1177,19 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        public JsonResult GetAllDatasets()
+        public JsonResult GetAllDatasetsForQueryPermission()
         {
-            var list = _datasetContext.Categories;
-
             List<SelectListItem> sList = new List<SelectListItem>();
 
-            foreach (var cat in list)
+            var groupedDatasets = _datasetService.GetDatasetsForQueryTool().GroupBy(x=> x.DatasetCategories.First());
+
+            foreach (var ds in groupedDatasets)
             {
-                IEnumerable<Dataset> dfList = Utility.GetDatasetByCategoryId(_datasetContext, cat.Id);
-
-                SelectListGroup group = new SelectListGroup() { Name = cat.Name };
-
-                sList.AddRange(dfList.Select(m => new SelectListItem()
+                sList.AddRange(ds.Select(m => new SelectListItem()
                 {
                     Text = m.DatasetName,
                     Value = m.DatasetId.ToString(),
-                    Group = group
+                    Group = new SelectListGroup() { Name = ds.Key.Name }
                 }));
             }
 

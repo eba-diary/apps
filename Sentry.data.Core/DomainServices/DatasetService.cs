@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Sentry.Common.Logging;
 using Sentry.Core;
 
@@ -24,7 +25,7 @@ namespace Sentry.data.Core
 
         public DatasetDto GetDatasetDto(int id)
         {
-            Dataset ds = _datasetContext.GetById<Dataset>(id);
+            Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id).FetchAllChildren(_datasetContext).FirstOrDefault();
             DatasetDto dto = new DatasetDto();
             MapToDto(ds, dto);
 
@@ -33,17 +34,7 @@ namespace Sentry.data.Core
 
         public DatasetDetailDto GetDatesetDetailDto(int id)
         {
-
-            //List<SecurityPermission> tickets = _datasetContext.SecurityPermission.//Where(x => x.Permission.PermissionCode == GlobalConstants.PermissionCodes.CAN_QUERY_DATASET).
-            //                                                                                                        Fetch(x => x.Permission).
-            //                                                                                                        Fetch(x => x.AddedFromTicket).ToList();
-
-
-            Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id).
-                                                                                        Fetch(s => s.Security).
-                                                                                        ThenFetchMany(t=> t.Tickets).
-                                                                                        ThenFetchMany(p=> p.Permissions).
-                                                                                        ThenFetch(x=> x.Permission).FirstOrDefault();
+            Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id).FetchAllChildren(_datasetContext).FirstOrDefault();
 
             DatasetDetailDto dto = new DatasetDetailDto();
             MapToDetailDto(ds, dto);
@@ -53,19 +44,47 @@ namespace Sentry.data.Core
 
         public UserSecurity GetUserSecurityForDataset(int datasetId)
         {
-            Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+            Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == datasetId).FetchSecurityTree(_datasetContext).FirstOrDefault();
 
             return _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
         }
 
         public UserSecurity GetUserSecurityForConfig(int configId)
         {
-            DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configId);
+            DatasetFileConfig dfc = _datasetContext.DatasetFileConfigs.Where(x => x.ConfigId == configId).FetchSecurityTree(_datasetContext).FirstOrDefault();
             if (dfc.ParentDataset != null)
             {
                 return _securityService.GetUserSecurity(dfc.ParentDataset, _userService.GetCurrentUser());
             }
             return new UserSecurity();
+        }
+
+        public List<Dataset> GetDatasetsForQueryTool()
+        {
+            //get all datasets where the there is a CanQueryData permission on the security
+            //OR all public datasets (no security object)
+            var query = _datasetContext.Datasets.Where(x => x.DatasetType == GlobalConstants.DataEntityCodes.DATASET &&
+                                                                                        (x.Security == null || x.Security.Tickets.Any(y => y.Permissions.Any(z => z.Permission.PermissionCode == GlobalConstants.PermissionCodes.CAN_QUERY_DATASET && z.IsEnabled))));
+
+            query.FetchMany(x => x.DatasetCategories).ToFuture();
+            List<Dataset> datasets = query.FetchSecurityTree(_datasetContext);
+
+            IApplicationUser user = _userService.GetCurrentUser();
+
+            List<Dataset> datasetsCanQuery = new List<Dataset>();
+
+            foreach (Dataset ds in datasets)
+            {
+                var userSecurity = _securityService.GetUserSecurity(ds, user);
+                if (userSecurity.CanQueryDataset)
+                {
+                    datasetsCanQuery.Add(ds);
+                }
+            }
+
+            //now add in all the public datasets.
+
+            return datasetsCanQuery;
         }
 
         public AccessRequest GetAccessRequest(int datasetId)

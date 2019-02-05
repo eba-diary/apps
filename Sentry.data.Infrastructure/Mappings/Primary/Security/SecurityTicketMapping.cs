@@ -31,13 +31,15 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.RequestedDate, (m) => m.Column("Requested_DTM"));
             this.Property((x) => x.TicketId, (m) => m.Column("Ticket_ID"));
             this.Property((x) => x.TicketStatus, (m) => m.Column("TicketStatus_DSC"));
+            this.Property((x) => x.RejectedReason, (m) => m.Column("Rejected_DSC"));
 
 
-            this.Set(x => x.Permissions, (m) =>
+            this.Bag(x => x.Permissions, (m) =>
             {
                 m.Inverse(true);
                 m.Table("SecurityPermission");
                 m.Cascade(Cascade.All);
+                m.Fetch(CollectionFetchMode.Select);
                 m.Key((k) =>
                 {
                     k.Column("AddedFromTicket_ID");

@@ -58,8 +58,7 @@ namespace Sentry.data.Web.Tests
             var mockExtendedUserInfoProvider = MockRepository.GenerateStub<IExtendedUserInfoProvider>();
             var mockCurrentUserIdProvider = MockRepository.GenerateStub<ICurrentUserIdProvider>();
 
-            var mockRequestService = MockRepository.GenerateStub<IRequestContext>();
-
+            var mockObsidianService = MockRepository.GenerateStub<IObsidianService>();
             var mockS3Provider = MockRepository.GenerateStub<S3ServiceProvider>();
             var mockSasProvider = MockRepository.GenerateStub<ISASService>();
 
@@ -85,12 +84,6 @@ namespace Sentry.data.Web.Tests
                 mockDatasetContext.Stub(x => x.GetById(ds.DatasetId)).Return(ds);
                 mockDatasetContext.Stub(x => x.IsUserSubscribedToDataset(ds.PrimaryOwnerId, ds.DatasetId)).Return(true);
                 mockDatasetContext.Stub(x => x.GetAllUserSubscriptionsForDataset(user.AssociateId, ds.DatasetId)).Return(datasetSubscriptions == null ? new List<DatasetSubscription>() : datasetSubscriptions);
-
-                //if (ds.DatasetFileConfigs.Any())
-                //{
-                //    mockDatasetContext.Stub(x => x.Schemas).Return(MockClasses.MockSchemas(ds.DatasetFileConfigs[0]).AsQueryable());
-                //    mockDatasetContext.Stub(x => x.Merge<DatasetFileConfig>(ds.DatasetFileConfigs[0])).Return(ds.DatasetFileConfigs[0]);
-                //}
             }
 
             mockDatasetContext.Stub(x => x.Merge<Dataset>(ds)).Return(ds);
@@ -109,7 +102,7 @@ namespace Sentry.data.Web.Tests
 
             mockUserService.Stub(x => x.GetCurrentUser()).Return(user);
 
-            var dsc = new DatasetController(mockDatasetContext, mockS3Provider, mockUserService, mockSasProvider, mockAssociateService, mockRequestService, mockDatasetService, mockEventService);
+            var dsc = new DatasetController(mockDatasetContext, mockS3Provider, mockUserService, mockSasProvider, mockAssociateService, mockObsidianService, mockDatasetService, mockEventService);
             dsc.SharedContext = mockSharedContextModel;
 
             return dsc;

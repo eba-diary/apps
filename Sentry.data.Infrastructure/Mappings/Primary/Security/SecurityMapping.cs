@@ -27,7 +27,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.UpdatedById, (m) => m.Column("UpdatedBy_ID"));
             this.Property((x) => x.CreatedById, (m) => m.Column("CreatedBy_ID"));
 
-            this.Set(x => x.Tickets, (m) =>
+            this.Bag(x => x.Tickets, (m) =>
             {
                 m.Inverse(true);
                 m.Table("SecurityTicket");

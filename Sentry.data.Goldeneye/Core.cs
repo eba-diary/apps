@@ -26,6 +26,7 @@ namespace Sentry.data.Goldeneye
         private CancellationToken _token;
         private IContainer _container;
         private IRequestContext _requestContext;
+        private IHpsmMonitoringService _hpsmMonitoringService;
         private Scheduler _backgroundJobServer;
         private List<RunningTask> currentTasks = new List<RunningTask>();
 
@@ -111,6 +112,7 @@ namespace Sentry.data.Goldeneye
                         try
                         {
                             _requestContext = _container.GetInstance<IRequestContext>();
+                            _hpsmMonitoringService = _container.GetInstance<IHpsmMonitoringService>();
                             complete = true;
                         }
                         catch (Exception ex)
@@ -172,7 +174,10 @@ namespace Sentry.data.Goldeneye
                             RecurringJob.AddOrUpdate("spamfactory_weekly", () => SpamFactory.Run("Weekly"), "00 8 * * MON", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
 
                             //Schedule Livy Job state monitor to run every minute
-                            RecurringJob.AddOrUpdate("LivyJobStateMonitor", () => RetrieverJobService.UpdateJobStatesAsync(), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));                            
+                            RecurringJob.AddOrUpdate("LivyJobStateMonitor", () => RetrieverJobService.UpdateJobStatesAsync(), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+
+                            //Schedule the Hpsm Monitor to run every 15 min.
+                            RecurringJob.AddOrUpdate("HPSMTicketMonitor", () => _hpsmMonitoringService.CheckHpsmTicketStatus(), Cron.MinuteInterval(15), TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
 
                             //Load all scheduled and enabled jobs into hangfire on startup to ensure all jobs are registered
                             List<RetrieverJob> JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && w.IsEnabled).ToList();

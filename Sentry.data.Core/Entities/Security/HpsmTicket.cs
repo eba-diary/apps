@@ -5,8 +5,9 @@ namespace Sentry.data.Core
     {
 
         public string TicketStatus { get; set; }
+        public bool PreApproved { get; set; }
         public string ApprovedById { get; set; }
         public string RejectedById { get; set; }
-        
+        public string RejectedReason { get; set; }
     }
 }

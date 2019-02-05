@@ -13,5 +13,6 @@
     [IsRemovingPermission_IND] BIT NOT NULL, 
     [IsAddingPermission_IND] BIT NOT NULL, 
     [Security_ID] UNIQUEIDENTIFIER NOT NULL,
-	CONSTRAINT [FK_SecurityTicket_Security] FOREIGN KEY ([Security_ID]) REFERENCES [Security]([Security_ID])
+	[Rejected_DSC] VARCHAR(256) NULL, 
+    CONSTRAINT [FK_SecurityTicket_Security] FOREIGN KEY ([Security_ID]) REFERENCES [Security]([Security_ID])
 )

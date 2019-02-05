@@ -223,6 +223,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="ServiceImplementations\HpsmMonitoringService.cs" />
     <Compile Include="ServiceImplementations\HpsmProvider.cs" />
     <Compile Include="ServiceImplementations\CubeProvider.cs" />
     <Compile Include="ServiceImplementations\DatafileBundleProvider.cs" />
@@ -234,6 +235,7 @@
     <Compile Include="ServiceImplementations\KafkaConsumer.cs" />
     <Compile Include="ServiceImplementations\KafkaMessagePublisher.cs" />
     <Compile Include="ServiceImplementations\MetadataRepositoryProvider.cs" />
+    <Compile Include="ServiceImplementations\ObsidianService.cs" />
     <Compile Include="ServiceImplementations\ODCFileProvider.cs" />
     <Compile Include="ServiceImplementations\RestAPIProvider.cs" />
     <Compile Include="ServiceImplementations\RetrieverJobService.cs" />

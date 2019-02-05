@@ -83,12 +83,16 @@
 
         public static class HpsmTicketStatus
         {
+            //DSC
             public const string PENDING = "Pending";
             public const string COMPLETED = "Completed";
-            public const string APPROVED = "Approved";
-            public const string IMPLEMENTATION = "Implementation";
-            public const string REJECTED = "Rejected";
-            public const string CLOSED = "Closed";
+            public const string DENIED = "Denied";
+            public const string WIDHTDRAWN = "Withdrawn";
+            //hpsm
+            public const string APPROVED = "approved";
+            public const string CLOSED = "closed";
+            public const string IMPLEMENTATION = "SI:STD:Implementation";
+            public const string LOG_AND_PREP = "SI:STD:Log and Prep";
         }
 
         public static class SecurableEntityName

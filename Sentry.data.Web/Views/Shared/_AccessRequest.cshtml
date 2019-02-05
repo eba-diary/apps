@@ -14,7 +14,7 @@
     <br />
 
     <div class="accessRequestErrorBox" id="AccessRequesrErrorBox" style="display:none">
-        
+
     </div>
 
     @Html.HiddenFor(model => model.DatasetId)
@@ -30,6 +30,12 @@
             @Html.TextBoxFor(model => model.AdGroupName, new { @class = "form-control edit-dataset-row" })
         </div>
     </div>
+    @*<div class="form-group">
+        @Html.LabelFor((model) => model.AdGroupName, new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownListFor((model) => model.AdGroupName, Model.AllAdGroups, new { @class = "form-control edit-dataset-row" })
+        </div>
+    </div>*@
     <div class="form-group">
         @Html.LabelFor(m => m.BusinessReason, new { @class = "col-md-2 control-label" })
         <div class="col-md-10">
@@ -40,7 +46,6 @@
         @Html.LabelFor((model) => model.SelectedApprover, new { @class = "control-label col-md-2" })
         <div class="col-md-10">
             @Html.DropDownListFor((model) => model.SelectedApprover, Model.AllApprovers, new { @class = "form-control edit-dataset-row" })
-            @Html.ValidationMessageFor((model) => model.SelectedApprover, "", new { @class = "text-danger" })
         </div>
     </div>
 

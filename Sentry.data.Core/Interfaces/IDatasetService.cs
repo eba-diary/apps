@@ -8,12 +8,11 @@ namespace Sentry.data.Core
         int CreateAndSaveNewDataset(DatasetDto dto);
         DatasetDto GetDatasetDto(int id);
         DatasetDetailDto GetDatesetDetailDto(int id);
-
         void UpdateAndSaveDataset(DatasetDto dto);
-
         UserSecurity GetUserSecurityForDataset(int datasetId);
         UserSecurity GetUserSecurityForConfig(int configId);
         AccessRequest GetAccessRequest(int datasetId);
         string RequestAccessToDataset(AccessRequest request);
+        List<Dataset> GetDatasetsForQueryTool();
     }
 }
