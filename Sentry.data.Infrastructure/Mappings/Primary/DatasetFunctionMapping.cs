@@ -14,7 +14,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             this.Id(x => x.Id, m =>
             {
-                m.Column("Id");
+                m.Column("DatasetFunction_Id");
                 m.Generator(Generators.Identity);
             });
 

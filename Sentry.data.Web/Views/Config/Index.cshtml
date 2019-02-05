@@ -213,7 +213,7 @@
                         <p>This configuration is classified as a @item.FileType</p>
                         <p>This configuration Data Scope is @item.ScopeType.Name which means : </p>
                         <p style="margin-left: 25px;">@item.ScopeType.Description</p>
-                        @if (item.FileExtension.Name.Trim() == "ANY")
+                        @if (item.FileExtension.Name.Trim() == "ANY" || item.FileExtension.Name.Trim() == "DELIMITED")
                         {<p>This configuration will allow all file extensions.</p>}
                         else
                         {<p>This configuration will only allow files with .@item.FileExtension.Name.ToLower() extension</p>}

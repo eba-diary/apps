@@ -1257,32 +1257,6 @@
                 temp = [];
 
 
-                //EXTENSION FILTER
-                counter = 0; //Needs seperate counter as multiple objects can appear per iteration
-                for (var item, i = 0; item = exhibits[i++];) {
-                    for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
-                        if (!(ext in extensionLookup)) {
-                            extensionLookup[ext] = 1;
-                            self.ExtensionFilters.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
-                            //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
-
-                            temp.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
-                            counter++;
-                        }
-                    }
-                }
-                ko.utils.arrayForEach(self.AllFilters(), function (v) {
-                    if (v.Name == 'Report Type') {
-                        item = v;
-                    }
-                });
-                if (item !== undefined) {
-                    temp = item.Filters().concat(temp);
-                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
-                }
-                self.AllFilters.push(new FilterCategory('Report Type', temp, 'darkblue'));
-                temp = [];
-
                 //TAG FILTER
                 //Retrieve unique list of tag groups across tags that exist on exhibits
                 // and alfa sort the list
@@ -1302,7 +1276,6 @@
                         }
                     }
                     arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
-                    //return arr; //For testing
                 };
 
                 array_move(tagGroups, tagGroups.indexOf('Other'), tagGroups.length - 1)
@@ -1341,6 +1314,32 @@
                     temp = [];
                 }
 
+
+                //REPORT TYPE FILTER
+                counter = 0; //Needs seperate counter as multiple objects can appear per iteration
+                for (var item, i = 0; item = exhibits[i++];) {
+                    for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
+                        if (!(ext in extensionLookup)) {
+                            extensionLookup[ext] = 1;
+                            self.ExtensionFilters.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
+                            //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
+
+                            temp.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
+                            counter++;
+                        }
+                    }
+                }
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name == 'Report Type') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
+                self.AllFilters.push(new FilterCategory('Report Type', temp, 'darkblue'));
+                temp = [];
 
             };
 
@@ -1488,9 +1487,6 @@
             };
 
             self.RemoveSelection = function (id) {
-                console.log('Removing : ' + id);
-
-
                 self.SelectedFilters.remove(function (feature) {
                     return feature == id;
                 });

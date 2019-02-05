@@ -512,7 +512,6 @@ namespace Sentry.data.Common
                             }
 
                             dynamic msg1 = new JObject();
-                            string eventTopic = $"{Configuration.Config.GetSetting("SAIDKey").ToLower()}-{Configuration.Config.GetHostSetting("EnvironmentName").ToLower()}-{Configuration.Config.GetHostSetting("DSCEventTopic").ToLower()}";
                             //Write file information to topic
                             try
                             {
@@ -521,11 +520,11 @@ namespace Sentry.data.Common
                                 msg1.SourceKey = df_newParent.FileLocation;
                                 msg1.SourceVersionId = df_newParent.VersionId;
 
-                                _publisher.Publish(eventTopic, df_newParent.Schema.DataElement_ID.ToString(), msg1.ToString());
+                                _publisher.PublishDSCEvent(df_newParent.Schema.DataElement_ID.ToString(), msg1.ToString());
                             }
                             catch (Exception ex)
                             {
-                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.DataElement_ID.ToString()} | topic:{eventTopic} | message:{msg1.ToString()})", ex);
+                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.DataElement_ID.ToString()} | DSCEvent topic | message:{msg1.ToString()})", ex);
                             }
 
                             Event f = new Event()
@@ -612,7 +611,6 @@ namespace Sentry.data.Common
                             }
 
                             dynamic msg1 = new JObject();
-                            string eventTopic = $"{Configuration.Config.GetSetting("SAIDKey").ToLower()}-{Configuration.Config.GetHostSetting("EnvironmentName").ToLower()}-{Configuration.Config.GetHostSetting("DSCEventTopic").ToLower()}";
                             //Write file information to topic
                             try
                             {
@@ -621,11 +619,11 @@ namespace Sentry.data.Common
                                 msg1.SourceKey = df_newParent.FileLocation;
                                 msg1.SourceVersionId = df_newParent.VersionId;
 
-                                _publisher.Publish(eventTopic, df_newParent.Schema.DataElement_ID.ToString(), msg1.ToString());
+                                _publisher.PublishDSCEvent(df_newParent.Schema.DataElement_ID.ToString(), msg1.ToString());
                             }
                             catch (Exception ex)
                             {
-                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.DataElement_ID.ToString()} | topic:{eventTopic} | message:{msg1.ToString()})", ex);
+                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.DataElement_ID.ToString()} | DSCEvent topic | message:{msg1.ToString()})", ex);
                             }
 
                             Event f = new Event()
@@ -939,7 +937,6 @@ namespace Sentry.data.Common
 
             }
         }
-
     }
 
     public static class DirectoryUtilities

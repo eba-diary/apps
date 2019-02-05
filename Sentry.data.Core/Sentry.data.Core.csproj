@@ -100,6 +100,7 @@
     <Compile Include="Interfaces\IEventService.cs" />
     <Compile Include="Interfaces\IUserService.cs" />
     <Compile Include="DomainServices\BusinessIntelligenceService.cs" />
+    <Compile Include="DomainServices\MessageHandlers\HiveMetadataHandler.cs" />
     <Compile Include="DomainServices\MetadataRepositoryService.cs" />
     <Compile Include="DTO\BaseEntityDTO.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceDTO.cs" />
@@ -128,6 +129,7 @@
     <Compile Include="Entities\Livy\LivySession.cs" />
     <Compile Include="Entities\Livy\QueryableDataset.cs" />
     <Compile Include="Entities\Goldeneye\RequestHeader.cs" />
+    <Compile Include="Entities\MessageFormats\HiveMetadataEvent.cs" />
     <Compile Include="Entities\Metadata\DataElement.cs" />
     <Compile Include="Entities\Metadata\DataElementDetail.cs" />
     <Compile Include="Entities\Metadata\DataObject.cs" />
@@ -236,7 +238,12 @@
     <None Include="packages.config" />
     <None Include="Sentry.data.Core.ruleset" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\StandaloneLibraries\Sentry.Messaging.Common\Sentry.Messaging.Common.csproj">
+      <Project>{bd4b0624-03a2-4896-b46e-4eb35e9efe6c}</Project>
+      <Name>Sentry.Messaging.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
