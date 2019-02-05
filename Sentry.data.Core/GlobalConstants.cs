@@ -120,8 +120,8 @@
             public const string REPORT_VIEW = "ReportView";
 
             public const string DATASET_MODIFY = "DatasetModify";
-            public const string DATA_ASSET_MODIFY = "DataAssetMngAlert";
-            public const string REPORT_MODIFY = "ReportMng";
+            public const string DATA_ASSET_MODIFY = "DataAssetModify";
+            public const string REPORT_MODIFY = "ReportModify";
 
             public const string USER_SWITCH = "UserSwitch";
             public const string ADMIN_USER = "AdminUser";
