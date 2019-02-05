@@ -191,7 +191,6 @@ namespace Sentry.data.Core
             dto.DatasetDtm = ds.DatasetDtm;
             dto.ChangedDtm = ds.ChangedDtm;
             dto.S3Key = ds.S3Key;
-            dto.IsSensitive = ds.IsSensitive;
             dto.DatasetType = ds.DatasetType;
             dto.Location = ds.Metadata.ReportMetadata.Location;
             dto.LocationType = ds.Metadata.ReportMetadata.LocationType;

@@ -284,8 +284,6 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        } 
-        
         public IQueryable<ApplicationConfiguration> ApplicationConfigurations
         {
             get
