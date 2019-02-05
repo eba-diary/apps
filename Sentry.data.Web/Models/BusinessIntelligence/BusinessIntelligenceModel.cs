@@ -16,6 +16,8 @@ namespace Sentry.data.Web
             Location = dto.Location;
             FileTypeId = dto.FileTypeId;
             FrequencyId = dto.FrequencyId;
+            DatasetBusinessUnitIds = dto.DatasetBusinessUnitIds;
+            DatasetFunctionIds = dto.DatasetFunctionIds;
             GetLatest = dto.GetLatest;
             ReportLink = dto.ReportLink;
         }
@@ -36,6 +38,13 @@ namespace Sentry.data.Web
         [DisplayName("Get Latest")]
         public bool GetLatest { get; set; }
 
+        [Required]
+        [DisplayName("Business Unit")]
+        public List<int> DatasetBusinessUnitIds { get; set; }
+
+        [Required]
+        [DisplayName("Function")]
+        public List<int> DatasetFunctionIds { get; set; }
         public string ReportLink { get; set; }
 
 

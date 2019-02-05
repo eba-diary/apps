@@ -121,7 +121,7 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                return Query<DataElement>().Cacheable();
+                return Query<DataElement>();
             }
         }
 
@@ -219,7 +219,15 @@ namespace Sentry.data.Infrastructure
             {
                 return Query<TagGroup>();
             }
-        }        
+        } 
+        
+        public IQueryable<ApplicationConfiguration> ApplicationConfigurations
+        {
+            get
+            {
+                return Query<ApplicationConfiguration>();
+            }
+        }
 
         public IEnumerable<Dataset> GetDatasetByCategoryID(int id)
         {

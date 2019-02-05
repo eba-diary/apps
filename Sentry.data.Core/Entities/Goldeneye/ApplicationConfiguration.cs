@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public class ApplicaitonConfiguration
+    public class ApplicationConfiguration
     {
         public virtual int Id { get; set; }
         public virtual string Application { get; set; }

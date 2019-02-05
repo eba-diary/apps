@@ -160,7 +160,7 @@ namespace Sentry.data.Goldeneye
                         {
                             _backgroundJobServer = new Scheduler();
                             currentTasks.Add(new RunningTask(
-                                Task.Factory.StartNew(() => _backgroundJobServer.Run(_token), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted),"BackgroundJobServer")
+                                Task.Factory.StartNew(() => _backgroundJobServer.Run(_token), TaskCreationOptions.LongRunning).ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted), "BackgroundJobServer")
                             );
 
                             //https://crontab.guru/
@@ -172,7 +172,7 @@ namespace Sentry.data.Goldeneye
                             RecurringJob.AddOrUpdate("spamfactory_weekly", () => SpamFactory.Run("Weekly"), "00 8 * * MON", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
 
                             //Schedule Livy Job state monitor to run every minute
-                            RecurringJob.AddOrUpdate("LivyJobStateMonitor", () => RetrieverJobService.UpdateJobStatesAsync(), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));                            
+                            RecurringJob.AddOrUpdate("LivyJobStateMonitor", () => RetrieverJobService.UpdateJobStatesAsync(), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
 
                             //Load all scheduled and enabled jobs into hangfire on startup to ensure all jobs are registered
                             List<RetrieverJob> JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && w.IsEnabled).ToList();
@@ -208,6 +208,11 @@ namespace Sentry.data.Goldeneye
                                     Job.JobLoggerMessage("Error", "Failed to remove disabled job on Goldeneye initialization", ex);
                                 }
                             }
+
+                            //Starting MetadataProcessor Consumer
+                            MetadataProcessorService metaProcessor = new MetadataProcessorService();
+                            currentTasks.Add(new RunningTask(
+                                            Task.Factory.StartNew(() => metaProcessor.Run(), TaskCreationOptions.LongRunning), "metadataProcessor"));                            
                         }
 
                         ////Dataset Loader

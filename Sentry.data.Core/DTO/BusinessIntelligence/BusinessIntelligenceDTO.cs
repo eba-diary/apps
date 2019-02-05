@@ -9,6 +9,9 @@ namespace Sentry.data.Core
         public string LocationType { get; set; }
         public int FileTypeId { get; set; }
         public int FrequencyId { get; set; }
+
+        public List<int> DatasetBusinessUnitIds { get; set; }
+        public List<int> DatasetFunctionIds { get; set; }
         public bool GetLatest { get; set; }
         public string ReportLink { get; set; }
     }

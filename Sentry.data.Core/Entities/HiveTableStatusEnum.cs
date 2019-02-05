@@ -11,6 +11,7 @@ namespace Sentry.data.Core
         Pending = 0,
         Requested = 1,
         Available = 2,
-        NameReserved = 3
+        NameReserved = 3,
+        RequestFailed = 4
     }
 }
