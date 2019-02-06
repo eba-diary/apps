@@ -1627,7 +1627,8 @@
                 $("#SearchText").attr("placeholder", "Search " + queryResults.length + " Datasets...");
 
                 return queryResults;
-            }).extend({ paged: { pageSize: 15 }});  // .extend() is for the knockout-paging plugin
+            }).extend({ paged: { pageSize: 15 } }); // .extend() is for the knockout-paging plugin
+            // go to https://github.com/ErikSchierboom/knockout-paging for information on the plugin
 
             self.sortExhibits = function () {
                 self.datasets.valueHasMutated();
