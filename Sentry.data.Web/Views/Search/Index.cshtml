@@ -183,9 +183,23 @@
                     
                     <div id="search-tile-footer" class="text-right">
 
+                        @* number of items option *@
+                        <div id="nbr-search-results-wrapper" class="footer-container">
+                            Showing
+                            
+                            <select id="search-results-choices" class="form-control" data-bind="event: { change: window.vm.limitSearchResults() }">
+                                <option value="15" selected>15</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="All">All</option>
+                            </select>
+
+                            results
+                        </div>
+
                         @* search results info display *@
-                        <div id="search-results-wrapper">
-                            Showing <span data-bind="text: searchResults.firstItemOnPage()"></span>-<span data-bind="text: searchResults.lastItemOnPage()"></span> of <span data-bind="text: searchResults.itemCount()"></span>
+                        <div id="search-results-wrapper" class="footer-container">
+                            Results <span data-bind="text: searchResults.firstItemOnPage()"></span>-<span data-bind="text: searchResults.lastItemOnPage()"></span> of <span data-bind="text: searchResults.itemCount()"></span>
                         </div>
 
                         @* pagination controls *@
@@ -1560,7 +1574,7 @@
             });
 
             self.searchResults = ko.computed(function () {
-                
+
                 if (!loaded) {
                     var list = JSON.parse(localStorage.getItem("filteredIds"));
 
@@ -1641,11 +1655,26 @@
                 $("#SearchText").attr("placeholder", "Search " + queryResults.length + " Datasets...");
 
                 return queryResults;
-            }).extend({ paged: {pageSize: 20}});  // .extend() is for the knockout-paging plugin
+            }).extend({ paged: { pageSize: 15 }});  // .extend() is for the knockout-paging plugin
 
             self.sortExhibits = function () {
                 self.datasets.valueHasMutated();
             };
+
+            self.limitSearchResults = function () {
+
+                var nbrResults = 15;
+
+                // determine number of results to return in the search results using the value selected in the drop-down
+                if ($("#search-results-choices").val() === "All") {
+                    nbrResults = self.searchResults.itemCount();
+                } else {
+                    nbrResults = parseInt($("#search-results-choices").val());
+                }
+
+                self.searchResults.pageSize(nbrResults);
+                
+            }
 
             self.SelectedFilters.subscribe(function () {
                 localStorage.setItem("filteredIds", ko.toJSON(self.SelectedFilters()));
