@@ -109,16 +109,32 @@
                         </select>
                     </div>
 
-                    @* sorting control *@
-                    <div id="sort-option-wrapper">
-                        <div>Sort by</div>
-                        <div>
-                            <select id="sort-results" class="form-control" data-bind="event: { change: window.vm.sortExhibits() }">
-                                @foreach (SelectListItem sortOption in Model.SortByOptions)
-                                {
-                                    <option value="@sortOption.Value">@sortOption.Text</option>
-                                }
+                    <div id="search-tile-header">
+                        @* number of items option *@
+                        <div id="nbr-search-results-wrapper" class="float-l">
+                            Showing
+
+                            <select id="search-results-choices" class="form-control" data-bind="event: { change: window.vm.limitSearchResults() }">
+                                <option value="15" selected>15</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="All">All</option>
                             </select>
+
+                            results
+                        </div>
+
+                        @* sorting control *@
+                        <div id="sort-option-wrapper" class="float-r">
+                            <div>Sort by</div>
+                            <div>
+                                <select id="sort-results" class="form-control" data-bind="event: { change: window.vm.sortExhibits() }">
+                                    @foreach (SelectListItem sortOption in Model.SortByOptions)
+                                    {
+                                        <option value="@sortOption.Value">@sortOption.Text</option>
+                                    }
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -180,34 +196,43 @@
                             </div>
                         </li>
                     </ul>
-                    
-                    @* pagination controls *@
-                    <ul class="pagination">
-                        @* button to take you directly to the first page *@
-                        <li data-bind="css: { disabled: searchResults.isFirstPage() }" class="previous disabled">
-                            <a href="#" aria-label="First" data-bind="click: searchResults.toFirstPage" title="First">&laquo;</a>
-                        </li>
-                        @* button to take you to the prevoius page *@
-                        <li data-bind="css: { disabled: !searchResults.hasPreviousPage() }" class="previous disabled">
-                            <a href="#" aria-label="Previous" data-bind="click: searchResults.toPreviousPage" title="Previous">&lt;</a>
-                        </li>
-                        
-                        @* loop through the pages, building a button for each *@
-                        <!-- ko foreach: searchResults.pages -->
-                        <li data-bind="css: { active: $data == $parent.searchResults.pageNumber() }">
-                            <a href="#" data-bind="text: $data, click: $parent.searchResults.pageNumber.bind($data)"></a>
-                        </li>
-                        <!-- /ko -->
 
-                        @* button to take you to the next page*@
-                        <li data-bind="css: { disabled: !searchResults.hasNextPage() }" class="next disabled">
-                            <a href="#" aria-label="Next" data-bind="click: searchResults.toNextPage" title="Next">&gt;</a>
-                        </li>
-                        @* button to take you directly to the last page *@
-                        <li data-bind="css: { disabled: searchResults.isLastPage() }" class="next disabled">
-                            <a href="#" aria-label="Last" data-bind="click: searchResults.toLastPage" title="Last">&raquo;</a>
-                        </li>
-                    </ul>
+                    <div id="search-tile-footer" class="text-right">
+
+                        @* search results info display *@
+                        <div id="search-results-wrapper" class="footer-container">
+                            Results <span data-bind="text: searchResults.firstItemOnPage()"></span>-<span data-bind="text: searchResults.lastItemOnPage()"></span> of <span data-bind="text: searchResults.itemCount()"></span>
+                        </div>
+
+                        @* pagination controls *@
+                        <div id="pagination-wrapper">
+                            <ul class="pagination">
+                                @* button to take you directly to the first page *@
+                                <li data-bind="css: { disabled: searchResults.isFirstPage() }" class="previous disabled">
+                                    <a href="#" aria-label="First" data-bind="click: searchResults.toFirstPage" title="First">&laquo;</a>
+                                </li>
+                                @* button to take you to the prevoius page *@
+                                <li data-bind="css: { disabled: !searchResults.hasPreviousPage() }" class="previous disabled">
+                                    <a href="#" aria-label="Previous" data-bind="click: searchResults.toPreviousPage" title="Previous">&lt;</a>
+                                </li>
+
+                                @* loop through the pages, building a button for each *@
+                                <!-- ko foreach: searchResults.pages -->
+                                <li data-bind="css: { active: $data == $parent.searchResults.pageNumber() }">
+                                    <a href="#" data-bind="text: $data, click: $parent.searchResults.pageNumber.bind($data)"></a>
+                                </li>
+                                <!-- /ko -->
+                                @* button to take you to the next page*@
+                                <li data-bind="css: { disabled: !searchResults.hasNextPage() }" class="next disabled">
+                                    <a href="#" aria-label="Next" data-bind="click: searchResults.toNextPage" title="Next">&gt;</a>
+                                </li>
+                                @* button to take you directly to the last page *@
+                                <li data-bind="css: { disabled: searchResults.isLastPage() }" class="next disabled">
+                                    <a href="#" aria-label="Last" data-bind="click: searchResults.toLastPage" title="Last">&raquo;</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
 
                     <hr>
                     <!-- ko if: searchResults().length == 0 -->
@@ -1523,7 +1548,7 @@
             });
 
             self.searchResults = ko.computed(function () {
-                
+
                 if (!loaded) {
                     var list = JSON.parse(localStorage.getItem("filteredIds"));
 
@@ -1604,11 +1629,27 @@
                 $("#SearchText").attr("placeholder", "Search " + queryResults.length + " Datasets...");
 
                 return queryResults;
-            }).extend({ paged: {pageSize: 20}});  // .extend() is for the knockout-paging plugin
+            }).extend({ paged: { pageSize: 15 } }); // .extend() is for the knockout-paging plugin
+            // go to https://github.com/ErikSchierboom/knockout-paging for information on the plugin
 
             self.sortExhibits = function () {
                 self.datasets.valueHasMutated();
             };
+
+            self.limitSearchResults = function () {
+
+                var nbrResults = 15;
+
+                // determine number of results to return in the search results using the value selected in the drop-down
+                if ($("#search-results-choices").val() === "All") {
+                    nbrResults = self.searchResults.itemCount();
+                } else {
+                    nbrResults = parseInt($("#search-results-choices").val());
+                }
+
+                self.searchResults.pageSize(nbrResults);
+                
+            }
 
             self.SelectedFilters.subscribe(function () {
                 localStorage.setItem("filteredIds", ko.toJSON(self.SelectedFilters()));
