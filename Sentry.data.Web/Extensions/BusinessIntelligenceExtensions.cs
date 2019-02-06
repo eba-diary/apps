@@ -16,8 +16,8 @@ namespace Sentry.data.Web
             {
                 DatasetId = model.DatasetId,
                 DatasetCategoryIds = model.DatasetCategoryIds,
-                DatasetBusinessUnitIds = model.DatasetBusinessUnitIds,
-                DatasetFunctionIds = model.DatasetFunctionIds,
+                DatasetBusinessUnitIds = (model.DatasetBusinessUnitIds == null) ? new List<int>() : model.DatasetBusinessUnitIds,
+                DatasetFunctionIds = (model.DatasetFunctionIds == null) ? new List<int>() : model.DatasetFunctionIds,
                 DatasetName = model.DatasetName,
                 DatasetDesc = model.DatasetDesc,
                 PrimaryOwnerId = model.PrimaryOwnerId,

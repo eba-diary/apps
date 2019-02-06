@@ -74,7 +74,7 @@
 
             @* Business Unit *@
             <div class="form-group">
-                @Html.LabelFor((model) => model.DatasetBusinessUnitIds, new { @class = "control-label col-md-2" })
+                <span class="control-label col-md-2">Business Unit</span>
                 <div class="col-md-10">
                     <select id="DatasetBusinessUnitIds" name="DatasetBusinessUnitIds" multiple="multiple" class="form-control edit-dataset-row">
                         @foreach (var li in Model.AllBusinessUnits)
@@ -88,7 +88,7 @@
 
             @* Function *@
             <div class="form-group">
-                @Html.LabelFor((model) => model.DatasetFunctionIds, new { @class = "control-label col-md-2" })
+                <span class="control-label col-md-2">Function</span>
                 <div class="col-md-10">
                     <select id="DatasetFunctionIds" name="DatasetFunctionIds" multiple="multiple" class="form-control edit-dataset-row">
                         @foreach (var li in Model.AllDatasetFunctions)
@@ -100,10 +100,7 @@
                 </div>
             </div>
 
-
-            @Html.Partial("_Tags", Model)
-
-
+            @* Exhibit Type*@
             <div class="form-group">
                 @Html.LabelFor(model => model.FileTypeId, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
@@ -112,7 +109,19 @@
                 </div>
             </div>
 
+            @* Frequency *@
+            <div class="form-group">
+                @Html.LabelFor((model) => model.FrequencyId, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor((model) => model.FrequencyId, Model.AllFrequencies, new { @class = "form-control edit-dataset-row" })
+                    @Html.ValidationMessageFor((model) => model.FrequencyId, "", new { @class = "text-danger" })
+                </div>
+            </div>
 
+            @* Tags *@
+            @Html.Partial("_Tags", Model)
+
+            @*Report Location *@
             <div id="UrlPanel" class="tab-pane fade in form-horizontal">
                 <div class="form-group">
                     @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -150,14 +159,8 @@
                     </div>
                 </div>
             </div>
-            <div class="form-group">
-                @Html.LabelFor((model) => model.FrequencyId, new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.DropDownListFor((model) => model.FrequencyId, Model.AllFrequencies, new { @class = "form-control edit-dataset-row" })
-                    @Html.ValidationMessageFor((model) => model.FrequencyId, "", new { @class = "text-danger" })
-                </div>
-            </div>
 
+            @* Owner *@
             <div class="form-group">
                 @Html.LabelFor(model => model.PrimaryOwnerName, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
@@ -165,6 +168,8 @@
                     @Html.ValidationMessageFor(model => model.PrimaryOwnerName, "", new { @class = "text-danger" })
                 </div>
             </div>
+
+            @* Contact *@
             <div class="form-group">
                 @Html.LabelFor(model => model.PrimaryContactName, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
