@@ -56,12 +56,12 @@
         @foreach (var item in Model.AllPermissions)
         {
             <div class="form-group">
-                <div class="col-sm-1">
+                <label class="col-sm-10 checkbox-container">
+                    @item.PermissionDescription
                     <input type="checkbox" value="@item.PermissionName" data-code="@item.PermissionCode" />
-                </div>
-                <div class="col-md-9">
-                    <label class="control-label">@item.PermissionDescription</label>
-                </div>
+                    <span class="checkmark"></span>
+                </label>
+                
             </div>
         }
     </div>

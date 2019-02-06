@@ -68,6 +68,9 @@ namespace Sentry.data.Core
 
         public UserSecurity GetUserSecurity(ISecurable securable, IApplicationUser user)
         {
+            //If the user is nothing for some reason, absolutly no permissions should be returned.
+            if(user == null) { return new UserSecurity(); }
+
             //if the user is one of the primary owners or primary contact, they should have all permissions without even requesting it.
             bool IsOwner = (user.AssociateId == securable?.PrimaryOwnerId || user.AssociateId == securable?.PrimaryContactId);
             List<string> userPermissions = new List<string>();
@@ -82,7 +85,7 @@ namespace Sentry.data.Core
             };
 
             //if it is not secure, it should be wide open except for upload.
-            if (securable == null || !securable.IsSecured)
+            if (securable == null || securable.Security == null || !securable.IsSecured)
             {
                 us.CanPreviewDataset = true;
                 us.CanQueryDataset = true;

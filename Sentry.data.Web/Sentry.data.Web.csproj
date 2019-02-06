@@ -282,6 +282,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Content Include="Content\checkbox.css" />
     <Content Include="Content\creat-edit-datasets.css" />
     <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\FavoritesController.cs" />
