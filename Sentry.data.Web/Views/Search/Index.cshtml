@@ -563,7 +563,7 @@
             self.ExtensionFilters = ko.observableArray([]);
             self.TagFilters = ko.observableArray([]);
 
-            self.FilterDatasets = function (datasets) {
+            self.FilterDatasets = function (datasets, sortVal) {
                 //First grab all the selected category ID's
                 var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
 
@@ -690,7 +690,7 @@
                     });
                 }
 
-                return datasets;
+                return sortTheResults(sortVal, datasets);
             };
 
             self.FilterExhibits = function (exhibits, sortVal) {
@@ -915,35 +915,7 @@
                     });
                 }
 
-                switch (parseInt(sortVal)) {
-                    case @((int)DatasetSortByOption.Alphabetical):
-                        return exhibits.sort(function (left, right) {
-                            return left.DatasetName == right.DatasetName ? 0 : (left.DatasetName < right.DatasetName ? -1 : 1)
-                        });
-                        break;
-                    case @((int)DatasetSortByOption.Favorites):
-                        return exhibits.sort(function (left, right) {
-                            return right.IsFavorite - left.IsFavorite;
-                        });
-                        break;
-                    case @((int)DatasetSortByOption.MostAccessed):
-                        return exhibits.sort(function (left, right) {
-                            return right.PageViews - left.PageViews;
-                        });
-                        break;
-                    case @((int)DatasetSortByOption.RecentlyAdded):
-                        return exhibits.sort(function (left, right) {
-                            return new Date(right.CreatedDtm) - new Date(left.CreatedDtm);
-                        });
-                        break;
-                    case @((int)DatasetSortByOption.RecentlyUpdated):
-                        return exhibits.sort(function (left, right) {
-                            return new Date(right.ChangedDtm) - new Date(left.ChangedDtm);
-                        });
-                        break;
-                    default:
-                        return exhibits;
-                }
+                return sortTheResults(sortVal, exhibits);
 
             };
 
@@ -1645,7 +1617,7 @@
                 var selectedCategoryList = [];
 
                 if (self.SearchType() == "Datasets") {
-                    queryResults = self.FilterDatasets(queryResults);
+                    queryResults = self.FilterDatasets(queryResults, $("#sort-results").val());
                 } else if (self.SearchType() == "BusinessIntelligence") {
                     queryResults = self.FilterExhibits(queryResults, $("#sort-results").val());
                 } else {
@@ -1799,6 +1771,38 @@
             var regex = /\/Search\/(\w+)/,
                 url = window.location.href;
             return regex.exec(url)[1];
+        }
+        
+        function sortTheResults(sortVal, items) {
+            switch (parseInt(sortVal)) {
+                case @((int)DatasetSortByOption.Alphabetical):
+                    return items.sort(function (left, right) {
+                        return left.DatasetName == right.DatasetName ? 0 : (left.DatasetName < right.DatasetName ? -1 : 1)
+                    });
+                    break;
+                case @((int)DatasetSortByOption.Favorites):
+                    return items.sort(function (left, right) {
+                        return right.IsFavorite - left.IsFavorite;
+                    });
+                    break;
+                case @((int)DatasetSortByOption.MostAccessed):
+                    return items.sort(function (left, right) {
+                        return right.PageViews - left.PageViews;
+                    });
+                    break;
+                case @((int)DatasetSortByOption.RecentlyAdded):
+                    return items.sort(function (left, right) {
+                        return new Date(right.CreatedDtm) - new Date(left.CreatedDtm);
+                    });
+                    break;
+                case @((int)DatasetSortByOption.RecentlyUpdated):
+                    return items.sort(function (left, right) {
+                        return new Date(right.ChangedDtm) - new Date(left.ChangedDtm);
+                    });
+                    break;
+                default:
+                    return items;
+            }
         }
 
     </script>
