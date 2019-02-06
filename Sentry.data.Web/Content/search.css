@@ -44,3 +44,18 @@
 .dataset-list-content .glyphicon-lock {
     padding-left: 10px;
 }
+
+#search-results-wrapper {
+    display: inline-block;
+    vertical-align: middle;
+    padding-right: 15px;
+    margin-right: 15px;
+    border-right: 1px solid #ccc;
+    line-height: 40px;
+    font-feature-settings: "lnum";
+}
+
+#pagination-wrapper {
+    display: inline-block;
+    vertical-align: middle;
+}

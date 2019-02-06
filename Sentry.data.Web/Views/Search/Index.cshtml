@@ -181,33 +181,42 @@
                         </li>
                     </ul>
                     
-                    @* pagination controls *@
-                    <ul class="pagination">
-                        @* button to take you directly to the first page *@
-                        <li data-bind="css: { disabled: searchResults.isFirstPage() }" class="previous disabled">
-                            <a href="#" aria-label="First" data-bind="click: searchResults.toFirstPage" title="First">&laquo;</a>
-                        </li>
-                        @* button to take you to the prevoius page *@
-                        <li data-bind="css: { disabled: !searchResults.hasPreviousPage() }" class="previous disabled">
-                            <a href="#" aria-label="Previous" data-bind="click: searchResults.toPreviousPage" title="Previous">&lt;</a>
-                        </li>
-                        
-                        @* loop through the pages, building a button for each *@
-                        <!-- ko foreach: searchResults.pages -->
-                        <li data-bind="css: { active: $data == $parent.searchResults.pageNumber() }">
-                            <a href="#" data-bind="text: $data, click: $parent.searchResults.pageNumber.bind($data)"></a>
-                        </li>
-                        <!-- /ko -->
+                    <div id="search-tile-footer" class="text-right">
 
-                        @* button to take you to the next page*@
-                        <li data-bind="css: { disabled: !searchResults.hasNextPage() }" class="next disabled">
-                            <a href="#" aria-label="Next" data-bind="click: searchResults.toNextPage" title="Next">&gt;</a>
-                        </li>
-                        @* button to take you directly to the last page *@
-                        <li data-bind="css: { disabled: searchResults.isLastPage() }" class="next disabled">
-                            <a href="#" aria-label="Last" data-bind="click: searchResults.toLastPage" title="Last">&raquo;</a>
-                        </li>
-                    </ul>
+                        @* search results info display *@
+                        <div id="search-results-wrapper">
+                            Showing <span data-bind="text: searchResults.firstItemOnPage()"></span>-<span data-bind="text: searchResults.lastItemOnPage()"></span> of <span data-bind="text: searchResults.itemCount()"></span>
+                        </div>
+
+                        @* pagination controls *@
+                        <div id="pagination-wrapper">
+                            <ul class="pagination">
+                                @* button to take you directly to the first page *@
+                                <li data-bind="css: { disabled: searchResults.isFirstPage() }" class="previous disabled">
+                                    <a href="#" aria-label="First" data-bind="click: searchResults.toFirstPage" title="First">&laquo;</a>
+                                </li>
+                                @* button to take you to the prevoius page *@
+                                <li data-bind="css: { disabled: !searchResults.hasPreviousPage() }" class="previous disabled">
+                                    <a href="#" aria-label="Previous" data-bind="click: searchResults.toPreviousPage" title="Previous">&lt;</a>
+                                </li>
+
+                                @* loop through the pages, building a button for each *@
+                                <!-- ko foreach: searchResults.pages -->
+                                <li data-bind="css: { active: $data == $parent.searchResults.pageNumber() }">
+                                    <a href="#" data-bind="text: $data, click: $parent.searchResults.pageNumber.bind($data)"></a>
+                                </li>
+                                <!-- /ko -->
+                                @* button to take you to the next page*@
+                                <li data-bind="css: { disabled: !searchResults.hasNextPage() }" class="next disabled">
+                                    <a href="#" aria-label="Next" data-bind="click: searchResults.toNextPage" title="Next">&gt;</a>
+                                </li>
+                                @* button to take you directly to the last page *@
+                                <li data-bind="css: { disabled: searchResults.isLastPage() }" class="next disabled">
+                                    <a href="#" aria-label="Last" data-bind="click: searchResults.toLastPage" title="Last">&raquo;</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
 
                     <hr>
                     <!-- ko if: searchResults().length == 0 -->
