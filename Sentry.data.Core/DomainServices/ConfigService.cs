@@ -273,7 +273,7 @@ namespace Sentry.data.Core
                 SchemaID = dataElement.DataElement_ID,
                 Format = dataElement.FileFormat,
                 Delimiter = dataElement.Delimiter,
-                Header = true,
+                Header = dataElement.HasHeader,
                 HiveDatabase = dataElement.HiveDatabase,
                 HiveTable = dataElement.HiveTable,
                 HiveStatus = dataElement.HiveTableStatus

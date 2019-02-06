@@ -161,7 +161,18 @@ namespace Sentry.data.Core
                 SetDataElementDetailValue("Storage_CDE", value);
             }
         }
-
+        public virtual Boolean HasHeader
+        {
+            get
+            {
+                DataElementDetail detail = GetElementDetail("HasHeader");
+                return (detail == null || detail.DataElementDetailType_VAL.ToLower() == "false" ) ? false : true;
+            }
+            set
+            {
+                SetDataElementDetailValue("HasHeader", value.ToString());
+            }
+        }
         #region DataElementDetailHelpers
         private DataElementDetail GetElementDetail(string typeCDE)
         {

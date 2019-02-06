@@ -274,6 +274,21 @@ namespace Sentry.data.Web.Helpers
 
             return rj;
         }
+        public static List<SelectListItem> BuildDatasetSortByOptions()
+        {
+            List<SelectListItem> sortOptions = new List<SelectListItem>();
+
+            foreach(DatasetSortByOption item in Enum.GetValues(typeof(DatasetSortByOption)))
+            {
+                sortOptions.Add(new SelectListItem
+                {
+                    Text = item.GetDescription(),
+                    Value = ((int)item).ToString()
+                });
+            }
+
+            return sortOptions;
+        }
 
         public static List<SelectListItem> BuildSelectListitem(List<KeyValuePair<string,string>> list, string defaultText)
         {
