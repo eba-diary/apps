@@ -93,6 +93,7 @@
     <Compile Include="Entities\MessageFormats\HiveTableCreateModel.cs" />
     <Compile Include="Entities\Metadata\ColumnModel.cs" />
     <Compile Include="GlobalEnums\DataClassificationType.cs" />
+    <Compile Include="GlobalEnums\DatasetSortByOption.cs" />
     <Compile Include="Interfaces\IAssociateInfoProvider.cs" />
     <Compile Include="Interfaces\IConfigService.cs" />
     <Compile Include="Interfaces\IDatasetService.cs" />

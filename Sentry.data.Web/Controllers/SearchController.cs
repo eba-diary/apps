@@ -64,7 +64,8 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult Index(string searchType, string category, string searchPhrase, string ids)
         {
-            return View();
+            SearchIndexModel model = new SearchIndexModel();
+            return View(model);
         }
 
         public class SearchTerms
@@ -126,10 +127,11 @@ namespace Sentry.data.Web.Controllers
                     break;
             }
 
-            foreach (Dataset ds in dsList)
+            foreach (Dataset ds in dsList.OrderBy(x => x.DatasetName).ToList())
             {
                 SearchModel sm = new SearchModel(ds, _associateInfoProvider);
                 sm.IsFavorite = ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId);
+                sm.PageViews = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset == ds.DatasetId).Count();
                 models.Add(sm);
             }
 

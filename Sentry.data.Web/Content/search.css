@@ -1,0 +1,46 @@
+﻿#listOfDatasets .disregardParentClick {
+    float: right;
+    margin-top: -3px;
+    margin-right: 1px;
+}
+
+#listOfDatasets .ul-dataset-link-item:hover {
+    opacity: 0.95;
+    box-shadow: 2px 6px 10px #888888;
+    cursor: pointer;
+}
+
+#listOfDatasets .ul-dataset-list-item {
+    background-color: #fff;
+}
+
+.dataset-list-filter-category label {
+    display: block;
+    font-weight: normal;
+}
+
+#sort-option-wrapper {
+    text-align: right;
+    margin-top: 12px;
+}
+    #sort-option-wrapper div {
+        display: inline-block;
+    }
+
+.search-dataset-name {
+    font-size: larger;
+    font-weight: bolder;
+    color: #003da5;
+}
+
+.ownerDate {
+    text-align: left !important;
+}
+    .ownerDate .link-btn {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
+.dataset-list-content .glyphicon-lock {
+    padding-left: 10px;
+}
