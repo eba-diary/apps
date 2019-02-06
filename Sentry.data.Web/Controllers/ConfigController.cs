@@ -218,6 +218,7 @@ namespace Sentry.data.Web.Controllers
                 SchemaRevision = 1,
                 SchemaIsForceMatch = false,
                 Delimiter = dfcm.Delimiter,
+                HasHeader = dfcm.HasHeader,
                 FileFormat = _datasetContext.GetById<FileExtension>(dfcm.FileExtensionID).Name.Trim(),
                 StorageCode = _datasetContext.GetNextStorageCDE().ToString(),
                 HiveDatabase = "Default",
@@ -1465,6 +1466,7 @@ namespace Sentry.data.Web.Controllers
                         DataElement_DSC = csm.Description,
                         DatasetFileConfig = dfc,
                         Delimiter = csm.Delimiter,
+                        HasHeader= csm.HasHeader,
                         SchemaName = csm.Name,
                         SchemaDescription = csm.Description,
                         SchemaIsForceMatch = csm.IsForceMatch,
@@ -1520,7 +1522,8 @@ namespace Sentry.data.Web.Controllers
                 IsPrimary = schema.SchemaIsPrimary,
                 DatasetId = schema.DatasetFileConfig.ParentDataset.DatasetId,
                 Delimiter = schema.Delimiter,
-                DataElement_ID = schema.DataElement_ID
+                DataElement_ID = schema.DataElement_ID,
+                HasHeader = schema.HasHeader
             };
 
             Event e = new Event();
@@ -1553,6 +1556,7 @@ namespace Sentry.data.Web.Controllers
                     schema.SchemaIsPrimary = esm.IsPrimary;
                     schema.Delimiter = esm.Delimiter;
                     schema.DataElementChange_DTM = DateTime.Now;
+                    schema.HasHeader = esm.HasHeader;
 
                     _datasetContext.Merge(schema);
                     _datasetContext.SaveChanges();
