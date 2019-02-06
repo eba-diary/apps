@@ -700,4 +700,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="DatasetFunction_Id" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="b9a36be9-d07f-45c2-965a-f1fd428bc9e2" ChangeDateTime="02/06/2019 15:27:39">
+    <Property Name="ElementName" Value="[dbo].[Dataset].[SecondaryOwner_ID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Dataset]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[PrimaryContact_ID]" />
+  </Operation>
 </Operations>

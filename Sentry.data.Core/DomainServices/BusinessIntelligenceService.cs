@@ -149,7 +149,8 @@ namespace Sentry.data.Core
             ds.DatasetName = dto.DatasetName;
             ds.DatasetDesc = dto.DatasetDesc;
             ds.CreationUserName = dto.CreationUserName;
-            ds.PrimaryOwnerId = dto.PrimaryOwnerId; //done on purpose since namming flipped.
+            ds.PrimaryOwnerId = dto.PrimaryOwnerId;
+            ds.PrimaryContactId = dto.PrimaryContactId;
             ds.UploadUserName = dto.UploadUserName;
             ds.OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), 1);  //All reports are internal
             ds.DatasetDtm = dto.DatasetDtm;
@@ -174,10 +175,13 @@ namespace Sentry.data.Core
         //could probably be an extension.
         private void MapToDto(Dataset ds, BusinessIntelligenceDto dto)
         {
-            string userDisplayname = _userService.GetByAssociateId(ds.PrimaryOwnerId)?.DisplayName;
+            IApplicationUser owner = _userService.GetByAssociateId(ds.PrimaryOwnerId);
+            IApplicationUser contact = _userService.GetByAssociateId(ds.PrimaryContactId);
 
             dto.Security = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
             dto.PrimaryOwnerId = ds.PrimaryOwnerId;
+            dto.PrimaryContactId = ds.PrimaryContactId;
+            dto.IsSecured = ds.IsSecured;
 
             dto.DatasetId = ds.DatasetId;
             dto.DatasetCategoryIds = ds.DatasetCategories.Select(x => x.Id).ToList();
@@ -185,7 +189,10 @@ namespace Sentry.data.Core
             dto.DatasetFunctionIds = ds.DatasetFunctions.Select(x => x.Id).ToList();
             dto.DatasetName = ds.DatasetName;
             dto.DatasetDesc = ds.DatasetDesc;
-            dto.PrimaryOwnerName = (string.IsNullOrWhiteSpace(userDisplayname) ? ds.PrimaryOwnerId : userDisplayname);
+            dto.PrimaryOwnerName = (owner != null ? owner.DisplayName : "Not Available");
+            dto.PrimaryContactName = (contact != null ? contact.DisplayName : "Not Available");
+            dto.PrimaryContactEmail = (contact != null ? contact.EmailAddress : "");
+
             dto.CreationUserName = ds.CreationUserName;
             dto.UploadUserName = ds.UploadUserName;
             dto.DatasetDtm = ds.DatasetDtm;

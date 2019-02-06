@@ -51,5 +51,19 @@ namespace Sentry.data.Infrastructure
             return response.GroupNames.Split(',').OrderBy(x=> x).ToList();
         }
 
+        public void GetUsersInGroup(string groupName)
+        {
+            cdtGetUsersByGroupRequest request = new cdtGetUsersByGroupRequest()
+            {
+                LogicalDomainName = "Intranet",
+                GroupNameQuery = groupName,
+                PropertyNameList = new List<string>() { "UserFullName", "UserEmployeeId"}
+            };
+
+            cdtGetUsersByGroupResponse response = Service().GetUsersByGroup(request);
+
+            var t = response;
+        }
+
     }
 }

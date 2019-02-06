@@ -45,7 +45,7 @@ data.Dataset = {
         });
     },
 
-    FormInit: function () {
+    FormInit: function (hrEmpUrl, hrEmpEnv) {
         /// Initialize the Create Dataset view
 
         if ($("#DatasetId").val() !== undefined && $("#DatasetId").val() > 0) {
@@ -57,19 +57,25 @@ data.Dataset = {
         }
 
         //Set Secure HREmp service URL for associate picker
-        $.assocSetup({ url: "https://hrempsecure.sentry.com/api/associates" });
-
+        $.assocSetup({ url: hrEmpUrl });
+        var permissionFilter = "DatasetModify,DatasetManagement," + hrEmpEnv;
         $("#PrimaryOwnerName").assocAutocomplete({
             associateSelected: function (associate) {
                 $('#PrimaryOwnerId').val(associate.Id);
-            }
+            },
+            filterPermission: permissionFilter ,
+            minLength: 0,
+            maxResults:10
+        });
+        $("#PrimaryContactName").assocAutocomplete({
+            associateSelected: function (associate) {
+                $('#PrimaryContactId').val(associate.Id);
+            },
+            filterPermission: permissionFilter,
+            minLength: 0,
+            maxResults: 10
         });
 
-        $("#SecondaryOwnerName").assocAutocomplete({
-            associateSelected: function (associate) {
-                $('#SecondaryOwnerId').val(associate.Id);
-            }
-        });
 
         $("#DataClassification").change(function () {
             switch ($("#DataClassification").val()) {

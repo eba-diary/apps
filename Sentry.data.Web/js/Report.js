@@ -39,7 +39,7 @@ data.Report = {
         });
     },
 
-    FormInit: function () {
+    FormInit: function (hrEmpUrl, hrEmpEnv) {
 
         $("#DatasetCategoryIds").select2({
             placeholder:"Select Categories"
@@ -62,12 +62,23 @@ data.Report = {
 
         /// Initialize the Create Dataset view
         //Set Secure HREmp service URL for associate picker
-        $.assocSetup({ url: "https://hrempsecure.sentry.com/api/associates" });
-
+        $.assocSetup({ url: hrEmpUrl });
+        var permissionFilter = "ReportModify,DatasetManagement," + hrEmpEnv;
         $("#PrimaryOwnerName").assocAutocomplete({
             associateSelected: function (associate) {
                 $('#PrimaryOwnerId').val(associate.Id);
-            }
+            },
+            filterPermission: permissionFilter,
+            minLength: 0,
+            maxResults: 10
+        });
+        $("#PrimaryContactName").assocAutocomplete({
+            associateSelected: function (associate) {
+                $('#PrimaryContactId').val(associate.Id);
+            },
+            filterPermission: permissionFilter,
+            minLength: 0,
+            maxResults: 10
         });
 
         //determine the cancel button url

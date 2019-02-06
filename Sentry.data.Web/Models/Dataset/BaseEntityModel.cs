@@ -9,7 +9,11 @@ namespace Sentry.data.Web
 {
     public class BaseEntityModel
     {
-        public BaseEntityModel() { }
+        public BaseEntityModel()
+        {
+            this.HrempServiceUrl = Configuration.Config.GetHostSetting("HrApiUrl");
+            this.HrempServiceEnv = Configuration.Config.GetHostSetting("HrApiEnvironment");
+        }
 
         public BaseEntityModel(BaseEntityDto dto)
         {
@@ -17,17 +21,23 @@ namespace Sentry.data.Web
             this.DatasetName = dto.DatasetName;
             this.DatasetDesc = dto.DatasetDesc;
             this.CreationUserName = dto.CreationUserName;
+            this.PrimaryOwnerId = dto.PrimaryOwnerId;
             this.PrimaryOwnerName = dto.PrimaryOwnerName;
+            this.PrimaryContactId = dto.PrimaryContactId;
+            this.PrimaryContactName = dto.PrimaryContactName;
+            this.PrimaryContactEmail = dto.PrimaryContactEmail;
+            this.IsSecured = dto.IsSecured;
+            this.DatasetCategoryIds = dto.DatasetCategoryIds;
+            this.TagIds = string.Join(",", dto.TagIds);
+
+            this.DatasetId = dto.DatasetId;
+            this.UploadUserName = dto.UploadUserName;
             this.DatasetDtm = dto.DatasetDtm;
             this.ChangedDtm = dto.ChangedDtm;
-            this.DatasetCategoryIds = dto.DatasetCategoryIds;
-            TagIds = string.Join(",", dto.TagIds);
 
-            //hidden properties
-            this.DatasetId = dto.DatasetId;
-            this.PrimaryOwnerId = dto.PrimaryOwnerId;
-            this.UploadUserName = dto.UploadUserName;
-
+            //this is needed for the associate picker js.
+            this.HrempServiceUrl = Configuration.Config.GetHostSetting("HrApiUrl");
+            this.HrempServiceEnv = Configuration.Config.GetHostSetting("HrApiEnvironment");
 
             //details
             this.IsFavorite = dto.IsFavorite;
@@ -56,7 +66,7 @@ namespace Sentry.data.Web
         [DisplayName("Originating Creator")]
         public string CreationUserName { get; set; }
         [Required]
-        [DisplayName("Primary Owner")]
+        [DisplayName("Owner")]
         public string PrimaryOwnerName { get; set; }
         [Required]
         [DisplayName("Creation Date")]
@@ -69,6 +79,12 @@ namespace Sentry.data.Web
         public List<int> DatasetCategoryIds { get; set; }
         public string TagIds { get; set; }
 
+        [Required]
+        [DisplayName("Contact")]
+        public string PrimaryContactName { get; set; }
+
+        [DisplayName("Restrict Dataset")]
+        public bool IsSecured { get; set; }
 
 
         //Dropdown Lists
@@ -87,8 +103,13 @@ namespace Sentry.data.Web
         //hidden properties
         public int DatasetId { get; set; }
         public string PrimaryOwnerId { get; set; }
+        public string PrimaryContactId { get; set; }
+        public string PrimaryContactEmail { get; set; }
         public string UploadUserName { get; set; }
 
+        //this is needed for the associate picker js.
+        public string HrempServiceUrl { get; set; }
+        public string HrempServiceEnv { get; set; }
 
         //shared details
         public int AmountOfSubscriptions { get; set; }

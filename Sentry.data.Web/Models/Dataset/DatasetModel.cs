@@ -19,9 +19,6 @@ namespace Sentry.data.Web
             FileExtensionId = dto.FileExtensionId;
             DatasetInformation = dto.DatasetInformation;
             DataClassification = dto.DataClassification;
-            SecondaryOwnerId = dto.SecondaryOwnerId;
-            SecondaryOwnerName = dto.SecondaryOwnerName;
-            IsSecured = dto.IsSecured;
         }
 
 
@@ -53,13 +50,6 @@ namespace Sentry.data.Web
         [Required]
         [DisplayName("Data Classification")]
         public DataClassificationType DataClassification { get; set; }
-
-        [DisplayName("Secondary Owner")]
-        public string SecondaryOwnerName { get; set; }
-        public string SecondaryOwnerId { get; set; }
-
-        [DisplayName("Restrict Dataset")]
-        public bool IsSecured { get; set; }
 
     }
 

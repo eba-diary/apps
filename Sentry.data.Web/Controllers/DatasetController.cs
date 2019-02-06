@@ -99,7 +99,7 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetDto dto = _datasetService.GetDatasetDto(id);
             DatasetModel model = new DatasetModel(dto);
-
+            _obsidianService.GetUsersInGroup("App_DataMgmt_MngDS ");
             Utility.SetupLists(_datasetContext, model);
 
             _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Edit Page", id);

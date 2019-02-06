@@ -4,6 +4,7 @@
     ViewBag.Title = "View Dataset Details";
     string color = Model.CategoryColor;
     string headerColor = "categoryBanner-" + Model.CategoryColor;
+    var mailTo = "mailto:" + Model.PrimaryContactEmail + "?Subject=Dataset%20Inquiry%20-%20" + Model.DatasetName;
 }
 
 @if (@Model.DatasetFileCount == 0)
@@ -257,12 +258,12 @@
                         <hr />
                         <div class="row">
                             <div class="col-lg-6">
-                                <h5 class="@color">Primary Owner</h5>
+                                <h5 class="@color">Owner</h5>
                                 <h6 class="@color">@Model.PrimaryOwnerName</h6>
                             </div>
                             <div class="col-lg-6">
-                                <h5 class="@color">Secondary Owner</h5>
-                                <h6 class="@color">@Model.SecondaryOwnerName</h6>
+                                <h5 class="@color">Contact</h5>
+                                <h6 class="@color"><a href="@mailTo">@Model.PrimaryContactName</a></h6>
                             </div>
                         </div>
                         <hr />

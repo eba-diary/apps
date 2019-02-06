@@ -21,6 +21,7 @@ namespace Sentry.data.Web
                 DatasetName = model.DatasetName,
                 DatasetDesc = model.DatasetDesc,
                 PrimaryOwnerId = model.PrimaryOwnerId,
+                PrimaryContactId = model.PrimaryContactId,
                 CreationUserName = model.CreationUserName,
                 UploadUserName = model.UploadUserName,
                 DatasetDtm = CreateTime,

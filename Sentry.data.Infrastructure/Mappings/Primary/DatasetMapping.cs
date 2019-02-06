@@ -24,7 +24,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.DatasetDesc, (m) => m.Column("Dataset_DSC"));
             this.Property((x) => x.CreationUserName, (m) => m.Column("FileCreator_NME"));
             this.Property((x) => x.PrimaryOwnerId, (m) => m.Column("PrimaryOwner_ID"));
-            this.Property((x) => x.SecondaryOwnerId, (m) => m.Column("SecondaryOwner_ID"));
+            this.Property((x) => x.PrimaryContactId, (m) => m.Column("PrimaryContact_ID"));
             this.Property((x) => x.UploadUserName, (m) => m.Column("UploadedBy_NME"));
             this.Property((x) => x.OriginationCode, (m) => m.Column("Origination_CDE"));
             this.Property((x) => x.DatasetDtm, (m) => m.Column("Dataset_DTM"));

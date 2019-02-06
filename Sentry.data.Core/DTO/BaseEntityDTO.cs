@@ -11,6 +11,10 @@ namespace Sentry.data.Core
         public string DatasetDesc { get; set; }
         public string PrimaryOwnerName { get; set; }
         public string PrimaryOwnerId { get; set; }
+        public string PrimaryContactId { get; set; }
+        public string PrimaryContactName { get; set; }
+        public string PrimaryContactEmail { get; set; }
+        public bool IsSecured { get; set; }
         public DateTime DatasetDtm { get; set; }
         public DateTime ChangedDtm { get; set; }
         public string S3Key { get; set; }

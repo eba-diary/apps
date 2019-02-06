@@ -158,7 +158,7 @@ namespace Sentry.data.Infrastructure
                             },
                             Description = new ChangeInstanceTypeDescriptionstructureDescription()
                             {
-                                Description = GetHpsmStringArr(model.BusinessReason)
+                                Description = new StringType[] { new StringType() {Value = model.BusinessReason } }
                             }
                         }
                     },
@@ -261,9 +261,7 @@ namespace Sentry.data.Infrastructure
             List<StringType> hstrl = new List<StringType>();
             foreach (string Part in parts)
             {
-                StringType hstr = new StringType();
-                hstr.Value = str;
-                hstrl.Add(hstr);
+                hstrl.Add(new StringType() {Value = str });
             }
 
             return hstrl.ToArray();

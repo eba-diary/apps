@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Sentry.data.Core.DomainServices
+namespace Sentry.data.Core
 {
     public class SecurityService : ISecurityService
     {
@@ -22,9 +22,9 @@ namespace Sentry.data.Core.DomainServices
         {
             //Lets format the business reason here before passing it into the hpsm service.
             StringBuilder sb = new StringBuilder();
-            sb.Append($"Please grant the Ad Group {model.AdGroupName} the following permissions for Data.sentry.com.");
-            model.Permissions.ForEach(x => sb.Append($"{x.PermissionName} - {x.PermissionDescription} |"));
-            sb.Append($"Business Reason: {model.BusinessReason}");
+            sb.Append($"Please grant the Ad Group {model.AdGroupName} the following permissions for Data.sentry.com.{ Environment.NewLine}");
+            model.Permissions.ForEach(x => sb.Append($"{x.PermissionName} - {x.PermissionDescription} { Environment.NewLine}"));
+            sb.Append($"Business Reason: {model.BusinessReason}{ Environment.NewLine}");
             sb.Append($"Requestor: {model.RequestorsId} - {model.RequestorsName}");
 
             model.BusinessReason = sb.ToString();
@@ -69,7 +69,7 @@ namespace Sentry.data.Core.DomainServices
         public UserSecurity GetUserSecurity(ISecurable securable, IApplicationUser user)
         {
             //if the user is one of the primary owners or primary contact, they should have all permissions without even requesting it.
-            bool IsOwner = (user.AssociateId == securable.PrimaryOwnerId || user.AssociateId == securable.SecondaryOwnerId);
+            bool IsOwner = (user.AssociateId == securable?.PrimaryOwnerId || user.AssociateId == securable?.PrimaryContactId);
             List<string> userPermissions = new List<string>();
 
             //set the user based permissions based off obsidian and ownership
@@ -82,7 +82,7 @@ namespace Sentry.data.Core.DomainServices
             };
 
             //if it is not secure, it should be wide open except for upload.
-            if (!securable.IsSecured)
+            if (securable == null || !securable.IsSecured)
             {
                 us.CanPreviewDataset = true;
                 us.CanQueryDataset = true;

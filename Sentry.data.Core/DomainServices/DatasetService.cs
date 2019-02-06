@@ -101,12 +101,12 @@ namespace Sentry.data.Core
 
 
             IApplicationUser primaryUser = _userService.GetByAssociateId(ds.PrimaryOwnerId);
-            ar.ApproverList.Add(new KeyValuePair<string, string>(ds.PrimaryOwnerId, primaryUser.DisplayName + " (Primary Owner)"));
+            ar.ApproverList.Add(new KeyValuePair<string, string>(ds.PrimaryOwnerId, primaryUser.DisplayName + " (Owner)"));
 
-            if (!string.IsNullOrWhiteSpace(ds.SecondaryOwnerId))
+            if (!string.IsNullOrWhiteSpace(ds.PrimaryContactId))
             {
-                IApplicationUser secondaryUser = _userService.GetByAssociateId(ds.SecondaryOwnerId);
-                ar.ApproverList.Add(new KeyValuePair<string, string>(ds.SecondaryOwnerId, secondaryUser.DisplayName + " (Secondary Owner)"));
+                IApplicationUser secondaryUser = _userService.GetByAssociateId(ds.PrimaryContactId);
+                ar.ApproverList.Add(new KeyValuePair<string, string>(ds.PrimaryContactId, secondaryUser.DisplayName + " (Contact)"));
             }
 
             return ar;
@@ -123,7 +123,7 @@ namespace Sentry.data.Core
                 request.SecurityId = ds.Security.SecurityId;
                 request.RequestorsId = user.AssociateId;
                 request.RequestorsName = user.DisplayName;
-                request.IsProd = bool.Parse(Configuration.Config.GetHostSetting("PreApproveHPSMTickets"));
+                request.IsProd = bool.Parse(Configuration.Config.GetHostSetting("RequireApprovalHPSMTickets"));
                 request.RequestedDate = DateTime.Now;
                 request.ApproverId = request.SelectedApprover;
                 request.Permissions = _datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
@@ -191,9 +191,9 @@ namespace Sentry.data.Core
             {
                 ds.PrimaryOwnerId = dto.PrimaryOwnerId;
             }
-            if (null != dto.SecondaryOwnerId && dto.SecondaryOwnerId.Length > 0)
+            if (null != dto.PrimaryContactId && dto.PrimaryContactId.Length > 0)
             {
-                ds.SecondaryOwnerId = dto.SecondaryOwnerId;
+                ds.PrimaryContactId = dto.PrimaryContactId;
             }
             if (dto.DataClassification > 0)
             {
@@ -252,15 +252,6 @@ namespace Sentry.data.Core
                 errors.Add("Dataset name already exists within category");
             }
 
-            if (dto.DataClassification == GlobalEnums.DataClassificationType.HighlySensitive && string.IsNullOrWhiteSpace(dto.SecondaryOwnerId))
-            {
-                errors.Add("Secondary owner is required");
-            }
-            if (dto.PrimaryOwnerId.Equals(dto.SecondaryOwnerId))
-            {
-                errors.Add("Secondary owner can not be the same as the primery owner");
-            }
-
             var currentFileExtension = _datasetContext.FileExtensions.FirstOrDefault(x => x.Id == dto.FileExtensionId).Name.ToLower();
 
             if (currentFileExtension == "csv" && dto.Delimiter != ",")
@@ -268,7 +259,7 @@ namespace Sentry.data.Core
                 errors.Add("File Extension CSV and it's delimiter do not match.");
             }
 
-            if (currentFileExtension == "delimited" && String.IsNullOrWhiteSpace(dto.Delimiter))
+            if (currentFileExtension == "delimited" && string.IsNullOrWhiteSpace(dto.Delimiter))
             {
                 errors.Add("File Extension Delimited is missing it's delimiter.");
             }
@@ -288,8 +279,8 @@ namespace Sentry.data.Core
                 DatasetDesc = dto.DatasetDesc,
                 DatasetInformation = dto.DatasetInformation,
                 CreationUserName = dto.CreationUserName,
-                PrimaryOwnerId = dto.PrimaryOwnerId,//done on purpose since namming flipped.
-                SecondaryOwnerId = dto.SecondaryOwnerId,
+                PrimaryOwnerId = dto.PrimaryOwnerId,
+                PrimaryContactId = dto.PrimaryContactId,
                 UploadUserName = dto.UploadUserName,
                 OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), dto.OriginationId),
                 DatasetDtm = dto.DatasetDtm,
@@ -449,11 +440,12 @@ namespace Sentry.data.Core
         private void MapToDto(Dataset ds, DatasetDto dto)
         {
             IApplicationUser primaryOwner = _userService.GetByAssociateId(ds.PrimaryOwnerId);
+            IApplicationUser primaryContact = _userService.GetByAssociateId(ds.PrimaryContactId);
 
             //map the ISecurable properties
             dto.Security = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
             dto.PrimaryOwnerId = ds.PrimaryOwnerId;
-            dto.SecondaryOwnerId = ds.SecondaryOwnerId;
+            dto.PrimaryContactId = ds.PrimaryContactId;
             dto.IsSecured = ds.IsSecured;
 
             dto.DatasetId = ds.DatasetId;
@@ -464,19 +456,10 @@ namespace Sentry.data.Core
             dto.DatasetType = ds.DatasetType;
             dto.DataClassification = ds.DataClassification;
             dto.CreationUserName = ds.CreationUserName;
-            dto.PrimaryOwnerName = (primaryOwner != null ? primaryOwner.DisplayName : ds.PrimaryOwnerId);
-            if (ds.SecondaryOwnerId != null)
-            {
-                IApplicationUser secondaryOwner = _userService.GetByAssociateId(ds.SecondaryOwnerId);
-                if (secondaryOwner != null && secondaryOwner.DisplayName != null)
-                {
-                    dto.SecondaryOwnerName = secondaryOwner.DisplayName;
-                }
-                else
-                {
-                    dto.SecondaryOwnerName = ds.SecondaryOwnerId;
-                }
-            }
+            dto.PrimaryOwnerName = (primaryOwner != null ? primaryOwner.DisplayName : "Not Available");
+            dto.PrimaryContactName = (primaryContact != null ? primaryContact.DisplayName : "Not Available");
+            dto.PrimaryContactEmail = (primaryContact != null ? primaryContact.EmailAddress : "");
+
             dto.UploadUserName = ds.UploadUserName;
             dto.DatasetDtm = ds.DatasetDtm;
             dto.ChangedDtm = ds.ChangedDtm;

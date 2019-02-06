@@ -7,5 +7,6 @@ namespace Sentry.data.Core
     {
         bool DoesGroupExist(string adGroup);
         List<string> GetAdGroups(string adGroup);
+        void GetUsersInGroup(string groupName);
     }
 }
