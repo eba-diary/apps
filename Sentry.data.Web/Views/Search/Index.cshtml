@@ -1,4 +1,8 @@
-﻿@{
+﻿@using Sentry.data.Core.GlobalEnums;
+
+@model Sentry.data.Web.SearchIndexModel
+
+@{
     ViewBag.Title = "Datasets";
 }
 @{
@@ -44,7 +48,7 @@
                             <ul class="list-unstyled ul-filter-list">
                                 <!-- ko foreach: OrderedFilters -->
                                 <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6">
-                                    <label data-bind="attr: { id: id }" style="display: block; font-weight: normal;">
+                                    <label data-bind="attr: { id: id }">
                                         <input type="checkbox" class="filterChbx"
                                                data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }" />
                                         <span data-bind="text : Title"></span>
@@ -58,7 +62,7 @@
                                     <!-- ko foreach: OrderedFilters -->
                                     <ul class="notNested">
                                         <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() >= 6">
-                                            <label data-bind="attr: { id: id }" style="display: block; font-weight: normal;">
+                                            <label data-bind="attr: { id: id }">
                                                 <input type="checkbox" class="filterChbx"
                                                        data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }" />
                                                 <span data-bind="text : Title"></span>
@@ -103,11 +107,80 @@
                             </optgroup>
                             <!-- /ko -->
                         </select>
-
-                        @*<select multiple="multiple" id="activeFilters " class="form-control select2-hidden-accessible"
-                            data-bind="select2: { options: SearchFilters, width: '100%', selectedOptions: Select2Filters, optionsText: 'Title' }"></select>*@
                     </div>
 
+                    @* sorting control *@
+                    <div id="sort-option-wrapper">
+                        <div>Sort by</div>
+                        <div>
+                            <select id="sort-results" class="form-control" data-bind="event: { change: window.vm.sortExhibits() }">
+                                @foreach (SelectListItem sortOption in Model.SortByOptions)
+                                {
+                                    <option value="@sortOption.Value">@sortOption.Text</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+
+                    <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults.pageItems">
+                        <li class="ul-dataset-list-item borderSide_gray boxShadowSm" data-bind="css : BorderColor, click: TileClicked, attr: { title: PrimaryTitle }">
+                            <div data-bind="if: $index > 20"></div>
+                            <div class="category-type-wrap">
+                                <div class="glyphicon glyphicon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none"></div>
+                                <div class="glyphicon glyphicon-star-empty btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite == false" style="display: none"></div>
+                                <div class="category-type" data-bind="css: BannerColor">
+                                    <span data-bind="text: AbbreviatedCategory" />
+                                </div>
+                            </div>
+                            <div></div>
+                            <div class="dataset-list-content">
+                                <!-- ko foreach: DistinctFileExtensions -->
+                                <div class="extension bg_gray" data-bind="css : $data">
+                                    <span data-bind="text: $data" />
+                                </div>
+                                <!-- /ko -->
+                                <span class="search-dataset-name" data-bind="text: DatasetName"></span>
+                                <!-- ko if: IsSensitive-->
+                                <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure"></i>
+                                <!-- /ko -->
+                            </div>
+
+                            <div class="dataset-list-content">
+                                <div class="dataset-list-content-label"></div>
+                                <div class="dataset-list-content-value listDesc">
+                                    <span data-bind="text: DatasetDesc"></span>
+                                </div>
+                            </div>
+                            <div class="dataset-list-content">
+                                <span class="custom-glyphiconz" aria-hidden="true" />
+                                <div class="dataset-list-content-label">
+                                    <div>
+                                        <div class="ownerDate">
+                                            <span class="textBold ownerDate" data-bind="css : Color">Sentry Owner:&nbsp;</span>
+                                            <span data-bind="text: SentryOwner"></span>
+
+                                            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+
+                                            <!-- ko ifnot: Type === "RPT" -->
+                                            <span class=" textBold ownerDate" data-bind="css : Color">Last Activity Date:&nbsp;</span>
+                                            <span data-bind="text: ChangedDtm"></span>
+                                            <!-- /ko -->
+                                            <!-- ko if: Type === "RPT" -->
+                                            <span class=" textBold ownerDate" data-bind="css : Color">Refresh Frequency:&nbsp;</span>
+                                            <span data-bind="text: UpdateFrequency"></span>
+
+                                            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                            <span class="textBold ownerDate link-btn btn btn-sm btn-info disregardParentClick" title="Go to the detail page">
+                                                <span class="disregardParentClick">Detail</span>
+                                            </span>
+                                            <!-- /ko -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                    
                     @* pagination controls *@
                     <ul class="pagination">
                         @* button to take you directly to the first page *@
@@ -136,66 +209,6 @@
                         </li>
                     </ul>
 
-                    <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults.pageItems">
-                        <li class="ul-dataset-list-item borderSide_gray boxShadowSm" style="background-color: white;" data-bind="css : BorderColor, click: TileClicked, attr: { title: PrimaryTitle }">
-                            <div data-bind="if: $index > 20"></div>
-                            <div class="category-type-wrap">
-                                <div class="glyphicon glyphicon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none"></div>
-                                <div class="glyphicon glyphicon-star-empty btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite == false" style="display: none"></div>
-                                <div class="category-type" data-bind="css: BannerColor">
-                                    <span data-bind="text: AbbreviatedCategory" />
-                                </div>
-                            </div>
-                            <div></div>
-                            <div class="dataset-list-content">
-                                <!-- ko foreach: DistinctFileExtensions -->
-                                <div class="extension bg_gray" data-bind="css : $data">
-                                    <span data-bind="text: $data" />
-                                </div>
-                                <!-- /ko -->
-                                <span data-bind="text: DatasetName" style="font-size: larger; font-weight: bolder; color: #003DA5;"></span>
-                                <!-- ko if: IsSensitive-->
-                                <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure" style="padding-left: 10px;"></i>
-                                <!-- /ko -->
-                            </div>
-
-                            <div class="dataset-list-content">
-                                <div class="dataset-list-content-label"></div>
-                                <div class="dataset-list-content-value listDesc">
-                                    <span data-bind="text: DatasetDesc"></span>
-                                </div>
-                            </div>
-                            <div class="dataset-list-content">
-                                <span class="custom-glyphiconz" aria-hidden="true" />
-                                <div class="dataset-list-content-label">
-                                    <div>
-                                        <div class="ownerDate" style="text-align : left;">
-                                            <span class="textBold ownerDate" data-bind="css : Color">Sentry Owner:&nbsp;</span>
-                                            <span data-bind="text: SentryOwner"></span>
-
-                                            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-
-                                            <!-- ko ifnot: Type === "RPT" -->
-                                            <span class=" textBold ownerDate" data-bind="css : Color">Last Activity Date:&nbsp;</span>
-                                            <span data-bind="text: ChangedDtm"></span>
-                                            <!-- /ko -->
-                                            <!-- ko if: Type === "RPT" -->
-                                            <span class=" textBold ownerDate" data-bind="css : Color">Refresh Frequency:&nbsp;</span>
-                                            <span data-bind="text: UpdateFrequency"></span>
-
-                                            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                                            <span class="textBold ownerDate link-btn btn btn-sm btn-info disregardParentClick" title="Go to the detail page">
-                                                <span class="disregardParentClick">Detail</span>
-                                            </span>
-                                            <!-- /ko -->
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
-
-                    </ul>
-                    
                     <hr>
                     <!-- ko if: searchResults().length == 0 -->
                     <div>
@@ -209,28 +222,6 @@
         </div>
     </div>
 </div>
-
-<style>
-
-    .disregardParentClick{
-        float: right;
-        margin-top: -3px;
-        margin-right: 1px;
-    }
-
-    .link-btn {
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-
-    .ul-dataset-list-item:hover {
-        opacity: 0.95;
-
-        box-shadow: 2px 6px 10px #888888;
-        cursor: pointer;
-    }
-
-</style>
 
 @section Scripts {
     <script>
@@ -498,6 +489,7 @@
                 return false;
             };
 
+            self.CreatedDtm = data.CreatedDtm;
             self.ChangedDtm = data.ChangedDtm;
             self.Color = data.Color;
 
@@ -528,10 +520,6 @@
                 }
             });
 
-
-            //this.header = ko.pureComputed(function () {
-            //    return this.currentProfit() < 0 ? "profitWarning" : "profitPositive";
-            //}, viewModel);
         }
 
         function ListViewModel() {
@@ -552,7 +540,7 @@
             self.ExtensionFilters = ko.observableArray([]);
             self.TagFilters = ko.observableArray([]);
 
-            self.FilterDatasets = function (datasets) {
+            self.FilterDatasets = function (datasets, sortVal) {
                 //First grab all the selected category ID's
                 var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
 
@@ -679,10 +667,11 @@
                     });
                 }
 
-                return datasets;
+                return sortTheResults(sortVal, datasets);
             };
 
-            self.FilterExhibits = function (exhibits) {
+            self.FilterExhibits = function (exhibits, sortVal) {
+                
                 //First grab all the selected category ID's
                 var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
                     if (feature.substring(0, 3) == '2_0') {
@@ -903,7 +892,8 @@
                     });
                 }
 
-                return exhibits;
+                return sortTheResults(sortVal, exhibits);
+
             };
 
             self.FilterGeneric = function (allObjects) {
@@ -1533,7 +1523,7 @@
             });
 
             self.searchResults = ko.computed(function () {
-
+                
                 if (!loaded) {
                     var list = JSON.parse(localStorage.getItem("filteredIds"));
 
@@ -1604,9 +1594,9 @@
                 var selectedCategoryList = [];
 
                 if (self.SearchType() == "Datasets") {
-                    queryResults = self.FilterDatasets(queryResults);
+                    queryResults = self.FilterDatasets(queryResults, $("#sort-results").val());
                 } else if (self.SearchType() == "BusinessIntelligence") {
-                    queryResults = self.FilterExhibits(queryResults);
+                    queryResults = self.FilterExhibits(queryResults, $("#sort-results").val());
                 } else {
                     queryResults = self.FilterGeneric(queryResults);
                 }
@@ -1616,6 +1606,9 @@
                 return queryResults;
             }).extend({ paged: {pageSize: 20}});  // .extend() is for the knockout-paging plugin
 
+            self.sortExhibits = function () {
+                self.datasets.valueHasMutated();
+            };
 
             self.SelectedFilters.subscribe(function () {
                 localStorage.setItem("filteredIds", ko.toJSON(self.SelectedFilters()));
@@ -1740,6 +1733,38 @@
             var regex = /\/Search\/(\w+)/,
                 url = window.location.href;
             return regex.exec(url)[1];
+        }
+        
+        function sortTheResults(sortVal, items) {
+            switch (parseInt(sortVal)) {
+                case @((int)DatasetSortByOption.Alphabetical):
+                    return items.sort(function (left, right) {
+                        return left.DatasetName == right.DatasetName ? 0 : (left.DatasetName < right.DatasetName ? -1 : 1)
+                    });
+                    break;
+                case @((int)DatasetSortByOption.Favorites):
+                    return items.sort(function (left, right) {
+                        return right.IsFavorite - left.IsFavorite;
+                    });
+                    break;
+                case @((int)DatasetSortByOption.MostAccessed):
+                    return items.sort(function (left, right) {
+                        return right.PageViews - left.PageViews;
+                    });
+                    break;
+                case @((int)DatasetSortByOption.RecentlyAdded):
+                    return items.sort(function (left, right) {
+                        return new Date(right.CreatedDtm) - new Date(left.CreatedDtm);
+                    });
+                    break;
+                case @((int)DatasetSortByOption.RecentlyUpdated):
+                    return items.sort(function (left, right) {
+                        return new Date(right.ChangedDtm) - new Date(left.ChangedDtm);
+                    });
+                    break;
+                default:
+                    return items;
+            }
         }
 
     </script>

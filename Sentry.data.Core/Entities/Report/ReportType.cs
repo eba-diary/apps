@@ -9,6 +9,7 @@ namespace Sentry.data.Core
     public enum ReportType
     {
         Tableau = 0,
-        Excel = 1
+        Excel = 1,
+        BusinessObjects = 2
     }
 }

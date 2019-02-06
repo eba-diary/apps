@@ -1,4 +1,4 @@
-﻿INSERT into [SentryDatasets_NR].[dbo].[FileExtension]
+﻿INSERT into [FileExtension]
   ([Extension_NME]
       ,[Created_DTM]
       ,[CreateUser_ID]) values

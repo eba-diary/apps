@@ -83,14 +83,14 @@
 
             <div class="form-group">
                 @Html.LabelFor((model) => model.FileExtensionID, new { @class = "control-label col-md-2" })
-                <div class="col-md-2">
+                <div class="col-md-10">
                     @Html.DropDownListFor(model => model.FileExtensionID, Model.ExtensionList, new { @class = "form-control edit-dataset-row" })
                 </div>
             </div>
 
             <div class="form-group">
                 @Html.LabelFor((model) => model.Delimiter, new { @class = "control-label col-md-2 optional" })
-                <div class="col-md-2">
+                <div class="col-md-10">
                     @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control edit-dataset-row" })
                 </div>
             </div>
@@ -98,7 +98,11 @@
             <div class="form-group fieldDescription">
                 <label class="control-label col-md-2"></label>
                 <div class="col-md-10">
-                    <span class="text-muted"><em id="fileTypeInfo"></em>The character or set of characters used to delimit the file.</span>
+                    <span class="text-muted">
+                        <em id="fileTypeInfo"></em>The character or set of characters used to delimit a file.
+                        <br />
+                        Note: When uploading a tab ( \t ) or pipe ( | ) delimited file please choose the DELIMITED file extension option.  If your file is comma delimited please choose the CSV file extension option.
+                    </span>
                 </div>
             </div>
 
