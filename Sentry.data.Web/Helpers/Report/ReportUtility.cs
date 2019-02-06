@@ -142,7 +142,7 @@ namespace Sentry.data.Web.Helpers
 
             temp.Add(new SelectListItem()
             {
-                Text = "Pick a Frequency",
+                Text = "Select Frequency",
                 Value = "0",
                 Selected = true,
                 Disabled = true
@@ -150,12 +150,19 @@ namespace Sentry.data.Web.Helpers
 
             model.AllFrequencies = temp.OrderBy(x => x.Value);
 
-            model.AllDataFileTypes = default(ReportType).ToEnumSelectList(((BusinessIntelligenceModel)model).FileTypeId.ToString());
-            
-            //model.AllDataFileTypes = Enum.GetValues(typeof(ReportType)).Cast<ReportType>().Select(v
-            //    => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+            temp = default(ReportType).ToEnumSelectList(((BusinessIntelligenceModel)model).FileTypeId.ToString()).ToList();
 
+            temp.Add(new SelectListItem()
+            {
+                Text = "Select Exhibit Type",
+                Value = "0",
+                Selected = true,
+                Disabled = true
+            });
+
+            model.AllDataFileTypes = temp;
         }
+
         public static IEnumerable<SelectListItem> GetCategoryList(IDatasetContext _datasetContext)
         {
             IEnumerable<SelectListItem> var = _datasetContext.Categories.Where(x=> x.ObjectType == GlobalConstants.DataEntityTypes.REPORT).
