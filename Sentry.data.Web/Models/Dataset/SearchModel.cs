@@ -58,7 +58,7 @@ namespace Sentry.data.Web
             {
                 this.ChangedDtm = ds.ChangedDtm.ToShortDateString();
             }
-            this.ChangedDtm = ds.ChangedDtm.ToShortDateString();
+
             this.Type = ds.DatasetType;
 
             if (ds.DatasetType == GlobalConstants.DataEntityTypes.REPORT)
@@ -76,6 +76,8 @@ namespace Sentry.data.Web
                 this.Link = "/Dataset/Detail/" + ds.DatasetId;
                 this.DistinctFileExtensions = ds.DatasetFiles.Select(x => Utilities.GetFileExtension(x.FileName).ToLower()).Distinct().ToList();
             }
+
+            this.CreatedDtm = ds.DatasetDtm.ToShortDateString();
         }
 
         public string Category { get; set; }
@@ -101,6 +103,7 @@ namespace Sentry.data.Web
         public Boolean IsSensitive { get; set; }
 
         public string ChangedDtm { get; set; }
+        public string CreatedDtm { get; set; }
 
         public string Color { get; set; }
         public string BannerColor { get; set; }
@@ -114,5 +117,6 @@ namespace Sentry.data.Web
         public Boolean CanEditDataset { get; set; }
         public List<string> BusinessUnits { get; set; }
         public List<string> DatasetFunctions { get; set; }
+        public int PageViews { get; set; }
     }
 }

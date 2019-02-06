@@ -1,4 +1,6 @@
-﻿@model Sentry.data.Web.SearchIndexModel
+﻿@using Sentry.data.Core.GlobalEnums;
+
+@model Sentry.data.Web.SearchIndexModel
 
 @{
     ViewBag.Title = "Datasets";
@@ -46,7 +48,7 @@
                             <ul class="list-unstyled ul-filter-list">
                                 <!-- ko foreach: OrderedFilters -->
                                 <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6">
-                                    <label data-bind="attr: { id: id }" style="display: block; font-weight: normal;">
+                                    <label data-bind="attr: { id: id }">
                                         <input type="checkbox" class="filterChbx"
                                                data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }" />
                                         <span data-bind="text : Title"></span>
@@ -60,7 +62,7 @@
                                     <!-- ko foreach: OrderedFilters -->
                                     <ul class="notNested">
                                         <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() >= 6">
-                                            <label data-bind="attr: { id: id }" style="display: block; font-weight: normal;">
+                                            <label data-bind="attr: { id: id }">
                                                 <input type="checkbox" class="filterChbx"
                                                        data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }" />
                                                 <span data-bind="text : Title"></span>
@@ -108,10 +110,10 @@
                     </div>
 
                     @* sorting control *@
-                    <div id="sort-option-wrapper" style="text-align: right; margin-top: 12px;">
-                        <div style="display:inline-block;">Sort by</div>
-                        <div style="display:inline-block;">
-                            <select id="sort-results" class="form-control" data-bind="event: { change: sortExhibits }">
+                    <div id="sort-option-wrapper">
+                        <div>Sort by</div>
+                        <div>
+                            <select id="sort-results" class="form-control" data-bind="event: { change: window.vm.sortExhibits() }">
                                 @foreach (SelectListItem sortOption in Model.SortByOptions)
                                 {
                                     <option value="@sortOption.Value">@sortOption.Text</option>
@@ -121,7 +123,7 @@
                     </div>
 
                     <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults.pageItems">
-                        <li class="ul-dataset-list-item borderSide_gray boxShadowSm" style="background-color: white;" data-bind="css : BorderColor, click: TileClicked, attr: { title: PrimaryTitle }">
+                        <li class="ul-dataset-list-item borderSide_gray boxShadowSm" data-bind="css : BorderColor, click: TileClicked, attr: { title: PrimaryTitle }">
                             <div data-bind="if: $index > 20"></div>
                             <div class="category-type-wrap">
                                 <div class="glyphicon glyphicon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none"></div>
@@ -137,9 +139,9 @@
                                     <span data-bind="text: $data" />
                                 </div>
                                 <!-- /ko -->
-                                <span data-bind="text: DatasetName" style="font-size: larger; font-weight: bolder; color: #003DA5;"></span>
+                                <span class="search-dataset-name" data-bind="text: DatasetName"></span>
                                 <!-- ko if: IsSensitive-->
-                                <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure" style="padding-left: 10px;"></i>
+                                <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure"></i>
                                 <!-- /ko -->
                             </div>
 
@@ -153,7 +155,7 @@
                                 <span class="custom-glyphiconz" aria-hidden="true" />
                                 <div class="dataset-list-content-label">
                                     <div>
-                                        <div class="ownerDate" style="text-align : left;">
+                                        <div class="ownerDate">
                                             <span class="textBold ownerDate" data-bind="css : Color">Sentry Owner:&nbsp;</span>
                                             <span data-bind="text: SentryOwner"></span>
 
@@ -220,28 +222,6 @@
         </div>
     </div>
 </div>
-
-<style>
-
-    .disregardParentClick{
-        float: right;
-        margin-top: -3px;
-        margin-right: 1px;
-    }
-
-    .link-btn {
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-
-    .ul-dataset-list-item:hover {
-        opacity: 0.95;
-
-        box-shadow: 2px 6px 10px #888888;
-        cursor: pointer;
-    }
-
-</style>
 
 @section Scripts {
     <script>
@@ -509,6 +489,7 @@
                 return false;
             };
 
+            self.CreatedDtm = data.CreatedDtm;
             self.ChangedDtm = data.ChangedDtm;
             self.Color = data.Color;
 
@@ -539,10 +520,6 @@
                 }
             });
 
-
-            //this.header = ko.pureComputed(function () {
-            //    return this.currentProfit() < 0 ? "profitWarning" : "profitPositive";
-            //}, viewModel);
         }
 
         function ListViewModel() {
@@ -693,7 +670,8 @@
                 return datasets;
             };
 
-            self.FilterExhibits = function (exhibits) {
+            self.FilterExhibits = function (exhibits, sortVal) {
+                
                 //First grab all the selected category ID's
                 var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
                     if (feature.substring(0, 3) == '2_0') {
@@ -914,7 +892,36 @@
                     });
                 }
 
-                return exhibits;
+                switch (parseInt(sortVal)) {
+                    case @((int)DatasetSortByOption.Alphabetical):
+                        return exhibits.sort(function (left, right) {
+                            return left.DatasetName == right.DatasetName ? 0 : (left.DatasetName < right.DatasetName ? -1 : 1)
+                        });
+                        break;
+                    case @((int)DatasetSortByOption.Favorites):
+                        return exhibits.sort(function (left, right) {
+                            return right.IsFavorite - left.IsFavorite;
+                        });
+                        break;
+                    case @((int)DatasetSortByOption.MostAccessed):
+                        return exhibits.sort(function (left, right) {
+                            return right.PageViews - left.PageViews;
+                        });
+                        break;
+                    case @((int)DatasetSortByOption.RecentlyAdded):
+                        return exhibits.sort(function (left, right) {
+                            return new Date(right.CreatedDtm) - new Date(left.CreatedDtm);
+                        });
+                        break;
+                    case @((int)DatasetSortByOption.RecentlyUpdated):
+                        return exhibits.sort(function (left, right) {
+                            return new Date(right.ChangedDtm) - new Date(left.ChangedDtm);
+                        });
+                        break;
+                    default:
+                        return exhibits;
+                }
+
             };
 
             self.FilterGeneric = function (allObjects) {
@@ -1504,10 +1511,6 @@
                 return what === getDetailType();
             };
 
-            self.sortExhibits = function (whathere) {
-                console.log(whathere);
-            };
-
             var loaded = false;
 
             var categoryLookup = {};
@@ -1548,7 +1551,7 @@
             });
 
             self.searchResults = ko.computed(function () {
-
+                
                 if (!loaded) {
                     var list = JSON.parse(localStorage.getItem("filteredIds"));
 
@@ -1621,7 +1624,7 @@
                 if (self.SearchType() == "Datasets") {
                     queryResults = self.FilterDatasets(queryResults);
                 } else if (self.SearchType() == "BusinessIntelligence") {
-                    queryResults = self.FilterExhibits(queryResults);
+                    queryResults = self.FilterExhibits(queryResults, $("#sort-results").val());
                 } else {
                     queryResults = self.FilterGeneric(queryResults);
                 }
@@ -1631,6 +1634,9 @@
                 return queryResults;
             }).extend({ paged: {pageSize: 20}});  // .extend() is for the knockout-paging plugin
 
+            self.sortExhibits = function () {
+                self.datasets.valueHasMutated();
+            };
 
             self.SelectedFilters.subscribe(function () {
                 localStorage.setItem("filteredIds", ko.toJSON(self.SelectedFilters()));
