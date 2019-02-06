@@ -109,16 +109,32 @@
                         </select>
                     </div>
 
-                    @* sorting control *@
-                    <div id="sort-option-wrapper">
-                        <div>Sort by</div>
-                        <div>
-                            <select id="sort-results" class="form-control" data-bind="event: { change: window.vm.sortExhibits() }">
-                                @foreach (SelectListItem sortOption in Model.SortByOptions)
-                                {
-                                    <option value="@sortOption.Value">@sortOption.Text</option>
-                                }
+                    <div id="search-tile-header">
+                        @* number of items option *@
+                        <div id="nbr-search-results-wrapper" class="float-l">
+                            Showing
+
+                            <select id="search-results-choices" class="form-control" data-bind="event: { change: window.vm.limitSearchResults() }">
+                                <option value="15" selected>15</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="All">All</option>
                             </select>
+
+                            results
+                        </div>
+
+                        @* sorting control *@
+                        <div id="sort-option-wrapper" class="float-r">
+                            <div>Sort by</div>
+                            <div>
+                                <select id="sort-results" class="form-control" data-bind="event: { change: window.vm.sortExhibits() }">
+                                    @foreach (SelectListItem sortOption in Model.SortByOptions)
+                                    {
+                                        <option value="@sortOption.Value">@sortOption.Text</option>
+                                    }
+                                </select>
+                            </div>
                         </div>
                     </div>
 
@@ -180,22 +196,8 @@
                             </div>
                         </li>
                     </ul>
-                    
+
                     <div id="search-tile-footer" class="text-right">
-
-                        @* number of items option *@
-                        <div id="nbr-search-results-wrapper" class="footer-container">
-                            Showing
-                            
-                            <select id="search-results-choices" class="form-control" data-bind="event: { change: window.vm.limitSearchResults() }">
-                                <option value="15" selected>15</option>
-                                <option value="25">25</option>
-                                <option value="50">50</option>
-                                <option value="All">All</option>
-                            </select>
-
-                            results
-                        </div>
 
                         @* search results info display *@
                         <div id="search-results-wrapper" class="footer-container">

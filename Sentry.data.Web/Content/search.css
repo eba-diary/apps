@@ -19,13 +19,18 @@
     font-weight: normal;
 }
 
-#sort-option-wrapper {
-    text-align: right;
-    margin-top: 12px;
+#nbr-search-results-wrapper {
+    font-feature-settings: "lnum";
 }
-    #sort-option-wrapper div {
-        display: inline-block;
-    }
+
+#search-tile-header {
+    overflow: hidden;
+    margin-top: 22px;
+}
+
+#sort-option-wrapper div {
+    display: inline-block;
+}
 
 .search-dataset-name {
     font-size: larger;
@@ -52,10 +57,6 @@
     border-right: 1px solid #ccc;
     line-height: 40px;
     vertical-align: middle;
-}
-
-#nbr-search-results-wrapper {
-    font-feature-settings: "lnum";
 }
 
 #search-results-wrapper {
