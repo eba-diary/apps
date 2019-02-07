@@ -7,6 +7,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Description;
+using Swashbuckle.Examples;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -66,11 +69,12 @@ namespace Sentry.data.Web.Controllers
         /// <summary>
         /// gets schema metadata
         /// </summary>
-        /// <param name="SchemaID"></param>
+        /// <param name="SchemaID">Schema Id assigned to given schema</param>
         /// <returns></returns>
         [HttpGet]
         [Route("schemas/{SchemaID}")]
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK,null,typeof(SchemaModel))]
         public async Task<IHttpActionResult> GetBasicMetadataInformationForSchema(int SchemaID)
         {
             SchemaDTO dto = _configService.GetSchemaDTO(SchemaID);
@@ -186,6 +190,7 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         [Route("datasets/{DatasetConfigID}/schemas/{SchemaID}/columns")]
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(OutputSchema))]
         public async Task<IHttpActionResult> GetColumnSchemaInformationFor(int DatasetConfigID, int SchemaID = 0)
         {
             DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
@@ -202,21 +207,13 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         [Route("schemas/{SchemaID}/columns")]
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaDetailModel))]
         public async Task<IHttpActionResult> GetColumnSchemaInformationForSchema(int SchemaID)
         {
+            SchemaDetailDTO dto = _configService.GetSchemaDetailDTO(SchemaID);
+            SchemaDetailModel sdm = new SchemaDetailModel(dto);
 
-            IList<ColumnDTO> dto = _configService.GetColumnDTO(SchemaID);
-            IList<ColumnModel> modelList = new List<ColumnModel>();
-            foreach (ColumnDTO column in dto)
-            {
-                modelList.Add(new ColumnModel(column));
-            }
-            
-            return Ok(modelList);
-
-            //DataElement schema = _dsContext.GetById<DataElement>(SchemaID);
-
-            //return await GetColumnSchema(schema.DatasetFileConfig, SchemaID);
+            return Ok(sdm);
         }
 
 

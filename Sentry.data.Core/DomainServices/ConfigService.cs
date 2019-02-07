@@ -28,7 +28,18 @@ namespace Sentry.data.Core
         }
         public SchemaDTO GetSchemaDTO(int id)
         {
-            return MapToDto(_datasetContext.GetById<DataElement>(id));
+            DataElement de = _datasetContext.GetById<DataElement>(id);
+            SchemaDTO dto = new SchemaDTO();
+            MapToDto(de, dto);
+            return dto;
+        }
+
+        public SchemaDetailDTO GetSchemaDetailDTO(int id)
+        {
+            DataElement de = _datasetContext.GetById<DataElement>(id);
+            SchemaDetailDTO dto = new SchemaDetailDTO();
+            MaptToDetailDto(de, dto);
+            return dto;
         }
 
         public IList<ColumnDTO> GetColumnDTO(int id)
@@ -267,20 +278,47 @@ namespace Sentry.data.Core
         //    _datasetContext.SaveChanges();
         //}
 
-        private SchemaDTO MapToDto(DataElement dataElement)
+        private void MapToDto(DataElement de, SchemaDTO dto)
         {
-            SchemaDTO dto = new SchemaDTO()
-            {
-                SchemaID = dataElement.DataElement_ID,
-                Format = dataElement.FileFormat,
-                Delimiter = dataElement.Delimiter,
-                Header = true,
-                HiveDatabase = dataElement.HiveDatabase,
-                HiveTable = dataElement.HiveTable,
-                HiveStatus = dataElement.HiveTableStatus
-            };
+            dto.SchemaID = de.DataElement_ID;
+            dto.Format = de.FileFormat;
+            dto.Delimiter = de.Delimiter;
+            dto.Header = true;
+            dto.HiveDatabase = de.HiveDatabase;
+            dto.HiveTable = de.HiveTable;
+            dto.HiveStatus = de.HiveTableStatus;
+        }
 
-            return dto;
+        private void MaptToDetailDto(DataElement de, SchemaDetailDTO dto)
+        {
+            MapToDto(de, dto);
+
+            List<SchemaRow> rows = new List<SchemaRow>();
+            DataObject dobj = de.DataObjects.FirstOrDefault();
+            IList<DataObjectField> dofs = (dobj != null) ? dobj.DataObjectFields : null;
+
+            if (dofs != null)
+            {
+                foreach (DataObjectField b in dofs)
+                {
+                    SchemaRow r = new SchemaRow()
+                    {
+                        Name = b.DataObjectField_NME,
+                        DataObjectField_ID = b.DataObjectField_ID,
+                        Description = b.DataObjectField_DSC,
+                        LastUpdated = b.LastUpdt_DTM.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds
+                    };
+
+                    r.Type = (!String.IsNullOrEmpty(b.DataType)) ? b.DataType.ToUpper() : "VARCHAR";
+                    if (b.Precision != null) { r.Precision = b.Precision ?? null; }
+                    if (b.Scale != null) { r.Scale = b.Scale ?? null; }
+                    if (b.Nullable != null) { r.Nullable = b.Nullable ?? null; }
+                    if (b.Length != null) { r.Length = b.Length ?? null; }
+                    rows.Add(r);
+                }
+            }            
+
+            dto.rows = rows;
         }
         private IList<ColumnDTO> MapToDto(IList<DataObject> objects)
         {

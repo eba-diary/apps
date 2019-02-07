@@ -21,6 +21,7 @@ namespace Sentry.data.Core
         }
 
         public virtual int Id { get; set; }
+        public virtual Guid JobGuid { get; set; }
         public virtual string Schedule { get; set; }
         public virtual string TimeZone { get; set; }
 

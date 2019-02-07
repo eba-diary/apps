@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Sentry.data.Core.Entities.Livy;
 using Swashbuckle.Swagger.Annotations;
+using Sentry.Common.Logging;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -287,6 +288,7 @@ namespace Sentry.data.Web.Controllers
 
                 if (!job.DataSource.Is<JavaAppSource>())
                 {
+                    Logger.Debug($"BadRequest - Only accepts jobs with JavaApp datasource. JobId:{JobId} JobGuid:{JobGuid}");
                     return BadRequest("This only submits job defined with a data source type of JavaApp");
                 }
 
@@ -434,16 +436,19 @@ namespace Sentry.data.Web.Controllers
                     }
                     else if (response.StatusCode == HttpStatusCode.BadRequest)
                     {
+                        Logger.Debug($"BadRequest from Spark (Job\\Submit) - JobId:{JobId} JobGuid:{JobGuid} javaOptionsOverride:{JsonConvert.SerializeObject(javaOptionsOverride)}");
                         return BadRequest(response.Content.ReadAsStringAsync().Result);
                     }
                     else
                     {
+                        Logger.Debug($"Status NotFound (Job\\Submit) - JobId:{JobId} JobGuid:{JobGuid} javaOptionsOverride:{JsonConvert.SerializeObject(javaOptionsOverride)}");
                         return NotFound();
                     }
                 }
             }
             catch (Exception ex)
             {
+                Logger.Error("Internal Error (Job\\Submit) - JobId:{JobId} JobGuid:{JobGuid} javaOptionsOverride:{JsonConvert.SerializeObject(javaOptionsOverride)}", ex);
                 return InternalServerError(ex);
             }
         }
