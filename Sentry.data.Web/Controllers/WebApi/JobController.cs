@@ -448,7 +448,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch (Exception ex)
             {
-                Logger.Error("Internal Error (Job\\Submit) - JobId:{JobId} JobGuid:{JobGuid} javaOptionsOverride:{JsonConvert.SerializeObject(javaOptionsOverride)}", ex);
+                Logger.Error($"Internal Error (Job\\Submit) - JobId:{JobId} JobGuid:{JobGuid} javaOptionsOverride:{JsonConvert.SerializeObject(javaOptionsOverride)}", ex);
                 return InternalServerError(ex);
             }
         }
