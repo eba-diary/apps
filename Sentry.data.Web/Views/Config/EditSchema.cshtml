@@ -62,6 +62,12 @@
                 @Html.ValidationMessageFor(model => model.Delimiter, "", new { @class = "text-danger" })
             </div>
         </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.HasHeader, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.CheckBoxFor(model => model.HasHeader, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+            </div>
+        </div>
     </div>
 
     <hr />

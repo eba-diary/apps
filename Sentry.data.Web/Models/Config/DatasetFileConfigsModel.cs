@@ -124,6 +124,7 @@ namespace Sentry.data.Web
         public string ConfigFileDesc { get; set; }
 
         public string Delimiter { get; set; }
+        public bool HasHeader { get; set; }
 
         public int DatasetId { get; set; }
         public string EditHref

@@ -83,14 +83,14 @@
 
             <div class="form-group">
                 @Html.LabelFor((model) => model.FileExtensionID, new { @class = "control-label col-md-2" })
-                <div class="col-md-2">
+                <div class="col-md-10">
                     @Html.DropDownListFor(model => model.FileExtensionID, Model.ExtensionList, new { @class = "form-control edit-dataset-row" })
                 </div>
             </div>
 
             <div class="form-group">
                 @Html.LabelFor((model) => model.Delimiter, new { @class = "control-label col-md-2 optional" })
-                <div class="col-md-2">
+                <div class="col-md-10">
                     @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control edit-dataset-row" })
                 </div>
             </div>
@@ -98,44 +98,29 @@
             <div class="form-group fieldDescription">
                 <label class="control-label col-md-2"></label>
                 <div class="col-md-10">
-                    <span class="text-muted"><em id="fileTypeInfo"></em>The character or set of characters used to delimit the file.</span>
-                </div>
-            </div>
-
-            @*
-            <div class="form-group">
-                @Html.LabelFor((model) => model.DataElement_ID, new { @class = "control-label col-md-2", @style = "font-weight: 100;" })
-                <div class="col-md-2">
-                    @Html.TextBoxFor(model => model.DataElement_ID, new { @type = "number", @value = "", @class = "form-control edit-dataset-row" })
-                </div>
-            </div>
-
-            <div class="form-group fieldDescription">
-                <label class="control-label col-md-2"></label>
-                <div class="col-md-10">
                     <span class="text-muted">
-                        <em> Data.Sentry.com has ID's associated to the Schema / Metadata Repository.  This can be set to 0 and filled in later.</em>
+                        <em id="fileTypeInfo"></em>The character or set of characters used to delimit a file.
+                        <br />
+                        Note: When uploading a tab ( \t ) or pipe ( | ) delimited file please choose the DELIMITED file extension option.  If your file is comma delimited please choose the CSV file extension option.
                     </span>
                 </div>
             </div>
 
             <div class="form-group">
-            @Html.LabelFor((model) => model.DropPath, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.EditorFor((model) => model.DropPath, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
-                @Html.ValidationMessageFor((model) => model.DropPath, "", new { @class = "text-danger" })
+                @Html.LabelFor(model => model.HasHeader, new { @class = "control-label col-md-2 optional" })
+                <div class="col-md-10">
+                    @Html.CheckBoxFor(model => model.HasHeader, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                </div>
             </div>
-        </div>
-        <div class="form-group fieldDescription">
-            <label class="control-label col-md-2"></label>
-            <div class="col-md-10">
-                <span class="text-muted">
-                    <em>
-                        <b> Warning:</b> Files that are dropped here will be deleted when the upload to this site is complete.  If this does not work for you then please create a staging location, a copy of the file, or <a href="mailto:DSCSupport@sentry.com?Subject=File_Drop_Location"> click here to contact site Administrators</a>
-                    </em>
-                </span>
+
+            <div class="form-group hadHeaderDescription">
+                <label class="control-label col-md-2"></label>
+                <div class="col-md-10">
+                    <span class="text-muted"><em id="hadHeaderInfo"></em>Do incoming files contain a header row.</span>
+                </div>
             </div>
-        </div>*@
+
+
         </div>
         <hr />
         <div class="form-group">
@@ -154,30 +139,7 @@
     @*@Scripts.Render("~/bundles/jqueryval")*@
     <script>
         $(function () {
-            //data.Dataset.EditInit();
-
-            var dropPathName = $("#DropPath").val();
-
-            if (dropPathName.substring(dropPathName.length - 1) !== "\\") {
-                dropPathName += "\\";
-            }
-
-            $("#ConfigFileName").keyup(function () {
-                var newName = dropPathName + $("#ConfigFileName").val().toLowerCase().replace(new RegExp(" ", "g"), "_") + "\\";
-                $("#DropPath").val(newName);
-
-            });
-
-            $("[id^='detailSectionHeader_']").click(function (e) {
-                e.preventDefault();
-
-                var id = $(this).attr("id");
-                var category = "#hide_" + id
-                var icon = "#icon_" + id;
-
-                $(category).slideToggle();
-                $(icon).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
-            });
+            data.Config.CreateInit();            
         });
     </script>
 }

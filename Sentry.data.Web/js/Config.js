@@ -4,6 +4,37 @@
 
 data.Config = {
 
+    CreateInit: function () {
+
+        $('#Delimiter').prop("readonly", "readonly");
+        $('#HasHeader').prop("readonly", false);
+        $('#HasHeader').prop("disabled", false);
+
+        $("#FileExtensionID").change(function () {
+            switch ($('#FileExtensionID option:selected').text()) {
+                case "CSV":
+                    $('#Delimiter').text(',');
+                    $('#Delimiter').val(',');
+                    $('#Delimiter').prop("readonly", "readonly");
+                    $('#HasHeader').prop("readonly", false);
+                    $('#HasHeader').prop("disabled", false);
+                    break;
+                case "DELIMITED":
+                    $('#Delimiter').val('');
+                    $('#Delimiter').prop("readonly", "");
+                    $('#HasHeader').prop("readonly", false);
+                    $('#HasHeader').prop("disabled", false);
+                    break;
+                default:
+                    $('#Delimiter').val('');
+                    $('#Delimiter').prop("readonly", "readonly");
+                    $('#HasHeader').prop("readonly", true);
+                    $('#HasHeader').prop("disabled", true);
+                    break;
+            }
+        });
+    },
+
     ExtensionInit: function() {
         $('#btnCreateExtensionMapping').click(function () {
             var data = $('#ExtensionForm').serialize();
