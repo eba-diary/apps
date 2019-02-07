@@ -8,7 +8,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
-using Swashbuckle.Examples;
 using Swashbuckle.Swagger.Annotations;
 
 namespace Sentry.data.Web.Controllers
