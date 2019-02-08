@@ -11,11 +11,13 @@ namespace Sentry.data.Core
     {
 
         private readonly IDatasetContext _datasetContext;
+        private readonly IEmailService _emailService;
         private readonly UserService _userService;
 
-        public BusinessIntelligenceService(IDatasetContext datasetContext, UserService userService)
+        public BusinessIntelligenceService(IDatasetContext datasetContext, IEmailService emailService, UserService userService)
         {
             _datasetContext = datasetContext;
+            _emailService = emailService;
             _userService = userService;
         }
 
@@ -95,11 +97,37 @@ namespace Sentry.data.Core
         {
             List<string> errors = new List<string>();
 
-            if (_datasetContext.Datasets.Where(w => w.DatasetName == dto.DatasetName &&
+            if (dto.DatasetId == 0 && _datasetContext.Datasets.Where(w => w.DatasetName == dto.DatasetName &&
                                                                         w.DatasetCategories.Any(x => dto.DatasetCategoryIds.Contains(x.Id)) &&
                                                                         w.DatasetType == GlobalConstants.DataEntityTypes.REPORT)?.Count() > 0)
             {
                 errors.Add("Dataset name already exists within category");
+            }
+
+            if (dto.FileTypeId == (int)ReportType.Excel)
+            {
+                int pos = dto.Location.LastIndexOf('\\');
+                string directory = dto.Location.Substring(0, pos);
+                try
+                {
+                    Directory.GetAccessControl(directory);
+                    File.GetAccessControl(dto.Location);
+                    var file = File.OpenRead(dto.Location);
+                    file.Close();
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Message == "Attempted to perform an unauthorized operation.")
+                    {
+                        errors.Add("This file can’t be accessed by data.sentry.com.  DSCSupport@sentry.com has been notified.  You will be contacted when the exhibit can be created.");
+
+                        _emailService.SendInvalidReportLocationEmail(dto, _userService.GetCurrentUser().DisplayName);
+                    }
+                    else
+                    {
+                        errors.Add($"An error occured finding the file. Please verify the file path is correct or contact DSCSupport@sentry.com for assistance.");
+                    }
+                }
             }
 
             return errors;
@@ -179,7 +207,7 @@ namespace Sentry.data.Core
         private void MapToDto(Dataset ds, BusinessIntelligenceDto dto)
         {
             string userDisplayname = _userService.GetByAssociateId(ds.SentryOwnerName)?.DisplayName;
-           
+
             dto.DatasetId = ds.DatasetId;
             dto.DatasetCategoryIds = ds.DatasetCategories.Select(x => x.Id).ToList();
             dto.DatasetBusinessUnitIds = ds.BusinessUnits.Select(x => x.Id).ToList();
@@ -205,7 +233,7 @@ namespace Sentry.data.Core
             dto.MailtoLink = "mailto:?Subject=Business%20Intelligence%20Exhibit%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/BusinessIntelligence/Detail/" + ds.DatasetId;
             dto.ReportLink = (ds.DatasetFileConfigs.First().FileTypeId == (int)ReportType.BusinessObjects && ds.Metadata.ReportMetadata.GetLatest) ? ds.Metadata.ReportMetadata.Location + GlobalConstants.BusinessObjectExhibit.GET_LATEST_URL_PARAMETER : ds.Metadata.ReportMetadata.Location;
 
-           // return dto;
+            // return dto;
         }
 
         private void MapToDetailDto(Dataset ds, BusinessIntelligenceDetailDto dto)
