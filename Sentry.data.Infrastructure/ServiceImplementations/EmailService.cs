@@ -24,7 +24,7 @@ namespace Sentry.data.Infrastructure
             MailMessage myMail = new System.Net.Mail.MailMessage();
             myMail.From = from;
 
-            myMail.Subject ="BI report location permission";
+            myMail.Subject = $"{Configuration.Config.GetDefaultEnvironmentName()} - BI report location permission";
 
             myMail.To.Add("DSCSupport@sentry.com");
 
