@@ -423,6 +423,7 @@ namespace Sentry.data.Web.Controllers
                         {
                             JobId = job,
                             BatchId = batchResult.Id,
+                            JobGuid = JobGuid,
                             State = batchResult.State,
                             LivyAppId = batchResult.Appid,
                             LivyDriverLogUrl = batchResult.AppInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault(),
@@ -457,11 +458,13 @@ namespace Sentry.data.Web.Controllers
         private static void GenerateArguments(string[] arguments, StringBuilder json)
         {
             json.Append($", \"args\": [");
-            int cnt = 1;
+            int iteration = 1;
+            int argcnt = arguments.Count();
             foreach (string arg in arguments)
             {
-                string argString = (cnt < arguments.Count()) ? $"\"{arg}\"," : $"\"{arg}\"]";
+                string argString = (iteration < argcnt) ? $"\"{arg}\"," : $"\"{arg}\"]";
                 json.Append(argString);
+                iteration++;
             }
         }
 
