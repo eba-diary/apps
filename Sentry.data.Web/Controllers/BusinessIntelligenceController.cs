@@ -98,7 +98,7 @@ namespace Sentry.data.Web.Controllers
                         bool IsSucessful = _businessIntelligenceService.UpdateAndSaveBusinessIntelligence(dto);
                         if (IsSucessful)
                         {
-                            _eventService.PublishSuccessEvent(GlobalConstants.EventType.UPDATED_REPORT, SharedContext.CurrentUser.AssociateId, crm.DatasetName + " was updated.", dto.DatasetId);
+                            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.UPDATED_REPORT, SharedContext.CurrentUser.AssociateId, crm.DatasetName + " was updated.", dto.DatasetId);
                             return RedirectToAction("Detail", new { id = dto.DatasetId });
                         }
                     }
