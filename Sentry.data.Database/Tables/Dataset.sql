@@ -3,7 +3,7 @@
 	[Dataset_NME] [varchar](1024) NOT NULL,
 	[Dataset_DSC] [varchar](4096) NULL,
 	[FileCreator_NME] [varchar](128) NOT NULL,
-	[PrimaryOwner_ID] [varchar](8) NULL,
+	[PrimaryOwner_ID] [varchar](8) NOT NULL,
 	[UploadedBy_NME] [varchar](128) NOT NULL,
 	[Origination_CDE] [varchar](16) NULL,
 	[Dataset_DTM] [datetime] NOT NULL,
@@ -15,7 +15,7 @@
     [Metadata] VARCHAR(MAX) NULL, 
     [Dataset_TYP] VARCHAR(3) NULL, 
     [DataClassification_CDE] INT NOT NULL DEFAULT 0 , 
-    [PrimaryContact_ID] VARCHAR(8) NOT NULL, 
+    [PrimaryContact_ID] VARCHAR(8) NOT NULL DEFAULT '000000', 
     [IsSecured_IND] BIT NOT NULL DEFAULT 0 , 
     [Security_ID] UNIQUEIDENTIFIER NULL, 
     PRIMARY KEY CLUSTERED 
