@@ -2703,7 +2703,18 @@ tr.shown td.details-control {
     width: 100% !important;
 }
 
-
+.accessRequestModelText {
+    text-align: center;
+    color: #00A3E0;
+    margin: 0px auto;
+    font-size: 17px;
+}
+.accessRequestErrorBox {
+    margin-bottom: 30px;
+    border: 1px solid red;
+    padding: 5px;
+    color:red;
+}
 
 .hero-media .container {
     display: block !important;

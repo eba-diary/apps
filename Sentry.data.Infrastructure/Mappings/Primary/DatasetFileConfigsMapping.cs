@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Sentry.data.Core;
 using NHibernate.Mapping.ByCode.Conformist;
 using NHibernate.Mapping.ByCode;
-using Sentry.data.Core.Entities.Metadata;
 
 namespace Sentry.data.Infrastructure.Mappings.Primary
 {

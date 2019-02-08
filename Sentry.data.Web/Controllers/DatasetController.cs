@@ -21,10 +21,12 @@ using Sentry.data.Common;
 using System.Diagnostics;
 using Sentry.Common.Logging;
 using Hangfire;
+using Sentry.Core;
 
 namespace Sentry.data.Web.Controllers
 {
     [SessionState(SessionStateBehavior.ReadOnly)]
+    [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_VIEW)]
     public class DatasetController : BaseController
     {
         public readonly IAssociateInfoProvider _associateInfoProvider;
@@ -32,34 +34,40 @@ namespace Sentry.data.Web.Controllers
         private readonly UserService _userService;
         private readonly S3ServiceProvider _s3Service;
         private readonly ISASService _sasService;
-        private readonly IRequestContext _requestContext;
-
+        private readonly IObsidianService _obsidianService;
         private readonly IDatasetService _datasetService;
         private readonly IEventService _eventService;
-        public DatasetController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, ISASService sasService, IAssociateInfoProvider associateInfoService, IRequestContext requestContext, IDatasetService datasetService, IEventService eventService)
+
+        public DatasetController(
+            IDatasetContext dsCtxt,
+            S3ServiceProvider dsSvc,
+            UserService userService,
+            ISASService sasService,
+            IAssociateInfoProvider associateInfoService,
+            IObsidianService obsidianService,
+            IDatasetService datasetService,
+            IEventService eventService)
         {
             _datasetContext = dsCtxt;
             _s3Service = dsSvc;
             _userService = userService;
             _sasService = sasService;
             _associateInfoProvider = associateInfoService;
-            _requestContext = requestContext;
+            _obsidianService = obsidianService;
             _datasetService = datasetService;
             _eventService = eventService;
         }
 
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult Index()
         {
             HomeModel hm = new HomeModel
             {
-                DatasetCount = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityTypes.DATASET).Count(),
-                Categories = _datasetContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityTypes.DATASET).ToList(),
-                CanEditDataset = SharedContext.CurrentUser.CanEditDataset,
-                CanUpload = SharedContext.CurrentUser.CanUpload
+                DatasetCount = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET).Count(),
+                Categories = _datasetContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityCodes.DATASET).ToList(),
+                CanEditDataset = SharedContext.CurrentUser.CanModifyDataset
             };
 
-            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Home Page", 0);
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Home Page", 0);
             return View(hm);
         }
 
@@ -67,7 +75,7 @@ namespace Sentry.data.Web.Controllers
         #region Dataset Modification
 
         [HttpGet]
-        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Create()
         {
             DatasetModel cdm = new DatasetModel()
@@ -80,26 +88,26 @@ namespace Sentry.data.Web.Controllers
 
             Utility.SetupLists(_datasetContext, cdm);
 
-            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Creation Page", cdm.DatasetId);
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Creation Page", cdm.DatasetId);
 
             return View("DatasetForm", cdm);
         }
 
         [HttpGet()]
-        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Edit(int id)
         {
             DatasetDto dto = _datasetService.GetDatasetDto(id);
             DatasetModel model = new DatasetModel(dto);
-
+            _obsidianService.GetUsersInGroup("App_DataMgmt_MngDS ");
             Utility.SetupLists(_datasetContext, model);
 
-            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Edit Page", id);
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Edit Page", id);
             return View("DatasetForm", model);
         }
 
         [HttpPost]
-        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult DatasetForm(DatasetModel model)
         {
             DatasetDto dto = model.ToDto();
@@ -108,21 +116,21 @@ namespace Sentry.data.Web.Controllers
             if (ModelState.IsValid)
             {
 
-                if(dto.DatasetId == 0)
+                if (dto.DatasetId == 0)
                 {
                     int datasetId = _datasetService.CreateAndSaveNewDataset(dto);
 
-                    _eventService.PublishSuccessEvent(GlobalConstants.EventType.CREATED_DATASET, SharedContext.CurrentUser.AssociateId, dto.DatasetName + " was created.", datasetId);
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.CREATED_DATASET, SharedContext.CurrentUser.AssociateId, dto.DatasetName + " was created.", datasetId);
                     return RedirectToAction("Detail", new { id = datasetId });
                 }
                 else
                 {
                     _datasetService.UpdateAndSaveDataset(dto);
 
-                    _eventService.PublishSuccessEvent(GlobalConstants.EventType.UPDATED_DATASET, SharedContext.CurrentUser.AssociateId, dto.DatasetName + " was created.", dto.DatasetId);
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.UPDATED_DATASET, SharedContext.CurrentUser.AssociateId, dto.DatasetName + " was created.", dto.DatasetId);
                     return RedirectToAction("Detail", new { id = dto.DatasetId });
                 }
-                
+
             }
 
             Utility.SetupLists(_datasetContext, model);
@@ -133,18 +141,43 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Dataset/Detail/{id}/")]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult Detail(int id)
         {
-            if (!SharedContext.CurrentUser.CanViewDataset)
-            {
-                throw new NotAuthorizedException("User is authenticated but does not have permission");
-            }
             DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
             DatasetDetailModel model = new DatasetDetailModel(dto);
 
-            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Page", dto.DatasetId);
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Page", dto.DatasetId);
             return View(model);
+        }
+
+        [HttpGet]
+        public ActionResult AccessRequest(int datasetId)
+        {
+            AccessRequestModel model = _datasetService.GetAccessRequest(datasetId).ToModel();
+            model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
+            return PartialView("_AccessRequest", model);
+        }
+
+        [HttpPost]
+        public ActionResult SubmitAccessRequest(AccessRequestModel model)
+        {
+            AccessRequest ar = model.ToCore();
+            string ticketId = _datasetService.RequestAccessToDataset(ar);
+
+            if (string.IsNullOrEmpty(ticketId))
+            {
+                return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
+            }
+            else
+            {
+                return PartialView("_Success", new SuccessModel("Dataset access was successfully requested.", "HPSM Change Id: " + ticketId, true));
+            }
+        }
+
+        [HttpGet]
+        public ActionResult CheckAdGroup(string adGroup)
+        {
+            return Json(_obsidianService.DoesGroupExist(adGroup), JsonRequestBehavior.AllowGet);
         }
 
         #endregion
@@ -152,7 +185,7 @@ namespace Sentry.data.Web.Controllers
         #region Dataset FILE Modification
 
         [HttpPost()]
-        [AuthorizeByPermission(PermissionNames.DatasetEdit)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditDatasetFile(int id, DatasetFileGridModel i)
         {
             try
@@ -195,7 +228,6 @@ namespace Sentry.data.Web.Controllers
 
 
         [HttpPost]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
         private void UpdateDatasetfileFromModel(DatasetFile df, DatasetFileGridModel dfgm)
         {
             DateTime now = DateTime.Now;
@@ -206,7 +238,6 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet()]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public PartialViewResult EditDatasetFile(int id)
         {
             DatasetFile df = _datasetContext.GetById<DatasetFile>(id);
@@ -224,19 +255,18 @@ namespace Sentry.data.Web.Controllers
 
         [Route("Dataset/Detail/{id}/Configuration")]
         [HttpGet]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult DatasetConfiguration(int id)
         {
             DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
             DatasetDetailModel model = new DatasetDetailModel(dto);
 
-            Task.Factory.StartNew(() => _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Configuration Page", dto.DatasetId), TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(() => _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Configuration Page", dto.DatasetId), TaskCreationOptions.LongRunning);
 
             return View("Configuration", model);
         }
 
         [HttpGet]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult Subscribe(int id)
         {
             Dataset ds = _datasetContext.GetById(id);
@@ -271,7 +301,6 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult Subscribe(SubscriptionModel sm)
         {
             IApplicationUser user = _userService.GetCurrentUser();
@@ -309,24 +338,24 @@ namespace Sentry.data.Web.Controllers
             return Redirect(Request.UrlReferrer.PathAndQuery);
         }
 
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public JsonResult GetDatasetFileInfoForGrid(int Id, Boolean bundle, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
             //IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
 
             List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
-            Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
-            Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
-            Boolean CanEdit = SharedContext.CurrentUser.CanEditDataset;
+
+            UserSecurity us = _datasetService.GetUserSecurityForConfig(Id);
+
 
             //Query the Dataset for the following information:
             foreach (DatasetFile df in _datasetContext.GetDatasetFilesForDatasetFileConfig(Id, x => !x.IsBundled).ToList())
             {
-                DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider);
-                dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
-                dfgm.CanDwnldSenstive = CanDwnldSenstive;
-                dfgm.CanEdit = CanEdit;
-                dfgm.CanPreview = true;
+                DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider)
+                {
+                    CanViewFullDataset = us.CanViewFullDataset,
+                    CanEditDataset = us.CanEditDataset,
+                    CanPreviewDataset = us.CanPreviewDataset
+                };
                 files.Add(dfgm);
             }
 
@@ -345,24 +374,23 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public JsonResult GetBundledFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
             //IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
             List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
-            Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
-            Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
-            Boolean CanEdit = SharedContext.CurrentUser.CanEditDataset;
+
+            UserSecurity us = _datasetService.GetUserSecurityForConfig(Id);
 
             List<DatasetFile> bundledList = _datasetContext.GetDatasetFilesForDatasetFileConfig(Id, w => w.IsBundled).ToList();
 
             foreach (DatasetFile df in bundledList)
             {
-                DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider);
-                dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
-                dfgm.CanDwnldSenstive = CanDwnldSenstive;
-                dfgm.CanEdit = CanEdit;
-                dfgm.CanPreview = true;
+                DatasetFileGridModel dfgm = new DatasetFileGridModel(df, _associateInfoProvider)
+                {
+                    CanViewFullDataset = us.CanViewFullDataset,
+                    CanEditDataset = us.CanEditDataset,
+                    CanPreviewDataset = us.CanPreviewDataset
+                };
                 files.Add(dfgm);
             }
 
@@ -372,23 +400,25 @@ namespace Sentry.data.Web.Controllers
 
         }
 
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public JsonResult GetVersionsOfDatasetFileForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
-            DatasetFile df = _datasetContext.GetDatasetFile(Id);
+            DatasetFile df = _datasetContext.DatasetFile.Where(x => x.DatasetFileId == Id).Fetch(x => x.DatasetFileConfig).FirstOrDefault();
 
             List<DatasetFileGridModel> files = new List<DatasetFileGridModel>();
-            Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
-            Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
-            Boolean CanEdit = SharedContext.CurrentUser.CanEditDataset;
 
-            foreach (DatasetFile dfversion in _datasetContext.GetDatasetFilesVersions(df.Dataset.DatasetId, df.DatasetFileConfig.ConfigId, df.FileName).ToList())
+            UserSecurity us = _datasetService.GetUserSecurityForConfig(Id);
+            List<DatasetFile> datasetFiles = _datasetContext.DatasetFile.Where(x => x.Dataset.DatasetId == df.Dataset.DatasetId &&
+                                                                                                                        x.DatasetFileConfig.ConfigId == df.DatasetFileConfig.ConfigId &&
+                                                                                                                        x.FileName == df.FileName).
+                                                                                                    Fetch(x => x.DatasetFileConfig).ToList();
+            foreach (DatasetFile dfversion in datasetFiles)
             {
-                DatasetFileGridModel dfgm = new DatasetFileGridModel(dfversion, _associateInfoProvider);
-                dfgm.CanDwnldNonSensitive = CanDwnldNonSensitive;
-                dfgm.CanDwnldSenstive = CanDwnldSenstive;
-                dfgm.CanEdit = CanEdit;
-                dfgm.CanPreview = false;
+                DatasetFileGridModel dfgm = new DatasetFileGridModel(dfversion, _associateInfoProvider)
+                {
+                    CanViewFullDataset = us.CanViewFullDataset,
+                    CanEditDataset = us.CanEditDataset,
+                    CanPreviewDataset = us.CanPreviewDataset
+                };
                 files.Add(dfgm);
             }
 
@@ -396,12 +426,10 @@ namespace Sentry.data.Web.Controllers
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
         }
 
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public JsonResult GetAllDatasetFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
-            IEnumerable<DatasetFileGridModel> files = _datasetContext.GetAllDatasetFiles().
-                Select((f) => new DatasetFileGridModel(f, _associateInfoProvider)
-                );
+            IEnumerable<DatasetFileGridModel> files = _datasetContext.DatasetFile.Where(x => x.ParentDatasetFileId == null).Fetch(x => x.DatasetFileConfig).
+                Select((f) => new DatasetFileGridModel(f, _associateInfoProvider));
 
             DataTablesQueryableAdapter<DatasetFileGridModel> dtqa = new DataTablesQueryableAdapter<DatasetFileGridModel>(files.AsQueryable(), dtRequest);
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
@@ -409,7 +437,6 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        [AuthorizeByPermission(PermissionNames.UseApp)]
         public JsonResult GetDatasetFileConfigInfo(int Id)
         {
             IEnumerable<DatasetFileConfigsModel> files = null;
@@ -429,7 +456,7 @@ namespace Sentry.data.Web.Controllers
             return Json(files, JsonRequestBehavior.AllowGet);
         }
 
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public JsonResult GetDatasetFileConfigInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
             IEnumerable<DatasetFileConfigsModel> files = null;
@@ -449,14 +476,19 @@ namespace Sentry.data.Web.Controllers
         #endregion
 
 
-        //TODO-Dan: Check out the PushToSAS to make sure the category is being done right.
         #region Helpers
 
         [HttpGet()]
-        [AuthorizeByPermission(PermissionNames.DwnldNonSensitive)]
         public JsonResult GetDatasetFileDownloadURL(int id)
         {
-            DatasetFile df = _datasetContext.GetDatasetFile(id);
+            DatasetFile df = _datasetContext.DatasetFile.Where(x => x.DatasetFileId == id).Fetch(x => x.DatasetFileConfig).FirstOrDefault();
+
+            UserSecurity us = _datasetService.GetUserSecurityForDataset(df.Dataset.DatasetId);
+            if (!us.CanViewFullDataset)
+            {
+                throw new UnauthorizedAccessException();
+            }
+
 
             Event e = new Event();
             e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Downloaded Data File").FirstOrDefault();
@@ -501,7 +533,6 @@ namespace Sentry.data.Web.Controllers
 
 
         [HttpPost]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult PushToSAS(int id, string fileOverride, string delimiter, int guessingrows)
         {
             Event _event = new Event();
@@ -611,7 +642,6 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet()]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public PartialViewResult PushToFileNameOverride(int id)
         {
             PushToDatasetModel model = new PushToDatasetModel();
@@ -625,7 +655,6 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet()]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult PreviewDatafile(int id)
         {
             Event e = new Event();
@@ -637,7 +666,7 @@ namespace Sentry.data.Web.Controllers
 
             try
             {
-                DatasetFile df = _datasetContext.GetDatasetFile(id);
+                DatasetFile df = _datasetContext.DatasetFile.Where(x => x.DatasetFileId == id).Fetch(x => x.DatasetFileConfig).FirstOrDefault();
                 e.DataFile = df.DatasetFileId;
                 e.Dataset = df.Dataset.DatasetId;
                 e.DataConfig = df.DatasetFileConfig.ConfigId;
@@ -662,7 +691,6 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet()]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public PartialViewResult PreviewLatestDatafile(int id)
         {
             Event e = new Event();
@@ -675,7 +703,7 @@ namespace Sentry.data.Web.Controllers
 
             try
             {
-                DatasetFile df = _datasetContext.GetDatasetFile(id);
+                DatasetFile df = _datasetContext.DatasetFile.Where(x => x.DatasetFileId == id).Fetch(x => x.DatasetFileConfig).FirstOrDefault();
                 e.DataFile = df.DatasetFileId;
                 e.Dataset = df.Dataset.DatasetId;
                 e.DataConfig = df.DatasetFileConfig.ConfigId;
@@ -727,7 +755,6 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet()]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public PartialViewResult GetDatasetFileVersions(int id)
         {
             DatasetFileVersionsModel model = new DatasetFileVersionsModel();
@@ -740,12 +767,11 @@ namespace Sentry.data.Web.Controllers
 
 
         [HttpPost]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public async Task<ActionResult> BundleFiles(string listOfIds, string newName, int datasetID)
         {
             string[] ids = listOfIds.Split(',');
 
-            List<DatasetFile> files = (from file in _datasetContext.GetAllDatasetFiles()
+            List<DatasetFile> files = (from file in _datasetContext.DatasetFile.Where(x => x.ParentDatasetFileId == null).Fetch(x => x.DatasetFileConfig).ToList()
                                        from id in ids
                                        where file.DatasetFileId.ToString() == id
                                        select file).ToList();
@@ -760,10 +786,8 @@ namespace Sentry.data.Web.Controllers
             //Get the users permissions
             Boolean errorsFound = false;
             string errorString = "";
-            Boolean CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive;
-            Boolean CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive;
 
-            Boolean bundlingSensitive = files.Any(x => x.Dataset.IsSensitive);
+            UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetID);
 
             if (newName == "" || newName == null)
             {
@@ -788,7 +812,7 @@ namespace Sentry.data.Web.Controllers
                 errorString += "<p>You selected no files.</p>";
             }
 
-            if ((bundlingSensitive && !CanDwnldSenstive) || (!bundlingSensitive && !CanDwnldNonSensitive))
+            if (us.CanViewFullDataset)
             {
                 errorsFound = true;
                 errorString += "<p>You do not have permission to download or bundle these files.</p>";
@@ -898,12 +922,17 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        [AuthorizeByPermission(PermissionNames.Upload)]
         public ActionResult UploadDatafile(int id, int configId)
         {//JsonResult
             if (Request.Files.Count > 0 && id != 0)
             {
                 DatasetFileConfig dfc = _datasetContext.getDatasetFileConfigs(configId);
+
+                UserSecurity us = _datasetService.GetUserSecurityForConfig(configId);
+                if (!us.CanUploadToDataset)
+                {
+                    throw new UnauthorizedAccessException();
+                }
 
                 IApplicationUser user = _userService.GetCurrentUser();
 
@@ -911,7 +940,7 @@ namespace Sentry.data.Web.Controllers
 
                 try
                 {
-                    if (user.CanUpload)
+                    if (_datasetService.GetUserSecurityForConfig(configId).CanUploadToDataset)
                     {
                         HttpFileCollectionBase files = Request.Files;
 
@@ -927,7 +956,7 @@ namespace Sentry.data.Web.Controllers
                             //Create Dataset Loader request
                             //Find job DFSBasic generic job associated with this config and add ID to request.
                             RetrieverJob dfsBasicJob = null;
-                            List<RetrieverJob> jobList = _requestContext.RetrieverJob.Where(w => w.DatasetConfig.ConfigId == configId).ToList();
+                            List<RetrieverJob> jobList = _datasetContext.RetrieverJob.Where(w => w.DatasetConfig.ConfigId == configId).ToList();
                             bool jobFound = false;
                             foreach (RetrieverJob job in jobList)
                             {
@@ -1037,9 +1066,15 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet()]
-        [AuthorizeByPermission(PermissionNames.Upload)]
         public ActionResult GetDatasetUploadPartialView(int datasetId)
         {
+
+            UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
+            if (!us.CanUploadToDataset)
+            {
+                throw new UnauthorizedAccessException();
+            }
+
             CreateDataFileModel cd = new CreateDataFileModel();
             //If a value was passed, load appropriate information
             if (datasetId != 0)
@@ -1054,7 +1089,7 @@ namespace Sentry.data.Web.Controllers
 
         #endregion
 
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         [HttpPost]
         public ActionResult RunRetrieverJob(int id)
         {
@@ -1071,7 +1106,7 @@ namespace Sentry.data.Web.Controllers
             return Json(new { Success = true, Message = "Job successfully queued." });
         }
 
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         [HttpPost]
         public ActionResult DisableRetrieverJob(int id)
         {
@@ -1090,7 +1125,7 @@ namespace Sentry.data.Web.Controllers
             return Json(new { Success = true, Message = "Job has been marked as disabled and will be removed from the job scheduler." });
         }
 
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         [HttpPost]
         public ActionResult EnableRetrieverJob(int id)
         {
@@ -1109,7 +1144,6 @@ namespace Sentry.data.Web.Controllers
             return Json(new { Success = true, Message = "Job has been marked as enabled and will be added to the job scheduler." });
         }
 
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public JsonResult LoadDatasetList(int id)
         {
             IEnumerable<Dataset> dfList = Utility.GetDatasetByCategoryId(_datasetContext, id);
@@ -1127,12 +1161,10 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet()]
-        [AuthorizeByPermission(PermissionNames.DwnldNonSensitive)]
         public JsonResult GetUserGuide(string key)
         {
             try
             {
-
                 JsonResult jr = new JsonResult();
                 jr.Data = _s3Service.GetUserGuideDownloadURL(key, "application\\pdf");
                 jr.JsonRequestBehavior = JsonRequestBehavior.AllowGet;
@@ -1145,24 +1177,19 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
-        public JsonResult GetAllDatasets()
+        public JsonResult GetAllDatasetsForQueryPermission()
         {
-            var list = _datasetContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityTypes.DATASET);
-
             List<SelectListItem> sList = new List<SelectListItem>();
 
-            foreach (var cat in list)
+            var groupedDatasets = _datasetService.GetDatasetsForQueryTool().GroupBy(x=> x.DatasetCategories.First());
+
+            foreach (var ds in groupedDatasets)
             {
-                IEnumerable<Dataset> dfList = Utility.GetDatasetByCategoryId(_datasetContext, cat.Id);
-
-                SelectListGroup group = new SelectListGroup() { Name = cat.Name };
-
-                sList.AddRange(dfList.Select(m => new SelectListItem()
+                sList.AddRange(ds.Select(m => new SelectListItem()
                 {
                     Text = m.DatasetName,
                     Value = m.DatasetId.ToString(),
-                    Group = group
+                    Group = new SelectListGroup() { Name = ds.Key.Name }
                 }));
             }
 
@@ -1177,63 +1204,14 @@ namespace Sentry.data.Web.Controllers
             return Json(obj, JsonRequestBehavior.AllowGet);
         }
 
-        [AuthorizeByPermission(PermissionNames.QueryToolPowerUser)]
         public ActionResult QueryTool()
         {
-            ViewBag.PowerUser = SharedContext.CurrentUser.CanQueryToolPowerUser;
             ViewBag.LivyURL = Sentry.Configuration.Config.GetHostSetting("ApacheLivy");
 
-            Event e = new Event();
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-            e.Reason = "Viewed Query Tool Page";
-            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Query Tool Page");
 
             return View("QueryTool");
         }
 
-        [Obsolete("This should be placed in the favorites controller that was created.")]
-        public JsonResult SetFavorite(int datasetId)
-        {
-            try
-            {
-                Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
-
-                if (!ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId))
-                {
-                    Favorite f = new Favorite()
-                    {
-                        DatasetId = ds.DatasetId,
-                        UserId = SharedContext.CurrentUser.AssociateId,
-                        Created = DateTime.Now
-                    };
-
-                    _datasetContext.Merge(f);
-                    _datasetContext.SaveChanges();
-
-                    Response.StatusCode = (int)HttpStatusCode.OK;
-                    return Json(new { message = "Successfully added favorite." }, JsonRequestBehavior.AllowGet);
-                }
-                else
-                {
-                    _datasetContext.Remove(ds.Favorities.First(w => w.UserId == SharedContext.CurrentUser.AssociateId));
-                    _datasetContext.SaveChanges();
-
-                    Response.StatusCode = (int)HttpStatusCode.OK;
-                    return Json(new { message = "Successfully removed favorite." }, JsonRequestBehavior.AllowGet);
-                }
-            }
-            catch (Exception)
-            {
-                _datasetContext.Clear();
-                Response.StatusCode = (int)HttpStatusCode.BadRequest;
-                return Json(new { message = "Failed to modify favorite." }, JsonRequestBehavior.AllowGet);
-            }
-
-        }
     }
 }

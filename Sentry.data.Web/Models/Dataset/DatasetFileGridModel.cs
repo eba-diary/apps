@@ -30,14 +30,13 @@ namespace Sentry.data.Web
             this.ConfigFileName = f.DatasetFileConfig.Name;
             this.ConfigFileDesc = f.DatasetFileConfig.Description;
             this.VersionId = f.VersionId;
-            this.IsSensitive = f.Dataset.IsSensitive;
             this.ParentDataSetID = f.Dataset.DatasetId;
             this.IsBundled = f.IsBundled;
             this.Information = f.Information;
         }
         public int Id { get; set; }
         public string Name { get; set; }
-        public string UploadUserName { get; set; }        
+        public string UploadUserName { get; set; }
         public DateTime ModifiedDTM { get; set; }
         public DateTime CreateDTM { get; set; }
         public string ActionLinks
@@ -46,43 +45,36 @@ namespace Sentry.data.Web
             {
                 string href = "";
                 Boolean correctFileTypeForPreview = (Path.GetExtension(Name).Contains("csv") || Path.GetExtension(Name).Contains("txt") || Path.GetExtension(Name).Contains("json"));
-                Boolean correctSensitivityForDownload = ((IsSensitive && CanDwnldSenstive) || (!IsSensitive && CanDwnldNonSensitive));
 
-                //if (IsUsable)
-                //{
-                    if (CanPreview && correctSensitivityForDownload && correctFileTypeForPreview)
-                    {
-                        href += "<a href = \"#\" onclick=\"data.Dataset.PreviewDatafileModal(" + Id + ")\" class=\"table-row-icon row-filepreview-icon\" title=\"Preview file\"><i class='glyphicon glyphicon-search text-primary'></i></a>";
-                    }
-                    else if(!correctFileTypeForPreview)
-                    {
-                        href += "<a disabled class=\"table-row-icon row-filepreview-icon disabled\" title=\"Not available for this file type.\"><i class='glyphicon glyphicon-search text-primary disabled' style='color:gray;'></i></a>";
-                    }
-                    else
-                    {
-                        href += "<a disabled class=\"table-row-icon row-filepreview-icon disabled\" title=\"This operation is not available.\"><i class='glyphicon glyphicon-search text-primary disabled' style='color:gray;'></i></a>";
-                    }
+                if (CanPreviewDataset && correctFileTypeForPreview)
+                {
+                    href += "<a href = \"#\" onclick=\"data.Dataset.PreviewDatafileModal(" + Id + ")\" class=\"table-row-icon row-filepreview-icon\" title=\"Preview file\"><i class='glyphicon glyphicon-search text-primary'></i></a>";
+                }
+                else if (!correctFileTypeForPreview)
+                {
+                    href += "<a disabled class=\"table-row-icon row-filepreview-icon disabled\" title=\"Not available for this file type.\"><i class='glyphicon glyphicon-search text-primary disabled' style='color:gray;'></i></a>";
+                }
+                else
+                {
+                    href += "<a disabled class=\"table-row-icon row-filepreview-icon disabled\" title=\"This operation is not available.\"><i class='glyphicon glyphicon-search text-primary disabled' style='color:gray;'></i></a>";
+                }
 
-                    if (correctSensitivityForDownload)
-                    {
-                        href += "<a href = \"#\" onclick=\"data.Dataset.DownloadDatasetFile(" + Id + ")\" class=\"table-row-icon row-filedownload-icon\" title=\"Download File\"><i class='glyphicon glyphicon-cloud-download text-primary'></i></a>";
-                    }
-                //}
-                if (CanEdit)
+                if (CanViewFullDataset)
+                {
+                    href += "<a href = \"#\" onclick=\"data.Dataset.DownloadDatasetFile(" + Id + ")\" class=\"table-row-icon row-filedownload-icon\" title=\"Download File\"><i class='glyphicon glyphicon-cloud-download text-primary'></i></a>";
+                }
+                if (CanEditDataset)
                 {
                     href += "<a href = \"#\" onclick=\"data.Dataset.EditDataFileInformation(" + Id + ")\" class=\"table-row-icon\" title=\"Edit File\"><i class='glyphicon glyphicon-edit text-primary'></i></a>";
                 }
 
-                //if (IsUsable)
-                //{
-                    if (correctSensitivityForDownload && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(Name)))
-                    {
-                        href += "<a href = \"#\" onclick=\"data.Dataset.FileNameModal(" + Id + ")\" title=\"Push to SAS\">" +
-                            "<img src=\"../../Images/sas_logo_min.png\" style=\" height: 15px; margin-bottom: 4px; margin-left: 5px;\"/>" +
-                            "</a>";
+                if (CanViewFullDataset && Utilities.IsExtentionPushToSAScompatible(Path.GetExtension(Name)))
+                {
+                    href += "<a href = \"#\" onclick=\"data.Dataset.FileNameModal(" + Id + ")\" title=\"Push to SAS\">" +
+                        "<img src=\"../../Images/sas_logo_min.png\" style=\" height: 15px; margin-bottom: 4px; margin-left: 5px;\"/>" +
+                        "</a>";
 
-                    }
-                //}
+                }
                 return href;
             }
         }
@@ -92,13 +84,13 @@ namespace Sentry.data.Web
         //PreviewDatafileModal
         public string s3Key { get; set; }
         public string VersionId { get; set; }
-        public Boolean CanDwnldSenstive { get; set; }
-        public Boolean CanDwnldNonSensitive { get; set; }
-        public Boolean CanEdit { get; set; }
-        public Boolean IsSensitive { get; set; }
-        public Boolean CanPreview { get; set; }
         public int ParentDataSetID { get; set; }
         public Boolean IsBundled { get; set; }
         public string Information { get; set; }
+
+
+        public bool CanPreviewDataset { get; set; }
+        public bool CanViewFullDataset { get; set; }
+        public bool CanEditDataset { get; set; }
     }
 }

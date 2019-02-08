@@ -6,7 +6,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Sentry.data.Web.Controllers
 {
     [RoutePrefix(WebConstants.Routes.VERSION_APPLICATIONS)]
-    [AuthorizeByPermission(PermissionNames.AdminUser)]
+    [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
     public class ApplicationController : BaseWebApiController
     {
 

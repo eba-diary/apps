@@ -2,7 +2,6 @@
 using NHibernate.Mapping.ByCode.Conformist;
 using NHibernate.Mapping.ByCode.Impl;
 using Sentry.data.Core;
-using Sentry.data.Core.Entities.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Linq;
