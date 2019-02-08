@@ -401,22 +401,23 @@ namespace Sentry.data.Web.Controllers
 
                     HttpResponseMessage response = await client.PostAsync("http://awe-t-apspml-01.sentry.com:8999/batches", contentPost);
 
+                    //Record submission regardless if target deems it a bad request.
+                    Submission sub = new Submission()
+                    {
+                        JobId = job,
+                        JobGuid = JobGuid,
+                        Created = DateTime.Now,
+                        Serialized_Job_Options = json.ToString()
+                    };
+
+                    _datasetContext.Merge(sub);
+                    _datasetContext.SaveChanges();
+
                     if (response.IsSuccessStatusCode)
                     {
                         string result = response.Content.ReadAsStringAsync().Result;
 
-                        LivyBatch batchResult = JsonConvert.DeserializeObject<LivyBatch>(result);
-
-                        Submission sub = new Submission()
-                        {
-                            JobId = job,
-                            JobGuid = JobGuid,
-                            Created = DateTime.Now,
-                            Serialized_Job_Options = json.ToString()
-                        };
-
-                        _datasetContext.Merge(sub);
-                        _datasetContext.SaveChanges();
+                        LivyBatch batchResult = JsonConvert.DeserializeObject<LivyBatch>(result);                        
 
                         JobHistory histRecord = new JobHistory()
                         {
