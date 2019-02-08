@@ -94,6 +94,7 @@ namespace Sentry.data.Web
                         Include("~/Content/favorites.css").
                         Include("~/Content/home.css").
                         Include("~/Content/search.css").
+                        Include("~/Content/business-unit.css").
                         Include("~/Content/site.css"));
 
             /* If you want to see content bundled/minimized when running locally, uncomment the EnableOptimizations 

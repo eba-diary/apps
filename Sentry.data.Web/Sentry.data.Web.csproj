@@ -282,8 +282,10 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Content Include="Content\business-unit.css" />
     <Content Include="Content\creat-edit-datasets.css" />
     <Compile Include="Controllers\AdminController.cs" />
+    <Compile Include="Controllers\BusinessUnitController.cs" />
     <Compile Include="Controllers\FavoritesController.cs" />
     <Compile Include="Controllers\WebApi\ApplicationController.cs" />
     <Compile Include="Controllers\WebApi\AssetController.cs" />
@@ -343,6 +345,7 @@
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceDetailModel.cs" />
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceModel.cs" />
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceUIModel.cs" />
+    <Compile Include="Models\BusinessUnit\BusinessUnitLandingPageModel.cs" />
     <Compile Include="Models\Config\CreateExtensionMapModel.cs" />
     <Compile Include="Models\Config\CreateSchemaModel.cs" />
     <Compile Include="Models\Config\CreateSourceModel.cs" />
@@ -407,6 +410,7 @@
     <Content Include="Images\Category\BusinessIntelligence\it.svg" />
     <Content Include="Images\Category\BusinessIntelligence\personal lines.svg" />
     <Content Include="Images\Category\BusinessIntelligence\corporate.svg" />
+    <Content Include="Images\dairyland_logo.png" />
     <Content Include="Images\Hole16_Summer_Flowers_14.jpg" />
     <Content Include="Images\Hole16_Summer_Flowers_14.png" />
     <Content Include="Images\Icons\bundle.png" />
@@ -1249,6 +1253,7 @@
     <Content Include="Views\Shared\_Tags.cshtml" />
     <Content Include="Views\Favorites\EditFavorites.cshtml" />
     <Content Include="Views\Favorites\_FavoritesList.cshtml" />
+    <Content Include="Views\BusinessUnit\PersonalLines.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
