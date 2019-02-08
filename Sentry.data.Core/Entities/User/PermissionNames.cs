@@ -25,7 +25,7 @@
         public const string QueryToolAdmin = "QueryToolAdmin";
         public const string UseAssetAPI = "UseAssetAPI";
         public const string AdminUser = "AdminUser";
-        public const string ManageReports = "ReportModify";
+        public const string ManageReports = "ReportMng";
         public const string ReportView = "ReportView";
     }
 }
