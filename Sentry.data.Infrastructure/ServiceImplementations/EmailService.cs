@@ -15,6 +15,29 @@ namespace Sentry.data.Infrastructure
             _associateInfoProvider = associateInfoProvider;
         }
 
+
+
+        public void SendInvalidReportLocationEmail(BusinessIntelligenceDto report, string userName)
+        {
+            SmtpClient smtpClient = new SmtpClient("mail.sentry.com");
+            MailAddress from = new MailAddress("NoReply@sentry.com");
+            MailMessage myMail = new System.Net.Mail.MailMessage();
+            myMail.From = from;
+
+            myMail.Subject = $"{Configuration.Config.GetDefaultEnvironmentName()} - BI report location permission";
+
+            myMail.To.Add("DSCSupport@sentry.com");
+
+            myMail.IsBodyHtml = true;
+            
+            myMail.Body += @"<p><b><font color=""red"">Do Not Reply To This Email, This Inbox Is Not Monitored</font></b></p>";
+            myMail.Body += $@"<p>{userName} tried to submit a Business Intelligence report with a report location that DSC does not have permisison to.</p>";
+            myMail.Body += $@"<p>Enter a ticket with IAM for DSC to gain access to {report.Location} .</p>";
+
+            smtpClient.Send(myMail);
+        }
+
+
         public void SendEmail(string emailAddress, string interval, string subject, List<Event> events)
         {
             //Real code could look something like this:
