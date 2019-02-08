@@ -8,7 +8,7 @@ using System.Web.SessionState;
 namespace Sentry.data.Web.Controllers
 {
     [SessionState(SessionStateBehavior.ReadOnly)]
-    //[AuthorizeByPermission(PermissionNames.ManageReports)]
+    [AuthorizeByPermission(PermissionNames.ManageReports)]
     public class BusinessIntelligenceController : BaseController
     {
 
