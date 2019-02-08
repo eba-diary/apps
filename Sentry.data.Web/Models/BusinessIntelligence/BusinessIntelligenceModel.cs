@@ -45,6 +45,8 @@ namespace Sentry.data.Web
         public List<int> DatasetFunctionIds { get; set; }
         public string ReportLink { get; set; }
 
+        public int BusinessObjectsEnumValue { get; set; }
+
 
         public List<string> Validate()
         {

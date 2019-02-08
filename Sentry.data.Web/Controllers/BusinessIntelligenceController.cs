@@ -45,6 +45,7 @@ namespace Sentry.data.Web.Controllers
                 DatasetId = 0,
                 CreationUserName = SharedContext.CurrentUser.AssociateId,
                 UploadUserName = SharedContext.CurrentUser.AssociateId,
+                BusinessObjectsEnumValue = (int)ReportType.BusinessObjects
             };
 
             ReportUtility.SetupLists(_datasetContext, cdm);
