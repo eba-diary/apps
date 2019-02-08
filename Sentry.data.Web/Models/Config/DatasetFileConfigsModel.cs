@@ -6,7 +6,6 @@ using Sentry.data.Core;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 using System.ComponentModel;
-using Sentry.data.Core.Entities.Metadata;
 
 namespace Sentry.data.Web
 {

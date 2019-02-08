@@ -6,7 +6,6 @@ using NHibernate.Linq;
 using Sentry.NHibernate;
 using Sentry.data.Core;
 using System.Threading.Tasks;
-using Sentry.data.Core.Entities.Metadata;
 using System.Reflection;
 using System.Collections;
 using System.Web;
@@ -76,6 +75,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<DatasetFile> DatasetFile
+        {
+            get
+            {
+                return Query<DatasetFile>();
+            }
+        }
+
         public IQueryable<DatasetScopeType> DatasetScopeTypes
         {
             get
@@ -113,7 +120,55 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                return Query<Dataset>().Where(x => x.CanDisplay);
+                return Query<Dataset>();
+            }
+        }
+
+        public IQueryable<DatasetFileConfig> DatasetFileConfigs
+        {
+            get
+            {
+                return Query<DatasetFileConfig>();
+            }
+        }
+
+        public IQueryable<SecurityTicket> HpsmTickets
+        {
+            get
+            {
+                return Query<SecurityTicket>();
+            }
+        }
+
+        public IQueryable<Security> Security
+        {
+            get
+            {
+                return Query<Security>();
+            }
+        }
+
+        public IQueryable<SecurityPermission> SecurityPermission
+        {
+            get
+            {
+                return Query<SecurityPermission>();
+            }
+        }
+
+        public IQueryable<SecurityTicket> SecurityTicket
+        {
+            get
+            {
+                return Query<SecurityTicket>();
+            }
+        }
+
+        public IQueryable<Permission> Permission
+        {
+            get
+            {
+                return Query<Permission>();
             }
         }
 
@@ -219,8 +274,16 @@ namespace Sentry.data.Infrastructure
             {
                 return Query<TagGroup>();
             }
-        } 
-        
+        }
+
+        public IQueryable<RetrieverJob> RetrieverJob
+        {
+            get
+            {
+                return Query<RetrieverJob>();
+            }
+        }
+
         public IQueryable<ApplicationConfiguration> ApplicationConfigurations
         {
             get
@@ -243,7 +306,7 @@ namespace Sentry.data.Infrastructure
         public int GetDatasetCount()
         {
 
-            return Query<Dataset>().Count(x => x.CanDisplay && x.DatasetType == GlobalConstants.DataEntityTypes.DATASET);
+            return Query<Dataset>().Count(x => x.CanDisplay && x.DatasetType == GlobalConstants.DataEntityCodes.DATASET);
         }
 
         public Dataset GetById(int id)
@@ -305,31 +368,6 @@ namespace Sentry.data.Infrastructure
                 .AsEnumerable();
 
             return list;
-        }
-
-        /// <summary>
-        /// Returns all versions of a datasetfile, including current.
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public IEnumerable<DatasetFile> GetDatasetFilesVersions(int datasetId, int dataFileConfigId, string filename)
-        {
-            IEnumerable<DatasetFile> list = Query<DatasetFile>().Where(x => x.Dataset.DatasetId == datasetId && x.DatasetFileConfig.ConfigId == dataFileConfigId && x.FileName == filename).Fetch(x => x.DatasetFileConfig).AsEnumerable();
-
-            return list;
-        }
-
-        public IEnumerable<DatasetFile> GetAllDatasetFiles()
-        {
-            IEnumerable<DatasetFile> list = Query<DatasetFile>().Where(x => x.ParentDatasetFileId == null).Fetch(x => x.DatasetFileConfig).AsEnumerable();
-
-            return list;
-        }
-
-        public DatasetFile GetDatasetFile(int id)
-        {
-            DatasetFile df = Query<DatasetFile>().Where(x => x.DatasetFileId == id).Fetch(x=> x.DatasetFileConfig).FirstOrDefault();
-            return df;
         }
 
         public int GetLatestDatasetFileIdForDataset(int id)
@@ -463,7 +501,7 @@ namespace Sentry.data.Infrastructure
 
         public int GetReportCount()
         {
-            return Query<Dataset>().Where(x => x.DatasetType == GlobalConstants.DataEntityTypes.REPORT).Cacheable().Count();
+            return Query<Dataset>().Where(x => x.DatasetType == GlobalConstants.DataEntityCodes.REPORT).Cacheable().Count();
         }
 
         public Favorite GetFavorite(int favoriteId)

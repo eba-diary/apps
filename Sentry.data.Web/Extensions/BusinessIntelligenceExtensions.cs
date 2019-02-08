@@ -16,17 +16,18 @@ namespace Sentry.data.Web
             {
                 DatasetId = model.DatasetId,
                 DatasetCategoryIds = model.DatasetCategoryIds,
-                DatasetBusinessUnitIds = model.DatasetBusinessUnitIds,
-                DatasetFunctionIds = model.DatasetFunctionIds,
+                DatasetBusinessUnitIds = (model.DatasetBusinessUnitIds == null) ? new List<int>() : model.DatasetBusinessUnitIds,
+                DatasetFunctionIds = (model.DatasetFunctionIds == null) ? new List<int>() : model.DatasetFunctionIds,
                 DatasetName = model.DatasetName,
                 DatasetDesc = model.DatasetDesc,
-                SentryOwnerId = model.SentryOwnerId,
+                PrimaryOwnerId = model.PrimaryOwnerId,
+                PrimaryContactId = model.PrimaryContactId,
                 CreationUserName = model.CreationUserName,
                 UploadUserName = model.UploadUserName,
                 DatasetDtm = CreateTime,
                 ChangedDtm = CreateTime,
-                DatasetType = Core.GlobalConstants.DataEntityTypes.REPORT,
-                ObjectType = Core.GlobalConstants.DataEntityTypes.REPORT, //whats the difference here?
+                DatasetType = Core.GlobalConstants.DataEntityCodes.REPORT,
+                ObjectType = Core.GlobalConstants.DataEntityCodes.REPORT, //whats the difference here?
                 Location = model.Location,
                 LocationType = new Uri(model.Location)?.Scheme,
                 FrequencyId = model.FrequencyId.Value,

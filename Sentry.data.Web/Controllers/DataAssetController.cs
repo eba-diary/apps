@@ -14,6 +14,7 @@ using Sentry.data.Common;
 
 namespace Sentry.data.Web.Controllers
 {
+    [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATA_ASSET_VIEW)]
     public class DataAssetController : BaseController
     {
         public readonly MetadataRepositoryService _metadataRepositoryService;
@@ -33,7 +34,6 @@ namespace Sentry.data.Web.Controllers
             _userService = userService;
         }
 
-        [AuthorizeByPermission(PermissionNames.DataAssetView)]
         public ActionResult Index(int id)
         {
             var das = new List<DataAsset>(_dataAssetContext.GetDataAssets());
@@ -67,7 +67,6 @@ namespace Sentry.data.Web.Controllers
         }
 
         [Route("Lineage/{line}")]
-        [AuthorizeByPermission(PermissionNames.DataAssetView)]
         public ActionResult Lineage(string line)
         {
             ViewBag.IsLine = true;
@@ -98,7 +97,6 @@ namespace Sentry.data.Web.Controllers
 
         [Route("Lineage/{line}/{assetName}")]
         [Route("Lineage/{line}/{assetName}/{businessObject}/{sourceElement}")]
-        [AuthorizeByPermission(PermissionNames.DataAssetView)]
         public ActionResult Lineage(string line, string assetName, string businessObject, string sourceElement)
         {
             var das = new List<DataAsset>(_dataAssetContext.GetDataAssets());
@@ -141,7 +139,6 @@ namespace Sentry.data.Web.Controllers
             else { return RedirectToAction("NotFound", "Error"); }
         }
 
-        [AuthorizeByPermission(PermissionNames.DataAssetView)]
         public ActionResult DataAsset(string assetName)
         {
             var das = new List<DataAsset>(_dataAssetContext.GetDataAssets());
@@ -173,7 +170,7 @@ namespace Sentry.data.Web.Controllers
             else { return RedirectToAction("NotFound", "Error"); }
         }
 
-        [AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATA_ASSET_MODIFY)]
         public ActionResult ManageAssetNotification()
         {
             BaseAssetNotificationModel banm = new BaseAssetNotificationModel();
@@ -181,7 +178,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        [AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATA_ASSET_MODIFY)]
         public ActionResult CreateAssetNotification()
         {
             IApplicationUser user = _userService.GetCurrentUser();
@@ -203,7 +200,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
-        [AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATA_ASSET_MODIFY)]
         public ActionResult CreateAssetNotification(CreateAssetNotificationModel canm)
         {
             IApplicationUser user = _userService.GetCurrentUser();
@@ -259,7 +256,7 @@ namespace Sentry.data.Web.Controllers
             return View("CreateAssetNotification", canm);
         }
 
-        [AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATA_ASSET_MODIFY)]
         public JsonResult GetAssetNotificationInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
             IEnumerable<BaseAssetNotificationModel> files = null;
@@ -278,7 +275,7 @@ namespace Sentry.data.Web.Controllers
 
 
         [HttpGet()]
-        [AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATA_ASSET_MODIFY)]
         public ActionResult EditAssetNotification(int notificationId)
         {
             IApplicationUser user = _userService.GetCurrentUser();
@@ -297,7 +294,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost()]
-        [AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATA_ASSET_MODIFY)]
         public ActionResult EditAssetNotification(EditAssetNotificationModel ean)
         {
             IApplicationUser user = _userService.GetCurrentUser();
@@ -349,7 +346,7 @@ namespace Sentry.data.Web.Controllers
             return View("EditAssetNotification", ean);
         }
 
-        [AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATA_ASSET_MODIFY)]
         public AssetNotifications UpdateAssetNotificationFromModel(AssetNotifications an, EditAssetNotificationModel ean)
         {
             an.ExpirationTime = ean.ExpirationTime;
@@ -358,7 +355,7 @@ namespace Sentry.data.Web.Controllers
             return an;
         }
 
-        [AuthorizeByPermission(PermissionNames.ManageAssetNotifications)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATA_ASSET_MODIFY)]
         public AssetNotifications CreateAssetNotificationFromModel(AssetNotifications an, CreateAssetNotificationModel can)
         {
             an.Message = can.Message;

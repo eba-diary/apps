@@ -13,11 +13,6 @@ namespace Sentry.data.Web
         {
             _permissions.Add(permission);
         }
-
-        public AuthorizeByPermissionAttribute(params string[] permissions)
-        {
-            _permissions.AddRange(permissions);
-        }
         
         public override Boolean DoesUserHaveAccess(IApplicationUser appUser)
         {

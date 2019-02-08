@@ -1,0 +1,1 @@
+﻿UPDATE Dataset SET SecondaryOwner_ID = PrimaryOwner_ID WHERE SecondaryOwner_ID is null

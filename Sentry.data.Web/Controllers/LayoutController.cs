@@ -1,12 +1,10 @@
 ﻿using System.Web.Mvc;
 using System.Web.SessionState;
 using Sentry.data.Core;
-using Sentry.data.Infrastructure;
 using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Reflection;
-using System.Diagnostics;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -30,17 +28,13 @@ namespace Sentry.data.Web.Controllers
             headerModel.CanUserSwitch = (SharedContext.CurrentUser.CanUserSwitch && Configuration.Config.GetHostSetting("ShowUserChoice").ToLower() == "true");
             headerModel.CurrentUserName = SharedContext.CurrentUser.DisplayName;
             headerModel.CanUseApp = SharedContext.CurrentUser.CanUseApp;
-            headerModel.CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs;
+            headerModel.CanEditDataset = SharedContext.CurrentUser.CanModifyDataset;
             headerModel.CanManageAssetAlerts = SharedContext.CurrentUser.CanManageAssetAlerts;
             headerModel.CanViewDataset = SharedContext.CurrentUser.CanViewDataset;
             headerModel.CanViewDataAsset = SharedContext.CurrentUser.CanViewDataAsset;
-            headerModel.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
-            headerModel.CanUpload = SharedContext.CurrentUser.CanUpload;
-            headerModel.CanQueryTool = SharedContext.CurrentUser.CanQueryTool;
-            headerModel.CanQueryToolPowerUser = SharedContext.CurrentUser.CanQueryToolPowerUser;
+            headerModel.CanEditDataset = SharedContext.CurrentUser.CanModifyDataset;
             headerModel.CanViewReports = SharedContext.CurrentUser.CanViewReports;
             headerModel.CanManageReports = SharedContext.CurrentUser.CanManageReports;
-            //headerModel.AdminUser = SharedContext.CurrentUser.AdminUser;
 
             if (SharedContext.CurrentUser.GetType() == typeof(ImpersonatedApplicationUser))
             {
@@ -57,7 +51,7 @@ namespace Sentry.data.Web.Controllers
 
             var das = new List<DataAsset>(_dataAssetContext.GetDataAssets());
             ViewBag.DataAssets = das.Select(x => new Models.AssetUIModel(x)).ToList();
-            ViewBag.BusinessIntelligenceCategories = _datasetContext.Categories.ToList().Where(w => w.ObjectType == GlobalConstants.DataEntityTypes.REPORT).OrderBy(o => o.Name).Select(x => new Models.BusinessIntelligenceUIModel(x)).ToList();
+            ViewBag.BusinessIntelligenceCategories = _datasetContext.Categories.ToList().Where(w => w.ObjectType == GlobalConstants.DataEntityCodes.REPORT).OrderBy(o => o.Name).Select(x => new Models.BusinessIntelligenceUIModel(x)).ToList();
 
             return PartialView("_Header", headerModel);
         }

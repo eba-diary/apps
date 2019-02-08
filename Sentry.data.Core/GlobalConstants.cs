@@ -2,6 +2,13 @@
 {
     public static class GlobalConstants
     {
+        
+        public static class System
+        {
+            public const string NAME = "Data.Sentry.Com";
+            public const string ABBREVIATED_NAME = "DSC";
+            public const string PROD = "PROD";
+        }
 
         public static class ValidationErrors
         {
@@ -21,7 +28,7 @@
         }
 
 
-        public static class DataEntityTypes
+        public static class DataEntityCodes
         {
             public const string REPORT = "RPT";
             public const string DATASET = "DS"; 
@@ -77,6 +84,47 @@
         public static class BusinessObjectExhibit
         {
             public const string GET_LATEST_URL_PARAMETER = "&sInstance=Last";
+        }
+
+        public static class HpsmTicketStatus
+        {
+            //DSC
+            public const string PENDING = "Pending";
+            public const string COMPLETED = "Completed";
+            public const string DENIED = "Denied";
+            public const string WIDHTDRAWN = "Withdrawn";
+            //hpsm
+            public const string APPROVED = "approved";
+            public const string CLOSED = "closed";
+            public const string IMPLEMENTATION = "SI:STD:Implementation";
+            public const string LOG_AND_PREP = "SI:STD:Log and Prep";
+        }
+
+        public static class SecurableEntityName
+        {
+            public const string DATASET = "Dataset";
+        }
+
+        public static class PermissionCodes
+        {
+            public const string CAN_PREVIEW_DATASET = "CanPreviewDataset";
+            public const string CAN_VIEW_FULL_DATASET = "CanViewFullDataset";
+            public const string CAN_QUERY_DATASET = "CanQueryDataset";
+            public const string CAN_CONNECT_TO_DATASET = "CanConnectToDataset";
+            public const string CAN_UPLOAD_TO_DATASET = "CanUploadToDataset";
+
+            public const string USE_APP = "UseApp";
+
+            public const string DATASET_VIEW = "DatasetView";
+            public const string DATA_ASSET_VIEW = "DataAssetView";
+            public const string REPORT_VIEW = "ReportView";
+
+            public const string DATASET_MODIFY = "DatasetModify";
+            public const string DATA_ASSET_MODIFY = "DataAssetModify";
+            public const string REPORT_MODIFY = "ReportModify";
+
+            public const string USER_SWITCH = "UserSwitch";
+            public const string ADMIN_USER = "AdminUser";
         }
 
     }

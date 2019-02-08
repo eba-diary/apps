@@ -23,13 +23,13 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.DatasetName, (m) => m.Column("Dataset_NME"));
             this.Property((x) => x.DatasetDesc, (m) => m.Column("Dataset_DSC"));
             this.Property((x) => x.CreationUserName, (m) => m.Column("FileCreator_NME"));
-            this.Property((x) => x.SentryOwnerName, (m) => m.Column("SentryOwner_NME"));
+            this.Property((x) => x.PrimaryOwnerId, (m) => m.Column("PrimaryOwner_ID"));
+            this.Property((x) => x.PrimaryContactId, (m) => m.Column("PrimaryContact_ID"));
             this.Property((x) => x.UploadUserName, (m) => m.Column("UploadedBy_NME"));
             this.Property((x) => x.OriginationCode, (m) => m.Column("Origination_CDE"));
             this.Property((x) => x.DatasetDtm, (m) => m.Column("Dataset_DTM"));
             this.Property((x) => x.ChangedDtm, (m) => m.Column("FileChanged_DTM"));
             this.Property((x) => x.S3Key, (m) => m.Column("S3_KEY"));
-            this.Property((x) => x.IsSensitive, (m) => m.Column("IsSensitive_IND"));
             this.Property((x) => x.CanDisplay, (m) => m.Column("Display_IND"));
             this.Property((x) => x.DatasetInformation, (m) => m.Column("Information_DSC"));
             this.Property((x) => x.DatasetType, (m) => m.Column("Dataset_TYP"));
@@ -155,6 +155,18 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                     k.ForeignKey("FK_DatasetFile_Dataset");
                 });
             }, map => map.OneToMany(a => a.Class(typeof(Favorite))));
+
+
+            //ISecurable Mapping
+            this.Property((x) => x.IsSecured, (m) => m.Column("IsSecured_IND"));
+            this.ManyToOne(x => x.Security, m =>
+            {
+                m.Column("Security_ID");
+                m.ForeignKey("FK_Dataset_Security");
+                m.Class(typeof(Security));
+                m.Cascade(Cascade.All);
+            });
+
         }
     }
 }

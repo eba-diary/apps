@@ -2,8 +2,6 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using Sentry.data.Core.Entities.Metadata;
 using Sentry.data.Core.Entities;
 
 namespace Sentry.data.Core
@@ -13,6 +11,12 @@ namespace Sentry.data.Core
         /** IQueryables **/
 
         IQueryable<Dataset> Datasets { get; }
+        IQueryable<DatasetFileConfig> DatasetFileConfigs { get; }
+        IQueryable<SecurityTicket> HpsmTickets { get; }
+        IQueryable<Security> Security { get; }
+        IQueryable<SecurityPermission> SecurityPermission { get; }
+        IQueryable<SecurityTicket> SecurityTicket { get; }
+        IQueryable<Permission> Permission { get; }
         IQueryable<DataSourceType> DataSourceTypes { get; }
         IQueryable<DataSource> DataSources { get; }
         IQueryable<DatasetScopeType> DatasetScopeTypes { get; }
@@ -22,6 +26,7 @@ namespace Sentry.data.Core
         IQueryable<Status> EventStatus { get; }
         IQueryable<DataElement> DataElements { get; }
         IQueryable<DataObject> DataObjects { get; }
+        IQueryable<DatasetFile> DatasetFile { get; }
         IQueryable<FileExtension> FileExtensions { get; }
         IQueryable<Category> Categories { get; }
         IQueryable<BusinessUnit> BusinessUnits { get; }
@@ -35,6 +40,7 @@ namespace Sentry.data.Core
         IQueryable<TagGroup> TagGroups { get; }
         IQueryable<ApplicationConfiguration> ApplicationConfigurations { get; }
 
+        IQueryable<RetrieverJob> RetrieverJob { get; }
         /** Datasets **/
 
         Dataset GetById(int id);
@@ -49,10 +55,7 @@ namespace Sentry.data.Core
 
         IEnumerable<DatasetFile> GetDatasetFilesForDataset(int datasetId, Func<DatasetFile, bool> where);
         IEnumerable<DatasetFile> GetDatasetFilesForDatasetFileConfig(int configId, Func<DatasetFile, bool> where);
-        IEnumerable<DatasetFile> GetDatasetFilesVersions(int datasetId, int dataFileConfigId, string filename);
         int GetLatestDatasetFileIdForDataset(int id);
-        IEnumerable<DatasetFile> GetAllDatasetFiles();
-        DatasetFile GetDatasetFile(int id);
         int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId, bool isBundled, string targetFileName = null, DataElement schema = null);
         Category GetCategoryById(int id);
 

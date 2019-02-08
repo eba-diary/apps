@@ -15,7 +15,7 @@ using Swashbuckle.Swagger.Annotations;
 namespace Sentry.data.Web.Controllers
 {
     [RoutePrefix(WebConstants.Routes.VERSION_JOB)]
-    [AuthorizeByPermission(PermissionNames.AdminUser)]
+    [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
     public class JobController : BaseWebApiController
     {
         private IDatasetContext _datasetContext;

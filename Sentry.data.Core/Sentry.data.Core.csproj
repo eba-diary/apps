@@ -83,6 +83,7 @@
   <ItemGroup>
     <Compile Include="DomainServices\ConfigService.cs" />
     <Compile Include="DomainServices\DatasetService.cs" />
+    <Compile Include="DomainServices\SecurityService.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceDetailDTO.cs" />
     <Compile Include="DTO\Dataset\DatasetDetailDTO.cs" />
     <Compile Include="Entities\ColumnDTO.cs" />
@@ -92,12 +93,25 @@
     <Compile Include="Entities\HiveTableStatusEnum.cs" />
     <Compile Include="Entities\MessageFormats\HiveTableCreateModel.cs" />
     <Compile Include="Entities\Metadata\ColumnModel.cs" />
+    <Compile Include="Entities\Security\HpsmTicket.cs" />
+    <Compile Include="Entities\Security\Permission.cs" />
+    <Compile Include="Entities\Security\SecurityTicket.cs" />
+    <Compile Include="Entities\Security\SecurityPermission.cs" />
+    <Compile Include="Entities\Security\RequestAccess.cs" />
+    <Compile Include="Entities\Security\Security.cs" />
+    <Compile Include="Entities\Security\UserSecurity.cs" />
+    <Compile Include="Extensions\DatasetQueryExtensions.cs" />
     <Compile Include="GlobalEnums\DataClassificationType.cs" />
+    <Compile Include="Interfaces\IHpsmMonitoringService.cs" />
+    <Compile Include="Interfaces\IHpsmProvider.cs" />
     <Compile Include="GlobalEnums\DatasetSortByOption.cs" />
     <Compile Include="Interfaces\IAssociateInfoProvider.cs" />
     <Compile Include="Interfaces\IConfigService.cs" />
     <Compile Include="Interfaces\IDatasetService.cs" />
     <Compile Include="Interfaces\IEventService.cs" />
+    <Compile Include="Interfaces\IObsidianService.cs" />
+    <Compile Include="Interfaces\ISecurable.cs" />
+    <Compile Include="Interfaces\ISecurityService.cs" />
     <Compile Include="Interfaces\IUserService.cs" />
     <Compile Include="DomainServices\BusinessIntelligenceService.cs" />
     <Compile Include="DomainServices\MessageHandlers\HiveMetadataHandler.cs" />
@@ -226,7 +240,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Entities\User\ApplicationUser.cs" />
     <Compile Include="Entities\User\ImpersonatedApplicationUser.cs" />
-    <Compile Include="Entities\User\PermissionNames.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">

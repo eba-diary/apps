@@ -8,15 +8,13 @@ using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Core
 {
-    public class Dataset : IValidatable
+    public class Dataset : IValidatable, ISecurable
     {
         private string _metadata;
 
         public Dataset(){ }
 
         public virtual int DatasetId { get; set; }
-
-        public virtual Boolean IsSensitive { get; set; }
 
         public virtual string S3Key { get; set; }
 
@@ -28,8 +26,6 @@ namespace Sentry.data.Core
 
         public virtual string CreationUserName { get; set; }
 
-        public virtual string SentryOwnerName { get; set; }
-
         public virtual string UploadUserName { get; set; }
 
         public virtual string OriginationCode { get; set; }
@@ -38,7 +34,7 @@ namespace Sentry.data.Core
 
         public virtual DateTime ChangedDtm { get; set; }
 
-        public virtual Boolean CanDisplay { get; set; }
+        public virtual bool CanDisplay { get; set; }
 
         public virtual IList<Category> DatasetCategories { get; set; }
         public virtual IList<BusinessUnit> BusinessUnits { get; set; }
@@ -54,7 +50,7 @@ namespace Sentry.data.Core
         {
             get
             {
-                if (String.IsNullOrEmpty(_metadata))
+                if (string.IsNullOrEmpty(_metadata))
                 {
                     return null;
                 }
@@ -78,6 +74,18 @@ namespace Sentry.data.Core
                 return DatasetFileConfigs.Select(x => x.DatasetScopeType).GroupBy(x => x.Name).Select(x => x.First()).ToList();
             }
         }
+
+
+        //ISecurable Impl.
+        public virtual string PrimaryOwnerId { get; set; }
+        public virtual string PrimaryContactId { get; set; }
+        public virtual bool IsSecured { get; set; }
+        public virtual Security Security { get; set; }
+        
+
+
+
+
 
         public virtual ValidationResults ValidateForDelete()
         {
@@ -104,7 +112,7 @@ namespace Sentry.data.Core
             {
                 vr.Add(GlobalConstants.ValidationErrors.UPLOAD_USER_NAME_IS_BLANK, "The Dataset UPload User Name is required");
             }
-            if (!Regex.IsMatch(SentryOwnerName, "(^[0-9]{6,6}$)"))
+            if (!Regex.IsMatch(PrimaryOwnerId, "(^[0-9]{6,6}$)"))
             {
                 vr.Add(GlobalConstants.ValidationErrors.SENTRY_OWNER_IS_NOT_NUMERIC, "The Sentry Owner ID should contain owners Sentry ID");
             }
@@ -118,7 +126,7 @@ namespace Sentry.data.Core
             }
 
             //Report specific checks
-            if (DatasetType == GlobalConstants.DataEntityTypes.REPORT && string.IsNullOrWhiteSpace(Metadata.ReportMetadata.Location))
+            if (DatasetType == GlobalConstants.DataEntityCodes.REPORT && string.IsNullOrWhiteSpace(Metadata.ReportMetadata.Location))
             {
                 vr.Add(GlobalConstants.ValidationErrors.LOCATION_IS_BLANK, "Report Location is required");
             }

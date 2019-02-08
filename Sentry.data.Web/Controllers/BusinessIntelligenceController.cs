@@ -8,7 +8,7 @@ using System.Web.SessionState;
 namespace Sentry.data.Web.Controllers
 {
     [SessionState(SessionStateBehavior.ReadOnly)]
-    [AuthorizeByPermission(PermissionNames.ManageReports)]
+    [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_VIEW)]
     public class BusinessIntelligenceController : BaseController
     {
 
@@ -31,12 +31,13 @@ namespace Sentry.data.Web.Controllers
         {
             BusinessIntelligenceHomeModel rhm = _businessIntelligenceService.GetHomeDto().ToModel();
 
-            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Business Intelligence Home Page", 0);
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Business Intelligence Home Page", 0);
             return View(rhm);
         }
 
 
         [HttpGet]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_MODIFY)]
         public ActionResult Create()
         {
             BusinessIntelligenceModel cdm = new BusinessIntelligenceModel
@@ -49,13 +50,14 @@ namespace Sentry.data.Web.Controllers
 
             ReportUtility.SetupLists(_datasetContext, cdm);
 
-            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Report Creation Page", cdm.DatasetId);
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Report Creation Page", cdm.DatasetId);
             return View("BusinessIntelligenceForm",cdm);
         }
 
 
 
         [HttpGet]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_MODIFY)]
         public ActionResult Edit(int id)
         {
             BusinessIntelligenceDto dto = _businessIntelligenceService.GetBusinessIntelligenceDto(id);
@@ -64,13 +66,14 @@ namespace Sentry.data.Web.Controllers
 
             ReportUtility.SetupLists(_datasetContext, model);
 
-            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Report Edit Page", dto.DatasetId);
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Report Edit Page", dto.DatasetId);
             return View("BusinessIntelligenceForm",model);
         }
 
 
 
         [HttpPost]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_MODIFY)]
         public ActionResult BusinessIntelligenceForm(BusinessIntelligenceModel crm) 
         {
             AddCoreValidationExceptionsToModel(crm.Validate());
@@ -87,7 +90,7 @@ namespace Sentry.data.Web.Controllers
                         bool IsSucessful = _businessIntelligenceService.CreateAndSaveBusinessIntelligence(dto);
                         if (IsSucessful)
                         {
-                            _eventService.PublishSuccessEvent(GlobalConstants.EventType.CREATED_REPORT, SharedContext.CurrentUser.AssociateId, crm.DatasetName + " was created.", dto.DatasetId);
+                            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.CREATED_REPORT, SharedContext.CurrentUser.AssociateId, crm.DatasetName + " was created.", dto.DatasetId);
                             return RedirectToAction("Index");
                         }
                     }
@@ -97,7 +100,7 @@ namespace Sentry.data.Web.Controllers
                     bool IsSucessful = _businessIntelligenceService.UpdateAndSaveBusinessIntelligence(dto);
                     if (IsSucessful)
                     {
-                        _eventService.PublishSuccessEvent(GlobalConstants.EventType.UPDATED_REPORT, SharedContext.CurrentUser.AssociateId, crm.DatasetName + " was updated.", dto.DatasetId);
+                        _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.UPDATED_REPORT, SharedContext.CurrentUser.AssociateId, crm.DatasetName + " was updated.", dto.DatasetId);
                         return RedirectToAction("Detail", new { id = dto.DatasetId });
                     }
                 }
@@ -111,6 +114,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("BusinessIntelligence/Delete/{id}/")]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_MODIFY)]
         public JsonResult Delete(int id)
         {
             try
@@ -130,17 +134,12 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("BusinessIntelligence/Detail/{id}/")]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult Detail(int id)
         {
-            if (!SharedContext.CurrentUser.CanViewReports)
-            {
-                throw new NotAuthorizedException("User is authenticated but does not have permission");
-            }
             BusinessIntelligenceDetailDto dto = _businessIntelligenceService.GetBusinessIntelligenceDetailDto(id);
             BusinessIntelligenceDetailModel model = new BusinessIntelligenceDetailModel(dto);
 
-            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Business Intelligence Detail Page", dto.DatasetId);
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Business Intelligence Detail Page", dto.DatasetId);
             return View(model);
         }
 
