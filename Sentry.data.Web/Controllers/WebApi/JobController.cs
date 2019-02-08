@@ -362,11 +362,11 @@ namespace Sentry.data.Web.Controllers
                     // THIS HAS BRACKETS javaOptionsOverride.ConfigurationParameters  [ ]
                     if (javaOptionsOverride != null && javaOptionsOverride.Arguments != null)
                     {
-                        json.Append($", \"args\": " + javaOptionsOverride.Arguments);
+                        GenerateArguments(javaOptionsOverride.Arguments, json);
                     }
                     else if (job.JobOptions != null && job.JobOptions.JavaAppOptions != null && job.JobOptions.JavaAppOptions.Arguments != null)
                     {
-                        json.Append($", \"args\": " + job.JobOptions.JavaAppOptions.Arguments);
+                        GenerateArguments(job.JobOptions.JavaAppOptions.Arguments, json);
                     }
 
                     string[] jars = dsrc.Options.JarDepenencies;
@@ -450,6 +450,17 @@ namespace Sentry.data.Web.Controllers
             {
                 Logger.Error($"Internal Error (Job\\Submit) - JobId:{JobId} JobGuid:{JobGuid} javaOptionsOverride:{JsonConvert.SerializeObject(javaOptionsOverride)}", ex);
                 return InternalServerError(ex);
+            }
+        }
+
+        private static void GenerateArguments(string[] arguments, StringBuilder json)
+        {
+            json.Append($", \"args\": [");
+            int cnt = 1;
+            foreach (string arg in arguments)
+            {
+                string argString = (cnt < arguments.Count()) ? $"\"{arg}\"," : $"\"{arg}\"]";
+                json.Append(argString);
             }
         }
 
@@ -564,7 +575,7 @@ namespace Sentry.data.Web.Controllers
         //THESE ARE EXACT COPIES FROM RETRIEVER JOB OPTIONS.
         public class JavaOptionsOverride
         {
-            public string Arguments { get; set; }
+            public string[] Arguments { get; set; }
             public string ConfigurationParameters { get; set; }
             public string DriverMemory { get; set; }
             public int? DriverCores { get; set; }
