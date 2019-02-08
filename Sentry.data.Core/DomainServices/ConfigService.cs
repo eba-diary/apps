@@ -283,7 +283,7 @@ namespace Sentry.data.Core
             dto.SchemaID = de.DataElement_ID;
             dto.Format = de.FileFormat;
             dto.Delimiter = de.Delimiter;
-            dto.Header = true;
+            dto.Header = de.HasHeader;
             dto.HiveDatabase = de.HiveDatabase;
             dto.HiveTable = de.HiveTable;
             dto.HiveStatus = de.HiveTableStatus;

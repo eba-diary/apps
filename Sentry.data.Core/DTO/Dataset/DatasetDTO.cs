@@ -11,6 +11,7 @@ namespace Sentry.data.Core
         public string ConfigFileDesc { get; set; }
         public int FileExtensionId { get; set; }
         public string Delimiter { get; set; }
+        public bool HasHeader { get; set; }
         public int DatasetScopeTypeId { get; set; }
         public string DatasetInformation { get; set; }
         public string CategoryName { get; set; }
