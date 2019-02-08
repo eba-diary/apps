@@ -166,7 +166,7 @@ namespace Sentry.data.Infrastructure
                 if (ds != null)
                 {
                     DataFeed df = null;
-                    if (ds.DatasetType == GlobalConstants.DataEntityTypes.REPORT)
+                    if (ds.DatasetType == GlobalConstants.DataEntityCodes.REPORT)
                     {
                         df = new DataFeed()
                         {
@@ -214,7 +214,7 @@ namespace Sentry.data.Infrastructure
                 if (ds != null)
                 {
                     DataFeed df = null;
-                    if (ds.DatasetType != null && ds.DatasetType == "RPT")
+                    if (ds.DatasetType != null && ds.DatasetType == GlobalConstants.DataEntityCodes.REPORT)
                     {
                         df = new DataFeed()
                         {

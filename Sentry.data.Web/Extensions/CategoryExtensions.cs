@@ -5,7 +5,7 @@ using System.Web.Mvc;
 
 namespace Sentry.data.Web
 {
-    public static class SharedExtensions
+    public static class CategoryExtensions
     {
 
         public static CategoryModel ToModel(this Core.Category core)
@@ -23,7 +23,7 @@ namespace Sentry.data.Web
 
         public static List<CategoryModel> ToModel(this List<Core.Category> core)
         {
-            if(core?.Count == 0) { return new List<CategoryModel>(); }
+            if(core is null || core.Count == 0) { return new List<CategoryModel>(); }
 
             List<CategoryModel> models = new List<CategoryModel>();
             core.ForEach(x => models.Add(x.ToModel()));

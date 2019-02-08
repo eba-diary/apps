@@ -44,10 +44,9 @@ namespace Sentry.data.Web.Controllers
 
             HomeModel hm = new HomeModel()
             {
-                DatasetCount = dsList.Count(w => w.DatasetType == GlobalConstants.DataEntityTypes.DATASET),
-                Categories = _dsContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityTypes.DATASET).ToList(),
-                CanEditDataset = SharedContext.CurrentUser.CanEditDataset,
-                CanUpload = SharedContext.CurrentUser.CanUpload
+                DatasetCount = dsList.Count(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET),
+                Categories = _dsContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityCodes.DATASET).ToList(),
+                CanEditDataset = SharedContext.CurrentUser.CanModifyDataset
             };
 
             Event e = new Event()
@@ -188,7 +187,7 @@ namespace Sentry.data.Web.Controllers
                 });
             }
 
-            ViewBag.CanEditDataset = SharedContext.CurrentUser.CanEditDataset;
+            ViewBag.CanEditDataset = SharedContext.CurrentUser.CanModifyDataset;
             return PartialView("_Favorites", favItems);
         }
     }

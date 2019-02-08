@@ -15,35 +15,21 @@ namespace Sentry.data.Core
     /// <remarks></remarks>
     public interface IApplicationUser
     {
-
         string AssociateId { get; }
-
-        //Simple properties that comes from external data sources
         string EmailAddress { get; }
-
-        //Security/Permission checks
-        //###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific
-        Boolean CanApproveItems { get; }
-        Boolean CanDwnldSenstive { get; }
-        Boolean CanDwnldNonSensitive { get; }
-        Boolean CanEditDataset { get; }
-        Boolean CanUpload { get; }
-        Boolean CanQueryTool { get; }
-        Boolean CanQueryToolPowerUser { get; }
-
-        //###  END Sentry.Data  ### - Code above is Sentry.Data-specific
-        Boolean CanUseApp { get; }
-        Boolean CanUserSwitch { get; }
-        IEnumerable<string> Permissions { get; }
-        Boolean CanManageConfigs { get; }
-        Boolean CanManageAssetAlerts { get; }
-        Boolean CanViewDataset { get; }
-        Boolean CanViewDataAsset { get; }
-        Boolean CanViewReports { get; }
-        Boolean CanManageReports { get; }
-        Boolean AdminUser { get; }
-        //Calculated values - may come from external data sources and/or our domain User object
         string DisplayName { get; }
+
+        Boolean CanUseApp { get; }
+        Boolean CanUserSwitch { get; } 
+        IEnumerable<string> Permissions { get; }
+        Boolean CanViewDataset { get; } //DSC_Dataset_View - DatasetView
+        Boolean CanModifyDataset { get; } //DSC_Dataset_Modify - DatasetModify
+        Boolean CanViewReports { get; } //DSC_Report_View - ReportView
+        Boolean CanManageReports { get; } //DSC_Report_Modify - ReportModify
+        Boolean CanViewDataAsset { get; } //DSC_Asset_View - DataAssetView
+        Boolean CanManageAssetAlerts { get; } //DSC_Asset_Modify - DataAssetModify
+        bool IsInGroup(string group);
+        //Calculated values - may come from external data sources and/or our domain User object
         DomainUser DomainUser { get; }
     }
 }

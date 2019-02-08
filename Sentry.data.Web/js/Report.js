@@ -39,7 +39,7 @@ data.Report = {
         });
     },
 
-    FormInit: function () {
+    FormInit: function (hrEmpUrl, hrEmpEnv) {
 
         $("#DatasetCategoryIds").select2({
             placeholder:"Select Categories"
@@ -51,25 +51,39 @@ data.Report = {
             placeholder: "Select Functions"
         });
         $("#DatasetFileTypeId").select2({
-            placeholder: "Select Exhibit Type"
+            placeholder: "Select Exhibit Type",
+            allowClear: true
         });
-        
+        $("#FileTypeId").select2({
+            placeholder: "Select Exhibit Type",
+            allowClear: true,
+            minimumResultsForSearch: 10
+        });
+        $("#FrequencyId").select2({
+            placeholder: "Select Frequency",
+            allowClear: true,
+            minimumResultsForSearch: 10
+        });
 
-        function setPanelDefaults() {
-            var fileTypeVal = $("#FileTypeId").find(":selected").text();
-            data.Report.SetGetLatestPanel(fileTypeVal);
-        }
-
-        /// Initialize the Create Dataset view
+        /// Initialize the Create Exhibit view
         //Set Secure HREmp service URL for associate picker
-        $.assocSetup({ url: "https://hrempsecure.sentry.com/api/associates" });
-
-        var picker = $("#SentryOwnerName");
-
-        picker.assocAutocomplete({
+        $.assocSetup({ url: hrEmpUrl });
+        var permissionFilter = "ReportModify,DatasetManagement," + hrEmpEnv;
+        $("#PrimaryOwnerName").assocAutocomplete({
             associateSelected: function (associate) {
-                $('#SentryOwnerId').val(associate.Id);
-            }
+                $('#PrimaryOwnerId').val(associate.Id);
+            },
+            filterPermission: permissionFilter,
+            minLength: 0,
+            maxResults: 10
+        });
+        $("#PrimaryContactName").assocAutocomplete({
+            associateSelected: function (associate) {
+                $('#PrimaryContactId').val(associate.Id);
+            },
+            filterPermission: permissionFilter,
+            minLength: 0,
+            maxResults: 10
         });
 
         //determine the cancel button url
@@ -88,9 +102,8 @@ data.Report = {
         });
 
         $("#FileTypeId").change(function () {
-            var txt = $(this).find(":selected").text();
-            data.Report.SetGetLatestPanel(txt);
-        })
+            data.Report.SetGetLatestPanel($(this).val());
+        });
 
         data.Tags.initTags();
     },
@@ -198,14 +211,13 @@ data.Report = {
     },
 
     SetGetLatestPanel: function (fileType) {
-        if (fileType == 'BusinessObjects') {
-            $('#BOGetLatestPanel').show();
+        // check for the BusinessObjects file type; value is stored in a hidden field on BusinessIntelligenceForm.cshtml
+        if (fileType === $("#hidBizObjEnumVal").val()) {
+            $('#BOGetLatestPanel').removeClass("hidden");
         }
         else {
-            $('#BOGetLatestPanel').hide();
+            $('#BOGetLatestPanel').addClass("hidden");
             $('#GetLatest').prop('checked', false);
-            $('#GetLatest').prop('disabled', true);
         }
     }    
 };
-

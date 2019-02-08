@@ -89,7 +89,6 @@ namespace Sentry.data.Infrastructure
             registry.For<IFtpProvider>().Singleton().Use<FtpProvider>();
             registry.For<IS3ServiceProvider>().Singleton().Use<S3ServiceProvider>();
             registry.For<IMessagePublisher>().Singleton().Use<KafkaMessagePublisher>();
-            
             //Create the StructureMap container
             _container = new StructureMap.Container(registry);
 

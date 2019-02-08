@@ -588,6 +588,62 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="Sequence" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="0657ffed-0d03-4547-8f35-1a832b0298fb" ChangeDateTime="01/28/2019 17:05:02">
+    <Property Name="ElementName" Value="[dbo].[Dataset].[SentryOwner_NME]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Dataset]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[PrimarySentryOwner_ID]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="8fb71d89-d39f-4892-9165-45d6d3a92409" ChangeDateTime="01/28/2019 17:05:28">
+    <Property Name="ElementName" Value="[dbo].[Dataset].[PrimarySentryOwner_ID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Dataset]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[PrimaryOwner_ID]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="1859249c-4bf4-434a-b4fd-c860e8396487" ChangeDateTime="01/28/2019 22:00:31">
+    <Property Name="ElementName" Value="[dbo].[Dataset].[IsSecured]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Dataset]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[IsSecured_IND]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="6543ce41-6118-41e8-8c5b-2bbb2afacb56" ChangeDateTime="01/29/2019 15:00:28">
+    <Property Name="ElementName" Value="[dbo].[Security].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Security]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Security_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="79d9aa9e-0605-4b6a-bd86-26999e34224e" ChangeDateTime="01/29/2019 17:34:02">
+    <Property Name="ElementName" Value="[dbo].[Security].[Object_TYP]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Security]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[Table_NME]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="e683ee48-65dd-4782-8b53-f1190089bd9d" ChangeDateTime="01/30/2019 14:44:42">
+    <Property Name="ElementName" Value="[dbo].[Security].[Table_NME]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Security]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[SecurableEntity_NME]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="26a68cbf-63e1-4102-ba94-b46586fc9057" ChangeDateTime="01/30/2019 22:04:27">
+    <Property Name="ElementName" Value="[dbo].[Security].[CreateBy_ID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Security]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[CreatedBy_ID]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="61adae91-3ac4-403b-9be2-b74a77594ebe" ChangeDateTime="01/31/2019 15:52:22">
+    <Property Name="ElementName" Value="[dbo].[SecurityPermission].[IsEnabled]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SecurityPermission]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[IsEnabled_IND]" />
+  </Operation>
   <Operation Name="Rename Refactor" Key="6d422808-95c4-4143-970d-061acbad1eed" ChangeDateTime="01/28/2019 20:19:00">
     <Property Name="ElementName" Value="[dbo].[DatasetBusinessUnit].[Id]" />
     <Property Name="ElementType" Value="SqlSimpleColumn" />
@@ -643,5 +699,12 @@
     <Property Name="ParentElementName" Value="[dbo].[DatasetFunction]" />
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="DatasetFunction_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="b9a36be9-d07f-45c2-965a-f1fd428bc9e2" ChangeDateTime="02/06/2019 15:27:39">
+    <Property Name="ElementName" Value="[dbo].[Dataset].[SecondaryOwner_ID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Dataset]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[PrimaryContact_ID]" />
   </Operation>
 </Operations>

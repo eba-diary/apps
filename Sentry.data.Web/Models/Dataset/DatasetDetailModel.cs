@@ -9,12 +9,6 @@ namespace Sentry.data.Web
 
         public DatasetDetailModel(DatasetDetailDto dto) : base(dto)
         {
-            CanDwnldSenstive = dto.CanDwnldSenstive;
-            CanManageConfigs = dto.CanManageConfigs;
-            CanDwnldNonSensitive = dto.CanDwnldNonSensitive;
-            CanQueryTool = dto.CanQueryTool;
-            CanUpload = dto.CanUpload;
-            CanEditDataset = dto.CanEditDataset;
             Downloads = dto.Downloads;
             DatasetFileCount = dto.DatasetFileCount;
             DatasetFileConfigNames = dto.DatasetFileConfigNames;
@@ -24,19 +18,12 @@ namespace Sentry.data.Web
             DataClassificationDescription = dto.DataClassificationDescription;
         }
 
-        public bool CanDwnldSenstive { get; set; }
-        public bool CanManageConfigs { get; set; }
-        public bool CanDwnldNonSensitive { get; set; }
-        public bool CanQueryTool { get; set; }
-        public bool CanUpload { get; set; }
-        public bool CanEditDataset { get; set; }
         public int Downloads { get; set; }
         public string OriginationCode { get; set; }
         public int DatasetFileCount { get; set; }
         public Dictionary<string, string> DatasetFileConfigNames { get; set; }
         public Dictionary<string, string> DatasetScopeTypeNames { get; set; }
         public List<string> DistinctFileExtensions { get; set; }
-
         public string DataClassificationDescription { get; set; }
     }
 }

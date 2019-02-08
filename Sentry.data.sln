@@ -42,6 +42,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "StandaloneLibraries", "Stan
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.AsyncCommandProcessor", "StandaloneLibraries\Sentry.AsyncCommandProcessor\Sentry.AsyncCommandProcessor.csproj", "{1995839B-6107-45DF-84BE-4BC4606DC530}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.data.Core.Tests", "Sentry.data.Core.Tests\Sentry.data.Core.Tests.csproj", "{D871509A-AB3D-4B70-B1F1-23BF5F807D0D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -91,6 +93,10 @@ Global
 		{1995839B-6107-45DF-84BE-4BC4606DC530}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1995839B-6107-45DF-84BE-4BC4606DC530}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1995839B-6107-45DF-84BE-4BC4606DC530}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D871509A-AB3D-4B70-B1F1-23BF5F807D0D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D871509A-AB3D-4B70-B1F1-23BF5F807D0D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D871509A-AB3D-4B70-B1F1-23BF5F807D0D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D871509A-AB3D-4B70-B1F1-23BF5F807D0D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

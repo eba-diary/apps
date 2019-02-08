@@ -6,8 +6,8 @@ namespace Sentry.data.Core.GlobalEnums
     {
         [Description("None")]
         None = 0,
-        [Description("Restricted")]
-        Restricted = 1,
+        //[Description("Restricted")]
+        //Restricted = 1,
         [Description("Highly Sensitive")]
         HighlySensitive = 2,
         [Description("Internal Use Only")]

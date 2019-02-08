@@ -38,14 +38,14 @@ namespace Sentry.data.Web
         [DisplayName("Get Latest")]
         public bool GetLatest { get; set; }
 
-        [Required]
         [DisplayName("Business Unit")]
         public List<int> DatasetBusinessUnitIds { get; set; }
 
-        [Required]
         [DisplayName("Function")]
         public List<int> DatasetFunctionIds { get; set; }
         public string ReportLink { get; set; }
+
+        public int BusinessObjectsEnumValue { get; set; }
 
 
         public List<string> Validate()

@@ -27,7 +27,6 @@ namespace Sentry.data.Core.Entities.Livy
         public Boolean HasSchema { get; set; }
         public Boolean HasQueryableSchema { get; set; }
         public Boolean IsGeneric { get; set; }
-        public Boolean IsPowerUser { get; set; }
         public List<QueryableSchema> Schemas { get; set; }
     }
     

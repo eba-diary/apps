@@ -18,9 +18,9 @@ using Sentry.Common.Logging;
 using Newtonsoft.Json;
 using System.Linq.Expressions;
 using StructureMap;
-using Sentry.data.Core.Entities.Metadata;
 using System.Runtime.InteropServices;
 using Newtonsoft.Json.Linq;
+using Sentry.Core;
 
 namespace Sentry.data.Common
 {
@@ -281,7 +281,7 @@ namespace Sentry.data.Common
                     //If datafiles exist for this DatasetFileConfig
                     if (df_id != 0)
                     {
-                        df_Orig = _dscontext.GetDatasetFile(df_id);
+                        df_Orig = _dscontext.DatasetFile.Where(x => x.DatasetFileId == df_id).Fetch(x => x.DatasetFileConfig).FirstOrDefault();
                         df_newParent = CreateParentDatasetFile(ds, dfc, uplduser, targetFileName, df_Orig, isBundled, startTime);
                     }
                     //If there are no datafiles for this DatasetFileConfig
@@ -398,7 +398,7 @@ namespace Sentry.data.Common
                             //If datafiles exist for this DatasetFileConfig
                             if (df_id != 0)
                             {
-                                df_Orig = _dscontext.GetDatasetFile(df_id);
+                                df_Orig = _dscontext.DatasetFile.Where(x => x.DatasetFileId == df_id).Fetch(x => x.DatasetFileConfig).FirstOrDefault();
                                 df_newParent = CreateParentDatasetFile(ds, job.DatasetConfig, uplduser, targetFileName, df_Orig, isBundled, startTime);
                             }
                             //If there are no datafiles for this DatasetFileConfig

@@ -1,17 +1,13 @@
 ﻿using Sentry.data.Core;
-using Sentry.data.Infrastructure;
-using Swashbuckle.Swagger.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace Sentry.data.Web.Controllers
 {
     [RoutePrefix(WebConstants.Routes.VERSION_TAG)]
-    [AuthorizeByPermission(PermissionNames.QueryToolUser)]
     public class TagController : BaseWebApiController
     {
         private MetadataRepositoryService _metadataRepositoryService;

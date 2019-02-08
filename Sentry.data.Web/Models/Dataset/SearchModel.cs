@@ -11,7 +11,7 @@ namespace Sentry.data.Web
         public SearchModel(Dataset ds, IAssociateInfoProvider _associateInfoProvider)
         {
 
-            Sentry.Associates.Associate sentryAssociate = _associateInfoProvider.GetAssociateInfo(ds.SentryOwnerName);
+            Sentry.Associates.Associate sentryAssociate = _associateInfoProvider.GetAssociateInfo(ds.PrimaryOwnerId);
 
             if (ds.DatasetCategories.Count > 1)
             {
@@ -40,6 +40,7 @@ namespace Sentry.data.Web
 
             this.Categories = ds.DatasetCategories.Select(x => x.Name).ToList();
             this.CategoryNames = string.Join(", ", this.Categories);
+            this.IsSecured = ds.IsSecured;
             this.DatasetName = ds.DatasetName;
             this.DatasetId = ds.DatasetId;
             this.DatasetDesc = ds.DatasetDesc;
@@ -61,7 +62,7 @@ namespace Sentry.data.Web
 
             this.Type = ds.DatasetType;
 
-            if (ds.DatasetType == GlobalConstants.DataEntityTypes.REPORT)
+            if (ds.DatasetType == GlobalConstants.DataEntityCodes.REPORT)
             {
                 ReportType type = (ReportType)ds.DatasetFileConfigs.First().FileTypeId;
                 this.DistinctFileExtensions = new List<string> { type.ToString() };
@@ -109,7 +110,7 @@ namespace Sentry.data.Web
         public List<string> Frequencies { get; set; }
         public string UpdateFrequency { get; set; }
 
-        public Boolean IsSensitive { get; set; }
+        public bool IsSecured { get; set; }
 
         public string ChangedDtm { get; set; }
         public string CreatedDtm { get; set; }

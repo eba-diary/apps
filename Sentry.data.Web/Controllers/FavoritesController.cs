@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Web;
 using System.Web.Mvc;
 using Sentry.data.Core;
@@ -61,6 +62,45 @@ namespace Sentry.data.Web.Controllers
             _datasetContext.SaveChanges();
 
             return PartialView("_FavoritesList", BuildFavoritesModel());
+        }
+
+        public JsonResult SetFavorite(int datasetId)
+        {
+            try
+            {
+                Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+
+                if (!ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId))
+                {
+                    Favorite f = new Favorite()
+                    {
+                        DatasetId = ds.DatasetId,
+                        UserId = SharedContext.CurrentUser.AssociateId,
+                        Created = DateTime.Now
+                    };
+
+                    _datasetContext.Merge(f);
+                    _datasetContext.SaveChanges();
+
+                    Response.StatusCode = (int)HttpStatusCode.OK;
+                    return Json(new { message = "Successfully added favorite." }, JsonRequestBehavior.AllowGet);
+                }
+                else
+                {
+                    _datasetContext.Remove(ds.Favorities.First(w => w.UserId == SharedContext.CurrentUser.AssociateId));
+                    _datasetContext.SaveChanges();
+
+                    Response.StatusCode = (int)HttpStatusCode.OK;
+                    return Json(new { message = "Successfully removed favorite." }, JsonRequestBehavior.AllowGet);
+                }
+            }
+            catch (Exception)
+            {
+                _datasetContext.Clear();
+                Response.StatusCode = (int)HttpStatusCode.BadRequest;
+                return Json(new { message = "Failed to modify favorite." }, JsonRequestBehavior.AllowGet);
+            }
+
         }
 
         // 
