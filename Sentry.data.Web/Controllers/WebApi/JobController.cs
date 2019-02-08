@@ -360,11 +360,11 @@ namespace Sentry.data.Web.Controllers
                     }
 
                     // THIS HAS BRACKETS javaOptionsOverride.ConfigurationParameters  [ ]
-                    if (javaOptionsOverride != null && javaOptionsOverride.Arguments != null)
+                    if (javaOptionsOverride != null && javaOptionsOverride.Arguments != null && javaOptionsOverride.Arguments.Any())
                     {
                         GenerateArguments(javaOptionsOverride.Arguments, json);
                     }
-                    else if (job.JobOptions != null && job.JobOptions.JavaAppOptions != null && job.JobOptions.JavaAppOptions.Arguments != null)
+                    else if (job.JobOptions != null && job.JobOptions.JavaAppOptions != null && job.JobOptions.JavaAppOptions.Arguments != null && job.JobOptions.JavaAppOptions.Arguments.Any())
                     {
                         GenerateArguments(job.JobOptions.JavaAppOptions.Arguments, json);
                     }
