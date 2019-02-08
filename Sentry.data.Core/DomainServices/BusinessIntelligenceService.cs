@@ -106,10 +106,10 @@ namespace Sentry.data.Core
 
             if (dto.FileTypeId == (int)ReportType.Excel)
             {
-                int pos = dto.Location.LastIndexOf('\\');
-                string directory = dto.Location.Substring(0, pos);
                 try
                 {
+                    int pos = dto.Location.LastIndexOf('\\');
+                    string directory = dto.Location.Substring(0, pos);
                     Directory.GetAccessControl(directory);
                     File.GetAccessControl(dto.Location);
                     var file = File.OpenRead(dto.Location);
