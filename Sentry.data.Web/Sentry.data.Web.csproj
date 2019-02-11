@@ -1262,6 +1262,7 @@
     <Content Include="Views\Favorites\_FavoritesList.cshtml" />
     <Content Include="Views\BusinessArea\PersonalLines.cshtml" />
     <Content Include="Views\BusinessArea\_LandingPageTile.cshtml" />
+    <Content Include="Views\BusinessArea\_WhatsNew.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
