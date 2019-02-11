@@ -23,6 +23,8 @@ namespace Sentry.data.Core
         public virtual bool IsAddingPermission { get; set; }
         public virtual bool IsRemovingPermission { get; set; }
         public virtual string AdGroupName { get; set; }
+        public virtual bool IsSecuredAtUserLevel { get; set; }
+        public virtual string GrantPermissionToUserId { get; set; }
 
         public virtual Security ParentSecurity { get; set; }
 
