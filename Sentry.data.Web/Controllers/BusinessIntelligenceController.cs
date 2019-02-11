@@ -50,7 +50,7 @@ namespace Sentry.data.Web.Controllers
             ReportUtility.SetupLists(_datasetContext, cdm);
 
             _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Report Creation Page", cdm.DatasetId);
-            return View("BusinessIntelligenceForm",cdm);
+            return View("BusinessIntelligenceForm", cdm);
         }
 
 
@@ -65,25 +65,24 @@ namespace Sentry.data.Web.Controllers
             ReportUtility.SetupLists(_datasetContext, model);
 
             _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Report Edit Page", dto.DatasetId);
-            return View("BusinessIntelligenceForm",model);
+            return View("BusinessIntelligenceForm", model);
         }
 
 
 
         [HttpPost]
-        public ActionResult BusinessIntelligenceForm(BusinessIntelligenceModel crm) 
+        public ActionResult BusinessIntelligenceForm(BusinessIntelligenceModel crm)
         {
             AddCoreValidationExceptionsToModel(crm.Validate());
 
             if (ModelState.IsValid)
             {
                 BusinessIntelligenceDto dto = crm.ToDto();
-
-                if(dto.DatasetId == 0)
-                { //CREATE A REPORT
-                    AddCoreValidationExceptionsToModel(_businessIntelligenceService.Validate(dto));
-                    if (ModelState.IsValid)
-                    {
+                AddCoreValidationExceptionsToModel(_businessIntelligenceService.Validate(dto));
+                if (ModelState.IsValid)
+                {
+                    if (dto.DatasetId == 0)
+                    { //CREATE A REPORT
                         bool IsSucessful = _businessIntelligenceService.CreateAndSaveBusinessIntelligence(dto);
                         if (IsSucessful)
                         {
@@ -91,14 +90,14 @@ namespace Sentry.data.Web.Controllers
                             return RedirectToAction("Index");
                         }
                     }
-                }
-                else
-                { //EDIT A REPORT
-                    bool IsSucessful = _businessIntelligenceService.UpdateAndSaveBusinessIntelligence(dto);
-                    if (IsSucessful)
-                    {
-                        _eventService.PublishSuccessEvent(GlobalConstants.EventType.UPDATED_REPORT, SharedContext.CurrentUser.AssociateId, crm.DatasetName + " was updated.", dto.DatasetId);
-                        return RedirectToAction("Detail", new { id = dto.DatasetId });
+                    else
+                    { //EDIT A REPORT
+                        bool IsSucessful = _businessIntelligenceService.UpdateAndSaveBusinessIntelligence(dto);
+                        if (IsSucessful)
+                        {
+                            _eventService.PublishSuccessEvent(GlobalConstants.EventType.UPDATED_REPORT, SharedContext.CurrentUser.AssociateId, crm.DatasetName + " was updated.", dto.DatasetId);
+                            return RedirectToAction("Detail", new { id = dto.DatasetId });
+                        }
                     }
                 }
             }
