@@ -282,10 +282,10 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
-    <Content Include="Content\business-unit.css" />
+    <Content Include="Content\business-area.css" />
     <Content Include="Content\creat-edit-datasets.css" />
     <Compile Include="Controllers\AdminController.cs" />
-    <Compile Include="Controllers\BusinessUnitController.cs" />
+    <Compile Include="Controllers\BusinessAreaController.cs" />
     <Compile Include="Controllers\FavoritesController.cs" />
     <Compile Include="Controllers\WebApi\ApplicationController.cs" />
     <Compile Include="Controllers\WebApi\AssetController.cs" />
@@ -342,10 +342,12 @@
     <Compile Include="Helpers\TimeSpanFormattingExtensions.cs" />
     <Compile Include="Helpers\WebCurrentUserIdProvider.cs" />
     <Compile Include="HttpExceptions\NotAuthorizedException.cs" />
+    <Compile Include="Models\BusinessArea\BusinessAreaTileModel.cs" />
+    <Compile Include="Models\BusinessArea\BusinessAreaTileRowModel.cs" />
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceDetailModel.cs" />
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceModel.cs" />
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceUIModel.cs" />
-    <Compile Include="Models\BusinessUnit\BusinessUnitLandingPageModel.cs" />
+    <Compile Include="Models\BusinessArea\BusinessAreaLandingPageModel.cs" />
     <Compile Include="Models\Config\CreateExtensionMapModel.cs" />
     <Compile Include="Models\Config\CreateSchemaModel.cs" />
     <Compile Include="Models\Config\CreateSourceModel.cs" />
@@ -404,6 +406,11 @@
     <Content Include="Content\query-tool.css" />
     <Content Include="Content\search.css" />
     <Content Include="Content\tags.css" />
+    <Content Include="Images\BusinessAreaTiles\Collaboration1.jpg" />
+    <Content Include="Images\BusinessAreaTiles\Collaboration5.jpg" />
+    <Content Include="Images\BusinessAreaTiles\ConceptVariety2.jpg" />
+    <Content Include="Images\BusinessAreaTiles\LearningBooks.jpg" />
+    <Content Include="Images\BusinessAreaTiles\Meeting2.jpg" />
     <Content Include="Images\Category\BusinessIntelligence\401k.svg" />
     <Content Include="Images\Category\BusinessIntelligence\claims.svg" />
     <Content Include="Images\Category\BusinessIntelligence\commercial lines.svg" />
@@ -1253,7 +1260,8 @@
     <Content Include="Views\Shared\_Tags.cshtml" />
     <Content Include="Views\Favorites\EditFavorites.cshtml" />
     <Content Include="Views\Favorites\_FavoritesList.cshtml" />
-    <Content Include="Views\BusinessUnit\PersonalLines.cshtml" />
+    <Content Include="Views\BusinessArea\PersonalLines.cshtml" />
+    <Content Include="Views\BusinessArea\_LandingPageTile.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

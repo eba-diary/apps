@@ -1,0 +1,30 @@
+﻿@using Sentry.data.Web;
+@model BusinessAreaLandingPageModel
+@{
+    ViewBag.Title = "Personal Lines";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div id="pl-landing-pg-wrapper">
+
+    <div class="row">
+        <div class="col-sm-12 col-md-12 col-lg-12"><img id="dairyland-logo" alt="Dairyland Logo" src="~/Images/dairyland_logo.png" width="220" /></div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12 col-md-9 col-lg-9">
+
+            @* loop through each row in the model *@
+            @foreach (BusinessAreaTileRowModel row in Model.Rows)
+            {
+                @Html.Partial("_LandingPageTile", row)
+            }
+
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3">
+            @* future home of the "feed-like" feature *@
+            &nbsp;
+        </div>
+    </div>
+
+</div>

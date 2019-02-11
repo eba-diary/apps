@@ -5,7 +5,8 @@ using System.Web;
 
 namespace Sentry.data.Web
 {
-    public class BusinessUnitLandingPageModel
+    public class BusinessAreaLandingPageModel
     {
+        public List<BusinessAreaTileRowModel> Rows { get; set; }
     }
 }

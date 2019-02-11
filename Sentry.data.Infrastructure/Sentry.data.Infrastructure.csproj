@@ -178,7 +178,10 @@
     <Compile Include="Mappings\Metadata\TagGroupMapping.cs" />
     <Compile Include="Mappings\Primary\AssetNotificationMapping.cs" />
     <Compile Include="Mappings\Primary\AssetSourceMapping.cs" />
+    <Compile Include="Mappings\Primary\BusinessAreaMapping.cs" />
+    <Compile Include="Mappings\Primary\BusinessAreaTileRowMapping.cs" />
     <Compile Include="Mappings\Primary\BusinessUnitMapping.cs" />
+    <Compile Include="Mappings\Primary\BusinessAreaTileMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetFileConfigsMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetFileMapping.cs" />
     <Compile Include="Mappings\Primary\ComponentElementMapping.cs" />

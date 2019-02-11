@@ -34,6 +34,7 @@ namespace Sentry.data.Core
         IQueryable<MetadataTag> Tags { get; }
         IQueryable<TagGroup> TagGroups { get; }
         IQueryable<ApplicationConfiguration> ApplicationConfigurations { get; }
+        IQueryable<BusinessAreaTileRow> BusinessAreaTileRows { get; }
 
         /** Datasets **/
 
