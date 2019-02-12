@@ -43,7 +43,7 @@ namespace Sentry.data.Web.Controllers
             BusinessIntelligenceModel cdm = new BusinessIntelligenceModel
             {
                 DatasetId = 0,
-                BusinessObjectsEnumValue = (int)ReportType.BusinessObjects
+                BusinessObjectsEnumValue = (int)ReportType.BusinessObjects,
                 CreationUserId = SharedContext.CurrentUser.AssociateId,
                 UploadUserId = SharedContext.CurrentUser.AssociateId,
             };
