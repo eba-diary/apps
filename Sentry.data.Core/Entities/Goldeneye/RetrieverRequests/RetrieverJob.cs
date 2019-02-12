@@ -188,8 +188,18 @@ namespace Sentry.data.Core
             //if Job options already is filtering file, no need to check if file extension is correct
             if (!filterfile)
             {
-                filterfile = ((DatasetConfig.FileExtension.Name.ToLower().Trim() != "any" || DatasetConfig.FileExtension.Name.ToLower().Trim() != "delimited") 
-                    && DatasetConfig.FileExtension.Name.ToLower().Trim() != Path.GetExtension(fileName).Replace(".",""));
+                switch (DatasetConfig.FileExtension.Name.ToLower().Trim())
+                {
+                    case "any":
+                    case "delimited":
+                        //do not perform any extension checking
+                        break;
+                    default:
+                        //Check if incoming extension matches
+                        filterfile = (DatasetConfig.FileExtension.Name.ToLower().Trim() != Path.GetExtension(fileName).Replace(".", ""));
+                        break;
+                }
+
                 if (filterfile) { this.JobLoggerMessage("Info", "Incoming file was filtered (file extension)"); }
             }                     
 
