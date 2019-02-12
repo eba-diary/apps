@@ -154,19 +154,19 @@ namespace Sentry.data.Core
                 }
 
 
-                if (sr.Type != "ARRAY")
+                if (sr.DataType != "ARRAY")
                 {
-                    dof.DataType = sr.Type;
+                    dof.DataType = sr.DataType;
                 }
                 else
                 {
-                    dof.DataType = sr.Type + "<" + sr.ArrayType + ">";
+                    dof.DataType = sr.DataType + "<" + sr.ArrayType + ">";
                 }
 
                 if (sr.Nullable != null) { dof.Nullable = sr.Nullable ?? null; }
                 if (sr.Precision != null)
                 {
-                    if (sr.Type == "DECIMAL")
+                    if (sr.DataType == "DECIMAL")
                     {
                         dof.Precision = sr.Precision;
                     }
@@ -177,7 +177,7 @@ namespace Sentry.data.Core
                 }
                 if (sr.Scale != null)
                 {
-                    if (sr.Type == "DECIMAL")
+                    if (sr.DataType == "DECIMAL")
                     {
                         dof.Scale = sr.Scale;
                     }
@@ -242,7 +242,7 @@ namespace Sentry.data.Core
                         LastUpdated = b.LastUpdt_DTM.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds
                     };
 
-                    r.Type = (!String.IsNullOrEmpty(b.DataType)) ? b.DataType.ToUpper() : "VARCHAR";
+                    r.DataType = (!String.IsNullOrEmpty(b.DataType)) ? b.DataType.ToUpper() : "VARCHAR";
                     if (b.Precision != null) { r.Precision = b.Precision ?? null; }
                     if (b.Scale != null) { r.Scale = b.Scale ?? null; }
                     if (b.Nullable != null) { r.Nullable = b.Nullable ?? null; }
