@@ -20,6 +20,7 @@ namespace Sentry.data.Web
             //view fields
             this.DatasetName = dto.DatasetName;
             this.DatasetDesc = dto.DatasetDesc;
+            this.CreationUserId = dto.CreationUserId;
             this.CreationUserName = dto.CreationUserName;
             this.PrimaryOwnerId = dto.PrimaryOwnerId;
             this.PrimaryOwnerName = dto.PrimaryOwnerName;
@@ -31,6 +32,7 @@ namespace Sentry.data.Web
             this.TagIds = string.Join(",", dto.TagIds);
 
             this.DatasetId = dto.DatasetId;
+            this.UploadUserId = dto.UploadUserId;
             this.UploadUserName = dto.UploadUserName;
             this.DatasetDtm = dto.DatasetDtm;
             this.ChangedDtm = dto.ChangedDtm;
@@ -64,7 +66,7 @@ namespace Sentry.data.Web
         [Required]
         [MaxLength(128)]
         [DisplayName("Originating Creator")]
-        public string CreationUserName { get; set; }
+        public string CreationUserId { get; set; }
         [Required]
         [DisplayName("Owner")]
         public string PrimaryOwnerName { get; set; }
@@ -105,7 +107,9 @@ namespace Sentry.data.Web
         public string PrimaryOwnerId { get; set; }
         public string PrimaryContactId { get; set; }
         public string PrimaryContactEmail { get; set; }
+        public string UploadUserId { get; set; }
         public string UploadUserName { get; set; }
+        public string CreationUserName { get; set; }
 
         //this is needed for the associate picker js.
         public string HrempServiceUrl { get; set; }
