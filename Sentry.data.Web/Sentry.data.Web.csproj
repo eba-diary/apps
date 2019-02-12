@@ -366,7 +366,8 @@
     <Compile Include="Models\Dataset\ObsoleteDatasetModel.cs" />
     <Compile Include="Models\Dataset\PreviewDataModel.cs" />
     <Compile Include="Models\Dataset\PushToDatasetModel.cs" />
-    <Compile Include="Models\Dataset\SchemaModel.cs" />
+    <Compile Include="Models\Schema\SchemaDetailModel.cs" />
+    <Compile Include="Models\Schema\SchemaModel.cs" />
     <Compile Include="Models\Dataset\DatasetModel.cs" />
     <Compile Include="Models\Dataset\_DatasetMetadataModel.cs" />
     <Compile Include="Models\Favorites\FavoriteItemModel.cs" />
