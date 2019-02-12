@@ -62,7 +62,7 @@ namespace Sentry.data.Web.Controllers
         {
             HomeModel hm = new HomeModel
             {
-                DatasetCount = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET).Count(),
+                DatasetCount = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET && w.CanDisplay).Count(),
                 Categories = _datasetContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityCodes.DATASET).ToList(),
                 CanEditDataset = SharedContext.CurrentUser.CanModifyDataset
             };
@@ -83,7 +83,7 @@ namespace Sentry.data.Web.Controllers
                 //these are defaluted for now and disbled on UI but will change to open field.
                 ConfigFileName = "Default",
                 ConfigFileDesc = "Default Config for Dataset.  Uploaded files that do not match any configs will default to this config",
-                UploadUserName = SharedContext.CurrentUser.AssociateId,
+                UploadUserId = SharedContext.CurrentUser.AssociateId,
             };
 
             Utility.SetupLists(_datasetContext, cdm);
