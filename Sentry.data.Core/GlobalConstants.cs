@@ -112,6 +112,7 @@
             public const string CAN_QUERY_DATASET = "CanQueryDataset";
             public const string CAN_CONNECT_TO_DATASET = "CanConnectToDataset";
             public const string CAN_UPLOAD_TO_DATASET = "CanUploadToDataset";
+            public const string CAN_MODIFY_NOTIFICATIONS = "CanModifyNotification";
 
             public const string USE_APP = "UseApp";
 

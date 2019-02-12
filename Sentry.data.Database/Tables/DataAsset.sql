@@ -10,5 +10,8 @@
     [DataAsset_DSC] VARCHAR(MAX) NULL, 
     [MetadataRepositoryAsset_NME] VARCHAR(50) NULL,
 	[Line_CDE] [varchar](5) NULL,
-	[Model_NME] [varchar](50) NULL
+	[Model_NME] [varchar](50) NULL, 
+    [IsSecured_IND] BIT NOT NULL DEFAULT 0, 
+    [PrimaryOwner_ID] VARCHAR(8) NOT NULL DEFAULT '000000', 
+    [PrimaryContact_ID] VARCHAR(8) NOT NULL DEFAULT '000000'
 )

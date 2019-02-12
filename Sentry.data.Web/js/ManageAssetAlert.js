@@ -39,7 +39,7 @@ data.ManageAssetAlert = {
             columns: [
                         { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px" },
                         { data: "EditHref", className: "editConfig", width: "20px" },
-                        { data: "IsActive", className: "isActive", render: function (data, type, row) { return (data == true) ? '<span class="glyphicon glyphicon-ok"> </span>' : '<span class="glyphicon glyphicon-remove"></span>'; } },
+                        { data: "IsActive", className: "isActive", render: function (data, type, row) { return data === true ? '<span class="glyphicon glyphicon-ok"> </span>' : '<span class="glyphicon glyphicon-remove"></span>'; } },
                         //{ data: "NotificationId", className: "notificationId" },
                         { data: "ParentDataAssetName", className: "parentDataAssetName" },
                         //{ data: "DisplayCreateUser.FullName", className: "displayCreateUser" },
@@ -49,29 +49,11 @@ data.ManageAssetAlert = {
                         { data: "Message", className: "message" }
             ],
             order: [[2, 'desc'],[4, 'desc']]
-            //stateSave: true,
-            //stateDuration: -1  // indicates session storage, not local storage
         });
 
-        //$("#datasetFileConfigsTable").dataTable().columnFilter({
-        //    sPlaceHolder: "head:after",
-        //    aoColumns: [
-        //            null,
-        //            null,
-        //            null,
-        //            { type: "number-range" },
-        //            { type: "text" },
-        //            { type: "text" },
-        //            { type: "text" },
-        //            { type: "text" }
-        //    ]
-        //});
-
-        var DataFilesTable = $('#assetnotificationTable').dataTable();
 
         // DataTable
         var table = $('#assetnotificationTable').DataTable();
-
 
         $('#assetnotificationTable tbody').on('click', 'tr', function () {
             if ($(this).hasClass('active')) {
@@ -83,19 +65,6 @@ data.ManageAssetAlert = {
             }
         });
 
-
-        //// Apply the filter
-        //table.columns().every(function () {
-        //    var column = this;
-
-        //    $('input', this.footer()).on('keyup change', function () {
-        //        column
-        //            .search(this.value)
-        //            .draw();
-        //    });
-        //});
-
-        //$("#userTable_wrapper .dt-toolbar").html($("#userToolbar"));
 
         $("#Add_Notification").click(function () {
             data.ManageAssetAlert.CreateNotification();

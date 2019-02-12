@@ -7,7 +7,7 @@
 									(2, 'CanViewFullDataset', 'View Full Dataset', 'Access to full dataset with download capability', 'Dataset'),
 									(3, 'CanUploadToDataset', 'Upload to Dataset', 'Access to upload data files to dataset', 'Dataset'),
 									(4, 'CanQueryDataset', 'Query Dataset', 'Access to query dataset using the Query Tool', 'Dataset'),
-									(5, 'CanModifyAlerts', 'Modify Alerts', 'Access to modify alerts for Data Assests', 'DataAsset')
+									(5, 'CanModifyNotification', 'Modify Notifications', 'Access to modify notifications for Data.sentry.com', 'DataAsset')
 									--(enter id here, 'CanConnectToDataset', 'Connect to Dataset', 'Access to connect to dataset using business intelligence tools', 'Dataset'),
 								)
 								AS Source ([Permission_ID], [Permission_CDE], [Permission_NME], [Permission_DSC], [SecurableObject_TYP]) 

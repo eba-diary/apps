@@ -1,0 +1,55 @@
+﻿@model Sentry.data.Web.BaseNotificationModel
+@{
+    ViewBag.Title = "Manage Notifications";
+}
+
+<div class="topBanner">
+    <div>
+        <a class="backToList" href="/DataAsset/Index"><span class="glyphicon glyphicon-chevron-left"></span>Back to Data Assets</a>
+    </div>
+</div>
+
+<h1>Notifications</h1>
+
+<hr />
+
+<div class="form-group">
+    <div>
+        <a href="~/DataAsset/CreateAssetNotification" class="btn btn-md btn-info">Create New Notification</a>
+    </div>
+</div>
+
+<hr />
+
+<div>
+    <div id="hide_detailSectionHeader_AssetNotification">
+        <table class="table table-striped table-bordered " id="assetnotificationTable">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Edit</th>
+                    <th>Active</th>
+                    <th>Parent Asset Name</th>
+                    @*<th>Create User</th>*@
+                    <th>Start Time</th>
+                    <th>Expiration Time</th>
+                    <th>Message Severity</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>
+<br />
+
+
+@section Scripts{
+    @Scripts.Render("~/bundles/dataTables")
+    <script>
+        $(function () {
+            data.ManageAssetAlert.Init();
+        });
+    </script>
+
+}

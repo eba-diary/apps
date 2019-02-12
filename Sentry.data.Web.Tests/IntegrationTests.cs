@@ -59,7 +59,7 @@ namespace Sentry.data.Web.Tests
 
             DataAssetController dac = MockControllers.MockDataAssetController(da);
 
-            var ban = new BaseAssetNotificationModel(an, dac._associateInfoService);
+            var ban = new BaseNotificationModel(an, dac._associateInfoService);
 
             Assert.IsTrue(ban.IsActive);
         }

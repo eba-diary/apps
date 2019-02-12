@@ -1,19 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Sentry.data.Core
 {
-    public class DataAsset
+    public class DataAsset : ISecurable
     {
-        private List<DataAssetHealth> _assetHealth;
 
         public DataAsset()
         {
             Components = new List<ConsumptionLayerComponent>();
         }
 
-        public virtual List<DataElement> DataElements { get; set; }
 
         //ID From the Sentry Datasets Database
         public virtual int Id { get; set; }
@@ -32,54 +29,10 @@ namespace Sentry.data.Core
         public virtual IList<AssetSource> AssetSource{ get; set;}
         public virtual IList<AssetNotifications> AssetNotifications { get; set; }
 
-        public virtual List<DataAssetHealth> AssetHealth
-        {
-            get
-            {
-                if (_assetHealth == null)
-                {
-                    _assetHealth = MetadataRepositoryService.GetByAssetName(MetadataRepAssetName, AssetSource.Where(w => w.IsVisiable).ToList()).OrderBy(o => o.SourceSystem).ToList();
-                    return _assetHealth;
-                }
-                else
-                {
-                    return _assetHealth;
-                }
-                
-            }
-        }
-        public virtual Boolean HealthIncludesSourceSystems {
-            get
-            {                
-                if (this.AssetHealth.Count > 1 || (this.AssetHealth.Count == 1 && this.AssetHealth.FirstOrDefault().SourceSystem != ""))
-                {
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }         
-            }
-        }
-        public virtual DateTime MaxProcessTime {
-            get
-            {
-                if (this.AssetHealth.Count > 0)
-                {
-                    if (this.AssetHealth.Count == 1)
-                    {
-                        return this.AssetHealth[0].AssetUpdtDTM;
-                    }
-                    else
-                    {
-                        return this.AssetHealth.Max(m => m.AssetUpdtDTM);
-                    }                    
-                }
-                else
-                {
-                    return DateTime.MinValue;
-                }
-            }
-        }
+
+        public bool IsSecured { get; set; }
+        public Security Security { get; set; }
+        public string PrimaryOwnerId { get; set; }
+        public string PrimaryContactId { get; set; }
     }
 }
