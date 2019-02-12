@@ -385,6 +385,8 @@
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceHomeModel.cs" />
     <Compile Include="Models\Shared\CategoryModel.cs" />
     <Compile Include="Models\Shared\SearchIndexModel.cs" />
+    <Compile Include="Models\Shared\SystemNotificationItemModel.cs" />
+    <Compile Include="Models\Shared\SystemNotificationModel.cs" />
     <Compile Include="Models\User\SharedContextModel.cs" />
     <Compile Include="Models\Shared\SuccessModel.cs" />
     <Compile Include="Models\Subscription\SubscriptionModel.cs" />
@@ -405,6 +407,7 @@
     <Content Include="Content\query-builder.default.min.css" />
     <Content Include="Content\query-tool.css" />
     <Content Include="Content\search.css" />
+    <Content Include="Content\system-notifications.css" />
     <Content Include="Content\tags.css" />
     <Content Include="Images\BusinessAreaTiles\Collaboration1.jpg" />
     <Content Include="Images\BusinessAreaTiles\Collaboration5.jpg" />
@@ -426,9 +429,11 @@
     <Content Include="Images\Icons\details_close.png" />
     <Content Include="Images\Icons\details_open.png" />
     <Content Include="Images\Icons\Exhibits.svg" />
+    <Content Include="Images\Icons\pl_notification_alert_icon.png" />
     <Content Include="Images\photo-businessintelligence.jpg" />
     <Content Include="Images\photo-dataassets.jpg" />
     <Content Include="Images\photo-datasets.jpg" />
+    <Content Include="Images\pl_notification_alert_icon.png" />
     <Content Include="Images\SHO_Aerial_10-4-17.jpg" />
     <Content Include="Images\SHO_Aerial_10-4-17.png" />
     <Content Include="Images\SHO_SentryWorld_Aerial.jpg" />
@@ -1263,6 +1268,7 @@
     <Content Include="Views\BusinessArea\PersonalLines.cshtml" />
     <Content Include="Views\BusinessArea\_LandingPageTile.cshtml" />
     <Content Include="Views\BusinessArea\_WhatsNew.cshtml" />
+    <Content Include="Views\Shared\_SystemNotifications.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

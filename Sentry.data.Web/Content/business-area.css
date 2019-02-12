@@ -22,5 +22,10 @@
 }
 
 #whats-new-wrapper h2 {
+    color: #472c70;
     margin-top: 0px;
+}
+
+.border-btm-pl {
+    border-bottom: 4px solid #d7d7df;
 }
