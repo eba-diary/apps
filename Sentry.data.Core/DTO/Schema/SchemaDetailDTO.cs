@@ -8,6 +8,6 @@ namespace Sentry.data.Core
 {
     public class SchemaDetailDTO : SchemaDTO
     {
-        public List<SchemaRow> rows { get; set; }
+        public List<SchemaRow> Rows { get; set; }
     }
 }

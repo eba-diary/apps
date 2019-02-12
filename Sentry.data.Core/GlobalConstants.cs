@@ -79,5 +79,10 @@
             public const string GET_LATEST_URL_PARAMETER = "&sInstance=Last";
         }
 
+        public static class ConvertedFileStoragePrefix
+        {
+            public const string PARQUET_STORAGE_PREFIX = "parquet";
+        }
+
     }
 }

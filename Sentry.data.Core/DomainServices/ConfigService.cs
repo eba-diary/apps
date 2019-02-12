@@ -203,90 +203,23 @@ namespace Sentry.data.Core
                 _datasetContext.SaveChanges();
             }
 
-            ////Write message to create associated hive table
-            //dynamic msg1 = new JObject();
-            //string eventTopic = $"{Configuration.Config.GetSetting("SAIDKey").ToUpper()}-{Configuration.Config.GetHostSetting("EnvironmentName").ToUpper()}-{Configuration.Config.GetHostSetting("DSCEventTopic").ToUpper()}";
-            ////Write file information to topic
-            //try
-            //{
-            //    msg1.EventType = "HIVE-TABLE-CREATE";
-            //    msg1.Schema = new JObject();
-            //    msg1.Schema.SchemaId = schema.DataElement_ID;
-            //    msg1.Schema.Format = schema.FileFormat;
-            //    msg1.Schema.Header = "true";
-            //    msg1.Schema.Delimiter = schema.Delimiter;
-            //    msg1.Schema.HiveDatabase = schema.HiveDatabase;
-            //    msg1.Schema.HiveTable = schema.HiveTable;
-            //    msg1.Schema.Columns = new JObject();
-
-            //    msg1.SourceBucket = Configuration.Config.GetHostSetting("AWSRootBucket");
-            //    msg1.SourceKey = df_newParent.FileLocation;
-            //    msg1.SourceVersionId = df_newParent.VersionId;
-
-            //    _messagePublisher.Publish(eventTopic, df_newParent.Schema.DataElement_ID.ToString(), msg1.ToString());
-            //}
-            //catch (Exception ex)
-            //{
-            //    job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{schema.DataElement_ID.ToString()} | topic:{eventTopic} | message:{msg1.ToString()})", ex);
-            //}
-
             HiveTableCreateModel hiveCreate = new HiveTableCreateModel();
+            schema.ToHiveCreateModel(hiveCreate);
 
-            SchemaModel sm = new SchemaModel();
-            sm.SchemaID = schema.DataElement_ID;
-            sm.Format = schema.FileFormat;
-            sm.Header = "true";
-            sm.Delimiter = schema.Delimiter;
-            sm.HiveDatabase = schema.HiveDatabase;
-            sm.HiveTable = schema.HiveTable;
-
-            DataObject dObj = schema.DataObjects.FirstOrDefault();
-
-            List<ColumnModel> ColumnModelList = new List<ColumnModel>();
-
-            if (dObj != null)
-            {
-                foreach (DataObjectField dof in dObj.DataObjectFields)
-                {
-                    ColumnModel cm = new ColumnModel();
-                    cm.Name = dof.DataObjectField_NME;
-                    cm.DataType = dof.DataType;
-                    cm.Nullable = dof.Nullable.ToString();
-                    cm.Length = dof.Length;
-                    cm.Precision = dof.Precision;
-                    cm.Scale = dof.Scale;
-
-                    ColumnModelList.Add(cm);
-                }
-            }
-
-            sm.Columns = ColumnModelList;
-
-            hiveCreate.Schema = sm;
-
-            _messagePublisher.PublishDSCEvent(schema.DataElement_ID.ToString(), JsonConvert.SerializeObject(hiveCreate));
-
-            //UpdateHiveTableStatus(schema, HiveTableStatusEnum.Requested);           
+            _messagePublisher.PublishDSCEvent(schema.DataElement_ID.ToString(), JsonConvert.SerializeObject(hiveCreate));       
             
         }
-
-        //private void UpdateHiveTableStatus(DataElement schema, HiveTableStatusEnum requested)
-        //{
-        //    schema.HiveTableStatus = requested.ToString();
-
-        //    _datasetContext.Merge(schema);
-        //    _datasetContext.SaveChanges();
-        //}
 
         private void MapToDto(DataElement de, SchemaDTO dto)
         {
             dto.SchemaID = de.DataElement_ID;
             dto.Format = de.FileFormat;
             dto.Delimiter = de.Delimiter;
-            dto.Header = de.HasHeader;
+            dto.Header = de.HasHeader.ToString();
             dto.HiveDatabase = de.HiveDatabase;
             dto.HiveTable = de.HiveTable;
             dto.HiveStatus = de.HiveTableStatus;
+            dto.HiveLocation = de.HiveLocation;
         }
 
         private void MaptToDetailDto(DataElement de, SchemaDetailDTO dto)
@@ -318,7 +251,7 @@ namespace Sentry.data.Core
                 }
             }            
 
-            dto.rows = rows;
+            dto.Rows = rows;
         }
         private IList<ColumnDTO> MapToDto(IList<DataObject> objects)
         {

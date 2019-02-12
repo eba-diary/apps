@@ -10,9 +10,9 @@ namespace Sentry.data.Web
     {
         public SchemaDetailModel(SchemaDetailDTO dto) : base(dto)
         {
-            rows = dto.rows;
+            Rows = dto.Rows;
         }
 
-        public List<SchemaRow> rows { get; set; }
+        public List<SchemaRow> Rows { get; set; }
     }
 }
