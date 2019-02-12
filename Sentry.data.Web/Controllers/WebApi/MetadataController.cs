@@ -264,7 +264,7 @@ namespace Sentry.data.Web.Controllers
                                 LastUpdated = b.LastUpdt_DTM.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds
                             };
 
-                            r.Type = (!String.IsNullOrEmpty(b.DataType)) ? b.DataType.ToUpper() : "VARCHAR";
+                            r.DataType = (!String.IsNullOrEmpty(b.DataType)) ? b.DataType.ToUpper() : "VARCHAR";
                             if (b.Precision != null) { r.Precision = b.Precision ?? null; }
                             if (b.Scale != null) { r.Scale = b.Scale ?? null; }
                             //r.Precision = (b.Precision != null && !String.IsNullOrEmpty(b.Precision)) ? b.Precision : null;
