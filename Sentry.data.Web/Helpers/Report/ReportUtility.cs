@@ -138,27 +138,31 @@ namespace Sentry.data.Web.Helpers
 
 
             //Business Intelligence Frequency
-            temp = GetDatasetFrequencyListItems().ToList();
+            temp = new List<SelectListItem>();
 
+            // add an empty option as the first item in the list; needed in order for the select2 placeholder text
             temp.Add(new SelectListItem()
             {
-                Text = "Select Frequency",
-                Value = "0",
-                Selected = true,
-                Disabled = true
+                Text = "",
+                Value = ""
             });
+
+            temp.AddRange(GetDatasetFrequencyListItems().ToList());
 
             model.AllFrequencies = temp.OrderBy(x => x.Value);
 
-            temp = default(ReportType).ToEnumSelectList(((BusinessIntelligenceModel)model).FileTypeId.ToString()).ToList();
+            // Business Intelligence Exhibit Type
+            temp = new List<SelectListItem>();
 
+            // add an empty option as the first item in the list; needed in order for the select2 placeholder text
             temp.Add(new SelectListItem()
             {
-                Text = "Select Exhibit Type",
-                Value = "0",
-                Selected = true,
-                Disabled = true
+                Text = "",
+                Value = ""
             });
+
+            temp.AddRange(default(ReportType).ToEnumSelectList((model).FileTypeId.ToString()).ToList());
+
 
             model.AllDataFileTypes = temp;
         }

@@ -45,15 +45,12 @@ namespace Sentry.data.Web
         public List<int> DatasetFunctionIds { get; set; }
         public string ReportLink { get; set; }
 
+        public int BusinessObjectsEnumValue { get; set; }
+
 
         public List<string> Validate()
         {
             List<string> errors = new List<string>();
-
-            if (!Uri.TryCreate(this.Location, UriKind.Absolute, out Uri temp))
-            {
-                errors.Add("Invalid report location value");
-            }
 
             switch (this.FileTypeId)
             {
@@ -64,9 +61,9 @@ namespace Sentry.data.Web
                     }
                     break;
                 case (int)ReportType.Excel:
-                    if (!Regex.IsMatch(this.Location.ToLower(), "^\\\\\\\\(sentry.com\\\\share\\\\|sentry.com\\\\appfs)"))
+                    if (!Uri.TryCreate(this.Location, UriKind.Absolute, out Uri temp))
                     {
-                        errors.Add("Excel exhibits should begin with \\\\Sentry.com\\Share or \\\\Sentry.com\\appfs");
+                        errors.Add("Invalid file path.");
                     }
                     break;
                 case (int)ReportType.BusinessObjects:

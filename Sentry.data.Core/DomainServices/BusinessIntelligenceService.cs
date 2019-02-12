@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Sentry.Common.Logging;
 
@@ -9,12 +10,14 @@ namespace Sentry.data.Core
     {
 
         private readonly IDatasetContext _datasetContext;
+        private readonly IEmailService _emailService;
         private readonly ISecurityService _securityService;
         private readonly UserService _userService;
 
-        public BusinessIntelligenceService(IDatasetContext datasetContext, ISecurityService securityService, UserService userService)
+        public BusinessIntelligenceService(IDatasetContext datasetContext, IEmailService emailService, ISecurityService securityService, UserService userService)
         {
             _datasetContext = datasetContext;
+            _emailService = emailService;
             _userService = userService;
             _securityService = securityService;
         }
@@ -95,11 +98,37 @@ namespace Sentry.data.Core
         {
             List<string> errors = new List<string>();
 
-            if (_datasetContext.Datasets.Where(w => w.DatasetName == dto.DatasetName &&
+            if (dto.DatasetId == 0 && _datasetContext.Datasets.Where(w => w.DatasetName == dto.DatasetName &&
                                                                         w.DatasetCategories.Any(x => dto.DatasetCategoryIds.Contains(x.Id)) &&
                                                                         w.DatasetType == GlobalConstants.DataEntityCodes.REPORT)?.Count() > 0)
             {
                 errors.Add("Dataset name already exists within category");
+            }
+
+            if (dto.FileTypeId == (int)ReportType.Excel)
+            {
+                try
+                {
+                    int pos = dto.Location.LastIndexOf('\\');
+                    string directory = dto.Location.Substring(0, pos);
+                    Directory.GetAccessControl(directory);
+                    File.GetAccessControl(dto.Location);
+                    var file = File.OpenRead(dto.Location);
+                    file.Close();
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Message == "Attempted to perform an unauthorized operation.")
+                    {
+                        errors.Add("This file can’t be accessed by data.sentry.com.  DSCSupport@sentry.com has been notified.  You will be contacted when the exhibit can be created.");
+
+                        _emailService.SendInvalidReportLocationEmail(dto, _userService.GetCurrentUser().DisplayName);
+                    }
+                    else
+                    {
+                        errors.Add($"An error occured finding the file. Please verify the file path is correct or contact DSCSupport@sentry.com for assistance.");
+                    }
+                }
             }
 
             return errors;

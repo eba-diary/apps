@@ -1096,7 +1096,7 @@
                         }
 
                         if (alias) {
-                            tables += tableAliasName.trim() + " = spark.sql(\"Select * from " + databaseName.trim() + "." + tableName.trim() + "\").printSchema();";
+                            tables += tableAliasName.trim() + " = spark.sql(\"Select * from " + databaseName.trim() + "." + tableName.trim() + "\"); " + tableAliasName.trim() + ".createOrReplaceTempView(\"" + tableAliasName.trim() + "\"); " + tableAliasName.trim() + ".printSchema();";
                             tableNames += tableAliasName.trim() + '|||';
                         }
                         else {
