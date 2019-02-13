@@ -313,11 +313,9 @@ div[id*="filterType_"]:hover {
     }
 
 .li-filter-enabled {
-    padding: 2px 2px 2px 2px;
+    padding: 2px 2px 2px 12px;
     background-color: #A6A6A6;
     vertical-align: middle;
-    /*border-top-right-radius: 2px;
-    border-bottom-right-radius: 2px;*/
 }
 
     .li-filter-enabled:hover {
@@ -350,8 +348,7 @@ div[id*="filterType_"]:hover {
 
 .li-filter-disabled {
     width: 100%;
-    padding: 2px 2px 2px 2px;
-    /*background-color: #F6F6F6;*/
+    padding: 2px 2px 2px 12px;
 }
 
 .filter-disabled-glyph {
