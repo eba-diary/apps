@@ -226,8 +226,23 @@ ul.list-group-indented {
     cursor: pointer;
 }
 
+.panel {
+    border: none;
+    border-bottom: 1px solid #ebebeb;
+    box-shadow: none;
+}
+
 .filterHead {
-    font-size: 17px;
+    font-size: 16px;
+    background-color: #fff !important;
+    border: none !important;
+    text-transform: uppercase;
+    color: #285780 !important;
+    margin: 8px 0px;
+}
+
+.filter-tile-count {
+    font-size: 12px;
 }
 
 .filterBorder_blue {
@@ -317,10 +332,6 @@ ul.list-group-indented {
     background-color: #285780 !important;
 }
 
-.outsideFilters {
-    width: 205px;
-}
-
 .fixedScroll {
     position: fixed;
     top: 135px;
@@ -376,6 +387,7 @@ div[id*="filterType_"]:hover {
 
 .ul-filter-list {
     padding: 0.5em 0.5em 0 0.5em;
+    font-feature-settings: "lnum";
 }
 
     .ul-filter-list:hover {
@@ -711,10 +723,8 @@ tr.categoryBanner-darkgray th.sorting_desc {
 }
 
 .listHeadGroup {
-    height: 40px;
     display: inline-block;
-    margin-top: 15px;
-    margin-bottom: 15px;
+    margin-bottom: 40px;
 }
 
 .datasetImg {
@@ -2279,10 +2289,6 @@ tr.categoryBanner-darkgray th.sorting_desc {
         margin-bottom: 10px;
     }
 
-    .listHeadGroup {
-        margin-bottom: 0;
-    }
-
     .searchBoxDS {
         margin-left: 10px;
     }
@@ -2296,10 +2302,6 @@ tr.categoryBanner-darkgray th.sorting_desc {
 
     .assetlastUpdt {
         margin-top: 2em;
-    }
-
-    .outsideFilters {
-        width: 255px;
     }
 }
 

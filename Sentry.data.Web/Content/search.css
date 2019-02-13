@@ -1,4 +1,29 @@
-﻿#listOfDatasets .disregardParentClick {
+﻿#filters-fixed-pane {
+    height: 100%;
+    width: 280px;
+    overflow-x: hidden;
+    position: fixed;
+    z-index: 1;
+    top: 0;
+    left: 0;
+    padding-top: 128px;
+    border-right: 1px solid #ebebeb;
+    background-color: #fff;
+}
+
+#search-page-wrapper {
+    margin-top: 20px;
+}
+    #search-page-wrapper .listHeadGroup {
+        display: block;
+        margin: 0px 0px 40px 0px;
+    }
+        #search-page-wrapper .listHeadGroup div {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+#listOfDatasets .disregardParentClick {
     float: right;
     margin-top: -3px;
     margin-right: 1px;
@@ -22,11 +47,14 @@
 #nbr-search-results-wrapper {
     font-feature-settings: "lnum";
 }
+    #nbr-search-results-wrapper div {
+        display: inline-block;
+    }
 
-#search-tile-header {
-    overflow: hidden;
-    margin-top: 22px;
-}
+    #search-tile-header {
+        overflow: hidden;
+        margin-top: 22px;
+    }
 
 #sort-option-wrapper div {
     display: inline-block;
@@ -67,3 +95,15 @@
     display: inline-block;
     vertical-align: middle;
 }
+
+@media (min-width: 767px) {
+    #navigation {
+        position: fixed;
+    }
+}
+
+/*@media (min-width: 767px) { 
+    #navigation{
+        position: fixed;
+    }
+}*/
