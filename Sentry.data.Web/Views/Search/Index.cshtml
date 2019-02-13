@@ -1089,7 +1089,7 @@
 
                         temp.push(new Filter(pageType + '0_' + i, category, 'Category'));
 
-                        if (category == param) {
+                        if (category === param) {
                             self.SelectedFilters.push(pageType + '0_' + i);
                         }
                     }
@@ -1167,12 +1167,18 @@
                 var pageType = '2_'
                 var item;
 
+                var param = getParameterByName('category');
+
                 //CATEGORY FILTER
                 for (var item, i = 0; item = exhibits[i++];) {
                     for (var cat, j = 0; cat = item.Categories[j++];) {
                         if (!(cat in categoryLookup)) {
                             categoryLookup[cat] = 1;
                             self.CategoryFilters.push(new Filter(pageType + '0_' + i, cat, 'Category'));
+
+                            if (cat === param) {
+                                self.SelectedFilters.push(pageType + '0_' + i);
+                            }
 
                             temp.push(new Filter(pageType + '0_' + i, cat, 'Category'));
                         }
