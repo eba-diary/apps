@@ -322,37 +322,19 @@
             $('.select2-container--default').css('width', '100%');
 
             $('#filterSelector').on('select2:select', function (e) {
-                // Do something
+                
                 var data = e.params.data;
 
+                // push the selected filter Id to the observable array
                 window.vm.SelectedFilters.push(data.id);
-
-                //$('#' + data.id).prop('checked', true);
-
-                //var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
-
-                //if (storedNames != null) {
-                //    storedNames[storedNames.length] = data.id;
-                //}
-                //else {
-                //    var storedNames = [];
-                //    storedNames[0] = data.id;
-                //}
-
-                //localStorage.setItem("filteredIds", JSON.stringify(storedNames));
-
-                //$('#filterSelector').select2("close");
-
-                //changeWindow();
-
             });
 
             $('#filterSelector').on('select2:unselect', function (e) {
-                // Do something
+                
                 var data = e.params.data;
 
+                // remove the selected filter Id from the observable array
                 window.vm.RemoveSelection(data.id);
-
             });
         });
 
@@ -570,7 +552,7 @@
             return filters;
         }
 
-        //This only should be used for teh Category type filter groups the ones that are 'OR'ed together when multiple selected in the same box.
+        //This only should be used for the Category type filter groups the ones that are 'OR'ed together when multiple selected in the same box.
         function IsSelectedFiltersAMatch(selectedFilters, datasetObjectArray, isAndOperator) {
 
             if (selectedFilters.length === 0) {
@@ -610,7 +592,7 @@
                     return sortTheResults(sortVal, exhibits);
                 }
 
-                //get all the filerters selected from the category group
+                //get all the filters selected from the category group
                 var selectedCategories = GetSelectedFiltersFromGroup(self.CategoryFilters, self.SelectedFilters);
                 var selectedBusinessUnits = GetSelectedFiltersFromGroup(self.BusinessUnitFilters, self.SelectedFilters);
                 var selectedFunctions = GetSelectedFiltersFromGroup(self.DatasetFunctionFilters, self.SelectedFilters);
@@ -619,7 +601,7 @@
                 var selectedOwners = GetSelectedFiltersFromGroup(self.OwnerFilters, self.SelectedFilters);
 
 
-                //filter the exhibits based on teh groups that are 'OR'ed toghether
+                //filter the exhibits based on the groups that are 'OR'ed together
                 exhibits = exhibits.filter(function (exhibit)
                 {
                     var categoryMatch = IsSelectedFiltersAMatch(selectedCategories, exhibit.Categories, true);
@@ -643,8 +625,6 @@
                 var pageType = '1_';
 
                 //CATEGORY FILTER
-                var param = getParameterByName('category');
-
                 for (var item, i = 0; item = datasets[i++];) {
                     var category = item.Category;
 
@@ -654,7 +634,8 @@
 
                         temp.push(new Filter(pageType + '0_' + i, category, 'Category'));
 
-                        if (category === param) {
+                        // compare the category to what may have been passed along in the URL; if there's a match, push it to the SelectedFilters observable array
+                        if (category === getParameterByName('category')) {
                             self.SelectedFilters.push(pageType + '0_' + i);
                         }
                     }
@@ -732,8 +713,6 @@
                 var pageType = '2_'
                 var item;
 
-                var param = getParameterByName('category');
-
                 //CATEGORY FILTER
                 for (var item, i = 0; item = exhibits[i++];) {
                     for (var cat, j = 0; cat = item.Categories[j++];) {
@@ -741,7 +720,8 @@
                             categoryLookup[cat] = 1;
                             self.CategoryFilters.push(new Filter(pageType + '0_' + i, cat, 'Category'));
 
-                            if (cat === param) {
+                            // compare the category to what may have been passed in the URL; if there's a match, push it to the SelectedFilters observable array
+                            if (cat === getParameterByName('category')) {
                                 self.SelectedFilters.push(pageType + '0_' + i);
                             }
 
