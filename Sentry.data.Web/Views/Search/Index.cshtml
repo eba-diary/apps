@@ -171,6 +171,19 @@
                                     <div class="dataset-list-content-label"></div>
                                     <div class="dataset-list-content-value listDesc">
                                         <span data-bind="text: DatasetDesc"></span>
+
+
+                                        @*TESTING ONLY - REMOVE THIS CHUNCK*@
+                                        <br />
+                                        <span>Tags: </span>
+                                        <!-- ko foreach: Tags -->
+                                        <span data-bind="text: Name"></span>
+                                        <!-- /ko -->
+                                        <br />
+                                        <span>Business Unit: </span>
+                                        <span data-bind="text: BusinessUnits"></span>
+
+
                                     </div>
                                 </div>
                                 <div class="dataset-list-content">
@@ -435,6 +448,7 @@
                     return left.Title == right.Title ? 0 : (left.Title < right.Title ? -1 : 1)
                 });
             });
+
         }
 
         function Dataset(data) {
@@ -519,6 +533,13 @@
             self.CanEditDataset = data.CanEditDataset;
             self.IsFavorite = data.IsFavorite;
 
+            self.TagNames = [];
+            if (data.Tags !== null && data.Tags.length !== 0) {
+                ko.utils.arrayForEach(data.Tags, function (v) {
+                    self.TagNames.push(v.Name);
+                });
+            }
+
             self.CanSeeDetails = ko.computed(function () {
                 if ((self.Type === "RPT" && self.CanEditDataset) || self.Type !== "RPT") {
                     return true;
@@ -530,16 +551,52 @@
 
         }
 
+        function GetSelectedFiltersFromGroup(allFiltersFromGroup, mySelectedFilters) {
+
+            if (allFiltersFromGroup().length === 0) {
+                return allFiltersFromGroup();
+            }
+
+            var filters = ko.utils.arrayFilter(allFiltersFromGroup(), function (feature)
+            {
+                for (var i = 0; i < mySelectedFilters().length; i++) {
+                    if (feature.id == mySelectedFilters()[i]) {
+                        return true;
+                    }
+                }
+                return false;
+            });
+
+            return filters;
+        }
+
+        //This only should be used for teh Category type filter groups the ones that are 'OR'ed together when multiple selected in the same box.
+        function IsSelectedFiltersAMatch(selectedFilters, datasetObjectArray, isAndOperator) {
+
+            if (selectedFilters.length === 0) {
+                return true;
+            } else if (datasetObjectArray.length === 0) {
+                return false;
+            } else {
+                for (var i = 0; i < selectedFilters.length; i++) {
+                    if (isAndOperator && datasetObjectArray.includes(selectedFilters[i].Title)) {
+                        return true;
+                    }
+                    else if (!isAndOperator && !datasetObjectArray.includes(selectedFilters[i].Title)) {
+                        return false;
+                    }
+                }
+            }
+
+            return !isAndOperator;
+        }
+
         function ListViewModel() {
             var self = this;
-            self.datasets = ko.observableArray([]);
-
-            self.AllFilters = ko.observableArray([]);  //This is the master list of all filters.
-
             self.Query = ko.observable('');
-
+            self.datasets = ko.observableArray([]);
+            self.AllFilters = ko.observableArray([]);  //This is the master list of all filters.
             self.SelectedFilters = ko.observableArray([]);
-
             self.CategoryFilters = ko.observableArray([]);
             self.BusinessUnitFilters = ko.observableArray([]);
             self.DatasetFunctionFilters = ko.observableArray([]);
@@ -547,530 +604,38 @@
             self.ExtensionFilters = ko.observableArray([]);
             self.TagFilters = ko.observableArray([]);
 
-            self.FilterDatasets = function (datasets, sortVal) {
-                //First grab all the selected category ID's
-                var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
-                    if (feature.substring(0, 3) == '1_0') {
-                        return feature;
-                    }
-                });
-
-                selectedCategoryList = [];
-                if (selectedCategoryIDs.length > 0) {
-                    //Convert those category ID's to Filter Items
-                    var selectedCategories = ko.utils.arrayFilter(self.CategoryFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedCategoryIDs.length; i++) {
-                            if (feature.id == selectedCategoryIDs[i]) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedCategories.length; i++) {
-                        selectedCategoryList.push(selectedCategories[i].Title);
-                    }
-
-                    //Then filter on those selected Categories
-                    datasets = datasets.filter(function (item) {
-
-                        for (var i = 0; i < selectedCategories.length; i++) {
-                            if (item.Category == selectedCategories[i].Title) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-                }
-
-                //First grab all the selected owner ID's
-                var selectedOwnerIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
-                    if (feature.substring(0, 3) == '1_1') {
-                        return feature;
-                    }
-                });
-
-                var selectedOwnerList = '';
-                if (selectedOwnerIDs.length > 0) {
-                    //Convert those category ID's to Filter Items
-                    var selectedOwners = ko.utils.arrayFilter(self.OwnerFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedOwnerIDs.length; i++) {
-                            if (feature.id == selectedOwnerIDs[i]) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedOwners.length; i++) {
-                        selectedOwnerList += (selectedOwners[i].Title) + "|";
-                    }
-
-                    //Then filter on those selected Categories
-                    datasets = datasets.filter(function (item) {
-
-                        for (var i = 0; i < selectedOwners.length; i++) {
-                            if (item.SentryOwner == selectedOwners[i].Title) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-                }
-
-                //First grab all the selected category ID's
-                var selectedExtensionIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
-                    if (feature.substring(0, 3) == '1_3') {
-                        return feature;
-                    }
-                });
-
-                var selectedExtensionsList = [];
-                if (selectedExtensionIDs.length > 0) {
-                    //Convert those category ID's to Filter Items
-                    var selectedExtensions = ko.utils.arrayFilter(self.ExtensionFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedExtensionIDs.length; i++) {
-                            if (feature.id == selectedExtensionIDs[i]) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedExtensions.length; i++) {
-                        selectedExtensionsList.push(selectedExtensions[i].Title);
-                    }
-
-                    //Then filter on those selected Categories
-                    datasets = datasets.filter(function (item) {
-
-                        for (var i = 0; i < selectedExtensions.length; i++) {
-                            for (var j = 0; j < item.DistinctFileExtensions.length; j++) {
-                                if (item.DistinctFileExtensions[j] == selectedExtensions[i].Title) {
-                                    return true;
-                                }
-                            }
-                        }
-                        return false;
-                    });
-                }
-
-                if ($('#dataColumn').is(":visible")) {
-                    $.ajax({
-                        dataType: "json",
-                        contentType: "application/json; charset=utf-8",
-                        type: 'POST',
-                        url: '/Search/SearchEvent?categoryFilters=' + selectedCategoryList +
-                            '&sentryOwners=' + selectedOwnerList +
-                            '&extensions=' + selectedExtensionsList +
-                            '&searchTerm=' + self.Query() +
-                            '&resultsReturned=' + queryResults.length
-                    });
-                }
-
-                return sortTheResults(sortVal, datasets);
-            };
-
             self.FilterExhibits = function (exhibits, sortVal) {
 
-                //First grab all the selected category ID's
-                var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-                    if (feature.substring(0, 3) == '2_0') {
-                        return feature;
-                    }
-                });
-
-                var selectedCategoryList = [];
-                if (selectedCategoryIDs.length > 0) {
-                    //Convert those category ID's to Filter Items
-                    var selectedCategories = ko.utils.arrayFilter(self.CategoryFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedCategoryIDs.length; i++) {
-                            if (feature.id == selectedCategoryIDs[i]) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedCategories.length; i++) {
-                        selectedCategoryList.push(selectedCategories[i].Title);
-                    }
-
-                    //Then filter on those selected Categories
-                    exhibits = exhibits.filter(function (item) {
-
-                        for (var i = 0; i < selectedCategories.length; i++) {
-                            for (var j = 0; j < item.Categories.length; j++) {
-                                if (item.Categories[j] === selectedCategories[i].Title) {
-                                    return true;
-                                }
-                            }
-                        }
-
-                        return false;
-                    });
+                if (self.SelectedFilters().length === 0) {
+                    return sortTheResults(sortVal, exhibits);
                 }
 
+                //get all the filerters selected from the category group
+                var selectedCategories = GetSelectedFiltersFromGroup(self.CategoryFilters, self.SelectedFilters);
+                var selectedBusinessUnits = GetSelectedFiltersFromGroup(self.BusinessUnitFilters, self.SelectedFilters);
+                var selectedFunctions = GetSelectedFiltersFromGroup(self.DatasetFunctionFilters, self.SelectedFilters);
+                var selectedExtensions = GetSelectedFiltersFromGroup(self.ExtensionFilters, self.SelectedFilters);
+                var selectedTags = GetSelectedFiltersFromGroup(self.TagFilters, self.SelectedFilters);
+                var selectedOwners = GetSelectedFiltersFromGroup(self.OwnerFilters, self.SelectedFilters);
 
-                // now grab any selected business units
-                var selectedBusinessUnitIds = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-                    if (feature.substring(0, 3) === '2_5') {
-                        return feature;
-                    }
+
+                //filter the exhibits based on teh groups that are 'OR'ed toghether
+                exhibits = exhibits.filter(function (exhibit)
+                {
+                    var categoryMatch = IsSelectedFiltersAMatch(selectedCategories, exhibit.Categories, true);
+                    var buMatch = IsSelectedFiltersAMatch(selectedBusinessUnits, exhibit.BusinessUnits, true);
+                    var extensionMatch = IsSelectedFiltersAMatch(selectedExtensions, exhibit.DistinctFileExtensions, true);
+                    var functionMatch = IsSelectedFiltersAMatch(selectedFunctions, exhibit.DatasetFunctions, true);
+                    var ownerMatch = IsSelectedFiltersAMatch(selectedOwners, exhibit.SentryOwner.split(", "), true);
+
+                    //now filter the rest of the exhibits on the groups that are 'AND'ed together.
+                    var tagMatch = IsSelectedFiltersAMatch(self.TagFilters, selectedTags, exhibit.TagNames, false);
+
+                    return categoryMatch && buMatch && functionMatch && extensionMatch && ownerMatch && tagMatch;
                 });
 
-                var selectedBusinessUnitsList = [];
-                if (selectedBusinessUnitIds.length > 0) {
-                    var selectedBusinessUnits = ko.utils.arrayFilter(self.BusinessUnitFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedBusinessUnitIds.length; i++) {
-                            if (feature.id === selectedBusinessUnitIds[i]) {
-                                return true;
-                            }
-                        }
-
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedBusinessUnits.length; i++) {
-                        selectedBusinessUnitsList.push(selectedBusinessUnits[i].Title);
-                    }
-
-                    // now apply the filter
-                    exhibits = exhibits.filter(function (item) {
-
-                        for (var i = 0; i < selectedBusinessUnits.length; i++) {
-                            for (var j = 0; j < item.BusinessUnits.length; j++) {
-                                if (item.BusinessUnits[j] === selectedBusinessUnits[i].Title) {
-                                    return true;
-                                }
-                            }
-                        }
-
-                        return false;
-                    });
-                }
-
-
-                // next grab any selected Dataset Functions
-                var selectedDatasetFunctionIds = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-                    if (feature.substring(0, 3) === '2_6') {
-                        return feature;
-                    }
-                });
-
-                var selectedDatasetFunctionsList = [];
-                if (selectedDatasetFunctionIds.length > 0) {
-                    var selectedDatasetFunctions = ko.utils.arrayFilter(self.DatasetFunctionFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedDatasetFunctionIds.length; i++) {
-                            if (feature.id === selectedDatasetFunctionIds[i]) {
-                                return true;
-                            }
-                        }
-
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedDatasetFunctions.length; i++) {
-                        selectedDatasetFunctionsList.push(selectedDatasetFunctions[i].Title);
-                    }
-
-                    // now apply the filter
-                    exhibits = exhibits.filter(function (item) {
-
-                        for (var i = 0; i < selectedDatasetFunctions.length; i++) {
-                            for (var j = 0; j < item.DatasetFunctions.length; j++) {
-                                if (item.DatasetFunctions[j] === selectedDatasetFunctions[i].Title) {
-                                    return true;
-                                }
-                            }
-                        }
-
-                        return false;
-                    });
-                }
-
-
-                //First grab all the selected owner ID's
-                var selectedOwnerIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
-                    if (feature.substring(0, 3) == '2_1') {
-                        return feature;
-                    }
-                });
-
-                //First grab all the selected category ID's
-                var selectedExtensionIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
-                    if (feature.substring(0, 3) == '2_2') {
-                        return feature;
-                    }
-                });
-
-                var selectedExtensionsList = [];
-                if (selectedExtensionIDs.length > 0) {
-                    //Convert those category ID's to Filter Items
-                    var selectedExtensions = ko.utils.arrayFilter(self.ExtensionFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedExtensionIDs.length; i++) {
-                            if (feature.id == selectedExtensionIDs[i]) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedExtensions.length; i++) {
-                        selectedExtensionsList.push(selectedExtensions[i].Title);
-                    }
-
-                    //Then filter on those selected Categories
-                    exhibits = exhibits.filter(function (item) {
-
-                        for (var i = 0; i < selectedExtensions.length; i++) {
-                            for (var j = 0; j < item.DistinctFileExtensions.length; j++) {
-                                if (item.DistinctFileExtensions[j] == selectedExtensions[i].Title) {
-                                    return true;
-                                }
-                            }
-                        }
-                        return false;
-                    });
-                }
-
-                //First grab all the selected tag ID's
-                var selectedTagIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
-                    if (feature.substring(0, 3) == '2_3') {
-                        return feature;
-                    }
-                });
-
-                var selectedTagList = '';
-                if (selectedTagIDs.length > 0) {
-                    //Convert those category ID's to Filter Items
-                    var selectedTags = ko.utils.arrayFilter(self.TagFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedTagIDs.length; i++) {
-                            if (feature.id == selectedTagIDs[i]) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedTags.length; i++) {
-                        selectedTagList += (selectedTags[i].Title) + "|";
-                    }
-
-                    //Then filter on those selected Categories
-                    exhibits = exhibits.filter(function (item) {
-                        if (item.Tags != null) {
-                            for (var i = 0; i < selectedTags.length; i++) {
-                                for (var j = 0; j < item.Tags.length; j++) {
-                                    if (item.Tags[j].Name == selectedTags[i].Title) {
-                                        return true;
-                                    }
-                                }
-                            }
-                        }
-                        return false;
-                    });
-                }
-
-                if ($('#dataColumn').is(":visible")) {
-                    $.ajax({
-                        dataType: "json",
-                        contentType: "application/json; charset=utf-8",
-                        type: 'POST',
-                        url: '/Search/SearchEvent?categoryFilters=' + selectedCategoryList +
-                            //'&sentryOwners=' + selectedOwnerList +
-                            '&extensions=' + selectedExtensionsList +
-                            '&searchTerm=' + self.Query() +
-                            '&resultsReturned=' + queryResults.length
-                    });
-                }
 
                 return sortTheResults(sortVal, exhibits);
-
-            };
-
-            self.FilterGeneric = function (allObjects) {
-                //First grab all the selected category ID's
-                var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
-                    if (feature.substring(0, 3) == '3_0') {
-                        return feature;
-                    }
-                });
-
-                selectedCategoryList = [];
-                if (selectedCategoryIDs.length > 0) {
-                    //Convert those category ID's to Filter Items
-                    var selectedCategories = ko.utils.arrayFilter(self.CategoryFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedCategoryIDs.length; i++) {
-                            if (feature.id == selectedCategoryIDs[i]) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedCategories.length; i++) {
-                        selectedCategoryList.push(selectedCategories[i].Title);
-                    }
-
-                    //Then filter on those selected Categories
-                    allObjects = allObjects.filter(function (item) {
-
-                        for (var i = 0; i < selectedCategories.length; i++) {
-                            if (item.Category == selectedCategories[i].Title) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-                }
-
-                //First grab all the selected owner ID's
-                var selectedOwnerIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
-                    if (feature.substring(0, 3) == '3_1') {
-                        return feature;
-                    }
-                });
-
-                var selectedOwnerList = '';
-                if (selectedOwnerIDs.length > 0) {
-                    //Convert those category ID's to Filter Items
-                    var selectedOwners = ko.utils.arrayFilter(self.OwnerFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedOwnerIDs.length; i++) {
-                            if (feature.id == selectedOwnerIDs[i]) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedOwners.length; i++) {
-                        selectedOwnerList += (selectedOwners[i].Title) + "|";
-                    }
-
-                    //Then filter on those selected Categories
-                    allObjects = allObjects.filter(function (item) {
-
-                        for (var i = 0; i < selectedOwners.length; i++) {
-                            if (item.SentryOwner == selectedOwners[i].Title) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-                }
-
-                //First grab all the selected category ID's
-                var selectedExtensionIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
-                    if (feature.substring(0, 3) == '3_3') {
-                        return feature;
-                    }
-                });
-
-                var selectedExtensionsList = [];
-                if (selectedExtensionIDs.length > 0) {
-                    //Convert those category ID's to Filter Items
-                    var selectedExtensions = ko.utils.arrayFilter(self.ExtensionFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedExtensionIDs.length; i++) {
-                            if (feature.id == selectedExtensionIDs[i]) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedExtensions.length; i++) {
-                        selectedExtensionsList.push(selectedExtensions[i].Title);
-                    }
-
-                    //Then filter on those selected Categories
-                    allObjects = allObjects.filter(function (item) {
-
-                        for (var i = 0; i < selectedExtensions.length; i++) {
-                            for (var j = 0; j < item.DistinctFileExtensions.length; j++) {
-                                if (item.DistinctFileExtensions[j] == selectedExtensions[i].Title) {
-                                    return true;
-                                }
-                            }
-                        }
-                        return false;
-                    });
-                }
-
-                //First grab all the selected tag ID's
-                var selectedTagIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
-                    if (feature.substring(0, 3) == '3_4') {
-                        return feature;
-                    }
-                });
-
-                var selectedTagList = '';
-                if (selectedTagIDs.length > 0) {
-                    //Convert those category ID's to Filter Items
-                    var selectedTags = ko.utils.arrayFilter(self.TagFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedTagIDs.length; i++) {
-                            if (feature.id == selectedTagIDs[i]) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedTags.length; i++) {
-                        selectedTagList += (selectedTags[i].Title) + "|";
-                    }
-
-                    //Then filter on those selected Categories
-                    allObjects = allObjects.filter(function (item) {
-                        if (item.Tags != null) {
-                            for (var i = 0; i < selectedTags.length; i++) {
-                                for (var j = 0; j < item.Tags.length; j++) {
-                                    if (item.Tags[j].Name == selectedTags[i].Title) {
-                                        return true;
-                                    }
-                                }
-                            }
-                        }
-                        return false;
-                    });
-                }
-
-                if ($('#dataColumn').is(":visible")) {
-                    $.ajax({
-                        dataType: "json",
-                        contentType: "application/json; charset=utf-8",
-                        type: 'POST',
-                        url: '/Search/SearchEvent?categoryFilters=' + selectedCategoryList +
-                            '&sentryOwners=' + selectedOwnerList +
-                            '&extensions=' + selectedExtensionsList +
-                            '&searchTerm=' + self.Query() +
-                            '&resultsReturned=' + queryResults.length
-                    });
-                }
-
-                return allObjects;
             };
 
             self.PopulateDatasetFilters = function (datasets) {
@@ -1519,8 +1084,7 @@
             };
 
             // Load initial state from server, convert it to Dataset instances, then populate self.datasets
-            url = "/Search/" + self.SearchType() + "/List"
-            $.getJSON(url, function (allData) {
+            $.getJSON( "/Search/" + self.SearchType() + "/List", function (allData) {
                 var mappedTasks = $.map(allData, function (item) { return new Dataset(item) });
 
                 self.datasets(self.datasets().concat(mappedTasks));
@@ -1603,15 +1167,8 @@
                 });
 
                 queryResults = temp.map(x => x.dataset);
-                var selectedCategoryList = [];
 
-                if (self.SearchType() == "Datasets") {
-                    queryResults = self.FilterDatasets(queryResults, $("#sort-results").val());
-                } else if (self.SearchType() == "BusinessIntelligence") {
-                    queryResults = self.FilterExhibits(queryResults, $("#sort-results").val());
-                } else {
-                    queryResults = self.FilterGeneric(queryResults);
-                }
+                queryResults = self.FilterExhibits(queryResults, $("#sort-results").val());
 
                 $("#SearchText").attr("placeholder", "Search " + queryResults.length + " Datasets...");
 
