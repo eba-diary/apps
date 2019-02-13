@@ -408,7 +408,7 @@
             });
         }
 
-        function FilterCategory(Name, Filters, Color) {
+        function FilterCategory(Name, Filters) {
             var self = this;
 
             self.Name = Name;
@@ -1107,7 +1107,7 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Category', temp));
                 temp = [];
 
 
@@ -1133,7 +1133,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Sentry Owner', temp));
                 temp = [];
 
 
@@ -1159,7 +1159,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Extension', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Extension', temp));
             };
 
             self.PopulateExhibitFilters = function (exhibits) {
@@ -1193,7 +1193,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Category', temp));
                 temp = [];
 
 
@@ -1219,7 +1219,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Business Unit', temp));
                 temp = [];
 
 
@@ -1245,7 +1245,33 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Function', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Function', temp));
+                temp = [];
+
+
+                //REPORT TYPE FILTER
+                counter = 0; // reset the counter
+                for (var item, i = 0; item = exhibits[i++];) {
+                    for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
+                        if (!(ext in extensionLookup)) {
+                            extensionLookup[ext] = 1;
+                            self.ExtensionFilters.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
+
+                            temp.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
+                            counter++;
+                        }
+                    }
+                }
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name == 'Report Type') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
+                self.AllFilters.push(new FilterCategory('Report Type', temp));
                 temp = [];
 
 
@@ -1301,37 +1327,10 @@
                         temp = item.Filters().concat(temp);
                         ko.utils.arrayRemoveItem(self.AllFilters(), item);
                     }
-                    self.AllFilters.push(new FilterCategory(group, temp, 'darkblue'));
+                    self.AllFilters.push(new FilterCategory(group, temp));
 
                     temp = [];
                 }
-
-
-                //REPORT TYPE FILTER
-                counter = 0; //Needs seperate counter as multiple objects can appear per iteration
-                for (var item, i = 0; item = exhibits[i++];) {
-                    for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
-                        if (!(ext in extensionLookup)) {
-                            extensionLookup[ext] = 1;
-                            self.ExtensionFilters.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
-                            //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
-
-                            temp.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
-                            counter++;
-                        }
-                    }
-                }
-                ko.utils.arrayForEach(self.AllFilters(), function (v) {
-                    if (v.Name == 'Report Type') {
-                        item = v;
-                    }
-                });
-                if (item !== undefined) {
-                    temp = item.Filters().concat(temp);
-                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
-                }
-                self.AllFilters.push(new FilterCategory('Report Type', temp, 'darkblue'));
-                temp = [];
 
             };
 
@@ -1369,7 +1368,7 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Category', temp));
                 temp = [];
 
 
@@ -1394,7 +1393,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Business Unit', temp));
 
 
                 //SENTRYOWNER FILTER
@@ -1419,7 +1418,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Sentry Owner', temp));
                 temp = [];
 
 
@@ -1446,7 +1445,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Extension', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Extension', temp));
 
                 //TAG FILTER
                 counter = 0; //Needs seperate counter as multiple objects can appear per iteration
@@ -1474,7 +1473,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Tag', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Tag', temp));
                 temp = [];
             };
 
