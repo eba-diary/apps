@@ -1,4 +1,32 @@
-﻿#listOfDatasets .disregardParentClick {
+﻿#search-pg-wrapper .listHeadGroup {
+    display: block;
+    margin: 0px 0px 30px 0px;
+}
+    #search-pg-wrapper .listHeadGroup div {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+#search-pg-filters .panel {
+    border: none;
+    border-bottom: 1px solid #ebebeb;
+    box-shadow: none;
+}
+
+.filterHead {
+    font-size: 16px;
+    background-color: #fff !important;
+    border: none !important;
+    text-transform: uppercase;
+    color: #285780 !important;
+    margin: 8px 0px 8px 8px;
+}
+
+.filter-tile-count {
+    font-size: 12px;
+}
+
+#listOfDatasets .disregardParentClick {
     float: right;
     margin-top: -3px;
     margin-right: 1px;
@@ -22,11 +50,14 @@
 #nbr-search-results-wrapper {
     font-feature-settings: "lnum";
 }
+    #nbr-search-results-wrapper div {
+        display: inline-block;
+    }
 
-#search-tile-header {
-    overflow: hidden;
-    margin-top: 22px;
-}
+    #search-tile-header {
+        overflow: hidden;
+        margin-top: 22px;
+    }
 
 #sort-option-wrapper div {
     display: inline-block;
@@ -66,4 +97,23 @@
 #pagination-wrapper {
     display: inline-block;
     vertical-align: middle;
+}
+
+@media (min-width: 767px) {
+    #search-pg-filters {
+        height: 100%;
+        overflow-x: hidden;
+        position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        padding-top: 128px;
+        border-right: 1px solid #ebebeb;
+        background-color: #fff;
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+    #search-pg-content-wrapper {
+        padding-left: 40px;
+    }
 }
