@@ -226,88 +226,6 @@ ul.list-group-indented {
     cursor: pointer;
 }
 
-.panel {
-    border: none;
-    border-bottom: 1px solid #ebebeb;
-    box-shadow: none;
-}
-
-.filterHead {
-    font-size: 16px;
-    background-color: #fff !important;
-    border: none !important;
-    text-transform: uppercase;
-    color: #285780 !important;
-    margin: 8px 0px;
-}
-
-.filter-tile-count {
-    font-size: 12px;
-}
-
-.filterBorder_blue {
-    border: 1px solid #003DA5;
-}
-
-.filterBorder_green {
-    border: 1px solid #005844;
-}
-
-.filterBorder_gold {
-    border: 1px solid #74531C;
-}
-
-.filterBorder_plum {
-    border: 1px solid #72246C;
-}
-
-.filterBorder_orange {
-    border: 1px solid #683431;
-}
-
-.filterBorder_blueGray {
-    border: 1px solid #285780;
-}
-
-.filterBorder_darkblue {
-    border: 1px solid #003da5;
-}
-
-.filterHead_darkblue {
-    border-bottom: 1px solid #003da5 !important;
-    background-color: #003da5 !important;
-}
-
-.filterHead_blue {
-    border-bottom: 1px solid #003DA5 !important;
-    background-color: #00A3E0 !important;
-}
-
-.filterHead_green {
-    border-bottom: 1px solid #005844 !important;
-    background-color: #84BD00 !important;
-}
-
-.filterHead_gold {
-    border-bottom: 1px solid #74531C !important;
-    background-color: #EAAA00 !important;
-}
-
-.filterHead_plum {
-    border-bottom: 1px solid #72246C !important;
-    background-color: #BB85AB !important;
-}
-
-.filterHead_orange {
-    border-bottom: 1px solid #683431 !important;
-    background-color: #E57200 !important;
-}
-
-.filterHead_blueGray {
-    border-bottom: 1px solid #285780 !important;
-    background-color: #89ABE3 !important;
-}
-
 .hover_btn_blue:hover {
     background-color: #003DA5 !important;
 }
@@ -1185,8 +1103,6 @@ tr.categoryBanner-darkgray th.sorting_desc {
 
 .searchBoxDS {
     display: inline-block;
-    /*height: 45px;*/
-    /*box-shadow: 2px 6px 10px #888888;*/
     width: 90% !important;
     margin-bottom: 3em;
     margin-top: 0.5em;
@@ -2287,10 +2203,6 @@ tr.categoryBanner-darkgray th.sorting_desc {
 
     .backToList {
         margin-bottom: 10px;
-    }
-
-    .searchBoxDS {
-        margin-left: 10px;
     }
 }
 

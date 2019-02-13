@@ -1,27 +1,30 @@
-﻿#filters-fixed-pane {
-    height: 100%;
-    width: 280px;
-    overflow-x: hidden;
-    position: fixed;
-    z-index: 1;
-    top: 0;
-    left: 0;
-    padding-top: 128px;
-    border-right: 1px solid #ebebeb;
-    background-color: #fff;
+﻿#search-pg-wrapper .listHeadGroup {
+    display: block;
+    margin: 0px 0px 30px 0px;
+}
+    #search-pg-wrapper .listHeadGroup div {
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+#search-pg-filters .panel {
+    border: none;
+    border-bottom: 1px solid #ebebeb;
+    box-shadow: none;
 }
 
-#search-page-wrapper {
-    margin-top: 20px;
+.filterHead {
+    font-size: 16px;
+    background-color: #fff !important;
+    border: none !important;
+    text-transform: uppercase;
+    color: #285780 !important;
+    margin: 8px 0px 8px 8px;
 }
-    #search-page-wrapper .listHeadGroup {
-        display: block;
-        margin: 0px 0px 40px 0px;
-    }
-        #search-page-wrapper .listHeadGroup div {
-            display: inline-block;
-            vertical-align: middle;
-        }
+
+.filter-tile-count {
+    font-size: 12px;
+}
 
 #listOfDatasets .disregardParentClick {
     float: right;
@@ -97,13 +100,20 @@
 }
 
 @media (min-width: 767px) {
-    #navigation {
+    #search-pg-filters {
+        height: 100%;
+        overflow-x: hidden;
         position: fixed;
+        z-index: 1;
+        top: 0;
+        left: 0;
+        padding-top: 128px;
+        border-right: 1px solid #ebebeb;
+        background-color: #fff;
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+    #search-pg-content-wrapper {
+        padding-left: 40px;
     }
 }
-
-/*@media (min-width: 767px) { 
-    #navigation{
-        position: fixed;
-    }
-}*/

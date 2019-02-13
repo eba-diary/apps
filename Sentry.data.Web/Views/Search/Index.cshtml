@@ -7,248 +7,253 @@
     @Html.AntiForgeryToken()
 }
 
+<div id="search-pg-wrapper" class="container-fluid">
+    <div class="row">
 
-<div id="filters-fixed-pane" class="hidden-sm hidden-xs hidden-md">
-    @* filters *@
-    <div id="filterColumn" style="display:none;">
-        <!-- ko foreach: AllFilters -->
-        @* category header *@
-        <div class="panel panel-default dataset-list-filters">
-            <div class="panel-heading filterHead" data-bind="attr: { id: HeadId }">
-                <strong data-bind="text : Name"></strong>
-                <span class="glyphicon glyphicon-chevron-down rightFloat filterViewIcon" data-bind="attr: { id: HeadIcon }"></span>
-            </div>
+        @* filters *@
+        <div id="search-pg-filters" class="col-lg-2 col-md-3 hidden-sm hidden-xs">
+            <div id="filterColumn" style="display:none;">
+                <!-- ko foreach: AllFilters -->
+                @* category header *@
+                <div class="panel panel-default dataset-list-filters">
+                    <div class="panel-heading filterHead" data-bind="attr: { id: HeadId }">
+                        <strong data-bind="text : Name"></strong>
+                        <span class="glyphicon glyphicon-chevron-down rightFloat filterViewIcon" data-bind="attr: { id: HeadIcon }"></span>
+                    </div>
 
-            @* foreach of the category filters *@
-            <div class="dataset-list-filter-category panel-body" data-bind="attr: {id : HeadHide }" style="display: none;">
-                <!-- ko if: OrderedFilters().length > 0 -->
-                <ul class="list-unstyled ul-filter-list">
+                    @* foreach of the category filters *@
+                    <div class="dataset-list-filter-category panel-body" data-bind="attr: {id : HeadHide }" style="display: none;">
+                        <!-- ko if: OrderedFilters().length > 0 -->
+                        <ul class="list-unstyled ul-filter-list">
 
-                    <!-- ko foreach: OrderedFilters -->
-                    <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6">
-                        <label data-bind="attr: { id: id }">
-                            <input type="checkbox" class="filterChbx"
-                                   data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }" />
-                            <strong data-bind="text : Title"></strong>
-                            <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
-                        </label>
-                    </li>
-                    <!-- /ko -->
-
-                    <li data-bind="attr: {id : HiddenMore}">
-                        <!-- ko foreach: OrderedFilters -->
-                        <ul class="notNested">
-                            <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() >= 6">
+                            <!-- ko foreach: OrderedFilters -->
+                            <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6">
                                 <label data-bind="attr: { id: id }">
                                     <input type="checkbox" class="filterChbx"
                                            data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }" />
-                                    <span data-bind="text : Title"></span>
-                                    <span class="badge badge-info" data-bind="text : Count"></span>
+                                    <strong data-bind="text : Title"></strong>
+                                    <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
                                 </label>
                             </li>
+                            <!-- /ko -->
+
+                            <li data-bind="attr: {id : HiddenMore}">
+                                <!-- ko foreach: OrderedFilters -->
+                                <ul class="notNested">
+                                    <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() >= 6">
+                                        <label data-bind="attr: { id: id }">
+                                            <input type="checkbox" class="filterChbx"
+                                                   data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }" />
+                                            <span data-bind="text : Title"></span>
+                                            <span class="badge badge-info" data-bind="text : Count"></span>
+                                        </label>
+                                    </li>
+                                </ul>
+                                <!-- /ko -->
+                            </li>
+
                         </ul>
                         <!-- /ko -->
-                    </li>
-
-                </ul>
-                <!-- /ko -->
-                <!-- ko if: OrderedFilters().length > 6 -->
-                <a href="#" class="filterMore" data-bind="attr: { id:  HiddenId}">
-                    <div class="glyphicon glyphicon-plus-sign inlineBlock moreIcon leftFloat" data-bind="attr : {id : IconMore}"></div>
-                    <div class="leftFloat txt_filterMore" data-bind="attr: {id: TxtMore}">Show More</div>
-                </a>
-                <!-- /ko -->
-
-            </div>
-        </div>
-
-        <!-- /ko -->
-    </div>
-</div>
-
-<div id="search-page-wrapper">
-    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
-        @* page title *@
-        <div class="listHeadGroup">
-            <div data-bind="visible: IsShownForCurrentType('Datasets')" style="display: none;"><img src="~/Images/Icons/DatasetsBlue.svg" class="datasetImg leftFloat" /></div>
-            <div data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;"><img src="~/Images/Icons/Business IntelligenceBlue.svg" class="datasetImg leftFloat" /></div>
-            <div data-bind="visible: IsShownForCurrentType('Datasets')" style="display: none;"><h1 class="htCenter datasetHeader">Datasets</h1></div>
-            <div data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;"><h1 class="htCenter datasetHeader">Business Intelligence</h1></div>
-        </div>
-
-        @* spinner (shown until content loads) *@
-        <div id="filterSpinner">
-            <div class="sentry-spinner-container" style="padding-top: 150px; margin-left: -80px;">
-                <span class="sentry-spinner"></span>
-            </div>
-        </div>
-
-        @* search box *@
-        <div class="searchBoxDS  has-feedback has-feedback-left">
-            <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Datasets..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('Datasets'), event: {'keyup': searchResults.toFirstPage }" autocomplete="off" style="display: none;">
-            <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Exhibits and Dashboards..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('BusinessIntelligence')" autocomplete="off" style="display: none;">
-            <i class="form-control-feedback glyphicon glyphicon-search"></i>
-        </div>
-
-        @* filters/tiles (hidden by default until content loads *@
-        <div id="dataColumn" style="display:none;">
-            <div id="DatasetItemList" class="dataset-list inlineBlock text-left">
-                <div>
-                    <h4 class="found">
-                        Active Filters:
-                        <button type="button" class="btn btn-sm btn-primary" id="btnClearFilters" data-bind="click: clearFilters, enable: SelectedFilters().length !== 0">Clear Filters</button>
-                    </h4>
-
-                    <select multiple="" class="form-control select2-hidden-accessible"
-                            id="filterSelector" name="filterSelector" tabindex="-1" aria-hidden="true">
-                        <!-- ko foreach: AllFilters -->
-                        <optgroup data-bind="attr: {label: Name}">
-                            <!-- ko foreach: Filters -->
-                            <option data-bind="value: $data.id, text: $data.Title"></option>
-                            <!-- /ko -->
-                        </optgroup>
+                        <!-- ko if: OrderedFilters().length > 6 -->
+                        <a href="#" class="filterMore" data-bind="attr: { id:  HiddenId}">
+                            <div class="glyphicon glyphicon-plus-sign inlineBlock moreIcon leftFloat" data-bind="attr : {id : IconMore}"></div>
+                            <div class="leftFloat txt_filterMore" data-bind="attr: {id: TxtMore}">Show More</div>
+                        </a>
                         <!-- /ko -->
-                    </select>
-                </div>
 
-                <div id="search-tile-header">
-                    @* number of items option *@
-                    <div id="nbr-search-results-wrapper" class="float-l">
-                        <div>Showing</div>
-                        <div>
-                            <select id="search-results-choices" class="form-control" data-bind="event: { change: window.vm.limitSearchResults() }">
-                                <option value="15" selected>15</option>
-                                <option value="25">25</option>
-                                <option value="50">50</option>
-                                <option value="All">All</option>
-                            </select>
-                        </div>
-                        <div>results</div>
-                    </div>
-
-                    @* sorting control *@
-                    <div id="sort-option-wrapper" class="float-r">
-                        <div>Sort by</div>
-                        <div>
-                            <select id="sort-results" class="form-control" data-bind="event: { change: window.vm.sortExhibits() }">
-                                @foreach (SelectListItem sortOption in Model.SortByOptions)
-                                {
-                                    <option value="@sortOption.Value">@sortOption.Text</option>
-                                }
-                            </select>
-                        </div>
                     </div>
                 </div>
 
-                <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults.pageItems">
-                    <li class="ul-dataset-list-item borderSide_gray boxShadowSm" data-bind="css : BorderColor, click: TileClicked, attr: { title: PrimaryTitle }">
-                        <div data-bind="if: $index > 20"></div>
-                        <div class="category-type-wrap">
-                            <div class="glyphicon glyphicon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none"></div>
-                            <div class="glyphicon glyphicon-star-empty btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite == false" style="display: none"></div>
-                            <div class="category-type" data-bind="css: BannerColor">
-                                <span data-bind="text: AbbreviatedCategory" />
-                            </div>
-                        </div>
-                        <div></div>
-                        <div class="dataset-list-content">
-                            <!-- ko foreach: DistinctFileExtensions -->
-                            <div class="extension bg_gray" data-bind="css : $data">
-                                <span data-bind="text: $data" />
-                            </div>
-                            <!-- /ko -->
-                            <span class="search-dataset-name" data-bind="text: DatasetName"></span>
-                            <!-- ko if: IsSecured-->
-                            <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure"></i>
-                            <!-- /ko -->
+                <!-- /ko -->
+            </div>
+        </div>
+
+        <div class="col-lg-2 col-md-3 hidden-sm hidden-xs">@* placeholder (keep empty) *@</div>
+
+        <div id="main" class="col-lg-10 col-md-9 col-sm-9 fill">
+            <div id="search-pg-content-wrapper">
+                @* page title *@
+                <div class="listHeadGroup">
+                    <div data-bind="visible: IsShownForCurrentType('Datasets')" style="display: none;"><img src="~/Images/Icons/DatasetsBlue.svg" class="datasetImg leftFloat" /></div>
+                    <div data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;"><img src="~/Images/Icons/Business IntelligenceBlue.svg" class="datasetImg leftFloat" /></div>
+                    <div data-bind="visible: IsShownForCurrentType('Datasets')" style="display: none;"><h1 class="htCenter datasetHeader">Datasets</h1></div>
+                    <div data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;"><h1 class="htCenter datasetHeader">Business Intelligence</h1></div>
+                </div>
+
+                @* spinner (shown until content loads) *@
+                <div id="filterSpinner">
+                    <div class="sentry-spinner-container" style="padding-top: 150px; margin-left: -80px;">
+                        <span class="sentry-spinner"></span>
+                    </div>
+                </div>
+
+                @* search box *@
+                <div class="searchBoxDS  has-feedback has-feedback-left">
+                    <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Datasets..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('Datasets'), event: {'keyup': searchResults.toFirstPage }" autocomplete="off" style="display: none;">
+                    <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Exhibits and Dashboards..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('BusinessIntelligence')" autocomplete="off" style="display: none;">
+                    <i class="form-control-feedback glyphicon glyphicon-search"></i>
+                </div>
+
+                @* filters/tiles (hidden by default until content loads *@
+                <div id="dataColumn" style="display:none;">
+                    <div id="DatasetItemList" class="dataset-list inlineBlock text-left">
+                        <div>
+                            <h4 class="found">
+                                Active Filters:
+                                <button type="button" class="btn btn-sm btn-primary" id="btnClearFilters" data-bind="click: clearFilters, enable: SelectedFilters().length !== 0">Clear Filters</button>
+                            </h4>
+
+                            <select multiple="" class="form-control select2-hidden-accessible"
+                                    id="filterSelector" name="filterSelector" tabindex="-1" aria-hidden="true">
+                                <!-- ko foreach: AllFilters -->
+                                <optgroup data-bind="attr: {label: Name}">
+                                    <!-- ko foreach: Filters -->
+                                    <option data-bind="value: $data.id, text: $data.Title"></option>
+                                    <!-- /ko -->
+                                </optgroup>
+                                <!-- /ko -->
+                            </select>
                         </div>
 
-                        <div class="dataset-list-content">
-                            <div class="dataset-list-content-label"></div>
-                            <div class="dataset-list-content-value listDesc">
-                                <span data-bind="text: DatasetDesc"></span>
-                            </div>
-                        </div>
-                        <div class="dataset-list-content">
-                            <span class="custom-glyphiconz" aria-hidden="true" />
-                            <div class="dataset-list-content-label">
+                        <div id="search-tile-header">
+                            @* number of items option *@
+                            <div id="nbr-search-results-wrapper" class="float-l">
+                                <div>Showing</div>
                                 <div>
-                                    <div class="ownerDate">
-                                        <span class="textBold ownerDate" data-bind="css : Color">Sentry Owner:&nbsp;</span>
-                                        <span data-bind="text: SentryOwner"></span>
+                                    <select id="search-results-choices" class="form-control" data-bind="event: { change: window.vm.limitSearchResults() }">
+                                        <option value="15" selected>15</option>
+                                        <option value="25">25</option>
+                                        <option value="50">50</option>
+                                        <option value="All">All</option>
+                                    </select>
+                                </div>
+                                <div>results</div>
+                            </div>
 
-                                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-
-                                        <!-- ko ifnot: Type === "RPT" -->
-                                        <span class=" textBold ownerDate" data-bind="css : Color">Last Activity Date:&nbsp;</span>
-                                        <span data-bind="text: ChangedDtm"></span>
-                                        <!-- /ko -->
-                                        <!-- ko if: Type === "RPT" -->
-                                        <span class=" textBold ownerDate" data-bind="css : Color">Refresh Frequency:&nbsp;</span>
-                                        <span data-bind="text: UpdateFrequency"></span>
-
-                                        &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                                        <span class="textBold ownerDate link-btn btn btn-sm btn-info disregardParentClick" title="Go to the detail page">
-                                            <span class="disregardParentClick">Detail</span>
-                                        </span>
-                                        <!-- /ko -->
-                                    </div>
+                            @* sorting control *@
+                            <div id="sort-option-wrapper" class="float-r">
+                                <div>Sort by</div>
+                                <div>
+                                    <select id="sort-results" class="form-control" data-bind="event: { change: window.vm.sortExhibits() }">
+                                        @foreach (SelectListItem sortOption in Model.SortByOptions)
+                                        {
+                                            <option value="@sortOption.Value">@sortOption.Text</option>
+                                        }
+                                    </select>
                                 </div>
                             </div>
                         </div>
-                    </li>
-                </ul>
 
-                <div id="search-tile-footer" class="text-right">
+                        <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults.pageItems">
+                            <li class="ul-dataset-list-item borderSide_gray boxShadowSm" data-bind="css : BorderColor, click: TileClicked, attr: { title: PrimaryTitle }">
+                                <div data-bind="if: $index > 20"></div>
+                                <div class="category-type-wrap">
+                                    <div class="glyphicon glyphicon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none"></div>
+                                    <div class="glyphicon glyphicon-star-empty btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite == false" style="display: none"></div>
+                                    <div class="category-type" data-bind="css: BannerColor">
+                                        <span data-bind="text: AbbreviatedCategory" />
+                                    </div>
+                                </div>
+                                <div></div>
+                                <div class="dataset-list-content">
+                                    <!-- ko foreach: DistinctFileExtensions -->
+                                    <div class="extension bg_gray" data-bind="css : $data">
+                                        <span data-bind="text: $data" />
+                                    </div>
+                                    <!-- /ko -->
+                                    <span class="search-dataset-name" data-bind="text: DatasetName"></span>
+                                    <!-- ko if: IsSecured-->
+                                    <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure"></i>
+                                    <!-- /ko -->
+                                </div>
 
-                    @* search results info display *@
-                    <div id="search-results-wrapper" class="footer-container">
-                        Results <span data-bind="text: searchResults.firstItemOnPage()"></span>-<span data-bind="text: searchResults.lastItemOnPage()"></span> of <span data-bind="text: searchResults.itemCount()"></span>
-                    </div>
+                                <div class="dataset-list-content">
+                                    <div class="dataset-list-content-label"></div>
+                                    <div class="dataset-list-content-value listDesc">
+                                        <span data-bind="text: DatasetDesc"></span>
+                                    </div>
+                                </div>
+                                <div class="dataset-list-content">
+                                    <span class="custom-glyphiconz" aria-hidden="true" />
+                                    <div class="dataset-list-content-label">
+                                        <div>
+                                            <div class="ownerDate">
+                                                <span class="textBold ownerDate" data-bind="css : Color">Sentry Owner:&nbsp;</span>
+                                                <span data-bind="text: SentryOwner"></span>
 
-                    @* pagination controls *@
-                    <div id="pagination-wrapper">
-                        <ul class="pagination">
-                            @* button to take you directly to the first page *@
-                            <li data-bind="css: { disabled: searchResults.isFirstPage() }" class="previous disabled">
-                                <a href="#" aria-label="First" data-bind="click: searchResults.toFirstPage" title="First">&laquo;</a>
-                            </li>
-                            @* button to take you to the prevoius page *@
-                            <li data-bind="css: { disabled: !searchResults.hasPreviousPage() }" class="previous disabled">
-                                <a href="#" aria-label="Previous" data-bind="click: searchResults.toPreviousPage" title="Previous">&lt;</a>
-                            </li>
+                                                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 
-                            @* loop through the pages, building a button for each *@
-                            <!-- ko foreach: searchResults.pages -->
-                            <li data-bind="css: { active: $data == $parent.searchResults.pageNumber() }">
-                                <a href="#" data-bind="text: $data, click: $parent.searchResults.pageNumber.bind($data)"></a>
-                            </li>
-                            <!-- /ko -->
-                            @* button to take you to the next page*@
-                            <li data-bind="css: { disabled: !searchResults.hasNextPage() }" class="next disabled">
-                                <a href="#" aria-label="Next" data-bind="click: searchResults.toNextPage" title="Next">&gt;</a>
-                            </li>
-                            @* button to take you directly to the last page *@
-                            <li data-bind="css: { disabled: searchResults.isLastPage() }" class="next disabled">
-                                <a href="#" aria-label="Last" data-bind="click: searchResults.toLastPage" title="Last">&raquo;</a>
+                                                <!-- ko ifnot: Type === "RPT" -->
+                                                <span class=" textBold ownerDate" data-bind="css : Color">Last Activity Date:&nbsp;</span>
+                                                <span data-bind="text: ChangedDtm"></span>
+                                                <!-- /ko -->
+                                                <!-- ko if: Type === "RPT" -->
+                                                <span class=" textBold ownerDate" data-bind="css : Color">Refresh Frequency:&nbsp;</span>
+                                                <span data-bind="text: UpdateFrequency"></span>
+
+                                                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                                <span class="textBold ownerDate link-btn btn btn-sm btn-info disregardParentClick" title="Go to the detail page">
+                                                    <span class="disregardParentClick">Detail</span>
+                                                </span>
+                                                <!-- /ko -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </li>
                         </ul>
+
+                        <div id="search-tile-footer" class="text-right">
+
+                            @* search results info display *@
+                            <div id="search-results-wrapper" class="footer-container">
+                                Results <span data-bind="text: searchResults.firstItemOnPage()"></span>-<span data-bind="text: searchResults.lastItemOnPage()"></span> of <span data-bind="text: searchResults.itemCount()"></span>
+                            </div>
+
+                            @* pagination controls *@
+                            <div id="pagination-wrapper">
+                                <ul class="pagination">
+                                    @* button to take you directly to the first page *@
+                                    <li data-bind="css: { disabled: searchResults.isFirstPage() }" class="previous disabled">
+                                        <a href="#" aria-label="First" data-bind="click: searchResults.toFirstPage" title="First">&laquo;</a>
+                                    </li>
+                                    @* button to take you to the prevoius page *@
+                                    <li data-bind="css: { disabled: !searchResults.hasPreviousPage() }" class="previous disabled">
+                                        <a href="#" aria-label="Previous" data-bind="click: searchResults.toPreviousPage" title="Previous">&lt;</a>
+                                    </li>
+
+                                    @* loop through the pages, building a button for each *@
+                                    <!-- ko foreach: searchResults.pages -->
+                                    <li data-bind="css: { active: $data == $parent.searchResults.pageNumber() }">
+                                        <a href="#" data-bind="text: $data, click: $parent.searchResults.pageNumber.bind($data)"></a>
+                                    </li>
+                                    <!-- /ko -->
+                                    @* button to take you to the next page*@
+                                    <li data-bind="css: { disabled: !searchResults.hasNextPage() }" class="next disabled">
+                                        <a href="#" aria-label="Next" data-bind="click: searchResults.toNextPage" title="Next">&gt;</a>
+                                    </li>
+                                    @* button to take you directly to the last page *@
+                                    <li data-bind="css: { disabled: searchResults.isLastPage() }" class="next disabled">
+                                        <a href="#" aria-label="Last" data-bind="click: searchResults.toLastPage" title="Last">&raquo;</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <hr>
+                        <!-- ko if: searchResults().length == 0 -->
+                        <div>
+                            <h4>
+                                No results given the active filters and/or search text.  Please refine your search parameters.
+                            </h4>
+                        </div>
+                        <!-- /ko -->
                     </div>
                 </div>
-
-                <hr>
-                <!-- ko if: searchResults().length == 0 -->
-                <div>
-                    <h4>
-                        No results given the active filters and/or search text.  Please refine your search parameters.
-                    </h4>
-                </div>
-                <!-- /ko -->
             </div>
         </div>
     </div>
 </div>
-
 
 @section Scripts {
     <script>
@@ -265,6 +270,9 @@
                 templateSelection: formatTag,
                 placeholder: "There are no active filters.  Pick an option to the left or click here to begin filtering.",
             });
+
+            // remove the "container" class from the parent object so the fluid container takes affect
+            $("#search-pg-wrapper").parent().removeClass("container");
 
             //This is fed into the Select2 Box to format tags.
             function formatTag(tag) {
