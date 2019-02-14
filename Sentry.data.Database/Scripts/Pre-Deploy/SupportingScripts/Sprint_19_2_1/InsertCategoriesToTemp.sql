@@ -16,7 +16,6 @@ Create table #OldCatNewCat(
 	Old_Id int,
 	New_Id int
 )
-GO
 
 insert into #OldCatNewCat select 'Claim',				(Select Id from Category where Name = 'Claim'),				1
 insert into #OldCatNewCat select 'Industry',			(Select Id from Category where Name = 'Industry'),			2
