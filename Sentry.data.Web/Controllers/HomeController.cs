@@ -40,7 +40,7 @@ namespace Sentry.data.Web.Controllers
         {
             ViewData["fluid"] = true;
 
-            List<Dataset> dsList = _dsContext.Datasets.ToList();
+            List<Dataset> dsList = _dsContext.Datasets.Where(x=> x.CanDisplay).ToList();
 
             HomeModel hm = new HomeModel()
             {

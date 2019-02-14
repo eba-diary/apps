@@ -177,10 +177,10 @@ namespace Sentry.data.Core
             ds.DatasetFunctions = _datasetContext.DatasetFunctions.Where(x => dto.DatasetFunctionIds.Contains(x.Id)).ToList();
             ds.DatasetName = dto.DatasetName;
             ds.DatasetDesc = dto.DatasetDesc;
-            ds.CreationUserName = dto.CreationUserName;
+            ds.CreationUserName = dto.CreationUserId;
             ds.PrimaryOwnerId = dto.PrimaryOwnerId;
             ds.PrimaryContactId = dto.PrimaryContactId;
-            ds.UploadUserName = dto.UploadUserName;
+            ds.UploadUserName = dto.UploadUserId;
             ds.OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), 1);  //All reports are internal
             ds.DatasetDtm = dto.DatasetDtm;
             ds.ChangedDtm = dto.ChangedDtm;
@@ -206,6 +206,8 @@ namespace Sentry.data.Core
         {
             IApplicationUser owner = _userService.GetByAssociateId(ds.PrimaryOwnerId);
             IApplicationUser contact = _userService.GetByAssociateId(ds.PrimaryContactId);
+            IApplicationUser creator = _userService.GetByAssociateId(ds.CreationUserName);
+            IApplicationUser uploaded = _userService.GetByAssociateId(ds.UploadUserName);
 
             dto.Security = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
             dto.PrimaryOwnerId = ds.PrimaryOwnerId;
@@ -222,8 +224,11 @@ namespace Sentry.data.Core
             dto.PrimaryContactName = (contact != null ? contact.DisplayName : "Not Available");
             dto.PrimaryContactEmail = (contact != null ? contact.EmailAddress : "");
 
-            dto.CreationUserName = ds.CreationUserName;
-            dto.UploadUserName = ds.UploadUserName;
+            dto.CreationUserId = ds.CreationUserName;
+            dto.CreationUserName = (creator != null ? creator?.DisplayName : "Not Available");
+            dto.UploadUserId = ds.UploadUserName;
+            dto.UploadUserName = (uploaded != null ? uploaded?.DisplayName : "Not Available");
+
             dto.DatasetDtm = ds.DatasetDtm;
             dto.ChangedDtm = ds.ChangedDtm;
             dto.S3Key = ds.S3Key;
