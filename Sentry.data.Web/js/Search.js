@@ -111,6 +111,143 @@ data.Search = {
         var regex = /\/Search\/(\w+)/,
             url = window.location.href;
         return regex.exec(url)[1];
+    },
+
+    GetParameterByName: function (name, url) {
+        if (!url) url = window.location.href;
+
+        name = name.replace(/[\[\]]/g, "\\$&");
+
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+
+        if (!results) return null;
+
+        if (!results[2]) return '';
+
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    },
+
+    Filter: function (id, Title, Category) {
+
+        this.id = id;
+        this.Title = Title;
+        this.Category = Category;
+
+        this.Count = ko.computed(function () {
+
+            var selectedFilters = [];//push them into a new array so we do not modify the original.
+            ko.utils.arrayForEach(window.vm.SelectedFilters(), function (filter) { selectedFilters.push(filter); });
+
+            //OR Group
+            var selectedCategories = data.Search.GetSelectedFiltersFromGroup(window.vm.CategoryFilters, selectedFilters);
+            var selectedBusinessUnits = data.Search.GetSelectedFiltersFromGroup(window.vm.BusinessUnitFilters, selectedFilters);
+            var selectedFunctions = data.Search.GetSelectedFiltersFromGroup(window.vm.DatasetFunctionFilters, selectedFilters);
+            var selectedExtensions = data.Search.GetSelectedFiltersFromGroup(window.vm.ExtensionFilters, selectedFilters);
+            var selectedOwners = data.Search.GetSelectedFiltersFromGroup(window.vm.OwnerFilters, selectedFilters);
+
+            var items = [];
+
+            if (Category === 'Category') {
+                //filter datasets for the count
+                var datasetsToLoop = filterForCount(selectedFilters, selectedCategories);
+                items = ko.utils.arrayFilter(datasetsToLoop, function (dataset) {
+                    if (dataset.Categories.includes(Title)) { return dataset; }
+                });
+            }
+            else if (Category === 'Sentry Owner') {
+                //filter datasets for the count
+                var datasetsToLoop = filterForCount(selectedFilters, selectedOwners);
+                items = ko.utils.arrayFilter(datasetsToLoop, function (dataset) {
+                    if (dataset.SentryOwner === Title) { return dataset; }
+                });
+            }
+            else if (Category === 'Extension' || Category === "Report Type") {
+                //filter datasets for the count
+                var datasetsToLoop = filterForCount(selectedFilters, selectedExtensions);
+                items = ko.utils.arrayFilter(datasetsToLoop, function (dataset) {
+                    if (dataset.DistinctFileExtensions.includes(Title)) { return dataset; }
+                });
+            }
+            else if (Category === 'Business Unit') {
+                //filter datasets for the count
+                var datasetsToLoop = filterForCount(selectedFilters, selectedBusinessUnits);
+                items = ko.utils.arrayFilter(datasetsToLoop, function (dataset) {
+                    if (dataset.BusinessUnits.includes(Title)) { return dataset; }
+                });
+            }
+            else if (Category === 'Function') {
+                //filter datasets for the count
+                var datasetsToLoop = filterForCount(selectedFilters, selectedFunctions);
+                items = ko.utils.arrayFilter(datasetsToLoop, function (dataset) {
+                    if (dataset.DatasetFunctions.includes(Title)) { return dataset; }
+                });
+            }
+            else {
+                //This is going to be all teh Tags within different groups.  All of them are AND'd together and should filter off the searchResults.
+                //filter datasets for the count
+                var datasetsToLoop = window.vm.searchResults();
+                // all AND groups here
+                items = ko.utils.arrayFilter(datasetsToLoop, function (dataset) {
+                    if (dataset.TagNames.includes(Title)) { return dataset; }
+                });
+            }
+
+            return items.length;
+        });
+
+    },
+
+    GetSelectedFiltersFromGroup: function (allFiltersFromGroup, mySelectedFilters) {
+
+        if (allFiltersFromGroup().length === 0) {
+            return allFiltersFromGroup();
+        }
+
+        var filters = ko.utils.arrayFilter(allFiltersFromGroup(), function (feature) {
+            for (var i = 0; i < mySelectedFilters.length; i++) {
+                if (feature.id === mySelectedFilters[i]) {
+                    return true;
+                }
+            }
+            return false;
+        });
+
+        return filters;
+
+    },
+
+    SortTheResults: function (sortVal, items, alphabetical, favorites, mostAccessed, recentlyAdded, recentlyUpdated) {
+
+        switch (parseInt(sortVal)) {
+            case alphabetical:
+                return items.sort(function (left, right) {
+                    return left.DatasetName === right.DatasetName ? 0 : (left.DatasetName < right.DatasetName ? -1 : 1);
+                });
+
+            case favorites:
+                return items.sort(function (left, right) {
+                    return right.IsFavorite - left.IsFavorite;
+                });
+
+            case mostAccessed:
+                return items.sort(function (left, right) {
+                    return right.PageViews - left.PageViews;
+                });
+
+            case recentlyAdded:
+                return items.sort(function (left, right) {
+                    return new Date(right.CreatedDtm) - new Date(left.CreatedDtm);
+                });
+
+            case recentlyUpdated:
+                return items.sort(function (left, right) {
+                    return new Date(right.ChangedDtm) - new Date(left.ChangedDtm);
+                });
+
+            default:
+                return items;
+        }
     }
     
 };

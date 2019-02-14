@@ -275,22 +275,12 @@
     <script>
         $(function () {
 
-            //data.Search.Init();
-
-            var $selector = $("#filterSelector").select2({
+            $("#filterSelector").select2({
                 selectOnClose: false,
                 closeOnSelect: false,
                 templateSelection: formatTag,
                 placeholder: "There are no active filters.  Pick an option to the left or click here to begin filtering.",
             });
-            $selector.select2({
-                selectOnClose: false,
-                closeOnSelect: false,
-                templateSelection: formatTag,
-                placeholder: "There are no active filters.  Pick an option to the left or click here to begin filtering.",
-            });
-
-            
 
             //This is fed into the Select2 Box to format tags.
             function formatTag(tag) {
@@ -332,75 +322,6 @@
                 window.vm.RemoveSelection(data.id);
             });
         });
-
-        function Filter(id, Title, Category, Count) {
-
-            this.id = id;
-            this.Title = Title;
-            this.Category = Category;
-
-            this.Count = ko.computed(function () {
-
-                var selectedFilters = [];//push them into a new array so we do not modify the original.
-                ko.utils.arrayForEach(window.vm.SelectedFilters(), function (filter) { selectedFilters.push(filter);  });
-
-                //OR Group
-                var selectedCategories = GetSelectedFiltersFromGroup(window.vm.CategoryFilters, selectedFilters);
-                var selectedBusinessUnits = GetSelectedFiltersFromGroup(window.vm.BusinessUnitFilters, selectedFilters);
-                var selectedFunctions = GetSelectedFiltersFromGroup(window.vm.DatasetFunctionFilters, selectedFilters);
-                var selectedExtensions = GetSelectedFiltersFromGroup(window.vm.ExtensionFilters, selectedFilters);
-                var selectedOwners = GetSelectedFiltersFromGroup(window.vm.OwnerFilters, selectedFilters);
-
-                var items = [];
-
-                if (Category === 'Category') {
-                    //filter datasets for the count
-                    var datasetsToLoop = filterForCount(selectedFilters, selectedCategories);
-                    items = ko.utils.arrayFilter(datasetsToLoop, function (dataset) {
-                        if (dataset.Categories.includes(Title)) { return dataset; }
-                    });
-                }
-                else if (Category === 'Sentry Owner') {
-                    //filter datasets for the count
-                    var datasetsToLoop = filterForCount(selectedFilters, selectedOwners);
-                    items = ko.utils.arrayFilter(datasetsToLoop, function (dataset) {
-                        if (dataset.SentryOwner === Title) { return dataset; }
-                    });
-                }
-                else if (Category === 'Extension' || Category === "Report Type") {
-                    //filter datasets for the count
-                    var datasetsToLoop = filterForCount(selectedFilters, selectedExtensions);
-                    items = ko.utils.arrayFilter(datasetsToLoop, function (dataset) {
-                        if (dataset.DistinctFileExtensions.includes(Title)) { return dataset; }
-                    });
-                }
-                else if (Category === 'Business Unit') {
-                    //filter datasets for the count
-                    var datasetsToLoop = filterForCount(selectedFilters, selectedBusinessUnits);
-                    items = ko.utils.arrayFilter(datasetsToLoop, function (dataset) {
-                        if (dataset.BusinessUnits.includes(Title)) { return dataset; }
-                    });
-                }
-                else if (Category === 'Function') {
-                    //filter datasets for the count
-                    var datasetsToLoop = filterForCount(selectedFilters, selectedFunctions);
-                    items = ko.utils.arrayFilter(datasetsToLoop, function (dataset) {
-                        if (dataset.DatasetFunctions.includes(Title)) { return dataset; }
-                    });
-                }
-                else {
-                    //This is going to be all teh Tags within different groups.  All of them are AND'd together and should filter off the searchResults.
-                    //filter datasets for the count
-                    var datasetsToLoop = window.vm.searchResults();
-                    // all AND groups here
-                    items = ko.utils.arrayFilter(datasetsToLoop, function (dataset) {
-                        if (dataset.TagNames.includes(Title)) { return dataset; }
-                    });
-                }
-
-                return items.length;
-            });
-        }
 
         function filterForCount(selectedFilters, filtersToRemove) {
             //build my selected fitler (all filters but Business Unit)
@@ -541,25 +462,6 @@
 
         }
 
-        function GetSelectedFiltersFromGroup(allFiltersFromGroup, mySelectedFilters) {
-
-            if (allFiltersFromGroup().length === 0) {
-                return allFiltersFromGroup();
-            }
-
-            var filters = ko.utils.arrayFilter(allFiltersFromGroup(), function (feature)
-            {
-                for (var i = 0; i < mySelectedFilters.length; i++) {
-                    if (feature.id == mySelectedFilters[i]) {
-                        return true;
-                    }
-                }
-                return false;
-            });
-
-            return filters;
-        }
-
         //This only should be used for the Category type filter groups the ones that are 'OR'ed together when multiple selected in the same box.
         function IsSelectedFiltersAMatch(selectedFilters, datasetObjectArray, isAndOperator) {
 
@@ -584,16 +486,22 @@
         function FilterExhibits(exhibits, sortVal, selectedFilters) {
 
             if (selectedFilters.length === 0 || window.vm === undefined) {
-                return sortTheResults(sortVal, exhibits);
+                return data.Search.SortTheResults(sortVal,
+                    exhibits,
+                    @((int)DatasetSortByOption.Alphabetical),
+                    @((int)DatasetSortByOption.Favorites),
+                    @((int)DatasetSortByOption.MostAccessed),
+                    @((int)DatasetSortByOption.RecentlyAdded),
+                    @((int)DatasetSortByOption.RecentlyUpdated));
             }
 
             //get all the filerters selected from the category group
-            var selectedCategories = GetSelectedFiltersFromGroup(window.vm.CategoryFilters, selectedFilters);
-            var selectedBusinessUnits = GetSelectedFiltersFromGroup(window.vm.BusinessUnitFilters, selectedFilters);
-            var selectedFunctions = GetSelectedFiltersFromGroup(window.vm.DatasetFunctionFilters, selectedFilters);
-            var selectedExtensions = GetSelectedFiltersFromGroup(window.vm.ExtensionFilters, selectedFilters);
-            var selectedTags = GetSelectedFiltersFromGroup(window.vm.TagFilters, selectedFilters);
-            var selectedOwners = GetSelectedFiltersFromGroup(window.vm.OwnerFilters, selectedFilters);
+            var selectedCategories = data.Search.GetSelectedFiltersFromGroup(window.vm.CategoryFilters, selectedFilters);
+            var selectedBusinessUnits = data.Search.GetSelectedFiltersFromGroup(window.vm.BusinessUnitFilters, selectedFilters);
+            var selectedFunctions = data.Search.GetSelectedFiltersFromGroup(window.vm.DatasetFunctionFilters, selectedFilters);
+            var selectedExtensions = data.Search.GetSelectedFiltersFromGroup(window.vm.ExtensionFilters, selectedFilters);
+            var selectedTags = data.Search.GetSelectedFiltersFromGroup(window.vm.TagFilters, selectedFilters);
+            var selectedOwners = data.Search.GetSelectedFiltersFromGroup(window.vm.OwnerFilters, selectedFilters);
 
             //filter the exhibits based on teh groups that are 'OR'ed toghether
             exhibits = exhibits.filter(function (exhibit) {
@@ -609,7 +517,13 @@
                 return categoryMatch && buMatch && functionMatch && extensionMatch && ownerMatch && tagMatch;
             });
 
-            return sortTheResults(sortVal, exhibits);
+            return data.Search.SortTheResults(sortVal,
+                exhibits,
+                @((int)DatasetSortByOption.Alphabetical),
+                @((int)DatasetSortByOption.Favorites),
+                @((int)DatasetSortByOption.MostAccessed),
+                @((int)DatasetSortByOption.RecentlyAdded),
+                @((int)DatasetSortByOption.RecentlyUpdated));
         }
 
         function ListViewModel() {
@@ -639,12 +553,12 @@
 
                     if (!(category in categoryLookup)) {
                         categoryLookup[category] = 1;
-                        self.CategoryFilters.push(new Filter(pageType + '0_' + i, category, 'Category'));
+                        self.CategoryFilters.push(new data.Search.Filter(pageType + '0_' + i, category, 'Category'));
 
-                        temp.push(new Filter(pageType + '0_' + i, category, 'Category'));
+                        temp.push(new data.Search.Filter(pageType + '0_' + i, category, 'Category'));
 
                         // compare the category to what may have been passed along in the URL; if there's a match, push it to the SelectedFilters observable array
-                        if (category === getParameterByName('category')) {
+                        if (category === data.Search.GetParameterByName('category')) {
                             self.SelectedFilters.push(pageType + '0_' + i);
                         }
                     }
@@ -672,10 +586,9 @@
 
                     if (!(owner in ownerLookup)) {
                         ownerLookup[owner] = 1;
-                        self.OwnerFilters.push(new Filter(pageType + '1_' + i, owner, 'Sentry Owner'));
-                        //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
+                        self.OwnerFilters.push(new data.Search.Filter(pageType + '1_' + i, owner, 'Sentry Owner'));
 
-                        temp.push(new Filter(pageType + '1_' + i, owner, 'Sentry Owner'));
+                        temp.push(new data.Search.Filter(pageType + '1_' + i, owner, 'Sentry Owner'));
                     }
 
                 }
@@ -698,9 +611,9 @@
                     for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
                         if (!(ext in extensionLookup)) {
                             extensionLookup[ext] = 1;
-                            self.ExtensionFilters.push(new Filter(pageType + '3_' + counter, ext, 'Extension'));
+                            self.ExtensionFilters.push(new data.Search.Filter(pageType + '3_' + counter, ext, 'Extension'));
 
-                            temp.push(new Filter(pageType + '3_' + counter, ext, 'Extension'));
+                            temp.push(new data.Search.Filter(pageType + '3_' + counter, ext, 'Extension'));
                             counter++;
                         }
                     }
@@ -727,14 +640,14 @@
                     for (var cat, j = 0; cat = item.Categories[j++];) {
                         if (!(cat in categoryLookup)) {
                             categoryLookup[cat] = 1;
-                            self.CategoryFilters.push(new Filter(pageType + '0_' + i, cat, 'Category'));
+                            self.CategoryFilters.push(new data.Search.Filter(pageType + '0_' + i, cat, 'Category'));
 
                             // compare the category to what may have been passed in the URL; if there's a match, push it to the SelectedFilters observable array
-                            if (cat === getParameterByName('category')) {
+                            if (cat === data.Search.GetParameterByName('category')) {
                                 self.SelectedFilters.push(pageType + '0_' + i);
                             }
 
-                            temp.push(new Filter(pageType + '0_' + i, cat, 'Category'));
+                            temp.push(new data.Search.Filter(pageType + '0_' + i, cat, 'Category'));
                         }
                     }
                 }
@@ -757,9 +670,9 @@
                     for (var bu, j = 0; bu = item.BusinessUnits[j++];) {
                         if (!(bu in businessUnitLookup)) {
                             businessUnitLookup[bu] = 1;
-                            self.BusinessUnitFilters.push(new Filter(pageType + '5_' + counter, bu, 'Business Unit'));
+                            self.BusinessUnitFilters.push(new data.Search.Filter(pageType + '5_' + counter, bu, 'Business Unit'));
 
-                            temp.push(new Filter(pageType + '5_' + counter, bu, 'Business Unit'));
+                            temp.push(new data.Search.Filter(pageType + '5_' + counter, bu, 'Business Unit'));
                             counter++;
                         }
                     }
@@ -783,9 +696,9 @@
                     for (var fn, j = 0; fn = item.DatasetFunctions[j++];) {
                         if (!(fn in datasetFunctionLookup)) {
                             datasetFunctionLookup[fn] = 1;
-                            self.DatasetFunctionFilters.push(new Filter(pageType + '6_' + counter, fn, 'Function'));
+                            self.DatasetFunctionFilters.push(new data.Search.Filter(pageType + '6_' + counter, fn, 'Function'));
 
-                            temp.push(new Filter(pageType + '6_' + counter, fn, 'Function'));
+                            temp.push(new data.Search.Filter(pageType + '6_' + counter, fn, 'Function'));
                             counter++;
                         }
                     }
@@ -809,9 +722,9 @@
                     for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
                         if (!(ext in extensionLookup)) {
                             extensionLookup[ext] = 1;
-                            self.ExtensionFilters.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
+                            self.ExtensionFilters.push(new data.Search.Filter(pageType + '2_' + counter, ext, 'Report Type'));
 
-                            temp.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
+                            temp.push(new data.Search.Filter(pageType + '2_' + counter, ext, 'Report Type'));
                             counter++;
                         }
                     }
@@ -864,9 +777,9 @@
                             for (var tag, j = 0; tag = Tags[j++];) {
                                 if (tag.Group == group && !(tag.Name in tagLookup)) {
                                     tagLookup[tag.Name] = 1;
-                                    self.TagFilters.push(new Filter(pageType + '3_' + counter, tag.Name, group));
+                                    self.TagFilters.push(new data.Search.Filter(pageType + '3_' + counter, tag.Name, group));
 
-                                    temp.push(new Filter(pageType + '3_' + counter, tag.Name, group));
+                                    temp.push(new data.Search.Filter(pageType + '3_' + counter, tag.Name, group));
                                     counter++;
                                 }
                             }
@@ -893,16 +806,16 @@
                 var pageType = '3_'
 
                 //CATEGORY FILTER
-                var param = getParameterByName('category');
+                var param = data.Search.GetParameterByName('category');
 
                 for (var item, i = 0; item = allObjects[i++];) {
                     var category = item.Category;
 
                     if (!(category in categoryLookup)) {
                         categoryLookup[category] = 1;
-                        self.CategoryFilters.push(new Filter(pageType + '0_' + i, category, 'Category'));
+                        self.CategoryFilters.push(new data.Search.Filter(pageType + '0_' + i, category, 'Category'));
 
-                        temp.push(new Filter(pageType + '0_' + i, category, 'Category'));
+                        temp.push(new data.Search.Filter(pageType + '0_' + i, category, 'Category'));
 
                         if (category == param) {
                             self.SelectedFilters.push(pageType + '0_' + i);
@@ -931,9 +844,9 @@
                     for (var bu, j = 0; bu = item.BusinessUnits[j++];) {
                         if (!(bu in businessUnitLookup)) {
                             businessUnitLookup[bu] = 1;
-                            self.BusinessUnitFilters.push(new Filter(pagetype + '5_' + counter, bu, 'Business Unit'));
+                            self.BusinessUnitFilters.push(new data.Search.Filter(pagetype + '5_' + counter, bu, 'Business Unit'));
 
-                            temp.push(new Filter(pageType + '5_' + counter, bu, 'Business Unit'));
+                            temp.push(new data.Search.Filter(pageType + '5_' + counter, bu, 'Business Unit'));
                             counter++;
                         }
                     }
@@ -956,10 +869,9 @@
 
                     if (!(owner in ownerLookup)) {
                         ownerLookup[owner] = 1;
-                        self.OwnerFilters.push(new Filter(pageType + '1_' + i, owner, 'Sentry Owner'));
-                        //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
+                        self.OwnerFilters.push(new data.Search.Filter(pageType + '1_' + i, owner, 'Sentry Owner'));
 
-                        temp.push(new Filter(pageType + '1_' + i, owner, 'Sentry Owner'));
+                        temp.push(new data.Search.Filter(pageType + '1_' + i, owner, 'Sentry Owner'));
                     }
 
                 }
@@ -982,10 +894,9 @@
                     for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
                         if (!(ext in extensionLookup)) {
                             extensionLookup[ext] = 1;
-                            self.ExtensionFilters.push(new Filter(pageType + '3_' + counter, ext, 'Extension'));
-                            //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
+                            self.ExtensionFilters.push(new data.Search.Filter(pageType + '3_' + counter, ext, 'Extension'));
 
-                            temp.push(new Filter(pageType + '3_' + counter, ext, 'Extension'));
+                            temp.push(new data.Search.Filter(pageType + '3_' + counter, ext, 'Extension'));
                             counter++;
                         }
                     }
@@ -1010,16 +921,16 @@
                         for (var tag, j = 0; tag = Tags[j++];) {
                             if (!(tag.Name in tagLookup)) {
                                 tagLookup[tag.Name] = 1;
-                                self.TagFilters.push(new Filter(pageType + '4_' + counter, tag.Name, 'Tag'));
+                                self.TagFilters.push(new data.Search.Filter(pageType + '4_' + counter, tag.Name, 'Tag'));
 
-                                temp.push(new Filter(pageType + '4_' + counter, tag.Name, 'Tag'));
+                                temp.push(new data.Search.Filter(pageType + '4_' + counter, tag.Name, 'Tag'));
                                 counter++;
                             }
                         }
                     }
                 }
                 ko.utils.arrayForEach(self.AllFilters(), function (v) {
-                    if (v.Name == 'Tag') {
+                    if (v.Name === 'Tag') {
                         item = v;
                     }
                 });
@@ -1086,6 +997,10 @@
                 $('.sentry-spinner-container').remove();
                 $(".select2-container--default").css('width', '100%');
                 $('#filterSelector').val(self.SelectedFilters()).trigger('change');
+
+                // have the first filter option expanded by default
+                $("#filterColumn .panel:first-child .filterViewIcon").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-up");
+                $("#filterColumn .panel:first-child .dataset-list-filter-category").show();
             });
 
             self.searchResults = ko.computed(function () {
@@ -1100,10 +1015,10 @@
                         }
                     }
 
-                    if (getParameterByName('searchPhrase')) {
-                        self.Query(getParameterByName('searchPhrase'));
+                    if (data.Search.GetParameterByName('searchPhrase')) {
+                        self.Query(data.Search.GetParameterByName('searchPhrase'));
                     }
-                    else if (getParameterByName('category')) {
+                    else if (data.Search.GetParameterByName('category')) {
                         self.Query('');
                     }
                     else {
@@ -1216,53 +1131,7 @@
 
         $(document).ready(function () {
             data.Search.Init();
-
-            
-
-            
         });
-
-        function getParameterByName(name, url) {
-            if (!url) url = window.location.href;
-            name = name.replace(/[\[\]]/g, "\\$&");
-            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-                results = regex.exec(url);
-            if (!results) return null;
-            if (!results[2]) return '';
-            return decodeURIComponent(results[2].replace(/\+/g, " "));
-        }
-
-        function sortTheResults(sortVal, items) {
-            switch (parseInt(sortVal)) {
-                case @((int)DatasetSortByOption.Alphabetical):
-                    return items.sort(function (left, right) {
-                        return left.DatasetName == right.DatasetName ? 0 : (left.DatasetName < right.DatasetName ? -1 : 1)
-                    });
-                    break;
-                case @((int)DatasetSortByOption.Favorites):
-                    return items.sort(function (left, right) {
-                        return right.IsFavorite - left.IsFavorite;
-                    });
-                    break;
-                case @((int)DatasetSortByOption.MostAccessed):
-                    return items.sort(function (left, right) {
-                        return right.PageViews - left.PageViews;
-                    });
-                    break;
-                case @((int)DatasetSortByOption.RecentlyAdded):
-                    return items.sort(function (left, right) {
-                        return new Date(right.CreatedDtm) - new Date(left.CreatedDtm);
-                    });
-                    break;
-                case @((int)DatasetSortByOption.RecentlyUpdated):
-                    return items.sort(function (left, right) {
-                        return new Date(right.ChangedDtm) - new Date(left.ChangedDtm);
-                    });
-                    break;
-                default:
-                    return items;
-            }
-        }
 
     </script>
 }
