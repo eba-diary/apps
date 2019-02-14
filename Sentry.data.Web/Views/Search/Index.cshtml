@@ -183,7 +183,9 @@
                                         <br />
                                         <span>Business Unit: </span>
                                         <span data-bind="text: BusinessUnits"></span>
-
+                                        <br />
+                                        <span>Functions: </span>
+                                        <span data-bind="text: DatasetFunctions"></span>
 
                                     </div>
                                 </div>
@@ -338,58 +340,75 @@
             this.Category = Category;
 
             this.Count = ko.computed(function () {
-                var items = ko.utils.arrayFilter(window.vm.searchResults(), function (prod) {
-                    if (Category == 'Category') {
-                        for (var i = 0; i < prod.Categories.length; i++) {
-                            if (prod.Categories[i] === Title) {
-                                return prod;
-                            }
-                        }
-                    }
-                    else if (Title == prod.SentryOwner && Category == 'Sentry Owner') {
-                        return prod;
-                    }
-                    else if (Category == 'Extension') {
-                        for (var i = 0; i < prod.DistinctFileExtensions.length; i++) {
-                            if (prod.DistinctFileExtensions[i] == Title) {
-                                return prod;
-                            }
-                        }
-                    }
-                    else if (Category == 'Report Type') {
-                        for (var i = 0; i < prod.DistinctFileExtensions.length; i++) {
-                            if (prod.DistinctFileExtensions[i] == Title) {
-                                return prod;
-                            }
-                        }
-                    }
-                    else if (Category === 'Business Unit') {
-                        for (var i = 0; i < prod.BusinessUnits.length; i++) {
-                            if (prod.BusinessUnits[i] === Title) {
-                                return prod;
-                            }
-                        }
-                    }
-                    else if (Category === 'Function') {
-                        for (var i = 0; i < prod.DatasetFunctions.length; i++) {
-                            if (prod.DatasetFunctions[i] === Title) {
-                                return prod;
-                            }
-                        }
-                    }
-                    else {
-                        if (prod.Tags != null) {
-                            for (var i = 0; i < prod.Tags.length; i++) {
-                                if (prod.Tags[i].Name == Title) {
-                                    return prod;
-                                }
-                            }
-                        }
-                    }
-                });
+
+                var selectedFilters = [];//push them into a new array so we do not modify the original.
+                ko.utils.arrayForEach(window.vm.SelectedFilters(), function (filter) { selectedFilters.push(filter);  });
+
+                //OR Group
+                var selectedCategories = GetSelectedFiltersFromGroup(window.vm.CategoryFilters, selectedFilters);
+                var selectedBusinessUnits = GetSelectedFiltersFromGroup(window.vm.BusinessUnitFilters, selectedFilters);
+                var selectedFunctions = GetSelectedFiltersFromGroup(window.vm.DatasetFunctionFilters, selectedFilters);
+                var selectedExtensions = GetSelectedFiltersFromGroup(window.vm.ExtensionFilters, selectedFilters);
+                var selectedOwners = GetSelectedFiltersFromGroup(window.vm.OwnerFilters, selectedFilters);
+
+                var items = [];
+
+                if (Category === 'Category') {
+                    //filter datasets for the count
+                    var datasetsToLoop = filterForCount(selectedFilters, selectedCategories);
+                    items = ko.utils.arrayFilter(datasetsToLoop, function (dataset) {
+                        if (dataset.Categories.includes(Title)) { return dataset; }
+                    });
+                }
+                else if (Category === 'Sentry Owner') {
+                    //filter datasets for the count
+                    var datasetsToLoop = filterForCount(selectedFilters, selectedOwners);
+                    items = ko.utils.arrayFilter(datasetsToLoop, function (dataset) {
+                        if (dataset.SentryOwner === Title) { return dataset; }
+                    });
+                }
+                else if (Category === 'Extension' || Category === "Report Type") {
+                    //filter datasets for the count
+                    var datasetsToLoop = filterForCount(selectedFilters, selectedExtensions);
+                    items = ko.utils.arrayFilter(datasetsToLoop, function (dataset) {
+                        if (dataset.DistinctFileExtensions.includes(Title)) { return dataset; }
+                    });
+                }
+                else if (Category === 'Business Unit') {
+                    //filter datasets for the count
+                    var datasetsToLoop = filterForCount(selectedFilters, selectedBusinessUnits);
+                    items = ko.utils.arrayFilter(datasetsToLoop, function (dataset) {
+                        if (dataset.BusinessUnits.includes(Title)) { return dataset; }
+                    });
+                }
+                else if (Category === 'Function') {
+                    //filter datasets for the count
+                    var datasetsToLoop = filterForCount(selectedFilters, selectedFunctions);
+                    items = ko.utils.arrayFilter(datasetsToLoop, function (dataset) {
+                        if (dataset.DatasetFunctions.includes(Title)) { return dataset; }
+                    });
+                }
+                else {
+                    //This is going to be all teh Tags within different groups.  All of them are AND'd together and should filter off the searchResults.
+                    //filter datasets for the count
+                    var datasetsToLoop = window.vm.searchResults();
+                    // all AND groups here
+                    items = ko.utils.arrayFilter(datasetsToLoop, function (dataset) {
+                        if (dataset.TagNames.includes(Title)) { return dataset; }
+                    });
+                }
 
                 return items.length;
             });
+        }
+
+        function filterForCount(selectedFilters, filtersToRemove) {
+            //build my selected fitler (all filters but Business Unit)
+            ko.utils.arrayForEach(filtersToRemove, function (item) {
+                selectedFilters.splice(selectedFilters.indexOf(item.id), 1);
+            });
+
+            return FilterExhibits(window.vm.datasets(), "0", selectedFilters);
         }
 
         function FilterCategory(Name, Filters) {
@@ -530,8 +549,8 @@
 
             var filters = ko.utils.arrayFilter(allFiltersFromGroup(), function (feature)
             {
-                for (var i = 0; i < mySelectedFilters().length; i++) {
-                    if (feature.id == mySelectedFilters()[i]) {
+                for (var i = 0; i < mySelectedFilters.length; i++) {
+                    if (feature.id == mySelectedFilters[i]) {
                         return true;
                     }
                 }
@@ -562,6 +581,37 @@
             return !isAndOperator;
         }
 
+        function FilterExhibits(exhibits, sortVal, selectedFilters) {
+
+            if (selectedFilters.length === 0 || window.vm === undefined) {
+                return sortTheResults(sortVal, exhibits);
+            }
+
+            //get all the filerters selected from the category group
+            var selectedCategories = GetSelectedFiltersFromGroup(window.vm.CategoryFilters, selectedFilters);
+            var selectedBusinessUnits = GetSelectedFiltersFromGroup(window.vm.BusinessUnitFilters, selectedFilters);
+            var selectedFunctions = GetSelectedFiltersFromGroup(window.vm.DatasetFunctionFilters, selectedFilters);
+            var selectedExtensions = GetSelectedFiltersFromGroup(window.vm.ExtensionFilters, selectedFilters);
+            var selectedTags = GetSelectedFiltersFromGroup(window.vm.TagFilters, selectedFilters);
+            var selectedOwners = GetSelectedFiltersFromGroup(window.vm.OwnerFilters, selectedFilters);
+
+            //filter the exhibits based on teh groups that are 'OR'ed toghether
+            exhibits = exhibits.filter(function (exhibit) {
+                var categoryMatch = IsSelectedFiltersAMatch(selectedCategories, exhibit.Categories, true);
+                var buMatch = IsSelectedFiltersAMatch(selectedBusinessUnits, exhibit.BusinessUnits, true);
+                var extensionMatch = IsSelectedFiltersAMatch(selectedExtensions, exhibit.DistinctFileExtensions, true);
+                var functionMatch = IsSelectedFiltersAMatch(selectedFunctions, exhibit.DatasetFunctions, true);
+                var ownerMatch = IsSelectedFiltersAMatch(selectedOwners, exhibit.SentryOwner.split(", "), true);
+
+                //now filter the rest of the exhibits on the groups that are 'AND'ed together.
+                var tagMatch = IsSelectedFiltersAMatch(selectedTags, exhibit.TagNames, false);
+
+                return categoryMatch && buMatch && functionMatch && extensionMatch && ownerMatch && tagMatch;
+            });
+
+            return sortTheResults(sortVal, exhibits);
+        }
+
         function ListViewModel() {
             var self = this;
             self.Query = ko.observable('');
@@ -576,37 +626,7 @@
             self.TagFilters = ko.observableArray([]);
 
             self.FilterExhibits = function (exhibits, sortVal) {
-
-                if (self.SelectedFilters().length === 0) {
-                    return sortTheResults(sortVal, exhibits);
-                }
-
-                //get all the filters selected from the category group
-                var selectedCategories = GetSelectedFiltersFromGroup(self.CategoryFilters, self.SelectedFilters);
-                var selectedBusinessUnits = GetSelectedFiltersFromGroup(self.BusinessUnitFilters, self.SelectedFilters);
-                var selectedFunctions = GetSelectedFiltersFromGroup(self.DatasetFunctionFilters, self.SelectedFilters);
-                var selectedExtensions = GetSelectedFiltersFromGroup(self.ExtensionFilters, self.SelectedFilters);
-                var selectedTags = GetSelectedFiltersFromGroup(self.TagFilters, self.SelectedFilters);
-                var selectedOwners = GetSelectedFiltersFromGroup(self.OwnerFilters, self.SelectedFilters);
-
-
-                //filter the exhibits based on the groups that are 'OR'ed together
-                exhibits = exhibits.filter(function (exhibit)
-                {
-                    var categoryMatch = IsSelectedFiltersAMatch(selectedCategories, exhibit.Categories, true);
-                    var buMatch = IsSelectedFiltersAMatch(selectedBusinessUnits, exhibit.BusinessUnits, true);
-                    var extensionMatch = IsSelectedFiltersAMatch(selectedExtensions, exhibit.DistinctFileExtensions, true);
-                    var functionMatch = IsSelectedFiltersAMatch(selectedFunctions, exhibit.DatasetFunctions, true);
-                    var ownerMatch = IsSelectedFiltersAMatch(selectedOwners, exhibit.SentryOwner.split(", "), true);
-
-                    //now filter the rest of the exhibits on the groups that are 'AND'ed together.
-                    var tagMatch = IsSelectedFiltersAMatch(self.TagFilters, selectedTags, exhibit.TagNames, false);
-
-                    return categoryMatch && buMatch && functionMatch && extensionMatch && ownerMatch && tagMatch;
-                });
-
-
-                return sortTheResults(sortVal, exhibits);
+                return FilterExhibits(exhibits, sortVal, self.SelectedFilters());
             };
 
             self.PopulateDatasetFilters = function (datasets) {
