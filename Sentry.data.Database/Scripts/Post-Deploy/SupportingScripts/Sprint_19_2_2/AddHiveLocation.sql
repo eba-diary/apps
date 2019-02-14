@@ -13,7 +13,12 @@ from (
 	GETDATE() as 'DataElementDetailCreate_DTM', 
 	GETDATE() as 'DataElementDetailChange_DTM', 
 	'HiveLocation' as 'DataElementDetailType_CDE',
-	'parquet/' + 
+	Case
+		WHEN ((UPPER(@@SERVERNAME) = 'FIT-N-SHARDB-12' OR UPPER(@@SERVERNAME) = 'FIT-N-SHARDB-11') AND DB_NAME = 'SentryDatasets') THEN 'sentry-dataset-management-np/'
+		WHEN ((UPPER(@@SERVERNAME) = 'FIT-N-SHARDB-12' OR UPPER(@@SERVERNAME) = 'FIT-N-SHARDB-11') AND DB_NAME = 'SentryDatasets_NR') THEN 'sentry-dataset-management-np-nr/'
+		ELSE 'sentry-dataset-management/'
+	END
+	+ 'parquet/' + 
 	Case
 		WHEN UPPER(@@SERVERNAME) = 'FIT-N-SHARDB-12' THEN 'data-dev/'
 		WHEN UPPER(@@SERVERNAME) = 'FIT-N-SHARDB-11' THEN 'data-test/'
