@@ -83,6 +83,7 @@
   <ItemGroup>
     <Compile Include="DomainServices\ConfigService.cs" />
     <Compile Include="DomainServices\DatasetService.cs" />
+    <Compile Include="DomainServices\NotificationService.cs" />
     <Compile Include="DomainServices\SecurityService.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceDetailDTO.cs" />
     <Compile Include="DTO\Dataset\DatasetDetailDTO.cs" />
@@ -109,6 +110,7 @@
     <Compile Include="Interfaces\IConfigService.cs" />
     <Compile Include="Interfaces\IDatasetService.cs" />
     <Compile Include="Interfaces\IEventService.cs" />
+    <Compile Include="Interfaces\INotificationService.cs" />
     <Compile Include="Interfaces\IObsidianService.cs" />
     <Compile Include="Interfaces\ISecurable.cs" />
     <Compile Include="Interfaces\ISecurityService.cs" />

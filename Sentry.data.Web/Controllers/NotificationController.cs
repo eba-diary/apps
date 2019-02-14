@@ -21,15 +21,17 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult ManageNotification()
         {
-            BaseNotificationModel banm = new BaseNotificationModel();
-            return View(banm);
+            ManageNotificationViewModel model = new ManageNotificationViewModel()
+            {
+                CanModifyNotifications = _notificationService.CanUserModifyNotifications()
+            };
+            return View(model);
         }
 
         [HttpGet]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.CAN_MODIFY_NOTIFICATIONS)]
-        public ActionResult CreateAssetNotification()
+        public ActionResult CreateNotification()
         {
-
             CreateAssetNotificationModel canm = new CreateAssetNotificationModel();
             canm.AllDataAssets = GetDataAssetsList();
             canm.AllSeverities = GetNotificationSeverities();
@@ -38,7 +40,7 @@ namespace Sentry.data.Web.Controllers
             canm.StartTime = DateTime.Now; //preset Start Time
             canm.ExpirationTime = DateTime.Now.AddHours(1);
 
-            return View("CreateAssetNotification", canm);
+            return View(canm);
         }
 
         [HttpPost]

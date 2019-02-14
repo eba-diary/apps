@@ -11,6 +11,7 @@ namespace Sentry.data.Core
         /** IQueryables **/
 
         IQueryable<Dataset> Datasets { get; }
+        IQueryable<DataAsset> DataAsset { get; }
         IQueryable<DatasetFileConfig> DatasetFileConfigs { get; }
         IQueryable<SecurityTicket> HpsmTickets { get; }
         IQueryable<Security> Security { get; }
@@ -52,8 +53,6 @@ namespace Sentry.data.Core
         IEnumerable<DatasetScopeType> GetAllDatasetScopeTypes();
         IEnumerable<DatasetFileConfig> getAllDatasetFileConfigs();
         DatasetFileConfig getDatasetFileConfigs(int configId);
-
-        IEnumerable<DatasetFile> GetDatasetFilesForDataset(int datasetId, Func<DatasetFile, bool> where);
         IEnumerable<DatasetFile> GetDatasetFilesForDatasetFileConfig(int configId, Func<DatasetFile, bool> where);
         int GetLatestDatasetFileIdForDataset(int id);
         int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId, bool isBundled, string targetFileName = null, DataElement schema = null);
@@ -65,18 +64,8 @@ namespace Sentry.data.Core
         Interval GetInterval(string description);
         List<Interval> GetAllIntervals();
         Interval GetInterval(int id);
-        Status GetStatus(string description);
-        Status GetStatus(int id);
-        List<Status> GetAllStatuses();
-        List<Event> GetEvents(string reason);
-        Event GetEvent(int id);
-        List<Event> GetEventsStartedByUser(string SentryOwnerName);
         bool IsUserSubscribedToDataset(string SentryOwnerName, int datasetID);
         List<DatasetSubscription> GetAllUserSubscriptionsForDataset(string SentryOwnerName, int datasetID);
-        bool IsUserSubscribedToDataAsset(string SentryOwnerName, int dataAssetID);
-        List<DataAssetSubscription> GetAllUserSubscriptionsForDataAsset(string SentryOwnerName, int dataAssetID);
-        List<DatasetSubscription> GetSubscriptionsForDataset(int datasetID);
-        List<DataAssetSubscription> GetSubscriptionsForDataAsset(int dataAssetID);
         List<DatasetSubscription> GetAllSubscriptions();
         List<Event> EventsSince(DateTime time, Boolean IsProcessed);
         int GetNextStorageCDE();

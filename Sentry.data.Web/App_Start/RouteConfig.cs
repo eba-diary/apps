@@ -23,18 +23,6 @@ namespace Sentry.data.Web
             );
 
             routes.MapRoute(
-                name: "EditAssetNotification",
-                url: "DataAsset/EditAssetNotification",
-                defaults: new { controller = "DataAsset", action = "EditAssetNotification" }
-            );
-
-            routes.MapRoute(
-                name: "CreateAssetNotification",
-                url: "DataAsset/CreateAssetNotification",
-                defaults: new { controller = "DataAsset", action = "CreateAssetNotification" }
-            );
-
-            routes.MapRoute(
                 name: "DataAssetGetEditAssetNotificationPartialView",
                 url: "DataAsset/GetEditAssetNotificationPartialView",
                 defaults: new { controller = "DataAsset", action = "GetEditAssetNotificationPartialView" }

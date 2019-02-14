@@ -1,4 +1,4 @@
-﻿@model Sentry.data.Web.BaseNotificationModel
+﻿@model Sentry.data.Web.ManageNotificationViewModel
 @{
     ViewBag.Title = "Manage Notifications";
 }
@@ -10,16 +10,18 @@
 </div>
 
 <h1>Notifications</h1>
-
 <hr />
 
-<div class="form-group">
-    <div>
-        <a href="~/DataAsset/CreateAssetNotification" class="btn btn-md btn-info">Create New Notification</a>
+@if (Model.CanModifyNotifications)
+{
+    <div class="form-group">
+        <div>
+            <a href="~/Notification/CreateNotification" class="btn btn-md btn-info">Create New Notification</a>
+        </div>
     </div>
-</div>
+    <hr />
+}
 
-<hr />
 
 <div>
     <div id="hide_detailSectionHeader_AssetNotification">
