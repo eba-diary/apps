@@ -25,6 +25,13 @@ namespace Sentry.data.Core
         #region "Public Functions"
 
 
+        public UserSecurity GetUserSecurityById(int datasetId)
+        {
+            Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).FirstOrDefault();
+            
+            return _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+        }
+
         public BusinessIntelligenceDto GetBusinessIntelligenceDto(int datasetId)
         {
             BusinessIntelligenceDto dto = new BusinessIntelligenceDto();
@@ -206,7 +213,6 @@ namespace Sentry.data.Core
         {
             IApplicationUser owner = _userService.GetByAssociateId(ds.PrimaryOwnerId);
             IApplicationUser contact = _userService.GetByAssociateId(ds.PrimaryContactId);
-            IApplicationUser creator = _userService.GetByAssociateId(ds.CreationUserName);
             IApplicationUser uploaded = _userService.GetByAssociateId(ds.UploadUserName);
 
             dto.Security = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
@@ -225,7 +231,7 @@ namespace Sentry.data.Core
             dto.PrimaryContactEmail = (contact != null ? contact.EmailAddress : "");
 
             dto.CreationUserId = ds.CreationUserName;
-            dto.CreationUserName = (creator != null ? creator?.DisplayName : "Not Available");
+            dto.CreationUserName = ds.CreationUserName;
             dto.UploadUserId = ds.UploadUserName;
             dto.UploadUserName = (uploaded != null ? uploaded?.DisplayName : "Not Available");
 
