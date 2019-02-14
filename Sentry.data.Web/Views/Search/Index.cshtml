@@ -324,37 +324,19 @@
             $('.select2-container--default').css('width', '100%');
 
             $('#filterSelector').on('select2:select', function (e) {
-                // Do something
+                
                 var data = e.params.data;
 
+                // push the selected filter Id to the observable array
                 window.vm.SelectedFilters.push(data.id);
-
-                //$('#' + data.id).prop('checked', true);
-
-                //var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
-
-                //if (storedNames != null) {
-                //    storedNames[storedNames.length] = data.id;
-                //}
-                //else {
-                //    var storedNames = [];
-                //    storedNames[0] = data.id;
-                //}
-
-                //localStorage.setItem("filteredIds", JSON.stringify(storedNames));
-
-                //$('#filterSelector').select2("close");
-
-                //changeWindow();
-
             });
 
             $('#filterSelector').on('select2:unselect', function (e) {
-                // Do something
+                
                 var data = e.params.data;
 
+                // remove the selected filter Id from the observable array
                 window.vm.RemoveSelection(data.id);
-
             });
         });
 
@@ -440,7 +422,7 @@
             return FilterExhibits(window.vm.datasets(), "0", selectedFilters);
         }
 
-        function FilterCategory(Name, Filters, Color) {
+        function FilterCategory(Name, Filters) {
             var self = this;
 
             self.Name = Name;
@@ -589,7 +571,7 @@
             return filters;
         }
 
-        //This only should be used for teh Category type filter groups the ones that are 'OR'ed together when multiple selected in the same box.
+        //This only should be used for the Category type filter groups the ones that are 'OR'ed together when multiple selected in the same box.
         function IsSelectedFiltersAMatch(selectedFilters, datasetObjectArray, isAndOperator) {
 
             if (selectedFilters.length === 0) {
@@ -663,8 +645,6 @@
                 var pageType = '1_';
 
                 //CATEGORY FILTER
-                var param = getParameterByName('category');
-
                 for (var item, i = 0; item = datasets[i++];) {
                     var category = item.Category;
 
@@ -674,7 +654,8 @@
 
                         temp.push(new Filter(pageType + '0_' + i, category, 'Category'));
 
-                        if (category === param) {
+                        // compare the category to what may have been passed along in the URL; if there's a match, push it to the SelectedFilters observable array
+                        if (category === getParameterByName('category')) {
                             self.SelectedFilters.push(pageType + '0_' + i);
                         }
                     }
@@ -692,7 +673,7 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Category', temp));
                 temp = [];
 
 
@@ -718,7 +699,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Sentry Owner', temp));
                 temp = [];
 
 
@@ -744,15 +725,13 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Extension', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Extension', temp));
             };
 
             self.PopulateExhibitFilters = function (exhibits) {
                 var temp = [];
                 var pageType = '2_'
                 var item;
-
-                var param = getParameterByName('category');
 
                 //CATEGORY FILTER
                 for (var item, i = 0; item = exhibits[i++];) {
@@ -761,7 +740,8 @@
                             categoryLookup[cat] = 1;
                             self.CategoryFilters.push(new Filter(pageType + '0_' + i, cat, 'Category'));
 
-                            if (cat === param) {
+                            // compare the category to what may have been passed in the URL; if there's a match, push it to the SelectedFilters observable array
+                            if (cat === getParameterByName('category')) {
                                 self.SelectedFilters.push(pageType + '0_' + i);
                             }
 
@@ -778,7 +758,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Category', temp));
                 temp = [];
 
 
@@ -804,7 +784,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Business Unit', temp));
                 temp = [];
 
 
@@ -830,7 +810,33 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Function', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Function', temp));
+                temp = [];
+
+
+                //REPORT TYPE FILTER
+                counter = 0; // reset the counter
+                for (var item, i = 0; item = exhibits[i++];) {
+                    for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
+                        if (!(ext in extensionLookup)) {
+                            extensionLookup[ext] = 1;
+                            self.ExtensionFilters.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
+
+                            temp.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
+                            counter++;
+                        }
+                    }
+                }
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name == 'Report Type') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
+                self.AllFilters.push(new FilterCategory('Report Type', temp));
                 temp = [];
 
 
@@ -886,37 +892,10 @@
                         temp = item.Filters().concat(temp);
                         ko.utils.arrayRemoveItem(self.AllFilters(), item);
                     }
-                    self.AllFilters.push(new FilterCategory(group, temp, 'darkblue'));
+                    self.AllFilters.push(new FilterCategory(group, temp));
 
                     temp = [];
                 }
-
-
-                //REPORT TYPE FILTER
-                counter = 0; //Needs seperate counter as multiple objects can appear per iteration
-                for (var item, i = 0; item = exhibits[i++];) {
-                    for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
-                        if (!(ext in extensionLookup)) {
-                            extensionLookup[ext] = 1;
-                            self.ExtensionFilters.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
-                            //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
-
-                            temp.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
-                            counter++;
-                        }
-                    }
-                }
-                ko.utils.arrayForEach(self.AllFilters(), function (v) {
-                    if (v.Name == 'Report Type') {
-                        item = v;
-                    }
-                });
-                if (item !== undefined) {
-                    temp = item.Filters().concat(temp);
-                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
-                }
-                self.AllFilters.push(new FilterCategory('Report Type', temp, 'darkblue'));
-                temp = [];
 
             };
 
@@ -954,7 +933,7 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Category', temp));
                 temp = [];
 
 
@@ -979,7 +958,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Business Unit', temp));
 
 
                 //SENTRYOWNER FILTER
@@ -1004,7 +983,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Sentry Owner', temp));
                 temp = [];
 
 
@@ -1031,7 +1010,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Extension', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Extension', temp));
 
                 //TAG FILTER
                 counter = 0; //Needs seperate counter as multiple objects can appear per iteration
@@ -1059,7 +1038,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Tag', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Tag', temp));
                 temp = [];
             };
 
