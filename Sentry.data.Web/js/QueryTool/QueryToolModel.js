@@ -447,8 +447,13 @@ function FromColumns(rawQuery) {
     var joinRules = vm.JoinPanel().Joins().length;
     var primaryTableName = vm.JoinPanel().PrimaryTableName();
 
-    if (joinRules === 0 || vm.JoinPanel().ListofTableNames().length === 1) {
-        rawQuery += " FROM " + firstTableName;
+    if ((joinRules === 0 || vm.JoinPanel().ListofTableNames().length === 1)) {
+        if (primaryTableName != firstTableName) {
+            rawQuery += " FROM " + primaryTableName;
+        }
+        else {
+            rawQuery += " FROM " + firstTableName;
+        }        
     } else {
 
         rawQuery += " FROM " + primaryTableName;
