@@ -281,8 +281,6 @@
 </div>
 
 
-
-
 @section Scripts {
     <script>
         $(function () {
@@ -343,37 +341,6 @@
 
             return FilterExhibits(window.vm.datasets(), "0", selectedFilters);
         }
-
-        //function FilterCategory(Name, Filters, Sequence) {
-        //    var self = this;
-
-        //    self.Name = Name;
-        //    self.Sequence = Sequence;
-
-        //    self.Filters = ko.observableArray(Filters);
-
-        //    self.HiddenId = 'filterMore_' + Name.replace(' ', '_');
-        //    self.HiddenMore = 'hidden_filterMore_' + Name.replace(' ', '_');
-        //    self.IconMore = 'icon_filterMore_' + Name.replace(' ', '_');
-        //    self.TxtMore = 'txt_filterMore_' + Name.replace(' ', '_');
-
-        //    self.HeadId = 'filterType_' + Name.replace(' ', '_');
-        //    self.HeadIcon = 'icon_filterType_' + Name.replace(' ', '_');
-        //    self.HeadHide = 'hide_filterType_' + Name.replace(' ', '_');
-
-        //    self.OrderedFilters = ko.computed(function () {
-
-        //        var list = ko.utils.arrayFilter(self.Filters(), function (prod) {
-        //            return prod;
-        //        });
-
-        //        //Sort the list alphabetically and show them to the user.
-        //        return list.sort(function (left, right) {
-        //            return left.Title == right.Title ? 0 : (left.Title < right.Title ? -1 : 1)
-        //        });
-        //    });
-
-        //}
 
         function Dataset(data) {
             var self = this;
