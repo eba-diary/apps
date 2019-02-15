@@ -87,6 +87,7 @@
     <Compile Include="DomainServices\SecurityService.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceDetailDTO.cs" />
     <Compile Include="DTO\Dataset\DatasetDetailDTO.cs" />
+    <Compile Include="DTO\Notification\ModifyNotificationModel.cs" />
     <Compile Include="Entities\ColumnDTO.cs" />
     <Compile Include="Entities\SchemaDTO.cs" />
     <Compile Include="Entities\Datasets\BusinessUnit.cs" />
@@ -101,7 +102,9 @@
     <Compile Include="Entities\Security\RequestAccess.cs" />
     <Compile Include="Entities\Security\Security.cs" />
     <Compile Include="Entities\Security\UserSecurity.cs" />
+    <Compile Include="Extensions\DataAssetQueryExtensions.cs" />
     <Compile Include="Extensions\DatasetQueryExtensions.cs" />
+    <Compile Include="Extensions\NotificationExtensions.cs" />
     <Compile Include="GlobalEnums\DataClassificationType.cs" />
     <Compile Include="Interfaces\IHpsmMonitoringService.cs" />
     <Compile Include="Interfaces\IHpsmProvider.cs" />

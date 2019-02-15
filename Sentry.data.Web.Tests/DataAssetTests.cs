@@ -71,71 +71,6 @@ namespace Sentry.data.Web.Tests
             Assert.AreEqual("Error", result.RouteValues["controller"]);
         }
 
-        [TestMethod]
-        [TestCategory("Data Asset Controller")]
-        [TestCategory("Data Asset Notifications")]
-        public void DataAsset_Does_CreateAssetNotification_CanCreate()
-        {
-            var user = MockUsers.App_DataMgmt_MgAlert();
-            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset(), user);
-
-            var result = dac.CreateAssetNotification() as ViewResult;
-
-            Assert.AreEqual("CreateAssetNotification", result.ViewName);
-        }
-
-        [TestMethod]
-        [TestCategory("Data Asset Controller")]
-        [TestCategory("Data Asset Notifications")]
-        public void DataAsset_Does_CreateAssetNotification_CanNOTCreate()
-        {
-            var user = MockUsers.App_DataMgmt_User();
-            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset(), user);
-
-            try
-            {
-                dac.CreateAssetNotification();
-                Assert.Fail();
-            }
-            catch (Exception ex)
-            {
-                Assert.IsTrue(ex is UnauthorizedAccessException);
-            }
-        }
-
-        [TestMethod]
-        [TestCategory("Data Asset Controller")]
-        [TestCategory("Data Asset Notifications")]
-        public void DataAsset_Does_EditAssetNotification_CanEdit()
-        {
-            var user = MockUsers.App_DataMgmt_MgAlert();
-            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset(), user);
-            var an = MockClasses.GetMockAssetNotifications(MockClasses.MockDataAsset(), user);
-
-            var result = dac.EditAssetNotification(an.NotificationId) as ViewResult;
-
-            Assert.AreEqual("EditAssetNotification", result.ViewName);
-        }
-
-        [TestMethod]
-        [TestCategory("Data Asset Controller")]
-        [TestCategory("Data Asset Notifications")]
-        public void DataAsset_Does_EditAssetNotification_CanNOTEdit()
-        {
-            var user = MockUsers.App_DataMgmt_User();
-            var dac = MockControllers.MockDataAssetController(MockClasses.MockDataAsset(), user);
-            var an = MockClasses.GetMockAssetNotifications(MockClasses.MockDataAsset(), user);
-
-            try
-            {
-                dac.EditAssetNotification(an.NotificationId);
-                Assert.Fail();
-            }
-            catch (Exception ex)
-            {
-                Assert.IsTrue(ex is UnauthorizedAccessException);
-            }
-        }
 
         [TestMethod]
         [TestCategory("Data Asset Notifications")]
@@ -176,84 +111,84 @@ namespace Sentry.data.Web.Tests
             Assert.IsTrue(an.CreateUser == user.AssociateId);
         }
 
-        [TestMethod]
-        [TestCategory("Data Asset Controller")]
-        [TestCategory("Data Asset Notifications")]
-        public void DataAsset_Create_Notification_Check_Redirect()
-        {
-            var user = MockUsers.App_DataMgmt_MgAlert();
-            var da = MockClasses.MockDataAsset();
-            var dac = MockControllers.MockDataAssetController(da, user);
-            var an = MockClasses.GetMockAssetNotifications(da, user);
+        //[TestMethod]
+        //[TestCategory("Data Asset Controller")]
+        //[TestCategory("Data Asset Notifications")]
+        //public void DataAsset_Create_Notification_Check_Redirect()
+        //{
+        //    var user = MockUsers.App_DataMgmt_MgAlert();
+        //    var da = MockClasses.MockDataAsset();
+        //    var dac = MockControllers.MockDataAssetController(da, user);
+        //    var an = MockClasses.GetMockAssetNotifications(da, user);
 
-            an.Message = "Data Asset Notification Creation Test";
-            CreateAssetNotificationModel can = new CreateAssetNotificationModel(an, dac._associateInfoService);
-            can.SeverityID = 0;
-            can.DataAssetID = da.Id;
+        //    an.Message = "Data Asset Notification Creation Test";
+        //    CreateAssetNotificationModel can = new CreateAssetNotificationModel(an, dac._associateInfoService);
+        //    can.SeverityID = 0;
+        //    can.DataAssetID = da.Id;
 
-            var result = dac.CreateAssetNotification(can);
+        //    var result = dac.CreateAssetNotification(can);
 
-            Assert.AreEqual("ManageAssetNotification", (result as ViewResult).ViewName);
+        //    Assert.AreEqual("ManageAssetNotification", (result as ViewResult).ViewName);
 
-        }
-
-
-        [TestMethod]
-        [TestCategory("Data Asset Controller")]
-        [TestCategory("Data Asset Notifications")]
-        public void DataAsset_Create_Notification_Model()
-        {
-            var user = MockUsers.App_DataMgmt_MgAlert();
-            var da = MockClasses.MockDataAsset();
-            var dac = MockControllers.MockDataAssetController(da, user);
-            var an = MockClasses.GetMockAssetNotifications(da, user);
-
-            CreateAssetNotificationModel can = new CreateAssetNotificationModel();
-            can.SeverityID = 0;
-            can.Message = "Data Asset Notification Creation Test";
-            can.CreateUser = user.AssociateId;
-            can.StartTime = an.StartTime;
-            can.ExpirationTime = an.ExpirationTime;
-            can.DataAssetID = da.Id;
-
-            var returnedNotification = new AssetNotifications();
-
-            returnedNotification = dac.CreateAssetNotificationFromModel(returnedNotification, can);
-
-            Assert.IsTrue(da.Name.ToString() == returnedNotification.ParentDataAsset.Name.ToString());
-
-        }
-
-        [TestMethod]
-        [TestCategory("Data Asset Controller")]
-        [TestCategory("Data Asset Notifications")]
-        public void DataAsset_Edit_Notification_Model()
-        {
-            var user = MockUsers.App_DataMgmt_MgAlert();
-            var da = MockClasses.MockDataAsset();
-            var dac = MockControllers.MockDataAssetController(da, user);
-            var an = MockClasses.GetMockAssetNotifications(da, user);
-
-            EditAssetNotificationModel ean = new EditAssetNotificationModel();
-            ean.SeverityID = an.MessageSeverity + 1;
-            ean.Message = "Data Asset Notification Edit Test";
-            ean.ExpirationTime = an.ExpirationTime.AddHours(1);
+        //}
 
 
-            var returnedNotification = dac.UpdateAssetNotificationFromModel(an, ean);
+        //[TestMethod]
+        //[TestCategory("Data Asset Controller")]
+        //[TestCategory("Data Asset Notifications")]
+        //public void DataAsset_Create_Notification_Model()
+        //{
+        //    var user = MockUsers.App_DataMgmt_MgAlert();
+        //    var da = MockClasses.MockDataAsset();
+        //    var dac = MockControllers.MockDataAssetController(da, user);
+        //    var an = MockClasses.GetMockAssetNotifications(da, user);
 
-            Assert.IsTrue(da.Name.ToString() == returnedNotification.ParentDataAsset.Name.ToString());
+        //    CreateAssetNotificationModel can = new CreateAssetNotificationModel();
+        //    can.SeverityID = 0;
+        //    can.Message = "Data Asset Notification Creation Test";
+        //    can.CreateUser = user.AssociateId;
+        //    can.StartTime = an.StartTime;
+        //    can.ExpirationTime = an.ExpirationTime;
+        //    can.DataAssetID = da.Id;
 
-            Assert.IsTrue(returnedNotification.ExpirationTime == ean.ExpirationTime);
-            Assert.IsFalse(returnedNotification.ExpirationTime == MockClasses.GetMockAssetNotifications(da, user).ExpirationTime);
+        //    var returnedNotification = new AssetNotifications();
 
-            Assert.IsTrue(returnedNotification.Message == ean.Message);
-            Assert.IsFalse(returnedNotification.Message == MockClasses.GetMockAssetNotifications(da, user).Message);
+        //    returnedNotification = dac.CreateAssetNotificationFromModel(returnedNotification, can);
 
-            Assert.IsTrue(returnedNotification.MessageSeverity == ean.SeverityID);
-            Assert.IsFalse(returnedNotification.MessageSeverity == MockClasses.GetMockAssetNotifications(da, user).MessageSeverity);
+        //    Assert.IsTrue(da.Name.ToString() == returnedNotification.ParentDataAsset.Name.ToString());
 
-        }
+        //}
+
+        //[TestMethod]
+        //[TestCategory("Data Asset Controller")]
+        //[TestCategory("Data Asset Notifications")]
+        //public void DataAsset_Edit_Notification_Model()
+        //{
+        //    var user = MockUsers.App_DataMgmt_MgAlert();
+        //    var da = MockClasses.MockDataAsset();
+        //    var dac = MockControllers.MockDataAssetController(da, user);
+        //    var an = MockClasses.GetMockAssetNotifications(da, user);
+
+        //    EditAssetNotificationModel ean = new EditAssetNotificationModel();
+        //    ean.SeverityID = an.MessageSeverity + 1;
+        //    ean.Message = "Data Asset Notification Edit Test";
+        //    ean.ExpirationTime = an.ExpirationTime.AddHours(1);
+
+
+        //    var returnedNotification = dac.UpdateAssetNotificationFromModel(an, ean);
+
+        //    Assert.IsTrue(da.Name.ToString() == returnedNotification.ParentDataAsset.Name.ToString());
+
+        //    Assert.IsTrue(returnedNotification.ExpirationTime == ean.ExpirationTime);
+        //    Assert.IsFalse(returnedNotification.ExpirationTime == MockClasses.GetMockAssetNotifications(da, user).ExpirationTime);
+
+        //    Assert.IsTrue(returnedNotification.Message == ean.Message);
+        //    Assert.IsFalse(returnedNotification.Message == MockClasses.GetMockAssetNotifications(da, user).Message);
+
+        //    Assert.IsTrue(returnedNotification.MessageSeverity == ean.SeverityID);
+        //    Assert.IsFalse(returnedNotification.MessageSeverity == MockClasses.GetMockAssetNotifications(da, user).MessageSeverity);
+
+        //}
 
         [TestMethod]
         [TestCategory("Data Asset Notifications")]
@@ -266,7 +201,7 @@ namespace Sentry.data.Web.Tests
 
             string mock = "This is a Mock Test.  Way different then the Mock.";
             an.Message = mock;
-            an.MessageSeverity = 1;
+            an.MessageSeverity = NotificationSeverity.Danger;
 
             Assert.IsTrue(an.MessageSeverityTag == NotificationSeverity.Danger.ToString());
             Assert.IsTrue(an.DisplayMessage.Contains("Alert!"));

@@ -132,6 +132,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<AssetNotifications> Notification
+        {
+            get
+            {
+                return Query<AssetNotifications>();
+            }
+        }
+
         public IQueryable<DatasetFileConfig> DatasetFileConfigs
         {
             get

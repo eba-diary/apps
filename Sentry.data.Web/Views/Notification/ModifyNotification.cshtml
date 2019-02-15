@@ -1,7 +1,6 @@
-﻿
-@model Sentry.data.Web.EditAssetNotificationModel
+﻿@model Sentry.data.Web.NotificationModel
 @{
-    ViewBag.Title = "Edit Asset Notification";
+    ViewBag.Title = "Create Asset Notification";
 }
 
 <div class="topBanner">
@@ -10,20 +9,33 @@
     </div>
 </div>
 
-
-<h1>Edit Data Asset Notification</h1>
+<h1>Create Data Asset Notification</h1>
 
 <hr />
 
-@using (Html.BeginForm("EditAssetNotification", "DataAsset", FormMethod.Post))
+@using (Html.BeginForm("ModifyNotification", "Notification", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
-
+    @Html.HiddenFor(m => m.CreateUser)
+    @Html.HiddenFor(m => m.AllDataAssets)
+    @Html.HiddenFor(m => m.AllSeverities)
+    
 <div class="form-horizontal">
     @Html.DisplayFor((model) => ViewData.ModelState)
 
     @Html.HiddenFor(model => model.NotificationId)
+    @Html.HiddenFor(model => model.AllSeverities)
+    @Html.HiddenFor(model => model.AllDataAssets)
 
+
+    <br />
+
+    <div class="form-group">
+        @Html.LabelFor((model) => model.DataAssetId, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownListFor(model => model.DataAssetId, Model.AllDataAssets, new { @class = "form-control" })
+        </div>
+    </div>
     <div class="form-group">
         @Html.LabelFor(m => m.CreateUser, htmlAttributes: new { @class = "control-label col-md-2" })
         <div class="col-md-10">
@@ -49,19 +61,13 @@
         </div>
     </div>
     <div class="form-group">
-        @Html.LabelFor(m => m.DisplayCreateUser, htmlAttributes: new { @class = "control-label col-md-2" })
+        @Html.LabelFor((model) => model.MessageSeverity, htmlAttributes: new { @class = "control-label col-md-2" })
         <div class="col-md-10">
-            @Html.TextBoxFor(m => m.DisplayCreateUser.FullName, new { @disabled = "disabled", @class = "form-control edit-dataset-row" })
+            @Html.DropDownListFor(model => model.MessageSeverity, Model.AllSeverities, new { @class = "form-control edit-dataset-row" })
         </div>
     </div>
     <div class="form-group">
-        @Html.LabelFor((model) => model.SeverityID, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.DropDownListFor(model => model.SeverityID, Model.AllSeverities, new { @class = "form-control edit-dataset-row" })
-        </div>
-    </div>
-    <div class="form-group">
-        @Html.LabelFor((model) => model.Message, htmlAttributes: new { @class = "control-label col-md-2 optional" })
+        @Html.LabelFor((model) => model.Message, htmlAttributes: new { @class = "control-label col-md-2" })
         <div class="col-md-10">
             @Html.TextAreaFor((model) => model.Message, new { @class = "form-control edit-dataset-row" })
         </div>
@@ -71,22 +77,21 @@
     </div>
     <br />
     <div class="form-group">
-
         <div>
-            <input type="submit" value="Update Notification" class="btn btn-primary" />
+            <input type="submit" value="Create Notification" class="btn btn-primary" />
             <a class="btn btn-warning" href="/DataAsset/ManageAssetNotification">Cancel</a>
         </div>
+
     </div>
 </div>
 }
-
 @section Scripts {
     <script>
 
-    $(function () {
-        $('#StartTime').datetimepicker();
-        $('#ExpirationTime').datetimepicker();
-    });
+        $(function () {
+            $('#StartTime').datetimepicker();
+            $('#ExpirationTime').datetimepicker();
+        });
 
     </script>
 }
