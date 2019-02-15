@@ -1,11 +1,12 @@
 ﻿data.AccessRequest = {
 
 
-    init: function (createUrl) {
+    InitForDataset: function (datasetId) {
 
-        var modal = Sentry.ShowModalWithSpinner("Request Access");
+        var modal = Sentry.ShowModalWithSpinner("Request Dataset Access");
+        var createRequestUrl = "/Dataset/AccessRequest/?datasetId=" + encodeURI(datasetId);
 
-        $.get(createUrl, function (e) {
+        $.get(createRequestUrl, function (e) {
             modal.ReplaceModalBody(e);
             //auto check the preview 
             $("input[data-code='CanPreviewDataset']").prop('checked', true).attr('disabled', 'disabled');
@@ -23,7 +24,7 @@
 
             $("#AdGroupName").change(function () {
                 $.ajax({
-                    url: '/AccessRequest/CheckAdGroup?adGroup=' + encodeURIComponent($(this).val()),
+                    url: '/Dataset/CheckAdGroup?adGroup=' + $(this).val(),
                     method: "GET",
                     dataType: 'json',
                     success: function (data) {
@@ -63,7 +64,7 @@
                     $.ajax({
                         type: 'POST',
                         data: $("#AccessRequestForm").serialize(),
-                        url: '/AccessRequest/SubmitAccessRequest',
+                        url: '/Dataset/SubmitAccessRequest',
                         success: function (data) { modal.ReplaceModalBody(data); }
                     });
                 } else {
@@ -72,6 +73,47 @@
             });
         });
        
+    },
+
+    InitForNotification: function () {
+
+        var modal = Sentry.ShowModalWithSpinner("Request Notification Access");
+
+        $.get('/Notification/AccessRequest', function (e) {
+            modal.ReplaceModalBody(e);
+            //auto check the preview 
+            $("input[data-code='CanPreviewDataset']").prop('checked', true).attr('disabled', 'disabled');
+            $("#SelectedPermissions").val($("input[type='checkbox']").first().data('code'));
+
+            $("[id^='SubmitAccessRequestButton']").off('click').on('click', function (e) {
+                e.preventDefault();
+                //check validation
+                var errors = "";
+                if ($("#BusinessReason").val() === undefined || $("#BusinessReason").val() === "") {
+                    errors += "<div>Business Reason is required</div>";
+                }
+                if ($("#SelectedApprover").val() === undefined || $("#SelectedApprover").val() === "") {
+                    errors += "<div>Approver is required</div>";
+                }
+                if ($("#SelectedPermissions").val() === undefined || $("#SelectedPermissions").val() === "") {
+                    errors += "<div>Permissions are required</div>";
+                }
+
+                if (errors === "") {
+                    $("#accessRequestSpinner").css('float', 'left');
+                    Sentry.InjectSpinner($("#accessRequestSpinner"), 30);
+                    $.ajax({
+                        type: 'POST',
+                        data: $("#AccessRequestForm").serialize(),
+                        url: '/Notification/SubmitAccessRequest',
+                        success: function (data) { modal.ReplaceModalBody(data); }
+                    });
+                } else {
+                    $("#AccessRequesrErrorBox").html(errors).show();
+                }
+            });
+        });
+
     }
 
 };

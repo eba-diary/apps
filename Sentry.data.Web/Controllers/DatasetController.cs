@@ -153,9 +153,31 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public ActionResult AccessRequest(int datasetId)
         {
-            AccessRequestModel model = _datasetService.GetAccessRequest(datasetId).ToModel();
+            DatasetAccessRequestModel model = _datasetService.GetAccessRequest(datasetId).ToDatasetModel();
             model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
-            return PartialView("_AccessRequest", model);
+            return PartialView("DatasetAccessRequest", model);
+        }
+
+        [HttpPost]
+        public ActionResult SubmitAccessRequest(DatasetAccessRequestModel model)
+        {
+            AccessRequest ar = model.ToCore();
+            string ticketId = _datasetService.RequestAccessToDataset(ar);
+
+            if (string.IsNullOrEmpty(ticketId))
+            {
+                return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
+            }
+            else
+            {
+                return PartialView("_Success", new SuccessModel("Dataset access was successfully requested.", "HPSM Change Id: " + ticketId, true));
+            }
+        }
+
+        [HttpGet]
+        public ActionResult CheckAdGroup(string adGroup)
+        {
+            return Json(_obsidianService.DoesGroupExist(adGroup), JsonRequestBehavior.AllowGet);
         }
 
         #endregion

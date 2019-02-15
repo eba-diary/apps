@@ -22,7 +22,14 @@ namespace Sentry.data.Core
         {
             //Lets format the business reason here before passing it into the hpsm service.
             StringBuilder sb = new StringBuilder();
-            sb.Append($"Please grant the Ad Group {model.AdGroupName} the following permissions for Data.sentry.com.{ Environment.NewLine}");
+            if (!string.IsNullOrWhiteSpace(model.AdGroupName))
+            {
+                sb.Append($"Please grant the Ad Group {model.AdGroupName} the following permissions for Data.sentry.com.{ Environment.NewLine}");
+            }
+            else
+            {
+                sb.Append($"Please grant user {model.PermissionForUserName} ({model.PermissionForUserId}) the following permissions for Data.sentry.com.{ Environment.NewLine}");
+            }
             model.Permissions.ForEach(x => sb.Append($"{x.PermissionName} - {x.PermissionDescription} { Environment.NewLine}"));
             sb.Append($"Business Reason: {model.BusinessReason}{ Environment.NewLine}");
             sb.Append($"Requestor: {model.RequestorsId} - {model.RequestorsName}");
@@ -38,6 +45,7 @@ namespace Sentry.data.Core
                 {
                     TicketId = ticketId,
                     AdGroupName = model.AdGroupName,
+                    GrantPermissionToUserId = model.PermissionForUserId,
                     TicketStatus = GlobalConstants.HpsmTicketStatus.PENDING,
                     RequestedById = model.RequestorsId,
                     RequestedDate = model.RequestedDate,

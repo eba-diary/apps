@@ -95,8 +95,8 @@ namespace Sentry.data.Core
             {
                 Permissions = _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList(),
                 ApproverList = new List<KeyValuePair<string, string>>(),
-                DatasetId = ds.DatasetId,
-                DatasetName = ds.DatasetName
+                SecurableObjectId = ds.DatasetId,
+                SecurableObjectName = ds.DatasetName
             };
 
 
@@ -115,11 +115,11 @@ namespace Sentry.data.Core
         public string RequestAccessToDataset(AccessRequest request)
         {
 
-            Dataset ds = _datasetContext.GetById<Dataset>(request.DatasetId);
+            Dataset ds = _datasetContext.GetById<Dataset>(request.SecurableObjectId);
             if (ds != null)
             {
                 IApplicationUser user = _userService.GetCurrentUser();
-                request.DatasetName = ds.DatasetName;
+                request.SecurableObjectName = ds.DatasetName;
                 request.SecurityId = ds.Security.SecurityId;
                 request.RequestorsId = user.AssociateId;
                 request.RequestorsName = user.DisplayName;

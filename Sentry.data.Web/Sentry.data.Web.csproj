@@ -384,7 +384,7 @@
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceHomeModel.cs" />
     <Compile Include="Models\Notification\NotificationModel.cs" />
     <Compile Include="Models\Notification\ManageNotificationViewModel.cs" />
-    <Compile Include="Models\Security\DataAssetAccessRequest.cs" />
+    <Compile Include="Models\Security\NotificationAccessRequestModel.cs" />
     <Compile Include="Models\Security\DatasetAccessRequestModel.cs" />
     <Compile Include="Models\Security\PermissionModel.cs" />
     <Compile Include="Models\Security\RequestAccessModel.cs" />
@@ -1264,6 +1264,8 @@
     <Content Include="Views\Notification\ModifyNotification.cshtml" />
     <Content Include="Views\Notification\ManageNotification.cshtml" />
     <Content Include="Views\Shared\NotFound.cshtml" />
+    <Content Include="Views\Shared\DatasetAccessRequest.cshtml" />
+    <Content Include="Views\Shared\NotificationAccessRequest.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -193,7 +193,7 @@ data.Dataset = {
 
         $("[id^='RequestAccessButton']").off('click').on('click', function (e) {
             e.preventDefault();
-            data.AccessRequest.Init("/Dataset/AccessRequest/?datasetId=" + encodeURI($(this).data("id")));
+            data.AccessRequest.InitForDataset($(this).data("id"));
         });
 
         $("[id^='DownloadLatest']").off('click').on('click', function (e) {

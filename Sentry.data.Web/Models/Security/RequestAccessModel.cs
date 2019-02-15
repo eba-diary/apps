@@ -9,10 +9,9 @@ namespace Sentry.data.Web
     public class AccessRequestModel
     {
         //shared
-        public int SecurableObjecttId { get; set; }
+        public int SecurableObjectId { get; set; }
 
         public string SecurableObjectName { get; set; }
-        public virtual string SecurableObjectLabel { get; }
 
         
 

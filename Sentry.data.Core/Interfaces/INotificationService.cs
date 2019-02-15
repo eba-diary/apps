@@ -12,5 +12,6 @@ namespace Sentry.data.Core
         List<NotificationModel> GetNotificationsForDataAsset();
         List<DataAsset> GetAssetsForUserSecurity();
         List<Permission> GetPermissionsForAccessRequest();
+        string RequestAccess(AccessRequest request);
     }
 }

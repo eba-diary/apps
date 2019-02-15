@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace Sentry.data.Web
@@ -17,12 +14,5 @@ namespace Sentry.data.Web
 
         public List<SelectListItem> AllAdGroups { get; set; }
 
-        public override string SecurableObjectLabel
-        {
-            get
-            {
-                return Core.GlobalConstants.SecurableEntityName.DATASET;
-            }
-        }
     }
 }

@@ -129,5 +129,30 @@ namespace Sentry.data.Core
         {
             return _domainContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATA_ASSET).ToList();
         }
+
+        public string RequestAccess(AccessRequest request)
+        {
+
+            DataAsset da = _domainContext.DataAsset.FirstOrDefault(x=> x.Id == request.SecurableObjectId);
+            if (da != null)
+            {
+                IApplicationUser user = _userService.GetCurrentUser();
+                IApplicationUser permissionForUser = _userService.GetByAssociateId(request.PermissionForUserId);
+
+                request.PermissionForUserName = permissionForUser.DisplayName;
+                request.SecurableObjectName = da.DisplayName;
+                request.SecurityId = da.Security.SecurityId;
+                request.RequestorsId = user.AssociateId;
+                request.RequestorsName = user.DisplayName;
+                request.IsProd = bool.Parse(Configuration.Config.GetHostSetting("RequireApprovalHPSMTickets"));
+                request.RequestedDate = DateTime.Now;
+                request.ApproverId = request.SelectedApprover;
+                request.Permissions = _domainContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
+                                                                                                                x.SecurableObject == GlobalConstants.SecurableEntityName.DATA_ASSET).ToList();
+                return _securityService.RequestPermission(request);
+            }
+
+            return string.Empty;
+        }
     }
 }

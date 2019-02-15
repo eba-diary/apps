@@ -74,12 +74,27 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult AccessRequest()
         {
-            AccessRequestModel model = new AccessRequestModel()
+            NotificationAccessRequestModel model = new NotificationAccessRequestModel()
             {
-                AllPermissions = _notificationService.GetPermissionsForAccessRequest().ToModel(),
-
+                AllPermissions = _notificationService.GetPermissionsForAccessRequest().ToModel()
             };
-            return View(model)
+            return View("NotificationAccessRequest", model);
+        }
+
+        [HttpPost]
+        public ActionResult SubmitAccessRequest(NotificationAccessRequestModel model)
+        {
+            AccessRequest ar = model.ToCore();
+            string ticketId = _notificationService.RequestAccess(ar);
+
+            if (string.IsNullOrEmpty(ticketId))
+            {
+                return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
+            }
+            else
+            {
+                return PartialView("_Success", new SuccessModel("Notification access was successfully requested.", "HPSM Change Id: " + ticketId, true));
+            }
         }
 
         public ActionResult GetNotificationPartialView(int notificationId)

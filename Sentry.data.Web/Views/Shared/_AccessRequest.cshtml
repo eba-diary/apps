@@ -1,48 +1,4 @@
 ﻿@model Sentry.data.Web.AccessRequestModel
-@{
-    ViewBag.Title = "Request Dataset Access";
-}
-
-@using (Html.BeginForm("SubmitAccessRequest", "Dataset", FormMethod.Post, new { @id = "AccessRequestForm" }))
-{
-    @Html.AntiForgeryToken()
-<div class="form-horizontal">
-
-    <div class="accessRequestModelText" style="width:auto">
-        <p>Dataset permission requests will utilize HPSM for approval.  Due to this process, a short delay in permission implementation can be expected.</p>
-    </div>
-    <br />
-
-    <div class="accessRequestErrorBox" id="AccessRequesrErrorBox" style="display:none">
-
-    </div>
-
-    @if (Model.SecurableObjectName == Sentry.data.Core.GlobalConstants.SecurableEntityName.DATASET)
-    {
-        @Html.HiddenFor(model => model.SecurableObjecttId)
-        <div class="form-group">
-            <label class="col-md-2 control-label">@Model.SecurableObjectLabel</label>
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.SecurableObjectName, new { @disabled = "disabled", @class = "form-control edit-dataset-row" })
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.AdGroupName, new { @class = "col-md-2 control-label" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.AdGroupName, new { @class = "form-control edit-dataset-row" })
-            </div>
-        </div>
-    }
-    else if(Model.SecurableObjectName == Sentry.data.Core.GlobalConstants.SecurableEntityName.DATA_ASSET)
-    {
-        <div class="form-group">
-            <label class="col-md-2 control-label">@Model.SecurableObjectLabel</label>
-            <div class="col-md-10">
-                @Html.DropDownListFor((model) => model.SecurableObjecttId, Model.AllAdGroups, new { @class = "form-control edit-dataset-row" })
-            </div>
-        </div>
-    }
-
 
     <div class="form-group">
         @Html.LabelFor(m => m.BusinessReason, new { @class = "col-md-2 control-label" })
@@ -73,12 +29,10 @@
             </div>
         }
     </div>
-</div>
 
 
     <div class="modal-footer">
         <div id="accessRequestSpinner"></div>
-        <input type="submit" class="btn btn-primary" id="SubmitAccessRequestButton" data-id="@Model.SecurableObjecttId" value="Request Access" />
+        <input type="submit" class="btn btn-primary" id="SubmitAccessRequestButton" data-id="@Model.SecurableObjectId" value="Request Access" />
         <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
     </div>
-}

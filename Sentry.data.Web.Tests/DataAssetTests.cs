@@ -8,6 +8,7 @@ using Sentry.data.Infrastructure;
 using System;
 using System.Linq;
 using Sentry.data.Web.Helpers;
+using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Web.Tests
 {
