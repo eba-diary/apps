@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Sentry.data.Core.Entities.Livy;
 using Swashbuckle.Swagger.Annotations;
+using Sentry.Common.Logging;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -287,6 +288,7 @@ namespace Sentry.data.Web.Controllers
 
                 if (!job.DataSource.Is<JavaAppSource>())
                 {
+                    Logger.Debug($"BadRequest - Only accepts jobs with JavaApp datasource. JobId:{JobId} JobGuid:{JobGuid}");
                     return BadRequest("This only submits job defined with a data source type of JavaApp");
                 }
 
@@ -358,13 +360,13 @@ namespace Sentry.data.Web.Controllers
                     }
 
                     // THIS HAS BRACKETS javaOptionsOverride.ConfigurationParameters  [ ]
-                    if (javaOptionsOverride != null && javaOptionsOverride.Arguments != null)
+                    if (javaOptionsOverride != null && javaOptionsOverride.Arguments != null && javaOptionsOverride.Arguments.Any())
                     {
-                        json.Append($", \"args\": " + javaOptionsOverride.Arguments);
+                        GenerateArguments(javaOptionsOverride.Arguments, json);
                     }
-                    else if (job.JobOptions != null && job.JobOptions.JavaAppOptions != null && job.JobOptions.JavaAppOptions.Arguments != null)
+                    else if (job.JobOptions != null && job.JobOptions.JavaAppOptions != null && job.JobOptions.JavaAppOptions.Arguments != null && job.JobOptions.JavaAppOptions.Arguments.Any())
                     {
-                        json.Append($", \"args\": " + job.JobOptions.JavaAppOptions.Arguments);
+                        GenerateArguments(job.JobOptions.JavaAppOptions.Arguments, json);
                     }
 
                     string[] jars = dsrc.Options.JarDepenencies;
@@ -399,27 +401,29 @@ namespace Sentry.data.Web.Controllers
 
                     HttpResponseMessage response = await client.PostAsync("http://awe-t-apspml-01.sentry.com:8999/batches", contentPost);
 
+                    //Record submission regardless if target deems it a bad request.
+                    Submission sub = new Submission()
+                    {
+                        JobId = job,
+                        JobGuid = JobGuid,
+                        Created = DateTime.Now,
+                        Serialized_Job_Options = json.ToString()
+                    };
+
+                    _datasetContext.Merge(sub);
+                    _datasetContext.SaveChanges();
+
                     if (response.IsSuccessStatusCode)
                     {
                         string result = response.Content.ReadAsStringAsync().Result;
 
-                        LivyBatch batchResult = JsonConvert.DeserializeObject<LivyBatch>(result);
-
-                        Submission sub = new Submission()
-                        {
-                            JobId = job,
-                            JobGuid = JobGuid,
-                            Created = DateTime.Now,
-                            Serialized_Job_Options = json.ToString()
-                        };
-
-                        _datasetContext.Merge(sub);
-                        _datasetContext.SaveChanges();
+                        LivyBatch batchResult = JsonConvert.DeserializeObject<LivyBatch>(result);                        
 
                         JobHistory histRecord = new JobHistory()
                         {
                             JobId = job,
                             BatchId = batchResult.Id,
+                            JobGuid = JobGuid,
                             State = batchResult.State,
                             LivyAppId = batchResult.Appid,
                             LivyDriverLogUrl = batchResult.AppInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault(),
@@ -434,17 +438,33 @@ namespace Sentry.data.Web.Controllers
                     }
                     else if (response.StatusCode == HttpStatusCode.BadRequest)
                     {
+                        Logger.Debug($"BadRequest from Spark (Job\\Submit) - JobId:{JobId} JobGuid:{JobGuid} javaOptionsOverride:{JsonConvert.SerializeObject(javaOptionsOverride)}");
                         return BadRequest(response.Content.ReadAsStringAsync().Result);
                     }
                     else
                     {
+                        Logger.Debug($"Status NotFound (Job\\Submit) - JobId:{JobId} JobGuid:{JobGuid} javaOptionsOverride:{JsonConvert.SerializeObject(javaOptionsOverride)}");
                         return NotFound();
                     }
                 }
             }
             catch (Exception ex)
             {
+                Logger.Error($"Internal Error (Job\\Submit) - JobId:{JobId} JobGuid:{JobGuid} javaOptionsOverride:{JsonConvert.SerializeObject(javaOptionsOverride)}", ex);
                 return InternalServerError(ex);
+            }
+        }
+
+        private static void GenerateArguments(string[] arguments, StringBuilder json)
+        {
+            json.Append($", \"args\": [");
+            int iteration = 1;
+            int argcnt = arguments.Count();
+            foreach (string arg in arguments)
+            {
+                string argString = (iteration < argcnt) ? $"\"{arg}\"," : $"\"{arg}\"]";
+                json.Append(argString);
+                iteration++;
             }
         }
 
@@ -559,7 +579,7 @@ namespace Sentry.data.Web.Controllers
         //THESE ARE EXACT COPIES FROM RETRIEVER JOB OPTIONS.
         public class JavaOptionsOverride
         {
-            public string Arguments { get; set; }
+            public string[] Arguments { get; set; }
             public string ConfigurationParameters { get; set; }
             public string DriverMemory { get; set; }
             public int? DriverCores { get; set; }

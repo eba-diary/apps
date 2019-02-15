@@ -1,51 +1,30 @@
 ﻿using Sentry.data.Core;
-using Sentry.data.Infrastructure;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
-using System.Web.Mvc;
 
 namespace Sentry.data.Web
 {
-    public class CreateDataFileModel : BaseDatasetModel
+    public class CreateDataFileModel : BaseEntityModel
     {
-        public CreateDataFileModel()
-        {
+        public CreateDataFileModel() { }
 
-        }
-
-        public CreateDataFileModel(Dataset ds, IAssociateInfoProvider associateService) : base(ds, associateService)
+        public CreateDataFileModel(DatasetDto dto) : base(dto)
         {
-            this.CategoryIDs = ds.DatasetCategory.Id;
-           // this.FreqencyID = (int)Enum.Parse(typeof(DatasetFrequency), ds.CreationFreqDesc);
-            this.OriginationID = (int)Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode);
-            this.dsID = ds.DatasetId;
+            this.CategoryIDs = dto.DatasetCategoryIds.First();
+            this.OriginationID = dto.OriginationId;
+            this.dsID = dto.DatasetId;
+            this.CategoryName = dto.CategoryName;
         }
 
         [DisplayName("File Upload")]
         public HttpPostedFile f { get; set; }
-
         public long ProgressConnectionId { get; set; }
-
-        /// <summary>
-        /// AllCategories holds the sorted list of all possible categories.
-        /// </summary>
-        public IEnumerable<SelectListItem> AllCategories { get; set; }
-
-        public IEnumerable<SelectListItem> AllFrequencies { get; set; }
-
-        public IEnumerable<SelectListItem> AllOriginationCodes { get; set; }
 
         [Required]
         [DisplayName("Category")]
         public int CategoryIDs { get; set; }
-
-        [Required]
-        [DisplayName("Frequency")]
-        public int FreqencyID { get; set; }
 
         [Required]
         [DisplayName("Origination Code")]
@@ -53,5 +32,9 @@ namespace Sentry.data.Web
 
         [DisplayName("Dataset")]
         public int dsID { get; set; }
+
+        [Required]
+        [DisplayName("Category")]
+        public string CategoryName { get; set; }
     }
 }

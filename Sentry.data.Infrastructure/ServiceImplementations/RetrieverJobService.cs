@@ -20,7 +20,7 @@ using WinSCP;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
-using Sentry.data.Infrastructure.ServiceImplementations;
+//using Sentry.data.Infrastructure.ServiceImplementations;
 
 namespace Sentry.data.Infrastructure
 {
@@ -865,12 +865,12 @@ namespace Sentry.data.Infrastructure
             {
                 IRequestContext _requestContext = Container.GetInstance<IRequestContext>();
                 
-                basicJob = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).ThenFetch(d => d.ParentDataset).ThenFetch(c => c.DatasetCategory).Fetch(f => f.DataSource).FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is S3Basic);
+                basicJob = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).ThenFetch(d => d.ParentDataset).Fetch(f => f.DataSource).FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is S3Basic);
                 
                 if (basicJob == null)
                 {
                     _job.JobLoggerMessage("Info", "No S3Basic job found for Schema... Finding DfsBasic job");
-                    basicJob = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).ThenFetch(d => d.ParentDataset).ThenFetch(c => c.DatasetCategory).Fetch(f => f.DataSource).FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is DfsBasic);
+                    basicJob = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).ThenFetch(d => d.ParentDataset).Fetch(f => f.DataSource).FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is DfsBasic);
 
                     if (basicJob == null)
                     {

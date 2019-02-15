@@ -79,7 +79,7 @@ namespace Sentry.data.Core
         [Serializable]
         public class JavaOptions
         {
-            public string Arguments { get; set; }
+            public string[] Arguments { get; set; }
             public string ConfigurationParameters { get; set; }
             public string DriverMemory { get; set; }
             public int? DriverCores { get; set; }

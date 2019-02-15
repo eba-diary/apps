@@ -149,6 +149,18 @@ namespace Sentry.data.Core.Entities.Metadata
                 SetDataElementDetailValue("HiveTableStatus", value);
             }
         }
+        public virtual string HiveLocation
+        {
+            get
+            {
+                DataElementDetail detail = GetElementDetail("HiveLocation");
+                return (detail == null) ? null : detail.DataElementDetailType_VAL;
+            }
+            set
+            {
+                SetDataElementDetailValue("HiveLocation", value);
+            }
+        }
         public virtual string StorageCode
         {
             get
@@ -161,7 +173,18 @@ namespace Sentry.data.Core.Entities.Metadata
                 SetDataElementDetailValue("Storage_CDE", value);
             }
         }
-
+        public virtual Boolean HasHeader
+        {
+            get
+            {
+                DataElementDetail detail = GetElementDetail("HasHeader");
+                return (detail == null || detail.DataElementDetailType_VAL.ToLower() == "false" ) ? false : true;
+            }
+            set
+            {
+                SetDataElementDetailValue("HasHeader", value.ToString());
+            }
+        }
         #region DataElementDetailHelpers
         private DataElementDetail GetElementDetail(string typeCDE)
         {
@@ -207,10 +230,4 @@ namespace Sentry.data.Core.Entities.Metadata
 
     }
 
-    public class DataElementCode
-    {
-        public const String BusinessTerm = "Business Term";
-        public const String Lineage = "Lineage";
-        public const String DataFile = "Data File";
-    }
 }

@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Description;
+using Swashbuckle.Swagger.Annotations;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -17,13 +19,17 @@ namespace Sentry.data.Web.Controllers
         private IDatasetContext _dsContext;
         private IAssociateInfoProvider _associateInfoService;
         private UserService _userService;
+        private IConfigService _configService;
 
-        public MetadataController(MetadataRepositoryService metadataRepositoryService, IDatasetContext dsContext, IAssociateInfoProvider associateInfoService, UserService userService)
+        public MetadataController(MetadataRepositoryService metadataRepositoryService, IDatasetContext dsContext, 
+                                IAssociateInfoProvider associateInfoService, UserService userService,
+                                IConfigService configService)
         {
             _metadataRepositoryService = metadataRepositoryService;
             _dsContext = dsContext;
             _associateInfoService = associateInfoService;
             _userService = userService;
+            _configService = configService;
         }
 
         public class OutputSchema
@@ -62,16 +68,17 @@ namespace Sentry.data.Web.Controllers
         /// <summary>
         /// gets schema metadata
         /// </summary>
-        /// <param name="SchemaID"></param>
+        /// <param name="SchemaID">Schema Id assigned to given schema</param>
         /// <returns></returns>
         [HttpGet]
         [Route("schemas/{SchemaID}")]
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK,null,typeof(SchemaModel))]
         public async Task<IHttpActionResult> GetBasicMetadataInformationForSchema(int SchemaID)
         {
-            DataElement schema = _dsContext.GetById<DataElement>(SchemaID);
-
-            return await GetMetadata(schema.DatasetFileConfig);
+            SchemaDTO dto = _configService.GetSchemaDTO(SchemaID);
+            SchemaModel sm = new SchemaModel(dto);
+            return Ok(sm);            
         }
 
         /// <summary>
@@ -182,6 +189,7 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         [Route("datasets/{DatasetConfigID}/schemas/{SchemaID}/columns")]
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(OutputSchema))]
         public async Task<IHttpActionResult> GetColumnSchemaInformationFor(int DatasetConfigID, int SchemaID = 0)
         {
             DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
@@ -198,11 +206,13 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         [Route("schemas/{SchemaID}/columns")]
         [AuthorizeByPermission(PermissionNames.QueryToolUser)]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaDetailModel))]
         public async Task<IHttpActionResult> GetColumnSchemaInformationForSchema(int SchemaID)
         {
-            DataElement schema = _dsContext.GetById<DataElement>(SchemaID);
+            SchemaDetailDTO dto = _configService.GetSchemaDetailDTO(SchemaID);
+            SchemaDetailModel sdm = new SchemaDetailModel(dto);
 
-            return await GetColumnSchema(schema.DatasetFileConfig, SchemaID);
+            return Ok(sdm);
         }
 
 
@@ -254,7 +264,7 @@ namespace Sentry.data.Web.Controllers
                                 LastUpdated = b.LastUpdt_DTM.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds
                             };
 
-                            r.Type = (!String.IsNullOrEmpty(b.DataType)) ? b.DataType.ToUpper() : "VARCHAR";
+                            r.DataType = (!String.IsNullOrEmpty(b.DataType)) ? b.DataType.ToUpper() : "VARCHAR";
                             if (b.Precision != null) { r.Precision = b.Precision ?? null; }
                             if (b.Scale != null) { r.Scale = b.Scale ?? null; }
                             //r.Precision = (b.Precision != null && !String.IsNullOrEmpty(b.Precision)) ? b.Precision : null;

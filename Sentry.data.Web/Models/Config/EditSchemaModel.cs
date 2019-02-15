@@ -25,6 +25,7 @@ namespace Sentry.data.Web.Models.Config
 
         public virtual int DataElement_ID { get; set; }
         public virtual string Delimiter { get; set; }
+        public virtual Boolean HasHeader { get; set; }
 
         public virtual int DatasetId { get; set; }
     }

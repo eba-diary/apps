@@ -1,4 +1,4 @@
-﻿@model Sentry.data.Web.BaseDatasetModel
+﻿@model Sentry.data.Web.ObsoleteDatasetModel
 
 @{
     ViewBag.Title = "View Dataset Configuration Details";
@@ -213,7 +213,7 @@
                         <p>This configuration is classified as a @item.FileType</p>
                         <p>This configuration Data Scope is @item.ScopeType.Name which means : </p>
                         <p style="margin-left: 25px;">@item.ScopeType.Description</p>
-                        @if (item.FileExtension.Name.Trim() == "ANY")
+                        @if (item.FileExtension.Name.Trim() == "ANY" || item.FileExtension.Name.Trim() == "DELIMITED")
                         {<p>This configuration will allow all file extensions.</p>}
                         else
                         {<p>This configuration will only allow files with .@item.FileExtension.Name.ToLower() extension</p>}
@@ -340,15 +340,16 @@
 
                                         <p>@schema.SchemaDescription</p>
                                         <p>This schema's current Delimiter is <b>@schema.Delimiter</b></p>
+                                        <p>Raw files contain headers: <b>@schema.HasHeader</b></p>
 
                                         @if(schema.DataObjects.Count() == 0)
                                         {
-                                            <p>This schema has a Data Element ID of @schema.DataElement_ID.</p>
+                                            <p>This schema Id is @schema.DataElement_ID.</p>
                                             <p>This schema is not currently does not yet have any columns associated to it.</p>
                                         }
                                         else
                                         {
-                                             <p>This schema has a Data Element ID of @schema.DataElement_ID.</p>
+                                            <p>This schema Id is @schema.DataElement_ID.</p>
                                         }
 
                                         <p>Created on: @schema.DataElementCreate_DTM</p>

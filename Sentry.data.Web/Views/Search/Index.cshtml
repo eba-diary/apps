@@ -1,4 +1,8 @@
-﻿@{
+﻿@using Sentry.data.Core.GlobalEnums;
+
+@model Sentry.data.Web.SearchIndexModel
+
+@{
     ViewBag.Title = "Datasets";
 }
 @{
@@ -44,7 +48,7 @@
                             <ul class="list-unstyled ul-filter-list">
                                 <!-- ko foreach: OrderedFilters -->
                                 <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6">
-                                    <label data-bind="attr: { id: id }" style="display: block; font-weight: normal;">
+                                    <label data-bind="attr: { id: id }">
                                         <input type="checkbox" class="filterChbx"
                                                data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }" />
                                         <span data-bind="text : Title"></span>
@@ -58,7 +62,7 @@
                                     <!-- ko foreach: OrderedFilters -->
                                     <ul class="notNested">
                                         <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() >= 6">
-                                            <label data-bind="attr: { id: id }" style="display: block; font-weight: normal;">
+                                            <label data-bind="attr: { id: id }">
                                                 <input type="checkbox" class="filterChbx"
                                                        data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }" />
                                                 <span data-bind="text : Title"></span>
@@ -103,41 +107,39 @@
                             </optgroup>
                             <!-- /ko -->
                         </select>
-
-                        @*<select multiple="multiple" id="activeFilters " class="form-control select2-hidden-accessible"
-                            data-bind="select2: { options: SearchFilters, width: '100%', selectedOptions: Select2Filters, optionsText: 'Title' }"></select>*@
                     </div>
 
-                    @* pagination controls *@
-                    <ul class="pagination">
-                        @* button to take you directly to the first page *@
-                        <li data-bind="css: { disabled: searchResults.isFirstPage() }" class="previous disabled">
-                            <a href="#" aria-label="First" data-bind="click: searchResults.toFirstPage" title="First">&laquo;</a>
-                        </li>
-                        @* button to take you to the prevoius page *@
-                        <li data-bind="css: { disabled: !searchResults.hasPreviousPage() }" class="previous disabled">
-                            <a href="#" aria-label="Previous" data-bind="click: searchResults.toPreviousPage" title="Previous">&lt;</a>
-                        </li>
-                        
-                        @* loop through the pages, building a button for each *@
-                        <!-- ko foreach: searchResults.pages -->
-                        <li data-bind="css: { active: $data == $parent.searchResults.pageNumber() }">
-                            <a href="#" data-bind="text: $data, click: $parent.searchResults.pageNumber.bind($data)"></a>
-                        </li>
-                        <!-- /ko -->
+                    <div id="search-tile-header">
+                        @* number of items option *@
+                        <div id="nbr-search-results-wrapper" class="float-l">
+                            Showing
 
-                        @* button to take you to the next page*@
-                        <li data-bind="css: { disabled: !searchResults.hasNextPage() }" class="next disabled">
-                            <a href="#" aria-label="Next" data-bind="click: searchResults.toNextPage" title="Next">&gt;</a>
-                        </li>
-                        @* button to take you directly to the last page *@
-                        <li data-bind="css: { disabled: searchResults.isLastPage() }" class="next disabled">
-                            <a href="#" aria-label="Last" data-bind="click: searchResults.toLastPage" title="Last">&raquo;</a>
-                        </li>
-                    </ul>
+                            <select id="search-results-choices" class="form-control" data-bind="event: { change: window.vm.limitSearchResults() }">
+                                <option value="15" selected>15</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="All">All</option>
+                            </select>
+
+                            results
+                        </div>
+
+                        @* sorting control *@
+                        <div id="sort-option-wrapper" class="float-r">
+                            <div>Sort by</div>
+                            <div>
+                                <select id="sort-results" class="form-control" data-bind="event: { change: window.vm.sortExhibits() }">
+                                    @foreach (SelectListItem sortOption in Model.SortByOptions)
+                                    {
+                                        <option value="@sortOption.Value">@sortOption.Text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
 
                     <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults.pageItems">
-                        <li class="ul-dataset-list-item borderSide_gray boxShadowSm" style="background-color: white;" data-bind="css : BorderColor, click: TileClicked, attr: { title: PrimaryTitle }">
+                        <li class="ul-dataset-list-item borderSide_gray boxShadowSm" data-bind="css : BorderColor, click: TileClicked, attr: { title: PrimaryTitle }">
                             <div data-bind="if: $index > 20"></div>
                             <div class="category-type-wrap">
                                 <div class="glyphicon glyphicon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none"></div>
@@ -153,9 +155,9 @@
                                     <span data-bind="text: $data" />
                                 </div>
                                 <!-- /ko -->
-                                <span data-bind="text: DatasetName" style="font-size: larger; font-weight: bolder; color: #003DA5;"></span>
+                                <span class="search-dataset-name" data-bind="text: DatasetName"></span>
                                 <!-- ko if: IsSensitive-->
-                                <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure" style="padding-left: 10px;"></i>
+                                <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure"></i>
                                 <!-- /ko -->
                             </div>
 
@@ -169,7 +171,7 @@
                                 <span class="custom-glyphiconz" aria-hidden="true" />
                                 <div class="dataset-list-content-label">
                                     <div>
-                                        <div class="ownerDate" style="text-align : left;">
+                                        <div class="ownerDate">
                                             <span class="textBold ownerDate" data-bind="css : Color">Sentry Owner:&nbsp;</span>
                                             <span data-bind="text: SentryOwner"></span>
 
@@ -193,9 +195,45 @@
                                 </div>
                             </div>
                         </li>
-
                     </ul>
-                    
+
+                    <div id="search-tile-footer" class="text-right">
+
+                        @* search results info display *@
+                        <div id="search-results-wrapper" class="footer-container">
+                            Results <span data-bind="text: searchResults.firstItemOnPage()"></span>-<span data-bind="text: searchResults.lastItemOnPage()"></span> of <span data-bind="text: searchResults.itemCount()"></span>
+                        </div>
+
+                        @* pagination controls *@
+                        <div id="pagination-wrapper">
+                            <ul class="pagination">
+                                @* button to take you directly to the first page *@
+                                <li data-bind="css: { disabled: searchResults.isFirstPage() }" class="previous disabled">
+                                    <a href="#" aria-label="First" data-bind="click: searchResults.toFirstPage" title="First">&laquo;</a>
+                                </li>
+                                @* button to take you to the prevoius page *@
+                                <li data-bind="css: { disabled: !searchResults.hasPreviousPage() }" class="previous disabled">
+                                    <a href="#" aria-label="Previous" data-bind="click: searchResults.toPreviousPage" title="Previous">&lt;</a>
+                                </li>
+
+                                @* loop through the pages, building a button for each *@
+                                <!-- ko foreach: searchResults.pages -->
+                                <li data-bind="css: { active: $data == $parent.searchResults.pageNumber() }">
+                                    <a href="#" data-bind="text: $data, click: $parent.searchResults.pageNumber.bind($data)"></a>
+                                </li>
+                                <!-- /ko -->
+                                @* button to take you to the next page*@
+                                <li data-bind="css: { disabled: !searchResults.hasNextPage() }" class="next disabled">
+                                    <a href="#" aria-label="Next" data-bind="click: searchResults.toNextPage" title="Next">&gt;</a>
+                                </li>
+                                @* button to take you directly to the last page *@
+                                <li data-bind="css: { disabled: searchResults.isLastPage() }" class="next disabled">
+                                    <a href="#" aria-label="Last" data-bind="click: searchResults.toLastPage" title="Last">&raquo;</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
                     <hr>
                     <!-- ko if: searchResults().length == 0 -->
                     <div>
@@ -209,28 +247,6 @@
         </div>
     </div>
 </div>
-
-<style>
-
-    .disregardParentClick{
-        float: right;
-        margin-top: -3px;
-        margin-right: 1px;
-    }
-
-    .link-btn {
-        padding-left: 10px;
-        padding-right: 10px;
-    }
-
-    .ul-dataset-list-item:hover {
-        opacity: 0.95;
-
-        box-shadow: 2px 6px 10px #888888;
-        cursor: pointer;
-    }
-
-</style>
 
 @section Scripts {
     <script>
@@ -268,28 +284,9 @@
                     '<span class="' + cat.split(" ").join("_").toLowerCase() + '_filter">' + cat + " : " + tag.text + '</span>'
                 );
 
-                //if you want to turn on color.
-                //$('.other_filter').parent().css('background-color', 'gold');
-                //$('.measure_group_filter').parent().css('background-color', 'gold');
-                //$('.business_group_filter').parent().css('background-color', 'gold');
-                //$('.attribute_group_filter').parent().css('background-color', 'gold');
-                //$('.report_type_filter').parent().css('background-color', 'plum');
-                //$('.category_filter').parent().css('background-color', '#00A3E0');
-
                 return $state;
             };
 
-            //$('body').on('click', ".ul-dataset-list-item", function (e) {
-            //    //console.log($(e.target).hasClass("disregardParentClick"));
-            //    //console.log($(e.target).closest("a").attr('href'));
-            //    //console.log($(e.target).closest(".ul-dataset-list-item").attr('href'));
-
-            //    if ($(e.target).hasClass("disregardParentClick") === false) {
-            //        window.location.replace($(this).closest(".ul-dataset-list-item").attr('href'));
-            //    } else {
-            //        //window.location.replace($(e.target).closest("a").attr('href'));
-            //    }
-            //});
 
             $('body').on('mouseenter', ".ul-dataset-list-item", function (e) {
                 $(this).css('background-color', $(this).css("border-color").slice(0, -1) + ', 0.1)')
@@ -330,8 +327,6 @@
             $('#filterSelector').on('select2:unselect', function (e) {
                 // Do something
                 var data = e.params.data;
-                //console.log('UNSELECT');
-                //console.log(data);
 
                 window.vm.RemoveSelection(data.id);
 
@@ -350,8 +345,12 @@
 
             this.Count = ko.computed(function () {
                 var items = ko.utils.arrayFilter(window.vm.searchResults(), function (prod) {
-                    if (Title == prod.Category && Category == 'Category') {
-                        return prod;
+                    if (Category == 'Category') {
+                        for (var i = 0; i < prod.Categories.length; i++) {
+                            if (prod.Categories[i] === Title) {
+                                return prod;
+                            }
+                        }
                     }
                     else if (Title == prod.SentryOwner && Category == 'Sentry Owner') {
                         return prod;
@@ -366,6 +365,20 @@
                     else if (Category == 'Report Type') {
                         for (var i = 0; i < prod.DistinctFileExtensions.length; i++) {
                             if (prod.DistinctFileExtensions[i] == Title) {
+                                return prod;
+                            }
+                        }
+                    }
+                    else if (Category === 'Business Unit') {
+                        for (var i = 0; i < prod.BusinessUnits.length; i++) {
+                            if (prod.BusinessUnits[i] === Title) {
+                                return prod;
+                            }
+                        }
+                    }
+                    else if (Category === 'Function') {
+                        for (var i = 0; i < prod.DatasetFunctions.length; i++) {
+                            if (prod.DatasetFunctions[i] === Title) {
                                 return prod;
                             }
                         }
@@ -407,11 +420,12 @@
             self.HeadHide = 'hide_filterType_' + Name.replace(' ', '_');
 
             self.OrderedFilters = ko.computed(function () {
+
                 //First filter the list so that we only have filters that have a count greater than 0
                 var list = ko.utils.arrayFilter(self.Filters(), function (prod) {
                     return prod.Count() !== 0;
                 });
-                
+
                 //If the count is 0, hide the section.
                 if (list.length === 0) {
                     $("#" + self.HeadHide).hide();
@@ -500,13 +514,17 @@
                 return false;
             };
 
+            self.CreatedDtm = data.CreatedDtm;
             self.ChangedDtm = data.ChangedDtm;
             self.Color = data.Color;
 
             self.BannerColor = data.BannerColor;
             self.BorderColor = data.BorderColor;
 
+            self.Categories = data.Categories;
             self.DistinctFileExtensions = data.DistinctFileExtensions;
+            self.BusinessUnits = data.BusinessUnits;
+            self.DatasetFunctions = data.DatasetFunctions;
 
             self.PageViews = data.PageViews;
             self.Downloads = data.Downloads;
@@ -527,10 +545,6 @@
                 }
             });
 
-
-            //this.header = ko.pureComputed(function () {
-            //    return this.currentProfit() < 0 ? "profitWarning" : "profitPositive";
-            //}, viewModel);
         }
 
         function ListViewModel() {
@@ -545,11 +559,13 @@
             self.SelectedFilters = ko.observableArray([]);
 
             self.CategoryFilters = ko.observableArray([]);
+            self.BusinessUnitFilters = ko.observableArray([]);
+            self.DatasetFunctionFilters = ko.observableArray([]);
             self.OwnerFilters = ko.observableArray([]);
             self.ExtensionFilters = ko.observableArray([]);
             self.TagFilters = ko.observableArray([]);
 
-            self.FilterDatasets = function (datasets) {
+            self.FilterDatasets = function (datasets, sortVal) {
                 //First grab all the selected category ID's
                 var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
 
@@ -676,13 +692,13 @@
                     });
                 }
 
-                return datasets;
+                return sortTheResults(sortVal, datasets);
             };
 
-            self.FilterExhibits = function (exhibits) {
+            self.FilterExhibits = function (exhibits, sortVal) {
+                
                 //First grab all the selected category ID's
                 var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
                     if (feature.substring(0, 3) == '2_0') {
                         return feature;
                     }
@@ -709,13 +725,97 @@
                     exhibits = exhibits.filter(function (item) {
 
                         for (var i = 0; i < selectedCategories.length; i++) {
-                            if (item.Category == selectedCategories[i].Title) {
-                                return true;
+                            for (var j = 0; j < item.Categories.length; j++) {
+                                if (item.Categories[j] === selectedCategories[i].Title) {
+                                    return true;
+                                }
                             }
                         }
+
                         return false;
                     });
                 }
+
+
+                // now grab any selected business units
+                var selectedBusinessUnitIds = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
+                    if (feature.substring(0, 3) === '2_5') {
+                        return feature;
+                    }
+                });
+
+                var selectedBusinessUnitsList = [];
+                if (selectedBusinessUnitIds.length > 0) {
+                    var selectedBusinessUnits = ko.utils.arrayFilter(self.BusinessUnitFilters(), function (feature) {
+
+                        for (var i = 0; i < selectedBusinessUnitIds.length; i++) {
+                            if (feature.id === selectedBusinessUnitIds[i]) {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    });
+
+                    for (var i = 0; i < selectedBusinessUnits.length; i++) {
+                        selectedBusinessUnitsList.push(selectedBusinessUnits[i].Title);
+                    }
+
+                    // now apply the filter
+                    exhibits = exhibits.filter(function (item) {
+
+                        for (var i = 0; i < selectedBusinessUnits.length; i++) {
+                            for (var j = 0; j < item.BusinessUnits.length; j++) {
+                                if (item.BusinessUnits[j] === selectedBusinessUnits[i].Title) {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        return false;
+                    });
+                }
+
+
+                // next grab any selected Dataset Functions
+                var selectedDatasetFunctionIds = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
+                    if (feature.substring(0, 3) === '2_6') {
+                        return feature;
+                    }
+                });
+
+                var selectedDatasetFunctionsList = [];
+                if (selectedDatasetFunctionIds.length > 0) {
+                    var selectedDatasetFunctions = ko.utils.arrayFilter(self.DatasetFunctionFilters(), function (feature) {
+
+                        for (var i = 0; i < selectedDatasetFunctionIds.length; i++) {
+                            if (feature.id === selectedDatasetFunctionIds[i]) {
+                                return true;
+                            }
+                        }
+
+                        return false;
+                    });
+
+                    for (var i = 0; i < selectedDatasetFunctions.length; i++) {
+                        selectedDatasetFunctionsList.push(selectedDatasetFunctions[i].Title);
+                    }
+
+                    // now apply the filter
+                    exhibits = exhibits.filter(function (item) {
+
+                        for (var i = 0; i < selectedDatasetFunctions.length; i++) {
+                            for (var j = 0; j < item.DatasetFunctions.length; j++) {
+                                if (item.DatasetFunctions[j] === selectedDatasetFunctions[i].Title) {
+                                    return true;
+                                }
+                            }
+                        }
+
+                        return false;
+                    });
+                }
+                
 
                 //First grab all the selected owner ID's
                 var selectedOwnerIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
@@ -817,7 +917,8 @@
                     });
                 }
 
-                return exhibits;
+                return sortTheResults(sortVal, exhibits);
+
             };
 
             self.FilterGeneric = function (allObjects) {
@@ -992,7 +1093,7 @@
 
             self.PopulateDatasetFilters = function (datasets) {
                 var temp = [];
-                var pageType = '1_'
+                var pageType = '1_';
 
                 //CATEGORY FILTER
                 var param = getParameterByName('category');
@@ -1024,9 +1125,8 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new FilterCategory('Category', temp, 'blue'));
+                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
                 temp = [];
-
 
 
                 //SENTRYOWNER FILTER
@@ -1051,7 +1151,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'green'));
+                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'darkblue'));
                 temp = [];
 
 
@@ -1062,7 +1162,6 @@
                         if (!(ext in extensionLookup)) {
                             extensionLookup[ext] = 1;
                             self.ExtensionFilters.push(new Filter(pageType + '3_' + counter, ext, 'Extension'));
-                            //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
 
                             temp.push(new Filter(pageType + '3_' + counter, ext, 'Extension'));
                             counter++;
@@ -1078,36 +1177,31 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Extension', temp, 'plum'));
+                self.AllFilters.push(new FilterCategory('Extension', temp, 'darkblue'));
             };
 
             self.PopulateExhibitFilters = function (exhibits) {
                 var temp = [];
                 var pageType = '2_'
-
-                //CATEGORY FILTER
-                var param = getParameterByName('category');
-
-                for (var item, i = 0; item = exhibits[i++];) {
-                    var category = item.Category;
-
-                    if (!(category in categoryLookup)) {
-                        categoryLookup[category] = 1;
-                        self.CategoryFilters.push(new Filter(pageType + '0_' + i, category, 'Category'));
-                        //self.SearchFilters.push(new Filter('0_' + i, category, 10));
-
-                        temp.push(new Filter(pageType + '0_' + i, category, 'Category'));
-
-                        if (category == param) {
-                            self.SelectedFilters.push(pageType + '0_' + i);
-                        }
-
-                    }
-                }
-
                 var item;
 
+                var param = getParameterByName('category');
 
+                //CATEGORY FILTER
+                for (var item, i = 0; item = exhibits[i++];) {
+                    for (var cat, j = 0; cat = item.Categories[j++];) {
+                        if (!(cat in categoryLookup)) {
+                            categoryLookup[cat] = 1;
+                            self.CategoryFilters.push(new Filter(pageType + '0_' + i, cat, 'Category'));
+
+                            if (cat === param) {
+                                self.SelectedFilters.push(pageType + '0_' + i);
+                            }
+
+                            temp.push(new Filter(pageType + '0_' + i, cat, 'Category'));
+                        }
+                    }
+                }
                 ko.utils.arrayForEach(self.AllFilters(), function (v) {
                     if (v.Name == 'Category') {
                         item = v;
@@ -1117,27 +1211,25 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-
-                self.AllFilters.push(new FilterCategory('Category', temp, 'blue'));
+                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
                 temp = [];
 
 
-                //EXTENSION FILTER
-                counter = 0; //Needs seperate counter as multiple objects can appear per iteration
+                //BUSINESS UNIT FILTER
+                counter = 0; //reset counter
                 for (var item, i = 0; item = exhibits[i++];) {
-                    for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
-                        if (!(ext in extensionLookup)) {
-                            extensionLookup[ext] = 1;
-                            self.ExtensionFilters.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
-                            //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
+                    for (var bu, j = 0; bu = item.BusinessUnits[j++];) {
+                        if (!(bu in businessUnitLookup)) {
+                            businessUnitLookup[bu] = 1;
+                            self.BusinessUnitFilters.push(new Filter(pageType + '5_' + counter, bu, 'Business Unit'));
 
-                            temp.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
+                            temp.push(new Filter(pageType + '5_' + counter, bu, 'Business Unit'));
                             counter++;
                         }
                     }
                 }
                 ko.utils.arrayForEach(self.AllFilters(), function (v) {
-                    if (v.Name == 'Report Type') {
+                    if (v.Name == 'Business Unit') {
                         item = v;
                     }
                 });
@@ -1145,8 +1237,35 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Report Type', temp, 'plum'));
+                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'darkblue'));
                 temp = [];
+
+
+                //DATASET FUNCTION FILTER
+                counter = 0; //reset counter
+                for (var item, i = 0; item = exhibits[i++];) {
+                    for (var fn, j = 0; fn = item.DatasetFunctions[j++];) {
+                        if (!(fn in datasetFunctionLookup)) {
+                            datasetFunctionLookup[fn] = 1;
+                            self.DatasetFunctionFilters.push(new Filter(pageType + '6_' + counter, fn, 'Function'));
+
+                            temp.push(new Filter(pageType + '6_' + counter, fn, 'Function'));
+                            counter++;
+                        }
+                    }
+                }
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name == 'Function') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
+                self.AllFilters.push(new FilterCategory('Function', temp, 'darkblue'));
+                temp = [];
+
 
                 //TAG FILTER
                 //Retrieve unique list of tag groups across tags that exist on exhibits
@@ -1167,7 +1286,6 @@
                         }
                     }
                     arr.splice(new_index, 0, arr.splice(old_index, 1)[0]);
-                    //return arr; //For testing
                 };
 
                 array_move(tagGroups, tagGroups.indexOf('Other'), tagGroups.length - 1)
@@ -1201,23 +1319,37 @@
                         temp = item.Filters().concat(temp);
                         ko.utils.arrayRemoveItem(self.AllFilters(), item);
                     }
-                    self.AllFilters.push(new FilterCategory(group, temp, 'gold'));
+                    self.AllFilters.push(new FilterCategory(group, temp, 'darkblue'));
 
                     temp = [];
                 }
 
-               
 
-                //var xyz = exhibits.map(item => item.tags.Group).reduce((prev, curr) => prev.concat(curr), []).filter((item, i, arr) => arr.indexOf(item) === i);
+                //REPORT TYPE FILTER
+                counter = 0; //Needs seperate counter as multiple objects can appear per iteration
+                for (var item, i = 0; item = exhibits[i++];) {
+                    for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
+                        if (!(ext in extensionLookup)) {
+                            extensionLookup[ext] = 1;
+                            self.ExtensionFilters.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
+                            //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
 
-                //console.log(xyz);                
-
-                //for (var group, i = 0; group = tagGroups[i++];) {
-                //    self.AllFilters.push(new FilterCategory(group, temp, 'gold'));
-                //}
-                //self.AllFilters.push(new FilterCategory('Blah', temp, 'gold'));
-
-                
+                            temp.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
+                            counter++;
+                        }
+                    }
+                }
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name == 'Report Type') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
+                self.AllFilters.push(new FilterCategory('Report Type', temp, 'darkblue'));
+                temp = [];
 
             };
 
@@ -1255,9 +1387,32 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new FilterCategory('Category', temp, 'blue'));
+                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
                 temp = [];
 
+
+                //BUSINESS UNIT FILTER
+                for (var item, i = 0; item = allObjects[i++];) {
+                    for (var bu, j = 0; bu = item.BusinessUnits[j++];) {
+                        if (!(bu in businessUnitLookup)) {
+                            businessUnitLookup[bu] = 1;
+                            self.BusinessUnitFilters.push(new Filter(pagetype + '5_' + counter, bu, 'Business Unit'));
+
+                            temp.push(new Filter(pageType + '5_' + counter, bu, 'Business Unit'));
+                            counter++;
+                        }
+                    }
+                }
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name === 'Business Unit') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
+                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'darkblue'));
 
 
                 //SENTRYOWNER FILTER
@@ -1282,7 +1437,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'green'));
+                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'darkblue'));
                 temp = [];
 
 
@@ -1309,7 +1464,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Extension', temp, 'plum'));
+                self.AllFilters.push(new FilterCategory('Extension', temp, 'darkblue'));
 
                 //TAG FILTER
                 counter = 0; //Needs seperate counter as multiple objects can appear per iteration
@@ -1337,14 +1492,11 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Tag', temp, 'gold'));
+                self.AllFilters.push(new FilterCategory('Tag', temp, 'darkblue'));
                 temp = [];
             };
 
             self.RemoveSelection = function (id) {
-                console.log('Removing : ' + id);
-
-
                 self.SelectedFilters.remove(function (feature) {
                     return feature == id;
                 });
@@ -1365,6 +1517,8 @@
             var loaded = false;
 
             var categoryLookup = {};
+            var businessUnitLookup = {};
+            var datasetFunctionLookup = {};
             var ownerLookup = {};
             var extensionLookup = {};
             var tagLookup = {};
@@ -1389,9 +1543,6 @@
                 var mappedTasks = $.map(allData, function (item) { return new Dataset(item) });
 
                 self.datasets(self.datasets().concat(mappedTasks));
-
-                //request.send();
-                //request2.send();
 
                 self.populateFilters();
 
@@ -1474,9 +1625,9 @@
                 var selectedCategoryList = [];
 
                 if (self.SearchType() == "Datasets") {
-                    queryResults = self.FilterDatasets(queryResults);
+                    queryResults = self.FilterDatasets(queryResults, $("#sort-results").val());
                 } else if (self.SearchType() == "BusinessIntelligence") {
-                    queryResults = self.FilterExhibits(queryResults);
+                    queryResults = self.FilterExhibits(queryResults, $("#sort-results").val());
                 } else {
                     queryResults = self.FilterGeneric(queryResults);
                 }
@@ -1484,8 +1635,27 @@
                 $("#SearchText").attr("placeholder", "Search " + queryResults.length + " Datasets...");
 
                 return queryResults;
-            }).extend({ paged: {pageSize: 20}});  // .extend() is for the knockout-paging plugin
+            }).extend({ paged: { pageSize: 15 } }); // .extend() is for the knockout-paging plugin
+            // go to https://github.com/ErikSchierboom/knockout-paging for information on the plugin
 
+            self.sortExhibits = function () {
+                self.datasets.valueHasMutated();
+            };
+
+            self.limitSearchResults = function () {
+
+                var nbrResults = 15;
+
+                // determine number of results to return in the search results using the value selected in the drop-down
+                if ($("#search-results-choices").val() === "All") {
+                    nbrResults = self.searchResults.itemCount();
+                } else {
+                    nbrResults = parseInt($("#search-results-choices").val());
+                }
+
+                self.searchResults.pageSize(nbrResults);
+                
+            }
 
             self.SelectedFilters.subscribe(function () {
                 localStorage.setItem("filteredIds", ko.toJSON(self.SelectedFilters()));
@@ -1516,8 +1686,8 @@
             };
         }
 
-
         $(document).ready(function () {
+
             window.vm = new ListViewModel();
             ko.applyBindings(vm);
 
@@ -1610,6 +1780,38 @@
             var regex = /\/Search\/(\w+)/,
                 url = window.location.href;
             return regex.exec(url)[1];
+        }
+        
+        function sortTheResults(sortVal, items) {
+            switch (parseInt(sortVal)) {
+                case @((int)DatasetSortByOption.Alphabetical):
+                    return items.sort(function (left, right) {
+                        return left.DatasetName == right.DatasetName ? 0 : (left.DatasetName < right.DatasetName ? -1 : 1)
+                    });
+                    break;
+                case @((int)DatasetSortByOption.Favorites):
+                    return items.sort(function (left, right) {
+                        return right.IsFavorite - left.IsFavorite;
+                    });
+                    break;
+                case @((int)DatasetSortByOption.MostAccessed):
+                    return items.sort(function (left, right) {
+                        return right.PageViews - left.PageViews;
+                    });
+                    break;
+                case @((int)DatasetSortByOption.RecentlyAdded):
+                    return items.sort(function (left, right) {
+                        return new Date(right.CreatedDtm) - new Date(left.CreatedDtm);
+                    });
+                    break;
+                case @((int)DatasetSortByOption.RecentlyUpdated):
+                    return items.sort(function (left, right) {
+                        return new Date(right.ChangedDtm) - new Date(left.ChangedDtm);
+                    });
+                    break;
+                default:
+                    return items;
+            }
         }
 
     </script>

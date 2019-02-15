@@ -2,57 +2,82 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Web;
+using System.Text.RegularExpressions;
 using Sentry.data.Core;
-using Sentry.data.Infrastructure;
-using System.Web.Script.Serialization;
 
 namespace Sentry.data.Web
 {
-    public class BusinessIntelligenceModel : BaseDatasetModel
+    public class BusinessIntelligenceModel : BaseEntityModel
     {
-        public BusinessIntelligenceModel()
-        {
-            this.Category = "";
-            this.DatasetDesc = "";
-            this.DatasetName = "";
-            this.FileExtension = null;
-            this.DatasetId = 0;
-            this.S3Key = "";
-            this.SentryOwnerName = "";
-            this.UploadUserName = "";
-            this.CanDisplay = true;
-            this.TagString = new JavaScriptSerializer().Serialize(new List<SearchableTag>());
+        public BusinessIntelligenceModel() { }
 
+        public BusinessIntelligenceModel(BusinessIntelligenceDto dto) : base(dto)
+        {
+            Location = dto.Location;
+            FileTypeId = dto.FileTypeId;
+            FrequencyId = dto.FrequencyId;
+            DatasetBusinessUnitIds = dto.DatasetBusinessUnitIds;
+            DatasetFunctionIds = dto.DatasetFunctionIds;
+            GetLatest = dto.GetLatest;
+            ReportLink = dto.ReportLink;
         }
 
-        public BusinessIntelligenceModel(Dataset ds, IAssociateInfoProvider associateService) : base(ds, associateService)
-        {
-            OwnerID = ds.SentryOwnerName;
-            Location = ds.Metadata.ReportMetadata.Location;
-            LocationType = ds.Metadata.ReportMetadata.LocationType;
-            FreqencyID = ds.Metadata.ReportMetadata.Frequency;
-            FileTypeId = ds.DatasetFileConfigs.First().FileTypeId;
-            TagString = new JavaScriptSerializer().Serialize(ds.Tags.Select(x => x.GetSearchableTag()));
-        }
 
-        [Required]
-        [DisplayName("Sentry Owner")]
-        public string OwnerID { get; set; }
 
         [Required]
         [DisplayName("Report Location")]
         public string Location { get; set; }
 
-        public string LocationType { get; set; }
-
-        [DisplayName("Update Frequency")]
-        public int FreqencyID { get; set; }
-
         [DisplayName("Exhibit Type")]
         public int FileTypeId { get; set; }
 
-        public string TagString { get; set; }
+        [Required]
+        [DisplayName("Frequency")]
+        public int? FrequencyId { get; set; }
+        
+        [DisplayName("Get Latest")]
+        public bool GetLatest { get; set; }
+
+        [Required]
+        [DisplayName("Business Unit")]
+        public List<int> DatasetBusinessUnitIds { get; set; }
+
+        [Required]
+        [DisplayName("Function")]
+        public List<int> DatasetFunctionIds { get; set; }
+        public string ReportLink { get; set; }
+
+        public int BusinessObjectsEnumValue { get; set; }
+
+
+        public List<string> Validate()
+        {
+            List<string> errors = new List<string>();
+
+            switch (this.FileTypeId)
+            {
+                case (int)ReportType.Tableau:
+                    if (!Regex.IsMatch(this.Location.ToLower(), "^https://tableau.sentry.com"))
+                    {
+                        errors.Add("Tableau exhibits should begin with https://Tableau.sentry.com");
+                    }
+                    break;
+                case (int)ReportType.Excel:
+                    if (!Uri.TryCreate(this.Location, UriKind.Absolute, out Uri temp))
+                    {
+                        errors.Add("Invalid file path.");
+                    }
+                    break;
+                case (int)ReportType.BusinessObjects:
+                    if (!Regex.IsMatch(this.Location.ToLower(), "^https://busobj.sentry.com"))
+                    {
+                        errors.Add("Business Objects exhibits should begin with https://busobj.sentry.com");
+                    }
+                    break;
+            }
+
+            return errors;
+        }
+
     }
 }

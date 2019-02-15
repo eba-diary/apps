@@ -82,14 +82,32 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DomainServices\ConfigService.cs" />
+    <Compile Include="DomainServices\DatasetService.cs" />
+    <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceDetailDTO.cs" />
+    <Compile Include="DTO\Dataset\DatasetDetailDTO.cs" />
+    <Compile Include="DTO\Schema\SchemaDetailDTO.cs" />
+    <Compile Include="Entities\ColumnDTO.cs" />
+    <Compile Include="DTO\Schema\SchemaDTO.cs" />
+    <Compile Include="Entities\Datasets\BusinessUnit.cs" />
+    <Compile Include="Entities\Datasets\DatasetFunction.cs" />
     <Compile Include="Entities\HiveTableStatusEnum.cs" />
     <Compile Include="Entities\MessageFormats\HiveTableCreateModel.cs" />
     <Compile Include="Entities\Metadata\ColumnModel.cs" />
+    <Compile Include="Extensions\DataElementExtensions.cs" />
+    <Compile Include="GlobalEnums\DataClassificationType.cs" />
+    <Compile Include="GlobalEnums\DatasetSortByOption.cs" />
+    <Compile Include="Interfaces\IAssociateInfoProvider.cs" />
     <Compile Include="Interfaces\IConfigService.cs" />
+    <Compile Include="Interfaces\IDatasetService.cs" />
     <Compile Include="Interfaces\IEventService.cs" />
     <Compile Include="Interfaces\IUserService.cs" />
+    <Compile Include="DomainServices\BusinessIntelligenceService.cs" />
+    <Compile Include="DomainServices\MessageHandlers\HiveMetadataHandler.cs" />
     <Compile Include="DomainServices\MetadataRepositoryService.cs" />
-    <Compile Include="Entities\DataFeeds\DataFeedConstants.cs" />
+    <Compile Include="DTO\BaseEntityDTO.cs" />
+    <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceDTO.cs" />
+    <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceHomeDTO.cs" />
+    <Compile Include="DTO\Dataset\DatasetDTO.cs" />
     <Compile Include="Entities\Datasets\DatasetMetadata.cs" />
     <Compile Include="Entities\Datasets\FileExtension.cs" />
     <Compile Include="Entities\Datasets\ReportMetadata.cs" />
@@ -113,6 +131,7 @@
     <Compile Include="Entities\Livy\LivySession.cs" />
     <Compile Include="Entities\Livy\QueryableDataset.cs" />
     <Compile Include="Entities\Goldeneye\RequestHeader.cs" />
+    <Compile Include="Entities\MessageFormats\HiveMetadataEvent.cs" />
     <Compile Include="Entities\Metadata\DataElement.cs" />
     <Compile Include="Entities\Metadata\DataElementDetail.cs" />
     <Compile Include="Entities\Metadata\DataObject.cs" />
@@ -182,10 +201,12 @@
     <Compile Include="Entities\Goldeneye\RetrieverRequests\RTRequest.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\RTRequestParameters.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\RTSourceTypes.cs" />
+    <Compile Include="GlobalConstants.cs" />
     <Compile Include="Helpers\DataFeedHelper.cs" />
     <Compile Include="Helpers\DisplayFormatter.cs" />
-    <Compile Include="Helpers\EnumExtensionMethods.cs" />
+    <Compile Include="GlobalEnums\EnumExtensionMethods.cs" />
     <Compile Include="Interfaces\IApplicationUser.cs" />
+    <Compile Include="Interfaces\IBusinessIntelligenceService.cs" />
     <Compile Include="Interfaces\ICurrentUserIdProvider.cs" />
     <Compile Include="Interfaces\IDatasetContext.cs" />
     <Compile Include="Interfaces\IDataFeedContext.cs" />
@@ -193,14 +214,13 @@
     <Compile Include="Interfaces\IExtendedUserInfo.cs" />
     <Compile Include="Interfaces\IExtendedUserInfoProvider.cs" />
     <Compile Include="Interfaces\IDataAssetContext.cs" />
-    <Compile Include="Interfaces\IDatasetService.cs" />
+    <Compile Include="Interfaces\IS3ServiceProvider.cs" />
     <Compile Include="Interfaces\IFtpProvider.cs" />
     <Compile Include="Interfaces\IMessagePublisher.cs" />
     <Compile Include="Interfaces\IMetadataRepositoryProvider.cs" />
     <Compile Include="Interfaces\IRequestContext.cs" />
     <Compile Include="Interfaces\ISASService.cs" />
     <Compile Include="Interfaces\IODCFileProvider.cs" />
-    <Compile Include="Interfaces\Report\IReportContext.cs" />
     <Compile Include="Interfaces\Retriever\IAuthenticationType.cs" />
     <Compile Include="Interfaces\Retriever\IDataSource.cs" />
     <Compile Include="Interfaces\Retriever\IRetrieverJob.cs" />
@@ -220,7 +240,12 @@
     <None Include="packages.config" />
     <None Include="Sentry.data.Core.ruleset" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\StandaloneLibraries\Sentry.Messaging.Common\Sentry.Messaging.Common.csproj">
+      <Project>{bd4b0624-03a2-4896-b46e-4eb35e9efe6c}</Project>
+      <Name>Sentry.Messaging.Common</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

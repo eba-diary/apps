@@ -64,7 +64,8 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(PermissionNames.DatasetView)]
         public ActionResult Index(string searchType, string category, string searchPhrase, string ids)
         {
-            return View();
+            SearchIndexModel model = new SearchIndexModel();
+            return View(model);
         }
 
         public class SearchTerms
@@ -116,21 +117,21 @@ namespace Sentry.data.Web.Controllers
             switch (searchType)
             {
                 case "BusinessIntelligence":
-                    dsList = _datasetContext.GetExhibits().ToList();
+                    dsList = _datasetContext.Datasets.Where(x => x.DatasetType == GlobalConstants.DataEntityTypes.REPORT).ToList();
                     break;
                 case "Datasets":
-                    dsList = _datasetContext.Datasets.ToList();
-                    dsList = dsList.Where(w => w.DatasetType != "RPT").ToList();
+                    dsList = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityTypes.DATASET).ToList();
                     break;
                 default:
                     dsList = _datasetContext.Datasets.ToList();
                     break;
             }
 
-            foreach (Dataset ds in dsList)
+            foreach (Dataset ds in dsList.OrderBy(x => x.DatasetName).ToList())
             {
                 SearchModel sm = new SearchModel(ds, _associateInfoProvider);
                 sm.IsFavorite = ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId);
+                sm.PageViews = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset == ds.DatasetId).Count();
                 models.Add(sm);
             }
 

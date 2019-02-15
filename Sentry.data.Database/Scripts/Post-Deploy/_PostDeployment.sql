@@ -14,15 +14,18 @@ All new files added for staic data or scripts should have it's properties update
 
 --Execute scripts to insert/delete/merge static data
 :r ..\Post-Deploy\StaticData\Category.sql
+:r ..\Post-Deploy\StaticData\EventType.sql
+:r ..\Post-Deploy\StaticData\BusinessUnit.sql
+:r ..\Post-Deploy\StaticData\DatasetFunction.sql
 
 
 
 
---Now only run these scritps if the versioning allows us.
+--Now only run these scripts if the versioning allows us.
 --ALTER THE SCRIPT VERSION BELOW FOR EVERY NEW SCRIPT 
 --SCRIPT VERSION should be in format yyyy.MM.dd_rr where rr is 2-digit revision number for day. 
 DECLARE @ScriptVersion AS VARCHAR(50) 
-SET @ScriptVersion = '2019.01.15_01'
+SET @ScriptVersion = '2019.01.29_01_PostDeploy'
 
 BEGIN TRAN 
   
@@ -30,7 +33,8 @@ IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion)
 BEGIN TRY 
 
   --insert one off script files here
-  :r ..\Post-Deploy\SupportingScripts\MTP_2019_01_15\UpdateSomeRow.sql
+  :r ..\Post-Deploy\SupportingScripts\Sprint_19_2_1\InsertDatasetCategories.sql
+  :r ..\Post-Deploy\SupportingScripts\Sprint_19_2_2\BusinessUnitChanges.sql
 
   --insert into the verision table so these scripts do not run again.
   INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 
@@ -58,3 +62,203 @@ END CATCH
   
 COMMIT TRAN
 
+--Now only run these scripts if the versioning allows us.
+--ALTER THE SCRIPT VERSION BELOW FOR EVERY NEW SCRIPT 
+--SCRIPT VERSION should be in format yyyy.MM.dd_rr where rr is 2-digit revision number for day. 
+DECLARE @ScriptVersion2 AS VARCHAR(50) 
+SET @ScriptVersion2 = '2019.02.4_01_PostDeploy'
+
+BEGIN TRAN 
+  
+IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion2) 
+BEGIN TRY 
+
+  --insert one off script files here
+  :r ..\Post-Deploy\SupportingScripts\Sprint_19_2_2\AddFileExtension.sql
+
+  --insert into the verision table so these scripts do not run again.
+  INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion2, GETDATE() ) 
+
+END TRY 
+
+BEGIN CATCH 
+    DECLARE @ErrorMessage2 NVARCHAR(4000); 
+    DECLARE @ErrorSeverity2 INT; 
+    DECLARE @ErrorState2 INT; 
+  
+    SELECT 
+        @ErrorMessage2 = ERROR_MESSAGE(), 
+        @ErrorSeverity2 = ERROR_SEVERITY(), 
+        @ErrorState2 = ERROR_STATE(); 
+  
+    RAISERROR (@ErrorMessage2, 
+               @ErrorSeverity2, 
+               @ErrorState2 
+               ); 
+  
+    ROLLBACK TRAN 
+    RETURN
+END CATCH 
+
+COMMIT TRAN
+--Now only run these scritps if the versioning allows us.
+--ALTER THE SCRIPT VERSION BELOW FOR EVERY NEW SCRIPT 
+--SCRIPT VERSION should be in format yyyy.MM.dd_rr where rr is 2-digit revision number for day. 
+DECLARE @ScriptVersion3 AS VARCHAR(50) 
+SET @ScriptVersion3 = '2019.02.13_01_PostDeploy'
+
+BEGIN TRAN 
+  
+IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion3) 
+BEGIN TRY 
+
+  --insert one off script files here
+  :r ..\Post-Deploy\SupportingScripts\Sprint_19_2_1\InitializeGetLatest.sql
+
+  --insert into the verision table so these scripts do not run again.
+  INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion3, GETDATE() ) 
+
+END TRY 
+
+BEGIN CATCH 
+    DECLARE @ErrorMessage3 NVARCHAR(4000); 
+    DECLARE @ErrorSeverity3 INT; 
+    DECLARE @ErrorState3 INT; 
+  
+    SELECT 
+        @ErrorMessage3 = ERROR_MESSAGE(), 
+        @ErrorSeverity3 = ERROR_SEVERITY(), 
+        @ErrorState3 = ERROR_STATE(); 
+  
+    RAISERROR (@ErrorMessage3, 
+               @ErrorSeverity3, 
+               @ErrorState3 
+               ); 
+  
+    ROLLBACK TRAN 
+    RETURN
+END CATCH 
+  
+COMMIT TRAN
+
+--Now only run these scritps if the versioning allows us.
+--ALTER THE SCRIPT VERSION BELOW FOR EVERY NEW SCRIPT 
+--SCRIPT VERSION should be in format yyyy.MM.dd_rr where rr is 2-digit revision number for day. 
+DECLARE @ScriptVersion4 AS VARCHAR(50) 
+SET @ScriptVersion4 = '2019.02.13_02_PostDeploy'
+
+BEGIN TRAN 
+  
+IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion4) 
+BEGIN TRY 
+
+  --insert one off script files here
+  :r ..\Post-Deploy\SupportingScripts\Sprint_19_2_2\ReAlignTableauReportTypeIdsql.sql
+
+  --insert into the verision table so these scripts do not run again.
+  INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion4, GETDATE() ) 
+
+END TRY 
+
+BEGIN CATCH 
+    DECLARE @ErrorMessage4 NVARCHAR(4000); 
+    DECLARE @ErrorSeverity4 INT; 
+    DECLARE @ErrorState4 INT; 
+  
+    SELECT 
+        @ErrorMessage4 = ERROR_MESSAGE(), 
+        @ErrorSeverity4 = ERROR_SEVERITY(), 
+        @ErrorState4 = ERROR_STATE(); 
+  
+    RAISERROR (@ErrorMessage4, 
+               @ErrorSeverity4, 
+               @ErrorState4 
+               ); 
+  
+    ROLLBACK TRAN 
+    RETURN
+END CATCH 
+  
+COMMIT TRAN
+
+--Now only run these scritps if the versioning allows us.
+--ALTER THE SCRIPT VERSION BELOW FOR EVERY NEW SCRIPT 
+--SCRIPT VERSION should be in format yyyy.MM.dd_rr where rr is 2-digit revision number for day. 
+DECLARE @ScriptVersion5 AS VARCHAR(50) 
+SET @ScriptVersion5 = '2019.02.13_03_PostDeploy'
+
+BEGIN TRAN 
+  
+IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion5) 
+BEGIN TRY 
+
+  --insert one off script files here
+	:r ..\Post-Deploy\SupportingScripts\Sprint_19_2_2\UpdateJavaApplicationOptionstoArray.sql
+
+  --insert into the verision table so these scripts do not run again.
+  INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion5, GETDATE() ) 
+
+END TRY 
+
+BEGIN CATCH 
+    DECLARE @ErrorMessage5 NVARCHAR(4000); 
+    DECLARE @ErrorSeverity5 INT; 
+    DECLARE @ErrorState5 INT; 
+  
+    SELECT 
+        @ErrorMessage5 = ERROR_MESSAGE(), 
+        @ErrorSeverity5 = ERROR_SEVERITY(), 
+        @ErrorState5 = ERROR_STATE(); 
+  
+    RAISERROR (@ErrorMessage5, 
+               @ErrorSeverity5, 
+               @ErrorState5 
+               ); 
+  
+    ROLLBACK TRAN 
+    RETURN
+END CATCH 
+  
+COMMIT TRAN
+
+
+
+--Now only run these scritps if the versioning allows us.
+--ALTER THE SCRIPT VERSION BELOW FOR EVERY NEW SCRIPT 
+--SCRIPT VERSION should be in format yyyy.MM.dd_rr where rr is 2-digit revision number for day. 
+DECLARE @ScriptVersion6 AS VARCHAR(50) 
+SET @ScriptVersion6 = '2019.02.13_04_PostDeploy'
+
+BEGIN TRAN 
+  
+IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion6) 
+BEGIN TRY 
+
+  --insert one off script files here
+	:r ..\Post-Deploy\SupportingScripts\Sprint_19_2_2\AddHiveLocation.sql
+
+  --insert into the verision table so these scripts do not run again.
+  INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion6, GETDATE() ) 
+
+END TRY 
+
+BEGIN CATCH 
+    DECLARE @ErrorMessage6 NVARCHAR(4000); 
+    DECLARE @ErrorSeverity6 INT; 
+    DECLARE @ErrorState6 INT; 
+  
+    SELECT 
+        @ErrorMessage6 = ERROR_MESSAGE(), 
+        @ErrorSeverity6 = ERROR_SEVERITY(), 
+        @ErrorState6 = ERROR_STATE(); 
+  
+    RAISERROR (@ErrorMessage6, 
+               @ErrorSeverity6, 
+               @ErrorState6 
+               ); 
+  
+    ROLLBACK TRAN 
+    RETURN
+END CATCH 
+  
+COMMIT TRAN

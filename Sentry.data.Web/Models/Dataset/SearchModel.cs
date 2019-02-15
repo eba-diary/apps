@@ -1,6 +1,5 @@
 ﻿using Sentry.data.Common;
 using Sentry.data.Core;
-using Sentry.data.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,8 +13,33 @@ namespace Sentry.data.Web
 
             Sentry.Associates.Associate sentryAssociate = _associateInfoProvider.GetAssociateInfo(ds.SentryOwnerName);
 
-            this.Category = ds.DatasetCategory.Name;            
-            this.AbbreviatedCategory = (String.IsNullOrWhiteSpace(ds.DatasetCategory.AbbreviatedName)) ? ds.DatasetCategory.Name : ds.DatasetCategory.AbbreviatedName;
+            if (ds.DatasetCategories.Count > 1)
+            {
+                List<string> catNameList = new List<string>();
+
+                foreach (Category cat in ds.DatasetCategories)
+                {
+                    // add either Name or Abbreviated Name (if exists)
+                    catNameList.Add((!string.IsNullOrWhiteSpace(cat.AbbreviatedName)) ? cat.AbbreviatedName : cat.Name);
+                }
+
+                this.Color = "darkgray";
+                this.Category = string.Join(", ", catNameList);
+                this.AbbreviatedCategory = this.Category;
+                this.BannerColor = "categoryBanner-" + this.Color;
+                this.BorderColor = "borderSide_" + this.Color;
+            }
+            else
+            {
+                this.Color = ds.DatasetCategories.First().Color;
+                this.Category = ds.DatasetCategories.First().Name;
+                this.AbbreviatedCategory = (!String.IsNullOrWhiteSpace(ds.DatasetCategories.First().AbbreviatedName)) ? ds.DatasetCategories.First().AbbreviatedName : ds.DatasetCategories.First().Name;
+                this.BannerColor = "categoryBanner-" + this.Color;
+                this.BorderColor = "borderSide_" + this.Color;
+            }
+
+            this.Categories = ds.DatasetCategories.Select(x => x.Name).ToList();
+            this.CategoryNames = string.Join(", ", this.Categories);
             this.DatasetName = ds.DatasetName;
             this.DatasetId = ds.DatasetId;
             this.DatasetDesc = ds.DatasetDesc;
@@ -23,6 +47,8 @@ namespace Sentry.data.Web
             this.SentryOwnerName = Sentry.data.Core.Helpers.DisplayFormatter.FormatAssociateName(sentryAssociate);
             this.DistinctFileExtensions = ds.DatasetFiles.Select(x => Utilities.GetFileExtension(x.FileName).ToLower()).Distinct().ToList();
             this.Frequencies = null;
+            this.BusinessUnits = ds.BusinessUnits.Select(x => x.Name).ToList();
+            this.DatasetFunctions = ds.DatasetFunctions.Select(x => x.Name).ToList();
 
             if (ds.DatasetFiles.Any())
             {
@@ -33,17 +59,23 @@ namespace Sentry.data.Web
                 this.ChangedDtm = ds.ChangedDtm.ToShortDateString();
             }
 
-            this.BannerColor = "categoryBanner-" + ds.DatasetCategory.Color;
-            this.BorderColor = "borderSide_" + ds.DatasetCategory.Color;
-            this.Color = ds.DatasetCategory.Color;
             this.Type = ds.DatasetType;
 
-            if (ds.DatasetType == "RPT")
+            if (ds.DatasetType == GlobalConstants.DataEntityTypes.REPORT)
             {
                 ReportType type = (ReportType)ds.DatasetFileConfigs.First().FileTypeId;
                 this.DistinctFileExtensions = new List<string> { type.ToString() };
                 this.Tags = ds.Tags.Select(s => s.GetSearchableTag()).ToList();
-                Location = (!String.IsNullOrWhiteSpace(ds.Metadata.ReportMetadata.Location)) ? ds.Metadata.ReportMetadata.Location : null;
+                
+                if (!String.IsNullOrWhiteSpace(ds.Metadata.ReportMetadata.Location))
+                {
+                    Location = (ds.Metadata.ReportMetadata.GetLatest) ?ds.Metadata.ReportMetadata.Location + GlobalConstants.BusinessObjectExhibit.GET_LATEST_URL_PARAMETER : ds.Metadata.ReportMetadata.Location;
+                }
+                else
+                {
+                    Location = null;
+                }
+                //Location = (!String.IsNullOrWhiteSpace(ds.Metadata.ReportMetadata.Location)) ? ds.Metadata.ReportMetadata.Location : null;
                 LocationType = (!String.IsNullOrWhiteSpace(ds.Metadata.ReportMetadata.LocationType)) ? ds.Metadata.ReportMetadata.LocationType : null;
                 this.UpdateFrequency = (Enum.GetName(typeof(ReportFrequency), ds.Metadata.ReportMetadata.Frequency) != null) ? Enum.GetName(typeof(ReportFrequency), ds.Metadata.ReportMetadata.Frequency) : "Not Specified";
                 this.Link = "/BusinessIntelligence/Detail/" + ds.DatasetId;
@@ -53,10 +85,14 @@ namespace Sentry.data.Web
                 this.Link = "/Dataset/Detail/" + ds.DatasetId;
                 this.DistinctFileExtensions = ds.DatasetFiles.Select(x => Utilities.GetFileExtension(x.FileName).ToLower()).Distinct().ToList();
             }
+
+            this.CreatedDtm = ds.DatasetDtm.ToShortDateString();
         }
 
         public string Category { get; set; }
+        public List<string> Categories { get; set; }
         public string AbbreviatedCategory { get; set; }
+        public string CategoryNames { get; set; }
 
         public string DatasetName { get; set; }
 
@@ -76,6 +112,7 @@ namespace Sentry.data.Web
         public Boolean IsSensitive { get; set; }
 
         public string ChangedDtm { get; set; }
+        public string CreatedDtm { get; set; }
 
         public string Color { get; set; }
         public string BannerColor { get; set; }
@@ -87,6 +124,8 @@ namespace Sentry.data.Web
         public List<SearchableTag> Tags { get; set; }
         public Boolean IsFavorite { get; set; }
         public Boolean CanEditDataset { get; set; }
-
+        public List<string> BusinessUnits { get; set; }
+        public List<string> DatasetFunctions { get; set; }
+        public int PageViews { get; set; }
     }
 }

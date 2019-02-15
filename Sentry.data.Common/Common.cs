@@ -37,7 +37,7 @@ namespace Sentry.data.Common
         /// <returns></returns>
         public static string GenerateDatasetDropLocation(Dataset ds)
         {
-            string filep = Path.Combine(Configuration.Config.GetHostSetting("DatasetLoaderBaseLocation"), ds.DatasetCategory.Name.ToLower());
+            string filep = Path.Combine(Configuration.Config.GetHostSetting("DatasetLoaderBaseLocation"), ds.DatasetCategories.First().Name.ToLower());
             filep = Path.Combine(filep, ds.DatasetName.Replace(' ', '_').ToLower());
             return filep.ToString();
         }
@@ -512,7 +512,6 @@ namespace Sentry.data.Common
                             }
 
                             dynamic msg1 = new JObject();
-                            string eventTopic = $"{Configuration.Config.GetSetting("SAIDKey").ToLower()}-{Configuration.Config.GetHostSetting("EnvironmentName").ToLower()}-{Configuration.Config.GetHostSetting("DSCEventTopic").ToLower()}";
                             //Write file information to topic
                             try
                             {
@@ -521,11 +520,11 @@ namespace Sentry.data.Common
                                 msg1.SourceKey = df_newParent.FileLocation;
                                 msg1.SourceVersionId = df_newParent.VersionId;
 
-                                _publisher.Publish(eventTopic, df_newParent.Schema.DataElement_ID.ToString(), msg1.ToString());
+                                _publisher.PublishDSCEvent(df_newParent.Schema.DataElement_ID.ToString(), msg1.ToString());
                             }
                             catch (Exception ex)
                             {
-                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.DataElement_ID.ToString()} | topic:{eventTopic} | message:{msg1.ToString()})", ex);
+                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.DataElement_ID.ToString()} | DSCEvent topic | message:{msg1.ToString()})", ex);
                             }
 
                             Event f = new Event()
@@ -612,7 +611,6 @@ namespace Sentry.data.Common
                             }
 
                             dynamic msg1 = new JObject();
-                            string eventTopic = $"{Configuration.Config.GetSetting("SAIDKey").ToLower()}-{Configuration.Config.GetHostSetting("EnvironmentName").ToLower()}-{Configuration.Config.GetHostSetting("DSCEventTopic").ToLower()}";
                             //Write file information to topic
                             try
                             {
@@ -621,11 +619,11 @@ namespace Sentry.data.Common
                                 msg1.SourceKey = df_newParent.FileLocation;
                                 msg1.SourceVersionId = df_newParent.VersionId;
 
-                                _publisher.Publish(eventTopic, df_newParent.Schema.DataElement_ID.ToString(), msg1.ToString());
+                                _publisher.PublishDSCEvent(df_newParent.Schema.DataElement_ID.ToString(), msg1.ToString());
                             }
                             catch (Exception ex)
                             {
-                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.DataElement_ID.ToString()} | topic:{eventTopic} | message:{msg1.ToString()})", ex);
+                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.DataElement_ID.ToString()} | DSCEvent topic | message:{msg1.ToString()})", ex);
                             }
 
                             Event f = new Event()
@@ -788,7 +786,7 @@ namespace Sentry.data.Common
             {
                 StringBuilder location = new StringBuilder();
                 location.Append(Configuration.Config.GetHostSetting("S3BundlePrefix"));
-                location.Append(GenerateCustomStorageLocation(new string[] { ds.DatasetCategory.Id.ToString(), ds.DatasetId.ToString() }));
+                location.Append(GenerateCustomStorageLocation(new string[] { ds.DatasetCategories.First().Id.ToString(), ds.DatasetId.ToString() }));
                 location.Append(targetFileName);
                 fileLocation = location.ToString();
             }
@@ -939,7 +937,6 @@ namespace Sentry.data.Common
 
             }
         }
-
     }
 
     public static class DirectoryUtilities

@@ -1,0 +1,138 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\..\packages\librdkafka.redist.0.11.3\build\librdkafka.redist.props" Condition="Exists('..\..\packages\librdkafka.redist.0.11.3\build\librdkafka.redist.props')" />
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{BD4B0624-03A2-4896-B46E-4EB35E9EFE6C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Sentry.Messaging.Common</RootNamespace>
+    <AssemblyName>Sentry.Messaging.Common</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Confluent.Kafka, Version=0.11.3.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Confluent.Kafka.0.11.3\lib\net45\Confluent.Kafka.dll</HintPath>
+    </Reference>
+    <Reference Include="DnsClient, Version=1.0.7.0, Culture=neutral, PublicKeyToken=4574bb5573c51424, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\DnsClient.1.0.7\lib\net45\DnsClient.dll</HintPath>
+    </Reference>
+    <Reference Include="log4net, Version=1.2.14.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\log4net.2.0.4\lib\net45-full\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Bson, Version=2.6.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MongoDB.Bson.2.6.1\lib\net45\MongoDB.Bson.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver, Version=2.6.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MongoDB.Driver.2.6.1\lib\net45\MongoDB.Driver.dll</HintPath>
+    </Reference>
+    <Reference Include="MongoDB.Driver.Core, Version=2.6.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\MongoDB.Driver.Core.2.6.1\lib\net45\MongoDB.Driver.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Sentry.Common, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Sentry.Common.1.4.0\lib\net452\Sentry.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.1.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Buffers.4.3.0\lib\netstandard1.1\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.InteropServices.RuntimeInformation, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Runtime.InteropServices.RuntimeInformation.4.0.0\lib\net45\System.Runtime.InteropServices.RuntimeInformation.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Class1.cs" />
+    <Compile Include="Messaging\BaseConsumptionService.cs" />
+    <Compile Include="Messaging\BaseEventMessage.cs" />
+    <Compile Include="Messaging\Interfaces\IMessageConsumer.cs" />
+    <Compile Include="Messaging\Interfaces\IMessageHandler.cs" />
+    <Compile Include="Messaging\Interfaces\IPublishable.cs" />
+    <Compile Include="Messaging\Kafka\BaseKafkaConsumer.cs" />
+    <Compile Include="Messaging\Kafka\CreateRawMessageKafkaConsumer.cs" />
+    <Compile Include="Messaging\Kafka\KafkaMessagePublisher.cs" />
+    <Compile Include="Messaging\Kafka\KafkaSettings.cs" />
+    <Compile Include="Messaging\Kafka\RawMessageKafkaConsumer.cs" />
+    <Compile Include="TransactionTracking\Streaming\MetadataProcessorKafkaConsumer.cs" />
+    <Compile Include="TransactionTracking\Streaming\MessageTransactionMongoConsumer.cs" />
+    <Compile Include="Messaging\RawMessage.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueueStatistics\BaseClasses\MongoAccessorComponent.cs" />
+    <Compile Include="QueueStatistics\Management\Implementation\MongoDbQueueStatisticManager.cs" />
+    <Compile Include="QueueStatistics\Management\IQueueStatisticManager.cs" />
+    <Compile Include="QueueStatistics\QueueConsumerStatistic.cs" />
+    <Compile Include="QueueStatistics\QueueProducerStatistic.cs" />
+    <Compile Include="QueueStatistics\QueueStatistic.cs" />
+    <Compile Include="QueueStatistics\Recording\EmptyQueueStatCommandProcessor.cs" />
+    <Compile Include="QueueStatistics\Recording\MongoDBQueueStatCommandProcessor.cs" />
+    <Compile Include="TransactionTracking\Access\MessageTransactionTrackingAccess.cs" />
+    <Compile Include="TransactionTracking\BaseTransaction.cs" />
+    <Compile Include="TransactionTracking\Implementations\ComboMessageTracker.cs" />
+    <Compile Include="TransactionTracking\Implementations\EmptyMessageTracker.cs" />
+    <Compile Include="TransactionTracking\Implementations\KafkaMessageTracker.cs" />
+    <Compile Include="TransactionTracking\Implementations\MessageTransaction.cs" />
+    <Compile Include="TransactionTracking\Implementations\MessageTransactionLite.cs" />
+    <Compile Include="TransactionTracking\Implementations\MongoDBMessageTracker.cs" />
+    <Compile Include="TransactionTracking\Implementations\TrackableMessage.cs" />
+    <Compile Include="TransactionTracking\Interfaces\IMessageTracker.cs" />
+    <Compile Include="TransactionTracking\Interfaces\ITrackableMessage.cs" />
+    <Compile Include="TransactionTracking\MessageTrackingCodes.cs" />
+    <Compile Include="TransactionTracking\Streaming\MessageTransactionKafkaConsumer.cs" />
+    <Compile Include="TransactionTracking\Streaming\MetadataProcessorService.cs" />
+    <Compile Include="TransactionTracking\Streaming\TransactionConsumptionService.cs" />
+    <Compile Include="Utility.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\Sentry.DataRetentionPolicy\Sentry.DataRetentionPolicy.vbproj">
+      <Project>{610322a0-693d-4e38-a94c-236b5b2ace05}</Project>
+      <Name>Sentry.DataRetentionPolicy</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Sentry.AsyncCommandProcessor\Sentry.AsyncCommandProcessor.csproj">
+      <Project>{1995839b-6107-45df-84be-4bc4606dc530}</Project>
+      <Name>Sentry.AsyncCommandProcessor</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\packages\librdkafka.redist.0.11.3\build\librdkafka.redist.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\packages\librdkafka.redist.0.11.3\build\librdkafka.redist.props'))" />
+  </Target>
+</Project>
