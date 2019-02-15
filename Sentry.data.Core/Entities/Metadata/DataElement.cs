@@ -149,6 +149,18 @@ namespace Sentry.data.Core
                 SetDataElementDetailValue("HiveTableStatus", value);
             }
         }
+        public virtual string HiveLocation
+        {
+            get
+            {
+                DataElementDetail detail = GetElementDetail("HiveLocation");
+                return (detail == null) ? null : detail.DataElementDetailType_VAL;
+            }
+            set
+            {
+                SetDataElementDetailValue("HiveLocation", value);
+            }
+        }
         public virtual string StorageCode
         {
             get

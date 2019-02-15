@@ -203,6 +203,7 @@ namespace Sentry.data.Web.Controllers
 
             Dataset ds = _datasetContext.GetById<Dataset>(dfcm.DatasetId);
 
+            string storageCode = _datasetContext.GetNextStorageCDE().ToString();
             DataElement de = new DataElement()
             {
                 DataElementCreate_DTM = DateTime.Now,
@@ -219,10 +220,11 @@ namespace Sentry.data.Web.Controllers
                 Delimiter = dfcm.Delimiter,
                 HasHeader = dfcm.HasHeader,
                 FileFormat = _datasetContext.GetById<FileExtension>(dfcm.FileExtensionID).Name.Trim(),
-                StorageCode = _datasetContext.GetNextStorageCDE().ToString(),
+                StorageCode = storageCode,
                 HiveDatabase = "Default",
                 HiveTable = ds.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dfcm.ConfigFileName.Replace(" ", "").ToUpper(),
-                HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString()
+                HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
+                HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
             };
 
             return de;
@@ -1457,7 +1459,8 @@ namespace Sentry.data.Web.Controllers
                         StorageCode = storageCode,
                         HiveDatabase = "Default",
                         HiveTable = dfc.ParentDataset.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dfc.Name.Replace(" ", "").ToUpper(),
-                        HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString()
+                        HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
+                        HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
                     };
 
                     dfc.Schema.Add(de);
