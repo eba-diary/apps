@@ -92,15 +92,6 @@ data.Report = {
             window.location = data.Report.CancelLink($(this).data("id"));
         });
 
-        $(".detailNameLink").click(function () {
-            var artifactLink = $(this).data('ArtifactLink');
-            var locationType = $(this).data('LocationType');
-            if (locationType === 'file') {
-                artifactLink = encodeURI(artifactLink);
-            }
-            data.Report.OpenReport(locationType, artifactLink);
-        });
-
         $("#FileTypeId").change(function () {
             data.Report.SetGetLatestPanel($(this).val());
         });
@@ -109,7 +100,18 @@ data.Report = {
     },
 
     DetailInit: function () {
-        /// Initialize the dataset detail page for data assets
+
+        // Initialize the dataset detail page
+
+        $(".detailNameLink").click(function () {
+            var artifactLink = $(this).data('artifactlink');
+            var locationType = $(this).data('locationtype');
+            if (locationType === 'file') {
+                artifactLink = encodeURI(artifactLink);
+            }
+            data.Report.OpenReport(locationType, artifactLink);
+        });
+
         $("[id^='EditDataset_']").off('click').on('click', function (e) {
             e.preventDefault();
             window.location = "/BusinessIntelligence/Edit/?" + "id=" + encodeURI($(this).data("id"));

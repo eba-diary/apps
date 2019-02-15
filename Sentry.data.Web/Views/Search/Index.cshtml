@@ -7,71 +7,76 @@
     @Html.AntiForgeryToken()
 }
 
-<div id="search-pg-wrapper" class="container-fluid">
+<div id="search-pg-wrapper">
+
     <div class="row">
 
         @* filters *@
-        <div id="search-pg-filters" class="col-lg-2 col-md-3 hidden-sm hidden-xs">
-            <p id="filter-by-label" style="display: none;">Filter by:</p>
-            <div id="filterColumn" style="display:none;">
-                <!-- ko foreach: AllFilters -->
-                @* category header *@
-                <div class="panel panel-default dataset-list-filters">
-                    <div class="panel-heading filterHead" data-bind="attr: { id: HeadId }">
-                        <strong data-bind="text : Name"></strong>
-                        <span class="glyphicon glyphicon-chevron-down rightFloat filterViewIcon" data-bind="attr: { id: HeadIcon }"></span>
-                    </div>
+        <div class="hidden-xs hidden-sm col-md-3 col-lg-3">
+            <div id="search-pg-filters">
 
-                    @* foreach of the category filters *@
-                    <div class="dataset-list-filter-category panel-body" data-bind="attr: {id : HeadHide }" style="display: none;">
-                        <!-- ko if: OrderedFilters().length > 0 -->
-                        <ul class="list-unstyled ul-filter-list">
+                @*<p id="filter-by-label" style="display: none;">Filter by:</p>*@
+                <div id="filterColumn" style="display:none;">
+                    <!-- ko foreach: AllFilters -->
+                    @* category header *@
+                    <div class="panel panel-default dataset-list-filters">
+                        <div class="panel-heading filterHead" data-bind="attr: { id: HeadId }">
+                            <span class="filterCategoryName" data-bind="text : Name"></span>
+                            <span class="glyphicon glyphicon-chevron-down rightFloat filterViewIcon" data-bind="attr: { id: HeadIcon }"></span>
+                        </div>
 
-                            <!-- ko foreach: OrderedFilters -->
-                            <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6">
-                                <label data-bind="attr: { id: id }">
-                                    <input type="checkbox" class="filterChbx"
-                                           data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }" />
-                                    <strong data-bind="text : Title"></strong>
-                                    <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
-                                </label>
-                            </li>
+                        @* foreach of the category filters *@
+                        <div class="dataset-list-filter-category panel-body" data-bind="attr: {id : HeadHide }" style="display: none;">
+                            <!-- ko if: OrderedFilters().length > 0 -->
+                            <ul class="list-unstyled ul-filter-list">
+
+                                <!-- ko foreach: OrderedFilters -->
+                                <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6">
+                                    <label data-bind="attr: { id: id }">
+                                        <input type="checkbox" class="filterChbx"
+                                               data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }" />
+                                        <strong data-bind="text : Title"></strong>
+                                        <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
+                                    </label>
+                                </li>
+                                <!-- /ko -->
+
+                                <li data-bind="attr: {id : HiddenMore}">
+                                    <!-- ko foreach: OrderedFilters -->
+                                    <ul class="notNested">
+                                        <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() >= 6">
+                                            <label data-bind="attr: { id: id }">
+                                                <input type="checkbox" class="filterChbx"
+                                                       data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }" />
+                                                <strong data-bind="text : Title"></strong>
+                                                <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                    <!-- /ko -->
+                                </li>
+
+                            </ul>
+                            <!-- /ko -->
+                            <!-- ko if: OrderedFilters().length > 6 -->
+                            <a href="#" class="filterMore" data-bind="attr: { id:  HiddenId}">
+                                <div class="glyphicon glyphicon-plus-sign inlineBlock moreIcon leftFloat" data-bind="attr : {id : IconMore}"></div>
+                                <div class="leftFloat txt_filterMore" data-bind="attr: {id: TxtMore}">Show More</div>
+                            </a>
                             <!-- /ko -->
 
-                            <li data-bind="attr: {id : HiddenMore}">
-                                <!-- ko foreach: OrderedFilters -->
-                                <ul class="notNested">
-                                    <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() >= 6">
-                                        <label data-bind="attr: { id: id }">
-                                            <input type="checkbox" class="filterChbx"
-                                                   data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }" />
-                                            <strong data-bind="text : Title"></strong>
-                                            <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
-                                        </label>
-                                    </li>
-                                </ul>
-                                <!-- /ko -->
-                            </li>
-
-                        </ul>
-                        <!-- /ko -->
-                        <!-- ko if: OrderedFilters().length > 6 -->
-                        <a href="#" class="filterMore" data-bind="attr: { id:  HiddenId}">
-                            <div class="glyphicon glyphicon-plus-sign inlineBlock moreIcon leftFloat" data-bind="attr : {id : IconMore}"></div>
-                            <div class="leftFloat txt_filterMore" data-bind="attr: {id: TxtMore}">Show More</div>
-                        </a>
-                        <!-- /ko -->
-
+                        </div>
                     </div>
+
+                    <!-- /ko -->
                 </div>
 
-                <!-- /ko -->
             </div>
         </div>
 
-        <div class="col-lg-2 col-md-3 hidden-sm hidden-xs">@* placeholder (keep empty) *@</div>
+        @* main content *@
+        <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
 
-        <div id="main" class="col-lg-10 col-md-9 col-sm-9 fill">
             <div id="search-pg-content-wrapper">
                 @* page title *@
                 <div class="listHeadGroup">
@@ -174,7 +179,7 @@
                                         <span data-bind="text: DatasetDesc"></span>
 
 
-                                        @*TESTING ONLY - REMOVE THIS CHUNCK*@
+                                        @*TESTING ONLY - REMOVE THIS CHUNK*@
                                         <br />
                                         <span>Tags: </span>
                                         <!-- ko foreach: Tags -->
@@ -186,6 +191,7 @@
                                         <br />
                                         <span>Functions: </span>
                                         <span data-bind="text: DatasetFunctions"></span>
+
 
                                     </div>
                                 </div>
@@ -267,9 +273,15 @@
                     </div>
                 </div>
             </div>
+
         </div>
+
     </div>
+
 </div>
+
+
+
 
 @section Scripts {
     <script>
@@ -332,35 +344,36 @@
             return FilterExhibits(window.vm.datasets(), "0", selectedFilters);
         }
 
-        function FilterCategory(Name, Filters) {
-            var self = this;
+        //function FilterCategory(Name, Filters, Sequence) {
+        //    var self = this;
 
-            self.Name = Name;
+        //    self.Name = Name;
+        //    self.Sequence = Sequence;
 
-            self.Filters = ko.observableArray(Filters);
+        //    self.Filters = ko.observableArray(Filters);
 
-            self.HiddenId = 'filterMore_' + Name.replace(' ', '_');
-            self.HiddenMore = 'hidden_filterMore_' + Name.replace(' ', '_');
-            self.IconMore = 'icon_filterMore_' + Name.replace(' ', '_');
-            self.TxtMore = 'txt_filterMore_' + Name.replace(' ', '_');
+        //    self.HiddenId = 'filterMore_' + Name.replace(' ', '_');
+        //    self.HiddenMore = 'hidden_filterMore_' + Name.replace(' ', '_');
+        //    self.IconMore = 'icon_filterMore_' + Name.replace(' ', '_');
+        //    self.TxtMore = 'txt_filterMore_' + Name.replace(' ', '_');
 
-            self.HeadId = 'filterType_' + Name.replace(' ', '_');
-            self.HeadIcon = 'icon_filterType_' + Name.replace(' ', '_');
-            self.HeadHide = 'hide_filterType_' + Name.replace(' ', '_');
+        //    self.HeadId = 'filterType_' + Name.replace(' ', '_');
+        //    self.HeadIcon = 'icon_filterType_' + Name.replace(' ', '_');
+        //    self.HeadHide = 'hide_filterType_' + Name.replace(' ', '_');
 
-            self.OrderedFilters = ko.computed(function () {
+        //    self.OrderedFilters = ko.computed(function () {
 
-                var list = ko.utils.arrayFilter(self.Filters(), function (prod) {
-                    return prod;
-                });
+        //        var list = ko.utils.arrayFilter(self.Filters(), function (prod) {
+        //            return prod;
+        //        });
 
-                //Sort the list alphabetically and show them to the user.
-                return list.sort(function (left, right) {
-                    return left.Title == right.Title ? 0 : (left.Title < right.Title ? -1 : 1)
-                });
-            });
+        //        //Sort the list alphabetically and show them to the user.
+        //        return list.sort(function (left, right) {
+        //            return left.Title == right.Title ? 0 : (left.Title < right.Title ? -1 : 1)
+        //        });
+        //    });
 
-        }
+        //}
 
         function Dataset(data) {
             var self = this;
@@ -576,7 +589,7 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new FilterCategory('Category', temp));
+                self.AllFilters.push(new data.Search.FilterCategory('Category', temp, 1));
                 temp = [];
 
 
@@ -601,7 +614,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Sentry Owner', temp));
+                self.AllFilters.push(new data.Search.FilterCategory('Sentry Owner', temp, 2));
                 temp = [];
 
 
@@ -627,7 +640,12 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Extension', temp));
+                self.AllFilters.push(new data.Search.FilterCategory('Extension', temp, 3));
+
+                // sort the filters by Sequence
+                self.AllFilters.sort(function (left, right) {
+                    return left.Sequence - right.Sequence;
+                });
             };
 
             self.PopulateExhibitFilters = function (exhibits) {
@@ -660,7 +678,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Category', temp));
+                self.AllFilters.push(new data.Search.FilterCategory('Category', temp, 1));
                 temp = [];
 
 
@@ -686,7 +704,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Business Unit', temp));
+                self.AllFilters.push(new data.Search.FilterCategory('Business Unit', temp, 2));
                 temp = [];
 
 
@@ -712,7 +730,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Function', temp));
+                self.AllFilters.push(new data.Search.FilterCategory('Function', temp, 3));
                 temp = [];
 
 
@@ -738,7 +756,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Report Type', temp));
+                self.AllFilters.push(new data.Search.FilterCategory('Report Type', temp, 4));
                 temp = [];
 
 
@@ -794,11 +812,15 @@
                         temp = item.Filters().concat(temp);
                         ko.utils.arrayRemoveItem(self.AllFilters(), item);
                     }
-                    self.AllFilters.push(new FilterCategory(group, temp));
+                    self.AllFilters.push(new data.Search.FilterCategory(group, temp, 5));
 
                     temp = [];
                 }
 
+                // sort the filters by Sequence
+                self.AllFilters.sort(function (left, right) {
+                    return left.Sequence - right.Sequence;
+                });
             };
 
             self.PopulateGenericFilters = function (allObjects) {
@@ -835,7 +857,7 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new FilterCategory('Category', temp));
+                self.AllFilters.push(new data.Search.FilterCategory('Category', temp, 1));
                 temp = [];
 
 
@@ -860,7 +882,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Business Unit', temp));
+                self.AllFilters.push(new data.Search.FilterCategory('Business Unit', temp, 2));
 
 
                 //SENTRYOWNER FILTER
@@ -884,7 +906,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Sentry Owner', temp));
+                self.AllFilters.push(new data.Search.FilterCategory('Sentry Owner', temp, 3));
                 temp = [];
 
 
@@ -910,7 +932,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Extension', temp));
+                self.AllFilters.push(new data.Search.FilterCategory('Extension', temp, 4));
 
                 //TAG FILTER
                 counter = 0; //Needs seperate counter as multiple objects can appear per iteration
@@ -938,8 +960,13 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Tag', temp));
+                self.AllFilters.push(new data.Search.FilterCategory('Tag', temp, 5));
                 temp = [];
+
+                // sort the filters by Sequence
+                self.AllFilters.sort(function (left, right) {
+                    return left.Sequence - right.Sequence;
+                });
             };
 
             self.RemoveSelection = function (id) {
@@ -991,16 +1018,9 @@
 
                 self.populateFilters();
 
-                $('#dataColumn').show();
-                $('#filter-by-label').show();
-                $('#filterColumn').show();
-                $('.sentry-spinner-container').remove();
-                $(".select2-container--default").css('width', '100%');
-                $('#filterSelector').val(self.SelectedFilters()).trigger('change');
+                data.Search.SetInitialDisplay();
 
-                // have the first filter option expanded by default
-                $("#filterColumn .panel:first-child .filterViewIcon").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-up");
-                $("#filterColumn .panel:first-child .dataset-list-filter-category").show();
+                $('#filterSelector').val(self.SelectedFilters()).trigger('change');
             });
 
             self.searchResults = ko.computed(function () {

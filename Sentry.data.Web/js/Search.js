@@ -41,7 +41,7 @@ data.Search = {
             $(show).slideToggle();
             $(icon).toggleClass("glyphicon-plus-sign glyphicon-minus-sign");
 
-            if ($(txt).text() == "Show Less") {
+            if ($(txt).text() === "Show Less") {
                 $(txt).text("Show More");
             }
             else {
@@ -85,10 +85,6 @@ data.Search = {
             $(this).toggleClass("glyphicon-star glyphicon-star-empty");
 
         });
-        
-
-        // remove the "container" class from the parent object so the fluid container takes affect
-        $("#search-pg-wrapper").parent().removeClass("container");
 
         // mouseover effect to change the background color of the search results tile
         $(".ul-dataset-list-item").on("mouseenter", function () {
@@ -248,6 +244,57 @@ data.Search = {
             default:
                 return items;
         }
+    },
+
+    SetInitialDisplay: function () {
+
+        $('#dataColumn').show();
+        $('#filter-by-label').show();
+        $('#filterColumn').show();
+        $('.sentry-spinner-container').remove();
+        $(".select2-container--default").css('width', '100%');
+
+        // have the first filter section expanded by default
+        $("#filterColumn .panel:first-child .filterViewIcon").removeClass("glyphicon-chevron-down").addClass("glyphicon-chevron-up");
+        $("#filterColumn .panel:first-child .dataset-list-filter-category").show();
+
+        // set the height of the filters <div> dynamically
+        $("#search-pg-filters").height(
+            $(window).height() - $(".sentry-navbar").height() - 30
+        );
+
+    },
+
+    FilterCategory: function (Name, Filters, Sequence) {
+
+        var self = this;
+
+        self.Name = Name;
+        self.Sequence = Sequence;
+
+        self.Filters = ko.observableArray(Filters);
+
+        self.HiddenId = 'filterMore_' + Name.replace(' ', '_');
+        self.HiddenMore = 'hidden_filterMore_' + Name.replace(' ', '_');
+        self.IconMore = 'icon_filterMore_' + Name.replace(' ', '_');
+        self.TxtMore = 'txt_filterMore_' + Name.replace(' ', '_');
+
+        self.HeadId = 'filterType_' + Name.replace(' ', '_');
+        self.HeadIcon = 'icon_filterType_' + Name.replace(' ', '_');
+        self.HeadHide = 'hide_filterType_' + Name.replace(' ', '_');
+
+        self.OrderedFilters = ko.computed(function () {
+
+            var list = ko.utils.arrayFilter(self.Filters(), function (prod) {
+                return prod;
+            });
+
+            //Sort the list alphabetically and show them to the user.
+            return list.sort(function (left, right) {
+                return left.Title === right.Title ? 0 : (left.Title < right.Title ? -1 : 1)
+            });
+        });
+
     }
     
 };

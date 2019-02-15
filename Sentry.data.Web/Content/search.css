@@ -1,11 +1,18 @@
-﻿#search-pg-wrapper .listHeadGroup {
-    display: block;
-    margin: 0px 0px 30px 0px;
+﻿#search-pg-wrapper {
+    padding-top: 10px;
 }
-    #search-pg-wrapper .listHeadGroup div {
-        display: inline-block;
-        vertical-align: middle;
+    #search-pg-wrapper .listHeadGroup {
+        display: block;
+        margin: 0px 0px 20px 0px;
     }
+        #search-pg-wrapper .listHeadGroup div {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+#search-pg-filters {
+    overflow-x: hidden;
+}
 
 #search-pg-filters #filter-by-label {
     color: #53565a;
@@ -16,6 +23,8 @@
 
 #search-pg-filters #filterColumn {
     border-top: 1px solid #ebebeb;
+    border-left: 1px solid #ebebeb;
+    border-right: 1px solid #ebebeb;
 }
 
 #search-pg-filters .panel {
@@ -28,9 +37,16 @@
     font-size: 16px;
     background-color: #fff !important;
     border: none !important;
-    text-transform: uppercase;
-    color: #285780 !important;
     margin: 8px 0px 8px 8px;
+}
+    .filterHead .glyphicon {
+        color: #003da5;
+    }
+
+.filterCategoryName {
+    font-size: 18px;
+    color: #003da5;
+    font-family: "KievitSlabWeb W03","Lucida Sans",serif;
 }
 
 .filter-tile-count {
@@ -109,23 +125,4 @@
 #pagination-wrapper {
     display: inline-block;
     vertical-align: middle;
-}
-
-@media (min-width: 767px) {
-    #search-pg-filters {
-        height: 100%;
-        overflow-x: hidden;
-        position: fixed;
-        z-index: 1;
-        top: 0;
-        left: 0;
-        padding-top: 140px;
-        border-right: 1px solid #ebebeb;
-        background-color: #fff;
-        padding-left: 0px;
-        padding-right: 0px;
-    }
-    #search-pg-content-wrapper {
-        padding-left: 40px;
-    }
 }
