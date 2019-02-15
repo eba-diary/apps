@@ -110,7 +110,7 @@ namespace Sentry.data.Core
             }
             if (string.IsNullOrWhiteSpace(UploadUserName))
             {
-                vr.Add(GlobalConstants.ValidationErrors.UPLOAD_USER_NAME_IS_BLANK, "The Dataset UPload User Name is required");
+                vr.Add(GlobalConstants.ValidationErrors.UPLOAD_USER_NAME_IS_BLANK, "The Dataset Upload User Name is required");
             }
             if (!Regex.IsMatch(PrimaryOwnerId, "(^[0-9]{6,6}$)"))
             {

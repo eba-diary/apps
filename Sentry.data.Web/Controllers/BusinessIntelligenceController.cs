@@ -43,9 +43,9 @@ namespace Sentry.data.Web.Controllers
             BusinessIntelligenceModel cdm = new BusinessIntelligenceModel
             {
                 DatasetId = 0,
-                CreationUserName = SharedContext.CurrentUser.AssociateId,
-                UploadUserName = SharedContext.CurrentUser.AssociateId,
-                BusinessObjectsEnumValue = (int)ReportType.BusinessObjects
+                BusinessObjectsEnumValue = (int)ReportType.BusinessObjects,
+                CreationUserId = SharedContext.CurrentUser.AssociateId,
+                UploadUserId = SharedContext.CurrentUser.AssociateId,
             };
 
             ReportUtility.SetupLists(_datasetContext, cdm);
