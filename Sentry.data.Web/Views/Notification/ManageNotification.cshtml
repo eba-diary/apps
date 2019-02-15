@@ -16,7 +16,16 @@
 {
     <div class="form-group">
         <div>
-            <a href="~/Notification/CreateNotification" class="btn btn-md btn-info">Create New Notification</a>
+            <a href="~/Notification/ModifyNotification" class="btn btn-md btn-info">Create New Notification</a>
+        </div>
+    </div>
+    <hr />
+}
+else
+{
+    <div class="form-group">
+        <div>
+            <a href="~/Notification/AccessRequest" class="btn btn-md btn-info">Request Access</a>
         </div>
     </div>
     <hr />
@@ -25,18 +34,17 @@
 
 <div>
     <div id="hide_detailSectionHeader_AssetNotification">
-        <table class="table table-striped table-bordered " id="assetnotificationTable">
+        <table class="table table-striped table-bordered " id="notificationTable">
             <thead>
                 <tr>
                     <th></th>
                     <th>Edit</th>
                     <th>Active</th>
-                    <th>Parent Asset Name</th>
-                    @*<th>Create User</th>*@
-                    <th>Start Time</th>
+                    <th>Notified Area</th>
+                    <th>Created By</th>
+                    <th>Effective Time</th>
                     <th>Expiration Time</th>
                     <th>Message Severity</th>
-                    <th>Message</th>
                 </tr>
             </thead>
             <tbody></tbody>
@@ -50,7 +58,7 @@
     @Scripts.Render("~/bundles/dataTables")
     <script>
         $(function () {
-            data.ManageAssetAlert.Init();
+            data.ManageNotification.Init();
         });
     </script>
 

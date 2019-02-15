@@ -5,6 +5,7 @@ using System.Web.Http;
 using Sentry.data.Core;
 using Sentry.Core;
 using Sentry.data.Web.Filters.AuthorizationFilters;
+using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -58,7 +59,7 @@ namespace Sentry.data.Web.Controllers
                     Message = message,
                     StartTime = DateTime.Now,
                     ExpirationTime = DateTime.MaxValue,
-                    MessageSeverity = severity,
+                    MessageSeverity = (NotificationSeverity)Enum.ToObject(typeof(NotificationSeverity), severity),
                     ParentDataAsset = _dataAssetContext.GetDataAsset(assetName)
                 };
 

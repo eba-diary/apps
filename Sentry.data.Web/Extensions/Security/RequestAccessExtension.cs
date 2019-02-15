@@ -12,7 +12,7 @@ namespace Sentry.data.Web
         {
             return new Core.AccessRequest()
             {
-                DatasetId = model.DatasetId,
+                DatasetId = model.SecurableObjecttId,
                 AdGroupName = model.AdGroupName,
                 BusinessReason = model.BusinessReason,
                 SelectedPermissionCodes = model.SelectedPermissions != null ? model.SelectedPermissions.Split(',').ToList() : new List<string>(),
@@ -26,8 +26,8 @@ namespace Sentry.data.Web
 
             return new AccessRequestModel()
             {
-                DatasetId = core.DatasetId,
-                DatasetName = core.DatasetName,
+                SecurableObjecttId = core.DatasetId,
+                SecurableObjectName = core.DatasetName,
                 AllPermissions = core.Permissions.ToModel(),
                 AllApprovers = Utility.BuildSelectListitem(core.ApproverList, "Select an approver")
             };

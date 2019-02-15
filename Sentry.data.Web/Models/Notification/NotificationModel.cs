@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Sentry.data.Core;
 using System.ComponentModel;
 using System.Web.Mvc;
+using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Web
 {
@@ -19,11 +19,12 @@ namespace Sentry.data.Web
         [DisplayName("Start Time")] public DateTime StartTime { get; set; }
         [DisplayName("Creator")] public string CreateUser { get; set; }
         [DisplayName("Severity")] public NotificationSeverity MessageSeverity { get; set; }
-        [DisplayName("Asset")] public List<int> DataAssetId { get; set; }
+        [DisplayName("Asset")] public int DataAssetId { get; set; }
         [DisplayName("Message")] public string Message { get; set; }
 
-        public string MessageSeverityTag { get; set; }
         public Boolean IsActive { get; set; }
+        public string DataAssetName { get; set; }
+        public string MessageSeverityDescription { get; set; }
 
         public IEnumerable<SelectListItem> AllDataAssets { get; set; }
         public IEnumerable<SelectListItem> AllSeverities { get; set; }

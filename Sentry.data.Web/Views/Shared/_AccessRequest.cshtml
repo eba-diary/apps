@@ -17,25 +17,33 @@
 
     </div>
 
-    @Html.HiddenFor(model => model.DatasetId)
-    <div class="form-group">
-        @Html.LabelFor(m => m.DatasetName, new { @class = "col-md-2 control-label" })
-        <div class="col-md-10">
-            @Html.TextBoxFor(model => model.DatasetName, new { @disabled = "disabled", @class = "form-control edit-dataset-row" })
+    @if (Model.SecurableObjectName == Sentry.data.Core.GlobalConstants.SecurableEntityName.DATASET)
+    {
+        @Html.HiddenFor(model => model.SecurableObjecttId)
+        <div class="form-group">
+            <label class="col-md-2 control-label">@Model.SecurableObjectLabel</label>
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.SecurableObjectName, new { @disabled = "disabled", @class = "form-control edit-dataset-row" })
+            </div>
         </div>
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(m => m.AdGroupName, new { @class = "col-md-2 control-label" })
-        <div class="col-md-10">
-            @Html.TextBoxFor(model => model.AdGroupName, new { @class = "form-control edit-dataset-row" })
+        <div class="form-group">
+            @Html.LabelFor(m => m.AdGroupName, new { @class = "col-md-2 control-label" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.AdGroupName, new { @class = "form-control edit-dataset-row" })
+            </div>
         </div>
-    </div>
-    @*<div class="form-group">
-        @Html.LabelFor((model) => model.AdGroupName, new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.DropDownListFor((model) => model.AdGroupName, Model.AllAdGroups, new { @class = "form-control edit-dataset-row" })
+    }
+    else if(Model.SecurableObjectName == Sentry.data.Core.GlobalConstants.SecurableEntityName.DATA_ASSET)
+    {
+        <div class="form-group">
+            <label class="col-md-2 control-label">@Model.SecurableObjectLabel</label>
+            <div class="col-md-10">
+                @Html.DropDownListFor((model) => model.SecurableObjecttId, Model.AllAdGroups, new { @class = "form-control edit-dataset-row" })
+            </div>
         </div>
-    </div>*@
+    }
+
+
     <div class="form-group">
         @Html.LabelFor(m => m.BusinessReason, new { @class = "col-md-2 control-label" })
         <div class="col-md-10">
@@ -61,7 +69,7 @@
                     <input type="checkbox" value="@item.PermissionName" data-code="@item.PermissionCode" />
                     <span class="checkmark"></span>
                 </label>
-                
+
             </div>
         }
     </div>
@@ -70,7 +78,7 @@
 
     <div class="modal-footer">
         <div id="accessRequestSpinner"></div>
-        <input type="submit" class="btn btn-primary" id="SubmitAccessRequestButton" data-id="@Model.DatasetId" value="Request Access" />
+        <input type="submit" class="btn btn-primary" id="SubmitAccessRequestButton" data-id="@Model.SecurableObjecttId" value="Request Access" />
         <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
     </div>
 }

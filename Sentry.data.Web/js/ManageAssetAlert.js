@@ -2,15 +2,20 @@
  * Javascript methods for the Manage Asset Alert Page
  ******************************************************************************************/
 
-data.ManageAssetAlert = {
+data.ManageNotification = {
 
     Init: function () {
-        data.ManageAssetAlert.AssetNotificationTableInit();
+        data.ManageNotification.NotificationTableInit();
+
+        $("[id^='RequestAccessButton']").off('click').on('click', function (e) {
+            e.preventDefault();
+            data.AccessRequest.Init("/Notification/AccessRequest");
+        });
     },
 
 
-    AssetNotificationTableInit: function () {
-        $('#assetnotificationTable tbody').on('click', 'td.details-control', function () {
+    NotificationTableInit: function () {
+        $('#notificationTable tbody').on('click', 'td.details-control', function () {
             var tr = $(this).closest('tr');
             var row = table.row(tr);
 
@@ -21,41 +26,40 @@ data.ManageAssetAlert = {
             }
             else {
                 // Open this row
-                row.child(data.ManageAssetAlert.formatAssetNotificationTableDetails(row.data())).show();
+                //ajax out to server to render the partial view and throw the html into the child row.
+                row.child(data.ManageNotification.formatAssetNotificationTableDetails(row.data())).show();
                 tr.addClass('shown');
             }
         });
 
-        $("#assetnotificationTable").DataTable({
+        $("#notificationTable").DataTable({
             autoWidth: true,
             serverSide: true,
-            processing: true,
+            processing: false,
             searching: false,
             paging: true,
             ajax: {
-                url: "/DataAsset/GetAssetNotificationInfoForGrid/?Id=0",
+                url: "/Notification/GetNotificationInfoForGrid/",
                 type: "POST"
             },
             columns: [
-                        { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px" },
-                        { data: "EditHref", className: "editConfig", width: "20px" },
-                        { data: "IsActive", className: "isActive", render: function (data, type, row) { return data === true ? '<span class="glyphicon glyphicon-ok"> </span>' : '<span class="glyphicon glyphicon-remove"></span>'; } },
-                        //{ data: "NotificationId", className: "notificationId" },
-                        { data: "ParentDataAssetName", className: "parentDataAssetName" },
-                        //{ data: "DisplayCreateUser.FullName", className: "displayCreateUser" },
-                        { data: "StartTime", className: "startTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
-                        { data: "ExpirationTime", className: "expirationTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
-                        { data: "MessageSeverityTag", className: "messageSeverityTag" },
-                        { data: "Message", className: "message" }
+                { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px" },
+                { data: null, className: "editConfig", width: "20px", render: function (data) { return '<a href=\"/Notification/ModifyNotification?notificationId=' + data.NotificationId + '\">Edit</a>'; } },
+                { data: "IsActive", className: "isActive", render: function (data) { return data === true ? 'Yes' : 'No'; } },
+                { data: "DataAssetName", className: "parentDataAssetName" },
+                { data: "CreateUser", className: "displayCreateUser" },
+                { data: "StartTime", className: "startTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
+                { data: "ExpirationTime", className: "expirationTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
+                { data: "MessageSeverityDescription", className: "messageSeverityTag" }
             ],
-            order: [[2, 'desc'],[4, 'desc']]
+            order: [[2, 'desc'], [5, 'desc']]
         });
 
 
         // DataTable
-        var table = $('#assetnotificationTable').DataTable();
+        var table = $('#notificationTable').DataTable();
 
-        $('#assetnotificationTable tbody').on('click', 'tr', function () {
+        $('#notificationTable tbody').on('click', 'tr', function () {
             if ($(this).hasClass('active')) {
                 $(this).removeClass('active');
             }
@@ -65,23 +69,19 @@ data.ManageAssetAlert = {
             }
         });
 
-
-        $("#Add_Notification").click(function () {
-            data.ManageAssetAlert.CreateNotification();
-        });
     },
 
     formatAssetNotificationTableDetails: function (d) {
         // `d` is the original data object for the row
         return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
             '<tr>' +
-                '<td><b>Notification ID</b>:</td>' +
-                '<td>' + d.NotificationId + '</td>' +
+            '<td><b>Notification ID</b>:</td>' +
+            '<td>' + d.NotificationId + '</td>' +
             '</tr>' +
             '<tr>' +
-                '<td><b>Creator</b>: </td>' +
-                '<td>' + d.DisplayCreateUser.FullName + '</td>' +
+            '<td><b>Creator</b>: </td>' +
+            '<td>' + d.CreateUser + '</td>' +
             '</tr>' +
-        '</table>';
+            '</table>';
     }
-}
+};

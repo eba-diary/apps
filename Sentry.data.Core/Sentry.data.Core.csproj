@@ -208,7 +208,7 @@
     <Compile Include="Entities\Datasets\DatasetScopeTypes.cs" />
     <Compile Include="Entities\User\DomainUser.cs" />
     <Compile Include="Entities\Datasets\FileType.cs" />
-    <Compile Include="Entities\DataAssets\NotificationSeverity.cs" />
+    <Compile Include="GlobalEnums\NotificationSeverity.cs" />
     <Compile Include="Entities\Subscriptions\EventType.cs" />
     <Compile Include="Entities\Subscriptions\Interval.cs" />
     <Compile Include="Entities\Subscriptions\Status.cs" />

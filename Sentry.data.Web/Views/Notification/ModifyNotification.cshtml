@@ -1,31 +1,27 @@
 ﻿@model Sentry.data.Web.NotificationModel
 @{
-    ViewBag.Title = "Create Asset Notification";
+    ViewBag.Title = "Create Notification";
 }
 
 <div class="topBanner">
     <div>
-        <a class="backToList" href="/DataAsset/ManageAssetNotification"><span class="glyphicon glyphicon-chevron-left"></span>Back to Previous Page</a>
+        <a class="backToList" href="/Notification/ManageNotification"><span class="glyphicon glyphicon-chevron-left"></span>Back to Previous Page</a>
     </div>
 </div>
 
-<h1>Create Data Asset Notification</h1>
+<h1>Create Notification</h1>
 
 <hr />
 
-@using (Html.BeginForm("ModifyNotification", "Notification", FormMethod.Post))
+@using (Html.BeginForm("SubmitNotification", "Notification", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
     @Html.HiddenFor(m => m.CreateUser)
-    @Html.HiddenFor(m => m.AllDataAssets)
-    @Html.HiddenFor(m => m.AllSeverities)
-    
-<div class="form-horizontal">
-    @Html.DisplayFor((model) => ViewData.ModelState)
-
     @Html.HiddenFor(model => model.NotificationId)
-    @Html.HiddenFor(model => model.AllSeverities)
-    @Html.HiddenFor(model => model.AllDataAssets)
+
+<div class="form-horizontal">
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
 
 
     <br />
@@ -34,12 +30,6 @@
         @Html.LabelFor((model) => model.DataAssetId, htmlAttributes: new { @class = "control-label col-md-2" })
         <div class="col-md-10">
             @Html.DropDownListFor(model => model.DataAssetId, Model.AllDataAssets, new { @class = "form-control" })
-        </div>
-    </div>
-    <div class="form-group">
-        @Html.LabelFor(m => m.CreateUser, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
-            @Html.TextBoxFor(m => m.CreateUser, new { @disabled = "disabled", @class = "form-control edit-dataset-row" })
         </div>
     </div>
     <div class="form-group">
@@ -79,7 +69,7 @@
     <div class="form-group">
         <div>
             <input type="submit" value="Create Notification" class="btn btn-primary" />
-            <a class="btn btn-warning" href="/DataAsset/ManageAssetNotification">Cancel</a>
+            <a class="btn btn-warning" href="/Notification/ManageNotification">Cancel</a>
         </div>
 
     </div>

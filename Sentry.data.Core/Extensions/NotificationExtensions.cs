@@ -13,12 +13,14 @@ namespace Sentry.data.Core
             {
                 CreateUser = core.CreateUser,
                 ExpirationTime = core.ExpirationTime,
-                IsActive = (core.StartTime < DateTime.Now && core.ExpirationTime > DateTime.Now),
                 Message = core.Message,
                 MessageSeverity = core.MessageSeverity,
-                MessageSeverityTag = core.MessageSeverityTag,
+                MessageSeverityDescription = core.MessageSeverity.ToString(),
                 NotificationId = core.NotificationId,
-                StartTime = core.StartTime
+                StartTime = core.StartTime,
+                DataAssetId = core.ParentDataAsset.Id,
+                DataAssetName = core.ParentDataAsset.Name,
+                IsActive = core.StartTime <= DateTime.Now && core.ExpirationTime > DateTime.Now
             };
         }
 

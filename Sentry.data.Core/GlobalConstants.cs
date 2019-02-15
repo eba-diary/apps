@@ -103,6 +103,7 @@
         public static class SecurableEntityName
         {
             public const string DATASET = "Dataset";
+            public const string DATA_ASSET = "DataAsset";
         }
 
         public static class PermissionCodes

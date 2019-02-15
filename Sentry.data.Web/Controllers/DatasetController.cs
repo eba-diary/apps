@@ -158,28 +158,6 @@ namespace Sentry.data.Web.Controllers
             return PartialView("_AccessRequest", model);
         }
 
-        [HttpPost]
-        public ActionResult SubmitAccessRequest(AccessRequestModel model)
-        {
-            AccessRequest ar = model.ToCore();
-            string ticketId = _datasetService.RequestAccessToDataset(ar);
-
-            if (string.IsNullOrEmpty(ticketId))
-            {
-                return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
-            }
-            else
-            {
-                return PartialView("_Success", new SuccessModel("Dataset access was successfully requested.", "HPSM Change Id: " + ticketId, true));
-            }
-        }
-
-        [HttpGet]
-        public ActionResult CheckAdGroup(string adGroup)
-        {
-            return Json(_obsidianService.DoesGroupExist(adGroup), JsonRequestBehavior.AllowGet);
-        }
-
         #endregion
 
         #region Dataset FILE Modification

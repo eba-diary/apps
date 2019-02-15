@@ -8,16 +8,13 @@ namespace Sentry.data.Web
 {
     public class AccessRequestModel
     {
+        //shared
+        public int SecurableObjecttId { get; set; }
 
-        public int DatasetId { get; set; }
+        public string SecurableObjectName { get; set; }
+        public virtual string SecurableObjectLabel { get; }
 
-        [DisplayName("Dataset")]
-        public string DatasetName { get; set; }
-
-        [Required]
-        [MaxLength(64)]
-        [DisplayName("AD Group")]
-        public string AdGroupName { get; set; }
+        
 
         [Required]
         [MaxLength(512)]
@@ -34,7 +31,7 @@ namespace Sentry.data.Web
 
         public List<PermissionModel> AllPermissions { get; set; }
         public List<SelectListItem> AllApprovers { get; set; }
-        public List<SelectListItem> AllAdGroups { get; set; }
+
 
     }
 }

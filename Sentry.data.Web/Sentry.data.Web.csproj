@@ -284,8 +284,8 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Content Include="Content\checkbox.css" />
     <Content Include="Content\creat-edit-datasets.css" />
+    <Compile Include="Controllers\AccessRequestController.cs" />
     <Compile Include="Controllers\AdminController.cs" />
-    <Compile Include="Controllers\AlertController.cs" />
     <Compile Include="Controllers\FavoritesController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\WebApi\ApplicationController.cs" />
@@ -358,9 +358,6 @@
     <Compile Include="Models\Config\EditSourceModel.cs" />
     <Compile Include="Models\Config\FieldModel.cs" />
     <Compile Include="Models\DataAsset\AssetUIModel.cs" />
-    <Compile Include="Models\DataAsset\BaseAssetNotificationModel.cs" />
-    <Compile Include="Models\DataAsset\CreateAssetNotificationModel.cs" />
-    <Compile Include="Models\DataAsset\EditAssetNotificationModel.cs" />
     <Compile Include="Models\Dataset\BaseDatasetFileModel.cs" />
     <Compile Include="Models\Dataset\ColumnModel.cs" />
     <Compile Include="Models\Dataset\CreateDataFileModel.cs" />
@@ -387,6 +384,8 @@
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceHomeModel.cs" />
     <Compile Include="Models\Notification\NotificationModel.cs" />
     <Compile Include="Models\Notification\ManageNotificationViewModel.cs" />
+    <Compile Include="Models\Security\DataAssetAccessRequest.cs" />
+    <Compile Include="Models\Security\DatasetAccessRequestModel.cs" />
     <Compile Include="Models\Security\PermissionModel.cs" />
     <Compile Include="Models\Security\RequestAccessModel.cs" />
     <Compile Include="Models\Shared\CategoryModel.cs" />
@@ -433,6 +432,7 @@
     <Content Include="Images\SHO_Aerial_10-4-17.jpg" />
     <Content Include="Images\SHO_Aerial_10-4-17.png" />
     <Content Include="Images\SHO_SentryWorld_Aerial.jpg" />
+    <Content Include="js\AccessRequest.js" />
     <Content Include="js\Config.js" />
     <Content Include="js\Favorites.js" />
     <Content Include="js\ManageAssetAlert.js" />
@@ -1227,7 +1227,6 @@
     <Content Include="Views\Dataset\_DatasetFileVersions.cshtml" />
     <Content Include="Views\Config\Manage.cshtml" />
     <Content Include="Views\Config\_EditConfigFile.cshtml" />
-    <Content Include="Views\DataAsset\ManageAssetNotification.cshtml" />
     <Content Include="Views\DataAsset\EditAssetNotification.cshtml" />
     <Content Include="Views\DataAsset\CreateAssetNotification.cshtml" />
     <Content Include="Views\Dataset\_BundleFilename.cshtml" />
@@ -1264,11 +1263,13 @@
     <Content Include="Views\Shared\_AccessRequest.cshtml" />
     <Content Include="Views\Notification\ModifyNotification.cshtml" />
     <Content Include="Views\Notification\ManageNotification.cshtml" />
+    <Content Include="Views\Shared\NotFound.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Images\Home\" />
     <Folder Include="Properties\PublishProfiles\" />
+    <Folder Include="Views\AccessRequest\" />
     <Folder Include="Views\Admin\DisplayTemplates\" />
     <Folder Include="Views\Alert\" />
     <Folder Include="Views\ExternalFile\" />

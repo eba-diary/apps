@@ -218,15 +218,8 @@ else
                                 </ul>
                             </li>
 
-                            @if (Model.CanManageAssetAlerts)
-                            {
-                                <li class="divider"></li>
-                                <li class="dropdown-header">Asset Administration</li>
-                                if (Model.CanManageAssetAlerts)
-                                {
-                                    <li><a href="/DataAsset/ManageAssetNotification">Manage Alerts</a></li>
-                                }
-                            }
+                            <li class="divider"></li>
+                            <li><a href="/Notification/ManageNotification">Notifications</a></li>
                         </ul>
                     </li>
                 }

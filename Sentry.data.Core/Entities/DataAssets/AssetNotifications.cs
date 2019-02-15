@@ -1,4 +1,5 @@
 ﻿using Sentry.Core;
+using Sentry.data.Core.GlobalEnums;
 using System;
 
 namespace Sentry.data.Core

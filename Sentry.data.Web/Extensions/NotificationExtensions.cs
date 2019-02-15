@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
+using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Web
 {
@@ -13,15 +14,17 @@ namespace Sentry.data.Web
             return new NotificationModel()
             {
                 AllDataAssets = core.AllDataAssets.Select(v => new SelectListItem { Text = v.DisplayName, Value = (v.Id).ToString() }).ToList(),
-                AllSeverities = core.AllSeverities.Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList(),
+                AllSeverities = default(NotificationSeverity).ToEnumSelectList(),
                 CreateUser = core.CreateUser,
                 ExpirationTime = core.ExpirationTime,
                 IsActive = core.IsActive,
                 Message = core.Message,
                 MessageSeverity = core.MessageSeverity,
-                MessageSeverityTag = core.MessageSeverityTag,
+                MessageSeverityDescription = core.MessageSeverityDescription,
                 NotificationId = core.NotificationId,
-                StartTime = core.StartTime
+                StartTime = core.StartTime,
+                DataAssetId = core.DataAssetId,
+                DataAssetName = core.DataAssetName
             };
         }
 
@@ -41,9 +44,9 @@ namespace Sentry.data.Web
                 ExpirationTime = model.ExpirationTime,
                 Message = model.Message,
                 MessageSeverity = model.MessageSeverity,
-                MessageSeverityTag = model.MessageSeverityTag,
                 NotificationId = model.NotificationId,
-                StartTime = model.StartTime
+                StartTime = model.StartTime,
+                DataAssetId = model.DataAssetId
             };
         }
 

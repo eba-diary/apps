@@ -35,18 +35,31 @@ namespace Sentry.data.Core
             return false;
         }
 
-        public NotificationModel GetModifyNotificationModel()
+        public NotificationModel GetNotificationModelForDisplay(int notificationId)
         {
             IApplicationUser user = _userService.GetCurrentUser();
-            NotificationModel model = new NotificationModel()
-            {
-                AllDataAssets = GetAssetsForUserSecurity(user),
-                AllSeverities = Enum.GetValues(typeof(NotificationSeverity)).Cast<NotificationSeverity>().ToList(),
-                CreateUser =user.AssociateId,
-                StartTime = DateTime.Now,
-                ExpirationTime = DateTime.Now.AddHours(1)
-            };
+            NotificationModel model;
 
+            if (notificationId == 0)
+            {
+                model = new NotificationModel()
+                {
+                    CreateUser = user.AssociateId,
+                    StartTime = DateTime.Now,
+                    ExpirationTime = DateTime.Now.AddHours(1)
+                };
+            }
+            else
+            {
+                model = _domainContext.Notification.Fetch(x => x.ParentDataAsset).FirstOrDefault(x => x.NotificationId == notificationId).ToModel();
+            }
+            return model;
+        }
+
+        public NotificationModel GetNotificationModelForModify(int notificationId)
+        {
+            NotificationModel model = GetNotificationModelForDisplay(notificationId);
+            model.AllDataAssets = GetAssetsForUserSecurity();
             return model;
         }
 
@@ -56,38 +69,49 @@ namespace Sentry.data.Core
             if (model.NotificationId == 0)
             {
                 an = model.ToCore();
+                an.CreateUser = _userService.GetCurrentUser().AssociateId;
+                an.ParentDataAsset = _domainContext.DataAsset.FirstOrDefault(x => x.Id == model.DataAssetId);
                 _domainContext.Add(an);
             }
             else
             {
                 an = _domainContext.Notification.FirstOrDefault(x => x.NotificationId == model.NotificationId);
                 an.ExpirationTime = model.ExpirationTime;
+                an.StartTime = model.StartTime;
                 an.MessageSeverity = model.MessageSeverity;
                 an.Message = model.Message;
+                an.ParentDataAsset = _domainContext.DataAsset.FirstOrDefault(x => x.Id == model.DataAssetId);
             }
 
             _domainContext.SaveChanges();
         }
 
-        public List<NotificationModel> GetNotificationsForDataAsset(int dataAssetId = 0)
+        public List<NotificationModel> GetNotificationsForDataAsset()
         {
-            List<NotificationModel> da;
-            if (dataAssetId != 0)
+            List<NotificationModel> da = _domainContext.Notification.Fetch(x=> x.ParentDataAsset).ToModels();
+
+            foreach(var asset in da)
             {
-                da = _domainContext.Notification.Where(x => x.ParentDataAsset.Id == dataAssetId).Fetch(x => x.ParentDataAsset).ToModels();
-            }
-            else
-            {
-                da = _domainContext.Notification.ToModels();
+                IApplicationUser user = _userService.GetByAssociateId(asset.CreateUser);
+                try
+                {
+                    asset.CreateUser = user.DisplayName;
+                }catch(Exception ex)
+                {
+                    Common.Logging.Logger.Error($"Could not get user by Id: {asset.CreateUser}", ex);
+                }
+
             }
             return da;
         }
 
 
-        private List<DataAsset> GetAssetsForUserSecurity(IApplicationUser user)
+        public List<DataAsset> GetAssetsForUserSecurity()
         {
+            IApplicationUser user = _userService.GetCurrentUser();
             List<DataAsset> assetsWithPermission = new List<DataAsset>();
-            List<DataAsset> dataAssets = _domainContext.DataAsset.FetchSecurityTree(_domainContext);
+            //List<DataAsset> dataAssets = _domainContext.DataAsset.FetchSecurityTree(_domainContext);
+            List<DataAsset> dataAssets = _domainContext.DataAsset.ToList();
             //only bring back the assests the user has permission to create alerts on.
             foreach(var asset in dataAssets)
             {
@@ -99,6 +123,11 @@ namespace Sentry.data.Core
             }
 
             return assetsWithPermission;
+        }
+
+        public List<Permission> GetPermissionsForAccessRequest()
+        {
+            return _domainContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATA_ASSET).ToList();
         }
     }
 }
