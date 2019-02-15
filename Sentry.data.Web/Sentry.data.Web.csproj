@@ -1257,6 +1257,7 @@
     <Content Include="Views\Favorites\EditFavorites.cshtml" />
     <Content Include="Views\Favorites\_FavoritesList.cshtml" />
     <Content Include="Views\Shared\_AccessRequest.cshtml" />
+    <Content Include="Views\Shared\Forbidden.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
