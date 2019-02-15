@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Sentry.Common.Logging;
 using Sentry.Core;
 
@@ -319,6 +318,8 @@ namespace Sentry.data.Core
 
         private DataElement CreateDataElement(DatasetDto dto)
         {
+            string storageCode = _datasetContext.GetNextStorageCDE().ToString();
+
             DataElement de = new DataElement()
             {
                 DataElementCreate_DTM = DateTime.Now,
@@ -334,10 +335,11 @@ namespace Sentry.data.Core
                 SchemaIsForceMatch = false,
                 FileFormat = _datasetContext.GetById<FileExtension>(dto.FileExtensionId).Name.ToUpper(),
                 Delimiter = dto.Delimiter,
-                StorageCode = _datasetContext.GetNextStorageCDE().ToString(),
+                StorageCode = storageCode,
                 HiveDatabase = "Default",
                 HiveTable = dto.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dto.ConfigFileName.Replace(" ", "").ToUpper(),
-                HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString()
+                HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
+                HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
             };
 
             return de;

@@ -370,7 +370,8 @@
     <Compile Include="Models\Dataset\ObsoleteDatasetModel.cs" />
     <Compile Include="Models\Dataset\PreviewDataModel.cs" />
     <Compile Include="Models\Dataset\PushToDatasetModel.cs" />
-    <Compile Include="Models\Dataset\SchemaModel.cs" />
+    <Compile Include="Models\Schema\SchemaDetailModel.cs" />
+    <Compile Include="Models\Schema\SchemaModel.cs" />
     <Compile Include="Models\Dataset\DatasetModel.cs" />
     <Compile Include="Models\Dataset\_DatasetMetadataModel.cs" />
     <Compile Include="Models\Favorites\FavoriteItemModel.cs" />
@@ -1257,6 +1258,7 @@
     <Content Include="Views\Favorites\EditFavorites.cshtml" />
     <Content Include="Views\Favorites\_FavoritesList.cshtml" />
     <Content Include="Views\Shared\_AccessRequest.cshtml" />
+    <Content Include="Views\Shared\Forbidden.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

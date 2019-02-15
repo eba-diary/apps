@@ -179,6 +179,7 @@ data.Report = {
     },
 
     OpenReport: function (artifactType, artifactPath) {
+
         // check what type we're working with
         if (artifactType === 'file') {
 

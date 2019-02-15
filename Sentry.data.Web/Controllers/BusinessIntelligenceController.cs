@@ -60,14 +60,18 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_MODIFY)]
         public ActionResult Edit(int id)
         {
-            BusinessIntelligenceDto dto = _businessIntelligenceService.GetBusinessIntelligenceDto(id);
+            UserSecurity us = _businessIntelligenceService.GetUserSecurityById(id);
 
-            BusinessIntelligenceModel model = new BusinessIntelligenceModel(dto);
+            if (us != null && us.CanEditReport)
+            {
+                BusinessIntelligenceDto dto = _businessIntelligenceService.GetBusinessIntelligenceDto(id);
+                BusinessIntelligenceModel model = new BusinessIntelligenceModel(dto);
+                ReportUtility.SetupLists(_datasetContext, model);
 
-            ReportUtility.SetupLists(_datasetContext, model);
-
-            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Report Edit Page", dto.DatasetId);
-            return View("BusinessIntelligenceForm",model);
+                _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Report Edit Page", dto.DatasetId);
+                return View("BusinessIntelligenceForm", model);
+            }
+            return View("Forbidden");
         }
 
 

@@ -127,5 +127,10 @@
             public const string ADMIN_USER = "AdminUser";
         }
 
+        public static class ConvertedFileStoragePrefix
+        {
+            public const string PARQUET_STORAGE_PREFIX = "parquet";
+        }
+
     }
 }
