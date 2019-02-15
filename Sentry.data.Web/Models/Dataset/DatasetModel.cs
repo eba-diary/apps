@@ -54,6 +54,7 @@ namespace Sentry.data.Web
         [Required]
         [DisplayName("Data Classification")]
         public DataClassificationType DataClassification { get; set; }
+
     }
 
 

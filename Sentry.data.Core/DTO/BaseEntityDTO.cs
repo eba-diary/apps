@@ -9,15 +9,20 @@ namespace Sentry.data.Core
         public int DatasetId { get; set; }
         public string DatasetName { get; set; }
         public string DatasetDesc { get; set; }
-        public string SentryOwnerName { get; set; }
-        public string SentryOwnerId { get; set; }
+        public string PrimaryOwnerName { get; set; }
+        public string PrimaryOwnerId { get; set; }
+        public string PrimaryContactId { get; set; }
+        public string PrimaryContactName { get; set; }
+        public string PrimaryContactEmail { get; set; }
+        public bool IsSecured { get; set; }
         public DateTime DatasetDtm { get; set; }
         public DateTime ChangedDtm { get; set; }
         public string S3Key { get; set; }
         public List<int> DatasetCategoryIds { get; set; }
         public string DatasetType { get; set; }
-        public bool IsSensitive { get; set; }
+        public string CreationUserId { get; set; }
         public string CreationUserName { get; set; }
+        public string UploadUserId { get; set; }
         public string UploadUserName { get; set; }
         public List<string> TagIds { get; set; }
 
@@ -32,7 +37,7 @@ namespace Sentry.data.Core
         public string MailtoLink { get; set; }
         public string CategoryColor { get; set; }
         public List<string> CategoryNames { get; set; }
-
+        public UserSecurity Security { get; set; }
 
     }
 }

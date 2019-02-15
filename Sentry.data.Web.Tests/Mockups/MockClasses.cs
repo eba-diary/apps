@@ -1,5 +1,4 @@
 ﻿using Sentry.data.Core;
-using Sentry.data.Core.Entities.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,13 +20,12 @@ namespace Sentry.data.Web.Tests
                 DatasetDesc = "Test Claim Dataset",
                 DatasetInformation = "Specific Information regarding datasetfile consumption",
                 CreationUserName = user != null ? user.DisplayName : "Nye, Bill",
-                SentryOwnerName = user != null ? user.AssociateId : "012345",
+                PrimaryOwnerId = user != null ? user.AssociateId : "012345",
                 UploadUserName = user != null ? user.DisplayName : "Nye, Bill",
                 OriginationCode = "Internal",
                 DatasetDtm = System.DateTime.Now.AddYears(-13),
                 ChangedDtm = System.DateTime.Now.AddYears(-12),
                 S3Key = "data-dev/government/quarterly_census_of_employment_and_wages/",
-                IsSensitive = false,
                 CanDisplay = true,
                 DatasetFiles = new List<DatasetFile>(),
                 DatasetFileConfigs = new List<DatasetFileConfig>(),

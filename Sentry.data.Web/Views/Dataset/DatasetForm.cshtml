@@ -30,8 +30,9 @@
             <br />
 
             @Html.HiddenFor(model => model.DatasetId)
-            @Html.HiddenFor(model => model.SentryOwnerId)
-            @Html.HiddenFor(model => model.UploadUserName)
+            @Html.HiddenFor(model => model.PrimaryOwnerId)
+            @Html.HiddenFor(model => model.PrimaryContactId)
+            @Html.HiddenFor(model => model.UploadUserId)
 
             <div class="form-group">
                 @Html.LabelFor((model) => model.DatasetCategoryIds, new { @class = "control-label col-md-2" })
@@ -88,10 +89,10 @@
 
 
             <div class="form-group">
-                @Html.LabelFor(model => model.CreationUserName, htmlAttributes: new { @class = "control-label col-md-2" })
+                @Html.LabelFor(model => model.CreationUserId, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.EditorFor(model => model.CreationUserName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                    @Html.ValidationMessageFor(model => model.CreationUserName, "", new { @class = "text-danger" })
+                    @Html.EditorFor(model => model.CreationUserId, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                    @Html.ValidationMessageFor(model => model.CreationUserId, "", new { @class = "text-danger" })
                 </div>
             </div>
             <div class="form-group fieldDescription">
@@ -119,6 +120,12 @@
                     @Html.ValidationMessageFor((model) => model.DataClassification, "", new { @class = "text-danger" })
                 </div>
             </div>
+            <div class="form-group" style="display:none">
+                @Html.LabelFor(m => m.IsSecured, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.CheckBoxFor(m => m.IsSecured)
+                </div>
+            </div>
             <div class="form-group">
                 <label class="control-label col-md-2"></label>
                 <div class="col-md-10">
@@ -127,10 +134,17 @@
             </div>
 
             <div class="form-group">
-                @Html.LabelFor(model => model.SentryOwnerName, htmlAttributes: new { @class = "control-label col-md-2" })
+                @Html.LabelFor(model => model.PrimaryOwnerName, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.EditorFor(model => model.SentryOwnerName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
-                    @Html.ValidationMessageFor(model => model.SentryOwnerName, "", new { @class = "text-danger" })
+                    @Html.EditorFor(model => model.PrimaryOwnerName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
+                    @Html.ValidationMessageFor(model => model.PrimaryOwnerName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(model => model.PrimaryContactName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.PrimaryContactName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
+                    @Html.ValidationMessageFor(model => model.PrimaryContactName, "", new { @class = "text-danger" })
                 </div>
             </div>
             <div class="form-group fieldDescription">
@@ -261,7 +275,7 @@
 @section Scripts {
     <script>
         $(function () {
-            data.Dataset.FormInit();
+            data.Dataset.FormInit('@(Model.HrempServiceUrl)' , '@(Model.HrempServiceEnv)');
         });
     </script>
 }

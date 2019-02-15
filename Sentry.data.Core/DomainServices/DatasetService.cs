@@ -4,26 +4,27 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Sentry.Common.Logging;
-using Sentry.data.Core.Entities.Metadata;
-using static Sentry.data.Core.RetrieverJobOptions;
+using Sentry.Core;
 
 namespace Sentry.data.Core
 {
     public class DatasetService : IDatasetService
     {
         private readonly IDatasetContext _datasetContext;
+        private readonly ISecurityService _securityService;
         private readonly UserService _userService;
 
-        public DatasetService(IDatasetContext datasetContext, UserService userService)
+        public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, UserService userService)
         {
             _datasetContext = datasetContext;
+            _securityService = securityService;
             _userService = userService;
         }
 
 
         public DatasetDto GetDatasetDto(int id)
         {
-            Dataset ds = _datasetContext.GetById<Dataset>(id);
+            Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id && x.CanDisplay).FetchAllChildren(_datasetContext).FirstOrDefault();
             DatasetDto dto = new DatasetDto();
             MapToDto(ds, dto);
 
@@ -32,13 +33,105 @@ namespace Sentry.data.Core
 
         public DatasetDetailDto GetDatesetDetailDto(int id)
         {
-            Dataset ds = _datasetContext.GetById<Dataset>(id);
+            Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id && x.CanDisplay).FetchAllChildren(_datasetContext).FirstOrDefault();
+
             DatasetDetailDto dto = new DatasetDetailDto();
             MapToDetailDto(ds, dto);
 
             return dto;
         }
 
+        public UserSecurity GetUserSecurityForDataset(int datasetId)
+        {
+            Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).FirstOrDefault();
+
+            return _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+        }
+
+        public UserSecurity GetUserSecurityForConfig(int configId)
+        {
+            DatasetFileConfig dfc = _datasetContext.DatasetFileConfigs.Where(x => x.ConfigId == configId).FetchSecurityTree(_datasetContext).FirstOrDefault();
+            if (dfc.ParentDataset != null)
+            {
+                return _securityService.GetUserSecurity(dfc.ParentDataset, _userService.GetCurrentUser());
+            }
+            return new UserSecurity();
+        }
+
+        public List<Dataset> GetDatasetsForQueryTool()
+        {
+            //get all datasets where the there is a CanQueryData permission on the security
+            //OR all public datasets (no security object)
+            var query = _datasetContext.Datasets.Where(x => x.DatasetType == GlobalConstants.DataEntityCodes.DATASET &&
+                                                                                        (x.Security == null || x.Security.Tickets.Any(y => y.Permissions.Any(z => z.Permission.PermissionCode == GlobalConstants.PermissionCodes.CAN_QUERY_DATASET && z.IsEnabled))));
+
+            query.FetchMany(x => x.DatasetCategories).ToFuture();
+            List<Dataset> datasets = query.FetchSecurityTree(_datasetContext);
+
+            IApplicationUser user = _userService.GetCurrentUser();
+
+            List<Dataset> datasetsCanQuery = new List<Dataset>();
+
+            foreach (Dataset ds in datasets)
+            {
+                var userSecurity = _securityService.GetUserSecurity(ds, user);
+                if (userSecurity.CanQueryDataset)
+                {
+                    datasetsCanQuery.Add(ds);
+                }
+            }
+
+            //now add in all the public datasets.
+
+            return datasetsCanQuery;
+        }
+
+        public AccessRequest GetAccessRequest(int datasetId)
+        {
+            Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+
+            AccessRequest ar = new AccessRequest()
+            {
+                Permissions = _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList(),
+                ApproverList = new List<KeyValuePair<string, string>>(),
+                DatasetId = ds.DatasetId,
+                DatasetName = ds.DatasetName
+            };
+
+
+            IApplicationUser primaryUser = _userService.GetByAssociateId(ds.PrimaryOwnerId);
+            ar.ApproverList.Add(new KeyValuePair<string, string>(ds.PrimaryOwnerId, primaryUser.DisplayName + " (Owner)"));
+
+            if (!string.IsNullOrWhiteSpace(ds.PrimaryContactId))
+            {
+                IApplicationUser secondaryUser = _userService.GetByAssociateId(ds.PrimaryContactId);
+                ar.ApproverList.Add(new KeyValuePair<string, string>(ds.PrimaryContactId, secondaryUser.DisplayName + " (Contact)"));
+            }
+
+            return ar;
+        }
+
+        public string RequestAccessToDataset(AccessRequest request)
+        {
+
+            Dataset ds = _datasetContext.GetById<Dataset>(request.DatasetId);
+            if (ds != null)
+            {
+                IApplicationUser user = _userService.GetCurrentUser();
+                request.DatasetName = ds.DatasetName;
+                request.SecurityId = ds.Security.SecurityId;
+                request.RequestorsId = user.AssociateId;
+                request.RequestorsName = user.DisplayName;
+                request.IsProd = bool.Parse(Configuration.Config.GetHostSetting("RequireApprovalHPSMTickets"));
+                request.RequestedDate = DateTime.Now;
+                request.ApproverId = request.SelectedApprover;
+                request.Permissions = _datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
+                                                                                                                x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
+                return _securityService.RequestPermission(request);
+            }
+
+            return string.Empty;
+        }
         public int CreateAndSaveNewDataset(DatasetDto dto)
         {
             Dataset ds = CreateDataset(dto);
@@ -77,9 +170,9 @@ namespace Sentry.data.Core
             {
                 ds.DatasetCategories = _datasetContext.Categories.Where(x => dto.DatasetCategoryIds.Contains(x.Id)).ToList();
             }
-            if (null != dto.CreationUserName && dto.CreationUserName.Length > 0)
+            if (null != dto.CreationUserId && dto.CreationUserId.Length > 0)
             {
-                ds.CreationUserName = dto.CreationUserName;
+                ds.CreationUserName = dto.CreationUserId;
             }
             if (null != dto.DatasetDesc && dto.DatasetDesc.Length > 0)
             {
@@ -93,14 +186,57 @@ namespace Sentry.data.Core
             {
                 ds.DatasetName = dto.DatasetName;
             }
-            if (null != dto.SentryOwnerId && dto.SentryOwnerId.Length > 0)
+            if (null != dto.PrimaryOwnerId && dto.PrimaryOwnerId.Length > 0)
             {
-                ds.SentryOwnerName = dto.SentryOwnerId;
+                ds.PrimaryOwnerId = dto.PrimaryOwnerId;
+            }
+            if (null != dto.PrimaryContactId && dto.PrimaryContactId.Length > 0)
+            {
+                ds.PrimaryContactId = dto.PrimaryContactId;
             }
             if (dto.DataClassification > 0)
             {
                 ds.DataClassification = dto.DataClassification;
             }
+
+            //override the Dto.IsSecured for certain classifications.
+            switch (dto.DataClassification)
+            {
+                case GlobalEnums.DataClassificationType.HighlySensitive:
+                    dto.IsSecured = true;
+                    break;
+                case GlobalEnums.DataClassificationType.InternalUseOnly:
+                    //don't override as it should flow from the form.
+                    break;
+                default:
+                    dto.IsSecured = false;
+                    break;
+            }
+
+            if (!ds.IsSecured && dto.IsSecured)
+            {
+                if (ds.Security == null)
+                {
+                    ds.Security = new Security(GlobalConstants.SecurableEntityName.DATASET)
+                    {
+                        CreatedById = _userService.GetCurrentUser().AssociateId
+                    };
+                }
+                else
+                {
+                    ds.Security.EnabledDate = DateTime.Now;
+                    ds.Security.UpdatedById = _userService.GetCurrentUser().AssociateId;
+                }
+            }
+            else if (ds.IsSecured && !dto.IsSecured)
+            {
+                ds.Security.RemovedDate = DateTime.Now;
+                ds.Security.UpdatedById = _userService.GetCurrentUser().AssociateId;
+            }
+
+            ds.IsSecured = dto.IsSecured;
+
+
             _datasetContext.SaveChanges();
         }
 
@@ -110,7 +246,7 @@ namespace Sentry.data.Core
             List<string> errors = new List<string>();
             if (dto.DatasetId == 0 && _datasetContext.Datasets.Where(w => w.DatasetName == dto.DatasetName &&
                                                                          w.DatasetCategories.Any(x => dto.DatasetCategoryIds.Contains(x.Id)) &&
-                                                                         w.DatasetType == GlobalConstants.DataEntityTypes.DATASET).Count() > 0)
+                                                                         w.DatasetType == GlobalConstants.DataEntityCodes.DATASET).Count() > 0)
             {
                 errors.Add("Dataset name already exists within category");
             }
@@ -122,7 +258,7 @@ namespace Sentry.data.Core
                 errors.Add("File Extension CSV and it's delimiter do not match.");
             }
 
-            if (currentFileExtension == "delimited" && String.IsNullOrWhiteSpace(dto.Delimiter))
+            if (currentFileExtension == "delimited" && string.IsNullOrWhiteSpace(dto.Delimiter))
             {
                 errors.Add("File Extension Delimited is missing it's delimiter.");
             }
@@ -141,19 +277,41 @@ namespace Sentry.data.Core
                 DatasetName = dto.DatasetName,
                 DatasetDesc = dto.DatasetDesc,
                 DatasetInformation = dto.DatasetInformation,
-                CreationUserName = dto.CreationUserName,
-                SentryOwnerName = dto.SentryOwnerId,//done on purpose since namming flipped.
-                UploadUserName = dto.UploadUserName,
+                CreationUserName = dto.CreationUserId,
+                PrimaryOwnerId = dto.PrimaryOwnerId,
+                PrimaryContactId = dto.PrimaryContactId,
+                UploadUserName = dto.UploadUserId,
                 OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), dto.OriginationId),
                 DatasetDtm = dto.DatasetDtm,
                 ChangedDtm = dto.ChangedDtm,
-                DatasetType = GlobalConstants.DataEntityTypes.DATASET,
+                DatasetType = GlobalConstants.DataEntityCodes.DATASET,
                 DataClassification = dto.DataClassification,
-                IsSensitive = false,
+                IsSecured = dto.IsSecured,
                 CanDisplay = true,
                 DatasetFiles = null,
                 DatasetFileConfigs = null
             };
+
+            switch (dto.DataClassification)
+            {
+                case GlobalEnums.DataClassificationType.HighlySensitive:
+                    ds.IsSecured = true;
+                    break;
+                case GlobalEnums.DataClassificationType.InternalUseOnly:
+                    ds.IsSecured = dto.IsSecured;
+                    break;
+                default:
+                    ds.IsSecured = false;
+                    break;
+            }
+
+            if (ds.IsSecured)
+            {
+                ds.Security = new Security(GlobalConstants.SecurableEntityName.DATASET)
+                {
+                    CreatedById = _userService.GetCurrentUser().AssociateId
+                };
+            }
 
             return ds;
         }
@@ -205,7 +363,7 @@ namespace Sentry.data.Core
 
         private RetrieverJob CreateRetrieverJob(DatasetFileConfig dfc, string dataSourceName)
         {
-            Compression compression = new Compression()
+            RetrieverJobOptions.Compression compression = new RetrieverJobOptions.Compression()
             {
                 IsCompressed = false,
                 CompressionType = null,
@@ -283,7 +441,16 @@ namespace Sentry.data.Core
 
         private void MapToDto(Dataset ds, DatasetDto dto)
         {
-            string userDisplayname = _userService.GetByAssociateId(ds.SentryOwnerName)?.DisplayName;
+            IApplicationUser primaryOwner = _userService.GetByAssociateId(ds.PrimaryOwnerId);
+            IApplicationUser primaryContact = _userService.GetByAssociateId(ds.PrimaryContactId);
+            IApplicationUser uploader = _userService.GetByAssociateId(ds.UploadUserName);
+
+            //map the ISecurable properties
+            dto.Security = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+            dto.PrimaryOwnerId = ds.PrimaryOwnerId;
+            dto.PrimaryContactId = ds.PrimaryContactId;
+            dto.IsSecured = ds.IsSecured;
+
             dto.DatasetId = ds.DatasetId;
             dto.DatasetCategoryIds = ds.DatasetCategories.Select(x => x.Id).ToList();
             dto.DatasetName = ds.DatasetName;
@@ -291,13 +458,17 @@ namespace Sentry.data.Core
             dto.DatasetInformation = ds.DatasetInformation;
             dto.DatasetType = ds.DatasetType;
             dto.DataClassification = ds.DataClassification;
+
+            dto.CreationUserId = ds.CreationUserName;
             dto.CreationUserName = ds.CreationUserName;
-            dto.SentryOwnerName = (string.IsNullOrWhiteSpace(userDisplayname) ? ds.SentryOwnerName : userDisplayname);
-            dto.SentryOwnerId = ds.SentryOwnerName;
-            dto.UploadUserName = ds.UploadUserName;
+            dto.PrimaryOwnerName = (primaryOwner != null ? primaryOwner.DisplayName : "Not Available");
+            dto.PrimaryContactName = (primaryContact != null ? primaryContact.DisplayName : "Not Available");
+            dto.PrimaryContactEmail = (primaryContact != null ? primaryContact.EmailAddress : "");
+            dto.UploadUserId = ds.UploadUserName;
+            dto.UploadUserName = (uploader != null ? uploader?.DisplayName : "Not Available");
+
             dto.DatasetDtm = ds.DatasetDtm;
             dto.ChangedDtm = ds.ChangedDtm;
-            dto.IsSensitive = ds.IsSensitive;
             dto.CanDisplay = ds.CanDisplay;
             dto.TagIds = new List<string>();
             dto.OriginationId = (int)Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode);
@@ -315,16 +486,9 @@ namespace Sentry.data.Core
         private void MapToDetailDto(Dataset ds, DatasetDetailDto dto)
         {
             MapToDto(ds, dto);
-            
+
             IApplicationUser user = _userService.GetCurrentUser();
 
-            dto.CanDwnldSenstive = user.CanDwnldSenstive;
-            dto.CanEditDataset = user.CanEditDataset;
-            dto.CanManageConfigs = user.CanManageConfigs;
-            dto.CanDwnldNonSensitive = user.CanDwnldNonSensitive;
-            dto.CanEditDataset = user.CanEditDataset;
-            dto.CanUpload = user.CanUpload;
-            dto.CanQueryTool = user.CanQueryTool || user.CanQueryToolPowerUser;
             dto.Downloads = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.DOWNLOAD && x.Dataset == ds.DatasetId).Count();
             dto.IsSubscribed = _datasetContext.IsUserSubscribedToDataset(_userService.GetCurrentUser().AssociateId, dto.DatasetId);
             dto.AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, dto.DatasetId).Count;
@@ -343,7 +507,6 @@ namespace Sentry.data.Core
                 dto.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);
             }
         }
-
 
         #endregion
 

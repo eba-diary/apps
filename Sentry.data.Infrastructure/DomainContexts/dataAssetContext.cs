@@ -7,7 +7,6 @@ using Sentry.data.Core;
 using System;
 using System.Web;
 using System.Collections.Generic;
-using Sentry.data.Core.Entities.Metadata;
 
 namespace Sentry.data.Infrastructure
 {
