@@ -398,7 +398,7 @@
             });
         }
 
-        function FilterCategory(Name, Filters, Color) {
+        function FilterCategory(Name, Filters, Color, Sequence) {
             var self = this;
 
             self.Name = Name;
@@ -406,6 +406,7 @@
             self.Filters = ko.observableArray(Filters);
 
             self.Color = Color;
+            self.Sequence = Sequence;
 
             self.BannerColor = 'filterHead_' + Color;
             self.BorderColor = 'filterBorder_' + Color;
@@ -1125,7 +1126,7 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue', 1));
                 temp = [];
 
 
@@ -1151,7 +1152,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'darkblue', 2));
                 temp = [];
 
 
@@ -1177,7 +1178,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Extension', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Extension', temp, 'darkblue', 3));
             };
 
             self.PopulateExhibitFilters = function (exhibits) {
@@ -1211,7 +1212,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue', 1));
                 temp = [];
 
 
@@ -1237,7 +1238,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'darkblue', 2));
                 temp = [];
 
 
@@ -1263,7 +1264,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Function', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Function', temp, 'darkblue', 3));
                 temp = [];
 
 
@@ -1319,7 +1320,7 @@
                         temp = item.Filters().concat(temp);
                         ko.utils.arrayRemoveItem(self.AllFilters(), item);
                     }
-                    self.AllFilters.push(new FilterCategory(group, temp, 'darkblue'));
+                    self.AllFilters.push(new FilterCategory(group, temp, 'darkblue', 5));
 
                     temp = [];
                 }
@@ -1348,9 +1349,14 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Report Type', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Report Type', temp, 'darkblue', 4));
                 temp = [];
 
+
+                // finally, sort the filter categories by Sequence to ensure they display in the desired order on screen
+                self.AllFilters.sort(function (left, right) {
+                    return left.Sequence - right.Sequence;
+                });
             };
 
             self.PopulateGenericFilters = function (allObjects) {
@@ -1387,7 +1393,7 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue', 1));
                 temp = [];
 
 
@@ -1412,7 +1418,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'darkblue', 2));
 
 
                 //SENTRYOWNER FILTER
@@ -1437,7 +1443,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'darkblue', 3));
                 temp = [];
 
 
@@ -1464,7 +1470,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Extension', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Extension', temp, 'darkblue', 4));
 
                 //TAG FILTER
                 counter = 0; //Needs seperate counter as multiple objects can appear per iteration
@@ -1492,7 +1498,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Tag', temp, 'darkblue'));
+                self.AllFilters.push(new FilterCategory('Tag', temp, 'darkblue', 5));
                 temp = [];
             };
 
