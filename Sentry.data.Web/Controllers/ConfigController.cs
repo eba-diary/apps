@@ -224,7 +224,7 @@ namespace Sentry.data.Web.Controllers
                 HiveDatabase = "Default",
                 HiveTable = ds.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dfcm.ConfigFileName.Replace(" ", "").ToUpper(),
                 HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
-                HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
+                HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
             };
 
             return de;
@@ -1460,7 +1460,7 @@ namespace Sentry.data.Web.Controllers
                         HiveDatabase = "Default",
                         HiveTable = dfc.ParentDataset.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dfc.Name.Replace(" ", "").ToUpper(),
                         HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
-                        HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
+                        HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
                     };
 
                     dfc.Schema.Add(de);
