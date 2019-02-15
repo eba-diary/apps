@@ -101,6 +101,8 @@ data.Report = {
 
     DetailInit: function () {
 
+        // Initialize the dataset detail page
+
         $(".detailNameLink").click(function () {
             var artifactLink = $(this).data('artifactlink');
             var locationType = $(this).data('locationtype');
@@ -110,7 +112,6 @@ data.Report = {
             data.Report.OpenReport(locationType, artifactLink);
         });
 
-        /// Initialize the dataset detail page for data assets
         $("[id^='EditDataset_']").off('click').on('click', function (e) {
             e.preventDefault();
             window.location = "/BusinessIntelligence/Edit/?" + "id=" + encodeURI($(this).data("id"));
