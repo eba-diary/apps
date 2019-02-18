@@ -100,7 +100,6 @@ namespace Sentry.data.Web.Tests
             var model = (result.Model as HomeModel);
 
             Assert.IsFalse(model.CanEditDataset);
-            Assert.IsTrue(model.CanUpload);
         }
 
         [TestMethod]
@@ -118,21 +117,6 @@ namespace Sentry.data.Web.Tests
             var model = (result.Model as HomeModel);
 
             Assert.IsTrue(model.CanEditDataset);
-            Assert.IsTrue(model.CanUpload);
-        }
-
-        [TestMethod]
-        [TestCategory("Dataset Controller")]
-        public void Dataset_Controller_Create_Without_Model_Check_Create_URL()
-        {
-            var user = MockUsers.App_DataMgmt_Upld();
-            var ds = MockClasses.MockDataset();
-            var dac = MockControllers.MockDatasetController(ds, user);
-
-            var result = dac.Create() as ViewResult;
-
-            //We don't want to see Index in the URL
-            Assert.AreEqual("DatasetForm", result.ViewName);
         }
 
 

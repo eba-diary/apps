@@ -15,18 +15,13 @@ namespace Sentry.data.Web
 
         //###  BEGIN Sentry.Data  A### - Code below is Sentry.Data-specific
         public Boolean CanApproveAssets { get; set; }
-        public Boolean CanManageConfigs { get; set; }
+        public Boolean CanEditDataset { get; set; }
         public Boolean CanManageAssetAlerts { get; set; }
         public Boolean CanViewOnly { get; set; }
         public Boolean CanViewDataset { get; set; }
         public Boolean CanViewDataAsset { get; set; }
         public Boolean CanViewReports { get; set; }
-        public Boolean CanEditDataset { get; set; }
         public Boolean CanManageReports { get; set; }
-        public Boolean CanUpload { get; set; }
-        public Boolean CanQueryTool { get; set; }
-        public Boolean CanQueryToolPowerUser { get; set; }
-        public Boolean AdminUser { get; set; }
 
     }
 }

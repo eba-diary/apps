@@ -1,6 +1,5 @@
 ﻿using Sentry.data.Common;
 using Sentry.data.Core;
-using Sentry.data.Core.Entities.Metadata;
 using Sentry.data.Infrastructure;
 using System;
 using System.Collections.Generic;
@@ -72,7 +71,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("schemas/{SchemaID}")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         [SwaggerResponse(System.Net.HttpStatusCode.OK,null,typeof(SchemaModel))]
         public async Task<IHttpActionResult> GetBasicMetadataInformationForSchema(int SchemaID)
         {
@@ -88,7 +86,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("datasets/{DatasetConfigID}")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> GetBasicMetadataInformationFor(int DatasetConfigID)
         {
             DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
@@ -155,7 +152,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("datasets/{DatasetConfigID}/schemas/{SchemaID}/hive")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         public async Task<IHttpActionResult> GetPrimaryHiveTableFor(int DatasetConfigID, int SchemaID = 0)
         {
             DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
@@ -188,7 +184,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("datasets/{DatasetConfigID}/schemas/{SchemaID}/columns")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(OutputSchema))]
         public async Task<IHttpActionResult> GetColumnSchemaInformationFor(int DatasetConfigID, int SchemaID = 0)
         {
@@ -205,7 +200,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("schemas/{SchemaID}/columns")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaDetailModel))]
         public async Task<IHttpActionResult> GetColumnSchemaInformationForSchema(int SchemaID)
         {

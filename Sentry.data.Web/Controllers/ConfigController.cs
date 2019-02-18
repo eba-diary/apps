@@ -2,7 +2,6 @@
 using Sentry.Core;
 using Sentry.data.Common;
 using Sentry.data.Core;
-using Sentry.data.Core.Entities.Metadata;
 using Sentry.data.Infrastructure;
 using Sentry.data.Web.Helpers;
 using Sentry.data.Web.Models;
@@ -29,11 +28,11 @@ namespace Sentry.data.Web.Controllers
         private ISASService _sasService;
         private IAppCache _cache;
         public IEventService _eventService;
-
+        public IDatasetService _DatasetService;
 
         public ConfigController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, 
             ISASService sasService, IAssociateInfoProvider associateInfoService, IConfigService configService,
-            IEventService eventService)
+            IEventService eventService, IDatasetService datasetService)
         {
             _cache = new CachingService();
             _datasetContext = dsCtxt;
@@ -43,21 +42,22 @@ namespace Sentry.data.Web.Controllers
             _associateInfoProvider = associateInfoService;
             _configService = configService;
             _eventService = eventService;
+            _DatasetService = datasetService;
         }
 
         [HttpGet]
         [Route("Config/Dataset/{id}")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Index(int id)
         {
             Dataset ds = _datasetContext.GetById(id);
+
+            UserSecurity us = _DatasetService.GetUserSecurityForDataset(id);
+
             ObsoleteDatasetModel bdm = new ObsoleteDatasetModel(ds, _associateInfoProvider, _datasetContext)
             {
-                CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive,
-                CanEditDataset = SharedContext.CurrentUser.CanEditDataset,
-                CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs,
-                CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive,
-                CanUpload = SharedContext.CurrentUser.CanUpload
+                CanEditDataset = us.CanEditDataset,
+                CanUpload = us.CanUploadToDataset
             };
 
             Event e = new Event();
@@ -76,7 +76,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/Dataset/{id}/Create")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Create(int id)
         {
             Dataset parent = _datasetContext.GetById<Dataset>(id);
@@ -106,7 +106,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/Dataset/{id}/Create")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Create(DatasetFileConfigsModel dfcm)
         {
 
@@ -200,7 +200,6 @@ namespace Sentry.data.Web.Controllers
 
         private DataElement CreateNewDataElement(DatasetFileConfigsModel dfcm)
         {
-            List<DataElementDetail> details = new List<DataElementDetail>();
 
             Dataset ds = _datasetContext.GetById<Dataset>(dfcm.DatasetId);
 
@@ -225,7 +224,7 @@ namespace Sentry.data.Web.Controllers
                 HiveDatabase = "Default",
                 HiveTable = ds.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dfcm.ConfigFileName.Replace(" ", "").ToUpper(),
                 HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
-                HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
+                HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
             };
 
             return de;
@@ -233,7 +232,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/Manage")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Manage()
         {
             DatasetFileConfigsModel edfc = new DatasetFileConfigsModel();
@@ -253,7 +252,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/Edit/{configId}")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Edit(int configId)
         {
             DatasetFileConfig dfc = _datasetContext.getDatasetFileConfigs(configId);
@@ -283,7 +282,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult GetEditConfigPartialView(int configId)
         {
             DatasetFileConfig dfc = _datasetContext.getDatasetFileConfigs(configId);
@@ -301,7 +300,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/Edit/{configId}")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Edit(EditDatasetFileConfigModel edfc)
         {
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(edfc.ConfigId);
@@ -330,7 +329,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/{configId}/Job/Create")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult CreateRetrievalJob(int configId)
         {
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configId);
@@ -358,7 +357,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/{configId}/Job/Create")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult CreateRetrievalJob(CreateJobModel cjm)
         {
             try
@@ -477,7 +476,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/{configId}/Job/Edit/{jobId}")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditRetrievalJob(int configId, int jobId)
         {
             RetrieverJob retrieverJob = _datasetContext.GetById<RetrieverJob>(jobId);
@@ -505,7 +504,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/{configId}/Job/Edit/{jobId}")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditRetrievalJob(EditJobModel ejm)
         {
             RetrieverJob rj = _datasetContext.GetById<RetrieverJob>(ejm.JobID);
@@ -584,7 +583,7 @@ namespace Sentry.data.Web.Controllers
                    {
                        Text = v.Name,
                        Value = v.DiscrimatorValue,
-                       Disabled = v.DiscrimatorValue == "DFSBasic" ? true : false
+                       Disabled = v.DiscrimatorValue == "DFSBasic"
                    }).ToList();
 
                 temp2 = DataSourcesByType(ejm.SelectedSourceType, ejm.SelectedDataSource).Where(x => x.Text == retrieverJob.DataSource.Name).ToList();
@@ -596,7 +595,7 @@ namespace Sentry.data.Web.Controllers
                    {
                        Text = v.Name,
                        Value = v.DiscrimatorValue,
-                       Disabled = v.DiscrimatorValue == "S3Basic" ? true : false
+                       Disabled = v.DiscrimatorValue == "S3Basic"
                    }).ToList();
 
                 temp2 = DataSourcesByType(ejm.SelectedSourceType, ejm.SelectedDataSource).Where(x => x.Text == retrieverJob.DataSource.Name).ToList();
@@ -608,7 +607,7 @@ namespace Sentry.data.Web.Controllers
                    {
                        Text = v.Name,
                        Value = v.DiscrimatorValue,
-                       Disabled = v.DiscrimatorValue == "DFSBasic" || v.DiscrimatorValue == "S3Basic" ? true : false
+                       Disabled = v.DiscrimatorValue == "DFSBasic" || v.DiscrimatorValue == "S3Basic"
                    }).ToList();
 
                 temp.Add(new SelectListItem()
@@ -652,7 +651,7 @@ namespace Sentry.data.Web.Controllers
                 {
                     Text = s,
                     Value = counter.ToString(),
-                    Selected = retrieverJob.ReadableSchedule == s ? true : false,
+                    Selected = retrieverJob.ReadableSchedule == s,
                     Disabled = false
                 });
 
@@ -668,9 +667,6 @@ namespace Sentry.data.Web.Controllers
 
             ejm.CompressionTypesDropdown = Enum.GetValues(typeof(CompressionTypes)).Cast<CompressionTypes>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
-
-
-            List<string> a = new List<string>();
 
 
 
@@ -701,7 +697,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/Source/Create")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult CreateSource()
         {
             CreateSourceModel csm = new CreateSourceModel();
@@ -723,7 +719,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/Source/Create")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult CreateSource(CreateSourceModel csm)
         {
             DataSource source = null;
@@ -931,7 +927,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/Source/Edit/{sourceID}")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditSource(int sourceID)
         {
             DataSource ds = _datasetContext.GetById<DataSource>(sourceID);
@@ -954,7 +950,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/Source/Edit/{sourceID}")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditSource(EditSourceModel esm)
         {
             try
@@ -1078,7 +1074,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/Extension/Create")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult CreateExtensionMapping()
         {
             CreateExtensionMapModel cem = new CreateExtensionMapModel();
@@ -1089,7 +1085,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/Extension/Create")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult CreateExtensionMapping(CreateExtensionMapModel cem)
         {
             int changeCnt = 0;
@@ -1157,7 +1153,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public JsonResult SourcesByType(string sourceType)
         {
             return Json(DataSourcesByType(sourceType, null), JsonRequestBehavior.AllowGet);
@@ -1228,17 +1224,17 @@ namespace Sentry.data.Web.Controllers
             if (authtype.Is<BasicAuthentication>())
             {
                 AuthenticationType auth = _datasetContext.AuthTypes.Where(w => w is BasicAuthentication).First();
-                return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID ? true : false };
+                return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID };
             }
             else if (authtype.Is<AnonymousAuthentication>())
             {
                 AuthenticationType auth = _datasetContext.AuthTypes.Where(w => w is AnonymousAuthentication).First();
-                return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID ? true : false };
+                return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID };
             }
             else if (authtype.Is<TokenAuthentication>())
             {
                 AuthenticationType auth = _datasetContext.AuthTypes.Where(w => w is TokenAuthentication).First();
-                return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID ? true : false };
+                return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID };
             }
             else
             {
@@ -1256,32 +1252,32 @@ namespace Sentry.data.Web.Controllers
                 case "FTP":
                     List<DataSource> fTpList = _datasetContext.DataSources.Where(x => x is FtpSource).ToList();
                     output = fTpList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
                     break;
                 case "SFTP":
                     List<DataSource> sfTpList = _datasetContext.DataSources.Where(x => x is SFtpSource).ToList();
                     output = sfTpList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
                     break;
                 case "DFSBasic":
                     List<DataSource> dfsBasicList = _datasetContext.DataSources.Where(x => x is DfsBasic).ToList();
                     output = dfsBasicList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
                     break;
                 case "DFSCustom":
                     List<DataSource> dfsCustomList = _datasetContext.DataSources.Where(x => x is DfsCustom).ToList();
                     output = dfsCustomList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
                     break;
                 case "S3Basic":
                     List<DataSource> s3BasicList = _datasetContext.DataSources.Where(x => x is S3Basic).ToList();
                     output = s3BasicList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
                     break;
                 case "HTTPS":
                     List<DataSource> HttpsList = _datasetContext.DataSources.Where(x => x is HTTPSSource).ToList();
                     output = HttpsList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id ? true : false }).ToList();
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
                     break;
                 default:
                     throw new NotImplementedException();
@@ -1344,18 +1340,18 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/{configId}/Schema/{schemaId}/Fields")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Fields(int configId, int schemaId)
         {
             DatasetFileConfig config = _datasetContext.GetById<DatasetFileConfig>(configId);
 
+            UserSecurity us = _DatasetService.GetUserSecurityForConfig(configId);
+
+
             ObsoleteDatasetModel bdm = new ObsoleteDatasetModel(config.ParentDataset, _associateInfoProvider, _datasetContext)
             {
-                CanDwnldSenstive = SharedContext.CurrentUser.CanDwnldSenstive,
-                CanEditDataset = SharedContext.CurrentUser.CanEditDataset,
-                CanManageConfigs = SharedContext.CurrentUser.CanManageConfigs,
-                CanDwnldNonSensitive = SharedContext.CurrentUser.CanDwnldNonSensitive,
-                CanUpload = SharedContext.CurrentUser.CanUpload
+                CanEditDataset = us.CanEditDataset,
+                CanUpload =us.CanUploadToDataset
             };
 
             Event e = new Event();
@@ -1370,20 +1366,6 @@ namespace Sentry.data.Web.Controllers
             e.Reason = "Viewed Edit Fields";
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
-            //DataElement de = _datasetContext.GetById<DataElement>(schemaId);
-
-            //if (de.DataObjects.Count == 0)
-            //{
-            //    List<DataObject> dobjList = new List<DataObject>();
-            //    de.DataObjects = dobjList;
-            //    //ViewBag.Schema = _datasetContext.GetById<DataElement>(schemaId);
-            //    ViewBag.Schema = de;
-            //}
-            //else
-            //{
-                
-            //}
-
             ViewBag.Schema = _datasetContext.GetById<DataElement>(schemaId);
 
             return View(bdm);
@@ -1391,7 +1373,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/{configId}/Schema/{schemaId}/UpdateFields")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public JsonResult UpdateFields(int configId, int schemaId, List<SchemaRow> schemaRows)
         {
             try
@@ -1410,7 +1392,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/{configId}/Schema/Create")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult CreateSchema(int configId)
         {
             //throw new NotImplementedException();
@@ -1441,7 +1423,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/{configId}/Schema/Create")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult CreateSchema(int configId, CreateSchemaModel csm)
         {
             //throw new NotImplementedException();
@@ -1478,7 +1460,7 @@ namespace Sentry.data.Web.Controllers
                         HiveDatabase = "Default",
                         HiveTable = dfc.ParentDataset.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dfc.Name.Replace(" ", "").ToUpper(),
                         HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
-                        HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
+                        HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
                     };
 
                     dfc.Schema.Add(de);
@@ -1512,7 +1494,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("Config/{configId}/Schema/{schemaId}/Edit")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditSchema(int configId, int schemaId)
         {
             DataElement schema = _datasetContext.GetById<DataElement>(schemaId);
@@ -1544,7 +1526,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpPost]
         [Route("Config/{configId}/Schema/{schemaId}/Edit")]
-        [AuthorizeByPermission(PermissionNames.ManageDataFileConfigs)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditSchema(int configId, int schemaId, EditSchemaModel esm)
         {
             DataElement schema = _datasetContext.GetById<DataElement>(schemaId);

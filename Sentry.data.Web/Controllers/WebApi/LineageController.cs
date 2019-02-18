@@ -2,7 +2,6 @@
 using Sentry.Common.Logging;
 using Sentry.data.Common;
 using Sentry.data.Core;
-using Sentry.data.Core.Entities.Metadata;
 using Sentry.data.Infrastructure;
 using System;
 using System.Linq;
@@ -54,7 +53,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("lineage")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS4014")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS1998")]
         public async Task<IHttpActionResult> GetLineageFor(int? DataAsset_ID = null, string DataElement_NME = "", string DataObject_NME = "", string DataObjectField_NME = "", string LineCDE = "")
@@ -111,7 +109,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("populateFirst")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS4014")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS1998")]
         public async Task<IHttpActionResult> PopulateFirstList(int? DataAsset_ID = null, string DataElement_NME = "", string DataObject_NME = "", string DataObjectField_NME = "")
@@ -141,7 +138,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("description")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS4014")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS1998")]
         public async Task<IHttpActionResult> GetDescriptionFor(int? DataAsset_ID = null, string DataElement_NME = "", string DataObject_NME = "", string DataObjectField_NME = "", string LineCDE = "")
@@ -180,7 +176,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("elements")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS4014")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS1998")]
         public async Task<IHttpActionResult> GetDataElementsFor(int? DataAsset_ID = null, string DataElement_NME = "", string DataObject_NME = "", string DataObjectField_NME = "", string LineCDE = "")
@@ -210,7 +205,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("objects")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS4014")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS1998")]
         public async Task<IHttpActionResult> GetDataObjectsFor(int? DataAsset_ID = null, string DataElement_NME = "", string DataObject_NME = "", string DataObjectField_NME = "", string LineCDE = "")
@@ -237,7 +231,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("businessTermDescription")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS4014")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS1998")]
         public async Task<IHttpActionResult> BusinessTermDescription(int? DataAsset_ID = null, string DataObjectField_NME = "", string LineCDE = "")
@@ -267,7 +260,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("businessTerms")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS4014")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS1998")]
         public async Task<IHttpActionResult> BusinessTerms(int? DataAsset_ID = null, string DataElement_NME = "", string DataObject_NME = "", string DataObjectField_NME = "", string LineCDE = "")
@@ -296,7 +288,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("layers")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS4014")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS1998")]
         public async Task<IHttpActionResult> Layers(int? DataAsset_ID = null, string DataElement_NME = "", string DataObject_NME = "", string DataObjectField_NME = "", string LineCDE = "")
@@ -325,7 +316,6 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("lineageTables")]
-        [AuthorizeByPermission(PermissionNames.QueryToolUser)]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS4014")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS1998")]
         public async Task<IHttpActionResult> LineageTables(int? DataAsset_ID = null, string DataElement_NME = "", string DataObject_NME = "", string DataObjectField_NME = "", string LineCDE = "")

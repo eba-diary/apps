@@ -116,8 +116,8 @@ else
                             @if (Model.CanManageReports)
                             {
                                 <li class="divider"></li>
-                                <li class="dropdown-header">Exhibit Actions</li>                                
-                                <li><a href="/BusinessIntelligence/Create" >Create Exhibit</a></li>
+                                <li class="dropdown-header">Exhibit Actions</li>
+                                <li><a href="/BusinessIntelligence/Create">Create Exhibit</a></li>
                             }
                         </ul>
                     </li>
@@ -131,35 +131,20 @@ else
                             <li><a href="~/Dataset/Index">Home</a></li>
                             <li><a href="~/Search/Datasets">Search</a></li>
 
-                            @if (Model.CanManageConfigs || Model.CanEditDataset || Model.CanUpload)
+                            @if (Model.CanEditDataset)
                             {
                                 <li class="divider"></li>
                                 <li class="dropdown-header">Dataset Actions</li>
 
-                                if (Model.CanEditDataset)
-                                {
-                                    <li><a href="/Dataset/Create" >Create Dataset</a></li>
-                                }
-
-                                if (Model.CanUpload)
-                                {
-                                    <li><a href="#" onclick="data.Dataset.UploadFileModal(0)">Upload Data File</a></li>
-                                }
-
-                                if (Model.CanManageConfigs)
-                                {
-                                    if (Model.CanManageConfigs)
-                                    {
-                                        <li class="divider"></li>
-                                        <li class="dropdown-header">Dataset Administration</li>
-                                        <li><a href="/Config/Manage">Manage Configs</a></li>
-                                    }
-                                }
+                                <li><a href="/Dataset/Create">Create Dataset</a></li>
+                                <li class="divider"></li>
+                                <li class="dropdown-header">Dataset Administration</li>
+                                <li><a href="/Config/Manage">Manage Configs</a></li>
                             }
                         </ul>
                     </li>
                 }
-                
+
                 @if (Model.CanViewDataAsset)
                 {
                     <li class="dropdown">
@@ -246,12 +231,9 @@ else
                     </li>
                 }
 
-                @if (Model.CanQueryToolPowerUser || Model.CanQueryTool)
-                {
-                    <li>
-                        <a href="~/Dataset/QueryTool" class="">Query Tool</a>
-                    </li>
-                }
+                <li>
+                    <a href="~/Dataset/QueryTool" class="">Query Tool</a>
+                </li>
 
 
 

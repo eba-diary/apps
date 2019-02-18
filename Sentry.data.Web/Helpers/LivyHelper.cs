@@ -1,7 +1,6 @@
 ﻿using Sentry.data.Core;
 using Sentry.data.Core.Entities;
 using Sentry.data.Core.Entities.Livy;
-using Sentry.data.Core.Entities.Metadata;
 using Sentry.data.Web.Controllers;
 using System;
 using System.Collections.Generic;

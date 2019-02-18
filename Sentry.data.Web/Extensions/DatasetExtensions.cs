@@ -16,9 +16,12 @@ namespace Sentry.data.Web
                 DatasetName = model.DatasetName,
                 DatasetDesc = model.DatasetDesc,
                 DatasetInformation = model.DatasetInformation,
-                SentryOwnerId = model.SentryOwnerId,
-                CreationUserName = model.CreationUserName,
-                UploadUserName = model.UploadUserName,
+                PrimaryOwnerId = model.PrimaryOwnerId,
+                PrimaryOwnerName = model.PrimaryOwnerName,
+                PrimaryContactId = model.PrimaryContactId,
+                PrimaryContactName = model.PrimaryContactName,
+                CreationUserId = model.CreationUserId,
+                UploadUserId = model.UploadUserId,
                 DatasetDtm = DateTime.Now,
                 ChangedDtm = DateTime.Now,
                 OriginationId = model.OriginationID,
@@ -27,7 +30,8 @@ namespace Sentry.data.Web
                 FileExtensionId = model.FileExtensionId,
                 Delimiter = model.Delimiter,
                 DatasetScopeTypeId = model.DatasetScopeTypeId,
-                DataClassification = model.DataClassification
+                DataClassification = model.DataClassification,
+                IsSecured = model.IsSecured
             };
         }
 

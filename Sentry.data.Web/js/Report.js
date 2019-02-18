@@ -39,7 +39,7 @@ data.Report = {
         });
     },
 
-    FormInit: function () {
+    FormInit: function (hrEmpUrl, hrEmpEnv) {
 
         $("#DatasetCategoryIds").select2({
             placeholder:"Select Categories"
@@ -67,29 +67,29 @@ data.Report = {
 
         /// Initialize the Create Exhibit view
         //Set Secure HREmp service URL for associate picker
-        $.assocSetup({ url: "https://hrempsecure.sentry.com/api/associates" });
-
-        var picker = $("#SentryOwnerName");
-
-        picker.assocAutocomplete({
+        $.assocSetup({ url: hrEmpUrl });
+        var permissionFilter = "ReportModify,DatasetManagement," + hrEmpEnv;
+        $("#PrimaryOwnerName").assocAutocomplete({
             associateSelected: function (associate) {
-                $('#SentryOwnerId').val(associate.Id);
-            }
+                $('#PrimaryOwnerId').val(associate.Id);
+            },
+            filterPermission: permissionFilter,
+            minLength: 0,
+            maxResults: 10
+        });
+        $("#PrimaryContactName").assocAutocomplete({
+            associateSelected: function (associate) {
+                $('#PrimaryContactId').val(associate.Id);
+            },
+            filterPermission: permissionFilter,
+            minLength: 0,
+            maxResults: 10
         });
 
         //determine the cancel button url
         $("[id^='CancelButton']").off('click').on('click', function (e) {
             e.preventDefault();
             window.location = data.Report.CancelLink($(this).data("id"));
-        });
-
-        $(".detailNameLink").click(function () {
-            var artifactLink = $(this).data('ArtifactLink');
-            var locationType = $(this).data('LocationType');
-            if (locationType === 'file') {
-                artifactLink = encodeURI(artifactLink);
-            }
-            data.Report.OpenReport(locationType, artifactLink);
         });
 
         $("#FileTypeId").change(function () {
@@ -100,7 +100,18 @@ data.Report = {
     },
 
     DetailInit: function () {
-        /// Initialize the dataset detail page for data assets
+
+        // Initialize the dataset detail page
+
+        $(".detailNameLink").click(function () {
+            var artifactLink = $(this).data('artifactlink');
+            var locationType = $(this).data('locationtype');
+            if (locationType === 'file') {
+                artifactLink = encodeURI(artifactLink);
+            }
+            data.Report.OpenReport(locationType, artifactLink);
+        });
+
         $("[id^='EditDataset_']").off('click').on('click', function (e) {
             e.preventDefault();
             window.location = "/BusinessIntelligence/Edit/?" + "id=" + encodeURI($(this).data("id"));
@@ -168,6 +179,7 @@ data.Report = {
     },
 
     OpenReport: function (artifactType, artifactPath) {
+
         // check what type we're working with
         if (artifactType === 'file') {
 
