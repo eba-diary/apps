@@ -111,26 +111,37 @@ namespace Sentry.data.Web.Controllers
         {
 
             List<SearchModel> models = new List<SearchModel>();
-            List<Dataset> dsList;
+            IQueryable<Dataset> dsQuery;
 
             switch (searchType)
             {
                 case "BusinessIntelligence":
-                    dsList = _datasetContext.Datasets.Where(x => x.DatasetType == GlobalConstants.DataEntityCodes.REPORT && x.CanDisplay).ToList();
+                    dsQuery = _datasetContext.Datasets.Where(x => x.DatasetType == GlobalConstants.DataEntityCodes.REPORT && x.CanDisplay);
                     break;
                 case "Datasets":
-                    dsList = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET && w.CanDisplay).ToList();
+                    dsQuery = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET && w.CanDisplay);
                     break;
                 default:
-                    dsList = _datasetContext.Datasets.Where(x=> x.CanDisplay).ToList();
+                    dsQuery = _datasetContext.Datasets.Where(x=> x.CanDisplay);
                     break;
+            }
+
+            var dsList = dsQuery.FetchAllChildren(_datasetContext);
+            var dsIds = dsList.Select(x => x.DatasetId.ToString()).ToList();
+
+            var events = new List<Event>();
+            foreach (var group in dsIds.Split(1000))
+            {
+                events.AddRange(_datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset.HasValue && dsIds.Contains(x.Dataset.Value.ToString())).ToList());
             }
 
             foreach (Dataset ds in dsList.OrderBy(x => x.DatasetName).ToList())
             {
-                SearchModel sm = new SearchModel(ds, _associateInfoProvider);
-                sm.IsFavorite = ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId);
-                sm.PageViews = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset == ds.DatasetId).Count();
+                SearchModel sm = new SearchModel(ds, _associateInfoProvider)
+                {
+                    IsFavorite = ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId),
+                    PageViews = events.Count(x => x.Dataset == ds.DatasetId)
+                };
                 models.Add(sm);
             }
 
