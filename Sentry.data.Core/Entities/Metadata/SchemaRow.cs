@@ -16,7 +16,7 @@ namespace Sentry.data.Core
         public int DataObjectField_ID { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public string Type { get; set; }
+        public string DataType { get; set; }
         public string ArrayType { get; set; }
         public string Length { get; set; }
         public string Precision { get; set; }

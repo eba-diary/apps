@@ -8,7 +8,8 @@
 									(3, 'PL State Management', 3),
 									(4, 'Pricing',  4),
 									(5, 'Sales',  5),
-									(6, 'Underwriting', 6)
+									(6, 'Underwriting', 6),
+									(7, 'Safety Services', 7)
 								)
 								AS Source (DatasetFunction_Id, [Name], [Sequence]) 
 

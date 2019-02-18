@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Sentry.data.Core.Entities.Metadata
+namespace Sentry.data.Core
 {
     public class DataElement
     {
@@ -147,6 +147,18 @@ namespace Sentry.data.Core.Entities.Metadata
             set
             {
                 SetDataElementDetailValue("HiveTableStatus", value);
+            }
+        }
+        public virtual string HiveLocation
+        {
+            get
+            {
+                DataElementDetail detail = GetElementDetail("HiveLocation");
+                return (detail == null) ? null : detail.DataElementDetailType_VAL;
+            }
+            set
+            {
+                SetDataElementDetailValue("HiveLocation", value);
             }
         }
         public virtual string StorageCode

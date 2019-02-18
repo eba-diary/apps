@@ -20,7 +20,7 @@ namespace Sentry.data.Web
 
         public ObsoleteDatasetModel(Dataset ds, IAssociateInfoProvider associateInfoService, IDatasetContext datasetContext = null)
         {
-            this.SentryOwner = associateInfoService.GetAssociateInfo(ds.SentryOwnerName);
+            this.SentryOwner = associateInfoService.GetAssociateInfo(ds.PrimaryOwnerId);
             this.SentryOwnerName = this.SentryOwner.FullName;
             this.DatasetId = ds.DatasetId;
             this.Category = ds.DatasetCategories.First().Name;
@@ -42,7 +42,7 @@ namespace Sentry.data.Web
             this.FileExtension = null;
             this.DatasetDtm = ds.DatasetDtm;
             this.ChangedDtm = ds.ChangedDtm;
-            this.IsSensitive = ds.IsSensitive;
+            this.IsSecured = ds.IsSecured;
             this.CanDisplay = ds.CanDisplay;
             this.DatasetInformation = ds.DatasetInformation;
 
@@ -90,7 +90,7 @@ namespace Sentry.data.Web
             else
             { this.IsPreviewCompatible = false; }
 
-            if (!String.IsNullOrWhiteSpace(ds.DatasetType) && ds.DatasetType == GlobalConstants.DataEntityTypes.REPORT)
+            if (!String.IsNullOrWhiteSpace(ds.DatasetType) && ds.DatasetType == GlobalConstants.DataEntityCodes.REPORT)
             {
                 List<MetadataTag> tagList = new List<MetadataTag>();
                 foreach (MetadataTag tag in ds.Tags)
@@ -223,7 +223,7 @@ namespace Sentry.data.Web
         public string S3Key { get; set; }
 
         [DisplayName("Sensitive")]
-        public Boolean IsSensitive { get; set; }
+        public Boolean IsSecured { get; set; }
 
         [DisplayName("Data Classification")]
         public string DataClassification { get; set; }
@@ -231,11 +231,8 @@ namespace Sentry.data.Web
         public Boolean CanDisplay { get; set; }
 
 
-        public Boolean CanDwnldSenstive { get; set; }
         public Boolean CanEditDataset { get; set; }
-        public Boolean CanManageConfigs { get; set; }
         public Boolean CanUpload { get; set; }
-        public Boolean CanDwnldNonSensitive { get; set; }
         public Boolean IsPushToSASCompatible { get; set; }
         public Boolean IsPushToTableauCompatible { get; set; }
         public Boolean IsPreviewCompatible { get; set; }

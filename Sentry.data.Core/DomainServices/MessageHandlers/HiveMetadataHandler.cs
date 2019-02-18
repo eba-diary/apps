@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Sentry.Messaging.Common;
 using Sentry.Common.Logging;
 using Newtonsoft.Json;
-using Sentry.data.Core.Entities.Metadata;
 using StructureMap;
 
 namespace Sentry.data.Core

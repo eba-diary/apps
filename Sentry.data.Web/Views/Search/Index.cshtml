@@ -4,58 +4,41 @@
 
 @{
     ViewBag.Title = "Datasets";
-}
-@{
     @Html.AntiForgeryToken()
 }
 
-<div id="main">
-    <div class="col-md-3 textCenter">
-        <div class="listHeadGroup">
-            <img src="~/Images/Icons/DatasetsBlue.svg" class="datasetImg leftFloat" data-bind="visible: IsShownForCurrentType('Datasets')" style="display: none;" />
-            <img src="~/Images/Icons/Business IntelligenceBlue.svg" class="datasetImg leftFloat" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;" />
-            <h1 class="htCenter datasetHeader" data-bind="visible: IsShownForCurrentType('Datasets')" style="display: none;">Datasets</h1>
-            <h1 class="htCenter datasetHeader" data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;">Business Intelligence</h1>
-        </div>
-    </div>
-    <div class="navbar-form navbar-center">
-        <div class="col-md-9 textCenter">
-            <div class="searchBoxDS  has-feedback has-feedback-left">
-                <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Datasets..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('Datasets'), event: {'keyup': searchResults.toFirstPage }" autocomplete="off" style="display: none;">
-                <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Exhibits and Dashboards..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('BusinessIntelligence')" autocomplete="off" style="display: none;">
-                <i class="form-control-feedback glyphicon glyphicon-search"></i>
-            </div>
-        </div>
+<div id="search-pg-wrapper">
 
-        <div id="filterSpinner">
-            <div class="sentry-spinner-container" style=" width: 1166px; padding-top: 150px;">
-                <span class="sentry-spinner" style="height:100px"></span>
-            </div>
-            <div class="col-sm-3 clearFloat no-padding hidden-sm hidden-xs" id="filterColumn" style="display:none;">
-                <div class="outsideFilters" id="outsideFilters">
+    <div class="row">
 
+        @* filters *@
+        <div class="hidden-xs hidden-sm col-md-3 col-lg-3">
+            <div id="search-pg-filters">
+
+                @*<p id="filter-by-label" style="display: none;">Filter by:</p>*@
+                <div id="filterColumn" style="display:none;">
                     <!-- ko foreach: AllFilters -->
-                    <!-- THE CATEGORY HEADER-->
-                    <div class="panel panel-default dataset-list-filters boxShadow" data-bind="css : BorderColor">
-                        <div class="panel-heading filterHead white" data-bind="css : BannerColor, attr: { id: HeadId }">
-                            <span data-bind="text : Name"></span>
-                            <span class="glyphicon glyphicon-chevron-up rightFloat filterViewIcon" data-bind="css : Color, visible:  OrderedFilters().length > 0, attr: { id: HeadIcon }"></span>
+                    @* category header *@
+                    <div class="panel panel-default dataset-list-filters">
+                        <div class="panel-heading filterHead" data-bind="attr: { id: HeadId }">
+                            <span class="filterCategoryName" data-bind="text : Name"></span>
+                            <span class="glyphicon glyphicon-chevron-down rightFloat filterViewIcon" data-bind="attr: { id: HeadIcon }"></span>
                         </div>
 
-                        <!-- FOREACH OF THE CATEGORY FILTERS-->
-                        <div class="dataset-list-filter-category panel-body" data-bind="attr: {id : HeadHide }">
+                        @* foreach of the category filters *@
+                        <div class="dataset-list-filter-category panel-body" data-bind="attr: {id : HeadHide }" style="display: none;">
                             <!-- ko if: OrderedFilters().length > 0 -->
                             <ul class="list-unstyled ul-filter-list">
+
                                 <!-- ko foreach: OrderedFilters -->
                                 <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6">
                                     <label data-bind="attr: { id: id }">
                                         <input type="checkbox" class="filterChbx"
                                                data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }" />
-                                        <span data-bind="text : Title"></span>
-                                        <span class="badge badge-info" data-bind="text : Count, css : $parent.BannerColor"></span>
+                                        <strong data-bind="text : Title"></strong>
+                                        <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
                                     </label>
                                 </li>
-
                                 <!-- /ko -->
 
                                 <li data-bind="attr: {id : HiddenMore}">
@@ -65,8 +48,8 @@
                                             <label data-bind="attr: { id: id }">
                                                 <input type="checkbox" class="filterChbx"
                                                        data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }" />
-                                                <span data-bind="text : Title"></span>
-                                                <span class="badge badge-info" data-bind="text : Count, css : $parent.BannerColor"></span>
+                                                <strong data-bind="text : Title"></strong>
+                                                <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
                                             </label>
                                         </li>
                                     </ul>
@@ -75,7 +58,6 @@
 
                             </ul>
                             <!-- /ko -->
-
                             <!-- ko if: OrderedFilters().length > 6 -->
                             <a href="#" class="filterMore" data-bind="attr: { id:  HiddenId}">
                                 <div class="glyphicon glyphicon-plus-sign inlineBlock moreIcon leftFloat" data-bind="attr : {id : IconMore}"></div>
@@ -88,176 +70,206 @@
 
                     <!-- /ko -->
                 </div>
+
             </div>
-            <div class="col-md-9 textCenter" id="dataColumn" style="display:none;">
-                <div id="DatasetItemList" class="dataset-list inlineBlock text-left">
-                    <div>
-                        <h4 class="found">
-                            Active Filters:
-                            <button type="button" class="btn btn-sm btn-primary" id="btnClearFilters" data-bind="click: clearFilters, enable: SelectedFilters().length !== 0">Clear Filters</button>
-                        </h4>
+        </div>
 
-                        <select multiple="" class="form-control select2-hidden-accessible"
-                                id="filterSelector" name="filterSelector" tabindex="-1" aria-hidden="true">
-                            <!-- ko foreach: AllFilters -->
-                            <optgroup data-bind="attr: {label: Name}">
-                                <!-- ko foreach: Filters -->
-                                <option data-bind="value: $data.id, text: $data.Title"></option>
-                                <!-- /ko -->
-                            </optgroup>
-                            <!-- /ko -->
-                        </select>
+        @* main content *@
+        <div class="col-xs-12 col-sm-12 col-md-9 col-lg-9">
+
+            <div id="search-pg-content-wrapper">
+                @* page title *@
+                <div class="listHeadGroup">
+                    <div data-bind="visible: IsShownForCurrentType('Datasets')" style="display: none;"><img src="~/Images/Icons/DatasetsBlue.svg" class="datasetImg leftFloat" /></div>
+                    <div data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;"><img src="~/Images/Icons/Business IntelligenceBlue.svg" class="datasetImg leftFloat" /></div>
+                    <div data-bind="visible: IsShownForCurrentType('Datasets')" style="display: none;"><h1 class="htCenter datasetHeader">Datasets</h1></div>
+                    <div data-bind="visible: IsShownForCurrentType('BusinessIntelligence')" style="display: none;"><h1 class="htCenter datasetHeader">Business Intelligence</h1></div>
+                </div>
+
+                @* spinner (shown until content loads) *@
+                <div id="filterSpinner">
+                    <div class="sentry-spinner-container" style="padding-top: 150px; margin-left: -80px;">
+                        <span class="sentry-spinner"></span>
                     </div>
+                </div>
 
-                    <div id="search-tile-header">
-                        @* number of items option *@
-                        <div id="nbr-search-results-wrapper" class="float-l">
-                            Showing
+                @* search box *@
+                <div class="searchBoxDS  has-feedback has-feedback-left">
+                    <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Datasets..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('Datasets'), event: {'keyup': searchResults.toFirstPage }" autocomplete="off" style="display: none;">
+                    <input class="form-control searchTextDS text-box single-line" id="SearchText" placeholder="Search Exhibits and Dashboards..." name="SearchText" type="text" data-bind="value: Query, valueUpdate: 'keyup', visible: IsShownForCurrentType('BusinessIntelligence')" autocomplete="off" style="display: none;">
+                    <i class="form-control-feedback glyphicon glyphicon-search"></i>
+                </div>
 
-                            <select id="search-results-choices" class="form-control" data-bind="event: { change: window.vm.limitSearchResults() }">
-                                <option value="15" selected>15</option>
-                                <option value="25">25</option>
-                                <option value="50">50</option>
-                                <option value="All">All</option>
+                @* filters/tiles (hidden by default until content loads *@
+                <div id="dataColumn" style="display:none;">
+                    <div id="DatasetItemList" class="dataset-list inlineBlock text-left">
+                        <div>
+                            <h4 class="found">
+                                Active Filters:
+                                <button type="button" class="btn btn-sm btn-primary" id="btnClearFilters" data-bind="click: clearFilters, enable: SelectedFilters().length !== 0">Clear Filters</button>
+                            </h4>
+
+                            <select multiple="" class="form-control select2-hidden-accessible"
+                                    id="filterSelector" name="filterSelector" tabindex="-1" aria-hidden="true">
+                                <!-- ko foreach: AllFilters -->
+                                <optgroup data-bind="attr: {label: Name}">
+                                    <!-- ko foreach: Filters -->
+                                    <option data-bind="value: $data.id, text: $data.Title"></option>
+                                    <!-- /ko -->
+                                </optgroup>
+                                <!-- /ko -->
                             </select>
-
-                            results
                         </div>
 
-                        @* sorting control *@
-                        <div id="sort-option-wrapper" class="float-r">
-                            <div>Sort by</div>
-                            <div>
-                                <select id="sort-results" class="form-control" data-bind="event: { change: window.vm.sortExhibits() }">
-                                    @foreach (SelectListItem sortOption in Model.SortByOptions)
-                                    {
-                                        <option value="@sortOption.Value">@sortOption.Text</option>
-                                    }
-                                </select>
+                        <div id="search-tile-header">
+                            @* number of items option *@
+                            <div id="nbr-search-results-wrapper" class="float-l">
+                                <div>Showing</div>
+                                <div>
+                                    <select id="search-results-choices" class="form-control" data-bind="event: { change: window.vm.limitSearchResults() }">
+                                        <option value="15" selected>15</option>
+                                        <option value="25">25</option>
+                                        <option value="50">50</option>
+                                        <option value="All">All</option>
+                                    </select>
+                                </div>
+                                <div>results</div>
+                            </div>
+
+                            @* sorting control *@
+                            <div id="sort-option-wrapper" class="float-r">
+                                <div>Sort by</div>
+                                <div>
+                                    <select id="sort-results" class="form-control" data-bind="event: { change: window.vm.sortExhibits() }">
+                                        @foreach (SelectListItem sortOption in Model.SortByOptions)
+                                        {
+                                            <option value="@sortOption.Value">@sortOption.Text</option>
+                                        }
+                                    </select>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults.pageItems">
-                        <li class="ul-dataset-list-item borderSide_gray boxShadowSm" data-bind="css : BorderColor, click: TileClicked, attr: { title: PrimaryTitle }">
-                            <div data-bind="if: $index > 20"></div>
-                            <div class="category-type-wrap">
-                                <div class="glyphicon glyphicon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none"></div>
-                                <div class="glyphicon glyphicon-star-empty btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite == false" style="display: none"></div>
-                                <div class="category-type" data-bind="css: BannerColor">
-                                    <span data-bind="text: AbbreviatedCategory" />
+                        <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults.pageItems">
+                            <li class="ul-dataset-list-item borderSide_gray boxShadowSm" data-bind="css : BorderColor, click: TileClicked, attr: { title: PrimaryTitle }">
+                                <div data-bind="if: $index > 20"></div>
+                                <div class="category-type-wrap">
+                                    <div class="glyphicon glyphicon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none"></div>
+                                    <div class="glyphicon glyphicon-star-empty btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite == false" style="display: none"></div>
+                                    <div class="category-type" data-bind="css: BannerColor, attr: {title: AbbreviatedCategory}">
+                                        <span data-bind="text: AbbreviatedCategory" />
+                                    </div>
                                 </div>
-                            </div>
-                            <div></div>
-                            <div class="dataset-list-content">
-                                <!-- ko foreach: DistinctFileExtensions -->
-                                <div class="extension bg_gray" data-bind="css : $data">
-                                    <span data-bind="text: $data" />
+                                <div></div>
+                                <div class="dataset-list-content">
+                                    <!-- ko foreach: DistinctFileExtensions -->
+                                    <div class="extension bg_gray" data-bind="css : $data">
+                                        <span data-bind="text: $data" />
+                                    </div>
+                                    <!-- /ko -->
+                                    <span class="search-dataset-name" data-bind="text: DatasetName"></span>
+                                    <!-- ko if: IsSecured-->
+                                    <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure"></i>
+                                    <!-- /ko -->
                                 </div>
-                                <!-- /ko -->
-                                <span class="search-dataset-name" data-bind="text: DatasetName"></span>
-                                <!-- ko if: IsSensitive-->
-                                <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure"></i>
-                                <!-- /ko -->
-                            </div>
 
-                            <div class="dataset-list-content">
-                                <div class="dataset-list-content-label"></div>
-                                <div class="dataset-list-content-value listDesc">
-                                    <span data-bind="text: DatasetDesc"></span>
+                                <div class="dataset-list-content">
+                                    <div class="dataset-list-content-label"></div>
+                                    <div class="dataset-list-content-value listDesc">
+                                        <span data-bind="text: DatasetDesc"></span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="dataset-list-content">
-                                <span class="custom-glyphiconz" aria-hidden="true" />
-                                <div class="dataset-list-content-label">
-                                    <div>
-                                        <div class="ownerDate">
-                                            <span class="textBold ownerDate" data-bind="css : Color">Sentry Owner:&nbsp;</span>
-                                            <span data-bind="text: SentryOwner"></span>
+                                <div class="dataset-list-content">
+                                    <span class="custom-glyphiconz" aria-hidden="true" />
+                                    <div class="dataset-list-content-label">
+                                        <div>
+                                            <div class="ownerDate">
+                                                <span class="bold ownerDate" data-bind="css : Color">Sentry Owner:&nbsp;</span>
+                                                <span data-bind="text: SentryOwner"></span>
 
-                                            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
 
-                                            <!-- ko ifnot: Type === "RPT" -->
-                                            <span class=" textBold ownerDate" data-bind="css : Color">Last Activity Date:&nbsp;</span>
-                                            <span data-bind="text: ChangedDtm"></span>
-                                            <!-- /ko -->
-                                            <!-- ko if: Type === "RPT" -->
-                                            <span class=" textBold ownerDate" data-bind="css : Color">Refresh Frequency:&nbsp;</span>
-                                            <span data-bind="text: UpdateFrequency"></span>
+                                                <!-- ko ifnot: Type === "RPT" -->
+                                                <span class=" bold ownerDate" data-bind="css : Color">Last Activity Date:&nbsp;</span>
+                                                <span data-bind="text: ChangedDtm"></span>
+                                                <!-- /ko -->
+                                                <!-- ko if: Type === "RPT" -->
+                                                <span class=" bold ownerDate" data-bind="css : Color">Refresh Frequency:&nbsp;</span>
+                                                <span data-bind="text: UpdateFrequency"></span>
 
-                                            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                                            <span class="textBold ownerDate link-btn btn btn-sm btn-info disregardParentClick" title="Go to the detail page">
-                                                <span class="disregardParentClick">Detail</span>
-                                            </span>
-                                            <!-- /ko -->
+                                                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+                                                <span class="bold ownerDate link-btn btn btn-sm btn-info disregardParentClick" title="Go to the detail page">
+                                                    <span class="disregardParentClick">Detail</span>
+                                                </span>
+                                                <!-- /ko -->
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
+                            </li>
+                        </ul>
+
+                        <div id="search-tile-footer" class="text-right">
+
+                            @* search results info display *@
+                            <div id="search-results-wrapper" class="footer-container">
+                                Results <span data-bind="text: searchResults.firstItemOnPage()"></span>-<span data-bind="text: searchResults.lastItemOnPage()"></span> of <span data-bind="text: searchResults.itemCount()"></span>
                             </div>
-                        </li>
-                    </ul>
 
-                    <div id="search-tile-footer" class="text-right">
+                            @* pagination controls *@
+                            <div id="pagination-wrapper">
+                                <ul class="pagination">
+                                    @* button to take you directly to the first page *@
+                                    <li data-bind="css: { disabled: searchResults.isFirstPage() }" class="previous disabled">
+                                        <a href="#" aria-label="First" data-bind="click: searchResults.toFirstPage" title="First">&laquo;</a>
+                                    </li>
+                                    @* button to take you to the prevoius page *@
+                                    <li data-bind="css: { disabled: !searchResults.hasPreviousPage() }" class="previous disabled">
+                                        <a href="#" aria-label="Previous" data-bind="click: searchResults.toPreviousPage" title="Previous">&lt;</a>
+                                    </li>
 
-                        @* search results info display *@
-                        <div id="search-results-wrapper" class="footer-container">
-                            Results <span data-bind="text: searchResults.firstItemOnPage()"></span>-<span data-bind="text: searchResults.lastItemOnPage()"></span> of <span data-bind="text: searchResults.itemCount()"></span>
+                                    @* loop through the pages, building a button for each *@
+                                    <!-- ko foreach: searchResults.pages -->
+                                    <li data-bind="css: { active: $data == $parent.searchResults.pageNumber() }">
+                                        <a href="#" data-bind="text: $data, click: $parent.searchResults.pageNumber.bind($data)"></a>
+                                    </li>
+                                    <!-- /ko -->
+                                    @* button to take you to the next page*@
+                                    <li data-bind="css: { disabled: !searchResults.hasNextPage() }" class="next disabled">
+                                        <a href="#" aria-label="Next" data-bind="click: searchResults.toNextPage" title="Next">&gt;</a>
+                                    </li>
+                                    @* button to take you directly to the last page *@
+                                    <li data-bind="css: { disabled: searchResults.isLastPage() }" class="next disabled">
+                                        <a href="#" aria-label="Last" data-bind="click: searchResults.toLastPage" title="Last">&raquo;</a>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
 
-                        @* pagination controls *@
-                        <div id="pagination-wrapper">
-                            <ul class="pagination">
-                                @* button to take you directly to the first page *@
-                                <li data-bind="css: { disabled: searchResults.isFirstPage() }" class="previous disabled">
-                                    <a href="#" aria-label="First" data-bind="click: searchResults.toFirstPage" title="First">&laquo;</a>
-                                </li>
-                                @* button to take you to the prevoius page *@
-                                <li data-bind="css: { disabled: !searchResults.hasPreviousPage() }" class="previous disabled">
-                                    <a href="#" aria-label="Previous" data-bind="click: searchResults.toPreviousPage" title="Previous">&lt;</a>
-                                </li>
-
-                                @* loop through the pages, building a button for each *@
-                                <!-- ko foreach: searchResults.pages -->
-                                <li data-bind="css: { active: $data == $parent.searchResults.pageNumber() }">
-                                    <a href="#" data-bind="text: $data, click: $parent.searchResults.pageNumber.bind($data)"></a>
-                                </li>
-                                <!-- /ko -->
-                                @* button to take you to the next page*@
-                                <li data-bind="css: { disabled: !searchResults.hasNextPage() }" class="next disabled">
-                                    <a href="#" aria-label="Next" data-bind="click: searchResults.toNextPage" title="Next">&gt;</a>
-                                </li>
-                                @* button to take you directly to the last page *@
-                                <li data-bind="css: { disabled: searchResults.isLastPage() }" class="next disabled">
-                                    <a href="#" aria-label="Last" data-bind="click: searchResults.toLastPage" title="Last">&raquo;</a>
-                                </li>
-                            </ul>
+                        <hr>
+                        <!-- ko if: searchResults().length == 0 -->
+                        <div>
+                            <h4>
+                                No results given the active filters and/or search text.  Please refine your search parameters.
+                            </h4>
                         </div>
+                        <!-- /ko -->
                     </div>
-
-                    <hr>
-                    <!-- ko if: searchResults().length == 0 -->
-                    <div>
-                        <h4>
-                            No results given the active filters and/or search text.  Please refine your search parameters.
-                        </h4>
-                    </div>
-                    <!-- /ko -->
                 </div>
             </div>
+
         </div>
+
     </div>
+
 </div>
+
 
 @section Scripts {
     <script>
         $(function () {
-            var $selector = $("#filterSelector").select2({
-                selectOnClose: false,
-                closeOnSelect: false,
-                templateSelection: formatTag,
-                placeholder: "There are no active filters.  Pick an option to the left or click here to begin filtering.",
-            });
-            $selector.select2({
+
+            $("#filterSelector").select2({
                 selectOnClose: false,
                 closeOnSelect: false,
                 templateSelection: formatTag,
@@ -265,7 +277,7 @@
             });
 
             //This is fed into the Select2 Box to format tags.
-            function formatTag(tag) {     
+            function formatTag(tag) {
                 var cat = "";
 
                 for (var i = 0; i < vm.AllFilters().length; i++) {
@@ -288,170 +300,30 @@
             };
 
 
-            $('body').on('mouseenter', ".ul-dataset-list-item", function (e) {
-                $(this).css('background-color', $(this).css("border-color").slice(0, -1) + ', 0.1)')
-            });
-
-            $('body').on('mouseleave', ".ul-dataset-list-item", function (e) {
-                $(this).css('background-color', 'white')
-            });
-
-            $('.select2-container--default').css('width', '100%');
-
             $('#filterSelector').on('select2:select', function (e) {
-                // Do something
+                
                 var data = e.params.data;
 
+                // push the selected filter Id to the observable array
                 window.vm.SelectedFilters.push(data.id);
-
-                //$('#' + data.id).prop('checked', true);
-
-                //var storedNames = JSON.parse(localStorage.getItem("filteredIds"));
-
-                //if (storedNames != null) {
-                //    storedNames[storedNames.length] = data.id;
-                //}
-                //else {
-                //    var storedNames = [];
-                //    storedNames[0] = data.id;
-                //}
-
-                //localStorage.setItem("filteredIds", JSON.stringify(storedNames));
-
-                //$('#filterSelector').select2("close");
-
-                //changeWindow();
-
             });
 
             $('#filterSelector').on('select2:unselect', function (e) {
-                // Do something
+                
                 var data = e.params.data;
 
+                // remove the selected filter Id from the observable array
                 window.vm.RemoveSelection(data.id);
-
             });
         });
 
-        function getDetailType() {
-            return window.location.pathname.split("/")[2];
-        }
-
-        function Filter(id, Title, Category, Count) {
-
-            this.id = id;
-            this.Title = Title;
-            this.Category = Category;
-
-            this.Count = ko.computed(function () {
-                var items = ko.utils.arrayFilter(window.vm.searchResults(), function (prod) {
-                    if (Category == 'Category') {
-                        for (var i = 0; i < prod.Categories.length; i++) {
-                            if (prod.Categories[i] === Title) {
-                                return prod;
-                            }
-                        }
-                    }
-                    else if (Title == prod.SentryOwner && Category == 'Sentry Owner') {
-                        return prod;
-                    }
-                    else if (Category == 'Extension') {
-                        for (var i = 0; i < prod.DistinctFileExtensions.length; i++) {
-                            if (prod.DistinctFileExtensions[i] == Title) {
-                                return prod;
-                            }
-                        }
-                    }
-                    else if (Category == 'Report Type') {
-                        for (var i = 0; i < prod.DistinctFileExtensions.length; i++) {
-                            if (prod.DistinctFileExtensions[i] == Title) {
-                                return prod;
-                            }
-                        }
-                    }
-                    else if (Category === 'Business Unit') {
-                        for (var i = 0; i < prod.BusinessUnits.length; i++) {
-                            if (prod.BusinessUnits[i] === Title) {
-                                return prod;
-                            }
-                        }
-                    }
-                    else if (Category === 'Function') {
-                        for (var i = 0; i < prod.DatasetFunctions.length; i++) {
-                            if (prod.DatasetFunctions[i] === Title) {
-                                return prod;
-                            }
-                        }
-                    }
-                    else {
-                        if (prod.Tags != null) {
-                            for (var i = 0; i < prod.Tags.length; i++) {
-                                if (prod.Tags[i].Name == Title) {
-                                    return prod;
-                                }
-                            }
-                        }
-                    }
-                });
-
-                return items.length;
+        function filterForCount(selectedFilters, filtersToRemove) {
+            //build my selected fitler (all filters but Business Unit)
+            ko.utils.arrayForEach(filtersToRemove, function (item) {
+                selectedFilters.splice(selectedFilters.indexOf(item.id), 1);
             });
-        }
 
-        function FilterCategory(Name, Filters, Color) {
-            var self = this;
-
-            self.Name = Name;
-
-            self.Filters = ko.observableArray(Filters);
-
-            self.Color = Color;
-
-            self.BannerColor = 'filterHead_' + Color;
-            self.BorderColor = 'filterBorder_' + Color;
-
-            self.HiddenId = 'filterMore_' + Name.replace(' ', '_');
-            self.HiddenMore = 'hidden_filterMore_' + Name.replace(' ', '_');
-            self.IconMore = 'icon_filterMore_' + Name.replace(' ', '_');
-            self.TxtMore = 'txt_filterMore_' + Name.replace(' ', '_');
-
-            self.HeadId = 'filterType_' + Name.replace(' ', '_');
-            self.HeadIcon = 'icon_filterType_' + Name.replace(' ', '_');
-            self.HeadHide = 'hide_filterType_' + Name.replace(' ', '_');
-
-            self.OrderedFilters = ko.computed(function () {
-
-                //First filter the list so that we only have filters that have a count greater than 0
-                var list = ko.utils.arrayFilter(self.Filters(), function (prod) {
-                    return prod.Count() !== 0;
-                });
-
-                //If the count is 0, hide the section.
-                if (list.length === 0) {
-                    $("#" + self.HeadHide).hide();
-                    $("#" + self.HeadIcon).hide();
-                }
-                //If the count is not zero, meaning there are available filters.
-                else
-                {
-                    //The user has closed this section and it should not open back up.
-                    if ($("#" + self.HeadIcon).hasClass("glyphicon-chevron-down"))
-                    {
-                        $("#" + self.HeadIcon).show();                
-                    }
-                    else
-                    //The user has this section open and it should show back up.
-                    {
-                        $("#" + self.HeadIcon).show();
-                        $("#" + self.HeadHide).show();
-                    }
-                }
-
-                //Sort the remaining list alphabetically and show them to the user.
-                return list.sort(function (left, right) {
-                    return left.Title == right.Title ? 0 : (left.Title < right.Title ? -1 : 1)
-                });
-            });
+            return FilterExhibits(window.vm.datasets(), "0", selectedFilters);
         }
 
         function Dataset(data) {
@@ -465,7 +337,7 @@
             self.DatasetName = data.DatasetName;
             self.Category = data.Category;
             self.AbbreviatedCategory = data.AbbreviatedCategory;
-            self.IsSensitive = data.IsSensitive;
+            self.IsSecured = data.IsSecured;
             self.Type = data.Type;
 
             self.PrimaryTitle = ko.computed(function () {
@@ -501,7 +373,7 @@
                     }
                     //And you did click on the button
                     else {
-                        
+
                         window.location.href = "/BusinessIntelligence/Detail/" + data.DatasetId;
                     }
 
@@ -536,6 +408,13 @@
             self.CanEditDataset = data.CanEditDataset;
             self.IsFavorite = data.IsFavorite;
 
+            self.TagNames = [];
+            if (data.Tags !== null && data.Tags.length !== 0) {
+                ko.utils.arrayForEach(data.Tags, function (v) {
+                    self.TagNames.push(v.Name);
+                });
+            }
+
             self.CanSeeDetails = ko.computed(function () {
                 if ((self.Type === "RPT" && self.CanEditDataset) || self.Type !== "RPT") {
                     return true;
@@ -547,17 +426,76 @@
 
         }
 
+        //This only should be used for the Category type filter groups the ones that are 'OR'ed together when multiple selected in the same box.
+        function IsSelectedFiltersAMatch(selectedFilters, datasetObjectArray, isAndOperator) {
+
+            if (selectedFilters.length === 0) {
+                return true;
+            } else if (datasetObjectArray.length === 0) {
+                return false;
+            } else {
+                for (var i = 0; i < selectedFilters.length; i++) {
+                    if (isAndOperator && datasetObjectArray.includes(selectedFilters[i].Title)) {
+                        return true;
+                    }
+                    else if (!isAndOperator && !datasetObjectArray.includes(selectedFilters[i].Title)) {
+                        return false;
+                    }
+                }
+            }
+
+            return !isAndOperator;
+        }
+
+        function FilterExhibits(exhibits, sortVal, selectedFilters) {
+
+            if (selectedFilters.length === 0 || window.vm === undefined) {
+                return data.Search.SortTheResults(sortVal,
+                    exhibits,
+                    @((int)DatasetSortByOption.Alphabetical),
+                    @((int)DatasetSortByOption.Favorites),
+                    @((int)DatasetSortByOption.MostAccessed),
+                    @((int)DatasetSortByOption.RecentlyAdded),
+                    @((int)DatasetSortByOption.RecentlyUpdated));
+            }
+
+            //get all the filerters selected from the category group
+            var selectedCategories = data.Search.GetSelectedFiltersFromGroup(window.vm.CategoryFilters, selectedFilters);
+            var selectedBusinessUnits = data.Search.GetSelectedFiltersFromGroup(window.vm.BusinessUnitFilters, selectedFilters);
+            var selectedFunctions = data.Search.GetSelectedFiltersFromGroup(window.vm.DatasetFunctionFilters, selectedFilters);
+            var selectedExtensions = data.Search.GetSelectedFiltersFromGroup(window.vm.ExtensionFilters, selectedFilters);
+            var selectedTags = data.Search.GetSelectedFiltersFromGroup(window.vm.TagFilters, selectedFilters);
+            var selectedOwners = data.Search.GetSelectedFiltersFromGroup(window.vm.OwnerFilters, selectedFilters);
+
+            //filter the exhibits based on teh groups that are 'OR'ed toghether
+            exhibits = exhibits.filter(function (exhibit) {
+                var categoryMatch = IsSelectedFiltersAMatch(selectedCategories, exhibit.Categories, true);
+                var buMatch = IsSelectedFiltersAMatch(selectedBusinessUnits, exhibit.BusinessUnits, true);
+                var extensionMatch = IsSelectedFiltersAMatch(selectedExtensions, exhibit.DistinctFileExtensions, true);
+                var functionMatch = IsSelectedFiltersAMatch(selectedFunctions, exhibit.DatasetFunctions, true);
+                var ownerMatch = IsSelectedFiltersAMatch(selectedOwners, exhibit.SentryOwner.split(", "), true);
+
+                //now filter the rest of the exhibits on the groups that are 'AND'ed together.
+                var tagMatch = IsSelectedFiltersAMatch(selectedTags, exhibit.TagNames, false);
+
+                return categoryMatch && buMatch && functionMatch && extensionMatch && ownerMatch && tagMatch;
+            });
+
+            return data.Search.SortTheResults(sortVal,
+                exhibits,
+                @((int)DatasetSortByOption.Alphabetical),
+                @((int)DatasetSortByOption.Favorites),
+                @((int)DatasetSortByOption.MostAccessed),
+                @((int)DatasetSortByOption.RecentlyAdded),
+                @((int)DatasetSortByOption.RecentlyUpdated));
+        }
+
         function ListViewModel() {
             var self = this;
-            self.datasets = ko.observableArray([]);
-
-            self.AllFilters = ko.observableArray([]);  //This is the master list of all filters.
-
             self.Query = ko.observable('');
-
-            // self.SearchFilters = ko.observableArray([]);  //For the DropDown List
+            self.datasets = ko.observableArray([]);
+            self.AllFilters = ko.observableArray([]);  //This is the master list of all filters.
             self.SelectedFilters = ko.observableArray([]);
-
             self.CategoryFilters = ko.observableArray([]);
             self.BusinessUnitFilters = ko.observableArray([]);
             self.DatasetFunctionFilters = ko.observableArray([]);
@@ -565,530 +503,8 @@
             self.ExtensionFilters = ko.observableArray([]);
             self.TagFilters = ko.observableArray([]);
 
-            self.FilterDatasets = function (datasets, sortVal) {
-                //First grab all the selected category ID's
-                var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
-                    if (feature.substring(0, 3) == '1_0') {
-                        return feature;
-                    }
-                });
-
-                selectedCategoryList = [];
-                if (selectedCategoryIDs.length > 0) {
-                    //Convert those category ID's to Filter Items
-                    var selectedCategories = ko.utils.arrayFilter(self.CategoryFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedCategoryIDs.length; i++) {
-                            if (feature.id == selectedCategoryIDs[i]) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedCategories.length; i++) {
-                        selectedCategoryList.push(selectedCategories[i].Title);
-                    }
-
-                    //Then filter on those selected Categories
-                    datasets = datasets.filter(function (item) {
-
-                        for (var i = 0; i < selectedCategories.length; i++) {
-                            if (item.Category == selectedCategories[i].Title) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-                }
-
-                //First grab all the selected owner ID's
-                var selectedOwnerIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
-                    if (feature.substring(0, 3) == '1_1') {
-                        return feature;
-                    }
-                });
-
-                var selectedOwnerList = '';
-                if (selectedOwnerIDs.length > 0) {
-                    //Convert those category ID's to Filter Items
-                    var selectedOwners = ko.utils.arrayFilter(self.OwnerFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedOwnerIDs.length; i++) {
-                            if (feature.id == selectedOwnerIDs[i]) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedOwners.length; i++) {
-                        selectedOwnerList += (selectedOwners[i].Title) + "|";
-                    }
-
-                    //Then filter on those selected Categories
-                    datasets = datasets.filter(function (item) {
-
-                        for (var i = 0; i < selectedOwners.length; i++) {
-                            if (item.SentryOwner == selectedOwners[i].Title) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-                }
-
-                //First grab all the selected category ID's
-                var selectedExtensionIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
-                    if (feature.substring(0, 3) == '1_3') {
-                        return feature;
-                    }
-                });
-
-                var selectedExtensionsList = [];
-                if (selectedExtensionIDs.length > 0) {
-                    //Convert those category ID's to Filter Items
-                    var selectedExtensions = ko.utils.arrayFilter(self.ExtensionFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedExtensionIDs.length; i++) {
-                            if (feature.id == selectedExtensionIDs[i]) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedExtensions.length; i++) {
-                        selectedExtensionsList.push(selectedExtensions[i].Title);
-                    }
-
-                    //Then filter on those selected Categories
-                    datasets = datasets.filter(function (item) {
-
-                        for (var i = 0; i < selectedExtensions.length; i++) {
-                            for (var j = 0; j < item.DistinctFileExtensions.length; j++) {
-                                if (item.DistinctFileExtensions[j] == selectedExtensions[i].Title) {
-                                    return true;
-                                }
-                            }
-                        }
-                        return false;
-                    });
-                }
-
-                if ($('#dataColumn').is(":visible")) {
-                    $.ajax({
-                        dataType: "json",
-                        contentType: "application/json; charset=utf-8",
-                        type: 'POST',
-                        url: '/Search/SearchEvent?categoryFilters=' + selectedCategoryList +
-                            '&sentryOwners=' + selectedOwnerList +
-                            '&extensions=' + selectedExtensionsList +
-                            '&searchTerm=' + self.Query() +
-                            '&resultsReturned=' + queryResults.length
-                    });
-                }
-
-                return sortTheResults(sortVal, datasets);
-            };
-
             self.FilterExhibits = function (exhibits, sortVal) {
-                
-                //First grab all the selected category ID's
-                var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-                    if (feature.substring(0, 3) == '2_0') {
-                        return feature;
-                    }
-                });
-
-                var selectedCategoryList = [];
-                if (selectedCategoryIDs.length > 0) {
-                    //Convert those category ID's to Filter Items
-                    var selectedCategories = ko.utils.arrayFilter(self.CategoryFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedCategoryIDs.length; i++) {
-                            if (feature.id == selectedCategoryIDs[i]) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedCategories.length; i++) {
-                        selectedCategoryList.push(selectedCategories[i].Title);
-                    }
-
-                    //Then filter on those selected Categories
-                    exhibits = exhibits.filter(function (item) {
-
-                        for (var i = 0; i < selectedCategories.length; i++) {
-                            for (var j = 0; j < item.Categories.length; j++) {
-                                if (item.Categories[j] === selectedCategories[i].Title) {
-                                    return true;
-                                }
-                            }
-                        }
-
-                        return false;
-                    });
-                }
-
-
-                // now grab any selected business units
-                var selectedBusinessUnitIds = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-                    if (feature.substring(0, 3) === '2_5') {
-                        return feature;
-                    }
-                });
-
-                var selectedBusinessUnitsList = [];
-                if (selectedBusinessUnitIds.length > 0) {
-                    var selectedBusinessUnits = ko.utils.arrayFilter(self.BusinessUnitFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedBusinessUnitIds.length; i++) {
-                            if (feature.id === selectedBusinessUnitIds[i]) {
-                                return true;
-                            }
-                        }
-
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedBusinessUnits.length; i++) {
-                        selectedBusinessUnitsList.push(selectedBusinessUnits[i].Title);
-                    }
-
-                    // now apply the filter
-                    exhibits = exhibits.filter(function (item) {
-
-                        for (var i = 0; i < selectedBusinessUnits.length; i++) {
-                            for (var j = 0; j < item.BusinessUnits.length; j++) {
-                                if (item.BusinessUnits[j] === selectedBusinessUnits[i].Title) {
-                                    return true;
-                                }
-                            }
-                        }
-
-                        return false;
-                    });
-                }
-
-
-                // next grab any selected Dataset Functions
-                var selectedDatasetFunctionIds = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-                    if (feature.substring(0, 3) === '2_6') {
-                        return feature;
-                    }
-                });
-
-                var selectedDatasetFunctionsList = [];
-                if (selectedDatasetFunctionIds.length > 0) {
-                    var selectedDatasetFunctions = ko.utils.arrayFilter(self.DatasetFunctionFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedDatasetFunctionIds.length; i++) {
-                            if (feature.id === selectedDatasetFunctionIds[i]) {
-                                return true;
-                            }
-                        }
-
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedDatasetFunctions.length; i++) {
-                        selectedDatasetFunctionsList.push(selectedDatasetFunctions[i].Title);
-                    }
-
-                    // now apply the filter
-                    exhibits = exhibits.filter(function (item) {
-
-                        for (var i = 0; i < selectedDatasetFunctions.length; i++) {
-                            for (var j = 0; j < item.DatasetFunctions.length; j++) {
-                                if (item.DatasetFunctions[j] === selectedDatasetFunctions[i].Title) {
-                                    return true;
-                                }
-                            }
-                        }
-
-                        return false;
-                    });
-                }
-                
-
-                //First grab all the selected owner ID's
-                var selectedOwnerIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
-                    if (feature.substring(0, 3) == '2_1') {
-                        return feature;
-                    }
-                });
-
-                //First grab all the selected category ID's
-                var selectedExtensionIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
-                    if (feature.substring(0, 3) == '2_2') {
-                        return feature;
-                    }
-                });
-
-                var selectedExtensionsList = [];
-                if (selectedExtensionIDs.length > 0) {
-                    //Convert those category ID's to Filter Items
-                    var selectedExtensions = ko.utils.arrayFilter(self.ExtensionFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedExtensionIDs.length; i++) {
-                            if (feature.id == selectedExtensionIDs[i]) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedExtensions.length; i++) {
-                        selectedExtensionsList.push(selectedExtensions[i].Title);
-                    }
-
-                    //Then filter on those selected Categories
-                    exhibits = exhibits.filter(function (item) {
-
-                        for (var i = 0; i < selectedExtensions.length; i++) {
-                            for (var j = 0; j < item.DistinctFileExtensions.length; j++) {
-                                if (item.DistinctFileExtensions[j] == selectedExtensions[i].Title) {
-                                    return true;
-                                }
-                            }
-                        }
-                        return false;
-                    });
-                }
-
-                //First grab all the selected tag ID's
-                var selectedTagIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
-                    if (feature.substring(0, 3) == '2_3') {
-                        return feature;
-                    }
-                });
-
-                var selectedTagList = '';
-                if (selectedTagIDs.length > 0) {
-                    //Convert those category ID's to Filter Items
-                    var selectedTags = ko.utils.arrayFilter(self.TagFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedTagIDs.length; i++) {
-                            if (feature.id == selectedTagIDs[i]) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedTags.length; i++) {
-                        selectedTagList += (selectedTags[i].Title) + "|";
-                    }
-
-                    //Then filter on those selected Categories
-                    exhibits = exhibits.filter(function (item) {
-                        if (item.Tags != null) {
-                            for (var i = 0; i < selectedTags.length; i++) {
-                                for (var j = 0; j < item.Tags.length; j++) {
-                                    if (item.Tags[j].Name == selectedTags[i].Title) {
-                                        return true;
-                                    }
-                                }
-                            }
-                        }
-                        return false;
-                    });
-                }
-
-                if ($('#dataColumn').is(":visible")) {
-                    $.ajax({
-                        dataType: "json",
-                        contentType: "application/json; charset=utf-8",
-                        type: 'POST',
-                        url: '/Search/SearchEvent?categoryFilters=' + selectedCategoryList +
-                            //'&sentryOwners=' + selectedOwnerList +
-                            '&extensions=' + selectedExtensionsList +
-                            '&searchTerm=' + self.Query() +
-                            '&resultsReturned=' + queryResults.length
-                    });
-                }
-
-                return sortTheResults(sortVal, exhibits);
-
-            };
-
-            self.FilterGeneric = function (allObjects) {
-                //First grab all the selected category ID's
-                var selectedCategoryIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
-                    if (feature.substring(0, 3) == '3_0') {
-                        return feature;
-                    }
-                });
-
-                selectedCategoryList = [];
-                if (selectedCategoryIDs.length > 0) {
-                    //Convert those category ID's to Filter Items
-                    var selectedCategories = ko.utils.arrayFilter(self.CategoryFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedCategoryIDs.length; i++) {
-                            if (feature.id == selectedCategoryIDs[i]) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedCategories.length; i++) {
-                        selectedCategoryList.push(selectedCategories[i].Title);
-                    }
-
-                    //Then filter on those selected Categories
-                    allObjects = allObjects.filter(function (item) {
-
-                        for (var i = 0; i < selectedCategories.length; i++) {
-                            if (item.Category == selectedCategories[i].Title) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-                }
-
-                //First grab all the selected owner ID's
-                var selectedOwnerIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
-                    if (feature.substring(0, 3) == '3_1') {
-                        return feature;
-                    }
-                });
-
-                var selectedOwnerList = '';
-                if (selectedOwnerIDs.length > 0) {
-                    //Convert those category ID's to Filter Items
-                    var selectedOwners = ko.utils.arrayFilter(self.OwnerFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedOwnerIDs.length; i++) {
-                            if (feature.id == selectedOwnerIDs[i]) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedOwners.length; i++) {
-                        selectedOwnerList += (selectedOwners[i].Title) + "|";
-                    }
-
-                    //Then filter on those selected Categories
-                    allObjects = allObjects.filter(function (item) {
-
-                        for (var i = 0; i < selectedOwners.length; i++) {
-                            if (item.SentryOwner == selectedOwners[i].Title) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-                }
-
-                //First grab all the selected category ID's
-                var selectedExtensionIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
-                    if (feature.substring(0, 3) == '3_3') {
-                        return feature;
-                    }
-                });
-
-                var selectedExtensionsList = [];
-                if (selectedExtensionIDs.length > 0) {
-                    //Convert those category ID's to Filter Items
-                    var selectedExtensions = ko.utils.arrayFilter(self.ExtensionFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedExtensionIDs.length; i++) {
-                            if (feature.id == selectedExtensionIDs[i]) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedExtensions.length; i++) {
-                        selectedExtensionsList.push(selectedExtensions[i].Title);
-                    }
-
-                    //Then filter on those selected Categories
-                    allObjects = allObjects.filter(function (item) {
-
-                        for (var i = 0; i < selectedExtensions.length; i++) {
-                            for (var j = 0; j < item.DistinctFileExtensions.length; j++) {
-                                if (item.DistinctFileExtensions[j] == selectedExtensions[i].Title) {
-                                    return true;
-                                }
-                            }
-                        }
-                        return false;
-                    });
-                }
-
-                //First grab all the selected tag ID's
-                var selectedTagIDs = ko.utils.arrayFilter(self.SelectedFilters(), function (feature) {
-
-                    if (feature.substring(0, 3) == '3_4') {
-                        return feature;
-                    }
-                });
-
-                var selectedTagList = '';
-                if (selectedTagIDs.length > 0) {
-                    //Convert those category ID's to Filter Items
-                    var selectedTags = ko.utils.arrayFilter(self.TagFilters(), function (feature) {
-
-                        for (var i = 0; i < selectedTagIDs.length; i++) {
-                            if (feature.id == selectedTagIDs[i]) {
-                                return true;
-                            }
-                        }
-                        return false;
-                    });
-
-                    for (var i = 0; i < selectedTags.length; i++) {
-                        selectedTagList += (selectedTags[i].Title) + "|";
-                    }
-
-                    //Then filter on those selected Categories
-                    allObjects = allObjects.filter(function (item) {
-                        if (item.Tags != null) {
-                            for (var i = 0; i < selectedTags.length; i++) {
-                                for (var j = 0; j < item.Tags.length; j++) {
-                                    if (item.Tags[j].Name == selectedTags[i].Title) {
-                                        return true;
-                                    }
-                                }
-                            }
-                        }
-                        return false;
-                    });
-                }
-
-                if ($('#dataColumn').is(":visible")) {
-                    $.ajax({
-                        dataType: "json",
-                        contentType: "application/json; charset=utf-8",
-                        type: 'POST',
-                        url: '/Search/SearchEvent?categoryFilters=' + selectedCategoryList +
-                            '&sentryOwners=' + selectedOwnerList +
-                            '&extensions=' + selectedExtensionsList +
-                            '&searchTerm=' + self.Query() +
-                            '&resultsReturned=' + queryResults.length
-                    });
-                }
-
-                return allObjects;
+                return FilterExhibits(exhibits, sortVal, self.SelectedFilters());
             };
 
             self.PopulateDatasetFilters = function (datasets) {
@@ -1096,18 +512,17 @@
                 var pageType = '1_';
 
                 //CATEGORY FILTER
-                var param = getParameterByName('category');
-
                 for (var item, i = 0; item = datasets[i++];) {
                     var category = item.Category;
 
                     if (!(category in categoryLookup)) {
                         categoryLookup[category] = 1;
-                        self.CategoryFilters.push(new Filter(pageType + '0_' + i, category, 'Category'));
+                        self.CategoryFilters.push(new data.Search.Filter(pageType + '0_' + i, category, 'Category'));
 
-                        temp.push(new Filter(pageType + '0_' + i, category, 'Category'));
+                        temp.push(new data.Search.Filter(pageType + '0_' + i, category, 'Category'));
 
-                        if (category == param) {
+                        // compare the category to what may have been passed along in the URL; if there's a match, push it to the SelectedFilters observable array
+                        if (category === data.Search.GetParameterByName('category')) {
                             self.SelectedFilters.push(pageType + '0_' + i);
                         }
                     }
@@ -1125,7 +540,7 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
+                self.AllFilters.push(new data.Search.FilterCategory('Category', temp, 1));
                 temp = [];
 
 
@@ -1135,10 +550,9 @@
 
                     if (!(owner in ownerLookup)) {
                         ownerLookup[owner] = 1;
-                        self.OwnerFilters.push(new Filter(pageType + '1_' + i, owner, 'Sentry Owner'));
-                        //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
+                        self.OwnerFilters.push(new data.Search.Filter(pageType + '1_' + i, owner, 'Sentry Owner'));
 
-                        temp.push(new Filter(pageType + '1_' + i, owner, 'Sentry Owner'));
+                        temp.push(new data.Search.Filter(pageType + '1_' + i, owner, 'Sentry Owner'));
                     }
 
                 }
@@ -1151,7 +565,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'darkblue'));
+                self.AllFilters.push(new data.Search.FilterCategory('Sentry Owner', temp, 2));
                 temp = [];
 
 
@@ -1161,9 +575,9 @@
                     for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
                         if (!(ext in extensionLookup)) {
                             extensionLookup[ext] = 1;
-                            self.ExtensionFilters.push(new Filter(pageType + '3_' + counter, ext, 'Extension'));
+                            self.ExtensionFilters.push(new data.Search.Filter(pageType + '3_' + counter, ext, 'Extension'));
 
-                            temp.push(new Filter(pageType + '3_' + counter, ext, 'Extension'));
+                            temp.push(new data.Search.Filter(pageType + '3_' + counter, ext, 'Extension'));
                             counter++;
                         }
                     }
@@ -1177,7 +591,12 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Extension', temp, 'darkblue'));
+                self.AllFilters.push(new data.Search.FilterCategory('Extension', temp, 3));
+
+                // sort the filters by Sequence
+                self.AllFilters.sort(function (left, right) {
+                    return left.Sequence - right.Sequence;
+                });
             };
 
             self.PopulateExhibitFilters = function (exhibits) {
@@ -1190,9 +609,14 @@
                     for (var cat, j = 0; cat = item.Categories[j++];) {
                         if (!(cat in categoryLookup)) {
                             categoryLookup[cat] = 1;
-                            self.CategoryFilters.push(new Filter(pageType + '0_' + i, cat, 'Category'));
+                            self.CategoryFilters.push(new data.Search.Filter(pageType + '0_' + i, cat, 'Category'));
 
-                            temp.push(new Filter(pageType + '0_' + i, cat, 'Category'));
+                            // compare the category to what may have been passed in the URL; if there's a match, push it to the SelectedFilters observable array
+                            if (cat === data.Search.GetParameterByName('category')) {
+                                self.SelectedFilters.push(pageType + '0_' + i);
+                            }
+
+                            temp.push(new data.Search.Filter(pageType + '0_' + i, cat, 'Category'));
                         }
                     }
                 }
@@ -1205,7 +629,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
+                self.AllFilters.push(new data.Search.FilterCategory('Category', temp, 1));
                 temp = [];
 
 
@@ -1215,9 +639,9 @@
                     for (var bu, j = 0; bu = item.BusinessUnits[j++];) {
                         if (!(bu in businessUnitLookup)) {
                             businessUnitLookup[bu] = 1;
-                            self.BusinessUnitFilters.push(new Filter(pageType + '5_' + counter, bu, 'Business Unit'));
+                            self.BusinessUnitFilters.push(new data.Search.Filter(pageType + '5_' + counter, bu, 'Business Unit'));
 
-                            temp.push(new Filter(pageType + '5_' + counter, bu, 'Business Unit'));
+                            temp.push(new data.Search.Filter(pageType + '5_' + counter, bu, 'Business Unit'));
                             counter++;
                         }
                     }
@@ -1231,7 +655,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'darkblue'));
+                self.AllFilters.push(new data.Search.FilterCategory('Business Unit', temp, 2));
                 temp = [];
 
 
@@ -1241,9 +665,9 @@
                     for (var fn, j = 0; fn = item.DatasetFunctions[j++];) {
                         if (!(fn in datasetFunctionLookup)) {
                             datasetFunctionLookup[fn] = 1;
-                            self.DatasetFunctionFilters.push(new Filter(pageType + '6_' + counter, fn, 'Function'));
+                            self.DatasetFunctionFilters.push(new data.Search.Filter(pageType + '6_' + counter, fn, 'Function'));
 
-                            temp.push(new Filter(pageType + '6_' + counter, fn, 'Function'));
+                            temp.push(new data.Search.Filter(pageType + '6_' + counter, fn, 'Function'));
                             counter++;
                         }
                     }
@@ -1257,7 +681,33 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Function', temp, 'darkblue'));
+                self.AllFilters.push(new data.Search.FilterCategory('Function', temp, 3));
+                temp = [];
+
+
+                //REPORT TYPE FILTER
+                counter = 0; // reset the counter
+                for (var item, i = 0; item = exhibits[i++];) {
+                    for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
+                        if (!(ext in extensionLookup)) {
+                            extensionLookup[ext] = 1;
+                            self.ExtensionFilters.push(new data.Search.Filter(pageType + '2_' + counter, ext, 'Report Type'));
+
+                            temp.push(new data.Search.Filter(pageType + '2_' + counter, ext, 'Report Type'));
+                            counter++;
+                        }
+                    }
+                }
+                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    if (v.Name == 'Report Type') {
+                        item = v;
+                    }
+                });
+                if (item !== undefined) {
+                    temp = item.Filters().concat(temp);
+                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                }
+                self.AllFilters.push(new data.Search.FilterCategory('Report Type', temp, 4));
                 temp = [];
 
 
@@ -1296,9 +746,9 @@
                             for (var tag, j = 0; tag = Tags[j++];) {
                                 if (tag.Group == group && !(tag.Name in tagLookup)) {
                                     tagLookup[tag.Name] = 1;
-                                    self.TagFilters.push(new Filter(pageType + '3_' + counter, tag.Name, group));
+                                    self.TagFilters.push(new data.Search.Filter(pageType + '3_' + counter, tag.Name, group));
 
-                                    temp.push(new Filter(pageType + '3_' + counter, tag.Name, group));
+                                    temp.push(new data.Search.Filter(pageType + '3_' + counter, tag.Name, group));
                                     counter++;
                                 }
                             }
@@ -1313,38 +763,15 @@
                         temp = item.Filters().concat(temp);
                         ko.utils.arrayRemoveItem(self.AllFilters(), item);
                     }
-                    self.AllFilters.push(new FilterCategory(group, temp, 'darkblue'));
+                    self.AllFilters.push(new data.Search.FilterCategory(group, temp, 5));
 
                     temp = [];
                 }
 
-
-                //REPORT TYPE FILTER
-                counter = 0; //Needs seperate counter as multiple objects can appear per iteration
-                for (var item, i = 0; item = exhibits[i++];) {
-                    for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
-                        if (!(ext in extensionLookup)) {
-                            extensionLookup[ext] = 1;
-                            self.ExtensionFilters.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
-                            //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
-
-                            temp.push(new Filter(pageType + '2_' + counter, ext, 'Report Type'));
-                            counter++;
-                        }
-                    }
-                }
-                ko.utils.arrayForEach(self.AllFilters(), function (v) {
-                    if (v.Name == 'Report Type') {
-                        item = v;
-                    }
+                // sort the filters by Sequence
+                self.AllFilters.sort(function (left, right) {
+                    return left.Sequence - right.Sequence;
                 });
-                if (item !== undefined) {
-                    temp = item.Filters().concat(temp);
-                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
-                }
-                self.AllFilters.push(new FilterCategory('Report Type', temp, 'darkblue'));
-                temp = [];
-
             };
 
             self.PopulateGenericFilters = function (allObjects) {
@@ -1352,16 +779,16 @@
                 var pageType = '3_'
 
                 //CATEGORY FILTER
-                var param = getParameterByName('category');
+                var param = data.Search.GetParameterByName('category');
 
                 for (var item, i = 0; item = allObjects[i++];) {
                     var category = item.Category;
 
                     if (!(category in categoryLookup)) {
                         categoryLookup[category] = 1;
-                        self.CategoryFilters.push(new Filter(pageType + '0_' + i, category, 'Category'));
+                        self.CategoryFilters.push(new data.Search.Filter(pageType + '0_' + i, category, 'Category'));
 
-                        temp.push(new Filter(pageType + '0_' + i, category, 'Category'));
+                        temp.push(new data.Search.Filter(pageType + '0_' + i, category, 'Category'));
 
                         if (category == param) {
                             self.SelectedFilters.push(pageType + '0_' + i);
@@ -1381,7 +808,7 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new FilterCategory('Category', temp, 'darkblue'));
+                self.AllFilters.push(new data.Search.FilterCategory('Category', temp, 1));
                 temp = [];
 
 
@@ -1390,9 +817,9 @@
                     for (var bu, j = 0; bu = item.BusinessUnits[j++];) {
                         if (!(bu in businessUnitLookup)) {
                             businessUnitLookup[bu] = 1;
-                            self.BusinessUnitFilters.push(new Filter(pagetype + '5_' + counter, bu, 'Business Unit'));
+                            self.BusinessUnitFilters.push(new data.Search.Filter(pagetype + '5_' + counter, bu, 'Business Unit'));
 
-                            temp.push(new Filter(pageType + '5_' + counter, bu, 'Business Unit'));
+                            temp.push(new data.Search.Filter(pageType + '5_' + counter, bu, 'Business Unit'));
                             counter++;
                         }
                     }
@@ -1406,7 +833,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Business Unit', temp, 'darkblue'));
+                self.AllFilters.push(new data.Search.FilterCategory('Business Unit', temp, 2));
 
 
                 //SENTRYOWNER FILTER
@@ -1415,10 +842,9 @@
 
                     if (!(owner in ownerLookup)) {
                         ownerLookup[owner] = 1;
-                        self.OwnerFilters.push(new Filter(pageType + '1_' + i, owner, 'Sentry Owner'));
-                        //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
+                        self.OwnerFilters.push(new data.Search.Filter(pageType + '1_' + i, owner, 'Sentry Owner'));
 
-                        temp.push(new Filter(pageType + '1_' + i, owner, 'Sentry Owner'));
+                        temp.push(new data.Search.Filter(pageType + '1_' + i, owner, 'Sentry Owner'));
                     }
 
                 }
@@ -1431,7 +857,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Sentry Owner', temp, 'darkblue'));
+                self.AllFilters.push(new data.Search.FilterCategory('Sentry Owner', temp, 3));
                 temp = [];
 
 
@@ -1441,10 +867,9 @@
                     for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
                         if (!(ext in extensionLookup)) {
                             extensionLookup[ext] = 1;
-                            self.ExtensionFilters.push(new Filter(pageType + '3_' + counter, ext, 'Extension'));
-                            //self.SearchFilters.push(new Filter('1_' + i, owner, 10));
+                            self.ExtensionFilters.push(new data.Search.Filter(pageType + '3_' + counter, ext, 'Extension'));
 
-                            temp.push(new Filter(pageType + '3_' + counter, ext, 'Extension'));
+                            temp.push(new data.Search.Filter(pageType + '3_' + counter, ext, 'Extension'));
                             counter++;
                         }
                     }
@@ -1458,7 +883,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Extension', temp, 'darkblue'));
+                self.AllFilters.push(new data.Search.FilterCategory('Extension', temp, 4));
 
                 //TAG FILTER
                 counter = 0; //Needs seperate counter as multiple objects can appear per iteration
@@ -1469,16 +894,16 @@
                         for (var tag, j = 0; tag = Tags[j++];) {
                             if (!(tag.Name in tagLookup)) {
                                 tagLookup[tag.Name] = 1;
-                                self.TagFilters.push(new Filter(pageType + '4_' + counter, tag.Name, 'Tag'));
+                                self.TagFilters.push(new data.Search.Filter(pageType + '4_' + counter, tag.Name, 'Tag'));
 
-                                temp.push(new Filter(pageType + '4_' + counter, tag.Name, 'Tag'));
+                                temp.push(new data.Search.Filter(pageType + '4_' + counter, tag.Name, 'Tag'));
                                 counter++;
                             }
                         }
                     }
                 }
                 ko.utils.arrayForEach(self.AllFilters(), function (v) {
-                    if (v.Name == 'Tag') {
+                    if (v.Name === 'Tag') {
                         item = v;
                     }
                 });
@@ -1486,8 +911,13 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new FilterCategory('Tag', temp, 'darkblue'));
+                self.AllFilters.push(new data.Search.FilterCategory('Tag', temp, 5));
                 temp = [];
+
+                // sort the filters by Sequence
+                self.AllFilters.sort(function (left, right) {
+                    return left.Sequence - right.Sequence;
+                });
             };
 
             self.RemoveSelection = function (id) {
@@ -1501,11 +931,11 @@
             };
 
             self.SearchType = ko.computed(function () {
-                return getSearchType();
+                return data.Search.GetSearchType();
             });
 
-            self.IsShownForCurrentType = function (what) {
-                return what === getDetailType();
+            self.IsShownForCurrentType = function (searchType) {
+                return searchType === data.Search.GetDetailType();
             };
 
             var loaded = false;
@@ -1532,18 +962,15 @@
             };
 
             // Load initial state from server, convert it to Dataset instances, then populate self.datasets
-            url = "/Search/" + self.SearchType() + "/List"
-            $.getJSON(url, function (allData) {
+            $.getJSON( "/Search/" + self.SearchType() + "/List", function (allData) {
                 var mappedTasks = $.map(allData, function (item) { return new Dataset(item) });
 
                 self.datasets(self.datasets().concat(mappedTasks));
 
                 self.populateFilters();
 
-                $('#dataColumn').show();
-                $('#filterColumn').show();
-                $('.sentry-spinner-container').remove();
-                $('.select2-search__field').css({ width: '500px' });
+                data.Search.SetInitialDisplay();
+
                 $('#filterSelector').val(self.SelectedFilters()).trigger('change');
             });
 
@@ -1559,10 +986,10 @@
                         }
                     }
 
-                    if (getParameterByName('searchPhrase')) {
-                        self.Query(getParameterByName('searchPhrase'));
+                    if (data.Search.GetParameterByName('searchPhrase')) {
+                        self.Query(data.Search.GetParameterByName('searchPhrase'));
                     }
-                    else if (getParameterByName('category')) {
+                    else if (data.Search.GetParameterByName('category')) {
                         self.Query('');
                     }
                     else {
@@ -1616,15 +1043,8 @@
                 });
 
                 queryResults = temp.map(x => x.dataset);
-                var selectedCategoryList = [];
 
-                if (self.SearchType() == "Datasets") {
-                    queryResults = self.FilterDatasets(queryResults, $("#sort-results").val());
-                } else if (self.SearchType() == "BusinessIntelligence") {
-                    queryResults = self.FilterExhibits(queryResults, $("#sort-results").val());
-                } else {
-                    queryResults = self.FilterGeneric(queryResults);
-                }
+                queryResults = self.FilterExhibits(queryResults, $("#sort-results").val());
 
                 $("#SearchText").attr("placeholder", "Search " + queryResults.length + " Datasets...");
 
@@ -1648,7 +1068,7 @@
                 }
 
                 self.searchResults.pageSize(nbrResults);
-                
+
             }
 
             self.SelectedFilters.subscribe(function () {
@@ -1681,132 +1101,8 @@
         }
 
         $(document).ready(function () {
-
-            window.vm = new ListViewModel();
-            ko.applyBindings(vm);
-
-            if (window.location.href.match(/&ids=/)) {
-
-            }
-            else {
-                window.vm.clearFilters();
-            }
-
-            $(document).on("click", "[id^='filterType_']", function (e) {
-                e.preventDefault();
-
-                var id = $(this).attr("id");
-                var category = "#hide_" + id
-                var icon = "#icon_" + id;
-
-                $(category).slideToggle();
-                $(icon).toggleClass("glyphicon-chevron-down glyphicon-chevron-up");
-            });
-
-            $(document).on("click", "[id^='filterMore_']", function (e) {
-                e.preventDefault();
-
-                var id = $(this).attr("id");
-                var show = "#hidden_" + id
-                var icon = "#icon_" + id;
-                var txt = "#txt_" + id;
-
-                $(show).slideToggle();
-                $(icon).toggleClass("glyphicon-plus-sign glyphicon-minus-sign");
-
-                if ($(txt).text() == "Show Less") {
-                    $(txt).text("Show More");
-                }
-                else {
-                    $(txt).text("Show Less");
-                }
-            });
-
-            $(document).on("click", "[id^='btnFavorite']", function (e) {
-                e.preventDefault();
-
-                var button = $(this);
-                var id = button.attr("data");
-
-                if (button.hasClass("glyphicon-star")) {
-
-                    $.ajax({
-                        url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent(id),
-                        method: "GET",
-                        dataType: 'json',
-                        success: function () {
-                        },
-                        error: function () {
-                            Sentry.ShowModalAlert("Failed to remove favorite.");
-                        }
-                    });
-                }
-                else if (button.hasClass("glyphicon-star-empty")) {
-
-                    $.ajax({
-                        url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent(id),
-                        method: "GET",
-                        dataType: 'json',
-                        success: function () {
-                        },
-                        error: function () {
-                            Sentry.ShowModalAlert("Failed to set favorite.");
-                        }
-                    });
-                }
-
-                $(this).toggleClass("glyphicon-star glyphicon-star-empty");
-
-            });
+            data.Search.Init();
         });
-
-        function getParameterByName(name, url) {
-            if (!url) url = window.location.href;
-            name = name.replace(/[\[\]]/g, "\\$&");
-            var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-                results = regex.exec(url);
-            if (!results) return null;
-            if (!results[2]) return '';
-            return decodeURIComponent(results[2].replace(/\+/g, " "));
-        }
-
-        function getSearchType() {
-            var regex = /\/Search\/(\w+)/,
-                url = window.location.href;
-            return regex.exec(url)[1];
-        }
-        
-        function sortTheResults(sortVal, items) {
-            switch (parseInt(sortVal)) {
-                case @((int)DatasetSortByOption.Alphabetical):
-                    return items.sort(function (left, right) {
-                        return left.DatasetName == right.DatasetName ? 0 : (left.DatasetName < right.DatasetName ? -1 : 1)
-                    });
-                    break;
-                case @((int)DatasetSortByOption.Favorites):
-                    return items.sort(function (left, right) {
-                        return right.IsFavorite - left.IsFavorite;
-                    });
-                    break;
-                case @((int)DatasetSortByOption.MostAccessed):
-                    return items.sort(function (left, right) {
-                        return right.PageViews - left.PageViews;
-                    });
-                    break;
-                case @((int)DatasetSortByOption.RecentlyAdded):
-                    return items.sort(function (left, right) {
-                        return new Date(right.CreatedDtm) - new Date(left.CreatedDtm);
-                    });
-                    break;
-                case @((int)DatasetSortByOption.RecentlyUpdated):
-                    return items.sort(function (left, right) {
-                        return new Date(right.ChangedDtm) - new Date(left.ChangedDtm);
-                    });
-                    break;
-                default:
-                    return items;
-            }
-        }
 
     </script>
 }

@@ -4,6 +4,7 @@
     ViewBag.Title = "View Dataset Details";
     string color = Model.CategoryColor;
     string headerColor = "categoryBanner-" + Model.CategoryColor;
+    var mailTo = "mailto:" + Model.PrimaryContactEmail + "?Subject=Dataset%20Inquiry%20-%20" + Model.DatasetName;
 }
 
 @if (@Model.DatasetFileCount == 0)
@@ -12,7 +13,7 @@
         <div id="alertInfoBanner" class="alert alert-dismissable alert-info">
             <button type="button" class="close" data-dismiss="alert">×</button>
             <div>
-                @if (Model.CanUpload)
+                @if (Model.Security.CanUploadToDataset)
                 {
                     <strong class="alertHeading">Info: </strong>
                     <span>This dataset has no files attached to it yet.  Please click the flashing upload button to upload your first file.</span>
@@ -20,7 +21,7 @@
                 else
                 {
                     <strong class="alertHeading">Info: </strong>
-                    <span>This dataset has no files attached to it yet.  Please contact the Sentry Owner: @Model.SentryOwnerName</span>
+                    <span>This dataset has no files attached to it yet.  Please contact the Sentry Owner: @Model.PrimaryOwnerName</span>
                 }
             </div>
         </div>
@@ -38,172 +39,106 @@
                     <h1 class="detailName leftFloat @color">
                         @Model.DatasetName
 
-                        @if (Model.IsSensitive)
+                        @if (Model.IsSecured)
                         {
                             <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
+                            <span>
+                                <input id="RequestAccessButton" type="button" value="Request Access" class="btn btn-primary" data-id="@Model.DatasetId"
+                                       data-toggle="tooltip" data-placement="top" title="Request Access to Dataset" style="margin-left:40px" />
+                            </span>
                         }
                     </h1>
-                    @{
+
+                    @if (Model.Security.CanPreviewDataset)
+                    {
                         foreach (string item in Model.DistinctFileExtensions)
                         {
                             <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
                         }
-                    }
 
-                    <div style="margin-top:-30px;" class="col-md-offset-9 col-md-4 col-lg-offset-10 col-lg-3">
 
-                        <div class="col-md-2 col-lg-2 ">
-                            <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Favorite">
-                                <button type="button" class="btn btn-default borderdk_gray borderdk_@Model.CategoryColor"
-                                        id="btnFavorite" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Favorite">
-                                    @if (Model.IsFavorite)
-                                    {
-                                        <span class="glyphicon glyphicon-star @Model.CategoryColor" id="favoriteIcon"></span>
-                                    }
-                                    else
-                                    {
-                                        <span class="glyphicon glyphicon-star-empty @Model.CategoryColor" id="favoriteIcon"></span>
-                                    }
-                                </button>
-                            </div>
-                        </div>
-                        @if (Model.CanUpload)
-                        {
+                        <div style="margin-top:-30px;" class="col-md-offset-9 col-md-4 col-lg-offset-10 col-lg-3">
+
                             <div class="col-md-2 col-lg-2 ">
-                                <button type="button"
-                                        class="btn btn-default dataset-operation-button borderdk_gray borderdk_@color"
-                                        id="UploadModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Upload File">
-                                    <span class="glyphicon glyphicon-cloud-upload @color"></span>
-                                </button>
+                                <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Favorite">
+                                    <button type="button" class="btn btn-default borderdk_gray borderdk_@Model.CategoryColor"
+                                            id="btnFavorite" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Favorite">
+                                        @if (Model.IsFavorite)
+                                        {
+                                            <span class="glyphicon glyphicon-star @Model.CategoryColor" id="favoriteIcon"></span>
+                                        }
+                                        else
+                                        {
+                                            <span class="glyphicon glyphicon-star-empty @Model.CategoryColor" id="favoriteIcon"></span>
+                                        }
+                                    </button>
+                                </div>
                             </div>
-                        }
-                        @if (Model.CanEditDataset)
-                        {
-                            <div class="col-md-2 col-lg-2">
-                                <button type="button"
-                                        class="btn btn-default btn dataset-operation-button borderdk_gray borderdk_@color"
-                                        id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
-                                    <span class="glyphicon glyphicon-edit @color"></span>
-                                </button>
-                            </div>
-                        }
-                        <div class="col-md-2 col-lg-2">
-                            <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions">
 
-                                <button type="button"
-                                        class="btn btn-default borderdk_gray borderdk_@color dropdown"
-                                        data-toggle="dropdown">
-                                    <span class="glyphicon glyphicon-menu-hamburger @color"></span>
-                                </button>
-                                <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
-                                    @if (Model.CanManageConfigs)
-                                    {
-                                    <li>
-                                        <a href="/Config/Dataset/@Model.DatasetId">
-                                            Manage Schemas
-                                        </a>
-                                    </li>
-                                    }
-                                    @if (Model.CanQueryTool)
-                                    {
-                                    <li title="Query Dataset">
-                                        <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
-                                            Query this Dataset
-                                        </a>
-                                    </li>
-                                    }
-                                    <li>
-                                        <a href="@Model.MailtoLink">Share Dataset</a>
-                                    </li>
-                                    <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
-                                        <a>
-                                            Subscribe
-                                        </a>
-                                    </li>
-                                </ul>
+                            @if (Model.Security.CanUploadToDataset)
+                            {
+                                <div class="col-md-2 col-lg-2 ">
+                                    <button type="button"
+                                            class="btn btn-default dataset-operation-button borderdk_gray borderdk_@color"
+                                            id="UploadModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Upload File">
+                                        <span class="glyphicon glyphicon-cloud-upload @color"></span>
+                                    </button>
+                                </div>
+                            }
+                            @if (Model.Security.CanEditDataset)
+                            {
+                                <div class="col-md-2 col-lg-2">
+                                    <button type="button"
+                                            class="btn btn-default btn dataset-operation-button borderdk_gray borderdk_@color"
+                                            id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
+                                        <span class="glyphicon glyphicon-edit @color"></span>
+                                    </button>
+                                </div>
+                            }
+                            <div class="col-md-2 col-lg-2">
+                                <div class="btn-group dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions">
+
+                                    <button type="button"
+                                            class="btn btn-default borderdk_gray borderdk_@color dropdown"
+                                            data-toggle="dropdown">
+                                        <span class="glyphicon glyphicon-menu-hamburger @color"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
+                                        @if (Model.Security.CanEditDataset)
+                                        {
+                                            <li>
+                                                <a href="/Config/Dataset/@Model.DatasetId">
+                                                    Manage Schemas
+                                                </a>
+                                            </li>
+                                        }
+                                        @if (Model.Security.CanQueryDataset)
+                                        {
+                                            <li title="Query Dataset">
+                                                <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
+                                                    Query this Dataset
+                                                </a>
+                                            </li>
+                                        }
+                                        <li>
+                                            <a href="@Model.MailtoLink">Share Dataset</a>
+                                        </li>
+                                        @if (Model.Security.CanViewFullDataset)
+                                        {
+                                            <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
+                                                <a>
+                                                    Subscribe
+                                                </a>
+                                            </li>
+                                        }
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="hidden-md hidden-lg">
-            <div>
-                @* show different h1 elements for Exhibit vs. Dataset (title for Dataset should not be clickable) *@
-                <h1 class="detailName leftFloat @color">
-                    @Model.DatasetName
-
-                    @if (Model.IsSensitive)
-                    {
-                        <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
                     }
-                </h1>
-
-                <div>
-                    <div class="btn-group rightFloat dataset-operation-button" data-toggle="tooltip" data-placement="top" title="Additional Actions" style="margin-top: 5px;">
-                        <button type="button"
-                                class="btn btn-default borderdk_gray borderdk_@color dropdown"
-                                data-toggle="dropdown">
-                            <span class="glyphicon glyphicon-menu-hamburger @color"></span>
-                        </button>
-
-                        <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
-                            <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
-                                <a>
-                                    Subscribe
-                                </a>
-                            </li>
-
-                            @if (Model.CanEditDataset)
-                            {
-                            <li>
-                                <a href="/Dataset/Edit/@Model.DatasetId">Edit Dataset</a>
-                            </li>
-                            }
-
-                            @if (Model.CanManageConfigs)
-                            {
-                                <li>
-                                    <a href="/Config/Dataset/@Model.DatasetId">
-                                        Manage Schemas
-                                    </a>
-                                </li>
-                            }
-
-                            @if (Model.CanQueryTool)
-                            {
-                                <li title="Query Dataset">
-                                    <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
-                                        Query this Dataset
-                                    </a>
-                                </li>
-                            }
-
-                            <li >
-                                <a href="@Model.MailtoLink">Share Dataset</a>
-                            </li>
-
-
-                            <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
-                                <a>
-                                    Subscribe
-                                </a>
-                            </li>
-
-                            @if (Model.CanUpload)
-                            {
-                                <li id="UploadModal" data-id="@Model.DatasetId">
-                                    <a>Upload Files</a>
-                                </li>
-                            }
-                        </ul>
-                    </div>
                 </div>
             </div>
-
         </div>
-
     </div>
 
     <br />
@@ -240,7 +175,8 @@
                             </div>
                             <br />
                         }
-                        @if (!String.IsNullOrWhiteSpace(Model.DatasetInformation))
+
+                        @if (!String.IsNullOrWhiteSpace(Model.DatasetInformation) && Model.Security.CanPreviewDataset)
                         {
                             <div class="row">
                                 <div class="col-lg-12">
@@ -265,43 +201,45 @@
                             </div>
                         }
                     </div>
-                    <hr />
-                    <div>
-                        <h3 class="@color">
-                            Schemas
-                        </h3>
-                    </div>
-
-                    <div>
-                        <div class="row">
-                            <div class="col-lg-12" style="margin-left: 20px; margin-top: 10px;">
-                                <select class="form-control" style="margin:1em !important;"
-                                        id="datasetConfigList" name="filterSelector">
-                                    @foreach (var a in Model.DatasetFileConfigNames)
-                                    {
-                                        <option value="@a.Key">@a.Value</option>
-                                    }
-                                </select>
-                            </div>
+                    @if (Model.Security.CanPreviewDataset)
+                    {
+                        <hr />
+                        <div>
+                            <h3 class="@color">
+                                Schemas
+                            </h3>
                         </div>
 
-                        <div class="row">
-                            <div class="col-lg-12">
-                                <br />
-                                <div style="margin-left: 35px;" data-bind="visible: Description() != null" class="spanContainer">
-                                    <h6 class="@color">Schema Description:</h6><br />
-                                    <span style="margin-top: 15px;" data-bind="text: LessDescription"></span>
-                                    <span id="schemaHasMoreDescription">
-                                        <span id="schemaSeeMoreEllipsis">&nbsp;...</span>
-                                        <span id="schemaSeeMorePanel" style="display: none; padding-left: 4px;" data-bind="text: MoreDescription"></span>
-                                        <span id="schemaSeeMoreButton" style="cursor: pointer;"><a onclick="$('#schemaSeeMorePanel').show(); $(this).parent().hide(); $('#schemaShowLessButton').show(); $('#schemaSeeMoreEllipsis').hide();">See More</a></span>
-                                        <span id="schemaShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#schemaSeeMorePanel').hide(); $(this).parent().hide(); $('#schemaSeeMoreButton').show(); $('#schemaSeeMoreEllipsis').show();">Show Less</a></span>
-                                    </span>
+                        <div>
+                            <div class="row">
+                                <div class="col-lg-12" style="margin-left: 20px; margin-top: 10px;">
+                                    <select class="form-control" style="margin:1em !important;"
+                                            id="datasetConfigList" name="filterSelector">
+                                        @foreach (var a in Model.DatasetFileConfigNames)
+                                        {
+                                            <option value="@a.Key">@a.Value</option>
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <br />
+                                    <div style="margin-left: 35px;" data-bind="visible: Description() != null" class="spanContainer">
+                                        <h6 class="@color">Schema Description:</h6><br />
+                                        <span style="margin-top: 15px;" data-bind="text: LessDescription"></span>
+                                        <span id="schemaHasMoreDescription">
+                                            <span id="schemaSeeMoreEllipsis">&nbsp;...</span>
+                                            <span id="schemaSeeMorePanel" style="display: none; padding-left: 4px;" data-bind="text: MoreDescription"></span>
+                                            <span id="schemaSeeMoreButton" style="cursor: pointer;"><a onclick="$('#schemaSeeMorePanel').show(); $(this).parent().hide(); $('#schemaShowLessButton').show(); $('#schemaSeeMoreEllipsis').hide();">See More</a></span>
+                                            <span id="schemaShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#schemaSeeMorePanel').hide(); $(this).parent().hide(); $('#schemaSeeMoreButton').show(); $('#schemaSeeMoreEllipsis').show();">Show Less</a></span>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
+                    }
                 </div>
 
                 <div class="col-lg-4">
@@ -319,9 +257,13 @@
                         </div>
                         <hr />
                         <div class="row">
-                            <div class="col-lg-12">
-                                <h5 class="@color">Sentry Owner</h5>
-                                <h6 class="@color">@Model.SentryOwnerName</h6>
+                            <div class="col-lg-6">
+                                <h5 class="@color">Owner</h5>
+                                <h6 class="@color">@Model.PrimaryOwnerName</h6>
+                            </div>
+                            <div class="col-lg-6">
+                                <h5 class="@color">Contact</h5>
+                                <h6 class="@color"><a href="@mailTo">@Model.PrimaryContactName</a></h6>
                             </div>
                         </div>
                         <hr />
@@ -353,270 +295,313 @@
 
     <hr />
 
-    <div class="row">
-        <div class="col-lg-12">
-            <div id="aboutThisSchema" class="metadataHeader">
-                <h3 class="@color">About this Schema</h3>
-            </div>
-            <div class="metadataBody container row" style="border: 1px #DDDDDD solid; background: white; padding: 10px;">
-                <div class="col-lg-4">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <h5 class="@color">Last Updated:</h5>
-                        </div>
-                    </div>
-                    <div class="row" style="margin-bottom:15px;">
-                        <div class="col-lg-6">
-                            <h5 class="@color">Data</h5>
-                            <h6 class="@color" data-bind="text: DataLastUpdated"></h6>
-                            <p id="dataLastUpdatedSpinner" class="mini-sentry-spinner-container sentry-spinner-container">
-                                <span class="sentry-spinner" style="background-size: 25px 25px; margin-left: 290px;"></span>
-                            </p>
-                        </div>
-                        <div class="col-lg-6">
-                            <h5 class="@color">Metadata</h5>
-                            <h6 class="@color" data-bind="text: MetadataLastDT"></h6>
-                            <p id="sessionSpinner" class="mini-sentry-spinner-container sentry-spinner-container">
-                                <span class="sentry-spinner" style="background-size: 25px 25px; margin-left: 290px;"></span>
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="row" data-bind="visible: SchemaRows().length > 0">
-                        <hr />
-                        <div class="col-lg-12">
-                            <h5 class="@color">In this Schema:</h5>
-                        </div>
-                    </div>
-
-                    <div class="row" data-bind="visible: SchemaRows().length > 0">
-                        <div class="col-lg-6">
-                            <h5 class="@color">Rows</h5>
-                            <h6 class="@color" id="rowCount" data-bind="text: RowCount"></h6>
-                        </div>
-                        <div class="col-lg-6">
-                            <h5 class="@color">Columns</h5>
-                            <h6 class="@color" data-bind="text: SchemaRows().length"></h6>
-                        </div>
-                    </div>
+    @if (Model.Security.CanPreviewDataset)
+    {
+        <div class="row">
+            <div class="col-lg-12">
+                <div id="aboutThisSchema" class="metadataHeader">
+                    <h3 class="@color">About this Schema</h3>
                 </div>
+                <div class="metadataBody container row" style="border: 1px #DDDDDD solid; background: white; padding: 10px;">
+                    <div class="col-lg-4">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <h5 class="@color">Last Updated:</h5>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-bottom:15px;">
+                            <div class="col-lg-6">
+                                <h5 class="@color">Data</h5>
+                                <h6 class="@color" data-bind="text: DataLastUpdated"></h6>
+                                <p id="dataLastUpdatedSpinner" class="mini-sentry-spinner-container sentry-spinner-container">
+                                    <span class="sentry-spinner" style="background-size: 25px 25px; margin-left: 290px;"></span>
+                                </p>
+                            </div>
+                            <div class="col-lg-6">
+                                <h5 class="@color">Metadata</h5>
+                                <h6 class="@color" data-bind="text: MetadataLastDT"></h6>
+                                <p id="sessionSpinner" class="mini-sentry-spinner-container sentry-spinner-container">
+                                    <span class="sentry-spinner" style="background-size: 25px 25px; margin-left: 290px;"></span>
+                                </p>
+                            </div>
+                        </div>
 
-                <div class="col-lg-8">
-                    <h5 class="@color">Data Ownership:</h5>
-                    <table class="table table-striped table-hover detailTable" style="margin-left: 0px;">
-                        <tbody>
-                            <tr class="borderMeta_@color">
-                                <td class="borderMeta_@color colOneMeta">Dataset Creator</td>
-                                <td class="borderMeta_@color">@Model.CreationUserName</td>
-                            </tr>
-                            <tr class="borderMeta_@color">
-                                <td class="borderMeta_@color colOneMeta">Dataset Origination</td>
-                                <td class="borderMeta_@color">@Model.OriginationCode</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <br />
-                    <div>
-                        <h5 class="@color">Refresh Frequency:</h5>
+                        <div class="row" data-bind="visible: SchemaRows().length > 0">
+                            <hr />
+                            <div class="col-lg-12">
+                                <h5 class="@color">In this Schema:</h5>
+                            </div>
+                        </div>
+
+                        <div class="row" data-bind="visible: SchemaRows().length > 0">
+                            <div class="col-lg-6">
+                                <h5 class="@color">Rows</h5>
+                                <h6 class="@color" id="rowCount" data-bind="text: RowCount"></h6>
+                            </div>
+                            <div class="col-lg-6">
+                                <h5 class="@color">Columns</h5>
+                                <h6 class="@color" data-bind="text: SchemaRows().length"></h6>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <h5 class="@color">Data Ownership:</h5>
                         <table class="table table-striped table-hover detailTable" style="margin-left: 0px;">
                             <tbody>
-                                <tr>
-                                    <td class="borderMeta_@color colOneMeta">Dataset Scope Type</td>
-                                    <td class="borderMeta_@color ">
-                                        @foreach (var dst in @Model.DatasetScopeTypeNames)
-                                        {
-                                            <span class="comma" title='@dst.Value'>@dst.Key</span>
-                                        }
-                                    </td>
-                                    <td class="borderMeta_@color"></td>
+                                <tr class="borderMeta_@color">
+                                    <td class="borderMeta_@color colOneMeta">Dataset Creator</td>
+                                    <td class="borderMeta_@color">@Model.CreationUserName</td>
                                 </tr>
-
-                                <tr data-bind="if: DFSDropLocation(), visible: DFSDropLocation != undefined" style="display:none;">
-                                    <td class="borderMeta_@color colOneMeta">DFS Drop Location</td>
-                                    <td class="borderMeta_@color" data-bind="text: DFSDropLocation().Location()"></td>
+                                <tr class="borderMeta_@color">
+                                    <td class="borderMeta_@color colOneMeta">Dataset Origination</td>
+                                    <td class="borderMeta_@color">@Model.OriginationCode</td>
                                 </tr>
-
-                                <tr data-bind="if: S3DropLocation(), visible: S3DropLocation != undefined" style="display:none;">
-                                    <td class="borderMeta_@color colOneMeta">S3 Drop Location</td>
-                                    <td class="borderMeta_@color" data-bind="text: S3DropLocation().Location()"></td>
-                                </tr>
-
-                                <!-- ko if: OtherJobs != undefined-->
-                                <!-- ko foreach: OtherJobs -->
-                                <tr>
-                                    <td class="borderMeta_@color colOneMeta" data-bind="text: Name()"></td>
-                                    @if (Model.CanManageConfigs)
-                                    {
-                                        <!-- ko if: IsEnabled-->
-                                        <td class="borderMeta_@color" data-bind="text: Location()"></td>
-                                        <td class="borderMeta_@color">
-                                            <button style="float:right; margin-left: 30px;" class="btn btn-default on-demand-run" data-bind="attr: { id: JobId }">On-Demand Run</button>
-                                            <button style="float:right; margin-left: 30px;" class="btn btn-default jobstatus jobstatus_enabled" data-bind="attr: { id: JobId }">Disable</button>
-                                        </td>
-                                        <!-- /ko -->
-                                        <!-- ko ifnot: IsEnabled-->
-                                        <td class="borderMeta_@color"> Disabled</td>
-                                        <td class="borderMeta_@color">
-                                            <button style="float:right; margin-left: 30px;" class="btn btn-default on-demand-run" disabled="disabled" data-toggle="tooltip" data-placement="top" title="Job is disabled" data-bind="attr: { id: JobId }">On-Demand Run</button>
-                                            <button style="float:right; margin-left: 30px;" class="btn btn-default jobstatus jobstatus_disabled" data-bind="attr: { id: JobId }">Enable</button>
-                                        </td>
-                                        <!-- /ko -->
-                                    }
-                                    else
-                                    {
-                                        <td class="borderMeta_@color"></td>
-                                    }
-
-                                </tr>
-                                <!-- /ko -->
-                                <!-- /ko -->
-
                             </tbody>
                         </table>
+                        <br />
+                        <div>
+                            <h5 class="@color">Refresh Frequency:</h5>
+                            <table class="table table-striped table-hover detailTable" style="margin-left: 0px;">
+                                <tbody>
+                                    <tr>
+                                        <td class="borderMeta_@color colOneMeta">Dataset Scope Type</td>
+                                        <td class="borderMeta_@color ">
+                                            @foreach (var dst in @Model.DatasetScopeTypeNames)
+                                            {
+                                                <span class="comma" title='@dst.Value'>@dst.Key</span>
+                                            }
+                                        </td>
+                                        <td class="borderMeta_@color"></td>
+                                    </tr>
+
+                                    <tr data-bind="if: DFSDropLocation(), visible: DFSDropLocation != undefined" style="display:none;">
+                                        <td class="borderMeta_@color colOneMeta">DFS Drop Location</td>
+                                        <td class="borderMeta_@color" data-bind="text: DFSDropLocation().Location()"></td>
+                                    </tr>
+
+                                    <tr data-bind="if: S3DropLocation(), visible: S3DropLocation != undefined" style="display:none;">
+                                        <td class="borderMeta_@color colOneMeta">S3 Drop Location</td>
+                                        <td class="borderMeta_@color" data-bind="text: S3DropLocation().Location()"></td>
+                                    </tr>
+
+                                    <!-- ko if: OtherJobs != undefined-->
+                                    <!-- ko foreach: OtherJobs -->
+                                    <tr>
+                                        <td class="borderMeta_@color colOneMeta" data-bind="text: Name()"></td>
+                                        @if (Model.Security.CanEditDataset)
+                                        {
+                                            <!-- ko if: IsEnabled-->
+                                            <td class="borderMeta_@color" data-bind="text: Location()"></td>
+                                            <td class="borderMeta_@color">
+                                                <button style="float:right; margin-left: 30px;" class="btn btn-default on-demand-run" data-bind="attr: { id: JobId }">On-Demand Run</button>
+                                                <button style="float:right; margin-left: 30px;" class="btn btn-default jobstatus jobstatus_enabled" data-bind="attr: { id: JobId }">Disable</button>
+                                            </td>
+                                            <!-- /ko -->
+                                            <!-- ko ifnot: IsEnabled-->
+                                            <td class="borderMeta_@color"> Disabled</td>
+                                            <td class="borderMeta_@color">
+                                                <button style="float:right; margin-left: 30px;" class="btn btn-default on-demand-run" disabled="disabled" data-toggle="tooltip" data-placement="top" title="Job is disabled" data-bind="attr: { id: JobId }">On-Demand Run</button>
+                                                <button style="float:right; margin-left: 30px;" class="btn btn-default jobstatus jobstatus_disabled" data-bind="attr: { id: JobId }">Enable</button>
+                                            </td>
+                                            <!-- /ko -->
+                                        }
+                                        else
+                                        {
+                                            <td class="borderMeta_@color"></td>
+                                        }
+
+                                    </tr>
+                                    <!-- /ko -->
+                                    <!-- /ko -->
+
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    }
 
+    @if (Model.Security.CanPreviewDataset)
+    {
+        <div class="row" id="schemaSection">
 
-    <div class="row" id="schemaSection">
+            <div class="col-lg-12">
+                <hr />
+                <section class="landing-page-section schema-preview">
+                    <div id="columnsInThisSchema">
+                        <h3 class="detailSection @color">Columns</h3>
+                    </div>
+                    <div class="section-content collapsed" id="hide_detailSectionHeader_Columns">
+                        <div class="table-wrapper">
+                            <table class="table table-bordered table-striped schema-table">
+                                <thead>
+                                    <tr class="@headerColor">
+                                        <th scope="col" style="width: 35%;" class="column-type">Column Name</th>
+                                        <th scope="col" class="column-type">Description</th>
+                                        <th scope="col" class="column-type">Type</th>
+                                        <th scope="col" style="width: 10%;" class="column-type">Precision</th>
+                                        <th scope="col" style="width: 10%;" class="column-type">Scale</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- ko foreach: SchemaRows -->
+                                    <tr class="SchemaRow" data-column="equip_id" aria-expanded="false" aria-haspopup="true" role="link" tabindex="0"
+                                        data-bind="css: { odd: ($index() % 2 === 1), even: ($index() % 2 === 0), extra: ($index() >= 10)}, visible: ($index() < 10)">
+                                        <td class="column-name @color" scope="row" data-bind="text : Name"></td>
+                                        <td class="column-description">
+                                            <div class="contents clamped">
+                                                <span class="Linkify" data-bind="text : Description"></span>
+                                            </div>
+                                        </td>
+                                        <td class="column-type">
+                                            <div>
+                                                <span class="type-name" data-name="text" data-bind="text : Type"></span>
+                                            </div>
+                                        </td>
+                                        <td class="column-type">
+                                            <div>
+                                                <span class="type-name" data-name="text" data-bind="text : Precision"></span>
+                                            </div>
+                                        </td>
+                                        <td class="column-type">
+                                            <div>
+                                                <span class="type-name" data-name="text" data-bind="text : Scale"></span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <!-- /ko -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div data-bind="if: FooterRow()">
+                            <div style="float: right;">
+                                <a onclick="$('.extra').toggle();">
+                                    <span>Show</span>
+                                    <span class="extra">More</span>
+                                    <span class="extra" style="display: none;">Less</span>
+                                    <span> (</span>
 
-        <div class="col-lg-12">
-            <hr />
-            <section class="landing-page-section schema-preview">
-                <div id="columnsInThisSchema">
-                    <h3 class="detailSection @color">Columns</h3>
+                                    <span data-bind="text: SchemaRows().length"></span>
+                                    <span>)</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div id="panelSpinner" style="min-height: 150px;">
+                            <div class="sentry-spinner-container" style=" width: 1166px; margin-top: 25px;">
+                                <span class="sentry-spinner" style="height:100px"></span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <br />
+        </div>
+    }
+
+    @if (Model.Security.CanViewFullDataset)
+    {
+        <hr id="schemaHR" />
+
+        <div data-bind="visible: DataLoading() == true && DataTableExists() == true" style="display: none;">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div>
+                        <h3 class="@color">Data Preview (Top 20 Rows)</h3>
+                    </div>
                 </div>
-                <div class="section-content collapsed" id="hide_detailSectionHeader_Columns">
-                    <div class="table-wrapper">
-                        <table class="table table-bordered table-striped schema-table">
+            </div>
+            <div class="row" style="height: 150px;">
+                <div class="col-lg-12">
+                    <div>
+                        <p id="dataSpinner" class="mini-sentry-spinner-container sentry-spinner-container" style="margin-left: 0; margin-top: 50px;">
+                            <span class="sentry-spinner"></span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="dataSection" data-bind="visible: DataLoading() == false  && DataTableExists() == true" style="display: none;">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div>
+                        <h3 class="@color">Data Preview (Top 20 Rows)</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12">
+                    <table class="table table-striped table-bordered @color" id="datasetRowTable">
+                        <thead>
+                            <tr id="tableFirstRow" class="filter-row"></tr>
+                            <tr id="tableColumnIDs" class="table-header table-header_@color @headerColor"></tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+                <hr />
+            </div>
+        </div>
+    }
+
+    @if (Model.Security.CanViewFullDataset)
+    {
+        <div class="row">
+            <div class="col-lg-12">
+                <div data-bind="visible: ShowDataFileTable() == true" style="display: none;">
+                    <div>
+                        <h3 class="@color">Data Files</h3>
+                    </div>
+                    <div id="hide_detailSectionHeader_DataFiles">
+                        @if (Model.DatasetFileCount >= 2)
+                        {
+                            <div id="userToolbar">
+                                <button id="bundle_selected" type="button" class="btn btn-link" title="Bundle Selected Files">
+                                    <img src="~/Images/icons/bundle.png" />
+                                    Selected Files (<span id="bundleCountSelected">0</span> Selected)
+                                </button>
+                                <button id="bundle_allFiltered" type="button" class="btn btn-link" title="Bundle Filtered Files">
+                                    <img src="~/Images/icons/bundle.png" />
+                                    Filtered Files (<span id="bundleCountFiltered">0</span> Shown)
+                                </button>
+                            </div>
+                        }
+                        <table class="table table-striped table-bordered @color" id="datasetFilesTable">
                             <thead>
-                                <tr class="@headerColor">
-                                    <th scope="col" style="width: 35%;" class="column-type">Column Name</th>
-                                    <th scope="col" class="column-type">Description</th>
-                                    <th scope="col" class="column-type">Type</th>
-                                    <th scope="col" style="width: 10%;" class="column-type">Precision</th>
-                                    <th scope="col" style="width: 10%;" class="column-type">Scale</th>
+                                <tr class="filter-row">
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td id="configFilterName"></td>
+                                </tr>
+                                <tr class="table-header_@color @headerColor">
+                                    <th>Details</th>
+                                    <th>Actions</th>
+                                    <th>Name</th>
+                                    <th>Upload User Name</th>
+                                    <th>Initial Upload Date</th>
+                                    <th>Modified Date</th>
+                                    <th>Schema</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <!-- ko foreach: SchemaRows -->
-                                <tr class="SchemaRow" data-column="equip_id" aria-expanded="false" aria-haspopup="true" role="link" tabindex="0"
-                                    data-bind="css: { odd: ($index() % 2 === 1), even: ($index() % 2 === 0), extra: ($index() >= 10)}, visible: ($index() < 10)">
-                                    <td class="column-name @color" scope="row" data-bind="text : Name"></td>
-                                    <td class="column-description">
-                                        <div class="contents clamped">
-                                            <span class="Linkify" data-bind="text : Description"></span>
-                                        </div>
-                                    </td>
-                                    <td class="column-type">
-                                        <div>
-                                            <span class="type-name" data-name="text" data-bind="text : Type"></span>
-                                        </div>
-                                    </td>
-                                    <td class="column-type">
-                                        <div>
-                                            <span class="type-name" data-name="text" data-bind="text : Precision"></span>
-                                        </div>
-                                    </td>
-                                    <td class="column-type">
-                                        <div>
-                                            <span class="type-name" data-name="text" data-bind="text : Scale"></span>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <!-- /ko -->
-                            </tbody>
+                            <tbody></tbody>
                         </table>
                     </div>
-                    <div data-bind="if: FooterRow()">
-                        <div style="float: right;">
-                            <a onclick="$('.extra').toggle();">
-                                <span>Show</span>
-                                <span class="extra">More</span>
-                                <span class="extra" style="display: none;">Less</span>
-                                <span> (</span>
-
-                                <span data-bind="text: SchemaRows().length"></span>
-                                <span>)</span>
-                            </a>
-                        </div>
-                    </div>
-                    <div id="panelSpinner" style="min-height: 150px;">
-                        <div class="sentry-spinner-container" style=" width: 1166px; margin-top: 25px;">
-                            <span class="sentry-spinner" style="height:100px"></span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </div>
-        <br />
-    </div>
-
-    <hr id="schemaHR" />
-
-    <div data-bind="visible: DataLoading() == true && DataTableExists() == true" style="display: none;">
-        <div class="row">
-            <div class="col-lg-12">
-                <div>
-                    <h3 class="@color">Data Preview (Top 20 Rows)</h3>
                 </div>
             </div>
-        </div>
-        <div class="row" style="height: 150px;">
-            <div class="col-lg-12">
-                <div>
-                    <p id="dataSpinner" class="mini-sentry-spinner-container sentry-spinner-container" style="margin-left: 0; margin-top: 50px;">
-                        <span class="sentry-spinner"></span>
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div id="dataSection" data-bind="visible: DataLoading() == false  && DataTableExists() == true" style="display: none;">
-        <div class="row">
-            <div class="col-lg-12">
-                <div>
-                    <h3 class="@color">Data Preview (Top 20 Rows)</h3>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-12">
-                <table class="table table-striped table-bordered @color" id="datasetRowTable">
-                    <thead>
-                        <tr id="tableFirstRow" class="filter-row"></tr>
-                        <tr id="tableColumnIDs" class="table-header table-header_@color @headerColor"></tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-            <hr />
-        </div>
-    </div>
 
-    <div class="row">
-        <div class="col-lg-12">
-            <div data-bind="visible: ShowDataFileTable() == true" style="display: none;">
-                <div>
-                    <h3 class="@color">Data Files</h3>
+            <div>
+                <div id="detailSectionHeader_BundledFiles" style="display: none;" class="leftSectionHeaderDiv">
+                    <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_BundledFiles"></span>
+                    <h2 class="detailSection @color">Bundled Files</h2>
                 </div>
-                <div id="hide_detailSectionHeader_DataFiles">
-                    @if (((Model.IsSensitive && Model.CanDwnldSenstive) || (!Model.IsSensitive && Model.CanDwnldNonSensitive)) && Model.DatasetFileCount >= 2)
-                    {
-                        <div id="userToolbar">
-                            <button id="bundle_selected" type="button" class="btn btn-link" title="Bundle Selected Files">
-                                <img src="~/Images/icons/bundle.png" />
-                                Selected Files (<span id="bundleCountSelected">0</span> Selected)
-                            </button>
-                            <button id="bundle_allFiltered" type="button" class="btn btn-link" title="Bundle Filtered Files">
-                                <img src="~/Images/icons/bundle.png" />
-                                Filtered Files (<span id="bundleCountFiltered">0</span> Shown)
-                            </button>
-                        </div>
-                    }
-                    <table class="table table-striped table-bordered @color" id="datasetFilesTable">
+                <div id="hide_detailSectionHeader_BundledFiles" style="display: none;">
+                    <table class="table table-striped table-bordered @color" id="bundledDatasetFilesTable">
                         <thead>
                             <tr class="filter-row">
                                 <td></td>
@@ -625,16 +610,16 @@
                                 <td></td>
                                 <td></td>
                                 <td></td>
-                                <td id="configFilterName"></td>
+                                <td></td>
                             </tr>
-                            <tr class="table-header_@color @headerColor">
+                            <tr class="table-header_@color">
                                 <th>Details</th>
                                 <th>Actions</th>
                                 <th>Name</th>
                                 <th>Upload User Name</th>
                                 <th>Initial Upload Date</th>
                                 <th>Modified Date</th>
-                                <th>Schema</th>
+                                <th>Config File Name</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
@@ -642,40 +627,7 @@
                 </div>
             </div>
         </div>
-
-        <div>
-            <div id="detailSectionHeader_BundledFiles" style="display: none;" class="leftSectionHeaderDiv">
-                <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_BundledFiles"></span>
-                <h2 class="detailSection @color">Bundled Files</h2>
-            </div>
-            <div id="hide_detailSectionHeader_BundledFiles" style="display: none;">
-                <table class="table table-striped table-bordered @color" id="bundledDatasetFilesTable">
-                    <thead>
-                        <tr class="filter-row">
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr class="table-header_@color">
-                            <th>Details</th>
-                            <th>Actions</th>
-                            <th>Name</th>
-                            <th>Upload User Name</th>
-                            <th>Initial Upload Date</th>
-                            <th>Modified Date</th>
-                            <th>Config File Name</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
+    }
 </div>
 
 @section Scripts {
@@ -828,7 +780,7 @@
             self.ShowDataFileTable = ko.computed(function () {
                 if (self.DataLastUpdated() === 'No Data Files Exist') {
                     return false;
-                }else {
+                } else {
                     return true;
                 }
             });
@@ -926,6 +878,8 @@
                     $('#datasetConfigList').val(getUrlParameter('configID')).trigger('change');
                 }
 
+                if ($('#datasetConfigList').val() === undefined) { return; }
+
                 var metadataURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val();
                 $.get(metadataURL, function (result) {
                     self.Downloads(result.Downloads);
@@ -952,8 +906,11 @@
             }
 
             function UpdateColumnSchema() {
+                if ($('#datasetConfigList').val() === undefined) { return;}
+
                 var schemaURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val() + "/schemas/0/columns";
                 var hiveTableURL = "/api/v1/metadata/datasets/" + $('#datasetConfigList').val() + "/schemas/0/hive";
+
                 self.DataLoading(true);
                 $('#dataSection').hide();
 

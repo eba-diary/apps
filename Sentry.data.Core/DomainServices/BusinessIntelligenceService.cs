@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Sentry.Common.Logging;
 
 namespace Sentry.data.Core
@@ -11,16 +10,27 @@ namespace Sentry.data.Core
     {
 
         private readonly IDatasetContext _datasetContext;
+        private readonly IEmailService _emailService;
+        private readonly ISecurityService _securityService;
         private readonly UserService _userService;
 
-        public BusinessIntelligenceService(IDatasetContext datasetContext, UserService userService)
+        public BusinessIntelligenceService(IDatasetContext datasetContext, IEmailService emailService, ISecurityService securityService, UserService userService)
         {
             _datasetContext = datasetContext;
+            _emailService = emailService;
             _userService = userService;
+            _securityService = securityService;
         }
 
         #region "Public Functions"
 
+
+        public UserSecurity GetUserSecurityById(int datasetId)
+        {
+            Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).FirstOrDefault();
+            
+            return _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+        }
 
         public BusinessIntelligenceDto GetBusinessIntelligenceDto(int datasetId)
         {
@@ -44,7 +54,7 @@ namespace Sentry.data.Core
             return new BusinessIntelligenceHomeDto()
             {
                 DatasetCount = _datasetContext.GetReportCount(),
-                Categories = _datasetContext.Categories.Where(x => x.ObjectType == GlobalConstants.DataEntityTypes.REPORT).ToList(),
+                Categories = _datasetContext.Categories.Where(x => x.ObjectType == GlobalConstants.DataEntityCodes.REPORT).ToList(),
                 CanManageReports = _userService.GetCurrentUser().CanManageReports
             };
         }
@@ -95,11 +105,37 @@ namespace Sentry.data.Core
         {
             List<string> errors = new List<string>();
 
-            if (_datasetContext.Datasets.Where(w => w.DatasetName == dto.DatasetName &&
+            if (dto.DatasetId == 0 && _datasetContext.Datasets.Where(w => w.DatasetName == dto.DatasetName &&
                                                                         w.DatasetCategories.Any(x => dto.DatasetCategoryIds.Contains(x.Id)) &&
-                                                                        w.DatasetType == GlobalConstants.DataEntityTypes.REPORT)?.Count() > 0)
+                                                                        w.DatasetType == GlobalConstants.DataEntityCodes.REPORT)?.Count() > 0)
             {
                 errors.Add("Dataset name already exists within category");
+            }
+
+            if (dto.FileTypeId == (int)ReportType.Excel)
+            {
+                try
+                {
+                    int pos = dto.Location.LastIndexOf('\\');
+                    string directory = dto.Location.Substring(0, pos);
+                    Directory.GetAccessControl(directory);
+                    File.GetAccessControl(dto.Location);
+                    var file = File.OpenRead(dto.Location);
+                    file.Close();
+                }
+                catch (Exception ex)
+                {
+                    if (ex.Message == "Attempted to perform an unauthorized operation.")
+                    {
+                        errors.Add("This file can’t be accessed by data.sentry.com.  DSCSupport@sentry.com has been notified.  You will be contacted when the exhibit can be created.");
+
+                        _emailService.SendInvalidReportLocationEmail(dto, _userService.GetCurrentUser().DisplayName);
+                    }
+                    else
+                    {
+                        errors.Add($"An error occured finding the file. Please verify the file path is correct or contact DSCSupport@sentry.com for assistance.");
+                    }
+                }
             }
 
             return errors;
@@ -119,17 +155,14 @@ namespace Sentry.data.Core
             MapDatasetFileConig(dto, ds);
         }
 
-        private DatasetFileConfig MapDatasetFileConig(BusinessIntelligenceDto dto, Dataset ds)
+        private void MapDatasetFileConig(BusinessIntelligenceDto dto, Dataset ds)
         {
-
             ds.DatasetFileConfigs.First().Name = dto.DatasetName;
             ds.DatasetFileConfigs.First().Description = dto.DatasetDesc;
             ds.DatasetFileConfigs.First().FileTypeId = dto.FileTypeId;
             ds.DatasetFileConfigs.First().ParentDataset = ds;
             ds.DatasetFileConfigs.First().DatasetScopeType = _datasetContext.DatasetScopeTypes.Where(w => w.Name == "Point-in-Time").FirstOrDefault();
             ds.DatasetFileConfigs.First().FileExtension = _datasetContext.FileExtensions.Where(w => w.Name == "ANY").FirstOrDefault();
-
-            return ds.DatasetFileConfigs.First();
         }
 
         private void CreateDataset(BusinessIntelligenceDto dto)
@@ -151,14 +184,14 @@ namespace Sentry.data.Core
             ds.DatasetFunctions = _datasetContext.DatasetFunctions.Where(x => dto.DatasetFunctionIds.Contains(x.Id)).ToList();
             ds.DatasetName = dto.DatasetName;
             ds.DatasetDesc = dto.DatasetDesc;
-            ds.CreationUserName = dto.CreationUserName;
-            ds.SentryOwnerName = dto.SentryOwnerId; //done on purpose since namming flipped.
-            ds.UploadUserName = dto.UploadUserName;
+            ds.CreationUserName = dto.CreationUserId;
+            ds.PrimaryOwnerId = dto.PrimaryOwnerId;
+            ds.PrimaryContactId = dto.PrimaryContactId;
+            ds.UploadUserName = dto.UploadUserId;
             ds.OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), 1);  //All reports are internal
             ds.DatasetDtm = dto.DatasetDtm;
             ds.ChangedDtm = dto.ChangedDtm;
-            ds.DatasetType = GlobalConstants.DataEntityTypes.REPORT;
-            ds.IsSensitive = false;
+            ds.DatasetType = GlobalConstants.DataEntityCodes.REPORT;
             ds.CanDisplay = true;
             ds.Metadata = new DatasetMetadata()
             {
@@ -178,22 +211,33 @@ namespace Sentry.data.Core
         //could probably be an extension.
         private void MapToDto(Dataset ds, BusinessIntelligenceDto dto)
         {
-            string userDisplayname = _userService.GetByAssociateId(ds.SentryOwnerName)?.DisplayName;
-           
+            IApplicationUser owner = _userService.GetByAssociateId(ds.PrimaryOwnerId);
+            IApplicationUser contact = _userService.GetByAssociateId(ds.PrimaryContactId);
+            IApplicationUser uploaded = _userService.GetByAssociateId(ds.UploadUserName);
+
+            dto.Security = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+            dto.PrimaryOwnerId = ds.PrimaryOwnerId;
+            dto.PrimaryContactId = ds.PrimaryContactId;
+            dto.IsSecured = ds.IsSecured;
+
             dto.DatasetId = ds.DatasetId;
             dto.DatasetCategoryIds = ds.DatasetCategories.Select(x => x.Id).ToList();
             dto.DatasetBusinessUnitIds = ds.BusinessUnits.Select(x => x.Id).ToList();
             dto.DatasetFunctionIds = ds.DatasetFunctions.Select(x => x.Id).ToList();
             dto.DatasetName = ds.DatasetName;
             dto.DatasetDesc = ds.DatasetDesc;
-            dto.SentryOwnerName = (string.IsNullOrWhiteSpace(userDisplayname) ? ds.SentryOwnerName : userDisplayname);
-            dto.SentryOwnerId = ds.SentryOwnerName;
+            dto.PrimaryOwnerName = (owner != null ? owner.DisplayName : "Not Available");
+            dto.PrimaryContactName = (contact != null ? contact.DisplayName : "Not Available");
+            dto.PrimaryContactEmail = (contact != null ? contact.EmailAddress : "");
+
+            dto.CreationUserId = ds.CreationUserName;
             dto.CreationUserName = ds.CreationUserName;
-            dto.UploadUserName = ds.UploadUserName;
+            dto.UploadUserId = ds.UploadUserName;
+            dto.UploadUserName = (uploaded != null ? uploaded?.DisplayName : "Not Available");
+
             dto.DatasetDtm = ds.DatasetDtm;
             dto.ChangedDtm = ds.ChangedDtm;
             dto.S3Key = ds.S3Key;
-            dto.IsSensitive = ds.IsSensitive;
             dto.DatasetType = ds.DatasetType;
             dto.Location = ds.Metadata.ReportMetadata.Location;
             dto.LocationType = ds.Metadata.ReportMetadata.LocationType;
@@ -204,8 +248,6 @@ namespace Sentry.data.Core
             dto.CanDisplay = ds.CanDisplay;
             dto.MailtoLink = "mailto:?Subject=Business%20Intelligence%20Exhibit%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/BusinessIntelligence/Detail/" + ds.DatasetId;
             dto.ReportLink = (ds.DatasetFileConfigs.First().FileTypeId == (int)ReportType.BusinessObjects && ds.Metadata.ReportMetadata.GetLatest) ? ds.Metadata.ReportMetadata.Location + GlobalConstants.BusinessObjectExhibit.GET_LATEST_URL_PARAMETER : ds.Metadata.ReportMetadata.Location;
-
-           // return dto;
         }
 
         private void MapToDetailDto(Dataset ds, BusinessIntelligenceDetailDto dto)
@@ -220,11 +262,8 @@ namespace Sentry.data.Core
             dto.Views = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset == ds.DatasetId).Count();
             dto.FrequencyDescription = Enum.GetName(typeof(ReportFrequency), ds.Metadata.ReportMetadata.Frequency) ?? "Not Specified";
             dto.TagNames = ds.Tags.Select(x => x.Name).ToList();
-            dto.CanManageReport = user.CanManageReports;
             dto.CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "darkgray";
             dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
-
-            //return dto;
         }
 
         #endregion

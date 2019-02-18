@@ -25,7 +25,6 @@ using System.Diagnostics;
 using LazyCache;
 using StackExchange.Profiling;
 using Sentry.Common.Logging;
-using Sentry.data.Core.Entities.Metadata;
 using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Web.Controllers
@@ -61,7 +60,7 @@ namespace Sentry.data.Web.Controllers
         // GET: Search/Datasets/searchParms
         [Route("Search/{searchType?}/Index")]
         [Route("Search/{searchType?}/")]
-        [AuthorizeByPermission(PermissionNames.DatasetView)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_VIEW)]
         public ActionResult Index(string searchType, string category, string searchPhrase, string ids)
         {
             SearchIndexModel model = new SearchIndexModel();
@@ -117,13 +116,13 @@ namespace Sentry.data.Web.Controllers
             switch (searchType)
             {
                 case "BusinessIntelligence":
-                    dsList = _datasetContext.Datasets.Where(x => x.DatasetType == GlobalConstants.DataEntityTypes.REPORT).ToList();
+                    dsList = _datasetContext.Datasets.Where(x => x.DatasetType == GlobalConstants.DataEntityCodes.REPORT && x.CanDisplay).ToList();
                     break;
                 case "Datasets":
-                    dsList = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityTypes.DATASET).ToList();
+                    dsList = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET && w.CanDisplay).ToList();
                     break;
                 default:
-                    dsList = _datasetContext.Datasets.ToList();
+                    dsList = _datasetContext.Datasets.Where(x=> x.CanDisplay).ToList();
                     break;
             }
 

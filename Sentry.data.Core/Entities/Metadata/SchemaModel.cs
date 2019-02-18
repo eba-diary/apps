@@ -1,9 +1,4 @@
-﻿using Sentry.data.Core.Entities.Metadata;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace Sentry.data.Core
 {
@@ -21,5 +16,6 @@ namespace Sentry.data.Core
         public string HiveDatabase { get; set; }
         public string HiveStatus { get; set; }
         public IList<ColumnModel> Columns { get; set; }
+        public string HiveLocation { get; internal set; }
     }   
 }

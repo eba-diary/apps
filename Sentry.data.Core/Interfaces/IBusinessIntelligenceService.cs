@@ -11,5 +11,7 @@ namespace Sentry.data.Core
         bool CreateAndSaveBusinessIntelligence(BusinessIntelligenceDto dto);
         bool UpdateAndSaveBusinessIntelligence(BusinessIntelligenceDto dto);
         void Delete(int id);
+
+        UserSecurity GetUserSecurityById(int datasetId);
     }
 }

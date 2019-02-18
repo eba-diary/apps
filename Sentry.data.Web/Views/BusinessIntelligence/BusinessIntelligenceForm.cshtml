@@ -26,9 +26,10 @@
             <br />
 
             @Html.HiddenFor(model => model.DatasetId)
-            @Html.HiddenFor(model => model.SentryOwnerId)
-            @Html.HiddenFor(model => model.CreationUserName)
-            @Html.HiddenFor(model => model.UploadUserName)
+            @Html.HiddenFor(model => model.PrimaryOwnerId)
+            @Html.HiddenFor(model => model.PrimaryContactId)
+            @Html.HiddenFor(model => model.CreationUserId)
+            @Html.HiddenFor(model => model.UploadUserId)
 
             @* Name *@
             <div class="form-group">
@@ -73,7 +74,7 @@
 
             @* Business Unit *@
             <div class="form-group">
-                @Html.LabelFor((model) => model.DatasetBusinessUnitIds, new { @class = "control-label col-md-2" })
+                <span class="control-label col-md-2">Business Unit</span>
                 <div class="col-md-10">
                     <select id="DatasetBusinessUnitIds" name="DatasetBusinessUnitIds" multiple="multiple" class="form-control edit-dataset-row">
                         @foreach (var li in Model.AllBusinessUnits)
@@ -87,7 +88,7 @@
 
             @* Function *@
             <div class="form-group">
-                @Html.LabelFor((model) => model.DatasetFunctionIds, new { @class = "control-label col-md-2" })
+                <span class="control-label col-md-2">Function</span>
                 <div class="col-md-10">
                     <select id="DatasetFunctionIds" name="DatasetFunctionIds" multiple="multiple" class="form-control edit-dataset-row">
                         @foreach (var li in Model.AllDatasetFunctions)
@@ -99,19 +100,28 @@
                 </div>
             </div>
 
-
-            @Html.Partial("_Tags", Model)
-
-            
+            @* Exhibit Type*@
             <div class="form-group">
                 @Html.LabelFor(model => model.FileTypeId, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">      
+                <div class="col-md-10">
                     @Html.DropDownListFor((model) => model.FileTypeId, Model.AllDataFileTypes, new { @class = "form-control edit-dataset-row" })
                     @Html.ValidationMessageFor((model) => model.FileTypeId, "", new { @class = "text-danger" })
                 </div>
             </div>
 
+            @* Frequency *@
+            <div class="form-group">
+                @Html.LabelFor((model) => model.FrequencyId, new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor((model) => model.FrequencyId, Model.AllFrequencies, new { @class = "form-control edit-dataset-row" })
+                    @Html.ValidationMessageFor((model) => model.FrequencyId, "", new { @class = "text-danger" })
+                </div>
+            </div>
 
+            @* Tags *@
+            @Html.Partial("_Tags", Model)
+
+            @*Report Location *@
             <div id="UrlPanel" class="tab-pane fade in form-horizontal">
                 <div class="form-group">
                     @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -133,35 +143,33 @@
                     </div>
                 </div>
             </div>
-            <div id="BOGetLatestPanel">
+            <div id="BOGetLatestPanel" class="hidden">
                 <div class="form-group">
                     @Html.LabelFor(model => model.GetLatest, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
+                    <div class="col-md-10" style="margin-top: 5px;">
                         @Html.CheckBoxFor(model => model.GetLatest, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                    </div>
-                </div>
-                <div class="form-group BOGetLatestDescription">
-                    <label class="control-label col-md-2"></label>
-                    <div class="col-md-10">
-                        <span class="text-muted">
+                        <p class="text-muted">
                             <em>This will ensure users are linked to the latest revision of the report specified above</em>
-                        </span>
+                        </p>
                     </div>
-                </div>
-            </div>
-            <div class="form-group">
-                @Html.LabelFor((model) => model.FrequencyId, new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.DropDownListFor((model) => model.FrequencyId, Model.AllFrequencies, new { @class = "form-control edit-dataset-row" })
-                    @Html.ValidationMessageFor((model) => model.FrequencyId, "", new { @class = "text-danger" })
                 </div>
             </div>
 
+            @* Owner *@
             <div class="form-group">
-                @Html.LabelFor(model => model.SentryOwnerName, htmlAttributes: new { @class = "control-label col-md-2" })
+                @Html.LabelFor(model => model.PrimaryOwnerName, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.EditorFor(model => model.SentryOwnerName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
-                    @Html.ValidationMessageFor(model => model.SentryOwnerName, "", new { @class = "text-danger" })
+                    @Html.EditorFor(model => model.PrimaryOwnerName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
+                    @Html.ValidationMessageFor(model => model.PrimaryOwnerName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            @* Contact *@
+            <div class="form-group">
+                @Html.LabelFor(model => model.PrimaryContactName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.PrimaryContactName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
+                    @Html.ValidationMessageFor(model => model.PrimaryContactName, "", new { @class = "text-danger" })
                 </div>
             </div>
         </div>
@@ -179,10 +187,13 @@
     </div>
 }
 
+@* use a hidden field to store the value of the BusinessObjects enum; used to avoid hardcoding it in the JavaScript file (Report.js) *@
+<input type="hidden" id="hidBizObjEnumVal" value="@Model.BusinessObjectsEnumValue" />
+
 @section Scripts {
     <script>
         $(function () {
-            data.Report.FormInit();
+            data.Report.FormInit('@(Model.HrempServiceUrl)' , '@(Model.HrempServiceEnv)');
         });
     </script>
 }

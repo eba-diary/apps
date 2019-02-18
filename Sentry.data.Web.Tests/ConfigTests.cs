@@ -13,25 +13,6 @@ namespace Sentry.data.Web.Tests
     [TestClass]
     public class ConfigTests
     {
-        [TestMethod]
-        [TestCategory("Config Controller")]
-        public void Config_Controller_Index_Returns_Index_View_With_Valid_ID()
-        {
-            var user = MockUsers.App_DataMgmt_Upld();
-
-            var ds = MockClasses.MockDataset();
-            var dfc = MockClasses.MockDataFileConfig(ds);
-
-            ds.DatasetFileConfigs.Add(dfc);
-
-            var cc = MockControllers.MockConfigController(dfc, user);
-
-            var result = cc.Index(dfc.ParentDataset.DatasetId) as ViewResult;
-
-            Assert.IsInstanceOfType(result.Model, typeof(ObsoleteDatasetModel));
-
-            Assert.AreEqual("", result.ViewName);
-        }
 
         [TestMethod]
         [TestCategory("Config Controller")]

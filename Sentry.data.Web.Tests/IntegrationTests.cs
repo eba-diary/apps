@@ -15,7 +15,6 @@ namespace Sentry.data.Web.Tests
             var user = MockUsers.App_DataMgmt_Upld();
             var ds = MockClasses.MockDataset(user);
 
-            Assert.IsTrue(user.CanUpload);
             Assert.IsTrue(ds.ValidateForSave().IsValid());
 
             var dfc = MockClasses.MockDataFileConfig(ds);
