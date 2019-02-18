@@ -399,7 +399,7 @@ namespace Sentry.data.Web.Controllers
                     client.DefaultRequestHeaders.Add("X-Requested-By", "data.sentry.com");
                     client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));//ACCEPT header
 
-                    HttpResponseMessage response = await client.PostAsync("http://awe-t-apspml-01.sentry.com:8999/batches", contentPost);
+                    HttpResponseMessage response = await client.PostAsync(Sentry.Configuration.Config.GetHostSetting("ApacheLivy") + "/batches", contentPost);
 
                     //Record submission regardless if target deems it a bad request.
                     Submission sub = new Submission()
@@ -493,7 +493,7 @@ namespace Sentry.data.Web.Controllers
             using (var client = new HttpClient(handler))
             {
 
-                HttpResponseMessage response = await client.GetAsync($"http://awe-t-apspml-01.sentry.com:8999/batches/{batchId}");
+                HttpResponseMessage response = await client.GetAsync(Sentry.Configuration.Config.GetHostSetting("ApacheLivy") + $"/batches/{batchId}");
 
 
                 if (response.IsSuccessStatusCode)
