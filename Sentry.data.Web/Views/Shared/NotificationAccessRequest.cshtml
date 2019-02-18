@@ -8,7 +8,7 @@
     @Html.AntiForgeryToken()
 
     <div class="accessRequestModelText" style="width:auto">
-        <p>Data Asset permission requests will utilize HPSM for approval.  Due to this process, a short delay in permission implementation can be expected.</p>
+        <p>Notification permission requests will utilize HPSM for approval.  Due to this process, a short delay in permission implementation can be expected.</p>
     </div>
     <br />
 
@@ -16,6 +16,7 @@
 
     </div>
 
+    <div class="form-horizontal">
 
         <div class="form-group">
             <label class="col-md-2 control-label">Notification Area</label>
@@ -25,5 +26,7 @@
         </div>
 
 
-    @Html.RenderPartial(Model);
+        @Html.Partial("_AccessRequest",Model)
+
+    </div>
 }

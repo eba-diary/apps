@@ -105,7 +105,18 @@ namespace Sentry.data.Core
             return da;
         }
 
+        /// <summary>
+        /// Gets assets for the request dropdown.
+        /// </summary>
+        /// <returns></returns>
+        public List<DataAsset> GetAssetsForAccessRequest()
+        {
+            return _domainContext.DataAsset.ToList();
+        }
 
+        /// <summary>
+        /// Gets the assets the user has permission to
+        /// </summary>
         public List<DataAsset> GetAssetsForUserSecurity()
         {
             IApplicationUser user = _userService.GetCurrentUser();

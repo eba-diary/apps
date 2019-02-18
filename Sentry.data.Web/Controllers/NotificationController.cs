@@ -76,9 +76,11 @@ namespace Sentry.data.Web.Controllers
         {
             NotificationAccessRequestModel model = new NotificationAccessRequestModel()
             {
-                AllPermissions = _notificationService.GetPermissionsForAccessRequest().ToModel()
+                AllPermissions = _notificationService.GetPermissionsForAccessRequest().ToModel(),
+                AllDataAssets = _notificationService.GetAssetsForAccessRequest().Select(x=> new SelectListItem() { Value = x.Id.ToString(), Text = x.DisplayName}).ToList(),
+                AllApprovers = new List<SelectListItem>()
             };
-            return View("NotificationAccessRequest", model);
+            return PartialView("NotificationAccessRequest", model);
         }
 
         [HttpPost]

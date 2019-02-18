@@ -9,7 +9,7 @@ data.ManageNotification = {
 
         $("[id^='RequestAccessButton']").off('click').on('click', function (e) {
             e.preventDefault();
-            data.AccessRequest.Init("/Notification/AccessRequest");
+            data.AccessRequest.InitForNotification();
         });
     },
 
