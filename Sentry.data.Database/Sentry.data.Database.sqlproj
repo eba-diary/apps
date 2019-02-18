@@ -231,6 +231,7 @@
     <None Include="Scripts\Post-Deploy\StaticData\BusinessArea.sql" />
     <None Include="Scripts\Post-Deploy\StaticData\BusinessAreaTile.sql" />
     <None Include="Scripts\Post-Deploy\StaticData\BusinessAreaTileRow.sql" />
+    <None Include="Scripts\Post-Deploy\StaticData\BusinessAreaTileRow_BusinessAreaTile.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Sentry.data.Database.refactorlog" />
