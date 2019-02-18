@@ -31,10 +31,10 @@
                             <ul class="list-unstyled ul-filter-list">
 
                                 <!-- ko foreach: OrderedFilters -->
-                                <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6">
+                                <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6, css: { notAllowed: Count() == 0 }">
                                     <label data-bind="attr: { id: id }">
                                         <input type="checkbox" class="filterChbx"
-                                               data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }" />
+                                               data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
                                         <strong data-bind="text : Title"></strong>
                                         <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
                                     </label>
@@ -44,10 +44,10 @@
                                 <li data-bind="attr: {id : HiddenMore}">
                                     <!-- ko foreach: OrderedFilters -->
                                     <ul class="notNested">
-                                        <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() >= 6">
+                                        <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() >= 6, css: { notAllowed: Count() == 0 }">
                                             <label data-bind="attr: { id: id }">
                                                 <input type="checkbox" class="filterChbx"
-                                                       data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id }" />
+                                                       data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
                                                 <strong data-bind="text : Title"></strong>
                                                 <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
                                             </label>

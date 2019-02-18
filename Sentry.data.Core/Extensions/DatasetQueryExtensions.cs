@@ -51,6 +51,9 @@ namespace Sentry.data.Core
             query.FetchMany(d => d.DatasetFiles).ThenFetch(f => f.Schema).ToFuture();
             query.FetchMany(d => d.DatasetCategories).ToFuture();
             query.FetchMany(d => d.Tags).ToFuture();
+            query.FetchMany(d => d.BusinessUnits).ToFuture();
+            query.FetchMany(d => d.DatasetFunctions).ToFuture();
+            
             var temp = query.FetchMany(d => d.Favorities).ToFuture(); //create a variable so we can toList it...can't do a toList on teh query object.
 
             return temp.ToList();

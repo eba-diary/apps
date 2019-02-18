@@ -108,6 +108,7 @@
     <Compile Include="Entities\Security\RequestAccess.cs" />
     <Compile Include="Entities\Security\Security.cs" />
     <Compile Include="Entities\Security\UserSecurity.cs" />
+    <Compile Include="Extensions\CommonExtensions.cs" />
     <Compile Include="Extensions\DatasetQueryExtensions.cs" />
     <Compile Include="Extensions\DataElementExtensions.cs" />
     <Compile Include="GlobalEnums\DataClassificationType.cs" />
