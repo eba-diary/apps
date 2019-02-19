@@ -31,7 +31,7 @@ namespace Sentry.data.Core
 
         public override Uri CalcRelativeUri(RetrieverJob Job)
         {
-            throw new NotImplementedException();
+            return null;
         }
 
         public override string GetDropPrefix(RetrieverJob Job)
