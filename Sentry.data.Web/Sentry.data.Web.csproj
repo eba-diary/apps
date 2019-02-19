@@ -282,6 +282,7 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\Startup.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
+    <Content Include="Content\business-intelligence.css" />
     <Content Include="Content\checkbox.css" />
     <Content Include="Content\business-area.css" />
     <Content Include="Content\creat-edit-datasets.css" />
@@ -408,6 +409,7 @@
     <Content Include="Content\css\select2.css" />
     <Content Include="Content\css\select2.min.css" />
     <Content Include="Content\dataset-detail.css" />
+    <Content Include="Content\datasets.css" />
     <Content Include="Content\favorites.css" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\home.css" />
