@@ -195,7 +195,8 @@ namespace Sentry.data.Web.Controllers
 
 
 
-                json += ", \"conf\": { \"spark.hadoop.fs.s3a.security.credential.provider.path\" : \"" + Config.GetHostSetting("SparkS3AKeyLocation") + "\"}";
+                json += ", \"conf\": { \"spark.hadoop.fs.s3a.security.credential.provider.path\" : \"" + Config.GetHostSetting("SparkS3AKeyLocation") + "\"," +
+                                        "\"spark.sql.hive.convertMetastoreParquet\" : \"false\"}";
                 json += "}";
 
 
@@ -289,7 +290,8 @@ namespace Sentry.data.Web.Controllers
                 }
 
 
-                json += ", \"conf\": { \"spark.hadoop.fs.s3a.security.credntial.provider.path\" : \"" + Config.GetHostSetting("SparkS3AKeyLocation") + "\"}";
+                json += ", \"conf\": { \"spark.hadoop.fs.s3a.security.credntial.provider.path\" : \"" + Config.GetHostSetting("SparkS3AKeyLocation") + "\"," +
+                                        "\"spark.sql.hive.convertMetastoreParquet\" : \"false\"}";
                 json += "}";
 
 
