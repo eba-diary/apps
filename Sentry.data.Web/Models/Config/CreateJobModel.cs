@@ -27,7 +27,7 @@ namespace Sentry.data.Web
 
             this.IsRegexSearch = true;
             this.SearchCriteria = "\\.";
-            this.OverwriteDataFile = true;
+            this.OverwriteDataFile = false;
             this.CreateCurrentFile = false;
             this.TargetFileName = "";
 
