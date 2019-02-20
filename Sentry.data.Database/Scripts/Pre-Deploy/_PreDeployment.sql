@@ -1,5 +1,5 @@
 ﻿DECLARE @ScriptVersion AS VARCHAR(50) 
-SET @ScriptVersion = '2019.02.06_01_PreDeploy'
+SET @ScriptVersion = '2019.02.20_01_PreDeploy'
 
 BEGIN TRAN 
   
@@ -7,7 +7,8 @@ IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion)
 BEGIN TRY 
 
   --insert one off script files here
-
+  :r ..\Pre-Deploy\SupportingScripts\Sprint_19_3_1\InsertSecurities.sql
+  
   --insert into the verision table so these scripts do not run again.
   INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 
 

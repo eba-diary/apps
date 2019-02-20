@@ -107,7 +107,7 @@ namespace Sentry.data.Core
             if (securable?.Security?.Tickets != null && securable.Security.Tickets.Count > 0)
             {
                 //build a adGroupName and  List(of permissionCode) anonymous obj.
-                var adGroups = securable.Security.Tickets.Select(x => new { adGroup = x.AdGroupName, permissions = x.Permissions.Where(y => y.IsEnabled).ToList() }).ToList();
+                var adGroups = securable.Security.Tickets.Select(x => new { adGroup = x.AdGroupName, permissions = x.Permissions.Where(y => y.IsEnabled).ToList() }).Where(x=> x.adGroup != null).ToList();
                 //loop through the dictionary to see if the user is part of the group, if so grab the permissions.
                 foreach (var item in adGroups)
                 {
@@ -118,7 +118,7 @@ namespace Sentry.data.Core
                 }
 
                 //build a userId and  List(of permissionCode) anonymous obj.
-                var userGroups = securable.Security.Tickets.Select(x => new { userId = x.GrantPermissionToUserId, permissions = x.Permissions.Where(y => y.IsEnabled).ToList() }).ToList();
+                var userGroups = securable.Security.Tickets.Select(x => new { userId = x.GrantPermissionToUserId, permissions = x.Permissions.Where(y => y.IsEnabled).ToList() }).Where(x=> x.userId != null).ToList();
                 //loop through the dictionary to see if the user is the user on the ticket, if so grab the permissions.
                 foreach (var item in userGroups)
                 {

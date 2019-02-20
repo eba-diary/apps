@@ -9,7 +9,7 @@ namespace Sentry.data.Web
 
         public string PermssionForUserId { get; set; }
 
-        public List<SelectListItem> AllDataAssets { get; set; }
+        public List<SelectListItem> AllSecurableObjects { get; set; }
 
 
     }

@@ -435,7 +435,7 @@
     <Content Include="js\AccessRequest.js" />
     <Content Include="js\Config.js" />
     <Content Include="js\Favorites.js" />
-    <Content Include="js\ManageAssetAlert.js" />
+    <Content Include="js\Notification.js" />
     <Content Include="js\ManageConfigs.js" />
     <Content Include="js\QueryTool\AddRule.js" />
     <Content Include="js\QueryTool\BannerControls.js" />
@@ -1213,7 +1213,7 @@
     <Content Include="Views\Dataset\Detail.cshtml" />
     <Content Include="_status\web.config" />
     <Content Include="Views\Dataset\_PushToFilenameOverride.cshtml" />
-    <Content Include="Views\Dataset\_Success.cshtml" />
+    <Content Include="Views\Shared\_Success.cshtml" />
     <Content Include="Views\Dataset\_PushToFilenameOverride_new.cshtml" />
     <Content Include="Views\DataAsset\Index.cshtml" />
     <Content Include="Views\DataAsset\_ConsumptionLayerComponent.cshtml" />

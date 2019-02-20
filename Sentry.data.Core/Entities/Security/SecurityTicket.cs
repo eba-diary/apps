@@ -58,10 +58,6 @@ namespace Sentry.data.Core
             {
                 vr.Add("TicketStatus", "Ticket Status is required");
             }
-            if (string.IsNullOrWhiteSpace(AdGroupName))
-            {
-                vr.Add("AdGroupName", "AD Group is required");
-            }
             if(Permissions == null || Permissions.Count == 0)
             {
                 vr.Add("Permissions", "Permissions are required on the ticket");

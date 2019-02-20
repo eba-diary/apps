@@ -14,5 +14,6 @@ namespace Sentry.data.Core
         List<DataAsset> GetAssetsForAccessRequest();
         List<Permission> GetPermissionsForAccessRequest();
         string RequestAccess(AccessRequest request);
+        List<KeyValuePair<string, string>> GetApproversByDataAsset(int dataAssetId);
     }
 }

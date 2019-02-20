@@ -143,14 +143,14 @@ namespace Sentry.data.Core
 
         public string RequestAccess(AccessRequest request)
         {
-
             DataAsset da = _domainContext.DataAsset.FirstOrDefault(x=> x.Id == request.SecurableObjectId);
+
             if (da != null)
             {
                 IApplicationUser user = _userService.GetCurrentUser();
-                IApplicationUser permissionForUser = _userService.GetByAssociateId(request.PermissionForUserId);
 
-                request.PermissionForUserName = permissionForUser.DisplayName;
+                request.PermissionForUserId = user.AssociateId;
+                request.PermissionForUserName = user.DisplayName;
                 request.SecurableObjectName = da.DisplayName;
                 request.SecurityId = da.Security.SecurityId;
                 request.RequestorsId = user.AssociateId;
@@ -164,6 +164,22 @@ namespace Sentry.data.Core
             }
 
             return string.Empty;
+        }
+
+        public List<KeyValuePair<string, string>> GetApproversByDataAsset(int dataAssetId)
+        {
+            DataAsset dataAsset = _domainContext.DataAsset.FirstOrDefault(x => x.Id == dataAssetId);
+
+            IApplicationUser owner = _userService.GetByAssociateId(dataAsset.PrimaryOwnerId);
+            IApplicationUser contact = _userService.GetByAssociateId(dataAsset.PrimaryContactId);
+
+            var owners = new List<KeyValuePair<string, string>>
+            {
+                new KeyValuePair<string, string>(dataAsset.PrimaryOwnerId, owner.DisplayName + " (Owner)"),
+                new KeyValuePair<string, string>(dataAsset.PrimaryContactId, contact.DisplayName + " (Contact)")
+            };
+
+            return owners;
         }
     }
 }

@@ -77,9 +77,10 @@ namespace Sentry.data.Web.Controllers
             NotificationAccessRequestModel model = new NotificationAccessRequestModel()
             {
                 AllPermissions = _notificationService.GetPermissionsForAccessRequest().ToModel(),
-                AllDataAssets = _notificationService.GetAssetsForAccessRequest().Select(x=> new SelectListItem() { Value = x.Id.ToString(), Text = x.DisplayName}).ToList(),
+                AllSecurableObjects = _notificationService.GetAssetsForAccessRequest().Select(x=> new SelectListItem() { Value = x.Id.ToString(), Text = x.DisplayName}).ToList(),
                 AllApprovers = new List<SelectListItem>()
             };
+            model.AllSecurableObjects.Insert(0, new SelectListItem() { Value = "0", Text = "Select a notification area" });
             return PartialView("NotificationAccessRequest", model);
         }
 
@@ -102,6 +103,12 @@ namespace Sentry.data.Web.Controllers
         public ActionResult GetNotificationPartialView(int notificationId)
         {
             return View("_Notification",_notificationService.GetNotificationModelForDisplay(notificationId).ToWeb());
+        }
+
+        public JsonResult GetApproversByDataAsset(int dataAssetId)
+        {
+            var owners = _notificationService.GetApproversByDataAsset(dataAssetId).Select(x=> new SelectListItem() {Value = x.Key, Text = x.Value }).ToList();
+            return Json(owners, JsonRequestBehavior.AllowGet);
         }
 
     }

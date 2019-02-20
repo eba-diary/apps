@@ -9,7 +9,7 @@
     [Approved_DTM] DATETIME NULL, 
     [Rejected_DTM] DATETIME NULL, 
     [TicketStatus_DSC] VARCHAR(32) NOT NULL, 
-    [AdGroup_NME] VARCHAR(64) NOT NULL, 
+    [AdGroup_NME] VARCHAR(64) NULL, 
     [IsRemovingPermission_IND] BIT NOT NULL, 
     [IsAddingPermission_IND] BIT NOT NULL, 
     [Security_ID] UNIQUEIDENTIFIER NOT NULL,

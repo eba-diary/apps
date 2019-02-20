@@ -52,7 +52,7 @@ namespace Sentry.data.Web
                 SecurableObjectId = core.SecurableObjectId,
                 SecurableObjectName = core.SecurableObjectName,
                 AllPermissions = core.Permissions.ToModel(),
-                AllDataAssets = core.DataAssest.Select(x => new SelectListItem() { Text = x.DisplayName, Value = x.Id.ToString() }).ToList(),
+                AllSecurableObjects = core.DataAssest.Select(x => new SelectListItem() { Text = x.DisplayName, Value = x.Id.ToString() }).ToList(),
                 AllApprovers = Utility.BuildSelectListitem(core.ApproverList, "Select an approver")
             };
         }
