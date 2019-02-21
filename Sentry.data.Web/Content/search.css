@@ -32,6 +32,9 @@
     border-bottom: 1px solid #ebebeb;
     box-shadow: none;
 }
+    #search-pg-filters .filterList label {
+        cursor: pointer;
+    }
 
 .filterHead {
     font-size: 16px;
@@ -39,9 +42,9 @@
     border: none !important;
     margin: 8px 0px 8px 8px;
 }
-    .filterHead .glyphicon {
-        color: #003da5;
-    }
+.filterHead .glyphicon {
+    color: #003da5;
+}
 
 .filterCategoryName {
     font-size: 18px;
@@ -51,6 +54,14 @@
 
 .filter-tile-count {
     font-size: 12px;
+}
+
+.notAllowed label {
+    cursor: not-allowed !important;
+    color: #bfbfbf;
+}
+.notAllowed:hover {
+    background-color: #fff !important;
 }
 
 #listOfDatasets .disregardParentClick {

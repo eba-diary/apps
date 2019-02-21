@@ -239,7 +239,7 @@ namespace Sentry.data.Web.Helpers
 
             RetrieverJobOptions rjo = new RetrieverJobOptions()
             {
-                OverwriteDataFile = true,
+                OverwriteDataFile = false,
                 TargetFileName = "",
                 CreateCurrentFile = false,
                 IsRegexSearch = true,
