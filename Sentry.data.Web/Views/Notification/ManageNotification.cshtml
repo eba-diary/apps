@@ -12,25 +12,22 @@
 <h1>Notifications</h1>
 <hr />
 
-@if (Model.CanModifyNotifications)
-{
-    <div class="form-group">
-        <div>
-            <a href="~/Notification/ModifyNotification" class="btn btn-md btn-info">Create New Notification</a>
-        </div>
-    </div>
-    <hr />
-}
-else
-{
-    <div class="form-group">
+
+
+<div class="form-group">
+    @if (Model.CanModifyNotifications)
+    {
         <span>
-            <input id="RequestAccessButton" type="button" value="Request Access" class="btn btn-primary" 
-                   data-toggle="tooltip" data-placement="top" title="Request access to create notifications" style="margin-left:40px" />
+            <a href="~/Notification/ModifyNotification" class="btn btn-primary">Create New Notification</a>
         </span>
-    </div>
-    <hr />
-}
+    }
+    <span>
+        <input id="RequestAccessButton" type="button" value="Request Access" class="btn btn-primary"
+               data-toggle="tooltip" data-placement="top" title="Request access to create notifications" style="margin-left:40px" />
+    </span>
+</div>
+<hr />
+
 
 
 <div>

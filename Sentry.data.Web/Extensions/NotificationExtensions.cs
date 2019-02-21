@@ -24,7 +24,8 @@ namespace Sentry.data.Web
                 NotificationId = core.NotificationId,
                 StartTime = core.StartTime,
                 DataAssetId = core.DataAssetId,
-                DataAssetName = core.DataAssetName
+                DataAssetName = core.DataAssetName,
+                CanEdit = core.CanEdit
             };
         }
 

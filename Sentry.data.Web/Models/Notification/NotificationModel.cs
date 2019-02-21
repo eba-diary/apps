@@ -25,6 +25,7 @@ namespace Sentry.data.Web
         public Boolean IsActive { get; set; }
         public string DataAssetName { get; set; }
         public string MessageSeverityDescription { get; set; }
+        public bool CanEdit { get; set; }
 
         public IEnumerable<SelectListItem> AllDataAssets { get; set; }
         public IEnumerable<SelectListItem> AllSeverities { get; set; }

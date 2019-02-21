@@ -88,21 +88,28 @@ namespace Sentry.data.Core
 
         public List<NotificationModel> GetNotificationsForDataAsset()
         {
-            List<NotificationModel> da = _domainContext.Notification.Fetch(x=> x.ParentDataAsset).ToModels();
+            List<NotificationModel> models = new List<NotificationModel>();
+            List<AssetNotifications> notifications = _domainContext.Notification.Fetch(x=> x.ParentDataAsset).ThenFetch(x=> x.Security).ThenFetchMany(x=> x.Tickets).ToList();
 
-            foreach(var asset in da)
+            foreach(var notification in notifications)
             {
-                IApplicationUser user = _userService.GetByAssociateId(asset.CreateUser);
+                NotificationModel model = notification.ToModel();
+                IApplicationUser user = _userService.GetByAssociateId(notification.CreateUser);
                 try
                 {
-                    asset.CreateUser = user.DisplayName;
+                    model.CreateUser = user.DisplayName;
                 }catch(Exception ex)
                 {
-                    Common.Logging.Logger.Error($"Could not get user by Id: {asset.CreateUser}", ex);
+                    Common.Logging.Logger.Error($"Could not get user by Id: {notification.CreateUser}", ex);
                 }
 
+                UserSecurity us = _securityService.GetUserSecurity(notification.ParentDataAsset, user);
+                model.CanEdit = us.CanModifyNotifications;
+
+                models.Add(model);
             }
-            return da;
+
+            return models;
         }
 
         /// <summary>

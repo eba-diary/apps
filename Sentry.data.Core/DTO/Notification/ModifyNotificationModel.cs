@@ -21,7 +21,7 @@ namespace Sentry.data.Core
         public int DataAssetId { get; set; }
         public string DataAssetName { get; set; }
         public Boolean IsActive { get; set; }
-
+        public bool CanEdit { get; set; }
 
         public List<DataAsset> AllDataAssets { get; set; } = new List<DataAsset>();
 
