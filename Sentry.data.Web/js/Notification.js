@@ -75,12 +75,8 @@ data.Notification = {
         // `d` is the original data object for the row
         return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
             '<tr>' +
-            '<td><b>Notification ID</b>:</td>' +
-            '<td>' + d.NotificationId + '</td>' +
-            '</tr>' +
-            '<tr>' +
-            '<td><b>Creator</b>: </td>' +
-            '<td>' + d.CreateUser + '</td>' +
+            '<td><b>Message:</b>&nbsp</td>' +
+            '<td>' + d.Message + '</td>' +
             '</tr>' +
             '</table>';
     }
