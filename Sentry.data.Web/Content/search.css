@@ -1,4 +1,70 @@
-﻿#listOfDatasets .disregardParentClick {
+﻿#search-pg-wrapper {
+    padding-top: 10px;
+}
+    #search-pg-wrapper .listHeadGroup {
+        display: block;
+        margin: 0px 0px 20px 0px;
+    }
+        #search-pg-wrapper .listHeadGroup div {
+            display: inline-block;
+            vertical-align: middle;
+        }
+
+#search-pg-filters {
+    overflow-x: hidden;
+}
+
+#search-pg-filters #filter-by-label {
+    color: #53565a;
+    padding-left: 22px;
+    font-size: 15px;
+    text-transform: uppercase;
+}
+
+#search-pg-filters #filterColumn {
+    border-top: 1px solid #ebebeb;
+    border-left: 1px solid #ebebeb;
+    border-right: 1px solid #ebebeb;
+}
+
+#search-pg-filters .panel {
+    border: none;
+    border-bottom: 1px solid #ebebeb;
+    box-shadow: none;
+}
+    #search-pg-filters .filterList label {
+        cursor: pointer;
+    }
+
+.filterHead {
+    font-size: 16px;
+    background-color: #fff !important;
+    border: none !important;
+    margin: 8px 0px 8px 8px;
+}
+.filterHead .glyphicon {
+    color: #003da5;
+}
+
+.filterCategoryName {
+    font-size: 18px;
+    color: #003da5;
+    font-family: "KievitSlabWeb W03","Lucida Sans",serif;
+}
+
+.filter-tile-count {
+    font-size: 12px;
+}
+
+.notAllowed label {
+    cursor: not-allowed !important;
+    color: #bfbfbf;
+}
+.notAllowed:hover {
+    background-color: #fff !important;
+}
+
+#listOfDatasets .disregardParentClick {
     float: right;
     margin-top: -3px;
     margin-right: 1px;
@@ -12,6 +78,7 @@
 
 #listOfDatasets .ul-dataset-list-item {
     background-color: #fff;
+    cursor: pointer;
 }
 
 .dataset-list-filter-category label {
@@ -22,11 +89,14 @@
 #nbr-search-results-wrapper {
     font-feature-settings: "lnum";
 }
+    #nbr-search-results-wrapper div {
+        display: inline-block;
+    }
 
-#search-tile-header {
-    overflow: hidden;
-    margin-top: 22px;
-}
+    #search-tile-header {
+        overflow: hidden;
+        margin-top: 22px;
+    }
 
 #sort-option-wrapper div {
     display: inline-block;

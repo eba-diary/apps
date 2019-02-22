@@ -100,7 +100,7 @@ else
                 @if (Model.CanViewReports)
                 {
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Business Intelligence<b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Business Intelligence <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             <li><a href="~/BusinessIntelligence/Index">Home</a></li>
                             <li class="dropdown-submenu">
@@ -126,7 +126,7 @@ else
                 @if (Model.CanUseApp)
                 {
                     <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Datasets<b class="caret"></b></a>
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Datasets <b class="caret"></b></a>
                         <ul class="dropdown-menu">
                             <li><a href="~/Dataset/Index">Home</a></li>
                             <li><a href="~/Search/Datasets">Search</a></li>
@@ -141,6 +141,16 @@ else
                                 <li class="dropdown-header">Dataset Administration</li>
                                 <li><a href="/Config/Manage">Manage Configs</a></li>
                             }
+                        </ul>
+                    </li>
+                }
+                
+                @if (Model.CanUseApp)
+                {
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Business Areas <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="~/BusinessArea/PersonalLines">Personal Lines</a></li>
                         </ul>
                     </li>
                 }
@@ -232,7 +242,7 @@ else
 
 
                 <li class="dropdown-xs">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Help<b class="caret"></b></a>
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">Help <b class="caret"></b></a>
                     <ul class="dropdown-menu">
                         @*<li><a href="/About/">About</a></li>*@
                         @*<li><a href="/Home/ReleaseNotes">Release Notes</a></li>*@

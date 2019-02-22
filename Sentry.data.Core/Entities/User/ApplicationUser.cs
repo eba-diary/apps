@@ -129,5 +129,13 @@ namespace Sentry.data.Core
             }
         }
 
+        public virtual bool IsAdmin
+        {
+            get
+            {
+                return _extendedUserInfo.Permissions.Contains(GlobalConstants.PermissionCodes.ADMIN_USER);
+            }
+        }
+
     }
 }

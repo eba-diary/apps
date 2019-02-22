@@ -9,6 +9,8 @@ data.Dataset = {
     IndexInit: function () {
         /// Initialize the Index page for data assets (with the categories)
 
+        $(".sentry-app-version").hide();
+
         $("[id^='CreateDataset']").click(function (e) {
             e.preventDefault();
             window.location = "/Dataset/Create";
