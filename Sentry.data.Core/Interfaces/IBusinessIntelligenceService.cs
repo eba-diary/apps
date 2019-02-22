@@ -13,5 +13,6 @@ namespace Sentry.data.Core
         void Delete(int id);
 
         UserSecurity GetUserSecurityById(int datasetId);
+        List<KeyValuePair<string,string>> GetAllTagGroups();
     }
 }

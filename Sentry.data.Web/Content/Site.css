@@ -2624,7 +2624,14 @@ tr.shown td.details-control {
     margin-bottom: 30px;
     border: 1px solid red;
     padding: 5px;
-    color:red;
+    color: red;
+}
+
+.tagFormErrorBox {
+    margin-bottom: 30px;
+    border: 1px solid red;
+    padding: 5px;
+    color: red;
 }
 
 .hero-media .container {
