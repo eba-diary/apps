@@ -267,6 +267,8 @@ namespace Sentry.data.Core
             dto.Views = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset == ds.DatasetId).Count();
             dto.FrequencyDescription = Enum.GetName(typeof(ReportFrequency), ds.Metadata.ReportMetadata.Frequency) ?? "Not Specified";
             dto.TagNames = ds.Tags.Select(x => x.Name).ToList();
+            dto.FunctionNames = ds.DatasetFunctions.Select(x => x.Name).ToList();
+            dto.BusinessUnitNames = ds.BusinessUnits.Select(x => x.Name).ToList();
             dto.CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "darkgray";
             dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
         }
