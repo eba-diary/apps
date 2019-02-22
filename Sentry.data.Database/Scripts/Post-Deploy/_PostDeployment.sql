@@ -124,7 +124,89 @@ COMMIT TRAN
 --Now only run these scritps if the versioning allows us.
 --ALTER THE SCRIPT VERSION BELOW FOR EVERY NEW SCRIPT 
 --SCRIPT VERSION should be in format yyyy.MM.dd_rr where rr is 2-digit revision number for day. 
-SET @ScriptVersion = '2019.02.13_03_PostDeploy'
+DECLARE @ScriptVersion5 AS VARCHAR(50) 
+SET @ScriptVersion5 = '2019.02.13_03_PostDeploy'
+
+BEGIN TRAN 
+  
+IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion5) 
+BEGIN TRY 
+
+  --insert one off script files here
+	:r ..\Post-Deploy\SupportingScripts\Sprint_19_2_2\UpdateJavaApplicationOptionstoArray.sql
+
+  --insert into the verision table so these scripts do not run again.
+  INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion5, GETDATE() ) 
+
+END TRY 
+
+BEGIN CATCH 
+    DECLARE @ErrorMessage5 NVARCHAR(4000); 
+    DECLARE @ErrorSeverity5 INT; 
+    DECLARE @ErrorState5 INT; 
+  
+    SELECT 
+        @ErrorMessage5 = ERROR_MESSAGE(), 
+        @ErrorSeverity5 = ERROR_SEVERITY(), 
+        @ErrorState5 = ERROR_STATE(); 
+  
+    RAISERROR (@ErrorMessage5, 
+               @ErrorSeverity5, 
+               @ErrorState5 
+               ); 
+  
+    ROLLBACK TRAN 
+    RETURN
+END CATCH 
+  
+COMMIT TRAN
+
+
+
+--Now only run these scritps if the versioning allows us.
+--ALTER THE SCRIPT VERSION BELOW FOR EVERY NEW SCRIPT 
+--SCRIPT VERSION should be in format yyyy.MM.dd_rr where rr is 2-digit revision number for day. 
+DECLARE @ScriptVersion6 AS VARCHAR(50) 
+SET @ScriptVersion6 = '2019.02.13_04_PostDeploy'
+
+BEGIN TRAN 
+  
+IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion6) 
+BEGIN TRY 
+
+  --insert one off script files here
+	:r ..\Post-Deploy\SupportingScripts\Sprint_19_2_2\AddHiveLocation.sql
+
+  --insert into the verision table so these scripts do not run again.
+  INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion6, GETDATE() ) 
+
+END TRY 
+
+BEGIN CATCH 
+    DECLARE @ErrorMessage6 NVARCHAR(4000); 
+    DECLARE @ErrorSeverity6 INT; 
+    DECLARE @ErrorState6 INT; 
+  
+    SELECT 
+        @ErrorMessage6 = ERROR_MESSAGE(), 
+        @ErrorSeverity6 = ERROR_SEVERITY(), 
+        @ErrorState6 = ERROR_STATE(); 
+  
+    RAISERROR (@ErrorMessage6, 
+               @ErrorSeverity6, 
+               @ErrorState6 
+               ); 
+  
+    ROLLBACK TRAN 
+    RETURN
+END CATCH 
+  
+COMMIT TRAN
+
+--Now only run these scritps if the versioning allows us.
+--ALTER THE SCRIPT VERSION BELOW FOR EVERY NEW SCRIPT 
+--SCRIPT VERSION should be in format yyyy.MM.dd_rr where rr is 2-digit revision number for day. 
+SET @ScriptVersion = '2019.02.15_01_PostDeploy'
 
 BEGIN TRAN 
   

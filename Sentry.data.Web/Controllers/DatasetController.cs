@@ -97,13 +97,18 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Edit(int id)
         {
-            DatasetDto dto = _datasetService.GetDatasetDto(id);
-            DatasetModel model = new DatasetModel(dto);
-            _obsidianService.GetUsersInGroup("App_DataMgmt_MngDS ");
-            Utility.SetupLists(_datasetContext, model);
+            UserSecurity us = _datasetService.GetUserSecurityForDataset(id);
+            if(us != null && us.CanEditDataset)
+            {
+                DatasetDto dto = _datasetService.GetDatasetDto(id);
+                DatasetModel model = new DatasetModel(dto);
+                Utility.SetupLists(_datasetContext, model);
 
-            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Edit Page", id);
-            return View("DatasetForm", model);
+                _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Edit Page", id);
+                return View("DatasetForm", model);
+            }
+
+            return View("Forbidden");
         }
 
         [HttpPost]

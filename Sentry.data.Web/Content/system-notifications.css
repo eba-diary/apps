@@ -1,0 +1,70 @@
+﻿/******************************************************************************************
+    Styles for each of the various areas for notifications through DSC
+    Allows for each area to have it's own look and feel
+******************************************************************************************/
+
+/*****  GENERIC (applies to all)  *****/
+.critical-notification-container {
+    margin-bottom: 20px;
+}
+
+.critical-notification-content-container {
+    padding: 8px 14px;
+}
+
+.critical-notification-title {
+    text-align: center;
+    font-size: 22px;
+    padding: 4px 0px;
+}
+
+.critical-notification-date, .standard-notification-date {
+    font-feature-settings: "lnum";
+    font-size: 12px;
+    margin-bottom: 10px;
+}
+
+.critical-notification-body, .standard-notification-body {
+    font-size: 18px;
+}
+
+#standard-notification-carousel {
+    min-height: 140px;
+    padding: 8px 50px;
+    margin-bottom: 60px;
+}
+    #standard-notification-carousel .carousel-control {
+        width: 3%;
+    }
+    #standard-notification-carousel .left, #standard-notification-carousel .right {
+        background-image: none;
+    }
+
+.standard-notification-title {
+    font-size: 19px;
+    font-weight: bold;
+    margin-bottom: 4px;
+    text-align: center;
+}
+
+
+/*****  PERSONAL LINES  *****/
+#pl-system-notification-wrapper .critical-notification-container {
+    background-color: #d7d7df;
+    color: #472c70;
+    border-bottom: 1px solid #afafaf;
+}
+
+#pl-system-notification-wrapper .critical-notification-title {
+    background-color: #472c70;
+    color: #d7d7df;
+}
+
+#pl-system-notification-wrapper .carousel {
+    background-color: #e1e2e4;
+}
+
+#pl-system-notification-wrapper .standard-notification-title {
+    color: #472c70;
+}
+/*****  END PERSONAL LINES  *****/

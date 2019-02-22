@@ -700,6 +700,55 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="DatasetFunction_Id" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="18ea7ef2-bfe0-42c2-b637-fe907d08c8b8" ChangeDateTime="02/08/2019 16:12:15">
+    <Property Name="ElementName" Value="[dbo].[BusinessArea].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[BusinessArea]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="BusinessArea_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="b5bf4af9-4a4f-401d-a8e6-764b3aa35b75" ChangeDateTime="02/08/2019 16:15:28">
+    <Property Name="ElementName" Value="[dbo].[BusinessAreaTile].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[BusinessAreaTile]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="BusinessAreaTile_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="df7d6c51-4143-4a14-8605-5456281dd4d3" ChangeDateTime="02/08/2019 16:29:03">
+    <Property Name="ElementName" Value="[dbo].[BusinessAreaTile].[Order_SEQ]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[BusinessAreaTile]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="BusinessArea_TYP" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="bab5336c-b87f-4a37-80bb-ce5cd527168c" ChangeDateTime="02/08/2019 17:54:16">
+    <Property Name="ElementName" Value="[dbo].[BusinessAreaTile].[Hyperlink_DSC]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[BusinessAreaTile]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Hyperlink_URL" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="0cfa6daf-7801-4652-8f7d-535299f1ab3b" ChangeDateTime="02/08/2019 19:55:42">
+    <Property Name="ElementName" Value="[dbo].[BusinessAreaTile].[BusinessArea_TYP]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[BusinessAreaTile]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="BusinessArea_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="11884088-c1ee-4e3e-98f1-388d3e081334" ChangeDateTime="02/11/2019 12:31:43">
+    <Property Name="ElementName" Value="[dbo].[BusinessAreaTileRow].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[BusinessAreaTileRow]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="BusinessAreaTileRow_ID" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="defc0497-553a-44cb-8062-0e3b6fc48240" ChangeDateTime="02/11/2019 12:46:50">
+    <Property Name="ElementName" Value="[dbo].[BusinessAreaTileRow_BusinessAreaTile].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[BusinessAreaTileRow_BusinessAreaTile]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="BusinessAreaTileRow_ID" />
+  </Operation>
   <Operation Name="Rename Refactor" Key="b9a36be9-d07f-45c2-965a-f1fd428bc9e2" ChangeDateTime="02/06/2019 15:27:39">
     <Property Name="ElementName" Value="[dbo].[Dataset].[SecondaryOwner_ID]" />
     <Property Name="ElementType" Value="SqlSimpleColumn" />

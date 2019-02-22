@@ -23,6 +23,46 @@ namespace Sentry.data.Core.Tests
 
         #region "CanEditDataset"
 
+        [TestMethod]
+        public void Security_Secured_NotOwner_Admin()
+        {
+            //ARRAGE
+            Security security = BuildBaseSecurity();
+            SecurityTicket ticket1 = BuildBaseTicket(security, "MyAdGroupName1");
+            SecurityTicket ticket2 = BuildBaseTicket(security, "MyAdGroupName2");
+            SecurityPermission previewPermission1 = BuildBasePermission(ticket1, CanPreviewDataset(), false);
+            SecurityPermission previewPermission2 = BuildBasePermission(ticket2, CanPreviewDataset(), false);
+
+            ticket1.Permissions.Add(previewPermission1);
+            ticket2.Permissions.Add(previewPermission2);
+            security.Tickets.Add(ticket1);
+            security.Tickets.Add(ticket2);
+
+            ISecurable securable = MockRepository.GenerateMock<ISecurable>();
+            securable.Stub(x => x.IsSecured).Return(true).Repeat.Any();
+            securable.Stub(x => x.PrimaryOwnerId).Return("123456").Repeat.Any();
+            securable.Stub(x => x.Security).Return(security).Repeat.Any();
+
+            IApplicationUser user = MockRepository.GenerateMock<IApplicationUser>();
+            user.Stub(x => x.AssociateId).Return("999999").Repeat.Any();
+            user.Stub(x => x.IsInGroup(ticket1.AdGroupName)).Return(false).Repeat.Any();
+            user.Stub(x => x.IsInGroup(ticket2.AdGroupName)).Return(false).Repeat.Any();
+            user.Stub(x => x.IsAdmin).Return(true).Repeat.Any();
+            //ACT
+            var ss = _container.GetInstance<ISecurityService>();
+            UserSecurity us = ss.GetUserSecurity(securable, user);
+
+            //ASSERT
+            Assert.IsTrue(us.CanPreviewDataset);
+            Assert.IsTrue(us.CanViewFullDataset);
+            Assert.IsTrue(us.CanQueryDataset);
+            Assert.IsTrue(us.CanUploadToDataset);
+            Assert.IsTrue(us.CanCreateDataset);
+            Assert.IsTrue(us.CanCreateReport);
+            Assert.IsTrue(us.CanEditDataset);
+            Assert.IsTrue(us.CanEditReport);
+        }
+
         /// <summary>
         /// a non owner is accessing a public dataser who also has no obsidian permissions.
         /// </summary>

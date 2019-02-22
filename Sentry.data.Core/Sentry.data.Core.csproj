@@ -81,15 +81,23 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DomainServices\BusinessAreaService.cs" />
     <Compile Include="DomainServices\ConfigService.cs" />
     <Compile Include="DomainServices\DatasetService.cs" />
     <Compile Include="DomainServices\NotificationService.cs" />
     <Compile Include="DomainServices\SecurityService.cs" />
+    <Compile Include="DTO\BusinessArea\BusinessAreaTileDto.cs" />
+    <Compile Include="DTO\BusinessArea\BusinessAreaTileRowDto.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceDetailDTO.cs" />
     <Compile Include="DTO\Dataset\DatasetDetailDTO.cs" />
+    <Compile Include="DTO\Schema\SchemaDetailDTO.cs" />
+    <Compile Include="Entities\BusinessArea\BusinessArea.cs" />
+    <Compile Include="Entities\BusinessArea\BusinessAreaTile.cs" />
+    <Compile Include="Entities\BusinessArea\BusinessAreaTileRow.cs" />
+    <Compile Include="Entities\BusinessArea\BusinessAreaType.cs" />
     <Compile Include="DTO\Notification\ModifyNotificationModel.cs" />
     <Compile Include="Entities\ColumnDTO.cs" />
-    <Compile Include="Entities\SchemaDTO.cs" />
+    <Compile Include="DTO\Schema\SchemaDTO.cs" />
     <Compile Include="Entities\Datasets\BusinessUnit.cs" />
     <Compile Include="Entities\Datasets\DatasetFunction.cs" />
     <Compile Include="Entities\HiveTableStatusEnum.cs" />
@@ -102,14 +110,17 @@
     <Compile Include="Entities\Security\RequestAccess.cs" />
     <Compile Include="Entities\Security\Security.cs" />
     <Compile Include="Entities\Security\UserSecurity.cs" />
+    <Compile Include="Extensions\CommonExtensions.cs" />
     <Compile Include="Extensions\DataAssetQueryExtensions.cs" />
     <Compile Include="Extensions\DatasetQueryExtensions.cs" />
+    <Compile Include="Extensions\DataElementExtensions.cs" />
     <Compile Include="Extensions\NotificationExtensions.cs" />
     <Compile Include="GlobalEnums\DataClassificationType.cs" />
     <Compile Include="Interfaces\IHpsmMonitoringService.cs" />
     <Compile Include="Interfaces\IHpsmProvider.cs" />
     <Compile Include="GlobalEnums\DatasetSortByOption.cs" />
     <Compile Include="Interfaces\IAssociateInfoProvider.cs" />
+    <Compile Include="Interfaces\IBusinessAreaService.cs" />
     <Compile Include="Interfaces\IConfigService.cs" />
     <Compile Include="Interfaces\IDatasetService.cs" />
     <Compile Include="Interfaces\IEventService.cs" />
