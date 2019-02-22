@@ -20,7 +20,9 @@ namespace Sentry.data.Core
         public string S3Key { get; set; }
         public List<int> DatasetCategoryIds { get; set; }
         public string DatasetType { get; set; }
+        public string CreationUserId { get; set; }
         public string CreationUserName { get; set; }
+        public string UploadUserId { get; set; }
         public string UploadUserName { get; set; }
         public List<string> TagIds { get; set; }
 

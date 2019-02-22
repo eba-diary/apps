@@ -25,7 +25,7 @@ namespace Sentry.data.Core
 
         public DatasetDto GetDatasetDto(int id)
         {
-            Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id).FetchAllChildren(_datasetContext).FirstOrDefault();
+            Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id && x.CanDisplay).FetchAllChildren(_datasetContext).FirstOrDefault();
             DatasetDto dto = new DatasetDto();
             MapToDto(ds, dto);
 
@@ -34,7 +34,7 @@ namespace Sentry.data.Core
 
         public DatasetDetailDto GetDatesetDetailDto(int id)
         {
-            Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id).FetchAllChildren(_datasetContext).FirstOrDefault();
+            Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id && x.CanDisplay).FetchAllChildren(_datasetContext).FirstOrDefault();
 
             DatasetDetailDto dto = new DatasetDetailDto();
             MapToDetailDto(ds, dto);
@@ -44,7 +44,7 @@ namespace Sentry.data.Core
 
         public UserSecurity GetUserSecurityForDataset(int datasetId)
         {
-            Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == datasetId).FetchSecurityTree(_datasetContext).FirstOrDefault();
+            Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).FirstOrDefault();
 
             return _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
         }
@@ -95,8 +95,8 @@ namespace Sentry.data.Core
             {
                 Permissions = _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList(),
                 ApproverList = new List<KeyValuePair<string, string>>(),
-                DatasetId = ds.DatasetId,
-                DatasetName = ds.DatasetName
+                SecurableObjectId = ds.DatasetId,
+                SecurableObjectName = ds.DatasetName
             };
 
 
@@ -115,11 +115,11 @@ namespace Sentry.data.Core
         public string RequestAccessToDataset(AccessRequest request)
         {
 
-            Dataset ds = _datasetContext.GetById<Dataset>(request.DatasetId);
+            Dataset ds = _datasetContext.GetById<Dataset>(request.SecurableObjectId);
             if (ds != null)
             {
                 IApplicationUser user = _userService.GetCurrentUser();
-                request.DatasetName = ds.DatasetName;
+                request.SecurableObjectName = ds.DatasetName;
                 request.SecurityId = ds.Security.SecurityId;
                 request.RequestorsId = user.AssociateId;
                 request.RequestorsName = user.DisplayName;
@@ -171,9 +171,9 @@ namespace Sentry.data.Core
             {
                 ds.DatasetCategories = _datasetContext.Categories.Where(x => dto.DatasetCategoryIds.Contains(x.Id)).ToList();
             }
-            if (null != dto.CreationUserName && dto.CreationUserName.Length > 0)
+            if (null != dto.CreationUserId && dto.CreationUserId.Length > 0)
             {
-                ds.CreationUserName = dto.CreationUserName;
+                ds.CreationUserName = dto.CreationUserId;
             }
             if (null != dto.DatasetDesc && dto.DatasetDesc.Length > 0)
             {
@@ -278,10 +278,10 @@ namespace Sentry.data.Core
                 DatasetName = dto.DatasetName,
                 DatasetDesc = dto.DatasetDesc,
                 DatasetInformation = dto.DatasetInformation,
-                CreationUserName = dto.CreationUserName,
+                CreationUserName = dto.CreationUserId,
                 PrimaryOwnerId = dto.PrimaryOwnerId,
                 PrimaryContactId = dto.PrimaryContactId,
-                UploadUserName = dto.UploadUserName,
+                UploadUserName = dto.UploadUserId,
                 OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), dto.OriginationId),
                 DatasetDtm = dto.DatasetDtm,
                 ChangedDtm = dto.ChangedDtm,
@@ -441,6 +441,7 @@ namespace Sentry.data.Core
         {
             IApplicationUser primaryOwner = _userService.GetByAssociateId(ds.PrimaryOwnerId);
             IApplicationUser primaryContact = _userService.GetByAssociateId(ds.PrimaryContactId);
+            IApplicationUser uploader = _userService.GetByAssociateId(ds.UploadUserName);
 
             //map the ISecurable properties
             dto.Security = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
@@ -455,12 +456,15 @@ namespace Sentry.data.Core
             dto.DatasetInformation = ds.DatasetInformation;
             dto.DatasetType = ds.DatasetType;
             dto.DataClassification = ds.DataClassification;
+
+            dto.CreationUserId = ds.CreationUserName;
             dto.CreationUserName = ds.CreationUserName;
             dto.PrimaryOwnerName = (primaryOwner != null ? primaryOwner.DisplayName : "Not Available");
             dto.PrimaryContactName = (primaryContact != null ? primaryContact.DisplayName : "Not Available");
             dto.PrimaryContactEmail = (primaryContact != null ? primaryContact.EmailAddress : "");
+            dto.UploadUserId = ds.UploadUserName;
+            dto.UploadUserName = (uploader != null ? uploader?.DisplayName : "Not Available");
 
-            dto.UploadUserName = ds.UploadUserName;
             dto.DatasetDtm = ds.DatasetDtm;
             dto.ChangedDtm = ds.ChangedDtm;
             dto.CanDisplay = ds.CanDisplay;

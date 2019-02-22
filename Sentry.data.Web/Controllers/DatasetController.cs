@@ -62,7 +62,7 @@ namespace Sentry.data.Web.Controllers
         {
             HomeModel hm = new HomeModel
             {
-                DatasetCount = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET).Count(),
+                DatasetCount = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET && w.CanDisplay).Count(),
                 Categories = _datasetContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityCodes.DATASET).ToList(),
                 CanEditDataset = SharedContext.CurrentUser.CanModifyDataset
             };
@@ -83,7 +83,7 @@ namespace Sentry.data.Web.Controllers
                 //these are defaluted for now and disbled on UI but will change to open field.
                 ConfigFileName = "Default",
                 ConfigFileDesc = "Default Config for Dataset.  Uploaded files that do not match any configs will default to this config",
-                UploadUserName = SharedContext.CurrentUser.AssociateId,
+                UploadUserId = SharedContext.CurrentUser.AssociateId,
             };
 
             Utility.SetupLists(_datasetContext, cdm);
@@ -153,13 +153,13 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public ActionResult AccessRequest(int datasetId)
         {
-            AccessRequestModel model = _datasetService.GetAccessRequest(datasetId).ToModel();
+            DatasetAccessRequestModel model = _datasetService.GetAccessRequest(datasetId).ToDatasetModel();
             model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
-            return PartialView("_AccessRequest", model);
+            return PartialView("DatasetAccessRequest", model);
         }
 
         [HttpPost]
-        public ActionResult SubmitAccessRequest(AccessRequestModel model)
+        public ActionResult SubmitAccessRequest(DatasetAccessRequestModel model)
         {
             AccessRequest ar = model.ToCore();
             string ticketId = _datasetService.RequestAccessToDataset(ar);

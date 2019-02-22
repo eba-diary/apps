@@ -83,9 +83,11 @@
   <ItemGroup>
     <Compile Include="DomainServices\ConfigService.cs" />
     <Compile Include="DomainServices\DatasetService.cs" />
+    <Compile Include="DomainServices\NotificationService.cs" />
     <Compile Include="DomainServices\SecurityService.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceDetailDTO.cs" />
     <Compile Include="DTO\Dataset\DatasetDetailDTO.cs" />
+    <Compile Include="DTO\Notification\ModifyNotificationModel.cs" />
     <Compile Include="Entities\ColumnDTO.cs" />
     <Compile Include="Entities\SchemaDTO.cs" />
     <Compile Include="Entities\Datasets\BusinessUnit.cs" />
@@ -100,7 +102,9 @@
     <Compile Include="Entities\Security\RequestAccess.cs" />
     <Compile Include="Entities\Security\Security.cs" />
     <Compile Include="Entities\Security\UserSecurity.cs" />
+    <Compile Include="Extensions\DataAssetQueryExtensions.cs" />
     <Compile Include="Extensions\DatasetQueryExtensions.cs" />
+    <Compile Include="Extensions\NotificationExtensions.cs" />
     <Compile Include="GlobalEnums\DataClassificationType.cs" />
     <Compile Include="Interfaces\IHpsmMonitoringService.cs" />
     <Compile Include="Interfaces\IHpsmProvider.cs" />
@@ -109,6 +113,7 @@
     <Compile Include="Interfaces\IConfigService.cs" />
     <Compile Include="Interfaces\IDatasetService.cs" />
     <Compile Include="Interfaces\IEventService.cs" />
+    <Compile Include="Interfaces\INotificationService.cs" />
     <Compile Include="Interfaces\IObsidianService.cs" />
     <Compile Include="Interfaces\ISecurable.cs" />
     <Compile Include="Interfaces\ISecurityService.cs" />
@@ -203,7 +208,7 @@
     <Compile Include="Entities\Datasets\DatasetScopeTypes.cs" />
     <Compile Include="Entities\User\DomainUser.cs" />
     <Compile Include="Entities\Datasets\FileType.cs" />
-    <Compile Include="Entities\DataAssets\NotificationSeverity.cs" />
+    <Compile Include="GlobalEnums\NotificationSeverity.cs" />
     <Compile Include="Entities\Subscriptions\EventType.cs" />
     <Compile Include="Entities\Subscriptions\Interval.cs" />
     <Compile Include="Entities\Subscriptions\Status.cs" />

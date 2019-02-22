@@ -1,4 +1,5 @@
 ﻿using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -310,7 +311,7 @@ namespace Sentry.data.Web.Tests
             AssetNotifications an = new AssetNotifications();
             an.NotificationId = 1;
             an.ParentDataAsset = da;
-            an.MessageSeverity = 1;
+            an.MessageSeverity = NotificationSeverity.Danger;
             an.Message = "Alert Message";
             an.StartTime = DateTime.Now.AddHours(-1).AddMinutes(1);
             an.ExpirationTime = DateTime.Now.AddDays(1);
