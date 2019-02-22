@@ -411,10 +411,10 @@
     <Content Include="Content\query-tool.css" />
     <Content Include="Content\search.css" />
     <Content Include="Content\tags.css" />
-    <Content Include="Images\Category\BusinessIntelligence\401k.svg" />
     <Content Include="Images\Category\BusinessIntelligence\claims.svg" />
     <Content Include="Images\Category\BusinessIntelligence\commercial lines.svg" />
     <Content Include="Images\Category\BusinessIntelligence\it.svg" />
+    <Content Include="Images\Category\BusinessIntelligence\life and annuities.svg" />
     <Content Include="Images\Category\BusinessIntelligence\personal lines.svg" />
     <Content Include="Images\Category\BusinessIntelligence\corporate.svg" />
     <Content Include="Images\Hole16_Summer_Flowers_14.jpg" />
