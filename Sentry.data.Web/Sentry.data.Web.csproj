@@ -387,6 +387,8 @@
     <Compile Include="Models\Security\RequestAccessModel.cs" />
     <Compile Include="Models\Shared\CategoryModel.cs" />
     <Compile Include="Models\Shared\SearchIndexModel.cs" />
+    <Compile Include="Models\Tag\TagGroupModel.cs" />
+    <Compile Include="Models\Tag\TagModel.cs" />
     <Compile Include="Models\User\SharedContextModel.cs" />
     <Compile Include="Models\Shared\SuccessModel.cs" />
     <Compile Include="Models\Subscription\SubscriptionModel.cs" />
@@ -1259,6 +1261,8 @@
     <Content Include="Views\Favorites\_FavoritesList.cshtml" />
     <Content Include="Views\Shared\_AccessRequest.cshtml" />
     <Content Include="Views\Shared\Forbidden.cshtml" />
+    <Content Include="Views\Shared\_TagForm.cshtml" />
+    <Content Include="Views\Shared\_Success.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

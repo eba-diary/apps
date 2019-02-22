@@ -51,5 +51,39 @@ namespace Sentry.data.Web
             };
         }
 
+        public static TagGroupModel ToModel(this Core.TagGroupDto dto)
+        {
+            return new TagGroupModel()
+            {
+                Name = dto.Name,
+                Description = dto.Description,
+                TagGroupId = dto.TagGroupId
+            };
+        }
+
+        public static List<TagGroupModel> ToModel(this List<Core.TagGroupDto> dtoList)
+        {
+            List<TagGroupModel> modelList = new List<TagGroupModel>();
+            foreach(Core.TagGroupDto dto in dtoList)
+            {
+                modelList.Add(dto.ToModel());
+            }
+            return modelList;
+        }
+
+        public static Core.TagDto ToDto(this TagModel model)
+        {
+            DateTime created = DateTime.Now;
+            return new Core.TagDto()
+            {
+                TagId = model.TagId,
+                TagName = model.TagName,
+                Description = model.Description,
+                TagGroupId = Int32.Parse(model.SelectedTagGroup),
+                Created = created,
+                CreatedBy = model.CreationUserId
+            };
+        }
+
     }
 }
