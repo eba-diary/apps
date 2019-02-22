@@ -158,13 +158,13 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public ActionResult AccessRequest(int datasetId)
         {
-            AccessRequestModel model = _datasetService.GetAccessRequest(datasetId).ToModel();
+            DatasetAccessRequestModel model = _datasetService.GetAccessRequest(datasetId).ToDatasetModel();
             model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
-            return PartialView("_AccessRequest", model);
+            return PartialView("DatasetAccessRequest", model);
         }
 
         [HttpPost]
-        public ActionResult SubmitAccessRequest(AccessRequestModel model)
+        public ActionResult SubmitAccessRequest(DatasetAccessRequestModel model)
         {
             AccessRequest ar = model.ToCore();
             string ticketId = _datasetService.RequestAccessToDataset(ar);

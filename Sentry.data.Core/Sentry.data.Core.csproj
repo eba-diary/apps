@@ -84,6 +84,7 @@
     <Compile Include="DomainServices\BusinessAreaService.cs" />
     <Compile Include="DomainServices\ConfigService.cs" />
     <Compile Include="DomainServices\DatasetService.cs" />
+    <Compile Include="DomainServices\NotificationService.cs" />
     <Compile Include="DomainServices\SecurityService.cs" />
     <Compile Include="DTO\BusinessArea\BusinessAreaTileDto.cs" />
     <Compile Include="DTO\BusinessArea\BusinessAreaTileRowDto.cs" />
@@ -94,6 +95,7 @@
     <Compile Include="Entities\BusinessArea\BusinessAreaTile.cs" />
     <Compile Include="Entities\BusinessArea\BusinessAreaTileRow.cs" />
     <Compile Include="Entities\BusinessArea\BusinessAreaType.cs" />
+    <Compile Include="DTO\Notification\ModifyNotificationModel.cs" />
     <Compile Include="Entities\ColumnDTO.cs" />
     <Compile Include="DTO\Schema\SchemaDTO.cs" />
     <Compile Include="Entities\Datasets\BusinessUnit.cs" />
@@ -109,8 +111,10 @@
     <Compile Include="Entities\Security\Security.cs" />
     <Compile Include="Entities\Security\UserSecurity.cs" />
     <Compile Include="Extensions\CommonExtensions.cs" />
+    <Compile Include="Extensions\DataAssetQueryExtensions.cs" />
     <Compile Include="Extensions\DatasetQueryExtensions.cs" />
     <Compile Include="Extensions\DataElementExtensions.cs" />
+    <Compile Include="Extensions\NotificationExtensions.cs" />
     <Compile Include="GlobalEnums\DataClassificationType.cs" />
     <Compile Include="Interfaces\IHpsmMonitoringService.cs" />
     <Compile Include="Interfaces\IHpsmProvider.cs" />
@@ -120,6 +124,7 @@
     <Compile Include="Interfaces\IConfigService.cs" />
     <Compile Include="Interfaces\IDatasetService.cs" />
     <Compile Include="Interfaces\IEventService.cs" />
+    <Compile Include="Interfaces\INotificationService.cs" />
     <Compile Include="Interfaces\IObsidianService.cs" />
     <Compile Include="Interfaces\ISecurable.cs" />
     <Compile Include="Interfaces\ISecurityService.cs" />
@@ -214,7 +219,7 @@
     <Compile Include="Entities\Datasets\DatasetScopeTypes.cs" />
     <Compile Include="Entities\User\DomainUser.cs" />
     <Compile Include="Entities\Datasets\FileType.cs" />
-    <Compile Include="Entities\DataAssets\NotificationSeverity.cs" />
+    <Compile Include="GlobalEnums\NotificationSeverity.cs" />
     <Compile Include="Entities\Subscriptions\EventType.cs" />
     <Compile Include="Entities\Subscriptions\Interval.cs" />
     <Compile Include="Entities\Subscriptions\Status.cs" />

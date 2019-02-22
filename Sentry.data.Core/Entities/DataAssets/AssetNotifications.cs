@@ -1,15 +1,12 @@
 ﻿using Sentry.Core;
+using Sentry.data.Core.GlobalEnums;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {    
     public class AssetNotifications : IValidatable
     {
-        public virtual int MessageSeverity { get; set; }
+        public virtual NotificationSeverity MessageSeverity { get; set; }
         public virtual DateTime ExpirationTime { get; set; }
         public virtual DateTime StartTime { get; set; }
         public virtual string CreateUser { get; set; }
@@ -21,13 +18,13 @@ namespace Sentry.data.Core
         {
             get
             {
-                switch (MessageSeverityTag.ToLower())
+                switch (MessageSeverity)
                 {
-                    case "danger":
+                    case NotificationSeverity.Danger:
                         return $"<strong class=\"alertHeading\">Alert!</strong> {Message}";
-                    case "warning":
+                    case NotificationSeverity.Warning:
                         return $"<strong class=\"alertHeading\">Warning!</strong> {Message}";
-                    case "info":
+                    case NotificationSeverity.Info:
                         return $"<strong class=\"alertHeading\">Info: </strong> {Message}";
                     default :
                         return Message;
@@ -39,9 +36,10 @@ namespace Sentry.data.Core
             get
             {
                  return Enum.GetName(typeof(NotificationSeverity), this.MessageSeverity);
-         
             }
         }
+
+
         public virtual ValidationResults ValidateForSave()
         {
             ValidationResults vr = new ValidationResults();
