@@ -135,5 +135,11 @@
             public const string PARQUET_STORAGE_PREFIX = "parquet";
         }
 
+        public static class SearchType
+        {
+            public const string BUSINESS_INTELLIGENCE_SEARCH = "BusinessIntelligence";
+            public const string DATASET_SEARCH = "Datasets";
+        }
+
     }
 }
