@@ -110,6 +110,10 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 @* eventual home of thumbnails *@
+                                @foreach (var image in Model.Images)
+                                {
+                                    <img src="~@Url.Content(image)" />
+                                }
                             </div>
                         </div>
                     </div>

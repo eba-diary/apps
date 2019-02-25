@@ -271,6 +271,7 @@ namespace Sentry.data.Core
             dto.BusinessUnitNames = ds.BusinessUnits.Select(x => x.Name).ToList();
             dto.CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "darkgray";
             dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
+            dto.Images = Directory.EnumerateFiles("/Images/Category/BusinessIntelligence/").Select(fn => "/Images/Category/BusinessIntelligence/" + Path.GetFileName(fn)).Take(3);
         }
 
         private void MapToDto(List<TagGroup> tagGroups, List<TagGroupDto> dto)

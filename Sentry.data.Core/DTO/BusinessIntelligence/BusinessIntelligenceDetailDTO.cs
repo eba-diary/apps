@@ -9,5 +9,6 @@ namespace Sentry.data.Core
         public List<string> TagNames { get; set; }
         public List<string> FunctionNames { get; set; }
         public List<string> BusinessUnitNames { get; set; }
+        public IEnumerable<string> Images { get; set; }
     }
 }

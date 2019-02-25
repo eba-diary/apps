@@ -13,6 +13,7 @@ namespace Sentry.data.Web
             FunctionNames = dto.FunctionNames;
             BusinessUnitNames = dto.BusinessUnitNames;
             LocationType = dto.LocationType;
+            Images = dto.Images;
         }
 
         public string FrequencyDescription { get; set; }
@@ -20,5 +21,6 @@ namespace Sentry.data.Web
         public List<string> FunctionNames { get; set; }
         public List<string> BusinessUnitNames { get; set; }
         public string LocationType { get; set; }
+        public IEnumerable<string> Images { get; set; }
     }
 }
