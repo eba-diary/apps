@@ -90,6 +90,12 @@ data.Tags = {
     },
 
     CreateInit: function () {
+        $("#SelectedTagGroup").select2({
+            placeholder: "Select Group",
+            //allowClear: true,
+            minimumResultsForSearch: 10
+        });
+
         $('body').on('change', '#TagName', function () {
             $.ajax({
                 type: "GET",
