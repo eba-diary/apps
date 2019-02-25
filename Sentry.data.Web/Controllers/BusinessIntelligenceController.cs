@@ -155,7 +155,6 @@ namespace Sentry.data.Web.Controllers
         {
             TagModel model = new TagModel()
             {
-                SelectedTagGroup = "0",
                 AllTagGroups = Utility.BuildSelectListitem(_businessIntelligenceService.GetAllTagGroups(), ""),
                 CreationUserId = SharedContext.CurrentUser.AssociateId,
             };

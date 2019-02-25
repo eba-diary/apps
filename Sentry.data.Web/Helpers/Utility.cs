@@ -298,6 +298,10 @@ namespace Sentry.data.Web.Helpers
             {
                 items.Add(new SelectListItem() { Text = defaultText, Value = "", Selected = true });
             }
+            else if (defaultText != null && defaultText == "")
+            {
+                items.Add(new SelectListItem() { Text = "", Value = ""});
+            }
 
             list.ForEach(x => items.Add(new SelectListItem() { Text = x.Value, Value = x.Key }));
 
