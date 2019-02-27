@@ -848,6 +848,27 @@ tr.categoryBanner-darkgray th.sorting_desc {
     height: inherit;
 }
 
+.detail-thumbnail-container {
+    width: 208px;
+    height: 180px;
+    border: 1px;
+    border-color: #DDDDDD;
+    border-style: solid;
+    box-shadow: 5px 5px 3px lightgrey;
+}
+
+.detail-thumbnail {
+    padding: 5px;
+    min-width: 204px;
+    min-height: 178px;
+    position:absolute;
+    clip: rect(0, 201px, 174px, 0);
+}
+
+.detail-thumbnail-list {
+    list-style-type: none;
+    padding-left: 0px;
+}
 /*Would be used for the side filter bar when screen is small*/
 /* The side navigation menu */
 .sidenav {
