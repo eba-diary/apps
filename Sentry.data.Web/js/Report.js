@@ -103,6 +103,9 @@ data.Report = {
 
         // Initialize the dataset detail page
 
+        // Initialize Images for thumbnails
+        data.Images.InitImages();
+
         $(".detailNameLink").click(function () {
             var artifactLink = $(this).data('artifactlink');
             var locationType = $(this).data('locationtype');

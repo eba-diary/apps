@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using Sentry.Common.Logging;
@@ -13,13 +15,17 @@ namespace Sentry.data.Core
         private readonly IEmailService _emailService;
         private readonly ISecurityService _securityService;
         private readonly UserService _userService;
+        private readonly IS3ServiceProvider _s3ServiceProvider;
 
-        public BusinessIntelligenceService(IDatasetContext datasetContext, IEmailService emailService, ISecurityService securityService, UserService userService)
+        public BusinessIntelligenceService(IDatasetContext datasetContext, 
+            IEmailService emailService, ISecurityService securityService, 
+            UserService userService, IS3ServiceProvider s3ServiceProvider)
         {
             _datasetContext = datasetContext;
             _emailService = emailService;
             _userService = userService;
             _securityService = securityService;
+            _s3ServiceProvider = s3ServiceProvider;
         }
 
         #region "Public Functions"
@@ -146,9 +152,48 @@ namespace Sentry.data.Core
             return _datasetContext.TagGroups.Select(s => new KeyValuePair<string,string>(s.TagGroupId.ToString(), s.Name)).OrderBy(o => o.Value).ToList();
         }
 
+        public byte[] GetImageData(string url)
+        {
+            MemoryStream target = new MemoryStream();
+            using (Stream s = _s3ServiceProvider.GetObject(url, null))
+            {
+                s.CopyTo(target);
+            }
+            return getThumbNail(target.ToArray(),3);
+        }
+
         #endregion
 
         #region "Private Functions"
+
+        private byte[] getThumbNail(byte[] data, int multi = 1)
+        {
+            using (var file = new MemoryStream(data))
+            {
+                int width = 200 * multi;
+                using (var image = Image.FromStream(file, true, true)) /* Creates Image from specified data stream */
+                {
+                    int X = image.Width;
+                    int Y = image.Height;
+                    int height = (int)((width * Y) / X);
+                    using (var thumb = image.GetThumbnailImage(width, height, () => false, IntPtr.Zero))
+                    {
+                        var jpgInfo = ImageCodecInfo.GetImageEncoders()
+                                       .Where(codecInfo => codecInfo.MimeType == "image/png").First();
+                        using (var encParams = new EncoderParameters(1))
+                        {
+                            using (var samllfile = new MemoryStream())
+                            {
+                                long quality = 100;
+                                encParams.Param[0] = new EncoderParameter(Encoder.Quality, quality);
+                                thumb.Save(samllfile, jpgInfo, encParams);
+                                return samllfile.ToArray();
+                            }
+                        };
+                    };
+                };
+            };
+        }
 
         private void UpdateDatasetFileConfig(BusinessIntelligenceDto dto, Dataset ds)
         {
@@ -271,7 +316,13 @@ namespace Sentry.data.Core
             dto.BusinessUnitNames = ds.BusinessUnits.Select(x => x.Name).ToList();
             dto.CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "darkgray";
             dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
-            dto.Images = Directory.EnumerateFiles("/Images/Category/BusinessIntelligence/").Select(fn => "/Images/Category/BusinessIntelligence/" + Path.GetFileName(fn)).Take(3);
+            List<string> list = new List<string>()
+            {
+                "Images/download.png",
+                "Images/download2.jpg",
+                "Images/download3.jpg"
+            };
+            dto.Images = list;
         }
 
         private void MapToDto(List<TagGroup> tagGroups, List<TagGroupDto> dto)

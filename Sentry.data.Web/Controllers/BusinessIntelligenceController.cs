@@ -195,5 +195,27 @@ namespace Sentry.data.Web.Controllers
 
             return PartialView("_TagForm", model);
         }
+
+        //public ActionResult GetThumbnailImages(int Id)
+        //{
+        //    ThumbnailImageDto dto = _businessIntelligenceService.GetThumbnailImageDto(Id);
+        //    ThumbnailImageModel model = new ThumbnailImageModel(dto);
+
+        //    return PartialView("_ThumbnailImages", model);
+        //}
+
+        public ActionResult GetImage(string url)
+        {
+            if (url == null)
+            {
+                return HttpNotFound();
+            }
+
+            byte[] img = _businessIntelligenceService.GetImageData(url);
+
+            return File(img, "image/jpg", "image_" + System.IO.Path.GetFileName(url));
+        }
+
+       
     }
 }
