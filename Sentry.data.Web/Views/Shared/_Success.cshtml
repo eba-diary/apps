@@ -1,0 +1,40 @@
+﻿@model Sentry.data.Web.SuccessModel
+
+@{ 
+    ViewData["Title"] = "Success";
+}
+
+@Html.AntiForgeryToken()
+@*<div class="form-horizontal">
+    <div class="form-group">
+        @Html.DisplayFor(model => model.Message, new { @class = "form-control offset-sm-2 col-sm-8"})
+    </div>
+</div>*@
+<div class="form-horizontal">
+    <div class="form-group">
+        <div class="sentry-error-container">
+            
+            @{
+                if ((!Model.WasSuccessful))
+                { <p><b><i class="fa fa-exclamation-triangle fa-3x text-danger">@Model.Title</i></b></p>
+                      <p>@Model.Message</p><br />
+                      <p>We apologize for the inconvenience.</p>
+                      <p>If you need assistance, please contact <a href="mailto:DSCSupport@sentry.com">Site Administration</a>.</p>
+                }
+                else
+                {<p>@Model.Title</p><br /> 
+                    if ((!String.IsNullOrEmpty(Model.Message)))
+                    {<p>@Model.Message</p>
+                    }
+                }
+            }
+            @*We apologize for the inconvenience.<br />
+            If you need assistance,
+            please contact <a href="mailto:DataArchitecture@sentry.com">Data Architecture</a>.*@
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal">Ok</button>
+        </div>
+
+    </div>
+</div>

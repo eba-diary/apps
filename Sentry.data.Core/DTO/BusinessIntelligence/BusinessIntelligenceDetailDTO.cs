@@ -7,5 +7,7 @@ namespace Sentry.data.Core
     {
         public string FrequencyDescription { get; set; }
         public List<string> TagNames { get; set; }
+        public List<string> FunctionNames { get; set; }
+        public List<string> BusinessUnitNames { get; set; }
     }
 }

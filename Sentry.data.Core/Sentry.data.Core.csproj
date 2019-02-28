@@ -83,10 +83,13 @@
   <ItemGroup>
     <Compile Include="DomainServices\ConfigService.cs" />
     <Compile Include="DomainServices\DatasetService.cs" />
+    <Compile Include="Interfaces\ITagService.cs" />
     <Compile Include="DomainServices\SecurityService.cs" />
+    <Compile Include="DomainServices\TagService.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceDetailDTO.cs" />
     <Compile Include="DTO\Dataset\DatasetDetailDTO.cs" />
     <Compile Include="DTO\Schema\SchemaDetailDTO.cs" />
+    <Compile Include="DTO\TagDto.cs" />
     <Compile Include="Entities\ColumnDTO.cs" />
     <Compile Include="DTO\Schema\SchemaDTO.cs" />
     <Compile Include="Entities\Datasets\BusinessUnit.cs" />
@@ -240,6 +243,7 @@
     <Compile Include="Interfaces\Retriever\IDataSource.cs" />
     <Compile Include="Interfaces\Retriever\IRetrieverJob.cs" />
     <Compile Include="Interfaces\Retriever\IRetrieverJobService.cs" />
+    <Compile Include="DTO\TagGroupDto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Entities\User\ApplicationUser.cs" />
     <Compile Include="Entities\User\ImpersonatedApplicationUser.cs" />

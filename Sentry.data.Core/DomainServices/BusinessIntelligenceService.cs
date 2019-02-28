@@ -141,6 +141,11 @@ namespace Sentry.data.Core
             return errors;
         }
 
+        public List<KeyValuePair<string,string>> GetAllTagGroups()
+        {
+            return _datasetContext.TagGroups.Select(s => new KeyValuePair<string,string>(s.TagGroupId.ToString(), s.Name)).OrderBy(o => o.Value).ToList();
+        }
+
         #endregion
 
         #region "Private Functions"
@@ -262,8 +267,27 @@ namespace Sentry.data.Core
             dto.Views = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset == ds.DatasetId).Count();
             dto.FrequencyDescription = Enum.GetName(typeof(ReportFrequency), ds.Metadata.ReportMetadata.Frequency) ?? "Not Specified";
             dto.TagNames = ds.Tags.Select(x => x.Name).ToList();
+            dto.FunctionNames = ds.DatasetFunctions.Select(x => x.Name).ToList();
+            dto.BusinessUnitNames = ds.BusinessUnits.Select(x => x.Name).ToList();
             dto.CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "darkgray";
             dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
+        }
+
+        private void MapToDto(List<TagGroup> tagGroups, List<TagGroupDto> dto)
+        {
+            foreach(TagGroup group in tagGroups)
+            {
+                TagGroupDto groupDto = new TagGroupDto();
+                MapToDto(group, groupDto);
+                dto.Add(groupDto);
+            }
+        }
+
+        private void MapToDto(TagGroup group, TagGroupDto dto)
+        {
+            dto.Name = group.Name;
+            dto.Description = group.Description;
+            dto.TagGroupId = group.TagGroupId;
         }
 
         #endregion
