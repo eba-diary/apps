@@ -8,7 +8,7 @@
 									(3, 'Regional', 'RG', 3),
 									(4, 'Transportation', 'TR', 4),
 									(5, 'Hortica', 'HRT', 5),
-									(6, 'Life and Health', 'LH', 6),
+									(6, '401k', '401k', 6),
 									(7, 'Parker Stevens Agency', 'PSA', 7),
 									(8, 'Motorcycle', 'MC', 8), 
 									(9, 'NonStandard Auto', 'NSA', 9)

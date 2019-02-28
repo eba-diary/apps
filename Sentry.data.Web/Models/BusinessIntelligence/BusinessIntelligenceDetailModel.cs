@@ -10,11 +10,15 @@ namespace Sentry.data.Web
         {
             FrequencyDescription = dto.FrequencyDescription;
             TagNames = dto.TagNames;
+            FunctionNames = dto.FunctionNames;
+            BusinessUnitNames = dto.BusinessUnitNames;
             LocationType = dto.LocationType;
         }
 
         public string FrequencyDescription { get; set; }
         public List<string> TagNames { get; set; }
+        public List<string> FunctionNames { get; set; }
+        public List<string> BusinessUnitNames { get; set; }
         public string LocationType { get; set; }
     }
 }

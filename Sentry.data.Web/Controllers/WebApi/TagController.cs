@@ -75,7 +75,7 @@ namespace Sentry.data.Web.Controllers
         //[SwaggerResponse(HttpStatusCode.OK, Type = typeof(List<SearchableTag>))]
         public async Task<IHttpActionResult> CheckNewTagName(string name)
         {
-            Boolean reply =  _dsContext.Tags.Count(x => x.Name.ToLower() == name.ToLower()) == 0 ? true : false;
+            Boolean reply = _dsContext.Tags.Count(x => x.Name.ToLower() == name.ToLower()) == 0 ? true : false;
 
             return Ok(reply);
         }
@@ -111,8 +111,5 @@ namespace Sentry.data.Web.Controllers
 
             return Ok();
         }
-
-
-
     }
 }

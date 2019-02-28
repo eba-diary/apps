@@ -2,6 +2,7 @@
 using Sentry.data.Core;
 using Sentry.data.Web.Helpers;
 using System;
+using System.Collections.Generic;
 using System.Web.Mvc;
 using System.Web.SessionState;
 
@@ -15,15 +16,18 @@ namespace Sentry.data.Web.Controllers
         private readonly IDatasetContext _datasetContext;
         private readonly IBusinessIntelligenceService _businessIntelligenceService;
         private readonly IEventService _eventService;
+        private readonly ITagService _tagService;
 
         public BusinessIntelligenceController(
             IDatasetContext datasetContext,
             IBusinessIntelligenceService businessIntelligenceService,
-            IEventService eventService)
+            IEventService eventService,
+            ITagService tagService)
         {
             _datasetContext = datasetContext;
             _businessIntelligenceService = businessIntelligenceService;
             _eventService = eventService;
+            _tagService = tagService;
         }
 
 
@@ -146,5 +150,50 @@ namespace Sentry.data.Web.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public ActionResult CreateTag()
+        {
+            TagModel model = new TagModel()
+            {
+                AllTagGroups = Utility.BuildSelectListitem(_businessIntelligenceService.GetAllTagGroups(), ""),
+                CreationUserId = SharedContext.CurrentUser.AssociateId,
+            };
+
+            return PartialView("_TagForm", model);
+        }
+
+        [HttpPost]
+        public ActionResult TagForm(TagModel model)
+        {
+            TagDto dto = model.ToDto();
+
+            AddCoreValidationExceptionsToModel(_tagService.Validate(dto));
+
+            if (ModelState.IsValid)
+            {
+                if (dto.TagId == 0)
+                {
+                    bool IsSuccessful = _tagService.CreateAndSaveNewTag(dto);
+                    if (IsSuccessful)
+                    {
+                        _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.CREATED_TAG, SharedContext.CurrentUser.AssociateId, model.TagName + " was created.", dto.TagId);
+                        return PartialView("_Success", new SuccessModel("Tag successfully added.", "", true));
+                    }
+                }
+                else
+                {
+                    bool IsSuccessful = _tagService.UpdateAndSaveTag(dto);
+                    if (IsSuccessful)
+                    {
+                        _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.UPDATED_TAG, SharedContext.CurrentUser.AssociateId, model.TagName + " was updated.", dto.TagId);
+                        return PartialView("_Success", new SuccessModel("Tag successfully updated.", "", true));
+                    }
+                }
+
+                return PartialView("_Success", new SuccessModel("There was an error adding the tag.", "", false));
+            }
+
+            return PartialView("_TagForm", model);
+        }
     }
 }
