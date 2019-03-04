@@ -67,8 +67,8 @@ namespace Sentry.data.Web.Controllers
                     Active_IND = true,
                     ForDSC_IND = true,
                     Kind = "Python",
-                    ExecutorCores = 6,
-                    ExecutorMemory = "8G",
+                    ExecutorCores = 3,
+                    ExecutorMemory = "7G",
                     NumExecutors = 1,
                     HeartbeatTimeoutInSecond = 86400
                 };
@@ -127,8 +127,8 @@ namespace Sentry.data.Web.Controllers
                     Active_IND = true,
                     ForDSC_IND = true,
                     Kind = "Python",
-                    ExecutorCores = 6,
-                    ExecutorMemory = "8G",
+                    ExecutorCores = 3,
+                    ExecutorMemory = "7G",
                     NumExecutors = 1,
                     HeartbeatTimeoutInSecond = 86400
                 };
