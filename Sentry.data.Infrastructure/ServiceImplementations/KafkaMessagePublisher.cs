@@ -69,7 +69,7 @@ namespace Sentry.data.Infrastructure
 
                         config = reqContext.ApplicaitonConfigurations.Where(w => w.Application == "goldeneye-producer").FirstOrDefault();
 
-                        Logger.Info($"Loaded Producer Configuration ({config.ToString()})");
+                        Logger.Info($"Loaded Producer Configuration ({JsonConvert.SerializeObject(config)})");
                     }
                     IList<KeyValuePair<String, Object>> configuration = new List<KeyValuePair<String, Object>>();
 
