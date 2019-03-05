@@ -68,6 +68,8 @@ namespace Sentry.data.Infrastructure
                         IRequestContext reqContext = Container.GetInstance<IRequestContext>();
 
                         config = reqContext.ApplicaitonConfigurations.Where(w => w.Application == "goldeneye-producer").FirstOrDefault();
+
+                        Logger.Info($"Loaded Producer Configuration ({config.ToString()})");
                     }
                     IList<KeyValuePair<String, Object>> configuration = new List<KeyValuePair<String, Object>>();
 
@@ -181,6 +183,8 @@ namespace Sentry.data.Infrastructure
                 {
                     Producer p = Producer;
                 }
+
+                Logger.Info($"Publishing message - Topic:{Sentry.data.Infrastructure.TopicHelper.GetDSCEventTopic()} Key:{key} Message:{value}");
 
                 //var task = Producer.ProduceAsync(topic, Encoding.ASCII.GetBytes(key), Encoding.ASCII.GetBytes(value));
                 var task = _producer_str_str.ProduceAsync(topic, key, value);
