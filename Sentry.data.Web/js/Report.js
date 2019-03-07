@@ -92,9 +92,15 @@ data.Report = {
             window.location = data.Report.CancelLink($(this).data("id"));
         });
 
+        //Initialize BO Get Latest option when FileTypeID is already pouplated on load
+        data.Report.SetGetLatestPanel($("#FileTypeId").val());
+
+        //Show\Hide BO Get Latest option based on FileTypeId selection
         $("#FileTypeId").change(function () {
             data.Report.SetGetLatestPanel($(this).val());
         });
+
+        
 
         data.Tags.initTags();
     },
@@ -220,7 +226,6 @@ data.Report = {
         }
         else {
             $('#BOGetLatestPanel').addClass("hidden");
-            $('#GetLatest').prop('checked', false);
         }
     }    
 };
