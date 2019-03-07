@@ -22,7 +22,7 @@ namespace Sentry.data.Core
         {
             //Lets format the business reason here before passing it into the hpsm service.
             StringBuilder sb = new StringBuilder();
-            sb.Append($"Please grant the Ad Group {model.AdGroupName} the following permissions for Data.sentry.com.{ Environment.NewLine}");
+            sb.Append($"Please grant the Ad Group {model.AdGroupName} the following permissions to {model.DatasetName} dataset within Data.sentry.com.{ Environment.NewLine}");
             model.Permissions.ForEach(x => sb.Append($"{x.PermissionName} - {x.PermissionDescription} { Environment.NewLine}"));
             sb.Append($"Business Reason: {model.BusinessReason}{ Environment.NewLine}");
             sb.Append($"Requestor: {model.RequestorsId} - {model.RequestorsName}");
