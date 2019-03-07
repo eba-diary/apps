@@ -226,7 +226,6 @@ data.Report = {
         }
         else {
             $('#BOGetLatestPanel').addClass("hidden");
-            $('#GetLatest').prop('checked', false);
         }
     }    
 };
