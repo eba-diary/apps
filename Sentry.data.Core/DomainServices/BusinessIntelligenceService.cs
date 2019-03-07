@@ -114,28 +114,38 @@ namespace Sentry.data.Core
 
             if (dto.FileTypeId == (int)ReportType.Excel)
             {
-                try
+                /*Excel files can reside on network shares or sharepoint
+                    - If Uri has file scheme, we need to ensure DSC service account has permissions to download file
+                        and is valid location.
+                    - All other Uri schemes (at this point would be http, for sharepoint) we do not need to perform any checks
+                        as we are assuming the external system will generate error if user does not have permissions.
+                */ 
+                Uri fileUri = new Uri(dto.Location);
+                if (fileUri.Scheme == Uri.UriSchemeFile)
                 {
-                    int pos = dto.Location.LastIndexOf('\\');
-                    string directory = dto.Location.Substring(0, pos);
-                    Directory.GetAccessControl(directory);
-                    File.GetAccessControl(dto.Location);
-                    var file = File.OpenRead(dto.Location);
-                    file.Close();
-                }
-                catch (Exception ex)
-                {
-                    if (ex.Message == "Attempted to perform an unauthorized operation.")
+                    try
                     {
-                        errors.Add("This file can’t be accessed by data.sentry.com.  DSCSupport@sentry.com has been notified.  You will be contacted when the exhibit can be created.");
+                        int pos = dto.Location.LastIndexOf('\\');
+                        string directory = dto.Location.Substring(0, pos);
+                        Directory.GetAccessControl(directory);
+                        File.GetAccessControl(dto.Location);
+                        var file = File.OpenRead(dto.Location);
+                        file.Close();
+                    }
+                    catch (Exception ex)
+                    {
+                        if (ex.Message == "Attempted to perform an unauthorized operation.")
+                        {
+                            errors.Add("This file can’t be accessed by data.sentry.com.  DSCSupport@sentry.com has been notified.  You will be contacted when the exhibit can be created.");
 
-                        _emailService.SendInvalidReportLocationEmail(dto, _userService.GetCurrentUser().DisplayName);
+                            _emailService.SendInvalidReportLocationEmail(dto, _userService.GetCurrentUser().DisplayName);
+                        }
+                        else
+                        {
+                            errors.Add($"An error occured finding the file. Please verify the file path is correct or contact DSCSupport@sentry.com for assistance.");
+                        }
                     }
-                    else
-                    {
-                        errors.Add($"An error occured finding the file. Please verify the file path is correct or contact DSCSupport@sentry.com for assistance.");
-                    }
-                }
+                }                
             }
 
             return errors;
