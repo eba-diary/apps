@@ -143,6 +143,7 @@ data.Report = {
             
         });
 
+        data.Report.SetReturntoSearchUrl();
     },
 
     DeleteDataset: function (id) {
@@ -225,5 +226,37 @@ data.Report = {
         else {
             $('#BOGetLatestPanel').addClass("hidden");
         }
-    }    
+    },
+
+    SetReturntoSearchUrl: function () {
+
+        var returnUrl = "/Search/BusinessIntelligence";
+        var returnLink = $('#linkReturnToBusinessIntelligenceList');
+
+        //---is this neede?
+        if (localStorage.getItem("searchText") !== null) {
+            var text = localStorage.getItem("searchText");
+            returnUrl += "?searchPhrase=" + text;
+            var storedNames;
+            if (localStorage.getItem("filteredIds") !== null) {
+                storedNames = JSON.parse(localStorage.getItem("filteredIds"));
+                returnUrl += "&ids=";
+
+                for (i = 0; i < storedNames.length; i++) {
+                    returnUrl += storedNames[i] + ',';
+                }
+                returnUrl = returnUrl.replace(/,\s*$/, "");
+            }
+        }
+        else if (localStorage.getItem("filteredIds") !== null) {
+            storedNames = JSON.parse(localStorage.getItem("filteredIds"));
+            returnUrl += "?ids=";
+
+            for (i = 0; i < storedNames.length; i++) {
+                returnUrl += storedNames[i] + ',';
+            }
+            returnUrl = returnUrl.replace(/,\s*$/, "");
+        }
+        returnLink.attr('href', returnUrl);
+    }
 };
