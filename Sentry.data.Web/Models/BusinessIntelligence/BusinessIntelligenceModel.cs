@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using System.Web;
 using Sentry.data.Core;
 
 namespace Sentry.data.Web
@@ -47,6 +48,7 @@ namespace Sentry.data.Web
 
         public int BusinessObjectsEnumValue { get; set; }
 
+        public List<HttpPostedFileBase> file { get; set; }
 
         public List<string> Validate()
         {
@@ -72,6 +74,11 @@ namespace Sentry.data.Web
                         errors.Add("Business Objects exhibits should begin with https://busobj.sentry.com");
                     }
                     break;
+            }
+
+            if (file.Count > 3)
+            {
+                errors.Add("Only three images are allowed");
             }
 
             return errors;

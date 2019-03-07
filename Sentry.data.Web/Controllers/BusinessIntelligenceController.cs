@@ -3,6 +3,8 @@ using Sentry.data.Core;
 using Sentry.data.Web.Helpers;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.SessionState;
 
@@ -84,6 +86,19 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_MODIFY)]
         public ActionResult BusinessIntelligenceForm(BusinessIntelligenceModel crm) 
         {
+            List<HttpPostedFileBase> fileList = new List<HttpPostedFileBase>();
+            HttpFileCollectionBase Files;
+
+            Files = Request.Files;
+            string[] arr1 = Files.AllKeys;
+
+            for (int i = 0; i < arr1.Length; i++)
+            {
+                fileList.Add(Files[i]);
+            }
+
+            crm.file = fileList;
+
             AddCoreValidationExceptionsToModel(crm.Validate());
 
             if (ModelState.IsValid)
@@ -196,26 +211,16 @@ namespace Sentry.data.Web.Controllers
             return PartialView("_TagForm", model);
         }
 
-        //public ActionResult GetThumbnailImages(int Id)
-        //{
-        //    ThumbnailImageDto dto = _businessIntelligenceService.GetThumbnailImageDto(Id);
-        //    ThumbnailImageModel model = new ThumbnailImageModel(dto);
-
-        //    return PartialView("_ThumbnailImages", model);
-        //}
-
-        public ActionResult GetImage(string url)
+        public ActionResult GetImage(string url, int? t)
         {
             if (url == null)
             {
                 return HttpNotFound();
             }
 
-            byte[] img = _businessIntelligenceService.GetImageData(url);
+            byte[] img = _businessIntelligenceService.GetImageData(url, t);
 
             return File(img, "image/jpg", "image_" + System.IO.Path.GetFileName(url));
         }
-
-       
     }
 }

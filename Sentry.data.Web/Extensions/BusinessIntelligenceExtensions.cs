@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 
@@ -33,7 +34,8 @@ namespace Sentry.data.Web
                 FrequencyId = model.FrequencyId.Value,
                 FileTypeId = model.FileTypeId,
                 GetLatest = model.GetLatest,
-                TagIds = (model.TagIds == null) ? new List<string>() : model.TagIds?.Split(',').ToList()
+                TagIds = (model.TagIds == null) ? new List<string>() : model.TagIds?.Split(',').ToList(),
+                Images = model.file.ToDto()
             };
         }
 
@@ -82,6 +84,34 @@ namespace Sentry.data.Web
                 TagGroupId = Int32.Parse(model.SelectedTagGroup),
                 Created = created,
                 CreatedBy = model.CreationUserId
+            };
+        }
+
+        public static List<Core.ImageDto> ToDto(this List<System.Web.HttpPostedFileBase> imageList)
+        {
+            List<Core.ImageDto> imageArray = new List<Core.ImageDto>();
+            foreach (var image in imageList)
+            {
+                Core.ImageDto dto = image.ToDto();
+                dto.GenerateStorageInfo();
+                imageArray.Add(dto);                
+            }
+
+            return imageArray;
+        }
+
+        public static Core.ImageDto ToDto(this System.Web.HttpPostedFileBase imageFile)
+        {
+            MemoryStream target = new MemoryStream();
+            imageFile.InputStream.CopyTo(target);
+            return new Core.ImageDto()
+            {
+                Data = target.ToArray(),
+                FileName = imageFile.FileName,
+                FileExtension = Path.GetExtension(imageFile.FileName),
+                ContentType = imageFile.ContentType,
+                UploadDate = DateTime.Now,
+                FileLength = imageFile.ContentLength
             };
         }
 

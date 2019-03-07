@@ -25,6 +25,7 @@ namespace Sentry.data.Core
         public string UploadUserId { get; set; }
         public string UploadUserName { get; set; }
         public List<string> TagIds { get; set; }
+        public List<ImageDto> Images { get; set; }
 
 
         //shared details

@@ -70,7 +70,7 @@ namespace Sentry.data.Core
             try
             {
                 CreateDataset(dto);
-
+                UploadImages(dto);
                 _datasetContext.SaveChanges();
             }
             catch (Exception ex)
@@ -79,6 +79,17 @@ namespace Sentry.data.Core
                 return false;
             }
             return true;
+        }
+
+        private void UploadImages(BusinessIntelligenceDto dto)
+        {
+            foreach (var img in dto.Images)
+            {
+                using (MemoryStream stream = new MemoryStream(img.Data))
+                {
+                    img.StorageETag = _s3ServiceProvider.UploadDataFile(stream, img.StorageKey);
+                }                    
+            }            
         }
 
         public bool UpdateAndSaveBusinessIntelligence(BusinessIntelligenceDto dto)
@@ -152,14 +163,21 @@ namespace Sentry.data.Core
             return _datasetContext.TagGroups.Select(s => new KeyValuePair<string,string>(s.TagGroupId.ToString(), s.Name)).OrderBy(o => o.Value).ToList();
         }
 
-        public byte[] GetImageData(string url)
+        public byte[] GetImageData(string url, int? t)
         {
             MemoryStream target = new MemoryStream();
             using (Stream s = _s3ServiceProvider.GetObject(url, null))
             {
                 s.CopyTo(target);
             }
-            return getThumbNail(target.ToArray(),3);
+            if (t == null)
+            {
+                return target.ToArray();
+            }
+            else
+            {
+                return getThumbNail(target.ToArray(), (int)t);
+            }
         }
 
         #endregion
@@ -171,7 +189,7 @@ namespace Sentry.data.Core
             using (var file = new MemoryStream(data))
             {
                 int width = 200 * multi;
-                using (var image = Image.FromStream(file, true, true)) /* Creates Image from specified data stream */
+                using (var image = System.Drawing.Image.FromStream(file, true, true)) /* Creates Image from specified data stream */
                 {
                     int X = image.Width;
                     int Y = image.Height;
@@ -218,8 +236,28 @@ namespace Sentry.data.Core
         private void CreateDataset(BusinessIntelligenceDto dto)
         {
             Dataset ds = MapDataset(dto, new Dataset());
+
             CreateDatasetFileConfig(dto, ds);
+            CreateImage(dto, ds);
+
             _datasetContext.Add(ds);
+        }
+
+        private void CreateImage(BusinessIntelligenceDto dto, Dataset ds)
+        {
+            List<Image> ImageList = new List<Image>();
+            ds.Images = ImageList;
+            if (dto.Images.Count > 0)
+            {
+                foreach (var image in dto.Images)
+                {
+                    Image img = MapImage(image, ds);
+
+                    _datasetContext.Add(img);
+
+                    ds.Images.Add(img);
+                }
+            }
         }
 
         private void UpdateDataset(BusinessIntelligenceDto dto, Dataset ds)
@@ -253,9 +291,26 @@ namespace Sentry.data.Core
                     GetLatest = dto.GetLatest
                 }
             };
-            ds.Tags = _datasetContext.Tags.Where(x => dto.TagIds.Contains(x.TagId.ToString())).ToList();
-
+            ds.Tags = _datasetContext.Tags.Where(x => dto.TagIds.Contains(x.TagId.ToString())).ToList();            
+                
             return ds;
+        }
+
+        private Image MapImage(ImageDto dto, Dataset ds)
+        {
+            Image img = new Image()
+            {
+                FileName = dto.FileName,
+                FileExtension = dto.FileExtension,
+                ParentDataset = ds,
+                ContentType = dto.ContentType,
+                UploadDate = dto.UploadDate,
+                StorageBucketName = dto.StorageBucketName,
+                StoragePrefix = dto.StoragePrefix,
+                StorageKey = dto.StorageKey
+            };
+
+            return img;
         }
 
         //could probably be an extension.
@@ -316,13 +371,13 @@ namespace Sentry.data.Core
             dto.BusinessUnitNames = ds.BusinessUnits.Select(x => x.Name).ToList();
             dto.CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "darkgray";
             dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
-            List<string> list = new List<string>()
-            {
-                "Images/download.png",
-                "Images/download2.jpg",
-                "Images/download3.jpg"
-            };
-            dto.Images = list;
+            //List<string> list = new List<string>()
+            //{
+            //    "Images/download.png",
+            //    "Images/download2.jpg",
+            //    "Images/download3.png"
+            //};
+            dto.Images = ds.Images.Select(x => x.StorageKey).ToList();
         }
 
         private void MapToDto(List<TagGroup> tagGroups, List<TagGroupDto> dto)

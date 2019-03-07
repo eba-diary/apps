@@ -4,7 +4,7 @@
 <h2>Create Exhibit</h2>
 <div></div>
 
-@using (Html.BeginForm("BusinessIntelligenceForm", "BusinessIntelligence", FormMethod.Post))
+@using (Html.BeginForm("BusinessIntelligenceForm", "BusinessIntelligence", FormMethod.Post, new { @id = "BusinessIntelligenceForm", @enctype = "multipart/form-data" }))
 {
     @Html.AntiForgeryToken()
 
@@ -172,6 +172,22 @@
                     @Html.ValidationMessageFor(model => model.PrimaryContactName, "", new { @class = "text-danger" })
                 </div>
             </div>
+
+
+
+
+
+
+            <div class="image-upload col-md-12">
+                <div class="image-box col-md-4">                    
+                </div>
+                <input type="file" name="file" id="files"/>
+            </div>
+            @*<div class="col-md-12" id="PreviewBox_file1">
+                <div class="col-md-4 detail-thumbnail-container">
+                    <img class="img detail-thumbnail" src="" />
+                </div>
+            </div>*@
         </div>
     </div>
 
@@ -182,6 +198,7 @@
     <div class="form-group">
         <div>
             <input type="submit" value="Submit" class="btn btn-primary" />
+            @*<button id="btnSubmit" class="btn btn-primary">Submit</button>*@
             <a id="CancelButton" class="btn btn-warning" data-id="@Model.DatasetId" href="">Cancel</a>
         </div>
     </div>

@@ -97,6 +97,170 @@ data.Report = {
         });
 
         data.Tags.initTags();
+
+        //var $inputs = $('.image-box');
+        var $inputs = $('#files')
+
+        var isAdvancedUpload = function () {
+            var div = document.createElement('div');
+            return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
+        }();
+
+        var droppedFiles = false;
+
+        $.each($inputs, function (i, obj) {
+            var $form = $(obj);            
+
+            if (isAdvancedUpload) {
+                $form.addClass('has-advanced-upload');                
+
+                $form.on('drag dragstart dragend dragover dragenter dragleave drop', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                })
+                    .on('dragover dragenter', function () {
+                        $form.addClass('is-dragover');
+                    })
+                    .on('dragleave dragend drop', function () {
+                        $form.removeClass('is-dragover');
+                    })
+                    .on('drop', function (e) {
+                        //droppedFiles = e.originalEvent.dataTransfer.files;
+                        //addDroppedFile(obj, e.originalEvent.dataTransfer.files);
+                        //showFiles(droppedFiles);
+                        //previewFile();
+                    });
+            }
+
+            var $input = $form.find('input[type="file"]'),
+                $label = $form.find('label'),
+                showFiles = function (files) {
+                    $label.text(files.length > 1 ? ($input.attr('data-multiple-caption') || '').replace('{count}', files.length) : files[0].name);
+                };
+
+            $input.id
+
+            $input.on('change', function (e) {
+                showFiles(e.target.files);
+                previewFile($form.find('#preview'));
+            });
+
+            //function onDrop(evt) {
+            //    var $someDiv = $('div');
+
+            //    $.each(evt.originalEvent.dataTransfer.files, function (index, file) {
+            //        var img = document.createElement('img');
+            //        img.onload = function () {
+            //            window.URL.revokeObjectURL(this.src);
+            //        };
+            //        img.height = 100;
+            //        img.src = window.URL.createObjectURL(file);
+            //        $someDiv.append(img);
+            //    });
+            //}
+
+        })
+
+        function addDroppedFile(input, e) {
+
+
+            var ajaxData = new FormData($('#BusinessIntelligenceForm').get(0));
+
+            ajaxData.append($(input).attr('name'), e);
+
+            //if (droppedFiles) {
+            //    $.each(droppedFiles, function (i, file) {
+                    
+            //    });
+            //}
+        }
+
+        function previewFile(obj) {
+            //var preview = $('#imgPreview1');
+            var preview = $(obj);
+            var file = document.querySelector('input[type=file]').files[0];
+            var reader = new FileReader();
+
+            reader.addEventListener("load", function () {
+                //$('#imgPreview1').attr('src', reader.result)
+                preview.src = reader.result;
+            }, false);
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function previewFiles() {
+
+            var preview = document.querySelector('#preview');
+            var files = document.querySelector('input[type=file]').files;
+
+            function readAndPreview(file) {
+
+                // Make sure `file.name` matches our extensions criteria
+                if (/\.(jpe?g|png|gif)$/i.test(file.name)) {
+                    var reader = new FileReader();
+
+                    reader.addEventListener("load", function () {
+                        var image = new Image();
+                        image.height = 100;
+                        image.title = file.name;
+                        image.src = this.result;
+                        $('#preview').empty();
+                        preview.appendChild(image);
+                    }, false);
+
+                    reader.readAsDataURL(file);
+                }
+
+            }
+
+            if (files) {
+                [].forEach.call(files, readAndPreview);
+            }
+
+        }
+
+        //$('#btnSubmit').on('click', function (e) {
+        //$("form").submit(function (e) {
+        //    e.preventDefault();
+        //    alert('hit submit trigger');
+        //    var $postForm = $(this);
+
+        //    if (isAdvancedUpload) {
+        //        var ajaxData = new FormData($postForm.get(0));
+
+        //        if (droppedFiles) {
+        //            $.each(droppedFiles, function (i, file) {
+        //                ajaxData.append($input.attr('name'), file);
+        //            });
+        //        }
+
+        //        $.ajax({
+        //            url: $postForm.attr('action'),
+        //            type: $postForm.attr('method'),
+        //            data: ajaxData,
+        //            dataType: 'json',
+        //            cache: false,
+        //            contentType: false,
+        //            processData: false,
+        //            complete: function () {
+        //                //$form.removeClass('is-uploading');
+        //                alert('Hit ajax complete method');
+        //            },
+        //            success: function (data) {
+        //                //$form.addClass(data.success == true ? 'is-success' : 'is-error');
+        //                //if (!data.success) $errorMsg.text(data.error);
+        //                alert('hit ajax success method');
+        //            },
+        //            error: function () {
+        //                // Log the error, show an alert, whatever works for you
+        //                alert('hit ajax error method')
+        //            }
+        //        });
+        //    }
+        //})        
     },
 
     DetailInit: function () {
