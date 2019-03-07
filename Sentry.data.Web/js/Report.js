@@ -73,7 +73,6 @@ data.Report = {
             associateSelected: function (associate) {
                 $('#PrimaryOwnerId').val(associate.Id);
             },
-            filterPermission: permissionFilter,
             minLength: 0,
             maxResults: 10
         });
@@ -81,7 +80,6 @@ data.Report = {
             associateSelected: function (associate) {
                 $('#PrimaryContactId').val(associate.Id);
             },
-            filterPermission: permissionFilter,
             minLength: 0,
             maxResults: 10
         });
