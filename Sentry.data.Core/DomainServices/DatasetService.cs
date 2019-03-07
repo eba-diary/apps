@@ -262,6 +262,11 @@ namespace Sentry.data.Core
             {
                 errors.Add("File Extension Delimited is missing it's delimiter.");
             }
+
+            if (String.IsNullOrWhiteSpace(dto.PrimaryOwnerId))
+            {
+                errors.Add("Owner is requried.");
+            }
             
             return errors;
         }

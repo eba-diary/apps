@@ -183,12 +183,12 @@
                                     <div class="dataset-list-content-label">
                                         <div>
                                             <div class="ownerDate">
+                                                <!-- ko ifnot: Type === "RPT" -->
                                                 <span class="bold ownerDate" data-bind="css : Color">Sentry Owner:&nbsp;</span>
                                                 <span data-bind="text: SentryOwner"></span>
-
+                                                
                                                 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-
-                                                <!-- ko ifnot: Type === "RPT" -->
+                                                
                                                 <span class=" bold ownerDate" data-bind="css : Color">Last Activity Date:&nbsp;</span>
                                                 <span data-bind="text: ChangedDtm"></span>
                                                 <!-- /ko -->
@@ -1017,13 +1017,15 @@
                     for (var j = 0; j < searchQuery.length; j++) {
                         var desc = dataset.DatasetDesc.toString();
                         var name = dataset.DatasetName.toString();
-                        var owner = dataset.SentryOwner.toString();
+                        if (!jQuery.isEmptyObject(dataset.SentryOwner)) {
+                            var owner = dataset.SentryOwner.toString();
+                        };
 
                         if (desc.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0) {
                             keywordFound = true;
                             count++;
                         }
-                        if (owner.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0) {
+                        if (!jQuery.isEmptyObject(owner) && owner.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0) {
                             keywordFound = true;
                             count++;
                         }

@@ -67,21 +67,11 @@ data.Report = {
 
         /// Initialize the Create Exhibit view
         //Set Secure HREmp service URL for associate picker
-        $.assocSetup({ url: hrEmpUrl });
-        var permissionFilter = "ReportModify,DatasetManagement," + hrEmpEnv;
-        $("#PrimaryOwnerName").assocAutocomplete({
-            associateSelected: function (associate) {
-                $('#PrimaryOwnerId').val(associate.Id);
-            },
-            filterPermission: permissionFilter,
-            minLength: 0,
-            maxResults: 10
-        });
+        $.assocSetup({ url: hrEmpUrl });        
         $("#PrimaryContactName").assocAutocomplete({
             associateSelected: function (associate) {
                 $('#PrimaryContactId').val(associate.Id);
             },
-            filterPermission: permissionFilter,
             minLength: 0,
             maxResults: 10
         });

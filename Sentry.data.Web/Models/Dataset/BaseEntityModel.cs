@@ -67,7 +67,6 @@ namespace Sentry.data.Web
         [MaxLength(128)]
         [DisplayName("Originating Creator")]
         public string CreationUserId { get; set; }
-        [Required]
         [DisplayName("Owner")]
         public string PrimaryOwnerName { get; set; }
         [Required]

@@ -200,7 +200,7 @@ namespace Sentry.data.Core
             ds.DatasetName = dto.DatasetName;
             ds.DatasetDesc = dto.DatasetDesc;
             ds.CreationUserName = dto.CreationUserId;
-            ds.PrimaryOwnerId = dto.PrimaryOwnerId;
+            ds.PrimaryOwnerId = dto.PrimaryOwnerId ?? "000000";
             ds.PrimaryContactId = dto.PrimaryContactId;
             ds.UploadUserName = dto.UploadUserId;
             ds.OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), 1);  //All reports are internal
