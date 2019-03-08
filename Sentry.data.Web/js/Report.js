@@ -67,10 +67,17 @@ data.Report = {
 
         /// Initialize the Create Exhibit view
         //Set Secure HREmp service URL for associate picker
-        $.assocSetup({ url: hrEmpUrl });        
-        $("#PrimaryContactName").assocAutocomplete({
+        $.assocSetup({ url: hrEmpUrl });
+        $('#ContactSearch').assocAutocomplete({
             associateSelected: function (associate) {
-                $('#PrimaryContactId').val(associate.Id);
+                $('.contactList ul').append('<li>' + associate.Id + '</li>');
+                $("[id^='Contacts']").last().after(
+                    "<input id='Contacts' name='Contacts' type='hidden' value=" + associate.Id + " />"
+                );
+            },
+            close: function () {
+                //$('#AssociateSearch').assocAutocomplete("clear");
+                $('#ContactSearch').val("");
             },
             minLength: 0,
             maxResults: 10

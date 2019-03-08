@@ -33,7 +33,8 @@ namespace Sentry.data.Web
                 FrequencyId = model.FrequencyId.Value,
                 FileTypeId = model.FileTypeId,
                 GetLatest = model.GetLatest,
-                TagIds = (model.TagIds == null) ? new List<string>() : model.TagIds?.Split(',').ToList()
+                TagIds = (model.TagIds == null) ? new List<string>() : model.TagIds?.Split(',').ToList(),
+                Contacts = model.Contacts.Where(w => !String.IsNullOrWhiteSpace(w)).ToList()
             };
         }
 

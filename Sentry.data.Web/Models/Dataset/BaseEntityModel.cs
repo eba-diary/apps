@@ -80,7 +80,6 @@ namespace Sentry.data.Web
         public List<int> DatasetCategoryIds { get; set; }
         public string TagIds { get; set; }
 
-        [Required]
         [DisplayName("Contact")]
         public string PrimaryContactName { get; set; }
 
@@ -109,6 +108,7 @@ namespace Sentry.data.Web
         public string UploadUserId { get; set; }
         public string UploadUserName { get; set; }
         public string CreationUserName { get; set; }
+        public List<string> Contacts { get; set; }
 
         //this is needed for the associate picker js.
         public string HrempServiceUrl { get; set; }

@@ -13,5 +13,6 @@ namespace Sentry.data.Core
         public virtual string LocationType { get; set; }
         public virtual int Frequency { get; set; }
         public bool GetLatest { get; set; }
+        public virtual IList<string> Contacts { get; set; }
     }
 }

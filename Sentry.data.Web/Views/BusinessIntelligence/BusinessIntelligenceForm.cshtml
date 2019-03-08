@@ -30,6 +30,7 @@
             @Html.HiddenFor(model => model.PrimaryContactId)
             @Html.HiddenFor(model => model.CreationUserId)
             @Html.HiddenFor(model => model.UploadUserId)
+            @Html.HiddenFor(model => model.Contacts)
 
             @* Name *@
             <div class="form-group">
@@ -157,11 +158,23 @@
 
             @* Contact *@
             <div class="form-group">
-                @Html.LabelFor(model => model.PrimaryContactName, htmlAttributes: new { @class = "control-label col-md-2" })
+                @Html.LabelFor(model => model.Contacts, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.EditorFor(model => model.PrimaryContactName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
-                    @Html.ValidationMessageFor(model => model.PrimaryContactName, "", new { @class = "text-danger" })
+                    @*@Html.TextBox("AssociateSearch","", new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })*@
+                    @*@Html.EditorFor(model => model.PrimaryContactName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })*@
+                    @*@Html.ValidationMessageFor(model => model.PrimaryContactName, "", new { @class = "text-danger" })*@
+                    <input id="ContactSearch" />
                 </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 contactList">
+                    <ul>
+                        @foreach (var li in Model.Contacts)
+                        {
+                            <li>@li</li>
+                        }
+                        </ul>
+                </div>                
             </div>
         </div>
     </div>
