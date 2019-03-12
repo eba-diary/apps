@@ -26,14 +26,27 @@
 
                         @* foreach of the category filters *@
                         <div class="dataset-list-filter-category panel-body" data-bind="attr: {id : HeadHide }" style="display: none;">
-                            <!-- ko if: (OrderedFilters().length > 0 && ShowMore()) -->
+                            <!-- ko if: (OrderedFilters().length > 0) -->
                             <ul class="list-unstyled ul-filter-list">
+                                <!-- ko if: !ShowMore -->
+                                <!-- ko foreach: OrderedFilters -->
+                                <li class="list-unstyled li-filter-disabled filterList" data-bind="css: { notAllowed: Count() == 0 }">
+                                    <label data-bind="attr: { id: id }">
+                                        <input type="checkbox" class="filterChbx"
+                                               data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
+                                        <strong data-bind="text : Title"></strong>
+                                        <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
+                                    </label>
+                                </li>
+                                <!-- /ko -->
+                                <!-- /ko -->
 
+                                <!-- ko if: ShowMore -->
                                 <!-- ko foreach: OrderedFilters -->
                                 <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6, css: { notAllowed: Count() == 0 }">
                                     <label data-bind="attr: { id: id }">
                                         <input type="checkbox" class="filterChbx"
-                                               data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
+                                                data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
                                         <strong data-bind="text : Title"></strong>
                                         <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
                                     </label>
@@ -46,7 +59,7 @@
                                         <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() >= 6, css: { notAllowed: Count() == 0 }">
                                             <label data-bind="attr: { id: id }">
                                                 <input type="checkbox" class="filterChbx"
-                                                       data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
+                                                        data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
                                                 <strong data-bind="text : Title"></strong>
                                                 <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
                                             </label>
@@ -54,10 +67,11 @@
                                     </ul>
                                     <!-- /ko -->
                                 </li>
+                                <!-- /ko -->
 
                             </ul>
                             <!-- /ko -->
-                            <!-- ko if: (OrderedFilters().length > 6 && ShowMore()) -->
+                            <!-- ko if: (OrderedFilters().length > 6 && ShowMore) -->
                             <a href="#" class="filterMore" data-bind="attr: { id:  HiddenId}">
                                 <div class="glyphicon glyphicon-plus-sign inlineBlock moreIcon leftFloat" data-bind="attr : {id : IconMore}"></div>
                                 <div class="leftFloat txt_filterMore" data-bind="attr: {id: TxtMore}">Show More</div>
