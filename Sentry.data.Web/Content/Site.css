@@ -383,18 +383,28 @@ div[id*="filterType_"]:hover {
     /*background-color: white;*/
 }
 
-    .ul-dataset-list-item:nth-child(even) {
-        background-color: #FFFFFF;
-    }
+.ul-dataset-list-item:nth-child(even) {
+    background-color: #FFFFFF;
+}
 
-    .ul-dataset-list-item:nth-child(odd) {
-        background-color: #F7F8FF;
-    }
+.ul-dataset-list-item:nth-child(odd) {
+    background-color: #F7F8FF;
+}
 
 .dataset-list-content {
     width: 90%;
     margin-left: 3px;
     padding: 2px 0;
+    display: inline-block;
+}
+
+.dataset-detail-contact-list{
+    list-style: none;
+}
+
+.dataset-detail-contact-label {
+    float: left;
+    padding-right: 5px;
 }
 
 .ownerDate {
@@ -1128,6 +1138,32 @@ tr.categoryBanner-darkgray th.sorting_desc {
     text-align: center;
     border-radius: 5px;
     margin: 5px;
+}
+
+.contacts-block {
+    background-color: #e4e4e4;
+    display: inline-block;
+    padding: 5px 5px;
+    text-align: center;
+    border-radius: 5px;
+    margin: 5px;
+    border: 1px solid #aaa;
+}
+
+.contactinfo-remove {
+    color: #999;
+    cursor: pointer;
+    display: inline-block;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.contactSearch {
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    min-height: 32px;
+    padding-left: 8px;
+    width: 200px;
 }
 
 .bg_gray {

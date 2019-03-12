@@ -64,23 +64,59 @@ data.Report = {
             allowClear: true,
             minimumResultsForSearch: 10
         });
+        $("#ContactSearch").attr("placeholder", "Add Associate by name or ID");
 
         /// Initialize the Create Exhibit view
         //Set Secure HREmp service URL for associate picker
         $.assocSetup({ url: hrEmpUrl });
-        $('#ContactSearch').assocAutocomplete({
+        var picker = $('#ContactSearch').assocAutocomplete({
             associateSelected: function (associate) {
-                $('.contactList ul').append('<li>' + associate.Id + '</li>');
-                $("[id^='Contacts']").last().after(
-                    "<input id='Contacts' name='Contacts' type='hidden' value=" + associate.Id + " />"
-                );
+                
+                //Check if user is already selected
+                //Generate jquery for Hidden field
+                var contactInput = "[name^=ContactIds][value=" + associate.Id + "]"
+                //Generate jquery for contacts-block
+                var contactBlock = "#" + associate.Id + ".contacts-block"
+
+                if ($(contactInput).length == 0 && $(contactBlock).length == 0) {
+                    jQuery('<div class="contacts-block" id="' + associate.Id + '"><span class="contactinfo-remove">x</span>' + associate.LastName + ',' + associate.FirstName + '</div>').appendTo('.contactList');
+                    //add hidden value for post back
+                    var inputs = $("[id^=ContactIds_]").length;
+
+                    jQuery('<input/>', {
+                        id: 'ContactIds_' + inputs + '_',
+                        name: 'ContactIds[' + inputs + ']',
+                        type: 'hidden',
+                        value: associate.Id
+                    }).appendTo('#informationPanel');
+                }
             },
             close: function () {
-                //$('#AssociateSearch').assocAutocomplete("clear");
-                $('#ContactSearch').val("");
+                picker.clear();
             },
             minLength: 0,
             maxResults: 10
+        });
+
+        $(document).on('click', '.contactinfo-remove', function (e) {
+            //e.StopPropagation();
+            //e.StopImmediatePropagation();
+            e.preventDefault();
+            //get parent div
+            var parent = $(this).parent()[0];
+            var blockId = parent.id;
+            //Get user ID
+            var userId = blockId.replace('contact_', '');
+            //Generate jquery for userId
+            var contactInput = "[name^=ContactIds][value=" + userId + "]"
+            //Generate jquery for contacts-block
+            var contactBlock = "#" + blockId + ".contacts-block"
+
+            //Remove associated ContactId hidden input
+            $(contactInput).remove();
+
+            //Remove associated contacts-block element
+            $(contactBlock).remove();
         });
 
         //determine the cancel button url

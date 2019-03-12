@@ -80,6 +80,26 @@ namespace Sentry.data.Web
                 LocationType = (!String.IsNullOrWhiteSpace(ds.Metadata.ReportMetadata.LocationType)) ? ds.Metadata.ReportMetadata.LocationType : null;
                 this.UpdateFrequency = (Enum.GetName(typeof(ReportFrequency), ds.Metadata.ReportMetadata.Frequency) != null) ? Enum.GetName(typeof(ReportFrequency), ds.Metadata.ReportMetadata.Frequency) : "Not Specified";
                 this.Link = "/BusinessIntelligence/Detail/" + ds.DatasetId;
+                
+                if(ds.Metadata.ReportMetadata.Contacts != null)
+                {
+                    List<ContactInfoModel> contactModels = new List<ContactInfoModel>();
+                    foreach(var contact in ds.Metadata.ReportMetadata.Contacts)
+                    {
+                        Associates.Associate user = _associateInfoProvider.GetAssociateInfo(contact);
+                        contactModels.Add(new ContactInfoModel()
+                        {
+                            Id = user.Id,
+                            Name = user.LastName + ", " + user.FirstName,
+                            Email = user.WorkEmailAddress
+                        });
+                    }
+                    this.ContactDetails = contactModels;
+                }
+                else
+                {
+                    this.ContactDetails = new List<ContactInfoModel>();
+                }
             }
             else
             {
@@ -128,5 +148,6 @@ namespace Sentry.data.Web
         public List<string> BusinessUnits { get; set; }
         public List<string> DatasetFunctions { get; set; }
         public int PageViews { get; set; }
+        public List<ContactInfoModel> ContactDetails { get; set; }
     }
 }
