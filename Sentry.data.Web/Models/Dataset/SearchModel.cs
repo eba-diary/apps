@@ -90,7 +90,7 @@ namespace Sentry.data.Web
                         contactModels.Add(new ContactInfoModel()
                         {
                             Id = user.Id,
-                            Name = user.LastName + ", " + user.FirstName,
+                            Name = user.FirstName + " " + user.LastName,
                             Email = user.WorkEmailAddress
                         });
                     }

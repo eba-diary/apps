@@ -391,21 +391,7 @@ div[id*="filterType_"]:hover {
     background-color: #F7F8FF;
 }
 
-.dataset-list-content {
-    width: 90%;
-    margin-left: 3px;
-    padding: 2px 0;
-    display: inline-block;
-}
 
-.dataset-detail-contact-list{
-    list-style: none;
-}
-
-.dataset-detail-contact-label {
-    float: left;
-    padding-right: 5px;
-}
 
 .ownerDate {
     padding: 4px 0;
@@ -413,11 +399,6 @@ div[id*="filterType_"]:hover {
 
 .spacer {
     width: 25px;
-}
-
-.listDesc {
-    padding-top: 5px;
-    padding-bottom: 6px;
 }
 
 /* wrap the upper-right of each row in the list */
@@ -1110,7 +1091,7 @@ tr.categoryBanner-darkgray th.sorting_desc {
 
 .searchBoxDS {
     display: inline-block;
-    width: 90% !important;
+    width: 100% !important;
     margin-bottom: 3em;
     margin-top: 0.5em;
 }
@@ -2157,10 +2138,6 @@ tr.categoryBanner-darkgray th.sorting_desc {
 
     .searchBtn {
         width: 50px;
-    }
-
-    .searchBoxDS {
-        width: 650px !important;
     }
 
     .ownerDate {

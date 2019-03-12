@@ -174,41 +174,36 @@
                                     </div>
 
                                     <div class="dataset-list-content">
-                                        <div class="dataset-list-content-label"></div>
-                                        <div class="dataset-list-content-value listDesc">
+                                        <div class="dataset-list-content-value ">
                                             <span data-bind="text: DatasetDesc"></span>
                                         </div>
                                     </div>
-                                    <div class="dataset-list-content">
-                                        <div class="dataset-list-content-label"></div>
-                                        <div class="ownerDate">
+                                    <div class="dataset-list-content dataset-detail-content-info">
+                                        <div>
                                             <!-- ko ifnot: Type === "RPT" -->
-                                            <div class="SentryOwner col-lg-5">
-                                                <span class="bold ownerDate" data-bind="css : Color">Sentry Owner:&nbsp;</span>
+                                            <div class="SentryOwner col-lg-5 dataset-detail-content-info-row">
+                                                <span class="bold ownerDate" data-bind="css : Color">Sentry Owner:</span>
                                                 <span data-bind="text: SentryOwner"></span>
                                             </div>
-
-                                            &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                                            <div class="col-lg-5">
-                                                <span class=" bold ownerDate" data-bind="css : Color">Last Activity Date:&nbsp;</span>
+                                            <div class="col-lg-5 dataset-detail-content-info-row">
+                                                <span class=" bold ownerDate" data-bind="css : Color">Last Activity Date:</span>
                                                 <span data-bind="text: ChangedDtm"></span>
                                             </div>
                                             <!-- /ko -->
                                             <!-- ko if: Type === "RPT" -->
-                                            <div class="SentryOwner col-lg-5">
-                                                <span class=" bold ownerDate" data-bind="css : Color">Refresh Frequency:&nbsp;</span>
-                                                <span data-bind="text: UpdateFrequency"></span>
+                                            <div class="SentryOwner col-lg-12 dataset-detail-content-info-row">
+                                                <span class="bold dataset-detail-contact-label" data-bind="css : Color">Refresh Frequency:</span>
+                                                <span class="info-detail" data-bind="text: UpdateFrequency"></span>
                                             </div>
-                                            <div class="contacts col-lg-5">
+                                            <div class="contacts col-lg-10 dataset-detail-content-info-row">
                                                 <span class="bold dataset-detail-contact-label" data-bind="css : Color">Contact:</span>
-                                                <ul class="col-lg-8 dataset-detail-contact-list" data-bind="foreach: ContactDetails">
-                                                    <li><span data-bind="text: Name"></span></li>
-                                                </ul>
+                                                <div class="info-detail">
+                                                    <span class="info-detail" data-bind="text: ContactNames()"></span>
+                                                    <span class="moreContacts info-detail" data-bind="text: moreContactInfo, attr: { title: AdditionalContacts}" title="Additional contact names"></span>
+                                                </div>
                                             </div>
-                                            <div class="col-lg-2">
-                                                <span class="bold ownerDate link-btn btn btn-sm btn-info disregardParentClick" title="Go to the detail page">
-                                                    <span class="disregardParentClick">Detail</span>
-                                                </span>
+                                            <div class="col-lg-2 dataset-detail-content-info-row">
+                                                <a href="#" class="home-tile-link-bi disregardParentClick">View Details ></a>
                                             </div>
                                             <!-- /ko -->
                                         </div>
@@ -416,6 +411,35 @@
             self.CanEditDataset = data.CanEditDataset;
             self.IsFavorite = data.IsFavorite;
             self.ContactDetails = data.ContactDetails;
+            self.AdditionalContacts = "";
+            self.moreContactInfo = "";
+
+            self.ContactNames = ko.computed(function () {
+                if (self.ContactDetails != null && self.ContactDetails.length > 0) {
+                    var moreItems = self.ContactDetails.length;
+                    var maxLength = 80;
+                    var result = "";
+                    var firstMoreItem = true;
+                    ko.utils.arrayForEach(self.ContactDetails, function (item) {
+                        if ((result.length + item.Name.length) <= maxLength) {
+                            if (moreItems < self.ContactDetails.length) { result += ", " + item.Name; }
+                            else { result += item.Name; }
+                            moreItems -= 1;
+                        }
+                        else {
+                            if (firstMoreItem) { self.AdditionalContacts += item.Name; firstMoreItem = false;}
+                            else { self.AdditionalContacts += ", " + item.Name; }
+                        }
+                    })
+
+                    if (moreItems > 0) { self.moreContactInfo = " and " + moreItems + " more"; }
+
+                    return result;
+                }
+                else {
+                    return "No contacts defined";
+                }
+            })
 
             self.TagNames = [];
             if (data.Tags !== null && data.Tags.length !== 0) {
