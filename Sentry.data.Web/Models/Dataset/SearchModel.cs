@@ -11,7 +11,7 @@ namespace Sentry.data.Web
         public SearchModel(Dataset ds, IAssociateInfoProvider _associateInfoProvider)
         {
 
-            Sentry.Associates.Associate sentryAssociate = _associateInfoProvider.GetAssociateInfo(ds.PrimaryOwnerId);
+            Sentry.Associates.Associate sentryAssociate = String.IsNullOrWhiteSpace(ds.PrimaryOwnerId)? null : _associateInfoProvider.GetAssociateInfo(ds.PrimaryOwnerId);
 
             if (ds.DatasetCategories.Count > 1)
             {
@@ -45,7 +45,7 @@ namespace Sentry.data.Web
             this.DatasetId = ds.DatasetId;
             this.DatasetDesc = ds.DatasetDesc;
             this.DatasetInformation = ds.DatasetInformation;
-            this.SentryOwnerName = Sentry.data.Core.Helpers.DisplayFormatter.FormatAssociateName(sentryAssociate);
+            this.SentryOwnerName = (sentryAssociate == null) ? null : Sentry.data.Core.Helpers.DisplayFormatter.FormatAssociateName(sentryAssociate);
             this.DistinctFileExtensions = ds.DatasetFiles.Select(x => Utilities.GetFileExtension(x.FileName).ToLower()).Distinct().ToList();
             this.Frequencies = null;
             this.BusinessUnits = ds.BusinessUnits.Select(x => x.Name).ToList();
@@ -80,6 +80,26 @@ namespace Sentry.data.Web
                 LocationType = (!String.IsNullOrWhiteSpace(ds.Metadata.ReportMetadata.LocationType)) ? ds.Metadata.ReportMetadata.LocationType : null;
                 this.UpdateFrequency = (Enum.GetName(typeof(ReportFrequency), ds.Metadata.ReportMetadata.Frequency) != null) ? Enum.GetName(typeof(ReportFrequency), ds.Metadata.ReportMetadata.Frequency) : "Not Specified";
                 this.Link = "/BusinessIntelligence/Detail/" + ds.DatasetId;
+                
+                if(ds.Metadata.ReportMetadata.Contacts != null)
+                {
+                    List<ContactInfoModel> contactModels = new List<ContactInfoModel>();
+                    foreach(var contact in ds.Metadata.ReportMetadata.Contacts)
+                    {
+                        Associates.Associate user = _associateInfoProvider.GetAssociateInfo(contact);
+                        contactModels.Add(new ContactInfoModel()
+                        {
+                            Id = user.Id,
+                            Name = user.FirstName + " " + user.LastName,
+                            Email = user.WorkEmailAddress
+                        });
+                    }
+                    this.ContactDetails = contactModels;
+                }
+                else
+                {
+                    this.ContactDetails = new List<ContactInfoModel>();
+                }
             }
             else
             {
@@ -128,5 +148,6 @@ namespace Sentry.data.Web
         public List<string> BusinessUnits { get; set; }
         public List<string> DatasetFunctions { get; set; }
         public int PageViews { get; set; }
+        public List<ContactInfoModel> ContactDetails { get; set; }
     }
 }

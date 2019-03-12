@@ -83,6 +83,7 @@
   <ItemGroup>
     <Compile Include="DomainServices\ConfigService.cs" />
     <Compile Include="DomainServices\DatasetService.cs" />
+    <Compile Include="DTO\ContactInfoDto.cs" />
     <Compile Include="Interfaces\ITagService.cs" />
     <Compile Include="DomainServices\SecurityService.cs" />
     <Compile Include="DomainServices\TagService.cs" />

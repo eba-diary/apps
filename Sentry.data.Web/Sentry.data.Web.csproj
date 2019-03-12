@@ -354,6 +354,7 @@
     <Compile Include="Models\Config\EditSchemaModel.cs" />
     <Compile Include="Models\Config\EditSourceModel.cs" />
     <Compile Include="Models\Config\FieldModel.cs" />
+    <Compile Include="Models\ContactInfoModel.cs" />
     <Compile Include="Models\DataAsset\AssetUIModel.cs" />
     <Compile Include="Models\DataAsset\BaseAssetNotificationModel.cs" />
     <Compile Include="Models\DataAsset\CreateAssetNotificationModel.cs" />
