@@ -89,9 +89,12 @@ namespace Sentry.data.Web
         public static List<ContactInfoModel> ToModel(this List<Core.ContactInfoDto> dtoList)
         {
             List<ContactInfoModel> modelList = new List<ContactInfoModel>();
-            foreach(Core.ContactInfoDto dto in dtoList)
+            if (dtoList != null)
             {
-                modelList.Add(dto.ToModel());
+                foreach (Core.ContactInfoDto dto in dtoList)
+                {
+                    modelList.Add(dto.ToModel());
+                }
             }
             return modelList;
         }
