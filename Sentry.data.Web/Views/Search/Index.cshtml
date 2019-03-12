@@ -154,8 +154,8 @@
                                 <div>
                                     <div data-bind="if: $index > 20"></div>
                                     <div class="category-type-wrap">
-                                        <div class="glyphicon glyphicon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none"></div>
-                                        <div class="glyphicon glyphicon-star-empty btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite == false" style="display: none"></div>
+                                        <div class="glyphicon glyphicon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none" title="Click to toggle favorite"></div>
+                                        <div class="glyphicon glyphicon-star-empty btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite == false" style="display: none" title="Click to toggle favorite"></div>
                                         <div class="category-type" data-bind="css: BannerColor, attr: {title: AbbreviatedCategory}">
                                             <span data-bind="text: AbbreviatedCategory" />
                                         </div>
@@ -203,7 +203,7 @@
                                                 </div>
                                             </div>
                                             <div class="col-lg-2 dataset-detail-content-info-row">
-                                                <a href="#" class="home-tile-link-bi disregardParentClick">View Details ></a>
+                                                <a href="#" class="home-tile-link-bi disregardParentClick" title="Click to view details">View Details ></a>
                                             </div>
                                             <!-- /ko -->
                                         </div>
