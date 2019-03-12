@@ -30,6 +30,10 @@
             @Html.HiddenFor(model => model.PrimaryContactId)
             @Html.HiddenFor(model => model.CreationUserId)
             @Html.HiddenFor(model => model.UploadUserId)
+            @for (int i = 0; i< Model.ContactIds.Count; i++)
+            {
+                @Html.HiddenFor(model => model.ContactIds[i])
+            }
 
             @* Name *@
             <div class="form-group">
@@ -155,21 +159,23 @@
                 </div>
             </div>
 
-            @* Owner *@
-            <div class="form-group">
-                @Html.LabelFor(model => model.PrimaryOwnerName, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.EditorFor(model => model.PrimaryOwnerName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
-                    @Html.ValidationMessageFor(model => model.PrimaryOwnerName, "", new { @class = "text-danger" })
-                </div>
-            </div>
-
             @* Contact *@
             <div class="form-group">
-                @Html.LabelFor(model => model.PrimaryContactName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <span class="control-label col-md-2">Add Contact</span>
                 <div class="col-md-10">
-                    @Html.EditorFor(model => model.PrimaryContactName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
-                    @Html.ValidationMessageFor(model => model.PrimaryContactName, "", new { @class = "text-danger" })
+                    <input id="ContactSearch" class="contactSearch" />
+                </div>
+            </div>
+            <div class="form-group">
+                <span class="control-label col-md-2">Selected Contacts</span>
+                <div class="col-md-4 contactList">
+                    @if (Model.ContactDetails != null)
+                    {
+                        foreach (var contactInfo in Model.ContactDetails)
+                        {
+                            <div class="contacts-block" id="contact_@contactInfo.Id"><span class="contactinfo-remove">x</span>@contactInfo.Name</div>
+                        }
+                    }
                 </div>
             </div>
         </div>

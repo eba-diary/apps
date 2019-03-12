@@ -200,8 +200,8 @@ namespace Sentry.data.Core
             ds.DatasetName = dto.DatasetName;
             ds.DatasetDesc = dto.DatasetDesc;
             ds.CreationUserName = dto.CreationUserId;
-            ds.PrimaryOwnerId = dto.PrimaryOwnerId;
-            ds.PrimaryContactId = dto.PrimaryContactId;
+            ds.PrimaryOwnerId = dto.PrimaryOwnerId ?? "000000";
+            ds.PrimaryContactId = dto.PrimaryContactId ?? "000000";
             ds.UploadUserName = dto.UploadUserId;
             ds.OriginationCode = Enum.GetName(typeof(DatasetOriginationCode), 1);  //All reports are internal
             ds.DatasetDtm = dto.DatasetDtm;
@@ -215,7 +215,8 @@ namespace Sentry.data.Core
                     Location = dto.Location,
                     LocationType = dto.LocationType,
                     Frequency = dto.FrequencyId,
-                    GetLatest = dto.GetLatest
+                    GetLatest = dto.GetLatest,
+                    Contacts = dto.ContactIds
                 }
             };
             ds.Tags = _datasetContext.Tags.Where(x => dto.TagIds.Contains(x.TagId.ToString())).ToList();
@@ -226,8 +227,8 @@ namespace Sentry.data.Core
         //could probably be an extension.
         private void MapToDto(Dataset ds, BusinessIntelligenceDto dto)
         {
-            IApplicationUser owner = _userService.GetByAssociateId(ds.PrimaryOwnerId);
-            IApplicationUser contact = _userService.GetByAssociateId(ds.PrimaryContactId);
+            IApplicationUser owner = (ds.PrimaryOwnerId == "000000")? null : _userService.GetByAssociateId(ds.PrimaryOwnerId);
+            IApplicationUser contact = (ds.PrimaryContactId == "000000")? null : _userService.GetByAssociateId(ds.PrimaryContactId);
             IApplicationUser uploaded = _userService.GetByAssociateId(ds.UploadUserName);
 
             dto.Security = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
@@ -263,6 +264,8 @@ namespace Sentry.data.Core
             dto.CanDisplay = ds.CanDisplay;
             dto.MailtoLink = "mailto:?Subject=Business%20Intelligence%20Exhibit%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/BusinessIntelligence/Detail/" + ds.DatasetId;
             dto.ReportLink = (ds.DatasetFileConfigs.First().FileTypeId == (int)ReportType.BusinessObjects && ds.Metadata.ReportMetadata.GetLatest) ? ds.Metadata.ReportMetadata.Location + GlobalConstants.BusinessObjectExhibit.GET_LATEST_URL_PARAMETER : ds.Metadata.ReportMetadata.Location;
+            dto.ContactIds = (ds.Metadata.ReportMetadata.Contacts != null)? ds.Metadata.ReportMetadata.Contacts.ToList() : new List<string>();
+            dto.ContactDetails = (ds.Metadata.ReportMetadata.Contacts != null)? MapContactsToDto(ds.Metadata.ReportMetadata.Contacts) : new List<ContactInfoDto>();
         }
 
         private void MapToDetailDto(Dataset ds, BusinessIntelligenceDetailDto dto)
@@ -300,6 +303,20 @@ namespace Sentry.data.Core
             dto.TagGroupId = group.TagGroupId;
         }
 
+        private List<ContactInfoDto> MapContactsToDto(IList<string> contacts)
+        {
+            List<ContactInfoDto> contactList = new List<ContactInfoDto>();
+            foreach (string contact in contacts)
+            {
+                IApplicationUser user = _userService.GetByAssociateId(contact);
+                contactList.Add(new ContactInfoDto() {
+                    Id = user.AssociateId,
+                    Name = user.DisplayName,
+                    Email = user.EmailAddress
+                });                
+            }
+            return contactList;
+        }
         #endregion
 
     }

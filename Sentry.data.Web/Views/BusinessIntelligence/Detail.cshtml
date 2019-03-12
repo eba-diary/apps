@@ -127,13 +127,13 @@
 
                         <hr />
                         <div class="row">
-                            <div class="col-lg-6">
-                                <h5 class="@Model.CategoryColor">Owner</h5>
-                                <h6 class="@Model.CategoryColor">@Model.PrimaryOwnerName</h6>
-                            </div>
-                            <div class="col-lg-6">
+                            <div class="col-lg-12">
                                 <h5 class="@Model.CategoryColor">Contact</h5>
-                                <h6 class="@Model.CategoryColor"><a href="@mailTo">@Model.PrimaryContactName</a></h6>
+                                @foreach (var contact in Model.ContactDetails)
+                                {
+                                    <h6 class="@Model.CategoryColor col-lg-6"><a href="mailto:@contact.Email?Subject=Dataset%20Inquiry%20- @Model.DatasetName">@contact.Name</a></h6>
+                                }
+
                             </div>
                         </div>
 

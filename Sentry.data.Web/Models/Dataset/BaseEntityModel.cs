@@ -13,6 +13,7 @@ namespace Sentry.data.Web
         {
             this.HrempServiceUrl = Configuration.Config.GetHostSetting("HrApiUrl");
             this.HrempServiceEnv = Configuration.Config.GetHostSetting("HrApiEnvironment");
+            this.ContactIds = new List<string>();
         }
 
         public BaseEntityModel(BaseEntityDto dto)
@@ -50,6 +51,8 @@ namespace Sentry.data.Web
             this.CategoryColor = dto.CategoryColor;
             this.CategoryNames = dto.CategoryNames;
             this.Security =dto.Security.ToModel();
+            this.ContactIds = dto.ContactIds;
+            this.ContactDetails = dto.ContactDetails.ToModel();
         }
 
 
@@ -67,7 +70,6 @@ namespace Sentry.data.Web
         [MaxLength(128)]
         [DisplayName("Originating Creator")]
         public string CreationUserId { get; set; }
-        [Required]
         [DisplayName("Owner")]
         public string PrimaryOwnerName { get; set; }
         [Required]
@@ -81,12 +83,14 @@ namespace Sentry.data.Web
         public List<int> DatasetCategoryIds { get; set; }
         public string TagIds { get; set; }
 
-        [Required]
         [DisplayName("Contact")]
         public string PrimaryContactName { get; set; }
 
         [DisplayName("Restrict Dataset")]
         public bool IsSecured { get; set; }
+
+        [DisplayName("Selected Contacts")]
+        public List<ContactInfoModel> ContactDetails { get; set; }
 
 
         //Dropdown Lists
@@ -110,6 +114,7 @@ namespace Sentry.data.Web
         public string UploadUserId { get; set; }
         public string UploadUserName { get; set; }
         public string CreationUserName { get; set; }
+        public List<string> ContactIds { get; set; }
 
         //this is needed for the associate picker js.
         public string HrempServiceUrl { get; set; }
