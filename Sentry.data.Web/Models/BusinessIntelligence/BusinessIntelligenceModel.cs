@@ -20,7 +20,7 @@ namespace Sentry.data.Web
             DatasetFunctionIds = dto.DatasetFunctionIds;
             GetLatest = dto.GetLatest;
             ReportLink = dto.ReportLink;
-            BusinessObjectsEnumValue = (dto.FileTypeId == (int)ReportType.BusinessObjects) ? (int)ReportType.BusinessObjects : 0;
+            BusinessObjectsEnumValue = (int)ReportType.BusinessObjects;
         }
 
 
