@@ -35,6 +35,7 @@ namespace Sentry.data.Web
                 FileTypeId = model.FileTypeId,
                 GetLatest = model.GetLatest,
                 TagIds = (model.TagIds == null) ? new List<string>() : model.TagIds?.Split(',').ToList(),
+                ContactIds = model.ContactIds.Where(w => !String.IsNullOrWhiteSpace(w)).ToList(),
                 Images = model.file.ToDto()
             };
         }
@@ -84,6 +85,29 @@ namespace Sentry.data.Web
                 TagGroupId = Int32.Parse(model.SelectedTagGroup),
                 Created = created,
                 CreatedBy = model.CreationUserId
+            };
+        }
+
+        public static List<ContactInfoModel> ToModel(this List<Core.ContactInfoDto> dtoList)
+        {
+            List<ContactInfoModel> modelList = new List<ContactInfoModel>();
+            if (dtoList != null)
+            {
+                foreach (Core.ContactInfoDto dto in dtoList)
+                {
+                    modelList.Add(dto.ToModel());
+                }
+            }
+            return modelList;
+        }
+
+        public static ContactInfoModel ToModel(this Core.ContactInfoDto dto)
+        {
+            return new ContactInfoModel()
+            {
+                Id = dto.Id,
+                Name = dto.Name,
+                Email = dto.Email
             };
         }
 
