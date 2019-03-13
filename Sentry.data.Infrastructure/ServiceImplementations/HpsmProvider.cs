@@ -21,12 +21,18 @@ namespace Sentry.data.Infrastructure
             {
                 if (_service is null)
                 {
-                    _service = new ChangeManagementClient();
-                    _service.ClientCredentials.UserName.UserName = Configuration.Config.GetHostSetting("HpsmServiceId");
-                    _service.ClientCredentials.UserName.Password = Configuration.Config.GetHostSetting("HpsmServicePassword");
-                    _service.ClientCredentials.UseIdentityConfiguration = true;
-                    _service.Endpoint.Address = new EndpointAddress(Configuration.Config.GetHostSetting("HpsmServiceUrl"));
-
+                    try
+                    {
+                        _service = new ChangeManagementClient();
+                        _service.ClientCredentials.UserName.UserName = Configuration.Config.GetHostSetting("HpsmServiceId");
+                        _service.ClientCredentials.UserName.Password = Configuration.Config.GetHostSetting("HpsmServicePassword");
+                        _service.ClientCredentials.UseIdentityConfiguration = true;
+                        _service.Endpoint.Address = new EndpointAddress(Configuration.Config.GetHostSetting("HpsmServiceUrl"));
+                    }
+                    catch(Exception ex)
+                    {
+                        Logger.Fatal("HPSMProvider failed loading configuration", ex);
+                    }
                 }
                 return _service;
             }
