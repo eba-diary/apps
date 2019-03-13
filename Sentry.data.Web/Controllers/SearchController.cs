@@ -156,7 +156,8 @@ namespace Sentry.data.Web.Controllers
                 SearchModel sm = new SearchModel(ds, _associateInfoProvider)
                 {
                     IsFavorite = ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId),
-                    PageViews = events.Count(x => x.Dataset == ds.DatasetId)
+                    PageViews = events.Count(x => x.Dataset == ds.DatasetId),
+                    CanEditDataset = (searchType == GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH) ? SharedContext.CurrentUser.CanManageReports : false
                 };
                 models.Add(sm);
             }

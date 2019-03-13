@@ -29,11 +29,10 @@ namespace Sentry.data.Infrastructure
                         _service.ClientCredentials.UseIdentityConfiguration = true;
                         _service.Endpoint.Address = new EndpointAddress(Configuration.Config.GetHostSetting("HpsmServiceUrl"));
                     }
-                    catch (Exception ex)
+                    catch(Exception ex)
                     {
                         Logger.Fatal("HPSMProvider failed loading configuration", ex);
                     }
-
                 }
                 return _service;
             }
