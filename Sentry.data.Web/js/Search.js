@@ -265,12 +265,13 @@ data.Search = {
 
     },
 
-    FilterCategory: function (Name, Filters, Sequence) {
+    FilterCategory: function (Name, Filters, Sequence, ShowMore) {
 
         var self = this;
 
         self.Name = Name;
         self.Sequence = Sequence;
+        self.ShowMore = ShowMore;
 
         self.Filters = ko.observableArray(Filters);
 

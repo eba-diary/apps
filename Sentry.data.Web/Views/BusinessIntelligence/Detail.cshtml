@@ -185,9 +185,12 @@
                         <div class="tags-block htCenter tag_@item">@item</div>
                     }
                 </div>
-                <div class="col-lg-4">
-                    <h5 class="@Model.CategoryColor">Exhibit Creator: @Model.UploadUserName</h5>
-                </div>
+                @if (Model.Security.CanEditReport)
+                {
+                    <div class="col-lg-4">
+                        <h5 class="@Model.CategoryColor">Exhibit Creator: @Model.UploadUserName</h5>
+                    </div>
+                }
             </div>
         </div>
     </div>
