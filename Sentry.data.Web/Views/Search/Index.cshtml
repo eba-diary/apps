@@ -26,14 +26,27 @@
 
                         @* foreach of the category filters *@
                         <div class="dataset-list-filter-category panel-body" data-bind="attr: {id : HeadHide }" style="display: none;">
-                            <!-- ko if: OrderedFilters().length > 0 -->
+                            <!-- ko if: (OrderedFilters().length > 0) -->
                             <ul class="list-unstyled ul-filter-list">
+                                <!-- ko if: !ShowMore -->
+                                <!-- ko foreach: OrderedFilters -->
+                                <li class="list-unstyled li-filter-disabled filterList" data-bind="css: { notAllowed: Count() == 0 }">
+                                    <label data-bind="attr: { id: id }">
+                                        <input type="checkbox" class="filterChbx"
+                                               data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
+                                        <strong data-bind="text : Title"></strong>
+                                        <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
+                                    </label>
+                                </li>
+                                <!-- /ko -->
+                                <!-- /ko -->
 
+                                <!-- ko if: ShowMore -->
                                 <!-- ko foreach: OrderedFilters -->
                                 <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6, css: { notAllowed: Count() == 0 }">
                                     <label data-bind="attr: { id: id }">
                                         <input type="checkbox" class="filterChbx"
-                                               data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
+                                                data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
                                         <strong data-bind="text : Title"></strong>
                                         <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
                                     </label>
@@ -46,7 +59,7 @@
                                         <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() >= 6, css: { notAllowed: Count() == 0 }">
                                             <label data-bind="attr: { id: id }">
                                                 <input type="checkbox" class="filterChbx"
-                                                       data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
+                                                        data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
                                                 <strong data-bind="text : Title"></strong>
                                                 <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
                                             </label>
@@ -54,10 +67,11 @@
                                     </ul>
                                     <!-- /ko -->
                                 </li>
+                                <!-- /ko -->
 
                             </ul>
                             <!-- /ko -->
-                            <!-- ko if: OrderedFilters().length > 6 -->
+                            <!-- ko if: (OrderedFilters().length > 6 && ShowMore) -->
                             <a href="#" class="filterMore" data-bind="attr: { id:  HiddenId}">
                                 <div class="glyphicon glyphicon-plus-sign inlineBlock moreIcon leftFloat" data-bind="attr : {id : IconMore}"></div>
                                 <div class="leftFloat txt_filterMore" data-bind="attr: {id: TxtMore}">Show More</div>
@@ -571,7 +585,7 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new data.Search.FilterCategory('Category', temp, 1));
+                self.AllFilters.push(new data.Search.FilterCategory('Category', temp, 1, true));
                 temp = [];
 
 
@@ -596,7 +610,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Sentry Owner', temp, 2));
+                self.AllFilters.push(new data.Search.FilterCategory('Sentry Owner', temp, 2, true));
                 temp = [];
 
 
@@ -622,7 +636,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Extension', temp, 3));
+                self.AllFilters.push(new data.Search.FilterCategory('Extension', temp, 3, true));
 
                 // sort the filters by Sequence
                 self.AllFilters.sort(function (left, right) {
@@ -660,7 +674,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Category', temp, 1));
+                self.AllFilters.push(new data.Search.FilterCategory('Category', temp, 1, true));
                 temp = [];
 
 
@@ -686,7 +700,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Business Unit', temp, 2));
+                self.AllFilters.push(new data.Search.FilterCategory('Business Unit', temp, 2, false));
                 temp = [];
 
 
@@ -712,7 +726,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Function', temp, 3));
+                self.AllFilters.push(new data.Search.FilterCategory('Function', temp, 3, false));
                 temp = [];
 
 
@@ -738,7 +752,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Report Type', temp, 4));
+                self.AllFilters.push(new data.Search.FilterCategory('Report Type', temp, 4, true));
                 temp = [];
 
 
@@ -794,7 +808,7 @@
                         temp = item.Filters().concat(temp);
                         ko.utils.arrayRemoveItem(self.AllFilters(), item);
                     }
-                    self.AllFilters.push(new data.Search.FilterCategory(group, temp, 5));
+                    self.AllFilters.push(new data.Search.FilterCategory(group, temp, 5, true));
 
                     temp = [];
                 }
@@ -839,7 +853,7 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new data.Search.FilterCategory('Category', temp, 1));
+                self.AllFilters.push(new data.Search.FilterCategory('Category', temp, 1, true));
                 temp = [];
 
 
@@ -864,7 +878,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Business Unit', temp, 2));
+                self.AllFilters.push(new data.Search.FilterCategory('Business Unit', temp, 2, false));
 
 
                 //SENTRYOWNER FILTER
@@ -888,7 +902,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Sentry Owner', temp, 3));
+                self.AllFilters.push(new data.Search.FilterCategory('Sentry Owner', temp, 3, true));
                 temp = [];
 
 
@@ -914,7 +928,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Extension', temp, 4));
+                self.AllFilters.push(new data.Search.FilterCategory('Extension', temp, 4, true));
 
                 //TAG FILTER
                 counter = 0; //Needs seperate counter as multiple objects can appear per iteration
@@ -942,7 +956,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Tag', temp, 5));
+                self.AllFilters.push(new data.Search.FilterCategory('Tag', temp, 5, true));
                 temp = [];
 
                 // sort the filters by Sequence
