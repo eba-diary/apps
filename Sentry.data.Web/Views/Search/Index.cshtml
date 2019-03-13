@@ -1047,6 +1047,10 @@
                     var dataset = self.datasets()[i];
 
                     for (var j = 0; j < searchQuery.length; j++) {
+
+                        /*******************************************
+                         * Shared metadata between BI and Datasets *
+                        ********************************************/
                         var desc = dataset.DatasetDesc.toString();
                         var name = dataset.DatasetName.toString();
                         if (!jQuery.isEmptyObject(dataset.SentryOwner)) {
@@ -1057,14 +1061,96 @@
                             keywordFound = true;
                             count++;
                         }
-                        if (!jQuery.isEmptyObject(owner) && owner.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0) {
-                            keywordFound = true;
-                            count++;
-                        }
+
+                        //Search Dataset Name
                         if (name.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0) {
                             keywordFound = true;
                             count++;
                         }
+
+                        //Search Extensions
+                        ko.utils.arrayForEach(dataset.DistinctFileExtensions, function (v) {
+                            if (v.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0) {
+                                keywordFound = true;
+                                count++;
+                            }
+                        })
+
+                        //Search Cateogy
+                        if (dataset.Category.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0) {
+                            keywordFound = true;
+                            count++;
+                        }
+
+
+                        /*************************
+                         * BI Specific metadata or searches *
+                        **************************/
+                        //Search Owner
+                        //  Only users which can edit reports can see the owner
+                        //  therefore we need to inlucde it only if current user
+                        //  has permissions to edit reports
+                        if (dataset.Type == 'RPT' && dataset.CanEditDataset && !jQuery.isEmptyObject(owner) && owner.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0) {
+                            keywordFound = true;
+                            count++;
+                        }
+
+                        //Search Tags
+                        if (!jQuery.isEmptyObject(dataset.tags)) {
+                            ko.utils.arrayForEach(dataset.Tags, function (v) {
+                                if (v.Name.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0) {
+                                    keywordFound = true;
+                                    count++;
+                                }
+                            });
+                        }                        
+
+                        //Search Contact Name
+                        if (!jQuery.isEmptyObject(dataset.ContactDetails)) {
+                            ko.utils.arrayForEach(dataset.ContactDetails, function (v) {
+                                if (v.Name.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0) {
+                                    keywordFound = true;
+                                    count++;
+                                }
+                            });
+                        }
+
+                        //Search Business Units
+                        if (!jQuery.isEmptyObject(dataset.BusinessUnits)) {
+                            ko.utils.arrayForEach(dataset.BusinessUnits, function (v) {
+                                if (v.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0) {
+                                    keywordFound = true;
+                                    count++;
+                                }
+                            })
+                        }
+
+                        //Search Functions
+                        if (!jQuery.isEmptyObject(dataset.DatasetFunctions)) {
+                            ko.utils.arrayForEach(dataset.DatasetFunctions, function (v) {
+                                if (v.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0) {
+                                    keywordFound = true;
+                                    count++;
+                                }
+                            })
+                        }
+
+                        //Search Update Frequency
+                        if (!jQuery.isEmptyObject(dataset.UpdateFrequency)) {
+                            if (dataset.UpdateFrequency.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0) {
+                                keywordFound = true;
+                                count++;
+                            }
+                        }
+
+                        /*****************************
+                         * Dataset Specific metadata or searches *
+                        ******************************/
+                        if (dataset.Type == 'DS' && !jQuery.isEmptyObject(owner) && owner.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0) {
+                            keywordFound = true;
+                            count++;
+                        }
+
                     }
                     if (keywordFound) {
                         temp.push({ dataset: dataset, count: count });
