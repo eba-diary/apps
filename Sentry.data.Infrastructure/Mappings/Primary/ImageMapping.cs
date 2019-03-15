@@ -28,6 +28,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.StoragePrefix, (m) => m.Column("StoragePrefix"));
             this.Property((x) => x.StorageKey, (m) => m.Column("StorageKey"));
             this.Property((x) => x.UploadDate, (m) => m.Column("UploadDate"));
+            this.Property((x) => x.Sort, (m) => m.Column("Sort"));
 
             this.ManyToOne(x => x.ParentDataset, m =>
             {

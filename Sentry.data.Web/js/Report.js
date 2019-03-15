@@ -41,6 +41,9 @@ data.Report = {
 
     FormInit: function (hrEmpUrl, hrEmpEnv) {
 
+        // Initialize Images for thumbnails
+        data.Images.InitImages();
+
         $("#DatasetCategoryIds").select2({
             placeholder:"Select Categories"
         });
@@ -99,8 +102,6 @@ data.Report = {
         });
 
         $(document).on('click', '.contactinfo-remove', function (e) {
-            //e.StopPropagation();
-            //e.StopImmediatePropagation();
             e.preventDefault();
             //get parent div
             var parent = $(this).parent()[0];
@@ -136,9 +137,15 @@ data.Report = {
         
 
         data.Tags.initTags();
+        data.Images.InitImages();
+
+        //$('#addNewImage').on('click', function () {
+        //     $('.detail-thumbnail-list').append('@Url.Action("newImage", "BusinessIntelligence")');
+        //})
+
 
         //var $inputs = $('.image-box');
-        var $inputs = $('#files')
+        var $inputs = $('input[type="file"]')
 
         var isAdvancedUpload = function () {
             var div = document.createElement('div');
@@ -175,14 +182,7 @@ data.Report = {
                 $label = $form.find('label'),
                 showFiles = function (files) {
                     $label.text(files.length > 1 ? ($input.attr('data-multiple-caption') || '').replace('{count}', files.length) : files[0].name);
-                };
-
-            $input.id
-
-            $input.on('change', function (e) {
-                showFiles(e.target.files);
-                previewFile($form.find('#preview'));
-            });
+                };            
 
             //function onDrop(evt) {
             //    var $someDiv = $('div');
@@ -200,6 +200,70 @@ data.Report = {
 
         })
 
+        var UploadTempFile = function (file) {
+            //alert('Setting temp file variable');
+            this.file = file;
+        };
+
+        UploadTempFile.prototype.getType = function () {
+            return this.file.type;
+        };
+        UploadTempFile.prototype.getSize = function () {
+            return this.file.size;
+        };
+        UploadTempFile.prototype.getName = function () {
+            return this.file.name;
+        };
+        UploadTempFile.prototype.doUpload = function (previewBoxData) {
+            //alert('Uploading UploadTempFile data');
+            //alert('was passed this data:' + previewBoxData)
+            var that = this;
+            var formData = new FormData();
+
+            // add assoc key values, this will be posts values
+            formData.append("file", this.file, this.getName());
+            formData.append("upload_file", true);
+
+            $.ajax({
+                type: "POST",
+                url: "/BusinessIntelligence/UploadPreviewImage",
+                xhr: function () {
+                    var myXhr = $.ajaxSettings.xhr();
+                    if (myXhr.upload) {
+                        myXhr.upload.addEventListener('progress', that.progressHandling, false);
+                    }
+                    return myXhr;
+                },
+                success: function (data) {
+                    //alert('Upload Susccess');
+                    //console.log(data);
+                    previewFile(previewBoxData, data);
+                    return data;
+                },
+                error: function (error) {
+                    alert('Upload Error');
+                    // handle error
+                },
+                async: true,
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                timeout: 60000
+            });
+        };
+
+        $(document).on('change', '#files', function () {
+            //showFiles(e.target.files);
+            //previewFile(this);
+
+            var file = $(this)[0].files[0];
+            var upload = new UploadTempFile(file);
+
+            //execute upload
+            upload.doUpload(this);
+        });
+
         function addDroppedFile(input, e) {
 
 
@@ -214,20 +278,19 @@ data.Report = {
             //}
         }
 
-        function previewFile(obj) {
-            //var preview = $('#imgPreview1');
-            var preview = $(obj);
-            var file = document.querySelector('input[type=file]').files[0];
-            var reader = new FileReader();
+        function previewFile(obj, data) {
+            var imageName = $(obj)[0].name;
+            //var imagePreview = ".thumbnail-preview-" + imageName;
+            //var imageBox = "#PreviewBox_" + imageName;
+            var imageNumber = imageName.substr(imageName.length - 1);
+            var fancybox = ".fancybox-image-" + imageNumber;
+            var hrefSelector = fancybox + " a";
+            var imgSelector = fancybox + " img";
+            var imageUrl = "/BusinessIntelligence/GetImage?url=" + data.StorageKey;
 
-            reader.addEventListener("load", function () {
-                //$('#imgPreview1').attr('src', reader.result)
-                preview.src = reader.result;
-            }, false);
-
-            if (file) {
-                reader.readAsDataURL(file);
-            }
+            $(hrefSelector).attr('href', imageUrl);
+            $(imgSelector).attr('src', imageUrl + "&t=2")
+            $(fancybox).css({ "display": "" });
         }
 
         function previewFiles() {
@@ -259,47 +322,7 @@ data.Report = {
                 [].forEach.call(files, readAndPreview);
             }
 
-        }
-
-        //$('#btnSubmit').on('click', function (e) {
-        //$("form").submit(function (e) {
-        //    e.preventDefault();
-        //    alert('hit submit trigger');
-        //    var $postForm = $(this);
-
-        //    if (isAdvancedUpload) {
-        //        var ajaxData = new FormData($postForm.get(0));
-
-        //        if (droppedFiles) {
-        //            $.each(droppedFiles, function (i, file) {
-        //                ajaxData.append($input.attr('name'), file);
-        //            });
-        //        }
-
-        //        $.ajax({
-        //            url: $postForm.attr('action'),
-        //            type: $postForm.attr('method'),
-        //            data: ajaxData,
-        //            dataType: 'json',
-        //            cache: false,
-        //            contentType: false,
-        //            processData: false,
-        //            complete: function () {
-        //                //$form.removeClass('is-uploading');
-        //                alert('Hit ajax complete method');
-        //            },
-        //            success: function (data) {
-        //                //$form.addClass(data.success == true ? 'is-success' : 'is-error');
-        //                //if (!data.success) $errorMsg.text(data.error);
-        //                alert('hit ajax success method');
-        //            },
-        //            error: function () {
-        //                // Log the error, show an alert, whatever works for you
-        //                alert('hit ajax error method')
-        //            }
-        //        });
-        //    }
-        //})        
+        }       
     },
 
     DetailInit: function () {

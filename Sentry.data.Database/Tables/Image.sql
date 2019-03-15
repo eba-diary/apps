@@ -9,6 +9,7 @@
     [StoragePrefix] VARCHAR(250) NOT NULL, 
     [StorageKey] VARCHAR(500) NOT NULL, 
     [UploadDate] DATETIME NOT NULL, 
+    [Sort] INT NOT NULL, 
     CONSTRAINT [PK_Image] PRIMARY KEY CLUSTERED ([ImageId] ASC),
 	CONSTRAINT [FK_Image_Dataset] FOREIGN KEY ([ParentDataset]) REFERENCES [dbo].[Dataset]([Dataset_ID])
 )

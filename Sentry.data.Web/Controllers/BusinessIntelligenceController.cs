@@ -1,4 +1,5 @@
-﻿using Sentry.Common.Logging;
+﻿using Newtonsoft.Json;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Web.Helpers;
 using System;
@@ -86,19 +87,6 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_MODIFY)]
         public ActionResult BusinessIntelligenceForm(BusinessIntelligenceModel crm) 
         {
-            List<HttpPostedFileBase> fileList = new List<HttpPostedFileBase>();
-            HttpFileCollectionBase Files;
-
-            Files = Request.Files;
-            string[] arr1 = Files.AllKeys;
-
-            for (int i = 0; i < arr1.Length; i++)
-            {
-                fileList.Add(Files[i]);
-            }
-
-            crm.file = fileList;
-
             AddCoreValidationExceptionsToModel(crm.Validate());
 
             if (ModelState.IsValid)
@@ -213,7 +201,7 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult GetImage(string url, int? t)
         {
-            if (url == null)
+            if (url == null || !url.StartsWith("images/"))
             {
                 return HttpNotFound();
             }
@@ -221,6 +209,27 @@ namespace Sentry.data.Web.Controllers
             byte[] img = _businessIntelligenceService.GetImageData(url, t);
 
             return File(img, "image/jpg", "image_" + System.IO.Path.GetFileName(url));
+        }
+
+        public JsonResult UploadPreviewImage()
+        {
+            HttpFileCollectionBase Files;
+            Files = Request.Files;
+
+            
+            ImageDto dto = BusinessIntelligenceExtensions.ToDto(new ImageDto(), Files[0], 0, true);
+            bool result = _businessIntelligenceService.SaveTemporaryPreviewImage(dto);
+
+            ImageModel model = ImageExtensions.ToModel(dto);
+
+            return Json(model, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult NewImage(int index = 0)
+        {
+            ImageModel im = new ImageModel();
+            ViewData["index"] = index;
+            return PartialView("_Images", im);
         }
     }
 }

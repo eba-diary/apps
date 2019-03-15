@@ -15,5 +15,6 @@ namespace Sentry.data.Core
         UserSecurity GetUserSecurityById(int datasetId);
         List<KeyValuePair<string,string>> GetAllTagGroups();
         byte[] GetImageData(string url, int? t);
+        bool SaveTemporaryPreviewImage(ImageDto dto);
     }
 }

@@ -70,7 +70,7 @@ namespace Sentry.data.Core
             try
             {
                 CreateDataset(dto);
-                UploadImages(dto);
+                //CreateImages(dto);
                 _datasetContext.SaveChanges();
             }
             catch (Exception ex)
@@ -81,15 +81,20 @@ namespace Sentry.data.Core
             return true;
         }
 
-        private void UploadImages(BusinessIntelligenceDto dto)
+        private void CreateImages(BusinessIntelligenceDto dto)
         {
             foreach (var img in dto.Images)
             {
-                using (MemoryStream stream = new MemoryStream(img.Data))
-                {
-                    img.StorageETag = _s3ServiceProvider.UploadDataFile(stream, img.StorageKey);
-                }                    
-            }            
+                UploadImage(img);
+            }
+        }
+
+        private void UploadImage(ImageDto dto)
+        {
+            using (MemoryStream stream = new MemoryStream(dto.Data))
+            {
+            dto.StorageETag = _s3ServiceProvider.UploadDataFile(stream, dto.StorageKey);
+            }       
         }
 
         public bool UpdateAndSaveBusinessIntelligence(BusinessIntelligenceDto dto)
@@ -111,6 +116,33 @@ namespace Sentry.data.Core
             return true;
         }
 
+        private void UpdateImages(BusinessIntelligenceDto dto, Dataset ds)
+        {
+            if (dto.Images.Any())
+            {
+                foreach(ImageDto img in dto.Images)
+                {
+                    Image curImage = ds.Images.FirstOrDefault(w => w.Sort == img.sortOrder);
+                    if(curImage != null)
+                    {
+                        curImage.UploadDate = DateTime.Now;
+                        curImage.FileExtension = img.FileExtension;
+                        curImage.FileName = img.FileName;
+                        curImage.ContentType = img.ContentType;
+
+                        //Reuse current image location
+                        img.StorageBucketName = curImage.StorageBucketName;
+                        img.StorageKey = curImage.StorageKey;
+                        img.StoragePrefix = curImage.StoragePrefix;
+                        UploadImage(img);
+                    }
+                    else
+                    {
+                        CreateImage(ds, img);
+                    }
+                }
+            }
+        }
 
         public void Delete(int id)
         {
@@ -190,6 +222,24 @@ namespace Sentry.data.Core
             }
         }
 
+        public bool SaveTemporaryPreviewImage(ImageDto dto)
+        {
+            try
+            {
+                using (MemoryStream stream = new MemoryStream(dto.Data))
+                {
+                    dto.StorageETag = _s3ServiceProvider.UploadDataFile(stream, dto.StorageKey);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Exhibit Temp image upload failure", ex);
+                return false;
+            }
+
+            return true;            
+        }
+
         #endregion
 
         #region "Private Functions"
@@ -248,12 +298,12 @@ namespace Sentry.data.Core
             Dataset ds = MapDataset(dto, new Dataset());
 
             CreateDatasetFileConfig(dto, ds);
-            CreateImage(dto, ds);
+            CreateImages(dto, ds);
 
             _datasetContext.Add(ds);
         }
 
-        private void CreateImage(BusinessIntelligenceDto dto, Dataset ds)
+        private void CreateImages(BusinessIntelligenceDto dto, Dataset ds)
         {
             List<Image> ImageList = new List<Image>();
             ds.Images = ImageList;
@@ -261,18 +311,24 @@ namespace Sentry.data.Core
             {
                 foreach (var image in dto.Images)
                 {
-                    Image img = MapImage(image, ds);
-
-                    _datasetContext.Add(img);
-
-                    ds.Images.Add(img);
+                    CreateImage(ds, image);
                 }
             }
+        }
+
+        private void CreateImage(Dataset ds, ImageDto image)
+        {
+            UploadImage(image);
+            Image img = MapImage(image, ds);
+            _datasetContext.Add(img);
+
+            ds.Images.Add(img);
         }
 
         private void UpdateDataset(BusinessIntelligenceDto dto, Dataset ds)
         {
             MapDataset(dto, ds);
+            UpdateImages(dto, ds);
         }
 
         private Dataset MapDataset(BusinessIntelligenceDto dto, Dataset ds)
@@ -318,7 +374,8 @@ namespace Sentry.data.Core
                 UploadDate = dto.UploadDate,
                 StorageBucketName = dto.StorageBucketName,
                 StoragePrefix = dto.StoragePrefix,
-                StorageKey = dto.StorageKey
+                StorageKey = dto.StorageKey,
+                Sort = dto.sortOrder
             };
 
             return img;
@@ -365,7 +422,7 @@ namespace Sentry.data.Core
             dto.MailtoLink = "mailto:?Subject=Business%20Intelligence%20Exhibit%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/BusinessIntelligence/Detail/" + ds.DatasetId;
             dto.ReportLink = (ds.DatasetFileConfigs.First().FileTypeId == (int)ReportType.BusinessObjects && ds.Metadata.ReportMetadata.GetLatest) ? ds.Metadata.ReportMetadata.Location + GlobalConstants.BusinessObjectExhibit.GET_LATEST_URL_PARAMETER : ds.Metadata.ReportMetadata.Location;
             dto.ContactIds = (ds.Metadata.ReportMetadata.Contacts != null)? ds.Metadata.ReportMetadata.Contacts.ToList() : new List<string>();
-            dto.ContactDetails = (ds.Metadata.ReportMetadata.Contacts != null)? MapContactsToDto(ds.Metadata.ReportMetadata.Contacts) : new List<ContactInfoDto>();
+            dto.Images = MapToDto(ds.Images);
         }
 
         private void MapToDetailDto(Dataset ds, BusinessIntelligenceDetailDto dto)
@@ -384,12 +441,6 @@ namespace Sentry.data.Core
             dto.BusinessUnitNames = ds.BusinessUnits.Select(x => x.Name).ToList();
             dto.CategoryColor = ds.DatasetCategories.Count == 1 ? ds.DatasetCategories.First().Color : "darkgray";
             dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
-            //List<string> list = new List<string>()
-            //{
-            //    "Images/download.png",
-            //    "Images/download2.jpg",
-            //    "Images/download3.png"
-            //};
             dto.Images = ds.Images.Select(x => x.StorageKey).ToList();
         }
 
@@ -424,6 +475,32 @@ namespace Sentry.data.Core
             }
             return contactList;
         }
+        
+        private List<ImageDto> MapToDto(IList<Image> images)
+        {
+            List<ImageDto> dtoList = new List<ImageDto>();
+            if (images != null)
+            {
+                foreach(Image img in images)
+                {
+                    dtoList.Add(new ImageDto()
+                    {
+                        ImageId = img.ImageId,
+                        ContentType = img.ContentType,
+                        DatasetId = img.ParentDataset.DatasetId,
+                        FileExtension = img.FileExtension,
+                        FileName = img.FileName,
+                        sortOrder = img.Sort,
+                        StorageBucketName = img.StorageBucketName,
+                        StorageKey = img.StorageKey,
+                        StoragePrefix = img.StoragePrefix,
+                        UploadDate = img.UploadDate
+                    });
+                };                                 
+            };
+            return dtoList;
+        }
+        
         #endregion
 
     }

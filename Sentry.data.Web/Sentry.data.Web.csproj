@@ -388,6 +388,7 @@
     <Compile Include="Models\Security\PermissionModel.cs" />
     <Compile Include="Models\Security\RequestAccessModel.cs" />
     <Compile Include="Models\Shared\CategoryModel.cs" />
+    <Compile Include="Models\Shared\ImageModel.cs" />
     <Compile Include="Models\Shared\SearchIndexModel.cs" />
     <Compile Include="Models\Tag\TagGroupModel.cs" />
     <Compile Include="Models\Tag\TagModel.cs" />

@@ -49,7 +49,12 @@ namespace Sentry.data.Web
 
         public int BusinessObjectsEnumValue { get; set; }
 
-        public List<HttpPostedFileBase> file { get; set; }
+        [DisplayName("Image 1")]
+        public HttpPostedFileBase ImageFile_1 { get; set; }
+        [DisplayName("Image 2")]
+        public HttpPostedFileBase ImageFile_2 { get; set; }
+        [DisplayName("Image 3")]
+        public HttpPostedFileBase ImageFile_3 { get; set; }
 
         public List<string> Validate()
         {
@@ -75,11 +80,6 @@ namespace Sentry.data.Web
                         errors.Add("Business Objects exhibits should begin with https://busobj.sentry.com");
                     }
                     break;
-            }
-
-            if (file.Count > 3)
-            {
-                errors.Add("Only three images are allowed");
             }
 
             return errors;

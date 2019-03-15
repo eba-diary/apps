@@ -20,5 +20,6 @@ namespace Sentry.data.Core
         public string StorageETag { get; set; }
         public DateTime UploadDate { get; set; }
         public byte[] Data { get; set; }
+        public int sortOrder { get; set; }
     }
 }

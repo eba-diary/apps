@@ -13,7 +13,7 @@ namespace Sentry.data.Web
         public static Core.BusinessIntelligenceDto ToDto(this BusinessIntelligenceModel model)
         {
             DateTime CreateTime = DateTime.Now;
-            return new Core.BusinessIntelligenceDto()
+            Core.BusinessIntelligenceDto dto = new Core.BusinessIntelligenceDto()
             {
                 DatasetId = model.DatasetId,
                 DatasetCategoryIds = model.DatasetCategoryIds,
@@ -35,9 +35,12 @@ namespace Sentry.data.Web
                 FileTypeId = model.FileTypeId,
                 GetLatest = model.GetLatest,
                 TagIds = (model.TagIds == null) ? new List<string>() : model.TagIds?.Split(',').ToList(),
-                ContactIds = model.ContactIds.Where(w => !String.IsNullOrWhiteSpace(w)).ToList(),
-                Images = model.file.ToDto()
+                ContactIds = model.ContactIds.Where(w => !String.IsNullOrWhiteSpace(w)).ToList()                
             };
+
+            ImagesToDto(model, dto);
+
+            return dto;
         }
 
 
@@ -111,17 +114,31 @@ namespace Sentry.data.Web
             };
         }
 
-        public static List<Core.ImageDto> ToDto(this List<System.Web.HttpPostedFileBase> imageList)
+        public static void ImagesToDto(BusinessIntelligenceModel model, Core.BusinessIntelligenceDto dto)
         {
             List<Core.ImageDto> imageArray = new List<Core.ImageDto>();
-            foreach (var image in imageList)
+            if (model.ImageFile_1 != null)
             {
-                Core.ImageDto dto = image.ToDto();
-                dto.GenerateStorageInfo();
-                imageArray.Add(dto);                
+                imageArray.Add(ToDto(new Core.ImageDto(), model.ImageFile_1, 1));
+            }
+            if (model.ImageFile_2 != null)
+            {
+                imageArray.Add(ToDto(new Core.ImageDto(), model.ImageFile_2, 2));
+            }
+            if (model.ImageFile_3 != null)
+            {
+                imageArray.Add(ToDto(new Core.ImageDto(), model.ImageFile_3, 3));
             }
 
-            return imageArray;
+            dto.Images = imageArray;
+        }
+
+        public static Core.ImageDto ToDto(Core.ImageDto dto, System.Web.HttpPostedFileBase imageFile, int sort, bool tempfile = false)
+        {
+            dto = imageFile.ToDto();
+            dto.GenerateStorageInfo(tempfile);
+            dto.sortOrder = sort;
+            return dto;
         }
 
         public static Core.ImageDto ToDto(this System.Web.HttpPostedFileBase imageFile)

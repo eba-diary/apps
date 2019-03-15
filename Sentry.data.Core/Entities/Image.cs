@@ -13,5 +13,6 @@ namespace Sentry.data.Core
         public virtual string StoragePrefix { get; set; }
         public virtual string StorageKey { get; set; }
         public virtual DateTime UploadDate { get; set; }
+        public virtual int Sort { get; set; }
     }
 }
