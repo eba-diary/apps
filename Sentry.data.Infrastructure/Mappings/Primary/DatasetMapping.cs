@@ -161,7 +161,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Lazy(CollectionLazy.Lazy);
                 m.Inverse(true);
                 m.Table("Image");
-                m.Cascade(Cascade.All);
+                m.Cascade(Cascade.DeleteOrphans);
                 m.Cache(c => c.Usage(CacheUsage.ReadWrite));
                 m.Key((k) =>
                 {

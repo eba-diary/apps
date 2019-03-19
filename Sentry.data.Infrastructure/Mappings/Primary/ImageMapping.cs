@@ -33,8 +33,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.ManyToOne(x => x.ParentDataset, m =>
             {
                 m.Column("ParentDataset");
-                m.ForeignKey("FK_DatasetFileConfigs_Dataset");
-                m.Cascade(Cascade.All);
+                m.ForeignKey("FK_Image_Dataset");
                 m.Class(typeof(Dataset));
             });
         }

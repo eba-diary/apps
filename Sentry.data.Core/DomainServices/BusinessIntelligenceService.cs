@@ -70,7 +70,6 @@ namespace Sentry.data.Core
             try
             {
                 CreateDataset(dto);
-                //CreateImages(dto);
                 _datasetContext.SaveChanges();
             }
             catch (Exception ex)
@@ -118,16 +117,42 @@ namespace Sentry.data.Core
 
         private void UpdateImages(BusinessIntelligenceDto dto, Dataset ds)
         {
-            if (dto.Images.Any())
+            
+            Image curImage;
+
+            //https://stackoverflow.com/questions/1582285/how-to-remove-elements-from-a-generic-list-while-iterating-over-it
+            for (int i = dto.Images.Count - 1; i >= 0; i--)
             {
-                foreach(ImageDto img in dto.Images)
+                ImageDto img = dto.Images[i];
+                bool updatesDetected = false;
+
+                // Image marked for delete
+                if (img.DeleteImage == true)
                 {
-                    Image curImage = ds.Images.FirstOrDefault(w => w.Sort == img.sortOrder);
-                    if(curImage != null)
+                    DeleteImage(img);
+                    Image removeimg = ds.Images.First(w => w.ImageId == img.ImageId);
+                    ds.Images.Remove(removeimg);
+                    //dto.Images.Remove(img);
+                }
+
+                //New Image
+                else if (img.ImageId == 0)
+                {
+                    CreateImage(ds, img);
+                }
+
+                //Existing image
+                else
+                {
+                    curImage = ds.Images.FirstOrDefault(w => w.ImageId == img.ImageId);
+
+                    if (curImage.Sort != img.sortOrder) { curImage.Sort = img.sortOrder; updatesDetected = true; }
+
+                    //Updated image data
+                    if (img.Data != null)
                     {
-                        curImage.UploadDate = DateTime.Now;
-                        curImage.FileExtension = img.FileExtension;
                         curImage.FileName = img.FileName;
+                        curImage.FileExtension = img.FileExtension;
                         curImage.ContentType = img.ContentType;
 
                         //Reuse current image location
@@ -135,12 +160,35 @@ namespace Sentry.data.Core
                         img.StorageKey = curImage.StorageKey;
                         img.StoragePrefix = curImage.StoragePrefix;
                         UploadImage(img);
+
+                        updatesDetected = true;
                     }
-                    else
-                    {
-                        CreateImage(ds, img);
-                    }
+
+                    if (updatesDetected) { curImage.UploadDate = DateTime.Now; };
                 }
+            }
+
+
+            //foreach (ImageDto img in dto.Images)
+            //{
+                
+            //}
+        }
+
+        private void DeleteImage(ImageDto img)
+        {
+            ObjectKeyVersion version = null;
+
+            Logger.Info($"Image Delete Issued - Id:{img.ImageId} Key:{img.StorageKey}");
+            try
+            {
+                //_datasetContext.RemoveById<Image>(img.ImageId);
+                version = _s3ServiceProvider.MarkDeleted(img.StorageKey);
+                Logger.Info($"Image Delete Successful - Id:{img.ImageId} Key:{version.key} DeleteMarker:{version.versionId}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Image Delete Failed - Id:{img.ImageId} Key:{img.StorageKey}", ex);
             }
         }
 

@@ -923,6 +923,12 @@ tr.categoryBanner-darkgray th.sorting_desc {
     list-style-type: none;
     padding-left: 0px;
 }
+
+.detail-thumbnail-list ul {
+    list-style: none;
+}
+
+
 /*Would be used for the side filter bar when screen is small*/
 /* The side navigation menu */
 .sidenav {

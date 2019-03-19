@@ -66,5 +66,22 @@ data.Images = {
                 timeout: 60000
             });
         };
-    }
+    },
+
+    removeNestedForm: function (element, container, deleteElement) {
+        $container = $(element).parents(container);
+        $container.find(deleteElement).val('True');
+        $container.hide();
+
+        // If file was just uploaded, we need to ensure file data is removed.
+
+    },
+
+    addNestedForm: function(container, counter, ticks, content) {
+    var nextIndex = $(counter).length;
+    var pattern = new RegExp(ticks, "gi");
+    content = content.replace(pattern, nextIndex);
+    $(container).append(content);
+}
+    
 }

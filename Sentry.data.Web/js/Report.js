@@ -139,9 +139,15 @@ data.Report = {
         data.Tags.initTags();
         data.Images.InitImages();
 
-        //$('#addNewImage').on('click', function () {
-        //     $('.detail-thumbnail-list').append('@Url.Action("newImage", "BusinessIntelligence")');
-        //})
+        $('#addNewImage').on('click', function () {
+
+            $.get('/BusinessIntelligence/NewImage', function (template) {
+                $('.detail-thumbnail-list').append(template);
+                //$("#test").click();
+            });
+
+            //$('.detail-thumbnail-list').append('@Url.Action("newImage", "BusinessIntelligence")');
+        });
 
 
         //var $inputs = $('.image-box');
@@ -253,7 +259,7 @@ data.Report = {
             });
         };
 
-        $(document).on('change', '#files', function () {
+        $(document).on('change', "input[name$='ImageFileData']", function () {
             //showFiles(e.target.files);
             //previewFile(this);
 
@@ -262,6 +268,9 @@ data.Report = {
 
             //execute upload
             upload.doUpload(this);
+
+            //Ensure associated Image is displayed
+            $(this).closest('.Image').css({ "display": "" });
         });
 
         function addDroppedFile(input, e) {
@@ -279,13 +288,16 @@ data.Report = {
         }
 
         function previewFile(obj, data) {
-            var imageName = $(obj)[0].name;
+            //var imageName = $(obj).parent().parent();
+
+            var imgObj = $(obj).closest('div.Image');
+            var imgSelector = $(imgObj).find('a');
             //var imagePreview = ".thumbnail-preview-" + imageName;
             //var imageBox = "#PreviewBox_" + imageName;
-            var imageNumber = imageName.substr(imageName.length - 1);
-            var fancybox = ".fancybox-image-" + imageNumber;
-            var hrefSelector = fancybox + " a";
-            var imgSelector = fancybox + " img";
+            //var imageNumber = imageName.substr(imageName.length - 1);
+            var fancybox = $(imgObj).find('fancybox-images');
+            var hrefSelector = $(imgObj).find('a');
+            var imgSelector = $(imgObj).find('img');
             var imageUrl = "/BusinessIntelligence/GetImage?url=" + data.StorageKey;
 
             $(hrefSelector).attr('href', imageUrl);

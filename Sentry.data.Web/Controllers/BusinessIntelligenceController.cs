@@ -217,7 +217,7 @@ namespace Sentry.data.Web.Controllers
             Files = Request.Files;
 
             
-            ImageDto dto = BusinessIntelligenceExtensions.ToDto(new ImageDto(), Files[0], 0, true);
+            ImageDto dto = BusinessIntelligenceExtensions.ToDto(new ImageModel(), Files[0], 0, true);
             bool result = _businessIntelligenceService.SaveTemporaryPreviewImage(dto);
 
             ImageModel model = ImageExtensions.ToModel(dto);

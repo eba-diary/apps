@@ -10,5 +10,7 @@ namespace Sentry.data.Web
         public int ImageId { get; set; }
         public string StorageKey { get; set; }
         public int sortOrder { get; set; }
+        public bool deleteImage { get; set; }
+        public HttpPostedFileBase ImageFileData { get; set; }
     }
 }

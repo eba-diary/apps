@@ -1,30 +1,43 @@
 ﻿@model Sentry.data.Web.ImageModel
 
-<div class="col-md-4">
-    @Html.HiddenFor(m => m.ImageId)
+@using (Html.BeginCollectionItem("Images"))
+{
+    <div class="col-md-4 Image">
+        @Html.HiddenFor(m => m.ImageId)
+        @Html.HiddenFor(m => m.sortOrder)
+        @Html.HiddenFor(m => m.StorageKey)
 
-    @if (!ViewData.ContainsKey("index"))
-    {
+        @*@if (!ViewData.ContainsKey("index"))
+        {*@
         <div class="col-md-12 fancybox-images fancybox-image-@Model.sortOrder">
-            <a class="fancybox" data-fancybox="gallery" data-caption="Image @Model.sortOrder" href="@Url.Action("GetImage", "BusinessIntelligence", new { Area ="" , url= Model.StorageKey })"></a>
+            <a class="fancybox" data-fancybox="gallery" data-caption="Image @Model.sortOrder" href="@Url.Action("GetImage", "BusinessIntelligence", new { Area = "", url = Model.StorageKey })"></a>
             <div class="detail-thumbnail-container">
-                <img class="img detail-thumbnail" src="@Url.Action("GetImage", "BusinessIntelligence", new { Area ="" , url= Model.StorageKey, t=2 })" />
+                <img class="img detail-thumbnail" src="@Url.Action("GetImage", "BusinessIntelligence", new { Area = "", url = Model.StorageKey, t = 2 })" />
+                @Html.HiddenFor(m => m.deleteImage, new { @class = "mark-for-delete" })
+            </div>
+            @*<div>
+                @Html.EditorFor(m => m.sortOrder)
+            </div>*@
+            <div class="col-md-12">
+                @Html.RemoveLink("Remove", "div.Image", "input.mark-for-delete")
             </div>
         </div>
-        <div class="image-upload col-md-12">
-            <input type="file" name="ImageFile_@Model.sortOrder" id="files" />
-        </div>
-    }
-    else
-    {
-        <div class="col-md-12 fancybox-images fancybox-image-@ViewData["index"]">
-            <a class="fancybox" data-fancybox="gallery" data-caption="Image @ViewData["index"]" href=""></a>
-            <div class="detail-thumbnail-container">
-                <img class="img detail-thumbnail" src="" />
+            <div class="image-upload col-md-12">
+                @Html.TextBoxFor(m => m.ImageFileData, null, new { @class = "", @type = "file"})
+                @*<input type="file" name="ImageFile_@Model.sortOrder" id="files" />*@
             </div>
-        </div>
-        <div class="image-upload col-md-12">
-            <input type="file" name="ImageFile_@ViewData["index"]" id="files" />
-        </div>
-    }
-</div>
+        @*}
+        else
+        {
+            <div class="col-md-12 fancybox-images fancybox-image-@ViewData["index"]">
+                <a class="fancybox" data-fancybox="gallery" data-caption="Image @ViewData["index"]" href=""></a>
+                <div class="detail-thumbnail-container">
+                    <img class="img detail-thumbnail" src="" />
+                </div>
+            </div>
+            <div class="image-upload col-md-12">
+                <input type="file" name="ImageFile_@ViewData["index"]" id="files" />
+            </div>
+        }*@
+    </div>
+}

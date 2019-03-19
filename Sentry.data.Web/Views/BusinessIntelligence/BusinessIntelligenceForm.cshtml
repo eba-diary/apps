@@ -184,29 +184,41 @@
             <div class="form-group">
                 <span class="control-label col-md-2">Thumbnail Images</span>
                 <div class="col-md-10">
+                    @if (Model.Images.Count >= 3)
+                    {
+                    <div class="col-md-2 add-thumbnail" style="display:none">
+                        <button id="addNewImage" type="button" class="btn-success btn"><span class="glyphicon glyphicon-plus"></span> Add Image</button>
+                        @*@Html.AddImageLink("Add Image", ".detail-thumbnail-list ul", ".Image", "Images", typeof(ImageModel))*@
+                    </div>
+                    }
+                    else
+                    {
                     <div class="col-md-2 add-thumbnail">
-                        @if (Model.Images.Count >= 3)
-                        {
-                            <button id="addNewImage" type="button" class="btn-success btn" style="display:none"><span class="glyphicon glyphicon-plus"></span> Add Image</button>
-                        }
-                        else
-                        {
-                            <button id="addNewImage" type="button" class="btn-success btn"><span class="glyphicon glyphicon-plus"></span> Add Image</button>
-                        }
-                    </div> 
+                        <button id="addNewImage" type="button" class="btn-success btn"><span class="glyphicon glyphicon-plus"></span> Add Image</button>
+                        @*@Html.AddImageLink("Add Image", ".detail-thumbnail-list ul", ".Image", "Images", typeof(ImageModel))*@
+                    </div>
+                    }
                     <div class="detail-thumbnail-list col-lg-10">
                         @*@for (int i = 0; i < Model.Images.Count; i++)
-                        {
-                            @Html.HiddenFor(model => model.Images[i].ImageId)
-                            @Html.Partial("_Images", Model.Images[i])
-                        }*@
+        {
+            @Html.HiddenFor(model => model.Images[i].ImageId)
+            @Html.Partial("_Images", Model.Images[i])
+        }*@
+
                         @* Thumbnails *@
-                        @foreach (var image in Model.Images)
+                        @*@foreach (var image in Model.Images)
+        {
+            @Html.Partial("_Images", image)
+        }*@
+
+                        @*@Html.EditorFor(m => m.Images)*@
+                        @foreach (ImageModel img in Model.Images)
                         {
-                            @Html.Partial("_Images", image)
+                            @Html.Partial("_Images", img);
                         }
+
                     </div>
-                   
+
                     @*@foreach (var image in Model.Images)
         {
             <div class="col-md-4">
@@ -339,7 +351,7 @@
         $(function () {
             data.Report.FormInit('@(Model.HrempServiceUrl)', '@(Model.HrempServiceEnv)');
 
-            $('#addNewImage').on('click', function (e) {
+            @*$('#addNewImage').on('click', function (e) {
                 e.preventDefault();
                 var imgCnt = $('.fancybox-images').length;
                 var newIndex = imgCnt + 1;
@@ -349,7 +361,7 @@
                 $.ajax({
                     url: url,
                     success: function (response) {               
-                        $('.detail-thumbnail-list').append(response);
+                        $('.detail-thumbnail-list ul').append('<li>' + response + '</li>');
                     },
                     error: function () {
                             alert("error occured");
@@ -361,7 +373,7 @@
                     $('.add-thumbnail').css({ "display": "none" });
                 };
                 //$('.detail-thumbnail-list').append(link);
-            })
+            })*@
         });
     </script>
 }

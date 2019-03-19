@@ -316,6 +316,7 @@
     <Compile Include="Filters\AuthorizationFilters\AuthorizeHangfireDashboard.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeAttribute.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeByPermissionAttribute.cs" />
+    <Compile Include="Helpers\ImageExtensions.cs" />
     <Compile Include="Helpers\LivyHelper.cs" />
     <Compile Include="Helpers\BeginCollectionItem.cs" />
     <Compile Include="Helpers\PredicateBuilder.cs" />
@@ -1170,6 +1171,7 @@
     <Content Include="Scripts\typeahead.jquery.js" />
     <Content Include="Scripts\typeahead.jquery.min.js" />
     <Content Include="Scripts\_references.js" />
+    <Content Include="Views\Shared\_Images.cshtml" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -1271,13 +1273,13 @@
     <Content Include="Views\Shared\Forbidden.cshtml" />
     <Content Include="Views\Shared\_TagForm.cshtml" />
     <Content Include="Views\Shared\_Success.cshtml" />
-    <Content Include="Views\Shared\_Images.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Images\Home\" />
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Views\Admin\DisplayTemplates\" />
+    <Folder Include="Views\BusinessIntelligence\EditorTemplates\" />
     <Folder Include="Views\ExternalFile\" />
     <Folder Include="Views\Lineage\" />
     <Folder Include="Views\Retriever\" />

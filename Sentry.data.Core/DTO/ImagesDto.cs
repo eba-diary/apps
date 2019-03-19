@@ -21,5 +21,8 @@ namespace Sentry.data.Core
         public DateTime UploadDate { get; set; }
         public byte[] Data { get; set; }
         public int sortOrder { get; set; }
+        public bool DeleteImage { get; set; }
+
+
     }
 }

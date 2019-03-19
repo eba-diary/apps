@@ -35,7 +35,7 @@ namespace Sentry.data.Web
                 FileTypeId = model.FileTypeId,
                 GetLatest = model.GetLatest,
                 TagIds = (model.TagIds == null) ? new List<string>() : model.TagIds?.Split(',').ToList(),
-                ContactIds = model.ContactIds.Where(w => !String.IsNullOrWhiteSpace(w)).ToList()                
+                ContactIds = model.ContactIds.Where(w => !String.IsNullOrWhiteSpace(w)).ToList()
             };
 
             ImagesToDto(model, dto);
@@ -117,44 +117,62 @@ namespace Sentry.data.Web
         public static void ImagesToDto(BusinessIntelligenceModel model, Core.BusinessIntelligenceDto dto)
         {
             List<Core.ImageDto> imageArray = new List<Core.ImageDto>();
-            if (model.ImageFile_1 != null)
+
+            for (int i = 0; i < model.Images.Count; i++)
             {
-                imageArray.Add(ToDto(new Core.ImageDto(), model.ImageFile_1, 1));
+                imageArray.Add(ToDto(model.Images[i], model.Images[i].ImageFileData, i));
             }
-            if (model.ImageFile_2 != null)
-            {
-                imageArray.Add(ToDto(new Core.ImageDto(), model.ImageFile_2, 2));
-            }
-            if (model.ImageFile_3 != null)
-            {
-                imageArray.Add(ToDto(new Core.ImageDto(), model.ImageFile_3, 3));
-            }
+
+            //foreach (ImageModel item in model.Images)
+            //{
+            //    imageArray.Add(ToDto(item, item.ImageFileData, item.sortOrder));
+            //}
+
+            //if (model.ImageFile_1 != null || model.Images.Any(s => s.sortOrder == 1))
+            //{
+            //    imageArray.Add(ToDto(model.Images.FirstOrDefault(w => w.sortOrder == 1), model.ImageFile_1, 1));
+            //}
+            //if (model.ImageFile_2 != null || model.Images.Any(s => s.sortOrder == 2))
+            //{
+            //    imageArray.Add(ToDto(model.Images.FirstOrDefault(w => w.sortOrder == 2), model.ImageFile_2, 2));
+            //}
+            //if (model.ImageFile_3 != null || model.Images.Any(s => s.sortOrder == 3))
+            //{
+            //    imageArray.Add(ToDto(model.Images.FirstOrDefault(w => w.sortOrder == 3), model.ImageFile_3, 3));
+            //}
 
             dto.Images = imageArray;
         }
 
-        public static Core.ImageDto ToDto(Core.ImageDto dto, System.Web.HttpPostedFileBase imageFile, int sort, bool tempfile = false)
+        public static Core.ImageDto ToDto(ImageModel model, System.Web.HttpPostedFileBase imageFile, int sort, bool tempfile = false)
         {
-            dto = imageFile.ToDto();
+            Core.ImageDto dto = ToDto(imageFile, model);
             dto.GenerateStorageInfo(tempfile);
             dto.sortOrder = sort;
             return dto;
         }
 
-        public static Core.ImageDto ToDto(this System.Web.HttpPostedFileBase imageFile)
+        public static Core.ImageDto ToDto(System.Web.HttpPostedFileBase imageFile, ImageModel model)
         {
-            MemoryStream target = new MemoryStream();
-            imageFile.InputStream.CopyTo(target);
-            return new Core.ImageDto()
-            {
-                Data = target.ToArray(),
-                FileName = imageFile.FileName,
-                FileExtension = Path.GetExtension(imageFile.FileName),
-                ContentType = imageFile.ContentType,
-                UploadDate = DateTime.Now,
-                FileLength = imageFile.ContentLength
-            };
-        }
+            Core.ImageDto dto = new Core.ImageDto();
 
+            dto.ImageId = model.ImageId;
+            dto.sortOrder = model.sortOrder;
+            dto.DeleteImage = model.deleteImage;
+
+            if (imageFile != null)
+            {
+                MemoryStream target = new MemoryStream();
+                imageFile.InputStream.CopyTo(target);
+                dto.Data = target.ToArray();
+                dto.FileName = imageFile.FileName;
+                dto.FileExtension = Path.GetExtension(imageFile.FileName);
+                dto.ContentType = imageFile.ContentType;
+                dto.FileLength = imageFile.ContentLength;
+                dto.UploadDate = DateTime.Now;
+            }
+
+            return dto;
+        }
     }
 }
