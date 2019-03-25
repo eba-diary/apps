@@ -1240,6 +1240,11 @@
                     }
                 });
             };
+
+            self.CurrentPageSelection = self.searchResults.pageNumber.subscribe(function () {
+                alert("PageNumber changed");
+                localStorage.setItem("pageSelection", ko.toJSON(self.searchResults.pageNumber()));
+            })
         }
 
         $(document).ready(function () {

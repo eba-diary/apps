@@ -267,31 +267,38 @@ data.Report = {
 
         var returnUrl = "/Search/BusinessIntelligence";
         var returnLink = $('#linkReturnToBusinessIntelligenceList');
+        var firstParam = true;
 
         //---is this neede?
         if (localStorage.getItem("searchText") !== null) {
-            var text = localStorage.getItem("searchText");
-            returnUrl += "?searchPhrase=" + text;
-            var storedNames;
-            if (localStorage.getItem("filteredIds") !== null) {
-                storedNames = JSON.parse(localStorage.getItem("filteredIds"));
-                returnUrl += "&ids=";
+            var text = { searchPhrase: localStorage.getItem("searchText") };
 
-                for (i = 0; i < storedNames.length; i++) {
-                    returnUrl += storedNames[i] + ',';
-                }
-                returnUrl = returnUrl.replace(/,\s*$/, "");
-            }
+            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+
+            returnUrl += $.param(text);
+            
         }
-        else if (localStorage.getItem("filteredIds") !== null) {
+
+        if (localStorage.getItem("filteredIds") !== null) {
             storedNames = JSON.parse(localStorage.getItem("filteredIds"));
-            returnUrl += "?ids=";
+
+            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+
+            returnUrl += "ids=";
 
             for (i = 0; i < storedNames.length; i++) {
                 returnUrl += storedNames[i] + ',';
             }
             returnUrl = returnUrl.replace(/,\s*$/, "");
         }
+
+        if (localStorage.getItem("pageSelection") !== null) {
+
+            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+
+            returnUrl += "pageSelection=" + localStorage.getItem("pageSelection")
+        }
+
         returnLink.attr('href', returnUrl);
     }
 };
