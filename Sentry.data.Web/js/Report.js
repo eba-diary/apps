@@ -169,7 +169,7 @@ data.Report = {
 
             var icon = $(this).children();
             $.ajax({
-                url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent($(this).data("id")),
+                url: '/Favorites/SetFavorite?datasetId=' + encodeURIComponent($(this).data("id")),
                 method: "GET",
                 dataType: 'json',
                 success: function () { icon.toggleClass("glyphicon-star glyphicon-star-empty"); },
