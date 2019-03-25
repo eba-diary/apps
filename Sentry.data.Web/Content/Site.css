@@ -383,19 +383,15 @@ div[id*="filterType_"]:hover {
     /*background-color: white;*/
 }
 
-    .ul-dataset-list-item:nth-child(even) {
-        background-color: #FFFFFF;
-    }
-
-    .ul-dataset-list-item:nth-child(odd) {
-        background-color: #F7F8FF;
-    }
-
-.dataset-list-content {
-    width: 90%;
-    margin-left: 3px;
-    padding: 2px 0;
+.ul-dataset-list-item:nth-child(even) {
+    background-color: #FFFFFF;
 }
+
+.ul-dataset-list-item:nth-child(odd) {
+    background-color: #F7F8FF;
+}
+
+
 
 .ownerDate {
     padding: 4px 0;
@@ -403,11 +399,6 @@ div[id*="filterType_"]:hover {
 
 .spacer {
     width: 25px;
-}
-
-.listDesc {
-    padding-top: 5px;
-    padding-bottom: 6px;
 }
 
 /* wrap the upper-right of each row in the list */
@@ -1100,7 +1091,7 @@ tr.categoryBanner-darkgray th.sorting_desc {
 
 .searchBoxDS {
     display: inline-block;
-    width: 90% !important;
+    width: 100% !important;
     margin-bottom: 3em;
     margin-top: 0.5em;
 }
@@ -1128,6 +1119,32 @@ tr.categoryBanner-darkgray th.sorting_desc {
     text-align: center;
     border-radius: 5px;
     margin: 5px;
+}
+
+.contacts-block {
+    background-color: #e4e4e4;
+    display: inline-block;
+    padding: 5px 5px;
+    text-align: center;
+    border-radius: 5px;
+    margin: 5px;
+    border: 1px solid #aaa;
+}
+
+.contactinfo-remove {
+    color: #999;
+    cursor: pointer;
+    display: inline-block;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.contactSearch {
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    min-height: 32px;
+    padding-left: 8px;
+    width: 200px;
 }
 
 .bg_gray {
@@ -2121,10 +2138,6 @@ tr.categoryBanner-darkgray th.sorting_desc {
 
     .searchBtn {
         width: 50px;
-    }
-
-    .searchBoxDS {
-        width: 650px !important;
     }
 
     .ownerDate {

@@ -20,6 +20,7 @@ namespace Sentry.data.Web
             DatasetFunctionIds = dto.DatasetFunctionIds;
             GetLatest = dto.GetLatest;
             ReportLink = dto.ReportLink;
+            BusinessObjectsEnumValue = (int)ReportType.BusinessObjects;
         }
 
 
