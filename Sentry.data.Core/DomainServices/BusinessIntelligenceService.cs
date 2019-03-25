@@ -140,8 +140,13 @@ namespace Sentry.data.Core
 
                             _emailService.SendInvalidReportLocationEmail(dto, _userService.GetCurrentUser().DisplayName);
                         }
+                        else if (ex.Message.Contains("because it is being used by another process"))
+                        {
+                            Logger.Error("Exhibit validation OpenRead test could be executed, file in use", ex);
+                        }
                         else
                         {
+                            Logger.Error($"Exhibit Validation Exception - Creator:{dto.CreationUserId} ExhibitName:{dto.DatasetName}", ex);
                             errors.Add($"An error occured finding the file. Please verify the file path is correct or contact DSCSupport@sentry.com for assistance.");
                         }
                     }
