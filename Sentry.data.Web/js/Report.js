@@ -296,7 +296,7 @@ data.Report = {
 
             if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
 
-            returnUrl += "pageSelection=" + localStorage.getItem("pageSelection");
+            returnUrl += "page=" + localStorage.getItem("pageSelection");
         }
 
         if (localStorage.getItem("sortByVal") !== null) {
