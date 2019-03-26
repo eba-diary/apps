@@ -1019,6 +1019,28 @@
                 $('#filterSelector').val(self.SelectedFilters()).trigger('change');
             });
 
+            self.SortByVal = function () {
+                if (!loaded) {
+                    //on initial load
+                    //look at url to determine if sort param exists, if so set local storage
+                    // and selected Sort By value.
+                    if (data.Search.GetParameterByName('sort')) {
+                        localStorage.setItem("sortByVal", (data.Search.GetParameterByName('sort')));
+                        $("#sort-results").val(data.Search.GetParameterByName('sort'));
+                    }
+                }
+
+                //pull sortby value from local storage
+                var val = localStorage.getItem("sortByVal");
+                
+                if (val !== undefined) {
+                    return val;
+                }
+                else {
+                    return '0';
+                }
+            }
+
             self.searchResults = ko.computed(function () {
 
                 if (!loaded) {
@@ -1044,7 +1066,6 @@
                             self.Query(searchText);
                         }
                     }
-                    loaded = true;
                 }
                 else {
                     localStorage.setItem("searchText", self.Query());
@@ -1186,7 +1207,7 @@
 
                 queryResults = temp.map(x => x.dataset);
 
-                queryResults = self.FilterExhibits(queryResults, $("#sort-results").val());
+                queryResults = self.FilterExhibits(queryResults, self.SortByVal());
 
                 $("#SearchText").attr("placeholder", "Search " + queryResults.length + " Datasets...");
 
@@ -1195,7 +1216,10 @@
             // go to https://github.com/ErikSchierboom/knockout-paging for information on the plugin
 
             self.sortExhibits = function () {
-                self.datasets.valueHasMutated();
+                if (loaded) {
+                    localStorage.setItem("sortByVal", $('#sort-results').val());
+                    self.datasets.valueHasMutated();
+                }
             };
 
             self.limitSearchResults = function () {
@@ -1242,9 +1266,10 @@
             };
 
             self.CurrentPageSelection = self.searchResults.pageNumber.subscribe(function () {
-                alert("PageNumber changed");
                 localStorage.setItem("pageSelection", ko.toJSON(self.searchResults.pageNumber()));
-            })
+            });
+
+            loaded = true;
         }
 
         $(document).ready(function () {
