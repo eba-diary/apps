@@ -1225,12 +1225,15 @@
             self.limitSearchResults = function () {
 
                 var nbrResults = 15;
-
+                
                 // determine number of results to return in the search results using the value selected in the drop-down
                 if ($("#search-results-choices").val() === "All") {
                     nbrResults = self.searchResults.itemCount();
+                    localStorage.setItem("itemsToShow", "All");
+                    //localStorage.setItem("itemCount", self.searchResults.itemCount());
                 } else {
                     nbrResults = parseInt($("#search-results-choices").val());
+                    localStorage.setItem("itemsToShow", nbrResults);
                 }
 
                 self.searchResults.pageSize(nbrResults);
@@ -1268,6 +1271,17 @@
             self.CurrentPageSelection = self.searchResults.pageNumber.subscribe(function () {
                 localStorage.setItem("pageSelection", ko.toJSON(self.searchResults.pageNumber()));
             });
+
+
+            //items that need to be run only on initial load of page
+            if (!loaded) {
+                if (data.Search.GetParameterByName('itemsToShow')) {
+                    //on initial load of view model, check url
+                    var selection = data.Search.GetParameterByName('itemsToShow');
+                    $("#search-results-choices").val(selection);
+                    self.searchResults.pageSize(selection);
+                }
+            }
 
             loaded = true;
         }

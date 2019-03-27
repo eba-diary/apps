@@ -305,6 +305,12 @@ data.Report = {
             returnUrl += "sort=" + localStorage.getItem("sortByVal");
         }
 
+        if (localStorage.getItem("itemsToShow") !== null) {
+            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+
+            returnUrl += "itemsToShow=" + localStorage.getItem("itemsToShow");
+        }
+
         returnLink.attr('href', returnUrl);
     }
 };

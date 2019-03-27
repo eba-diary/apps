@@ -12,6 +12,9 @@ data.Search = {
         window.vm = new ListViewModel();
         ko.applyBindings(vm);
 
+        //needed to set page number on initial page load
+        // setPageNumber loop is needed as it is unknow when ko will load
+        //   all pages for pagination.
         if (data.Search.GetParameterByName('page')) {
             localStorage.setItem("pageSelection", (data.Search.GetParameterByName('page')));
             data.Search.setPageNumber(localStorage.getItem("pageSelection"));
