@@ -158,10 +158,37 @@ data.Report = {
 
         $('#deleteLink').click(function (e) {
             e.preventDefault();
+            var d_id = $(this).data("id");
 
-            var modal = Sentry.ShowModalConfirmation("Delete Exhibit", function () { data.BusinessIntelligenceDetail.DeleteDataset($(this).data("id")); });
-            modal.ReplaceModalBody("This will <u>permanently</u> delete this Exhibit (<b>not the object which it references</b>). </br></br> Do you wish to continue?");
-            modal.show();
+            $.ajax({
+                url: '/BusinessIntelligence/' + d_id + '/Favorites',
+                method: "GET",
+                dataType: 'json',
+                success: function (obj) {
+                    var message;
+                    var objData = JSON.parse(obj);
+                    var favCount = objData.Favorites.length;
+                    if (favCount === 1) {
+                        message = "This exhibit is favorited by " + objData.Favorites.length + " user.</br>Click <a href=" + objData.MailToAllLink + ">here</a> if you wish to start an email to the user before deleting.</br></br>Otherwise, continuing will <u>permanently</u> delete this Exhibit (<b>not the object which it references</b>).  In addition, the favorite association to this exhibit will be removed. </br></br> Do you wish to continue?"
+                    }
+                    else if (favCount > 1) {
+                        message = "This exhibit is favorited by " + objData.Favorites.length + " users.</br>Click <a href=" + objData.MailToAllLink + ">here</a> if you wish to start email to all users before deleting.</br></br>Otherwise, continuing will <u>permanently</u> delete this Exhibit (<b>not the object which it references</b>).  </br> All faviorite associations to this exhibit will be removed </br></br> Do you wish to continue?"
+                    }
+                    else {
+                        message = "This will <u>permanently</u> delete this Exhibit (<b>not the object which it references</b>). </br></br> Do you wish to continue?"
+                    }
+
+                    var modal = Sentry.ShowModalConfirmation("Delete Exhibit", function () { data.Report.DeleteDataset(d_id); });
+                    modal.ReplaceModalBody(message);
+                    modal.show();
+                },
+                failure: function () {
+                    Sentry.ShowModalAlert("We failed to delete exhibit.  Please try again later.", function () { location.reload(); });
+                },
+                error: function () {
+                    Sentry.ShowModalAlert("We failed to delete exhibit.  Please try again later.", function () { location.reload(); });
+                }
+            });            
         });
 
         $(document).on("click", "[id^='btnFavorite']", function (e) {
@@ -192,7 +219,7 @@ data.Report = {
                 if (obj.Success) {
                     Sentry.ShowModalConfirmation(obj.Message, function () { window.location = returnUrl; });
                 } else {
-                    Sentry.ShowModalAlert(obj.Message, function () { window.location = returnUrl; });
+                    Sentry.ShowModalAlert(obj.Message, function () { location.reload(); });
                 }
             },
             failure: function (obj) {

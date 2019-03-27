@@ -97,6 +97,13 @@ namespace Sentry.data.Core
 
         public void Delete(int id)
         {
+            Dataset exhibit = _datasetContext.GetById<Dataset>(id);
+
+            foreach (Favorite fav in exhibit.Favorities)
+            {
+                _datasetContext.RemoveById<Favorite>(fav.FavoriteId);
+            }
+
             _datasetContext.RemoveById<Dataset>(id);
             _datasetContext.SaveChanges();
         }
@@ -161,6 +168,11 @@ namespace Sentry.data.Core
             return _datasetContext.TagGroups.Select(s => new KeyValuePair<string,string>(s.TagGroupId.ToString(), s.Name)).OrderBy(o => o.Value).ToList();
         }
 
+
+        public List<FavoriteDto> GetDatasetFavoritesDto(int id)
+        {
+            return _datasetContext.Favorites.Where(w => w.DatasetId == id).Select(s => MapToDto(s)).ToList();
+        }
         #endregion
 
         #region "Private Functions"
@@ -321,6 +333,17 @@ namespace Sentry.data.Core
                 });                
             }
             return contactList;
+        }
+
+        private FavoriteDto MapToDto(Favorite fav)
+        {
+            IApplicationUser user = _userService.GetByAssociateId(fav.UserId);
+            return new FavoriteDto()
+            {
+                UserId = fav.UserId,
+                UserEmail = user.EmailAddress,
+                UserDisplayName = user.DisplayName
+            };
         }
         #endregion
 
