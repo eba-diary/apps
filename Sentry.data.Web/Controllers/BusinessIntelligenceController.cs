@@ -128,6 +128,7 @@ namespace Sentry.data.Web.Controllers
             try
             {
                 _businessIntelligenceService.Delete(id);
+                _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.DELETED_REPORT, SharedContext.CurrentUser.AssociateId, "Deleted Report", id);
                 return Json(new { Success = true, Message = "Exhibit was successfully deleted" });
             }
             catch (Exception ex)
