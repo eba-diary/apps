@@ -512,6 +512,7 @@
             var selectedFunctions = data.Search.GetSelectedFiltersFromGroup(window.vm.DatasetFunctionFilters, selectedFilters);
             var selectedExtensions = data.Search.GetSelectedFiltersFromGroup(window.vm.ExtensionFilters, selectedFilters);
             var selectedTags = data.Search.GetSelectedFiltersFromGroup(window.vm.TagFilters, selectedFilters);
+            var selectedOwners = data.Search.GetSelectedFiltersFromGroup(window.vm.OwnerFilters, selectedFilters);
 
             //filter the exhibits based on teh groups that are 'OR'ed toghether
             exhibits = exhibits.filter(function (exhibit) {
@@ -519,11 +520,12 @@
                 var buMatch = IsSelectedFiltersAMatch(selectedBusinessUnits, exhibit.BusinessUnits, true);
                 var extensionMatch = IsSelectedFiltersAMatch(selectedExtensions, exhibit.DistinctFileExtensions, true);
                 var functionMatch = IsSelectedFiltersAMatch(selectedFunctions, exhibit.DatasetFunctions, true);
+                var ownerMatch = IsSelectedFiltersAMatch(selectedOwners, exhibit.SentryOwner, true);
 
                 //now filter the rest of the exhibits on the groups that are 'AND'ed together.
                 var tagMatch = IsSelectedFiltersAMatch(selectedTags, exhibit.TagNames, false);
 
-                return categoryMatch && buMatch && functionMatch && extensionMatch && tagMatch;
+                return categoryMatch && buMatch && functionMatch && extensionMatch && tagMatch & ownerMatch;
             });
 
             return data.Search.SortTheResults(sortVal,
@@ -556,20 +558,31 @@
                 var temp = [];
                 var pageType = '1_';
 
+                //Guarentee order of categories to ensure filter numbering is consistent
+                //https://stackoverflow.com/a/13359705
+                //pulling all unique category values from observablearray
+                var uniqueCategories = ko.dependentObservable(function () {
+                    var categories = ko.utils.arrayMap(datasets, function (item) { return item.Category });
+                    return ko.utils.arrayGetDistinctValues(categories).sort();
+                })
+
                 //CATEGORY FILTER
-                for (var item, i = 0; item = datasets[i++];) {
-                    var category = item.Category;
+                var uniqueCatCnt = 1;
+                for (var item, i = 0; item = uniqueCategories()[i++];) {
+                    var category = item;
 
                     if (!(category in categoryLookup)) {
                         categoryLookup[category] = 1;
-                        self.CategoryFilters.push(new data.Search.Filter(pageType + '0_' + i, category, 'Category'));
+                        self.CategoryFilters.push(new data.Search.Filter(pageType + '0_' + uniqueCatCnt, category, 'Category'));
 
-                        temp.push(new data.Search.Filter(pageType + '0_' + i, category, 'Category'));
+                        temp.push(new data.Search.Filter(pageType + '0_' + uniqueCatCnt, category, 'Category'));
 
                         // compare the category to what may have been passed along in the URL; if there's a match, push it to the SelectedFilters observable array
                         if (category === data.Search.GetParameterByName('category')) {
-                            self.SelectedFilters.push(pageType + '0_' + i);
+                            self.SelectedFilters.push(pageType + '0_' + uniqueCatCnt);
                         }
+
+                        uniqueCatCnt++;
                     }
                 }
 
@@ -589,9 +602,16 @@
                 temp = [];
 
 
+                //Guarentee order of Owners to ensure filter numbering is consistent
+                //https://stackoverflow.com/a/13359705
+                //pulling all unique category values from observablearray
+                var uniqueOwners = ko.dependentObservable(function () {
+                    var Owners = ko.utils.arrayMap(datasets, function (item) { return item.SentryOwner });
+                    return ko.utils.arrayGetDistinctValues(Owners).sort();
+                })
                 //SENTRYOWNER FILTER
-                for (var item, i = 0; item = datasets[i++];) {
-                    var owner = item.SentryOwner;
+                for (var item, i = 0; item = uniqueOwners()[i++];) {
+                    var owner = item;
 
                     if (!(owner in ownerLookup)) {
                         ownerLookup[owner] = 1;
@@ -649,20 +669,29 @@
                 var pageType = '2_'
                 var item;
 
+                //Guarentee order of categories to ensure filter numbering is consistent
+                //https://stackoverflow.com/a/13359705
+                //pulling all unique category values from observablearray
+                var uniqueCategories = ko.computed(function () {
+                    var categories = [];
+                    ko.utils.arrayForEach(exhibits, function (item) {
+                        ko.utils.arrayMap(item.Categories, function (innercats) { return categories.push(innercats) });
+                    });
+                    return ko.utils.arrayGetDistinctValues(categories).sort();
+                });
+
                 //CATEGORY FILTER
-                for (var item, i = 0; item = exhibits[i++];) {
-                    for (var cat, j = 0; cat = item.Categories[j++];) {
-                        if (!(cat in categoryLookup)) {
-                            categoryLookup[cat] = 1;
-                            self.CategoryFilters.push(new data.Search.Filter(pageType + '0_' + i, cat, 'Category'));
+                for (var cat, i = 0; cat = uniqueCategories()[i++];) {
+                    if (!(cat in categoryLookup)) {
+                        categoryLookup[cat] = 1;
+                        self.CategoryFilters.push(new data.Search.Filter(pageType + '0_' + i, cat, 'Category'));
 
-                            // compare the category to what may have been passed in the URL; if there's a match, push it to the SelectedFilters observable array
-                            if (cat === data.Search.GetParameterByName('category')) {
-                                self.SelectedFilters.push(pageType + '0_' + i);
-                            }
-
-                            temp.push(new data.Search.Filter(pageType + '0_' + i, cat, 'Category'));
+                        // compare the category to what may have been passed in the URL; if there's a match, push it to the SelectedFilters observable array
+                        if (cat === data.Search.GetParameterByName('category')) {
+                            self.SelectedFilters.push(pageType + '0_' + i);
                         }
+
+                        temp.push(new data.Search.Filter(pageType + '0_' + i, cat, 'Category'));
                     }
                 }
                 ko.utils.arrayForEach(self.AllFilters(), function (v) {
@@ -1118,7 +1147,7 @@
                                 }
                             })
 
-                            //Search Cateogy
+                            //Search Category
                             ko.utils.arrayForEach(dataset.Categories, function (v) {
                                 if (v.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
                                     keywordFound = true;

@@ -326,39 +326,10 @@ data.Dataset = {
             });
         });
 
-
-        var returnUrl = "/Search/Datasets";
-        var returnLink = $('#linkReturnToDatasetList');
+         
+        data.Dataset.SetReturntoSearchUrl();
 
         $('#datasetConfigList').select2({ width: '85%' });
-
-
-        //---is this neede?
-        if (localStorage.getItem("searchText") !== null) {
-            var text = localStorage.getItem("searchText");
-            returnUrl += "?searchPhrase=" + text;
-            var storedNames;
-            if (localStorage.getItem("filteredIds") !== null) {
-                storedNames = JSON.parse(localStorage.getItem("filteredIds"));
-                returnUrl += "&ids=";
-
-                for (i = 0; i < storedNames.length; i++) {
-                    returnUrl += storedNames[i] + ',';
-                }
-                returnUrl = returnUrl.replace(/,\s*$/, "");
-            }
-        }
-        else if (localStorage.getItem("filteredIds") !== null) {
-            storedNames = JSON.parse(localStorage.getItem("filteredIds"));
-            returnUrl += "?ids=";
-
-            for (i = 0; i < storedNames.length; i++) {
-                returnUrl += storedNames[i] + ',';
-            }
-            returnUrl = returnUrl.replace(/,\s*$/, "");
-        }
-        returnLink.attr('href', returnUrl);
-
 
         $('body').on('click', '.on-demand-run', function () {
             $.ajax({
@@ -1584,6 +1555,56 @@ data.Dataset = {
         $.get("/Dataset/PreviewDatafile/" + id, function (result) {
             modal.ReplaceModalBody(result);
         });
+    },
+
+    SetReturntoSearchUrl: function () {
+        var returnUrl = "/Search/Datasets";
+        var returnLink = $('#linkReturnToDatasetList');
+        var firstParam = true;
+
+        //---is this neede?
+        if (localStorage.getItem("searchText") !== null) {
+            var text = { searchPhrase: localStorage.getItem("searchText") };
+
+            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+
+            returnUrl += $.param(text);
+
+        }
+
+        if (localStorage.getItem("filteredIds") !== null) {
+            storedNames = JSON.parse(localStorage.getItem("filteredIds"));
+
+            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+
+            returnUrl += "ids=";
+
+            for (i = 0; i < storedNames.length; i++) {
+                returnUrl += storedNames[i] + ',';
+            }
+            returnUrl = returnUrl.replace(/,\s*$/, "");
+        }
+
+        if (localStorage.getItem("pageSelection") !== null) {
+
+            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+
+            returnUrl += "page=" + localStorage.getItem("pageSelection");
+        }
+
+        if (localStorage.getItem("sortByVal") !== null) {
+            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+
+            returnUrl += "sort=" + localStorage.getItem("sortByVal");
+        }
+
+        if (localStorage.getItem("itemsToShow") !== null) {
+            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+
+            returnUrl += "itemsToShow=" + localStorage.getItem("itemsToShow");
+        }
+
+        returnLink.attr('href', returnUrl);
     }
 
 };
