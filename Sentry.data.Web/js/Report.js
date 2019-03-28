@@ -306,7 +306,7 @@ data.Report = {
         }
 
         if (localStorage.getItem("itemsToShow") !== null) {
-            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }            
 
             returnUrl += "itemsToShow=" + localStorage.getItem("itemsToShow");
         }

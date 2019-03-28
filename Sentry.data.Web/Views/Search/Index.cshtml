@@ -1228,7 +1228,7 @@
                 
                 // determine number of results to return in the search results using the value selected in the drop-down
                 if ($("#search-results-choices").val() === "All") {
-                    nbrResults = self.searchResults.itemCount();
+                    nbrResults = 100000;
                     localStorage.setItem("itemsToShow", "All");
                     //localStorage.setItem("itemCount", self.searchResults.itemCount());
                 } else {
@@ -1274,12 +1274,15 @@
 
 
             //items that need to be run only on initial load of page
-            if (!loaded) {
+            if (loaded === false) {
                 if (data.Search.GetParameterByName('itemsToShow')) {
                     //on initial load of view model, check url
-                    var selection = data.Search.GetParameterByName('itemsToShow');
+                    var selection = data.Search.GetParameterByName('itemsToShow').replace(/'/g, '');
                     $("#search-results-choices").val(selection);
-                    self.searchResults.pageSize(selection);
+                    if (selection === "All") {
+                        self.searchResults.pageSize(100000);
+                    }
+                    else { console.log("setting page size:" + selection); self.searchResults.pageSize(selection); }
                 }
             }
 
@@ -1287,6 +1290,7 @@
         }
 
         $(document).ready(function () {
+            console.log("pre-init");
             data.Search.Init();
         });
 
