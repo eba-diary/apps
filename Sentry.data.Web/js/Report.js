@@ -169,17 +169,16 @@ data.Report = {
                     var objData = JSON.parse(obj);
                     var favCount = objData.Favorites.length;
                     if (favCount === 1) {
-                        message = "This exhibit is favorited by " + objData.Favorites.length + " user.</br>Click <a href=" + objData.MailToAllLink + ">here</a> if you wish to start an email to the user before deleting.</br></br>Otherwise, continuing will <u>permanently</u> delete this Exhibit (<b>not the object which it references</b>).  In addition, the favorite association to this exhibit will be removed. </br></br> Do you wish to continue?"
+                        message = "This exhibit is favorited by 1 user.  Click <a href=" + objData.MailToAllLink + ">here</a> to email the user before deleting. If you choose to continue, the exhibit link will be permanently deleted from data.sentry.com.</br></br>Do you wish to continue?"
                     }
                     else if (favCount > 1) {
-                        message = "This exhibit is favorited by " + objData.Favorites.length + " users.</br>Click <a href=" + objData.MailToAllLink + ">here</a> if you wish to start email to all users before deleting.</br></br>Otherwise, continuing will <u>permanently</u> delete this Exhibit (<b>not the object which it references</b>).  </br> All faviorite associations to this exhibit will be removed </br></br> Do you wish to continue?"
+                        message = "This exhibit is favorited by " + objData.Favorites.length + " users.  Click <a href=" + objData.MailToAllLink + ">here</a> to email the users before deleting. If you choose to continue, the exhibit link will be permanently deleted from data.sentry.com.</br></br>Do you wish to continue?"
                     }
                     else {
-                        message = "This will <u>permanently</u> delete this Exhibit (<b>not the object which it references</b>). </br></br> Do you wish to continue?"
+                        message = "This will permanently delete the exhibit link from data.sentry.com.</br></br>Do you wish to continue?"
                     }
 
-                    var modal = Sentry.ShowModalConfirmation("Delete Exhibit", function () { data.Report.DeleteDataset(d_id); });
-                    modal.ReplaceModalBody(message);
+                    var model = Sentry.ShowModalCustom("Delete Exhibit", message, Sentry.ModalButtonsOKCancel(function () { data.Report.DeleteDataset(d_id); }));
                     modal.show();
                 },
                 failure: function () {
