@@ -307,6 +307,7 @@
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Extensions\BusinessIntelligenceExtensions.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
+    <Compile Include="Extensions\FavoriteExtensions.cs" />
     <Compile Include="Extensions\ImageExtensions.cs" />
     <Compile Include="Extensions\Security\PermissionExtensions.cs" />
     <Compile Include="Extensions\Security\RequestAccessExtension.cs" />
@@ -373,6 +374,8 @@
     <Compile Include="Models\Dataset\ObsoleteDatasetModel.cs" />
     <Compile Include="Models\Dataset\PreviewDataModel.cs" />
     <Compile Include="Models\Dataset\PushToDatasetModel.cs" />
+    <Compile Include="Models\Favorites\FavoriteItemDetailModel.cs" />
+    <Compile Include="Models\Favorites\FavoritesDetailModel.cs" />
     <Compile Include="Models\Schema\SchemaDetailModel.cs" />
     <Compile Include="Models\Schema\SchemaModel.cs" />
     <Compile Include="Models\Dataset\DatasetModel.cs" />

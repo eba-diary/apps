@@ -23,6 +23,7 @@ All new files added for staic data or scripts should have it's properties update
 --Now only run these scripts if the versioning allows us.
 --ALTER THE SCRIPT VERSION BELOW FOR EVERY NEW SCRIPT 
 --SCRIPT VERSION should be in format yyyy.MM.dd_rr where rr is 2-digit revision number for day. 
+DECLARE @ScriptVersion AS VARCHAR(50); 
 DECLARE @ErrorMessage NVARCHAR(4000); 
 DECLARE @ErrorSeverity INT; 
 DECLARE @ErrorState INT; 

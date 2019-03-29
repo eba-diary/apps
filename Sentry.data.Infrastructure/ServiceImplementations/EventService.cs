@@ -34,14 +34,17 @@ namespace Sentry.data.Infrastructure
                 EventType et = _datasetContext.EventTypes.Where(w => w.Description == eventType).FirstOrDefault();
                 Status status = _datasetContext.EventStatus.Where(w => w.Description == GlobalConstants.Statuses.SUCCESS).FirstOrDefault();
 
-                    if (datasetId == 0 && configId != 0)
-                    {
-                        datasetId = _datasetContext.GetById<DatasetFileConfig>(configId).ParentDataset.DatasetId;
-                    }
-                    if (configId == 0 && datasetId != 0)
-                    {
-                        configId = _datasetContext.GetById<Dataset>(datasetId).DatasetFileConfigs.First().ConfigId;
-                    }
+                if (datasetId == 0 && configId != 0)
+                {
+                    datasetId = _datasetContext.GetById<DatasetFileConfig>(configId).ParentDataset.DatasetId;
+                }
+                if (configId == 0 && datasetId != 0)
+                {
+                    //Need to ensure object has not been deleted (i.e. Deleted Report event will be submitted after successfuly deleted)
+                    Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+                    DatasetFileConfig dfc = (ds == null)? null : ds.DatasetFileConfigs.FirstOrDefault();
+                    configId = (dfc == null)? 0 : dfc.ConfigId;
+                }
 
                 Event evt = CreateAndSaveEvent(et, status, userId, reason, datasetId, configId);
 

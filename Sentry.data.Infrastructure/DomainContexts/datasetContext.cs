@@ -292,6 +292,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<Favorite> Favorites
+        {
+            get
+            {
+                return Query<Favorite>();
+            }
+        }
+
         public IEnumerable<Dataset> GetDatasetByCategoryID(int id)
         {
             return Query<Dataset>().Where(w => w.DatasetCategories.Any(y=> y.Id == id)).Where(x => x.CanDisplay).AsEnumerable();
