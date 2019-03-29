@@ -139,16 +139,20 @@ data.Report = {
         data.Tags.initTags();
         data.Images.InitImages();
 
-        $('#addNewImage').on('click', function () {
-
-            $.get('/BusinessIntelligence/NewImage', function (template) {
-                $('.detail-thumbnail-list').append(template);
-                //$("#test").click();
-            });
-
-            //$('.detail-thumbnail-list').append('@Url.Action("newImage", "BusinessIntelligence")');
+        $('#addNewImage').on('click', function (e) {
+            e.preventDefault();
+            //$.get('/BusinessIntelligence/NewImage', function (template) {
+            //    $('.detail-thumbnail-list').append(template)
+            //});
+            $('input[type="file"]').click();
         });
 
+        function TriggerInput(obj) {
+            var parentContainer = $(this).parent().parent()
+            var fileInput = $(parentContainer).find("input[name$='ImageFileData']:last")
+            //$(fileInput).trigger('click');
+            $(fileInput).click();
+        }
 
         //var $inputs = $('.image-box');
         var $inputs = $('input[type="file"]')
@@ -243,8 +247,12 @@ data.Report = {
                 success: function (data) {
                     //alert('Upload Susccess');
                     //console.log(data);
-                    previewFile(previewBoxData, data);
-                    return data;
+
+                    $('.detail-thumbnail-list').append(data)
+                    //data.Images.InitImages();
+                    $('head').append('<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css" />');
+                    //previewFile(previewBoxData, data);
+                    //return data;
                 },
                 error: function (error) {
                     alert('Upload Error');
@@ -269,8 +277,19 @@ data.Report = {
             //execute upload
             upload.doUpload(this);
 
-            //Ensure associated Image is displayed
-            $(this).closest('.Image').css({ "display": "" });
+            ////Ensure associated Image is displayed
+            //$(this).closest('.Image').css({ "display": "" });
+
+            //Hide Add button when there are three images on page, however,
+            //  third element is not rendered before this count takes plage.
+            //Since call has been made for the third, only count if to images
+            //  if two images are available.   
+            if ($('.detail-thumbnail-list .Image:visible').length === 2) {
+                $('.add-thumbnail').hide("fast");
+            };
+
+            
+
         });
 
         function addDroppedFile(input, e) {

@@ -8,10 +8,10 @@ namespace Sentry.data.Web
 {
     public static class ImageExtensions
     {
-        public static void GenerateStorageInfo(this Core.ImageDto dto, bool tempfile = false)
+        public static void GenerateStorageInfo(this Core.ImageDto dto)
         {
             var bucket = Configuration.Config.GetHostSetting("AWSRootBucket");
-            var prefix = (tempfile) ? Sentry.data.Core.GlobalConstants.StoragePrefixes.DATASET_IMAGE_STORAGE_PREFIX + "/temporary" : Sentry.data.Core.GlobalConstants.StoragePrefixes.DATASET_IMAGE_STORAGE_PREFIX;
+            var prefix = Sentry.data.Core.GlobalConstants.StoragePrefixes.DATASET_IMAGE_STORAGE_PREFIX;
             prefix += "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + System.Guid.NewGuid().ToString();
 
             dto.StorageBucketName = bucket;
@@ -38,7 +38,12 @@ namespace Sentry.data.Web
             {
                 ImageId = dto.ImageId,
                 StorageKey = dto.StorageKey,
-                sortOrder = dto.sortOrder
+                sortOrder = dto.sortOrder,
+                ContentType = dto.ContentType,
+                FileExtension = dto.FileExtension,
+                StorageBucketName = dto.StorageBucketName,
+                StoragePrefix = dto.StoragePrefix,
+                FileName = dto.FileName
             };
         }
     }

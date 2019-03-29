@@ -346,9 +346,10 @@ namespace Sentry.data.Core
             Dataset ds = MapDataset(dto, new Dataset());
 
             CreateDatasetFileConfig(dto, ds);
-            CreateImages(dto, ds);
 
             _datasetContext.Add(ds);
+
+            CreateImages(dto, ds);
         }
 
         private void CreateImages(BusinessIntelligenceDto dto, Dataset ds)
@@ -357,7 +358,8 @@ namespace Sentry.data.Core
             ds.Images = ImageList;
             if (dto.Images.Count > 0)
             {
-                foreach (var image in dto.Images)
+                //Exclude any images marked for delete
+                foreach (var image in dto.Images.Where(w => !w.DeleteImage))
                 {
                     CreateImage(ds, image);
                 }
@@ -366,10 +368,9 @@ namespace Sentry.data.Core
 
         private void CreateImage(Dataset ds, ImageDto image)
         {
-            UploadImage(image);
+            //UploadImage(image);
             Image img = MapImage(image, ds);
             _datasetContext.Add(img);
-
             ds.Images.Add(img);
         }
 
@@ -419,11 +420,11 @@ namespace Sentry.data.Core
                 FileExtension = dto.FileExtension,
                 ParentDataset = ds,
                 ContentType = dto.ContentType,
-                UploadDate = dto.UploadDate,
+                UploadDate = DateTime.Now,
                 StorageBucketName = dto.StorageBucketName,
                 StoragePrefix = dto.StoragePrefix,
                 StorageKey = dto.StorageKey,
-                Sort = dto.sortOrder
+                Sort = dto.sortOrder,
             };
 
             return img;

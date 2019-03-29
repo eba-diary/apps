@@ -183,22 +183,29 @@
 
             <div class="form-group">
                 <span class="control-label col-md-2">Thumbnail Images</span>
-                <div class="col-md-10">
-                    @if (Model.Images.Count >= 3)
-                    {
-                    <div class="col-md-2 add-thumbnail" style="display:none">
-                        <button id="addNewImage" type="button" class="btn-success btn"><span class="glyphicon glyphicon-plus"></span> Add Image</button>
-                        @*@Html.AddImageLink("Add Image", ".detail-thumbnail-list ul", ".Image", "Images", typeof(ImageModel))*@
-                    </div>
-                    }
-                    else
-                    {
-                    <div class="col-md-2 add-thumbnail">
-                        <button id="addNewImage" type="button" class="btn-success btn"><span class="glyphicon glyphicon-plus"></span> Add Image</button>
-                        @*@Html.AddImageLink("Add Image", ".detail-thumbnail-list ul", ".Image", "Images", typeof(ImageModel))*@
-                    </div>
-                    }
+                <div class="col-md-10">                    
                     <div class="detail-thumbnail-list col-lg-10">
+                        @if (Model.Images.Count == 3)
+                        {
+                            @*<div class="col-md-2 add-thumbnail" style="display:none">
+                                <button id="addNewImage" type="button" class="btn-success btn"><span class="glyphicon glyphicon-plus"></span> Add Image</button>
+                            </div>*@
+                            <div class="col-md-2 add-thumbnail" style="display:none">
+                                <div class="image-upload-a">
+                                    <button id="addNewImage" type="button" class="btn-success btn"><span class="glyphicon glyphicon-plus"></span> Add Image</button>
+                                    <input type="file" name="ImageFileData" id="files" class="image-upload" />
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="col-md-2 add-thumbnail">
+                                <div class="image-upload-a">
+                                    <button id="addNewImage" type="button" class="btn-success btn"><span class="glyphicon glyphicon-plus"></span> Add Image</button>
+                                    <input type="file" name="ImageFileData" id="files" class="image-upload" />
+                                </div>
+                            </div>
+                        }
                         @*@for (int i = 0; i < Model.Images.Count; i++)
         {
             @Html.HiddenFor(model => model.Images[i].ImageId)

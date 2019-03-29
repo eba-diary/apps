@@ -147,7 +147,7 @@ namespace Sentry.data.Web
         public static Core.ImageDto ToDto(ImageModel model, System.Web.HttpPostedFileBase imageFile, int sort, bool tempfile = false)
         {
             Core.ImageDto dto = ToDto(imageFile, model);
-            dto.GenerateStorageInfo(tempfile);
+            if (tempfile) { dto.GenerateStorageInfo(); }            
             dto.sortOrder = sort;
             return dto;
         }
@@ -159,6 +159,7 @@ namespace Sentry.data.Web
             dto.ImageId = model.ImageId;
             dto.sortOrder = model.sortOrder;
             dto.DeleteImage = model.deleteImage;
+            dto.UploadDate = DateTime.Now;
 
             if (imageFile != null)
             {
@@ -170,6 +171,15 @@ namespace Sentry.data.Web
                 dto.ContentType = imageFile.ContentType;
                 dto.FileLength = imageFile.ContentLength;
                 dto.UploadDate = DateTime.Now;
+            }
+            else
+            {
+                dto.FileName = model.FileName;
+                dto.FileExtension = model.FileExtension;
+                dto.ContentType = model.ContentType;
+                dto.StorageBucketName = model.StorageBucketName;
+                dto.StorageKey = model.StorageKey;
+                dto.StoragePrefix = model.StoragePrefix;
             }
 
             return dto;

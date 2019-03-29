@@ -211,7 +211,7 @@ namespace Sentry.data.Web.Controllers
             return File(img, "image/jpg", "image_" + System.IO.Path.GetFileName(url));
         }
 
-        public JsonResult UploadPreviewImage()
+        public ActionResult UploadPreviewImage()
         {
             HttpFileCollectionBase Files;
             Files = Request.Files;
@@ -222,7 +222,8 @@ namespace Sentry.data.Web.Controllers
 
             ImageModel model = ImageExtensions.ToModel(dto);
 
-            return Json(model, JsonRequestBehavior.AllowGet);
+            return PartialView("_Images", model);
+            //return Json(model, JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult NewImage(int index = 0)

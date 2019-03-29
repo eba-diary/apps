@@ -141,12 +141,16 @@ ul.list-group-indented {
     background-color: grey;
 }
 
+.image-upload {
+    width: 0px;
+    height: 0px;
+    overflow: hidden;
+}
 /*.box__file:focus + label,
 .box__file + label:hover {
     background-color: red;
 }*/
 /*#endregion BusinessIntelligenceForm*/
-
 /* hide selected select2 tags, all over */
 .select2-results__option[aria-selected=true] {
     display: none;

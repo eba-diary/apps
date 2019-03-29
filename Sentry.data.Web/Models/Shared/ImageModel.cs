@@ -12,5 +12,10 @@ namespace Sentry.data.Web
         public int sortOrder { get; set; }
         public bool deleteImage { get; set; }
         public HttpPostedFileBase ImageFileData { get; set; }
+        public string ContentType { get; set; }
+        public string FileExtension { get; set; }
+        public string FileName { get; set; }
+        public string StorageBucketName { get; set; }
+        public virtual string StoragePrefix { get; set; }
     }
 }

@@ -5,7 +5,8 @@
 data.Images = {
 
     InitImages: function () {
-        $(".fancybox").fancybox({
+        $().fancybox({
+            selector: '.detail-thumbnail-list .fancybox:visible',
             buttons: [
                 "zoom",
                 "close"
@@ -69,9 +70,22 @@ data.Images = {
     },
 
     removeNestedForm: function (element, container, deleteElement) {
+        //find parent image container
         $container = $(element).parents(container);
+        //mark object for deletion
         $container.find(deleteElement).val('True');
+        //hide image container
         $container.hide();
+
+        //find fancybox href and remove data-fancybox attribute to ensure
+        // removed image does not showup in preview.
+        $href = $container.find('.fancybox');
+        $href.removeAttr("data-fancybox");
+
+        //Show add image button if visible images are less than 3
+        if ($('.detail-thumbnail-list .Image:visible').length < 3) {
+            $('.add-thumbnail').show("fast");
+        }; 
 
         // If file was just uploaded, we need to ensure file data is removed.
 
