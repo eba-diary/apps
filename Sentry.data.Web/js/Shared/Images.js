@@ -14,10 +14,20 @@ data.Images = {
         });
     },
 
-    initImageUpload: function () {
+    InitImageUpload: function () {
+
+        $('#addNewImage').on('click', function (e) {
+            e.preventDefault();
+            $('input[type="file"]').click();
+        });
+
+        function TriggerInput(obj) {
+            var parentContainer = $(this).parent().parent()
+            var fileInput = $(parentContainer).find("input[name$='ImageFileData']:last")
+            $(fileInput).click();
+        }
 
         var UploadTempFile = function (file) {
-            alert('Setting temp file variable');
             this.file = file;
         };
 
@@ -30,8 +40,7 @@ data.Images = {
         UploadTempFile.prototype.getName = function () {
             return this.file.name;
         };
-        UploadTempFile.prototype.doUpload = function () {
-            alert('Uploading UploadTempFile data');
+        UploadTempFile.prototype.doUpload = function (previewBoxData) {
             var that = this;
             var formData = new FormData();
 
@@ -50,10 +59,7 @@ data.Images = {
                     return myXhr;
                 },
                 success: function (data) {
-                    alert('Upload Susccess');
-                    console.log(data);
-                    alert(data.Image.StorageKey);
-                    // your callback here
+                    $('.detail-thumbnail-list').append(data)
                 },
                 error: function (error) {
                     alert('Upload Error');
@@ -67,6 +73,28 @@ data.Images = {
                 timeout: 60000
             });
         };
+
+        $(document).on('change', "input[name$='ImageFileData']", function () {
+            var file = $(this)[0].files[0];
+            var upload = new UploadTempFile(file);
+
+            //limit image types
+            if (upload.getType().indexOf("jpeg") >= 0 || upload.getType().indexOf("png") >= 0) {
+                //execute upload
+                upload.doUpload(this);
+
+                //Hide Add button when there are three images on page, however,
+                //  third element is not rendered before this count takes plage.
+                //Since call has been made for the third, only count if to images
+                //  if two images are available.   
+                if ($('.detail-thumbnail-list .Image:visible').length === 2) {
+                    $('.add-thumbnail').hide("fast");
+                };
+            }
+            else {
+                Sentry.ShowModalAlert("We only support jpeg and png image formats.");
+            }
+        }); 
     },
 
     removeNestedForm: function (element, container, deleteElement) {
