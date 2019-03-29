@@ -167,33 +167,11 @@ namespace Sentry.data.Core
                     if (updatesDetected) { curImage.UploadDate = DateTime.Now; };
                 }
             }
-
-
-            //foreach (ImageDto img in dto.Images)
-            //{
-                
-            //}
-        }
-
-        private void DeleteImage(ImageDto img)
-        {
-            ObjectKeyVersion version = null;
-
-            Logger.Info($"Image Delete Issued - Id:{img.ImageId} Key:{img.StorageKey}");
-            try
-            {
-                //_datasetContext.RemoveById<Image>(img.ImageId);
-                version = _s3ServiceProvider.MarkDeleted(img.StorageKey);
-                Logger.Info($"Image Delete Successful - Id:{img.ImageId} Key:{version.key} DeleteMarker:{version.versionId}");
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"Image Delete Failed - Id:{img.ImageId} Key:{img.StorageKey}", ex);
-            }
         }
 
         public void Delete(int id)
         {
+            RemoveAllImages(id);
             _datasetContext.RemoveById<Dataset>(id);
             _datasetContext.SaveChanges();
         }
@@ -291,6 +269,61 @@ namespace Sentry.data.Core
         #endregion
 
         #region "Private Functions"
+
+        /// <summary>
+        /// Deletes an image file from storage.
+        /// </summary>
+        /// <param name="img"></param>
+        private void DeleteImage(ImageDto img)
+        {
+            ObjectKeyVersion version = null;
+
+            Logger.Info($"Image Delete Issued - Id:{img.ImageId} Key:{img.StorageKey}");
+            try
+            {
+                version = _s3ServiceProvider.MarkDeleted(img.StorageKey);
+                Logger.Info($"Image Delete Successful - Id:{img.ImageId} Key:{version.key} DeleteMarker:{version.versionId}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Image Delete Failed - Id:{img.ImageId} Key:{img.StorageKey}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Deletes an image file from storage.
+        /// </summary>
+        /// <param name="img"></param>
+        private void DeleteImage(Image img)
+        {
+            ObjectKeyVersion version = null;
+
+            Logger.Info($"Image Delete Issued - Id:{img.ImageId} Key:{img.StorageKey}");
+            try
+            {
+                version = _s3ServiceProvider.MarkDeleted(img.StorageKey);
+                Logger.Info($"Image Delete Successful - Id:{img.ImageId} Key:{version.key} DeleteMarker:{version.versionId}");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Image Delete Failed - Id:{img.ImageId} Key:{img.StorageKey}", ex);
+            }
+        }
+
+        /// <summary>
+        /// Deletes associated images, from storage and metadata, assossicated with dataset.
+        /// </summary>
+        /// <param name="id">Dataset Id</param>
+        private void RemoveAllImages(int id)
+        {
+            Dataset ds = _datasetContext.GetById<Dataset>(id);
+            foreach (Image img in ds.Images)
+            {
+                DeleteImage(img);
+                _datasetContext.RemoveById<Image>(img.ImageId);
+            }
+        }
+
 
         private byte[] getThumbNail(byte[] data, int multi = 1)
         {
