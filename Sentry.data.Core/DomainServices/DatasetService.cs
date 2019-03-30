@@ -62,8 +62,7 @@ namespace Sentry.data.Core
         {
             //get all datasets where the there is a CanQueryData permission on the security
             //OR all public datasets (no security object)
-            var query = _datasetContext.Datasets.Where(x => x.DatasetType == GlobalConstants.DataEntityCodes.DATASET &&
-                                                                                        (x.Security == null || x.Security.Tickets.Any(y => y.Permissions.Any(z => z.Permission.PermissionCode == GlobalConstants.PermissionCodes.CAN_QUERY_DATASET && z.IsEnabled))));
+            var query = _datasetContext.Datasets.Where(x => x.DatasetType == GlobalConstants.DataEntityCodes.DATASET && x.CanDisplay);
 
             query.FetchMany(x => x.DatasetCategories).ToFuture();
             List<Dataset> datasets = query.FetchSecurityTree(_datasetContext);
