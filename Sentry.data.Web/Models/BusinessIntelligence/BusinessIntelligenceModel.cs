@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using System.Web;
 using Sentry.data.Core;
 
 namespace Sentry.data.Web
@@ -48,6 +49,12 @@ namespace Sentry.data.Web
 
         public int BusinessObjectsEnumValue { get; set; }
 
+        [DisplayName("Image 1")]
+        public HttpPostedFileBase ImageFile_1 { get; set; }
+        [DisplayName("Image 2")]
+        public HttpPostedFileBase ImageFile_2 { get; set; }
+        [DisplayName("Image 3")]
+        public HttpPostedFileBase ImageFile_3 { get; set; }
 
         public List<string> Validate()
         {

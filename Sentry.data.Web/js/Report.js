@@ -41,6 +41,9 @@ data.Report = {
 
     FormInit: function (hrEmpUrl, hrEmpEnv) {
 
+        // Initialize Images for thumbnails
+        data.Images.InitImages();
+
         $("#DatasetCategoryIds").select2({
             placeholder:"Select Categories"
         });
@@ -99,8 +102,6 @@ data.Report = {
         });
 
         $(document).on('click', '.contactinfo-remove', function (e) {
-            //e.StopPropagation();
-            //e.StopImmediatePropagation();
             e.preventDefault();
             //get parent div
             var parent = $(this).parent()[0];
@@ -133,14 +134,17 @@ data.Report = {
             data.Report.SetGetLatestPanel($(this).val());
         });
 
-        
-
         data.Tags.initTags();
+        data.Images.InitImageUpload();
+        data.Images.InitImages();
     },
 
     DetailInit: function () {
 
         // Initialize the dataset detail page
+
+        // Initialize Images for thumbnails
+        data.Images.InitImages();
 
         $(".detailNameLink").click(function () {
             var artifactLink = $(this).data('artifactlink');
@@ -195,7 +199,7 @@ data.Report = {
 
             var icon = $(this).children();
             $.ajax({
-                url: '/Favorites/SetFavorite?datasetId=' + encodeURIComponent($(this).data("id")),
+                url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent($(this).data("id")),
                 method: "GET",
                 dataType: 'json',
                 success: function () { icon.toggleClass("glyphicon-star glyphicon-star-empty"); },
