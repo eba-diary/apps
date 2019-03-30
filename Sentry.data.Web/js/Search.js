@@ -12,6 +12,17 @@ data.Search = {
         window.vm = new ListViewModel();
         ko.applyBindings(vm);
 
+        //needed to set page number on initial page load
+        // setPageNumber loop is needed as it is unknow when ko will load
+        //   all pages for pagination.
+        if (data.Search.GetParameterByName('page')) {
+            localStorage.setItem("pageSelection", (data.Search.GetParameterByName('page')));
+            data.Search.setPageNumber(localStorage.getItem("pageSelection"));
+        }
+        else {
+            localStorage.setItem("pageSelection", 1);
+        }
+
         if (window.location.href.match(/&ids=/)) {
             // do nothing
         }
@@ -296,6 +307,17 @@ data.Search = {
             });
         });
 
+    },
+
+    setPageNumber: function (targetpage) {
+        //There is a delay in all pages showing up, therefore, we need a loop
+        var pages = vm.searchResults.pageCount();
+        if (pages < targetpage) {
+            setTimeout(data.Search.setPageNumber, 500, targetpage);
+        }
+        else {
+            vm.searchResults.pageNumber(targetpage);
+        }
     }
     
 };
