@@ -52,11 +52,12 @@ function callFileDownload(s3Key) {
     s3Key = s3Key.replace(bucket, '');
 
     var s3FileName = $('#s3FileName').val() + "." + $('#s3SaveAsFileExtension').find(":selected").text();
+    var key = s3Key + "/" + s3FileName;
 
     console.log(s3Key);
     $.ajax({
         type: "GET",
-        url: "/api/v1/queryTool/files/" + s3Key + "/" + fileName,
+        url: "/api/v1/queryTool/files/DownloadUrl/" + key,
         dataType: "json",
         success: function (msg) {
             $('#s3DownloadLocation').attr('href', msg);
