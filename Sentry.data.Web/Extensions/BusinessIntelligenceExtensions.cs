@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 
@@ -13,7 +12,7 @@ namespace Sentry.data.Web
         public static Core.BusinessIntelligenceDto ToDto(this BusinessIntelligenceModel model)
         {
             DateTime CreateTime = DateTime.Now;
-            Core.BusinessIntelligenceDto dto = new Core.BusinessIntelligenceDto()
+            return new Core.BusinessIntelligenceDto()
             {
                 DatasetId = model.DatasetId,
                 DatasetCategoryIds = model.DatasetCategoryIds,
@@ -37,10 +36,6 @@ namespace Sentry.data.Web
                 TagIds = (model.TagIds == null) ? new List<string>() : model.TagIds?.Split(',').ToList(),
                 ContactIds = model.ContactIds.Where(w => !String.IsNullOrWhiteSpace(w)).ToList()
             };
-
-            ImagesToDto(model, dto);
-
-            return dto;
         }
 
 
@@ -114,75 +109,5 @@ namespace Sentry.data.Web
             };
         }
 
-        public static void ImagesToDto(BusinessIntelligenceModel model, Core.BusinessIntelligenceDto dto)
-        {
-            List<Core.ImageDto> imageArray = new List<Core.ImageDto>();
-
-            for (int i = 0; i < model.Images.Count; i++)
-            {
-                imageArray.Add(ToDto(model.Images[i], model.Images[i].ImageFileData, i));
-            }
-
-            //foreach (ImageModel item in model.Images)
-            //{
-            //    imageArray.Add(ToDto(item, item.ImageFileData, item.sortOrder));
-            //}
-
-            //if (model.ImageFile_1 != null || model.Images.Any(s => s.sortOrder == 1))
-            //{
-            //    imageArray.Add(ToDto(model.Images.FirstOrDefault(w => w.sortOrder == 1), model.ImageFile_1, 1));
-            //}
-            //if (model.ImageFile_2 != null || model.Images.Any(s => s.sortOrder == 2))
-            //{
-            //    imageArray.Add(ToDto(model.Images.FirstOrDefault(w => w.sortOrder == 2), model.ImageFile_2, 2));
-            //}
-            //if (model.ImageFile_3 != null || model.Images.Any(s => s.sortOrder == 3))
-            //{
-            //    imageArray.Add(ToDto(model.Images.FirstOrDefault(w => w.sortOrder == 3), model.ImageFile_3, 3));
-            //}
-
-            dto.Images = imageArray;
-        }
-
-        public static Core.ImageDto ToDto(ImageModel model, System.Web.HttpPostedFileBase imageFile, int sort, bool tempfile = false)
-        {
-            Core.ImageDto dto = ToDto(imageFile, model);
-            if (tempfile) { dto.GenerateStorageInfo(); }            
-            dto.sortOrder = sort;
-            return dto;
-        }
-
-        public static Core.ImageDto ToDto(System.Web.HttpPostedFileBase imageFile, ImageModel model)
-        {
-            Core.ImageDto dto = new Core.ImageDto();
-
-            dto.ImageId = model.ImageId;
-            dto.sortOrder = model.sortOrder;
-            dto.DeleteImage = model.deleteImage;
-            dto.UploadDate = DateTime.Now;
-
-            if (imageFile != null)
-            {
-                MemoryStream target = new MemoryStream();
-                imageFile.InputStream.CopyTo(target);
-                dto.Data = target.ToArray();
-                dto.FileName = imageFile.FileName;
-                dto.FileExtension = Path.GetExtension(imageFile.FileName);
-                dto.ContentType = imageFile.ContentType;
-                dto.FileLength = imageFile.ContentLength;
-                dto.UploadDate = DateTime.Now;
-            }
-            else
-            {
-                dto.FileName = model.FileName;
-                dto.FileExtension = model.FileExtension;
-                dto.ContentType = model.ContentType;
-                dto.StorageBucketName = model.StorageBucketName;
-                dto.StorageKey = model.StorageKey;
-                dto.StoragePrefix = model.StoragePrefix;
-            }
-
-            return dto;
-        }
     }
 }

@@ -142,10 +142,5 @@
             public const string DATASET_SEARCH = "Datasets";
         }
 
-        public static class StoragePrefixes
-        {
-            public const string DATASET_IMAGE_STORAGE_PREFIX = "images";
-        }
-
     }
 }

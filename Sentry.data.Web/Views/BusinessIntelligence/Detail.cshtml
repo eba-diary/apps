@@ -3,7 +3,7 @@
 @{
     ViewBag.Title = "View Report Details";
     var mailTo = "mailto:" + Model.PrimaryContactEmail + "?Subject=Dataset%20Inquiry%20-%20" + Model.DatasetName;
-}
+    }
 
 <a href="@Url.Action("BusinessIntelligence", "Search")" class="backToList" id="linkReturnToBusinessIntelligenceList"><span class="glyphicon glyphicon-chevron-left"></span>Back to list</a>
 
@@ -109,19 +109,7 @@
                     <div>
                         <div class="row">
                             <div class="col-lg-12">
-                                <ul class="row detail-thumbnail-list">
-                                    @foreach (var image in Model.Images)
-                                    {
-                                        <li class="col-md-4">
-                                            <a class="fancybox" data-fancybox="gallery" data-caption="Image"
-                                                href="@Url.Action("GetImage", "BusinessIntelligence", new { Area ="" , url= image.StorageKey })">
-                                                <div class="detail-thumbnail-container">
-                                                    <img class="img detail-thumbnail" src="@Url.Action("GetImage", "BusinessIntelligence", new { Area ="" , url=image.StorageKey, t=2 })" />
-                                                </div>                                                    
-                                            </a>                                           
-                                        </li>
-                                    }
-                                </ul>
+                                @* eventual home of thumbnails *@
                             </div>
                         </div>
                     </div>
@@ -212,12 +200,5 @@
 @section Scripts {
     @Scripts.Render("~/bundles/prettyCron")
     @Scripts.Render("~/bundles/dataTables")
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.css" />
-    <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.6/dist/jquery.fancybox.min.js"></script>
-    <script src="~/Scripts/jquery.fancybox.min.js"></script>
-    <script>
-        $(function () {
-            data.Report.DetailInit();
-        });
-    </script>
+    <script>$(function () { data.Report.DetailInit(); });</script>
 }

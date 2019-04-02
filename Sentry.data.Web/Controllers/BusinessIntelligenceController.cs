@@ -4,8 +4,6 @@ using Sentry.data.Core;
 using Sentry.data.Web.Helpers;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.SessionState;
 
@@ -207,40 +205,6 @@ namespace Sentry.data.Web.Controllers
             }
 
             return PartialView("_TagForm", model);
-        }
-
-        public ActionResult GetImage(string url, int? t)
-        {
-            if (url == null || !url.StartsWith("images/"))
-            {
-                return HttpNotFound();
-            }
-
-            byte[] img = _businessIntelligenceService.GetImageData(url, t);
-
-            return File(img, "image/jpg", "image_" + System.IO.Path.GetFileName(url));
-        }
-
-        public ActionResult UploadPreviewImage()
-        {
-            HttpFileCollectionBase Files;
-            Files = Request.Files;
-
-            
-            ImageDto dto = BusinessIntelligenceExtensions.ToDto(new ImageModel(), Files[0], 0, true);
-            bool result = _businessIntelligenceService.SaveTemporaryPreviewImage(dto);
-
-            ImageModel model = ImageExtensions.ToModel(dto);
-
-            return PartialView("_Images", model);
-            //return Json(model, JsonRequestBehavior.AllowGet);
-        }
-
-        public ActionResult NewImage(int index = 0)
-        {
-            ImageModel im = new ImageModel();
-            ViewData["index"] = index;
-            return PartialView("_Images", im);
         }
     }
 }
