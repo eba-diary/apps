@@ -308,6 +308,7 @@
     <Compile Include="Extensions\BusinessIntelligenceExtensions.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
     <Compile Include="Extensions\FavoriteExtensions.cs" />
+    <Compile Include="Extensions\ImageExtensions.cs" />
     <Compile Include="Extensions\Security\PermissionExtensions.cs" />
     <Compile Include="Extensions\Security\RequestAccessExtension.cs" />
     <Compile Include="Extensions\CategoryExtensions.cs" />
@@ -390,6 +391,7 @@
     <Compile Include="Models\Security\PermissionModel.cs" />
     <Compile Include="Models\Security\RequestAccessModel.cs" />
     <Compile Include="Models\Shared\CategoryModel.cs" />
+    <Compile Include="Models\Shared\ImageModel.cs" />
     <Compile Include="Models\Shared\SearchIndexModel.cs" />
     <Compile Include="Models\Tag\TagGroupModel.cs" />
     <Compile Include="Models\Tag\TagModel.cs" />
@@ -447,6 +449,7 @@
     <Content Include="js\QueryTool\SaveTo.js" />
     <Content Include="js\QueryTool\Startup.js" />
     <Content Include="js\Report.js" />
+    <Content Include="js\Shared\Images.js" />
     <Content Include="js\Shared\Tags.js" />
     <Content Include="readme.txt" />
     <Content Include="Scripts\bootstrap-datetimepicker.js" />
@@ -1267,6 +1270,8 @@
     <Content Include="Views\Shared\Forbidden.cshtml" />
     <Content Include="Views\Shared\_TagForm.cshtml" />
     <Content Include="Views\Shared\_Success.cshtml" />
+    <Content Include="Views\BusinessIntelligence\EditorTemplates\ImageModel.cshtml" />
+    <Content Include="Views\Shared\_Images.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
