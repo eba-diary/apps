@@ -41,6 +41,9 @@ data.Report = {
 
     FormInit: function (hrEmpUrl, hrEmpEnv) {
 
+        // Initialize Images for thumbnails
+        data.Images.InitImages();
+
         $("#DatasetCategoryIds").select2({
             placeholder:"Select Categories"
         });
@@ -136,11 +139,16 @@ data.Report = {
         
 
         data.Tags.initTags();
+        data.Images.InitImageUpload();
+        data.Images.InitImages();
     },
 
     DetailInit: function () {
 
         // Initialize the dataset detail page
+
+        // Initialize Images for thumbnails
+        data.Images.InitImages();
 
         $(".detailNameLink").click(function () {
             var artifactLink = $(this).data('artifactlink');

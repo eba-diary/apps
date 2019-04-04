@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
+using System.Web;
 using Sentry.data.Core;
 
 namespace Sentry.data.Web

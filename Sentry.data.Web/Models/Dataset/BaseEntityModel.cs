@@ -14,6 +14,7 @@ namespace Sentry.data.Web
             this.HrempServiceUrl = Configuration.Config.GetHostSetting("HrApiUrl");
             this.HrempServiceEnv = Configuration.Config.GetHostSetting("HrApiEnvironment");
             this.ContactIds = new List<string>();
+            this.Images = new List<ImageModel>();
         }
 
         public BaseEntityModel(BaseEntityDto dto)
@@ -54,6 +55,7 @@ namespace Sentry.data.Web
             this.ContactIds = dto.ContactIds;
             this.ContactDetails = dto.ContactDetails.ToModel();
             this.MailtoLink = dto.MailtoLink;
+            this.Images = dto.Images.ToModel();
         }
 
 
@@ -92,6 +94,8 @@ namespace Sentry.data.Web
 
         [DisplayName("Selected Contacts")]
         public List<ContactInfoModel> ContactDetails { get; set; }
+
+        public List<ImageModel> Images { get; set; }
 
 
         //Dropdown Lists
