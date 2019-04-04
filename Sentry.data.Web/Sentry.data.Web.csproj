@@ -317,7 +317,6 @@
     <Compile Include="Filters\AuthorizationFilters\AuthorizeHangfireDashboard.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeAttribute.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeByPermissionAttribute.cs" />
-    <Compile Include="Helpers\ImageExtensions.cs" />
     <Compile Include="Helpers\LivyHelper.cs" />
     <Compile Include="Helpers\BeginCollectionItem.cs" />
     <Compile Include="Helpers\PredicateBuilder.cs" />
@@ -413,8 +412,6 @@
     <Content Include="Content\favorites.css" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\home.css" />
-    <Content Include="Content\jquery.fancybox.css" />
-    <Content Include="Content\jquery.fancybox.min.css" />
     <Content Include="Content\query-builder.default.css" />
     <Content Include="Content\query-builder.default.min.css" />
     <Content Include="Content\query-tool.css" />
@@ -523,8 +520,6 @@
     <Content Include="Scripts\knockout-paging.js" />
     <Content Include="Scripts\knockout-sortable.min.js" />
     <Content Include="Scripts\later.js" />
-    <Content Include="Scripts\jquery.fancybox.js" />
-    <Content Include="Scripts\jquery.fancybox.min.js" />
     <Content Include="Scripts\prettycron.js" />
     <Content Include="Scripts\query-builder.js" />
     <Content Include="Scripts\query-builder.min.js" />
@@ -1174,7 +1169,6 @@
     <Content Include="Scripts\typeahead.jquery.js" />
     <Content Include="Scripts\typeahead.jquery.min.js" />
     <Content Include="Scripts\_references.js" />
-    <Content Include="Views\Shared\_Images.cshtml" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
@@ -1276,13 +1270,14 @@
     <Content Include="Views\Shared\Forbidden.cshtml" />
     <Content Include="Views\Shared\_TagForm.cshtml" />
     <Content Include="Views\Shared\_Success.cshtml" />
+    <Content Include="Views\BusinessIntelligence\EditorTemplates\ImageModel.cshtml" />
+    <Content Include="Views\Shared\_Images.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Images\Home\" />
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Views\Admin\DisplayTemplates\" />
-    <Folder Include="Views\BusinessIntelligence\EditorTemplates\" />
     <Folder Include="Views\ExternalFile\" />
     <Folder Include="Views\Lineage\" />
     <Folder Include="Views\Retriever\" />

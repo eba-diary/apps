@@ -54,6 +54,7 @@ namespace Sentry.data.Web
             this.Security =dto.Security.ToModel();
             this.ContactIds = dto.ContactIds;
             this.ContactDetails = dto.ContactDetails.ToModel();
+            this.MailtoLink = dto.MailtoLink;
             this.Images = dto.Images.ToModel();
         }
 

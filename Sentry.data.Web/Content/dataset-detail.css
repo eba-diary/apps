@@ -91,3 +91,8 @@
     color: gray;
     font-weight: bold;
 }
+
+.listDesc {
+    /*padding-top: 5px;*/
+    /*padding-bottom: 6px;*/
+}

@@ -147,7 +147,7 @@ namespace Sentry.data.Web
         public static Core.ImageDto ToDto(ImageModel model, System.Web.HttpPostedFileBase imageFile, int sort, bool tempfile = false)
         {
             Core.ImageDto dto = ToDto(imageFile, model);
-            if (tempfile) { dto.GenerateStorageInfo(); }            
+            if (tempfile) { dto.GenerateStorageInfo(); }
             dto.sortOrder = sort;
             return dto;
         }
@@ -184,5 +184,6 @@ namespace Sentry.data.Web
 
             return dto;
         }
+
     }
 }

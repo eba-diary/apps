@@ -17,8 +17,8 @@ namespace Sentry.data.Core
         private readonly UserService _userService;
         private readonly IS3ServiceProvider _s3ServiceProvider;
 
-        public BusinessIntelligenceService(IDatasetContext datasetContext, 
-            IEmailService emailService, ISecurityService securityService, 
+        public BusinessIntelligenceService(IDatasetContext datasetContext,
+            IEmailService emailService, ISecurityService securityService,
             UserService userService, IS3ServiceProvider s3ServiceProvider)
         {
             _datasetContext = datasetContext;
@@ -70,6 +70,7 @@ namespace Sentry.data.Core
             try
             {
                 CreateDataset(dto);
+
                 _datasetContext.SaveChanges();
             }
             catch (Exception ex)
@@ -92,8 +93,8 @@ namespace Sentry.data.Core
         {
             using (MemoryStream stream = new MemoryStream(dto.Data))
             {
-            dto.StorageETag = _s3ServiceProvider.UploadDataFile(stream, dto.StorageKey);
-            }       
+                dto.StorageETag = _s3ServiceProvider.UploadDataFile(stream, dto.StorageKey);
+            }
         }
 
         public bool UpdateAndSaveBusinessIntelligence(BusinessIntelligenceDto dto)
@@ -117,7 +118,7 @@ namespace Sentry.data.Core
 
         private void UpdateImages(BusinessIntelligenceDto dto, Dataset ds)
         {
-            
+
             Image curImage;
 
             //https://stackoverflow.com/questions/1582285/how-to-remove-elements-from-a-generic-list-while-iterating-over-it
@@ -168,6 +169,7 @@ namespace Sentry.data.Core
                 }
             }
         }
+
 
         public void Delete(int id)
         {
@@ -222,8 +224,13 @@ namespace Sentry.data.Core
 
                             _emailService.SendInvalidReportLocationEmail(dto, _userService.GetCurrentUser().DisplayName);
                         }
+                        else if (ex.Message.Contains("because it is being used by another process"))
+                        {
+                            Logger.Error("Exhibit validation OpenRead test could be executed, file in use", ex);
+                        }
                         else
                         {
+                            Logger.Error($"Exhibit Validation Exception - Creator:{dto.CreationUserId} ExhibitName:{dto.DatasetName}", ex);
                             errors.Add($"An error occured finding the file. Please verify the file path is correct or contact DSCSupport@sentry.com for assistance.");
                         }
                     }
@@ -270,7 +277,7 @@ namespace Sentry.data.Core
                 return false;
             }
 
-            return true;            
+            return true;
         }
 
 
@@ -389,11 +396,8 @@ namespace Sentry.data.Core
         private void CreateDataset(BusinessIntelligenceDto dto)
         {
             Dataset ds = MapDataset(dto, new Dataset());
-
             CreateDatasetFileConfig(dto, ds);
-
             _datasetContext.Add(ds);
-
             CreateImages(dto, ds);
         }
 
@@ -452,8 +456,8 @@ namespace Sentry.data.Core
                     Contacts = dto.ContactIds
                 }
             };
-            ds.Tags = _datasetContext.Tags.Where(x => dto.TagIds.Contains(x.TagId.ToString())).ToList();            
-                
+            ds.Tags = _datasetContext.Tags.Where(x => dto.TagIds.Contains(x.TagId.ToString())).ToList();
+
             return ds;
         }
 
@@ -516,6 +520,7 @@ namespace Sentry.data.Core
             dto.MailtoLink = "mailto:?Subject=Business%20Intelligence%20Exhibit%20-%20" + Uri.EscapeDataString(ds.DatasetName) + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/BusinessIntelligence/Detail/" + ds.DatasetId;
             dto.ReportLink = (ds.DatasetFileConfigs.First().FileTypeId == (int)ReportType.BusinessObjects && ds.Metadata.ReportMetadata.GetLatest) ? ds.Metadata.ReportMetadata.Location + GlobalConstants.BusinessObjectExhibit.GET_LATEST_URL_PARAMETER : ds.Metadata.ReportMetadata.Location;
             dto.ContactIds = (ds.Metadata.ReportMetadata.Contacts != null)? ds.Metadata.ReportMetadata.Contacts.ToList() : new List<string>();
+            dto.ContactDetails = (ds.Metadata.ReportMetadata.Contacts != null)? MapContactsToDto(ds.Metadata.ReportMetadata.Contacts) : new List<ContactInfoDto>();
             dto.Images = MapToDto(ds.Images);
         }
 
@@ -580,13 +585,13 @@ namespace Sentry.data.Core
                 UserDisplayName = user.DisplayName
             };
         }
-        
+
         private List<ImageDto> MapToDto(IList<Image> images)
         {
             List<ImageDto> dtoList = new List<ImageDto>();
             if (images != null)
             {
-                foreach(Image img in images)
+                foreach (Image img in images)
                 {
                     dtoList.Add(new ImageDto()
                     {
@@ -601,11 +606,11 @@ namespace Sentry.data.Core
                         StoragePrefix = img.StoragePrefix,
                         UploadDate = img.UploadDate
                     });
-                };                                 
+                };
             };
             return dtoList;
         }
-        
+
         #endregion
 
     }

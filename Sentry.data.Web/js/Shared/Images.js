@@ -1,6 +1,6 @@
 ﻿/******************************************************************************************
- * Javascript methods for the Images
- ******************************************************************************************/
+* Javascript methods for the Images
+******************************************************************************************/
 
 data.Images = {
 
@@ -12,6 +12,19 @@ data.Images = {
                 "close"
             ]
         });
+
+        //ensure all images marked for delete are hidden
+        $('.Image').each(function (index) {
+            var item = $(this);
+            var deleteVal = item.find('.mark-for-delete').val();
+            if (deleteVal === "True") {
+                item.hide();
+            }
+
+            if ($('.detail-thumbnail-list .Image:visible').length < 3) {
+                $('.add-thumbnail').show();
+            };
+        });        
     },
 
     InitImageUpload: function () {
@@ -94,7 +107,7 @@ data.Images = {
             else {
                 Sentry.ShowModalAlert("We only support jpeg and png image formats.");
             }
-        }); 
+        });
     },
 
     removeNestedForm: function (element, container, deleteElement) {
@@ -113,17 +126,17 @@ data.Images = {
         //Show add image button if visible images are less than 3
         if ($('.detail-thumbnail-list .Image:visible').length < 3) {
             $('.add-thumbnail').show("fast");
-        }; 
+        };
 
         // If file was just uploaded, we need to ensure file data is removed.
 
     },
 
-    addNestedForm: function(container, counter, ticks, content) {
-    var nextIndex = $(counter).length;
-    var pattern = new RegExp(ticks, "gi");
-    content = content.replace(pattern, nextIndex);
-    $(container).append(content);
-}
-    
+    addNestedForm: function (container, counter, ticks, content) {
+        var nextIndex = $(counter).length;
+        var pattern = new RegExp(ticks, "gi");
+        content = content.replace(pattern, nextIndex);
+        $(container).append(content);
+    }
+
 }

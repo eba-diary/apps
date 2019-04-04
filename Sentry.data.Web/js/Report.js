@@ -102,6 +102,8 @@ data.Report = {
         });
 
         $(document).on('click', '.contactinfo-remove', function (e) {
+            //e.StopPropagation();
+            //e.StopImmediatePropagation();
             e.preventDefault();
             //get parent div
             var parent = $(this).parent()[0];
@@ -133,6 +135,8 @@ data.Report = {
         $("#FileTypeId").change(function () {
             data.Report.SetGetLatestPanel($(this).val());
         });
+
+        
 
         data.Tags.initTags();
         data.Images.InitImageUpload();
@@ -199,7 +203,7 @@ data.Report = {
 
             var icon = $(this).children();
             $.ajax({
-                url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent($(this).data("id")),
+                url: '/Favorites/SetFavorite?datasetId=' + encodeURIComponent($(this).data("id")),
                 method: "GET",
                 dataType: 'json',
                 success: function () { icon.toggleClass("glyphicon-star glyphicon-star-empty"); },
