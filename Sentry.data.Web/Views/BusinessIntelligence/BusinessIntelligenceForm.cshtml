@@ -177,20 +177,16 @@
                     }
                 </div>
             </div>
-
-
             <br />
             <br />
 
+            @* Thumbnails *@
             <div class="form-group">
                 <span class="control-label col-md-2">Thumbnail Images</span>
                 <div class="col-md-10">
                     <div class="detail-thumbnail-list col-lg-10">
                         @if (Model.Images.Count == 3)
                         {
-                            @*<div class="col-md-2 add-thumbnail" style="display:none">
-                                    <button id="addNewImage" type="button" class="btn-success btn"><span class="glyphicon glyphicon-plus"></span> Add Image</button>
-                                </div>*@
                             <div class="col-md-2 add-thumbnail" style="display:none">
                                 <div class="image-upload-a">
                                     <button id="addNewImage" type="button" class="btn-success btn"><span class="glyphicon glyphicon-plus"></span> Add Image</button>
@@ -207,131 +203,13 @@
                                 </div>
                             </div>
                         }
-                        @*@for (int i = 0; i < Model.Images.Count; i++)
-                            {
-                                @Html.HiddenFor(model => model.Images[i].ImageId)
-                                @Html.Partial("_Images", Model.Images[i])
-                            }*@
-
-                        @* Thumbnails *@
-                        @*@foreach (var image in Model.Images)
-                            {
-                                @Html.Partial("_Images", image)
-                            }*@
-
-                        @*@Html.EditorFor(m => m.Images)*@
                         @foreach (ImageModel img in Model.Images)
                         {
                             @Html.Partial("_Images", img);
                         }
-
                     </div>
-
-                    @*@foreach (var image in Model.Images)
-                        {
-                            <div class="col-md-4">
-                                <div class="col-lg-12 fancybox-image-@image.sortOrder">
-                                    <a class="fancybox" data-fancybox="gallery" data-caption="Image @image.sortOrder" href="@Url.Action("GetImage", "BusinessIntelligence", new { Area ="" , url= image.StorageKey })"></a>
-                                    <div class="detail-thumbnail-container">
-                                        <img class="img detail-thumbnail" src="@Url.Action("GetImage", "BusinessIntelligence", new { Area ="" , url= image.StorageKey, t=2 })" />
-                                    </div>
-                                </div>
-
-                                <div class="image-upload col-md-12">
-                                    <input type="file" name="ImageFile_@image.sortOrder" id="files" />
-                                </div>
-                            </div>
-                        }
-                        <button id="addNewImage" type="button" class="btn-success btn"><span></span></button>*@
-
-                    @*<div class="col-md-4">
-                            @if (Model.Images != null && Model.Images.Any(s => s.sortOrder == 1))
-                            {
-                                <div class="col-lg-12 fancybox-image1">
-                                    <a class="fancybox" data-fancybox="gallery" data-caption="Image 1" href="@Url.Action("GetImage", "BusinessIntelligence", new { Area ="" , url= Model.Images[0].StorageKey })">
-                                        <div class="detail-thumbnail-container">
-                                            <img class="img detail-thumbnail" src="@Url.Action("GetImage", "BusinessIntelligence", new { Area ="" , url= Model.Images[0].StorageKey, t=2 })" />
-                                        </div>
-                                    </a>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="col-lg-12 fancybox-image@Model.Images[1].sortOrder" style="display:none">
-                                    <a class="fancybox" data-fancybox="gallery" data-caption="Image 1" href="@Url.Action("GetImage", "BusinessIntelligence", new { Area ="" , url= "" })">
-                                        <div class="detail-thumbnail-container">
-                                            <img class="img detail-thumbnail" src="@Url.Action("GetImage", "BusinessIntelligence", new { Area ="" , url= "", t=2 })" />
-                                        </div>
-                                    </a>
-                                </div>
-                            }
-                            <div class="image-upload col-md-12">
-                                <input type="file" name="ImageFile1" id="files" />
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            @if (Model.Images != null && Model.Images.Any(s => s.sortOrder == 2))
-                            {
-                                <div class="col-lg-12 fancybox-image2">
-                                    <a class="fancybox" data-fancybox="gallery" data-caption="Image 2" href="@Url.Action("GetImage", "BusinessIntelligence", new { Area ="" , url= Model.Images[1].StorageKey })">
-                                        <div class="detail-thumbnail-container">
-                                            <img class="img detail-thumbnail" src="@Url.Action("GetImage", "BusinessIntelligence", new { Area ="" , url= Model.Images[1].StorageKey, t=2 })" />
-                                        </div>
-                                    </a>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="col-lg-12 fancybox-image2" style="display:none">
-                                    <a class="fancybox" data-fancybox="gallery" data-caption="Image 2" href="@Url.Action("GetImage", "BusinessIntelligence", new { Area ="" , url= "" })">
-                                        <div class="detail-thumbnail-container">
-                                            <img class="img detail-thumbnail" src="@Url.Action("GetImage", "BusinessIntelligence", new { Area ="" , url= "", t=2 })" />
-                                        </div>
-                                    </a>
-                                </div>
-                            }
-                            <div class="image-upload col-md-12">
-                                <input type="file" name="ImageFile2" id="files" />
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            @if (Model.Images != null && Model.Images.Any(s => s.sortOrder == 3))
-                            {
-                                <div class="col-lg-12  fancybox-image3">
-                                    <a class="fancybox" data-fancybox="gallery" data-caption="Image 3" href="@Url.Action("GetImage", "BusinessIntelligence", new { Area ="" , url= Model.Images[2].StorageKey })">
-                                        <div class="detail-thumbnail-container">
-                                            <img class="img detail-thumbnail" src="@Url.Action("GetImage", "BusinessIntelligence", new { Area ="" , url= Model.Images[2].StorageKey, t=2 })" />
-                                        </div>
-                                    </a>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="col-lg-12  fancybox-image3" style="display:none">
-                                    <a class="fancybox" data-fancybox="gallery" data-caption="Image 3" href="@Url.Action("GetImage", "BusinessIntelligence", new { Area ="" , url= "" })">
-                                        <div class="detail-thumbnail-container">
-                                            <img class="img detail-thumbnail" src="@Url.Action("GetImage", "BusinessIntelligence", new { Area ="" , url= "", t=2 })" />
-                                        </div>
-                                    </a>
-                                </div>
-                            }
-                            <div class="image-upload col-md-12">
-                                <input type="file" name="ImageFile3" id="files" />
-                            </div>
-                        </div>*@
                 </div>
             </div>
-            @*<div class="col-md-12" id="PreviewBox_ImageFile1">
-                    <div class="col-md-4 detail-thumbnail-container">
-                        <img class="img detail-thumbnail thumbnail-preview-ImageFile1" src="" />
-                    </div>
-                </div>
-                <div class="image-upload col-md-12">
-                    <input type="file" name="ImageFile1" id="files" />
-                    <div class="image-box col-md-4">
-                    <label for="ImageFile1"><strong>Choose a file</strong><span class="box__dragndrop"> or drag it here</span>.</label>
-                </div>
-                </div>*@
         </div>
     </div>
 

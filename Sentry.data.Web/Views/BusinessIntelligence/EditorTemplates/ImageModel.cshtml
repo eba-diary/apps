@@ -2,7 +2,7 @@
 
 @using (Html.BeginCollectionItem("Images"))
 {
-    <div class="col-md-4">
+    @*<div class="col-md-4">
         @Html.HiddenFor(m => m.ImageId)
         @Html.HiddenFor(m => m.sortOrder)
         @Html.HiddenFor(m => m.StorageKey)
@@ -36,5 +36,5 @@
                 <input type="file" name="ImageFile_@ViewData["index"]" id="files" />
             </div>
         }
-    </div>
+    </div>*@
 }

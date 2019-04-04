@@ -12,6 +12,19 @@ data.Images = {
                 "close"
             ]
         });
+
+        //ensure all images marked for delete are hidden
+        $('.Image').each(function (index) {
+            var item = $(this);
+            var deleteVal = item.find('.mark-for-delete').val();
+            if (deleteVal === "True") {
+                item.hide();
+            }
+
+            if ($('.detail-thumbnail-list .Image:visible').length < 3) {
+                $('.add-thumbnail').show();
+            };
+        });        
     },
 
     InitImageUpload: function () {
