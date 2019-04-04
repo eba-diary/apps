@@ -181,10 +181,6 @@ namespace Sentry.data.Core
             {
                 ds.DatasetDtm = dto.DatasetDtm;
             }
-            if (null != dto.DatasetName && dto.DatasetName.Length > 0)
-            {
-                ds.DatasetName = dto.DatasetName;
-            }
             if (null != dto.PrimaryOwnerId && dto.PrimaryOwnerId.Length > 0)
             {
                 ds.PrimaryOwnerId = dto.PrimaryOwnerId;
