@@ -1070,10 +1070,10 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        [HttpGet()]
-        public ActionResult GetDatasetUploadPartialView(int datasetId)
+        [HttpGet]
+        [Route("Dataset/Upload/{datasetId}/Config/{configId}")]
+        public ActionResult Upload(int datasetId, int configId = 0)
         {
-
             UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
             if (!us.CanUploadToDataset)
             {
@@ -1084,10 +1084,8 @@ namespace Sentry.data.Web.Controllers
             //If a value was passed, load appropriate information
             if (datasetId != 0)
             {
-                cd = new CreateDataFileModel(_datasetService.GetDatasetDto(datasetId));
+                cd = new CreateDataFileModel(_datasetService.GetDatesetDetailDto(datasetId));
             }
-
-            ViewBag.Categories = Utility.GetCategoryList(_datasetContext);
 
             return PartialView("_UploadDataFile", cd);
         }
