@@ -1066,13 +1066,7 @@ data.Dataset = {
             columns: [
                 { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px", searchable: false },
                 { data: "ActionLinks", className: "downloadFile", width: "100px", searchable: false, orderable: false },
-                {
-                    data: "Name", width: "40%", className: "Name", render: function (data, type, row) {
-                        return "<a href = \"#\" onclick=\"data.Dataset.GetDatasetFileVersions(" + row.Id
-                            + ")\" title=\"View File Versions\">" + row.Name
-                            + "</a>";
-                    }
-                },
+                { data: "Name", className: "Name" },
                 { data: "UploadUserName", className: "UploadUserName" },
                 { data: "CreateDTM", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
                 { data: "ModifiedDTM", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
