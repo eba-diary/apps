@@ -484,6 +484,7 @@ namespace Sentry.data.Core
             dto.DatasetScopeTypeId = ds.DatasetFileConfigs.First().DatasetScopeType.ScopeTypeId;
             dto.CategoryName = ds.DatasetCategories.First().Name;
             dto.MailtoLink = "mailto:?Subject=Dataset%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/Dataset/Detail/" + ds.DatasetId;
+            dto.CategoryNames = ds.DatasetCategories.Select(s => s.Name).ToList();
         }
 
 

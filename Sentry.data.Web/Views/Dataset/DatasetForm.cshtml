@@ -37,6 +37,7 @@
             <div class="form-group">
                 @Html.LabelFor((model) => model.DatasetCategoryIds, new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
+                    @* Ensures Category cannot be changed on edit *@
                     @if (Model.DatasetId == 0)
                     {
                         <select id="DatasetCategoryIds" name="DatasetCategoryIds" class="form-control edit-dataset-row">
@@ -48,15 +49,13 @@
                     }
                     else
                     {
-                        @*@Html.DisplayFor(model => model.CategoryNames)*@
-                        
-                            var catNames = "";
-                            foreach (var item in Model.CategoryNames)
-                            {
-                                catNames = catNames + ", " + item;
-                            }
-                            @Html.DisplayText(catNames)
-                        
+                        for (int i = 0; i < Model.DatasetCategoryIds.Count; i++)
+                        {
+                            <input type="hidden" name="DatasetCategoryIds" value="@Model.DatasetCategoryIds[i]" />
+                        }
+                        <div class="textReadOnly">
+                            @Html.Raw(Sentry.data.Web.Helpers.Utility.FormatCategoryList(Model.CategoryNames))
+                        </div>
                     }
                 </div>
             </div>
@@ -65,6 +64,7 @@
             <div class="form-group">
                 @Html.LabelFor(model => model.DatasetName, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
+                    @* Ensures DatasetName cannot be changed on edit *@
                     @if (Model.DatasetId == 0)
                     {
                         @Html.EditorFor(model => model.DatasetName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
@@ -72,7 +72,7 @@
                     }
                     else
                     {
-                        <div class="nonEditible edit-dataset-row">
+                        <div class="textReadOnly">
                             @Html.HiddenFor(model => model.DatasetName)
                             @Html.DisplayFor(model => model.DatasetName)
                         </div>
