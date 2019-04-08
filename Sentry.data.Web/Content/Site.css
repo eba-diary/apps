@@ -2769,3 +2769,7 @@ tr.shown td.details-control {
         height: auto;
         top: auto;
     }
+
+.textReadOnly {
+    padding-top: 6px;
+}
