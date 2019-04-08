@@ -20,67 +20,38 @@
 
 
     <br />
-    @{
-        if (Model.dsID == 0)
-        {
-            <div class="form-group">
-                @Html.LabelFor(m => m.CategoryIDs, new { @class = "col-md-2 control-label" })
-                <div class="col-md-10">
-                    @Html.DropDownListFor((model) => model.CategoryIDs, new SelectList(ViewBag.Categories as
-                         System.Collections.IEnumerable, "Value", "Text"), new { id = "categoryList", @class = "form-control edit-dataset-row" })
-                </div>
-            </div>
 
-            <div class="form-group">
-                @Html.LabelFor(m => m.dsID, new { @class = "col-md-2 control-label" })
-                <div class="col-md-10">
-                    @Html.DropDownListFor((model) => model.dsID, new
-                         SelectList(Enumerable.Empty<SelectListItem>(), "Value", "Text"), new { id = "datasetList", @class = "form-control edit-dataset-row" })
-                </div>
-            </div>
-
-        }
-        else
-        {
-            <div class="form-group">
-                @Html.LabelFor(m => m.CategoryName, new { @class = "col-md-2 control-label" })
-                <div class="col-md-10">
-                    @Html.TextBoxFor(model => model.CategoryName, new { @disabled = "disabled", @class = "form-control edit-dataset-row" })
-                </div>
-            </div>
-            <div class="form-group">
-                @Html.LabelFor(m => m.dsID, new { @class = "col-md-2 control-label" })
-                <div class="col-md-10">
-                    @Html.TextBoxFor(model => model.DatasetName, new { @disabled = "disabled", @class = "form-control edit-dataset-row" })
-                </div>
-            </div>
-        }
-
-    }
-
-    <div class="form-group">
-        @Html.LabelFor(model => model.f, new { @class = "col-md-2 control-label" })
-        <div class="col-md-10">
-            <input type="file" class="edit-dataset-row file-load" id="DatasetFileUpload" />
-            @*@Html.HiddenFor(model => model.f)*@
-        </div>
-    </div>
+    @Html.HiddenFor(model => model.DatasetId)
 
     <div class="form-group">
         @Html.Label("Schema", new { @class = "col-md-2 control-label" })
-        <div class="col-md-10">
-            <select id="configList" class="form-control edit-dataset-row" />
+        <div class="col-lg-8 edit-dataset-row" >
+            <select class="form-control"
+                    id="configList" name="filterSelector">
+                @foreach (var a in Model.DatasetFileConfigNames)
+                {
+                    if (int.Parse(a.Key) == ViewBag.CurrentConfigId)
+                    {
+                        <option value="@a.Key" selected="selected">@a.Value</option>
+                    }
+                    else
+                    {
+                        <option value="@a.Key">@a.Value</option>
+                    }
+                }
+            </select>
         </div>
     </div>
 
-    <div>
-        <span id="configDescription" />
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="file" class="edit-dataset-row file-load" id="DatasetFileUpload" />
+        </div>
     </div>
 </div>
 
 
 <div class="modal-footer">
-    <button type="button" class="btn btn-primary" id="btnUploadFile" data-id="0">Upload Data File</button>
-    <button type="button" class="btn btn-primary" id="btnCreateDatasetAtUpload">Create New Dataset</button>
+    <button type="button" class="btn btn-primary" id="btnUploadFile" data-id="0" style="display:none">Upload Data File</button>
     <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
 </div>
