@@ -162,7 +162,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Inverse(true);
                 m.Table("Image");
                 m.Cascade(Cascade.DeleteOrphans);
-                m.Cache(c => c.Usage(CacheUsage.ReadWrite));
                 m.Key((k) =>
                 {
                     k.Column("ParentDataset");
