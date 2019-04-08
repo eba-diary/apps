@@ -7,7 +7,7 @@
 									(1, 2),
 									(2, 3),
 									(2, 4),
-									(2, 5)
+									(1, 5)
 								)
 								AS Source ([BusinessAreaTileRow_ID], [BusinessAreaTile_ID]) 
 
