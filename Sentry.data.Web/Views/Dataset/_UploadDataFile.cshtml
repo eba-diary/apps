@@ -30,7 +30,14 @@
                     id="configList" name="filterSelector">
                 @foreach (var a in Model.DatasetFileConfigNames)
                 {
-                    <option value="@a.Key">@a.Value</option>
+                    if (int.Parse(a.Key) == ViewBag.CurrentConfigId)
+                    {
+                        <option value="@a.Key" selected="selected">@a.Value</option>
+                    }
+                    else
+                    {
+                        <option value="@a.Key">@a.Value</option>
+                    }
                 }
             </select>
         </div>

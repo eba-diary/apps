@@ -599,7 +599,7 @@ data.Dataset = {
         var modal = Sentry.ShowModalWithSpinner("Upload Data File");
         //var createDatafileUrl = "/Dataset/GetDatasetUploadPartialView/?datasetId=" + encodeURI(id);
         var selectedConfig = $('#datasetConfigList').find(":selected").val();
-        var createDatafileUrl = "/Dataset/Upload/"+ encodeURI(id) + "/Config/" + encodeURI(id);
+        var createDatafileUrl = "/Dataset/Upload/" + encodeURI(id) + "/Config/" + encodeURI(selectedConfig);
 
         $.get(createDatafileUrl, function (e) {
             modal.ReplaceModalBody(e);
@@ -620,51 +620,13 @@ data.Dataset = {
         var idFromSelectList = $('#datasetConfigList').find(":selected").val();
         var dID;
 
-        //console.log(idFromSelectList + "," + dID);
-
         if (idFromSelectList === undefined) {
             dId = id;
         } else {
             dId = idFromSelectList;
         }
 
-        $("#categoryList").prepend($("<option />").val(0).html("-- Select a Category --"));
-
-        $("#categoryList").each(function (i) {
-            $(this).val(i);
-        });
-
         $('#btnUploadFile').prop("disabled", true);
-
-        if (id === 0 || id === 1) {
-            //Hide Create Button
-            $("#btnCreateDatasetAtUpload").prop("disabled", true);
-            $("#btnCreateDatasetAtUpload").hide();
-
-            //Hide File Upload
-            $("#DatasetFileUpload").prop("disabled", true);
-            $("#DatasetFileUpload").parent().parent().hide();
-
-            //Hide Dataset List
-            $("#datasetList").parent().parent().hide();
-
-            //Hide Configuration List
-            $('#configList').parent().parent().hide();
-            $("#configDescription").hide();
-        }
-        else {
-            //Hide Create Button
-            $("#btnCreateDatasetAtUpload").prop("disabled", true);
-            $("#btnCreateDatasetAtUpload").hide();
-
-            $('#configList').parent().parent().show();
-            $("#configDescription").show();
-
-            if (id > 0) {
-                //console.log('Main Loop');
-                getConfigs();
-            }
-        }
 
         $("[id^='btnUploadFile']").off('click').on('click', function () {
             $('#btnUploadFile').closest('.bootbox').hide();
@@ -682,9 +644,6 @@ data.Dataset = {
                 }
             });
 
-
-            //$('.modal-footer btn-success').prop("disabled", true);
-
             // This approach is from the following site:
             // http://www.c-sharpcorner.com/UploadFile/manas1/upload-files-through-jquery-ajax-in-Asp-Net-mvc/
             if (window.FormData !== undefined) {
@@ -701,17 +660,6 @@ data.Dataset = {
                 var token = $('input[name="__RequestVerificationToken"]').val();
 
                 var xhr = new XMLHttpRequest();
-                //modal.ReplaceModalBody('<p> Large files may take a long time to upload through the browser. </p>' +
-                //    '<p>Please do not close the window as your file is uploading. </p>' +
-                //    '<p> Progress: <span id=\'progressKB\'/></p>' +
-                //    '<h3><b><span id=\'percentTotal\'></span></b ></h3>' +
-                //    '<div>' +
-                //    '<div class="progress progress-striped active">' +
-                //    '<div class="progress-bar" id="progressBar"></div>' +
-                //    '</div>' +
-                //    '</div>'
-                //);
-
 
                 (xhr.upload || xhr).addEventListener('progress', function (e) {
                     var done = e.position || e.loaded;
@@ -756,114 +704,6 @@ data.Dataset = {
             else {
                 $("#btnUploadFile").prop("disabled", false);
                 $('#btnUploadFile').show();
-            }
-        });
-
-        function getConfigs() {
-            var idFromSelectList = $('#datasetList').find(":selected").val();
-            var dID;
-
-            if (idFromSelectList === undefined) {
-                dID = id;
-            } else {
-                dID = idFromSelectList;
-            }
-
-            var controllerURL = "/Dataset/GetDatasetFileConfigInfo/?id=" + encodeURI(dID);
-            $.get(controllerURL, function (result) {
-                configs = result;
-                var select = $("#configList");
-
-                select.empty();
-
-                var fileUpload = $("#DatasetFileUpload").get(0);
-                var files = fileUpload.files;
-
-                if (files.length > 0) {
-
-                    var matchFound = false;
-                    var indexes = [];
-                    var matchIndex;
-                    var amountMatched = 0;
-                    var j;
-
-                    var extension = files[0].name.substr(files[0].name.lastIndexOf('.') + 1);  //https://stackoverflow.com/questions/3042312/jquery-find-file-extension-from-string
-
-                    for (i = 1; i < configs.length; i++) {
-                        for (j = 0; j < configs[i].SearchCriteria.length; j++) {
-                            if (configs[i].FileExtension.Name.toLowerCase().trim() === 'any' || configs[i].FileExtension.Name.toLowerCase().trim() === extension.toLowerCase()) {
-                                if (configs[i].IsRegexSearch[j] && files[0].name.match(configs[i].SearchCriteria[j])) {
-                                    if (indexes.indexOf(i) === -1) {
-                                        if (!matchFound) {
-                                            matchIndex = i;
-                                            matchFound = true;
-                                        }
-
-                                        select.append($('<option/>', {
-                                            value: configs[i].ConfigId,
-                                            selected: matchIndex === i ? true : false,
-                                            text: configs[i].ConfigFileName
-                                        }));
-
-                                        indexes.push(i);
-                                        amountMatched++;
-                                    }
-                                }
-                                else if (!configs[i].IsRegexSearch[j] && files[0].name === configs[i].SearchCriteria[j]) {
-                                    if (indexes.indexOf(i) === -1) {
-                                        if (!matchFound) {
-                                            matchIndex = i;
-                                            matchFound = true;
-                                        }
-
-                                        select.append($('<option/>', {
-                                            value: configs[i].ConfigId,
-                                            selected: matchIndex === i ? true : false,
-                                            text: configs[i].ConfigFileName
-                                        }));
-
-                                        indexes.push(i);
-                                        amountMatched++;
-                                    }
-                                }
-                            }
-                        }
-                    }
-
-                    if (matchFound) {
-                        $("#configDescription").html(configs[matchIndex].ConfigFileDesc);
-
-                        if (amountMatched > 1) {
-                            $("#configList").prop('disabled', false);
-                        }
-                        $('#btnUploadFile').prop("disabled", false);
-                    }
-                    else {
-                        select.append($('<option/>', {
-                            value: configs[0].ConfigId,
-                            selected: true,
-                            text: configs[0].ConfigFileName
-                        }));
-                        $("#configList").prop('disabled', false);
-                        $('#btnUploadFile').prop("disabled", false);
-                        $("#configDescription").html(configs[0].ConfigFileDesc);
-                    }
-                } else {
-                    $("#configList").prop('disabled', true);
-                    $('#btnUploadFile').prop("disabled", true);
-                    $("#configDescription").html("Please choose a file from the Choose File button.");
-                }
-            });
-        }
-
-        $("#configList").change(function () {
-            var configID = $(this).val();
-
-            for (i = 0; i < configs.length; i++) {
-                if (configs[i].ConfigId === configID) {
-                    $("#configDescription").html(configs[i].ConfigFileDesc);
-                    break;
-                }
             }
         });
     },

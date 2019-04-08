@@ -1087,6 +1087,8 @@ namespace Sentry.data.Web.Controllers
                 cd = new CreateDataFileModel(_datasetService.GetDatesetDetailDto(datasetId));
             }
 
+            ViewBag.CurrentConfigId = configId;
+
             return PartialView("_UploadDataFile", cd);
         }
 
