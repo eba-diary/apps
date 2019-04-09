@@ -33,7 +33,6 @@ DECLARE @ErrorMessage NVARCHAR(4000);
 DECLARE @ErrorSeverity INT; 
 DECLARE @ErrorState INT; 
 
-DECLARE @ScriptVersion AS VARCHAR(50) 
 SET @ScriptVersion = '2019.02.4_01_PostDeploy'
 
 
