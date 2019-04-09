@@ -43,10 +43,14 @@
             public const string VIEWED_REPORT = "Viewed Report";
             public const string CREATED_REPORT = "Created Report";
             public const string UPDATED_REPORT = "Updated Report";
+            public const string DELETED_REPORT = "Deleted Report";
 
             public const string VIEWED_DATASET = "Viewed Dataset";
             public const string CREATED_DATASET = "Created Dataset";
             public const string UPDATED_DATASET = "Updated Dataset";
+
+            public const string CREATED_TAG = "Created Tag";
+            public const string UPDATED_TAG = "Updated Tag";
         }
 
         public static class Statuses
@@ -132,6 +136,17 @@
         public static class ConvertedFileStoragePrefix
         {
             public const string PARQUET_STORAGE_PREFIX = "parquet";
+        }
+
+        public static class SearchType
+        {
+            public const string BUSINESS_INTELLIGENCE_SEARCH = "BusinessIntelligence";
+            public const string DATASET_SEARCH = "Datasets";
+        }
+
+        public static class StoragePrefixes
+        {
+            public const string DATASET_IMAGE_STORAGE_PREFIX = "images";
         }
 
     }

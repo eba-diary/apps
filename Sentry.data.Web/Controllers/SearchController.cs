@@ -40,6 +40,8 @@ namespace Sentry.data.Web.Controllers
         private IAppCache _cache;
         private IRequestContext _requestContext;
 
+        private string Title { get; set; }
+
         public SearchController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, ISASService sasService, IAssociateInfoProvider associateInfoService, IRequestContext requestContext)
         {
             _cache = new CachingService();
@@ -64,6 +66,20 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Index(string searchType, string category, string searchPhrase, string ids)
         {
             SearchIndexModel model = new SearchIndexModel();
+
+            switch (searchType)
+            {
+                case GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH:
+                    ViewBag.Title = "Business Intelligence";
+                    break;
+                case GlobalConstants.SearchType.DATASET_SEARCH:
+                    ViewBag.Title = "Dataset";
+                    break;
+                default:
+                    ViewBag.Title = "Search";
+                    break;
+            }            
+
             return View(model);
         }
 
@@ -140,7 +156,8 @@ namespace Sentry.data.Web.Controllers
                 SearchModel sm = new SearchModel(ds, _associateInfoProvider)
                 {
                     IsFavorite = ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId),
-                    PageViews = events.Count(x => x.Dataset == ds.DatasetId)
+                    PageViews = events.Count(x => x.Dataset == ds.DatasetId),
+                    CanEditDataset = (searchType == GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH) ? SharedContext.CurrentUser.CanManageReports : false
                 };
                 models.Add(sm);
             }

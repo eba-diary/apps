@@ -62,8 +62,7 @@ namespace Sentry.data.Core
         {
             //get all datasets where the there is a CanQueryData permission on the security
             //OR all public datasets (no security object)
-            var query = _datasetContext.Datasets.Where(x => x.DatasetType == GlobalConstants.DataEntityCodes.DATASET &&
-                                                                                        (x.Security == null || x.Security.Tickets.Any(y => y.Permissions.Any(z => z.Permission.PermissionCode == GlobalConstants.PermissionCodes.CAN_QUERY_DATASET && z.IsEnabled))));
+            var query = _datasetContext.Datasets.Where(x => x.DatasetType == GlobalConstants.DataEntityCodes.DATASET && x.CanDisplay);
 
             query.FetchMany(x => x.DatasetCategories).ToFuture();
             List<Dataset> datasets = query.FetchSecurityTree(_datasetContext);
@@ -182,10 +181,6 @@ namespace Sentry.data.Core
             {
                 ds.DatasetDtm = dto.DatasetDtm;
             }
-            if (null != dto.DatasetName && dto.DatasetName.Length > 0)
-            {
-                ds.DatasetName = dto.DatasetName;
-            }
             if (null != dto.PrimaryOwnerId && dto.PrimaryOwnerId.Length > 0)
             {
                 ds.PrimaryOwnerId = dto.PrimaryOwnerId;
@@ -262,7 +257,17 @@ namespace Sentry.data.Core
             {
                 errors.Add("File Extension Delimited is missing it's delimiter.");
             }
-            
+
+            if (String.IsNullOrWhiteSpace(dto.PrimaryOwnerId))
+            {
+                errors.Add("Owner is requried.");
+            }
+
+            if (String.IsNullOrWhiteSpace(dto.PrimaryContactId))
+            {
+                errors.Add("Contact is requried.");
+            }
+
             return errors;
         }
 
@@ -479,6 +484,7 @@ namespace Sentry.data.Core
             dto.DatasetScopeTypeId = ds.DatasetFileConfigs.First().DatasetScopeType.ScopeTypeId;
             dto.CategoryName = ds.DatasetCategories.First().Name;
             dto.MailtoLink = "mailto:?Subject=Dataset%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/Dataset/Detail/" + ds.DatasetId;
+            dto.CategoryNames = ds.DatasetCategories.Select(s => s.Name).ToList();
         }
 
 

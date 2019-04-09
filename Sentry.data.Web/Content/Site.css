@@ -83,7 +83,79 @@ ul.list-group-indented {
 }
 
 /*#endregion MainPage - Favorites*/
+/*#region BusinessIntelligenceForm*/
+.box__dragndrop,
+.box__uploading,
+.box__success,
+.box__error {
+    display: none;
+}
 
+.image-box {
+    background-color: #c8dadf;
+    position: relative;
+    padding: 40px 20px;
+}
+
+.box__file {
+    width: 0.1px;
+    height: 6.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+    .box__file + label {
+        max-width: 80%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        cursor: pointer;
+        display: inline-block;
+        overflow: hidden;
+    }
+
+.box_button {
+    font-weight: 700;
+    color: #e5edf1;
+    background-color: #39bfd3;
+    display: none;
+    padding: 8px 16px;
+    margin: 40px auto 0;
+}
+
+.image-box.has-advanced-upload .box__icon {
+    width: 100%;
+    height: 80px;
+    fill: #92b0b3;
+    display: block;
+    font-size: 40px;
+    align-content: center;
+}
+
+.image-box.has-advanced-upload {
+    outline: 2px dashed black;
+    outline-offset: -10px;
+}
+
+    .image-box.has-advanced-upload .box__dragndrop {
+        display: inline;
+    }
+
+.image-box.is-dragover {
+    background-color: grey;
+}
+
+.image-upload {
+    width: 0px;
+    height: 0px;
+    overflow: hidden;
+}
+/*.box__file:focus + label,
+.box__file + label:hover {
+    background-color: red;
+}*/
+/*#endregion BusinessIntelligenceForm*/
 /* hide selected select2 tags, all over */
 .select2-results__option[aria-selected=true] {
     display: none;
@@ -383,19 +455,15 @@ div[id*="filterType_"]:hover {
     /*background-color: white;*/
 }
 
-    .ul-dataset-list-item:nth-child(even) {
-        background-color: #FFFFFF;
-    }
-
-    .ul-dataset-list-item:nth-child(odd) {
-        background-color: #F7F8FF;
-    }
-
-.dataset-list-content {
-    width: 90%;
-    margin-left: 3px;
-    padding: 2px 0;
+.ul-dataset-list-item:nth-child(even) {
+    background-color: #FFFFFF;
 }
+
+.ul-dataset-list-item:nth-child(odd) {
+    background-color: #F7F8FF;
+}
+
+
 
 .ownerDate {
     padding: 4px 0;
@@ -403,11 +471,6 @@ div[id*="filterType_"]:hover {
 
 .spacer {
     width: 25px;
-}
-
-.listDesc {
-    padding-top: 5px;
-    padding-bottom: 6px;
 }
 
 /* wrap the upper-right of each row in the list */
@@ -848,6 +911,32 @@ tr.categoryBanner-darkgray th.sorting_desc {
     height: inherit;
 }
 
+.detail-thumbnail-container {
+    width: 208px;
+    height: 180px;
+    border: 1px;
+    border-color: #DDDDDD;
+    border-style: solid;
+    box-shadow: 5px 5px 3px lightgrey;
+}
+
+.detail-thumbnail {
+    padding: 5px;
+    min-width: 204px;
+    min-height: 178px;
+    position: absolute;
+    clip: rect(0, 201px, 174px, 0);
+}
+
+.detail-thumbnail-list {
+    list-style-type: none;
+    padding-left: 0px;
+}
+
+    .detail-thumbnail-list ul {
+        list-style: none;
+    }
+
 /*Would be used for the side filter bar when screen is small*/
 /* The side navigation menu */
 .sidenav {
@@ -1100,7 +1189,7 @@ tr.categoryBanner-darkgray th.sorting_desc {
 
 .searchBoxDS {
     display: inline-block;
-    width: 90% !important;
+    width: 100% !important;
     margin-bottom: 3em;
     margin-top: 0.5em;
 }
@@ -1128,6 +1217,32 @@ tr.categoryBanner-darkgray th.sorting_desc {
     text-align: center;
     border-radius: 5px;
     margin: 5px;
+}
+
+.contacts-block {
+    background-color: #e4e4e4;
+    display: inline-block;
+    padding: 5px 5px;
+    text-align: center;
+    border-radius: 5px;
+    margin: 5px;
+    border: 1px solid #aaa;
+}
+
+.contactinfo-remove {
+    color: #999;
+    cursor: pointer;
+    display: inline-block;
+    font-weight: bold;
+    margin-right: 5px;
+}
+
+.contactSearch {
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    min-height: 32px;
+    padding-left: 8px;
+    width: 200px;
 }
 
 .bg_gray {
@@ -2123,10 +2238,6 @@ tr.categoryBanner-darkgray th.sorting_desc {
         width: 50px;
     }
 
-    .searchBoxDS {
-        width: 650px !important;
-    }
-
     .ownerDate {
         /*float: right;*/
         text-align: right;
@@ -2624,7 +2735,14 @@ tr.shown td.details-control {
     margin-bottom: 30px;
     border: 1px solid red;
     padding: 5px;
-    color:red;
+    color: red;
+}
+
+.tagFormErrorBox {
+    margin-bottom: 30px;
+    border: 1px solid red;
+    padding: 5px;
+    color: red;
 }
 
 .hero-media .container {
@@ -2651,3 +2769,7 @@ tr.shown td.details-control {
         height: auto;
         top: auto;
     }
+
+.textReadOnly {
+    padding-top: 6px;
+}

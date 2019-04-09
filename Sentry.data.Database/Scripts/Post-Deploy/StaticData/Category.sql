@@ -14,7 +14,7 @@
 									(9, 'Claims', NULL, 'gold', 'RPT', NULL),
 									(10, 'Corporate', NULL, 'green', 'RPT', NULL),
 									(11, 'IT', NULL, 'plum', 'RPT', NULL),
-									(12, '401k', NULL, 'blue', 'RPT', NULL)
+									(12, 'Life and Annuities', NULL, 'blue', 'RPT', 'LA')
 								)
 								AS Source ([Id], [Name], ParentCategory, Color, Object_TYP, AbbreviatedName) 
 

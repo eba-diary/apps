@@ -74,6 +74,7 @@ namespace Sentry.data.Core
                 return DatasetFileConfigs.Select(x => x.DatasetScopeType).GroupBy(x => x.Name).Select(x => x.First()).ToList();
             }
         }
+        public virtual IList<Image> Images { get; set; }
 
 
         //ISecurable Impl.

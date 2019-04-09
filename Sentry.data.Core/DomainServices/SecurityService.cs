@@ -90,7 +90,7 @@ namespace Sentry.data.Core
             {
                 CanEditDataset = (user.CanModifyDataset && IsOwner) || IsAdmin,
                 CanCreateDataset = user.CanModifyDataset || IsAdmin,
-                CanEditReport = (user.CanManageReports && IsOwner) || IsAdmin,
+                CanEditReport = user.CanManageReports || IsAdmin,
                 CanCreateReport = user.CanManageReports || IsAdmin
             };
 

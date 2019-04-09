@@ -154,6 +154,19 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 });
             }, map => map.OneToMany(a => a.Class(typeof(Favorite))));
 
+            this.Bag(x => x.Images, (m) =>
+            {
+                m.Lazy(CollectionLazy.Lazy);
+                m.Inverse(true);
+                m.Table("Image");
+                m.Cascade(Cascade.DeleteOrphans);
+                m.Key((k) =>
+                {
+                    k.Column("ParentDataset");
+                    k.ForeignKey("FK_Image_Dataset");
+                });
+            }, map => map.OneToMany(a => a.Class(typeof(Image))));
+
 
             //ISecurable Mapping
             this.Property((x) => x.IsSecured, (m) => m.Column("IsSecured_IND"));

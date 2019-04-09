@@ -20,7 +20,10 @@
 									(15, 'Updated Report', 1,0),
 									(16, 'Updated Dataset', 1,0),
 									(17, 'Viewed Report', 1,0),
-									(18, 'Viewed Dataset', 1,0)
+									(18, 'Viewed Dataset', 1,0),
+									(19, 'Created Tag', 1,0),
+									(20, 'Updated Tag', 1,0),
+									(21, 'Deleted Report', 1,0)
 								)
 								AS Source ([Type_ID], [Description], Severity, Display_IND) 
 
