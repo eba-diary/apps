@@ -28,7 +28,7 @@ namespace Sentry.data.Core
         public virtual string Description { get; set; }
         public virtual string MetadataRepAssetName { get; set; }
         public virtual IList<AssetSource> AssetSource{ get; set;}
-        public virtual IList<AssetNotifications> AssetNotifications { get; set; }
+        public virtual IList<Notification> AssetNotifications { get; set; }
 
         //ISecurable
         public virtual bool IsSecured { get; set; }

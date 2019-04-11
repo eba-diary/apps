@@ -64,7 +64,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                     k.Column("DataAsset_ID");
                     k.ForeignKey("FK_AssetNotifications_DataAsset");
                 });
-            }, map => map.OneToMany(a => a.Class(typeof(AssetNotifications))));
+            }, map => map.OneToMany(a => a.Class(typeof(Notification))));
 
 
             //ISecurable Mapping

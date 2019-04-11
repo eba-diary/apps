@@ -12,7 +12,7 @@ namespace Sentry.data.Core
 
         IQueryable<Dataset> Datasets { get; }
         IQueryable<DataAsset> DataAsset { get; }
-        IQueryable<AssetNotifications> Notification { get; }
+        IQueryable<Notification> Notification { get; }
         IQueryable<DatasetFileConfig> DatasetFileConfigs { get; }
         IQueryable<SecurityTicket> HpsmTickets { get; }
         IQueryable<Security> Security { get; }
@@ -43,6 +43,7 @@ namespace Sentry.data.Core
         IQueryable<ApplicationConfiguration> ApplicationConfigurations { get; }
         IQueryable<Favorite> Favorites { get; }
         IQueryable<BusinessAreaTileRow> BusinessAreaTileRows { get; }
+        IQueryable<BusinessArea> BusinessAreas { get; }
 
         IQueryable<RetrieverJob> RetrieverJob { get; }
         /** Datasets **/

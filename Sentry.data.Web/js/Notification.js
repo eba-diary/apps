@@ -46,7 +46,7 @@ data.Notification = {
                 { data: null, className: "details-control", orderable: false, defaultContent: "", width: "20px" },
                 { data: null, className: "editConfig", width: "20px", render: function (data) { return data.CanEdit ? '<a href=/Notification/ModifyNotification?notificationId=' + data.NotificationId + '\>Edit</a>' : ''; } },
                 { data: "IsActive", className: "isActive", render: function (data) { return data === true ? 'Yes' : 'No'; } },
-                { data: "DataAssetName", className: "parentDataAssetName" },
+                { data: "ObjectName", className: "parentDataAssetName" },
                 { data: "CreateUser", className: "displayCreateUser" },
                 { data: "StartTime", className: "startTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
                 { data: "ExpirationTime", className: "expirationTime", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },

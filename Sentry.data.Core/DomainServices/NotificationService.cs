@@ -51,7 +51,7 @@ namespace Sentry.data.Core
             }
             else
             {
-                model = _domainContext.Notification.Fetch(x => x.ParentDataAsset).FirstOrDefault(x => x.NotificationId == notificationId).ToModel();
+                model = _domainContext.Notification.Fetch(x => x.ParentObject).FirstOrDefault(x => x.NotificationId == notificationId).ToModel();
             }
             return model;
         }
@@ -60,17 +60,18 @@ namespace Sentry.data.Core
         {
             NotificationModel model = GetNotificationModelForDisplay(notificationId);
             model.AllDataAssets = GetAssetsForUserSecurity();
+            model.AllBusinessAreas = GetBusinessAreasForUserSecurity();
             return model;
         }
 
         public void SubmitNotification(NotificationModel model)
         {
-            AssetNotifications an = null;
+            Notification an = null;
+
             if (model.NotificationId == 0)
             {
                 an = model.ToCore();
                 an.CreateUser = _userService.GetCurrentUser().AssociateId;
-                an.ParentDataAsset = _domainContext.DataAsset.FirstOrDefault(x => x.Id == model.DataAssetId);
                 _domainContext.Add(an);
             }
             else
@@ -80,7 +81,7 @@ namespace Sentry.data.Core
                 an.StartTime = model.StartTime;
                 an.MessageSeverity = model.MessageSeverity;
                 an.Message = model.Message;
-                an.ParentDataAsset = _domainContext.DataAsset.FirstOrDefault(x => x.Id == model.DataAssetId);
+                an.ParentObject = model.ObjectId;
             }
 
             _domainContext.SaveChanges();
@@ -88,24 +89,61 @@ namespace Sentry.data.Core
 
         public List<NotificationModel> GetNotificationsForDataAsset()
         {
+            throw new NotImplementedException();
+            //List<NotificationModel> models = new List<NotificationModel>();
+            //List<Notification> notifications = _domainContext.Notification.Fetch(x=> x.ParentObject).ThenFetch(x=> x.Security).ThenFetchMany(x=> x.Tickets).ToList();
+
+            //foreach(var notification in notifications)
+            //{
+            //    NotificationModel model = notification.ToModel();
+            //    IApplicationUser user = _userService.GetByAssociateId(notification.CreateUser);
+            //    try
+            //    {
+            //        model.CreateUser = user.DisplayName;
+            //    }catch(Exception ex)
+            //    {
+            //        Common.Logging.Logger.Error($"Could not get user by Id: {notification.CreateUser}", ex);
+            //    }
+
+            //    //UserSecurity us = _securityService.GetUserSecurity(notification.ParentObject, user);
+            //    //model.CanEdit = us.CanModifyNotifications;
+
+            //    models.Add(model);
+            //}
+
+            //return models;
+        }
+
+        public List<NotificationModel> GetNotificationForBusinessArea();
+
+        public List<NotificationModel> GetAllNotifications()
+        {
             List<NotificationModel> models = new List<NotificationModel>();
-            List<AssetNotifications> notifications = _domainContext.Notification.Fetch(x=> x.ParentDataAsset).ThenFetch(x=> x.Security).ThenFetchMany(x=> x.Tickets).ToList();
+            List<Notification> notifications = _domainContext.Notification.ToList();
+            IApplicationUser user = _userService.GetCurrentUser();
 
-            foreach(var notification in notifications)
-            {
+            foreach (var notification in notifications)
+            {                
                 NotificationModel model = notification.ToModel();
-                IApplicationUser user = _userService.GetByAssociateId(notification.CreateUser);
-                try
+
+                switch (model.NotificationType)
                 {
-                    model.CreateUser = user.DisplayName;
-                }catch(Exception ex)
-                {
-                    Common.Logging.Logger.Error($"Could not get user by Id: {notification.CreateUser}", ex);
+                    case GlobalConstants.Notifications.DATAASSET_TYPE:
+                        DataAsset da = _domainContext.GetById<DataAsset>(notification.ParentObject);
+                        model.ObjectName = da.DisplayName;
+                        UserSecurity us = _securityService.GetUserSecurity(da, user);
+                        model.CanEdit = us.CanModifyNotifications;
+                        break;
+                    case GlobalConstants.Notifications.BUSINESSAREA_TYPE:
+                        BusinessArea ba = _domainContext.GetById<BusinessArea>(notification.ParentObject);
+                        model.ObjectName = ba.Name;
+                        //UserSecurity us = _securityService.GetUserSecurity(notification.ParentObject, user);
+                        //model.CanEdit = us.CanModifyNotifications;
+                        model.CanEdit = true;
+                        break;
+                    default:
+                        break;
                 }
-
-                UserSecurity us = _securityService.GetUserSecurity(notification.ParentDataAsset, user);
-                model.CanEdit = us.CanModifyNotifications;
-
                 models.Add(model);
             }
 
@@ -141,6 +179,13 @@ namespace Sentry.data.Core
             }
 
             return assetsWithPermission;
+        }
+
+        public List<BusinessArea> GetBusinessAreasForUserSecurity()
+        {
+            List<BusinessArea> baList = _domainContext.BusinessAreas.ToList();
+
+            return baList;
         }
 
         public List<Permission> GetPermissionsForAccessRequest()

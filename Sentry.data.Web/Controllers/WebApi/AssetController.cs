@@ -54,13 +54,14 @@ namespace Sentry.data.Web.Controllers
 
             try
             {
-                AssetNotifications an = new AssetNotifications()
+                Notification an = new Notification()
                 {
                     Message = message,
                     StartTime = DateTime.Now,
                     ExpirationTime = DateTime.MaxValue,
                     MessageSeverity = (NotificationSeverity)Enum.ToObject(typeof(NotificationSeverity), severity),
-                    ParentDataAsset = _dataAssetContext.GetDataAsset(assetName)
+                    ParentObject = _dataAssetContext.GetDataAsset(assetName).Id,
+                    NotificationType = Core.GlobalConstants.Notifications.DATAASSET_TYPE
                 };
 
                 if (String.IsNullOrWhiteSpace(userName))
@@ -79,7 +80,7 @@ namespace Sentry.data.Web.Controllers
                     an.CreateUser = userName;
                 }
 
-                _dataAssetContext.Merge<AssetNotifications>(an);
+                _dataAssetContext.Merge<Notification>(an);
                 _dataAssetContext.SaveChanges();
             }
             catch (Sentry.Core.ValidationException ex)
@@ -104,12 +105,12 @@ namespace Sentry.data.Web.Controllers
         [Route("expireAlerts/users/{userName}")]
         public IHttpActionResult ExpireAlertsByUser(string userName)
         {
-            List<AssetNotifications> userAlerts = _dataAssetContext.GetAllAssetNotifications().Where(w => w.CreateUser == userName && w.ExpirationTime > DateTime.Now).ToList();
+            List<Notification> userAlerts = _dataAssetContext.GetAllAssetNotifications().Where(w => w.CreateUser == userName && w.ExpirationTime > DateTime.Now).ToList();
 
-            foreach (AssetNotifications alert in userAlerts)
+            foreach (Notification alert in userAlerts)
             {
                 alert.ExpirationTime = DateTime.Now;
-                _dataAssetContext.Merge<AssetNotifications>(alert);
+                _dataAssetContext.Merge<Notification>(alert);
             }
 
             _dataAssetContext.SaveChanges();
@@ -139,12 +140,12 @@ namespace Sentry.data.Web.Controllers
 
             try
             {
-                List<AssetNotifications> assetAlerts = _dataAssetContext.GetAllAssetNotifications().Where(w => w.ParentDataAsset == asset && w.ExpirationTime > DateTime.Now).ToList();
+                List<Notification> assetAlerts = _dataAssetContext.GetAllAssetNotifications().Where(w => w.ParentObject == asset.Id && w.ExpirationTime > DateTime.Now).ToList();
 
-                foreach (AssetNotifications alert in assetAlerts)
+                foreach (Notification alert in assetAlerts)
                 {
                     alert.ExpirationTime = DateTime.Now;
-                    _dataAssetContext.Merge<AssetNotifications>(alert);
+                    _dataAssetContext.Merge<Notification>(alert);
                 }
 
                 _dataAssetContext.SaveChanges();
@@ -168,16 +169,16 @@ namespace Sentry.data.Web.Controllers
             {
                 switch (vr.Id)
                 {
-                    case AssetNotifications.ValidationErrors.emptyCreateUser:
+                    case Notification.ValidationErrors.emptyCreateUser:
                         ModelState.AddModelError("CreateUser", vr.Description);
                         break;
-                    case AssetNotifications.ValidationErrors.expireDateBeforeStartDate:
+                    case Notification.ValidationErrors.expireDateBeforeStartDate:
                         ModelState.AddModelError("ExpirationDate", vr.Description);
                         break;
-                    case AssetNotifications.ValidationErrors.messageIsBlank:
+                    case Notification.ValidationErrors.messageIsBlank:
                         ModelState.AddModelError("Message", vr.Description);
                         break;
-                    case AssetNotifications.ValidationErrors.invalidSeverity:
+                    case Notification.ValidationErrors.invalidSeverity:
                         ModelState.AddModelError("Severity", vr.Description);
                         break;
                     default:

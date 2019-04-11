@@ -146,7 +146,7 @@
     <Build Include="Tables\DatasetScopeTypes.sql" />
     <Build Include="Tables\DatasetFileConfigs.sql" />
     <Build Include="Tables\AssetSource.sql" />
-    <Build Include="Tables\AssetNotifications.sql" />
+    <Build Include="Tables\Notifications.sql" />
     <Build Include="Tables\Subscriptions\DataAsset_Subscription.sql" />
     <Build Include="Tables\Subscriptions\Dataset_Subscription.sql" />
     <Build Include="Tables\Subscriptions\Event.sql" />

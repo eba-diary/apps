@@ -4,7 +4,7 @@ using System;
 
 namespace Sentry.data.Core
 {    
-    public class AssetNotifications : IValidatable
+    public class Notification : IValidatable
     {
         public virtual NotificationSeverity MessageSeverity { get; set; }
         public virtual DateTime ExpirationTime { get; set; }
@@ -12,7 +12,8 @@ namespace Sentry.data.Core
         public virtual string CreateUser { get; set; }
         public virtual string Message { get; set; }
         public virtual int NotificationId { get; set; }
-        public virtual DataAsset ParentDataAsset { get; set; }
+        public virtual int ParentObject { get; set; }
+        public virtual string NotificationType { get; set; }
 
         public virtual string DisplayMessage
         {
@@ -59,7 +60,7 @@ namespace Sentry.data.Core
             {
                 vr.Add(ValidationErrors.invalidSeverity, "The severity is not valid");
             }
-            if (ParentDataAsset == null)
+            if (ParentObject == null)
             {
                 vr.Add(ValidationErrors.parentAssetIsNull, "The Asset is required");
             }

@@ -52,17 +52,17 @@ namespace Sentry.data.Infrastructure
             return da;
         }
 
-        public IEnumerable<AssetNotifications> GetAssetNotificationsByDataAssetId(int id)
+        public IEnumerable<Notification> GetAssetNotificationsByDataAssetId(int id)
         {
-            return Query<AssetNotifications>().Where(w => w.ParentDataAsset.Id == id).ToList();
+            return Query<Notification>().Where(w => w.ParentObject == id && w.NotificationType == GlobalConstants.Notifications.DATAASSET_TYPE).ToList();
         }
-        public IEnumerable<AssetNotifications> GetAllAssetNotifications()
+        public IEnumerable<Notification> GetAllAssetNotifications()
         {
-            return Query<AssetNotifications>().ToList();
+            return Query<Notification>().ToList();
         }
-        public AssetNotifications GetAssetNotificationByID(int id)
+        public Notification GetAssetNotificationByID(int id)
         {
-            return Query<AssetNotifications>().Where(w => w.NotificationId == id).First();
+            return Query<Notification>().Where(w => w.NotificationId == id).First();
         }
 
         private IQueryable<Lineage> QueryCreator(Boolean forLineage, int? DataAsset_ID, String dataElementCode = "", String _DataElement_NME = "", String _DataObject_NME = "", String _DataObjectField_NME = "", String _Line_CDE = "")

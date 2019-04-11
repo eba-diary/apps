@@ -19,9 +19,9 @@ namespace Sentry.data.Core
 
         /** Data Asset Notifications **/
 
-        IEnumerable<AssetNotifications> GetAssetNotificationsByDataAssetId(int id);
-        IEnumerable<AssetNotifications> GetAllAssetNotifications();
-        AssetNotifications GetAssetNotificationByID(int id);
+        IEnumerable<Notification> GetAssetNotificationsByDataAssetId(int id);
+        IEnumerable<Notification> GetAllAssetNotifications();
+        Notification GetAssetNotificationByID(int id);
 
         /** Lineage **/
 

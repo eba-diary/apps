@@ -13,22 +13,24 @@ namespace Sentry.data.Web.Controllers
     {
         private readonly IBusinessAreaService _businessAreaService;
         private readonly IEventService _eventService;
+        private readonly INotificationService _notificationService;
 
-        public BusinessAreaController(IBusinessAreaService busAreaService, IEventService eventService)
+        public BusinessAreaController(IBusinessAreaService busAreaService, IEventService eventService, INotificationService notificationService)
         {
             _businessAreaService = busAreaService;
             _eventService = eventService;
+            _notificationService = notificationService;
         }
 
         public ActionResult PersonalLines()
         {
-            // TODO: should we create an event for someone viewing the personal lines landing page??
-
+            // TODO: should we create an event for someone viewing the personal lines landing page??            
 
             BusinessAreaLandingPageModel model = new BusinessAreaLandingPageModel()
             {
                 Rows = new List<BusinessAreaTileRowModel>(),
-                Notifications = BuildMockNotifications() // temporary!!
+                //Notifications = BuildMockNotifications() // temporary!!
+                Notifications = _notificationService.GetNotificationForBusinessArea(1).ToModel();
             };
             model.HasActiveNotification = model.Notifications.CriticalNotifications.Any() || model.Notifications.StandardNotifications.Any();
 
@@ -74,6 +76,8 @@ namespace Sentry.data.Web.Controllers
 
         private SystemNotificationModel BuildMockNotifications()
         {
+            List<NotificationModel>
+
             SystemNotificationModel model = new SystemNotificationModel
             {
                 CriticalNotifications = new List<SystemNotificationItemModel>(),

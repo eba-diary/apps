@@ -67,7 +67,7 @@ namespace Sentry.data.Web.Controllers
 
         public JsonResult GetNotificationInfoForGrid([ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
-            List<NotificationModel> files = _notificationService.GetNotificationsForDataAsset().ToWeb();
+            List<NotificationModel> files = _notificationService.GetAllNotifications().ToWeb();
             DataTablesQueryableAdapter<NotificationModel> dtqa = new DataTablesQueryableAdapter<NotificationModel>(files.AsQueryable(), dtRequest);
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
         }
