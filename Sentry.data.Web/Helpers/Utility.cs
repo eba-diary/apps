@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using System.ComponentModel;
 using static Sentry.data.Core.RetrieverJobOptions;
 using Sentry.data.Core.GlobalEnums;
+using System.Text;
 
 namespace Sentry.data.Web.Helpers
 {
@@ -334,6 +335,32 @@ namespace Sentry.data.Web.Helpers
             }
 
             return classifications;
+        }
+
+        public static string FormatCategoryList(List<string> Categories)
+        {
+            if(Categories != null)
+            {
+                StringBuilder catNames = new StringBuilder();
+                bool firstCat = true;
+                foreach (string item in Categories)
+                {
+                    if (firstCat)
+                    {
+                        catNames.Append(item);
+                        firstCat = false;
+                    }
+                    else
+                    {
+                        catNames.Append(", " + item);
+                    }
+                }
+                return catNames.ToString();
+            }
+            else
+            {
+                return "No Category Assigned";
+            }            
         }
     }
 

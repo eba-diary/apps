@@ -41,6 +41,9 @@ data.Report = {
 
     FormInit: function (hrEmpUrl, hrEmpEnv) {
 
+        // Initialize Images for thumbnails
+        data.Images.InitImages();
+
         $("#DatasetCategoryIds").select2({
             placeholder:"Select Categories"
         });
@@ -136,11 +139,16 @@ data.Report = {
         
 
         data.Tags.initTags();
+        data.Images.InitImageUpload();
+        data.Images.InitImages();
     },
 
     DetailInit: function () {
 
         // Initialize the dataset detail page
+
+        // Initialize Images for thumbnails
+        data.Images.InitImages();
 
         $(".detailNameLink").click(function () {
             var artifactLink = $(this).data('artifactlink');
@@ -158,10 +166,36 @@ data.Report = {
 
         $('#deleteLink').click(function (e) {
             e.preventDefault();
+            var d_id = $(this).data("id");
 
-            var modal = Sentry.ShowModalConfirmation("Delete Exhibit", function () { data.BusinessIntelligenceDetail.DeleteDataset($(this).data("id")); });
-            modal.ReplaceModalBody("This will <u>permanently</u> delete this Exhibit (<b>not the object which it references</b>). </br></br> Do you wish to continue?");
-            modal.show();
+            $.ajax({
+                url: '/BusinessIntelligence/' + d_id + '/Favorites',
+                method: "GET",
+                dataType: 'json',
+                success: function (obj) {
+                    var message;
+                    var objData = JSON.parse(obj);
+                    var favCount = objData.Favorites.length;
+                    if (favCount === 1) {
+                        message = "This exhibit is favorited by 1 user.  Click <a href=" + objData.MailToAllLink + ">here</a> to email the user before deleting. If you choose to continue, the exhibit link will be permanently deleted from data.sentry.com.</br></br>Do you wish to continue?"
+                    }
+                    else if (favCount > 1) {
+                        message = "This exhibit is favorited by " + objData.Favorites.length + " users.  Click <a href=" + objData.MailToAllLink + ">here</a> to email the users before deleting. If you choose to continue, the exhibit link will be permanently deleted from data.sentry.com.</br></br>Do you wish to continue?"
+                    }
+                    else {
+                        message = "This will permanently delete the exhibit link from data.sentry.com.</br></br>Do you wish to continue?"
+                    }
+
+                    var model = Sentry.ShowModalCustom("Delete Exhibit", message, Sentry.ModalButtonsOKCancel(function () { data.Report.DeleteDataset(d_id); }));
+                    modal.show();
+                },
+                failure: function () {
+                    Sentry.ShowModalAlert("We failed to delete exhibit.  Please try again later.", function () { location.reload(); });
+                },
+                error: function () {
+                    Sentry.ShowModalAlert("We failed to delete exhibit.  Please try again later.", function () { location.reload(); });
+                }
+            });            
         });
 
         $(document).on("click", "[id^='btnFavorite']", function (e) {
@@ -169,7 +203,7 @@ data.Report = {
 
             var icon = $(this).children();
             $.ajax({
-                url: '/Dataset/SetFavorite?datasetId=' + encodeURIComponent($(this).data("id")),
+                url: '/Favorites/SetFavorite?datasetId=' + encodeURIComponent($(this).data("id")),
                 method: "GET",
                 dataType: 'json',
                 success: function () { icon.toggleClass("glyphicon-star glyphicon-star-empty"); },
@@ -192,7 +226,7 @@ data.Report = {
                 if (obj.Success) {
                     Sentry.ShowModalConfirmation(obj.Message, function () { window.location = returnUrl; });
                 } else {
-                    Sentry.ShowModalAlert(obj.Message, function () { window.location = returnUrl; });
+                    Sentry.ShowModalAlert(obj.Message, function () { location.reload(); });
                 }
             },
             failure: function (obj) {
@@ -267,31 +301,50 @@ data.Report = {
 
         var returnUrl = "/Search/BusinessIntelligence";
         var returnLink = $('#linkReturnToBusinessIntelligenceList');
+        var firstParam = true;
 
         //---is this neede?
         if (localStorage.getItem("searchText") !== null) {
-            var text = localStorage.getItem("searchText");
-            returnUrl += "?searchPhrase=" + text;
-            var storedNames;
-            if (localStorage.getItem("filteredIds") !== null) {
-                storedNames = JSON.parse(localStorage.getItem("filteredIds"));
-                returnUrl += "&ids=";
+            var text = { searchPhrase: localStorage.getItem("searchText") };
 
-                for (i = 0; i < storedNames.length; i++) {
-                    returnUrl += storedNames[i] + ',';
-                }
-                returnUrl = returnUrl.replace(/,\s*$/, "");
-            }
+            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+
+            returnUrl += $.param(text);
+            
         }
-        else if (localStorage.getItem("filteredIds") !== null) {
+
+        if (localStorage.getItem("filteredIds") !== null) {
             storedNames = JSON.parse(localStorage.getItem("filteredIds"));
-            returnUrl += "?ids=";
+
+            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+
+            returnUrl += "ids=";
 
             for (i = 0; i < storedNames.length; i++) {
                 returnUrl += storedNames[i] + ',';
             }
             returnUrl = returnUrl.replace(/,\s*$/, "");
         }
+
+        if (localStorage.getItem("pageSelection") !== null) {
+
+            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+
+            returnUrl += "page=" + localStorage.getItem("pageSelection");
+        }
+
+        if (localStorage.getItem("sortByVal") !== null) {
+            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }
+
+            returnUrl += "sort=" + localStorage.getItem("sortByVal");
+        }
+
+        if (localStorage.getItem("itemsToShow") !== null) {
+            if (firstParam) { returnUrl += "?"; firstParam = false; } else { returnUrl += "&"; }            
+
+            returnUrl += "itemsToShow=" + localStorage.getItem("itemsToShow");
+        }
+
         returnLink.attr('href', returnUrl);
     }
 };
