@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Sentry.data.Core;
 using StructureMap;
 using Sentry.Common.Logging;
+using System.IO;
 
 namespace Sentry.data.Infrastructure
 {
@@ -69,7 +70,7 @@ namespace Sentry.data.Infrastructure
                         { new KeyValuePair<String, Object>("security.protocol", "sasl_ssl") },
                         { new KeyValuePair<String, Object>("sasl.mechanism", "GSSAPI") },
                         { new KeyValuePair<String, Object>("sasl.kerberos.service.name", Configuration.Config.GetHostSetting("sasl_kerberos_service_name")) },
-                        { new KeyValuePair<String, Object>("ssl.ca.location", Configuration.Config.GetHostSetting("CertPath")) }
+                        { new KeyValuePair<String, Object>("ssl.ca.location", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Configuration.Config.GetHostSetting("CertPath"))) }
                     };
 
                     //Add kafka debug logging 

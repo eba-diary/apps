@@ -285,9 +285,6 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <Content Include="Security\cacert_sentry.pem">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <None Include="Sentry.data.Infrastructure.ruleset" />
     <None Include="Service References\HPMSChangeManagement\ChangeManagement.wsdl" />
     <None Include="Service References\HPMSChangeManagement\Common.xsd">
