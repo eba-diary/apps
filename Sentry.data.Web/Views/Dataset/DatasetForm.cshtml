@@ -14,7 +14,6 @@
 
     @*Show the custom validation summary*@
     @Html.DisplayFor((model) => ViewData.ModelState)
-    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
 
     <ul class="nav nav-tabs">
         <li class="active"><a href="#informationPanel" data-toggle="tab" aria-expanded="true">Dataset Information <span id="infoBadge" class="badge badge-danger"></span></a></li>
@@ -34,23 +33,50 @@
             @Html.HiddenFor(model => model.PrimaryContactId)
             @Html.HiddenFor(model => model.UploadUserId)
 
+            @* Category *@
             <div class="form-group">
                 @Html.LabelFor((model) => model.DatasetCategoryIds, new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    <select id="DatasetCategoryIds" name="DatasetCategoryIds" class="form-control edit-dataset-row">
-                        @foreach (var item in Model.AllCategories)
+                    @* Ensures Category cannot be changed on edit *@
+                    @if (Model.DatasetId == 0)
+                    {
+                        <select id="DatasetCategoryIds" name="DatasetCategoryIds" class="form-control edit-dataset-row">
+                            @foreach (var item in Model.AllCategories)
+                            {
+                                <option selected="@item.Selected" value="@item.Value">@item.Text</option>}
+                        </select>
+                        @Html.ValidationMessageFor((model) => model.DatasetCategoryIds, "", new { @class = "text-danger" })
+                    }
+                    else
+                    {
+                        for (int i = 0; i < Model.DatasetCategoryIds.Count; i++)
                         {
-                            <option selected="@item.Selected" value="@item.Value">@item.Text</option>}
-                    </select>
-                    @Html.ValidationMessageFor((model) => model.DatasetCategoryIds, "", new { @class = "text-danger" })
+                            <input type="hidden" name="DatasetCategoryIds" value="@Model.DatasetCategoryIds[i]" />
+                        }
+                        <div class="textReadOnly">
+                            @Html.Raw(Sentry.data.Web.Helpers.Utility.FormatCategoryList(Model.CategoryNames))
+                        </div>
+                    }
                 </div>
             </div>
 
+            @* DatasetName *@
             <div class="form-group">
                 @Html.LabelFor(model => model.DatasetName, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.EditorFor(model => model.DatasetName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                    @Html.ValidationMessageFor(model => model.DatasetName, "", new { @class = "text-danger" })
+                    @* Ensures DatasetName cannot be changed on edit *@
+                    @if (Model.DatasetId == 0)
+                    {
+                        @Html.EditorFor(model => model.DatasetName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                        @Html.ValidationMessageFor(model => model.DatasetName, "", new { @class = "text-danger" })
+                    }
+                    else
+                    {
+                        <div class="textReadOnly">
+                            @Html.HiddenFor(model => model.DatasetName)
+                            @Html.DisplayFor(model => model.DatasetName)
+                        </div>
+                    }
                 </div>
             </div>
 

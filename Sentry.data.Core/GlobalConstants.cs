@@ -43,6 +43,7 @@
             public const string VIEWED_REPORT = "Viewed Report";
             public const string CREATED_REPORT = "Created Report";
             public const string UPDATED_REPORT = "Updated Report";
+            public const string DELETED_REPORT = "Deleted Report";
 
             public const string VIEWED_DATASET = "Viewed Dataset";
             public const string CREATED_DATASET = "Created Dataset";
@@ -139,6 +140,11 @@
         {
             public const string BUSINESS_INTELLIGENCE_SEARCH = "BusinessIntelligence";
             public const string DATASET_SEARCH = "Datasets";
+        }
+
+        public static class StoragePrefixes
+        {
+            public const string DATASET_IMAGE_STORAGE_PREFIX = "images";
         }
 
     }

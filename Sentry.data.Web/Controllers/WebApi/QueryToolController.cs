@@ -571,15 +571,17 @@ namespace Sentry.data.Web.Controllers
         /// gets a dataset from a file location
         /// </summary>
         /// <param name="s3Key"></param>
-        /// <param name="fileName"></param>
         /// <returns></returns>
         [HttpGet]
-        [Route("files/{s3Key}/{fileName}")]
-        public async Task<IHttpActionResult> GetDatasetFileDownloadURL(string s3Key, string fileName)
+        [Route("files/DownloadUrl/{*s3Key}")]
+        public async Task<IHttpActionResult> GetDatasetFileDownloadURL(string s3Key)
         {
+            var key = s3Key.Substring(0, s3Key.LastIndexOf('/') + 1);
+            var fileName = s3Key.Replace(key, "");
+
             try
             {
-                List<string> list = _s3Service.FindObject(s3Key);
+                List<string> list = _s3Service.FindObject(key);
 
                 foreach (string obj in list)
                 {

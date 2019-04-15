@@ -1,8 +1,11 @@
-﻿using Sentry.Common.Logging;
+﻿using Newtonsoft.Json;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Web.Helpers;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.SessionState;
 
@@ -49,7 +52,7 @@ namespace Sentry.data.Web.Controllers
                 DatasetId = 0,
                 BusinessObjectsEnumValue = (int)ReportType.BusinessObjects,
                 CreationUserId = SharedContext.CurrentUser.AssociateId,
-                UploadUserId = SharedContext.CurrentUser.AssociateId,
+                UploadUserId = SharedContext.CurrentUser.AssociateId
             };
 
             ReportUtility.SetupLists(_datasetContext, cdm);
@@ -127,6 +130,7 @@ namespace Sentry.data.Web.Controllers
             try
             {
                 _businessIntelligenceService.Delete(id);
+                _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.DELETED_REPORT, SharedContext.CurrentUser.AssociateId, "Deleted Report", id);
                 return Json(new { Success = true, Message = "Exhibit was successfully deleted" });
             }
             catch (Exception ex)
@@ -148,6 +152,15 @@ namespace Sentry.data.Web.Controllers
 
             _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Business Intelligence Detail Page", dto.DatasetId);
             return View(model);
+        }
+
+        [HttpGet]
+        [Route("businessIntelligence/{id}/Favorites/")]
+        public JsonResult FavoritesDetail(int Id)
+        {
+            List<FavoriteDto> favList = _businessIntelligenceService.GetDatasetFavoritesDto(Id);
+            FavoritesDetailModel model = favList.ToModel();
+            return Json(JsonConvert.SerializeObject(model), JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]
@@ -194,6 +207,40 @@ namespace Sentry.data.Web.Controllers
             }
 
             return PartialView("_TagForm", model);
+        }
+
+        public ActionResult GetImage(string url, int? t)
+        {
+            if (url == null || !url.StartsWith("images/"))
+            {
+                return HttpNotFound();
+            }
+
+            byte[] img = _businessIntelligenceService.GetImageData(url, t);
+
+            return File(img, "image/jpg", "image_" + System.IO.Path.GetFileName(url));
+        }
+
+        public ActionResult UploadPreviewImage()
+        {
+            HttpFileCollectionBase Files;
+            Files = Request.Files;
+
+
+            ImageDto dto = BusinessIntelligenceExtensions.ToDto(new ImageModel(), Files[0], 0, true);
+            bool result = _businessIntelligenceService.SaveTemporaryPreviewImage(dto);
+
+            ImageModel model = ImageExtensions.ToModel(dto);
+
+            return PartialView("_Images", model);
+            //return Json(model, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult NewImage(int index = 0)
+        {
+            ImageModel im = new ImageModel();
+            ViewData["index"] = index;
+            return PartialView("_Images", im);
         }
     }
 }
