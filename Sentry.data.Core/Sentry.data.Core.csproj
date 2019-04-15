@@ -205,7 +205,7 @@
     <Compile Include="Entities\Subscriptions\DataAssetSubscription.cs" />
     <Compile Include="Entities\Subscriptions\DatasetSubscription.cs" />
     <Compile Include="Entities\Subscriptions\Event.cs" />
-    <Compile Include="Entities\DataAssets\AssetNotifications.cs" />
+    <Compile Include="Entities\Notification.cs" />
     <Compile Include="Entities\DataAssets\AssetSource.cs" />
     <Compile Include="Entities\Goldeneye\BundleRequest.cs" />
     <Compile Include="Entities\Goldeneye\BundleResponse.cs" />

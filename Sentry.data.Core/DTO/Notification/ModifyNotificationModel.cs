@@ -18,11 +18,12 @@ namespace Sentry.data.Core
         public DateTime StartTime { get; set; }
         public string CreateUser { get; set; }
         public string Message { get; set; }
-        public int ObjectId { get; set; }
+        public string ObjectId { get; set; }
         public string ObjectName { get; set; }
         public Boolean IsActive { get; set; }
         public bool CanEdit { get; set; }
         public string NotificationType { get; set; }
+        public string Title { get; set; }
 
         public List<DataAsset> AllDataAssets { get; set; } = new List<DataAsset>();
         public List<BusinessArea> AllBusinessAreas { get; set; } = new List<BusinessArea>();

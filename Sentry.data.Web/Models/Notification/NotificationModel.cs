@@ -21,11 +21,13 @@ namespace Sentry.data.Web
         [DisplayName("Severity")] public NotificationSeverity MessageSeverity { get; set; }
         [DisplayName("Asset")] public string ObjectId { get; set; }
         [DisplayName("Message")] public string Message { get; set; }
+        [DisplayName("Title")] public string Title { get; set; }
 
         public Boolean IsActive { get; set; }
         public string ObjectName { get; set; }
         public string MessageSeverityDescription { get; set; }
         public bool CanEdit { get; set; }
+        public string ObjectType { get; set; }
 
         public IEnumerable<SelectListItem> AllDataAssets { get; set; }
         public IEnumerable<SelectListItem> AllSeverities { get; set; }

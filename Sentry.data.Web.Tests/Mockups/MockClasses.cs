@@ -316,6 +316,7 @@ namespace Sentry.data.Web.Tests
             an.StartTime = DateTime.Now.AddHours(-1).AddMinutes(1);
             an.ExpirationTime = DateTime.Now.AddDays(1);
             an.NotificationType = GlobalConstants.Notifications.DATAASSET_TYPE;
+            an.Title = "Alert Title";
 
             if(user != null)
             {

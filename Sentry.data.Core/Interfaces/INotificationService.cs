@@ -10,7 +10,7 @@ namespace Sentry.data.Core
         NotificationModel GetNotificationModelForDisplay(int notificationId);
         void SubmitNotification(NotificationModel model);
         List<NotificationModel> GetNotificationsForDataAsset();
-        List<NotificationModel> GetNotificationForBusinessArea(int Id);
+        List<NotificationModel> GetNotificationForBusinessArea(BusinessAreaType type);
         List<NotificationModel> GetAllNotifications();
         List<DataAsset> GetAssetsForUserSecurity();
         List<DataAsset> GetAssetsForAccessRequest();
