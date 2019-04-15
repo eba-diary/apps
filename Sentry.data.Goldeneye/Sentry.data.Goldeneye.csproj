@@ -181,7 +181,9 @@
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
-    <Content Include="Security\cacert_sentry.pem" />
+    <Content Include="Security\cacert_sentry.pem">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="Sentry.data.Goldeneye.ruleset" />
     <None Include="UninstallService.cmd">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
