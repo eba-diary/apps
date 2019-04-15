@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Sentry.Messaging.Common;
 using Sentry.data.Core;
+using System.IO;
 
 namespace Sentry.data.Infrastructure
 {
@@ -46,8 +47,10 @@ namespace Sentry.data.Infrastructure
                                             Sentry.data.Infrastructure.TopicHelper.GetDSCEventTopic(),
                                             Configuration.Config.GetHostSetting("EnvironmentName").ToUpper(),
                                             (Configuration.Config.GetHostSetting("KafkaDebugLogging").ToLower() == "true") ? true : false, 
-                                            null, 
-                                            0 /*This is not used for consumers*/
+                                            Path.Combine(Environment.CurrentDirectory,Configuration.Config.GetHostSetting("CertPath")), 
+                                            0, /*This is not used for consumers*/
+                                            (Configuration.Config.GetHostSetting("KafkaSSL").ToLower() == "true") ? true : false,
+                                            Configuration.Config.GetHostSetting("sasl_kerberos_service_name")
                                             );
 
             return new MetadataProcessorKafkaConsumer(settings);

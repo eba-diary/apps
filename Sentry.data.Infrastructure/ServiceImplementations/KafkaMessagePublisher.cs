@@ -62,28 +62,18 @@ namespace Sentry.data.Infrastructure
 
                 try
                 {
-                    //Return configuration from database
-                    using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                    IList<KeyValuePair<String, Object>> configuration = new List<KeyValuePair<String, Object>>()
                     {
-                        IRequestContext reqContext = Container.GetInstance<IRequestContext>();
-
-                        config = reqContext.ApplicaitonConfigurations.Where(w => w.Application == "goldeneye-producer").FirstOrDefault();
-
-                        Logger.Info($"Loaded Producer Configuration ({JsonConvert.SerializeObject(config)})");
-                    }
-                    IList<KeyValuePair<String, Object>> configuration = new List<KeyValuePair<String, Object>>();
-
-                    //Adding Production options from database
-                    foreach (JObject item in config.OptionsObject["ProducerOptions"])
-                    {
-                        foreach (JProperty prop in item.Properties())
-                        {
-                            configuration.Add(new KeyValuePair<String, Object>(prop.Name, prop.Value));
-                        }
-                    }
+                        { new KeyValuePair<String, Object>("statistics.interval.ms", "60000") },
+                        { new KeyValuePair<String, Object>("bootstrap.servers", Configuration.Config.GetHostSetting("KafkaBootstrapServers")) },
+                        { new KeyValuePair<String, Object>("security.protocol", "sasl_ssl") },
+                        { new KeyValuePair<String, Object>("sasl.mechanism", "GSSAPI") },
+                        { new KeyValuePair<String, Object>("sasl.kerberos.service.name", Configuration.Config.GetHostSetting("sasl_kerberos_service_name")) },
+                        { new KeyValuePair<String, Object>("ssl.ca.location", Configuration.Config.GetHostSetting("CertPath")) }
+                    };
 
                     //Add kafka debug logging 
-                    if ((bool)config.OptionsObject["DebugLogging"])
+                    if ((Configuration.Config.GetHostSetting("KafkaDebugLogging").ToLower() == "true")? true : false)
                     {
                         configuration.Add(new KeyValuePair<String, Object>("debug", "all"));
                     }
@@ -96,14 +86,13 @@ namespace Sentry.data.Infrastructure
 
                         cfgstr += itm.Key + ": " + itm.Value.ToString();
                     }
-                    Sentry.Common.Logging.Logger.Info(cfgstr);
+                    Logger.Info(cfgstr);
 
                     //Create a generic producer
                     _producer = new Producer(configuration);
 
                     //Send kafka send log events to kafka
                     _producer.OnLog += _producer_OnLog;
-                    //_producer.OnStatistics += _producer_OnStatistics;
 
                     //create a producer with string serializer for Key and Value
                     _producer_str_str = _producer.GetSerializingProducer(new Confluent.Kafka.Serialization.StringSerializer(Encoding.UTF8), new Confluent.Kafka.Serialization.StringSerializer(Encoding.UTF8));
