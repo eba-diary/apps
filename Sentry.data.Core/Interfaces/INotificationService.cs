@@ -13,6 +13,7 @@ namespace Sentry.data.Core
         List<NotificationModel> GetNotificationForBusinessArea(BusinessAreaType type);
         List<NotificationModel> GetAllNotifications();
         List<DataAsset> GetAssetsForUserSecurity();
+        List<BusinessArea> GetBusinessAreasForUserSecurity();
         List<DataAsset> GetAssetsForAccessRequest();
         List<Permission> GetPermissionsForAccessRequest();
         string RequestAccess(AccessRequest request);

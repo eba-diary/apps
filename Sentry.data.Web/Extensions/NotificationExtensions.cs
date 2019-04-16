@@ -61,7 +61,8 @@ namespace Sentry.data.Web
                 NotificationId = model.NotificationId,
                 StartTime = model.StartTime,
                 ObjectId = model.ObjectId.Split('_')[1],
-                NotificationType = model.ObjectId.Split('_')[0]
+                NotificationType = model.ObjectId.Split('_')[0],
+                Title = model.Title
             };
         }
 
@@ -112,7 +113,7 @@ namespace Sentry.data.Web
         {
             return new SystemNotificationItemModel()
             {
-                Title = "Title",
+                Title = (String.IsNullOrWhiteSpace(notification.Title)) ? "Alert" : notification.Title,
                 Message = notification.Message,
                 NotificationDate = notification.StartTime.ToShortDateString()
             };

@@ -20,21 +20,9 @@ namespace Sentry.data.Core
                 StartTime = core.StartTime,
                 IsActive = core.StartTime <= DateTime.Now && core.ExpirationTime > DateTime.Now,
                 NotificationType = core.NotificationType,
-                ObjectId = core.ParentObject.ToString(),
+                ObjectId = core.NotificationType + "_" + core.ParentObject.ToString(),
                 Title = core.Title                
             };
-
-            //switch (core.NotificationType)
-            //{
-            //    case GlobalConstants.Notifications.BUSINESSAREA_TYPE:
-            //        model.objectId = GlobalConstants.Notifications.BUSINESSAREA_TYPE + "_" + core.NotificationId.ToString();
-            //        break;
-            //    case GlobalConstants.Notifications.DATAASSET_TYPE:
-            //        model.ObjectId = GlobalConstants.Notifications.DATAASSET_TYPE + "_" + core.NotificationId.ToString();
-            //        break;
-            //    default:
-            //        break;
-            //}
 
             return model;
         }

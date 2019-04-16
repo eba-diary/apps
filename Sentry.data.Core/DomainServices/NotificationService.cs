@@ -84,6 +84,7 @@ namespace Sentry.data.Core
                 an.Message = model.Message;
                 an.NotificationType = model.NotificationType;
                 an.ParentObject = int.Parse(model.ObjectId);
+                an.Title = model.Title;
             }
 
             _domainContext.SaveChanges();
