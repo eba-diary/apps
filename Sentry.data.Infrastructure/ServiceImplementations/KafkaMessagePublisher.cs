@@ -60,7 +60,7 @@ namespace Sentry.data.Infrastructure
                 Sentry.Common.Logging.Logger.Info("Initializing goldeneye-producer");
 
                 ApplicationConfiguration config = null;
-
+                
                 try
                 {
                     IList<KeyValuePair<String, Object>> configuration = new List<KeyValuePair<String, Object>>()
@@ -70,7 +70,8 @@ namespace Sentry.data.Infrastructure
                         { new KeyValuePair<String, Object>("security.protocol", "sasl_ssl") },
                         { new KeyValuePair<String, Object>("sasl.mechanism", "GSSAPI") },
                         { new KeyValuePair<String, Object>("sasl.kerberos.service.name", Configuration.Config.GetHostSetting("sasl_kerberos_service_name")) },
-                        { new KeyValuePair<String, Object>("ssl.ca.location", Configuration.Config.GetHostSetting("CertPath")) }
+                        { new KeyValuePair<String, Object>("ssl.ca.location", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Configuration.Config.GetHostSetting("CertPath"))) }
+                        
                     };
 
                     //Add kafka debug logging 

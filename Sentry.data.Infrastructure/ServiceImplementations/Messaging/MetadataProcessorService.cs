@@ -46,8 +46,8 @@ namespace Sentry.data.Infrastructure
                                             Configuration.Config.GetHostSetting("KafkaBootstrapServers"),
                                             Sentry.data.Infrastructure.TopicHelper.GetDSCEventTopic(),
                                             Configuration.Config.GetHostSetting("EnvironmentName").ToUpper(),
-                                            (Configuration.Config.GetHostSetting("KafkaDebugLogging").ToLower() == "true") ? true : false, 
-                                            Configuration.Config.GetHostSetting("CertPath"), 
+                                            (Configuration.Config.GetHostSetting("KafkaDebugLogging").ToLower() == "true") ? true : false,
+                                            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Configuration.Config.GetHostSetting("CertPath")), 
                                             0, /*This is not used for consumers*/
                                             (Configuration.Config.GetHostSetting("KafkaSSL").ToLower() == "true") ? true : false,
                                             Configuration.Config.GetHostSetting("sasl_kerberos_service_name")

@@ -51,7 +51,8 @@ namespace Sentry.Messaging.Common
                 configuration.Add(new KeyValuePair<String, Object>("security.protocol", "sasl_ssl"));
                 configuration.Add(new KeyValuePair<String, Object>("sasl.mechanisms", "GSSAPI"));
                 configuration.Add(new KeyValuePair<String, Object>("sasl.kerberos.service.name", _settings.KerberosServiceName));
-                configuration.Add(new KeyValuePair<String, Object>("ssl.ca.location", _settings.CertPath));
+                configuration.Add(new KeyValuePair<String, Object>("ssl.ca.location", _settings.CertPath));                
+
             }
 
             if (_settings.UseLogging)
