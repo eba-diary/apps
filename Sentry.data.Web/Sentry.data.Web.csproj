@@ -436,7 +436,6 @@
     <Content Include="Images\BusinessAreaTiles\ConceptVariety2.jpg" />
     <Content Include="Images\BusinessAreaTiles\LearningBooks.jpg" />
     <Content Include="Images\BusinessAreaTiles\Meeting2.jpg" />
-    <Content Include="Images\Category\BusinessIntelligence\401k.svg" />
     <Content Include="Images\Category\BusinessIntelligence\claims.svg" />
     <Content Include="Images\Category\BusinessIntelligence\commercial lines.svg" />
     <Content Include="Images\Category\BusinessIntelligence\it.svg" />
