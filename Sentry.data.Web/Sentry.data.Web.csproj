@@ -1272,6 +1272,9 @@
     <Content Include="Views\Shared\_Success.cshtml" />
     <Content Include="Views\BusinessIntelligence\EditorTemplates\ImageModel.cshtml" />
     <Content Include="Views\Shared\_Images.cshtml" />
+    <Content Include="Security\cacert_sentry.pem">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

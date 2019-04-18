@@ -33,7 +33,7 @@ namespace Sentry.data.Core
                 {
                     case "HIVE-TABLE-CREATE-COMPLETED":
                         HiveTableCreateModel hiveCreatedEvent = JsonConvert.DeserializeObject<HiveTableCreateModel>(msg);
-                        Logger.Debug("HiveMetadataHandler processing HIVE-TABLE-CREATE-COMPLETED message: " + JsonConvert.SerializeObject(hiveCreatedEvent));
+                        Logger.Info("HiveMetadataHandler processing HIVE-TABLE-CREATE-COMPLETED message: " + JsonConvert.SerializeObject(hiveCreatedEvent));
 
                         switch (hiveCreatedEvent.Schema.HiveStatus.ToUpper())
                         {
@@ -57,7 +57,7 @@ namespace Sentry.data.Core
                         break;
                     case "HIVE-TABLE-CREATE-REQUESTED":
                         HiveTableCreateModel hiveReqeustedEvent = JsonConvert.DeserializeObject<HiveTableCreateModel>(msg);
-                        Logger.Debug("HiveMetadataHandler processing HIVE-TABLE-CREATE-REQUESTED message: " + JsonConvert.SerializeObject(hiveReqeustedEvent));
+                        Logger.Info("HiveMetadataHandler processing HIVE-TABLE-CREATE-REQUESTED message: " + JsonConvert.SerializeObject(hiveReqeustedEvent));
 
                         de = _dsContext.GetById<DataElement>(hiveReqeustedEvent.Schema.SchemaID);
                         de.HiveTableStatus = HiveTableStatusEnum.Requested.ToString();
@@ -66,7 +66,7 @@ namespace Sentry.data.Core
                         _dsContext.SaveChanges();
                         break;
                     default:
-                        Logger.Debug($"HiveMetadataHandler not configured to handle {baseEvent.EventType.ToUpper()} event type, skipping event.");
+                        Logger.Info($"HiveMetadataHandler not configured to handle {baseEvent.EventType.ToUpper()} event type, skipping event.");
                         break;
                 }
             }

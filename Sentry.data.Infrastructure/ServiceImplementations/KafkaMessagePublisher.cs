@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Sentry.data.Core;
 using StructureMap;
 using Sentry.Common.Logging;
+using System.IO;
 
 namespace Sentry.data.Infrastructure
 {
@@ -59,29 +60,22 @@ namespace Sentry.data.Infrastructure
                 Sentry.Common.Logging.Logger.Info("Initializing goldeneye-producer");
 
                 ApplicationConfiguration config = null;
-
+                
                 try
                 {
-                    //Return configuration from database
-                    using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                    IList<KeyValuePair<String, Object>> configuration = new List<KeyValuePair<String, Object>>()
                     {
-                        IRequestContext reqContext = Container.GetInstance<IRequestContext>();
-
-                        config = reqContext.ApplicaitonConfigurations.Where(w => w.Application == "goldeneye-producer").FirstOrDefault();
-                    }
-                    IList<KeyValuePair<String, Object>> configuration = new List<KeyValuePair<String, Object>>();
-
-                    //Adding Production options from database
-                    foreach (JObject item in config.OptionsObject["ProducerOptions"])
-                    {
-                        foreach (JProperty prop in item.Properties())
-                        {
-                            configuration.Add(new KeyValuePair<String, Object>(prop.Name, prop.Value));
-                        }
-                    }
+                        { new KeyValuePair<String, Object>("statistics.interval.ms", "60000") },
+                        { new KeyValuePair<String, Object>("bootstrap.servers", Configuration.Config.GetHostSetting("KafkaBootstrapServers")) },
+                        { new KeyValuePair<String, Object>("security.protocol", "sasl_ssl") },
+                        { new KeyValuePair<String, Object>("sasl.mechanism", "GSSAPI") },
+                        { new KeyValuePair<String, Object>("sasl.kerberos.service.name", Configuration.Config.GetHostSetting("sasl_kerberos_service_name")) },
+                        { new KeyValuePair<String, Object>("ssl.ca.location", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Configuration.Config.GetHostSetting("CertPath"))) }
+                        
+                    };
 
                     //Add kafka debug logging 
-                    if ((bool)config.OptionsObject["DebugLogging"])
+                    if ((Configuration.Config.GetHostSetting("KafkaDebugLogging").ToLower() == "true")? true : false)
                     {
                         configuration.Add(new KeyValuePair<String, Object>("debug", "all"));
                     }
@@ -94,14 +88,13 @@ namespace Sentry.data.Infrastructure
 
                         cfgstr += itm.Key + ": " + itm.Value.ToString();
                     }
-                    Sentry.Common.Logging.Logger.Info(cfgstr);
+                    Logger.Info(cfgstr);
 
                     //Create a generic producer
                     _producer = new Producer(configuration);
 
                     //Send kafka send log events to kafka
                     _producer.OnLog += _producer_OnLog;
-                    //_producer.OnStatistics += _producer_OnStatistics;
 
                     //create a producer with string serializer for Key and Value
                     _producer_str_str = _producer.GetSerializingProducer(new Confluent.Kafka.Serialization.StringSerializer(Encoding.UTF8), new Confluent.Kafka.Serialization.StringSerializer(Encoding.UTF8));
@@ -118,61 +111,6 @@ namespace Sentry.data.Infrastructure
             Sentry.Common.Logging.Logger.Info("DEBUG LOG FROM KAFKA: " + e.Message);
         }
 
-        //private static void _producer_OnStatistics(object sender, string e)
-        //{
-        //    var json = JsonConvert.DeserializeObject<JObject>(e);
-
-        //    JToken brokers_tkn = null;
-        //    json.TryGetValue("brokers", out brokers_tkn);
-
-        //    if (brokers_tkn != null && typeof(JObject) == brokers_tkn.GetType())
-        //    {
-        //        if (brokers_tkn.Children<JProperty>().ToList().Count > 0)
-        //        {
-        //            IList<JProperty> brokers = brokers_tkn.Children<JProperty>().ToList();
-        //            foreach (JProperty jp in brokers)
-        //            {
-        //                if (jp.Value != null && typeof(JObject) == jp.Value.GetType())
-        //                {
-        //                    QueueProducerStatistic stats = new QueueProducerStatistic();
-        //                    stats.Environment = _environment;
-        //                    stats.ProducerName = "GOLDENEYE-PRODUCER";
-        //                    stats.QueueType = "KAFKA";
-        //                    stats.QueueName = _topicName;
-
-        //                    JObject p = (JObject)jp.Value;
-        //                    int nodeId = p.Value<int>("nodeid");
-        //                    JObject ilatency = p.Value<JObject>("int_latency");
-        //                    JObject rtt = p.Value<JObject>("rtt");
-        //                    string fullServer = p.Value<string>("name");
-
-        //                    if (nodeId >= 0 && !string.IsNullOrEmpty(fullServer))
-        //                    {
-        //                        stats.Server = fullServer.Split(":".ToCharArray()).First();
-        //                        stats.Port = fullServer.Split(":".ToCharArray()).Last().Substring(0, 4);
-        //                        stats.InternalId = nodeId.ToString();
-
-        //                        stats report microseconds - i want milliseconds
-        //                        stats.InternalPublishTime.MinimumTime = ilatency.GetValue("min").Value<int>() / 1000;
-        //                        stats.InternalPublishTime.MaximumTime = ilatency.GetValue("max").Value<int>() / 1000;
-        //                        stats.InternalPublishTime.AverageTime = ilatency.GetValue("avg").Value<int>() / 1000;
-        //                        stats.InternalPublishTime.SumTime = ilatency.GetValue("sum").Value<int>() / 1000;
-        //                        stats.InternalPublishTime.SamplePoints = ilatency.GetValue("cnt").Value<int>();
-
-        //                        stats.RoundTripTime.MinimumTime = rtt.GetValue("min").Value<int>() / 1000;
-        //                        stats.RoundTripTime.MaximumTime = rtt.GetValue("max").Value<int>() / 1000;
-        //                        stats.RoundTripTime.AverageTime = rtt.GetValue("avg").Value<int>() / 1000;
-        //                        stats.RoundTripTime.SumTime = rtt.GetValue("sum").Value<int>() / 1000;
-        //                        stats.RoundTripTime.SamplePoints = rtt.GetValue("cnt").Value<int>();
-
-        //                        Sentry.Common.Logging.Logger.Info(JsonConvert.SerializeObject(stats));
-        //                    }
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
-
         public void Publish(string topic, string key, string value)
         {
             try
@@ -181,6 +119,8 @@ namespace Sentry.data.Infrastructure
                 {
                     Producer p = Producer;
                 }
+
+                Logger.Info($"Publishing message - Topic:{Sentry.data.Infrastructure.TopicHelper.GetDSCEventTopic()} Key:{key} Message:{value}");
 
                 //var task = Producer.ProduceAsync(topic, Encoding.ASCII.GetBytes(key), Encoding.ASCII.GetBytes(value));
                 var task = _producer_str_str.ProduceAsync(topic, key, value);

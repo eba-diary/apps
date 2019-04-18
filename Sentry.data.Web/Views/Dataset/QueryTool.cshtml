@@ -19,19 +19,21 @@
     <div class="col-lg-6">
         <h1>Query Tool</h1>
     </div>
-    <div class="col-lg-3">
-        <h3><a href="@livyURL" target="_blank" id="LivyURL">Spark Session: <span id="sessionID"></span></a></h3>
-    </div>
-    <div class="col-lg-3" id="adminToolsButtons">
-        <div class="btn-group">
-            <a class="btn btn-primary" onclick="data.QueryTool.ToggleAdminControls()">Code History and Custom Code</a>
-            <a href="#/" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></a>
-            <ul class="dropdown-menu">
-                <li><a onclick="CreateSession(true)">Re-Create Session</a></li>
-                <li><a onclick="ResetHiveTables()">Reset Hive Tables</a></li>
-            </ul>
+    @if (ViewBag.IsAdmin)
+    {
+        <div class="col-lg-3">
+            <h3><a href="@livyURL" target="_blank" id="LivyURL">Spark Session: <span id="sessionID"></span></a></h3>
         </div>
-    </div>
+        <div class="col-lg-3" id="adminToolsButtons">
+            <div class="btn-group">
+                <a class="btn btn-primary" onclick="data.QueryTool.ToggleAdminControls()">Code History and Custom Code</a>
+                <a href="#/" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                    <li><a onclick="CreateSession(true)">Re-Create Session</a></li>
+                </ul>
+            </div>
+        </div>
+    }
 </div>
 
 
@@ -1325,48 +1327,6 @@
                 $('#dataInfo').text(failureReason);
             }
         }
-
-        function ResetHiveTables() {
-
-            updateJoins();
-            var rawQuery = "";
-
-            for (var i = 0; i < tableList.length; i++) {
-                rawQuery += "spark.catalog.dropTempView(\"" + tableList[i] + "\");" + tableList[i] + ".createTempView(\"" + tableList[i] + "\");";
-            }
-
-
-            var json = JSON.stringify(rawQuery.escapeForJson());
-
-            console.log(json);
-
-            $('#sqlQueryOutput').val(rawQuery);
-            SendCode(json, 'Reset Hive Tables');
-        }
-
-        //function updateJoins() {
-        //    var rules = $('#joinContainer').children('.rule-container').children('.ruleController').length / 6;
-        //    $('#joinPython').val('');
-        //    for (var i = 0; i < rules; i++) {
-
-        //        var tableOne = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6)].value;
-        //        var joinType = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 1].value;
-        //        var tableTwo = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 2].value;
-        //        var tableOneCol = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 3].value;
-        //        var operand = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 4].value;
-        //        var tableTwoCol = $('#joinContainer').children('.rule-container').children('.ruleController')[(i * 6) + 5].value;
-
-
-        //        var OnStatement = tableOneCol + ' ' + operand + ' ' + tableTwoCol;
-
-        //        var Join = tableOne.trim() + " = " + tableOne.trim() + ".join(" + tableTwo.trim() + "," + OnStatement.trim() + ");";
-
-        //        Join = Join.replace(/`/g, '');
-
-        //        $('#joinPython').val($('#joinPython').val() + Join + "\n");
-        //    }
-
-        //}
 
         function RemoveParent(e) {
             console.log($(e).parent().parent());

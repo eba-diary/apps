@@ -1211,7 +1211,10 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult QueryTool()
         {
+            IApplicationUser user = _userService.GetCurrentUser();
+
             ViewBag.LivyURL = Sentry.Configuration.Config.GetHostSetting("ApacheLivy");
+            ViewBag.IsAdmin = user.IsAdmin;
 
             _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Query Tool Page");
 
