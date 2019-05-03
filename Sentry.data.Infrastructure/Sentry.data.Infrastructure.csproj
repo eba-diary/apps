@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\librdkafka.redist.0.11.5\build\librdkafka.redist.props" Condition="Exists('..\packages\librdkafka.redist.0.11.5\build\librdkafka.redist.props')" />
+  <Import Project="..\packages\librdkafka.redist.0.11.6\build\librdkafka.redist.props" Condition="Exists('..\packages\librdkafka.redist.0.11.6\build\librdkafka.redist.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -50,8 +50,8 @@
       <HintPath>..\packages\AWSSDK.S3.3.3.5.10\lib\net45\AWSSDK.S3.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Confluent.Kafka, Version=0.11.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Confluent.Kafka.0.11.5\lib\net46\Confluent.Kafka.dll</HintPath>
+    <Reference Include="Confluent.Kafka, Version=0.11.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Confluent.Kafka.0.11.6\lib\net46\Confluent.Kafka.dll</HintPath>
     </Reference>
     <Reference Include="Hangfire.Core, Version=1.6.17.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Hangfire.Core.1.6.17\lib\net45\Hangfire.Core.dll</HintPath>
@@ -239,6 +239,7 @@
     <Compile Include="ServiceImplementations\KafkaMessagePublisher.cs" />
     <Compile Include="ServiceImplementations\Messaging\HiveMetadataService.cs" />
     <Compile Include="ServiceImplementations\Messaging\MetadataProcessorService.cs" />
+    <Compile Include="ServiceImplementations\Messaging\ProducerDeliveryHandler.cs" />
     <Compile Include="ServiceImplementations\MetadataRepositoryProvider.cs" />
     <Compile Include="ServiceImplementations\ObsidianService.cs" />
     <Compile Include="ServiceImplementations\ODCFileProvider.cs" />
@@ -708,7 +709,7 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\WinSCP.5.13.2\build\WinSCP.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\WinSCP.5.13.2\build\WinSCP.targets'))" />
-    <Error Condition="!Exists('..\packages\librdkafka.redist.0.11.5\build\librdkafka.redist.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\librdkafka.redist.0.11.5\build\librdkafka.redist.props'))" />
+    <Error Condition="!Exists('..\packages\librdkafka.redist.0.11.6\build\librdkafka.redist.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\librdkafka.redist.0.11.6\build\librdkafka.redist.props'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
