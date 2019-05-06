@@ -182,18 +182,10 @@ namespace Sentry.data.Infrastructure
                     Producer p = Producer;
                 }
 
-                //var task = Producer.ProduceAsync(topic, Encoding.ASCII.GetBytes(key), Encoding.ASCII.GetBytes(value));
-                var task = _producer_str_str.ProduceAsync(topic, key, value);
+                Logger.Info($"Publishing message - Topic:{Sentry.data.Infrastructure.TopicHelper.GetDSCEventTopic()} Key:{key} Message:{value}");
 
-                task.Wait(TimeSpan.FromSeconds(10));
+                _producer_str_str.ProduceAsync(topic, key, value, new ProducerDeliveryHandler());
 
-                if (task.Exception != null)
-                {
-                    foreach (Exception e in task.Exception.Flatten().InnerExceptions)
-                    {
-                        Logger.Error($"Failed to execute kafka producer ProduceAsync", e);
-                    }
-                }
             }
             catch (Exception ex)
             {
