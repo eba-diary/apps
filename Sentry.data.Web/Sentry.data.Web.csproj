@@ -306,6 +306,7 @@
     <Compile Include="Controllers\WebApi\TagController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Extensions\BusinessIntelligenceExtensions.cs" />
+    <Compile Include="Extensions\ConfigExtension.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
     <Compile Include="Extensions\FavoriteExtensions.cs" />
     <Compile Include="Extensions\ImageExtensions.cs" />
