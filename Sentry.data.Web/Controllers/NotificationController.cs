@@ -31,7 +31,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult ModifyNotification(int notificationId)
+        public ActionResult ModifyNotification(int notificationId = 0)
         {
             if (_notificationService.CanUserModifyNotifications())
             {

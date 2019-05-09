@@ -1255,8 +1255,6 @@
     <Content Include="Views\Dataset\_DatasetFileVersions.cshtml" />
     <Content Include="Views\Config\Manage.cshtml" />
     <Content Include="Views\Config\_EditConfigFile.cshtml" />
-    <Content Include="Views\DataAsset\EditAssetNotification.cshtml" />
-    <Content Include="Views\DataAsset\CreateAssetNotification.cshtml" />
     <Content Include="Views\Dataset\_BundleFilename.cshtml" />
     <Content Include="Views\Dataset\EditDataFile.cshtml" />
     <Content Include="Views\Config\Create.cshtml" />
