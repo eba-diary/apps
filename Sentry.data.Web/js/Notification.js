@@ -73,11 +73,36 @@ data.Notification = {
 
     formatAssetNotificationTableDetails: function (d) {
         // `d` is the original data object for the row
-        return '<table cellpadding="5" cellspacing="0" border="0" style="padding-left:50px;">' +
-            '<tr>' +
-            '<td><b>Message:</b>&nbsp</td>' +
-            '<td>' + d.Message + '</td>' +
-            '</tr>' +
-            '</table>';
+        if (d.MessageSeverity === 1) {
+            var htmlString = '<div id="preview-system-notification-wrapper">' +
+                '<div class="critical-notification-container">' +
+                '<div class="critical-notification-title">' + d.Title + '</div>' +
+                '<div class="critical-notification-content-container">' +
+                '<div class="critical-notification-date">' + moment(d.StartTime).format("M/D/YYYY") + '</div>' +
+                '<div class="critical-notification-body">' + d.Message + d.MessageSeverity + '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+        else {
+            var htmlString = '<div id="preview-system-notification-wrapper">' +
+                '<div id="standard-notification-carousel-preview" class="carousel slide" data-ride="carousel">' +
+                '<div class="carousel-inner">' +
+                '<div class="item active">' +
+                '<div class="standard-notification-title">' + d.Title + '</div>' +
+                '<div class="standard-notification-date">' + moment(d.StartTime).format("M/D/YYYY") + '</div>' +
+                '<div class="standard-notification-body">' + d.Message + d.MessageSeverity + '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        }
+        
+
+        var div = document.createElement('div');
+        div.innerHTML = htmlString.trim();
+
+        return div.childNodes;
+
     }
 };
