@@ -22,6 +22,7 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
+        [Ignore]
         public void Get_Business_Intelligence_Dto_By_Id()
         {
             IDatasetContext dsContext = MockRepository.GenerateMock<IDatasetContext>();
@@ -60,8 +61,11 @@ namespace Sentry.data.Core.Tests
         }
 
         [TestMethod]
+        [Ignore]
         public void Get_Business_Intelligence_Detail_Dto_By_Id()
         {
+            
+
             IDatasetContext dsContext = MockRepository.GenerateMock<IDatasetContext>();
             dsContext.Stub(x => x.GetById<Dataset>(1)).Return(BuildMockDataset().First()).Repeat.Any();
             dsContext.Stub(x => x.IsUserSubscribedToDataset("081226", 1)).Return(true).Repeat.Any();
