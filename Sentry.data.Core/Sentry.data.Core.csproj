@@ -86,7 +86,12 @@
     <Compile Include="DTO\ContactInfoDto.cs" />
     <Compile Include="DTO\Favorites\FavoriteDto.cs" />
     <Compile Include="DTO\ImagesDto.cs" />
+    <Compile Include="Entities\Goldeneye\FileProcess.cs" />
+    <Compile Include="Entities\Goldeneye\RetrieverRequests\DfsBasicHsz.cs" />
+    <Compile Include="Entities\Goldeneye\RunningTask.cs" />
     <Compile Include="Entities\Image.cs" />
+    <Compile Include="Entities\MessageFormats\HszDropLocationCreateModel.cs" />
+    <Compile Include="Extensions\RetrieverJobExtensions.cs" />
     <Compile Include="Interfaces\ITagService.cs" />
     <Compile Include="DomainServices\SecurityService.cs" />
     <Compile Include="DomainServices\TagService.cs" />
@@ -245,6 +250,7 @@
     <Compile Include="Interfaces\IODCFileProvider.cs" />
     <Compile Include="Interfaces\Retriever\IAuthenticationType.cs" />
     <Compile Include="Interfaces\Retriever\IDataSource.cs" />
+    <Compile Include="Interfaces\Retriever\IHszFileWatchService.cs" />
     <Compile Include="Interfaces\Retriever\IRetrieverJob.cs" />
     <Compile Include="Interfaces\Retriever\IRetrieverJobService.cs" />
     <Compile Include="DTO\TagGroupDto.cs" />

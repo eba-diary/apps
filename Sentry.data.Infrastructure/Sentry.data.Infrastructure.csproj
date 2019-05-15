@@ -234,6 +234,7 @@
     <Compile Include="ServiceImplementations\EncryptionService.cs" />
     <Compile Include="ServiceImplementations\EventService.cs" />
     <Compile Include="ServiceImplementations\FtpProvider.cs" />
+    <Compile Include="ServiceImplementations\HszFileWatchService.cs" />
     <Compile Include="ServiceImplementations\HTTPSProvider.cs" />
     <Compile Include="ServiceImplementations\JawsService.cs" />
     <Compile Include="ServiceImplementations\KafkaMessagePublisher.cs" />

@@ -206,4 +206,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             });
         }
     }
+
+    public class DfsBasicHszMapping : SubclassMapping<DfsBasicHsz>
+    {
+        public DfsBasicHszMapping()
+        {
+            DiscriminatorValue(@"DFSBasicHsz");
+        }
+    }
 }
