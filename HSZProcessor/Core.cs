@@ -44,7 +44,7 @@ namespace HSZProcessor
         /// </summary>
         private void DoWork()
         {
-            Logger.Info("HszProcessor Worker task started.");
+            Logger.Info("HszProcessor_Worker_task_started");
 
             //call your bootstrapper to initialize your application
             Bootstrapper.Init();
@@ -57,7 +57,7 @@ namespace HSZProcessor
                 using (_container = Bootstrapper.Container.GetNestedContainer())
                 {
                     _requestContext = _container.GetInstance<IRequestContext>();
-                    _hszFileWatchService = _container.GetInstance<IHszFileWatchService>();
+                    //_hszFileWatchService = _container.GetInstance<IHszFileWatchService>();
 
                     //If it's completed dispose of it.
                     var tasks = currentTasks.Where(x => x.Name.StartsWith("Watch") && x.Task.IsCompleted).ToList();
@@ -78,7 +78,7 @@ namespace HSZProcessor
                         if (initRun)
                         {
                             currentTasks.Add(new RunningTask(
-                                Task.Factory.StartNew(() => _hszFileWatchService.OnStart(job, _token),
+                                Task.Factory.StartNew(() => new HszFileWatchService().OnStart(job, _token),
                                                                 TaskCreationOptions.LongRunning).ContinueWith(TaskException,
                                                                 TaskContinuationOptions.OnlyOnFaulted),
                                                                 $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
@@ -89,7 +89,7 @@ namespace HSZProcessor
                         else if (tasks.Any(w => Int64.Parse(w.Name.Split('_')[2]) == configID))
                         {
                             currentTasks.Add(new RunningTask(
-                                Task.Factory.StartNew(() => _hszFileWatchService.OnStart(job, _token),
+                                Task.Factory.StartNew(() => new HszFileWatchService().OnStart(job, _token),
                                                                 TaskCreationOptions.LongRunning).ContinueWith(TaskException,
                                                                 TaskContinuationOptions.OnlyOnFaulted),
                                                                 $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
@@ -103,7 +103,7 @@ namespace HSZProcessor
                             Logger.Info($"Detected new config ({configID}) to monitor ({watchPath})");
 
                             currentTasks.Add(new RunningTask(
-                                Task.Factory.StartNew(() => _hszFileWatchService.OnStart(job, _token),
+                                Task.Factory.StartNew(() => new HszFileWatchService().OnStart(job, _token),
                                                                 TaskCreationOptions.LongRunning).ContinueWith(TaskException,
                                                                 TaskContinuationOptions.OnlyOnFaulted),
                                                                 $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")

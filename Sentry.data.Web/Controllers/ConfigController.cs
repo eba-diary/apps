@@ -437,7 +437,7 @@ namespace Sentry.data.Web.Controllers
                 Disabled = true
             });
 
-            cjm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic").Where(x => x.Value != "S3Basic" && x.Value != "JavaApp").OrderBy(x => x.Value);
+            cjm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic").Where(x => x.Value != "S3Basic" && x.Value != "DFSBasicHsz" && x.Value != "JavaApp").OrderBy(x => x.Value);
 
             List<SelectListItem> temp2 = new List<SelectListItem>();
 
@@ -890,7 +890,7 @@ namespace Sentry.data.Web.Controllers
                 Disabled = true
             });
 
-            csm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic" && x.Value != "S3Basic").OrderBy(x => x.Value);
+            csm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic" && x.Value != "S3Basic" && x.Value != "DFSBasicHsz" && x.Value != "JavaApp").OrderBy(x => x.Value);
 
             if (csm.SourceType == null)
             {

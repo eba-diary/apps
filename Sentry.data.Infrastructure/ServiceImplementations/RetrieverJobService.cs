@@ -487,10 +487,10 @@ namespace Sentry.data.Infrastructure
                     {
                         RetrieverJob targetJob = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).ThenFetch(d => d.ParentDataset).Fetch(f => f.DataSource).FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is S3Basic);
                         //Get target path based on basic job found
-                        string targetFullPath = GetTargetPath(targetJob);
+                        //string targetFullPath = GetTargetPath(targetJob);
 
                         //Set directory search
-                        var dirSearchCriteria = (String.IsNullOrEmpty(filePath)) ? "*" : filePath;
+                        var dirSearchCriteria = (String.IsNullOrEmpty(filePath)) ? "*" : Path.GetFileName(filePath);
 
                         //Only search top directory and source files not locked and does not start with two exclamaition points !!
                         foreach (var a in Directory.GetFiles(_job.GetUri().LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w) && !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
@@ -506,10 +506,20 @@ namespace Sentry.data.Infrastructure
                                 if (!_job.FilterIncomingFile(Path.GetFileName(a)))
                                 {
 
-                                    //Upload file to s3 drop location
+                                    string processingFile = GenerateProcessingFileName(filePath);
 
-                                    string targetkey = targetFullPath;
-                                    var versionId = _s3ServiceProvider.UploadDataFile(filePath, targetkey);
+                                    //Rename file to indicate a request has been sent to Dataset Loader
+                                    File.Move(filePath, processingFile);
+
+                                    //generate targetkey, remove processing indicator from filename
+                                    string targetkey = $"{targetJob.DataSource.GetDropPrefix(targetJob)}{_job.GetTargetFileName(Path.GetFileName(filePath).Replace(Configuration.Config.GetHostSetting("ProcessedFilePrefix"),""))}";
+                                    var versionId = _s3ServiceProvider.UploadDataFile(processingFile, targetkey);
+
+                                    //Cleanup target file if exists
+                                    if (File.Exists(processingFile))
+                                    {
+                                        File.Delete(processingFile);
+                                    }
 
                                     _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
 
@@ -1070,6 +1080,23 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        private string GenerateProcessingFileName(string filepath)
+        {
+            var orginalPath = Path.GetFullPath(filepath).Replace(Path.GetFileName(filepath), "");
+            var origFileName = Path.GetFileName(filepath);
+            return orginalPath + Configuration.Config.GetHostSetting("ProcessedFilePrefix") + origFileName;
+        }
+
+        private string GetFileOwner(string filepath)
+        {
+            var fsecurity = File.GetAccessControl(filepath);
+            var sid = fsecurity.GetOwner(typeof(SecurityIdentifier));
+            var ntAccount = sid.Translate(typeof(NTAccount));
+
+            //remove domain
+            return ntAccount.ToString().Replace(@"SHOESD01\", "");
+        }
+
         private void SubmitLoaderRequest(string filepath)
         {
             string processingFile = null;
@@ -1077,16 +1104,8 @@ namespace Sentry.data.Infrastructure
 
             if (_job.DataSource.Is<DfsBasic>() || _job.DataSource.Is<DfsCustom>())
             {
-                var orginalPath = Path.GetFullPath(filepath).Replace(Path.GetFileName(filepath), "");
-                var origFileName = Path.GetFileName(filepath);
-                processingFile = orginalPath + Configuration.Config.GetHostSetting("ProcessedFilePrefix") + origFileName;
-
-                var fsecurity = File.GetAccessControl(filepath);
-                var sid = fsecurity.GetOwner(typeof(SecurityIdentifier));
-                var ntAccount = sid.Translate(typeof(NTAccount));
-
-                //remove domain
-                fileOwner = ntAccount.ToString().Replace(@"SHOESD01\", "");
+                processingFile = GenerateProcessingFileName(filepath);
+                fileOwner = GetFileOwner(filepath);
 
                 //Rename file to indicate a request has been sent to Dataset Loader
                 File.Move(filepath, processingFile);

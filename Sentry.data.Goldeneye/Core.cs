@@ -326,7 +326,7 @@ namespace Sentry.data.Goldeneye
 
 
 
-                            rtjob = _requestContext.RetrieverJob.Where(w => (w.DataSource is DfsBasic || w.DataSource is DfsCustom) && w.Schedule == "Instant" && w.IsEnabled).ToList();
+                            rtjob = _requestContext.RetrieverJob.Where(w => (!(w.DataSource is DfsBasicHsz) && (w.DataSource is DfsBasic || w.DataSource is DfsCustom)) && w.Schedule == "Instant" && w.IsEnabled).ToList();
 
 
 

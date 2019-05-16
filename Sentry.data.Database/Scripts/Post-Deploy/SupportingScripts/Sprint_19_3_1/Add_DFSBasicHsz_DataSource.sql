@@ -9,24 +9,122 @@ END
 
 IF NOT EXISTS (Select * from DataSource where Source_NME = 'Default HSZ Drop Location')
 BEGIN
-insert into DataSource
-select 
-	'Default HSZ Drop Location',
-	'Default HSZ Drop Location',
-	'file:///c:/tmp/DatasetLoader/hsz/',
-	0,
-	'DFSBasicHsz',
-	1,
-	'2304E10B-AF6',
-	GETDATE(),
-	GETDATE(),
-	null,
-	0,
-	null,
-	0,
-	null,
-	null,
-	null,
-	null,
-	null
+	IF EXISTS (select 1 where @@SERVERNAME like '%fit-p-shardb-10%' OR @@SERVERNAME like '%fit-p-shardb-20%')
+	BEGIN
+		insert into DataSource
+		select 
+			'Default HSZ Drop Location',
+			'Default HSZ Drop Location',
+			'file:////sentry.com/securefs/datasetloader/',
+			0,
+			'DFSBasicHsz',
+			1,
+			'2304E10B-AF6',
+			GETDATE(),
+			GETDATE(),
+			null,
+			0,
+			null,
+			0,
+			null,
+			null,
+			null,
+			null,
+			null
+	END
+	ELSE IF EXISTS (select 1 where @@SERVERNAME like '%fit-n-shardb-10%' OR @@SERVERNAME like '%fit-n-shardb-20%')
+	BEGIN
+		insert into DataSource
+		select 
+			'Default HSZ Drop Location',
+			'Default HSZ Drop Location',
+			'file:////sentry.com/securefs_nonprod/datasetloader/',
+			0,
+			'DFSBasicHsz',
+			1,
+			'2304E10B-AF6',
+			GETDATE(),
+			GETDATE(),
+			null,
+			0,
+			null,
+			0,
+			null,
+			null,
+			null,
+			null,
+			null
+	END
+	ELSE IF EXISTS (select 1 where @@SERVERNAME like '%fit-n-shardb-11%' and DB_NAME() = 'SentryDatasets_NR')
+	BEGIN
+		insert into DataSource
+		select 
+			'Default HSZ Drop Location',
+			'Default HSZ Drop Location',
+			'file:////sentry.com/securefs_nonprod/datasetloader/nrtest/',
+			0,
+			'DFSBasicHsz',
+			1,
+			'2304E10B-AF6',
+			GETDATE(),
+			GETDATE(),
+			null,
+			0,
+			null,
+			0,
+			null,
+			null,
+			null,
+			null,
+			null
+	END
+	ELSE IF EXISTS (select 1 where @@SERVERNAME like '%fit-n-shardb-11%' and DB_NAME() = 'SentryDatasets')
+	BEGIN
+		insert into DataSource
+		select 
+			'Default HSZ Drop Location',
+			'Default HSZ Drop Location',
+			'file:////sentry.com/securefs_nonprod/datasetloader/test/',
+			0,
+			'DFSBasicHsz',
+			1,
+			'2304E10B-AF6',
+			GETDATE(),
+			GETDATE(),
+			null,
+			0,
+			null,
+			0,
+			null,
+			null,
+			null,
+			null,
+			null
+	END
+	ELSE
+	BEGIN
+		insert into DataSource
+		select 
+			'Default HSZ Drop Location',
+			'Default HSZ Drop Location',
+			'file:///c:/tmp/datasetloader/hsz/',
+			0,
+			'DFSBasicHsz',
+			1,
+			'2304E10B-AF6',
+			GETDATE(),
+			GETDATE(),
+			null,
+			0,
+			null,
+			0,
+			null,
+			null,
+			null,
+			null,
+			null
+	END
 END
+
+select DB_NAME()
+

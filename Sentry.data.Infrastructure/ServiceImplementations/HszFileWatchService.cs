@@ -55,9 +55,8 @@ namespace Sentry.data.Infrastructure
                 this.Job = Job;
                 RetrieverJobId = Job.Id;
 
-
-                Console.WriteLine("Watcher instance started for : " + watcher.Path);
-                Logger.Info("Watcher instance started for : " + watcher.Path);
+                Console.WriteLine("hszWatcher_instance_started : " + watcher.Path);
+                Logger.Info("hszWatcher_instance_started : " + watcher.Path);
 
                 /* Watch for changes in LastAccess and LastWrite times, and
                    the renaming of files or directories. */
@@ -79,8 +78,8 @@ namespace Sentry.data.Infrastructure
                 //  Filter out DatasetLoader Request and Failed Request folders.
                 foreach (var a in Directory.GetFiles(watcher.Path, "*", SearchOption.TopDirectoryOnly).Where(w => !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
                 {
-                    Console.WriteLine("Found : " + a);
-                    Logger.Info("Found : " + a);
+                    Console.WriteLine("found : " + a);
+                    Logger.Info("found : " + a);
                     allFiles.Add(new FileProcess(a));
                 }
 
@@ -92,7 +91,7 @@ namespace Sentry.data.Infrastructure
             }
             catch (Exception ex)
             {
-                Logger.Error($"Error initilizing watch for {watchPath}", ex);
+                Logger.Error($"error_initilizing_hszwatch : {watchPath}", ex);
             }
         }
 
@@ -131,11 +130,7 @@ namespace Sentry.data.Infrastructure
                         {
                             RetrieverJobService _retrieverJobService = container.GetInstance<RetrieverJobService>();
 
-                            _retrieverJobService.RunHszRetrieverJob(Job, token, Path.GetFileName(file.fileName));
-
-                            //Create a fire-forget Hangfire job to decompress the file and drop extracted file into drop location
-                            //BackgroundJob.Enqueue<RetrieverJobService>(RetrieverJobService => RetrieverJobService.RunRetrieverJob(RetrieverJobId, JobCancellationToken.Null, Path.GetFileName(file.fileName)));
-                            //RecurringJob.AddOrUpdate<RetrieverJobService>($"RetrieverJob_{RetrieverJobId}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(RetrieverJobId), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                            _retrieverJobService.RunHszRetrieverJob(Job, token, file.fileName);
 
                             file.started = true;
                         }
