@@ -58,6 +58,9 @@ namespace Sentry.data.Web.Controllers
             ReportUtility.SetupLists(_datasetContext, cdm);
 
             _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Report Creation Page", cdm.DatasetId);
+
+            ViewData["Title"] = "Create Exhibit";
+
             return View("BusinessIntelligenceForm",cdm);
         }
 
@@ -76,6 +79,9 @@ namespace Sentry.data.Web.Controllers
                 ReportUtility.SetupLists(_datasetContext, model);
 
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Report Edit Page", dto.DatasetId);
+
+                ViewData["Title"] = "Edit Exhibit";
+
                 return View("BusinessIntelligenceForm", model);
             }
             return View("Forbidden");
