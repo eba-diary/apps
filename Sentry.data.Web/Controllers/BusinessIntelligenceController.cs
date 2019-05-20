@@ -151,6 +151,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("BusinessIntelligence/Detail/{id}/")]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_VIEW)]
         public ActionResult Detail(int id)
         {
             BusinessIntelligenceDetailDto dto = _businessIntelligenceService.GetBusinessIntelligenceDetailDto(id);
@@ -162,6 +163,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [Route("businessIntelligence/{id}/Favorites/")]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_VIEW)]
         public JsonResult FavoritesDetail(int Id)
         {
             List<FavoriteDto> favList = _businessIntelligenceService.GetDatasetFavoritesDto(Id);
@@ -170,6 +172,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_MODIFY)]
         public ActionResult CreateTag()
         {
             TagModel model = new TagModel()
@@ -182,6 +185,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_MODIFY)]
         public ActionResult TagForm(TagModel model)
         {
             TagDto dto = model.ToDto();
@@ -215,6 +219,8 @@ namespace Sentry.data.Web.Controllers
             return PartialView("_TagForm", model);
         }
 
+
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_VIEW)]
         public ActionResult GetImage(string url, int? t)
         {
             if (url == null || !url.StartsWith("images/"))
@@ -227,6 +233,8 @@ namespace Sentry.data.Web.Controllers
             return File(img, "image/jpg", "image_" + System.IO.Path.GetFileName(url));
         }
 
+
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_MODIFY)]
         public ActionResult UploadPreviewImage()
         {
             HttpFileCollectionBase Files;
@@ -242,6 +250,7 @@ namespace Sentry.data.Web.Controllers
             //return Json(model, JsonRequestBehavior.AllowGet);
         }
 
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.REPORT_MODIFY)]
         public ActionResult NewImage(int index = 0)
         {
             ImageModel im = new ImageModel();
