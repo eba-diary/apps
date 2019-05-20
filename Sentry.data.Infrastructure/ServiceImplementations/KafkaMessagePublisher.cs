@@ -66,13 +66,16 @@ namespace Sentry.data.Infrastructure
                     IList<KeyValuePair<String, Object>> configuration = new List<KeyValuePair<String, Object>>()
                     {
                         { new KeyValuePair<String, Object>("statistics.interval.ms", "60000") },
-                        { new KeyValuePair<String, Object>("bootstrap.servers", Configuration.Config.GetHostSetting("KafkaBootstrapServers")) },
-                        { new KeyValuePair<String, Object>("security.protocol", "sasl_ssl") },
-                        { new KeyValuePair<String, Object>("sasl.mechanism", "GSSAPI") },
-                        { new KeyValuePair<String, Object>("sasl.kerberos.service.name", Configuration.Config.GetHostSetting("sasl_kerberos_service_name")) },
-                        { new KeyValuePair<String, Object>("ssl.ca.location", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Configuration.Config.GetHostSetting("CertPath"))) }
-                        
+                        { new KeyValuePair<String, Object>("bootstrap.servers", Configuration.Config.GetHostSetting("KafkaBootstrapServers")) }                        
                     };
+
+                    if ((Configuration.Config.GetHostSetting("KafkaSSL").ToLower() == "true") ? true : false)
+                    {
+                        configuration.Add(new KeyValuePair<String, Object>("security.protocol", "sasl_ssl"));
+                        configuration.Add(new KeyValuePair<String, Object>("sasl.mechanism", "GSSAPI"));
+                        configuration.Add(new KeyValuePair<String, Object>("sasl.kerberos.service.name", Configuration.Config.GetHostSetting("sasl_kerberos_service_name")));
+                        configuration.Add(new KeyValuePair<String, Object>("ssl.ca.location", Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Configuration.Config.GetHostSetting("CertPath"))));
+                    }
 
                     //Add kafka debug logging 
                     if ((Configuration.Config.GetHostSetting("KafkaDebugLogging").ToLower() == "true")? true : false)
@@ -81,7 +84,9 @@ namespace Sentry.data.Infrastructure
                     }
 
                     //Print configuration on start
-                    string cfgstr = "Producer Configuration:";
+                    string cfgstr = "Producer Configuration:\r\n";
+                    cfgstr += $"KafkaSSL: {Configuration.Config.GetHostSetting("KafkaSSL")}\r\n";
+                    cfgstr += $"KafkaDebugLogging: {Configuration.Config.GetHostSetting("KafkaDebugLogging")}";
                     foreach (KeyValuePair<String, Object> itm in configuration)
                     {
                         if (!string.IsNullOrEmpty(cfgstr)) cfgstr += "\r\n";
