@@ -31,7 +31,8 @@ namespace Sentry.data.Web
                 Delimiter = model.Delimiter,
                 DatasetScopeTypeId = model.DatasetScopeTypeId,
                 DataClassification = model.DataClassification,
-                IsSecured = model.IsSecured
+                IsSecured = model.IsSecured,
+                HasHeader = model.HasHeader
             };
         }
 

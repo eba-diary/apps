@@ -1,7 +1,6 @@
 ﻿@model Sentry.data.Web.BusinessIntelligenceModel
-@{ViewData["Title"] = "Create Exhibit";}
 
-<h2>Create Exhibit</h2>
+<h2>@ViewData["Title"]</h2>
 <div></div>
 
 @using (Html.BeginForm("BusinessIntelligenceForm", "BusinessIntelligence", FormMethod.Post, new { @id = "BusinessIntelligenceForm", @enctype = "multipart/form-data" }))

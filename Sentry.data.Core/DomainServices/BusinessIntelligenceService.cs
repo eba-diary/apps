@@ -131,17 +131,18 @@ namespace Sentry.data.Core
                 if (img.DeleteImage == true)
                 {
                     DeleteImage(img);
-                    Image removeimg = ds.Images.First(w => w.ImageId == img.ImageId);
-                    ds.Images.Remove(removeimg);
-                    //dto.Images.Remove(img);
+                    if(ds.Images.Any(w => w.ImageId == img.ImageId))
+                    {
+                        Image removeimg = ds.Images.First(w => w.ImageId == img.ImageId);
+                        ds.Images.Remove(removeimg);
+                        //dto.Images.Remove(img);
+                    }
                 }
-
                 //New Image
                 else if (img.ImageId == 0)
                 {
                     CreateImage(ds, img);
                 }
-
                 //Existing image
                 else
                 {

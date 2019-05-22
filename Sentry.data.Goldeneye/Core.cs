@@ -272,15 +272,6 @@ namespace Sentry.data.Goldeneye
                     //Run All the Processes that MUST BE run once per MINUTE
                     if ((DateTime.Now - config.LastRunMinute).TotalMinutes >= 1 || firstRun)
                     {
-
-                        //DatasetLoader Back Pressure
-                        if (true)
-                        {
-                            int files = Directory.GetFiles(Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath"), "*", SearchOption.AllDirectories).Where(w => !w.Contains(Config.GetHostSetting("LoaderRequestPath") + Config.GetHostSetting("ProcessedFilePrefix"))).Count();
-                            Console.WriteLine($"Dataset Loader Back Pressure: {files}");
-                            Logger.Info($"Dataset Loader Back Pressure: {files}");
-                        }
-
                         //Reload and modifed\new jobs
                         List<RetrieverJob> JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && w.IsEnabled && (w.Created > config.LastRunMinute || w.Modified > config.LastRunMinute)).ToList();
 

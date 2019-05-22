@@ -15,11 +15,12 @@ namespace Sentry.Messaging.Common
         #region BaseKafkaConsumer Overrides
         protected override void _consumer_OnMessage(object sender, Message<string, string> e)
         {
+            Logger.Info($"Key:{e.Value}");
             BaseEventMessage msg = null;
             try
             {
                 msg = JsonConvert.DeserializeObject<BaseEventMessage>(e.Value);
-                Logger.Debug(msg.EventType + " consumed from topic.");
+                Logger.Info(msg.EventType + " consumed from topic.");
                 ProcessMessage(e.Value);
             }
             catch (Exception ex)

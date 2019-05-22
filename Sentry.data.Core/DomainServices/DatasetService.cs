@@ -246,18 +246,6 @@ namespace Sentry.data.Core
                 errors.Add("Dataset name already exists within category");
             }
 
-            var currentFileExtension = _datasetContext.FileExtensions.FirstOrDefault(x => x.Id == dto.FileExtensionId).Name.ToLower();
-
-            if (currentFileExtension == "csv" && dto.Delimiter != ",")
-            {
-                errors.Add("File Extension CSV and it's delimiter do not match.");
-            }
-
-            if (currentFileExtension == "delimited" && string.IsNullOrWhiteSpace(dto.Delimiter))
-            {
-                errors.Add("File Extension Delimited is missing it's delimiter.");
-            }
-
             if (String.IsNullOrWhiteSpace(dto.PrimaryOwnerId))
             {
                 errors.Add("Owner is requried.");
@@ -344,7 +332,8 @@ namespace Sentry.data.Core
                 HiveDatabase = "Default",
                 HiveTable = dto.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dto.ConfigFileName.Replace(" ", "").ToUpper(),
                 HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
-                HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
+                HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
+                HasHeader = dto.HasHeader
             };
 
             return de;

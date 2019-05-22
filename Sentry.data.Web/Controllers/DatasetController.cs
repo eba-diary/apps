@@ -37,6 +37,7 @@ namespace Sentry.data.Web.Controllers
         private readonly IObsidianService _obsidianService;
         private readonly IDatasetService _datasetService;
         private readonly IEventService _eventService;
+        private readonly IConfigService _configService;
 
         public DatasetController(
             IDatasetContext dsCtxt,
@@ -46,7 +47,8 @@ namespace Sentry.data.Web.Controllers
             IAssociateInfoProvider associateInfoService,
             IObsidianService obsidianService,
             IDatasetService datasetService,
-            IEventService eventService)
+            IEventService eventService,
+            IConfigService configService)
         {
             _datasetContext = dsCtxt;
             _s3Service = dsSvc;
@@ -56,6 +58,7 @@ namespace Sentry.data.Web.Controllers
             _obsidianService = obsidianService;
             _datasetService = datasetService;
             _eventService = eventService;
+            _configService = configService;
         }
 
         public ActionResult Index()
@@ -90,6 +93,8 @@ namespace Sentry.data.Web.Controllers
 
             _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Creation Page", cdm.DatasetId);
 
+            ViewData["Title"] = "Create Dataset";
+
             return View("DatasetForm", cdm);
         }
 
@@ -105,6 +110,9 @@ namespace Sentry.data.Web.Controllers
                 Utility.SetupLists(_datasetContext, model);
 
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Edit Page", id);
+                
+                ViewData["Title"] = "Edit Dataset";
+
                 return View("DatasetForm", model);
             }
 
@@ -117,7 +125,15 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetDto dto = model.ToDto();
 
+            //only validate config settings on dataset create
+            if (model.DatasetId == 0)
+            {
+                DataElementDto elementDto = model.DatasetModelToDto();
+                AddCoreValidationExceptionsToModel(_configService.Validate(elementDto));
+            }
+
             AddCoreValidationExceptionsToModel(_datasetService.Validate(dto));
+
             if (ModelState.IsValid)
             {
 
@@ -1094,7 +1110,7 @@ namespace Sentry.data.Web.Controllers
 
         #endregion
 
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)] 
         [HttpPost]
         public ActionResult RunRetrieverJob(int id)
         {
@@ -1211,7 +1227,10 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult QueryTool()
         {
+            IApplicationUser user = _userService.GetCurrentUser();
+
             ViewBag.LivyURL = Sentry.Configuration.Config.GetHostSetting("ApacheLivy");
+            ViewBag.IsAdmin = user.IsAdmin;
 
             _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Query Tool Page");
 

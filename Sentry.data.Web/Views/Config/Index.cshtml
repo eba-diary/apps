@@ -29,60 +29,6 @@
                         <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
                     }
                 }
-
-                <div style="margin-top:-29px;">
-                    <div class="btn-group rightFloat dataset-operation-button">
-                        <button type="button"
-                                class="btn btn-default borderdk_gray borderdk_@color dropdown"
-                                data-toggle="dropdown" data-placement="top" title="Additional Actions">
-                            <span class="glyphicon glyphicon-menu-hamburger @color"></span>
-                        </button>
-
-                        <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
-                            <li id="SubscribeModal" style="cursor: pointer;" data-id="@Model.DatasetId" data-placement="top" title="Subscribe">
-                                <a>
-                                    Subscribe
-                                </a>
-                            </li>
-
-                            @if (Model.CanQueryTool)
-                            {
-                                <li title="Query Dataset">
-                                    <a href="/Dataset/QueryTool?DatasetID=@Model.DatasetId">
-                                        Query this Dataset
-                                    </a>
-                                </li>
-                            }
-                            @if (Model.CanEditDataset)
-                            {
-                                <li>
-                                    <a href="/Config/Dataset/@Model.DatasetId">
-                                        Manage Schemas
-                                    </a>
-                                </li>
-                            }
-                        </ul>
-                    </div>
-
-                    @if (Model.CanUpload)
-                    {
-                        <button type="button"
-                                class="btn btn-default dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                                id="UploadModal" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Upload File">
-                            <span class="glyphicon glyphicon-cloud-upload @color"></span>
-                        </button>
-                    }
-
-                    @if (Model.CanEditDataset)
-                    {
-                        <button type="button"
-                                class="btn btn-default btn dataset-operation-button rightFloat borderdk_gray borderdk_@color"
-                                id="EditDataset_@Model.DatasetId" data-id="@Model.DatasetId" data-toggle="tooltip" data-placement="top" title="Edit Dataset">
-                            <span class="glyphicon glyphicon-edit @color"></span>
-                        </button>
-                    }
-
-                </div>
             </div>
         </div>
     </div>
@@ -290,7 +236,7 @@
                         @if (item.Schemas != null && item.Schemas.Any())
                         {
                             <hr />
-                            <h4 class="@color">Schemas (Sorted by Most Recent)</h4>
+                            <h4 class="@color">Schema (columns, datatypes, delimiter, etc.)</h4>
                             <hr />
                             foreach (var schema in item.Schemas.OrderByDescending(x => x.DataElementCreate_DTM))
                             {
@@ -386,8 +332,8 @@
                                 </div>
                             }
                         }
-
-                        <a class="backToList" href="/Config/@item.ConfigId/Schema/Create"><span class="glyphicon glyphicon-plus"></span>  Add New Schema</a>
+                        
+                        @*<a class="backToList" href="/Config/@item.ConfigId/Schema/Create"><span class="glyphicon glyphicon-plus"></span>  Add New Schema</a>*@
                     </div>
 
                 </div>

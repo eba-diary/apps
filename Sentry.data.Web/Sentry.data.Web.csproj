@@ -306,6 +306,7 @@
     <Compile Include="Controllers\WebApi\TagController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Extensions\BusinessIntelligenceExtensions.cs" />
+    <Compile Include="Extensions\ConfigExtension.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
     <Compile Include="Extensions\FavoriteExtensions.cs" />
     <Compile Include="Extensions\ImageExtensions.cs" />
@@ -1272,6 +1273,9 @@
     <Content Include="Views\Shared\_Success.cshtml" />
     <Content Include="Views\BusinessIntelligence\EditorTemplates\ImageModel.cshtml" />
     <Content Include="Views\Shared\_Images.cshtml" />
+    <Content Include="Security\cacert_sentry.pem">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -1,4 +1,4 @@
-﻿@model Sentry.data.Web.Models.Config.EditSchemaModel
+﻿@model Sentry.data.Web.EditSchemaModel
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -18,9 +18,8 @@
     @*Show the custom validation summary*@
     @Html.DisplayFor((model) => ViewData.ModelState)
 
-    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
-
     @Html.HiddenFor(model => model.DatasetId)
+    @Html.HiddenFor(model => model.FileTypeId)
 
     <h1>Edit Schema Revision</h1>
     <hr />
