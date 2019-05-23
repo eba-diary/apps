@@ -10,8 +10,8 @@
     <ProjectGuid>{4CEF5744-53D4-4A4D-8E2B-A47A68C52F05}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>HSZProcessor</RootNamespace>
-    <AssemblyName>HSZProcessor</AssemblyName>
+    <RootNamespace>HSZGOLDENEYE</RootNamespace>
+    <AssemblyName>HSZGOLDENEYE</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <MyType>Console</MyType>

@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <doc>
     <assembly>
-        <name>HSZProcessor</name>
+        <name>HSZGOLDENEYE</name>
     </assembly>
     <members>
         <member name="T:HSZProcessor.Core">
