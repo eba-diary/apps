@@ -45,7 +45,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.AsyncCommandProcesso
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.data.Core.Tests", "Sentry.data.Core.Tests\Sentry.data.Core.Tests.csproj", "{D871509A-AB3D-4B70-B1F1-23BF5F807D0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSZProcessor", "HSZProcessor\HSZProcessor.csproj", "{4CEF5744-53D4-4A4D-8E2B-A47A68C52F05}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSZGOLDENEYE", "HSZProcessor\HSZGOLDENEYE.csproj", "{4CEF5744-53D4-4A4D-8E2B-A47A68C52F05}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
