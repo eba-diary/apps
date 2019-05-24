@@ -59,6 +59,8 @@ namespace Sentry.data.Infrastructure
                         _ftpProvider = Container.GetInstance<IFtpProvider>();
                         _ftpProvider.SetCredentials(_job.DataSource.SourceAuthType.GetCredentials(_job));
 
+                        _job.JobLoggerMessage("Info", $"ftp.job.options - ftppatter:{_job.JobOptions.FtpPattern.ToString()} isregexsearch:{_job.JobOptions.IsRegexSearch.ToString()} searchcriteria:{_job.JobOptions.SearchCriteria}");
+
                         //Setup temporary work space for job
                         var tempFile = SetupTempWorkSpace();
 
