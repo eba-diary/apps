@@ -83,6 +83,7 @@
   <ItemGroup>
     <Compile Include="DomainServices\ConfigService.cs" />
     <Compile Include="DomainServices\DatasetService.cs" />
+    <Compile Include="DomainServices\JobService.cs" />
     <Compile Include="DTO\ContactInfoDto.cs" />
     <Compile Include="DTO\Favorites\FavoriteDto.cs" />
     <Compile Include="DTO\ImagesDto.cs" />
@@ -247,7 +248,7 @@
     <Compile Include="Interfaces\Retriever\IAuthenticationType.cs" />
     <Compile Include="Interfaces\Retriever\IDataSource.cs" />
     <Compile Include="Interfaces\Retriever\IRetrieverJob.cs" />
-    <Compile Include="Interfaces\Retriever\IRetrieverJobService.cs" />
+    <Compile Include="Interfaces\IJobService.cs" />
     <Compile Include="DTO\TagGroupDto.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Entities\User\ApplicationUser.cs" />

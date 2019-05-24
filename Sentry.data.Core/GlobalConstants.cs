@@ -147,5 +147,10 @@
             public const string DATASET_IMAGE_STORAGE_PREFIX = "images";
         }
 
+        public static class JobStates
+        {
+            public const string RETRIEVERJOB_SUCCESS_STATE = "Success";
+        }
+
     }
 }

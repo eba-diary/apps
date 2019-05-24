@@ -11,6 +11,8 @@ namespace Sentry.data.Core
         NoPattern = 0,
         SpecificFileNoDelete = 1,
         RegexFileNoDelete = 2,
-        SpecificFileArchive = 3
+        SpecificFileArchive = 3,
+        RegexFileSinceLastExecution = 4,
+        SpecificFileSinceLastexecution = 5
     }
 }
