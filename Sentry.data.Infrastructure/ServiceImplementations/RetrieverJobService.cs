@@ -489,16 +489,16 @@ namespace Sentry.data.Infrastructure
 
                 var rx = new Regex(_job.JobOptions.SearchCriteria, RegexOptions.IgnoreCase);
 
-                _job.JobLoggerMessage("Info", $"regexlastexecution.search executiontime:{lastExecution.Created.ToShortTimeString()} search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_job.GetUri().AbsoluteUri}");
-
                 List<RemoteFile> matchList;
 
                 if (lastExecution != null)
                 {
+                    _job.JobLoggerMessage("Info", $"regexlastexecution.search executiontime:{lastExecution.Created.ToShortTimeString()} search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_job.GetUri().AbsoluteUri}");
                     matchList = resultList.Where(w => rx.IsMatch(w.Name) && w.Modified > lastExecution.Created.AddSeconds(-10)).ToList();
                 }
                 else
                 {
+                    _job.JobLoggerMessage("Info", $"regexlastexecution.search executiontime:noexecutionhistory search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_job.GetUri().AbsoluteUri}");
                     matchList = resultList.Where(w => rx.IsMatch(w.Name)).ToList();
                 }
 
