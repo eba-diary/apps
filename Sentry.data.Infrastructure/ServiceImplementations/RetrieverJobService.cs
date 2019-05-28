@@ -514,7 +514,7 @@ namespace Sentry.data.Infrastructure
                 foreach (RemoteFile file in matchList)
                 {
                     _job.JobLoggerMessage("Info", $"regexlastexecution.processing.file {file.Name}");
-                    //string remoteUrl = _job.GetUri().AbsoluteUri + file.Name;
+                    string remoteUrl = _job.GetUri().AbsoluteUri + file.Name;
                     RetrieveFTPFile(remoteUrl);
                 }
 
