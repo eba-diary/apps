@@ -149,7 +149,10 @@
 
         public static class JobStates
         {
+            public const string RETRIEVERJOB_STARTED_STATE = "Started";
+            public const string RETRIEVERJOB_RUNNING_STATE = "Running";
             public const string RETRIEVERJOB_SUCCESS_STATE = "Success";
+            public const string RETRIEVERJOB_FAILED_STATE = "Failed";
         }
 
     }

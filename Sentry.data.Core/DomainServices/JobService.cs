@@ -19,5 +19,55 @@ namespace Sentry.data.Core
         {
             return _datasetConext.JobHistory.OrderByDescending(o => o.Created).Take(1).SingleOrDefault(w => w.JobId.Id == job.Id && w.State == GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE);
         }
+
+        void RecordJobState(Submission submission, RetrieverJob job, string state)
+        {
+            JobHistory histRecord = null;
+
+            if (job.DataSource.Is<FtpSource>())
+            {
+                histRecord = new JobHistory()
+                {
+                    JobId = job,
+                    BatchId = 0,
+                    JobGuid = submission.JobGuid,
+                    State = state,
+                    LivyAppId = null,
+                    LivyDriverLogUrl = null,
+                    LivySparkUiUrl = null,
+                    Active = true
+                };
+            }
+
+            _datasetConext.Add(histRecord);
+            _datasetConext.SaveChanges();
+            
+        }
+
+        public void SaveJobState(RetrieverJob job, string state)
+        {
+            JobHistory histRecord = new JobHistory()
+            {
+                JobId = job,
+                BatchId = batchResult.Id,
+                JobGuid = JobGuid,
+                State = batchResult.State,
+                LivyAppId = batchResult.Appid,
+                LivyDriverLogUrl = batchResult.AppInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault(),
+                LivySparkUiUrl = batchResult.AppInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault(),
+                Active = true
+            };
+
+            _datasetContext.Merge(histRecord);
+            _datasetContext.SaveChanges();
+        }
+
+        public Submission SaveSubmission(RetrieverJob job, string options)
+        {
+            Submission sub = job.ToSubmission();
+
+            _datasetConext.Add(sub);
+            _datasetConext.SaveChanges();
+        }
     }
 }

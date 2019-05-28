@@ -89,6 +89,7 @@
     <Compile Include="DTO\ImagesDto.cs" />
     <Compile Include="DTO\Schema\DataElementDTO.cs" />
     <Compile Include="Entities\Image.cs" />
+    <Compile Include="Extensions\JobExtensions.cs" />
     <Compile Include="Interfaces\ITagService.cs" />
     <Compile Include="DomainServices\SecurityService.cs" />
     <Compile Include="DomainServices\TagService.cs" />

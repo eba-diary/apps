@@ -26,6 +26,7 @@ namespace Sentry.data.Infrastructure
     public class RetrieverJobService
     {
         private RetrieverJob _job;
+        private Submission _submission;
         private IFtpProvider _ftpProvider;
         private IJobService _jobService;
         private string _tempFile;
@@ -56,6 +57,8 @@ namespace Sentry.data.Infrastructure
 
                     if (_job.DataSource.Is<FtpSource>())
                     {
+                        _submission = _jobService.SaveSubmission(_job, "");
+
                         _ftpProvider = Container.GetInstance<IFtpProvider>();
                         _ftpProvider.SetCredentials(_job.DataSource.SourceAuthType.GetCredentials(_job));
 
@@ -91,6 +94,7 @@ namespace Sentry.data.Infrastructure
                         catch (Exception ex)
                         {
                             _job.JobLoggerMessage("Error", $"Retriever Job Failed", ex);
+                            _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_FAILED_STATE);
                         }                        
                     }
                     else if (_job.DataSource.Is<SFtpSource>())
@@ -475,6 +479,9 @@ namespace Sentry.data.Infrastructure
             {
                 _jobService = Container.GetInstance<IJobService>();
 
+                
+                _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_STARTED_STATE);
+
                 JobHistory lastExecution = _jobService.GetLastExecution(_job);
 
                 string fileName = Path.GetFileName(_job.GetUri().AbsoluteUri);
@@ -484,7 +491,7 @@ namespace Sentry.data.Infrastructure
                     _job.JobLoggerMessage("Error", "Job terminating - Uri does not end with forward slash.");
                     return;
                 }
-
+                
                 IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
 
                 var rx = new Regex(_job.JobOptions.SearchCriteria, RegexOptions.IgnoreCase);
@@ -508,8 +515,10 @@ namespace Sentry.data.Infrastructure
                 {
                     _job.JobLoggerMessage("Info", $"regexlastexecution.processing.file {file.Name}");
                     //string remoteUrl = _job.GetUri().AbsoluteUri + file.Name;
-                    //RetrieveFTPFile(remoteUrl);
+                    RetrieveFTPFile(remoteUrl);
                 }
+
+                _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE);
             }            
         }
 
