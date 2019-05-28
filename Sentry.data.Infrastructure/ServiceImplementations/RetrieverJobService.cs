@@ -28,7 +28,6 @@ namespace Sentry.data.Infrastructure
         private RetrieverJob _job;
         private Submission _submission;
         private IFtpProvider _ftpProvider;
-        private IJobService _jobService;
         private string _tempFile;
         private readonly List<KeyValuePair<string, string>> _dropLocationTags = new List<KeyValuePair<string, string>>()
         {
@@ -51,6 +50,7 @@ namespace Sentry.data.Infrastructure
                 using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
                 {
                     IRequestContext _requestContext = Container.GetInstance<IRequestContext>();
+                    IJobService _jobService = Container.GetInstance<IJobService>();
 
                     //Retrieve job details
                     _job = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).Fetch(f => f.DataSource).Where(w => w.Id == JobId).FirstOrDefault();
@@ -477,7 +477,7 @@ namespace Sentry.data.Infrastructure
         {
             using (Container = Bootstrapper.Container.GetNestedContainer())
             {
-                _jobService = Container.GetInstance<IJobService>();
+                IJobService _jobService = Container.GetInstance<IJobService>();
 
                 
                 _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_STARTED_STATE);
