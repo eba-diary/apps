@@ -17,7 +17,7 @@ namespace Sentry.data.Core
 
         public JobHistory GetLastExecution(RetrieverJob job)
         {
-            return _datasetConext.JobHistory.OrderByDescending(o => o.Created).Take(1).SingleOrDefault(w => w.JobId.Id == job.Id && w.State == GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE);
+            return _datasetConext.JobHistory.Where(w => w.JobId.Id == job.Id && w.State == GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE).OrderByDescending(o => o.Created).Take(1).SingleOrDefault();
         }
 
         public void RecordJobState(Submission submission, RetrieverJob job, string state)
