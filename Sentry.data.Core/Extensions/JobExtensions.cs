@@ -13,9 +13,9 @@ namespace Sentry.data.Core
             return new Submission()
             {
                 JobId = job,
-                JobGuid = new Guid(),
+                JobGuid = Guid.NewGuid(),
                 Created = DateTime.Now,
-                Serialized_Job_Options = null
+                Serialized_Job_Options = ""
             };
         }
     }
