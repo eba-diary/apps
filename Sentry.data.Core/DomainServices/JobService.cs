@@ -35,9 +35,19 @@ namespace Sentry.data.Core
                     LivyAppId = null,
                     LivyDriverLogUrl = null,
                     LivySparkUiUrl = null,
-                    Active = true
+                    Active = false
                 };
-            }
+
+                //only started state gets active set to true, all others it is set to false.
+                if (state == GlobalConstants.JobStates.RETRIEVERJOB_STARTED_STATE) { histRecord.Active = true; };
+            }            
+
+            //if job has completed (state is success or failed), set the original active indicator to false.
+            if (state == GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE || state == GlobalConstants.JobStates.RETRIEVERJOB_FAILED_STATE)
+            {
+                JobHistory orignialRecord = _datasetConext.JobHistory.Where(w => w.JobId.Id == job.Id && w.JobGuid == submission.JobGuid && w.Active == true).SingleOrDefault();
+                if (orignialRecord != null) { orignialRecord.Active = false; };                
+            };
 
             _datasetConext.Add(histRecord);
             _datasetConext.SaveChanges();

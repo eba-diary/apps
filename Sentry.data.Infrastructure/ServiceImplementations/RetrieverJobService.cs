@@ -500,7 +500,7 @@ namespace Sentry.data.Infrastructure
 
                 if (lastExecution != null)
                 {
-                    _job.JobLoggerMessage("Info", $"regexlastexecution.search executiontime:{lastExecution.Created.ToShortTimeString()} search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_job.GetUri().AbsoluteUri}");
+                    _job.JobLoggerMessage("Info", $"regexlastexecution.search executiontime:{lastExecution.Created.ToString("s")} search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_job.GetUri().AbsoluteUri}");
                     matchList = resultList.Where(w => rx.IsMatch(w.Name) && w.Modified > lastExecution.Created.AddSeconds(-10)).ToList();
                 }
                 else
@@ -766,7 +766,7 @@ namespace Sentry.data.Infrastructure
                     using (var client = new HttpClient(handler))
                     {
 
-                        var tasks = _datasetContext.JobHistory.Where(w => w.Active).ToList().Select(s => client.GetAsync($"{Configuration.Config.GetHostSetting("WebApiUrl")}/api/v1/jobs/{s.JobId.Id}/batches/{s.BatchId}"));
+                        var tasks = _datasetContext.JobHistory.Where(w => w.Active && w.BatchId != 0).ToList().Select(s => client.GetAsync($"{Configuration.Config.GetHostSetting("WebApiUrl")}/api/v1/jobs/{s.JobId.Id}/batches/{s.BatchId}"));
 
                         var results = await Task.WhenAll(tasks);
 
