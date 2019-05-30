@@ -49,8 +49,8 @@ data.Dataset = {
         /// Initialize the Create Dataset view
 
         if ($("#DatasetId").val() !== undefined && $("#DatasetId").val() > 0) {
-            $("#retrievalPanelTab").hide();
-            $("#retrievalPanel").hide();
+            //$("#retrievalPanelTab").hide();
+            //$("#retrievalPanel").hide();
             $("#DatasetScopeTypeId").attr('readonly', 'readonly');
             $("#FileExtensionId").attr('readonly', 'readonly');
             $("#Delimiter").attr('readonly', 'readonly');

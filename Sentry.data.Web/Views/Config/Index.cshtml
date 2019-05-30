@@ -236,7 +236,7 @@
                         @if (item.Schemas != null && item.Schemas.Any())
                         {
                             <hr />
-                            <h4 class="@color">Schemas (Sorted by Most Recent)</h4>
+                            <h4 class="@color">Schema (columns, datatypes, delimiter, etc.)</h4>
                             <hr />
                             foreach (var schema in item.Schemas.OrderByDescending(x => x.DataElementCreate_DTM))
                             {
@@ -332,8 +332,8 @@
                                 </div>
                             }
                         }
-
-                        <a class="backToList" href="/Config/@item.ConfigId/Schema/Create"><span class="glyphicon glyphicon-plus"></span>  Add New Schema</a>
+                        
+                        @*<a class="backToList" href="/Config/@item.ConfigId/Schema/Create"><span class="glyphicon glyphicon-plus"></span>  Add New Schema</a>*@
                     </div>
 
                 </div>
