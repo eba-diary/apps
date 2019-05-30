@@ -1273,6 +1273,10 @@
                 localStorage.setItem("filteredIds", ko.toJSON(self.SelectedFilters()));
                 $('#filterSelector').val(self.SelectedFilters()).trigger('change');
 
+                if (localStorage.getItem("pageSelection")) {
+                    data.Search.setPageNumber(localStorage.getItem("pageSelection"), true);
+                }                
+
             });
 
             self.GetFile = function (data) {
