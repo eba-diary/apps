@@ -13,6 +13,6 @@ namespace Sentry.data.Core
         RegexFileNoDelete = 2,
         SpecificFileArchive = 3,
         RegexFileSinceLastExecution = 4,
-        SpecificFileSinceLastexecution = 5
+        NewFilesSinceLastexecution = 5
     }
 }

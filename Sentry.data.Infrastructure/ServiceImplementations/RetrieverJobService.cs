@@ -89,6 +89,9 @@ namespace Sentry.data.Infrastructure
                                 case FtpPattern.RegexFileSinceLastExecution:
                                     ProcessRegexFileSinceLastExecution();
                                     break;
+                                case FtpPattern.NewFilesSinceLastexecution:
+                                    ProcessNewFilesSinceLastExecution();
+                                    break;
                             }
                         }
                         catch (Exception ex)
@@ -473,13 +476,16 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        private void ProcessRegexFileSinceLastExecution()
+
+
+        #region FTP Processing
+
+        private void ProcessNewFilesSinceLastExecution()
         {
             using (Container = Bootstrapper.Container.GetNestedContainer())
             {
                 IJobService _jobService = Container.GetInstance<IJobService>();
 
-                
                 _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_STARTED_STATE);
 
                 JobHistory lastExecution = _jobService.GetLastExecution(_job);
@@ -491,7 +497,45 @@ namespace Sentry.data.Infrastructure
                     _job.JobLoggerMessage("Error", "Job terminating - Uri does not end with forward slash.");
                     return;
                 }
-                
+
+                IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
+
+                _job.JobLoggerMessage("Info", $"newfileslastexecution.search executiontime:{lastExecution.Created.ToString("s")} sourcelocation:{_job.GetUri().AbsoluteUri}");
+
+                List<RemoteFile> matchList = resultList.Where(w => w.Modified > lastExecution.Created.AddSeconds(-10)).ToList();
+
+                _job.JobLoggerMessage("Info", $"newfileslastexecution.search.count {matchList.Count}");
+
+                foreach (RemoteFile file in matchList)
+                {
+                    _job.JobLoggerMessage("Info", $"newfileslastexecution.processing.file {file.Name}");
+                    string remoteUrl = _job.GetUri().AbsoluteUri + file.Name;
+                    RetrieveFTPFile(remoteUrl);
+                }
+
+                _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE);
+            }
+        }
+
+        private void ProcessRegexFileSinceLastExecution()
+        {
+            using (Container = Bootstrapper.Container.GetNestedContainer())
+            {
+                IJobService _jobService = Container.GetInstance<IJobService>();
+
+
+                _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_STARTED_STATE);
+
+                JobHistory lastExecution = _jobService.GetLastExecution(_job);
+
+                string fileName = Path.GetFileName(_job.GetUri().AbsoluteUri);
+
+                if (fileName != "")
+                {
+                    _job.JobLoggerMessage("Error", "Job terminating - Uri does not end with forward slash.");
+                    return;
+                }
+
                 IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
 
                 var rx = new Regex(_job.JobOptions.SearchCriteria, RegexOptions.IgnoreCase);
@@ -519,10 +563,9 @@ namespace Sentry.data.Infrastructure
                 }
 
                 _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE);
-            }            
+            }
         }
 
-        #region FTP Processing
         private void ProcessSpecificFileArchive()
         {
             //throw new NotImplementedException();
