@@ -92,8 +92,6 @@
     <Compile Include="Entities\Image.cs" />
     <Compile Include="Entities\MessageFormats\HszDropLocationCreateModel.cs" />
     <Compile Include="Extensions\RetrieverJobExtensions.cs" />
-    <Compile Include="GlobalEnums\OAuthGrantType.cs" />
-    <Compile Include="GlobalEnums\OAuthPublicClaims.cs" />
     <Compile Include="Interfaces\ITagService.cs" />
     <Compile Include="DomainServices\SecurityService.cs" />
     <Compile Include="DomainServices\TagService.cs" />
