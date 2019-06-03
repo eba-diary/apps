@@ -4,7 +4,7 @@ using Sentry.Configuration;
 using System.Linq;
 using System;
 
-namespace HSZProcessor
+namespace HSZGOLDENEYE
 {
 
     public class Program

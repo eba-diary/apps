@@ -4,33 +4,33 @@
         <name>HSZGOLDENEYE</name>
     </assembly>
     <members>
-        <member name="T:HSZProcessor.Core">
+        <member name="T:HSZGOLDENEYE.Core">
             <summary>
             This class represents where you should run your application logic
             </summary>
         </member>
-        <member name="M:HSZProcessor.Core.OnStart">
+        <member name="M:HSZGOLDENEYE.Core.OnStart">
             <summary>
             Start the core worker
             </summary>
         </member>
-        <member name="M:HSZProcessor.Core.DoWork">
+        <member name="M:HSZGOLDENEYE.Core.DoWork">
             <summary>
             Loop until cancellation is requested, doing the primary work of this service
             </summary>
         </member>
-        <member name="M:HSZProcessor.Core.OnStop">
+        <member name="M:HSZGOLDENEYE.Core.OnStop">
             <summary>
             Request the core worker to stop
             </summary>
         </member>
-        <member name="M:HSZProcessor.Core.TaskException(System.Threading.Tasks.Task)">
+        <member name="M:HSZGOLDENEYE.Core.TaskException(System.Threading.Tasks.Task)">
             <summary>
             An exception occurred on the main task; log it and shut down the service with an error exit code
             </summary>
             <param name="t">The main thread task</param>
         </member>
-        <member name="M:HSZProcessor.Program.Main(System.String[])">
+        <member name="M:HSZGOLDENEYE.Program.Main(System.String[])">
             <summary>
             The entry point into the Windows Service.  You can also run this program
             as a console app if you pass "-console" as the first parameter.

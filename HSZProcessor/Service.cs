@@ -1,7 +1,7 @@
 ﻿using System.ServiceProcess;
 using System.Threading.Tasks;
 
-namespace HSZProcessor
+namespace HSZGOLDENEYE
 {
     public partial class Service
     {

@@ -9,7 +9,7 @@ using StructureMap;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace HSZProcessor
+namespace HSZGOLDENEYE
 {
     /// <summary>
     /// This class represents where you should run your application logic

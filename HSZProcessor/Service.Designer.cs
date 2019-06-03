@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ServiceProcess;
 
-namespace HSZProcessor
+namespace HSZGOLDENEYE
 {
     partial class Service : ServiceBase
     {
