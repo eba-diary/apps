@@ -9,6 +9,8 @@ namespace Sentry.data.Core
 {
     public class OAuthClaim
     {
+        public virtual int ID { get; set; }
+        public virtual DataSource DataSourceID { get; set; }
         public virtual OAuthClaims Type { get; set; } 
         public virtual string Value { get; set; }
     }

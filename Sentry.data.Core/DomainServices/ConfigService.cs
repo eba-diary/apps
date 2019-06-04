@@ -273,15 +273,25 @@ namespace Sentry.data.Core
                 TokenExp = "3600"
             };
 
-            dsrc.Claims = new List<OAuthClaim>()
-            {
-                new OAuthClaim(){ Type = GlobalEnums.OAuthClaims.iss, Value = dsrc.ClientID},
-                new OAuthClaim(){ Type = GlobalEnums.OAuthClaims.scope, Value = dsrc.Scope},
-                new OAuthClaim(){ Type = GlobalEnums.OAuthClaims.aud, Value = dsrc.TokenUrl},
-                new OAuthClaim(){ Type = GlobalEnums.OAuthClaims.exp, Value = DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromMinutes(30)).TotalSeconds.ToString()}
-            };
-
             _datasetContext.Add(dsrc);
+
+            List<OAuthClaim> claimsList = new List<OAuthClaim>();
+            OAuthClaim claim;
+            claim = new OAuthClaim() { DataSourceID = dsrc, Type = GlobalEnums.OAuthClaims.iss, Value = dsrc.ClientID };
+            _datasetContext.Add(claim);
+            claimsList.Add(claim);
+            claim = new OAuthClaim() { DataSourceID = dsrc, Type = GlobalEnums.OAuthClaims.scope, Value = dsrc.Scope };
+            _datasetContext.Add(claim);
+            claimsList.Add(claim);
+            claim = new OAuthClaim() { DataSourceID = dsrc, Type = GlobalEnums.OAuthClaims.aud, Value = dsrc.TokenUrl };
+            _datasetContext.Add(claim);
+            claimsList.Add(claim);
+            claim = new OAuthClaim() { DataSourceID = dsrc, Type = GlobalEnums.OAuthClaims.exp, Value = DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromMinutes(30)).TotalSeconds.ToString() };
+            _datasetContext.Add(claim);
+            claimsList.Add(claim);
+
+            dsrc.Claims = claimsList;
+
             _datasetContext.SaveChanges();
         }
 
