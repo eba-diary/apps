@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -68,6 +69,18 @@ namespace Sentry.data.Core
         // Only used for TokenAuthentication type
         public virtual string AuthenticationTokenValue { get; set; }
         public virtual string IVKey { get; set; }
+
+        #region OAuth
+        public virtual string ClientID { get; set; }
+        public virtual string ClientPrivateID { get; set; }
+        public virtual string Scope { get; set; }
+        public virtual string TokenUrl { get; set; }
+        public virtual string TokenExp { get; set; }
+        public virtual string CurrentToken { get; set; }
+        public virtual DateTime CurrentTokenExp { get; set; }
+        public virtual List<OAuthClaim> Claims { get; set; }
+        public virtual OAuthGrantType GrantType { get; set; }
+        #endregion
 
         public virtual List<RequestHeader> RequestHeaders
         {

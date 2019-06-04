@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using System.Threading;
 using Sentry.data.Core;
 using System.Net;
-using RestSharp;
 using Newtonsoft.Json.Linq;
 using System.IO;
 using WinSCP;
