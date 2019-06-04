@@ -29,7 +29,7 @@ namespace Sentry.data.Web.Controllers
         public IEventService _eventService;
         public IDatasetService _DatasetService;
 
-        public ConfigController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, 
+        public ConfigController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService,
             ISASService sasService, IAssociateInfoProvider associateInfoService, IConfigService configService,
             IEventService eventService, IDatasetService datasetService)
         {
@@ -714,6 +714,13 @@ namespace Sentry.data.Web.Controllers
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
             return View("CreateDataSource", csm);
+        }
+
+        
+        [Route("Config/OAuthSource/Create")]
+        public void CreateOAuthSource()
+        {
+            _configService.CreateOAuthSource();
         }
 
         [HttpPost]

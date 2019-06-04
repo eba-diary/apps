@@ -228,6 +228,63 @@ namespace Sentry.data.Core
             
         }
 
+        public void CreateOAuthSource()
+        {
+            DataSource oldSrc = _datasetContext.DataSources.Where(w => w.Name == "OAuthTesting").FirstOrDefault();
+            List<RetrieverJob> oldJobList = _datasetContext.RetrieverJob.Where(w => w.DataSource == oldSrc).ToList();
+
+            if (oldJobList != null)
+            {
+                foreach(RetrieverJob job in oldJobList)
+                {
+                    _datasetContext.Remove<RetrieverJob>(job);
+                }
+                _datasetContext.SaveChanges();
+            }
+
+            if (oldSrc != null)
+            {
+                _datasetContext.Remove<DataSource>(oldSrc);
+                _datasetContext.SaveChanges();
+            }
+
+            HTTPSSource dsrc = new HTTPSSource()
+            {
+                Name = "OAuthTesting",
+                Description = "Testing OAuth Data Source",
+                BaseUri = new Uri("https://www.googleapis.com/"),
+                Bucket = "sentry-dataset-management-np-nr",
+                IsUriEditable = false,
+                SourceType = "HTTPS",
+                SourceAuthType = _datasetContext.GetById<AuthenticationType>(4),
+                Created = DateTime.Now,
+                Modified = DateTime.Now,
+                PortNumber = 443,
+                HostFingerPrintKey = null,
+                IsUserPassRequired = false,
+                AuthenticationHeaderName = null,
+                IVKey = null,
+                CurrentToken = null,
+                CurrentTokenExp = DateTime.Now.AddDays(-30),
+                ClientID = "dscsupportsv@datasentrycom.iam.gserviceaccount.com",
+                ClientPrivateID = null,
+                Scope = "https://www.googleapis.com/auth/analytics.readonly",
+                TokenUrl = "https://www.googleapis.com/oauth2/v4/token",
+                TokenExp = "3600"
+            };
+
+            dsrc.Claims = new List<OAuthClaim>()
+            {
+                new OAuthClaim(){ Type = GlobalEnums.OAuthClaims.iss, Value = dsrc.ClientID},
+                new OAuthClaim(){ Type = GlobalEnums.OAuthClaims.scope, Value = dsrc.Scope},
+                new OAuthClaim(){ Type = GlobalEnums.OAuthClaims.aud, Value = dsrc.TokenUrl},
+                new OAuthClaim(){ Type = GlobalEnums.OAuthClaims.exp, Value = DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromMinutes(30)).TotalSeconds.ToString()}
+            };
+
+            _datasetContext.Add(dsrc);
+            _datasetContext.SaveChanges();
+        }
+
         private void MapToDto(DataElement de, SchemaDTO dto)
         {
             dto.SchemaID = de.DataElement_ID;
