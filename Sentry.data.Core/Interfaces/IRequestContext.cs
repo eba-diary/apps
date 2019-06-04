@@ -19,6 +19,8 @@ namespace Sentry.data.Core
 
         IQueryable<ApplicationConfiguration> ApplicaitonConfigurations { get; }
 
+        IQueryable<JobHistory> JobHistory { get; }
+
         IList<RTSourceTypes> GetSourceTypes();
 
         IList<RTRequest> GetEnabledRequests();
