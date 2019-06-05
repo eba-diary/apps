@@ -10,7 +10,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary.Retriever
         {
             Table("AuthenticationClaims");
 
-            Id(x => x.ID, m =>
+            Id(x => x.Id, m =>
             {
                 m.Column("Id");
                 m.Generator(Generators.Identity);

@@ -71,8 +71,8 @@ namespace Sentry.data.Core
         public virtual string IVKey { get; set; }
 
         #region OAuth
-        public virtual string ClientID { get; set; }
-        public virtual string ClientPrivateID { get; set; }
+        public virtual string ClientId { get; set; }
+        public virtual string ClientPrivateId { get; set; }
         public virtual string Scope { get; set; }
         public virtual string TokenUrl { get; set; }
         public virtual string TokenExp { get; set; }

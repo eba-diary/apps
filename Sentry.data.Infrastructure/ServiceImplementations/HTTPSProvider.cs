@@ -20,7 +20,7 @@ namespace Sentry.data.Infrastructure
     public class HTTPSProvider
     {
         #region Declarations
-        private RestRequest _request;
+        private readonly RestRequest _request;
         private Uri _uri;
         #endregion
 
@@ -45,7 +45,7 @@ namespace Sentry.data.Infrastructure
                 {
                     _request.AddHeader("Authorization", "Bearer " + token);
                 }
-            };
+            }
             
             //Add datasource specific headers to request
             List<RequestHeader> headerList = ((HTTPSSource)job.DataSource).RequestHeaders;
@@ -96,7 +96,8 @@ namespace Sentry.data.Infrastructure
             };
 
             _request.ResponseWriter = (responseStream) => responseStream.CopyTo(targetStream);
-            var response = client.DownloadData(_request);
+
+            client.DownloadData(_request);
         }
 
 
@@ -117,14 +118,11 @@ namespace Sentry.data.Infrastructure
 
             byte[] keyBytes = Convert.FromBase64String(pk.Replace("-----BEGIN PRIVATE KEY-----", "").Replace("-----END PRIVATE KEY-----", "").Replace("\n", ""));
 
-            //var privKeyObj = Asn1Object.FromByteArray(keyBytes);
-            //var privStruct = RsaPrivateKeyStructure.GetInstance((Asn1Sequence)privKeyObj);
             var asymmetricKeyParameter = PrivateKeyFactory.CreateKey(keyBytes);
             var rsaKeyParameter = (RsaKeyParameters)asymmetricKeyParameter;
 
             ISigner sig = SignerUtilities.GetSigner("SHA256withRSA");
 
-            //sig.Init(true, new RsaKeyParameters(true, privStruct.Modulus, privStruct.PrivateExponent));
             sig.Init(true, rsaKeyParameter);
 
             sig.BlockUpdate(bytesToSign, 0, bytesToSign.Length);
@@ -151,7 +149,7 @@ namespace Sentry.data.Infrastructure
                 var httpClient = new System.Net.Http.HttpClient();
                 var keyValues = new List<KeyValuePair<string, string>>();
                 AddGrantType(keyValues, source);
-                keyValues.Add(new KeyValuePair<string, string>("assertion", GenerateJWTToken(source)));
+                keyValues.Add(new KeyValuePair<string, string>("assertion", GenerateJwtToken(source)));
                 var oAuthPostContent = new System.Net.Http.FormUrlEncodedContent(keyValues);
                 var oAuthPostResult = httpClient.PostAsync(source.TokenUrl, oAuthPostContent).Result;
                 var response = oAuthPostResult.Content.ReadAsStringAsync().Result;
@@ -188,10 +186,10 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        private string GenerateJWTToken(HTTPSSource source)
+        private string GenerateJwtToken(HTTPSSource source)
         {
             string claimsJSON = GenerateClaims(source.Claims);
-            return Sign(claimsJSON, source.ClientPrivateID);
+            return Sign(claimsJSON, source.ClientPrivateId);
         }
 
         private string GenerateClaims(List<OAuthClaim> in_claims)

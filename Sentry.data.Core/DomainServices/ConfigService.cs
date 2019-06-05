@@ -266,8 +266,8 @@ namespace Sentry.data.Core
                 IVKey = null,
                 CurrentToken = null,
                 CurrentTokenExp = DateTime.Now.AddDays(-30),
-                ClientID = "dscsupportsv@datasentrycom.iam.gserviceaccount.com",
-                ClientPrivateID = null,
+                ClientId = "dscsupportsv@datasentrycom.iam.gserviceaccount.com",
+                ClientPrivateId = null,
                 Scope = "https://www.googleapis.com/auth/analytics.readonly",
                 TokenUrl = "https://www.googleapis.com/oauth2/v4/token",
                 TokenExp = "3600"
@@ -277,16 +277,16 @@ namespace Sentry.data.Core
 
             List<OAuthClaim> claimsList = new List<OAuthClaim>();
             OAuthClaim claim;
-            claim = new OAuthClaim() { DataSourceID = dsrc, Type = GlobalEnums.OAuthClaims.iss, Value = dsrc.ClientID };
+            claim = new OAuthClaim() { DataSourceId = dsrc, Type = GlobalEnums.OAuthClaims.iss, Value = dsrc.ClientId };
             _datasetContext.Add(claim);
             claimsList.Add(claim);
-            claim = new OAuthClaim() { DataSourceID = dsrc, Type = GlobalEnums.OAuthClaims.scope, Value = dsrc.Scope };
+            claim = new OAuthClaim() { DataSourceId = dsrc, Type = GlobalEnums.OAuthClaims.scope, Value = dsrc.Scope };
             _datasetContext.Add(claim);
             claimsList.Add(claim);
-            claim = new OAuthClaim() { DataSourceID = dsrc, Type = GlobalEnums.OAuthClaims.aud, Value = dsrc.TokenUrl };
+            claim = new OAuthClaim() { DataSourceId = dsrc, Type = GlobalEnums.OAuthClaims.aud, Value = dsrc.TokenUrl };
             _datasetContext.Add(claim);
             claimsList.Add(claim);
-            claim = new OAuthClaim() { DataSourceID = dsrc, Type = GlobalEnums.OAuthClaims.exp, Value = DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromMinutes(30)).TotalSeconds.ToString() };
+            claim = new OAuthClaim() { DataSourceId = dsrc, Type = GlobalEnums.OAuthClaims.exp, Value = DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromMinutes(30)).TotalSeconds.ToString() };
             _datasetContext.Add(claim);
             claimsList.Add(claim);
 
