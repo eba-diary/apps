@@ -502,7 +502,18 @@ namespace Sentry.data.Infrastructure
 
                 _job.JobLoggerMessage("Info", $"newfileslastexecution.search executiontime:{lastExecution.Created.ToString("s")} sourcelocation:{_job.GetUri().AbsoluteUri}");
 
-                List<RemoteFile> matchList = resultList.Where(w => w.Modified > lastExecution.Created.AddSeconds(-10)).ToList();
+                List<RemoteFile> matchList;
+
+                if (lastExecution != null)
+                {
+                    _job.JobLoggerMessage("Info", $"newfileslastexecution.search executiontime:{lastExecution.Created.ToString("s")} sourcelocation:{_job.GetUri().AbsoluteUri}");
+                    matchList = resultList.Where(w => w.Modified > lastExecution.Created.AddSeconds(-10)).ToList();
+                }
+                else
+                {
+                    _job.JobLoggerMessage("Info", $"newfileslastexecution.search executiontime:noexecutionhistory sourcelocation:{_job.GetUri().AbsoluteUri}");
+                    matchList = resultList.ToList();
+                }
 
                 _job.JobLoggerMessage("Info", $"newfileslastexecution.search.count {matchList.Count}");
 
