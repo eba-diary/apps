@@ -17,7 +17,7 @@ data.Search = {
         //   all pages for pagination.
         if (data.Search.GetParameterByName('page')) {
             localStorage.setItem("pageSelection", (data.Search.GetParameterByName('page')));
-            data.Search.setPageNumber(localStorage.getItem("pageSelection"));
+            data.Search.setPageNumber(localStorage.getItem("pageSelection"), true);
         }
         else {
             localStorage.setItem("pageSelection", 1);
@@ -309,11 +309,21 @@ data.Search = {
 
     },
 
-    setPageNumber: function (targetpage) {
+    setPageNumber: function (targetpage, initload) {
         //There is a delay in all pages showing up, therefore, we need a loop
         var pages = vm.searchResults.pageCount();
-        if (pages < targetpage) {
-            setTimeout(data.Search.setPageNumber, 500, targetpage);
+
+        //On initial load, wait 500 ms and then call setPageNumber function again
+        if (pages < targetpage && initload === true) {
+            //setTimeout(data.Search.setPageNumber, 500, targetpage);
+            setTimeout(function() {
+                data.Search.setPageNumber(targetpage, false);
+            }, 500)
+        }
+        //On second call of function, set page number to 1 if targetpage is greater than pages.
+        else if (pages < targetpage && initload === false) {
+            vm.searchResults.pageNumber(1);
+            localStorage.setItem("pageSelection", 1);
         }
         else {
             vm.searchResults.pageNumber(targetpage);
