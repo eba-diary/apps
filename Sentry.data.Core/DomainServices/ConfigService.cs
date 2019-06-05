@@ -46,7 +46,26 @@ namespace Sentry.data.Core
             return MapToDto(_datasetContext.GetById<DataElement>(id).DataObjects);
         }
 
-        
+        public List<string> Validate(DataElementDto dto)
+        {
+            List<string> errors = new List<string>();
+
+            var currentFileExtension = _datasetContext.FileExtensions.FirstOrDefault(x => x.Id == dto.FileFormatId).Name.ToLower();
+
+            if (currentFileExtension == "csv" && dto.Delimiter != ",")
+            {
+                errors.Add("File Extension CSV and it's delimiter do not match.");
+            }
+
+            if (currentFileExtension == "delimited" && string.IsNullOrWhiteSpace(dto.Delimiter))
+            {
+                errors.Add("File Extension Delimited is missing it's delimiter.");
+            }
+
+            return errors;
+        }
+
+
         public void UpdateFields(int configId, int schemaId, List<SchemaRow> schemaRows)
         {
             DatasetFileConfig config = _datasetContext.GetById<DatasetFileConfig>(configId);

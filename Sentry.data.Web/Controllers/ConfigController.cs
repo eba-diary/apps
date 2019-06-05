@@ -5,7 +5,6 @@ using Sentry.data.Core;
 using Sentry.data.Infrastructure;
 using Sentry.data.Web.Helpers;
 using Sentry.data.Web.Models;
-using Sentry.data.Web.Models.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -1499,6 +1498,7 @@ namespace Sentry.data.Web.Controllers
         {
             DataElement schema = _datasetContext.GetById<DataElement>(schemaId);
 
+            int fileFormatId = _datasetContext.FileExtensions.FirstOrDefault(w => w.Name == schema.FileFormat).Id;
             EditSchemaModel editSchemaModel = new EditSchemaModel()
             {
                 Name = schema.SchemaName,
@@ -1508,7 +1508,8 @@ namespace Sentry.data.Web.Controllers
                 DatasetId = schema.DatasetFileConfig.ParentDataset.DatasetId,
                 Delimiter = schema.Delimiter,
                 DataElement_ID = schema.DataElement_ID,
-                HasHeader = schema.HasHeader
+                HasHeader = schema.HasHeader,
+                FileTypeId = fileFormatId
             };
 
             Event e = new Event();
@@ -1529,10 +1530,17 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditSchema(int configId, int schemaId, EditSchemaModel esm)
         {
+
+            DataElementDto dto = esm.ToDto();
+
             DataElement schema = _datasetContext.GetById<DataElement>(schemaId);
+
+
 
             try
             {
+                AddCoreValidationExceptionsToModel(_configService.Validate(dto));
+
                 if (ModelState.IsValid)
                 {
                     schema.SchemaName = esm.Name;

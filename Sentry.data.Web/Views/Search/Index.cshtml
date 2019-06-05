@@ -1169,9 +1169,9 @@
                             }
 
                             //Search Tags
-                            if (!jQuery.isEmptyObject(dataset.tags)) {
-                                ko.utils.arrayForEach(dataset.Tags, function (v) {
-                                    if (v.Name.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
+                            if (!jQuery.isEmptyObject(dataset.TagNames)) {
+                                ko.utils.arrayForEach(dataset.TagNames, function (v) {
+                                    if (v.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
                                         keywordFound = true;
                                         count++;
                                     }
@@ -1272,6 +1272,10 @@
             self.SelectedFilters.subscribe(function () {
                 localStorage.setItem("filteredIds", ko.toJSON(self.SelectedFilters()));
                 $('#filterSelector').val(self.SelectedFilters()).trigger('change');
+
+                if (localStorage.getItem("pageSelection")) {
+                    data.Search.setPageNumber(localStorage.getItem("pageSelection"), true);
+                }                
 
             });
 
