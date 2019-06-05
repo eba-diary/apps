@@ -472,7 +472,7 @@ namespace Sentry.data.Infrastructure
             }
             catch (Exception ex)
             {
-                Logger.Error($"Retriever Job Failed to initialize", ex);
+                Logger.Error($"Retriever Job Failed to initialize - Job:{JobId}", ex);
             }
         }
 
