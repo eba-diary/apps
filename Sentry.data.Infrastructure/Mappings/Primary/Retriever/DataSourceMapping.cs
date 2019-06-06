@@ -188,6 +188,48 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Column("RequestHeaders");
                 m.Access(Accessor.Field);
             });
+
+            Property(x => x.ClientId, m =>
+            {
+                m.Column("ClientId");
+                m.NotNullable(false);
+            });
+
+            Property(x => x.ClientPrivateId, m =>
+            {
+                m.Column("ClientPrivateId");
+                m.NotNullable(false);
+            });
+
+            Property(x => x.Scope, m =>
+            {
+                m.Column("Scope");
+                m.NotNullable(false);
+            });
+
+            Property(x => x.TokenUrl, m =>
+            {
+                m.Column("TokenUrl");
+                m.NotNullable(false);
+            });
+
+            Property(x => x.TokenExp, m =>
+            {
+                m.Column("TokenExp");
+                m.NotNullable(false);
+            });
+
+            Property(x => x.CurrentToken, m =>
+            {
+                m.Column("CurrentToken");
+                m.NotNullable(false);
+            });
+
+            Property(x => x.CurrentTokenExp, m =>
+            {
+                m.Column("CurrentTokenExp");
+                m.NotNullable(false);
+            });
         }
     }
 

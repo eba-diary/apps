@@ -188,20 +188,28 @@ namespace Sentry.data.Infrastructure
 
         private string GenerateJwtToken(HTTPSSource source)
         {
-            string claimsJSON = GenerateClaims(source.Claims);
+            List<OAuthClaim> claims;
+            using (IContainer Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+            {
+                IDatasetContext dsContext = Container.GetInstance<IDatasetContext>();
+
+                claims = dsContext.OAuthClaims.Where(w => w.DataSourceId == source).ToList();
+            }
+
+            string claimsJSON = GenerateClaims(claims);
             return Sign(claimsJSON, source.ClientPrivateId);
         }
 
         private string GenerateClaims(List<OAuthClaim> in_claims)
         {
-            Dictionary<string, string> claims = new Dictionary<string, string>();
+            Dictionary<string, object> claims = new Dictionary<string, object>();
 
             foreach (OAuthClaim claim in in_claims)
             {
                 switch (claim.Type)
                 {
                     case Core.GlobalEnums.OAuthClaims.exp:
-                        claims.Add(claim.Type.ToString(), DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromMinutes(double.Parse(claim.Value))).TotalSeconds.ToString());
+                        claims.Add(claim.Type.ToString(), DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromMinutes(30)).TotalSeconds);
                         break;
                     default:
                         claims.Add(claim.Type.ToString(), claim.Value);
@@ -210,7 +218,7 @@ namespace Sentry.data.Infrastructure
             }
 
             //add Issue At time
-            claims.Add("iat", DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds.ToString());
+            claims.Add("iat", DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds);
 
             return JsonConvert.SerializeObject(claims);
         }

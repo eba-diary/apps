@@ -2,7 +2,7 @@
 using NHibernate.Mapping.ByCode.Conformist;
 using Sentry.data.Core;
 
-namespace Sentry.data.Infrastructure.Mappings.Primary.Retriever
+namespace Sentry.data.Infrastructure.Mappings.Primary
 {
     public class OAuthClaimTypeMapping : ClassMapping<OAuthClaim>
     {
@@ -18,6 +18,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary.Retriever
 
             Property(x => x.Type, m => m.Column("Name"));
             Property(x => x.Value, m => m.Column("Value"));
+            this.ManyToOne(x => x.DataSourceId, m =>
+            {
+                m.Column("DataSource_Id");
+                m.ForeignKey("FK_AuthenticationClaims_DataSource");
+                m.Class(typeof(DataSource));
+            });
         }
     }
 }

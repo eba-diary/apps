@@ -40,6 +40,7 @@ namespace Sentry.data.Core
         IQueryable<TagGroup> TagGroups { get; }
         IQueryable<ApplicationConfiguration> ApplicationConfigurations { get; }
         IQueryable<Favorite> Favorites { get; }
+        IQueryable<OAuthClaim> OAuthClaims { get; }
 
         IQueryable<RetrieverJob> RetrieverJob { get; }
         /** Datasets **/
