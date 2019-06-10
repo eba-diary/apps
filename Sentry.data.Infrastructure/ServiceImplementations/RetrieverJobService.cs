@@ -68,18 +68,18 @@ namespace Sentry.data.Infrastructure
                             switch (_job.JobOptions.FtpPattern)
                             {
                                 case 
-                                FtpPattern.NoPattern:
+                                FtpPattern.NoPattern: /* #0*/
                                 default:
                                     RetrieveFTPFile(_job.GetUri().AbsoluteUri);                                    
                                     break;
                                 case FtpPattern.SpecificFileNoDelete:
                                     ProcessSpecificFileNoDelete();
                                     break;
-                                case FtpPattern.RegexFileNoDelete:
-                                    ProcessRegexFileNoDelete();
+                                case FtpPattern.RegexFileNoDelete:  /* #4*/
+                                    ProcessRegexFileNoDelete(); 
                                     break;
-                                case FtpPattern.SpecificFileArchive:
-                                    ProcessSpecificFileArchive();
+                                case FtpPattern.SpecificFileArchive:  /* #5*/
+                                    ProcessSpecificFileArchive(); 
                                     break;
                             }
                         }

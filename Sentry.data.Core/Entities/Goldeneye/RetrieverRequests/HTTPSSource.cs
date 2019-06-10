@@ -77,7 +77,7 @@ namespace Sentry.data.Core
         public virtual string TokenUrl { get; set; }
         public virtual string TokenExp { get; set; }
         public virtual string CurrentToken { get; set; }
-        public virtual DateTime CurrentTokenExp { get; set; }
+        public virtual DateTime ?CurrentTokenExp { get; set; }
         public virtual List<OAuthClaim> Claims { get; set; }
         public virtual OAuthGrantType GrantType { get; set; }
         #endregion
