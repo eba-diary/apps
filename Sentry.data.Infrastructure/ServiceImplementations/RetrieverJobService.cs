@@ -49,10 +49,10 @@ namespace Sentry.data.Infrastructure
 
                 using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
                 {
-                    IRequestContext _requestContext = Container.GetInstance<IRequestContext>();
+                    IDatasetContext _requestContext = Container.GetInstance<IDatasetContext>();
 
                     //Retrieve job details
-                    _job = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).Fetch(f => f.DataSource).Where(w => w.Id == JobId).FirstOrDefault();
+                    _job = _requestContext.RetrieverJob.Where(w => w.Id == JobId).FetchAllConfiguration(_requestContext).FirstOrDefault();
 
                     if (_job.DataSource.Is<FtpSource>())
                     {
@@ -852,14 +852,14 @@ namespace Sentry.data.Infrastructure
 
             using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
             {
-                IRequestContext _requestContext = Container.GetInstance<IRequestContext>();
+                IDatasetContext _requestContext = Container.GetInstance<IDatasetContext>();
                 
-                basicJob = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).ThenFetch(d => d.ParentDataset).Fetch(f => f.DataSource).FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is S3Basic);
-                
+                basicJob = _requestContext.RetrieverJob.Where(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is S3Basic).FetchAllConfiguration(_requestContext).SingleOrDefault();
+
                 if (basicJob == null)
                 {
                     _job.JobLoggerMessage("Info", "No S3Basic job found for Schema... Finding DfsBasic job");
-                    basicJob = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).ThenFetch(d => d.ParentDataset).Fetch(f => f.DataSource).FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is DfsBasic);
+                    basicJob = _requestContext.RetrieverJob.Where(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is DfsBasic).FetchAllConfiguration(_requestContext).SingleOrDefault();
 
                     if (basicJob == null)
                     {

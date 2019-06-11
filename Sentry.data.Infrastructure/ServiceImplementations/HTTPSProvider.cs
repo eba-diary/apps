@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
-using System.Web;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
+using RestSharp;
 using Sentry.data.Core;
 using StructureMap;
-using RestSharp;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Net;
+using System.Text;
 
 namespace Sentry.data.Infrastructure
 {
@@ -160,8 +157,11 @@ namespace Sentry.data.Infrastructure
                 {
                     IDatasetContext dsContext = Container.GetInstance<IDatasetContext>();
 
-                    source.CurrentToken = accessToken.ToString();
-                    source.CurrentTokenExp = DateTime.Parse(source.Claims.Where(w => w.Type == Core.GlobalEnums.OAuthClaims.exp).Select(s => s.Value).SingleOrDefault());
+                    HTTPSSource updatedSource = (HTTPSSource)dsContext.DataSources.Where(w => w.Id == source.Id).FirstOrDefault();
+                    //string expClaim = dsContext.OAuthClaims.Where(w => w.DataSourceId.Id == source.Id && w.Type == Core.GlobalEnums.OAuthClaims.exp).Select(s => s.Value).SingleOrDefault();
+                    //string expClaim2 = DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromMinutes(30)).TotalSeconds;
+                    updatedSource.CurrentToken = accessToken.ToString();
+                    updatedSource.CurrentTokenExp = ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromMinutes(30)).TotalSeconds);
 
                     dsContext.SaveChanges();
                 }
@@ -188,28 +188,28 @@ namespace Sentry.data.Infrastructure
 
         private string GenerateJwtToken(HTTPSSource source)
         {
-            List<OAuthClaim> claims;
+            string claimsJSON = GenerateClaims(source);
+            return Sign(claimsJSON, source.ClientPrivateId);
+        }
+
+        private string GenerateClaims(HTTPSSource source)
+        {
+            Dictionary<string, object> claims = new Dictionary<string, object>();
+            List<OAuthClaim> sourceClaims;
+
             using (IContainer Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
             {
                 IDatasetContext dsContext = Container.GetInstance<IDatasetContext>();
 
-                claims = dsContext.OAuthClaims.Where(w => w.DataSourceId == source).ToList();
+                sourceClaims = dsContext.OAuthClaims.Where(w => w.DataSourceId == source).ToList();
             }
 
-            string claimsJSON = GenerateClaims(claims);
-            return Sign(claimsJSON, source.ClientPrivateId);
-        }
-
-        private string GenerateClaims(List<OAuthClaim> in_claims)
-        {
-            Dictionary<string, object> claims = new Dictionary<string, object>();
-
-            foreach (OAuthClaim claim in in_claims)
+            foreach (OAuthClaim claim in sourceClaims)
             {
                 switch (claim.Type)
                 {
                     case Core.GlobalEnums.OAuthClaims.exp:
-                        claims.Add(claim.Type.ToString(), DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromMinutes(30)).TotalSeconds);
+                        claims.Add(claim.Type.ToString(), DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(3600)).TotalSeconds);
                         break;
                     default:
                         claims.Add(claim.Type.ToString(), claim.Value);
@@ -223,6 +223,11 @@ namespace Sentry.data.Infrastructure
             return JsonConvert.SerializeObject(claims);
         }
 
+        private static DateTime ConvertFromUnixTimestamp(double timestamp)
+        {
+            DateTime origin = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
+            return origin.AddSeconds(timestamp);
+        }
         #endregion
     }
 }

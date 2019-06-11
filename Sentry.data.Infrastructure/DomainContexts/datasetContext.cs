@@ -180,6 +180,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<DataElementDetail> DataElementDetails
+        {
+            get
+            {
+                return Query<DataElementDetail>();
+            }
+        }
+
         public IQueryable<DataObject> DataObjects
         {
             get
