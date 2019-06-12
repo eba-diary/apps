@@ -63,6 +63,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<JobHistory> JobHistory
+        {
+            get
+            {
+                return Query<JobHistory>();
+            }
+        }
+
         public IList<RTSourceTypes> GetSourceTypes()
         {
             return Query<RTSourceTypes>().ToList();
