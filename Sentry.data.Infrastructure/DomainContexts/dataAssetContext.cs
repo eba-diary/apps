@@ -12,12 +12,12 @@ namespace Sentry.data.Infrastructure
 {
     [Obsolete("Merge everything here into a common DomainContext")]
 
-    public class dataAssetContext : NHWritableDomainContext, IDataAssetContext
+    public class DataAssetContext : NHWritableDomainContext, IDataAssetContext
     {
 
-        public dataAssetContext(ISession session) : base(session)
+        public DataAssetContext(ISession session) : base(session)
         {
-            NHQueryableExtensionProvider.RegisterQueryableExtensionsProvider<dataAssetContext>();
+            NHQueryableExtensionProvider.RegisterQueryableExtensionsProvider<DataAssetContext>();
         }
 
         public IQueryable<DomainUser> Users

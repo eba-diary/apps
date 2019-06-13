@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Sentry.data.Core
 {
@@ -10,5 +11,6 @@ namespace Sentry.data.Core
         void UpdateFields(int configId, int schemaId, List<SchemaRow> schemaRows);
         List<string> Validate(DataElementDto dto);
         void CreateOAuthSource();
+        bool UpdateandSaveOAuthToken(HTTPSSource source, string newToken, DateTime tokenExpTime);
     }
 }

@@ -47,6 +47,9 @@
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="RestSharp, Version=106.6.9.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.106.6.9\lib\net452\RestSharp.dll</HintPath>
+    </Reference>
     <Reference Include="Sentry.Associates, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Associates.1.3.0\lib\net35\Sentry.Associates.dll</HintPath>
     </Reference>
@@ -68,6 +71,7 @@
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -86,8 +90,11 @@
     <Compile Include="Entities\Goldeneye\RetrieverRequests\OAuthAuthentication.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\OAuthClaim.cs" />
     <Compile Include="Entities\Image.cs" />
+    <Compile Include="Extensions\DataSourceExtensions.cs" />
     <Compile Include="GlobalEnums\OAuthClaims.cs" />
     <Compile Include="GlobalEnums\OAuthGrantType.cs" />
+    <Compile Include="Interfaces\IEncryptionService.cs" />
+    <Compile Include="Interfaces\IHttpsProvider.cs" />
     <Compile Include="Interfaces\ITagService.cs" />
     <Compile Include="DomainServices\SecurityService.cs" />
     <Compile Include="DomainServices\TagService.cs" />
@@ -260,7 +267,9 @@
     <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="packages.config" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Sentry.data.Core.ruleset" />
   </ItemGroup>
   <ItemGroup>

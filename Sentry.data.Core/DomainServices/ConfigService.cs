@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Sentry.Common.Logging;
 
 namespace Sentry.data.Core
 {
@@ -15,15 +16,18 @@ namespace Sentry.data.Core
         public IUserService _userService;
         public IEventService _eventService;
         public IMessagePublisher _messagePublisher;
+        public IEncryptionService _encryptService;
 
         public ConfigService(IDatasetContext dsCtxt, IMessagePublisher publisher, 
-            IUserService userService, IEventService eventService, IMessagePublisher messagePublisher)
+            IUserService userService, IEventService eventService, IMessagePublisher messagePublisher,
+            IEncryptionService encryptService)
         {
             _datasetContext = dsCtxt;
             _publisher = publisher;
             _userService = userService;
             _eventService = eventService;
             _messagePublisher = messagePublisher;
+            _encryptService = encryptService;
         }
         public SchemaDTO GetSchemaDTO(int id)
         {
@@ -277,13 +281,15 @@ namespace Sentry.data.Core
                 AuthenticationHeaderName = null,
                 IVKey = null,
                 CurrentToken = null,
-                CurrentTokenExp = DateTime.MinValue,
+                CurrentTokenExp = null,
                 ClientId = "dscsupportsv@datasentrycom.iam.gserviceaccount.com",
                 ClientPrivateId = "\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCnQmcERucR2wnu\nWXM04sQxe+Z/NOgrgC/TtnH7/m4jHaTWp8+w+HKSGh/hDqxQ20JMJ8H69BrmFxiQ\nmYZg9Cj28JIPYMKfqUr9M1kBf6elIPR97pp9lHZYS+hUtSF15SraeFDqsBhICEyB\nadbKxzV5ZuG2HfhAWNWSZeSE5tNYe6Ccb4r3M6lqo1NVpaD9XBSa2vbmutocPQIA\nQncuPkqN2KJARgrnlvu7/MpKDQoV9n5uI4+Hm6rOjeO6wC+Nx9jQvZC/rgwvk/lE\nvEa+zTk99GCw4DUJy2ZON2Bw1VYjoR+ZoSRtwVeIBs/uz4kjyHbKiRlMvovRLzgF\nDJoscmwxAgMBAAECggEACvfeHOKwE8oDDF/4n8GLJMTqPZybk6wJTDSM+ahv/S+G\nzWjIbuOBUowSBnEu4vKDQM6Oou/6X5eozbqznDdcBFg29nky6hjGSR+3432ajHKX\nyzZSvToiH0eDCc2tpGHjKIZ2pUfnn7mjmAz3v+kbsZq0jHvJ+XZEiHV+wdRdNv0b\n9re0XyVxO20Y5ko66k2Dyea3jA6W4yIeVmOS/EgLyQsvPFNG8vJXJnT7kiz1YdyM\n+dwfhoKmqroji/T7zxbvALDSV154N2mnCVsFeMk0M/8TDcaKpkMasgoe0AN8CL0g\n8BXq3y14sJepied0Cpcm71v/ZnAbVsJP8/Kxkyr0EQKBgQDRZXYKlJ78FWZHXSwo\nKF6yoDAzqYUz4L/P7PNRzzZttInqLSVVjNZJq9lEMz5pZ0iShy0ezEbMSUYCteuO\nUHk8Hoi96bOT83AWiV67EhYJ3BgFVE3hlEfgiPd+SW5+iP1swg6MSj5fdH6tdKaK\nB55vsMSdaC73gLJ+Lys31VAn3QKBgQDMfCbi6wpb/enFsqyCRXySuFavxiqSuw/S\ncJi/rcG/hD9Qb+cmcH9TH/7eUYxvZCowOJ+WmT+iBHz6DR5ZKKcQW7moEzmJTEpr\nMyvljZ72NKcPpAlgI4EfXaxTC69ukuLRw7m7hBbcymv9xRieaPRizb5xOWTiCamo\nIOWFz5taZQKBgDWIngQYeQjzo6FtFaPypjs+rvQWS+K2e/N5nb91nXGwrW28OwZD\nKmnNUI+aFkO2Txx/CK8OBK+nsAlzXxSUSFpxZ/49qFaT7z0jw59KAW5l4ZJDOmII\nmdOy0KtttJ0PAtNyTWvac1XOH7DS2N0DE6N0at/fSdqnAXs3LfJpS8PVAoGAQetY\nAdjxavxsyy2xTQGnigjg8SM6ADlLfXSM2WXjSqEQZBbe9lZXxW1QFU1Gr3Yj342x\nbLQUfl9iBp4KBYYEbVKUhClGaAtvBiXl5ceE0ivhGzqvRw3LB1iEP/VJZaT2d9bX\n3ipT0HN04scSC6cb+WoIFaoB6phg1/Fa7Isjsr0CgYAKAYDBSeqJXZe2TwWV38fW\ny4YgW8qltpsTkJQmiXwM5sNqXbqGh/Pf09G9n/2IG4iOO/GjSTO7CovHFsbrDLe/\nBCjDOtjiPZ5HjL49HDU8iKI3WfC/ImHgpoKUeQyKqRkzPCvWTXW4GNxF/4rE1MBd\nZ2IpJ0NQc75Ly9GPPKyW5Q==",
                 Scope = "https://www.googleapis.com/auth/analytics.readonly",
                 TokenUrl = "https://www.googleapis.com/oauth2/v4/token",
                 TokenExp = "3600"
             };
+
+            dsrc.IVKey = dsrc.Encrpyt(_encryptService, _datasetContext);
 
             _datasetContext.Add(dsrc);
 
@@ -307,6 +313,28 @@ namespace Sentry.data.Core
             _datasetContext.SaveChanges();
         }
 
+        public bool UpdateandSaveOAuthToken(HTTPSSource source, string newToken, DateTime tokenExpTime)
+        {
+            try
+            {
+                HTTPSSource updatedSource = (HTTPSSource)_datasetContext.GetById<DataSource>(source.Id);
+
+                updatedSource.CurrentToken = newToken;
+                updatedSource.CurrentTokenExp = tokenExpTime;
+                updatedSource.IVKey = updatedSource.Encrpyt(_encryptService, _datasetContext);
+
+                _datasetContext.SaveChanges();
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Failed to save new OAuthToken", ex);
+                return false;
+            }
+        }
+
+        #region PrivateMethods
         private void MapToDto(DataElement de, SchemaDTO dto)
         {
             dto.SchemaID = de.DataElement_ID;
@@ -318,7 +346,6 @@ namespace Sentry.data.Core
             dto.HiveStatus = de.HiveTableStatus;
             dto.HiveLocation = de.HiveLocation;
         }
-
         private void MaptToDetailDto(DataElement de, SchemaDetailDTO dto)
         {
             MapToDto(de, dto);
@@ -346,7 +373,7 @@ namespace Sentry.data.Core
                     if (b.Length != null) { r.Length = b.Length ?? null; }
                     rows.Add(r);
                 }
-            }            
+            }
 
             dto.Rows = rows;
         }
@@ -371,5 +398,6 @@ namespace Sentry.data.Core
             }
             return dtoList;
         }
+        #endregion
     }
 }

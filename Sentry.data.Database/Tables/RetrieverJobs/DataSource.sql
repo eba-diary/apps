@@ -24,7 +24,7 @@
     [ClientPrivateID] VARCHAR(MAX) NULL, 
     [Scope] VARCHAR(250) NULL, 
     [TokenUrl] NVARCHAR(1000) NULL, 
-    [TokenExp] DATETIME NULL, 
+    [TokenExp] CHAR(20) NULL, 
     PRIMARY KEY CLUSTERED ([DataSource_Id] ASC),
     CONSTRAINT [FK_DataSource_AuthenticationType] FOREIGN KEY ([SourceAuth_ID]) REFERENCES [dbo].[AuthenticationType] ([Auth_Id])
 );

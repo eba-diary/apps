@@ -239,7 +239,7 @@
     <Compile Include="ServiceImplementations\EncryptionService.cs" />
     <Compile Include="ServiceImplementations\EventService.cs" />
     <Compile Include="ServiceImplementations\FtpProvider.cs" />
-    <Compile Include="ServiceImplementations\HTTPSProvider.cs" />
+    <Compile Include="ServiceImplementations\HttpsProvider.cs" />
     <Compile Include="ServiceImplementations\JawsService.cs" />
     <Compile Include="ServiceImplementations\KafkaMessagePublisher.cs" />
     <Compile Include="ServiceImplementations\Messaging\HiveMetadataService.cs" />

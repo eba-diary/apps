@@ -59,7 +59,7 @@ namespace Sentry.data.Infrastructure
             StructureMap.Registry registry = new StructureMap.Registry();
             registry.Scan((scanner) =>
             {
-                scanner.AssemblyContainingType<dataAssetContext>();
+                scanner.AssemblyContainingType<DataAssetContext>();
                 scanner.AssemblyContainingType<IDataAssetContext>();
                 scanner.AssemblyContainingType<DatasetContext>();
                 scanner.AssemblyContainingType<IDatasetContext>();
@@ -72,7 +72,7 @@ namespace Sentry.data.Infrastructure
             });
 
             //Repeat the following line once per database / domain context
-            registry.For<IDataAssetContext>().Use(() => new dataAssetContext(_defaultSessionFactory.OpenSession()));
+            registry.For<IDataAssetContext>().Use(() => new DataAssetContext(_defaultSessionFactory.OpenSession()));
             registry.For<IDatasetContext>().Use(() => new DatasetContext(_defaultSessionFactory.OpenSession()));
             registry.For<IDataFeedContext>().Use(() => new DataFeedProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IMetadataRepositoryProvider>().Use(() => new MetadataRepositoryProvider(_defaultSessionFactory.OpenStatelessSession()));

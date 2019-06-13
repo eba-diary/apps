@@ -319,10 +319,12 @@ namespace Sentry.data.Infrastructure
                         }
                     }
                     else if (_job.DataSource.Is<HTTPSSource>())
-                    {                        
+                    {
                         //set up HTTP Request
-                        HTTPSProvider requestProvider = new HTTPSProvider(_job, null);
-                        IRestResponse resp = requestProvider.SendRequest();                        
+                        IHttpsProvider _requestProvider = Container.GetInstance<IHttpsProvider>();
+                        //HttpsProvider requestProvider = new HttpsProvider();
+                        _requestProvider.ConfigureProvider(_job, null);
+                        IRestResponse resp = _requestProvider.SendRequest();                        
                         if (resp.StatusCode != HttpStatusCode.OK)
                         {
                             throw new WebException($"HTTPS call returned {resp.StatusCode} with description {resp.StatusDescription}");
@@ -347,7 +349,7 @@ namespace Sentry.data.Infrastructure
                             {
                                 using (Stream filestream = new FileStream(tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
                                 {
-                                    requestProvider.CopyToStream(filestream);                                
+                                    _requestProvider.CopyToStream(filestream);                                
                                 }
 
                                 //Create a fire-forget Hangfire job to decompress the file and drop extracted file into drop locations
@@ -376,7 +378,7 @@ namespace Sentry.data.Infrastructure
                                 {
                                     using (Stream filestream = new FileStream(tempFile, FileMode.Create, FileAccess.ReadWrite))
                                     {
-                                        requestProvider.CopyToStream(filestream);
+                                        _requestProvider.CopyToStream(filestream);
                                     }
                                 }
                                 catch (Exception ex)
@@ -411,7 +413,7 @@ namespace Sentry.data.Infrastructure
                                 {
                                     using (Stream filestream = new FileStream(targetFullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
                                     {
-                                        requestProvider.CopyToStream(filestream);
+                                        _requestProvider.CopyToStream(filestream);
                                     }
                                 }
                                 catch (WebException ex)
