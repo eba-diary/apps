@@ -51,6 +51,9 @@
 
             public const string CREATED_TAG = "Created Tag";
             public const string UPDATED_TAG = "Updated Tag";
+
+            public const string CREATED_DATASOURCE = "Created Data Source";
+            public const string UPDATED_DATASOURCE = "Updated Data Source";
         }
 
         public static class Statuses

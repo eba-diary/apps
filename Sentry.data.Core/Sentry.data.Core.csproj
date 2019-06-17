@@ -86,6 +86,7 @@
     <Compile Include="DTO\ContactInfoDto.cs" />
     <Compile Include="DTO\Favorites\FavoriteDto.cs" />
     <Compile Include="DTO\ImagesDto.cs" />
+    <Compile Include="DTO\Retriever\DataSourceDto.cs" />
     <Compile Include="DTO\Schema\DataElementDTO.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\OAuthAuthentication.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\OAuthClaim.cs" />

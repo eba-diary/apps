@@ -24,7 +24,8 @@ namespace Sentry.data.Infrastructure
         private IEncryptionService _encryptionService;
         #endregion
 
-        public HttpsProvider(IDatasetContext datasetContext, IConfigService configService, IEncryptionService encryptionService)
+        public HttpsProvider(IDatasetContext datasetContext, 
+            IConfigService configService, IEncryptionService encryptionService)
         {
             _dsContext = datasetContext;
             _configService = configService;
@@ -150,7 +151,7 @@ namespace Sentry.data.Infrastructure
 
         private object GetAccessToken(HTTPSSource source)
         {
-            if (source.CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
+            if (source.CurrentTokenExp == null || source.CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
             {
                 // Get the OAuth access token
                 var httpClient = new System.Net.Http.HttpClient();

@@ -52,13 +52,32 @@ namespace Sentry.data.Web
         public IEnumerable<SelectListItem> SourceTypesDropdown { get; set; }
         public IEnumerable<SelectListItem> AuthTypesDropdown { get; set; }
 
+        #region TokenAuthSpecificProperties
         [DisplayName("Token Name")]
         public string TokenAuthHeader { get; set; }
 
         [DisplayName("Token Value")]
         public string TokenAuthValue { get; set; }
+        #endregion
+
+        #region OAuthSpecificProperties
+        [DisplayName("Client Id")]
+        public string ClientId { get; set; }
+
+        [DisplayName("Client Private Id")]
+        public string ClientPrivateId { get; set; }
+
+        [DisplayName("Token Url")]
+        public string TokenUrl { get; set; }
+
+        [DisplayName("Token Expiration (in Seconds)")]
+        public string TokenExp { get; set; }
+
+        [DisplayName("Scope")]
+        public string Scope { get; set; }
+        #endregion
 
         [DisplayName("Request Headers")]
-        public List<RequestHeader> Headers { get; set; }
+        public List<RequestHeader> Headers { get; set; }          
     }
 }

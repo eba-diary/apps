@@ -230,6 +230,17 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Column("CurrentTokenExp");
                 m.NotNullable(false);
             });
+
+            this.Bag(x => x.Claims, (m) =>
+            {
+                m.Inverse(true);
+                m.Table("AuthenticationClaims");
+                m.Key((k) =>
+                {
+                    k.Column("DataSource_Id");
+                    k.ForeignKey("FK_AuthenticationClaims_DataSource");
+                });
+            }, map => map.OneToMany(a => a.Class(typeof(OAuthClaim))));
         }
     }
 

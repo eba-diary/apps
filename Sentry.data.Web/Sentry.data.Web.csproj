@@ -352,6 +352,7 @@
     <Compile Include="Models\Config\CreateExtensionMapModel.cs" />
     <Compile Include="Models\Config\CreateSchemaModel.cs" />
     <Compile Include="Models\Config\CreateSourceModel.cs" />
+    <Compile Include="Models\Config\DataSourceModel.cs" />
     <Compile Include="Models\Config\EditJobModel.cs" />
     <Compile Include="Models\Config\EditSchemaModel.cs" />
     <Compile Include="Models\Config\EditSourceModel.cs" />
