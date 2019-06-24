@@ -47,11 +47,9 @@ namespace Sentry.data.Infrastructure
             {
                 HTTPSSource source = (HTTPSSource)job.DataSource;
 
-                var token = GetAccessToken(source);
-
                 if (source.GrantType == Core.GlobalEnums.OAuthGrantType.jwtbearer)
                 {
-                    _request.AddHeader("Authorization", "Bearer " + token);
+                    _request.AddHeader("Authorization", "Bearer " + GetAccessToken(source));
                 }
             }
             
@@ -124,6 +122,8 @@ namespace Sentry.data.Infrastructure
 
             byte[] bytesToSign = Encoding.UTF8.GetBytes(stringToSign);
 
+            string x = _encryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
+
             byte[] keyBytes = Convert.FromBase64String(_encryptionService.DecryptString(source.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey));
 
             var asymmetricKeyParameter = PrivateKeyFactory.CreateKey(keyBytes);
@@ -149,7 +149,7 @@ namespace Sentry.data.Infrastructure
             return output;
         }
 
-        private object GetAccessToken(HTTPSSource source)
+        private string GetAccessToken(HTTPSSource source)
         {
             if (source.CurrentTokenExp == null || source.CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
             {
@@ -164,15 +164,15 @@ namespace Sentry.data.Infrastructure
                 var responseAsJson = Newtonsoft.Json.Linq.JObject.Parse(response);
                 var accessToken = responseAsJson.GetValue("access_token");
 
-                DateTime newTokenExp = ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(double.Parse(source.TokenExp))).TotalSeconds);
+                DateTime newTokenExp = ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(source.TokenExp)).TotalSeconds);
 
                 bool result = _configService.UpdateandSaveOAuthToken(source, accessToken.ToString(), newTokenExp);
 
-                return accessToken;
+                return accessToken.ToString();
             }
             else
             {
-                return source.CurrentToken;
+                return _encryptionService.DecryptString(source.CurrentToken, Configuration.Config.GetHostSetting("EncryptionServiceKey"), source.IVKey);
             }
         }
 
@@ -206,7 +206,7 @@ namespace Sentry.data.Infrastructure
                 switch (claim.Type)
                 {
                     case Core.GlobalEnums.OAuthClaims.exp:
-                        claims.Add(claim.Type.ToString(), DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(double.Parse(source.TokenExp))).TotalSeconds);
+                        claims.Add(claim.Type.ToString(), DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(source.TokenExp)).TotalSeconds);
                         break;
                     default:
                         claims.Add(claim.Type.ToString(), claim.Value);

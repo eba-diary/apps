@@ -75,7 +75,7 @@ namespace Sentry.data.Core
         public virtual string ClientPrivateId { get; set; }
         public virtual string Scope { get; set; }
         public virtual string TokenUrl { get; set; }
-        public virtual string TokenExp { get; set; }
+        public virtual int TokenExp { get; set; }
         public virtual string CurrentToken { get; set; }
         public virtual DateTime ?CurrentTokenExp { get; set; }
         public virtual IList<OAuthClaim> Claims { get; set; }

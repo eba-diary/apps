@@ -92,7 +92,6 @@
     <Compile Include="Entities\Goldeneye\RetrieverRequests\OAuthAuthentication.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\OAuthClaim.cs" />
     <Compile Include="Entities\Image.cs" />
-    <Compile Include="Extensions\DataSourceExtensions.cs" />
     <Compile Include="GlobalEnums\OAuthClaims.cs" />
     <Compile Include="GlobalEnums\OAuthGrantType.cs" />
     <Compile Include="Interfaces\IEncryptionService.cs" />

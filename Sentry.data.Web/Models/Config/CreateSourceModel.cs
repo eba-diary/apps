@@ -71,7 +71,7 @@ namespace Sentry.data.Web
         public string TokenUrl { get; set; }
 
         [DisplayName("Token Expiration (in Seconds)")]
-        public string TokenExp { get; set; }
+        public int TokenExp { get; set; }
 
         [DisplayName("Scope")]
         public string Scope { get; set; }

@@ -714,16 +714,7 @@ namespace Sentry.data.Web.Controllers
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
             return View("CreateDataSource", dsm);
-        }
-
-        
-        [Route("Config/OAuthSource/Create")]
-        public void CreateOAuthSource()
-        {
-            _configService.CreateOAuthSource();
-        }
-
-        
+        }        
 
         public ActionResult HeaderEntryRow()
         {

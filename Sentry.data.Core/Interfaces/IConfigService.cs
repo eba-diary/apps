@@ -11,7 +11,6 @@ namespace Sentry.data.Core
         void UpdateFields(int configId, int schemaId, List<SchemaRow> schemaRows);
         List<string> Validate(DataElementDto dto);
         List<string> Validate(DataSourceDto dto);
-        void CreateOAuthSource();
         bool UpdateandSaveOAuthToken(HTTPSSource source, string newToken, DateTime tokenExpTime);
         bool CreateAndSaveNewDataSource(DataSourceDto dto);
         bool UpdateAndSaveDataSource(DataSourceDto dto);
