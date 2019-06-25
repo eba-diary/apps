@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using Sentry.Common.Logging;
 
 namespace Sentry.data.Infrastructure
 {
@@ -163,8 +164,12 @@ namespace Sentry.data.Infrastructure
                 var response = oAuthPostResult.Content.ReadAsStringAsync().Result;
                 var responseAsJson = Newtonsoft.Json.Linq.JObject.Parse(response);
                 var accessToken = responseAsJson.GetValue("access_token");
+                var expires_in = responseAsJson.GetValue("expires_in");
+                var token_type = responseAsJson.GetValue("token_type");
 
-                DateTime newTokenExp = ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(source.TokenExp)).TotalSeconds);
+                Logger.Info($"recieved_oauth_access_token - source:{source.Name} sourceId:{source.Id} expires_in:{expires_in} token_type:{token_type}");
+
+                DateTime newTokenExp = ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromSeconds(double.Parse(expires_in.ToString()))).TotalSeconds);
 
                 bool result = _configService.UpdateandSaveOAuthToken(source, accessToken.ToString(), newTokenExp);
 
