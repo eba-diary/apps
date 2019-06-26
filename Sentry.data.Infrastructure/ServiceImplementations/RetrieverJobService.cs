@@ -349,6 +349,7 @@ namespace Sentry.data.Infrastructure
                         RetrieverJob targetJob = FindBasicJob();
 
                         //Get target path based on basic job found
+                        Logger.Info($"https_response_contenttype - {resp.ContentType}");
                         string extension = ParseContentType(resp.ContentType);
 
                         string targetFullPath = $"{GetTargetPath(targetJob)}.{extension}";
