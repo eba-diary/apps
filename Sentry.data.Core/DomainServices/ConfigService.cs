@@ -135,6 +135,16 @@ namespace Sentry.data.Core
                         }
                     }
                     break;
+                case "GOOGLEAPI":
+                    if (!(dto.BaseUri.ToString().StartsWith("https://")))
+                    {
+                        errors.Add("A valid GoogleApi URI starts with https:// (i.e. https://analyticsreporting.googleapis.com/)");
+                    }
+                    if (!(dto.BaseUri.ToString().Contains("googleapis.com")))
+                    {
+                        errors.Add("An invalid GoogleApi URI");
+                    }
+                    break;
                 case "DFSBasic":
                 default:
                     throw new NotImplementedException();
@@ -310,6 +320,31 @@ namespace Sentry.data.Core
                         ((HTTPSSource)source).TokenUrl = dto.TokenUrl;
                         ((HTTPSSource)source).TokenExp = dto.TokenExp;
                         ((HTTPSSource)source).Scope = dto.Scope;
+                    }
+                    break;
+                case "GOOGLEAPI":
+                    source = new GoogleApiSource();
+                    ((GoogleApiSource)source).IVKey = _encryptService.GenerateNewIV();
+
+                    //Process only if headers exist
+                    if (dto.RequestHeaders.Any())
+                    {
+                        ((GoogleApiSource)source).RequestHeaders = dto.RequestHeaders;
+                    }
+
+                    if (auth.Is<TokenAuthentication>())
+                    {
+                        ((GoogleApiSource)source).AuthenticationHeaderName = dto.TokenAuthHeader;
+                        ((GoogleApiSource)source).AuthenticationTokenValue = _encryptService.EncryptString(dto.TokenAuthValue, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)source).IVKey).Item1;
+                    }
+
+                    if (auth.Is<OAuthAuthentication>())
+                    {
+                        ((GoogleApiSource)source).ClientId = dto.ClientId;
+                        ((GoogleApiSource)source).ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)source).IVKey).Item1;
+                        ((GoogleApiSource)source).TokenUrl = dto.TokenUrl;
+                        ((GoogleApiSource)source).TokenExp = dto.TokenExp;
+                        ((GoogleApiSource)source).Scope = dto.Scope;
                     }
                     break;
                 default:
@@ -583,6 +618,8 @@ namespace Sentry.data.Core
                 dto.Scope = ((HTTPSSource)dsrc).Scope;
                 dto.RequestHeaders = ((HTTPSSource)dsrc).RequestHeaders;
                 dto.TokenAuthHeader = ((HTTPSSource)dsrc).AuthenticationHeaderName;
+                dto.UrlBasedRequest = ((HTTPSSource)dsrc).UrlBasedRequest;
+                dto.ObjectBasedRequest = ((HTTPSSource)dsrc).ObjectBasedRequest;
             }
         }
 

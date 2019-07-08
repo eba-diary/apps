@@ -166,7 +166,8 @@
     <Compile Include="DomainContexts\datasetContext.cs" />
     <Compile Include="DomainContexts\dataAssetContext.cs" />
     <Compile Include="DomainContexts\RequestContext.cs" />
-    <Compile Include="Extensions\RetrieverJobQueryExtensions.cs" />
+    <Compile Include="Extensions\RestSharpExtensions.cs" />
+    <Compile Include="Extensions\RetrieverJobExtensions.cs" />
     <Compile Include="HangfireFilters\DisableMultipleQueuedItemsFilter.cs" />
     <Compile Include="Helpers\TopicHelper.cs" />
     <Compile Include="Mappings\Metadata\DataElementDetailMapping.cs" />
@@ -232,6 +233,8 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
+    <Compile Include="ServiceImplementations\DataSourceProviders\GoogleApiProvider.cs" />
     <Compile Include="ServiceImplementations\HpsmMonitoringService.cs" />
     <Compile Include="ServiceImplementations\HpsmProvider.cs" />
     <Compile Include="ServiceImplementations\CubeProvider.cs" />
@@ -239,7 +242,7 @@
     <Compile Include="ServiceImplementations\EncryptionService.cs" />
     <Compile Include="ServiceImplementations\EventService.cs" />
     <Compile Include="ServiceImplementations\FtpProvider.cs" />
-    <Compile Include="ServiceImplementations\HttpsProvider.cs" />
+    <Compile Include="ServiceImplementations\DataSourceProviders\BaseHttpsProvider.cs" />
     <Compile Include="ServiceImplementations\JawsService.cs" />
     <Compile Include="ServiceImplementations\KafkaMessagePublisher.cs" />
     <Compile Include="ServiceImplementations\Messaging\HiveMetadataService.cs" />

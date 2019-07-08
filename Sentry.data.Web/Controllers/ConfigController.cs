@@ -384,6 +384,38 @@ namespace Sentry.data.Web.Controllers
                         CompressionOptions = compression
                     };
 
+                    if (dataSource.Is<GoogleApiSource>())
+                    {
+                        HttpsOptions ho = new HttpsOptions()
+                        {
+                            Body = cjm.HttpRequestBody
+                        };
+
+                        switch (cjm.SelectedRequestMethod)
+                        {
+                            case (int)HttpMethods.get:
+                                ho.RequestMethod = HttpMethods.get;
+                                break;
+                            case (int)HttpMethods.post:
+                                ho.RequestMethod = HttpMethods.post;
+                                break;
+                            default:
+                                break;
+                        }
+
+                        switch (cjm.SelectedRequestDataFormat)
+                        {
+                            case (int)HttpDataFormat.json:
+                                ho.RequestDataFormat = HttpDataFormat.json;
+                                break;
+                            default:
+                                break;
+                        }
+
+                        rjo.HttpOptions = ho;
+                    }
+
+
                     RetrieverJob rj = new RetrieverJob()
                     {
 
@@ -468,6 +500,29 @@ namespace Sentry.data.Web.Controllers
                 cjm.FileNameExclusionList = new List<string>();
             }
 
+            List<SelectListItem> temp3 = new List<SelectListItem>();
+
+            temp3.Add(new SelectListItem()
+            {
+                Text = "Pick a Source",
+                Value = "0",
+                Selected = true,
+                Disabled = true
+            });
+
+            cjm.RequestMethodDropdown = temp3;
+
+            List<SelectListItem> temp4 = new List<SelectListItem>();
+
+            temp4.Add(new SelectListItem()
+            {
+                Text = "Pick a Request Method",
+                Value = "0",
+                Selected = true,
+                Disabled = true
+            });
+
+            cjm.RequestDataFormatDropdown = temp4;
 
             return cjm;
         }
@@ -531,6 +586,22 @@ namespace Sentry.data.Web.Controllers
                         SearchCriteria = ejm.SearchCriteria,
                         CompressionOptions = compression
                     };
+
+                    if (dataSource.Is<GoogleApiSource>())
+                    {
+                        rj.JobOptions.HttpOptions.Body = ejm.HttpRequestBody;
+                        switch (ejm.SelectedRequestMethod)
+                        {
+                            case (int)HttpMethods.get:
+                                rj.JobOptions.HttpOptions.RequestMethod = HttpMethods.get;
+                                break;
+                            case (int)HttpMethods.post:
+                                rj.JobOptions.HttpOptions.RequestMethod = HttpMethods.post;
+                                break;
+                            default:
+                                break;
+                        }
+                    }
 
                     rj.Schedule = ejm.Schedule;
                     rj.TimeZone = "Central Standard Time";
@@ -666,7 +737,6 @@ namespace Sentry.data.Web.Controllers
 
             ejm.CompressionTypesDropdown = Enum.GetValues(typeof(CompressionTypes)).Cast<CompressionTypes>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
-
 
 
             if (ejm.NewFileNameExclusionList != null)
@@ -945,6 +1015,97 @@ namespace Sentry.data.Web.Controllers
             return Json(AuthenticationTypesByType(sourceType, null), JsonRequestBehavior.AllowGet);
         }
 
+        [HttpGet]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        public JsonResult RequestMethodByType(string sourceType)
+        {
+            return Json(GetRequestMethods(sourceType, null), JsonRequestBehavior.AllowGet);
+        }
+
+        private List<SelectListItem> GetRequestMethods(string sourceType, int? selectedId)
+        {
+            List<SelectListItem> output = new List<SelectListItem>();
+
+            if (selectedId == null)
+            {
+                output.Add(new SelectListItem()
+                {
+                    Text = "Pick a Request Method type",
+                    Value = "0",
+                    Selected = true,
+                    Disabled = true
+                });
+            }
+
+            List<HttpMethods> methodList = new List<HttpMethods>();
+
+            switch (sourceType)
+            {
+                case "HTTPS":
+                    HTTPSSource https = new HTTPSSource();
+                    methodList = https.ValidHttpMethods;                    
+                    break;
+                case "GOOGLEAPI":
+                    GoogleApiSource gapi = new GoogleApiSource();
+                    methodList = gapi.ValidHttpMethods;
+                    break;
+                default:
+                    break;
+            }
+
+            foreach (HttpMethods methodType in methodList)
+            {
+                output.Add(new SelectListItem { Text = methodType.ToString().ToUpper(), Value = ((int)methodType).ToString(), Selected = selectedId == (int)methodType });
+            }
+
+            return output;
+        }
+
+        [HttpGet]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        public JsonResult RequestDataFormatByType(string sourceType)
+        {
+            return Json(GetRequestDataFormat(sourceType, null), JsonRequestBehavior.AllowGet);
+        }
+        
+        private List<SelectListItem> GetRequestDataFormat(string sourceType, int? selectedId)
+        {
+            List<SelectListItem> output = new List<SelectListItem>();
+
+            if (selectedId == null)
+            {
+                output.Add(new SelectListItem()
+                {
+                    Text = "Pick a Request Data Format type",
+                    Value = "0",
+                    Selected = true,
+                    Disabled = true
+                });
+            }
+
+            List<HttpDataFormat> methodList = new List<HttpDataFormat>();
+
+            switch (sourceType)
+            {
+                case "HTTPS":
+                    HTTPSSource https = new HTTPSSource();
+                    methodList = https.ValidHttpDataFormats;
+                    break;
+                case "GOOGLEAPI":
+                    GoogleApiSource gapi = new GoogleApiSource();
+                    methodList = gapi.ValidHttpDataFormats;
+                    break;
+                default:
+                    break;
+            }
+
+            foreach (HttpDataFormat methodType in methodList)
+            {
+                output.Add(new SelectListItem { Text = methodType.ToString().ToUpper(), Value = ((int)methodType).ToString(), Selected = selectedId == (int)methodType });
+            }
+
+            return output;
+        }
 
         private List<SelectListItem> AuthenticationTypesByType(string sourceType, int? selectedId)
         {
@@ -987,6 +1148,13 @@ namespace Sentry.data.Web.Controllers
                 case "HTTPS":
                     HTTPSSource https = new HTTPSSource();
                     foreach (AuthenticationType authtype in https.ValidAuthTypes)
+                    {
+                        output.Add(GetAuthSelectedListItem(authtype, selectedId));
+                    }
+                    break;
+                case "GOOGLEAPI":
+                    GoogleApiSource gapi = new GoogleApiSource();
+                    foreach (AuthenticationType authtype in gapi.ValidAuthTypes)
                     {
                         output.Add(GetAuthSelectedListItem(authtype, selectedId));
                     }
@@ -1062,6 +1230,11 @@ namespace Sentry.data.Web.Controllers
                 case "HTTPS":
                     List<DataSource> HttpsList = _datasetContext.DataSources.Where(x => x is HTTPSSource).ToList();
                     output = HttpsList.Select(v
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
+                    break;
+                case "GOOGLEAPI":
+                    List<DataSource> GApiList = _datasetContext.DataSources.Where(x => x is GoogleApiSource).ToList();
+                    output = GApiList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
                     break;
                 default:
@@ -1358,6 +1531,26 @@ namespace Sentry.data.Web.Controllers
             }
 
             return View(esm);
+        }
+
+        [HttpGet]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        public JsonResult IsHttpSource(int dataSourceId)
+        {
+            DataSourceDto dto = _configService.GetDataSourceDto(dataSourceId);
+            bool result;
+            switch (dto.SourceType)
+            {
+                case GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE:
+                case GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE:
+                    result = true;
+                    break;
+                default:
+                    result = false;
+                    break;
+            }
+
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
     }
 }

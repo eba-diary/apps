@@ -15,6 +15,9 @@ namespace Sentry.data.Core
         public string AuthID { get; set; }
         public bool IsUserPassRequired { get; set; }
         public int PortNumber { get; set; }
+        public HttpMethods RequestMethod { get; set; }
+        public bool UrlBasedRequest { get; set; }
+        public bool ObjectBasedRequest { get; set; }
         public Uri BaseUri { get; set; }
 
         #region TokenAuthSpecific

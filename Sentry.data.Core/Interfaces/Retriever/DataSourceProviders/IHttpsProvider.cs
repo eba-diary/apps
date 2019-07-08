@@ -4,9 +4,9 @@ using RestSharp;
 
 namespace Sentry.data.Core
 {
-    public interface IHttpsProvider
+    public interface IBaseHttpsProvider
     {
-        void ConfigureProvider(RetrieverJob job, List<KeyValuePair<string, string>> headers);
+        void ConfigureProvider(RetrieverJob job);
         IRestResponse SendRequest();
         void CopyToStream(Stream targetStream);
     }

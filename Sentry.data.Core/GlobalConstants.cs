@@ -79,6 +79,22 @@
             public const string DEFAULT_S3_DROP_LOCATION = "Default S3 Drop Location";
         }
 
+        public static class DataSoureDiscriminator
+        {
+            public const string DFS_SOURCE = "DFS";
+            public const string DEFAULT_DROP_LOCATION = "DFSBasic";
+            public const string DFS_CUSTOM = "DFSCustom";
+            public const string DEFAULT_S3_DROP_LOCATION = "S3Basic";
+            public const string FTP_SOURCE = "FTP";
+            public const string S3_SOURCE = "S3";
+            public const string SFTP_SOURCE = "SFTP";
+            public const string HTTPS_SOURCE = "HTTPS";
+            public const string JAVA_APP_SOURCE = "JavaApp";
+            public const string GOOGLE_API_SOURCE = "GOOGLEAPI";
+
+
+        }
+
         public static class DataFeedType
         {
             public const string SAS = "SAS";

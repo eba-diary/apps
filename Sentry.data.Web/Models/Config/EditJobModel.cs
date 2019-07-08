@@ -32,6 +32,7 @@ namespace Sentry.data.Web
             SelectedDataSource = rj.DataSource.Id;
             JobID = rj.Id;
             IsGeneric = rj.IsGeneric;
+            HttpRequestBody = rj.JobOptions.HttpOptions.Body;
         }
 
         public int JobID { get; set; }
@@ -44,6 +45,9 @@ namespace Sentry.data.Web
 
         [DisplayName("Relative URI")]
         public string RelativeUri { get; set; }
+
+        [DisplayName("Https Body")]
+        public string HttpRequestBody { get; set; }
 
         [DisplayName("Search Criteria")]
         public string SearchCriteria { get; set; }
@@ -74,13 +78,15 @@ namespace Sentry.data.Web
 
         [DisplayName("Data Source")]
         public int SelectedDataSource { get; set; }
-
         [DisplayName("Source Type")]
         public string SelectedSourceType { get; set; }
+        [DisplayName("Request Method")]
+        public int SelectedRequestMethod { get; set; }
 
         public List<DataSource> AvailableSources { get; set; }
 
         public IEnumerable<SelectListItem> SourceTypesDropdown { get; set; }
         public IEnumerable<SelectListItem> SourcesForDropdown { get; set; }
+        public IEnumerable<SelectListItem> RequestMethodDropdown { get; set; }
     }
 }

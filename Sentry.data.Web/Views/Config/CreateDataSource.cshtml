@@ -240,7 +240,7 @@
         $(document).ready(function () {
 
             function setSourceTypeDefaults(sourceType) {
-                if (sourceType == "SFTP" || sourceType == "FTP" || sourceType == "HTTPS") {
+                if (sourceType == "SFTP" || sourceType == "FTP" || sourceType == "HTTPS" || sourceType == "GOOGLEAPI") {
 
                     $('#portNumberPanel').show();
                     $('#userPassPanel').hide();
@@ -265,7 +265,7 @@
                         //Setting default values for port number
                         $('#PortNumber').val('21');
                     }
-                    else if (sourceType == "HTTPS") {
+                    else if (sourceType == "HTTPS" || sourceType == "GOOGLEAPI") {
                         //Setting default values for port number
                         $('#PortNumber').val('443');
                         $('#requestHeaderPanel').show();

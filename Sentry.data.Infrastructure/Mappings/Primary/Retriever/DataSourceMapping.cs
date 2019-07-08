@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NHibernate.Mapping.ByCode;
+﻿using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
 using Sentry.data.Core;
 using NHibernate;
@@ -106,7 +101,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public DfsSourceMapping()
         {
-            DiscriminatorValue(@"DFS");
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.DFS_SOURCE);
         }
     }
 
@@ -114,7 +109,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public DfsBasicMapping()
         {
-            DiscriminatorValue(@"DFSBasic");
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.DEFAULT_DROP_LOCATION);
         }
     }
 
@@ -122,7 +117,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public DfsCustomMapping()
         {
-            DiscriminatorValue(@"DFSCustom");
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.DFS_CUSTOM);
         }
     }
 
@@ -130,7 +125,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public FtpSourceMapping()
         {
-            DiscriminatorValue(@"FTP");
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.FTP_SOURCE);
         }
     }
 
@@ -138,7 +133,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public S3SourceMapping()
         {
-            DiscriminatorValue(@"S3");
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.S3_SOURCE);
         }
     }
 
@@ -146,7 +141,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public S3BasicMapping()
         {
-            DiscriminatorValue(@"S3Basic");
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION);
         }
     }
 
@@ -154,7 +149,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public SFtpSourceMapping()
         {
-            DiscriminatorValue(@"SFTP");
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.SFTP_SOURCE);
         }
     }
 
@@ -162,7 +157,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public HTTPSSourceMapping()
         {
-            DiscriminatorValue(@"HTTPS");
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE);
 
 
             Property(x => x.AuthenticationHeaderName, m =>
@@ -248,7 +243,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public JavaAppSourceMapping()
         {
-            DiscriminatorValue(@"JavaApp");
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.JAVA_APP_SOURCE);
 
             Property(x => x.Options, m =>
             {
@@ -257,6 +252,14 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 //http://geekswithblogs.net/lszk/archive/2011/07/11/nhibernatemapping-a-string-field-as-nvarcharmax-in-sql-server-using.aspx
                 m.Type(NHibernateUtil.StringClob);
             });
+        }
+    }
+
+    public class GoogleApiMapping : SubclassMapping<GoogleApiSource>
+    {
+        public GoogleApiMapping()
+        {
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE);
         }
     }
 }

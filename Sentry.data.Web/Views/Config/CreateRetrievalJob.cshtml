@@ -15,7 +15,7 @@
 {
     @Html.AntiForgeryToken()
 
-    
+
     @*Show the custom validation summary*@
     @Html.DisplayFor((model) => ViewData.ModelState)
 
@@ -84,8 +84,8 @@
 
             <div class="form-group configQuestion">
                 <div class="col-md-12">
-                    <h6>Where is the source file?</h6>                
-                </div>                
+                    <h6>Where is the source file?</h6>
+                </div>
             </div>
 
             <div class="form-group questionDescription">
@@ -99,9 +99,46 @@
             <div class="form-group">
                 @Html.LabelFor(model => model.RelativeUri, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    <input type="text" id="baseURLTextBox" readonly="readonly" disabled="disabled" class="form-control edit-dataset-row col-md-4"  style="width:40% ;" />
+                    <input type="text" id="baseURLTextBox" readonly="readonly" disabled="disabled" class="form-control edit-dataset-row col-md-4" style="width:40% ;" />
                     @Html.TextBoxFor(model => model.RelativeUri, new { @class = "form-control edit-dataset-row col-md-6", @style = "width:60%;", @placeholder = "Do not include starting forward slash (/)" })
                     @Html.ValidationMessageFor(model => model.RelativeUri, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="httpSourcePanel" style="display:none;">
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.SelectedRequestMethod, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor(model => model.SelectedRequestMethod, Model.RequestMethodDropdown, new { @class = "form-control edit-dataset-row", })
+                        @Html.ValidationMessageFor(model => model.SelectedRequestMethod, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="httpPostPanel" style="display:none;">
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.SelectedRequestDataFormat, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.DropDownListFor(model => model.SelectedRequestDataFormat, Model.RequestDataFormatDropdown, new { @class = "form-control edit-dataset-row", })
+                            @Html.ValidationMessageFor(model => model.SelectedRequestDataFormat, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.HttpRequestBody, htmlAttributes: new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            @Html.TextAreaFor(model => model.HttpRequestBody, new { rows = "15", cols = "132", htmlAttributes = new { @class = "form-control edit-dataset-row,", @placeholder = "JSON format" } })
+                            @Html.ValidationMessageFor(model => model.HttpRequestBody, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-2">
+                            <input type="button" id="jsonPreview" value="Validate Body" class="btn btn-primary" />
+                        </div>
+                    </div>
+                    <div class="jsonValidateResultsPanel form-group" style="display:none;">
+                        <div class="col-md-offset-2 col-md-10">
+                            <pre id="json-viewer"></pre>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -123,7 +160,7 @@
             <div class="form-group">
                 @Html.LabelFor(model => model.TargetFileName, htmlAttributes: new { @class = "control-label col-md-2 optional", @id = "targetfilenamelabel" })
                 <div class="col-md-10">
-                    @Html.EditorFor(model => model.TargetFileName, new { htmlAttributes = new { @class = "form-control edit-dataset-row,", @placeholder = "Exclude file extension"} })
+                    @Html.EditorFor(model => model.TargetFileName, new { htmlAttributes = new { @class = "form-control edit-dataset-row,", @placeholder = "Exclude file extension" } })
                     @Html.ValidationMessageFor(model => model.TargetFileName, "", new { @class = "text-danger" })
                 </div>
             </div>
@@ -143,7 +180,7 @@
                         <em>A regex search of \. is the least restrictive and will match anything with a period.</em>
                     </span>
                 </div>
-            </div>     
+            </div>
 
             <div class="form-group">
                 @Html.LabelFor(model => model.IsRegexSearch, htmlAttributes: new { @class = "control-label col-md-2 optional" })
@@ -168,7 +205,7 @@
                     @Html.EditorFor(model => model.SearchCriteria, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
                     @Html.ValidationMessageFor(model => model.SearchCriteria, "", new { @class = "text-danger" })
                 </div>
-            </div>   
+            </div>
 
             <div class="form-group configQuestion">
                 <div class="col-md-12">
@@ -183,7 +220,7 @@
                         <em>Compressed files can be decompressed as part of the retrieval processes if needed.  Contents of compressed file will be loaded into this Schema.</em>
                     </span>
                 </div>
-            </div>     
+            </div>
 
             <div class="form-group">
                 @Html.LabelFor(model => model.IsSourceCompressed, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -194,7 +231,7 @@
             </div>
 
 
-            <div id="compressionPanel" >
+            <div id="compressionPanel">
                 <div class="form-group">
                     @Html.LabelFor(model => model.CompressionType, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
@@ -360,15 +397,16 @@
     .removeFileName {
         cursor: pointer;
     }
-    .configQuestion{
+
+    .configQuestion {
         margin-top: 30px;
         margin-left: 3em;
         margin-bottom: 10px;
     }
+
     .questionDescription {
         margin-top: 15px;
     }
-    
 </style>
 
 
@@ -382,9 +420,9 @@
 
             $("#SelectedSourceType").change(function () {
                 var val = $('#SelectedSourceType :selected').val();
-                var subItems = "";
 
-                $.getJSON("@Url.Action("SourcesByType", "Config")", {sourceType:val} ,function (data) {
+                $.getJSON("@Url.Action("SourcesByType", "Config")", { sourceType: val }, function (data) {
+                    var subItems = "";
                     $.each(data,function(index,item){
                       subItems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
                     });
@@ -398,13 +436,28 @@
                             $("#baseURL").text(" The Base URL of the Data Source you picked is " + data.BaseUri + ".  What you type in the Relative URL will be appended to the end of this Base URL.");
                         });
                         $("#editDataSource").show();
+
+                        $.getJSON("@Url.Action("IsHttpSource", "Config")", { dataSourceId: data[0].Value} ,function (data) {
+                            if (data) {
+                                $('.httpSourcePanel').show();
+                            }
+                            else {
+                                $('.httpSourcePanel').hide();
+                            }
+                        });
                     }
 
                     $("#SelectedDataSource").html(subItems);
                 });
 
+                RequestMethodDropdownPopulate();
+
                 targetFileNameDescUpdate();
             });
+
+            $('#SelectedRequestMethod').change(function () {
+                DisplayHttpPostPanel();
+            })
 
             function targetFileNameDescUpdate() {
                 var val = $('#SelectedSourceType :selected').val();
@@ -420,6 +473,45 @@
                     $('#targetfilenamelabel').addClass("optional");
                 }
             };
+
+            function RequestMethodDropdownPopulate() {
+                var val = $('#SelectedSourceType :selected').val();
+
+                $.getJSON("@Url.Action("RequestMethodByType", "Config")", { sourceType: val }, function (data) {
+                    var subItems = "";
+                    $.each(data, function (index, item) {
+                        subItems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+                    });
+
+                    $('#SelectedRequestMethod').html(subItems);
+                });
+
+                DisplayHttpPostPanel();
+            };
+
+            function DisplayHttpPostPanel() {
+                var val = $('#SelectedRequestMethod :selected').text();
+                if (val === 'POST') {
+                    RequestDataFormatDropdownPopulate();
+                    $('.httpPostPanel').show();
+                }
+                else {
+                    $('.httpPostPanel').hide();
+                }
+            }
+
+            function RequestDataFormatDropdownPopulate() {
+                var val = $('#SelectedSourceType :selected').val();
+
+                $.getJSON("@Url.Action("RequestDataFormatByType", "Config")", { sourceType: val }, function (data) {
+                    var subItems = "";
+                    $.each(data, function (index, item) {
+                        subItems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+                    });
+
+                    $('#SelectedRequestDataFormat').html(subItems);
+                });
+            }
 
             targetFileNameDescUpdate();
 
@@ -725,6 +817,17 @@
             });
 
             $("#cronJobDatePicker").datepicker();
+
+            $('#jsonPreview').on('click', function () {                
+                try {
+                    var data = JSON.parse($('#HttpRequestBody').val());
+                    $('#json-viewer').jsonViewer(data);
+                    $('.jsonValidateResultsPanel').show();
+                }
+                catch (error) {
+                    alert("invalid json");
+                }
+            });
         });
 
     </script>

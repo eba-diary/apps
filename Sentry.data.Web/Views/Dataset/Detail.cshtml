@@ -860,6 +860,7 @@
                 console.log($('#datasetConfigList').val());
                 var fileInfoURL = "/Dataset/GetDatasetFileInfoForGrid/?Id=" + $('#datasetConfigList').val() + "&bundle=false";
                 $('#datasetFilesTable').DataTable().ajax.url(fileInfoURL).load();
+                $('#datasetFilesTable').DataTable().columns[4].DefaultCellSytle.Format = 'dd/MM/yyyy';
 
                 UpdateMetadata();
 

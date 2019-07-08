@@ -46,26 +46,7 @@ namespace Sentry.data.Core
         }
 
         public virtual JavaOptions JavaAppOptions { get; set; }
-
-        //public virtual JavaOptions JavaAppOptions
-        //{
-        //    get
-        //    {
-        //        if (String.IsNullOrEmpty(_javaAppOptions))
-        //        {
-        //            return null;
-        //        }
-        //        else
-        //        {
-        //            JavaOptions a = JsonConvert.DeserializeObject<JavaOptions>(_javaAppOptions);
-        //            return a;
-        //        }
-        //    }
-        //    set
-        //    {
-        //        _javaAppOptions = JsonConvert.SerializeObject(value);
-        //    }
-        //}
+        public virtual HttpsOptions HttpOptions { get; set; }
 
         //All options pertaining to compression\decompression logic
         [Serializable]
@@ -86,6 +67,14 @@ namespace Sentry.data.Core
             public string ExecutorMemory { get; set; }
             public int? ExecutorCores { get; set; }
             public int? NumExecutors { get; set; }
+        }
+
+        [Serializable]
+        public class HttpsOptions
+        {
+            public string Body { get; set; }
+            public HttpMethods RequestMethod { get; set; }
+            public HttpDataFormat RequestDataFormat { get; set; }
         }
     }
 }

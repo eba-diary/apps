@@ -48,13 +48,31 @@ namespace Sentry.data.Infrastructure
             {
                 token.ThrowIfCancellationRequested();
 
-                using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                using (Container = Bootstrapper.Container.GetNestedContainer())
                 {
                     IDatasetContext _requestContext = Container.GetInstance<IDatasetContext>();
                     IJobService _jobService = Container.GetInstance<IJobService>();
 
                     //Retrieve job details
                     _job = _requestContext.RetrieverJob.Where(w => w.Id == JobId).FetchAllConfiguration(_requestContext).FirstOrDefault();
+
+                    //if logic only needed until all sources are converted to this Source\Provider pattern
+                    switch (_job.DataSource.SourceType)
+                    {
+                        case GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE:
+                            IBaseJobProvider _jobProvider = Container.GetInstance<IBaseJobProvider>(_job.DataSource.SourceType);
+
+                            // Execute job
+                            if (_jobProvider != null)
+                            {
+                                _jobProvider.Execute(_job);
+                            }
+                            break;
+                        default:
+                            _job.JobLoggerMessage("Info", "Job not configured for new Source\\Provider pattern");
+                            break;
+                    }
+                    
 
                     if (_job.DataSource.Is<FtpSource>())
                     {
@@ -334,13 +352,10 @@ namespace Sentry.data.Infrastructure
                     else if (_job.DataSource.Is<HTTPSSource>())
                     {
                         //set up HTTP Request
-                        IHttpsProvider _requestProvider = Container.GetInstance<IHttpsProvider>();
-                        _requestProvider.ConfigureProvider(_job, null);
-                        IRestResponse resp = _requestProvider.SendRequest();                        
-                        if (resp.StatusCode != HttpStatusCode.OK)
-                        {
-                            throw new WebException($"HTTPS call returned {resp.StatusCode} with description {resp.StatusDescription}");
-                        }
+                        IBaseHttpsProvider _requestProvider = Container.GetInstance<IBaseHttpsProvider>();
+                        _requestProvider.ConfigureProvider(_job);
+
+                        IRestResponse resp = _requestProvider.SendRequest();
 
                         //Setup temporary work space for job
                         var tempFile = SetupTempWorkSpace();
@@ -349,7 +364,6 @@ namespace Sentry.data.Infrastructure
                         RetrieverJob targetJob = FindBasicJob();
 
                         //Get target path based on basic job found
-                        Logger.Info($"https_response_contenttype - {resp.ContentType}");
                         string extension = ParseContentType(resp.ContentType);
 
                         string targetFullPath = $"{GetTargetPath(targetJob)}.{extension}";
@@ -838,6 +852,8 @@ namespace Sentry.data.Infrastructure
             //https://technet.microsoft.com/en-us/library/cc995276.aspx
             //https://www.iana.org/assignments/media-types/media-types.xhtml
 
+            _job.JobLoggerMessage("Info", $"incoming_contenttype - {contentType}");
+
             var content = new ContentType(contentType);
 
             using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
@@ -852,6 +868,7 @@ namespace Sentry.data.Infrastructure
                     return "txt";
                 }
 
+                _job.JobLoggerMessage("Info", $"detected_mediatype - {extensions.Value}");
                 return extensions.Value;
             }
         }
