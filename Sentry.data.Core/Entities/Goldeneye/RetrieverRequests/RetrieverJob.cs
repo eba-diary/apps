@@ -78,7 +78,6 @@ namespace Sentry.data.Core
         }
 
         public virtual string RelativeUri { get; set; }
-        public virtual string HttpsBody { get; set; }
         public virtual DataSource DataSource { get; set; }
         public virtual DatasetFileConfig DatasetConfig { get; set; }
         public virtual DateTime Created { get; set; }

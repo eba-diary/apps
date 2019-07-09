@@ -25,8 +25,6 @@
     [Scope] VARCHAR(250) NULL, 
     [TokenUrl] NVARCHAR(1000) NULL, 
     [TokenExp] INT NULL, 
-    [ObjectBasedRequest] BIT NULL, 
-    [UrlBasedRequest] BIT NULL, 
     PRIMARY KEY CLUSTERED ([DataSource_Id] ASC),
     CONSTRAINT [FK_DataSource_AuthenticationType] FOREIGN KEY ([SourceAuth_ID]) REFERENCES [dbo].[AuthenticationType] ([Auth_Id])
 );

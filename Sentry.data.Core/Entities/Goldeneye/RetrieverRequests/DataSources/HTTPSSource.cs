@@ -16,8 +16,6 @@ namespace Sentry.data.Core
             IsUriEditable = true;
             IsSourceCompressed = false;
             KeyCode = Guid.NewGuid().ToString().Substring(0, 13);
-            UrlBasedRequest = true;
-            ObjectBasedRequest = false;
 
             //Control auth types which can be chosen for this source type.  As new
             // types are integrated, add the type to the list.
@@ -80,8 +78,6 @@ namespace Sentry.data.Core
         public virtual string IVKey { get; set; }
         public virtual HttpMethods RequestMethod { get; set; }
         public virtual HttpDataFormat RequestDataFormat { get; set; }
-        public virtual bool UrlBasedRequest { get; set; }
-        public virtual bool ObjectBasedRequest { get; set; }
         public virtual bool PagingEnabled { get; set; }
 
         #region OAuth
