@@ -618,8 +618,6 @@ namespace Sentry.data.Core
                 dto.Scope = ((HTTPSSource)dsrc).Scope;
                 dto.RequestHeaders = ((HTTPSSource)dsrc).RequestHeaders;
                 dto.TokenAuthHeader = ((HTTPSSource)dsrc).AuthenticationHeaderName;
-                dto.UrlBasedRequest = ((HTTPSSource)dsrc).UrlBasedRequest;
-                dto.ObjectBasedRequest = ((HTTPSSource)dsrc).ObjectBasedRequest;
             }
         }
 

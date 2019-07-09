@@ -15,8 +15,6 @@ namespace Sentry.data.Core
             IsSourceCompressed = false;
             KeyCode = Guid.NewGuid().ToString().Substring(0, 13);
             PagingEnabled = false;
-            ObjectBasedRequest = true;
-            UrlBasedRequest = false;
 
             //Control auth types which can be chosen for this source type.  As new
             // types are integrated, add the type to the list.
