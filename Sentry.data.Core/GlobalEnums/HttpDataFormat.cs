@@ -1,7 +1,11 @@
-﻿namespace Sentry.data.Core
+﻿using System.ComponentModel;
+
+namespace Sentry.data.Core
 {
     public enum HttpDataFormat
     {
-        json = 0
+        none = 0,
+        [Description("JSON")]
+        json = 1
     }
 }

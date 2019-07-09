@@ -14,7 +14,7 @@ namespace Sentry.data.Core
             IsUriEditable = true;
             IsSourceCompressed = false;
             KeyCode = Guid.NewGuid().ToString().Substring(0, 13);
-            PagingEnabled = true;
+            PagingEnabled = false;
             ObjectBasedRequest = true;
             UrlBasedRequest = false;
 

@@ -4,9 +4,10 @@ namespace Sentry.data.Core
 {
     public enum HttpMethods
     {
+        none = 0,
         [Description("Get")]
-        get = 0,
+        get = 1,
         [Description("Post")]
-        post = 1
+        post = 2
     }
 }

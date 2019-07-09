@@ -418,7 +418,9 @@
 
         $(function () {
 
-            $("#SelectedSourceType").change(function () {
+            data.Job.FormInit();
+
+            @*$("#SelectedSourceType").change(function () {
                 var val = $('#SelectedSourceType :selected').val();
 
                 $.getJSON("@Url.Action("SourcesByType", "Config")", { sourceType: val }, function (data) {
@@ -450,72 +452,14 @@
                     $("#SelectedDataSource").html(subItems);
                 });
 
-                RequestMethodDropdownPopulate();
+                data.Job.RequestMethodDropdownPopulate();
 
-                targetFileNameDescUpdate();
-            });
+                data.Job.targetFileNameDescUpdate();
+            });*@
 
-            $('#SelectedRequestMethod').change(function () {
-                DisplayHttpPostPanel();
-            })
+            data.Job.targetFileNameDescUpdate();
 
-            function targetFileNameDescUpdate() {
-                var val = $('#SelectedSourceType :selected').val();
-
-                if (val == 'HTTPS') {
-                    $("#targetfilenamequestion").text("What should target file be named?");
-                    $("#targetfilenamedesc").text("Due to the type of data source, a target file name is required as we are receiving a message not retrieving specific file.");
-                    $('#targetfilenamelabel').removeClass("optional");
-                }
-                else {
-                    $("#targetfilenamequestion").text("Should file be renamed?");
-                    $("#targetfilenamedesc").text("The incoming file will be renamed to Target File Name supplied.  If left blank, original source file name will used when saved to data.sentry.com.");
-                    $('#targetfilenamelabel').addClass("optional");
-                }
-            };
-
-            function RequestMethodDropdownPopulate() {
-                var val = $('#SelectedSourceType :selected').val();
-
-                $.getJSON("@Url.Action("RequestMethodByType", "Config")", { sourceType: val }, function (data) {
-                    var subItems = "";
-                    $.each(data, function (index, item) {
-                        subItems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
-                    });
-
-                    $('#SelectedRequestMethod').html(subItems);
-                });
-
-                DisplayHttpPostPanel();
-            };
-
-            function DisplayHttpPostPanel() {
-                var val = $('#SelectedRequestMethod :selected').text();
-                if (val === 'POST') {
-                    RequestDataFormatDropdownPopulate();
-                    $('.httpPostPanel').show();
-                }
-                else {
-                    $('.httpPostPanel').hide();
-                }
-            }
-
-            function RequestDataFormatDropdownPopulate() {
-                var val = $('#SelectedSourceType :selected').val();
-
-                $.getJSON("@Url.Action("RequestDataFormatByType", "Config")", { sourceType: val }, function (data) {
-                    var subItems = "";
-                    $.each(data, function (index, item) {
-                        subItems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
-                    });
-
-                    $('#SelectedRequestDataFormat').html(subItems);
-                });
-            }
-
-            targetFileNameDescUpdate();
-
-            $("#SelectedDataSource").change(function () {
+            @*$("#SelectedDataSource").change(function () {
                 var val = $(this).val();
 
                 $("#editDataSource").attr("href", "/Config/Source/Edit/" + val);
@@ -526,7 +470,7 @@
                     $("#baseURLTextBox").val(data.BaseUri);
                     $("#baseURL").text(" The Base URL of the Data Source you picked is " + data.BaseUri + ".  What you type in the Relative URL will be appended to the end of this Base URL.");
                 });
-            });
+            });*@
 
             var val = $("#SelectedDataSource").val();
 
@@ -536,11 +480,11 @@
                 $("#editDataSource").show();
             }
 
-            $.getJSON("@Url.Action("DataSourceDescription", "Config")", { sourceId: val} ,function (data) {
+            @*$.getJSON("@Url.Action("DataSourceDescription", "Config")", { sourceId: val} ,function (data) {
                 $("#dataSourceDescription").text(data.Description);
                 $("#baseURLTextBox").val(data.BaseUri);
                 $("#baseURL").text(" The Base URL of the Data Source you picked is " + data.BaseUri + ".  What you type in the Relative URL will be appended to the end of this Base URL.");
-            });
+            });*@
 
             $('#NewFileNameExclusionList').text("");
 
@@ -817,17 +761,6 @@
             });
 
             $("#cronJobDatePicker").datepicker();
-
-            $('#jsonPreview').on('click', function () {                
-                try {
-                    var data = JSON.parse($('#HttpRequestBody').val());
-                    $('#json-viewer').jsonViewer(data);
-                    $('.jsonValidateResultsPanel').show();
-                }
-                catch (error) {
-                    alert("invalid json");
-                }
-            });
         });
 
     </script>

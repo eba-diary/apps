@@ -83,9 +83,9 @@ namespace Sentry.data.Web
         [DisplayName("Source Type")]
         public string SelectedSourceType { get; set; }
         [DisplayName("Request Method")]
-        public int SelectedRequestMethod { get; set; }
+        public HttpMethods SelectedRequestMethod { get; set; }
         [DisplayName("Request Body Format")]
-        public int SelectedRequestDataFormat { get; set; }
+        public HttpDataFormat SelectedRequestDataFormat { get; set; }
         public List<DataSource> AvailableSources { get; set; }
 
         public IEnumerable<SelectListItem> SourceTypesDropdown { get; set; }

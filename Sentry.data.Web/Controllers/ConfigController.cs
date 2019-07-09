@@ -388,29 +388,10 @@ namespace Sentry.data.Web.Controllers
                     {
                         HttpsOptions ho = new HttpsOptions()
                         {
-                            Body = cjm.HttpRequestBody
+                            Body = cjm.HttpRequestBody,
+                            RequestMethod = cjm.SelectedRequestMethod,
+                            RequestDataFormat = cjm.SelectedRequestDataFormat
                         };
-
-                        switch (cjm.SelectedRequestMethod)
-                        {
-                            case (int)HttpMethods.get:
-                                ho.RequestMethod = HttpMethods.get;
-                                break;
-                            case (int)HttpMethods.post:
-                                ho.RequestMethod = HttpMethods.post;
-                                break;
-                            default:
-                                break;
-                        }
-
-                        switch (cjm.SelectedRequestDataFormat)
-                        {
-                            case (int)HttpDataFormat.json:
-                                ho.RequestDataFormat = HttpDataFormat.json;
-                                break;
-                            default:
-                                break;
-                        }
 
                         rjo.HttpOptions = ho;
                     }
@@ -500,29 +481,9 @@ namespace Sentry.data.Web.Controllers
                 cjm.FileNameExclusionList = new List<string>();
             }
 
-            List<SelectListItem> temp3 = new List<SelectListItem>();
+            cjm.RequestMethodDropdown = Utility.BuildRequestMethodDropdown(cjm.SelectedRequestMethod);
 
-            temp3.Add(new SelectListItem()
-            {
-                Text = "Pick a Source",
-                Value = "0",
-                Selected = true,
-                Disabled = true
-            });
-
-            cjm.RequestMethodDropdown = temp3;
-
-            List<SelectListItem> temp4 = new List<SelectListItem>();
-
-            temp4.Add(new SelectListItem()
-            {
-                Text = "Pick a Request Method",
-                Value = "0",
-                Selected = true,
-                Disabled = true
-            });
-
-            cjm.RequestDataFormatDropdown = temp4;
+            cjm.RequestDataFormatDropdown = Utility.BuildRequestDataFormatDropdown(cjm.SelectedRequestDataFormat);
 
             return cjm;
         }
@@ -570,36 +531,32 @@ namespace Sentry.data.Web.Controllers
                     DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(ejm.DatasetConfigID);
                     DataSource dataSource = _datasetContext.GetById<DataSource>(ejm.SelectedDataSource);
 
-                    Compression compression = new Compression()
-                    {
-                        IsCompressed = ejm.IsSourceCompressed,
-                        CompressionType = ejm.CompressionType,
-                        FileNameExclusionList = ejm.NewFileNameExclusionList.Split('|').Where(x => !String.IsNullOrWhiteSpace(x)).ToList()
-                    };
+                    rj.JobOptions.OverwriteDataFile = ejm.OverwriteDataFile;
+                    rj.JobOptions.TargetFileName = ejm.TargetFileName;
+                    rj.JobOptions.CreateCurrentFile = ejm.CreateCurrentFile;
+                    rj.JobOptions.IsRegexSearch = ejm.IsRegexSearch;
+                    rj.JobOptions.SearchCriteria = ejm.SearchCriteria;
 
-                    rj.JobOptions = new RetrieverJobOptions()
-                    {
-                        OverwriteDataFile = ejm.OverwriteDataFile,
-                        TargetFileName = ejm.TargetFileName,
-                        CreateCurrentFile = ejm.CreateCurrentFile,
-                        IsRegexSearch = ejm.IsRegexSearch,
-                        SearchCriteria = ejm.SearchCriteria,
-                        CompressionOptions = compression
-                    };
+                    rj.JobOptions.CompressionOptions.IsCompressed = ejm.IsSourceCompressed;
+                    rj.JobOptions.CompressionOptions.CompressionType = ejm.CompressionType;
+                    rj.JobOptions.CompressionOptions.FileNameExclusionList = ejm.NewFileNameExclusionList.Split('|').Where(x => !String.IsNullOrWhiteSpace(x)).ToList();
 
                     if (dataSource.Is<GoogleApiSource>())
                     {
-                        rj.JobOptions.HttpOptions.Body = ejm.HttpRequestBody;
-                        switch (ejm.SelectedRequestMethod)
+                        if (rj.JobOptions.HttpOptions == null)
                         {
-                            case (int)HttpMethods.get:
-                                rj.JobOptions.HttpOptions.RequestMethod = HttpMethods.get;
-                                break;
-                            case (int)HttpMethods.post:
-                                rj.JobOptions.HttpOptions.RequestMethod = HttpMethods.post;
-                                break;
-                            default:
-                                break;
+                            rj.JobOptions.HttpOptions = new HttpsOptions()
+                            {
+                                Body = ejm.HttpRequestBody,
+                                RequestMethod = ejm.SelectedRequestMethod,
+                                RequestDataFormat = ejm.SelectedRequestDataFormat
+                            };
+                        }
+                        else
+                        {
+                            rj.JobOptions.HttpOptions.Body = ejm.HttpRequestBody;
+                            rj.JobOptions.HttpOptions.RequestDataFormat = ejm.SelectedRequestDataFormat;
+                            rj.JobOptions.HttpOptions.RequestMethod = ejm.SelectedRequestMethod;
                         }
                     }
 
@@ -759,6 +716,10 @@ namespace Sentry.data.Web.Controllers
                 ejm.NewFileNameExclusionList = "";
                 //ejm.FileNameExclusionList = new List<string>();
             }
+
+            ejm.RequestMethodDropdown = Utility.BuildRequestMethodDropdown(ejm.SelectedRequestMethod);
+
+            ejm.RequestDataFormatDropdown = Utility.BuildRequestDataFormatDropdown(ejm.SelectedRequestDataFormat);
 
             return ejm;
         }
@@ -1017,6 +978,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        [Route("Config/RequestMethodByType/{sourceType}")]
         public JsonResult RequestMethodByType(string sourceType)
         {
             return Json(GetRequestMethods(sourceType, null), JsonRequestBehavior.AllowGet);
@@ -1063,6 +1025,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        [Route("Config/RequestDataFormatByType/{sourceType}")]
         public JsonResult RequestDataFormatByType(string sourceType)
         {
             return Json(GetRequestDataFormat(sourceType, null), JsonRequestBehavior.AllowGet);
@@ -1537,6 +1500,8 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public JsonResult IsHttpSource(int dataSourceId)
         {
+            if (dataSourceId == 0) { return Json(false, JsonRequestBehavior.AllowGet); }
+
             DataSourceDto dto = _configService.GetDataSourceDto(dataSourceId);
             bool result;
             switch (dto.SourceType)

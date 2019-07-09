@@ -414,6 +414,7 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\home.css" />
     <Content Include="Content\jquery.json-viewer.css" />
+    <Content Include="js\Job.js" />
     <Content Include="Scripts\jquery.json-viewer.js" />
     <Content Include="Content\query-builder.default.css" />
     <Content Include="Content\query-builder.default.min.css" />
