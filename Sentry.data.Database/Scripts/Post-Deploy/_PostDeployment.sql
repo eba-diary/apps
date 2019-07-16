@@ -18,6 +18,7 @@ All new files added for staic data or scripts should have it's properties update
 :r ..\Post-Deploy\StaticData\Permission.sql
 :r ..\Post-Deploy\StaticData\BusinessUnit.sql
 :r ..\Post-Deploy\StaticData\DatasetFunction.sql
+:r ..\Post-Deploy\StaticData\AuthenticationType.sql
 
 
 --Now only run these scripts if the versioning allows us.
