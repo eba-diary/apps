@@ -99,7 +99,7 @@ namespace Sentry.data.Infrastructure
         {
             RestClient client = new RestClient
             {
-                Proxy = new WebProxy(Configuration.Config.GetHostSetting("SentryWebProxyHost"))
+                Proxy = new WebProxy(Configuration.Config.GetHostSetting("SentryWebProxyHost"), int.Parse(Configuration.Config.GetSetting("SentryWebProxyPort")))
                 {
                     Credentials = CredentialCache.DefaultNetworkCredentials
                 }
