@@ -13,6 +13,7 @@ using Org.BouncyCastle.Crypto;
 using Hangfire;
 using System.Net;
 using Newtonsoft.Json.Linq;
+using RestSharp.Authenticators;
 
 namespace Sentry.data.Infrastructure
 {
@@ -43,7 +44,7 @@ namespace Sentry.data.Infrastructure
             _client = new RestClient
             {
                 BaseUrl = new Uri(baseUri),
-                Proxy = new WebProxy(Configuration.Config.GetHostSetting("SentryWebProxyHost"))
+                Proxy = new WebProxy(Configuration.Config.GetHostSetting("SentryWebProxyHost"), int.Parse(Configuration.Config.GetHostSetting("SentryWebProxyPort")))
                 {
                     Credentials = CredentialCache.DefaultNetworkCredentials
                 }
@@ -278,8 +279,16 @@ namespace Sentry.data.Infrastructure
         {
             if (source.CurrentTokenExp == null || source.CurrentTokenExp < ConvertFromUnixTimestamp(DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds))
             {
-                // Get the OAuth access token
-                var httpClient = new System.Net.Http.HttpClient();
+               var httpHandler = new System.Net.Http.HttpClientHandler()
+                {
+                    Proxy = new WebProxy(Configuration.Config.GetHostSetting("SentryWebProxyHost"), int.Parse(Configuration.Config.GetHostSetting("SentryWebProxyPort")))
+                    {
+                        Credentials = CredentialCache.DefaultNetworkCredentials
+                    }
+                };
+
+                var httpClient = new System.Net.Http.HttpClient(httpHandler);
+
                 var keyValues = new List<KeyValuePair<string, string>>();
                 AddOAuthGrantType(keyValues, source);
                 keyValues.Add(new KeyValuePair<string, string>("assertion", GenerateJwtToken(source)));
@@ -354,8 +363,5 @@ namespace Sentry.data.Infrastructure
             segments.Add(Base64UrlEncode(signature));
             return string.Join(".", segments.ToArray());
         }
-
-        
-
     }
 }
