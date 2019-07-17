@@ -12,7 +12,8 @@ Post-Deployment Script Template
 IF NOT EXISTS (Select * from AuthenticationType where [AuthType_CDE] = 'OAuth')
 BEGIN
 	insert into AuthenticationType
-	select
+	SELECT
+		4,
 		'OAuth',
 		'OAuth 2.0 Authentication',
 		'Utilizes OAuth flow to retrieve accesstoken to pull data from source'
