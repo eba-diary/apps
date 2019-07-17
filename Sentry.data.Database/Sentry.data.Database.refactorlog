@@ -707,4 +707,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="[PrimaryContact_ID]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="076ebcd4-d84f-4db7-b176-02003a40a51a" ChangeDateTime="06/03/2019 20:03:16">
+    <Property Name="ElementName" Value="[dbo].[DataSource].[CurrentTokenIat]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataSource]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CurrentTokenExp" />
+  </Operation>
 </Operations>

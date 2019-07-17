@@ -36,5 +36,52 @@ namespace Sentry.data.Web
                 FileFormatId = model.FileExtensionId
             };
         }
+
+        public static Core.DataSourceDto ToDto(this CreateSourceModel model)
+        {
+            return new Core.DataSourceDto()
+            {
+                OriginatingId = model.Id,
+                RetrunUrl = model.ReturnUrl,
+                Name = model.Name,
+                SourceType = model.SourceType,
+                AuthID = model.AuthID,
+                IsUserPassRequired = model.IsUserPassRequired,
+                PortNumber = model.PortNumber,
+                BaseUri = model.BaseUri,
+                TokenAuthHeader = model.TokenAuthHeader,
+                TokenAuthValue = model.TokenAuthValue,
+                ClientId = model.ClientId,
+                ClientPrivateId = model.ClientPrivateId,
+                TokenUrl = model.TokenUrl,
+                TokenExp = model.TokenExp,
+                Scope = model.Scope,
+                RequestHeaders = model.Headers
+            };
+        }
+
+        public static Core.DataSourceDto ToDto(this DataSourceModel model)
+        {
+            return new Core.DataSourceDto()
+            {
+                OriginatingId = model.Id,
+                RetrunUrl = model.ReturnUrl,
+                Name = model.Name,
+                Description = model.Description,
+                SourceType = model.SourceType,
+                AuthID = model.AuthID,
+                IsUserPassRequired = model.IsUserPassRequired,
+                PortNumber = model.PortNumber,
+                BaseUri = model.BaseUri,
+                TokenAuthHeader = model.TokenAuthHeader,
+                TokenAuthValue = model.TokenAuthValue,
+                ClientId = model.ClientId,
+                ClientPrivateId = model.ClientPrivateId,
+                TokenUrl = model.TokenUrl,
+                TokenExp = model.TokenExp,
+                Scope = model.Scope,
+                RequestHeaders = model.Headers
+            };
+        }
     }
 }
