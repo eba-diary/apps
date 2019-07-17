@@ -234,6 +234,7 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
+    <Compile Include="ServiceImplementations\DataSourceProviders\GenericHttpsProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\GoogleApiProvider.cs" />
     <Compile Include="ServiceImplementations\HpsmMonitoringService.cs" />
     <Compile Include="ServiceImplementations\HpsmProvider.cs" />

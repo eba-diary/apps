@@ -80,6 +80,7 @@ namespace Sentry.data.Infrastructure
             registry.For<IRequestContext>().Use(() => new RequestContext(_defaultSessionFactory.OpenSession()));
             registry.For<IBaseJobProvider>().AddInstances(x =>
             {
+                x.Type<GenericHttpsProvider>().Named(GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE);
                 x.Type<GoogleApiProvider>().Named(GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE);
             });
             //Register other services

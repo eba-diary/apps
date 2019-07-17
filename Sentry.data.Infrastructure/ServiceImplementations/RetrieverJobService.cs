@@ -60,6 +60,7 @@ namespace Sentry.data.Infrastructure
                     switch (_job.DataSource.SourceType)
                     {
                         case GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE:
+                        case GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE:
                             IBaseJobProvider _jobProvider = Container.GetInstance<IBaseJobProvider>(_job.DataSource.SourceType);
 
                             // Execute job
@@ -349,126 +350,126 @@ namespace Sentry.data.Infrastructure
                             }
                         }
                     }
-                    else if (_job.DataSource.Is<HTTPSSource>())
-                    {
-                        //set up HTTP Request
-                        IBaseHttpsProvider _requestProvider = Container.GetInstance<IBaseHttpsProvider>();
-                        _requestProvider.ConfigureProvider(_job);
+                    //else if (_job.DataSource.Is<HTTPSSource>())
+                    //{
+                    //    //set up HTTP Request
+                    //    IBaseHttpsProvider _requestProvider = Container.GetInstance<IBaseHttpsProvider>();
+                    //    _requestProvider.ConfigureProvider(_job);
 
-                        IRestResponse resp = _requestProvider.SendRequest();
+                    //    IRestResponse resp = _requestProvider.SendRequest();
 
-                        //Setup temporary work space for job
-                        var tempFile = SetupTempWorkSpace();
+                    //    //Setup temporary work space for job
+                    //    var tempFile = SetupTempWorkSpace();
 
-                        //Find appropriate drop location (S3Basic or DfsBasic)
-                        RetrieverJob targetJob = FindBasicJob();
+                    //    //Find appropriate drop location (S3Basic or DfsBasic)
+                    //    RetrieverJob targetJob = FindBasicJob();
 
-                        //Get target path based on basic job found
-                        string extension = ParseContentType(resp.ContentType);
+                    //    //Get target path based on basic job found
+                    //    string extension = ParseContentType(resp.ContentType);
 
-                        string targetFullPath = $"{GetTargetPath(targetJob)}.{extension}";
+                    //    string targetFullPath = $"{GetTargetPath(targetJob)}.{extension}";
 
-                        if (_job.JobOptions != null && _job.JobOptions.CompressionOptions.IsCompressed)
-                        {
-                            _job.JobLoggerMessage("Info", $"Compressed option is detected... Streaming to temp location");
+                    //    if (_job.JobOptions != null && _job.JobOptions.CompressionOptions.IsCompressed)
+                    //    {
+                    //        _job.JobLoggerMessage("Info", $"Compressed option is detected... Streaming to temp location");
 
-                            try
-                            {
-                                using (Stream filestream = new FileStream(tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-                                {
-                                    _requestProvider.CopyToStream(filestream);                                
-                                }
+                    //        try
+                    //        {
+                    //            using (Stream filestream = new FileStream(tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                    //            {
+                    //                _requestProvider.CopyToStream(filestream);                                
+                    //            }
 
-                                //Create a fire-forget Hangfire job to decompress the file and drop extracted file into drop locations
-                                //Jaws will cleanup the source temporary file after it completes processing file.
-                                BackgroundJob.Enqueue<JawsService>(x => x.UncompressRetrieverJob(_job.Id, tempFile));
-                            }
-                            catch (Exception ex)
-                            {
-                                _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
-                                _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
+                    //            //Create a fire-forget Hangfire job to decompress the file and drop extracted file into drop locations
+                    //            //Jaws will cleanup the source temporary file after it completes processing file.
+                    //            BackgroundJob.Enqueue<JawsService>(x => x.UncompressRetrieverJob(_job.Id, tempFile));
+                    //        }
+                    //        catch (Exception ex)
+                    //        {
+                    //            _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
+                    //            _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
 
-                                //Cleanup target file if exists
-                                if (File.Exists(tempFile))
-                                {
-                                    File.Delete(tempFile);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (targetJob.DataSource.Is<S3Basic>())
-                            {
-                                _job.JobLoggerMessage("Info", "Sending file to S3 drop location");
+                    //            //Cleanup target file if exists
+                    //            if (File.Exists(tempFile))
+                    //            {
+                    //                File.Delete(tempFile);
+                    //            }
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        if (targetJob.DataSource.Is<S3Basic>())
+                    //        {
+                    //            _job.JobLoggerMessage("Info", "Sending file to S3 drop location");
 
-                                try
-                                {
-                                    using (Stream filestream = new FileStream(tempFile, FileMode.Create, FileAccess.ReadWrite))
-                                    {
-                                        _requestProvider.CopyToStream(filestream);
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    _job.JobLoggerMessage("Error", "Retriever job failed streaming temp location.", ex);
-                                    _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
+                    //            try
+                    //            {
+                    //                using (Stream filestream = new FileStream(tempFile, FileMode.Create, FileAccess.ReadWrite))
+                    //                {
+                    //                    _requestProvider.CopyToStream(filestream);
+                    //                }
+                    //            }
+                    //            catch (Exception ex)
+                    //            {
+                    //                _job.JobLoggerMessage("Error", "Retriever job failed streaming temp location.", ex);
+                    //                _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
 
-                                    //Cleanup temp file if exists
-                                    if (File.Exists(tempFile))
-                                    {
-                                        File.Delete(tempFile);
-                                    }
-                                }
+                    //                //Cleanup temp file if exists
+                    //                if (File.Exists(tempFile))
+                    //                {
+                    //                    File.Delete(tempFile);
+                    //                }
+                    //            }
 
-                                S3ServiceProvider s3Service = new S3ServiceProvider();
-                                string targetkey = targetFullPath;
-                                var versionId = s3Service.UploadDataFile(tempFile, targetkey);
+                    //            S3ServiceProvider s3Service = new S3ServiceProvider();
+                    //            string targetkey = targetFullPath;
+                    //            var versionId = s3Service.UploadDataFile(tempFile, targetkey);
 
-                                _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
+                    //            _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
 
-                                //Cleanup temp file if exists
-                                if (File.Exists(tempFile))
-                                {
-                                    File.Delete(tempFile);
-                                }
-                            }
-                            else if (targetJob.DataSource.Is<DfsBasic>())
-                            {
-                                _job.JobLoggerMessage("Info", "Sending file to DFS drop location");
+                    //            //Cleanup temp file if exists
+                    //            if (File.Exists(tempFile))
+                    //            {
+                    //                File.Delete(tempFile);
+                    //            }
+                    //        }
+                    //        else if (targetJob.DataSource.Is<DfsBasic>())
+                    //        {
+                    //            _job.JobLoggerMessage("Info", "Sending file to DFS drop location");
 
-                                try
-                                {
-                                    using (Stream filestream = new FileStream(targetFullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
-                                    {
-                                        _requestProvider.CopyToStream(filestream);
-                                    }
-                                }
-                                catch (WebException ex)
-                                {
-                                    _job.JobLoggerMessage("Error", "Web request return error", ex);
-                                    _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
+                    //            try
+                    //            {
+                    //                using (Stream filestream = new FileStream(targetFullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
+                    //                {
+                    //                    _requestProvider.CopyToStream(filestream);
+                    //                }
+                    //            }
+                    //            catch (WebException ex)
+                    //            {
+                    //                _job.JobLoggerMessage("Error", "Web request return error", ex);
+                    //                _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
 
-                                    //Cleanup target file if exists
-                                    if (File.Exists(targetFullPath))
-                                    {
-                                        File.Delete(targetFullPath);
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
-                                    _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
+                    //                //Cleanup target file if exists
+                    //                if (File.Exists(targetFullPath))
+                    //                {
+                    //                    File.Delete(targetFullPath);
+                    //                }
+                    //            }
+                    //            catch (Exception ex)
+                    //            {
+                    //                _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
+                    //                _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
 
-                                    //Cleanup target file if exists
-                                    if (File.Exists(targetFullPath))
-                                    {
-                                        File.Delete(targetFullPath);
-                                    }
+                    //                //Cleanup target file if exists
+                    //                if (File.Exists(targetFullPath))
+                    //                {
+                    //                    File.Delete(targetFullPath);
+                    //                }
 
-                                }
-                            }                        
-                        }
-                    }
+                    //            }
+                    //        }                        
+                    //    }
+                    //}
                 }
             }
             catch (OperationCanceledException)

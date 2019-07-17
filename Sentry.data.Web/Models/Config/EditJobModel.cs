@@ -32,8 +32,9 @@ namespace Sentry.data.Web
             SelectedDataSource = rj.DataSource.Id;
             JobID = rj.Id;
             IsGeneric = rj.IsGeneric;
-            SelectedRequestMethod = rj.JobOptions.HttpOptions.RequestMethod;
-            HttpRequestBody = rj.JobOptions.HttpOptions.Body;
+            SelectedRequestMethod = (rj.JobOptions.HttpOptions != null && rj.JobOptions.HttpOptions.RequestMethod != null) ? rj.JobOptions.HttpOptions.RequestMethod : HttpMethods.none;
+            HttpRequestBody = (rj.JobOptions.HttpOptions != null && rj.JobOptions.HttpOptions.Body != null) ? rj.JobOptions.HttpOptions.Body : null;
+            SelectedRequestDataFormat = (rj.JobOptions.HttpOptions != null && rj.JobOptions.HttpOptions.RequestDataFormat != null) ? rj.JobOptions.HttpOptions.RequestDataFormat : HttpDataFormat.none;            
         }
 
         public int JobID { get; set; }
