@@ -35,7 +35,7 @@
 		DECLARE @Merge_AuthenticationType_ErrorState INT; 
   
 		SELECT 
-			@Merge_AuthenticationTypen_ErrorMessage = ERROR_MESSAGE(), 
+			@Merge_AuthenticationType_ErrorMessage = ERROR_MESSAGE(), 
 			@Merge_AuthenticationType_ErrorSeverity = ERROR_SEVERITY(), 
 			@Merge_AuthenticationType_ErrorState = ERROR_STATE(); 
   
