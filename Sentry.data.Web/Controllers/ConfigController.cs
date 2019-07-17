@@ -531,34 +531,30 @@ namespace Sentry.data.Web.Controllers
                     DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(ejm.DatasetConfigID);
                     DataSource dataSource = _datasetContext.GetById<DataSource>(ejm.SelectedDataSource);
 
-                    rj.JobOptions.OverwriteDataFile = ejm.OverwriteDataFile;
-                    rj.JobOptions.TargetFileName = ejm.TargetFileName;
-                    rj.JobOptions.CreateCurrentFile = ejm.CreateCurrentFile;
-                    rj.JobOptions.IsRegexSearch = ejm.IsRegexSearch;
-                    rj.JobOptions.SearchCriteria = ejm.SearchCriteria;
-
-                    rj.JobOptions.CompressionOptions.IsCompressed = ejm.IsSourceCompressed;
-                    rj.JobOptions.CompressionOptions.CompressionType = ejm.CompressionType;
-                    rj.JobOptions.CompressionOptions.FileNameExclusionList = ejm.NewFileNameExclusionList.Split('|').Where(x => !String.IsNullOrWhiteSpace(x)).ToList();
-
-                    if (dataSource.Is<GoogleApiSource>())
+                    Compression compression = new Compression()
                     {
-                        if (rj.JobOptions.HttpOptions == null)
-                        {
-                            rj.JobOptions.HttpOptions = new HttpsOptions()
-                            {
-                                Body = ejm.HttpRequestBody,
-                                RequestMethod = ejm.SelectedRequestMethod,
-                                RequestDataFormat = ejm.SelectedRequestDataFormat
-                            };
-                        }
-                        else
-                        {
-                            rj.JobOptions.HttpOptions.Body = ejm.HttpRequestBody;
-                            rj.JobOptions.HttpOptions.RequestDataFormat = ejm.SelectedRequestDataFormat;
-                            rj.JobOptions.HttpOptions.RequestMethod = ejm.SelectedRequestMethod;
-                        }
-                    }
+                        IsCompressed = ejm.IsSourceCompressed,
+                        CompressionType = ejm.CompressionType,
+                        FileNameExclusionList = ejm.NewFileNameExclusionList.Split('|').Where(x => !String.IsNullOrWhiteSpace(x)).ToList()
+                    };
+
+                    HttpsOptions hOptions = new HttpsOptions()
+                    {
+                        Body = ejm.HttpRequestBody,
+                        RequestMethod = ejm.SelectedRequestMethod,
+                        RequestDataFormat = ejm.SelectedRequestDataFormat
+                    };
+
+                    rj.JobOptions = new RetrieverJobOptions()
+                    {
+                        OverwriteDataFile = ejm.OverwriteDataFile,
+                        TargetFileName = ejm.TargetFileName,
+                        CreateCurrentFile = ejm.CreateCurrentFile,
+                        IsRegexSearch = ejm.IsRegexSearch,
+                        SearchCriteria = ejm.SearchCriteria,
+                        CompressionOptions = compression,
+                        HttpOptions = hOptions
+                    };                    
 
                     rj.Schedule = ejm.Schedule;
                     rj.TimeZone = "Central Standard Time";

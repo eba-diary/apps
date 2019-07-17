@@ -11,6 +11,7 @@ namespace Sentry.data.Core
     public class RetrieverJobOptions
     {
         private string _compressionOptions;
+        private string _httpsOptions;
         private string _javaAppOptions;
 
         //public RetrieverJobOptions()
@@ -46,7 +47,25 @@ namespace Sentry.data.Core
         }
 
         public virtual JavaOptions JavaAppOptions { get; set; }
-        public virtual HttpsOptions HttpOptions { get; set; }
+        public virtual HttpsOptions HttpOptions
+        {
+            get
+            {
+                if (String.IsNullOrEmpty(_httpsOptions))
+                {
+                    return null;
+                }
+                else
+                {
+                    HttpsOptions a = JsonConvert.DeserializeObject<HttpsOptions>(_httpsOptions);
+                    return a;
+                }
+            }
+            set
+            {
+                _httpsOptions = JsonConvert.SerializeObject(value);
+            }
+        }
 
         //All options pertaining to compression\decompression logic
         [Serializable]

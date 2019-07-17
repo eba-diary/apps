@@ -252,6 +252,12 @@ namespace Sentry.data.Infrastructure
             JToken next = null;
 
             resp = _client.Execute(_request);
+            if (resp.StatusCode != HttpStatusCode.OK)
+            {
+                _job.JobLoggerMessage("Error", "failed_request", resp.ErrorException);
+                throw new HttpListenerException((int)resp.StatusCode, resp.Content);
+            }
+
             JObject x = JObject.Parse(resp.Content);
             
             JArray report = (JArray)x["reports"];                
