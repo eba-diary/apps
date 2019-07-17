@@ -180,6 +180,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<DataElementDetail> DataElementDetails
+        {
+            get
+            {
+                return Query<DataElementDetail>();
+            }
+        }
+
         public IQueryable<DataObject> DataObjects
         {
             get
@@ -297,6 +305,14 @@ namespace Sentry.data.Infrastructure
             get
             {
                 return Query<Favorite>();
+            }
+        }
+
+        public IQueryable<OAuthClaim> OAuthClaims
+        {
+            get
+            {
+                return Query<OAuthClaim>();
             }
         }
 

@@ -62,4 +62,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             DiscriminatorValue(@"TokenAuth");
         }
     }
+
+    public class OAuthAuthenticationMapping : SubclassMapping<OAuthAuthentication>
+    {
+        public OAuthAuthenticationMapping()
+        {
+            DiscriminatorValue(@"OAuth");
+        }
+    }
 }

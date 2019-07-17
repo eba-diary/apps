@@ -2773,3 +2773,9 @@ tr.shown td.details-control {
 .textReadOnly {
     padding-top: 6px;
 }
+
+.text-box[type="number"] {
+    border: 1px solid #ccc;
+    padding: 5px 10px;
+    height: 32px;
+}

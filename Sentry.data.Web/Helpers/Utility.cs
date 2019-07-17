@@ -362,6 +362,61 @@ namespace Sentry.data.Web.Helpers
                 return "No Category Assigned";
             }            
         }
+
+        public static IEnumerable<SelectListItem> BuildRequestMethodDropdown(HttpMethods requestMethod)
+        {
+            List<SelectListItem> requestMethodList = new List<SelectListItem>();
+
+            if (requestMethod == HttpMethods.none) {
+                requestMethodList.Add(new SelectListItem()
+                {
+                    Text = "Pick a Method",
+                    Value = "0",
+                    Selected = true,
+                    Disabled = true
+                });
+            }
+
+            foreach(HttpMethods item in Enum.GetValues(typeof(HttpMethods)))
+            {
+                requestMethodList.Add(new SelectListItem()
+                {
+                    Text = item.GetDescription(),
+                    Value = ((int)item).ToString(),
+                    Selected = requestMethod == item
+                });
+            }
+
+            return requestMethodList;
+        }
+
+        public static IEnumerable<SelectListItem> BuildRequestDataFormatDropdown(HttpDataFormat requestDataMethod)
+        {
+            List<SelectListItem> requestDataMethodList = new List<SelectListItem>();
+
+            if (requestDataMethod == HttpDataFormat.none)
+            {
+                requestDataMethodList.Add(new SelectListItem()
+                {
+                    Text = "Pick a Data Format",
+                    Value = "0",
+                    Selected = true,
+                    Disabled = true
+                });
+            }
+
+            foreach (HttpDataFormat item in Enum.GetValues(typeof(HttpDataFormat)))
+            {
+                requestDataMethodList.Add(new SelectListItem()
+                {
+                    Text = item.GetDescription(),
+                    Value = ((int)item).ToString(),
+                    Selected = requestDataMethod == item
+                });
+            }
+
+            return requestDataMethodList;
+        }
     }
 
 }

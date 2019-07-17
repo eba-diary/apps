@@ -11,5 +11,6 @@ namespace Sentry.data.Core
         JobHistory GetLastExecution(RetrieverJob job);
         Submission SaveSubmission(RetrieverJob job, string options);
         void RecordJobState(Submission submission, RetrieverJob job, string state);
+        RetrieverJob FindBasicJob(RetrieverJob job);
     }
 }

@@ -1,5 +1,5 @@
 ﻿@using Sentry.data.Core;
-@model Sentry.data.Web.EditSourceModel
+@model Sentry.data.Web.DataSourceModel
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -25,7 +25,7 @@
 </div>
 
 
-@using (Html.BeginForm("EditSource", "Config", FormMethod.Post))
+@using (Html.BeginForm("DataSourceForm", "Config", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
 
@@ -75,105 +75,143 @@
                 </div>
             </div>
 
-            
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.BaseUri, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(model => model.BaseUri, new { @value = "", @disabled = "disabled", @class = "form-control edit-dataset-row" })
+                    @Html.ValidationMessageFor(model => model.BaseUri, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div id="authPanel">
                 <div class="form-group">
-                    @Html.LabelFor(model => model.BaseUri, htmlAttributes: new { @class = "control-label col-md-2" })
+                    @Html.LabelFor((model) => model.AuthID, new { @class = "control-label col-md-2" })
                     <div class="col-md-10">
-                        @Html.TextBoxFor(model => model.BaseUri, new { @value = "", @disabled = "disabled", @class = "form-control edit-dataset-row" })
-                        @Html.ValidationMessageFor(model => model.BaseUri, "", new { @class = "text-danger" })
+                        @Html.DropDownListFor((model) => model.AuthID, Model.AuthTypesDropdown, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.AuthID, "", new { @class = "text-danger" })
                     </div>
                 </div>
 
-                <div id="authPanel">
-                    <div class="form-group">
-                        @Html.LabelFor((model) => model.AuthID, new { @class = "control-label col-md-2" })
-                        <div class="col-md-10">
-                            @Html.DropDownListFor((model) => model.AuthID, Model.AuthTypesDropdown, new { @class = "form-control edit-dataset-row" })
-                            @Html.ValidationMessageFor((model) => model.AuthID, "", new { @class = "text-danger" })
-                        </div>
+                <div class="form-group fieldDescription">
+                    <label class="control-label col-md-2"></label>
+                    <div class="col-md-10">
+                        <span class="text-muted">
+                            <em id="authDescription"></em>
+                        </span>
                     </div>
+                </div>
+            </div>
 
-                    <div class="form-group fieldDescription">
-                        <label class="control-label col-md-2"></label>
-                        <div class="col-md-10">
-                            <span class="text-muted">
-                                <em id="authDescription"></em>
-                            </span>
-                        </div>
+            <div id="userPassPanel">
+                <div class="form-group">
+                    @Html.LabelFor((model) => model.IsUserPassRequired, new { @class = "control-label col-md-2" })
+                    <div class="col-md-1">
+                        @Html.CheckBoxFor((model) => model.IsUserPassRequired, new { @class = "edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.IsUserPassRequired, "", new { @class = "text-danger" })
                     </div>
-                </div>
-
-                <div id="userPassPanel">
-                    <div class="form-group">
-                        @Html.LabelFor((model) => model.IsUserPassRequired, new { @class = "control-label col-md-2" })
-                        <div class="col-md-1">
-                            @Html.CheckBoxFor((model) => model.IsUserPassRequired, new { @class = "edit-dataset-row" })
-                            @Html.ValidationMessageFor((model) => model.IsUserPassRequired, "", new { @class = "text-danger" })
-                        </div>
-                        <div id="userPassNotificationPanel" class="credentialWarning">
-                            <div class="col-md-9">
-                                <em>Work with data.sentry.com administrators to configure credentials.  The data source will not operate until credentials are configured.</em>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="tokenAuthPanel">
-                    <div class="form-group">
-                        @Html.Label("Authentication Header", new { @class = "control-label col-md-2" })
-                        <div class="col-md-10">
-                            <div class="col-md-5 headerEntry">
-                                @Html.Label("Token Header Name", new { @class = "col-md-5 headerEntryLabel" })
-                                @Html.TextBoxFor(m => m.TokenAuthHeader, new { @value = "", @class = "form-control edit-dataset-row col-md-3" })
-                            </div>
-                            <div class="col-md-5 headerEntry">
-                                @Html.Label("Token Value", new { @class = "col-md-5 headerEntryLabel" })
-                                @Html.PasswordFor(m => m.TokenAuthValue, new { @value = "", @class = "form-control edit-dataset-row col-md-3", @placeholder = "Leave blank to retain current token value" })
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="portNumberPanel">
-                    <div class="form-group">
-                        @Html.LabelFor(model => model.PortNumber, htmlAttributes: new { @class = "control-label col-md-2" })
-                        <div class="col-md-3">
-                            @Html.TextBoxFor(model => model.PortNumber, new { @value = "", @class = "form-control edit-dataset-row col-md-3" })
-                            @Html.ValidationMessageFor(model => model.PortNumber, "", new { @class = "text-danger" })
-                        </div>
-                    </div>
-                    <div class="form-group fieldDescription">
-                        <label class="control-label col-md-2"></label>
-                        <div class="col-md-10 text-muted">
-                            <em>Industry statandard default port values:</em>
-                            <ul>
-                                <li><em>FTP : 21</em></li>
-                                <li><em>SSH\SFTP : 22</em></li>
-                                <li><em>HTTPS : 443</em></li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <div id="requestHeaderPanel">
-                    <div class="form-group">
-                        @Html.LabelFor((model) => model.Headers, new { @class = "control-label col-md-2" })
-                        <div id="requestHeader" class="col-md-10">
-                            <div class="form-group col-md-10 headerEntry">
-                                <a class="addHeader" style="display: inline-block; margin-left: 10px;"><span class="glyphicon glyphicon-plus"></span> Add Header</a>
-                            </div>
-                            <div class="col-md-5 headerEntryLabel">
-                                @Html.Label("Header Name", new { @value = "", @class = "col-md-5 headerEntryLabel" })
-                            </div>
-                            <div class="col-md-5 headerEntryLabel">
-                                @Html.Label("Header Value", new { @value = "", @class = "col-md-5 headerEntryLabel" })
-                            </div>
-                            @*This approach is described at the site http://ivanz.com/2011/06/16/editing-variable-length-reorderable-collections-in-asp-net-mvc-part-1/*@
-                            @foreach (RequestHeader header in Model.Headers)
-                            {
-                                Html.RenderPartial("_Headers", header);
-                            }
+                    <div id="userPassNotificationPanel" class="credentialWarning">
+                        <div class="col-md-9">
+                            <em>Work with data.sentry.com administrators to configure credentials.  The data source will not operate until credentials are configured.</em>
                         </div>
                     </div>
                 </div>
             </div>
+            <div id="tokenAuthPanel">
+                <div class="form-group">
+                    @Html.Label("Authentication Header", new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        <div class="col-md-5 headerEntry">
+                            @Html.Label("Token Header Name", new { @class = "col-md-5 headerEntryLabel" })
+                            @Html.TextBoxFor(m => m.TokenAuthHeader, new { @value = "", @class = "form-control edit-dataset-row col-md-3" })
+                        </div>
+                        <div class="col-md-5 headerEntry">
+                            @Html.Label("Token Value", new { @class = "col-md-5 headerEntryLabel" })
+                            @Html.PasswordFor(m => m.TokenAuthValue, new { @value = "", @class = "form-control edit-dataset-row col-md-3", @placeholder = "Leave blank to retain current token value" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="OAuthPanel">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ClientId, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor((model) => model.ClientId, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.ClientId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ClientPrivateId, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor((model) => model.ClientPrivateId, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.ClientPrivateId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.TokenUrl, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor((model) => model.TokenUrl, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.TokenUrl, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.TokenExp, new { @class = "control-label col-md-2" })
+                    <div class="col-md-3">
+                        @Html.TextBoxFor((model) => model.TokenExp, new { @value = "", @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.TokenExp, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Scope, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor((model) => model.Scope, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.Scope, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            <div id="portNumberPanel">
+                <div class="form-group">
+                    @Html.LabelFor(model => model.PortNumber, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-3">
+                        @Html.TextBoxFor(model => model.PortNumber, new { @value = "", @class = "form-control edit-dataset-row col-md-3" })
+                        @Html.ValidationMessageFor(model => model.PortNumber, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group fieldDescription">
+                    <label class="control-label col-md-2"></label>
+                    <div class="col-md-10 text-muted">
+                        <em>Industry statandard default port values:</em>
+                        <ul>
+                            <li><em>FTP : 21</em></li>
+                            <li><em>SSH\SFTP : 22</em></li>
+                            <li><em>HTTPS : 443</em></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div id="requestHeaderPanel">
+                <div class="form-group">
+                    @Html.LabelFor((model) => model.Headers, new { @class = "control-label col-md-2" })
+                    <div id="requestHeader" class="col-md-10">
+                        <div class="form-group col-md-10 headerEntry">
+                            <a class="addHeader" style="display: inline-block; margin-left: 10px;"><span class="glyphicon glyphicon-plus"></span> Add Header</a>
+                        </div>
+                        <div class="col-md-5 headerEntryLabel">
+                            @Html.Label("Header Name", new { @value = "", @class = "col-md-5 headerEntryLabel" })
+                        </div>
+                        <div class="col-md-5 headerEntryLabel">
+                            @Html.Label("Header Value", new { @value = "", @class = "col-md-5 headerEntryLabel" })
+                        </div>
+                        @*This approach is described at the site http://ivanz.com/2011/06/16/editing-variable-length-reorderable-collections-in-asp-net-mvc-part-1/*@
+                        @foreach (RequestHeader header in Model.Headers)
+                        {
+                            Html.RenderPartial("_Headers", header);
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="form-group">
@@ -201,20 +239,34 @@
             function setAuthTypePanels(authType) {
 
                 if (authType == 'Anonymous Authentication') {
+                    $('#requestHeaderPanel').hide();
                     $('#userPassPanel').hide();
                     $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').hide();
                 }
                 else if (authType == 'Basic Authentication') {
+                    $('#requestHeaderPanel').hide();
                     $('#userPassPanel').show();
                     $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').hide();
                 }
                 else if (authType == 'Token Authentication') {
+                    $('#requestHeaderPanel').show();
                     $('#userPassPanel').hide();
                     $('#tokenAuthPanel').show();
+                    $('#OAuthPanel').hide();
+                }
+                else if (authType == 'OAuth 2.0 Authentication') {
+                    $('#requestHeaderPanel').hide();
+                    $('#userPassPanel').hide();
+                    $('#tokenAuthPanel').show();
+                    $('#OAuthPanel').show();
                 }
                 else {
+                    $('#requestHeaderPanel').hide();
                     $('#userPassPanel').show();
                     $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').hide();
                 }
             }
 
@@ -249,14 +301,23 @@
                 else if (sourceType == "HTTPS") {
                     $('#IsUserPassRequired').attr('disabled', true);
                     $('#userPassPanel').hide();
-                    $('#requestHeaderPanel').show();
                     if (authtxt == 'Token Authentication') {
+                        $('#requestHeaderPanel').show();
                         $('#tokenAuthPanel').show();
                         $('#userPassPanel').hide();
+                        $('#OAuthPanel').hide();
                     }
-                    else {
+                    else if (authtxt == 'OAuth 2.0 Authentication') {
+                        $('#requestHeaderPanel').hide();
                         $('#tokenAuthPanel').hide();
                         $('#userPassPanel').hide();
+                        $('#OAuthPanel').show();
+                    }
+                    else {
+                        $('#requestHeaderPanel').hide();
+                        $('#tokenAuthPanel').hide();
+                        $('#userPassPanel').hide();
+                        $('#OAuthPanel').hide();
                     }
                 }
                 else if (sourceType == "S3Basic" || sourceType == "DFSCustom") {
@@ -321,6 +382,7 @@
                     $('#IsUserPassRequired').attr('disabled', true);
                     $('#userPassPanel').hide();
                     $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').hide();
                 }
                 else if (txt == 'Basic Authentication') {
                     $('#IsUserPassRequired').prop('checked', true);
@@ -328,6 +390,7 @@
                     $('#IsUserPassRequired').trigger("change");
                     $('#userPassPanel').show();
                     $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').hide();
                 } else if (txt == 'Token Authentication') {
                     var userpasschkbx = $('#IsUserPassRequired');
                     userpasschkbx.prop('checked', false);
@@ -335,10 +398,19 @@
                     userpasschkbx.trigger("change");
                     $('#userPassPanel').hide();
                     $('#tokenAuthPanel').show();
-                }
-                else {
+                    $('#OAuthPanel').hide();
+                } else if (txt == 'OAuth 2.0 Authentication') {
+                    var userpasschkbx = $('#IsUserPassRequired');
+                    userpasschkbx.prop('checked', false);
+                    userpasschkbx.attr('disabled', true);
+                    userpasschkbx.trigger("change");
+                    $('#userPassPanel').hide();
+                    $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').show();
+                } else {
                     $('#IsUserPassRequired').attr('disabled', false);
                     $('#userPassPanel').show();
+                    $('#OAuthPanel').hide();
                 }
             });
 

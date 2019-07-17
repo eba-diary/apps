@@ -8,16 +8,16 @@ namespace Sentry.data.Core
 {
     public class JobService : IJobService
     {
-        private IDatasetContext _datasetConext;
+        private IDatasetContext _datasetContext;
 
         public JobService(IDatasetContext datasetContext)
         {
-            _datasetConext = datasetContext;
+            _datasetContext = datasetContext;
         }
 
         public JobHistory GetLastExecution(RetrieverJob job)
         {
-            return _datasetConext.JobHistory.Where(w => w.JobId.Id == job.Id && w.State == GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE).OrderByDescending(o => o.Created).Take(1).SingleOrDefault();
+            return _datasetContext.JobHistory.Where(w => w.JobId.Id == job.Id && w.State == GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE).OrderByDescending(o => o.Created).Take(1).SingleOrDefault();
         }
 
         public void RecordJobState(Submission submission, RetrieverJob job, string state)
@@ -45,12 +45,12 @@ namespace Sentry.data.Core
             //if job has completed (state is success or failed), set the original active indicator to false.
             if (state == GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE || state == GlobalConstants.JobStates.RETRIEVERJOB_FAILED_STATE)
             {
-                JobHistory orignialRecord = _datasetConext.JobHistory.Where(w => w.JobId.Id == job.Id && w.JobGuid == submission.JobGuid && w.Active == true).SingleOrDefault();
+                JobHistory orignialRecord = _datasetContext.JobHistory.Where(w => w.JobId.Id == job.Id && w.JobGuid == submission.JobGuid && w.Active == true).SingleOrDefault();
                 if (orignialRecord != null) { orignialRecord.Active = false; };                
             };
 
-            _datasetConext.Add(histRecord);
-            _datasetConext.SaveChanges();
+            _datasetContext.Add(histRecord);
+            _datasetContext.SaveChanges();
             
         }
 
@@ -58,10 +58,31 @@ namespace Sentry.data.Core
         {
             Submission sub = job.ToSubmission();
 
-            _datasetConext.Add(sub);
-            _datasetConext.SaveChanges();
+            _datasetContext.Add(sub);
+            _datasetContext.SaveChanges();
 
             return sub;
+        }
+
+        public RetrieverJob FindBasicJob(RetrieverJob job)
+        {
+            RetrieverJob basicJob = null;
+
+            basicJob = _datasetContext.RetrieverJob.Where(w => w.DatasetConfig.ConfigId == job.DatasetConfig.ConfigId && w.DataSource is S3Basic).FetchAllConfiguration(_datasetContext).SingleOrDefault();
+
+            if (basicJob == null)
+            {
+                job.JobLoggerMessage("Info", "No S3Basic job found for Schema... Finding DfsBasic job");
+                basicJob = _datasetContext.RetrieverJob.Where(w => w.DatasetConfig.ConfigId == job.DatasetConfig.ConfigId && w.DataSource is DfsBasic).FetchAllConfiguration(_datasetContext).SingleOrDefault();
+
+                if (basicJob == null)
+                {
+                    job.JobLoggerMessage("Fatal", "Failed to find basic job");
+                    throw new NotImplementedException("Failed to find generic Basic job");
+                }
+            }
+
+            return basicJob;
         }
     }
 }

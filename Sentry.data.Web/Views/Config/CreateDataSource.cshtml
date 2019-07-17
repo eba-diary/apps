@@ -1,5 +1,5 @@
 ﻿@using Sentry.data.Core;
-@model Sentry.data.Web.CreateSourceModel
+@model Sentry.data.Web.DataSourceModel
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -24,7 +24,7 @@
 
 </div>
 
-@using (Html.BeginForm("CreateSource", "Config", FormMethod.Post))
+@using (Html.BeginForm("DataSourceForm", "Config", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
 
@@ -128,6 +128,44 @@
                 </div>
             </div>
             
+            <div id="OAuthPanel">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ClientId, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor((model) => model.ClientId, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.ClientId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ClientPrivateId, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor((model) => model.ClientPrivateId, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.ClientPrivateId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.TokenUrl, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor((model) => model.TokenUrl, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.TokenUrl, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.TokenExp, new { @class = "control-label col-md-2" })
+                    <div class="col-md-2">
+                        @Html.EditorFor((model) => model.TokenExp, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.TokenExp, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Scope, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor((model) => model.Scope, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.Scope, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+
             <div id="portNumberPanel">
                 <div class="form-group">
                     @Html.LabelFor(model => model.PortNumber, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -202,12 +240,13 @@
         $(document).ready(function () {
 
             function setSourceTypeDefaults(sourceType) {
-                if (sourceType == "SFTP" || sourceType == "FTP" || sourceType == "HTTPS") {
+                if (sourceType == "SFTP" || sourceType == "FTP" || sourceType == "HTTPS" || sourceType == "GOOGLEAPI") {
 
                     $('#portNumberPanel').show();
                     $('#userPassPanel').hide();
                     $('#authPanel').show();
                     $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').hide();
                     $('#requestHeaderPanel').hide();
 
                     //User\Pass is required, so check and disable for changing
@@ -226,7 +265,7 @@
                         //Setting default values for port number
                         $('#PortNumber').val('21');
                     }
-                    else if (sourceType == "HTTPS") {
+                    else if (sourceType == "HTTPS" || sourceType == "GOOGLEAPI") {
                         //Setting default values for port number
                         $('#PortNumber').val('443');
                         $('#requestHeaderPanel').show();
@@ -252,6 +291,7 @@
                     $('#portNumberPanel').hide();
                     $('#userPassPanel').hide();
                     $('#authPanel').hide();
+                    $('#OAuthPanel').hide();
                     $('#requestHeaderPanel').hide();
                 }
                 else {
@@ -263,6 +303,7 @@
                     $('#userPassPanel').hide();
                     $('#authPanel').hide();
                     $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').hide();
                     $('#requestHeaderPanel').hide();
                 }
             }
@@ -309,6 +350,7 @@
                     userpasschkbx.attr('disabled', true);
                     $('#userPassPanel').hide();
                     $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').hide();
                 }
                 else if (txt == 'Basic Authentication') {
                     var userpasschkbx = $('#IsUserPassRequired');
@@ -317,6 +359,7 @@
                     userpasschkbx.trigger("change");
                     $('#userPassPanel').show();
                     $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').hide();
                 }
                 else if (txt == 'Token Authentication') {
                     var userpasschkbx = $('#IsUserPassRequired');
@@ -325,6 +368,16 @@
                     userpasschkbx.trigger("change");
                     $('#userPassPanel').hide();
                     $('#tokenAuthPanel').show();
+                    $('#OAuthPanel').hide();
+                }
+                else if (txt == 'OAuth 2.0 Authentication') {
+                    var userpasschkbx = $('#IsUserPassRequired');
+                    userpasschkbx.prop('checked', false);
+                    userpasschkbx.attr('disabled', true);
+                    userpasschkbx.trigger("change");
+                    $('#userPassPanel').hide();
+                    $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').show();
                 }
                 else {
                     var userpasschkbx = $('#IsUserPassRequired');
@@ -333,6 +386,7 @@
                     $("#authDescription").text('');
                     $('#userPassPanel').show();
                     $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').hide();
                 }
             });
 
