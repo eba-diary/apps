@@ -88,6 +88,14 @@ namespace Sentry.data.Goldeneye
             //Initialize the Bootstrapper
             Bootstrapper.Init();
 
+            var registry = new StructureMap.Registry();
+
+            //adding ThreadCurrentUserIdProvider similar to how Web app adds this to context.
+            Bootstrapper.Container.Configure((x) =>
+            {
+                x.AddRegistry(registry);
+                x.For<ICurrentUserIdProvider>().Use<ThreadCurrentUserIdProvider>();
+            });
             //Start all the internal processes.
 
             //Get or Create the Runtime Configuration

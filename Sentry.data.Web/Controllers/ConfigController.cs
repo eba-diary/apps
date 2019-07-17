@@ -29,7 +29,7 @@ namespace Sentry.data.Web.Controllers
         public IEventService _eventService;
         public IDatasetService _DatasetService;
 
-        public ConfigController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, 
+        public ConfigController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService,
             ISASService sasService, IAssociateInfoProvider associateInfoService, IConfigService configService,
             IEventService eventService, IDatasetService datasetService)
         {
@@ -384,6 +384,19 @@ namespace Sentry.data.Web.Controllers
                         CompressionOptions = compression
                     };
 
+                    if (dataSource.Is<GoogleApiSource>())
+                    {
+                        HttpsOptions ho = new HttpsOptions()
+                        {
+                            Body = cjm.HttpRequestBody,
+                            RequestMethod = cjm.SelectedRequestMethod,
+                            RequestDataFormat = cjm.SelectedRequestDataFormat
+                        };
+
+                        rjo.HttpOptions = ho;
+                    }
+
+
                     RetrieverJob rj = new RetrieverJob()
                     {
 
@@ -468,6 +481,9 @@ namespace Sentry.data.Web.Controllers
                 cjm.FileNameExclusionList = new List<string>();
             }
 
+            cjm.RequestMethodDropdown = Utility.BuildRequestMethodDropdown(cjm.SelectedRequestMethod);
+
+            cjm.RequestDataFormatDropdown = Utility.BuildRequestDataFormatDropdown(cjm.SelectedRequestDataFormat);
 
             return cjm;
         }
@@ -522,6 +538,13 @@ namespace Sentry.data.Web.Controllers
                         FileNameExclusionList = ejm.NewFileNameExclusionList.Split('|').Where(x => !String.IsNullOrWhiteSpace(x)).ToList()
                     };
 
+                    HttpsOptions hOptions = new HttpsOptions()
+                    {
+                        Body = ejm.HttpRequestBody,
+                        RequestMethod = ejm.SelectedRequestMethod,
+                        RequestDataFormat = ejm.SelectedRequestDataFormat
+                    };
+
                     rj.JobOptions = new RetrieverJobOptions()
                     {
                         OverwriteDataFile = ejm.OverwriteDataFile,
@@ -529,8 +552,9 @@ namespace Sentry.data.Web.Controllers
                         CreateCurrentFile = ejm.CreateCurrentFile,
                         IsRegexSearch = ejm.IsRegexSearch,
                         SearchCriteria = ejm.SearchCriteria,
-                        CompressionOptions = compression
-                    };
+                        CompressionOptions = compression,
+                        HttpOptions = hOptions
+                    };                    
 
                     rj.Schedule = ejm.Schedule;
                     rj.TimeZone = "Central Standard Time";
@@ -668,7 +692,6 @@ namespace Sentry.data.Web.Controllers
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
 
 
-
             if (ejm.NewFileNameExclusionList != null)
             {
                 if (ejm.FileNameExclusionList.Any())
@@ -690,6 +713,10 @@ namespace Sentry.data.Web.Controllers
                 //ejm.FileNameExclusionList = new List<string>();
             }
 
+            ejm.RequestMethodDropdown = Utility.BuildRequestMethodDropdown(ejm.SelectedRequestMethod);
+
+            ejm.RequestDataFormatDropdown = Utility.BuildRequestDataFormatDropdown(ejm.SelectedRequestDataFormat);
+
             return ejm;
         }
 
@@ -699,9 +726,9 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult CreateSource()
         {
-            CreateSourceModel csm = new CreateSourceModel();
+            DataSourceModel dsm = new DataSourceModel();
 
-            csm = CreateSourceDropDown(csm);
+            dsm = CreateSourceDropDown(dsm);
 
             Event e = new Event();
             e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
@@ -713,153 +740,8 @@ namespace Sentry.data.Web.Controllers
             e.Reason = "Viewed Data Source Creation Page";
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
-            return View("CreateDataSource", csm);
-        }
-
-        [HttpPost]
-        [Route("Config/Source/Create")]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
-        public ActionResult CreateSource(CreateSourceModel csm)
-        {
-            DataSource source = null;
-            try
-            {
-
-                AuthenticationType auth = _datasetContext.GetById<AuthenticationType>(Convert.ToInt32(csm.AuthID));
-
-                switch (csm.SourceType)
-                {
-                    case "DFSBasic":
-                        source = new DfsBasic();
-                        break;
-                    case "DFSCustom":
-                        source = new DfsCustom();
-                        if (_datasetContext.DataSources.Where(w => w is DfsCustom && w.Name == csm.Name).Count() > 0)
-                        {
-                            AddCoreValidationExceptionsToModel(new ValidationException("Name", "An DFS Custom Data Source is already exists with this name."));
-                        }
-                        break;
-                    case "FTP":
-                        source = new FtpSource();
-                        if (_datasetContext.DataSources.Where(w => w is FtpSource && w.Name == csm.Name).Count() > 0)
-                        {
-                            AddCoreValidationExceptionsToModel(new ValidationException("Name", "An FTP Data Source is already exists with this name."));
-                        }
-                        if (!(csm.BaseUri.ToString().StartsWith("ftp://")))
-                        {
-                            AddCoreValidationExceptionsToModel(new ValidationException("BaseUri", "A valid FTP URI starts with ftp:// (i.e. ftp://foo.bar.com/base/dir)"));
-                        }
-                        break;
-                    case "SFTP":
-                        source = new SFtpSource();
-                        if (_datasetContext.DataSources.Where(w => w is SFtpSource && w.Name == csm.Name).Count() > 0)
-                        {
-                            AddCoreValidationExceptionsToModel(new ValidationException("Name", "An SFTP Data Source is already exists with this name."));
-                        }
-                        if (!(csm.BaseUri.ToString().StartsWith("sftp://")))
-                        {
-                            AddCoreValidationExceptionsToModel(new ValidationException("BaseUri", "A valid SFTP URI starts with sftp:// (i.e. sftp://foo.bar.com//base/dir/)"));
-                        }
-                        break;
-                    case "HTTPS":
-                        source = new HTTPSSource();
-                        bool valid = true;
-
-                        if (_datasetContext.DataSources.Where(w => w is HTTPSSource && w.Name == csm.Name).Count() > 0)
-                        {
-                            AddCoreValidationExceptionsToModel(new ValidationException("Name", "An HTTPS Data Source is already exists with this name."));
-                            valid = false;
-                        }
-                        if (!(csm.BaseUri.ToString().StartsWith("https://")))
-                        {
-                            AddCoreValidationExceptionsToModel(new ValidationException("BaseUri", "A valid HTTPS URI starts with https:// (i.e. https://foo.bar.com/base/api/)"));
-                            valid = false;
-                        }
-
-                        //if token authentication, user must enter values for token header and value
-                        if (auth.Is<TokenAuthentication>())
-                        {
-
-                            if (String.IsNullOrWhiteSpace(csm.TokenAuthHeader))
-                            {
-                                AddCoreValidationExceptionsToModel(new ValidationException("TokenAuthHeader", "Token Authenticaion requires a token header"));
-                                valid = false;
-                            }
-
-                            if (String.IsNullOrWhiteSpace(csm.TokenAuthValue))
-                            {
-                                AddCoreValidationExceptionsToModel(new ValidationException("TokenAuthValue", "Token Authentication requires a token header value"));
-                                valid = false;
-                            }
-
-                            if (valid)
-                            {
-                                ((HTTPSSource)source).AuthenticationHeaderName = csm.TokenAuthHeader;
-
-                                EncryptionService encryptService = new EncryptionService();
-                                Tuple<string, string> eresp = encryptService.EncryptString(csm.TokenAuthValue, Configuration.Config.GetHostSetting("EncryptionServiceKey"));
-
-                                ((HTTPSSource)source).AuthenticationTokenValue = eresp.Item1;
-                                ((HTTPSSource)source).IVKey = eresp.Item2;
-                            }
-                        }
-
-                        foreach (RequestHeader h in csm.Headers)
-                        {
-                            if (String.IsNullOrWhiteSpace(h.Key) || String.IsNullOrWhiteSpace(h.Value))
-                            {
-                                valid = false;
-                                AddCoreValidationExceptionsToModel(new ValidationException("RequestHeader", "Request headers need to contain valid values"));
-                            }
-                        }
-
-
-                        //Process only if validations pass and headers exist
-                        if (valid && csm.Headers.Any())
-                        {
-
-
-                            ((HTTPSSource)source).RequestHeaders = csm.Headers;
-                        }
-
-                        break;
-                    default:
-                        throw new NotImplementedException();
-                }
-
-                if (ModelState.IsValid)
-                {
-
-                    source.Name = csm.Name;
-                    source.Description = csm.Description;
-                    source.SourceAuthType = auth;
-                    source.IsUserPassRequired = csm.IsUserPassRequired;
-                    source.BaseUri = csm.BaseUri;
-                    source.PortNumber = csm.PortNumber;
-
-                    _datasetContext.Add(source);
-                    _datasetContext.SaveChanges();
-
-                    if (!String.IsNullOrWhiteSpace(csm.ReturnUrl))
-                    {
-                        return Redirect(csm.ReturnUrl);
-                    }
-                    else
-                    {
-                        return Redirect("/");
-                    }
-                }
-            }
-            catch (Sentry.Core.ValidationException ex)
-            {
-                AddCoreValidationExceptionsToModel(ex);
-                _datasetContext.Clear();
-            }
-
-            csm = CreateSourceDropDown(csm);
-            return View("CreateDataSource", csm);
-
-        }
+            return View("CreateDataSource", dsm);
+        }        
 
         public ActionResult HeaderEntryRow()
         {
@@ -876,7 +758,7 @@ namespace Sentry.data.Web.Controllers
             return PartialView("_ExtensionMapping");
         }
 
-        private CreateSourceModel CreateSourceDropDown(CreateSourceModel csm)
+        private DataSourceModel CreateSourceDropDown(DataSourceModel csm)
         {
             var temp = _datasetContext.DataSourceTypes.Select(v
                  => new SelectListItem { Text = v.Name, Value = v.DiscrimatorValue }).ToList();
@@ -923,153 +805,81 @@ namespace Sentry.data.Web.Controllers
             return csm;
         }
 
+        [HttpPost]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        public ActionResult DataSourceForm(DataSourceModel model)
+        {
+            DataSourceDto dto = model.ToDto();
+
+            AddCoreValidationExceptionsToModel(_configService.Validate(dto));
+
+            if (ModelState.IsValid)
+            {
+                if (dto.OriginatingId == 0)
+                {
+                    bool IsSuccessful = _configService.CreateAndSaveNewDataSource(dto);
+                    if (IsSuccessful)
+                    {
+                        _eventService.PublishSuccessEvent(GlobalConstants.EventType.CREATED_DATASOURCE, SharedContext.CurrentUser.AssociateId, dto.Name + " was created.");
+
+                        if (!String.IsNullOrWhiteSpace(model.ReturnUrl))
+                        {
+                            return Redirect(model.ReturnUrl);
+                        }
+                        else
+                        {
+                            return Redirect("/");
+                        }
+                    }                    
+                }
+                else
+                {
+                    bool IsSuccessful = _configService.UpdateAndSaveDataSource(dto);
+                    if (IsSuccessful)
+                    {
+                        _eventService.PublishSuccessEvent(GlobalConstants.EventType.UPDATED_DATASOURCE, SharedContext.CurrentUser.AssociateId, dto.Name + " was updated.");
+                        if (!String.IsNullOrWhiteSpace(model.ReturnUrl))
+                        {
+                            return Redirect(model.ReturnUrl);
+                        }
+                        else
+                        {
+                            return Redirect("/");
+                        }
+                    }                    
+                }
+            }
+
+
+            if (model.Id == 0)
+            {
+                _datasetContext.Clear();
+                model = CreateSourceDropDown(model);
+                return View("CreateDataSource", model);
+            }
+            else
+            {
+                _datasetContext.Clear();
+                EditSourceDropDown(model);
+                return View("EditDataSource", model);
+            }
+        }
 
         [HttpGet]
         [Route("Config/Source/Edit/{sourceID}")]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditSource(int sourceID)
         {
-            DataSource ds = _datasetContext.GetById<DataSource>(sourceID);
-            EditSourceModel esm = new EditSourceModel(ds);
+            DataSourceDto dto = _configService.GetDataSourceDto(sourceID);
+            DataSourceModel model = new DataSourceModel(dto);
 
-            esm = EditSourceDropDown(esm);
+            EditSourceDropDown(model);
 
-            Event e = new Event();
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-            e.Reason = "Viewed Data Source Edit Page";
-            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Data Source Edit Page");
 
-            return View("EditDataSource", esm);
+            return View("EditDataSource", model);            
         }
 
-        [HttpPost]
-        [Route("Config/Source/Edit/{sourceID}")]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
-        public ActionResult EditSource(EditSourceModel esm)
-        {
-            try
-            {
-                if (ModelState.IsValid)
-                {
-                    DataSource source = null;
-                    AuthenticationType auth = _datasetContext.GetById<AuthenticationType>(Convert.ToInt32(esm.AuthID));
-
-                    switch (esm.SourceType)
-                    {
-                        case "DFSBasic":
-                            source = _datasetContext.GetById<DfsBasic>(esm.Id);
-                            break;
-                        case "DFSCustom":
-                            source = _datasetContext.GetById<DfsCustom>(esm.Id);
-                            break;
-                        case "FTP":
-                            source = _datasetContext.GetById<FtpSource>(esm.Id);
-                            break;
-                        case "S3Basic":
-                            source = _datasetContext.GetById<S3Basic>(esm.Id);
-                            break;
-                        case "SFTP":
-                            source = _datasetContext.GetById<SFtpSource>(esm.Id);
-                            break;
-                        case "HTTPS":
-                            source = _datasetContext.GetById<HTTPSSource>(esm.Id);
-                            bool valid = true;
-
-                            //if token authentication, a token header is required.  However, a token header value is not required.  The existing
-                            // token header value will be used if no value is specified.
-                            if (auth.Is<TokenAuthentication>())
-                            {
-                                if (String.IsNullOrWhiteSpace(esm.TokenAuthHeader))
-                                {
-                                    AddCoreValidationExceptionsToModel(new ValidationException("TokenAuthHeader", "Token Authenticaion requires a token header"));
-                                    valid = false;
-                                }
-
-                                if (valid)
-                                {
-                                    //If a new value was supplied, save new encrypted value and assoicated initial value
-                                    if (!String.IsNullOrWhiteSpace(esm.TokenAuthValue))
-                                    {
-                                        EncryptionService encryptService = new EncryptionService();
-                                        Tuple<string, string> eresp = encryptService.EncryptString(esm.TokenAuthValue, Configuration.Config.GetHostSetting("EncryptionServiceKey"));
-
-                                        ((HTTPSSource)source).AuthenticationTokenValue = eresp.Item1;
-                                        ((HTTPSSource)source).IVKey = eresp.Item2;
-                                        ((HTTPSSource)source).AuthenticationHeaderName = esm.TokenAuthHeader;
-                                    }
-                                }
-                            }
-
-                            if (esm.Headers != null && esm.Headers.Any())
-                            {
-                                foreach (RequestHeader h in esm.Headers)
-                                {
-                                    //Check each request header\value pair to ensure they each have values
-                                    if (String.IsNullOrWhiteSpace(h.Key) || String.IsNullOrWhiteSpace(h.Value))
-                                    {
-                                        valid = false;
-                                        AddCoreValidationExceptionsToModel(new ValidationException("RequestHeader", "Request headers need to contain valid values"));
-                                    }
-                                }
-                            }                            
-
-                            //Replace all headers on each save
-                            if (valid)
-                            {
-                                ((HTTPSSource)source).RequestHeaders = (esm.Headers != null && esm.Headers.Any()) ? esm.Headers : null;
-                            }
-                            break;
-                        default:
-                            throw new NotImplementedException();
-                    }
-                    try
-                    {
-                        if (ModelState.IsValid)
-                        {
-                            source.Description = esm.Description;
-                            source.SourceAuthType = auth;
-                            source.IsUserPassRequired = esm.IsUserPassRequired;
-                            source.BaseUri = esm.BaseUri;
-                            source.PortNumber = esm.PortNumber;
-
-                            _datasetContext.SaveChanges();
-
-                            if (!String.IsNullOrWhiteSpace(esm.ReturnUrl))
-                            {
-                                return Redirect(esm.ReturnUrl);
-                            }
-                            else
-                            {
-                                return Redirect("/");
-                            }
-                        }
-                    }
-                    catch (Sentry.Core.ValidationException ex)
-                    {
-                        AddCoreValidationExceptionsToModel(ex);
-                        _datasetContext.Clear();
-                    }
-                }
-
-                esm = EditSourceDropDown(esm);
-                return View("EditDataSource", esm);
-
-            }
-            catch (Sentry.Core.ValidationException ex)
-            {
-                AddCoreValidationExceptionsToModel(ex);
-                _datasetContext.Clear();
-            }
-
-            esm = EditSourceDropDown(esm);
-            return View("EditDataSource", esm);
-
-        }
 
         [HttpGet]
         [Route("Config/Extension/Create")]
@@ -1133,22 +943,20 @@ namespace Sentry.data.Web.Controllers
             }            
         }
 
-        private EditSourceModel EditSourceDropDown(EditSourceModel esm)
+        private void EditSourceDropDown(DataSourceModel model)
         {
             var temp = _datasetContext.DataSourceTypes.Select(v
               => new SelectListItem { Text = v.Name, Value = v.DiscrimatorValue }).ToList();
 
             //set selected for current value
-            temp.ForEach(x => x.Selected = esm.SourceType.Equals(x.Value));
+            temp.ForEach(x => x.Selected = model.SourceType.Equals(x.Value));
 
-            esm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic" && x.Value != "S3Basic" && x.Value != "JavaApp").OrderBy(x => x.Value);
+            model.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic" && x.Value != "S3Basic" && x.Value != "JavaApp").OrderBy(x => x.Value);
 
             int intvalue;
-            var temp2 = AuthenticationTypesByType(esm.SourceType, Int32.TryParse(esm.AuthID, out intvalue) ? (int?)intvalue : null);
+            var temp2 = AuthenticationTypesByType(model.SourceType, Int32.TryParse(model.AuthID, out intvalue) ? (int?)intvalue : null);
             
-            esm.AuthTypesDropdown = temp2.OrderBy(x => x.Value);
-
-            return esm;
+            model.AuthTypesDropdown = temp2.OrderBy(x => x.Value);
         }
 
         [HttpGet]
@@ -1164,6 +972,99 @@ namespace Sentry.data.Web.Controllers
             return Json(AuthenticationTypesByType(sourceType, null), JsonRequestBehavior.AllowGet);
         }
 
+        [HttpGet]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        [Route("Config/RequestMethodByType/{sourceType}")]
+        public JsonResult RequestMethodByType(string sourceType)
+        {
+            return Json(GetRequestMethods(sourceType, null), JsonRequestBehavior.AllowGet);
+        }
+
+        private List<SelectListItem> GetRequestMethods(string sourceType, int? selectedId)
+        {
+            List<SelectListItem> output = new List<SelectListItem>();
+
+            if (selectedId == null)
+            {
+                output.Add(new SelectListItem()
+                {
+                    Text = "Pick a Request Method type",
+                    Value = "0",
+                    Selected = true,
+                    Disabled = true
+                });
+            }
+
+            List<HttpMethods> methodList = new List<HttpMethods>();
+
+            switch (sourceType)
+            {
+                case "HTTPS":
+                    HTTPSSource https = new HTTPSSource();
+                    methodList = https.ValidHttpMethods;                    
+                    break;
+                case "GOOGLEAPI":
+                    GoogleApiSource gapi = new GoogleApiSource();
+                    methodList = gapi.ValidHttpMethods;
+                    break;
+                default:
+                    break;
+            }
+
+            foreach (HttpMethods methodType in methodList)
+            {
+                output.Add(new SelectListItem { Text = methodType.ToString().ToUpper(), Value = ((int)methodType).ToString(), Selected = selectedId == (int)methodType });
+            }
+
+            return output;
+        }
+
+        [HttpGet]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        [Route("Config/RequestDataFormatByType/{sourceType}")]
+        public JsonResult RequestDataFormatByType(string sourceType)
+        {
+            return Json(GetRequestDataFormat(sourceType, null), JsonRequestBehavior.AllowGet);
+        }
+        
+        private List<SelectListItem> GetRequestDataFormat(string sourceType, int? selectedId)
+        {
+            List<SelectListItem> output = new List<SelectListItem>();
+
+            if (selectedId == null)
+            {
+                output.Add(new SelectListItem()
+                {
+                    Text = "Pick a Request Data Format type",
+                    Value = "0",
+                    Selected = true,
+                    Disabled = true
+                });
+            }
+
+            List<HttpDataFormat> methodList = new List<HttpDataFormat>();
+
+            switch (sourceType)
+            {
+                case "HTTPS":
+                    HTTPSSource https = new HTTPSSource();
+                    methodList = https.ValidHttpDataFormats;
+                    break;
+                case "GOOGLEAPI":
+                    GoogleApiSource gapi = new GoogleApiSource();
+                    methodList = gapi.ValidHttpDataFormats;
+                    break;
+                default:
+                    break;
+            }
+
+            foreach (HttpDataFormat methodType in methodList)
+            {
+                output.Add(new SelectListItem { Text = methodType.ToString().ToUpper(), Value = ((int)methodType).ToString(), Selected = selectedId == (int)methodType });
+            }
+
+            return output;
+        }
 
         private List<SelectListItem> AuthenticationTypesByType(string sourceType, int? selectedId)
         {
@@ -1210,6 +1111,13 @@ namespace Sentry.data.Web.Controllers
                         output.Add(GetAuthSelectedListItem(authtype, selectedId));
                     }
                     break;
+                case "GOOGLEAPI":
+                    GoogleApiSource gapi = new GoogleApiSource();
+                    foreach (AuthenticationType authtype in gapi.ValidAuthTypes)
+                    {
+                        output.Add(GetAuthSelectedListItem(authtype, selectedId));
+                    }
+                    break;
                 default:
                     throw new NotImplementedException();
             }
@@ -1233,6 +1141,11 @@ namespace Sentry.data.Web.Controllers
             else if (authtype.Is<TokenAuthentication>())
             {
                 AuthenticationType auth = _datasetContext.AuthTypes.Where(w => w is TokenAuthentication).First();
+                return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID };
+            }
+            else if (authtype.Is<OAuthAuthentication>())
+            {
+                AuthenticationType auth = _datasetContext.AuthTypes.Where(w => w is OAuthAuthentication).First();
                 return new SelectListItem() { Text = auth.AuthName, Value = auth.AuthID.ToString(), Selected = selectedId == auth.AuthID };
             }
             else
@@ -1276,6 +1189,11 @@ namespace Sentry.data.Web.Controllers
                 case "HTTPS":
                     List<DataSource> HttpsList = _datasetContext.DataSources.Where(x => x is HTTPSSource).ToList();
                     output = HttpsList.Select(v
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
+                    break;
+                case "GOOGLEAPI":
+                    List<DataSource> GApiList = _datasetContext.DataSources.Where(x => x is GoogleApiSource).ToList();
+                    output = GApiList.Select(v
                          => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
                     break;
                 default:
@@ -1572,6 +1490,28 @@ namespace Sentry.data.Web.Controllers
             }
 
             return View(esm);
+        }
+
+        [HttpGet]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        public JsonResult IsHttpSource(int dataSourceId)
+        {
+            if (dataSourceId == 0) { return Json(false, JsonRequestBehavior.AllowGet); }
+
+            DataSourceDto dto = _configService.GetDataSourceDto(dataSourceId);
+            bool result;
+            switch (dto.SourceType)
+            {
+                case GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE:
+                case GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE:
+                    result = true;
+                    break;
+                default:
+                    result = false;
+                    break;
+            }
+
+            return Json(result, JsonRequestBehavior.AllowGet);
         }
     }
 }
