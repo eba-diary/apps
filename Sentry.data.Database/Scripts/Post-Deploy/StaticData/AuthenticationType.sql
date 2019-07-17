@@ -30,18 +30,18 @@
 
 	END TRY 
 	BEGIN CATCH 
-		DECLARE @Merge_DatasetFunction_ErrorMessage NVARCHAR(4000); 
-		DECLARE @Merge_DatasetFunction_ErrorSeverity INT; 
-		DECLARE @Merge_DatasetFunction_ErrorState INT; 
+		DECLARE @Merge_AuthenticationType_ErrorMessage NVARCHAR(4000); 
+		DECLARE @Merge_AuthenticationType_ErrorSeverity INT; 
+		DECLARE @Merge_AuthenticationType_ErrorState INT; 
   
 		SELECT 
-			@Merge_DatasetFunction_ErrorMessage = ERROR_MESSAGE(), 
-			@Merge_DatasetFunction_ErrorSeverity = ERROR_SEVERITY(), 
-			@Merge_DatasetFunction_ErrorState = ERROR_STATE(); 
+			@Merge_AuthenticationType_ErrorMessage = ERROR_MESSAGE(), 
+			@Merge_AuthenticationType_ErrorSeverity = ERROR_SEVERITY(), 
+			@Merge_AuthenticationType_ErrorState = ERROR_STATE(); 
   
-		RAISERROR (@Merge_DatasetFunction_ErrorMessage, 
-				   @Merge_DatasetFunction_ErrorSeverity, 
-				   @Merge_DatasetFunction_ErrorState 
+		RAISERROR (@Merge_AuthenticationType_ErrorMessage, 
+				   @Merge_AuthenticationType_ErrorSeverity, 
+				   @Merge_AuthenticationType_ErrorState 
 				   ); 
   
 		ROLLBACK TRAN 
