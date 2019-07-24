@@ -9,10 +9,10 @@ namespace Sentry.data.Web
     public class AccessRequestModel
     {
 
-        public int DatasetId { get; set; }
+        public int ObjectId { get; set; }
 
-        [DisplayName("Dataset")]
-        public string DatasetName { get; set; }
+        [DisplayName("Name")]
+        public string ObjectName { get; set; }
 
         [Required]
         [MaxLength(64)]

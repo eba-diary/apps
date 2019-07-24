@@ -12,6 +12,11 @@ namespace Sentry.data.Web
         public DataSourceModel()
         {
             Headers = new List<RequestHeader>();
+            ContactIds = new List<string>();
+
+            //this is needed for the associate picker js.
+            this.HrempServiceUrl = Configuration.Config.GetHostSetting("HrApiUrl");
+            this.HrempServiceEnv = Configuration.Config.GetHostSetting("HrApiEnvironment");
         }
 
         public DataSourceModel(DataSourceDto dto)
@@ -25,16 +30,25 @@ namespace Sentry.data.Web
             PortNumber = dto.PortNumber;
             Headers = new List<RequestHeader>();
             SourceType = dto.SourceType;
-            Headers = dto.RequestHeaders?? new List<RequestHeader>();
+            Headers = dto.RequestHeaders ?? new List<RequestHeader>();
             TokenAuthHeader = dto.TokenAuthHeader;
             ClientId = dto.ClientId;
             TokenUrl = dto.TokenUrl;
             TokenExp = dto.TokenExp;
+            PrimaryContactId = dto.PrimaryContactId;
+            PrimaryContactName = dto.PrimaryContactName;
+            PrimaryOwnerId = dto.PrimaryOwnerId;
+            PrimaryOwnerName = dto.PrimaryOwnerName;
+            IsSecured = dto.IsSecured;
 
             //We do not populate TokenAuthValue and ClientPrivateID.  On Post
             // if a value exists, then a new value is encrypted.  Otherwise, old value is unchanged.
             TokenAuthValue = null;
             ClientPrivateId = null;
+
+            //this is needed for the associate picker js.
+            this.HrempServiceUrl = Configuration.Config.GetHostSetting("HrApiUrl");
+            this.HrempServiceEnv = Configuration.Config.GetHostSetting("HrApiEnvironment");
         }
 
         public virtual int Id { get; set; }
@@ -100,5 +114,28 @@ namespace Sentry.data.Web
 
         [DisplayName("Request Headers")]
         public List<RequestHeader> Headers { get; set; }
+
+        [DisplayName("Owner")]
+        public string PrimaryOwnerName { get; set; }
+
+        #region Security
+        [DisplayName("Contact")]
+        public string PrimaryContactName { get; set; }
+
+        [DisplayName("Restrict Data Source")]
+        public bool IsSecured { get; set; }
+        public List<ContactInfoModel> ContactDetails { get; set; }
+        #endregion
+
+
+        //hidden properties
+        public string PrimaryOwnerId { get; set; }
+        public string PrimaryContactId { get; set; }
+        public List<string> ContactIds { get; set; }
+
+
+        //this is needed for the associate picker js.
+        public string HrempServiceUrl { get; set; }
+        public string HrempServiceEnv { get; set; }
     }
 }

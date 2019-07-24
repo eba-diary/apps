@@ -6,9 +6,9 @@ namespace Sentry.data.Core
 {
     public class AccessRequest
     {
-        public int DatasetId { get; set; }
+        public int ObjectId { get; set; }
         public Guid SecurityId { get; set; }
-        public string DatasetName { get; set; }
+        public string ObjectName { get; set; }
         public string AdGroupName { get; set; }
         public string BusinessReason { get; set; }
         public string RequestorsId { get; set; }

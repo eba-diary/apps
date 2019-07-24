@@ -91,6 +91,18 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.ForeignKey("FK_DataSource_AuthenticationType");
                 m.Class(typeof(AuthenticationType));
             });
+            this.Property((x) => x.PrimaryOwnerId, (m) => m.Column("PrimaryOwner_ID"));
+            this.Property((x) => x.PrimaryContactId, (m) => m.Column("PrimaryContact_ID"));
+
+            //ISecurable Mapping
+            this.Property((x) => x.IsSecured, (m) => m.Column("IsSecured_IND"));
+            this.ManyToOne(x => x.Security, m =>
+            {
+                m.Column("Security_ID");
+                m.ForeignKey("FK_DataSource_Security");
+                m.Class(typeof(Security));
+                m.Cascade(Cascade.All);
+            });
 
         }
 

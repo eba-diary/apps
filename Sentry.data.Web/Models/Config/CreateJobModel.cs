@@ -122,5 +122,8 @@ namespace Sentry.data.Web
             }
         }
 
+        public List<string> SourceIds { get; set; }
+
+        public UserSecurity Security { get; set; }
     }
 }
