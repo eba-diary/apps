@@ -392,8 +392,8 @@ namespace Sentry.data.Core
             {
                 Permissions = _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASOURCE).ToList(),
                 ApproverList = new List<KeyValuePair<string, string>>(),
-                ObjectId = ds.Id,
-                ObjectName = ds.Name
+                SecurableObjectId = ds.Id,
+                SecurableObjectName = ds.Name
             };
 
             IApplicationUser primaryUser = _userService.GetByAssociateId(ds.PrimaryOwnerId);
@@ -411,11 +411,11 @@ namespace Sentry.data.Core
         public string RequestAccessToDataSource(AccessRequest request)
         {
 
-            DataSource ds = _datasetContext.GetById<DataSource>(request.ObjectId);
+            DataSource ds = _datasetContext.GetById<DataSource>(request.SecurableObjectId);
             if (ds != null)
             {
                 IApplicationUser user = _userService.GetCurrentUser();
-                request.ObjectName = ds.Name;
+                request.SecurableObjectName = ds.Name;
                 request.SecurityId = ds.Security.SecurityId;
                 request.RequestorsId = user.AssociateId;
                 request.RequestorsName = user.DisplayName;
@@ -428,7 +428,7 @@ namespace Sentry.data.Core
                 
                 //Format the business reason here.
                 StringBuilder sb = new StringBuilder();
-                sb.Append($"Please grant the Ad Group {request.AdGroupName} the following permissions to the \"{request.ObjectName}\" data source within Data.sentry.com.{ Environment.NewLine}");
+                sb.Append($"Please grant the Ad Group {request.AdGroupName} the following permissions to the \"{request.SecurableObjectName}\" data source within Data.sentry.com.{ Environment.NewLine}");
                 request.Permissions.ForEach(x => sb.Append($"{x.PermissionName} - {x.PermissionDescription} { Environment.NewLine}"));
                 sb.Append($"Business Reason: {request.BusinessReason}{ Environment.NewLine}");
                 sb.Append($"Requestor: {request.RequestorsId} - {request.RequestorsName}");

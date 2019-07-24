@@ -389,6 +389,8 @@
     <Compile Include="Models\Dataset\BaseEntityModel.cs" />
     <Compile Include="Models\Dataset\SearchModel.cs" />
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceHomeModel.cs" />
+    <Compile Include="Models\Security\DatasetAccessRequestModel.cs" />
+    <Compile Include="Models\Security\DataSourceAccessRequestModel.cs" />
     <Compile Include="Models\Security\PermissionModel.cs" />
     <Compile Include="Models\Security\RequestAccessModel.cs" />
     <Compile Include="Models\Shared\CategoryModel.cs" />
@@ -1280,6 +1282,8 @@
     <Content Include="Security\cacert_sentry.pem">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Views\Shared\DatasetAccessRequest.cshtml" />
+    <Content Include="Views\Shared\DataSourceAccessRequest.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -1544,13 +1544,13 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public ActionResult DataSourceAccessRequest(int dataSourceId)
         {
-            AccessRequestModel model = _configService.GetDataSourceAccessRequest(dataSourceId).ToModel();
+            DataSourceAccessRequestModel model = _configService.GetDataSourceAccessRequest(dataSourceId).ToDataSourceModel();
             model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
-            return PartialView("_AccessRequest", model);
+            return PartialView("DataSourceAccessRequest", model);
         }
 
         [HttpPost]
-        public ActionResult SubmitAccessRequest(AccessRequestModel model)
+        public ActionResult SubmitAccessRequest(DataSourceAccessRequestModel model)
         {
             AccessRequest ar = model.ToCore();
             string ticketId = _configService.RequestAccessToDataSource(ar);
@@ -1561,7 +1561,7 @@ namespace Sentry.data.Web.Controllers
             }
             else
             {
-                return PartialView("_Success", new SuccessModel("Access was successfully requested.", "HPSM Change Id: " + ticketId, true));
+                return PartialView("_Success", new SuccessModel("Data Source access was successfully requested.", "HPSM Change Id: " + ticketId, true));
             }
         }
     }

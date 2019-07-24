@@ -1,76 +1,38 @@
 ﻿@model Sentry.data.Web.AccessRequestModel
-@{
-    ViewBag.Title = "Request Access";
-}
 
-@using (Html.BeginForm("SubmitAccessRequest", "Dataset", FormMethod.Post, new { @id = "AccessRequestForm" }))
-{
-    @Html.AntiForgeryToken()
-    <div class="form-horizontal">
-
-        <div class="accessRequestModelText" style="width:auto">
-            <p>Permission requests will utilize HPSM for approval.  Due to this process, a short delay in permission implementation can be expected.</p>
-        </div>
-        <br />
-
-        <div class="accessRequestErrorBox" id="AccessRequesrErrorBox" style="display:none">
-
-        </div>
-
-        @Html.HiddenFor(model => model.ObjectId)
-        <div class="form-group">
-            @Html.LabelFor(m => m.ObjectName, new { @class = "col-md-2 control-label" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.ObjectName, new { @disabled = "disabled", @class = "form-control edit-dataset-row" })
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.AdGroupName, new { @class = "col-md-2 control-label" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(model => model.AdGroupName, new { @class = "form-control edit-dataset-row" })
-            </div>
-        </div>
-        @*<div class="form-group">
-                @Html.LabelFor((model) => model.AdGroupName, new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.DropDownListFor((model) => model.AdGroupName, Model.AllAdGroups, new { @class = "form-control edit-dataset-row" })
-                </div>
-            </div>*@
-        <div class="form-group">
-            @Html.LabelFor(m => m.BusinessReason, new { @class = "col-md-2 control-label" })
-            <div class="col-md-10">
-                @Html.TextAreaFor(model => model.BusinessReason, new { @class = "form-control edit-dataset-row" })
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor((model) => model.SelectedApprover, new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownListFor((model) => model.SelectedApprover, Model.AllApprovers, new { @class = "form-control edit-dataset-row" })
-            </div>
-        </div>
-
-        <br />
-        @Html.HiddenFor(model => model.SelectedPermissions)
-        @Html.LabelFor((model) => model.SelectedPermissions, new { @class = "col-md-10" }) <br /><br />
-        <div style="margin-left:30px">
-            @foreach (var item in Model.AllPermissions)
-            {
-                <div class="form-group">
-                    <label class="col-sm-10 checkbox-container">
-                        @item.PermissionDescription
-                        <input type="checkbox" value="@item.PermissionName" data-code="@item.PermissionCode" />
-                        <span class="checkmark"></span>
-                    </label>
-
-                </div>
-            }
-        </div>
+<div class="form-group">
+    @Html.LabelFor(m => m.BusinessReason, new { @class = "col-md-2 control-label" })
+    <div class="col-md-10">
+        @Html.TextAreaFor(model => model.BusinessReason, new { @class = "form-control edit-dataset-row" })
     </div>
-
-
-    <div class="modal-footer">
-        <div id="accessRequestSpinner"></div>
-        <button type="submit" class="btn btn-primary" id="SubmitAccessRequestButton" data-id="@Model.ObjectId" value="Request Access">Submit Request</button>
-        <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+</div>
+<div class="form-group">
+    @Html.LabelFor((model) => model.SelectedApprover, new { @class = "control-label col-md-2" })
+    <div class="col-md-10">
+        @Html.DropDownListFor((model) => model.SelectedApprover, Model.AllApprovers, new { @class = "form-control edit-dataset-row" })
     </div>
-}
+</div>
+
+<br />
+    @Html.HiddenFor(model => model.SelectedPermissions)
+    @Html.LabelFor((model) => model.SelectedPermissions, new { @class = "col-md-10" }) <br /><br />
+<div style="margin-left:30px">
+    @foreach (var item in Model.AllPermissions)
+    {
+    <div class="form-group">
+        <label class="col-sm-10 checkbox-container">
+            @item.PermissionDescription
+            <input type="checkbox" value="@item.PermissionName" data-code="@item.PermissionCode" />
+            <span class="checkmark"></span>
+        </label>
+
+    </div>
+    }
+</div>
+
+
+<div class="modal-footer">
+    <div id="accessRequestSpinner"></div>
+    <input type="submit" class="btn btn-primary" id="SubmitAccessRequestButton" data-id="@Model.SecurableObjectId" value="Request Access" />
+    <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+</div>
