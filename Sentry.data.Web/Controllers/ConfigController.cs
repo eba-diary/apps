@@ -877,7 +877,7 @@ namespace Sentry.data.Web.Controllers
         public ActionResult EditSource(int sourceID)
         {
             UserSecurity us = _configService.GetUserSecurityForDataSource(sourceID);
-            if (us != null && us.CanEditDataset)
+            if (us != null && us.CanEditDataSource)
             {
                 DataSourceDto dto = _configService.GetDataSourceDto(sourceID);
                 DataSourceModel model = new DataSourceModel(dto);
@@ -1532,13 +1532,11 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         public JsonResult SourceDetails (int sourceId)
-        {
-            
-            UserSecurity us = _configService.GetUserSecurityForDataSource(sourceId);
-
+        {            
             DataSourceDto dto = _configService.GetDataSourceDto(sourceId);
+            DataSourceModel model = new DataSourceModel(dto);
 
-            return Json(new { Secured = dto.IsSecured, Permissions = us.CanUseDataSource }, JsonRequestBehavior.AllowGet);
+            return Json(model, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]

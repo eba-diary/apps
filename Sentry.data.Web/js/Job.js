@@ -18,8 +18,9 @@
 
         $("#SelectedSourceType").change(function () {
             $('.questionairePanel').hide();
+            $(".editDataSourceLink").hide();
             $('#btnCreateDataset').hide();
-            $("#editDataSource").hide();
+            $('.dataSourceInfoPanel').hide();
             var val = $('#SelectedSourceType :selected').val();
 
             $.getJSON("/Config/SourcesByType", { sourceType: val }, function (data) {
@@ -50,20 +51,16 @@
                     type: "GET",
                     data: { sourceId: $('#SelectedDataSource :selected').val() },
                     success: function (data) {
-                        //data.Job.SetSecurityPanel(data.Secured, data.Permissions);
-                        if (!data.Secured || (data.Secured && data.Permissions)) {
+                        //Data Source is not restricted or user has permissions to use data source
+                        if (!data.IsSecured || (data.IsSecured && data.Security.CanUseDataSource)) {
                             $('.securityPanel').hide();
                             $('.questionairePanel').show();
                             $('#btnCreateDataset').show();
 
-                            $("#editDataSource").attr("href", "/Config/Source/Edit/" + val);
-                            $("#editDataSource").show();
-
-                            $.getJSON("/Config/DataSourceDescription", { sourceId: val }, function (data) {
-                                $("#dataSourceDescription").text(data.Description);
-                                $("#baseURLTextBox").val(data.BaseUri);
-                                $("#baseURL").text(" The Base URL of the Data Source you picked is " + data.BaseUri + ".  What you type in the Relative URL will be appended to the end of this Base URL.");
-                            });
+                            if (data.Security.CanEditDataSource) {
+                                $("#editDataSource").attr("href", "/Config/Source/Edit/" + val);
+                                $(".editDataSourceLink").show();
+                            }
 
                             $.getJSON("/Config/IsHttpSource/", { dataSourceId: val }, function (data) {
                                 if (data) {
@@ -79,9 +76,19 @@
                         else {
                             $('.securityPanel').show();
                             $('.questionairePanel').hide();
+                            $(".editDataSourceLink").hide();
                             $('#btnCreateDataset').hide();
                             $('#btnCreateDataset').hide();
                         }
+
+                        $('#primaryOwner').text(data.PrimaryOwnerName);
+                        $('#dataSourceContactEmail').attr("href", data.MailToLink)
+                        $('#dataSourceContactEmail').text(data.PrimaryContactName);
+                        //$('#primaryContact.a').text("<a href/" + data.MailToLink + "/"adfad");
+                        $('.dataSourceInfoPanel').show();
+                        $("#dataSourceDescription").text(data.Description);
+                        $("#baseURLTextBox").val(data.BaseUri);
+                        $("#baseURL").text(" The Base URL of the Data Source you picked is " + data.BaseUri + ".  What you type in the Relative URL will be appended to the end of this Base URL.");
                     }
                 });
             }            

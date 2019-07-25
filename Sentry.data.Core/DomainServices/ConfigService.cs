@@ -152,6 +152,16 @@ namespace Sentry.data.Core
                     throw new NotImplementedException();
             }
 
+            if (String.IsNullOrWhiteSpace(dto.PrimaryOwnerId))
+            {
+                errors.Add("Owner is requried.");
+            }
+
+            if (String.IsNullOrWhiteSpace(dto.PrimaryContactId))
+            {
+                errors.Add("Contact is requried.");
+            }
+
             return errors;
         }
 
@@ -468,11 +478,16 @@ namespace Sentry.data.Core
             dto.IsUserPassRequired = dsrc.IsUserPassRequired;
             dto.PortNumber = dsrc.PortNumber;
             dto.BaseUri = dsrc.BaseUri;
+
+            //Security Properites
             dto.IsSecured = dsrc.IsSecured;
             dto.PrimaryContactId = dsrc.PrimaryContactId;
             dto.PrimaryContactName = (primaryContact != null && primaryContact.AssociateId != "000000" ? primaryContact.DisplayName : "Not Available");
+            dto.PrimaryContactEmail = (primaryContact != null && primaryContact.AssociateId != "000000" ? primaryContact.EmailAddress : "");
             dto.PrimaryOwnerId = dsrc.PrimaryOwnerId;
             dto.PrimaryOwnerName = (primaryOwner != null && primaryOwner.AssociateId != "000000" ? primaryOwner.DisplayName : "Not Available");
+            dto.Security = _securityService.GetUserSecurity(dsrc, _userService.GetCurrentUser());
+            dto.MailToLink = "mailto:" + dto.PrimaryContactEmail + "?Subject=Data%20Source%20Inquiry%20-%20" + dsrc.Name;
 
             MapDataSourceSpecificToDto(dsrc, dto);
         }
@@ -570,27 +585,29 @@ namespace Sentry.data.Core
         {
             dsrc.PrimaryOwnerId = dto.PrimaryOwnerId;
             dsrc.PrimaryContactId = dto.PrimaryContactId;
-            dsrc.IsSecured = dto.IsSecured;
 
-            if (!dsrc.IsSecured && dto.IsSecured)
+            if (dsrc.Security == null)
             {
-                if (dsrc.Security == null)
+                dsrc.Security = new Security(GlobalConstants.SecurableEntityName.DATASET)
                 {
-                    dsrc.Security = new Security(GlobalConstants.SecurableEntityName.DATASET)
-                    {
-                        CreatedById = _userService.GetCurrentUser().AssociateId
-                    };
-                }
-                else
+                    CreatedById = _userService.GetCurrentUser().AssociateId
+                };
+            }
+            else
+            {
+                if (!dsrc.IsSecured && dto.IsSecured)
                 {
                     dsrc.Security.EnabledDate = DateTime.Now;
                     dsrc.Security.UpdatedById = _userService.GetCurrentUser().AssociateId;
+                    dsrc.Security.RemovedDate = null;
                 }
-            }
-            else if (dsrc.IsSecured && !dto.IsSecured)
-            {
-                dsrc.Security.RemovedDate = DateTime.Now;
-                dsrc.Security.UpdatedById = _userService.GetCurrentUser().AssociateId;
+                else if (dsrc.IsSecured && !dto.IsSecured)
+                {
+                    dsrc.Security.RemovedDate = DateTime.Now;
+                    dsrc.Security.UpdatedById = _userService.GetCurrentUser().AssociateId;
+                }
+
+                dsrc.IsSecured = dto.IsSecured;
             }
         }
 

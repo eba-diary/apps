@@ -37,9 +37,12 @@ namespace Sentry.data.Web
             TokenExp = dto.TokenExp;
             PrimaryContactId = dto.PrimaryContactId;
             PrimaryContactName = dto.PrimaryContactName;
+            PrimaryContactEmail = dto.PrimaryContactEmail;
             PrimaryOwnerId = dto.PrimaryOwnerId;
             PrimaryOwnerName = dto.PrimaryOwnerName;
             IsSecured = dto.IsSecured;
+            Security = dto.Security.ToModel();
+            MailToLink = dto.MailToLink;
 
             //We do not populate TokenAuthValue and ClientPrivateID.  On Post
             // if a value exists, then a new value is encrypted.  Otherwise, old value is unchanged.
@@ -131,7 +134,10 @@ namespace Sentry.data.Web
         //hidden properties
         public string PrimaryOwnerId { get; set; }
         public string PrimaryContactId { get; set; }
+        public string PrimaryContactEmail { get; set; }
+        public string MailToLink { get; set; }
         public List<string> ContactIds { get; set; }
+        public UserSecurityModel Security { get; set; }
 
 
         //this is needed for the associate picker js.

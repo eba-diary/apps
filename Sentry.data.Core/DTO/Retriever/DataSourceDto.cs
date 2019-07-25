@@ -39,5 +39,8 @@ namespace Sentry.data.Core
         public string PrimaryOwnerName { get; set; }
         public string PrimaryContactId { get; set; }
         public string PrimaryContactName { get; set; }
+        public string PrimaryContactEmail { get; set; }
+        public string MailToLink { get; set; }
+        public UserSecurity Security { get; set; }
     }
 }
