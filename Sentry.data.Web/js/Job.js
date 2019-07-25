@@ -61,6 +61,9 @@
                                 $("#editDataSource").attr("href", "/Config/Source/Edit/" + val);
                                 $(".editDataSourceLink").show();
                             }
+                            else {
+                                $(".editDataSourceLink").hide();
+                            }
 
                             $.getJSON("/Config/IsHttpSource/", { dataSourceId: val }, function (data) {
                                 if (data) {

@@ -503,6 +503,7 @@ namespace Sentry.data.Web.Controllers
             RetrieverJob retrieverJob = _datasetContext.GetById<RetrieverJob>(jobId);
 
             EditJobModel ejm = new EditJobModel(retrieverJob);
+            ejm.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
 
             ejm.SelectedDataSource = retrieverJob.DataSource.Id;
             ejm.SelectedSourceType = retrieverJob.DataSource.SourceType;

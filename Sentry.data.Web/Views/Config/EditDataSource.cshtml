@@ -261,6 +261,8 @@
     <script>
         $(document).ready(function () {
 
+            data.DataSource.FormInit('@(Model.HrempServiceUrl)' , '@(Model.HrempServiceEnv)');
+
             function setAuthTypePanels(authType) {
 
                 if (authType == 'Anonymous Authentication') {
