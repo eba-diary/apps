@@ -271,7 +271,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public DfsBasicHszMapping()
         {
-            DiscriminatorValue(@"DFSBasicHsz");
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.DEFAULT_HSZ_DROP_LOCATION);
         }
     }
 

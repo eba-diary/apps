@@ -455,7 +455,11 @@ namespace Sentry.data.Web.Controllers
                 Disabled = true
             });
 
-            cjm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic").Where(x => x.Value != "S3Basic" && x.Value != "DFSBasicHsz" && x.Value != "JavaApp").OrderBy(x => x.Value);
+            cjm.SourceTypesDropdown = temp.Where(x => 
+                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_DROP_LOCATION && 
+                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION && 
+                x.Value != GlobalConstants.DataSoureDiscriminator.JAVA_APP_SOURCE &&
+                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_HSZ_DROP_LOCATION).OrderBy(x => x.Value);
 
             List<SelectListItem> temp2 = new List<SelectListItem>();
 
@@ -778,7 +782,11 @@ namespace Sentry.data.Web.Controllers
                 Disabled = true
             });
 
-            csm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic" && x.Value != "S3Basic" && x.Value != "DFSBasicHsz" && x.Value != "JavaApp").OrderBy(x => x.Value);
+            csm.SourceTypesDropdown = temp.Where(x => 
+                    x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_DROP_LOCATION && 
+                    x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION && 
+                    x.Value != GlobalConstants.DataSoureDiscriminator.JAVA_APP_SOURCE &&
+                    x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_HSZ_DROP_LOCATION).OrderBy(x => x.Value);
 
             if (csm.SourceType == null)
             {

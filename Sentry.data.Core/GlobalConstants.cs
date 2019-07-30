@@ -92,8 +92,7 @@
             public const string HTTPS_SOURCE = "HTTPS";
             public const string JAVA_APP_SOURCE = "JavaApp";
             public const string GOOGLE_API_SOURCE = "GOOGLEAPI";
-
-
+            public const string DEFAULT_HSZ_DROP_LOCATION = "DFSBasicHsz";
         }
 
         public static class DataFeedType
