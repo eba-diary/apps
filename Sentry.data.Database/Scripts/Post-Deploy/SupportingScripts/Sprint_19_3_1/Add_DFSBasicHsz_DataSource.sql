@@ -37,6 +37,10 @@ BEGIN
 			null,
 			null,
 			null,
+			null,
+			'072984',
+			'072984',
+			0,
 			null
 	END
 	ELSE IF EXISTS (select 1 where @@SERVERNAME like '%fit-n-shardb-10%' OR @@SERVERNAME like '%fit-n-shardb-20%')
@@ -67,6 +71,10 @@ BEGIN
 			null,
 			null,
 			null,
+			null,
+			'072984',
+			'072984',
+			0,
 			null
 	END
 	ELSE IF EXISTS (select 1 where @@SERVERNAME like '%fit-n-shardb-11%' and DB_NAME() = 'SentryDatasets_NR')
@@ -97,6 +105,10 @@ BEGIN
 			null,
 			null,
 			null,
+			null,
+			'072984',
+			'072984',
+			0,
 			null
 	END
 	ELSE IF EXISTS (select 1 where @@SERVERNAME like '%fit-n-shardb-11%' and DB_NAME() = 'SentryDatasets')
@@ -127,6 +139,10 @@ BEGIN
 			null,
 			null,
 			null,
+			null,
+			'072984',
+			'072984',
+			0,
 			null
 	END
 	ELSE
@@ -157,6 +173,10 @@ BEGIN
 			null,
 			null,
 			null,
+			null,
+			'072984',
+			'072984',
+			0,
 			null
 	END
 END
