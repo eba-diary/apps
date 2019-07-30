@@ -25,6 +25,7 @@ namespace Sentry.data.Core
         IQueryable<Event> Events { get; }
         IQueryable<Status> EventStatus { get; }
         IQueryable<DataElement> DataElements { get; }
+        IQueryable<DataElementDetail> DataElementDetails { get; }
         IQueryable<DataObject> DataObjects { get; }
         IQueryable<DatasetFile> DatasetFile { get; }
         IQueryable<FileExtension> FileExtensions { get; }
@@ -40,6 +41,7 @@ namespace Sentry.data.Core
         IQueryable<TagGroup> TagGroups { get; }
         IQueryable<ApplicationConfiguration> ApplicationConfigurations { get; }
         IQueryable<Favorite> Favorites { get; }
+        IQueryable<OAuthClaim> OAuthClaims { get; }
 
         IQueryable<RetrieverJob> RetrieverJob { get; }
         /** Datasets **/

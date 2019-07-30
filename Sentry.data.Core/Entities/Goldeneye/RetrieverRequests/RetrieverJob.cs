@@ -246,7 +246,8 @@ namespace Sentry.data.Core
 
         public virtual ValidationResults ValidateForDelete()
         {
-            throw new NotImplementedException();
+            return new ValidationResults();
+            //throw new NotImplementedException();
         }
         public class ValidationErrors
         {

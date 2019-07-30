@@ -20,14 +20,6 @@ namespace Sentry.data.Core
 
         public string RequestPermission(AccessRequest model)
         {
-            //Lets format the business reason here before passing it into the hpsm service.
-            StringBuilder sb = new StringBuilder();
-            sb.Append($"Please grant the Ad Group {model.AdGroupName} the following permissions to {model.DatasetName} dataset within Data.sentry.com.{ Environment.NewLine}");
-            model.Permissions.ForEach(x => sb.Append($"{x.PermissionName} - {x.PermissionDescription} { Environment.NewLine}"));
-            sb.Append($"Business Reason: {model.BusinessReason}{ Environment.NewLine}");
-            sb.Append($"Requestor: {model.RequestorsId} - {model.RequestorsName}");
-
-            model.BusinessReason = sb.ToString();
 
             string ticketId = _hpsmProvider.CreateHpsmTicket(model);
             if (!string.IsNullOrWhiteSpace(ticketId))
@@ -83,7 +75,9 @@ namespace Sentry.data.Core
                 CanEditDataset = (user.CanModifyDataset && IsOwner) || IsAdmin,
                 CanCreateDataset = user.CanModifyDataset || IsAdmin,
                 CanEditReport = user.CanManageReports || IsAdmin,
-                CanCreateReport = user.CanManageReports || IsAdmin
+                CanCreateReport = user.CanManageReports || IsAdmin,
+                CanEditDataSource = (user.CanModifyDataset && IsOwner) || IsAdmin,
+                CanCreateDataSource = user.CanModifyDataset || IsAdmin
             };
 
             //if it is not secure, it should be wide open except for upload.
@@ -93,6 +87,7 @@ namespace Sentry.data.Core
                 us.CanQueryDataset = true;
                 us.CanViewFullDataset = true;
                 us.CanUploadToDataset = IsOwner || IsAdmin;
+                us.CanUseDataSource = true;
                 return us;
             }
 
@@ -117,6 +112,7 @@ namespace Sentry.data.Core
             us.CanViewFullDataset = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_VIEW_FULL_DATASET) || IsOwner || IsAdmin;
             us.CanQueryDataset = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_QUERY_DATASET) || IsOwner || IsAdmin;
             us.CanUploadToDataset = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_UPLOAD_TO_DATASET) || IsOwner || IsAdmin;
+            us.CanUseDataSource = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_USE_DATA_SOURCE) || IsOwner || IsAdmin;
 
             return us;
         }

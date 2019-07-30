@@ -32,6 +32,9 @@ namespace Sentry.data.Web
             SelectedDataSource = rj.DataSource.Id;
             JobID = rj.Id;
             IsGeneric = rj.IsGeneric;
+            SelectedRequestMethod = (rj.JobOptions.HttpOptions != null && rj.JobOptions.HttpOptions.RequestMethod != null) ? rj.JobOptions.HttpOptions.RequestMethod : HttpMethods.none;
+            HttpRequestBody = (rj.JobOptions.HttpOptions != null && rj.JobOptions.HttpOptions.Body != null) ? rj.JobOptions.HttpOptions.Body : null;
+            SelectedRequestDataFormat = (rj.JobOptions.HttpOptions != null && rj.JobOptions.HttpOptions.RequestDataFormat != null) ? rj.JobOptions.HttpOptions.RequestDataFormat : HttpDataFormat.none;
         }
 
         public int JobID { get; set; }
@@ -44,6 +47,9 @@ namespace Sentry.data.Web
 
         [DisplayName("Relative URI")]
         public string RelativeUri { get; set; }
+
+        [DisplayName("Https Body")]
+        public string HttpRequestBody { get; set; }
 
         [DisplayName("Search Criteria")]
         public string SearchCriteria { get; set; }
@@ -74,13 +80,19 @@ namespace Sentry.data.Web
 
         [DisplayName("Data Source")]
         public int SelectedDataSource { get; set; }
-
         [DisplayName("Source Type")]
         public string SelectedSourceType { get; set; }
+        [DisplayName("Request Method")]
+        public HttpMethods SelectedRequestMethod { get; set; }
+        [DisplayName("Request Body Format")]
+        public HttpDataFormat SelectedRequestDataFormat { get; set; }
+        public UserSecurity Security { get; set; }
 
         public List<DataSource> AvailableSources { get; set; }
 
         public IEnumerable<SelectListItem> SourceTypesDropdown { get; set; }
         public IEnumerable<SelectListItem> SourcesForDropdown { get; set; }
+        public IEnumerable<SelectListItem> RequestMethodDropdown { get; set; }
+        public IEnumerable<SelectListItem> RequestDataFormatDropdown { get; set; }
     }
 }

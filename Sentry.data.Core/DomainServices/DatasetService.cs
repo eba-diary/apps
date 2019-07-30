@@ -97,8 +97,8 @@ namespace Sentry.data.Core
             {
                 Permissions = _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList(),
                 ApproverList = new List<KeyValuePair<string, string>>(),
-                DatasetId = ds.DatasetId,
-                DatasetName = ds.DatasetName
+                SecurableObjectId = ds.DatasetId,
+                SecurableObjectName = ds.DatasetName
             };
 
 
@@ -117,11 +117,11 @@ namespace Sentry.data.Core
         public string RequestAccessToDataset(AccessRequest request)
         {
 
-            Dataset ds = _datasetContext.GetById<Dataset>(request.DatasetId);
+            Dataset ds = _datasetContext.GetById<Dataset>(request.SecurableObjectId);
             if (ds != null)
             {
                 IApplicationUser user = _userService.GetCurrentUser();
-                request.DatasetName = ds.DatasetName;
+                request.SecurableObjectName = ds.DatasetName;
                 request.SecurityId = ds.Security.SecurityId;
                 request.RequestorsId = user.AssociateId;
                 request.RequestorsName = user.DisplayName;
@@ -130,11 +130,22 @@ namespace Sentry.data.Core
                 request.ApproverId = request.SelectedApprover;
                 request.Permissions = _datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
                                                                                                                 x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
+
+                //Format the business reason here.
+                StringBuilder sb = new StringBuilder();
+                sb.Append($"Please grant the Ad Group {request.AdGroupName} the following permissions to {request.SecurableObjectName} dataset within Data.sentry.com.{ Environment.NewLine}");
+                request.Permissions.ForEach(x => sb.Append($"{x.PermissionName} - {x.PermissionDescription} { Environment.NewLine}"));
+                sb.Append($"Business Reason: {request.BusinessReason}{ Environment.NewLine}");
+                sb.Append($"Requestor: {request.RequestorsId} - {request.RequestorsName}");
+
+                request.BusinessReason = sb.ToString();
+
                 return _securityService.RequestPermission(request);
             }
 
             return string.Empty;
         }
+
         public int CreateAndSaveNewDataset(DatasetDto dto)
         {
             Dataset ds = CreateDataset(dto);

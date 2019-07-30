@@ -18,8 +18,20 @@
     [IVKey] NVARCHAR(MAX) NULL, 
     [RequestHeaders] NVARCHAR(MAX) NULL, 
     [Options] NVARCHAR(MAX) NULL, 
+    [CurrentToken] NVARCHAR(MAX) NULL, 
+    [CurrentTokenExp] DATETIME NULL, 
+    [ClientID] VARCHAR(250) NULL, 
+    [ClientPrivateID] VARCHAR(MAX) NULL, 
+    [Scope] VARCHAR(250) NULL, 
+    [TokenUrl] NVARCHAR(1000) NULL, 
+    [TokenExp] INT NULL, 
+    [PrimaryContact_ID] VARCHAR(8) NOT NULL DEFAULT '000000', 
+    [PrimaryOwner_ID] VARCHAR(8) NOT NULL, 
+    [IsSecured_IND] BIT NOT NULL DEFAULT 0, 
+    [Security_ID] UNIQUEIDENTIFIER NULL, 
     PRIMARY KEY CLUSTERED ([DataSource_Id] ASC),
-    CONSTRAINT [FK_DataSource_AuthenticationType] FOREIGN KEY ([SourceAuth_ID]) REFERENCES [dbo].[AuthenticationType] ([Auth_Id])
+    CONSTRAINT [FK_DataSource_AuthenticationType] FOREIGN KEY ([SourceAuth_ID]) REFERENCES [dbo].[AuthenticationType] ([Auth_Id]),
+	CONSTRAINT [FK_DataSource_Security] FOREIGN KEY ([Security_ID]) REFERENCES [Security]([Security_Id])
 );
 
 

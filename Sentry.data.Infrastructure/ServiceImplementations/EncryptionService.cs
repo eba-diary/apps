@@ -6,11 +6,13 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using Sentry.Common.Logging;
+using Sentry.data.Core;
 
 namespace Sentry.data.Infrastructure
 {
-    public class EncryptionService
+    public class EncryptionService : IEncryptionService
     {
+        public EncryptionService() { }
         /// <summary>
         /// Generate an encrypted value and return a new initial value with each encryption.
         /// Returns a tuple (Item1 = encrypted\decrypted string, Item2 = inital value used to seed the encryption).
@@ -19,7 +21,7 @@ namespace Sentry.data.Infrastructure
         /// <param name="inputString"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        public Tuple<string,string> EncryptString(string inputString, string key)
+        public Tuple<string,string> EncryptString(string inputString, string key, string iv = null)
         {
             try
             {
@@ -28,7 +30,14 @@ namespace Sentry.data.Infrastructure
                     //Set key
                     myAes.Key = Convert.FromBase64String(key);
 
-                    myAes.GenerateIV();
+                    if (iv == null)
+                    {
+                        myAes.GenerateIV();
+                    }
+                    else
+                    {
+                        myAes.IV = Convert.FromBase64String(iv);
+                    }
 
                     byte[] encrypted = EncryptStringToBytes_Aes(inputString, myAes.Key, myAes.IV);
 
@@ -70,6 +79,29 @@ namespace Sentry.data.Infrastructure
                 Logger.Error("Failed to Encrypt value", ex);
                 throw;
             }
+        }
+
+        public string GenerateNewIV()
+        {
+            using (AesManaged myAes = new AesManaged())
+            {
+                myAes.GenerateIV();
+
+                return Convert.ToBase64String(myAes.IV);
+            }
+        }
+
+        /// <summary>
+        /// Decrypts existing value with old IV and encrypts value with new IV, using same key.  Returns new encrypted value.
+        /// </summary>
+        /// <param name="origValue"></param>
+        /// <param name="key"></param>
+        /// <param name="oldIv"></param>
+        /// <param name="newIv"></param>
+        /// <returns></returns>
+        public string DecryptEncryptUsingNewIV(string origValue, string key, string oldIv, string newIv)
+        {
+            return EncryptString(DecryptString(origValue, key, oldIv), key, newIv).Item1;
         }
 
         private byte[] EncryptStringToBytes_Aes(string plainText, byte[] Key, byte[] IV)

@@ -51,6 +51,9 @@
 
             public const string CREATED_TAG = "Created Tag";
             public const string UPDATED_TAG = "Updated Tag";
+
+            public const string CREATED_DATASOURCE = "Created Data Source";
+            public const string UPDATED_DATASOURCE = "Updated Data Source";
         }
 
         public static class Statuses
@@ -75,6 +78,22 @@
             public const string DEFAULT_DROP_LOCATION = "Default Drop Location";
             public const string DEFAULT_S3_DROP_LOCATION = "Default S3 Drop Location";
             public const string DEFAULT_HSZ_DROP_LOCATION = "Default HSZ Drop Location";
+        }
+
+        public static class DataSoureDiscriminator
+        {
+            public const string DFS_SOURCE = "DFS";
+            public const string DEFAULT_DROP_LOCATION = "DFSBasic";
+            public const string DFS_CUSTOM = "DFSCustom";
+            public const string DEFAULT_S3_DROP_LOCATION = "S3Basic";
+            public const string FTP_SOURCE = "FTP";
+            public const string S3_SOURCE = "S3";
+            public const string SFTP_SOURCE = "SFTP";
+            public const string HTTPS_SOURCE = "HTTPS";
+            public const string JAVA_APP_SOURCE = "JavaApp";
+            public const string GOOGLE_API_SOURCE = "GOOGLEAPI";
+
+
         }
 
         public static class DataFeedType
@@ -108,6 +127,7 @@
         public static class SecurableEntityName
         {
             public const string DATASET = "Dataset";
+            public const string DATASOURCE = "DataSource";
         }
 
         public static class PermissionCodes
@@ -117,6 +137,7 @@
             public const string CAN_QUERY_DATASET = "CanQueryDataset";
             public const string CAN_CONNECT_TO_DATASET = "CanConnectToDataset";
             public const string CAN_UPLOAD_TO_DATASET = "CanUploadToDataset";
+            public const string CAN_USE_DATA_SOURCE = "CanUseDataSource";
 
             public const string USE_APP = "UseApp";
 

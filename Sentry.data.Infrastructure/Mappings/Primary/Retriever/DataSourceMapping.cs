@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NHibernate.Mapping.ByCode;
+﻿using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
 using Sentry.data.Core;
 using NHibernate;
@@ -96,6 +91,18 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.ForeignKey("FK_DataSource_AuthenticationType");
                 m.Class(typeof(AuthenticationType));
             });
+            this.Property((x) => x.PrimaryOwnerId, (m) => m.Column("PrimaryOwner_ID"));
+            this.Property((x) => x.PrimaryContactId, (m) => m.Column("PrimaryContact_ID"));
+
+            //ISecurable Mapping
+            this.Property((x) => x.IsSecured, (m) => m.Column("IsSecured_IND"));
+            this.ManyToOne(x => x.Security, m =>
+            {
+                m.Column("Security_ID");
+                m.ForeignKey("FK_DataSource_Security");
+                m.Class(typeof(Security));
+                m.Cascade(Cascade.All);
+            });
 
         }
 
@@ -106,7 +113,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public DfsSourceMapping()
         {
-            DiscriminatorValue(@"DFS");
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.DFS_SOURCE);
         }
     }
 
@@ -114,7 +121,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public DfsBasicMapping()
         {
-            DiscriminatorValue(@"DFSBasic");
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.DEFAULT_DROP_LOCATION);
         }
     }
 
@@ -122,7 +129,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public DfsCustomMapping()
         {
-            DiscriminatorValue(@"DFSCustom");
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.DFS_CUSTOM);
         }
     }
 
@@ -130,7 +137,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public FtpSourceMapping()
         {
-            DiscriminatorValue(@"FTP");
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.FTP_SOURCE);
         }
     }
 
@@ -138,7 +145,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public S3SourceMapping()
         {
-            DiscriminatorValue(@"S3");
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.S3_SOURCE);
         }
     }
 
@@ -146,7 +153,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public S3BasicMapping()
         {
-            DiscriminatorValue(@"S3Basic");
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION);
         }
     }
 
@@ -154,7 +161,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public SFtpSourceMapping()
         {
-            DiscriminatorValue(@"SFTP");
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.SFTP_SOURCE);
         }
     }
 
@@ -162,7 +169,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public HTTPSSourceMapping()
         {
-            DiscriminatorValue(@"HTTPS");
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE);
 
 
             Property(x => x.AuthenticationHeaderName, m =>
@@ -188,6 +195,59 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Column("RequestHeaders");
                 m.Access(Accessor.Field);
             });
+
+            Property(x => x.ClientId, m =>
+            {
+                m.Column("ClientId");
+                m.NotNullable(false);
+            });
+
+            Property(x => x.ClientPrivateId, m =>
+            {
+                m.Column("ClientPrivateId");
+                m.NotNullable(false);
+            });
+
+            Property(x => x.Scope, m =>
+            {
+                m.Column("Scope");
+                m.NotNullable(false);
+            });
+
+            Property(x => x.TokenUrl, m =>
+            {
+                m.Column("TokenUrl");
+                m.NotNullable(false);
+            });
+
+            Property(x => x.TokenExp, m =>
+            {
+                m.Column("TokenExp");
+                m.NotNullable(false);
+            });
+
+            Property(x => x.CurrentToken, m =>
+            {
+                m.Column("CurrentToken");
+                m.NotNullable(false);
+            });
+
+            Property(x => x.CurrentTokenExp, m =>
+            {
+                m.Column("CurrentTokenExp");
+                m.NotNullable(false);
+            });
+
+            this.Bag(x => x.Claims, (m) =>
+            {
+                m.Inverse(true);
+                m.Table("AuthenticationClaims");
+                m.Key((k) =>
+                {
+                    k.Column("DataSource_Id");
+                    k.ForeignKey("FK_AuthenticationClaims_DataSource");
+                });
+            }, map => map.OneToMany(a => a.Class(typeof(OAuthClaim))));
         }
     }
 
@@ -195,7 +255,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
     {
         public JavaAppSourceMapping()
         {
-            DiscriminatorValue(@"JavaApp");
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.JAVA_APP_SOURCE);
 
             Property(x => x.Options, m =>
             {
@@ -212,6 +272,14 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
         public DfsBasicHszMapping()
         {
             DiscriminatorValue(@"DFSBasicHsz");
+        }
+    }
+
+    public class GoogleApiMapping : SubclassMapping<GoogleApiSource>
+    {
+        public GoogleApiMapping()
+        {
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE);
         }
     }
 }

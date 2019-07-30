@@ -40,13 +40,12 @@
                                 </li>
                                 <!-- /ko -->
                                 <!-- /ko -->
-
                                 <!-- ko if: ShowMore -->
                                 <!-- ko foreach: OrderedFilters -->
                                 <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6, css: { notAllowed: Count() == 0 }">
                                     <label data-bind="attr: { id: id }">
                                         <input type="checkbox" class="filterChbx"
-                                                data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
+                                               data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
                                         <strong data-bind="text : Title"></strong>
                                         <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
                                     </label>
@@ -59,7 +58,7 @@
                                         <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() >= 6, css: { notAllowed: Count() == 0 }">
                                             <label data-bind="attr: { id: id }">
                                                 <input type="checkbox" class="filterChbx"
-                                                        data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
+                                                       data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
                                                 <strong data-bind="text : Title"></strong>
                                                 <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
                                             </label>
@@ -318,7 +317,7 @@
 
 
             $('#filterSelector').on('select2:select', function (e) {
-                
+
                 var data = e.params.data;
 
                 // push the selected filter Id to the observable array
@@ -326,7 +325,7 @@
             });
 
             $('#filterSelector').on('select2:unselect', function (e) {
-                
+
                 var data = e.params.data;
 
                 // remove the selected filter Id from the observable array
@@ -568,23 +567,32 @@
 
                 //CATEGORY FILTER
                 var uniqueCatCnt = 1;
+                var newCatFilterList = [];
+                var newSelectedCatFilterList = [];
                 for (var item, i = 0; item = uniqueCategories()[i++];) {
                     var category = item;
 
                     if (!(category in categoryLookup)) {
                         categoryLookup[category] = 1;
-                        self.CategoryFilters.push(new data.Search.Filter(pageType + '0_' + uniqueCatCnt, category, 'Category'));
+
+                        //self.CategoryFilters.push(new data.Search.Filter(pageType + '0_' + uniqueCatCnt, category, 'Category'));
+                        newCatFilterList.push(new data.Search.Filter(pageType + '0_' + uniqueCatCnt, category, 'Category'));
 
                         temp.push(new data.Search.Filter(pageType + '0_' + uniqueCatCnt, category, 'Category'));
 
                         // compare the category to what may have been passed along in the URL; if there's a match, push it to the SelectedFilters observable array
                         if (category === data.Search.GetParameterByName('category')) {
-                            self.SelectedFilters.push(pageType + '0_' + uniqueCatCnt);
+                            //self.SelectedFilters.push(pageType + '0_' + uniqueCatCnt);
+                            newSelectedCatFilterList.push(pageType + '0_' + uniqueCatCnt);
                         }
 
                         uniqueCatCnt++;
                     }
                 }
+
+                self.CategoryFilters.push.apply(self.CategoryFilters, newCatFilterList);
+                self.SelectedFilters.push.apply(self.SelectedFilters, newSelectedCatFilterList);
+
 
                 var item;
 
@@ -668,6 +676,7 @@
                 var temp = [];
                 var pageType = '2_'
                 var item;
+                var newAllFiltersList = [];
 
                 //Guarentee order of categories to ensure filter numbering is consistent
                 //https://stackoverflow.com/a/13359705
@@ -681,107 +690,120 @@
                 });
 
                 //CATEGORY FILTER
+                var newCatFilterList = [];
+                var newSelectedCatFilterList = [];
                 for (var cat, i = 0; cat = uniqueCategories()[i++];) {
                     if (!(cat in categoryLookup)) {
                         categoryLookup[cat] = 1;
-                        self.CategoryFilters.push(new data.Search.Filter(pageType + '0_' + i, cat, 'Category'));
+                        newCatFilterList.push(new data.Search.Filter(pageType + '0_' + i, cat, 'Category'));
 
                         // compare the category to what may have been passed in the URL; if there's a match, push it to the SelectedFilters observable array
                         if (cat === data.Search.GetParameterByName('category')) {
-                            self.SelectedFilters.push(pageType + '0_' + i);
+                            newSelectedCatFilterList.push(pageType + '0_' + i);
                         }
 
                         temp.push(new data.Search.Filter(pageType + '0_' + i, cat, 'Category'));
                     }
                 }
-                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+
+                self.CategoryFilters.push.apply(self.CategoryFilters, newCatFilterList);
+                self.SelectedFilters.push.apply(self.SelectedFilters, newSelectedCatFilterList);
+
+                ko.utils.arrayForEach(newAllFiltersList, function (v) {
                     if (v.Name == 'Category') {
                         item = v;
                     }
                 });
                 if (item !== undefined) {
                     temp = item.Filters().concat(temp);
-                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                    ko.utils.arrayRemoveItem(newAllFiltersList, item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Category', temp, 1, true));
+                newAllFiltersList.push(new data.Search.FilterCategory('Category', temp, 1, true));
+
                 temp = [];
 
 
                 //BUSINESS UNIT FILTER
+                var newBusinessUnitFilterList = [];
                 counter = 0; //reset counter
                 for (var item, i = 0; item = exhibits[i++];) {
                     for (var bu, j = 0; bu = item.BusinessUnits[j++];) {
                         if (!(bu in businessUnitLookup)) {
                             businessUnitLookup[bu] = 1;
-                            self.BusinessUnitFilters.push(new data.Search.Filter(pageType + '5_' + counter, bu, 'Business Unit'));
+                            newBusinessUnitFilterList.push(new data.Search.Filter(pageType + '5_' + counter, bu, 'Business Unit'));
 
                             temp.push(new data.Search.Filter(pageType + '5_' + counter, bu, 'Business Unit'));
                             counter++;
                         }
                     }
                 }
-                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                ko.utils.arrayForEach(newAllFiltersList, function (v) {
                     if (v.Name == 'Business Unit') {
                         item = v;
                     }
                 });
                 if (item !== undefined) {
                     temp = item.Filters().concat(temp);
-                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                    ko.utils.arrayRemoveItem(newAllFiltersList, item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Business Unit', temp, 2, false));
+                self.BusinessUnitFilters.push.apply(self.BusinessUnitFilters, newBusinessUnitFilterList)
+                newAllFiltersList.push(new data.Search.FilterCategory('Business Unit', temp, 2, false));
                 temp = [];
 
 
                 //DATASET FUNCTION FILTER
+                var newdatasetFunctionFilters = [];
                 counter = 0; //reset counter
                 for (var item, i = 0; item = exhibits[i++];) {
                     for (var fn, j = 0; fn = item.DatasetFunctions[j++];) {
                         if (!(fn in datasetFunctionLookup)) {
                             datasetFunctionLookup[fn] = 1;
-                            self.DatasetFunctionFilters.push(new data.Search.Filter(pageType + '6_' + counter, fn, 'Function'));
+                            newdatasetFunctionFilters.push(new data.Search.Filter(pageType + '6_' + counter, fn, 'Function'));
 
                             temp.push(new data.Search.Filter(pageType + '6_' + counter, fn, 'Function'));
                             counter++;
                         }
                     }
                 }
-                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                ko.utils.arrayForEach(newAllFiltersList, function (v) {
                     if (v.Name == 'Function') {
                         item = v;
                     }
                 });
                 if (item !== undefined) {
                     temp = item.Filters().concat(temp);
-                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                    ko.utils.arrayRemoveItem(newAllFiltersList, item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Function', temp, 3, false));
+                self.DatasetFunctionFilters.push.apply(self.DatasetFunctionFilters, newdatasetFunctionFilters);
+                newAllFiltersList.push(new data.Search.FilterCategory('Function', temp, 3, false));
                 temp = [];
 
 
                 //REPORT TYPE FILTER
+                var newExtensionFiltersList = [];
                 counter = 0; // reset the counter
                 for (var item, i = 0; item = exhibits[i++];) {
                     for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
                         if (!(ext in extensionLookup)) {
                             extensionLookup[ext] = 1;
-                            self.ExtensionFilters.push(new data.Search.Filter(pageType + '2_' + counter, ext, 'Report Type'));
+                            newExtensionFiltersList.push(new data.Search.Filter(pageType + '2_' + counter, ext, 'Report Type'));
 
                             temp.push(new data.Search.Filter(pageType + '2_' + counter, ext, 'Report Type'));
                             counter++;
                         }
                     }
                 }
-                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                ko.utils.arrayForEach(newAllFiltersList, function (v) {
                     if (v.Name == 'Report Type') {
                         item = v;
                     }
                 });
                 if (item !== undefined) {
                     temp = item.Filters().concat(temp);
-                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                    ko.utils.arrayRemoveItem(newAllFiltersList, item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Report Type', temp, 4, true));
+                self.ExtensionFilters.push.apply(self.ExtensionFilters, newExtensionFiltersList);
+                newAllFiltersList.push(new data.Search.FilterCategory('Report Type', temp, 4, true));
                 temp = [];
 
 
@@ -809,9 +831,11 @@
                 array_move(tagGroups, tagGroups.indexOf('Other'), tagGroups.length - 1)
 
 
-                counter = 0; //Needs seperate counter as multiple objects can appear per iteration
+                counter = 0;
+                //Needs seperate counter as multiple objects can appear per iteration
                 //Loop through each tag group, add all tags for the group which are associated
                 // with each exhibit
+                var newTagFilterList = [];
                 for (var group, g = 0; group = tagGroups[g++];) {
                     for (var item, i = 0; item = exhibits[i++];) {
                         if (item.Tags != null) {
@@ -820,32 +844,37 @@
                             for (var tag, j = 0; tag = Tags[j++];) {
                                 if (tag.Group == group && !(tag.Name in tagLookup)) {
                                     tagLookup[tag.Name] = 1;
-                                    self.TagFilters.push(new data.Search.Filter(pageType + '3_' + counter, tag.Name, group));
+                                    newTagFilterList.push(new data.Search.Filter(pageType + '3_' + counter, tag.Name, group));
 
                                     temp.push(new data.Search.Filter(pageType + '3_' + counter, tag.Name, group));
                                     counter++;
                                 }
                             }
+
                         }
                     }
-                    ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    ko.utils.arrayForEach(newAllFiltersList, function (v) {
                         if (v.Name == group) {
                             item = v;
                         }
                     });
                     if (item !== undefined) {
                         temp = item.Filters().concat(temp);
-                        ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                        ko.utils.arrayRemoveItem(newAllFiltersList, item);
                     }
-                    self.AllFilters.push(new data.Search.FilterCategory(group, temp, 5, true));
+                    newAllFiltersList.push(new data.Search.FilterCategory(group, temp, 5, true));
 
                     temp = [];
                 }
 
+                self.TagFilters.push.apply(self.TagFilters, newTagFilterList);
+
                 // sort the filters by Sequence
-                self.AllFilters.sort(function (left, right) {
+                newAllFiltersList.sort(function (left, right) {
                     return left.Sequence - right.Sequence;
                 });
+
+                self.AllFilters.push.apply(self.AllFilters, newAllFiltersList);
             };
 
             self.PopulateGenericFilters = function (allObjects) {
@@ -1039,7 +1068,7 @@
             $.getJSON( "/Search/" + self.SearchType() + "/List", function (allData) {
                 var mappedTasks = $.map(allData, function (item) { return new Dataset(item) });
 
-                self.datasets(self.datasets().concat(mappedTasks));
+                self.datasets(mappedTasks);
 
                 self.populateFilters();
 
@@ -1061,7 +1090,7 @@
 
                 //pull sortby value from local storage
                 var val = localStorage.getItem("sortByVal");
-                
+
                 if (val !== undefined) {
                     return val;
                 }
@@ -1076,10 +1105,7 @@
                     var list = JSON.parse(localStorage.getItem("filteredIds"));
 
                     if (list != undefined) {
-
-                        for (var i = 0; i < list.length; i++) {
-                            self.SelectedFilters.push(list[i]);
-                        }
+                        self.SelectedFilters.push.apply(self.SelectedFilters, list)
                     }
 
                     if (data.Search.GetParameterByName('searchPhrase')) {
@@ -1224,7 +1250,7 @@
                                 count++;
                             }
                         }
-                    
+
                     if (keywordFound) {
                         temp.push({ dataset: dataset, count: count });
                     }
@@ -1254,7 +1280,7 @@
             self.limitSearchResults = function () {
 
                 var nbrResults = 15;
-                
+
                 // determine number of results to return in the search results using the value selected in the drop-down
                 if ($("#search-results-choices").val() === "All") {
                     nbrResults = 100000;
@@ -1275,7 +1301,7 @@
 
                 if (localStorage.getItem("pageSelection")) {
                     data.Search.setPageNumber(localStorage.getItem("pageSelection"), true);
-                }                
+                }
 
             });
 
