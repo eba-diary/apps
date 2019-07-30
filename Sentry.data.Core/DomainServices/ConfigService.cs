@@ -17,10 +17,11 @@ namespace Sentry.data.Core
         public IEventService _eventService;
         public IMessagePublisher _messagePublisher;
         public IEncryptionService _encryptService;
+        private readonly ISecurityService _securityService;
 
         public ConfigService(IDatasetContext dsCtxt, IMessagePublisher publisher, 
             IUserService userService, IEventService eventService, IMessagePublisher messagePublisher,
-            IEncryptionService encryptService)
+            IEncryptionService encryptService, ISecurityService securityService)
         {
             _datasetContext = dsCtxt;
             _publisher = publisher;
@@ -28,6 +29,7 @@ namespace Sentry.data.Core
             _eventService = eventService;
             _messagePublisher = messagePublisher;
             _encryptService = encryptService;
+            _securityService = securityService;
         }
         public SchemaDTO GetSchemaDTO(int id)
         {
@@ -150,6 +152,16 @@ namespace Sentry.data.Core
                     throw new NotImplementedException();
             }
 
+            if (String.IsNullOrWhiteSpace(dto.PrimaryOwnerId))
+            {
+                errors.Add("Owner is requried.");
+            }
+
+            if (String.IsNullOrWhiteSpace(dto.PrimaryContactId))
+            {
+                errors.Add("Contact is requried.");
+            }
+
             return errors;
         }
 
@@ -183,212 +195,6 @@ namespace Sentry.data.Core
                 Logger.Error("Error saving data source", ex);
                 return false;
             }
-        }
-
-        private void UpdateDataSource(DataSourceDto dto, DataSource dsrc)
-        {
-            MapDataSource(dto, dsrc);
-        }
-
-        private void MapDataSource(DataSourceDto dto, DataSource dsrc)
-        {
-            dsrc.Name = dto.Name;
-            dsrc.Description = dto.Description;
-            dsrc.SourceType = dto.SourceType;
-            dsrc.SourceAuthType = _datasetContext.GetById<AuthenticationType>(int.Parse(dto.AuthID));
-            dsrc.IsUserPassRequired = dto.IsUserPassRequired;
-            dsrc.PortNumber = dto.PortNumber;
-            dsrc.BaseUri = dto.BaseUri;
-
-            MapDataSourceSpecific(dto, dsrc);
-
-        }
-
-        private void MapDataSourceSpecific(DataSourceDto dto, DataSource dsrc)
-        {
-            if (dsrc.Is<HTTPSSource>())
-            {
-                ((HTTPSSource)dsrc).ClientId = dto.ClientId;
-                ((HTTPSSource)dsrc).TokenUrl = dto.TokenUrl;
-                ((HTTPSSource)dsrc).TokenExp = dto.TokenExp;
-                ((HTTPSSource)dsrc).AuthenticationHeaderName = dto.TokenAuthHeader;
-                ((HTTPSSource)dsrc).RequestHeaders = (dto.RequestHeaders.Any()) ? dto.RequestHeaders : null;
-
-                UpdateClaims((HTTPSSource)dsrc, dto);
-            }
-
-            // only update if new value is supplied
-            if (dto.TokenAuthValue != null)
-            {
-                ((HTTPSSource)dsrc).AuthenticationTokenValue = _encryptService.EncryptString(dto.TokenAuthValue, Configuration.Config.GetHostSetting("EncryptionServiceKey"), dto.IVKey).Item1;
-            }
-
-            // only update if new value is supplied
-            if (dto.ClientPrivateId != null)
-            {
-                ((HTTPSSource)dsrc).ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), dto.IVKey).Item1;
-            }
-                
-        }
-
-        private void UpdateClaims(HTTPSSource dsrc, DataSourceDto dto)
-        {
-            //foreach claim type in dsrc
-            // does claim type exist in dto?
-            //if yes, update if value is different
-            //if no, create OAuthClaim with dto value
-
-            foreach (OAuthClaim item in dsrc.Claims)
-            {
-                switch (item.Type)
-                {
-                    case GlobalEnums.OAuthClaims.iss:
-                        if (dto.ClientId != null && dto.ClientId != item.Value) { item.Value = dto.ClientId; }
-                        break;
-                    case GlobalEnums.OAuthClaims.aud:
-                        if (dto.TokenUrl != null && dto.TokenUrl != item.Value) { item.Value = dto.TokenUrl; }
-                        break;
-                    case GlobalEnums.OAuthClaims.exp:
-                        if (dto.TokenExp != 0 && dto.TokenExp.ToString() != item.Value) { item.Value = dto.TokenExp.ToString(); }
-                        break;
-                    case GlobalEnums.OAuthClaims.scope:
-                        if (dto.Scope != null && dto.Scope != item.Value) { item.Value = dto.Scope; }
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-
-            ////Property exists on original source
-            //if(dsrc.Claims.Any(w => w.Type == GlobalEnums.OAuthClaims.iss))
-            //{
-            //    //Property has changed
-            //    if(dsrc.Claims.Where(w => w.Type == GlobalEnums.OAuthClaims.iss).Select(s => s.Value).SingleOrDefault() != dto.ClientId)
-            //    {
-            //        //Update property
-            //        dsrc.ClientId = dto.ClientId;
-            //    }
-            //}
-            ////Property does not exist on original source
-            //else
-            //{
-            //    dsrc.ClientId = dto.ClientId;
-            //}
-        }
-
-        private DataSource CreateDataSource(DataSourceDto dto)
-        {
-            DataSource source = null;
-
-            AuthenticationType auth = _datasetContext.GetById<AuthenticationType>(Convert.ToInt32(dto.AuthID));
-
-            switch (dto.SourceType)
-            {
-                case "DFSBasic":
-                    source = new DfsBasic();
-                    break;
-                case "DFSCustom":
-                    source = new DfsCustom();
-                    break;
-                case "FTP":
-                    source = new FtpSource();
-                    break;
-                case "SFTP":
-                    source = new SFtpSource();
-                    break;
-                case "HTTPS":
-                    source = new HTTPSSource();
-                    ((HTTPSSource)source).IVKey = _encryptService.GenerateNewIV();
-
-                    //Process only if headers exist
-                    if (dto.RequestHeaders.Any())
-                    {
-                        ((HTTPSSource)source).RequestHeaders = dto.RequestHeaders;
-                    }
-
-                    if (auth.Is<TokenAuthentication>())
-                    {
-                        ((HTTPSSource)source).AuthenticationHeaderName = dto.TokenAuthHeader;
-                        ((HTTPSSource)source).AuthenticationTokenValue = _encryptService.EncryptString(dto.TokenAuthValue, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)source).IVKey).Item1;
-                    }
-
-                    if (auth.Is<OAuthAuthentication>())
-                    {
-                        ((HTTPSSource)source).ClientId = dto.ClientId;
-                        ((HTTPSSource)source).ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)source).IVKey).Item1;
-                        ((HTTPSSource)source).TokenUrl = dto.TokenUrl;
-                        ((HTTPSSource)source).TokenExp = dto.TokenExp;
-                        ((HTTPSSource)source).Scope = dto.Scope;
-                    }
-                    break;
-                case "GOOGLEAPI":
-                    source = new GoogleApiSource();
-                    ((GoogleApiSource)source).IVKey = _encryptService.GenerateNewIV();
-
-                    //Process only if headers exist
-                    if (dto.RequestHeaders.Any())
-                    {
-                        ((GoogleApiSource)source).RequestHeaders = dto.RequestHeaders;
-                    }
-
-                    if (auth.Is<TokenAuthentication>())
-                    {
-                        ((GoogleApiSource)source).AuthenticationHeaderName = dto.TokenAuthHeader;
-                        ((GoogleApiSource)source).AuthenticationTokenValue = _encryptService.EncryptString(dto.TokenAuthValue, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)source).IVKey).Item1;
-                    }
-
-                    if (auth.Is<OAuthAuthentication>())
-                    {
-                        ((GoogleApiSource)source).ClientId = dto.ClientId;
-                        ((GoogleApiSource)source).ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)source).IVKey).Item1;
-                        ((GoogleApiSource)source).TokenUrl = dto.TokenUrl;
-                        ((GoogleApiSource)source).TokenExp = dto.TokenExp;
-                        ((GoogleApiSource)source).Scope = dto.Scope;
-                    }
-                    break;
-                default:
-                    throw new NotImplementedException("SourceType is not configured for save");
-            }
-
-            source.Name = dto.Name;
-            source.Description = dto.Description;
-            source.SourceAuthType = auth;
-            source.IsUserPassRequired = dto.IsUserPassRequired;
-            source.BaseUri = dto.BaseUri;
-            source.PortNumber = dto.PortNumber;
-
-            _datasetContext.Add(source);
-
-            if (source.Is<HTTPSSource>() && auth.Is<OAuthAuthentication>())
-            {
-                CreateClaims(dto, (HTTPSSource)source);
-            }
-
-            return source;
-        }
-
-        private void CreateClaims(DataSourceDto dto, HTTPSSource source)
-        {
-            List<OAuthClaim> claimsList = new List<OAuthClaim>();
-            source.Claims = claimsList;
-            OAuthClaim claim;
-
-            claim = new OAuthClaim() { DataSourceId = source, Type = GlobalEnums.OAuthClaims.iss, Value = dto.ClientId };
-            _datasetContext.Add(claim);
-            claimsList.Add(claim);
-
-            claim = new OAuthClaim() { DataSourceId = source, Type = GlobalEnums.OAuthClaims.scope, Value = dto.Scope };
-            _datasetContext.Add(claim);
-            claimsList.Add(claim);
-
-            claim = new OAuthClaim() { DataSourceId = source, Type = GlobalEnums.OAuthClaims.aud, Value = dto.TokenUrl };
-            _datasetContext.Add(claim);
-            claimsList.Add(claim);
-
-            claim = new OAuthClaim() { DataSourceId = source, Type = GlobalEnums.OAuthClaims.exp, Value = DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromMinutes(dto.TokenExp)).TotalSeconds.ToString() };
-            _datasetContext.Add(claim);
-            claimsList.Add(claim);
         }
 
         public void UpdateFields(int configId, int schemaId, List<SchemaRow> schemaRows)
@@ -580,6 +386,71 @@ namespace Sentry.data.Core
             MapToDto(dsrc, dto);
             return dto;
         }
+
+        public UserSecurity GetUserSecurityForDataSource(int id)
+        {
+            DataSource ds = _datasetContext.DataSources.Where(x => x.Id == id).FetchSecurityTree(_datasetContext).FirstOrDefault();
+
+            return _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+        }
+
+        public AccessRequest GetDataSourceAccessRequest(int dataSourceId)
+        {
+            DataSource ds = _datasetContext.GetById<DataSource>(dataSourceId);
+
+            AccessRequest ar = new AccessRequest()
+            {
+                Permissions = _datasetContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATASOURCE).ToList(),
+                ApproverList = new List<KeyValuePair<string, string>>(),
+                SecurableObjectId = ds.Id,
+                SecurableObjectName = ds.Name
+            };
+
+            IApplicationUser primaryUser = _userService.GetByAssociateId(ds.PrimaryOwnerId);
+            ar.ApproverList.Add(new KeyValuePair<string, string>(ds.PrimaryOwnerId, primaryUser.DisplayName + " (Owner)"));
+
+            if (!string.IsNullOrWhiteSpace(ds.PrimaryContactId))
+            {
+                IApplicationUser secondaryUser = _userService.GetByAssociateId(ds.PrimaryContactId);
+                ar.ApproverList.Add(new KeyValuePair<string, string>(ds.PrimaryContactId, secondaryUser.DisplayName + " (Contact)"));
+            }
+
+            return ar;
+        }
+
+        public string RequestAccessToDataSource(AccessRequest request)
+        {
+
+            DataSource ds = _datasetContext.GetById<DataSource>(request.SecurableObjectId);
+            if (ds != null)
+            {
+                IApplicationUser user = _userService.GetCurrentUser();
+                request.SecurableObjectName = ds.Name;
+                request.SecurityId = ds.Security.SecurityId;
+                request.RequestorsId = user.AssociateId;
+                request.RequestorsName = user.DisplayName;
+                request.IsProd = bool.Parse(Configuration.Config.GetHostSetting("RequireApprovalHPSMTickets"));
+                request.RequestedDate = DateTime.Now;
+                request.ApproverId = request.SelectedApprover;
+                request.Permissions = _datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
+                                                                                                                x.SecurableObject == GlobalConstants.SecurableEntityName.DATASOURCE).ToList();
+
+                
+                //Format the business reason here.
+                StringBuilder sb = new StringBuilder();
+                sb.Append($"Please grant the Ad Group {request.AdGroupName} the following permissions to the \"{request.SecurableObjectName}\" data source within Data.sentry.com.{ Environment.NewLine}");
+                request.Permissions.ForEach(x => sb.Append($"{x.PermissionName} - {x.PermissionDescription} { Environment.NewLine}"));
+                sb.Append($"Business Reason: {request.BusinessReason}{ Environment.NewLine}");
+                sb.Append($"Requestor: {request.RequestorsId} - {request.RequestorsName}");
+
+                request.BusinessReason = sb.ToString();
+
+                return _securityService.RequestPermission(request);
+            }
+
+            return string.Empty;
+        }
+
         #region PrivateMethods
         private void MapToDto(DataElement de, SchemaDTO dto)
         {
@@ -592,8 +463,12 @@ namespace Sentry.data.Core
             dto.HiveStatus = de.HiveTableStatus;
             dto.HiveLocation = de.HiveLocation;
         }
+
         private void MapToDto(DataSource dsrc, DataSourceDto dto)
         {
+            IApplicationUser primaryOwner = _userService.GetByAssociateId(dsrc.PrimaryOwnerId);
+            IApplicationUser primaryContact = _userService.GetByAssociateId(dsrc.PrimaryContactId);
+
             dto.OriginatingId = dsrc.Id;
             dto.Name = dsrc.Name;
             dto.Description = dsrc.Description;
@@ -603,6 +478,16 @@ namespace Sentry.data.Core
             dto.IsUserPassRequired = dsrc.IsUserPassRequired;
             dto.PortNumber = dsrc.PortNumber;
             dto.BaseUri = dsrc.BaseUri;
+
+            //Security Properites
+            dto.IsSecured = dsrc.IsSecured;
+            dto.PrimaryContactId = dsrc.PrimaryContactId;
+            dto.PrimaryContactName = (primaryContact != null && primaryContact.AssociateId != "000000" ? primaryContact.DisplayName : "Not Available");
+            dto.PrimaryContactEmail = (primaryContact != null && primaryContact.AssociateId != "000000" ? primaryContact.EmailAddress : "");
+            dto.PrimaryOwnerId = dsrc.PrimaryOwnerId;
+            dto.PrimaryOwnerName = (primaryOwner != null && primaryOwner.AssociateId != "000000" ? primaryOwner.DisplayName : "Not Available");
+            dto.Security = _securityService.GetUserSecurity(dsrc, _userService.GetCurrentUser());
+            dto.MailToLink = "mailto:" + dto.PrimaryContactEmail + "?Subject=Data%20Source%20Inquiry%20-%20" + dsrc.Name;
 
             MapDataSourceSpecificToDto(dsrc, dto);
         }
@@ -672,6 +557,239 @@ namespace Sentry.data.Core
                 }
             }
             return dtoList;
+        }
+
+
+        private void UpdateDataSource(DataSourceDto dto, DataSource dsrc)
+        {
+            MapDataSource(dto, dsrc);
+        }
+
+        private void MapDataSource(DataSourceDto dto, DataSource dsrc)
+        {
+            dsrc.Name = dto.Name;
+            dsrc.Description = dto.Description;
+            dsrc.SourceType = dto.SourceType;
+            dsrc.SourceAuthType = _datasetContext.GetById<AuthenticationType>(int.Parse(dto.AuthID));
+            dsrc.IsUserPassRequired = dto.IsUserPassRequired;
+            dsrc.PortNumber = dto.PortNumber;
+            dsrc.BaseUri = dto.BaseUri;
+
+            MapDataSourceSpecific(dto, dsrc);
+
+            MapDataSourceSecurity(dto, dsrc);
+
+        }
+
+        private void MapDataSourceSecurity(DataSourceDto dto, DataSource dsrc)
+        {
+            dsrc.PrimaryOwnerId = dto.PrimaryOwnerId;
+            dsrc.PrimaryContactId = dto.PrimaryContactId;
+
+            if (dsrc.Security == null)
+            {
+                dsrc.Security = new Security(GlobalConstants.SecurableEntityName.DATASET)
+                {
+                    CreatedById = _userService.GetCurrentUser().AssociateId
+                };
+            }
+            else
+            {
+                if (!dsrc.IsSecured && dto.IsSecured)
+                {
+                    dsrc.Security.EnabledDate = DateTime.Now;
+                    dsrc.Security.UpdatedById = _userService.GetCurrentUser().AssociateId;
+                    dsrc.Security.RemovedDate = null;
+                }
+                else if (dsrc.IsSecured && !dto.IsSecured)
+                {
+                    dsrc.Security.RemovedDate = DateTime.Now;
+                    dsrc.Security.UpdatedById = _userService.GetCurrentUser().AssociateId;
+                }
+
+                dsrc.IsSecured = dto.IsSecured;
+            }
+        }
+
+        private void MapDataSourceSpecific(DataSourceDto dto, DataSource dsrc)
+        {
+            if (dsrc.Is<HTTPSSource>())
+            {
+                ((HTTPSSource)dsrc).ClientId = dto.ClientId;
+                ((HTTPSSource)dsrc).TokenUrl = dto.TokenUrl;
+                ((HTTPSSource)dsrc).TokenExp = dto.TokenExp;
+                ((HTTPSSource)dsrc).AuthenticationHeaderName = dto.TokenAuthHeader;
+                ((HTTPSSource)dsrc).RequestHeaders = (dto.RequestHeaders.Any()) ? dto.RequestHeaders : null;
+
+                UpdateClaims((HTTPSSource)dsrc, dto);
+            }
+
+            // only update if new value is supplied
+            if (dto.TokenAuthValue != null)
+            {
+                ((HTTPSSource)dsrc).AuthenticationTokenValue = _encryptService.EncryptString(dto.TokenAuthValue, Configuration.Config.GetHostSetting("EncryptionServiceKey"), dto.IVKey).Item1;
+            }
+
+            // only update if new value is supplied
+            if (dto.ClientPrivateId != null)
+            {
+                ((HTTPSSource)dsrc).ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), dto.IVKey).Item1;
+            }
+
+        }
+
+        private void UpdateClaims(HTTPSSource dsrc, DataSourceDto dto)
+        {
+            //foreach claim type in dsrc
+            // does claim type exist in dto?
+            //if yes, update if value is different
+            //if no, create OAuthClaim with dto value
+
+            foreach (OAuthClaim item in dsrc.Claims)
+            {
+                switch (item.Type)
+                {
+                    case GlobalEnums.OAuthClaims.iss:
+                        if (dto.ClientId != null && dto.ClientId != item.Value) { item.Value = dto.ClientId; }
+                        break;
+                    case GlobalEnums.OAuthClaims.aud:
+                        if (dto.TokenUrl != null && dto.TokenUrl != item.Value) { item.Value = dto.TokenUrl; }
+                        break;
+                    case GlobalEnums.OAuthClaims.exp:
+                        if (dto.TokenExp != 0 && dto.TokenExp.ToString() != item.Value) { item.Value = dto.TokenExp.ToString(); }
+                        break;
+                    case GlobalEnums.OAuthClaims.scope:
+                        if (dto.Scope != null && dto.Scope != item.Value) { item.Value = dto.Scope; }
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        private DataSource CreateDataSource(DataSourceDto dto)
+        {
+            DataSource source = null;
+
+            AuthenticationType auth = _datasetContext.GetById<AuthenticationType>(Convert.ToInt32(dto.AuthID));
+
+            switch (dto.SourceType)
+            {
+                case "DFSBasic":
+                    source = new DfsBasic();
+                    break;
+                case "DFSCustom":
+                    source = new DfsCustom();
+                    break;
+                case "FTP":
+                    source = new FtpSource();
+                    break;
+                case "SFTP":
+                    source = new SFtpSource();
+                    break;
+                case "HTTPS":
+                    source = new HTTPSSource();
+                    ((HTTPSSource)source).IVKey = _encryptService.GenerateNewIV();
+
+                    //Process only if headers exist
+                    if (dto.RequestHeaders.Any())
+                    {
+                        ((HTTPSSource)source).RequestHeaders = dto.RequestHeaders;
+                    }
+
+                    if (auth.Is<TokenAuthentication>())
+                    {
+                        ((HTTPSSource)source).AuthenticationHeaderName = dto.TokenAuthHeader;
+                        ((HTTPSSource)source).AuthenticationTokenValue = _encryptService.EncryptString(dto.TokenAuthValue, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)source).IVKey).Item1;
+                    }
+
+                    if (auth.Is<OAuthAuthentication>())
+                    {
+                        ((HTTPSSource)source).ClientId = dto.ClientId;
+                        ((HTTPSSource)source).ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)source).IVKey).Item1;
+                        ((HTTPSSource)source).TokenUrl = dto.TokenUrl;
+                        ((HTTPSSource)source).TokenExp = dto.TokenExp;
+                        ((HTTPSSource)source).Scope = dto.Scope;
+                    }
+                    break;
+                case "GOOGLEAPI":
+                    source = new GoogleApiSource();
+                    ((GoogleApiSource)source).IVKey = _encryptService.GenerateNewIV();
+
+                    //Process only if headers exist
+                    if (dto.RequestHeaders.Any())
+                    {
+                        ((GoogleApiSource)source).RequestHeaders = dto.RequestHeaders;
+                    }
+
+                    if (auth.Is<TokenAuthentication>())
+                    {
+                        ((GoogleApiSource)source).AuthenticationHeaderName = dto.TokenAuthHeader;
+                        ((GoogleApiSource)source).AuthenticationTokenValue = _encryptService.EncryptString(dto.TokenAuthValue, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)source).IVKey).Item1;
+                    }
+
+                    if (auth.Is<OAuthAuthentication>())
+                    {
+                        ((GoogleApiSource)source).ClientId = dto.ClientId;
+                        ((GoogleApiSource)source).ClientPrivateId = _encryptService.EncryptString(dto.ClientPrivateId, Configuration.Config.GetHostSetting("EncryptionServiceKey"), ((HTTPSSource)source).IVKey).Item1;
+                        ((GoogleApiSource)source).TokenUrl = dto.TokenUrl;
+                        ((GoogleApiSource)source).TokenExp = dto.TokenExp;
+                        ((GoogleApiSource)source).Scope = dto.Scope;
+                    }
+                    break;
+                default:
+                    throw new NotImplementedException("SourceType is not configured for save");
+            }
+
+            source.Name = dto.Name;
+            source.Description = dto.Description;
+            source.SourceAuthType = auth;
+            source.IsUserPassRequired = dto.IsUserPassRequired;
+            source.BaseUri = dto.BaseUri;
+            source.PortNumber = dto.PortNumber;
+            source.IsSecured = dto.IsSecured;
+            source.PrimaryOwnerId = dto.PrimaryOwnerId;
+            source.PrimaryContactId = dto.PrimaryContactId;
+
+            _datasetContext.Add(source);
+
+            if (source.Is<HTTPSSource>() && auth.Is<OAuthAuthentication>())
+            {
+                CreateClaims(dto, (HTTPSSource)source);
+            }
+
+            if (source.IsSecured)
+            {
+                source.Security = new Security(GlobalConstants.SecurableEntityName.DATASOURCE)
+                {
+                    CreatedById = _userService.GetCurrentUser().AssociateId
+                };
+            }
+
+            return source;
+        }
+
+        private void CreateClaims(DataSourceDto dto, HTTPSSource source)
+        {
+            List<OAuthClaim> claimsList = new List<OAuthClaim>();
+            source.Claims = claimsList;
+            OAuthClaim claim;
+
+            claim = new OAuthClaim() { DataSourceId = source, Type = GlobalEnums.OAuthClaims.iss, Value = dto.ClientId };
+            _datasetContext.Add(claim);
+            claimsList.Add(claim);
+
+            claim = new OAuthClaim() { DataSourceId = source, Type = GlobalEnums.OAuthClaims.scope, Value = dto.Scope };
+            _datasetContext.Add(claim);
+            claimsList.Add(claim);
+
+            claim = new OAuthClaim() { DataSourceId = source, Type = GlobalEnums.OAuthClaims.aud, Value = dto.TokenUrl };
+            _datasetContext.Add(claim);
+            claimsList.Add(claim);
+
+            claim = new OAuthClaim() { DataSourceId = source, Type = GlobalEnums.OAuthClaims.exp, Value = DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromMinutes(dto.TokenExp)).TotalSeconds.ToString() };
+            _datasetContext.Add(claim);
+            claimsList.Add(claim);
         }
         #endregion
     }

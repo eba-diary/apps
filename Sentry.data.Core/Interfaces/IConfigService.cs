@@ -15,5 +15,8 @@ namespace Sentry.data.Core
         bool CreateAndSaveNewDataSource(DataSourceDto dto);
         bool UpdateAndSaveDataSource(DataSourceDto dto);
         DataSourceDto GetDataSourceDto(int Id);
+        UserSecurity GetUserSecurityForDataSource(int id);
+        AccessRequest GetDataSourceAccessRequest(int dataSourceId);
+        string RequestAccessToDataSource(AccessRequest request);
     }
 }

@@ -80,7 +80,12 @@ namespace Sentry.data.Web
                 TokenUrl = model.TokenUrl,
                 TokenExp = model.TokenExp,
                 Scope = model.Scope,
-                RequestHeaders = model.Headers
+                RequestHeaders = model.Headers,
+                IsSecured = model.IsSecured,
+                PrimaryOwnerId = model.PrimaryOwnerId,
+                PrimaryOwnerName = model.PrimaryOwnerName,
+                PrimaryContactId= model.PrimaryContactId,
+                PrimaryContactName = model.PrimaryContactName
             };
         }
     }

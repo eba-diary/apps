@@ -11,6 +11,7 @@ namespace Sentry.data.Web
         public bool CanQueryDataset { get; set; }
         public bool CanConnectToDataset { get; set; }
         public bool CanUploadToDataset { get; set; }
+        public bool CanUseDataSource { get; set; }
 
 
         public bool CanEditDataset { get; set; }
@@ -19,5 +20,8 @@ namespace Sentry.data.Web
 
         public bool CanEditReport { get; set; }
         public bool CanCreateReport { get; set; }
+
+        public bool CanEditDataSource { get; set; }
+        public bool CanCreateDataSource { get; set; }
     }
 }

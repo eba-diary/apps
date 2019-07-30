@@ -31,6 +31,8 @@
     @Html.ValidationSummary(false, "", new { @class = "text-danger" })
 
     @Html.HiddenFor(model => model.ReturnUrl)
+    @Html.HiddenFor(model => model.PrimaryOwnerId)
+    @Html.HiddenFor(model => model.PrimaryContactId)
 
     <h1>Create Data Source</h1>
     <hr />
@@ -54,6 +56,29 @@
             </div>
 
             <div class="form-group">
+                @Html.LabelFor(model => model.PrimaryOwnerName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.PrimaryOwnerName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
+                    @Html.ValidationMessageFor(model => model.PrimaryOwnerName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.PrimaryContactName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.PrimaryContactName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
+                    @Html.ValidationMessageFor(model => model.PrimaryContactName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.IsSecured, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.CheckBoxFor(m => m.IsSecured)
+                </div>
+            </div>
+
+            <div class="form-group">
                 @Html.LabelFor((model) => model.SourceType, new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
                     @Html.DropDownListFor((model) => model.SourceType, Model.SourceTypesDropdown, new { @class = "form-control edit-dataset-row" })
@@ -73,7 +98,7 @@
             <div class="form-group">
                 @Html.LabelFor(model => model.BaseUri, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.TextBoxFor(model => model.BaseUri, new { @value = "", @class = "form-control edit-dataset-row "})
+                    @Html.TextBoxFor(model => model.BaseUri, new { @value = "", @class = "form-control edit-dataset-row " })
                     @Html.ValidationMessageFor(model => model.BaseUri, "", new { @class = "text-danger" })
                 </div>
             </div>
@@ -127,7 +152,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div id="OAuthPanel">
                 <div class="form-group">
                     @Html.LabelFor(m => m.ClientId, new { @class = "control-label col-md-2" })
@@ -186,20 +211,20 @@
                     </div>
                 </div>
             </div>
-            
+
             <div id="requestHeaderPanel">
                 <div class="form-group">
-                        @Html.LabelFor((model) => model.Headers, htmlAttributes: new { @class = "control-label col-md-2"})
+                    @Html.LabelFor((model) => model.Headers, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div id="requestHeader" class="col-md-10">
                         <div class="form-group col-md-10 headerEntry">
                             <a class="addHeader" style="display: inline-block; margin-left: 10px;"><span class="glyphicon glyphicon-plus"></span> Add Header</a>
                         </div>
-                            <div class="col-md-5 headerEntryLabel">
-                                @Html.Label("Header Name", new { @value = "", @class = "col-md-5 headerEntryLabel" })
-                            </div>
-                            <div class="col-md-5 headerEntryLabel">
-                                @Html.Label("Header Value", new { @value = "", @class = "col-md-5 headerEntryLabel" })
-                            </div>
+                        <div class="col-md-5 headerEntryLabel">
+                            @Html.Label("Header Name", new { @value = "", @class = "col-md-5 headerEntryLabel" })
+                        </div>
+                        <div class="col-md-5 headerEntryLabel">
+                            @Html.Label("Header Value", new { @value = "", @class = "col-md-5 headerEntryLabel" })
+                        </div>
                         @*This approach is described at the site http://ivanz.com/2011/06/16/editing-variable-length-reorderable-collections-in-asp-net-mvc-part-1/*@
                         @foreach (RequestHeader header in Model.Headers)
                         {
@@ -207,7 +232,7 @@
                         }
                     </div>
                 </div>
-            </div>            
+            </div>
         </div>
     </div>
 
@@ -223,11 +248,13 @@
 }
 
 <style>
-    .credentialWarning{
+    .credentialWarning {
     }
-    .addHeader{
-        padding-top: 6px; 
+
+    .addHeader {
+        padding-top: 6px;
     }
+
     .headerEntry, .headerEntryLabel {
         padding-left: 0px;
     }
@@ -238,6 +265,8 @@
 
     <script>
         $(document).ready(function () {
+
+            data.DataSource.FormInit('@(Model.HrempServiceUrl)' , '@(Model.HrempServiceEnv)');
 
             function setSourceTypeDefaults(sourceType) {
                 if (sourceType == "SFTP" || sourceType == "FTP" || sourceType == "HTTPS" || sourceType == "GOOGLEAPI") {

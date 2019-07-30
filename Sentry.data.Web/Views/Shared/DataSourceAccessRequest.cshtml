@@ -1,0 +1,37 @@
+﻿@model Sentry.data.Web.DataSourceAccessRequestModel
+@{
+    ViewBag.Title = "Request Data Source Access";
+}
+
+@using (Html.BeginForm("SubmitAccessRequest", "Config", FormMethod.Post, new { @id = "AccessRequestForm" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="accessRequestModelText" style="width:auto">
+        <p>Data Source permission requests will utilize HPSM for approval.  Due to this process, a short delay in permission implementation can be expected.</p>
+    </div>
+    <br />
+
+    <div class="accessRequestErrorBox" id="AccessRequesrErrorBox" style="display:none">
+
+    </div>
+
+    <div class="form-horizontal">
+        @Html.HiddenFor(model => model.SecurableObjectId)
+        <div class="form-group">
+            <label class="col-md-2 control-label">Dataset</label>
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.SecurableObjectName, new { @disabled = "disabled", @class = "form-control edit-dataset-row" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(m => m.AdGroupName, new { @class = "col-md-2 control-label" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.AdGroupName, new { @class = "form-control edit-dataset-row" })
+            </div>
+        </div>
+
+
+        @Html.Partial("_AccessRequest", Model)
+    </div>
+}
