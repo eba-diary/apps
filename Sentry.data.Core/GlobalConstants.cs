@@ -91,8 +91,7 @@
             public const string HTTPS_SOURCE = "HTTPS";
             public const string JAVA_APP_SOURCE = "JavaApp";
             public const string GOOGLE_API_SOURCE = "GOOGLEAPI";
-
-
+            public const string DEFAULT_HSZ_DROP_LOCATION = "DFSBasicHsz";
         }
 
         public static class DataFeedType
@@ -126,6 +125,7 @@
         public static class SecurableEntityName
         {
             public const string DATASET = "Dataset";
+            public const string DATASOURCE = "DataSource";
         }
 
         public static class PermissionCodes
@@ -135,6 +135,7 @@
             public const string CAN_QUERY_DATASET = "CanQueryDataset";
             public const string CAN_CONNECT_TO_DATASET = "CanConnectToDataset";
             public const string CAN_UPLOAD_TO_DATASET = "CanUploadToDataset";
+            public const string CAN_USE_DATA_SOURCE = "CanUseDataSource";
 
             public const string USE_APP = "UseApp";
 

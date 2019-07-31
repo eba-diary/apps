@@ -125,6 +125,8 @@ namespace Sentry.data.Web.Tests
             var mockUserService = MockRepository.GenerateStub<UserService>(mockDataAssetContext, mockExtendedUserInfoProvider, mockCurrentUserIdProvider);
             var mockSharedContextModel = MockRepository.GenerateStub<SharedContextModel>();
             var mockDatasetService = MockRepository.GenerateStub<IDatasetService>();
+            var mockObsidianService = MockRepository.GenerateStub<IObsidianService>();
+            var mockSecurityService = MockRepository.GenerateStub<ISecurityService>();
 
             mockSharedContextModel.CurrentUser = user;
 
@@ -152,7 +154,7 @@ namespace Sentry.data.Web.Tests
 
             mockUserService.Stub(x => x.GetCurrentUser()).Return(user != null ? user : MockUsers.App_DataMgmt_Admin_User());
 
-            var cc = new ConfigController(mockDatasetContext, mockS3Provider, mockUserService, mockSasProvider, mockAssociateService, mockConfigService, mockEvensService, mockDatasetService);
+            var cc = new ConfigController(mockDatasetContext, mockS3Provider, mockUserService, mockSasProvider, mockAssociateService, mockConfigService, mockEvensService, mockDatasetService, mockObsidianService, mockSecurityService);
             cc.SharedContext = mockSharedContextModel;
 
             return cc;

@@ -28,10 +28,13 @@ namespace Sentry.data.Web.Controllers
         private IAppCache _cache;
         public IEventService _eventService;
         public IDatasetService _DatasetService;
+        public IObsidianService _obsidianService;
+        public ISecurityService _securityService;
 
         public ConfigController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService,
             ISASService sasService, IAssociateInfoProvider associateInfoService, IConfigService configService,
-            IEventService eventService, IDatasetService datasetService)
+            IEventService eventService, IDatasetService datasetService, IObsidianService obsidianService,
+            ISecurityService securityService)
         {
             _cache = new CachingService();
             _datasetContext = dsCtxt;
@@ -42,6 +45,8 @@ namespace Sentry.data.Web.Controllers
             _configService = configService;
             _eventService = eventService;
             _DatasetService = datasetService;
+            _obsidianService = obsidianService;
+            _securityService = securityService;
         }
 
         [HttpGet]
@@ -335,6 +340,7 @@ namespace Sentry.data.Web.Controllers
 
             ViewBag.DatasetId = dfc.ParentDataset.DatasetId;
             CreateJobModel cjm = new CreateJobModel(dfc.ConfigId, dfc.ParentDataset.DatasetId);
+            cjm.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
 
             cjm = CreateDropDownSetup(cjm);
 
@@ -449,7 +455,11 @@ namespace Sentry.data.Web.Controllers
                 Disabled = true
             });
 
-            cjm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic").Where(x => x.Value != "S3Basic" && x.Value != "JavaApp").OrderBy(x => x.Value);
+            cjm.SourceTypesDropdown = temp.Where(x => 
+                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_DROP_LOCATION && 
+                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION && 
+                x.Value != GlobalConstants.DataSoureDiscriminator.JAVA_APP_SOURCE &&
+                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_HSZ_DROP_LOCATION).OrderBy(x => x.Value);
 
             List<SelectListItem> temp2 = new List<SelectListItem>();
 
@@ -497,6 +507,7 @@ namespace Sentry.data.Web.Controllers
             RetrieverJob retrieverJob = _datasetContext.GetById<RetrieverJob>(jobId);
 
             EditJobModel ejm = new EditJobModel(retrieverJob);
+            ejm.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
 
             ejm.SelectedDataSource = retrieverJob.DataSource.Id;
             ejm.SelectedSourceType = retrieverJob.DataSource.SourceType;
@@ -771,7 +782,11 @@ namespace Sentry.data.Web.Controllers
                 Disabled = true
             });
 
-            csm.SourceTypesDropdown = temp.Where(x => x.Value != "DFSBasic" && x.Value != "S3Basic").OrderBy(x => x.Value);
+            csm.SourceTypesDropdown = temp.Where(x => 
+                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_DROP_LOCATION && 
+                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION && 
+                x.Value != GlobalConstants.DataSoureDiscriminator.JAVA_APP_SOURCE &&
+                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_HSZ_DROP_LOCATION).OrderBy(x => x.Value);
 
             if (csm.SourceType == null)
             {
@@ -870,14 +885,20 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditSource(int sourceID)
         {
-            DataSourceDto dto = _configService.GetDataSourceDto(sourceID);
-            DataSourceModel model = new DataSourceModel(dto);
+            UserSecurity us = _configService.GetUserSecurityForDataSource(sourceID);
+            if (us != null && us.CanEditDataSource)
+            {
+                DataSourceDto dto = _configService.GetDataSourceDto(sourceID);
+                DataSourceModel model = new DataSourceModel(dto);
 
-            EditSourceDropDown(model);
+                EditSourceDropDown(model);
 
-            _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Data Source Edit Page");
+                _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Data Source Edit Page");
 
-            return View("EditDataSource", model);            
+                return View("EditDataSource", model);
+            }
+
+            return View("Forbidden");                        
         }
 
 
@@ -1156,45 +1177,49 @@ namespace Sentry.data.Web.Controllers
 
         private List<SelectListItem> DataSourcesByType(string sourceType, int? selectedId)
         {
-            List<SelectListItem> output;
+            List<SelectListItem> output = new List<SelectListItem>();
 
+            if(selectedId != null || selectedId != 0)
+            {
+                output.Add(new SelectListItem() { Text = "Pick a Data Source", Value = "0" });
+            }
 
             switch (sourceType)
             {
                 case "FTP":
                     List<DataSource> fTpList = _datasetContext.DataSources.Where(x => x is FtpSource).ToList();
-                    output = fTpList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
+                    output.AddRange(fTpList.Select(v
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
                     break;
                 case "SFTP":
                     List<DataSource> sfTpList = _datasetContext.DataSources.Where(x => x is SFtpSource).ToList();
-                    output = sfTpList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
+                    output.AddRange(sfTpList.Select(v
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
                     break;
                 case "DFSBasic":
                     List<DataSource> dfsBasicList = _datasetContext.DataSources.Where(x => x is DfsBasic).ToList();
-                    output = dfsBasicList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
+                    output.AddRange(dfsBasicList.Select(v
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
                     break;
                 case "DFSCustom":
                     List<DataSource> dfsCustomList = _datasetContext.DataSources.Where(x => x is DfsCustom).ToList();
-                    output = dfsCustomList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
+                    output.AddRange(dfsCustomList.Select(v
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
                     break;
                 case "S3Basic":
                     List<DataSource> s3BasicList = _datasetContext.DataSources.Where(x => x is S3Basic).ToList();
-                    output = s3BasicList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
+                    output.AddRange(s3BasicList.Select(v
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
                     break;
                 case "HTTPS":
                     List<DataSource> HttpsList = _datasetContext.DataSources.Where(x => x is HTTPSSource).ToList();
-                    output = HttpsList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
+                    output.AddRange(HttpsList.Select(v
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
                     break;
                 case "GOOGLEAPI":
                     List<DataSource> GApiList = _datasetContext.DataSources.Where(x => x is GoogleApiSource).ToList();
-                    output = GApiList.Select(v
-                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList();
+                    output.AddRange(GApiList.Select(v
+                         => new SelectListItem { Text = v.Name, Value = v.Id.ToString(), Selected = selectedId == v.Id }).ToList());
                     break;
                 default:
                     throw new NotImplementedException();
@@ -1512,6 +1537,39 @@ namespace Sentry.data.Web.Controllers
             }
 
             return Json(result, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public JsonResult SourceDetails (int sourceId)
+        {            
+            DataSourceDto dto = _configService.GetDataSourceDto(sourceId);
+            DataSourceModel model = new DataSourceModel(dto);
+
+            return Json(model, JsonRequestBehavior.AllowGet);
+        }
+
+        [HttpGet]
+        public ActionResult DataSourceAccessRequest(int dataSourceId)
+        {
+            DataSourceAccessRequestModel model = _configService.GetDataSourceAccessRequest(dataSourceId).ToDataSourceModel();
+            model.AllAdGroups = _obsidianService.GetAdGroups("").Select(x => new SelectListItem() { Text = x, Value = x }).ToList();
+            return PartialView("DataSourceAccessRequest", model);
+        }
+
+        [HttpPost]
+        public ActionResult SubmitAccessRequest(DataSourceAccessRequestModel model)
+        {
+            AccessRequest ar = model.ToCore();
+            string ticketId = _configService.RequestAccessToDataSource(ar);
+
+            if (string.IsNullOrEmpty(ticketId))
+            {
+                return PartialView("_Success", new SuccessModel("There was an error processing your request.", "", false));
+            }
+            else
+            {
+                return PartialView("_Success", new SuccessModel("Data Source access was successfully requested.", "HPSM Change Id: " + ticketId, true));
+            }
         }
     }
 }

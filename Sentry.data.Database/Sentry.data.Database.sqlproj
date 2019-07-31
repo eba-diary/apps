@@ -213,6 +213,7 @@
     <Build Include="Tables\DatasetFileParquet.sql" />
     <Build Include="Tables\SparkConverter.sql" />
     <Build Include="Tables\RetrieverJobs\AuthenticationClaims.sql" />
+    <Build Include="Tables\DatasetFileReply.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

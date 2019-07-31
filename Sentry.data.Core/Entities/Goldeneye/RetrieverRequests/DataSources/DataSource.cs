@@ -11,7 +11,7 @@ namespace Sentry.data.Core
     /// 
 
     // TODO: Remove Interface
-    public abstract class DataSource : IDataSource
+    public abstract class DataSource : IDataSource, ISecurable
     {
         public virtual int Id { get; set; }
         public virtual string Name { get; set; }
@@ -46,6 +46,16 @@ namespace Sentry.data.Core
         public virtual DateTime Created { get; set; }
         public virtual DateTime Modified { get; set; }
         public virtual string Bucket { get; set; }
+
+        #region Security
+
+        public virtual bool IsSecured { get; set; }
+        public virtual Security Security { get; set; }
+        public virtual string PrimaryOwnerId { get; set; }
+        public virtual string PrimaryContactId { get; set; }
+
+        #endregion
+
 
         public abstract Uri CalcRelativeUri(RetrieverJob Job);
         public abstract string GetDropPrefix(RetrieverJob Job);
