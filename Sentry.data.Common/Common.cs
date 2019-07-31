@@ -338,7 +338,7 @@ namespace Sentry.data.Common
                             else
                             {
                                 throw new ArgumentException("Original Datafile was not found");
-                            };
+                            }
 
                             //Write dataset to database
                             _dscontext.Merge(df_Orig);
