@@ -54,8 +54,8 @@ data.ManageConfigs = {
                         { data: "TargetFileName", className: "targetFileName" },
                         { data: "IsRegexSearch", className: "isRegexSearch", render: function (data, type, row) { return (data == true) ? '<span class="glyphicon glyphicon-ok"> </span>' : '<span class="glyphicon glyphicon-remove"></span>'; } },
                         { data: "OverwriteDatasetFile", type: "date", className: "overwriteDatsetFile", render: function (data, type, row) { return (data == true) ? '<span class="glyphicon glyphicon-ok"> </span>' : '<span class="glyphicon glyphicon-remove"></span>'; } },
-                        { data: "VersionsToKeep", type: "date", className: "versionToKeep", },
-                        { data: "FileTypeId", type: "date", className: "fileTypeId", }
+                        { data: "VersionsToKeep", type: "date", className: "versionToKeep" },
+                        { data: "FileTypeId", type: "date", className: "fileTypeId" }
             ],
             select: {
                 style: "os",

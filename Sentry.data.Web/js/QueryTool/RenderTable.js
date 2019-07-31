@@ -60,7 +60,7 @@ function renderTable(input, queryTool, push) {
                 table = $('#datasetRowTable').DataTable({
                     "scrollX": true,
                     data: parsedRows,
-                    columns: parsedColumns,
+                    columns: parsedColumns
                 });
             } else {
                 table = $('#datasetRowTable').DataTable({ "scrollX": true }).rows.add(parsedRows).draw();
@@ -70,7 +70,7 @@ function renderTable(input, queryTool, push) {
             table = $('#datasetRowTable').DataTable({
                 "scrollX": true,
                 data: parsedRows,
-                columns: parsedColumns,
+                columns: parsedColumns
             });
         }
 
