@@ -256,11 +256,6 @@ namespace Sentry.data.Common
                 IRequestContext _requestContext = _container.GetInstance<IRequestContext>();
                 IMessagePublisher _publisher = _container.GetInstance<IMessagePublisher>();
 
-                if (response.RetrieverJobId > 0)
-                {
-                    job = _requestContext.RetrieverJob.Where(w => w.Id == response.RetrieverJobId).FirstOrDefault();
-                }
-
                 DateTime startTime = DateTime.Now;
 
                 if (isBundled)
@@ -377,6 +372,15 @@ namespace Sentry.data.Common
                 }
                 else if (!isBundled)
                 {
+                    if (response.RetrieverJobId > 0)
+                    {
+                        job = _requestContext.RetrieverJob.Where(w => w.Id == response.RetrieverJobId).FirstOrDefault();
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Job ID is invalid");
+                    }
+
                     Logger.Debug("ProcessFile: Detected Dataset file");
 
                     latestSchemaRevision = job.DatasetConfig.GetLatestSchemaRevision();
