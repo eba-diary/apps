@@ -25,8 +25,6 @@ namespace Sentry.data.Goldeneye
         private FileSystemWatcher watcher;
         private List<FileProcess> allFiles = new List<FileProcess>();
         private IContainer container;
-        private IDatasetContext _datasetContext;
-        private int FileCount { get; set; }
         private DateTime FileCounterStart { get; set; }
         private int DatasetFileConfigId { get; set; }
         private int RetrieverJobId { get; set; }
@@ -85,12 +83,8 @@ namespace Sentry.data.Goldeneye
                     {
                         using (container = Bootstrapper.Container.GetNestedContainer())
                         {
-                            _datasetContext = container.GetInstance<IDatasetContext>();
-                            //SubmitLoaderRequest(file);
-
                             //Create a fire-forget Hangfire job to decompress the file and drop extracted file into drop location
                             BackgroundJob.Enqueue<RetrieverJobService>(RetrieverJobService => RetrieverJobService.RunRetrieverJob(RetrieverJobId, JobCancellationToken.Null, Path.GetFileName(file.fileName)));
-                            //RecurringJob.AddOrUpdate<RetrieverJobService>($"RetrieverJob_{RetrieverJobId}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(RetrieverJobId), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
 
                             file.started = true;
                         }
@@ -262,27 +256,6 @@ namespace Sentry.data.Goldeneye
             Logger.Error($"Watcher Error - Cancelling watch job (JobId:{RetrieverJobId})", e.GetException());
 
             _internalTokenSource.Cancel();
-        }
-
-        private Guid GenerateHash(string input)
-        {
-            string start = input + DateTime.Now.ToString();
-            Guid result;
-            using (MD5 md5 = MD5.Create())
-            {
-                byte[] hash = md5.ComputeHash(Encoding.Default.GetBytes(start));
-                result = new Guid(hash);
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Returns current processed file count
-        /// </summary>
-        /// <returns></returns>
-        public int GetCount()
-        {
-            return FileCount;
         }
 
         /// <summary>
