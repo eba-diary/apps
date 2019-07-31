@@ -256,11 +256,6 @@ namespace Sentry.data.Common
                 IRequestContext _requestContext = _container.GetInstance<IRequestContext>();
                 IMessagePublisher _publisher = _container.GetInstance<IMessagePublisher>();
 
-                if (response.RetrieverJobId > 0)
-                {
-                    job = _requestContext.RetrieverJob.Where(w => w.Id == response.RetrieverJobId).FirstOrDefault();
-                }
-
                 DateTime startTime = DateTime.Now;
 
                 if (isBundled)
@@ -331,7 +326,14 @@ namespace Sentry.data.Common
                         {
                             //Version the Old Parent DatasetFile
                             int df_newParentId = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.ConfigId, isBundled, null, latestSchemaRevision);
-                            df_Orig.ParentDatasetFileId = df_newParentId;
+                            if (df_Orig != null)
+                            {
+                                df_Orig.ParentDatasetFileId = df_newParentId;
+                            }
+                            else
+                            {
+                                throw new ArgumentException("Original Datafile was not found");
+                            }
 
                             //Write dataset to database
                             _dscontext.Merge(df_Orig);
@@ -342,9 +344,12 @@ namespace Sentry.data.Common
                         {
                             StringBuilder builder = new StringBuilder();
                             builder.Append("Failed to set ParentDatasetFile_ID on Original Parent in Dataset Management.");
-                            builder.Append($"DatasetFile_ID: {df_Orig.DatasetFileId}");
-                            builder.Append($"File_NME: {df_Orig.FileName}");
-                            builder.Append($"ParentDatasetFile_ID: {df_Orig.ParentDatasetFileId}");
+                            if (df_Orig != null)
+                            {
+                                builder.Append($"DatasetFile_ID: {df_Orig.DatasetFileId}");
+                                builder.Append($"File_NME: {df_Orig.FileName}");
+                                builder.Append($"ParentDatasetFile_ID: {df_Orig.ParentDatasetFileId}");
+                            }
 
                             Sentry.Common.Logging.Logger.Error(builder.ToString(), ex);
                         }
@@ -367,6 +372,15 @@ namespace Sentry.data.Common
                 }
                 else if (!isBundled)
                 {
+                    if (response.RetrieverJobId > 0)
+                    {
+                        job = _requestContext.RetrieverJob.Where(w => w.Id == response.RetrieverJobId).FirstOrDefault();
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Job ID is invalid");
+                    }
+
                     Logger.Debug("ProcessFile: Detected Dataset file");
 
                     latestSchemaRevision = job.DatasetConfig.GetLatestSchemaRevision();

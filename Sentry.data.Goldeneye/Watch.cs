@@ -25,8 +25,6 @@ namespace Sentry.data.Goldeneye
         private FileSystemWatcher watcher;
         private List<FileProcess> allFiles = new List<FileProcess>();
         private IContainer container;
-        private IDatasetContext _datasetContext;
-        private int FileCount { get; set; }
         private DateTime FileCounterStart { get; set; }
         private int DatasetFileConfigId { get; set; }
         private int RetrieverJobId { get; set; }
@@ -85,12 +83,8 @@ namespace Sentry.data.Goldeneye
                     {
                         using (container = Bootstrapper.Container.GetNestedContainer())
                         {
-                            _datasetContext = container.GetInstance<IDatasetContext>();
-                            //SubmitLoaderRequest(file);
-
                             //Create a fire-forget Hangfire job to decompress the file and drop extracted file into drop location
                             BackgroundJob.Enqueue<RetrieverJobService>(RetrieverJobService => RetrieverJobService.RunRetrieverJob(RetrieverJobId, JobCancellationToken.Null, Path.GetFileName(file.fileName)));
-                            //RecurringJob.AddOrUpdate<RetrieverJobService>($"RetrieverJob_{RetrieverJobId}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(RetrieverJobId), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
 
                             file.started = true;
                         }
@@ -136,85 +130,6 @@ namespace Sentry.data.Goldeneye
             }
 
             return false;
-        }
-
-        private void SubmitLoaderRequest(FileProcess file)
-        {
-            LoaderRequest loadReq = null;
-            try
-            {
-                var orginalPath = Path.GetFullPath(file.fileName).Replace(Path.GetFileName(file.fileName), "");
-                var origFileName = Path.GetFileName(file.fileName);
-                var processingFile = orginalPath + Configuration.Config.GetHostSetting("ProcessedFilePrefix") + origFileName;
-                var fileOwner = Utilities.GetFileOwner(new FileInfo(file.fileName));
-
-                //Rename file to indicate a request has been sent to Dataset Loader
-                File.Move(file.fileName, processingFile);
-
-                var hashInput = $"{Sentry.Configuration.Config.GetHostSetting("ServiceAccountID")}_{DateTime.Now.ToString("MM-dd-yyyyHH:mm:ss.fffffff")}_{file.fileName}";
-                //Create new loader request object and set file property
-                loadReq = new LoaderRequest(GenerateHash(hashInput));
-                loadReq.File = processingFile;
-                loadReq.IsBundled = false;
-                loadReq.RequestInitiatorId = fileOwner;
-
-                Logger.Debug($"Submitting Loader Request - File:{file.fileName} Guid:{loadReq.RequestGuid} HashInput:{hashInput}");
-
-                string jsonReq = JsonConvert.SerializeObject(loadReq, Formatting.Indented);
-
-                //Send request to DFS location loader service is watching for requests
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    StreamWriter writer = new StreamWriter(ms);
-
-                    writer.WriteLine(jsonReq);
-                    writer.Flush();
-
-                    //You have to rewind the MemoryStream before copying
-                    ms.Seek(0, SeekOrigin.Begin);
-
-                    using (FileStream fs = new FileStream($"{Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath")}{loadReq.RequestGuid}.json", FileMode.OpenOrCreate))
-                    {
-                        ms.CopyTo(fs);
-                        fs.Flush();
-                    }
-                }
-
-                //Add to file count
-                FileCount++;
-
-                //Create Bundle Success Event
-                Event e = new Event();
-                e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Created File").FirstOrDefault();
-                e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Started").FirstOrDefault();
-                e.TimeCreated = DateTime.Now;
-                e.TimeNotified = DateTime.Now;
-                e.IsProcessed = false;                
-                e.UserWhoStartedEvent = loadReq.RequestInitiatorId;
-                e.Dataset = loadReq.DatasetID;
-                e.DataConfig = loadReq.DatasetFileConfigId;
-                e.Reason = $"Successfully submitted request to Dataset Loader to upload file [<b>{origFileName}</b>]";
-                e.Parent_Event = loadReq.RequestGuid;
-                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error submitting loader request", ex);
-
-                //Create Bundle Failed Event
-                Event e = new Event();
-                e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Created File").FirstOrDefault();
-                e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Error").FirstOrDefault();
-                e.TimeCreated = DateTime.Now;
-                e.TimeNotified = DateTime.Now;
-                e.IsProcessed = false;
-                e.UserWhoStartedEvent = loadReq.RequestInitiatorId;
-                e.Dataset = loadReq.DatasetID;
-                e.DataConfig = loadReq.DatasetFileConfigId;
-                e.Reason = "Failed to submit request to Dataset Loader";
-                e.Parent_Event = loadReq.RequestGuid;
-                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-            }
         }
   
         /// <summary>
@@ -341,27 +256,6 @@ namespace Sentry.data.Goldeneye
             Logger.Error($"Watcher Error - Cancelling watch job (JobId:{RetrieverJobId})", e.GetException());
 
             _internalTokenSource.Cancel();
-        }
-
-        private Guid GenerateHash(string input)
-        {
-            string start = input + DateTime.Now.ToString();
-            Guid result;
-            using (MD5 md5 = MD5.Create())
-            {
-                byte[] hash = md5.ComputeHash(Encoding.Default.GetBytes(start));
-                result = new Guid(hash);
-            }
-            return result;
-        }
-
-        /// <summary>
-        /// Returns current processed file count
-        /// </summary>
-        /// <returns></returns>
-        public int GetCount()
-        {
-            return FileCount;
         }
 
         /// <summary>
