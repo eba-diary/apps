@@ -5,7 +5,7 @@ using StructureMap;
 
 namespace Sentry.data.Infrastructure
 {
-    public class HpsmMonitoringService : IHpsmMonitoringService
+    public class HpsmMonitoringService
     {
         private IDatasetContext _datasetContext;
         private IHpsmProvider _hpsmProvider;
@@ -13,7 +13,7 @@ namespace Sentry.data.Infrastructure
         private IContainer _container;
         public HpsmMonitoringService() { }
 
-        public void CheckHpsmTicketStatus()
+        public void CheckTicketStatus()
         {
             using (_container = Bootstrapper.Container.GetNestedContainer())
             {
@@ -32,11 +32,11 @@ namespace Sentry.data.Infrastructure
 
                             if (st.PreApproved) { st.ApprovedById = ticket.RequestedById; }
                             _SecurityService.ApproveTicket(ticket, st.ApprovedById);
-                            _hpsmProvider.CloseHpsmTicket(ticket.TicketId);
+                            _hpsmProvider.CloseTicket(ticket.TicketId);
                             break;
                         case GlobalConstants.HpsmTicketStatus.DENIED: //or Denied?  find out those statuses.
 
-                            _hpsmProvider.CloseHpsmTicket(ticket.TicketId, true);
+                            _hpsmProvider.CloseTicket(ticket.TicketId, true);
                             _SecurityService.CloseTicket(ticket, st.RejectedById, st.RejectedReason, st.TicketStatus);
                             break;
                         case GlobalConstants.HpsmTicketStatus.WIDHTDRAWN:

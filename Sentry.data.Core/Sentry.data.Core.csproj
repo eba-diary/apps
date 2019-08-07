@@ -98,6 +98,9 @@
     <Compile Include="GlobalEnums\HTTPMethods.cs" />
     <Compile Include="GlobalEnums\OAuthClaims.cs" />
     <Compile Include="GlobalEnums\OAuthGrantType.cs" />
+    <Compile Include="Interfaces\ITicketMonitorService.cs" />
+    <Compile Include="Interfaces\IBaseTicketProvider.cs" />
+    <Compile Include="Interfaces\ICherwellProvider.cs" />
     <Compile Include="Interfaces\IEncryptionService.cs" />
     <Compile Include="Interfaces\Retriever\DataSourceProviders\IHttpsProvider.cs" />
     <Compile Include="Extensions\JobExtensions.cs" />
@@ -126,7 +129,6 @@
     <Compile Include="Extensions\DatasetQueryExtensions.cs" />
     <Compile Include="Extensions\DataElementExtensions.cs" />
     <Compile Include="GlobalEnums\DataClassificationType.cs" />
-    <Compile Include="Interfaces\IHpsmMonitoringService.cs" />
     <Compile Include="Interfaces\IHpsmProvider.cs" />
     <Compile Include="GlobalEnums\DatasetSortByOption.cs" />
     <Compile Include="Interfaces\IAssociateInfoProvider.cs" />

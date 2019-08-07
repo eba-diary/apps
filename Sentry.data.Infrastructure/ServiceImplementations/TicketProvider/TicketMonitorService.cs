@@ -1,0 +1,66 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Sentry.data.Core;
+using Sentry.Common;
+using StructureMap;
+
+namespace Sentry.data.Infrastructure
+{
+    public class TicketMonitorService : ITicketMonitorService
+    {
+        public TicketMonitorService() { }
+
+        public void CheckTicketStatus()
+        {
+            using (IContainer Container = Bootstrapper.Container.GetNestedContainer())
+            {
+                IBaseTicketProvider _baseTicketProvider;
+                IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
+                ISecurityService _SecurityService = Container.GetInstance<ISecurityService>();
+
+                if (Configuration.Config.GetHostSetting("UseCherwell") == "true")
+                {
+                    _baseTicketProvider = Container.GetInstance<ICherwellProvider>();
+                }
+                else
+                {
+                    _baseTicketProvider = Container.GetInstance<IHpsmProvider>();
+                }                
+
+                List<SecurityTicket> tickets = _datasetContext.HpsmTickets.Where(x => x.TicketStatus == GlobalConstants.HpsmTicketStatus.PENDING).ToList();
+
+                foreach (SecurityTicket ticket in tickets)
+                {
+                    HpsmTicket st = _baseTicketProvider.RetrieveTicket(ticket.TicketId);
+                    if(st != null)
+                    {
+                        switch (st.TicketStatus)
+                        {
+                            case GlobalConstants.HpsmTicketStatus.APPROVED:
+
+                                if (st.PreApproved) { st.ApprovedById = ticket.RequestedById; }
+                                _SecurityService.ApproveTicket(ticket, st.ApprovedById);
+                                _baseTicketProvider.CloseTicket(ticket.TicketId);
+                                break;
+                            case GlobalConstants.HpsmTicketStatus.DENIED: //or Denied?  find out those statuses.
+
+                                _baseTicketProvider.CloseTicket(ticket.TicketId, true);
+                                _SecurityService.CloseTicket(ticket, st.RejectedById, st.RejectedReason, st.TicketStatus);
+                                break;
+                            case GlobalConstants.HpsmTicketStatus.WIDHTDRAWN:
+
+                                _SecurityService.CloseTicket(ticket, st.RejectedById, st.RejectedReason, st.TicketStatus); //Check if the ticket was closed without approval.
+                                break;
+                            default:
+                                break;  //do nothing, we will check again in 15 min.
+                        }
+                    }                    
+                }
+                _datasetContext.SaveChanges();
+            }
+        }
+    }
+}

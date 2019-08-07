@@ -41,7 +41,7 @@ namespace Sentry.data.Infrastructure
         /// <summary>
         /// Creates a new HPSM Change ticket.
         /// </summary>
-        public string CreateHpsmTicket(AccessRequest model)
+        public string CreateChangeTicket(AccessRequest model)
         {
             try
             {
@@ -91,7 +91,7 @@ namespace Sentry.data.Infrastructure
         }
 
 
-        public void CloseHpsmTicket(string hpsmChangeId, bool wasTicketDenied = false)
+        public void CloseTicket(string hpsmChangeId, bool wasTicketDenied = false)
         {
             string message = wasTicketDenied ? "Denied" : "Successful";
 

@@ -234,6 +234,9 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
+    <Compile Include="ServiceImplementations\TicketProvider\BaseTicketProvider.cs" />
+    <Compile Include="ServiceImplementations\TicketProvider\CherwellProvider.cs" />
+    <Compile Include="ServiceImplementations\TicketProvider\CherwellService.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\GenericHttpsProvider.cs" />
     <Compile Include="ServiceImplementations\DataSourceProviders\GoogleApiProvider.cs" />
     <Compile Include="ServiceImplementations\HpsmMonitoringService.cs" />
@@ -269,6 +272,7 @@
     <Compile Include="ServiceImplementations\S3ServiceProvider.cs" />
     <Compile Include="ServiceImplementations\SASProvider.cs" />
     <Compile Include="ServiceImplementations\SASServiceProvider.cs" />
+    <Compile Include="ServiceImplementations\TicketProvider\TicketMonitorService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
