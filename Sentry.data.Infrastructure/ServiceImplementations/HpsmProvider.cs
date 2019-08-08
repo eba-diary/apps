@@ -64,7 +64,7 @@ namespace Sentry.data.Infrastructure
 
 
 
-        public override HpsmTicket RetrieveTicket(string hpsmChangeId)
+        public override HpsmTicket RetrieveTicket(string ticketId)
         {
 
             RetrieveChangeRequest request = new RetrieveChangeRequest()

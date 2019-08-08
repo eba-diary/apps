@@ -10,7 +10,7 @@ namespace Sentry.data.Infrastructure
     public abstract class BaseTicketProvider : IBaseTicketProvider
     {
         public abstract string CreateChangeTicket(AccessRequest model);
-        public abstract HpsmTicket RetrieveTicket(string hpsmChangeId);
-        public abstract void CloseTicket(string hpsmChangeId, bool wasTicketDenied = false);
+        public abstract HpsmTicket RetrieveTicket(string ticketId);
+        public abstract void CloseTicket(string ticketId, bool wasTicketDenied = false);
     }
 }

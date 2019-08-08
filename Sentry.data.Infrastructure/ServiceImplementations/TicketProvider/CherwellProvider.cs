@@ -51,11 +51,6 @@ namespace Sentry.data.Infrastructure
             try
             {
                 ReadResponse response = GetBusinessObjectByPublicId(ticketId);
-                //foreach (var field in response.Fields)
-                //{
-                //    Console.WriteLine(field.Name + ", " + field.DisplayName + ", " + field.Value + ", " + field.FieldId);
-                //}
-
                 return MapToHpsmTicket(response);
             }
             catch (Exception ex)
@@ -237,10 +232,6 @@ namespace Sentry.data.Infrastructure
         private SaveRequest GetSaveRequest(ReadResponse existingTicket)
         {
             Logger.Info("cherwell_entered_getsaverequest");
-
-            //Summary busObj = GetBusinessObjectSummaryByName(templateName);
-            //Logger.Info($"cherwell_getsaverequest_recieved_busobjsummary - {busObj.DisplayName},{busObj.BusObId}");
-
             TemplateResponse changeTemplateResponse = GetBusinessObjectTemplate(existingTicket.BusObId);
             Logger.Info($"cherwell_getsaverequest_recieved_busobjtemplate");
 

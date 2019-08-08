@@ -11,13 +11,11 @@ namespace Sentry.data.Infrastructure
 {
     public class TicketMonitorService : ITicketMonitorService
     {
-        public TicketMonitorService() { }
-
         public void CheckTicketStatus()
         {
             using (IContainer Container = Bootstrapper.Container.GetNestedContainer())
             {
-                IBaseTicketProvider _baseTicketProvider = Container.GetInstance<IBaseTicketProvider>(); ;
+                IBaseTicketProvider _baseTicketProvider = Container.GetInstance<IBaseTicketProvider>();
                 IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
                 ISecurityService _SecurityService = Container.GetInstance<ISecurityService>();
 
@@ -32,7 +30,10 @@ namespace Sentry.data.Infrastructure
                         {
                             case GlobalConstants.HpsmTicketStatus.APPROVED:
 
-                                if (st.PreApproved) { st.ApprovedById = ticket.RequestedById; }
+                                if (st.PreApproved)
+                                {
+                                    st.ApprovedById = ticket.RequestedById;
+                                }
                                 _SecurityService.ApproveTicket(ticket, st.ApprovedById);
                                 _baseTicketProvider.CloseTicket(ticket.TicketId);
                                 break;
