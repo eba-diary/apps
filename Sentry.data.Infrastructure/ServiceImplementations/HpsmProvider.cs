@@ -74,7 +74,7 @@ namespace Sentry.data.Infrastructure
                     instance = new ChangeInstanceType(),
                     keys = new ChangeKeysType()
                     {
-                        ChangeID = GetHpsmString(hpsmChangeId)
+                        ChangeID = GetHpsmString(ticketId)
                     }
                 },
                 ignoreEmptyElements = true,
@@ -91,7 +91,7 @@ namespace Sentry.data.Infrastructure
         }
 
 
-        public override void CloseTicket(string hpsmChangeId, bool wasTicketDenied = false)
+        public override void CloseTicket(string ticketId, bool wasTicketDenied = false)
         {
             string message = wasTicketDenied ? "Denied" : "Successful";
 
@@ -109,7 +109,7 @@ namespace Sentry.data.Infrastructure
                     },
                     keys = new ChangeKeysType()
                     {
-                        ChangeID = GetHpsmString(hpsmChangeId)
+                        ChangeID = GetHpsmString(ticketId)
                     }
                 },
                 ignoreEmptyElements = true
