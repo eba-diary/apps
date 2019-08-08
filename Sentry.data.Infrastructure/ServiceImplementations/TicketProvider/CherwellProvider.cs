@@ -11,7 +11,7 @@ using Sentry.Common.Logging;
 
 namespace Sentry.data.Infrastructure
 {
-    public class CherwellProvider : ICherwellProvider
+    public class CherwellProvider : BaseTicketProvider, IBaseTicketProvider
     {
         private BusinessObjectClient _businessObjectClient;
         private ServiceClient _tokenClient;
@@ -27,7 +27,7 @@ namespace Sentry.data.Infrastructure
 
 
         #region Public Methods
-        public string CreateChangeTicket(AccessRequest model)
+        public override string CreateChangeTicket(AccessRequest model)
         {
             try
             {
@@ -35,7 +35,7 @@ namespace Sentry.data.Infrastructure
 
                 AddApproversToTicket(newBusPublicObId, model);
 
-                //ChangeStatus(newBusPublicObId, GlobalConstants.CherwellStatus.APPROVAL);
+                ChangeStatus(newBusPublicObId, GlobalConstants.CherwellChangeStatusNames.APPROVAL, GlobalConstants.CherwellChangeStatusOrder.APPROVAL);
 
                 return newBusPublicObId;
             }
@@ -46,7 +46,7 @@ namespace Sentry.data.Infrastructure
             }            
         }
 
-        public HpsmTicket RetrieveTicket(string ticketId)
+        public override HpsmTicket RetrieveTicket(string ticketId)
         {
             try
             {
@@ -77,15 +77,15 @@ namespace Sentry.data.Infrastructure
             string ticketStatus = response.Fields.First(w => w.Name == "Status").Value;
 
             //If ticket is not approved, it will be moved back to Logging and Prep
-            if (ticketStatus == GlobalConstants.CherwellStatus.LOGGING_AND_PREP)
+            if (ticketStatus == GlobalConstants.CherwellChangeStatusNames.LOGGING_AND_PREP)
             {
                 ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.DENIED;
             }
-            else if (ticketStatus == GlobalConstants.CherwellStatus.IMPLEMENTING)
+            else if (ticketStatus == GlobalConstants.CherwellChangeStatusNames.IMPLEMENTING)
             {
                 ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.APPROVED;
             }
-            else if (ticketStatus == GlobalConstants.CherwellStatus.CLOSED)
+            else if (ticketStatus == GlobalConstants.CherwellChangeStatusNames.CLOSED)
             {
                 ticket.TicketStatus = GlobalConstants.HpsmTicketStatus.WIDHTDRAWN;
             }
@@ -94,9 +94,9 @@ namespace Sentry.data.Infrastructure
         return ticket;
         }
 
-        public void CloseTicket(string ticketId, bool wasTicketDenied = false)
+        public override void CloseTicket(string ticketId, bool wasTicketDenied = false)
         {
-            ChangeStatus(ticketId, GlobalConstants.CherwellStatus.CLOSED);
+            ChangeStatus(ticketId, GlobalConstants.CherwellChangeStatusNames.CLOSED, GlobalConstants.CherwellChangeStatusOrder.CLOSED);
         }
         #endregion
 
@@ -251,7 +251,7 @@ namespace Sentry.data.Infrastructure
                 BusObId = existingTicket.BusObId,
                 BusObPublicId = existingTicket.BusObPublicId,
                 BusObRecId = existingTicket.BusObRecId,
-                Fields = changeTemplateResponse.Fields
+                Fields =  changeTemplateResponse.Fields
             };
         }
 
@@ -343,11 +343,12 @@ namespace Sentry.data.Infrastructure
             return readResponse.GetAwaiter().GetResult();
         }
 
-        private void ChangeStatus(string busObPublicId, string statusName)
+        private void ChangeStatus(string busObPublicId, string statusName, string orderid)
         {
             ReadResponse response = GetBusinessObjectByPublicId(busObPublicId);
             SaveRequest saveReq = GetSaveRequest(response);
             SetFieldValue(saveReq.Fields, "Status", statusName);
+            SetFieldValue(saveReq.Fields, "OrderStatus", orderid);
             SaveBusinessObject(saveReq);
         }
 
@@ -487,7 +488,7 @@ namespace Sentry.data.Infrastructure
         {
             foreach(FieldTemplateItem field in response.Fields)
             {
-                if (existingTicket.Fields.Any(a => a.Name == field.Name))
+                if (existingTicket.Fields.Any(a => a.Name == field.Name && field.Name != "ApprovedBy"))
                 {
                     SetFieldValue(response.Fields, field.Name, existingTicket.Fields.First(w => w.Name == field.Name).Value);
                 }
@@ -506,11 +507,22 @@ namespace Sentry.data.Infrastructure
 
         static void SetFieldValue(ICollection<FieldTemplateItem> fields, string fieldName, string fieldValue)
         {
-            var fieldTemplate = fields.First(s => s.Name.Equals(fieldName));
-            if (fieldTemplate != null)
+            if (fields.Any(s => s.Name.Equals(fieldName)))
             {
+                var fieldTemplate = fields.First(s => s.Name.Equals(fieldName));
                 fieldTemplate.Value = fieldValue;
                 fieldTemplate.Dirty = true;
+            }
+            else
+            {
+                var newField = new FieldTemplateItem()
+                {
+                    Name = fieldName,
+                    Value = fieldValue,
+                    Dirty = true
+                };
+
+                fields.Add(newField);
             }
         }
         #endregion

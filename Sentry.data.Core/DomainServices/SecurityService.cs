@@ -10,21 +10,14 @@ namespace Sentry.data.Core
     {
 
         private readonly IDatasetContext _datasetContext;
+        //BaseTicketProvider implementation is determined within Bootstrapper and could be either ICherwellProvider or IHPSMProvider
         private readonly IBaseTicketProvider _baseTicketProvider;
 
-        public SecurityService(IDatasetContext datasetContext, IHpsmProvider hpsmProvider, ICherwellProvider cherwellProvider)
+        public SecurityService(IDatasetContext datasetContext, IBaseTicketProvider baseTicketProvider)
         {
             _datasetContext = datasetContext;
-            if (Config.GetHostSetting("UseCherwell") == "true")
-            {
-                _baseTicketProvider = cherwellProvider;
-            }
-            else
-            {
-                _baseTicketProvider = hpsmProvider;
-            }
+            _baseTicketProvider = baseTicketProvider;
         }
-
 
         public string RequestPermission(AccessRequest model)
         {

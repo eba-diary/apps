@@ -17,18 +17,9 @@ namespace Sentry.data.Infrastructure
         {
             using (IContainer Container = Bootstrapper.Container.GetNestedContainer())
             {
-                IBaseTicketProvider _baseTicketProvider;
+                IBaseTicketProvider _baseTicketProvider = Container.GetInstance<IBaseTicketProvider>(); ;
                 IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
                 ISecurityService _SecurityService = Container.GetInstance<ISecurityService>();
-
-                if (Configuration.Config.GetHostSetting("UseCherwell") == "true")
-                {
-                    _baseTicketProvider = Container.GetInstance<ICherwellProvider>();
-                }
-                else
-                {
-                    _baseTicketProvider = Container.GetInstance<IHpsmProvider>();
-                }                
 
                 List<SecurityTicket> tickets = _datasetContext.HpsmTickets.Where(x => x.TicketStatus == GlobalConstants.HpsmTicketStatus.PENDING).ToList();
 

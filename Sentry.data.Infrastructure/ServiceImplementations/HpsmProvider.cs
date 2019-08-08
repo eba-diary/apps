@@ -8,7 +8,7 @@ using Sentry.data.Infrastructure.HPMSChangeManagement;
 
 namespace Sentry.data.Infrastructure
 {
-    public class HpsmProvider : IHpsmProvider
+    public class HpsmProvider : BaseTicketProvider, IBaseTicketProvider
     {
 
 
@@ -41,7 +41,7 @@ namespace Sentry.data.Infrastructure
         /// <summary>
         /// Creates a new HPSM Change ticket.
         /// </summary>
-        public string CreateChangeTicket(AccessRequest model)
+        public override string CreateChangeTicket(AccessRequest model)
         {
             try
             {
@@ -64,7 +64,7 @@ namespace Sentry.data.Infrastructure
 
 
 
-        public HpsmTicket RetrieveTicket(string hpsmChangeId)
+        public override HpsmTicket RetrieveTicket(string hpsmChangeId)
         {
 
             RetrieveChangeRequest request = new RetrieveChangeRequest()
@@ -91,7 +91,7 @@ namespace Sentry.data.Infrastructure
         }
 
 
-        public void CloseTicket(string hpsmChangeId, bool wasTicketDenied = false)
+        public override void CloseTicket(string hpsmChangeId, bool wasTicketDenied = false)
         {
             string message = wasTicketDenied ? "Denied" : "Successful";
 
