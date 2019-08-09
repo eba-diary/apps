@@ -97,15 +97,15 @@ namespace Sentry.data.Infrastructure
                                 default:
                                     RetrieveFTPFile(_job.GetUri().AbsoluteUri);                                    
                                     break;
-                                case FtpPattern.SpecificFileNoDelete:
-                                    ProcessSpecificFileNoDelete();
-                                    break;
+                                //case FtpPattern.SpecificFileNoDelete:
+                                //    ProcessSpecificFileNoDelete();
+                                //    break;
                                 case FtpPattern.RegexFileNoDelete:  /* #4*/
                                     ProcessRegexFileNoDelete(); 
                                     break;
-                                case FtpPattern.SpecificFileArchive:  /* #5*/
-                                    ProcessSpecificFileArchive(); 
-                                    break;
+                                //case FtpPattern.SpecificFileArchive:  /* #5*/
+                                //    ProcessSpecificFileArchive(); 
+                                //    break;
                                 case FtpPattern.RegexFileSinceLastExecution:
                                     ProcessRegexFileSinceLastExecution();
                                     break;
@@ -584,64 +584,64 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        private void ProcessSpecificFileArchive()
-        {
-            //throw new NotImplementedException();
-            //Process specific file
-            ProcessSpecificFileNoDelete();
+        //private void ProcessSpecificFileArchive()
+        //{
+        //    //throw new NotImplementedException();
+        //    //Process specific file
+        //    ProcessSpecificFileNoDelete();
 
-            //Archive specific file
-            ArchiveSpecificFile(_job.GetUri().AbsoluteUri);
+        //    //Archive specific file
+        //    ArchiveSpecificFile(_job.GetUri().AbsoluteUri);
 
-        }
+        //}
 
-        private void ArchiveSpecificFile(string sourceUrl)
-        {
-            //throw new NotImplementedException();
-            //Remove filename from job URI
-            string baseDir = sourceUrl.Replace(Path.GetFileName(sourceUrl), "");
+        //private void ArchiveSpecificFile(string sourceUrl)
+        //{
+        //    //throw new NotImplementedException();
+        //    //Remove filename from job URI
+        //    string baseDir = sourceUrl.Replace(Path.GetFileName(sourceUrl), "");
 
-            //Add archive directory name to URI
-            string archiveDir = baseDir + "archive/";
+        //    //Add archive directory name to URI
+        //    string archiveDir = baseDir + "archive/";
 
-            //Determine if Archive directory exists
-            IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(baseDir, "directories");
+        //    //Determine if Archive directory exists
+        //    IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(baseDir, "directories");
 
-            if (!resultList.Where(w => w.Name == "archive").Any())
-            {
-                _job.JobLoggerMessage("Error", $"FTP archive directory does not exist, ask vendor to create archive directory in url - url:{archiveDir}");
-            }
+        //    if (!resultList.Where(w => w.Name == "archive").Any())
+        //    {
+        //        _job.JobLoggerMessage("Error", $"FTP archive directory does not exist, ask vendor to create archive directory in url - url:{archiveDir}");
+        //    }
 
-            _ftpProvider.RenameFile(sourceUrl, "ftp://ftp.cabfinancial.com/PublicData/PublicData20121231/ISS_History_Test.zip");
-        }
+        //    _ftpProvider.RenameFile(sourceUrl, "ftp://ftp.cabfinancial.com/PublicData/PublicData20121231/ISS_History_Test.zip");
+        //}
 
-        private void ProcessSpecificFileNoDelete()
-        {
-            string remoteDir = null;
+        //private void ProcessSpecificFileNoDelete()
+        //{
+        //    string remoteDir = null;
 
-            string fileName = Path.GetFileName(_job.GetUri().AbsoluteUri);
-            if (fileName != "")
-            {
-                remoteDir = _job.GetUri().AbsoluteUri.Replace(fileName, "");
-            }
-            else
-            {
-                _job.JobLoggerMessage("Error", "Job terminating - Uri does not contain file name.");
-                throw new ArgumentNullException("RelativeUri", "Uri does not contain file name");
-            }
+        //    string fileName = Path.GetFileName(_job.GetUri().AbsoluteUri);
+        //    if (fileName != "")
+        //    {
+        //        remoteDir = _job.GetUri().AbsoluteUri.Replace(fileName, "");
+        //    }
+        //    else
+        //    {
+        //        _job.JobLoggerMessage("Error", "Job terminating - Uri does not contain file name.");
+        //        throw new ArgumentNullException("RelativeUri", "Uri does not contain file name");
+        //    }
 
-            IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(remoteDir, "files");
+        //    IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(remoteDir, "files");
 
-            if (resultList.Where(w => w.Name == fileName).Any())
-            {
-                RetrieveFTPFile(_job.GetUri().AbsoluteUri);
-            }
-            else
-            {
-                _job.JobLoggerMessage("Info", $"Remote file does not exist - FileName:{fileName}");
-                throw new FileNotFoundException($"Remote file does not exist - FileName:{fileName}");
-            }
-        }
+        //    if (resultList.Where(w => w.Name == fileName).Any())
+        //    {
+        //        RetrieveFTPFile(_job.GetUri().AbsoluteUri);
+        //    }
+        //    else
+        //    {
+        //        _job.JobLoggerMessage("Info", $"Remote file does not exist - FileName:{fileName}");
+        //        throw new FileNotFoundException($"Remote file does not exist - FileName:{fileName}");
+        //    }
+        //}
 
         private void ProcessRegexFileNoDelete()
         {
