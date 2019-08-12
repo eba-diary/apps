@@ -48,7 +48,7 @@ namespace Sentry.data.Web
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw;
             }
@@ -107,11 +107,11 @@ namespace Sentry.data.Web
         public string FileType {
             get
             {
-                return ((FileType) FileTypeId).ToString();
+                return ((FileType)FileTypeId).ToString();
             }
             set
             {
-                FileTypeId = (int) Enum.Parse(typeof(FileType), value); ;
+                FileTypeId = (int)Enum.Parse(typeof(FileType), value); ;
             }
         }
 
@@ -121,11 +121,11 @@ namespace Sentry.data.Web
 
         [DisplayName("Description")]
         public string ConfigFileDesc { get; set; }
-
+        [DisplayName("Delimiter")]
         public string Delimiter { get; set; }
+        [DisplayName("Includes Header Row")]
         public bool HasHeader { get; set; }
 
-        public int DatasetId { get; set; }
         public string EditHref
         {
             get
@@ -135,16 +135,19 @@ namespace Sentry.data.Web
                 return href;
             }
         }
-
         [DisplayName("Parent Dataset")]
         public string ParentDatasetName { get; set; }
-
-        public DatasetScopeType ScopeType { get; set; }
         [DisplayName("Data Scope Type")]
         public int DatasetScopeTypeID { get; set; }
-
-        public FileExtension FileExtension { get; set; }
+        [DisplayName("File Extension")]
         public int FileExtensionID { get; set; }
+        [DisplayName("Create Current View")]
+        public bool CreateCurrentView { get; set; }
+
+
+        public int DatasetId { get; set; }
+        public DatasetScopeType ScopeType { get; set; }
+        public FileExtension FileExtension { get; set; }
         public string RawStorageId { get; set; }
 
         public IList<RetrieverJob> RetrieverJobs { get; set; }
