@@ -467,6 +467,7 @@ namespace Sentry.data.Infrastructure
 
             //Standard or Normal
             SetFieldValue(response.Fields, "Type", "Standard");
+            SetFieldValue(response.Fields, "ApprovalLock", "true");
             //We are always using Routine
             SetFieldValue(response.Fields, "RiskUrgency", "Routine");
             //The following three properties are needed to ensure the change details show on the UI
@@ -479,7 +480,7 @@ namespace Sentry.data.Infrastructure
         {
             foreach(FieldTemplateItem field in response.Fields)
             {
-                if (existingTicket.Fields.Any(a => a.Name == field.Name && field.Name != "ApprovedBy"))
+                if (existingTicket.Fields.Any(a => a.Name == field.Name && !String.IsNullOrEmpty(field.Value)))
                 {
                     SetFieldValue(response.Fields, field.Name, existingTicket.Fields.First(w => w.Name == field.Name).Value);
                 }
@@ -493,6 +494,7 @@ namespace Sentry.data.Infrastructure
             SetFieldValue(templateResponse.Fields, "ApproverName", userInfoResponse[0].Fields.FirstOrDefault(w => w.Name == "FullName").Value);
             SetFieldValue(templateResponse.Fields, "Details", "Approval Detailed reason");
             SetFieldValue(templateResponse.Fields, "Deadline", DateTime.Now.Add(TimeSpan.FromDays(3)).ToString("MM/dd/yyyy hh:mm tt"));
+            SetFieldValue(templateResponse.Fields, "ParentTypeName", "Change Request");
             SetFieldValue(templateResponse.Fields, "ParentRecID", ticketBusObRecId);
         }
 
