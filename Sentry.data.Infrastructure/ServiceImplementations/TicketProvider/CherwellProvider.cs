@@ -18,18 +18,19 @@ namespace Sentry.data.Infrastructure
         private SearchesClient _searchesClient;
         private readonly string _apiUrl;
         private readonly string _clientId;
-        private readonly string _token;
-        private readonly DateTime _tokenTimer;
+        private string _token;
+        private DateTime _tokenTimer;
         private readonly object _tokenLockObject = new object();
         private readonly object _bussinessObjectClientLock = new object();
         private readonly object _searchesClientLock = new object();
         private readonly object _tokenClientLock = new object();
-        private readonly int _tokenInterval = 30;
+        private readonly int _tokenInterval;
 
         public CherwellProvider()
         {
             _apiUrl = Config.GetHostSetting("CherwellApiUrl");
             _clientId = Config.GetHostSetting("CherwellClientId");
+            _tokenInterval = int.Parse(Config.GetHostSetting("CherwellTokenInterval"));
         }
 
 
