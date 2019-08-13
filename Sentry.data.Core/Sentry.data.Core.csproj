@@ -84,6 +84,7 @@
     <Compile Include="DomainServices\ConfigService.cs" />
     <Compile Include="DomainServices\DatasetService.cs" />
     <Compile Include="DomainServices\JobService.cs" />
+    <Compile Include="DTO\Config\DatasetFileConfigDto.cs" />
     <Compile Include="DTO\ContactInfoDto.cs" />
     <Compile Include="DTO\Favorites\FavoriteDto.cs" />
     <Compile Include="DTO\ImagesDto.cs" />

@@ -17,11 +17,13 @@ namespace Sentry.data.Core
         public IEventService _eventService;
         public IMessagePublisher _messagePublisher;
         public IEncryptionService _encryptService;
+        public IJobService _jobService;
         private readonly ISecurityService _securityService;
 
         public ConfigService(IDatasetContext dsCtxt, IMessagePublisher publisher, 
             IUserService userService, IEventService eventService, IMessagePublisher messagePublisher,
-            IEncryptionService encryptService, ISecurityService securityService)
+            IEncryptionService encryptService, ISecurityService securityService,
+            IJobService jobService)
         {
             _datasetContext = dsCtxt;
             _publisher = publisher;
@@ -30,6 +32,7 @@ namespace Sentry.data.Core
             _messagePublisher = messagePublisher;
             _encryptService = encryptService;
             _securityService = securityService;
+            _jobService = jobService;
         }
         public SchemaDTO GetSchemaDTO(int id)
         {
@@ -165,6 +168,20 @@ namespace Sentry.data.Core
             return errors;
         }
 
+        public List<string> Validate(DatasetFileConfigDto dto)
+        {
+            List<string> errors = new List<string>();
+
+            Dataset parent = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
+
+            if (parent.DatasetFileConfigs.Any(x => x.Name.ToLower() == dto.Name.ToLower()))
+            {
+                errors.Add("Dataset config with that name already exists within dataset");
+            }
+
+            return errors;
+        }
+
         public bool CreateAndSaveNewDataSource(DataSourceDto dto)
         {
             try
@@ -192,9 +209,134 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error("Error saving data source", ex);
+                Logger.Error("datasource_save_error", ex);
                 return false;
             }
+        }
+
+        public bool CreateAndSaveDatasetFileConfig(DatasetFileConfigDto dto)
+        {
+            try
+            {
+                DatasetFileConfig dfc = CreateDatasetFileConfig(dto);
+
+                DataSource basicSource = _datasetContext.DataSources.First(x => x.Name.Contains(GlobalConstants.DataSourceName.DEFAULT_DROP_LOCATION));
+
+                RetrieverJob rj = _jobService.InstantiateJobsForCreation(dfc, basicSource);
+
+                List<RetrieverJob> jobList = new List<RetrieverJob>
+                {
+                    rj,
+                    _jobService.InstantiateJobsForCreation(dfc, _datasetContext.DataSources.First(x => x.Name.Contains(GlobalConstants.DataSourceName.DEFAULT_S3_DROP_LOCATION)))
+                };
+
+                dfc.RetrieverJobs = jobList;
+
+                Dataset parent = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
+                List<DatasetFileConfig> dfcList = parent.DatasetFileConfigs.ToList();
+                dfcList.Add(dfc);
+                parent.DatasetFileConfigs = dfcList;
+
+                _datasetContext.Merge(parent);
+                _datasetContext.SaveChanges();
+
+
+                _jobService.CreateDropLocation(rj);
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("Error creating Dataset File Config", ex);
+                return false;
+            }            
+        }
+
+        public bool UpdateAndSaveDatasetFileConfig(DatasetFileConfigDto dto)
+        {
+            try
+            {
+                DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(dto.ConfigId);
+                UpdateDatasetFileConfig(dto, dfc);
+                _datasetContext.SaveChanges();
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("datasetfileconfig_save_error", ex);
+                return false;
+            }
+        }
+
+        private void UpdateDatasetFileConfig(DatasetFileConfigDto dto, DatasetFileConfig dfc)
+        {
+            dfc.DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId);
+            dfc.FileTypeId = dto.FileTypeId;
+            dfc.Description = dto.Description;
+            dfc.FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId);
+        }
+
+        public DatasetFileConfigDto GetDatasetFileConfigDto(int configId)
+        {
+            DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configId);
+            DatasetFileConfigDto dto = new DatasetFileConfigDto();
+            MapToDatasetFileConfigDto(dfc, dto);
+            return dto;
+        }
+
+        private DatasetFileConfig CreateDatasetFileConfig(DatasetFileConfigDto dto)
+        {
+            List<DataElement> deList = new List<DataElement>();
+            DataElement de = CreateNewDataElement(dto.Schemas[0]);
+
+            DatasetFileConfig dfc = new DatasetFileConfig()
+            {
+                Name = dto.Name,
+                Description = dto.Description,
+                FileTypeId = dto.FileTypeId,
+                ParentDataset = _datasetContext.GetById<Dataset>(dto.ParentDatasetId),
+                FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId),
+                DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId),
+                Schema = deList
+            };
+
+            de.DatasetFileConfig = dfc;
+            deList.Add(de);
+            dfc.Schema = deList;
+
+            return dfc;
+        }
+
+        private DataElement CreateNewDataElement(DataElementDto dto)
+        {
+            Dataset ds = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
+            string storageCode = _datasetContext.GetNextStorageCDE().ToString();
+
+            DataElement de = new DataElement()
+            {
+                DataElementCreate_DTM = DateTime.Now,
+                DataElementChange_DTM = DateTime.Now,
+                DataElement_CDE = "F",
+                DataElement_DSC = GlobalConstants.DataElementDescription.DATA_FILE,
+                DataElement_NME = dto.DataElementName,
+                LastUpdt_DTM = DateTime.Now,
+                SchemaIsPrimary = true,
+                SchemaDescription = dto.SchemaDescription,
+                SchemaName = dto.SchemaName,
+                SchemaRevision = 1,
+                SchemaIsForceMatch = false,
+                Delimiter = dto.Delimiter,
+                HasHeader = dto.HasHeader,
+                FileFormat = _datasetContext.GetById<FileExtension>(dto.FileExtensionId).Name.Trim(),
+                StorageCode = storageCode,
+                HiveDatabase = "Default",
+                HiveTable = ds.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dto.SchemaName.Replace(" ", "").ToUpper(),
+                HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
+                HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
+                CreateCurrentView = dto.CreateCurrentView
+            };
+
+            return de;
         }
 
         public void UpdateFields(int configId, int schemaId, List<SchemaRow> schemaRows)
@@ -790,6 +932,18 @@ namespace Sentry.data.Core
             claim = new OAuthClaim() { DataSourceId = source, Type = GlobalEnums.OAuthClaims.exp, Value = DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).Add(TimeSpan.FromMinutes(dto.TokenExp)).TotalSeconds.ToString() };
             _datasetContext.Add(claim);
             claimsList.Add(claim);
+        }
+
+        private void MapToDatasetFileConfigDto(DatasetFileConfig dfc, DatasetFileConfigDto dto)
+        {
+            dto.ConfigId = dfc.ConfigId;
+            dto.Name = dfc.Name;
+            dto.Description = dfc.Description;
+            dto.DatasetScopeTypeId = dfc.DatasetScopeType.ScopeTypeId;
+            dto.FileExtensionId = dfc.FileExtension.Id;
+            dto.ParentDatasetId = dfc.ParentDataset.DatasetId;
+            dto.StorageCode = dfc.GetStorageCode();
+            dto.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
         }
         #endregion
     }

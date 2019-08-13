@@ -3,7 +3,7 @@
     ViewBag.Title = "Create Data File Config";
 }
 
-@using (Html.BeginForm("Create", "Config", FormMethod.Post))
+@using (Html.BeginForm("DatasetFileConfigForm", "Config", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
 
@@ -114,13 +114,20 @@
                 @Html.Label("Do incoming files contain a header row?", new { @class = "control-label col-md-9 optional text-muted", @style = "text-align: left" })
             </div>
 
-            <div class="form-group">
-                @Html.LabelFor(model => model.CreateCurrentView, new { @class = "control-label col-md-2 optional" })
-                <div class="col-md-1">
-                    @Html.CheckBoxFor(model => model.CreateCurrentView, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+            @if (Model.Security.ShowAdminControls)
+            {
+                <div class="form-group">
+                    @Html.LabelFor(model => model.CreateCurrentView, new { @class = "control-label col-md-2 optional" })
+                    <div class="col-md-1">
+                        @Html.CheckBoxFor(model => model.CreateCurrentView, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                    </div>
+                    @Html.Label("A view will be created filtering to data within latest file loaded into this schema", new { @class = "control-label col-md-9 optional text-muted", @style = "text-align: left" })
                 </div>
-                @Html.Label("A view will be created filtering to data within latest file loaded into this schema", new { @class = "control-label col-md-9 optional text-muted", @style = "text-align: left" })
-            </div>
+            }
+            else
+            {
+                @Html.HiddenFor(model => model.CreateCurrentView)
+            }
 
 
         </div>

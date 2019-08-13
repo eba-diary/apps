@@ -6,6 +6,7 @@ using Sentry.data.Core;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 using System.ComponentModel;
+using Sentry.Core;
 
 namespace Sentry.data.Web
 {
@@ -52,6 +53,18 @@ namespace Sentry.data.Web
             {
                 throw;
             }
+        }
+        public DatasetFileConfigsModel(DatasetFileConfigDto dto)
+        {
+            this.ConfigId = dto.ConfigId;
+            this.FileTypeId = dto.FileTypeId;
+            this.ConfigFileName = dto.Name;
+            this.ConfigFileDesc = dto.Description;
+            this.DatasetId = dto.ParentDatasetId;
+            this.DatasetScopeTypeID = dto.DatasetScopeTypeId;
+            this.FileExtensionID = dto.FileExtensionId;
+            this.RawStorageId = dto.StorageCode;
+            this.Security = dto.Security;
         }
 
         public DatasetFileConfigsModel(DatasetFileConfig dsfc, Boolean renderingForTable, Boolean renderingForPopup, IDatasetContext datasetContext)
@@ -135,6 +148,7 @@ namespace Sentry.data.Web
                 return href;
             }
         }
+
         [DisplayName("Parent Dataset")]
         public string ParentDatasetName { get; set; }
         [DisplayName("Data Scope Type")]
@@ -157,5 +171,7 @@ namespace Sentry.data.Web
         public IEnumerable<SelectListItem> AllDatasetScopeTypes { get; set; }
         public IEnumerable<SelectListItem> AllDataFileTypes { get; set; }
         public IEnumerable<SelectListItem> ExtensionList { get; set; }
+
+        public UserSecurity Security { get; set; }
     }
 }

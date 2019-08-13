@@ -175,5 +175,9 @@
             public const string RETRIEVERJOB_FAILED_STATE = "Failed";
         }
 
+        public static class DataElementDetailCodes
+        {
+            public const string CREATE_CURRENT_VIEW = "CreateCurrentView";
+        }
     }
 }
