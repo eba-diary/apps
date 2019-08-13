@@ -18,6 +18,13 @@ namespace Sentry.data.Infrastructure
         private SearchesClient _searchesClient;
         private readonly string _apiUrl;
         private readonly string _clientId;
+        private readonly string _token;
+        private readonly DateTime _tokenTimer;
+        private readonly object _tokenLockObject = new object();
+        private readonly object _bussinessObjectClientLock = new object();
+        private readonly object _searchesClientLock = new object();
+        private readonly object _tokenClientLock = new object();
+        private readonly int _tokenInterval = 30;
 
         public CherwellProvider()
         {
@@ -102,23 +109,25 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                if (_businessObjectClient is null)
+                lock (_bussinessObjectClientLock)
                 {
-                    Logger.Info("cherwell_initialize_busobjclient");
-                    var token = TokenAsync().ConfigureAwait(false);
-                    Logger.Info("cherwell_retrieve_token_success");
-
-                    var httpClientHandler = new HttpClientHandler() { UseDefaultCredentials = true };
-                    var client = new HttpClient(httpClientHandler)
+                    if (_businessObjectClient is null || (DateTime.Now - _tokenTimer).TotalSeconds > _tokenInterval)
                     {
-                        Timeout = new TimeSpan(0, 0, 30),
-                        BaseAddress = new Uri(_apiUrl)
-                    };
-                    client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token.GetAwaiter().GetResult().Access_token);
+                        Logger.Info("cherwell_initialize_busobjclient");
+                        RefreshToken();
 
-                    _businessObjectClient = new BusinessObjectClient(client);
-                    _businessObjectClient.BaseUrl = _apiUrl;
-                }
+                        var httpClientHandler = new HttpClientHandler() { UseDefaultCredentials = true };
+                        var client = new HttpClient(httpClientHandler)
+                        {
+                            Timeout = new TimeSpan(0, 0, 30),
+                            BaseAddress = new Uri(_apiUrl)
+                        };
+                        client.DefaultRequestHeaders.Add("Authorization", "Bearer " + _token);
+
+                        _businessObjectClient = new BusinessObjectClient(client);
+                        _businessObjectClient.BaseUrl = _apiUrl;
+                    }
+                }                
                 return _businessObjectClient;
             }
         }
@@ -126,55 +135,60 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                if (_searchesClient is null)
+                lock (_searchesClientLock)
                 {
-                    Logger.Info("cherwell_initialize_searchesclient");
-                    var token = TokenAsync().ConfigureAwait(false);
-                    Logger.Info("cherwell_retrieve_token_success");
-
-                    var httpClientHandler = new HttpClientHandler() { UseDefaultCredentials = true };
-                    var client = new HttpClient(httpClientHandler)
+                    if (_searchesClient is null || (DateTime.Now - _tokenTimer).TotalSeconds > _tokenInterval)
                     {
-                        Timeout = new TimeSpan(0, 0, 30),
-                        BaseAddress = new Uri(_apiUrl)
-                    };
-                    client.DefaultRequestHeaders.Add("Authorization", "Bearer " + token.GetAwaiter().GetResult().Access_token);
+                        Logger.Info("cherwell_initialize_searchesclient");
+                        RefreshToken();
 
-                    _searchesClient = new SearchesClient(client);
-                    _searchesClient.BaseUrl = _apiUrl;
+                        var httpClientHandler = new HttpClientHandler() { UseDefaultCredentials = true };
+                        var client = new HttpClient(httpClientHandler)
+                        {
+                            Timeout = new TimeSpan(0, 0, 30),
+                            BaseAddress = new Uri(_apiUrl)
+                        };
+                        client.DefaultRequestHeaders.Add("Authorization", "Bearer " + _token);
+
+                        _searchesClient = new SearchesClient(client);
+                        _searchesClient.BaseUrl = _apiUrl;
+                    }
                 }
                 return _searchesClient;
             }
         }
-
         private ServiceClient TokenClient
         {
             get
             {
-                if (_tokenClient is null)
+                lock (_tokenClientLock)
                 {
-                    Logger.Info("cherwell_initialize_tokenclient");
-                    var httpClientHandler = new HttpClientHandler() { UseDefaultCredentials = true };
-                    var client = new HttpClient(httpClientHandler)
+                    if (_tokenClient is null)
                     {
-                        Timeout = new TimeSpan(0, 0, 30),
-                        BaseAddress = new Uri(_apiUrl)
-                    };
+                        Logger.Info("cherwell_initialize_tokenclient");
+                        var httpClientHandler = new HttpClientHandler() { UseDefaultCredentials = true };
+                        var client = new HttpClient(httpClientHandler)
+                        {
+                            Timeout = new TimeSpan(0, 0, 30),
+                            BaseAddress = new Uri(_apiUrl)
+                        };
 
-                    _tokenClient = new ServiceClient(client);
-                    _tokenClient.BaseUrl = _apiUrl;
+                        _tokenClient = new ServiceClient(client);
+                        _tokenClient.BaseUrl = _apiUrl;
+                    }
                 }
                 return _tokenClient;
             }
         }
-
         private async Task<TokenResponse> TokenAsync()
         {
             try
             {
                 Logger.Info("cherwell_retrieve_token");
-                return await TokenClient.TokenAsync("password", _clientId,
-                null, Config.GetHostSetting("ServiceAccountID"), Config.GetHostSetting("ServiceAccountPass"), null, Auth_mode.LDAP, null).ConfigureAwait(false);
+                TokenResponse response = await TokenClient.TokenAsync("password", _clientId,
+                null, Config.GetHostSetting("ServiceAccountID"), Config.GetHostSetting("ServiceAccountPassword"), null, Auth_mode.LDAP, null).ConfigureAwait(false);
+                Logger.Info("cherwell_retrieve_token_success");
+                return response;
             }
             catch (Exception ex)
             {
@@ -186,6 +200,20 @@ namespace Sentry.data.Infrastructure
 
 
         #region Private Methods
+        private void RefreshToken()
+        {
+            lock (_tokenLockObject)
+            {
+                if ((DateTime.Now - _tokenTimer).TotalSeconds > 30)
+                {
+                    Logger.Info("cherwell_refreshing_token");
+                    var token = TokenAsync().ConfigureAwait(false);
+                    _token = token.GetAwaiter().GetResult().Access_token;
+                    _tokenTimer = DateTime.Now;
+                }
+            }
+        }
+
         private void AddApproversToTicket(string busPublicObId, AccessRequest model)
         {
             Summary busObj = GetBusinessObjectSummaryByName(GlobalConstants.CherwellBusinessObjectNames.APPROVAL);
