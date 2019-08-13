@@ -233,39 +233,6 @@ namespace Sentry.data.Web.Controllers
         //    return View(dfcm);
         //}
 
-        private DataElement CreateNewDataElement(DatasetFileConfigsModel dfcm)
-        {
-
-            Dataset ds = _datasetContext.GetById<Dataset>(dfcm.DatasetId);
-
-            string storageCode = _datasetContext.GetNextStorageCDE().ToString();
-            DataElement de = new DataElement()
-            {
-                DataElementCreate_DTM = DateTime.Now,
-                DataElementChange_DTM = DateTime.Now,
-                DataElement_CDE = "F",
-                DataElement_DSC = GlobalConstants.DataElementDescription.DATA_FILE,
-                DataElement_NME = dfcm.ConfigFileName,
-                LastUpdt_DTM = DateTime.Now,
-                SchemaIsPrimary = true,
-                SchemaDescription = dfcm.ConfigFileDesc,
-                SchemaName = dfcm.ConfigFileName,
-                SchemaRevision = 1,
-                SchemaIsForceMatch = false,
-                Delimiter = dfcm.Delimiter,
-                HasHeader = dfcm.HasHeader,
-                FileFormat = _datasetContext.GetById<FileExtension>(dfcm.FileExtensionID).Name.Trim(),
-                StorageCode = storageCode,
-                HiveDatabase = "Default",
-                HiveTable = ds.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dfcm.ConfigFileName.Replace(" ", "").ToUpper(),
-                HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
-                HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
-                CreateCurrentView = dfcm.CreateCurrentView
-            };
-
-            return de;
-        }
-
         [HttpGet]
         [Route("Config/Manage")]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]

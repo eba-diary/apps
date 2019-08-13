@@ -13,6 +13,6 @@ namespace Sentry.data.Core
         void RecordJobState(Submission submission, RetrieverJob job, string state);
         RetrieverJob FindBasicJob(RetrieverJob job);
         RetrieverJob InstantiateJobsForCreation(DatasetFileConfig dfc, DataSource dataSource);
-        void CreateDropLocation(RetrieverJob retrieverJob);
+        void CreateDropLocation(RetrieverJob job);
     }
 }

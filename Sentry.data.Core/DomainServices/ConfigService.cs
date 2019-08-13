@@ -32,8 +32,21 @@ namespace Sentry.data.Core
             _messagePublisher = messagePublisher;
             _encryptService = encryptService;
             _securityService = securityService;
-            _jobService = jobService;
+            JobService = jobService;
         }
+
+        private IJobService JobService
+        {
+            get
+            {
+                return _jobService;
+            }
+            set
+            {
+                _jobService = value;
+            }
+        }
+
         public SchemaDTO GetSchemaDTO(int id)
         {
             DataElement de = _datasetContext.GetById<DataElement>(id);
@@ -222,12 +235,12 @@ namespace Sentry.data.Core
 
                 DataSource basicSource = _datasetContext.DataSources.First(x => x.Name.Contains(GlobalConstants.DataSourceName.DEFAULT_DROP_LOCATION));
 
-                RetrieverJob rj = _jobService.InstantiateJobsForCreation(dfc, basicSource);
+                RetrieverJob rj = JobService.InstantiateJobsForCreation(dfc, basicSource);
 
                 List<RetrieverJob> jobList = new List<RetrieverJob>
                 {
                     rj,
-                    _jobService.InstantiateJobsForCreation(dfc, _datasetContext.DataSources.First(x => x.Name.Contains(GlobalConstants.DataSourceName.DEFAULT_S3_DROP_LOCATION)))
+                    JobService.InstantiateJobsForCreation(dfc, _datasetContext.DataSources.First(x => x.Name.Contains(GlobalConstants.DataSourceName.DEFAULT_S3_DROP_LOCATION)))
                 };
 
                 dfc.RetrieverJobs = jobList;
@@ -241,7 +254,7 @@ namespace Sentry.data.Core
                 _datasetContext.SaveChanges();
 
 
-                _jobService.CreateDropLocation(rj);
+                JobService.CreateDropLocation(rj);
 
                 return true;
             }

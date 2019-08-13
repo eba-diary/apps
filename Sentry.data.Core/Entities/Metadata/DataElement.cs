@@ -191,7 +191,7 @@ namespace Sentry.data.Core
             get
             {
                 DataElementDetail detail = GetElementDetail(GlobalConstants.DataElementDetailCodes.CREATE_CURRENT_VIEW);
-                return (detail == null || detail.DataElementDetailType_VAL.ToLower() == "false") ? false : true;
+                return (detail == null || detail.DataElementDetailType_VAL.ToLower() == "false");
             }
             set
             {
