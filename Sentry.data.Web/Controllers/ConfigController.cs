@@ -783,10 +783,10 @@ namespace Sentry.data.Web.Controllers
             });
 
             csm.SourceTypesDropdown = temp.Where(x => 
-                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_DROP_LOCATION && 
-                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION && 
-                x.Value != GlobalConstants.DataSoureDiscriminator.JAVA_APP_SOURCE &&
-                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_HSZ_DROP_LOCATION).OrderBy(x => x.Value);
+                    x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_DROP_LOCATION && 
+                    x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION && 
+                    x.Value != GlobalConstants.DataSoureDiscriminator.JAVA_APP_SOURCE &&
+                    x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_HSZ_DROP_LOCATION).OrderBy(x => x.Value);
 
             if (csm.SourceType == null)
             {

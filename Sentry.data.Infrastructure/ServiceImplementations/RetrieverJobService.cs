@@ -483,8 +483,90 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Used to run HSZ retriever jobs
+        /// </summary>
+        /// <param name="JobId"></param>
+        /// <param name="token"></param>
+        /// <param name="filePath"></param>
+        public void RunHszRetrieverJob(RetrieverJob job, CancellationToken token, string filePath = null)
+        {
+            try
+            {
+                token.ThrowIfCancellationRequested();
 
+                using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                {
+                    IRequestContext _requestContext = Container.GetInstance<IRequestContext>();
+                    IS3ServiceProvider _s3ServiceProvider = Container.GetInstance<IS3ServiceProvider>();
 
+                    //set job details
+                    _job = job;
+
+                    try
+                    {
+                        RetrieverJob targetJob = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).ThenFetch(d => d.ParentDataset).Fetch(f => f.DataSource).FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is S3Basic);
+                        //Get target path based on basic job found
+                        //string targetFullPath = GetTargetPath(targetJob);
+
+                        //Set directory search
+                        var dirSearchCriteria = (String.IsNullOrEmpty(filePath)) ? "*" : Path.GetFileName(filePath);
+
+                        //Only search top directory and source files not locked and does not start with two exclamaition points !!
+                        foreach (var a in Directory.GetFiles(_job.GetUri().LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w) && !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
+                        {
+                            if (_job.JobOptions.CompressionOptions.IsCompressed)
+                            {
+                                //TODO: Revisit delete source file logic to handle not deleting source file
+                                ProcessCompressedFile(a, true);
+                            }
+                            else
+                            {
+                                //check for searchcriteria for filtering incoming files
+                                if (!_job.FilterIncomingFile(Path.GetFileName(a)))
+                                {
+
+                                    string processingFile = GenerateProcessingFileName(filePath);
+
+                                    //Rename file to indicate a request has been sent to Dataset Loader
+                                    File.Move(filePath, processingFile);
+
+                                    //generate targetkey, remove processing indicator from filename
+                                    string targetkey = $"{targetJob.DataSource.GetDropPrefix(targetJob)}{_job.GetTargetFileName(Path.GetFileName(filePath).Replace(Configuration.Config.GetHostSetting("ProcessedFilePrefix"),""))}";
+                                    var versionId = _s3ServiceProvider.UploadDataFile(processingFile, targetkey);
+
+                                    //Cleanup target file if exists
+                                    if (File.Exists(processingFile))
+                                    {
+                                        File.Delete(processingFile);
+                                    }
+
+                                    _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
+
+                                }
+                                else
+                                {
+                                    _job.JobLoggerMessage("Info", $"Filtered file from processing ({a})");
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _job.JobLoggerMessage("Error", $"Retriever Job Failed", ex);
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                Logger.Info($"Retriever Job Cancelled - Job:{job.Id}");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Retriever Job Failed to initialize - Job:{job.Id}", ex);
+            }
+        }
         #region FTP Processing
 
         private void ProcessNewFilesSinceLastExecution()
@@ -968,13 +1050,15 @@ namespace Sentry.data.Infrastructure
                 filename = _job.GetTargetFileName(_job.GetTargetFileName(String.Empty));
                 targetPath = $"{basepath}{_job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString()))}";
             }
+            else if (_job.DataSource.Is<DfsBasicHsz>())
+            {
+                targetPath = basepath;
+            }
             else
             {
                 filename = _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString()));
                 targetPath = Path.Combine(basepath, _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString())));
-            }
-
-            
+            }            
 
             return targetPath;
         }
@@ -1117,6 +1201,23 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        private string GenerateProcessingFileName(string filepath)
+        {
+            var orginalPath = Path.GetFullPath(filepath).Replace(Path.GetFileName(filepath), "");
+            var origFileName = Path.GetFileName(filepath);
+            return orginalPath + Configuration.Config.GetHostSetting("ProcessedFilePrefix") + origFileName;
+        }
+
+        private string GetFileOwner(string filepath)
+        {
+            var fsecurity = File.GetAccessControl(filepath);
+            var sid = fsecurity.GetOwner(typeof(SecurityIdentifier));
+            var ntAccount = sid.Translate(typeof(NTAccount));
+
+            //remove domain
+            return ntAccount.ToString().Replace(@"SHOESD01\", "");
+        }
+
         private void SubmitLoaderRequest(string filepath)
         {
             string processingFile = null;
@@ -1124,16 +1225,8 @@ namespace Sentry.data.Infrastructure
 
             if (_job.DataSource.Is<DfsBasic>() || _job.DataSource.Is<DfsCustom>())
             {
-                var orginalPath = Path.GetFullPath(filepath).Replace(Path.GetFileName(filepath), "");
-                var origFileName = Path.GetFileName(filepath);
-                processingFile = orginalPath + Configuration.Config.GetHostSetting("ProcessedFilePrefix") + origFileName;
-
-                var fsecurity = File.GetAccessControl(filepath);
-                var sid = fsecurity.GetOwner(typeof(SecurityIdentifier));
-                var ntAccount = sid.Translate(typeof(NTAccount));
-
-                //remove domain
-                fileOwner = ntAccount.ToString().Replace(@"SHOESD01\", "");
+                processingFile = GenerateProcessingFileName(filepath);
+                fileOwner = GetFileOwner(filepath);
 
                 //Rename file to indicate a request has been sent to Dataset Loader
                 File.Move(filepath, processingFile);

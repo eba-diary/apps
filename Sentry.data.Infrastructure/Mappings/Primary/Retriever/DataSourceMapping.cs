@@ -267,6 +267,14 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
         }
     }
 
+    public class DfsBasicHszMapping : SubclassMapping<DfsBasicHsz>
+    {
+        public DfsBasicHszMapping()
+        {
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.DEFAULT_HSZ_DROP_LOCATION);
+        }
+    }
+
     public class GoogleApiMapping : SubclassMapping<GoogleApiSource>
     {
         public GoogleApiMapping()
