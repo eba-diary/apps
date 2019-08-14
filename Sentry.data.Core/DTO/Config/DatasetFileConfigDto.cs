@@ -18,5 +18,6 @@ namespace Sentry.data.Core
         public virtual int FileExtensionId { get; set; }
         public virtual IList<DataElementDto> Schemas { get; set; }
         public UserSecurity Security { get; internal set; }
+        public bool CreateCurrentView { get; set; }
     }
 }

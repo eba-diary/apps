@@ -65,6 +65,7 @@ namespace Sentry.data.Web
             this.FileExtensionID = dto.FileExtensionId;
             this.RawStorageId = dto.StorageCode;
             this.Security = dto.Security;
+            this.CreateCurrentView = dto.CreateCurrentView;
         }
 
         public DatasetFileConfigsModel(DatasetFileConfig dsfc, Boolean renderingForTable, Boolean renderingForPopup, IDatasetContext datasetContext)

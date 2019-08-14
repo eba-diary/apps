@@ -20,5 +20,6 @@ namespace Sentry.data.Core
         public bool CreateCurrentView { get; set; }
         public int ParentDatasetId { get; set; }
         public int FileExtensionId { get; set; }
+        public int DataElementID { get; set; }
     }
 }

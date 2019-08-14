@@ -287,6 +287,14 @@ namespace Sentry.data.Core
             dfc.FileTypeId = dto.FileTypeId;
             dfc.Description = dto.Description;
             dfc.FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId);
+
+            DataElement de = _datasetContext.DataElements.Where(w => w.DatasetFileConfig.ConfigId == dfc.ConfigId && w.DataElement_NME == dfc.Schema.FirstOrDefault().DataElement_NME).FirstOrDefault();
+            UpdateDataElement(dto, de);
+        }
+
+        private void UpdateDataElement(DatasetFileConfigDto dto, DataElement de)
+        {
+            de.CreateCurrentView = dto.Schemas.FirstOrDefault().CreateCurrentView;
         }
 
         public DatasetFileConfigDto GetDatasetFileConfigDto(int configId)
@@ -957,6 +965,7 @@ namespace Sentry.data.Core
             dto.ParentDatasetId = dfc.ParentDataset.DatasetId;
             dto.StorageCode = dfc.GetStorageCode();
             dto.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
+            dto.CreateCurrentView = (dfc.Schema.FirstOrDefault() != null) ? dfc.Schema.FirstOrDefault().CreateCurrentView : false;
         }
         #endregion
     }

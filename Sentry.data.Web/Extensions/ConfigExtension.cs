@@ -112,6 +112,7 @@ namespace Sentry.data.Web
         {
             return new Core.DataElementDto()
             {
+                DataElementID = model.DataElement_ID,
                 DataElementName = model.ConfigFileName,
                 SchemaName = model.ConfigFileName,
                 SchemaDescription = model.ConfigFileDesc,
