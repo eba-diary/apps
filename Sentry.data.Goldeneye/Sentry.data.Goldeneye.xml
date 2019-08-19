@@ -83,12 +83,6 @@
             <param name="watchPath"></param>
             <param name="token"></param>
         </member>
-        <member name="M:Sentry.data.Goldeneye.Watch.GetCount">
-            <summary>
-            Returns current processed file count
-            </summary>
-            <returns></returns>
-        </member>
         <member name="M:Sentry.data.Goldeneye.Watch.GetCountStart">
             <summary>
             Returns start datetime of file counter
