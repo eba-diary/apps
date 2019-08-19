@@ -77,7 +77,8 @@ namespace Sentry.data.Core
                 CanEditReport = user.CanManageReports || IsAdmin,
                 CanCreateReport = user.CanManageReports || IsAdmin,
                 CanEditDataSource = (user.CanModifyDataset && IsOwner) || IsAdmin,
-                CanCreateDataSource = user.CanModifyDataset || IsAdmin
+                CanCreateDataSource = user.CanModifyDataset || IsAdmin,
+                ShowAdminControls = IsAdmin
             };
 
             //if it is not secure, it should be wide open except for upload.

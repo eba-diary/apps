@@ -88,5 +88,41 @@ namespace Sentry.data.Web
                 PrimaryContactName = model.PrimaryContactName
             };
         }
+
+        public static Core.DatasetFileConfigDto ToDto(this DatasetFileConfigsModel model)
+        {
+            List<Core.DataElementDto> deList = new List<Core.DataElementDto>();
+            deList.Add(model.ToSchemaDto());
+
+            return new Core.DatasetFileConfigDto()
+            {
+                ConfigId = model.ConfigId,
+                Name = model.ConfigFileName,
+                Description = model.ConfigFileDesc,
+                DatasetScopeTypeId = model.DatasetScopeTypeID,
+                ParentDatasetId = model.DatasetId,
+                FileTypeId = model.FileTypeId,
+                StorageCode = model.RawStorageId,
+                Schemas = deList,
+                FileExtensionId = model.FileExtensionID
+            };
+        }
+
+        public static Core.DataElementDto ToSchemaDto(this DatasetFileConfigsModel model)
+        {
+            return new Core.DataElementDto()
+            {
+                DataElementID = model.DataElement_ID,
+                DataElementName = model.ConfigFileName,
+                SchemaName = model.ConfigFileName,
+                SchemaDescription = model.ConfigFileDesc,
+                Delimiter = model.Delimiter,
+                HasHeader = model.HasHeader,
+                CreateCurrentView = model.CreateCurrentView,
+                FileFormatId = model.FileTypeId,
+                ParentDatasetId = model.DatasetId,
+                FileExtensionId = model.FileExtensionID
+            };
+        }
     }
 }
