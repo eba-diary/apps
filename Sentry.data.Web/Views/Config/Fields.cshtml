@@ -228,7 +228,7 @@
                     <h6 style="float: left; margin-right: 6px; line-height: 0.5; width: 15px;" data-bind="text: Id"></h6>
                     <input class="col-lg-3" data-bind="value: Name" placeholder="Field Name..." />
                     <input class="col-lg-3" data-bind="value: Description" placeholder="Description..." />
-                    <select class="typeSelect" data-bind="value: Type">
+                    <select class="typeSelect" data-bind="value: DataType">
                         <optgroup label="Numeric Data Types">
                             <option title="A signed one-byte integer, from -128 to 127." value="TINYINT">
                                 TINYINT
@@ -470,7 +470,7 @@
             self.DataObjectField_ID = ko.observable(data.DataObjectField_ID);
             self.Name = ko.observable(data.Name);
             self.Description = ko.observable(data.Description);
-            self.Type = ko.observable(data.DataType);
+            self.DataType = ko.observable(data.DataType);
             self.ArrayType = ko.observable(data.ArrayType);
             self.Precision = ko.observable(data.Precision);
             self.Scale = ko.observable(data.Scale);
@@ -485,17 +485,17 @@
 
 
                 //Has no children.  Error
-                if ((self.Type() === 'STRUCT' || (self.Type() === 'ARRAY' && self.ArrayType() === 'STRUCT')) && self.ChildRows !== undefined && self.ChildRows().length === 0) {
+                if ((self.DataType() === 'STRUCT' || (self.DataType() === 'ARRAY' && self.ArrayType() === 'STRUCT')) && self.ChildRows !== undefined && self.ChildRows().length === 0) {
                     parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Type', 'Description': ' has no children.  Please add a child or change data types.' });
                     hasError = true;
                 }
                 //Has children when it shouldn't
-                else if (self.Type() === 'ARRAY' && self.ArrayType() !== "STRUCT" && self.ChildRows !== undefined && self.ChildRows().length > 0) {
+                else if (self.DataType() === 'ARRAY' && self.ArrayType() !== "STRUCT" && self.ChildRows !== undefined && self.ChildRows().length > 0) {
                     parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to ARRAY<STRUCT>.' });
                     hasError = true;
                 }
                 //Has children when it shouldn't
-                else if (self.Type() !== 'STRUCT' && (self.Type() !== 'ARRAY' && self.ArrayType() !== "STRUCT") && self.ChildRows !== undefined && self.ChildRows().length > 0) {
+                else if (self.DataType() !== 'STRUCT' && (self.DataType() !== 'ARRAY' && self.ArrayType() !== "STRUCT") && self.ChildRows !== undefined && self.ChildRows().length > 0) {
                     parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to STRUCT.' });
                     hasError = true;
                 }
@@ -524,7 +524,7 @@
 
 
             self.ShowPandS = ko.computed(function () {
-                if (self.Type() === 'DECIMAL') {
+                if (self.DataType() === 'DECIMAL') {
                     return true;
                 }
                 else {
@@ -533,7 +533,7 @@
             });
 
             self.ShowArrayType = ko.computed(function () {
-                if (self.Type() === 'ARRAY') {
+                if (self.DataType() === 'ARRAY') {
                     return true;
                 }
                 else {
@@ -542,7 +542,7 @@
             });
 
             self.ShowAddChild = ko.computed(function () {
-                if (self.Type() === 'STRUCT' || (self.Type() === 'ARRAY' && self.ArrayType() === 'STRUCT')) {
+                if (self.DataType() === 'STRUCT' || (self.DataType() === 'ARRAY' && self.ArrayType() === 'STRUCT')) {
                     return true;
                 }
                 else {
@@ -557,7 +557,7 @@
 
             self.addChild = function () {
                 currentMax++;
-                self.ChildRows.push(new Row(currentMax, [{ DataObjectField_ID: "", Name: "", Description: "", Type: "", ArrayType: "", Precision: null, Scale: null }], parent));
+                self.ChildRows.push(new Row(currentMax, [{ DataObjectField_ID: "", Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }], parent));
             };
 
             self.removeChild = function (row) {
@@ -585,7 +585,7 @@
 
             self.addRow = function () {
                 currentMax++;
-                self.Rows.push(new Row(currentMax, [{ DataObjectField_ID: "", Name: "", Description: "", Type: "", ArrayType: "", Precision: null, Scale: null }], self));
+                self.Rows.push(new Row(currentMax, [{ DataObjectField_ID: "", Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }], self));
             };
 
             self.removeRow = function (row) {
@@ -594,7 +594,7 @@
             }
 
             self.save = function () {
-                var a = JSON.stringify(ko.toJS(vm.Rows), ['Name', 'DataObjectField_ID', 'Description', 'Type', 'ArrayType', 'Precision', 'Scale', 'ChildRows']);
+                var a = JSON.stringify(ko.toJS(vm.Rows), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows']);
                 console.log(a);
 
                 var url_parts = window.location.href.replace(/\/\s*$/, '').split('/');
@@ -627,19 +627,19 @@
 
         var initialData = [
             {
-                Name: "Parent1", Description: "LaRusso", Type: "ARRAY", ArrayType: "STRUCT", Precision: "", Scale: "",
+                Name: "Parent1", Description: "LaRusso", DataType: "ARRAY", ArrayType: "STRUCT", Precision: "", Scale: "",
                 ChildRows: [
                     {
-                        Name: "Child1", Description: "LaRusso", Type: "STRUCT", ArrayType: "", Precision: "", Scale: "",
+                        Name: "Child1", Description: "LaRusso", DataType: "STRUCT", ArrayType: "", Precision: "", Scale: "",
                         ChildRows: [
                             {
-                                Name: "Child11", Description: "LaRusso", Type: "INTEGER", ArrayType: "", Precision: "", Scale: "",
+                                Name: "Child11", Description: "LaRusso", DataType: "INTEGER", ArrayType: "", Precision: "", Scale: "",
                             },
                             {
-                                Name: "Child12", Description: "LaRusso", Type: "STRUCT", ArrayType: "", Precision: "", Scale: "",
+                                Name: "Child12", Description: "LaRusso", DataType: "STRUCT", ArrayType: "", Precision: "", Scale: "",
                                 ChildRows: [
-                                    { Name: "Child121", Description: "LaRusso", Type: "INTEGER", ArrayType: "", Precision: "", Scale: "" },
-                                    { Name: "Child122", Description: "LaRusso", Type: "INTEGER", ArrayType: "", Precision: "", Scale: "" }
+                                    { Name: "Child121", Description: "LaRusso", DataType: "INTEGER", ArrayType: "", Precision: "", Scale: "" },
+                                    { Name: "Child122", Description: "LaRusso", DataType: "INTEGER", ArrayType: "", Precision: "", Scale: "" }
                                 ]
                             }
                         ]
@@ -647,7 +647,7 @@
                 ]
             },
             {
-                Name: "Parent2", Description: "LaRusso", Type: "INTEGER", ArrayType: "", Precision: "", Scale: ""
+                Name: "Parent2", Description: "LaRusso", DataType: "INTEGER", ArrayType: "", Precision: "", Scale: ""
             }
         ];
 
