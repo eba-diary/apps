@@ -1,22 +1,9 @@
 ﻿data.Job = {
 
     FormInit: function () {
-
-        if ($("#JobID").val() != "0" && $("#JobID").val() != undefined) {
-            var val = $('#SelectedDataSource :selected').val();
-            $.getJSON("/Config/IsHttpSource/", { dataSourceId: val }, function (data) {
-                if (data) {
-                    $('.httpSourcePanel').show();
-                }
-                else {
-                    $('.httpSourcePanel').hide();
-                }
-            });
-
-            data.Job.DisplayHttpPostPanel();
-        };
-
         $("#SelectedSourceType").change(function () {
+            data.Job.SetDataSourceSpecificPanels();
+            data.Job.SetFtpPatternDefaults();
             $('.questionairePanel').hide();
             $(".editDataSourceLink").hide();
             $('#btnCreateDataset').hide();
@@ -50,20 +37,24 @@
                     dataType: 'json',
                     type: "GET",
                     data: { sourceId: $('#SelectedDataSource :selected').val() },
-                    success: function (data) {
+                    success: function (datain) {
                         //Data Source is not restricted or user has permissions to use data source
-                        if (!data.IsSecured || (data.IsSecured && data.Security.CanUseDataSource)) {
+                        if (!datain.IsSecured || (datain.IsSecured && datain.Security.CanUseDataSource)) {
                             $('.securityPanel').hide();
                             $('.questionairePanel').show();
                             $('#btnCreateDataset').show();
 
-                            if (data.Security.CanEditDataSource) {
+                            if (datain.Security.CanEditDataSource) {
                                 $("#editDataSource").attr("href", "/Config/Source/Edit/" + val);
                                 $(".editDataSourceLink").show();
                             }
                             else {
                                 $(".editDataSourceLink").hide();
                             }
+
+
+                            data.Job.SetDataSourceSpecificPanels(datain.SourceType);
+
 
                             $.getJSON("/Config/IsHttpSource/", { dataSourceId: val }, function (data) {
                                 if (data) {
@@ -84,14 +75,14 @@
                             $('#btnCreateDataset').hide();
                         }
 
-                        $('#primaryOwner').text(data.PrimaryOwnerName);
-                        $('#dataSourceContactEmail').attr("href", data.MailToLink)
-                        $('#dataSourceContactEmail').text(data.PrimaryContactName);
+                        $('#primaryOwner').text(datain.PrimaryOwnerName);
+                        $('#dataSourceContactEmail').attr("href", datain.MailToLink)
+                        $('#dataSourceContactEmail').text(datain.PrimaryContactName);
                         //$('#primaryContact.a').text("<a href/" + data.MailToLink + "/"adfad");
                         $('.dataSourceInfoPanel').show();
-                        $("#dataSourceDescription").text(data.Description);
-                        $("#baseURLTextBox").val(data.BaseUri);
-                        $("#baseURL").text(" The Base URL of the Data Source you picked is " + data.BaseUri + ".  What you type in the Relative URL will be appended to the end of this Base URL.");
+                        $("#dataSourceDescription").text(datain.Description);
+                        $("#baseURLTextBox").val(datain.BaseUri);
+                        $("#baseURL").text(" The Base URL of the Data Source you picked is " + datain.BaseUri + ".  What you type in the Relative URL will be appended to the end of this Base URL.");
                     }
                 });
             }            
@@ -112,6 +103,106 @@
             e.preventDefault();
             data.Job.AccessRequest($('#SelectedDataSource :selected').val());
         });
+
+        $('#FtpPattern').change(function () {
+            data.Job.SetFtpPatternDefaults($('#FtpPattern').val());
+        })
+
+        $('#IsSourceCompressed').on('change', function () {
+            $("#compressionPanel").toggle($("#IsSourceCompressed").is(':checked'));
+
+            if ($(this).is(':checked')) {
+                $('.jobquestion.targetFileName').hide();
+                $('#TargetFileName').val("");
+            }
+
+            if (!$(this).is(':checked') && $("#SelectedSourceType").val().toLowerCase() != "ftp") {
+                $('.jobquestion.targetFileName').show();
+            }
+        });
+
+        if ($("#JobID").val() != "0" && $("#JobID").val() != undefined) {
+            $("#SelectedDataSource").trigger('change');
+            data.Job.targetFileNameDescUpdate();
+            if ($("#SelectedSourceType").val().toLowerCase() === "ftp") {
+                data.Job.SetFtpPatternDefaults($('#FtpPattern').val());
+            }
+        };
+
+        $("#compressionPanel").toggle($("#IsSourceCompressed").is(':checked'));
+    },
+
+    SetFtpPatternDefaults: function (patternSelection) {
+        if (patternSelection == undefined) {
+            //reset properties and panels
+            $('.searchCriteria.searchCriteriaIsRegex').show();
+            $('#IsRegexSearch').prop('checked', false);
+        }
+        else {
+            var init = true;
+            if ($("#JobID").val() != "0" && $("#JobID").val() != undefined) {
+                init = false;
+            }
+
+            switch (patternSelection) {
+                case "0":
+                    $('.searchCriteria.searchCriteriaIsRegex').show();
+                    $('.jobquestion.searchCriteria').show();
+                    break;
+                case "2": //RegexFileNoDelete
+                    $('.searchCriteria.searchCriteriaIsRegex').hide();
+                    $('.jobquestion.searchCriteria').show();
+                    break;
+                case "4": //RegexFileSinceLastExecution
+                    $('.searchCriteria.searchCriteriaIsRegex').hide();
+                    $('.jobquestion.searchCriteria').show();
+                    break;
+                case "5": //NewFilesSinceLastexecution
+                    $('.searchCriteria.searchCriteriaIsRegex').hide();
+                    $('.jobquestion.searchCriteria').hide();
+                    break;
+            }
+
+            if (init) {
+                $('#IsRegexSearch').prop('checked', true);
+            }
+        }
+        
+    },
+
+    SetDataSourceSpecificPanels: function (sourceType) {
+        if (sourceType == undefined) {
+            $('.jobquestion').hide();
+            $('.ftpSourcePanel').hide();
+            $('#IsSourceCompressed').prop('checked', false);
+            $("#compressionPanel").toggle($("#IsSourceCompressed").is(':checked'));
+        }
+        else {
+            switch (sourceType.toLowerCase()) {
+                case "ftp": 
+                    $('.jobquestion.ftpPattern').show();
+                    $('.jobquestion.compression').show();
+                    $('.jobquestion.targetFileName').hide();
+                    break;
+                case "googleapi":
+                    $('.jobquestion.targetFileName').show();
+                    $('.httpSourcePanel').show();
+                    $('.httpPostPanel').hide();
+                    break;
+                case "https":
+                    $('.jobquestion.targetFileName').show();
+                    $('.httpSourcePanel').show();
+                    $('.httpPostPanel').hide();
+                    $('.jobquestion.compression').show();
+                    break;
+                case "DFSCustom":
+                    $('.jobquestion.compression').show();
+            }
+
+            //show common questions
+            $('.jobquestion.sourceLocation').show();
+            $('.jobquestion.schedule').show();
+        }
     },
 
     AccessRequest: function (sourceId) {
@@ -235,9 +326,9 @@
     },
 
     targetFileNameDescUpdate: function () {
-        var val = $('#SelectedSourceType :selected').val();
+        var val = $('#SelectedSourceType :selected').val().toLowerCase();
 
-        if (val == 'HTTPS') {
+        if (val == 'https' || val == 'googleapi') {
             $("#targetfilenamequestion").text("What should target file be named?");
             $("#targetfilenamedesc").text("Due to the type of data source, a target file name is required as we are receiving a message not retrieving specific file.");
             $('#targetfilenamelabel').removeClass("optional");

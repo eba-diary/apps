@@ -417,6 +417,34 @@ namespace Sentry.data.Web.Helpers
 
             return requestDataMethodList;
         }
+
+        public static List<SelectListItem> BuildFtpPatternSelectList(FtpPattern selectedType)
+        {
+            List<SelectListItem> patterns = new List<SelectListItem>();
+
+            if (selectedType == FtpPattern.NoPattern)
+            {
+                patterns.Add(new SelectListItem()
+                {
+                    Text = "Pick a ftp pattern",
+                    Value = "0",
+                    Selected = true,
+                    Disabled = true
+                });
+            }
+
+            foreach (FtpPattern item in Enum.GetValues(typeof(FtpPattern)))
+            {
+                patterns.Add(new SelectListItem()
+                {
+                    Text = item.GetDescription(),
+                    Value = ((int)item).ToString(),
+                    Selected = selectedType == item
+                });
+            }
+
+            return patterns;
+        }
     }
 
 }

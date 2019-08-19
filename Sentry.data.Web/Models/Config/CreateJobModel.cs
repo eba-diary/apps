@@ -86,12 +86,15 @@ namespace Sentry.data.Web
         public HttpMethods SelectedRequestMethod { get; set; }
         [DisplayName("Request Body Format")]
         public HttpDataFormat SelectedRequestDataFormat { get; set; }
+        [DisplayName("FTP Pattern")]
+        public FtpPattern FtpPattern { get; set; }
         public List<DataSource> AvailableSources { get; set; }
 
         public IEnumerable<SelectListItem> SourceTypesDropdown { get; set; }
         public IEnumerable<SelectListItem> SourcesForDropdown { get; set; }
         public IEnumerable<SelectListItem> RequestMethodDropdown { get; set; }
         public IEnumerable<SelectListItem> RequestDataFormatDropdown { get; set; }
+        public IEnumerable<SelectListItem> FtpPatternDropDown { get; internal set; }
 
         public IEnumerable<SelectListItem> SchedulePickerDropdown
         {

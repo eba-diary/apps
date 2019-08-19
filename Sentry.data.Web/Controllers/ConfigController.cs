@@ -387,7 +387,8 @@ namespace Sentry.data.Web.Controllers
                         CreateCurrentFile = cjm.CreateCurrentFile,
                         IsRegexSearch = cjm.IsRegexSearch,
                         SearchCriteria = cjm.SearchCriteria,
-                        CompressionOptions = compression
+                        CompressionOptions = compression,
+                        FtpPattern = cjm.FtpPattern
                     };
 
                     if (dataSource.Is<GoogleApiSource>())
@@ -495,6 +496,8 @@ namespace Sentry.data.Web.Controllers
 
             cjm.RequestDataFormatDropdown = Utility.BuildRequestDataFormatDropdown(cjm.SelectedRequestDataFormat);
 
+            cjm.FtpPatternDropDown = Utility.BuildFtpPatternSelectList(cjm.FtpPattern);
+
             return cjm;
         }
 
@@ -564,7 +567,8 @@ namespace Sentry.data.Web.Controllers
                         IsRegexSearch = ejm.IsRegexSearch,
                         SearchCriteria = ejm.SearchCriteria,
                         CompressionOptions = compression,
-                        HttpOptions = hOptions
+                        HttpOptions = hOptions,
+                        FtpPattern = ejm.FtpPattern
                     };                    
 
                     rj.Schedule = ejm.Schedule;
@@ -721,12 +725,13 @@ namespace Sentry.data.Web.Controllers
             else
             {
                 ejm.NewFileNameExclusionList = "";
-                //ejm.FileNameExclusionList = new List<string>();
             }
 
             ejm.RequestMethodDropdown = Utility.BuildRequestMethodDropdown(ejm.SelectedRequestMethod);
 
             ejm.RequestDataFormatDropdown = Utility.BuildRequestDataFormatDropdown(ejm.SelectedRequestDataFormat);
+
+            ejm.FtpPatternDropDown = Utility.BuildFtpPatternSelectList(ejm.FtpPattern);
 
             return ejm;
         }

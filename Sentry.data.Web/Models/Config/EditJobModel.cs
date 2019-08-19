@@ -35,6 +35,7 @@ namespace Sentry.data.Web
             SelectedRequestMethod = (rj.JobOptions.HttpOptions != null && rj.JobOptions.HttpOptions.RequestMethod != null) ? rj.JobOptions.HttpOptions.RequestMethod : HttpMethods.none;
             HttpRequestBody = (rj.JobOptions.HttpOptions != null && rj.JobOptions.HttpOptions.Body != null) ? rj.JobOptions.HttpOptions.Body : null;
             SelectedRequestDataFormat = (rj.JobOptions.HttpOptions != null && rj.JobOptions.HttpOptions.RequestDataFormat != null) ? rj.JobOptions.HttpOptions.RequestDataFormat : HttpDataFormat.none;
+            FtpPattern = rj.JobOptions.FtpPattern;
         }
 
         public int JobID { get; set; }
@@ -86,6 +87,8 @@ namespace Sentry.data.Web
         public HttpMethods SelectedRequestMethod { get; set; }
         [DisplayName("Request Body Format")]
         public HttpDataFormat SelectedRequestDataFormat { get; set; }
+        [DisplayName("FTP Pattern")]
+        public FtpPattern FtpPattern { get; set; }
         public UserSecurity Security { get; set; }
 
         public List<DataSource> AvailableSources { get; set; }
@@ -94,5 +97,6 @@ namespace Sentry.data.Web
         public IEnumerable<SelectListItem> SourcesForDropdown { get; set; }
         public IEnumerable<SelectListItem> RequestMethodDropdown { get; set; }
         public IEnumerable<SelectListItem> RequestDataFormatDropdown { get; set; }
+        public IEnumerable<SelectListItem> FtpPatternDropDown { get; internal set; }
     }
 }
