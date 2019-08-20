@@ -1,0 +1,23 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Sentry.data.Core
+{
+    public class DatasetFileConfigDto
+    {
+        public virtual int ConfigId { get; set; }
+        public virtual string Name { get; set; }
+        public virtual string Description { get; set; }
+        public virtual int FileTypeId { get; set; }
+        public virtual int ParentDatasetId { get; set; }
+        public virtual int DatasetScopeTypeId { get; set; }
+        public virtual string StorageCode { get; set; }
+        public virtual int FileExtensionId { get; set; }
+        public virtual IList<DataElementDto> Schemas { get; set; }
+        public UserSecurity Security { get; internal set; }
+        public bool CreateCurrentView { get; set; }
+    }
+}

@@ -84,5 +84,75 @@ namespace Sentry.data.Core
 
             return basicJob;
         }
+
+        public RetrieverJob InstantiateJobsForCreation(DatasetFileConfig dfc, DataSource dataSource)
+        {
+            RetrieverJobOptions.Compression compression = new RetrieverJobOptions.Compression()
+            {
+                IsCompressed = false,
+                CompressionType = null,
+                FileNameExclusionList = new List<string>()
+            };
+
+            RetrieverJobOptions rjo = new RetrieverJobOptions()
+            {
+                OverwriteDataFile = false,
+                TargetFileName = "",
+                CreateCurrentFile = false,
+                IsRegexSearch = true,
+                SearchCriteria = "\\.",
+                CompressionOptions = compression
+            };
+            RetrieverJob rj = new RetrieverJob()
+            {
+                TimeZone = "Central Standard Time",
+                RelativeUri = null,
+                DataSource = dataSource,
+                DatasetConfig = dfc,
+                Created = DateTime.Now,
+                Modified = DateTime.Now,
+                IsGeneric = true,
+
+                JobOptions = rjo
+            };
+
+            if (dataSource.Is<S3Basic>())
+            {
+                rj.Schedule = "*/1 * * * *";
+            }
+            else if (dataSource.Is<DfsBasic>())
+            {
+                rj.Schedule = "Instant";
+            }
+            else
+            {
+                throw new NotImplementedException("This method does not support this type of Data Source");
+            }
+
+            return rj;
+        }
+
+
+        public void CreateDropLocation(RetrieverJob job)
+        {
+            try
+            {
+                if (job.DataSource.Is<DfsBasic>()  && !System.IO.Directory.Exists(job.GetUri().LocalPath))
+                {
+                    System.IO.Directory.CreateDirectory(job.GetUri().LocalPath);
+                }
+            }
+            catch (Exception e)
+            {
+
+                StringBuilder errmsg = new StringBuilder();
+                errmsg.AppendLine("Failed to Create Drop Location:");
+                errmsg.AppendLine($"DatasetId: {job.DatasetConfig.ParentDataset.DatasetId}");
+                errmsg.AppendLine($"DatasetName: {job.DatasetConfig.ParentDataset.DatasetName}");
+                errmsg.AppendLine($"DropLocation: {job.GetUri().LocalPath}");
+
+                Sentry.Common.Logging.Logger.Error(errmsg.ToString(), e);
+            }
+        }
     }
 }

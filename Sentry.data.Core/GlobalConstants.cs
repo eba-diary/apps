@@ -77,6 +77,7 @@
         {
             public const string DEFAULT_DROP_LOCATION = "Default Drop Location";
             public const string DEFAULT_S3_DROP_LOCATION = "Default S3 Drop Location";
+            public const string DEFAULT_HSZ_DROP_LOCATION = "Default HSZ Drop Location";
         }
 
         public static class DataSoureDiscriminator
@@ -175,5 +176,9 @@
             public const string RETRIEVERJOB_FAILED_STATE = "Failed";
         }
 
+        public static class DataElementDetailCodes
+        {
+            public const string CREATE_CURRENT_VIEW = "CreateCurrentView";
+        }
     }
 }
