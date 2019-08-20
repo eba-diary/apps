@@ -12,7 +12,7 @@
 
 <hr/>
 
-@{using (Html.BeginForm("Edit", "Config", FormMethod.Post))
+@{using (Html.BeginForm("DatasetFileConfigForm", "Config", FormMethod.Post))
 {
         @Html.AntiForgeryToken()
 
@@ -31,9 +31,6 @@
             @Html.HiddenFor(model => model.FileExtensionID)
             @{Model.ModifyType = ViewBag.ModifyType;}
 
-
-
-
             <div class="form-group">
                 @Html.LabelFor(m => m.ConfigFileName, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-sm-4">
@@ -50,9 +47,15 @@
             <div class="form-group">
                 @Html.LabelFor(model => model.FileType, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-sm-4">
-                    @*@Html.DisplayFor(m => m.FileType, new { htmlAttributes = new { @class = "from-control-static" } })*@
-                    @Html.DropDownListFor(model => model.FileType,
-               new SelectList(Model.AllDataFileTypes, "Text", "Text", Model.FileType), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control " })
+                    @if (Model.Security.ShowAdminControls)
+                    {
+                        @Html.DropDownListFor((model) => model.FileType, Model.AllDataFileTypes, new { @class = "form-control" })
+                    }
+                    else
+                    {
+                        @Html.DropDownListFor(model => model.FileType, new SelectList(Model.AllDataFileTypes, "Text", "Text", Model.FileType), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control " })
+                        @Html.HiddenFor(model => model.CreateCurrentView)
+                    }
                 </div>
             </div>
             <div class="form-group">
@@ -78,22 +81,16 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                @Html.LabelFor((model) => model.DataElement_ID, new { @class = "control-label col-md-2", @style = "font-weight: 100;" })
-                <div class="col-md-2">
-                    @Html.TextBoxFor(model => model.DataElement_ID, new { @type = "number", @value = "", @class = "form-control edit-dataset-row" })
+            @if (Model.Security.ShowAdminControls)
+            {
+                <div class="form-group">
+                    @Html.LabelFor(model => model.CreateCurrentView, new { @class = "control-label col-md-2 optional" })
+                    <div class="col-md-1">
+                        @Html.CheckBoxFor(model => model.CreateCurrentView, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                    </div>
+                    @Html.Label("A view will be created filtering to data within latest file loaded into this schema", new { @class = "control-label col-md-9 optional text-muted", @style = "text-align: left" })
                 </div>
-            </div>
-
-            <div class="form-group fieldDescription">
-                <label class="control-label col-md-2"></label>
-                <div class="col-md-10">
-                    <span class="text-muted">
-                        <em> Data.Sentry.com has ID's associated to the Schema / Metadata Repository.  This can be set to 0 and filled in later.</em>
-                    </span>
-                </div>
-            </div>
-
+            }
 
             <hr />
             <div class="form-group">

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 using Sentry.Common.Logging;
 using Sentry.Core;
 
@@ -13,12 +14,15 @@ namespace Sentry.data.Core
         private readonly IDatasetContext _datasetContext;
         private readonly ISecurityService _securityService;
         private readonly UserService _userService;
+        private readonly IMessagePublisher _messagePublisher;
 
-        public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, UserService userService)
+        public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, 
+                            UserService userService, IMessagePublisher messagePublisher)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
             _userService = userService;
+            _messagePublisher = messagePublisher;
         }
 
 
@@ -156,11 +160,17 @@ namespace Sentry.data.Core
             de.DatasetFileConfig = dfc;
             dfc.Schema = new List<DataElement> { de };
 
-            List<RetrieverJob> jobList = new List<RetrieverJob>
+            List<RetrieverJob> jobList = new List<RetrieverJob>();
+            if (ds.DataClassification == GlobalEnums.DataClassificationType.HighlySensitive)
             {
-                CreateRetrieverJob(dfc, GlobalConstants.DataSourceName.DEFAULT_DROP_LOCATION),
-                CreateRetrieverJob(dfc, GlobalConstants.DataSourceName.DEFAULT_S3_DROP_LOCATION)
-            };
+                jobList.Add(CreateRetrieverJob(dfc, GlobalConstants.DataSourceName.DEFAULT_HSZ_DROP_LOCATION));
+            }
+            else
+            {
+                CreateRetrieverJob(dfc, GlobalConstants.DataSourceName.DEFAULT_DROP_LOCATION);
+            }
+
+            jobList.Add(CreateRetrieverJob(dfc, GlobalConstants.DataSourceName.DEFAULT_S3_DROP_LOCATION));
 
             dfc.RetrieverJobs = jobList;
 
@@ -408,12 +418,21 @@ namespace Sentry.data.Core
             {
                 CreateDropLocation(rj.GetUri().LocalPath, dfc);
             }
+            else if (dataSourceName == GlobalConstants.DataSourceName.DEFAULT_HSZ_DROP_LOCATION)
+            {
+                //Send message to kafka for HSZ ingestion service to pickup and create directory
+                HszDropLocationCreateModel hszDropCreate = new HszDropLocationCreateModel();
+                rj.ToHszDropCreateModel(hszDropCreate);
 
+                _messagePublisher.PublishDSCEvent(rj.Id.ToString(), JsonConvert.SerializeObject(hszDropCreate));
+            }
+
+            //Set Schedule metadata
             if (dataSource.Is<S3Basic>())
             {
                 rj.Schedule = "*/1 * * * *";
             }
-            else if (dataSource.Is<DfsBasic>())
+            else if (dataSource.Is<DfsBasic>() || dataSource.Is<DfsBasicHsz>())
             {
                 rj.Schedule = "Instant";
             }

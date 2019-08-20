@@ -185,6 +185,23 @@ namespace Sentry.data.Core
                 SetDataElementDetailValue("HasHeader", value.ToString());
             }
         }
+
+        public bool CreateCurrentView
+        {
+            get
+            {
+                DataElementDetail detail = GetElementDetail(GlobalConstants.DataElementDetailCodes.CREATE_CURRENT_VIEW);
+                return (detail == null || detail.DataElementDetailType_VAL.ToLower() == "false") ? false : true;
+            }
+            set
+            {
+                SetDataElementDetailValue(GlobalConstants.DataElementDetailCodes.CREATE_CURRENT_VIEW, value.ToString());
+            }
+        }
+
+
+
+
         #region DataElementDetailHelpers
         private DataElementDetail GetElementDetail(string typeCDE)
         {
