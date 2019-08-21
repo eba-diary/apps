@@ -148,6 +148,8 @@
                         {<p>This configuration will only allow files with .@item.FileExtension.Name.ToLower() extension</p>}
 
                         <a class="backToList" href="/Config/Edit/@item.ConfigId"><span class="glyphicon glyphicon-edit"></span>  Edit Config</a>
+                        
+                        <button class="btn btn-danger" id="btnDeleteConfig" data-id="@item.ConfigId">Delete</button>
 
                         <hr />
                         <h4 class="@color">Dataset Retrieval Jobs</h4>
@@ -244,15 +246,15 @@
                                     <div class="jobHeader categoryBanner-@color">
                                         <h6>@schema.SchemaName</h6>
                                         <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
-                                        
+
                                         @if (schema.SchemaIsPrimary)
                                         {
                                             <span style="float: right; margin-top: 10px;margin-righ t: 10px;"><span class="glyphicon glyphicon-ok"></span> This is the Primary Schema</span>
-                                        }    
+                                        }
                                         @*@if (schema.HiveTable.Any(x => x.IsPrimary))
-                                        {
-                                            <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-ok"></span> This Schema has the Primary Hive Table</span>
-                                        }*@
+                        {
+                            <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-ok"></span> This Schema has the Primary Hive Table</span>
+                        }*@
                                         @if (schema.SchemaIsForceMatch)
                                         {
                                             <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-ok"></span> Force Match</span>
@@ -262,7 +264,7 @@
                                             <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-remove"></span> Force Match</span>
                                         }
 
-                                        
+
 
                                     </div>
                                     <div class="jobContainer" style="display:none;">
@@ -271,7 +273,7 @@
                                         <p>This schema's current Delimiter is <b>@schema.Delimiter</b></p>
                                         <p>Raw files contain headers: <b>@schema.HasHeader</b></p>
 
-                                        @if(schema.DataObjects.Count() == 0)
+                                        @if (schema.DataObjects.Count() == 0)
                                         {
                                             <p>This schema Id is @schema.DataElement_ID.</p>
                                             <p>This schema is not currently does not yet have any columns associated to it.</p>
@@ -290,49 +292,49 @@
                                         }
 
                                         @*@if (schema.HiveTables.Any())
+                        {
+                            <br />
+                            <h4 class="@color">Hive Tables</h4>
+                            <hr />
+
+                            foreach (var table in schema.HiveTables)
+                            {
+                                <div class="retJob">
+                                    <div class="jobHeader categoryBanner-@color">
+                                        <h6>@table.HiveDatabase_NME.@table.Hive_NME</h6>
+                                        <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
+                                        @if (table.IsPrimary)
                                         {
+                                            <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-ok"></span> Primary Hive Table</span>
+                                        }
+                                    </div>
+                                    <div class="jobContainer" style="display:none;">
+                                        <p>@table.Hive_DSC</p>
+                                        <p>Created on: @table.Created_DTM</p>
+                                        <p>Last Modified on: @table.Changed_DTM</p>
+                                    </div>
+                                </div>
+                            }
+                            <hr />
+                        }*@
+                                        <p>
+                                            <a class="backToList" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Edit"><span class="glyphicon glyphicon-edit"></span>  Edit Schema Metadata</a>
                                             <br />
-                                            <h4 class="@color">Hive Tables</h4>
-                                            <hr />
 
-                                            foreach (var table in schema.HiveTables)
+                                            @if (schema.DataObjects.Count() > 0)
                                             {
-                                                <div class="retJob">
-                                                    <div class="jobHeader categoryBanner-@color">
-                                                        <h6>@table.HiveDatabase_NME.@table.Hive_NME</h6>
-                                                        <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
-                                                        @if (table.IsPrimary)
-                                                        {
-                                                            <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-ok"></span> Primary Hive Table</span>
-                                                        }
-                                                    </div>
-                                                    <div class="jobContainer" style="display:none;">
-                                                        <p>@table.Hive_DSC</p>
-                                                        <p>Created on: @table.Created_DTM</p>
-                                                        <p>Last Modified on: @table.Changed_DTM</p>
-                                                    </div>
-                                                </div>
-                                            }
-                                            <hr />
-                                        }*@
-                                            <p>
-                                                <a class="backToList" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Edit"><span class="glyphicon glyphicon-edit"></span>  Edit Schema Metadata</a>
-                                                <br/>
-
-                                                @if(schema.DataObjects.Count() > 0)
-                                                {
                                                 <a class="backToList" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Fields"><span class="glyphicon glyphicon-edit"></span>  Edit Schema's Columns and Fields</a>
-                                                }
-                                                @if (schema.DataObjects.Count() == 0)
-                                                {
-                                                    <a class="backToList" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Fields"><span class="glyphicon glyphicon-edit"></span>  Add Columns and Fields to Schema</a>
-                                                }
-                                            </p>
+                                            }
+                                            @if (schema.DataObjects.Count() == 0)
+                                            {
+                                                <a class="backToList" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Fields"><span class="glyphicon glyphicon-edit"></span>  Add Columns and Fields to Schema</a>
+                                            }
+                                        </p>
                                     </div>
                                 </div>
                             }
                         }
-                        
+
                         @*<a class="backToList" href="/Config/@item.ConfigId/Schema/Create"><span class="glyphicon glyphicon-plus"></span>  Add New Schema</a>*@
                     </div>
 
@@ -449,109 +451,7 @@
 
     <script>
         $(function () {
-            $('body').on('click', '.configHeader', function () {
-
-                if ($(this).children('.tracker-menu-icon').hasClass('glyphicon-menu-down')) {
-                    $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-down', 'glyphicon-menu-up');
-                } else {
-                    $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-up', 'glyphicon-menu-down');
-                }
-                $(this).next('.configContainer').toggle();
-
-                if ($(this).next('.configContainer:visible').length == 0) {
-                    // action when all are hidden
-                    $(this).css('border-radius', '5px 5px 5px 5px');
-                } else {
-                    $(this).css('border-radius', '5px 5px 0px 0px');
-                }
-            });
-
-            $('body').on('click', '.jobstatus', function () {
-                if ($(this).hasClass('jobstatus_enabled')) {
-                    var controllerurl = "/Dataset/DisableRetrieverJob/?id=";                                                           
-                }
-                else {
-                    var controllerurl = "/Dataset/EnableRetrieverJob/?id=";                   
-                }
-
-                var request = $.ajax({
-                    url: controllerurl + $(this).attr('id'),
-                    method: "POST",
-                    dataType: 'json',
-                    success: function (obj) {
-                        var modal = Sentry.ShowModalConfirmation(
-                            obj.Message, function () { location.reload() })
-                    },
-                    failure: function (obj) {
-                        var modal = Sentry.ShowModalAlert(
-                            obj.Message, function () { location.reload() })
-                    },
-                    error: function (obj) {
-                        var modal = Sentry.ShowModalAlert(
-                            obj.Message, function () { location.reload() })
-                    }
-                });
-            });
-
-            $('body').on('click', '.jobHeader', function () {
-                if ($(this).children('.tracker-menu-icon').hasClass('glyphicon-menu-down')) {
-                    $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-down', 'glyphicon-menu-up');
-                } else {
-                    $(this).children('.tracker-menu-icon').switchClass('glyphicon-menu-up', 'glyphicon-menu-down');
-                }
-                $(this).next('.jobContainer').toggle();
-
-                if ($(this).next('.jobContainer:visible').length == 0) {
-                    // action when all are hidden
-                    $(this).css('border-radius', '5px 5px 5px 5px');
-                } else {
-                    $(this).css('border-radius', '5px 5px 0px 0px');
-                }
-            });
-
-            $('body').on('click', '.on-demand-run', function () {
-                var request = $.ajax({
-                    url: "/Dataset/RunRetrieverJob/?id=" + $(this).attr('id'),
-                    method: "POST",
-                    dataType: 'json',
-                    success: function (obj) {
-                        var modal = Sentry.ShowModalConfirmation(
-                            obj.Message, function () { })
-                    },
-                    failure: function (obj) {
-                        var modal = Sentry.ShowModalAlert(
-                            obj.Message, function () { })
-                    },
-                    error: function (obj) {
-                        var modal = Sentry.ShowModalAlert(
-                            obj.Message, function () { })
-                    }
-                });
-
-            });
-
-            $(".schedule").each(function (index, element) {
-                $(this).text("Next processing time will be " + prettyCron.getNext($(this).text()));
-            });
-
-            $('body').on('click', ".btnCreateDirectory", function () {
-
-                $(this).parent().parent().children("#configs").children().children().children(".DFSBasic").children(".filePath").each(function (index, element) {
-                    console.log($(this).text());
-
-                    var text = $(this).text();
-                    text = text.replace("file:///", "");
-
-                    var request = $.ajax({
-                        url: "/Dataset/CreateFilePath/?filePath=" + text,
-                        method: "POST",
-                        dataType: 'json',
-                        success: function (obj) {
-                        }
-                    });
-                });
-            });
-
+            data.Config.IndexInit();
         });
     </script>
 }

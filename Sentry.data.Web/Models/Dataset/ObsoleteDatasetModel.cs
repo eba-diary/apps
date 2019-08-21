@@ -60,7 +60,7 @@ namespace Sentry.data.Web
 
             this.DatasetFileConfigs = new List<DatasetFileConfigsModel>();
             List<string> locations = new List<string>();
-            foreach (DatasetFileConfig dfc in ds.DatasetFileConfigs)
+            foreach (DatasetFileConfig dfc in ds.DatasetFileConfigs.Where(w => w.DeleteInd == false))
             {
                 if (datasetContext != null)
                 {

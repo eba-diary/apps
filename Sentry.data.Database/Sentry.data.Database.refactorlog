@@ -714,4 +714,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="CurrentTokenExp" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="ee952397-d4df-4874-adef-5a0a3829c1e0" ChangeDateTime="08/21/2019 16:57:35">
+    <Property Name="ElementName" Value="[dbo].[DatasetFileConfigs].[DeleteIssue]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetFileConfigs]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DeleteIssuer" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="dd885b03-a519-4eb0-b7c3-644054c6716b" ChangeDateTime="08/21/2019 16:58:09">
+    <Property Name="ElementName" Value="[dbo].[DatasetFileConfigs].[D]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetFileConfigs]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DeleteIssueDTM" />
+  </Operation>
 </Operations>

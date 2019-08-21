@@ -614,7 +614,32 @@ namespace Sentry.data.Core
             return string.Empty;
         }
 
+        public void Delete(int id)
+        {
+            DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(id);
+            DataElement de = dfc.Schema.FirstOrDefault();
+
+            MarkForDelete(dfc);
+            MarkForDelete(de);
+
+            _datasetContext.SaveChanges();
+        }
+
         #region PrivateMethods
+        private void MarkForDelete(DatasetFileConfig dfc)
+        {
+            dfc.DeleteInd = true;
+            dfc.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
+            dfc.DeleteIssueDTM = DateTime.Now;
+        }
+
+        private void MarkForDelete(DataElement de)
+        {
+            de.DeleteInd = true;
+            de.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
+            de.DeleteIssueDTM = DateTime.Now;
+        }
+
         private void MapToDto(DataElement de, SchemaDTO dto)
         {
             dto.SchemaID = de.DataElement_ID;
