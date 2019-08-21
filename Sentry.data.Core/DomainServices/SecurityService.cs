@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Sentry.Configuration;
 
 namespace Sentry.data.Core
 {
@@ -9,19 +10,18 @@ namespace Sentry.data.Core
     {
 
         private readonly IDatasetContext _datasetContext;
-        private readonly IHpsmProvider _hpsmProvider;
+        //BaseTicketProvider implementation is determined within Bootstrapper and could be either ICherwellProvider or IHPSMProvider
+        private readonly IBaseTicketProvider _baseTicketProvider;
 
-        public SecurityService(IDatasetContext datasetContext, IHpsmProvider hpsmProvider)
+        public SecurityService(IDatasetContext datasetContext, IBaseTicketProvider baseTicketProvider)
         {
             _datasetContext = datasetContext;
-            _hpsmProvider = hpsmProvider;
+            _baseTicketProvider = baseTicketProvider;
         }
-
 
         public string RequestPermission(AccessRequest model)
         {
-
-            string ticketId = _hpsmProvider.CreateHpsmTicket(model);
+            string ticketId = _baseTicketProvider.CreateChangeTicket(model);
             if (!string.IsNullOrWhiteSpace(ticketId))
             {
                 Security security = _datasetContext.Security.FirstOrDefault(x => x.SecurityId == model.SecurityId);

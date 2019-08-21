@@ -176,6 +176,29 @@
             public const string RETRIEVERJOB_FAILED_STATE = "Failed";
         }
 
+        public static class CherwellBusinessObjectNames
+        {
+            public const string CHANGE_REQUEST = "ChangeRequest";
+            public const string APPROVAL = "Approval";
+            public const string USER = "UserInfo";
+            public const string CUSTOMER = "CustomerInternal";
+        }
+
+        public static class CherwellChangeStatusNames
+        {
+            public const string LOGGING_AND_PREP = "Logging and Prep";
+            public const string APPROVAL = "Approval";
+            public const string IMPLEMENTING = "Implementing";
+            public const string CLOSED = "Closed";
+        }
+
+        public static class CherwellChangeStatusOrder
+        {
+            public const string LOGGING_AND_PREP = "1";
+            public const string APPROVAL = "2";
+            public const string IMPLEMENTING = "3";
+            public const string CLOSED = "4";
+        }
         public static class DataElementDetailCodes
         {
             public const string CREATE_CURRENT_VIEW = "CreateCurrentView";

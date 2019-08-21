@@ -15,9 +15,6 @@ namespace Sentry.data.Core.Tests
 
         protected ISecurityService _securityService;
         protected IDatasetContext _datasetContext;
-        protected IHpsmProvider _hpsmProvider;
-
-
 
         public virtual void TestInitialize()
         {
@@ -31,9 +28,8 @@ namespace Sentry.data.Core.Tests
             });
 
             //add in the infrastructure implementations using MockRepository so we don't actually initalize contexts or services.
-            registry.For<IHpsmProvider>().Use(() => MockRepository.GenerateStub<IHpsmProvider>());
             registry.For<IDatasetContext>().Use(() => MockRepository.GenerateStub<IDatasetContext>());
-
+            registry.For<IBaseTicketProvider>().Use(() => MockRepository.GenerateStub<ICherwellProvider>());
             //set the container
             _container = new StructureMap.Container(registry);
 
