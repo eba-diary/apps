@@ -207,7 +207,7 @@
                 </span>
             </span>
             <hr />
-            <button class="btn btn-success" data-bind='click: save'>Save</button>
+            <button class="btn btn-success" id="saveBtn" data-bind='click: save'>Save</button>
             <div id="buttonSpinner" style="
                     display: inline-block;
                     margin-bottom: 24px;
@@ -226,7 +226,7 @@
             <div class="row">
                 <div data-bind="style : { 'background-color' : RowColor }" style="padding: 2px">
                     <h6 style="float: left; margin-right: 6px; line-height: 0.5; width: 15px;" data-bind="text: Id"></h6>
-                    <input class="col-lg-3" data-bind="value: Name" placeholder="Field Name..." />
+                    <input class="col-lg-3 rowFieldName" data-bind="value: Name" placeholder="Field Name..." />
                     <input class="col-lg-3" data-bind="value: Description" placeholder="Description..." />
                     <select class="typeSelect" data-bind="value: DataType">
                         <optgroup label="Numeric Data Types">
@@ -459,30 +459,30 @@
 @section Scripts {
 
     <script>
+
         var currentMax = 0;
         var errorList = [];
 
-        function Row(id, data, parent) {
+        function Row(id, indata, parent) {
             var self = this;
             var parent = parent;
 
             self.Id = ko.observable(id);
-            self.DataObjectField_ID = ko.observable(data.DataObjectField_ID);
-            self.Name = ko.observable(data.Name);
-            self.Description = ko.observable(data.Description);
-            self.DataType = ko.observable(data.DataType);
-            self.ArrayType = ko.observable(data.ArrayType);
-            self.Precision = ko.observable(data.Precision);
-            self.Scale = ko.observable(data.Scale);
+            self.DataObjectField_ID = ko.observable(indata.DataObjectField_ID);
+            self.Name = ko.observable(indata.Name).extend({ notify: 'always' });
+            self.Description = ko.observable(indata.Description);
+            self.DataType = ko.observable(indata.DataType);
+            self.ArrayType = ko.observable(indata.ArrayType);
+            self.Precision = ko.observable(indata.Precision);
+            self.Scale = ko.observable(indata.Scale);
 
             self.RowColor = ko.computed(function () {
                 var hasError = false;
 
                 if (parent.Errors !== undefined) {
                     parent.Errors.remove(function (item) { return item.Id === self.Id() && item.ErrorType == 'Type'; });
-                    parent.Errors.remove(function (item) { return item.Id === self.Id() && item.ErrorType == 'Name'; });
+                    parent.Errors.remove(function (item) { return item.Id === self.Id() && item.ErrorType == 'Name'; });                    
                 }
-
 
                 //Has no children.  Error
                 if ((self.DataType() === 'STRUCT' || (self.DataType() === 'ARRAY' && self.ArrayType() === 'STRUCT')) && self.ChildRows !== undefined && self.ChildRows().length === 0) {
@@ -499,26 +499,46 @@
                     parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to STRUCT.' });
                     hasError = true;
                 }
-
+                //Name is blank
                 if (parent.checkForErrors && (self.Name() === '' || self.Name() === undefined || self.Name() === null)) {
                     parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Name', 'Description': ' has no name.' });
                     hasError = true;
                 }
 
-                if (self.Name() === '' && self.Name() === undefined && self.Name() === null && self.Name().trim().includes(" ")) {
-                    parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Name', 'Description': ' Name cannot contain Spaces.' });
-                    hasError = true;
-                }
+                if (self.Name() !== undefined && self.Name() !== '' && self.Name() !== null) {
+                    //Name contains spaces
+                    if (self.Name().indexOf(' ') >= 0) {
+                        parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Name', 'Description': ' Name cannot contain Spaces.' });
+                        hasError = true;
+                    }
 
+                    //Name contains special characters
+                    var pattchar = new RegExp("[-:,;{}()]");
+                    if (pattchar.test(self.Name())) {
+                        parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Name', 'Description': ' Name cannot special characters (-:,;{}()).' });
+                        hasError = true;
+                    }
+
+                    //Name contains uppercase 
+                    var pattupper = new RegExp("[A-Z]");
+                    //var nme = self.Name();
+                    if (pattupper.test(self.Name())) {
+                        parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Name', 'Description': ' Name cannot uppercase letters.' });
+                        hasError = true;
+                    }
+                }
+                
 
                 if (hasError) {
+                    $('#saveBtn').hide();
                     return 'rgba(255, 0, 0, 0.8)';
                 }
                 else {
+                    if (parent.Errors !== undefined && parent.Errors().length === 0) {
+                        $('#saveBtn').show(); 
+                    }
                     return '';
                 }
-
-
 
             });
 
@@ -564,11 +584,12 @@
                 parent.Errors.remove(function (item) { return item.Id === row.Id(); });
                 self.ChildRows.remove(row);
             };
-        }
-
+        };
 
         var viewModel = function (incomingJson) {
             var self = this;
+
+            self.Errors = ko.observableArray();
 
             self.Rows = ko.observableArray(ko.utils.arrayMap(incomingJson.rows, function (rowInfo) {
                 currentMax++;
@@ -578,8 +599,6 @@
             self.HiveDatabaseName = ko.observable(incomingJson.HiveDatabaseName);
             self.HiveTableName = ko.observable(incomingJson.HiveTableName);
             self.RowCount = ko.observable(incomingJson.RowCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-
-            self.Errors = ko.observableArray();
 
             self.checkForErrors = ko.observable(false);
 
@@ -681,8 +700,7 @@
                 async: false
             });
         });
-
-
+       
     </script>
 
 }
