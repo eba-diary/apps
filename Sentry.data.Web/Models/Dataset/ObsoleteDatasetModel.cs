@@ -270,5 +270,6 @@ namespace Sentry.data.Web
         public List<MetadataTag> Tags { get; set; }
         public string UploadFrequency { get; set; }
         public Boolean IsFavorite { get; set; }
+        public UserSecurity Security { get; set; }
     }
 }

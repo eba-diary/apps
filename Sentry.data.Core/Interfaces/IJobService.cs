@@ -14,5 +14,6 @@ namespace Sentry.data.Core
         RetrieverJob FindBasicJob(RetrieverJob job);
         RetrieverJob InstantiateJobsForCreation(DatasetFileConfig dfc, DataSource dataSource);
         void CreateDropLocation(RetrieverJob job);
+        void DisableJob(int id);
     }
 }

@@ -61,7 +61,8 @@ namespace Sentry.data.Web.Controllers
             ObsoleteDatasetModel bdm = new ObsoleteDatasetModel(ds, _associateInfoProvider, _datasetContext)
             {
                 CanEditDataset = us.CanEditDataset,
-                CanUpload = us.CanUploadToDataset
+                CanUpload = us.CanUploadToDataset,
+                Security = us
             };
 
             Event e = new Event();
@@ -1208,7 +1209,8 @@ namespace Sentry.data.Web.Controllers
             ObsoleteDatasetModel bdm = new ObsoleteDatasetModel(config.ParentDataset, _associateInfoProvider, _datasetContext)
             {
                 CanEditDataset = us.CanEditDataset,
-                CanUpload =us.CanUploadToDataset
+                CanUpload =us.CanUploadToDataset,
+                Security = us
             };
 
             Event e = new Event();
