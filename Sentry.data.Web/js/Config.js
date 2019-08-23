@@ -109,38 +109,30 @@ data.Config = {
 
         $('body').on('click', '#btnDeleteConfig', function () {
             var config = $(this);
-            Sentry.ShowModalConfirmation("Are you sure?", function () {
-
-
-
-                Sentry.ShowModalConfirmation("<p><h3><b><font color=\"red\">THIS IS NOT A REVERSABLE ACTION!</font></b></h3></p> </br>Deleting the schema will remove all associated data files and hive consumption layers.  </br>If at a later point " +
-                                                    "this needs to be recreated, all files will need to be resent from source.", function () {
-                })
+            var ConfirmMessage = "<p>Are you sure</p><p><h3><b><font color=\"red\">THIS IS NOT A REVERSIBLE ACTION!</font></b></h3></p> </br>Deleting the schema will remove all associated data files and hive consumption layers.  </br>If at a later point " +
+                "this needs to be recreated, all files will need to be resent from source."
+            Sentry.ShowModalConfirmation(ConfirmMessage, function () {
+                    $.ajax({
+                    url: "/Config/" + config.attr("data-id"),
+                    method: "DELETE",
+                    dataType: 'json',
+                    success: function (obj) {
+                        Sentry.ShowModalAlert(obj.Message, function () {
+                            location.reload();                             
+                        })                       
+                    },
+                    failure: function (obj) {
+                        alert("failure");
+                        Sentry.ShowModalAlert(
+                            obj.Message, function () { })
+                    },
+                    error: function (obj) {
+                        Sentry.ShowModalAlert(
+                            obj.Message, function () { })
+                    }
+                });
             })
-        });
-
-
-                    //var config = $(this);
-                    //$.ajax({
-                    //    url: "/Config/" + $(this).attr("data-id"),
-                    //    method: "DELETE",
-                    //    dataType: 'json',
-                    //    success: function (obj) {
-                    //        alert("Yay");
-                    //        //var modal = Sentry.ShowModalConfirmation(
-                    //        //    obj.Message, function () { })
-                    //    },
-                    //    failure: function (obj) {
-                    //        alert("failure");
-                    //        //var modal = Sentry.ShowModalAlert(
-                    //        //    obj.Message, function () { })
-                    //    },
-                    //    error: function (obj) {
-                    //        alert("error");
-                    //        //var modal = Sentry.ShowModalAlert(
-                    //        //    obj.Message, function () { })
-                    //    }
-                    //});
+        });    
     },
 
     CreateInit: function () {

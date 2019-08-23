@@ -20,7 +20,7 @@ namespace Sentry.data.Core
         public virtual DatasetScopeType DatasetScopeType { get; set; }
         public virtual bool DeleteInd { get; set; }
         public virtual string DeleteIssuer { get; set; }
-        public virtual DateTime DeleteIssueDTM { get; set; }
+        public virtual DateTime? DeleteIssueDTM { get; set; }
 
         public virtual IList<DatasetFile> DatasetFiles { get; set; }
         public virtual IList<RetrieverJob> RetrieverJobs { get; set; }

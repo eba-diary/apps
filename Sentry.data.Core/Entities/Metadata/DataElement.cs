@@ -232,7 +232,7 @@ namespace Sentry.data.Core
                 return DateTime.ParseExact(detail.DataElementDetailType_VAL, "O", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
             }
             set
-            {                
+            {
                 SetDataElementDetailValue(GlobalConstants.DataElementDetailCodes.DELETE_ISSUE_DTM, value?.ToString("O"));
             }
         }
