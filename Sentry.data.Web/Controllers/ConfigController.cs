@@ -142,6 +142,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpDelete]
         [Route("Config/{id}")]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public JsonResult Delete(int id)
         {
             try

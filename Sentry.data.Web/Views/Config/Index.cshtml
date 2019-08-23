@@ -148,8 +148,11 @@
                         {<p>This configuration will only allow files with .@item.FileExtension.Name.ToLower() extension</p>}
 
                         <a class="backToList" href="/Config/Edit/@item.ConfigId"><span class="glyphicon glyphicon-edit"></span>  Edit Config</a>
-                        
-                        <button class="btn btn-danger" id="btnDeleteConfig" data-id="@item.ConfigId">Delete</button>
+
+                        @if (Model.Security.ShowAdminControls)
+                        {
+                            <button class="btn btn-danger" id="btnDeleteConfig" data-id="@item.ConfigId">Delete</button>
+                        }
 
                         <hr />
                         <h4 class="@color">Dataset Retrieval Jobs</h4>
