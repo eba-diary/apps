@@ -165,5 +165,30 @@ namespace Sentry.data.Infrastructure
             smtpClient.Send(myMail);
 
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="emailAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        /// <param name="cc">Multiple emails supported by separating with semi-colon</param>
+        public void SendGenericEmail(string emailAddress, string subject, string body, string cc)
+        {
+            SmtpClient smtpClient = new SmtpClient("mail.sentry.com");
+            MailAddress from = new MailAddress("NoReply@sentry.com");
+            MailMessage myMail = new MailMessage
+            {
+                From = from,
+                Subject = subject,
+                IsBodyHtml = true,
+                Body = body,
+            };
+
+            myMail.To.Add(emailAddress);
+            myMail.CC.Add(cc);
+
+            smtpClient.Send(myMail);
+        }
     }
 }

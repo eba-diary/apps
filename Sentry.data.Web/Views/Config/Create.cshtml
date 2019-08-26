@@ -130,24 +130,13 @@
                 @Html.HiddenFor(model => model.CreateCurrentView)
             }
 
-                <div class="form-group">
-
-                    @Html.LabelFor(model => model.IncludedInSAS, new { @class = "control-label col-md-2 optional" })
-                    <div class="col-md-1">
-                        @Html.CheckBoxFor(model => model.IncludedInSAS, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                    </div>
-                    <div class="sas-saslibrary" style="display: none;">
-                        @Html.LabelFor(model => model.SasLibrary, new { @class = "control-label col-md-1 optional" })
-                        <div class="col-md-3">
-                            @Html.TextBoxFor(model => model.SasLibrary, new { @value = "", @class = "form-control edit-dataset-row" })
-                        </div>
-                    </div>
-                    @Html.Label("Schema will be added to SAS after columns are defined", new { @class = "control-label col-md-4 optional text-muted", @style = "text-align: left" })
-                </div>
-            
-
-
-
+            <div class="form-group">
+                @Html.LabelFor(model => model.IncludedInSAS, new { @class = "control-label col-md-2 optional" })
+                <div class="col-md-1">
+                    @Html.CheckBoxFor(model => model.IncludedInSAS, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                </div>                   
+                @Html.Label("Schema will be added to SAS after columns are defined", new { @class = "control-label col-md-4 optional text-muted", @style = "text-align: left" })
+            </div>
         </div>
         <hr />
         <div class="form-group">

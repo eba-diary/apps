@@ -32,7 +32,8 @@ namespace Sentry.data.Web
                 DatasetScopeTypeId = model.DatasetScopeTypeId,
                 DataClassification = model.DataClassification,
                 IsSecured = model.IsSecured,
-                HasHeader = model.HasHeader
+                HasHeader = model.HasHeader,
+                IsInSAS = model.IncludeInSas
             };
         }
 

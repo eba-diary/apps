@@ -18,12 +18,13 @@ namespace Sentry.data.Core
         public IMessagePublisher _messagePublisher;
         public IEncryptionService _encryptService;
         public IJobService _jobService;
+        public IEmailService _emailService;
         private readonly ISecurityService _securityService;
 
         public ConfigService(IDatasetContext dsCtxt, IMessagePublisher publisher, 
             IUserService userService, IEventService eventService, IMessagePublisher messagePublisher,
             IEncryptionService encryptService, ISecurityService securityService,
-            IJobService jobService)
+            IJobService jobService, IEmailService emailService)
         {
             _datasetContext = dsCtxt;
             _publisher = publisher;
@@ -33,6 +34,7 @@ namespace Sentry.data.Core
             _encryptService = encryptService;
             _securityService = securityService;
             JobService = jobService;
+            _emailService = emailService;
         }
 
         private IJobService JobService
@@ -296,7 +298,9 @@ namespace Sentry.data.Core
         {
             de.CreateCurrentView = dto.Schemas.FirstOrDefault().CreateCurrentView;
             de.IsInSAS = dto.IsInSAS;
-            de.SasLibrary = dto.SasLibrary;
+            de.SasLibrary = (dto.IsInSAS) ? dto.GenerateSASLibaryName(_datasetContext) : null;
+
+            de.SendIncludeInSasEmail(_userService.GetCurrentUser(), _emailService);
         }
 
         public DatasetFileConfigDto GetDatasetFileConfigDto(int configId)
@@ -358,7 +362,7 @@ namespace Sentry.data.Core
                 HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
                 CreateCurrentView = dto.CreateCurrentView,
                 IsInSAS = dto.IsInSAS,
-                SasLibrary = dto.SasLibrary
+                SasLibrary = (dto.IsInSAS) ? dto.GenerateSASLibary(_datasetContext) : null
             };
 
             return de;
@@ -386,61 +390,11 @@ namespace Sentry.data.Core
                 };
 
                 schema.DataObjects.Add(DOBJ);
-                //_datasetContext.Merge(DOBJ);
-                //DOBJ = _datasetContext.SaveChanges();
             }
             else
-            //else if(schema.DataObjects.Count == 1 && schema.DataObjects[0].DataObjectFields.Count == 0)
             {
-                //Add fields to Existing Data Object
                 DOBJ = schema.DataObjects.Single();
             }
-            //else
-            //{
-            //    newRev = true;
-            //    DataElement maxRevision = config.Schema.OrderByDescending(o => o.SchemaRevision).Take(1).FirstOrDefault();
-            //    newRevision = new DataElement()
-            //    {
-            //        DataElementCreate_DTM = DateTime.Now,
-            //        DataElementChange_DTM = DateTime.Now,
-            //        LastUpdt_DTM = DateTime.Now,
-            //        DataElement_NME = maxRevision.DataElement_NME,
-            //        DataElement_DSC = maxRevision.DataElement_DSC,
-            //        DataElement_CDE = maxRevision.DataElement_CDE,
-            //        DataElementCode_DSC = maxRevision.DataElementCode_DSC,
-            //        DataElementDetails = maxRevision.DataElementDetails
-            //    };
-
-            //    //This is a new configuration with no schema defined.
-            //    DOBJ = new DataObject()
-            //    {
-            //        DataObjectCreate_DTM = DateTime.Now,
-            //        DataObjectChange_DTM = DateTime.Now,
-            //        LastUpdt_DTM = DateTime.Now,
-            //        DataObject_NME = schema.SchemaName,
-            //        DataObject_DSC = schema.SchemaDescription,
-            //        DataObject_CDE = config.FileExtension.Id.ToString(),
-            //        DataObjectCode_DSC = config.FileExtension.Name
-            //    };
-
-            //    List<DataObject> dobjList = new List<DataObject>
-            //    {
-            //        DOBJ
-            //    };
-            //    newRevision.DataObjects = dobjList;
-
-            //    newRevision.SchemaRevision += 1;
-            //    newRevision.SchemaIsPrimary = false;
-
-            //    DOBJ = newRevision.DataObjects.Single();
-
-            //    //Schema revision(s) exist, therefore, Create new schema revision
-            //    //  Retrieve max schema revision (data element)
-            //    //  Use Data Element values to create new data element and increment schema revision
-            //    //  Use Data Object values to create new data object for element created above
-            //    //  add Data Object Field \ Detail values from incoming data
-            //    //  
-            //}
 
             List<DataObjectField> dofList = new List<DataObjectField>();
 
@@ -519,12 +473,16 @@ namespace Sentry.data.Core
                 _datasetContext.SaveChanges();
             }
 
+            //Send message to create hive table
             HiveTableCreateModel hiveCreate = new HiveTableCreateModel();
             schema.ToHiveCreateModel(hiveCreate);
+            _messagePublisher.PublishDSCEvent(schema.DataElement_ID.ToString(), JsonConvert.SerializeObject(hiveCreate));
 
-            _messagePublisher.PublishDSCEvent(schema.DataElement_ID.ToString(), JsonConvert.SerializeObject(hiveCreate));       
-            
+            //Send Email to have hive table added to SAS if option is checked
+            schema.SendIncludeInSasEmail(_userService.GetCurrentUser(), _emailService);
+
         }
+
 
         public bool UpdateandSaveOAuthToken(HTTPSSource source, string newToken, DateTime tokenExpTime)
         {

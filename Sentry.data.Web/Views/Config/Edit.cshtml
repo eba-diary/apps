@@ -90,7 +90,29 @@
                     </div>
                     @Html.Label("A view will be created filtering to data within latest file loaded into this schema", new { @class = "control-label col-md-9 optional text-muted", @style = "text-align: left" })
                 </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.IncludedInSAS, new { @class = "control-label col-md-2 optional" })
+                    <div class="col-md-1">
+                        @Html.CheckBoxFor(model => model.IncludedInSAS, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                    </div>
+                    @Html.Label("Schema will be added to SAS after columns are defined", new { @class = "control-label col-md-4 optional text-muted", @style = "text-align: left" })
+                </div>
             }
+            else
+            {
+                @Html.HiddenFor(m => Model.IncludedInSAS)
+                <div class="form-group">
+                    @Html.LabelFor(model => model.IncludedInSAS, new { @class = "control-label col-md-2 optional" })
+                    <div class="col-md-1">
+                        @Html.CheckBoxFor(model => model.IncludedInSAS, new { @class = "edit-dataset-row", @disabled = "disabled" })
+                    </div>
+                    <div class="col-md-6 text-muted">
+                        Please work with <a href="mailto:DSCSupport@Sentry.com">Site Administration</a> if you would like this removed from SAS
+                    </div>
+                </div>
+            }
+
+
 
             <hr />
             <div class="form-group">

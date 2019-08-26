@@ -201,7 +201,8 @@ namespace Sentry.data.Core
         {
             get
             {
-                return Boolean.Parse(GetElementDetail(GlobalConstants.DataElementDetailCodes.INCLUDE_IN_SAS).DataElementDetailType_VAL);
+                DataElementDetail detail = GetElementDetail(GlobalConstants.DataElementDetailCodes.INCLUDE_IN_SAS);
+                return (detail == null || detail.DataElementDetailType_VAL.ToLower() == "false") ? false : true;
             }
             set
             {

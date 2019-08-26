@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace Sentry.data.Web
 {
@@ -33,7 +31,8 @@ namespace Sentry.data.Web
                 Delimiter = model.Delimiter,
                 DataElementChange_DTM = DateTime.Now,
                 HasHeader = model.HasHeader,
-                FileFormatId = model.FileExtensionId
+                FileFormatId = model.FileExtensionId,
+                IsInSAS = model.IncludeInSas
             };
         }
 
@@ -105,8 +104,7 @@ namespace Sentry.data.Web
                 StorageCode = model.RawStorageId,
                 Schemas = deList,
                 FileExtensionId = model.FileExtensionID,
-                IsInSAS = model.IncludedInSAS,
-                SasLibrary = model.SasLibrary
+                IsInSAS = model.IncludedInSAS
             };
         }
 

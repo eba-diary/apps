@@ -21,5 +21,11 @@ namespace Sentry.data.Core
             return lists;
         }
 
+        public static string GenerateSASLibaryName(Dataset ds)
+        {
+            var catName = ds.DatasetCategories.First().Name.Replace(" ", "");
+            return $"DSC{Configuration.Config.GetHostSetting("EnvironmentName").ToUpper()}_{catName}";
+        }
+
     }
 }
