@@ -295,6 +295,8 @@ namespace Sentry.data.Core
         private void UpdateDataElement(DatasetFileConfigDto dto, DataElement de)
         {
             de.CreateCurrentView = dto.Schemas.FirstOrDefault().CreateCurrentView;
+            de.IsInSAS = dto.IsInSAS;
+            de.SasLibrary = dto.SasLibrary;
         }
 
         public DatasetFileConfigDto GetDatasetFileConfigDto(int configId)
@@ -354,7 +356,9 @@ namespace Sentry.data.Core
                 HiveTable = ds.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dto.SchemaName.Replace(" ", "").ToUpper(),
                 HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
                 HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
-                CreateCurrentView = dto.CreateCurrentView
+                CreateCurrentView = dto.CreateCurrentView,
+                IsInSAS = dto.IsInSAS,
+                SasLibrary = dto.SasLibrary
             };
 
             return de;
@@ -966,6 +970,7 @@ namespace Sentry.data.Core
             dto.StorageCode = dfc.GetStorageCode();
             dto.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
             dto.CreateCurrentView = (dfc.Schema.FirstOrDefault() != null) ? dfc.Schema.FirstOrDefault().CreateCurrentView : false;
+            dto.IsInSAS = (dfc.Schema.FirstOrDefault() != null) ? dfc.Schema.FirstOrDefault().IsInSAS : false;
         }
         #endregion
     }

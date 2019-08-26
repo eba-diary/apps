@@ -185,7 +185,6 @@ namespace Sentry.data.Core
                 SetDataElementDetailValue("HasHeader", value.ToString());
             }
         }
-
         public bool CreateCurrentView
         {
             get
@@ -198,7 +197,29 @@ namespace Sentry.data.Core
                 SetDataElementDetailValue(GlobalConstants.DataElementDetailCodes.CREATE_CURRENT_VIEW, value.ToString());
             }
         }
-
+        public virtual Boolean IsInSAS
+        {
+            get
+            {
+                return Boolean.Parse(GetElementDetail(GlobalConstants.DataElementDetailCodes.INCLUDE_IN_SAS).DataElementDetailType_VAL);
+            }
+            set
+            {
+                SetDataElementDetailValue(GlobalConstants.DataElementDetailCodes.INCLUDE_IN_SAS, (value) ? "True" : "False");
+            }
+        }
+        public string SasLibrary
+        {
+            get
+            {
+                DataElementDetail detail = GetElementDetail(GlobalConstants.DataElementDetailCodes.SAS_LIBRARY);
+                return detail?.DataElementDetailType_VAL;
+            }
+            set
+            {
+                SetDataElementDetailValue(GlobalConstants.DataElementDetailCodes.SAS_LIBRARY, value);
+            }
+        }
 
 
 

@@ -33,6 +33,21 @@ data.Config = {
                     break;
             }
         });
+
+        //trigger sas-saslibrary section on checkbox change
+        $("#IncludedInSAS").change(function () {
+            if ($(this).is(":checked")) {
+                $(".sas-saslibrary").show();
+            }
+            else {
+                $(".sas-saslibrary").hide();
+            }
+        });
+
+        //initialize sas-saslibary section on page load
+        if ($("#IncludedInSAS").is(":checked")) {
+            $(".sas-saslibrary").show();
+        };
     },
 
     ExtensionInit: function() {

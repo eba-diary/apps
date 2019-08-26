@@ -202,6 +202,8 @@
         public static class DataElementDetailCodes
         {
             public const string CREATE_CURRENT_VIEW = "CreateCurrentView";
+            public const string INCLUDE_IN_SAS = "SAS_IND";
+            public static string SAS_LIBRARY = "SASLibrary";
         }
     }
 }

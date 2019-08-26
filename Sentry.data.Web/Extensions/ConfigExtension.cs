@@ -104,7 +104,9 @@ namespace Sentry.data.Web
                 FileTypeId = model.FileTypeId,
                 StorageCode = model.RawStorageId,
                 Schemas = deList,
-                FileExtensionId = model.FileExtensionID
+                FileExtensionId = model.FileExtensionID,
+                IsInSAS = model.IncludedInSAS,
+                SasLibrary = model.SasLibrary
             };
         }
 
@@ -121,7 +123,9 @@ namespace Sentry.data.Web
                 CreateCurrentView = model.CreateCurrentView,
                 FileFormatId = model.FileTypeId,
                 ParentDatasetId = model.DatasetId,
-                FileExtensionId = model.FileExtensionID
+                FileExtensionId = model.FileExtensionID,
+                IsInSAS = model.IncludedInSAS,
+                SasLibrary = model.SasLibrary
             };
         }
     }

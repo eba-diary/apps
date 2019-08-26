@@ -158,6 +158,8 @@ namespace Sentry.data.Web
         public int FileExtensionID { get; set; }
         [DisplayName("Create Current View")]
         public bool CreateCurrentView { get; set; }
+        [DisplayName("Add to SAS")]
+        public bool IncludedInSAS { get; set; }
 
 
         public int DatasetId { get; set; }
@@ -174,5 +176,6 @@ namespace Sentry.data.Web
         public IEnumerable<SelectListItem> ExtensionList { get; set; }
 
         public UserSecurity Security { get; set; }
+        public string SasLibrary { get; set; }
     }
 }

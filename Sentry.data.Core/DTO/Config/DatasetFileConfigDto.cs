@@ -19,5 +19,7 @@ namespace Sentry.data.Core
         public virtual IList<DataElementDto> Schemas { get; set; }
         public UserSecurity Security { get; internal set; }
         public bool CreateCurrentView { get; set; }
+        public bool IsInSAS { get; set; }
+        public string SasLibrary { get; set; }
     }
 }
