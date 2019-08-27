@@ -102,6 +102,7 @@ namespace Sentry.data.Web.Controllers
 
 
         [HttpPost]
+        [Route("Config/DatasetFileConfigForm")]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult DatasetFileConfigForm(DatasetFileConfigsModel dfcm)
         {
