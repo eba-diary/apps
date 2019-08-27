@@ -520,6 +520,7 @@ namespace Sentry.data.Infrastructure
         {
             var customerInfoResponse = GetCustomerInfo(model.ApproverId);
 
+            SetFieldValue(templateResponse.Fields, "ApproverName", customerInfoResponse.Fields.FirstOrDefault(w => w.Name == "FullName").Value);
             SetFieldValue(templateResponse.Fields, "ApproverID", customerInfoResponse.Fields.FirstOrDefault(w => w.Name == "RecID").Value);
             SetFieldValue(templateResponse.Fields, "Details", "Approval Detailed reason");
             SetFieldValue(templateResponse.Fields, "Deadline", DateTime.Now.Add(TimeSpan.FromDays(3)).ToString("MM/dd/yyyy hh:mm tt"));
