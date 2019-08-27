@@ -25,7 +25,10 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             this.Property((x) => x.FileTypeId, (m) => m.Column("FileType_ID"));
             this.Property((x) => x.Name, (m) => m.Column("Config_NME"));
-            this.Property((x) => x.Description, (m) => m.Column("Config_DSC"));            
+            this.Property((x) => x.Description, (m) => m.Column("Config_DSC"));
+            this.Property((x) => x.DeleteInd, (m) => m.Column("DeleteInd"));
+            this.Property((x) => x.DeleteIssuer, (m) => m.Column("DeleteIssuer"));
+            this.Property((x) => x.DeleteIssueDTM, (m) => m.Column("DeleteIssueDTM"));
 
             this.ManyToOne(x => x.ParentDataset, m =>
             {

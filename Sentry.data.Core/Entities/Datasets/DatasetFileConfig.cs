@@ -6,7 +6,10 @@ namespace Sentry.data.Core
 {
     public class DatasetFileConfig
     {
-        public DatasetFileConfig() {}        
+        public DatasetFileConfig()
+        {
+            DeleteInd = false;
+        }       
  
         
         public virtual int ConfigId { get; set; }
@@ -15,6 +18,9 @@ namespace Sentry.data.Core
         public virtual int FileTypeId { get; set; }
         public virtual Dataset ParentDataset { get; set; }
         public virtual DatasetScopeType DatasetScopeType { get; set; }
+        public virtual bool DeleteInd { get; set; }
+        public virtual string DeleteIssuer { get; set; }
+        public virtual DateTime? DeleteIssueDTM { get; set; }
 
         public virtual IList<DatasetFile> DatasetFiles { get; set; }
         public virtual IList<RetrieverJob> RetrieverJobs { get; set; }

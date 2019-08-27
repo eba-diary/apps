@@ -49,6 +49,8 @@
             public const string CREATED_DATASET = "Created Dataset";
             public const string UPDATED_DATASET = "Updated Dataset";
 
+            public const string DELETE_DATASET_SCHEMA = "Deleted Dataset Schema";
+
             public const string CREATED_TAG = "Created Tag";
             public const string UPDATED_TAG = "Updated Tag";
 
@@ -202,6 +204,9 @@
         public static class DataElementDetailCodes
         {
             public const string CREATE_CURRENT_VIEW = "CreateCurrentView";
+            public const string DELETE_INDICATOR = "DeleteInd";
+            public const string DELETE_ISSUER = "DeleteIssuer";
+            public const string DELETE_ISSUE_DTM = "DeleteIssueDTM";
         }
     }
 }

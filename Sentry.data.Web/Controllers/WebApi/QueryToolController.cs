@@ -613,7 +613,7 @@ namespace Sentry.data.Web.Controllers
 
             List<QueryableConfig> reply = new List<QueryableConfig>();
 
-            foreach (var item in ds.DatasetFileConfigs)
+            foreach (var item in ds.DatasetFileConfigs.Where(w => w.DeleteInd == false))
             {
                 if (item.FileTypeId != (int)FileType.Supplementary)
                 {
