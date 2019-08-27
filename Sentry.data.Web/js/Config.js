@@ -107,32 +107,41 @@ data.Config = {
             });
         });
 
-        $('body').on('click', '#btnDeleteConfig', function () {
-            var config = $(this);
-            var ConfirmMessage = "<p>Are you sure</p><p><h3><b><font color=\"red\">THIS IS NOT A REVERSIBLE ACTION!</font></b></h3></p> </br>Deleting the schema will remove all associated data files and hive consumption layers.  </br>If at a later point " +
-                "this needs to be recreated, all files will need to be resent from source."
-            Sentry.ShowModalConfirmation(ConfirmMessage, function () {
+        //Disable delete functionality if only 1 Schema exists
+        if ($('.configHeader').length === 1) {
+            $('#btnDeleteConfig').removeClass("btn-danger");
+            $('#btnDeleteConfig').attr("disabled", "disabled");
+            $('#btnDeleteConfig').attr('title', 'Dataset must contain at least one schema');
+        }
+        else {
+            $('body').on('click', '#btnDeleteConfig', function () {
+                var config = $(this);
+                var ConfirmMessage = "<p>Are you sure</p><p><h3><b><font color=\"red\">THIS IS NOT A REVERSIBLE ACTION!</font></b></h3></p> </br>Deleting the schema will remove all associated data files and hive consumption layers.  </br>If at a later point " +
+                    "this needs to be recreated, all files will need to be resent from source."
+
+                Sentry.ShowModalConfirmation(ConfirmMessage, function () {
                     $.ajax({
-                    url: "/Config/" + config.attr("data-id"),
-                    method: "DELETE",
-                    dataType: 'json',
-                    success: function (obj) {
-                        Sentry.ShowModalAlert(obj.Message, function () {
-                            location.reload();                             
-                        })                       
-                    },
-                    failure: function (obj) {
-                        alert("failure");
-                        Sentry.ShowModalAlert(
-                            obj.Message, function () { })
-                    },
-                    error: function (obj) {
-                        Sentry.ShowModalAlert(
-                            obj.Message, function () { })
-                    }
-                });
-            })
-        });    
+                        url: "/Config/" + config.attr("data-id"),
+                        method: "DELETE",
+                        dataType: 'json',
+                        success: function (obj) {
+                            Sentry.ShowModalAlert(obj.Message, function () {
+                                location.reload();
+                            })
+                        },
+                        failure: function (obj) {
+                            alert("failure");
+                            Sentry.ShowModalAlert(
+                                obj.Message, function () { })
+                        },
+                        error: function (obj) {
+                            Sentry.ShowModalAlert(
+                                obj.Message, function () { })
+                        }
+                    });
+                })
+            });
+        }   
     },
 
     CreateInit: function () {

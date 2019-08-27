@@ -147,12 +147,8 @@
                         else
                         {<p>This configuration will only allow files with .@item.FileExtension.Name.ToLower() extension</p>}
 
-                        <a class="backToList" href="/Config/Edit/@item.ConfigId"><span class="glyphicon glyphicon-edit"></span>  Edit Config</a>
-
-                        @if (Model.Security.ShowAdminControls)
-                        {
-                            <button class="btn btn-danger" id="btnDeleteConfig" data-id="@item.ConfigId">Delete</button>
-                        }
+                        <a class="btn btn-primary" href="/Config/Edit/@item.ConfigId">Edit</a>
+                        <button class="btn btn-danger" id="btnDeleteConfig" data-id="@item.ConfigId">Delete</button>
 
                         <hr />
                         <h4 class="@color">Dataset Retrieval Jobs</h4>
@@ -230,13 +226,14 @@
                                     <hr />
                                     <p>Created on : @job.Created</p>
                                     <p>Modified on : @job.Modified</p>
-                                    <a class="backToList" href="/Config/@item.ConfigId/Job/Edit/@job.Id"><span class="glyphicon glyphicon-edit"></span>  Edit Retrieval Job</a>
+                                    
+                                    <a class="btn btn-primary" href="/Config/@item.ConfigId/Job/Edit/@job.Id">Edit</a>
 
                                 </div>
                             </div>
                         }
 
-                        <a class="backToList" href="/Config/@item.ConfigId/Job/Create"><span class="glyphicon glyphicon-plus"></span>  Add New Retrieval Job</a>
+                        <a class="btn btn-success" href="/Config/@item.ConfigId/Job/Create">Add Job</a>
 
                         @if (item.Schemas != null && item.Schemas.Any())
                         {
@@ -320,25 +317,24 @@
                             }
                             <hr />
                         }*@
-                                        <p>
-                                            <a class="backToList" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Edit"><span class="glyphicon glyphicon-edit"></span>  Edit Schema Metadata</a>
-                                            <br />
+                                            <p>
+                                                <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Edit">Edit Schema Metadata</a>
+                                                <br>
+                                                <br>
 
-                                            @if (schema.DataObjects.Count() > 0)
-                                            {
-                                                <a class="backToList" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Fields"><span class="glyphicon glyphicon-edit"></span>  Edit Schema's Columns and Fields</a>
-                                            }
-                                            @if (schema.DataObjects.Count() == 0)
-                                            {
-                                                <a class="backToList" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Fields"><span class="glyphicon glyphicon-edit"></span>  Add Columns and Fields to Schema</a>
-                                            }
-                                        </p>
+                                                @if (schema.DataObjects.Count() > 0)
+                                                {
+                                                    <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Fields">Edit Columns and Fields</a>
+                                                }
+                                                @if (schema.DataObjects.Count() == 0)
+                                                {
+                                                    <a class="btn btn-success" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Fields">Add Columns and Fields</a>
+                                                }
+                                            </p>
                                     </div>
                                 </div>
                             }
                         }
-
-                        @*<a class="backToList" href="/Config/@item.ConfigId/Schema/Create"><span class="glyphicon glyphicon-plus"></span>  Add New Schema</a>*@
                     </div>
 
                 </div>
@@ -348,20 +344,20 @@
         </div>
     }
 
-    <div>
-        @if (HttpContext.Current.IsDebuggingEnabled)
-        {
-            <a class="btnCreateDirectory"><span class="glyphicon glyphicon-plus"></span>  Create Directories</a>
-            <hr />
-        }
-        <a class="backToList" href="/Config/Dataset/@Model.DatasetId/Create"><span class="glyphicon glyphicon-plus"></span>  Create new Data File Configuration</a>
-    </div>
+        <div>
+            @if (HttpContext.Current.IsDebuggingEnabled)
+            {
+                <a class="btn btn-success btnCreateDirectory"><span class="glyphicon glyphicon-plus"></span>  Create Directories</a>
+                <hr />
+            }
+            <a class="btn btn-success" href="/Config/Dataset/@Model.DatasetId/Create"><span class="glyphicon glyphicon-plus"></span>  Create new Data File Configuration</a>
+        </div>
     <hr />
 }
 
-<div>
-    <a class="backToList" href="/Dataset/Detail/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>  Back to Dataset Information</a>
-</div>
+    <div>
+        <a class="backToList" href="/Dataset/Detail/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>  Back to Dataset Information</a>
+    </div>
 
 <style>
     .jobstatus {
