@@ -153,6 +153,7 @@ namespace Sentry.data.Core
         {
             Dataset ds = CreateDataset(dto);
             _datasetContext.Add(ds);
+            dto.DatasetId = ds.DatasetId;
 
             DataElement de = CreateDataElement(dto);
             DatasetFileConfig dfc = CreateDatasetFileConfig(dto, ds);
