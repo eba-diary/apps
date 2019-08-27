@@ -518,13 +518,15 @@ namespace Sentry.data.Infrastructure
 
         private void AddApproverToTemplate(string ticketBusObRecId, TemplateResponse templateResponse, AccessRequest model)
         {
-            var userInfoResponse = GetUserInfo(model.ApproverId);
+            var customerInfoResponse = GetCustomerInfo(model.ApproverId);
 
-            SetFieldValue(templateResponse.Fields, "ApproverName", userInfoResponse[0].Fields.FirstOrDefault(w => w.Name == "FullName").Value);
+            SetFieldValue(templateResponse.Fields, "ApproverName", customerInfoResponse.Fields.FirstOrDefault(w => w.Name == "FullName").Value);
+            SetFieldValue(templateResponse.Fields, "ApproverID", customerInfoResponse.Fields.FirstOrDefault(w => w.Name == "RecID").Value);
             SetFieldValue(templateResponse.Fields, "Details", "Approval Detailed reason");
             SetFieldValue(templateResponse.Fields, "Deadline", DateTime.Now.Add(TimeSpan.FromDays(3)).ToString("MM/dd/yyyy hh:mm tt"));
             SetFieldValue(templateResponse.Fields, "ParentTypeName", "Change Request");
             SetFieldValue(templateResponse.Fields, "ParentRecID", ticketBusObRecId);
+            SetFieldValue(templateResponse.Fields, "ApproverSelectionType", "Customer");
         }
 
         static void SetFieldValue(ICollection<FieldTemplateItem> fields, string fieldName, string fieldValue)
