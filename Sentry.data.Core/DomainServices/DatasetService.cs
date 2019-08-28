@@ -153,6 +153,7 @@ namespace Sentry.data.Core
         {
             Dataset ds = CreateDataset(dto);
             _datasetContext.Add(ds);
+            dto.DatasetId = ds.DatasetId;
 
             DataElement de = CreateDataElement(dto);
             DatasetFileConfig dfc = CreateDatasetFileConfig(dto, ds);
@@ -357,7 +358,9 @@ namespace Sentry.data.Core
                 HiveTable = dto.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dto.ConfigFileName.Replace(" ", "").ToUpper(),
                 HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
                 HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
-                HasHeader = dto.HasHeader
+                HasHeader = dto.HasHeader,
+                IsInSAS = dto.IsInSAS,
+                SasLibrary = (dto.IsInSAS) ? dto.GenerateSASLibary(_datasetContext) : null
             };
 
             return de;

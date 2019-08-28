@@ -16,5 +16,6 @@ namespace Sentry.data.Core
         public string DatasetInformation { get; set; }
         public string CategoryName { get; set; }
         public DataClassificationType DataClassification { get; set; }
+        public bool IsInSAS { get; set; }
     }
 }

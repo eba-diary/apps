@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
@@ -47,6 +45,39 @@ namespace Sentry.data.Core
             SchemaModel schemaModel = new SchemaModel();
             de.ToSchemaModel(schemaModel);
             model.Schema = schemaModel;
+        }
+
+        public static string GenerateSASLibary(this DataElementDto dto, IDatasetContext dsContext)
+        {
+            return CommonExtensions.GenerateSASLibaryName(dsContext.GetById<Dataset>(dto.ParentDatasetId));
+        }
+
+        public static void SendIncludeInSasEmail(this DataElement schema, IApplicationUser user, IEmailService emailService)
+        {
+            if (schema.IsInSAS && Configuration.Config.GetHostSetting("SendIncludeInSasEmail") == "true")
+            {
+                StringBuilder bodySb = new StringBuilder();
+
+                if (schema.DataObjects.Count == 0)
+                {
+                    bodySb.Append($"<p>{user.DisplayName} has requested {schema.HiveTable} be added to {schema.SasLibrary}.</p>");
+                }
+                else if (schema.DataObjects.Count > 0)
+                {
+                    bodySb.Append($"<p>{user.DisplayName} has updated {schema.HiveTable} schema.  Can you please refresh {schema.HiveTable} within {schema.SasLibrary} library.</p>");
+                }
+
+                bodySb.Append($"<p>Thank you from your friendly data.sentry.com Administration team</p>");
+
+                if (Configuration.Config.GetHostSetting("EmailDSCSupportAsCC") == "true")
+                {
+                    emailService.SendGenericEmail(Configuration.Config.GetHostSetting("SASAdministrationEmail"), $"Add {schema.HiveTable} to {schema.SasLibrary}", bodySb.ToString(), $"{user.EmailAddress};DSCSupport@sentry.com");
+                }
+                else
+                {
+                    emailService.SendGenericEmail(Configuration.Config.GetHostSetting("SASAdministrationEmail"), $"Add {schema.HiveTable} to {schema.SasLibrary}", bodySb.ToString(), $"{user.EmailAddress}");
+                }
+            }
         }
     }
 }

@@ -264,8 +264,14 @@
                         </div>
                     </div>
 
+                    <div class="form-group">
+                        @Html.LabelFor(model => model.IncludeInSas, new { @class = "control-label col-md-2 optional" })
+                        <div class="col-md-1">
+                            @Html.CheckBoxFor(model => model.IncludeInSas, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                        </div>
+                        @Html.Label("Schema will be added to SAS after columns are defined", new { @class = "control-label col-md-4 optional text-muted", @style = "text-align: left" })
+                    </div>
                 </div>
-
             </div>
         }
 

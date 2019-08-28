@@ -207,6 +207,8 @@
             public const string DELETE_INDICATOR = "DeleteInd";
             public const string DELETE_ISSUER = "DeleteIssuer";
             public const string DELETE_ISSUE_DTM = "DeleteIssueDTM";
+            public const string INCLUDE_IN_SAS = "SAS_IND";
+            public static string SAS_LIBRARY = "SASLibrary";
         }
     }
 }
