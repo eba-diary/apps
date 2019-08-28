@@ -3,6 +3,7 @@ using System.Net.Mail;
 using Sentry.data.Core;
 using System.Linq;
 using System.Text;
+using System;
 
 namespace Sentry.data.Infrastructure
 {
@@ -185,8 +186,15 @@ namespace Sentry.data.Infrastructure
                 Body = body,
             };
 
-            myMail.To.Add(emailAddress);
-            myMail.CC.Add(cc);
+            foreach (var address in emailAddress.Split(new[] { ":" }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                myMail.To.Add(address);
+            }            
+
+            foreach (var address in cc.Split(new[] { ":" }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                myMail.CC.Add(address);
+            }            
 
             smtpClient.Send(myMail);
         }
