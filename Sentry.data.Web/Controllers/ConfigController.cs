@@ -143,14 +143,19 @@ namespace Sentry.data.Web.Controllers
 
         [HttpDelete]
         [Route("Config/{id}")]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public JsonResult Delete(int id)
         {
             try
             {
-                _configService.Delete(id);
-                _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.DELETE_DATASET_SCHEMA, SharedContext.CurrentUser.AssociateId, "Deleted Dataset Schema", id);
-                return Json(new { Success = true, Message = "Schema was successfully deleted" });
+                UserSecurity us = _configService.GetUserSecurityForConfig(id);
+
+                if (us != null && us.CanEditDataset)
+                {
+                    _configService.Delete(id);
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.DELETE_DATASET_SCHEMA, SharedContext.CurrentUser.AssociateId, "Deleted Dataset Schema", id);
+                    return Json(new { Success = true, Message = "Schema was successfully deleted" });
+                }
+                return Json(new { Success = false, Message = "You do not have permissions to delete schema" });
             }
             catch (Exception ex)
             {
