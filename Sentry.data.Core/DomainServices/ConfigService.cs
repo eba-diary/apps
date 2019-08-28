@@ -642,6 +642,12 @@ namespace Sentry.data.Core
             }
         }
 
+        public UserSecurity GetUserSecurityForConfig(int id)
+        {
+            DatasetFileConfig dfc = _datasetContext.DatasetFileConfigs.Where(w => w.ConfigId == id).FirstOrDefault();
+            return _securityService.GetUserSecurity(dfc.ParentDataset, _userService.GetCurrentUser());
+        }
+
         #region PrivateMethods
         private void MarkForDelete(DatasetFileConfig dfc)
         {
