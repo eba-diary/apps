@@ -97,6 +97,8 @@
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DfsBasicHsz.cs" />
     <Compile Include="Entities\Goldeneye\RunningTask.cs" />
     <Compile Include="Entities\Image.cs" />
+    <Compile Include="Extensions\DatasetExtensions.cs" />
+    <Compile Include="Extensions\DatasetFileConfigExtensions.cs" />
     <Compile Include="Extensions\DataSourceQueryExtensions.cs" />
     <Compile Include="GlobalEnums\HttpDataFormat.cs" />
     <Compile Include="GlobalEnums\HTTPMethods.cs" />

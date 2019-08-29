@@ -153,6 +153,7 @@ namespace Sentry.data.Core
         {
             Dataset ds = CreateDataset(dto);
             _datasetContext.Add(ds);
+            dto.DatasetId = ds.DatasetId;
 
             DataElement de = CreateDataElement(dto);
             DatasetFileConfig dfc = CreateDatasetFileConfig(dto, ds);
@@ -357,7 +358,9 @@ namespace Sentry.data.Core
                 HiveTable = dto.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dto.ConfigFileName.Replace(" ", "").ToUpper(),
                 HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
                 HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
-                HasHeader = dto.HasHeader
+                HasHeader = dto.HasHeader,
+                IsInSAS = dto.IsInSAS,
+                SasLibrary = (dto.IsInSAS) ? dto.GenerateSASLibary(_datasetContext) : null
             };
 
             return de;
@@ -522,7 +525,7 @@ namespace Sentry.data.Core
             dto.AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, dto.DatasetId).Count;
             dto.Views = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset == ds.DatasetId).Count();
             dto.IsFavorite = ds.Favorities.Any(w => w.UserId == user.AssociateId);
-            dto.DatasetFileConfigNames = ds.DatasetFileConfigs.ToDictionary(x => x.ConfigId.ToString(), y => y.Name);
+            dto.DatasetFileConfigNames = ds.DatasetFileConfigs.Where(w => w.DeleteInd == false).ToDictionary(x => x.ConfigId.ToString(), y => y.Name);
             dto.DatasetScopeTypeNames = ds.DatasetScopeType.ToDictionary(x => x.Name, y => y.Description);
             dto.DistinctFileExtensions = ds.DatasetFiles.Select(x => Path.GetExtension(x.FileName).TrimStart('.').ToLower()).Distinct().ToList();
             dto.DatasetFileCount = ds.DatasetFiles.Count();

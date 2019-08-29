@@ -3,6 +3,7 @@ using System.Net.Mail;
 using Sentry.data.Core;
 using System.Linq;
 using System.Text;
+using System;
 
 namespace Sentry.data.Infrastructure
 {
@@ -164,6 +165,38 @@ namespace Sentry.data.Infrastructure
             
             smtpClient.Send(myMail);
 
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="emailAddress"></param>
+        /// <param name="subject"></param>
+        /// <param name="body"></param>
+        /// <param name="cc">Multiple emails supported by separating with semi-colon</param>
+        public void SendGenericEmail(string emailAddress, string subject, string body, string cc)
+        {
+            SmtpClient smtpClient = new SmtpClient("mail.sentry.com");
+            MailAddress from = new MailAddress("NoReply@sentry.com");
+            MailMessage myMail = new MailMessage
+            {
+                From = from,
+                Subject = subject,
+                IsBodyHtml = true,
+                Body = body,
+            };
+
+            foreach (var address in emailAddress.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                myMail.To.Add(address);
+            }            
+
+            foreach (var address in cc.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries))
+            {
+                myMail.CC.Add(address);
+            }            
+
+            smtpClient.Send(myMail);
         }
     }
 }

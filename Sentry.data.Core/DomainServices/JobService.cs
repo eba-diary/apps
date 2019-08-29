@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Sentry.Common.Logging;
 
 namespace Sentry.data.Core
 {
@@ -151,8 +152,25 @@ namespace Sentry.data.Core
                 errmsg.AppendLine($"DatasetName: {job.DatasetConfig.ParentDataset.DatasetName}");
                 errmsg.AppendLine($"DropLocation: {job.GetUri().LocalPath}");
 
-                Sentry.Common.Logging.Logger.Error(errmsg.ToString(), e);
+                Logger.Error(errmsg.ToString(), e);
             }
+        }
+
+        public void DisableJob(int id)
+        {
+            try
+            {
+                RetrieverJob job = _datasetContext.GetById<RetrieverJob>(id);
+
+                job.IsEnabled = false;
+                job.Modified = DateTime.Now;
+
+                _datasetContext.SaveChanges();
+            } catch (Exception ex)
+            {
+                Logger.Error($"jobservice-disablejob-failed - jobid:{id}", ex);
+                throw;
+            }            
         }
     }
 }
