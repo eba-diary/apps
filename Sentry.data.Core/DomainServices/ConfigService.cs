@@ -625,6 +625,7 @@ namespace Sentry.data.Core
             dto.HiveTable = de.HiveTable;
             dto.HiveStatus = de.HiveTableStatus;
             dto.HiveLocation = de.HiveLocation;
+            dto.CurrentView = de.CreateCurrentView;
         }
 
         private void MapToDto(DataSource dsrc, DataSourceDto dto)

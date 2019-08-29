@@ -12,5 +12,6 @@ namespace Sentry.data.Core
         public string HiveDatabase { get; set; }
         public string HiveStatus { get; set; }
         public string HiveLocation { get; set; }
+        public bool CurrentView { get; set; }
     }
 }

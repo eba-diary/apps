@@ -185,7 +185,6 @@ namespace Sentry.data.Core
                 SetDataElementDetailValue("HasHeader", value.ToString());
             }
         }
-
         public bool CreateCurrentView
         {
             get
