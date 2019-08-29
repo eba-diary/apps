@@ -61,7 +61,8 @@ namespace Sentry.data.Web.Controllers
             ObsoleteDatasetModel bdm = new ObsoleteDatasetModel(ds, _associateInfoProvider, _datasetContext)
             {
                 CanEditDataset = us.CanEditDataset,
-                CanUpload = us.CanUploadToDataset
+                CanUpload = us.CanUploadToDataset,
+                Security = us
             };
 
             Event e = new Event();
@@ -102,6 +103,7 @@ namespace Sentry.data.Web.Controllers
 
 
         [HttpPost]
+        [Route("Config/DatasetFileConfigForm")]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult DatasetFileConfigForm(DatasetFileConfigsModel dfcm)
         {
@@ -135,103 +137,40 @@ namespace Sentry.data.Web.Controllers
             dfcm.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext);
             dfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
             dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext);
+            dfcm.Security = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);
 
-            return View(dfcm);
+            if (dto.ConfigId == 0)
+            {
+                return View("Create", dfcm);
+            }
+            else
+            {
+                return View("Edit", dfcm);
+            }
         }
 
-        //[HttpPost]
-        //[Route("Config/Dataset/{id}/Create")]
-        //[AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
-        //public ActionResult Create(DatasetFileConfigsModel dfcm)
-        //{
+        [HttpDelete]
+        [Route("Config/{id}")]
+        public JsonResult Delete(int id)
+        {
+            try
+            {
+                UserSecurity us = _configService.GetUserSecurityForConfig(id);
 
-        //    Dataset parent = _datasetContext.GetById<Dataset>(dfcm.DatasetId);
-
-        //    if (parent.DatasetFileConfigs.Any(x => x.Name.ToLower() == dfcm.ConfigFileName.ToLower()))
-        //    {
-        //        AddCoreValidationExceptionsToModel(new ValidationException("Dataset config with that name already exists within dataset"));
-        //    }
-
-
-        //    try
-        //    {
-        //        if (ModelState.IsValid)
-        //        {
-        //            List<DatasetFileConfig> dfcList = parent.DatasetFileConfigs.ToList();
-
-        //            List<DataElement> deList = new List<DataElement>();
-        //            DataElement de = CreateNewDataElement(dfcm);
-
-        //            //Create Generic Data File Config for Dataset                    
-        //            DatasetFileConfig dfc = new DatasetFileConfig()
-        //            {
-        //                ConfigId = 0,
-        //                Name = dfcm.ConfigFileName,
-        //                Description = dfcm.ConfigFileDesc,
-        //                //DropPath = dfcm.DropPath,
-        //                FileTypeId = dfcm.FileTypeId,
-        //                //IsGeneric = false,
-        //                ParentDataset = parent,
-        //                FileExtension = _datasetContext.GetById<FileExtension>(dfcm.FileExtensionID),
-        //                DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dfcm.DatasetScopeTypeID),
-        //                Schema = deList
-        //            };
-
-        //            de.DatasetFileConfig = dfc;
-        //            deList.Add(de);
-        //            dfc.Schema = deList;
-
-        //            List<RetrieverJob> jobList = new List<RetrieverJob>();
-
-        //            RetrieverJob rj = Utility.InstantiateJobsForCreation(dfc, _datasetContext.DataSources.First(x => x.Name.Contains("Default Drop Location")));
-        //            jobList.Add(rj);
-
-        //            jobList.Add(Utility.InstantiateJobsForCreation(dfc, _datasetContext.DataSources.First(x => x.Name.Contains("Default S3 Drop Location"))));
-
-        //            dfc.RetrieverJobs = jobList;
-
-        //            dfcList.Add(dfc);
-        //            parent.DatasetFileConfigs = dfcList;
-
-        //            _datasetContext.Merge<Dataset>(parent);
-        //            _datasetContext.SaveChanges();
-
-        //            try
-        //            {
-        //                if (!System.IO.Directory.Exists(rj.GetUri().LocalPath))
-        //                {
-        //                    System.IO.Directory.CreateDirectory(rj.GetUri().LocalPath);
-        //                }
-        //            }
-        //            catch (Exception e)
-        //            {
-
-        //                StringBuilder errmsg = new StringBuilder();
-        //                errmsg.AppendLine("Failed to Create Drop Location:");
-        //                errmsg.AppendLine($"DatasetId: {parent.DatasetId}");
-        //                errmsg.AppendLine($"DatasetName: {parent.DatasetName}");
-        //                errmsg.AppendLine($"DropLocation: {rj.GetUri().LocalPath}");
-
-        //                Sentry.Common.Logging.Logger.Error(errmsg.ToString(), e);
-        //            }
-
-        //            return RedirectToAction("Index", new { id = parent.DatasetId });
-        //        }
-        //    }
-        //    catch (Sentry.Core.ValidationException ex)
-        //    {
-        //        AddCoreValidationExceptionsToModel(ex);
-        //    }
-        //    finally
-        //    {
-        //        _datasetContext.Clear();
-        //        dfcm.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext);
-        //        dfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v
-        //                => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
-        //    }
-
-        //    return View(dfcm);
-        //}
+                if (us != null && us.CanEditDataset)
+                {
+                    _configService.Delete(id);
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.DELETE_DATASET_SCHEMA, SharedContext.CurrentUser.AssociateId, "Deleted Dataset Schema", id);
+                    return Json(new { Success = true, Message = "Schema was successfully deleted" });
+                }
+                return Json(new { Success = false, Message = "You do not have permissions to delete schema" });
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to delete dataset schema - DatasetId:{id} RequestorId:{SharedContext.CurrentUser.AssociateId} RequestorName:{SharedContext.CurrentUser.DisplayName}", ex);
+                return Json(new { Success = false, Message = "We failed to delete schema.  Please try again later.  Please contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a> if problem persists." });
+            }
+        }
 
         [HttpGet]
         [Route("Config/Manage")]
@@ -259,17 +198,17 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Edit(int configId)
         {
             DatasetFileConfigDto dto = _configService.GetDatasetFileConfigDto(configId);
-            EditDatasetFileConfigModel newEdfcm = new EditDatasetFileConfigModel(dto);
+            DatasetFileConfigsModel dfcm = new DatasetFileConfigsModel(dto);
 
-            newEdfcm.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext, newEdfcm.DatasetScopeTypeID);
-            newEdfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
-            newEdfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, newEdfcm.FileExtensionID);
+            dfcm.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext, dfcm.DatasetScopeTypeID);
+            dfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+            dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, dfcm.FileExtensionID);
 
-            ViewBag.ModifyType = "Edit";
+            //ViewBag.ModifyType = "Edit";
 
-            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Configuration Edit Page", newEdfcm.DatasetId);
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Configuration Edit Page", dfcm.DatasetId);
 
-            return View(newEdfcm);
+            return View(dfcm);
         }
 
         [HttpGet]
@@ -1285,7 +1224,8 @@ namespace Sentry.data.Web.Controllers
             ObsoleteDatasetModel bdm = new ObsoleteDatasetModel(config.ParentDataset, _associateInfoProvider, _datasetContext)
             {
                 CanEditDataset = us.CanEditDataset,
-                CanUpload =us.CanUploadToDataset
+                CanUpload =us.CanUploadToDataset,
+                Security = us
             };
 
             Event e = new Event();

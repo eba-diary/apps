@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace Sentry.data.Web
 {
@@ -33,7 +31,8 @@ namespace Sentry.data.Web
                 Delimiter = model.Delimiter,
                 DataElementChange_DTM = DateTime.Now,
                 HasHeader = model.HasHeader,
-                FileFormatId = model.FileExtensionId
+                FileFormatId = model.FileExtensionId,
+                IsInSAS = model.IncludeInSas
             };
         }
 
@@ -104,7 +103,8 @@ namespace Sentry.data.Web
                 FileTypeId = model.FileTypeId,
                 StorageCode = model.RawStorageId,
                 Schemas = deList,
-                FileExtensionId = model.FileExtensionID
+                FileExtensionId = model.FileExtensionID,
+                IsInSAS = model.IncludedInSAS
             };
         }
 
@@ -121,7 +121,9 @@ namespace Sentry.data.Web
                 CreateCurrentView = model.CreateCurrentView,
                 FileFormatId = model.FileTypeId,
                 ParentDatasetId = model.DatasetId,
-                FileExtensionId = model.FileExtensionID
+                FileExtensionId = model.FileExtensionID,
+                IsInSAS = model.IncludedInSAS,
+                SasLibrary = model.SasLibrary
             };
         }
     }
