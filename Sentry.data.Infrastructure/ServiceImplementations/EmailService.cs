@@ -186,12 +186,12 @@ namespace Sentry.data.Infrastructure
                 Body = body,
             };
 
-            foreach (var address in emailAddress.Split(new[] { ":" }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var address in emailAddress.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries))
             {
                 myMail.To.Add(address);
             }            
 
-            foreach (var address in cc.Split(new[] { ":" }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var address in cc.Split(new[] { ";" }, StringSplitOptions.RemoveEmptyEntries))
             {
                 myMail.CC.Add(address);
             }            
