@@ -1,4 +1,4 @@
-﻿@model Sentry.data.Web.EditDatasetFileConfigModel
+﻿@model Sentry.data.Web.DatasetFileConfigsModel
 @{
     ViewBag.Title = "Edit Data File Config";
 }
@@ -26,10 +26,8 @@
             @Html.HiddenFor(model => model.ConfigFileName)
             @Html.HiddenFor(model => model.FileTypeId)
             @Html.HiddenFor(model => model.DatasetId)
-            @Html.HiddenFor(model => model.ModifyType)
             @Html.HiddenFor(model => model.DatasetScopeTypeID)
             @Html.HiddenFor(model => model.FileExtensionID)
-            @{Model.ModifyType = ViewBag.ModifyType;}
 
             <div class="form-group">
                 @Html.LabelFor(m => m.ConfigFileName, htmlAttributes: new { @class = "control-label col-md-2" })

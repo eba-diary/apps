@@ -137,8 +137,16 @@ namespace Sentry.data.Web.Controllers
             dfcm.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext);
             dfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
             dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext);
+            dfcm.Security = _securityService.GetUserSecurity(null, SharedContext.CurrentUser);
 
-            return View(dfcm);
+            if (dto.ConfigId == 0)
+            {
+                return View("Create", dfcm);
+            }
+            else
+            {
+                return View("Edit", dfcm);
+            }
         }
 
         [HttpDelete]
@@ -190,17 +198,17 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Edit(int configId)
         {
             DatasetFileConfigDto dto = _configService.GetDatasetFileConfigDto(configId);
-            EditDatasetFileConfigModel newEdfcm = new EditDatasetFileConfigModel(dto);
+            DatasetFileConfigsModel dfcm = new DatasetFileConfigsModel(dto);
 
-            newEdfcm.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext, newEdfcm.DatasetScopeTypeID);
-            newEdfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
-            newEdfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, newEdfcm.FileExtensionID);
+            dfcm.AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext, dfcm.DatasetScopeTypeID);
+            dfcm.AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+            dfcm.ExtensionList = Utility.GetFileExtensionListItems(_datasetContext, dfcm.FileExtensionID);
 
-            ViewBag.ModifyType = "Edit";
+            //ViewBag.ModifyType = "Edit";
 
-            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Configuration Edit Page", newEdfcm.DatasetId);
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Configuration Edit Page", dfcm.DatasetId);
 
-            return View(newEdfcm);
+            return View(dfcm);
         }
 
         [HttpGet]
