@@ -60,7 +60,6 @@
                 <label class="control-label col-md-2"></label>
                 <div class="col-md-10">
                     <span class="text-muted">
-                        @*<em> The type of protocol (FTP or API) or location type (internal DFS or EC2) that will be used to retrieve this file. </em>*@
                         <em> Data.Sentry.com will create and manage a file share drop location.  Associates and\or applications can drop files to this location for upload to this dataset (See Drop Path below).</em>
                     </span>
                 </div>
@@ -88,20 +87,20 @@
                 </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group delimiter">
                 @Html.LabelFor((model) => model.Delimiter, new { @class = "control-label col-md-2 optional" })
                 <div class="col-md-10">
                     @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control edit-dataset-row" })
                 </div>
             </div>
 
-            <div class="form-group fieldDescription">
+            <div class="form-group fieldDescription delimiter delimiterDescription">
                 <label class="control-label col-md-2"></label>
                 <div class="col-md-10">
                     <span class="text-muted">
-                        <em id="fileTypeInfo"></em>The character or set of characters used to delimit a file.
+                        <em id="fileTypeInfo"></em>The character or set of characters used to delimit a file.  Common delimiters include; tab (\t), pipe (|), tilda (~).
                         <br />
-                        Note: When uploading a tab ( \t ) or pipe ( | ) delimited file please choose the DELIMITED file extension option.  If your file is comma delimited please choose the CSV file extension option.
+                        Note: If your file is comma (,) delimited please choose the CSV file extension option. 
                     </span>
                 </div>
             </div>
@@ -141,18 +140,14 @@
         <hr />
         <div class="form-group">
             <div>
-                <input type="submit" value="Save" class="btn btn-lg btn-success" />
+                <input type="submit" value="Save" class="btn btn-success" />
+                <a class="btn btn-warning" href="/Config/Dataset/@Model.DatasetId">Cancel</a>
             </div>
         </div>
     </div>
 }
 
-    <div>
-        <a class="backToList" href="/Config/Dataset/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>Back to Dataset Configuration</a>
-    </div>
-
 @section Scripts {
-    @*@Scripts.Render("~/bundles/jqueryval")*@
     <script>
         $(function () {
             data.Config.CreateInit();            

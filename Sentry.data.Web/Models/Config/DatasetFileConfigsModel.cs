@@ -67,6 +67,7 @@ namespace Sentry.data.Web
             this.Security = dto.Security;
             this.CreateCurrentView = dto.CreateCurrentView;
             this.IncludedInSAS = dto.IsInSAS;
+            this.Delimiter = dto.Schemas.FirstOrDefault().Delimiter;
         }
 
         public DatasetFileConfigsModel(DatasetFileConfig dsfc, Boolean renderingForTable, Boolean renderingForPopup, IDatasetContext datasetContext)

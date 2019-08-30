@@ -146,33 +146,51 @@ data.Config = {
 
     CreateInit: function () {
 
-        $('#Delimiter').prop("readonly", "readonly");
-        $('#HasHeader').prop("readonly", false);
-        $('#HasHeader').prop("disabled", false);
+        data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
 
         $("#FileExtensionID").change(function () {
-            switch ($('#FileExtensionID option:selected').text()) {
-                case "CSV":
-                    $('#Delimiter').text(',');
-                    $('#Delimiter').val(',');
-                    $('#Delimiter').prop("readonly", "readonly");
-                    $('#HasHeader').prop("readonly", false);
-                    $('#HasHeader').prop("disabled", false);
-                    break;
-                case "DELIMITED":
-                    $('#Delimiter').val('');
-                    $('#Delimiter').prop("readonly", "");
-                    $('#HasHeader').prop("readonly", false);
-                    $('#HasHeader').prop("disabled", false);
-                    break;
-                default:
-                    $('#Delimiter').val('');
-                    $('#Delimiter').prop("readonly", "readonly");
-                    $('#HasHeader').prop("readonly", true);
-                    $('#HasHeader').prop("disabled", true);
-                    break;
-            }
+            data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
         });
+    },
+
+    EditInit: function () {
+        $("#EditConfigForm").validateBootstrap(true);
+
+        data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
+
+        $("#FileExtensionID").change(function () {
+            data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
+        });
+    },
+
+    SetFileExtensionProperites: function (extension) {
+        switch (extension) {
+            case "CSV":
+                $('.delimiter').show();
+                $('.delimiterDescription').hide();
+                $('#Delimiter').text(',');
+                $('#Delimiter').val(',');
+                $('#Delimiter').prop("readonly", "readonly");
+                $('#HasHeader').prop("readonly", false);
+                $('#HasHeader').prop("disabled", false);
+                break;
+            case "DELIMITED":
+            case "ANY":
+                $('.delimiter').show();
+                $('.delimiterDescription').show();
+                $('#Delimiter').val('');
+                $('#Delimiter').prop("readonly", "");
+                $('#HasHeader').prop("readonly", false);
+                $('#HasHeader').prop("disabled", false);
+                break;
+            default:
+                $('.delimiter').hide();
+                $('#Delimiter').val('');
+                $('#Delimiter').prop("readonly", "readonly");
+                $('#HasHeader').prop("readonly", true);
+                $('#HasHeader').prop("disabled", true);
+                break;
+        }
     },
 
     ExtensionInit: function() {

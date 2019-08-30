@@ -296,11 +296,18 @@ namespace Sentry.data.Core
 
         private void UpdateDataElement(DatasetFileConfigDto dto, DataElement de)
         {
-            de.CreateCurrentView = dto.Schemas.FirstOrDefault().CreateCurrentView;
-            de.IsInSAS = dto.IsInSAS;
+            
+            de.CreateCurrentView = dto.Schemas.FirstOrDefault().CreateCurrentView;            
             de.SasLibrary = (dto.IsInSAS) ? dto.GenerateSASLibaryName(_datasetContext) : null;
+            de.FileFormat = _datasetContext.GetById<FileExtension>(dto.FileExtensionId).Name.Trim();
+            de.Delimiter = dto.Schemas.FirstOrDefault().Delimiter;
 
-            de.SendIncludeInSasEmail(_userService.GetCurrentUser(), _emailService);
+            //if IsInSAS property changed to checked, send email communication.
+            if (de.IsInSAS != dto.IsInSAS && dto.IsInSAS)
+            {
+                de.SendIncludeInSasEmail(_userService.GetCurrentUser(), _emailService);
+            }
+            de.IsInSAS = dto.IsInSAS;
         }
 
         public DatasetFileConfigDto GetDatasetFileConfigDto(int configId)
