@@ -104,7 +104,10 @@ namespace Sentry.data.Web
                 StorageCode = model.RawStorageId,
                 Schemas = deList,
                 FileExtensionId = model.FileExtensionID,
-                IsInSAS = model.IncludedInSAS
+                IsInSAS = model.IncludedInSAS,
+                HasHeader = model.HasHeader,
+                Delimiter = model.Delimiter,
+                CreateCurrentView = model.CreateCurrentView
             };
         }
 

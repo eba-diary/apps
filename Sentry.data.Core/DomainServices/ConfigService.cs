@@ -301,6 +301,7 @@ namespace Sentry.data.Core
             de.SasLibrary = (dto.IsInSAS) ? dto.GenerateSASLibaryName(_datasetContext) : null;
             de.FileFormat = _datasetContext.GetById<FileExtension>(dto.FileExtensionId).Name.Trim();
             de.Delimiter = dto.Schemas.FirstOrDefault().Delimiter;
+            de.HasHeader = dto.HasHeader;
 
             //if IsInSAS property changed to checked, send email communication.
             if (de.IsInSAS != dto.IsInSAS && dto.IsInSAS)

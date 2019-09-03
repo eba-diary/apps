@@ -88,6 +88,7 @@ namespace Sentry.data.Web
             this.Delimiter = dsfc.Schema.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().Delimiter;
             this.RawStorageId = dsfc.GetStorageCode();
             this.CreateCurrentView = dsfc.Schema.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().CreateCurrentView;
+            this.HasHeader = dsfc.Schema.OrderByDescending(o => o.DataElementChange_DTM).FirstOrDefault().HasHeader;
 
             try
             {
