@@ -164,28 +164,39 @@ data.Config = {
     },
 
     SetFileExtensionProperites: function (extension) {
+        var editMode = true;
+        if ($('#ConfigId').val === 0) {
+            editMode = false;
+        }
+
         switch (extension) {
             case "CSV":
                 $('.delimiter').show();
                 $('.delimiterDescription').hide();
-                $('#Delimiter').text(',');
-                $('#Delimiter').val(',');
                 $('#Delimiter').prop("readonly", "readonly");
                 $('#HasHeader').prop("readonly", false);
                 $('#HasHeader').prop("disabled", false);
+                if (!editMode) {
+                    $('#Delimiter').text(',');
+                    $('#Delimiter').val(',');
+                }
                 break;
             case "DELIMITED":
             case "ANY":
                 $('.delimiter').show();
                 $('.delimiterDescription').show();
-                $('#Delimiter').val('');
+                if (!editMode) {
+                    $('#Delimiter').val('');
+                }
                 $('#Delimiter').prop("readonly", "");
                 $('#HasHeader').prop("readonly", false);
                 $('#HasHeader').prop("disabled", false);
                 break;
             default:
                 $('.delimiter').hide();
-                $('#Delimiter').val('');
+                if (!editMode) {
+                    $('#Delimiter').val('');
+                }
                 $('#Delimiter').prop("readonly", "readonly");
                 $('#HasHeader').prop("readonly", true);
                 $('#HasHeader').prop("disabled", true);

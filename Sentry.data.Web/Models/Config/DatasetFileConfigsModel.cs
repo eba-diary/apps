@@ -28,6 +28,7 @@ namespace Sentry.data.Web
             this.FileExtension = dsfc.FileExtension;
             this.Schemas = dsfc.Schema;
             this.RawStorageId = dsfc.GetStorageCode();
+            this.SchemaId = dsfc.Schema.FirstOrDefault().DataElement_ID;
 
             try
             {
@@ -67,7 +68,8 @@ namespace Sentry.data.Web
             this.Security = dto.Security;
             this.CreateCurrentView = dto.CreateCurrentView;
             this.IncludedInSAS = dto.IsInSAS;
-            this.Delimiter = dto.Schemas.FirstOrDefault().Delimiter;
+            this.Delimiter = dto.Delimiter;
+            this.HasHeader = dto.HasHeader;
         }
 
         public DatasetFileConfigsModel(DatasetFileConfig dsfc, Boolean renderingForTable, Boolean renderingForPopup, IDatasetContext datasetContext)
@@ -82,7 +84,10 @@ namespace Sentry.data.Web
             this.FileExtensionID = dsfc.FileExtension.Id;
             this.FileExtension = dsfc.FileExtension;
             this.Schemas = dsfc.Schema;
+            this.SchemaId = dsfc.Schema.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().DataElement_ID;
+            this.Delimiter = dsfc.Schema.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().Delimiter;
             this.RawStorageId = dsfc.GetStorageCode();
+            this.CreateCurrentView = dsfc.Schema.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().CreateCurrentView;
 
             try
             {
@@ -168,7 +173,7 @@ namespace Sentry.data.Web
         public DatasetScopeType ScopeType { get; set; }
         public FileExtension FileExtension { get; set; }
         public string RawStorageId { get; set; }
-
+        public int SchemaId { get; set; }
         public IList<RetrieverJob> RetrieverJobs { get; set; }
 
         public IList<DataElement> Schemas { get; set; }     

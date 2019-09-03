@@ -116,6 +116,13 @@
                 </div>
             </div>
 
+            <div class="form-group fileHasHeader">
+                @Html.LabelFor((model) => model.HasHeader, new { @class = "control-label col-md-2 optional" })
+                <div class="col-md-10">
+                    @Html.CheckBoxFor((model) => model.HasHeader, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                </div>
+            </div>
+
             @if (Model.Security.ShowAdminControls)
             {
                 <div class="form-group">

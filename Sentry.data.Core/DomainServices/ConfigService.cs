@@ -984,6 +984,8 @@ namespace Sentry.data.Core
             dto.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
             dto.CreateCurrentView = (dfc.Schema.FirstOrDefault() != null) ? dfc.Schema.FirstOrDefault().CreateCurrentView : false;
             dto.IsInSAS = (dfc.Schema.FirstOrDefault() != null) ? dfc.Schema.FirstOrDefault().IsInSAS : false;
+            dto.Delimiter = dfc.Schema.FirstOrDefault().Delimiter;
+            dto.HasHeader = (dfc.Schema.FirstOrDefault() != null) ? dfc.Schema.FirstOrDefault().HasHeader : false;
         }
         #endregion
     }
