@@ -595,6 +595,11 @@ namespace Sentry.data.Core
                 MarkForDelete(de);
                 _datasetContext.SaveChanges();
 
+                //Send message to create hive table
+                HiveTableDeleteModel hiveDelete = new HiveTableDeleteModel();
+                de.ToHiveDeleteModel(hiveDelete);
+                _messagePublisher.PublishDSCEvent(de.DataElement_ID.ToString(), JsonConvert.SerializeObject(hiveDelete));
+
                 return true;
             }
             catch (Exception ex)

@@ -46,6 +46,12 @@ namespace Sentry.data.Core
             de.ToSchemaModel(schemaModel);
             model.Schema = schemaModel;
         }
+        public static void ToHiveDeleteModel(this DataElement de, HiveTableDeleteModel model)
+        {
+            model.SchemaId = de.DataElement_ID;
+            model.HiveDatabase = de.HiveDatabase;
+            model.HiveTable = de.HiveTable;
+        }
 
         public static string GenerateSASLibary(this DataElementDto dto, IDatasetContext dsContext)
         {
