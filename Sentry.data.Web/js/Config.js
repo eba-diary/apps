@@ -119,27 +119,55 @@ data.Config = {
                 var ConfirmMessage = "<p>Are you sure</p><p><h3><b><font color=\"red\">THIS IS NOT A REVERSIBLE ACTION!</font></b></h3></p> </br>Deleting the schema will remove all associated data files and hive consumption layers.  </br>If at a later point " +
                     "this needs to be recreated, all files will need to be resent from source."
 
-                Sentry.ShowModalConfirmation(ConfirmMessage, function () {
-                    $.ajax({
-                        url: "/Config/" + config.attr("data-id"),
-                        method: "DELETE",
-                        dataType: 'json',
-                        success: function (obj) {
-                            Sentry.ShowModalAlert(obj.Message, function () {
-                                location.reload();
-                            })
-                        },
-                        failure: function (obj) {
-                            alert("failure");
-                            Sentry.ShowModalAlert(
-                                obj.Message, function () { })
-                        },
-                        error: function (obj) {
-                            Sentry.ShowModalAlert(
-                                obj.Message, function () { })
+                Sentry.ShowModalCustom("Delete Schema", ConfirmMessage, {
+                    Confirm: {
+                        label: "Confirm",
+                        className: "btn-danger",
+                        callback: function () {
+                            $.ajax({
+                                url: "/Config/" + config.attr("data-id"),
+                                method: "DELETE",
+                                dataType: 'json',
+                                success: function (obj) {
+                                    Sentry.ShowModalAlert(obj.Message, function () {
+                                        location.reload();
+                                    })
+                                },
+                                failure: function (obj) {
+                                    alert("failure");
+                                    Sentry.ShowModalAlert(
+                                        obj.Message, function () { })
+                                },
+                                error: function (obj) {
+                                    Sentry.ShowModalAlert(
+                                        obj.Message, function () { })
+                                }
+                            });
                         }
-                    });
-                })
+                    }
+                });
+
+                //Sentry.ShowModalConfirmation(ConfirmMessage, function () {
+                //    $.ajax({
+                //        url: "/Config/" + config.attr("data-id"),
+                //        method: "DELETE",
+                //        dataType: 'json',
+                //        success: function (obj) {
+                //            Sentry.ShowModalAlert(obj.Message, function () {
+                //                location.reload();
+                //            })
+                //        },
+                //        failure: function (obj) {
+                //            alert("failure");
+                //            Sentry.ShowModalAlert(
+                //                obj.Message, function () { })
+                //        },
+                //        error: function (obj) {
+                //            Sentry.ShowModalAlert(
+                //                obj.Message, function () { })
+                //        }
+                //    });
+                //})
             });
         }   
     },
