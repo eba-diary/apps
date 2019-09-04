@@ -165,7 +165,7 @@ data.Config = {
 
     SetFileExtensionProperites: function (extension) {
         var editMode = true;
-        if ($('#ConfigId').val === 0) {
+        if ($('#ConfigId').val === "0") {
             editMode = false;
         }
 
