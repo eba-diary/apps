@@ -189,7 +189,8 @@ namespace Sentry.data.Core
 
             Dataset parent = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
 
-            if (parent.DatasetFileConfigs.Any(x => x.Name.ToLower() == dto.Name.ToLower()))
+            //remove any schemas which are marked for deletion
+            if (parent.DatasetFileConfigs.Any(x => !x.DeleteInd && x.Name.ToLower() == dto.Name.ToLower()))
             {
                 errors.Add("Dataset config with that name already exists within dataset");
             }
