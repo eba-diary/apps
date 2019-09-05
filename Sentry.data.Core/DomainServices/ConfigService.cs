@@ -612,6 +612,12 @@ namespace Sentry.data.Core
                 {
                     try
                     {
+                        //Ensure all associated RetrieverJobs are disabled
+                        foreach (var job in dfc.RetrieverJobs)
+                        {
+                            _jobService.DisableJob(job.Id);
+                        }
+
                         //Delete all parquet files under schema storage code
                         DeleteParquetFilesByStorageCode(de.StorageCode);
 
@@ -619,21 +625,21 @@ namespace Sentry.data.Core
                         DeleteRawFilesByStorageCode(de.StorageCode);
                         
 
-                        //Delete all DatasetFileParquet metadata
+                        //Delete all DatasetFileParquet metadata  (inserts are managed outside of DSC code)
                         List<DatasetFileParquet> parquetFileList = _datasetContext.DatasetFileParquet.Where(w => w.SchemaId == de.DataElement_ID).ToList();
                         foreach (DatasetFileParquet record in parquetFileList)
                         {
                             _datasetContext.Remove(record);
                         }
 
-                        //Delete all DatasetFileReply metadata
+                        //Delete all DatasetFileReply metadata  (inserts are managed outside of DSC code)
                         List<DatasetFileReply> replyList = _datasetContext.DatasetFileReply.Where(w => w.SchemaID == de.DataElement_ID).ToList();
                         foreach (DatasetFileReply record in replyList)
                         {
                             _datasetContext.Remove(record);
                         }
 
-                        //Delete all Schema metadata
+                        //Delete all Schema metadata (will cascade delete to datafiles, dataelement, dataobject, dataobjectfield tables (including detail tables))
                         _datasetContext.Remove(dfc);
 
                         _datasetContext.SaveChanges();
