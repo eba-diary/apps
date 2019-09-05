@@ -50,9 +50,10 @@ namespace Sentry.data.Core
 
         List<string> FindObject(string keyPrefix);
 
-        IList<string> ListObjects(string bucket, string prefix, List<KeyValuePair<string, string>> tagList);
+        IList<string> ListObjects(string bucket, string prefix, List<KeyValuePair<string, string>> tagList = null);
 
         List<KeyValuePair<string, string>> GetObjectTags(string bucket, string key, string versionId = null);
+        void DeleteParquetFilesByStorageCode(string storageCode);
     }
 
 }

@@ -273,6 +273,7 @@
     <Compile Include="ServiceImplementations\SASProvider.cs" />
     <Compile Include="ServiceImplementations\SASServiceProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\TicketMonitorService.cs" />
+    <Compile Include="ServiceImplementations\WallEService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">

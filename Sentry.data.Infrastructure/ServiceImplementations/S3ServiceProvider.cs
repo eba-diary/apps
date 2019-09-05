@@ -639,13 +639,15 @@ namespace Sentry.data.Infrastructure
                 dosReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
                 dosReq.Objects = objects;
                 DeleteObjectsResponse dosRsp = S3Client.DeleteObjects(dosReq);
-                Logger.Info($"No. of objects successfully deleted = {dosRsp.DeletedObjects.Count()}");
+                Logger.Info($"No. of objects successfully deleted = {dosRsp.DeletedObjects.Count}");
 
                 foreach (DeletedObject dobj in dosRsp.DeletedObjects)
                 {
-                    ObjectKeyVersion newItem = new ObjectKeyVersion();
-                    newItem.key = dobj.Key;
-                    newItem.versionId = dobj.VersionId;
+                    ObjectKeyVersion newItem = new ObjectKeyVersion
+                    {
+                        key = dobj.Key,
+                        versionId = dobj.VersionId
+                    };
                     deletedObjects.Add(newItem);
                 }
 
@@ -658,8 +660,8 @@ namespace Sentry.data.Infrastructure
                 {
                     sb.Append($"Object Key: {error.Key} Object VersionID: {error.VersionId} Code: {error.Code} Message:{error.Message}");
                 }
-                Logger.Error($"Successfully deleted = {dosRsp.DeletedObjects.Count()} : Failed to Delete = {dosRsp.DeleteErrors.Count()}", new Exception(sb.ToString()));
-                throw new Exception($"Failed DeleteMultipleS3keys: Failed to Delete {dosRsp.DeleteErrors.Count()} keys", new Exception(sb.ToString()));
+                Logger.Error($"Successfully deleted = {dosRsp.DeletedObjects.Count} : Failed to Delete = {dosRsp.DeleteErrors.Count}", new Exception(sb.ToString()));
+                throw new Exception($"Failed DeleteMultipleS3keys: Failed to Delete {dosRsp.DeleteErrors.Count} keys", new Exception(sb.ToString()));
             }
             catch (AmazonS3Exception amazonS3Exception)
             {
@@ -1034,6 +1036,12 @@ namespace Sentry.data.Infrastructure
                     throw;
                 }
             }
+        }
+
+        public void DeleteParquetFilesByStorageCode(string storageCode)
+        {
+            S3DirectoryInfo S3DirectoryToDelete = new S3DirectoryInfo(S3Client, Configuration.Config.GetHostSetting("AWSRootBucket"), $"parquet/{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
+            S3DirectoryToDelete.Delete(true);
         }
 
         #region Helpers

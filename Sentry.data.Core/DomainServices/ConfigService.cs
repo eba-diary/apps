@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Sentry.Common.Logging;
+using StructureMap;
 
 namespace Sentry.data.Core
 {
@@ -19,12 +20,13 @@ namespace Sentry.data.Core
         public IEncryptionService _encryptService;
         public IJobService _jobService;
         public IEmailService _emailService;
+        private IS3ServiceProvider s3ServiceProvider;
         private readonly ISecurityService _securityService;
 
         public ConfigService(IDatasetContext dsCtxt, IMessagePublisher publisher, 
             IUserService userService, IEventService eventService, IMessagePublisher messagePublisher,
             IEncryptionService encryptService, ISecurityService securityService,
-            IJobService jobService, IEmailService emailService)
+            IJobService jobService, IEmailService emailService, IS3ServiceProvider s3ServiceProvider)
         {
             _datasetContext = dsCtxt;
             _publisher = publisher;
@@ -35,6 +37,7 @@ namespace Sentry.data.Core
             _securityService = securityService;
             JobService = jobService;
             _emailService = emailService;
+            S3ServiceProvider = s3ServiceProvider;
         }
 
         private IJobService JobService
@@ -48,6 +51,8 @@ namespace Sentry.data.Core
                 _jobService = value;
             }
         }
+
+        private IS3ServiceProvider S3ServiceProvider { get; set; }
 
         public SchemaDTO GetSchemaDTO(int id)
         {
@@ -576,29 +581,55 @@ namespace Sentry.data.Core
             return string.Empty;
         }
 
-        public bool Delete(int id)
+        public bool Delete(int id, bool logicalDelete = true)
         {
             try
             {
                 DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(id);
                 DataElement de = dfc.Schema.FirstOrDefault();
 
-                //Disable all associated RetrieverJobs
-                foreach (var job in dfc.RetrieverJobs)
+                if (logicalDelete)
                 {
-                    _jobService.DisableJob(job.Id);
+                    //Disable all associated RetrieverJobs
+                    foreach (var job in dfc.RetrieverJobs)
+                    {
+                        _jobService.DisableJob(job.Id);
+                    }
+
+                    //Mark Object for delete to ensure they are not displaed in UI
+                    //Goldeneye service will perform delete after determined amount of time
+                    MarkForDelete(dfc);
+                    MarkForDelete(de);
+                    _datasetContext.SaveChanges();
+
+                    //Send message to create hive table
+                    HiveTableDeleteModel hiveDelete = new HiveTableDeleteModel();
+                    de.ToHiveDeleteModel(hiveDelete);
+                    _messagePublisher.PublishDSCEvent(de.DataElement_ID.ToString(), JsonConvert.SerializeObject(hiveDelete));
+
                 }
-
-                //Mark Object for delete to ensure they are not displaed in UI
-                //Goldeneye service will perform delete after determined amount of time
-                MarkForDelete(dfc);
-                MarkForDelete(de);
-                _datasetContext.SaveChanges();
-
-                //Send message to create hive table
-                HiveTableDeleteModel hiveDelete = new HiveTableDeleteModel();
-                de.ToHiveDeleteModel(hiveDelete);
-                _messagePublisher.PublishDSCEvent(de.DataElement_ID.ToString(), JsonConvert.SerializeObject(hiveDelete));
+                else
+                {
+                    try
+                    {
+                        //Delete Parquet Files
+                        List<string> keys = S3ServiceProvider.ListObjects(Configuration.Config.GetHostSetting("AWSRootBucket"), $"parquet/{Configuration.Config.GetHostSetting("S3DataPrefix")}{de.StorageCode}").ToList();
+                        List<ObjectKeyVersion> keyVersionList = new List<ObjectKeyVersion>();
+                        foreach (var key in keys)
+                        {
+                            keyVersionList.Add(new ObjectKeyVersion()
+                            {
+                                key = key,
+                                versionId = null
+                            });
+                        }
+                        S3ServiceProvider.DeleteMultipleS3keys(keyVersionList);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"configservice-delete-permanant-failed", ex);
+                    }
+                }
 
                 return true;
             }
