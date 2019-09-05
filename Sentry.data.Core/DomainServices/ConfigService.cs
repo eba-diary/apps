@@ -612,22 +612,37 @@ namespace Sentry.data.Core
                 {
                     try
                     {
-                        //Delete Parquet Files
-                        List<string> keys = S3ServiceProvider.ListObjects(Configuration.Config.GetHostSetting("AWSRootBucket"), $"parquet/{Configuration.Config.GetHostSetting("S3DataPrefix")}{de.StorageCode}").ToList();
-                        List<ObjectKeyVersion> keyVersionList = new List<ObjectKeyVersion>();
-                        foreach (var key in keys)
+                        //Delete all parquet files under schema storage code
+                        DeleteParquetFilesByStorageCode(de.StorageCode);
+
+                        //Delete all raw data files under schema storage code
+                        DeleteRawFilesByStorageCode(de.StorageCode);
+                        
+
+                        //Delete all DatasetFileParquet metadata
+                        List<DatasetFileParquet> parquetFileList = _datasetContext.DatasetFileParquet.Where(w => w.SchemaId == de.DataElement_ID).ToList();
+                        foreach (DatasetFileParquet record in parquetFileList)
                         {
-                            keyVersionList.Add(new ObjectKeyVersion()
-                            {
-                                key = key,
-                                versionId = null
-                            });
+                            _datasetContext.Remove(record);
                         }
-                        S3ServiceProvider.DeleteMultipleS3keys(keyVersionList);
+
+                        //Delete all DatasetFileReply metadata
+                        List<DatasetFileReply> replyList = _datasetContext.DatasetFileReply.Where(w => w.SchemaID == de.DataElement_ID).ToList();
+                        foreach (DatasetFileReply record in replyList)
+                        {
+                            _datasetContext.Remove(record);
+                        }
+
+                        //Delete all Schema metadata
+                        _datasetContext.Remove(dfc);
+
+                        _datasetContext.SaveChanges();
+
                     }
                     catch (Exception ex)
                     {
                         Logger.Error($"configservice-delete-permanant-failed", ex);
+                        return false;
                     }
                 }
 
@@ -644,6 +659,22 @@ namespace Sentry.data.Core
         {
             DatasetFileConfig dfc = _datasetContext.DatasetFileConfigs.Where(w => w.ConfigId == id).FirstOrDefault();
             return _securityService.GetUserSecurity(dfc.ParentDataset, _userService.GetCurrentUser());
+        }
+
+        public List<DatasetFileConfig> GetSchemaMarkedDeleted()
+        {
+            List<DatasetFileConfig> configList = _datasetContext.DatasetFileConfigs.Where(w => w.DeleteInd && w.DeleteIssueDTM < DateTime.Now.AddDays(-7)).ToList();
+            return configList;
+        }
+
+        public void DeleteParquetFilesByStorageCode(string storageCode)
+        {
+            S3ServiceProvider.DeleteS3Prefix($"parquet/{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
+        }
+
+        public void DeleteRawFilesByStorageCode(string storageCode)
+        {
+            S3ServiceProvider.DeleteS3Prefix($"{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
         }
 
         #region PrivateMethods

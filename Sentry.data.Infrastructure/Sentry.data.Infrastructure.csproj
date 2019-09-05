@@ -191,6 +191,8 @@
     <Compile Include="Mappings\Primary\ConsumptionLayerTypeMapping.cs" />
     <Compile Include="Mappings\Primary\DataAssetMapping.cs" />
     <Compile Include="Mappings\Primary\DataFeedMapping.cs" />
+    <Compile Include="Mappings\Primary\DatasetFileParquetMapping.cs" />
+    <Compile Include="Mappings\Primary\DatasetFileReplyMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetScopeTypeMapping.cs" />
     <Compile Include="Mappings\Primary\FavoriteMapping.cs" />

@@ -681,7 +681,20 @@ namespace Sentry.data.Infrastructure
             }
         }
         #endregion
-        
+        public void DeleteMulitpleS3keys(List<string> keys)
+        {
+            List<ObjectKeyVersion> keyList = new List<ObjectKeyVersion>();
+            foreach (string key in keys)
+            {
+                keyList.Add(new ObjectKeyVersion()
+                {
+                    key = key,
+                    versionId = null
+                });
+            }
+
+            DeleteMultipleS3keys(keyList);
+        }
         /// <summary>
         /// Get list of datasets currently on S3, within the given parentDir
         /// </summary>
@@ -1044,6 +1057,27 @@ namespace Sentry.data.Infrastructure
             S3DirectoryToDelete.Delete(true);
         }
 
+        public void DeleteS3Prefix(string prefix)
+        {
+            List<ObjectKeyVersion> s3Keys = ConvertToObjectKeyVersion(ListObjects(Configuration.Config.GetHostSetting("AWSRootBucket"), prefix).ToList());
+            if (s3Keys.Count == 0)
+            {
+                Logger.Info($"deleteS3Prefix-nofilesdetected - prefix:{prefix}");
+            }
+            else
+            {
+                DeleteMultipleS3keys(s3Keys);
+            }
+        }
+
+        public void DeleteS3Prefix(List<string> prefixList)
+        {
+            foreach (string prefix in prefixList)
+            {
+                DeleteS3Prefix(prefix);
+            }
+        }
+
         #region Helpers
 
         private KeyVersion ToKeyVersion (ObjectKeyVersion input)
@@ -1075,6 +1109,20 @@ namespace Sentry.data.Infrastructure
 
         }
         
+        private List<ObjectKeyVersion> ConvertToObjectKeyVersion(List<string> keyList)
+        {
+            List<ObjectKeyVersion> keyVersionList = new List<ObjectKeyVersion>();
+            foreach (var key in keyList)
+            {
+                keyVersionList.Add(new ObjectKeyVersion()
+                {
+                    key = key,
+                    versionId = null
+                });
+            }
+
+            return keyVersionList;
+        }
         #endregion
         
     }
