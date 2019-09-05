@@ -70,7 +70,7 @@ namespace Sentry.data.Core
                         Logger.Info($"HiveMetadataHandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(deleteEvent)}");
 
                         de = _dsContext.GetById<DataElement>(deleteEvent.SchemaId);
-                        de.HiveTableStatus = HiveTableStatusEnum.Requested.ToString();
+                        de.HiveTableStatus = HiveTableStatusEnum.DeleteRequested.ToString();
                         _dsContext.SaveChanges();
                         break;
                     case "HIVE-TABLE-DELETE-COMPLETED":
@@ -85,7 +85,7 @@ namespace Sentry.data.Core
                                 de.HiveTableStatus = HiveTableStatusEnum.Deleted.ToString();
                                 break;
                             case "FAILED":
-                                de.HiveTableStatus = HiveTableStatusEnum.RequestFailed.ToString();
+                                de.HiveTableStatus = HiveTableStatusEnum.DeleteFailed.ToString();
                                 break;
                             default:
                                 de.HiveTableStatus = HiveTableStatusEnum.Pending.ToString();
