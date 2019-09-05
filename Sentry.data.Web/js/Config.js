@@ -156,19 +156,14 @@ data.Config = {
     EditInit: function () {
         $("#EditConfigForm").validateBootstrap(true);
 
-        data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
+        data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text(), $('#ConfigId').val() !== "0");
 
         $("#FileExtensionID").change(function () {
-            data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
+            data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text(), $('#ConfigId').val() !== "0");
         });
     },
 
-    SetFileExtensionProperites: function (extension) {
-        var editMode = true;
-        if ($('#ConfigId').val() === "0") {
-            editMode = false;
-        }
-
+    SetFileExtensionProperites: function (extension, editMode) {
         switch (extension) {
             case "CSV":
                 $('.delimiter').show();
