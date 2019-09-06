@@ -677,7 +677,7 @@ namespace Sentry.data.Core
 
         public List<DatasetFileConfig> GetSchemaMarkedDeleted()
         {
-            List<DatasetFileConfig> configList = _datasetContext.DatasetFileConfigs.Where(w => w.DeleteInd && w.DeleteIssueDTM < DateTime.Now.AddDays(-7)).ToList();
+            List<DatasetFileConfig> configList = _datasetContext.DatasetFileConfigs.Where(w => w.DeleteInd && w.DeleteIssueDTM < DateTime.Now.AddDays(Double.Parse(Configuration.Config.GetHostSetting("SchemaDeleteWaitDays")))).ToList();
             return configList;
         }
 
