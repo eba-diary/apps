@@ -590,6 +590,7 @@ namespace Sentry.data.Core
 
                 if (logicalDelete)
                 {
+                    Logger.Info($"configservice-delete-logical - configid:{id} configname:{dfc.Name}");
                     //Disable all associated RetrieverJobs
                     foreach (var job in dfc.RetrieverJobs)
                     {
@@ -610,44 +611,51 @@ namespace Sentry.data.Core
                 }
                 else
                 {
+                    Logger.Info($"configservice-delete-physical - configid:{id} configname:{dfc.Name}");
                     try
                     {
+                        Logger.Info($"configservice-delete-disabledjobs - configid:{id} configname:{dfc.Name}");
                         //Ensure all associated RetrieverJobs are disabled
                         foreach (var job in dfc.RetrieverJobs)
                         {
                             _jobService.DisableJob(job.Id);
                         }
 
+                        Logger.Info($"configservice-delete-deleteparquetstorage - configid:{id} configname:{dfc.Name}");
                         //Delete all parquet files under schema storage code
                         DeleteParquetFilesByStorageCode(de.StorageCode);
 
+                        Logger.Info($"configservice-delete-deleterawstorage - configid:{id} configname:{dfc.Name}");
                         //Delete all raw data files under schema storage code
                         DeleteRawFilesByStorageCode(de.StorageCode);
-                        
 
+                        Logger.Info($"configservice-delete-datasetfileparquetmetadata - configid:{id} configname:{dfc.Name}");
                         //Delete all DatasetFileParquet metadata  (inserts are managed outside of DSC code)
                         List<DatasetFileParquet> parquetFileList = _datasetContext.DatasetFileParquet.Where(w => w.SchemaId == de.DataElement_ID).ToList();
+                        Logger.Info($"configservice-delete-datasetfileparquetmetadata - recordsfound:{parquetFileList.Count} configid:{id} configname:{dfc.Name}");
                         foreach (DatasetFileParquet record in parquetFileList)
                         {
                             _datasetContext.Remove(record);
                         }
 
+                        Logger.Info($"configservice-delete-datasetfilereplymetadata - configid:{id} configname:{dfc.Name}");
                         //Delete all DatasetFileReply metadata  (inserts are managed outside of DSC code)
                         List<DatasetFileReply> replyList = _datasetContext.DatasetFileReply.Where(w => w.SchemaID == de.DataElement_ID).ToList();
+                        Logger.Info($"configservice-delete-datasetfilereplymetadata - recordsfound:{parquetFileList.Count} configid:{id} configname:{dfc.Name}");
                         foreach (DatasetFileReply record in replyList)
                         {
                             _datasetContext.Remove(record);
                         }
 
+                        Logger.Info($"configservice-delete-configmetadata - configid:{id} configname:{dfc.Name}");
                         //Delete all Schema metadata (will cascade delete to datafiles, dataelement, dataobject, dataobjectfield tables (including detail tables))
                         _datasetContext.Remove(dfc);
-
                         _datasetContext.SaveChanges();
 
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error($"configservice-delete-permanant-failed", ex);
+                        Logger.Error($"configservice-delete-permanant-failed - configid:{id} configname:{dfc.Name}", ex);
                         return false;
                     }
                 }
@@ -656,7 +664,7 @@ namespace Sentry.data.Core
             }
             catch (Exception ex)
             {
-                Logger.Error("configservice-delete-failed", ex);
+                Logger.Error($"configservice-delete-failed - configid:{id}", ex);
                 return false;
             }
         }

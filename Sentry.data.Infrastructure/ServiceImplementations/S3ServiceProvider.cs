@@ -650,7 +650,6 @@ namespace Sentry.data.Infrastructure
                     };
                     deletedObjects.Add(newItem);
                 }
-
             }
             catch (DeleteObjectsException e)
             {
@@ -1066,6 +1065,7 @@ namespace Sentry.data.Infrastructure
             }
             else
             {
+                Logger.Info($"deleteS3Prefix-detectedfiles - prefix:{prefix} count:{s3Keys.Count.ToString()}");
                 DeleteMultipleS3keys(s3Keys);
             }
         }
