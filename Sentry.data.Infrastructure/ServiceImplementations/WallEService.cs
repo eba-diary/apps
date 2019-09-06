@@ -34,7 +34,9 @@ namespace Sentry.data.Infrastructure
                     Logger.Info($"walleservice-schemadeletes-detected - {DeleteSchemaList.Count} schemas found - guid:{_runGuid}");
                     foreach (DatasetFileConfig config in DeleteSchemaList)
                     {
+                        Logger.Info($"walleservice-schemadelete-start - DatasetId:{config.ParentDataset.DatasetId} DatasetName:{config.ParentDataset.DatasetName} ConfigId:{config.ConfigId} ConfigName:{config.Name} guid:{_runGuid}");
                         configService.Delete(config.ConfigId, false);
+                        Logger.Info($"walleservice-schemadelete-end - DatasetId:{config.ParentDataset.DatasetId} DatasetName:{config.ParentDataset.DatasetName} ConfigId:{config.ConfigId} ConfigName:{config.Name} guid:{_runGuid}");
                     }
                 }
                 else
