@@ -12,14 +12,9 @@
     @*Show the custom validation summary*@
     @Html.DisplayFor((model) => ViewData.ModelState)
 
-    <ul class="nav nav-tabs">
-        <li class="active"><a href="#informationPanel" data-toggle="tab" aria-expanded="true">Dataset Information <span id="infoBadge" class="badge badge-danger"></span></a></li>
-        @if (Model.DatasetId == 0) { <li class="" id="retrievalPanelTab"><a href="#retrievalPanel" data-toggle="tab" aria-expanded="false">Dataset Retrieval <span id="retBadge" class="badge badge-danger"></span></a></li> }
-        <li class="" style="display:none;"><a href="#columnPanel" data-toggle="tab" aria-expanded="false">Column Metadata <span id="columnBadge" class="badge badge-danger"></span></a></li>
-    </ul>
 
-    <div id="myTabContent" class="tab-content">
-        <div id="informationPanel" class="tab-pane fade active in form-horizontal">
+    <div id="myTabContent">
+        <div id="informationPanel" class="form-horizontal">
 
             <br />
             <h4>Dataset Information</h4>
@@ -186,10 +181,10 @@
             </div>
 
         </div>
-
+        <hr />
         @if (Model.DatasetId == 0)
         {
-            <div id="retrievalPanel" class="tab-pane fade in form-horizontal">
+            <div id="retrievalPanel" class="form-horizontal">
                 <br />
                 <h4>Dataset Retrieval</h4>
                 <br />
@@ -273,12 +268,13 @@
                     </div>
                 </div>
             </div>
+            <hr />
         }
 
 
 
         @*This is being kept for a shell which might be used later.*@
-        <div id="columnPanel" class="tab-pane fade in form-horizontal">
+        @*<div id="columnPanel" class="form-horizontal">
             <br /><h4>Column Metadata</h4><br />
             <div class="form-group">
                 <label for="DatasetFileUpload" class="control-label col-md-2">Example File</label>
@@ -287,12 +283,10 @@
                 </div>
             </div>
             <button type="button" class="btn btn-primary" id="btnUploadFile" data-id="0">Upload Example Data File</button>
-        </div>
+        </div>*@
 
 
     </div>
-
-    <hr />
     <div class="form-group">
         <span class="text-muted"><em>** Fields in <b>Bold</b> are Required</em></span>
     </div>
