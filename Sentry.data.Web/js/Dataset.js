@@ -733,8 +733,8 @@ data.Dataset = {
                 { data: "ActionLinks", className: "downloadFile", width: "100px", searchable: false, orderable: false },
                 { data: "Name", className: "Name" },
                 { data: "UploadUserName", className: "UploadUserName" },
-                { data: "CreateDTM", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
-                { data: "ModifiedDTM", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss") : null; } },
+                { data: "CreateDTM", className: "createdtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
+                { data: "ModifiedDTM", type: "date", className: "modifieddtm", width: "auto", render: function (data) { return data ? moment(data).format("MM/DD/YYYY h:mm:ss a") : null; } },
                 { data: "ConfigFileName", className: "ConfigFileName" }
             ],
             language: {
