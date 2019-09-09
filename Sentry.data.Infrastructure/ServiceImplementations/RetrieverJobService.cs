@@ -35,8 +35,6 @@ namespace Sentry.data.Infrastructure
             new KeyValuePair<string, string>("ProcessingStatus","NotStarted")
         };
 
-        static private IContainer Container { get; set; }
-
         /// <summary>
         /// Implementation of core job logic for each DataSOurce type.
         /// </summary>
@@ -48,7 +46,7 @@ namespace Sentry.data.Infrastructure
             {
                 token.ThrowIfCancellationRequested();
 
-                using (Container = Bootstrapper.Container.GetNestedContainer())
+                using (IContainer Container = Bootstrapper.Container.GetNestedContainer())
                 {
                     IDatasetContext _requestContext = Container.GetInstance<IDatasetContext>();
                     IJobService _jobService = Container.GetInstance<IJobService>();
@@ -495,7 +493,7 @@ namespace Sentry.data.Infrastructure
             {
                 token.ThrowIfCancellationRequested();
 
-                using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                using (IContainer Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
                 {
                     IRequestContext _requestContext = Container.GetInstance<IRequestContext>();
                     IS3ServiceProvider _s3ServiceProvider = Container.GetInstance<IS3ServiceProvider>();
@@ -571,7 +569,7 @@ namespace Sentry.data.Infrastructure
 
         private void ProcessNewFilesSinceLastExecution()
         {
-            using (Container = Bootstrapper.Container.GetNestedContainer())
+            using (IContainer Container = Bootstrapper.Container.GetNestedContainer())
             {
                 IJobService _jobService = Container.GetInstance<IJobService>();
 
@@ -619,7 +617,7 @@ namespace Sentry.data.Infrastructure
 
         private void ProcessRegexFileSinceLastExecution()
         {
-            using (Container = Bootstrapper.Container.GetNestedContainer())
+            using (IContainer Container = Bootstrapper.Container.GetNestedContainer())
             {
                 IJobService _jobService = Container.GetInstance<IJobService>();
 
@@ -896,7 +894,7 @@ namespace Sentry.data.Infrastructure
         {
             try
             {
-                using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                using (IContainer Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
                 {
                     IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
 
@@ -929,40 +927,13 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        private string ParseContentType(string contentType)
-        {
-            //Mime types
-            //https://technet.microsoft.com/en-us/library/cc995276.aspx
-            //https://www.iana.org/assignments/media-types/media-types.xhtml
-
-            _job.JobLoggerMessage("Info", $"incoming_contenttype - {contentType}");
-
-            var content = new ContentType(contentType);
-
-            using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
-            {
-                IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
-
-                MediaTypeExtension extensions = _datasetContext.MediaTypeExtensions.Where(w => w.Key == content.MediaType).FirstOrDefault();
-
-                if (extensions == null)
-                {
-                    _job.JobLoggerMessage("Warn", $"Detected new MediaType ({content.MediaType}), defaulting to txt");
-                    return "txt";
-                }
-
-                _job.JobLoggerMessage("Info", $"detected_mediatype - {extensions.Value}");
-                return extensions.Value;
-            }
-        }
-
         public void DisableJob(int JobId)
         {
             RetrieverJob job = null;
 
             try
             {
-                using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                using (IContainer Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
                 {
                     //Goldeneye will monitor for modified jobs and perform necessary actions to ensure hangfire reflects job changes
 
@@ -997,7 +968,7 @@ namespace Sentry.data.Infrastructure
 
             try
             {
-                using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                using (IContainer Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
                 {
                     //Goldeneye will monitor for modified jobs and perform necessary actions to ensure hangfire reflects job changes
 
@@ -1067,7 +1038,7 @@ namespace Sentry.data.Infrastructure
         {
             RetrieverJob basicJob = null;
 
-            using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+            using (IContainer Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
             {
                 IDatasetContext _requestContext = Container.GetInstance<IDatasetContext>();
                 

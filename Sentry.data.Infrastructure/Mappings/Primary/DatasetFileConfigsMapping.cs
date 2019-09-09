@@ -34,7 +34,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             {
                 m.Column("Dataset_ID");
                 m.ForeignKey("FK_DatasetFileConfigs_Dataset");
-                m.Cascade(Cascade.All);
+                //m.Cascade(Cascade.All);
                 m.Class(typeof(Dataset));
             });
 

@@ -186,7 +186,9 @@ data.Report = {
                         message = "This will permanently delete the exhibit link from data.sentry.com.</br></br>Do you wish to continue?"
                     }
 
-                    var model = Sentry.ShowModalCustom("Delete Exhibit", message, Sentry.ModalButtonsOKCancel(function () { data.Report.DeleteDataset(d_id); }));
+                    //var model = Sentry.ShowModalCustom("Delete Exhibit", message, Sentry.ModalButtonsOKCancel(function () { data.Report.DeleteDataset(d_id); }));
+                    var modal = Sentry.ShowModalCustom("Delete Exhibit", message, { Confirm: { label: "Confirm", className: "btn-danger", callback: function () { data.Report.DeleteDataset(d_id); } } } );
+                    //'<button type="button" data-dismiss="modal" class="btn btn-success ok-button">Success!</button>'
                     modal.show();
                 },
                 failure: function () {

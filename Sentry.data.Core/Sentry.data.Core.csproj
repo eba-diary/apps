@@ -90,6 +90,8 @@
     <Compile Include="DTO\ImagesDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
     <Compile Include="DTO\Schema\DataElementDTO.cs" />
+    <Compile Include="Entities\Datasets\DatasetFileParquet.cs" />
+    <Compile Include="Entities\Datasets\DatasetFileReply.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\Authentications\OAuthAuthentication.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\GoogleAPISource.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\OAuthClaim.cs" />
@@ -97,8 +99,10 @@
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DfsBasicHsz.cs" />
     <Compile Include="Entities\Goldeneye\RunningTask.cs" />
     <Compile Include="Entities\Image.cs" />
+    <Compile Include="Entities\MessageFormats\HiveTableDeleteModel.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
     <Compile Include="Extensions\DatasetFileConfigExtensions.cs" />
+    <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\DataSourceQueryExtensions.cs" />
     <Compile Include="GlobalEnums\HttpDataFormat.cs" />
     <Compile Include="GlobalEnums\HTTPMethods.cs" />

@@ -282,7 +282,6 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Content Include="Content\checkbox.css" />
     <Content Include="Content\creat-edit-datasets.css" />
-    <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\FavoritesController.cs" />
     <Compile Include="Controllers\WebApi\ApplicationController.cs" />
     <Compile Include="Controllers\WebApi\AssetController.cs" />
@@ -1203,10 +1202,6 @@
     <Content Include="Views\Home\_AssetCarousel.cshtml" />
     <Content Include="Views\Home\_AssetOverview.cshtml" />
     <Content Include="Views\Home\_HotTopicsFeed.cshtml" />
-    <Content Include="Views\Admin\EditorTemplates\UserAddressModel.cshtml" />
-    <Content Include="Views\Admin\_UserAddress.cshtml" />
-    <Content Include="Views\Admin\EditUser.cshtml" />
-    <Content Include="Views\Admin\ManageUsers.cshtml" />
     <Content Include="Views\Category\_CategoryTreeNode.cshtml" />
     <Content Include="Views\Category\_Create.cshtml" />
     <Content Include="Views\Category\_Edit.cshtml" />
@@ -1288,7 +1283,6 @@
     <Folder Include="App_Data\" />
     <Folder Include="Images\Home\" />
     <Folder Include="Properties\PublishProfiles\" />
-    <Folder Include="Views\Admin\DisplayTemplates\" />
     <Folder Include="Views\ExternalFile\" />
     <Folder Include="Views\Lineage\" />
     <Folder Include="Views\Retriever\" />

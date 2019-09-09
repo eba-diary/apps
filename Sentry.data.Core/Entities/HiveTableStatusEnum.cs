@@ -12,6 +12,9 @@ namespace Sentry.data.Core
         Requested = 1,
         Available = 2,
         NameReserved = 3,
-        RequestFailed = 4
+        RequestFailed = 4,
+        Deleted = 5,
+        DeleteRequested = 6,
+        DeleteFailed =7
     }
 }

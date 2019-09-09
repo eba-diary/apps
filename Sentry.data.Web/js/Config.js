@@ -119,60 +119,112 @@ data.Config = {
                 var ConfirmMessage = "<p>Are you sure</p><p><h3><b><font color=\"red\">THIS IS NOT A REVERSIBLE ACTION!</font></b></h3></p> </br>Deleting the schema will remove all associated data files and hive consumption layers.  </br>If at a later point " +
                     "this needs to be recreated, all files will need to be resent from source."
 
-                Sentry.ShowModalConfirmation(ConfirmMessage, function () {
-                    $.ajax({
-                        url: "/Config/" + config.attr("data-id"),
-                        method: "DELETE",
-                        dataType: 'json',
-                        success: function (obj) {
-                            Sentry.ShowModalAlert(obj.Message, function () {
-                                location.reload();
-                            })
-                        },
-                        failure: function (obj) {
-                            alert("failure");
-                            Sentry.ShowModalAlert(
-                                obj.Message, function () { })
-                        },
-                        error: function (obj) {
-                            Sentry.ShowModalAlert(
-                                obj.Message, function () { })
+                Sentry.ShowModalCustom("Delete Schema", ConfirmMessage, {
+                    Confirm: {
+                        label: "Confirm",
+                        className: "btn-danger",
+                        callback: function () {
+                            $.ajax({
+                                url: "/Config/" + config.attr("data-id"),
+                                method: "DELETE",
+                                dataType: 'json',
+                                success: function (obj) {
+                                    Sentry.ShowModalAlert(obj.Message, function () {
+                                        location.reload();
+                                    })
+                                },
+                                failure: function (obj) {
+                                    alert("failure");
+                                    Sentry.ShowModalAlert(
+                                        obj.Message, function () { })
+                                },
+                                error: function (obj) {
+                                    Sentry.ShowModalAlert(
+                                        obj.Message, function () { })
+                                }
+                            });
                         }
-                    });
-                })
+                    }
+                });
+
+                //Sentry.ShowModalConfirmation(ConfirmMessage, function () {
+                //    $.ajax({
+                //        url: "/Config/" + config.attr("data-id"),
+                //        method: "DELETE",
+                //        dataType: 'json',
+                //        success: function (obj) {
+                //            Sentry.ShowModalAlert(obj.Message, function () {
+                //                location.reload();
+                //            })
+                //        },
+                //        failure: function (obj) {
+                //            alert("failure");
+                //            Sentry.ShowModalAlert(
+                //                obj.Message, function () { })
+                //        },
+                //        error: function (obj) {
+                //            Sentry.ShowModalAlert(
+                //                obj.Message, function () { })
+                //        }
+                //    });
+                //})
             });
         }   
     },
 
     CreateInit: function () {
 
-        $('#Delimiter').prop("readonly", "readonly");
-        $('#HasHeader').prop("readonly", false);
-        $('#HasHeader').prop("disabled", false);
+        data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
 
         $("#FileExtensionID").change(function () {
-            switch ($('#FileExtensionID option:selected').text()) {
-                case "CSV":
+            data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
+        });
+    },
+
+    EditInit: function () {
+        $("#EditConfigForm").validateBootstrap(true);
+
+        data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text(), $('#ConfigId').val() !== "0");
+
+        $("#FileExtensionID").change(function () {
+            data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text(), $('#ConfigId').val() !== "0");
+        });
+    },
+
+    SetFileExtensionProperites: function (extension, editMode) {
+        switch (extension) {
+            case "CSV":
+                $('.delimiter').show();
+                $('.delimiterDescription').hide();
+                $('#Delimiter').prop("readonly", "readonly");
+                $('#HasHeader').prop("readonly", false);
+                $('#HasHeader').prop("disabled", false);
+                if (!editMode) {
                     $('#Delimiter').text(',');
                     $('#Delimiter').val(',');
-                    $('#Delimiter').prop("readonly", "readonly");
-                    $('#HasHeader').prop("readonly", false);
-                    $('#HasHeader').prop("disabled", false);
-                    break;
-                case "DELIMITED":
+                }
+                break;
+            case "DELIMITED":
+            case "ANY":
+                $('.delimiter').show();
+                $('.delimiterDescription').show();
+                if (!editMode) {
                     $('#Delimiter').val('');
-                    $('#Delimiter').prop("readonly", "");
-                    $('#HasHeader').prop("readonly", false);
-                    $('#HasHeader').prop("disabled", false);
-                    break;
-                default:
+                }
+                $('#Delimiter').prop("readonly", "");
+                $('#HasHeader').prop("readonly", false);
+                $('#HasHeader').prop("disabled", false);
+                break;
+            default:
+                $('.delimiter').hide();
+                if (!editMode) {
                     $('#Delimiter').val('');
-                    $('#Delimiter').prop("readonly", "readonly");
-                    $('#HasHeader').prop("readonly", true);
-                    $('#HasHeader').prop("disabled", true);
-                    break;
-            }
-        });
+                }
+                $('#Delimiter').prop("readonly", "readonly");
+                $('#HasHeader').prop("readonly", true);
+                $('#HasHeader').prop("disabled", true);
+                break;
+        }
     },
 
     ExtensionInit: function() {

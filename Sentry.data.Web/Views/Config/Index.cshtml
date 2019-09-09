@@ -121,31 +121,58 @@
                         <h4 class="@color">Schema and Configuration Information</h4>
                         <hr />
 
-                        @if (item.ConfigFileDesc != null && item.ConfigFileDesc.Length >= 300)
-                        {
+                        <div class="col-md-12">
+                            @if (item.ConfigFileDesc != null && item.ConfigFileDesc.Length >= 300)
+                            {
 
-                            int lastInfo = item.ConfigFileDesc.Substring(0, 300).LastIndexOf(" ");
-                            <p>
-                                <span style="margin-top: 15px;">@item.ConfigFileDesc.Substring(0, lastInfo)</span>
-                                <span id="usageSeeMoreEllipsis">...&nbsp;</span>
-                                <span id="usageSeeMorePanel" style="display: none;">@item.ConfigFileDesc.Substring(lastInfo)</span>
-                                <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
-                                <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
-                            </p>
-                        }
-                        else
+                                int lastInfo = item.ConfigFileDesc.Substring(0, 300).LastIndexOf(" ");
+                                <p>
+                                    <span style="margin-top: 15px;">@item.ConfigFileDesc.Substring(0, lastInfo)</span>
+                                    <span id="usageSeeMoreEllipsis">...&nbsp;</span>
+                                    <span id="usageSeeMorePanel" style="display: none;">@item.ConfigFileDesc.Substring(lastInfo)</span>
+                                    <span id="usageSeeMoreButton" style="cursor: pointer;"><a onclick="$('#usageSeeMorePanel').show(); $(this).parent().hide(); $('#usageShowLessButton').show(); $('#usageSeeMoreEllipsis').hide();">See More</a></span>
+                                    <span id="usageShowLessButton" style="cursor: pointer; display:none;"><a onclick="$('#usageSeeMorePanel').hide(); $(this).parent().hide(); $('#usageSeeMoreButton').show(); $('#usageSeeMoreEllipsis').show();">Show Less</a></span>
+                                </p>
+                            }
+                            else
+                            {
+                                <p style="margin-top: 15px;">@item.ConfigFileDesc</p>
+                            }
+                        </div>
+                        <div class="col-md-12 configDetailRow">
+                            <div class="col-md-3">Storage id: <b>@item.RawStorageId</b></div>
+                            <div class="col-md-3">Schema id: <b>@item.SchemaId</b></div>
+                            <div class="col-md-3">Configuration classification: <b>@item.FileType</b></div>
+                            <div class="col-md-3">File type: <b>@item.FileExtension.Name</b></div>
+                        </div>
+                        @if (item.FileExtension.Name.Trim() == "ANY" || item.FileExtension.Name.Trim() == "DELIMITED" || item.FileExtension.Name.Trim() == "CSV")
                         {
-                            <p style="margin-top: 15px;">@item.ConfigFileDesc</p>
+                            <div class="col-md-12 configDetailRow">
+                                <div class="col-md-6">This schema's current Delimiter is ( <b>@item.Delimiter</b> )</div>
+                                <div class="col-md-6">Files contain headers: <b>@item.HasHeader</b></div>
+                            </div>
                         }
+                        <div class="col-md-12 configDetailRow">
+                            @if (item.FileExtension.Name.Trim() == "ANY" || item.FileExtension.Name.Trim() == "DELIMITED")
+                            {<div class="col-md-12">This configuration will allow <b>all</b> file extensions.</div>}
+                            else
+                            {<div class="col-md-12">This configuration will only allow files with <b>.@item.FileExtension.Name.ToLower()</b> extension</div>}
+                        </div>
+                        <div class="col-md-12 configDetailRow">
+                            <div class="col-md-12">This configuration Data Scope is <b>@item.ScopeType.Name</b> which means :</div>
+                            <div class="col-md-11 col-md-offset-1">@item.ScopeType.Description</div>
+                        </div>
+                        <div class="col-md-12 configDetailRow">
+                            @if (item.CreateCurrentView)
+                            {
+                                <div class="col-md-12">A current view exists for this schema which filters to data from latest file processed.</div>
+                            }
+                            else
+                            {
+                                <div class="col-md-12">This schema does not contain a current view</div>
+                            }
+                        </div>
 
-                        <p>Raw storage location id: @item.RawStorageId</p>
-                        <p>This configuration is classified as a @item.FileType</p>
-                        <p>This configuration Data Scope is @item.ScopeType.Name which means : </p>
-                        <p style="margin-left: 25px;">@item.ScopeType.Description</p>
-                        @if (item.FileExtension.Name.Trim() == "ANY" || item.FileExtension.Name.Trim() == "DELIMITED")
-                        {<p>This configuration will allow all file extensions.</p>}
-                        else
-                        {<p>This configuration will only allow files with .@item.FileExtension.Name.ToLower() extension</p>}
 
                         <a class="btn btn-primary" href="/Config/Edit/@item.ConfigId">Edit</a>
                         <button class="btn btn-danger" id="btnDeleteConfig" data-id="@item.ConfigId">Delete</button>
@@ -226,7 +253,7 @@
                                     <hr />
                                     <p>Created on : @job.Created</p>
                                     <p>Modified on : @job.Modified</p>
-                                    
+
                                     <a class="btn btn-primary" href="/Config/@item.ConfigId/Job/Edit/@job.Id">Edit</a>
 
                                 </div>
@@ -270,18 +297,18 @@
                                     <div class="jobContainer" style="display:none;">
 
                                         <p>@schema.SchemaDescription</p>
-                                        <p>This schema's current Delimiter is <b>@schema.Delimiter</b></p>
-                                        <p>Raw files contain headers: <b>@schema.HasHeader</b></p>
+                                        @*<p>This schema's current Delimiter is <b>@schema.Delimiter</b></p>
+                        <p>Raw files contain headers: <b>@schema.HasHeader</b></p>*@
 
                                         @if (schema.DataObjects.Count() == 0)
                                         {
-                                            <p>This schema Id is @schema.DataElement_ID.</p>
+                                            @*<p>This schema Id is @schema.DataElement_ID.</p>*@
                                             <p>This schema is not currently does not yet have any columns associated to it.</p>
                                         }
-                                        else
-                                        {
-                                            <p>This schema Id is @schema.DataElement_ID.</p>
-                                        }
+                                        @*else
+                        {
+                            <p>This schema Id is @schema.DataElement_ID.</p>
+                        }*@
 
                                         <p>Created on: @schema.DataElementCreate_DTM</p>
                                         <p>Last Modified on: @schema.DataElementChange_DTM</p>
@@ -317,20 +344,20 @@
                             }
                             <hr />
                         }*@
-                                            <p>
-                                                <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Edit">Edit Schema Metadata</a>
-                                                <br>
-                                                <br>
+                                        <p>
+                                            <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Edit">Edit Schema Metadata</a>
+                                            <br>
+                                            <br>
 
-                                                @if (schema.DataObjects.Count() > 0)
-                                                {
-                                                    <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Fields">Edit Columns and Fields</a>
-                                                }
-                                                @if (schema.DataObjects.Count() == 0)
-                                                {
-                                                    <a class="btn btn-success" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Fields">Add Columns and Fields</a>
-                                                }
-                                            </p>
+                                            @if (schema.DataObjects.Count() > 0)
+                                            {
+                                                <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Fields">Edit Columns and Fields</a>
+                                            }
+                                            @if (schema.DataObjects.Count() == 0)
+                                            {
+                                                <a class="btn btn-success" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Fields">Add Columns and Fields</a>
+                                            }
+                                        </p>
                                     </div>
                                 </div>
                             }
@@ -360,6 +387,9 @@
     </div>
 
 <style>
+    .configDetailRow{
+        padding-bottom: 15px;
+    }
     .jobstatus {
         cursor: pointer;
         margin-right: 30px;

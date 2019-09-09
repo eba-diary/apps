@@ -259,6 +259,20 @@ namespace Sentry.data.Infrastructure
                 return Query<RetrieverJob>();
             }
         }
+        public IQueryable<DatasetFileParquet> DatasetFileParquet
+        {
+            get
+            {
+                return Query<DatasetFileParquet>();
+            }
+        }
+        public IQueryable<DatasetFileReply> DatasetFileReply
+        {
+            get
+            {
+                return Query<DatasetFileReply>();
+            }
+        }
 
         public IQueryable<JobHistory> JobHistory
         {
