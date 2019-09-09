@@ -50,8 +50,8 @@ data.Dataset = {
 
         if ($("#DatasetId").val() !== undefined && $("#DatasetId").val() > 0) {
             $("#DatasetScopeTypeId").attr('readonly', 'readonly');
-            $("#FileExtensionId").attr('readonly', 'readonly');
-            $("#Delimiter").attr('readonly', 'readonly');
+            //$("#FileExtensionId").attr('readonly', 'readonly');
+            //$("#Delimiter").attr('readonly', 'readonly');
         }
 
         //Set Secure HREmp service URL for associate picker
@@ -143,33 +143,39 @@ data.Dataset = {
             }
         });
 
-        $('#Delimiter').prop("readonly", "readonly");
-        $('#HasHeader').prop("readonly", false);
-        $('#HasHeader').prop("disabled", false);
+        data.Config.SetFileExtensionProperites($('#FileExtensionId option:selected').text(), $('#DatasetId').val() !== "0");
 
         $("#FileExtensionId").change(function () {
-            switch ($('#FileExtensionId option:selected').text()) {
-                case "CSV":
-                    $('#Delimiter').text(',');
-                    $('#Delimiter').val(',');
-                    $('#Delimiter').prop("readonly", "readonly");
-                    $('#HasHeader').prop("readonly", false);
-                    $('#HasHeader').prop("disabled", false);
-                    break;
-                case "DELIMITED":
-                    $('#Delimiter').val('');
-                    $('#Delimiter').prop("readonly", "");
-                    $('#HasHeader').prop("readonly", false);
-                    $('#HasHeader').prop("disabled", false);
-                    break;
-                default:
-                    $('#Delimiter').val('');
-                    $('#Delimiter').prop("readonly", "readonly");
-                    $('#HasHeader').prop("readonly", true);
-                    $('#HasHeader').prop("disabled", true);
-                    break;                 
-            }
+            data.Config.SetFileExtensionProperites($('#FileExtensionId option:selected').text(), $('#DatasetId').val() !== "0");
         });
+
+        //$('#Delimiter').prop("readonly", "readonly");
+        //$('#HasHeader').prop("readonly", false);
+        //$('#HasHeader').prop("disabled", false);
+
+        //$("#FileExtensionId").change(function () {
+        //    switch ($('#FileExtensionId option:selected').text()) {
+        //        case "CSV":
+        //            $('#Delimiter').text(',');
+        //            $('#Delimiter').val(',');
+        //            $('#Delimiter').prop("readonly", "readonly");
+        //            $('#HasHeader').prop("readonly", false);
+        //            $('#HasHeader').prop("disabled", false);
+        //            break;
+        //        case "DELIMITED":
+        //            $('#Delimiter').val('');
+        //            $('#Delimiter').prop("readonly", "");
+        //            $('#HasHeader').prop("readonly", false);
+        //            $('#HasHeader').prop("disabled", false);
+        //            break;
+        //        default:
+        //            $('#Delimiter').val('');
+        //            $('#Delimiter').prop("readonly", "readonly");
+        //            $('#HasHeader').prop("readonly", true);
+        //            $('#HasHeader').prop("disabled", true);
+        //            break;                 
+        //    }
+        //});
 
     },
 

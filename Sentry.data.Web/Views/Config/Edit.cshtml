@@ -24,10 +24,7 @@
 
             @Html.HiddenFor(model => model.ConfigId, new { @name = "configId" })
             @Html.HiddenFor(model => model.ConfigFileName)
-            @Html.HiddenFor(model => model.FileTypeId)
             @Html.HiddenFor(model => model.DatasetId)
-            @Html.HiddenFor(model => model.DatasetScopeTypeID)
-            @Html.HiddenFor(model => model.FileExtensionID)
 
             <div class="form-group">
                 @Html.LabelFor(m => m.ConfigFileName, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -51,31 +48,78 @@
                     }
                     else
                     {
+                        @Html.HiddenFor(model => model.FileTypeId)
                         @Html.DropDownListFor(model => model.FileType, new SelectList(Model.AllDataFileTypes, "Text", "Text", Model.FileType), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control " })
-                        @Html.HiddenFor(model => model.CreateCurrentView)
+
                     }
                 </div>
             </div>
-            <div class="form-group">
-                @Html.LabelFor((model) => model.DatasetScopeTypeID, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-sm-4">
-                    @Html.DropDownListFor(model => model.DatasetScopeTypeID,
-               new SelectList(Model.AllDatasetScopeTypes, "Value", "Text", Model.DatasetScopeTypeID), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control" })
+            @if (Model.Security.ShowAdminControls)
+            {
+                <div class="form-group">
+                    @Html.LabelFor((model) => model.DatasetScopeTypeID, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-sm-4">
+                        @Html.DropDownListFor(model => model.DatasetScopeTypeID,
+                   new SelectList(Model.AllDatasetScopeTypes, "Value", "Text", Model.DatasetScopeTypeID), new { @class = "form-control" })
+                    </div>
+                </div>
+            }
+            else
+            {
+                @Html.HiddenFor(model => model.DatasetScopeTypeID)
+                <div class="form-group">
+                    @Html.LabelFor((model) => model.DatasetScopeTypeID, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-sm-4">
+                        @Html.DropDownListFor(model => model.DatasetScopeTypeID,
+                   new SelectList(Model.AllDatasetScopeTypes, "Value", "Text", Model.DatasetScopeTypeID), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control" })
+                    </div>
+                </div>
+            }
+
+            @if (Model.Security.ShowAdminControls)
+            {
+                <div class="form-group">
+                    @Html.LabelFor((model) => model.FileExtensionID, new { @class = "control-label col-md-2" })
+                    <div class="col-md-4">
+                        @Html.DropDownListFor(model => model.FileExtensionID,
+                   new SelectList(Model.ExtensionList, "Value", "Text", Model.FileExtensionID), new { @class = "form-control" })
+                    </div>
+                </div>
+            }
+            else
+            {
+                @Html.HiddenFor(model => model.FileExtensionID)
+                <div class="form-group">
+                    @Html.LabelFor((model) => model.FileExtensionID, new { @class = "control-label col-md-2" })
+                    <div class="col-md-4">
+                        @Html.DropDownListFor(model => model.FileExtensionID,
+                   new SelectList(Model.ExtensionList, "Value", "Text", Model.FileExtensionID), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control" })
+                    </div>
+                </div>
+            }
+
+            <div class="form-group delimiter">
+                @Html.LabelFor((model) => model.Delimiter, new { @class = "control-label col-md-2 optional" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control edit-dataset-row" })
                 </div>
             </div>
-            @*<div class="form-group">
-            @Html.LabelFor(m => m.DropPath, htmlAttributes: new { @class = "control-label col-sm-3" })
-            <div class="col-sm-9">
-                @Html.DisplayFor(m => m.DropPath, new { htmlAttributes = new { @class = "from-control-static" } })
-                @Html.EditorFor(model => model.DropPath, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
-                    @Html.ValidationMessageFor(model => model.DropPath, "", new { @class = "text-danger" })
+
+            <div class="form-group fieldDescription delimiter delimiterDescription">
+                <label class="control-label col-md-2"></label>
+                <div class="col-md-10">
+                    <span class="text-muted">
+                        <em id="fileTypeInfo"></em>The character or set of characters used to delimit a file.  Common delimiters include; tab (\t), pipe (|), tilda (~).
+                        <br />
+                        Note: If your file is comma (,) delimited please choose the CSV file extension option. 
+                    </span>
+                </div>
             </div>
-        </div>*@
-            <div class="form-group">
-                @Html.LabelFor((model) => model.FileExtensionID, new { @class = "control-label col-md-2" })
-                <div class="col-md-4">
-                    @Html.DropDownListFor(model => model.FileExtensionID,
-               new SelectList(Model.ExtensionList, "Value", "Text", Model.FileExtensionID), new { @disabled = "disabled", @readonly = "readonly", @class = "form-control" })
+
+            <div class="form-group fileHasHeader">
+                @Html.LabelFor((model) => model.HasHeader, new { @class = "control-label col-md-2 optional" })
+                <div class="col-md-10">
+                    @Html.CheckBoxFor((model) => model.HasHeader, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
                 </div>
             </div>
 
@@ -88,18 +132,24 @@
                     </div>
                     @Html.Label("A view will be created filtering to data within latest file loaded into this schema", new { @class = "control-label col-md-9 optional text-muted", @style = "text-align: left" })
                 </div>
-                <div class="form-group">
+            }
+            else
+            {
+                @Html.HiddenFor(model => model.CreateCurrentView)
+            }
+
+            <div class="form-group">
+                @if (Model.Security.ShowAdminControls)
+                {
                     @Html.LabelFor(model => model.IncludedInSAS, new { @class = "control-label col-md-2 optional" })
                     <div class="col-md-1">
                         @Html.CheckBoxFor(model => model.IncludedInSAS, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
                     </div>
                     @Html.Label("Schema will be added to SAS after columns are defined", new { @class = "control-label col-md-4 optional text-muted", @style = "text-align: left" })
-                </div>
-            }
-            else
-            {
-                @Html.HiddenFor(m => Model.IncludedInSAS)
-                <div class="form-group">
+                }
+                else
+                {
+                    @Html.HiddenFor(m => Model.IncludedInSAS)
                     @Html.LabelFor(model => model.IncludedInSAS, new { @class = "control-label col-md-2 optional" })
                     <div class="col-md-1">
                         @Html.CheckBoxFor(model => model.IncludedInSAS, new { @class = "edit-dataset-row", @disabled = "disabled" })
@@ -107,10 +157,8 @@
                     <div class="col-md-6 text-muted">
                         Please work with <a href="mailto:DSCSupport@Sentry.com">Site Administration</a> if you would like this removed from SAS
                     </div>
-                </div>
-            }
-
-
+                }
+            </div>
 
             <hr />
             <div class="form-group">
@@ -118,18 +166,18 @@
             </div>
             <div class="form-group">
                 <div>
-                    <input type="submit" value="Edit Config File" class="btn btn-primary" />
+                    <input type="submit" value="Save" class="btn btn-primary" />
                     <a class="btn btn-warning" href="/Config/Dataset/@Model.DatasetId">Cancel</a>
                 </div>
             </div>
         </div>
-    }
-}
+        }
+        }
 
-@section Scripts {
-    <script>
-        $(function () {
-            data.ManageConfigs.EditConfigInit();
-        });
-    </script>
-}
+        @section Scripts {
+            <script>
+                $(function () {
+                    data.Config.CreateInit();
+                });
+            </script>
+        }
