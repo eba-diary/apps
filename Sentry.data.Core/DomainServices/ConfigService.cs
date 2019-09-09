@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Sentry.Common.Logging;
+using StructureMap;
 
 namespace Sentry.data.Core
 {
@@ -19,12 +20,13 @@ namespace Sentry.data.Core
         public IEncryptionService _encryptService;
         public IJobService _jobService;
         public IEmailService _emailService;
+        private IS3ServiceProvider s3ServiceProvider;
         private readonly ISecurityService _securityService;
 
         public ConfigService(IDatasetContext dsCtxt, IMessagePublisher publisher, 
             IUserService userService, IEventService eventService, IMessagePublisher messagePublisher,
             IEncryptionService encryptService, ISecurityService securityService,
-            IJobService jobService, IEmailService emailService)
+            IJobService jobService, IEmailService emailService, IS3ServiceProvider s3ServiceProvider)
         {
             _datasetContext = dsCtxt;
             _publisher = publisher;
@@ -35,6 +37,7 @@ namespace Sentry.data.Core
             _securityService = securityService;
             JobService = jobService;
             _emailService = emailService;
+            S3ServiceProvider = s3ServiceProvider;
         }
 
         private IJobService JobService
@@ -48,6 +51,8 @@ namespace Sentry.data.Core
                 _jobService = value;
             }
         }
+
+        private IS3ServiceProvider S3ServiceProvider { get; set; }
 
         public SchemaDTO GetSchemaDTO(int id)
         {
@@ -189,7 +194,8 @@ namespace Sentry.data.Core
 
             Dataset parent = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
 
-            if (parent.DatasetFileConfigs.Any(x => x.Name.ToLower() == dto.Name.ToLower()))
+            //remove any schemas which are marked for deletion
+            if (parent.DatasetFileConfigs.Any(x => !x.DeleteInd && x.Name.ToLower() == dto.Name.ToLower()))
             {
                 errors.Add("Dataset config with that name already exists within dataset");
             }
@@ -296,11 +302,19 @@ namespace Sentry.data.Core
 
         private void UpdateDataElement(DatasetFileConfigDto dto, DataElement de)
         {
-            de.CreateCurrentView = dto.Schemas.FirstOrDefault().CreateCurrentView;
-            de.IsInSAS = dto.IsInSAS;
+            
+            de.CreateCurrentView = dto.Schemas.FirstOrDefault().CreateCurrentView;            
             de.SasLibrary = (dto.IsInSAS) ? dto.GenerateSASLibaryName(_datasetContext) : null;
+            de.FileFormat = _datasetContext.GetById<FileExtension>(dto.FileExtensionId).Name.Trim();
+            de.Delimiter = dto.Schemas.FirstOrDefault().Delimiter;
+            de.HasHeader = dto.HasHeader;
 
-            de.SendIncludeInSasEmail(_userService.GetCurrentUser(), _emailService);
+            //if IsInSAS property changed to checked, send email communication.
+            if (de.IsInSAS != dto.IsInSAS && dto.IsInSAS)
+            {
+                de.SendIncludeInSasEmail(_userService.GetCurrentUser(), _emailService);
+            }
+            de.IsInSAS = dto.IsInSAS;
         }
 
         public DatasetFileConfigDto GetDatasetFileConfigDto(int configId)
@@ -576,30 +590,90 @@ namespace Sentry.data.Core
             return string.Empty;
         }
 
-        public bool Delete(int id)
+        public bool Delete(int id, bool logicalDelete = true)
         {
             try
             {
                 DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(id);
                 DataElement de = dfc.Schema.FirstOrDefault();
 
-                //Disable all associated RetrieverJobs
-                foreach (var job in dfc.RetrieverJobs)
+                if (logicalDelete)
                 {
-                    _jobService.DisableJob(job.Id);
-                }
+                    Logger.Info($"configservice-delete-logical - configid:{id} configname:{dfc.Name}");
+                    //Disable all associated RetrieverJobs
+                    foreach (var job in dfc.RetrieverJobs)
+                    {
+                        _jobService.DisableJob(job.Id);
+                    }
 
-                //Mark Object for delete to ensure they are not displaed in UI
-                //Goldeneye service will perform delete after determined amount of time
-                MarkForDelete(dfc);
-                MarkForDelete(de);
-                _datasetContext.SaveChanges();
+                    //Mark Object for delete to ensure they are not displaed in UI
+                    //Goldeneye service will perform delete after determined amount of time
+                    MarkForDelete(dfc);
+                    MarkForDelete(de);
+                    _datasetContext.SaveChanges();
+
+                    //Send message to create hive table
+                    HiveTableDeleteModel hiveDelete = new HiveTableDeleteModel();
+                    de.ToHiveDeleteModel(hiveDelete);
+                    _messagePublisher.PublishDSCEvent(de.DataElement_ID.ToString(), JsonConvert.SerializeObject(hiveDelete));
+
+                }
+                else
+                {
+                    Logger.Info($"configservice-delete-physical - configid:{id} configname:{dfc.Name}");
+                    try
+                    {
+                        Logger.Info($"configservice-delete-disabledjobs - configid:{id} configname:{dfc.Name}");
+                        //Ensure all associated RetrieverJobs are disabled
+                        foreach (var job in dfc.RetrieverJobs)
+                        {
+                            _jobService.DisableJob(job.Id);
+                        }
+
+                        Logger.Info($"configservice-delete-deleteparquetstorage - configid:{id} configname:{dfc.Name}");
+                        //Delete all parquet files under schema storage code
+                        DeleteParquetFilesByStorageCode(de.StorageCode);
+
+                        Logger.Info($"configservice-delete-deleterawstorage - configid:{id} configname:{dfc.Name}");
+                        //Delete all raw data files under schema storage code
+                        DeleteRawFilesByStorageCode(de.StorageCode);
+
+                        Logger.Info($"configservice-delete-datasetfileparquetmetadata - configid:{id} configname:{dfc.Name}");
+                        //Delete all DatasetFileParquet metadata  (inserts are managed outside of DSC code)
+                        List<DatasetFileParquet> parquetFileList = _datasetContext.DatasetFileParquet.Where(w => w.SchemaId == de.DataElement_ID).ToList();
+                        Logger.Info($"configservice-delete-datasetfileparquetmetadata - recordsfound:{parquetFileList.Count} configid:{id} configname:{dfc.Name}");
+                        foreach (DatasetFileParquet record in parquetFileList)
+                        {
+                            _datasetContext.Remove(record);
+                        }
+
+                        Logger.Info($"configservice-delete-datasetfilereplymetadata - configid:{id} configname:{dfc.Name}");
+                        //Delete all DatasetFileReply metadata  (inserts are managed outside of DSC code)
+                        List<DatasetFileReply> replyList = _datasetContext.DatasetFileReply.Where(w => w.SchemaID == de.DataElement_ID).ToList();
+                        Logger.Info($"configservice-delete-datasetfilereplymetadata - recordsfound:{parquetFileList.Count} configid:{id} configname:{dfc.Name}");
+                        foreach (DatasetFileReply record in replyList)
+                        {
+                            _datasetContext.Remove(record);
+                        }
+
+                        Logger.Info($"configservice-delete-configmetadata - configid:{id} configname:{dfc.Name}");
+                        //Delete all Schema metadata (will cascade delete to datafiles, dataelement, dataobject, dataobjectfield tables (including detail tables))
+                        _datasetContext.Remove(dfc);
+                        _datasetContext.SaveChanges();
+
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error($"configservice-delete-permanant-failed - configid:{id} configname:{dfc.Name}", ex);
+                        return false;
+                    }
+                }
 
                 return true;
             }
             catch (Exception ex)
             {
-                Logger.Error("configservice-delete-failed", ex);
+                Logger.Error($"configservice-delete-failed - configid:{id}", ex);
                 return false;
             }
         }
@@ -608,6 +682,22 @@ namespace Sentry.data.Core
         {
             DatasetFileConfig dfc = _datasetContext.DatasetFileConfigs.Where(w => w.ConfigId == id).FirstOrDefault();
             return _securityService.GetUserSecurity(dfc.ParentDataset, _userService.GetCurrentUser());
+        }
+
+        public List<DatasetFileConfig> GetSchemaMarkedDeleted()
+        {
+            List<DatasetFileConfig> configList = _datasetContext.DatasetFileConfigs.Where(w => w.DeleteInd && w.DeleteIssueDTM < DateTime.Now.AddDays(Double.Parse(Configuration.Config.GetHostSetting("SchemaDeleteWaitDays")))).ToList();
+            return configList;
+        }
+
+        public void DeleteParquetFilesByStorageCode(string storageCode)
+        {
+            S3ServiceProvider.DeleteS3Prefix($"parquet/{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
+        }
+
+        public void DeleteRawFilesByStorageCode(string storageCode)
+        {
+            S3ServiceProvider.DeleteS3Prefix($"{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
         }
 
         #region PrivateMethods
@@ -635,6 +725,7 @@ namespace Sentry.data.Core
             dto.HiveTable = de.HiveTable;
             dto.HiveStatus = de.HiveTableStatus;
             dto.HiveLocation = de.HiveLocation;
+            dto.CurrentView = de.CreateCurrentView;
         }
 
         private void MapToDto(DataSource dsrc, DataSourceDto dto)
@@ -977,6 +1068,8 @@ namespace Sentry.data.Core
             dto.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
             dto.CreateCurrentView = (dfc.Schema.FirstOrDefault() != null) ? dfc.Schema.FirstOrDefault().CreateCurrentView : false;
             dto.IsInSAS = (dfc.Schema.FirstOrDefault() != null) ? dfc.Schema.FirstOrDefault().IsInSAS : false;
+            dto.Delimiter = dfc.Schema.FirstOrDefault().Delimiter;
+            dto.HasHeader = (dfc.Schema.FirstOrDefault() != null) ? dfc.Schema.FirstOrDefault().HasHeader : false;
         }
         #endregion
     }

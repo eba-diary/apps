@@ -191,6 +191,8 @@
     <Compile Include="Mappings\Primary\ConsumptionLayerTypeMapping.cs" />
     <Compile Include="Mappings\Primary\DataAssetMapping.cs" />
     <Compile Include="Mappings\Primary\DataFeedMapping.cs" />
+    <Compile Include="Mappings\Primary\DatasetFileParquetMapping.cs" />
+    <Compile Include="Mappings\Primary\DatasetFileReplyMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetScopeTypeMapping.cs" />
     <Compile Include="Mappings\Primary\FavoriteMapping.cs" />
@@ -273,6 +275,7 @@
     <Compile Include="ServiceImplementations\SASProvider.cs" />
     <Compile Include="ServiceImplementations\SASServiceProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\TicketMonitorService.cs" />
+    <Compile Include="ServiceImplementations\WallEService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">

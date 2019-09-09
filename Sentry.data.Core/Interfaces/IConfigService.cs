@@ -17,12 +17,13 @@ namespace Sentry.data.Core
         bool UpdateAndSaveDataSource(DataSourceDto dto);
         bool CreateAndSaveDatasetFileConfig(DatasetFileConfigDto dto);
         bool UpdateAndSaveDatasetFileConfig(DatasetFileConfigDto dto);
+        List<DatasetFileConfig> GetSchemaMarkedDeleted();
         DataSourceDto GetDataSourceDto(int Id);
         UserSecurity GetUserSecurityForDataSource(int id);
         AccessRequest GetDataSourceAccessRequest(int dataSourceId);
         string RequestAccessToDataSource(AccessRequest request);
         DatasetFileConfigDto GetDatasetFileConfigDto(int configId);
-        bool Delete(int id);
+        bool Delete(int id, bool logicalDelete = true);
         UserSecurity GetUserSecurityForConfig(int id);
     }
 }

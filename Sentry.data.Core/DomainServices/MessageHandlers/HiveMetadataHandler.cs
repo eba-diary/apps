@@ -57,13 +57,43 @@ namespace Sentry.data.Core
                         break;
                     case "HIVE-TABLE-CREATE-REQUESTED":
                         HiveTableCreateModel hiveReqeustedEvent = JsonConvert.DeserializeObject<HiveTableCreateModel>(msg);
-                        Logger.Info("HiveMetadataHandler processing HIVE-TABLE-CREATE-REQUESTED message: " + JsonConvert.SerializeObject(hiveReqeustedEvent));
+                        Logger.Info($"HiveMetadataHandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(hiveReqeustedEvent)}");
 
                         de = _dsContext.GetById<DataElement>(hiveReqeustedEvent.Schema.SchemaID);
                         de.HiveTableStatus = HiveTableStatusEnum.Requested.ToString();
 
                         _dsContext.Merge(de);
                         _dsContext.SaveChanges();
+                        break;
+                    case "HIVE-TABLE-DELETE-REQUESTED":
+                        HiveTableDeleteModel deleteEvent = JsonConvert.DeserializeObject<HiveTableDeleteModel>(msg);
+                        Logger.Info($"HiveMetadataHandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(deleteEvent)}");
+
+                        de = _dsContext.GetById<DataElement>(deleteEvent.SchemaId);
+                        de.HiveTableStatus = HiveTableStatusEnum.DeleteRequested.ToString();
+                        _dsContext.SaveChanges();
+                        break;
+                    case "HIVE-TABLE-DELETE-COMPLETED":
+                        HiveTableDeleteModel deleteCompletedEvent = JsonConvert.DeserializeObject<HiveTableDeleteModel>(msg);
+                        Logger.Info($"HiveMetadataHandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(deleteCompletedEvent)}");
+
+                        de = _dsContext.GetById<DataElement>(deleteCompletedEvent.SchemaId);
+
+                        switch (deleteCompletedEvent.HiveStatus.ToUpper())
+                        {
+                            case "DELETED":
+                                de.HiveTableStatus = HiveTableStatusEnum.Deleted.ToString();
+                                break;
+                            case "FAILED":
+                                de.HiveTableStatus = HiveTableStatusEnum.DeleteFailed.ToString();
+                                break;
+                            default:
+                                de.HiveTableStatus = HiveTableStatusEnum.Pending.ToString();
+                                break;
+                        }
+
+                        _dsContext.SaveChanges();
+
                         break;
                     default:
                         Logger.Info($"HiveMetadataHandler not configured to handle {baseEvent.EventType.ToUpper()} event type, skipping event.");

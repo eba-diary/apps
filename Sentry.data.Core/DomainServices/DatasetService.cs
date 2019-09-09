@@ -15,14 +15,17 @@ namespace Sentry.data.Core
         private readonly ISecurityService _securityService;
         private readonly UserService _userService;
         private readonly IMessagePublisher _messagePublisher;
+        private readonly IS3ServiceProvider _s3ServiceProvider;
 
         public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, 
-                            UserService userService, IMessagePublisher messagePublisher)
+                            UserService userService, IMessagePublisher messagePublisher,
+                            IS3ServiceProvider s3ServiceProvider)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
             _userService = userService;
             _messagePublisher = messagePublisher;
+            _s3ServiceProvider = s3ServiceProvider;
         }
 
 
@@ -283,6 +286,39 @@ namespace Sentry.data.Core
 
             return errors;
         }
+
+        //public bool DeleteDatasetFile(int datasetFileId)
+        //{
+        //    DatasetFile df = _datasetContext.DatasetFile.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
+
+        //    if (df != null)
+        //    {
+        //        try
+        //        {
+        //            //Find associated parquet prefixes and delete from S3
+        //            List<DatasetFileParquet> parquetFileList = _datasetContext.DatasetFileParquet.Where(w => w.DatasetFileId == df.DatasetFileId).ToList();
+        //            List<string> s3PrefixList = parquetFileList.ToObjectKeyVersion();
+        //            _s3ServiceProvider.DeleteS3Prefix(s3PrefixList);
+
+
+        //            _datasetContext.Remove(df);
+        //            _datasetContext.SaveChanges();
+        //            return true;
+        //        }
+        //        catch (Exception ex)
+        //        {
+
+        //            Logger.Error($"deletedatasetfile-")
+        //            return false;
+        //        }
+                
+        //    }
+        //    else
+        //    {
+        //        Logger.Info($"deletedatasetfile-nofilefound = datasetfileid:{datasetFileId}");
+        //        return true;
+        //    }
+        //}
 
         #region "private functions"
 

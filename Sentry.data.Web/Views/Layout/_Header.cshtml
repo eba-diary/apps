@@ -231,13 +231,12 @@ else
                         </ul>
                     </li>
                 }
-
-                <li>
-                    <a href="~/Dataset/QueryTool" class="">Query Tool</a>
-                </li>
-
-
-
+                @if (Model.CanViewDataset || Model.CanEditDataset)
+                {
+                    <li>
+                        <a href="~/Dataset/QueryTool" class="">Query Tool</a>
+                    </li>
+                }
 
                 <li class="dropdown-xs">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Help<b class="caret"></b></a>

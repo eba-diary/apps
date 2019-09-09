@@ -42,8 +42,9 @@ namespace Sentry.data.Core
         IQueryable<ApplicationConfiguration> ApplicationConfigurations { get; }
         IQueryable<Favorite> Favorites { get; }
         IQueryable<OAuthClaim> OAuthClaims { get; }
-
         IQueryable<RetrieverJob> RetrieverJob { get; }
+        IQueryable<DatasetFileParquet> DatasetFileParquet { get; }
+        IQueryable<DatasetFileReply> DatasetFileReply { get; }
         /** Datasets **/
 
         Dataset GetById(int id);
