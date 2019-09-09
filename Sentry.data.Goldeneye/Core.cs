@@ -188,6 +188,8 @@ namespace Sentry.data.Goldeneye
                             int timeInterval = int.Parse(Config.GetHostSetting("HpsmTicketMonitorTimeInterval"));
                             RecurringJob.AddOrUpdate("HPSMTicketMonitor", () => _ticketMonitorService.CheckTicketStatus(), Cron.MinuteInterval(timeInterval), TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
 
+                            //Schedule WallEService every day at midnight
+                            RecurringJob.AddOrUpdate("WallEService", () => WallEService.Run(), "00 0 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
                             //Load all scheduled and enabled jobs into hangfire on startup to ensure all jobs are registered
                             List<RetrieverJob> JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && w.IsEnabled).ToList();
 
