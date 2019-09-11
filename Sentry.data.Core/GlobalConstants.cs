@@ -210,5 +210,17 @@
             public const string INCLUDE_IN_SAS = "SAS_IND";
             public static string SAS_LIBRARY = "SASLibrary";
         }
+
+        public static class Datatypes
+        {
+            public const string VARCHAR = "VARCHAR";
+            public const string INTEGER = "INTEGER";
+            public const string BIGINT = "BIGINT";
+            public const string DECIMAL = "DECIMAL";
+            public const string DATE = "DATE";
+            public const string TIMESTAMP = "TIMESTAMP";
+            public const string STRUCT = "STRUCT";
+            public const string STRING = "STRING";
+        }
     }
 }

@@ -228,7 +228,8 @@
                     <h6 style="float: left; margin-right: 6px; line-height: 0.5; width: 15px;" data-bind="text: Id"></h6>
                     <input class="col-lg-3 rowFieldName" data-bind="value: Name" placeholder="Field Name..." />
                     <input class="col-lg-3" data-bind="value: Description" placeholder="Description..." />
-                    <select class="typeSelect" data-bind="value: DataType">
+                    <select class="typeSelect" data-bind="options: $parent.DataTypes, optionsCaption: 'Choose Datatype', optionsValue: 'Name', optionsText: 'Name', optionsAfterRender: $parent.setTagGroup, value: DataType"></select>
+                    @*<select class="typeSelect" data-bind="value: DataType">
                         <optgroup label="Numeric Data Types">
                             <option title="A signed one-byte integer, from -128 to 127." value="TINYINT">
                                 TINYINT
@@ -286,19 +287,19 @@
                             </option>
                         </optgroup>
 
-                        @*<optgroup label="Complex Data Types">
-                            <option title="A complex data type that can represent an arbitrary number of ordered elements." value="ARRAY" disabled="disabled">
-                                ARRAY
-                            </option>
-                            <option title="A complex data type, representing multiple fields of a single item." value="STRUCT" disabled="disabled">
-                                STRUCT
-                            </option>
-                        </optgroup>*@
-                    </select>
+                    </select>*@
+                    @*<optgroup label="Complex Data Types">
+            <option title="A complex data type that can represent an arbitrary number of ordered elements." value="ARRAY" disabled="disabled">
+                ARRAY
+            </option>
+            <option title="A complex data type, representing multiple fields of a single item." value="STRUCT" disabled="disabled">
+                STRUCT
+            </option>
+        </optgroup>*@
 
 
 
-                    <div class="optionContainer">
+                    @*<div class="optionContainer">
                         <div class="arrayTypeSelect" data-bind="visible: ShowArrayType">
                             <select class="arrayTypeSelect" data-bind="value: ArrayType">
                                 <optgroup label="Numeric Data Types">
@@ -392,7 +393,7 @@
                                 </button>
                             </div>
                         </div>
-                    </div>
+                    </div>*@
                 </div>
                 <div class="childrenContainer" data-bind="template: {name: 'RowTemplate' , foreach: ChildRows}"></div>
             </div>
@@ -414,7 +415,7 @@
     }
 
     .typeSelect {
-        width: 100px;
+        width: auto;
         height: 26px;
         padding-left: 10px;
     }
@@ -425,7 +426,7 @@
 
     .arrayTypeSelect {
         display: inline;
-        width: 100px;
+        width: auto;
         height: 26px;
         padding-left: 10px;
     }
@@ -586,6 +587,13 @@
             };
         };
 
+        function ValidDataType(item) {
+            this.Name = ko.observable(item.Name);
+            this.Description = ko.observable(item.Description);
+            this.Tag = ko.observable(item.Tag);
+            return this;
+        }
+
         var viewModel = function (incomingJson) {
             var self = this;
 
@@ -598,6 +606,7 @@
 
             self.HiveDatabaseName = ko.observable(incomingJson.HiveDatabaseName);
             self.HiveTableName = ko.observable(incomingJson.HiveTableName);
+            self.FileExtensionId = incomingJson.FileExtension;
             self.RowCount = ko.observable(incomingJson.RowCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
 
             self.checkForErrors = ko.observable(false);
@@ -640,6 +649,35 @@
                     async: false
                 });
 
+            };
+
+            self.DataTypes = ko.observableArray();
+
+            $.ajax({
+                type: "GET",
+                url: "/Config/GetDatatypesByFileExtension/" + self.FileExtensionId,
+                contentType: "application/json",
+                success: function (returnedData) {
+                    console.log("ValidDatatypes");
+                    console.log(returnedData);
+                    self.DataTypes($.map(returnedData.ValidDatatypes, function (item) {
+                        return new ValidDataType(item);
+                    }));
+                },
+                async: false
+            });
+
+            self.setTagGroup = function (option, item) {
+                console.log(item);
+                if (item !== undefined && item.Tag()) {
+                    var grp = $(option).parent("select").find("[label=\"" + item.Tag() + "\"]");
+                    if (grp.length == 0) {
+                        grp = $("<optGroup></optGroup>");
+                        grp.attr("label", item.Tag());
+                        $(option).parent("select").append(grp);
+                    }
+                    grp.append($(option));
+                }
             };
 
         };
@@ -699,6 +737,20 @@
                 },
                 async: false
             });
+
+
+            //$.ajax({
+            //    type: "GET",
+            //    url: "/Config/GetDatatypesByFileExtension/" + vm.FileExtensionId,
+            //    contentType: "application/json",
+            //    success: function (returnedData) {
+            //        console.log("ValidDatatypes");
+            //        console.log(returnedData);
+            //        vm.DataTypes = returnedData;
+            //    },
+            //    async: false
+            //});
+
         });
        
     </script>
