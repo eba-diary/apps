@@ -93,6 +93,7 @@ namespace Sentry.data.Web
                         Include("~/Content/query-tool.css").
                         Include("~/Content/dataset-detail.css").
                         Include("~/Content/favorites.css").
+                        Include("~/Content/fields.css").
                         Include("~/Content/home.css").
                         Include("~/Content/search.css").
                         Include("~/Content/checkbox.css").

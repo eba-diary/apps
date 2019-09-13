@@ -1514,16 +1514,22 @@ namespace Sentry.data.Web.Controllers
             switch (fe.Name)
             {
                 case "CSV":
+                    model.IsPositional = true;
+                    model.IsFixedWidth = false;
+                    break;
                 case "ANY":
                 case "DELIMITED":
-                    model.IsPositional = false;
-                    break;
                 case "TXT":
-                    model.IsPositional = true;
+                    model.IsPositional = false;
+                    model.IsFixedWidth = false;
+                    break;
+                case "FIXEDWIDTH":
+                    model.IsFixedWidth = true;
                     break;
                 case "JSON":
                     model.IsPositional = false;
-                    //model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.STRUCT, "A complex data type, representing multiple fields of a single item.", "Complex Data Types"));
+                    model.IsFixedWidth = false;
+                    //model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.STRUCT, "A struct", "Complex Data Types"));
                     break;
                 default:
                     break;
@@ -1536,7 +1542,6 @@ namespace Sentry.data.Web.Controllers
             model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.DECIMAL, "A fixed-point decimal number, with 38 digits precision.", "Numeric Data Types"));
             model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.DATE, "An ANSI SQL date type. YYYY-MM-DD", "Date Time Data Types"));
             model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.TIMESTAMP, "A UNIX timestamp with optional nanosecond precision. YYYY-MM-DD HH:MM:SS.sss", "Date Time Data Types"));
-            //model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.STRING, "A string"));
 
             return Json(model, JsonRequestBehavior.AllowGet);
         }

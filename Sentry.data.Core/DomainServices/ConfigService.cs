@@ -422,6 +422,7 @@ namespace Sentry.data.Core
                     dof = DOBJ.DataObjectFields.Where(w => w.DataObjectField_ID == sr.DataObjectField_ID).FirstOrDefault();
                     dof.DataObjectField_NME = sr.Name;
                     dof.DataObjectField_DSC = sr.Description;
+                    dof.OrdinalPosition = sr.Position.ToString();
                     dof.LastUpdt_DTM = DateTime.Now;
                     dof.DataObjectFieldChange_DTM = DateTime.Now;
                 }
@@ -433,6 +434,7 @@ namespace Sentry.data.Core
                     dof.DataObjectFieldCreate_DTM = DateTime.Now;
                     dof.DataObjectField_NME = sr.Name;
                     dof.DataObjectField_DSC = sr.Description;
+                    dof.OrdinalPosition = sr.Position.ToString();
                     dof.LastUpdt_DTM = DateTime.Now;
                     dof.DataObjectFieldChange_DTM = DateTime.Now;
                 }

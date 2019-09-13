@@ -220,7 +220,6 @@
             public const string DATE = "DATE";
             public const string TIMESTAMP = "TIMESTAMP";
             public const string STRUCT = "STRUCT";
-            public const string STRING = "STRING";
         }
     }
 }

@@ -1,0 +1,23 @@
+﻿.fields-sortable-ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid #aaa;
+}
+
+    .fields-sortable-ul li {
+        display: table;
+        width: 100%;
+        background-color: #fff;
+        border-top: 1px solid #aaa;
+        padding: 15px;
+    }
+
+        .sortable-ul li span {
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+.fields-wrapper {
+    margin-top: 20px;
+}

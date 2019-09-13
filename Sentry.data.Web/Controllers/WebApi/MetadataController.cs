@@ -268,6 +268,7 @@ namespace Sentry.data.Web.Controllers
                             //r.Scale = (b.Scale != null && !String.IsNullOrEmpty(b.Scale)) ? b.Scale : null;
                             if (b.Nullable != null) { r.Nullable = b.Nullable ?? null; }
                             if (b.Length != null) { r.Length = b.Length ?? null; }
+                            if (b.OrdinalPosition != null) { r.Position = Int32.Parse(b.OrdinalPosition); }
                             s.rows.Add(r);
                         }
 

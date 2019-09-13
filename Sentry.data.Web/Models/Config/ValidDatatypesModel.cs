@@ -15,6 +15,7 @@ namespace Sentry.data.Web
         public FileExtension FileExtension { get; set; }
         public bool IsPositional { get; set; }
         public List<DataTypeModel> ValidDatatypes { get; set; }
+        public bool IsFixedWidth { get; set; }
     }
 
     public class DataTypeModel

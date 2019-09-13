@@ -159,7 +159,6 @@
 {
     @Html.AntiForgeryToken()
     <h2 class="@color">Fields for @schema.SchemaName</h2>
-    <hr />
 
     @Html.ValidationSummary(false, "", new { @class = "text-danger" })
 
@@ -184,9 +183,9 @@
             </li>
         </ul>
 
-        <div id="tablePanel" class="col-lg-12">
-            <div class="rules-group-container row" id="tableSelection" data-bind="template: {name: 'RowTemplate' , foreach: Rows}">
-            </div>
+        <div id="tablePanel" class="col-lg-12 fields-wrapper">
+            <ul class="rules-group-container row fields-sortable-ul" id="fields" data-bind="template: {name: 'RowTemplate' , foreach: Rows}, css: SortableRows()">
+            </ul>
         </div>
 
 
@@ -222,188 +221,125 @@
     </div>
 
     <script type="text/html" id="RowTemplate">
-        <div class="col-lg-12 parentContainer">
+        <li class="col-lg-12 parentContainer ui-sortable-handle" data-bind="css: $parent.ClickableRows()">
             <div class="row">
                 <div data-bind="style : { 'background-color' : RowColor }" style="padding: 2px">
-                    <h6 style="float: left; margin-right: 6px; line-height: 0.5; width: 15px;" data-bind="text: Id"></h6>
+                    <h6 style="float: left; margin-right: 6px; line-height: 0.5; width: 15px;" data-bind="text: Position"></h6>
                     <input class="col-lg-3 rowFieldName" data-bind="value: Name" placeholder="Field Name..." />
                     <input class="col-lg-3" data-bind="value: Description" placeholder="Description..." />
                     <select class="typeSelect" data-bind="options: $parent.DataTypes, optionsCaption: 'Choose Datatype', optionsValue: 'Name', optionsText: 'Name', optionsAfterRender: $parent.setTagGroup, value: DataType"></select>
-                    @*<select class="typeSelect" data-bind="value: DataType">
-                        <optgroup label="Numeric Data Types">
-                            <option title="A signed one-byte integer, from -128 to 127." value="TINYINT">
-                                TINYINT
-                            </option>
-                            <option title="A signed two-byte integer, from -32,768 to 32,767." value="SMALLINT">
-                                SMALLINT
-                            </option>
-                            <option title="A signed four-byte integer." value="INTEGER">
-                                INTEGER
-                            </option>
-                            <option title="A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807." value="BIGINT">
-                                BIGINT
-                            </option>
-                            <option title="A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807." value="LONG">
-                                LONG
-                            </option>
-                            <option title="A four-byte, single-precision floating-point number." value="FLOAT">
-                                FLOAT
-                            </option>
-                            <option title="An eight-byte, double-precision floating-point number." value="DOUBLE">
-                                DOUBLE
-                            </option>
-                            <option title="A fixed-point decimal number, with 38 digits precision." value="DECIMAL">
-                                DECIMAL
-                            </option>
-                        </optgroup>
-
-                        <optgroup label="String Data Types">
-                            <option title="A variable-length character string." value="STRING">
-                                STRING
-                            </option>
-                            <option title="A varying-length character string." value="VARCHAR">
-                                VARCHAR
-                            </option>
-                            <option title="A character string up to 255 characters." value="CHAR">
-                                CHAR
-                            </option>
-                        </optgroup>
-
-                        <optgroup label="Date/Time Data Types">
-                            <option title="An ANSI SQL date type. YYYY-MM-DD" value="DATE">
-                                DATE
-                            </option>
-                            <option title="A UNIX timestamp with optional nanosecond precision. YYYY-MM-DD HH:MM:SS.sss" value="TIMESTAMP">
-                                TIMESTAMP
-                            </option>
-                        </optgroup>
-
-                        <optgroup label="Misc. Data Types">
-                            <option title="A textual true or false value." value="BOOLEAN">
-                                BOOLEAN
-                            </option>
-                            <option title="A varying length binary string." value="BINARY">
-                                BINARY
-                            </option>
-                        </optgroup>
-
-                    </select>*@
-                    @*<optgroup label="Complex Data Types">
-            <option title="A complex data type that can represent an arbitrary number of ordered elements." value="ARRAY" disabled="disabled">
-                ARRAY
-            </option>
-            <option title="A complex data type, representing multiple fields of a single item." value="STRUCT" disabled="disabled">
-                STRUCT
-            </option>
-        </optgroup>*@
+                    <input type="hidden" name="dataObjectField_Id" data-bind="value: DataObjectField_ID" />
 
 
 
                     @*<div class="optionContainer">
-                        <div class="arrayTypeSelect" data-bind="visible: ShowArrayType">
-                            <select class="arrayTypeSelect" data-bind="value: ArrayType">
-                                <optgroup label="Numeric Data Types">
-                                    <option title="A signed one-byte integer, from -128 to 127." value="TINYINT">
-                                        TINYINT
-                                    </option>
-                                    <option title="A signed two-byte integer, from -32,768 to 32,767." value="SMALLINT">
-                                        SMALLINT
-                                    </option>
-                                    <option title="A signed four-byte integer." value="INTEGER">
-                                        INTEGER
-                                    </option>
-                                    <option title="A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807." value="BIGINT">
-                                        BIGINT
-                                    </option>
-                                    <option title="A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807." value="LONG">
-                                        LONG
-                                    </option>
-                                    <option title="A four-byte, single-precision floating-point number." value="FLOAT">
-                                        FLOAT
-                                    </option>
-                                    <option title="An eight-byte, double-precision floating-point number." value="DOUBLE">
-                                        DOUBLE
-                                    </option>
-                                    <option title="A fixed-point decimal number, with 38 digits precision." value="DECIMAL">
-                                        DECIMAL
-                                    </option>
-                                </optgroup>
+            <div class="arrayTypeSelect" data-bind="visible: ShowArrayType">
+                <select class="arrayTypeSelect" data-bind="value: ArrayType">
+                    <optgroup label="Numeric Data Types">
+                        <option title="A signed one-byte integer, from -128 to 127." value="TINYINT">
+                            TINYINT
+                        </option>
+                        <option title="A signed two-byte integer, from -32,768 to 32,767." value="SMALLINT">
+                            SMALLINT
+                        </option>
+                        <option title="A signed four-byte integer." value="INTEGER">
+                            INTEGER
+                        </option>
+                        <option title="A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807." value="BIGINT">
+                            BIGINT
+                        </option>
+                        <option title="A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807." value="LONG">
+                            LONG
+                        </option>
+                        <option title="A four-byte, single-precision floating-point number." value="FLOAT">
+                            FLOAT
+                        </option>
+                        <option title="An eight-byte, double-precision floating-point number." value="DOUBLE">
+                            DOUBLE
+                        </option>
+                        <option title="A fixed-point decimal number, with 38 digits precision." value="DECIMAL">
+                            DECIMAL
+                        </option>
+                    </optgroup>
 
-                                <optgroup label="String Data Types">
-                                    <option title="A variable-length character string." value="STRING">
-                                        STRING
-                                    </option>
-                                    <option title="A varying-length character string." value="VARCHAR">
-                                        VARCHAR
-                                    </option>
-                                    <option title="A character string up to 255 characters." value="CHAR">
-                                        CHAR
-                                    </option>
-                                </optgroup>
+                    <optgroup label="String Data Types">
+                        <option title="A variable-length character string." value="STRING">
+                            STRING
+                        </option>
+                        <option title="A varying-length character string." value="VARCHAR">
+                            VARCHAR
+                        </option>
+                        <option title="A character string up to 255 characters." value="CHAR">
+                            CHAR
+                        </option>
+                    </optgroup>
 
-                                <optgroup label="Date/Time Data Types">
-                                    <option title="An ANSI SQL date type. YYYY-MM-DD" value="DATE">
-                                        DATE
-                                    </option>
-                                    <option title="A UNIX timestamp with optional nanosecond precision. YYYY-MM-DD HH:MM:SS.sss" value="TIMESTAMP">
-                                        TIMESTAMP
-                                    </option>
-                                </optgroup>
+                    <optgroup label="Date/Time Data Types">
+                        <option title="An ANSI SQL date type. YYYY-MM-DD" value="DATE">
+                            DATE
+                        </option>
+                        <option title="A UNIX timestamp with optional nanosecond precision. YYYY-MM-DD HH:MM:SS.sss" value="TIMESTAMP">
+                            TIMESTAMP
+                        </option>
+                    </optgroup>
 
-                                <optgroup label="Misc. Data Types">
-                                    <option title="A textual true or false value." value="BOOLEAN">
-                                        BOOLEAN
-                                    </option>
-                                    <option title="A varying length binary string." value="BINARY">
-                                        BINARY
-                                    </option>
-                                </optgroup>
+                    <optgroup label="Misc. Data Types">
+                        <option title="A textual true or false value." value="BOOLEAN">
+                            BOOLEAN
+                        </option>
+                        <option title="A varying length binary string." value="BINARY">
+                            BINARY
+                        </option>
+                    </optgroup>
 
-                                <optgroup label="Complex Data Types">
-                                    <option title="A complex data type that can represent an arbitrary number of ordered elements." value="ARRAY" disabled="disabled">
-                                        ARRAY
-                                    </option>
-                                    <option title="A complex data type, representing multiple fields of a single item." value="STRUCT" disabled="disabled">
-                                        STRUCT
-                                    </option>
-                                </optgroup>
-                            </select>
+                    <optgroup label="Complex Data Types">
+                        <option title="A complex data type that can represent an arbitrary number of ordered elements." value="ARRAY" disabled="disabled">
+                            ARRAY
+                        </option>
+                        <option title="A complex data type, representing multiple fields of a single item." value="STRUCT" disabled="disabled">
+                            STRUCT
+                        </option>
+                    </optgroup>
+                </select>
 
-                        </div>
-
-                        <div class="showPandS" data-bind="visible: ShowPandS">
-                            <input class="precision" data-bind="value: Precision" type="number" min="1" placeholder="Precision" />
-                            <input class="scale" data-bind="value: Scale" type="number" min="1" placeholder="Scale" />
-                        </div>
-
-                        <div class="options">
-                            <button class="rightButton" data-bind='click: addChild, visible: ShowAddChild'>Add a Child</button>
-
-                            <div class="rightButton" data-bind="visible: $parent.Name === undefined">
-
-                                <button type="button" class="btn btn-xs btn-danger" data-bind='click: $root.removeRow'>
-                                    <i class="glyphicon glyphicon-remove"></i>
-                                    Delete
-                                </button>
-                            </div>
-                            <div class="rightButton" data-bind="visible: $parent.Name !== undefined">
-                                <button type="button" class="btn btn-xs btn-danger" data-bind='click: $parent.removeChild'>
-                                    <i class="glyphicon glyphicon-remove"></i>
-                                    Delete
-                                </button>
-                            </div>
-                        </div>
-                    </div>*@
-                </div>
-                <div class="childrenContainer" data-bind="template: {name: 'RowTemplate' , foreach: ChildRows}"></div>
             </div>
-        </div>
+        </div>*@
+                    <div class="showPandS" data-bind="visible: ShowPandS">
+                        <input class="precision" data-bind="value: Precision" type="number" min="1" placeholder="Precision" />
+                        <input class="scale" data-bind="value: Scale" type="number" min="1" placeholder="Scale" />
+                    </div>
+                    <div class="showDateFormat" data-bind="visible: ShowDateFormat">
+                        <input class="dateFormat" data-bind="value: Format" placeholder="Format" />
+                    </div>
+
+                    <div class="options">
+                        <button class="rightButton" data-bind='click: addChild, visible: ShowAddChild'>Add a Child</button>
+
+                        <div class="rightButton" data-bind="visible: $parent.Name === undefined">
+
+                            <button type="button" class="btn btn-xs btn-danger" data-bind='click: $root.removeRow'>
+                                <i class="glyphicon glyphicon-remove"></i>
+                                Delete
+                            </button>
+                        </div>
+                        <div class="rightButton" data-bind="visible: $parent.Name !== undefined">
+                            <button type="button" class="btn btn-xs btn-danger" data-bind='click: $parent.removeChild'>
+                                <i class="glyphicon glyphicon-remove"></i>
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="childrenContainer" data-bind="template: {name: 'RowTemplate' , foreach: ChildRows}"></div>
+
+            </div>
+        </li>
     </script>
 }
 
 <style>
     .parentContainer {
-        margin-top: 10px;
         background-color: rgba(0,0,0,0.05);
         padding: 5px;
         padding-left: 20px;
@@ -460,6 +396,7 @@
 @section Scripts {
 
     <script>
+        data.Fields.Init();
 
         var currentMax = 0;
         var errorList = [];
@@ -468,7 +405,12 @@
             var self = this;
             var parent = parent;
 
-            self.Id = ko.observable(id);
+            if (indata.Position == 0) {
+                self.Position = ko.observable(indata.Position);
+            }
+            else {
+                self.Position = ko.observable(id);
+            }            
             self.DataObjectField_ID = ko.observable(indata.DataObjectField_ID);
             self.Name = ko.observable(indata.Name).extend({ notify: 'always' });
             self.Description = ko.observable(indata.Description);
@@ -476,6 +418,7 @@
             self.ArrayType = ko.observable(indata.ArrayType);
             self.Precision = ko.observable(indata.Precision);
             self.Scale = ko.observable(indata.Scale);
+            self.Format = ko.observable();
 
             self.RowColor = ko.computed(function () {
                 var hasError = false;
@@ -543,7 +486,6 @@
 
             });
 
-
             self.ShowPandS = ko.computed(function () {
                 if (self.DataType() === 'DECIMAL') {
                     return true;
@@ -552,6 +494,15 @@
                     return false;
                 }
             });
+
+            self.ShowDateFormat = ko.computed(function () {
+                if (self.DataType() === 'DATE' || self.DataType() === 'TIMESTAMP') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            })
 
             self.ShowArrayType = ko.computed(function () {
                 if (self.DataType() === 'ARRAY') {
@@ -570,6 +521,14 @@
                     return false;
                 }
             });
+
+            self.ShowFixed = ko.computed(function () {
+                return parent.IsFixedWidth;
+            });
+
+            self.ShowPositional = ko.computed(function () {
+                return parent.IsPositional;
+            })
 
             self.ChildRows = ko.observableArray(ko.utils.arrayMap(data.ChildRows, function (rowInfo) {
                 currentMax++;
@@ -613,16 +572,29 @@
 
             self.addRow = function () {
                 currentMax++;
-                self.Rows.push(new Row(currentMax, [{ DataObjectField_ID: "", Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }], self));
+                var r = new Row(currentMax, { DataObjectField_ID: "new" + currentMax, Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }, self);
+                self.Rows.push(r);
             };
 
             self.removeRow = function (row) {
-                self.Errors.remove(function (item) { return item.Id === row.Id(); });
-                self.Rows.remove(row)
-            }
+                var newlist = self.Rows();
+
+
+                //self.Errors.remove(function (item) { return item.Id === row.Position(); });
+                //console.log(row.DataObjectField_ID());
+                newlist = $.grep(newlist, function(item) {
+                    console.log('item: ' + item.DataObjectField_ID());
+                    console.log('row: ' + row.DataObjectField_ID());
+                    return (item.DataObjectField_ID().toString() !== row.DataObjectField_ID().toString());
+                });
+
+                self.Rows(newlist);
+
+            };
 
             self.save = function () {
-                var a = JSON.stringify(ko.toJS(vm.Rows), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows']);
+                console.log(ko.toJS(vm.Rows));           
+                var a = JSON.stringify(ko.toJS(vm.Rows), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows', 'Position']);
                 console.log(a);
 
                 var url_parts = window.location.href.replace(/\/\s*$/, '').split('/');
@@ -639,7 +611,7 @@
                     contentType: "application/json",
                     success: function (returnedData) {
                         $('#buttonSpinner').hide();
-                        console.log(returnedData);
+                        //console.log(returnedData);
                         window.location.href = "/Config/Dataset/@Model.DatasetId";
                     },
                     error: function (error) {
@@ -651,15 +623,20 @@
 
             };
 
+
             self.DataTypes = ko.observableArray();
+            self.IsPositional = ko.observable();
+            self.IsFixedWidth = ko.observable();
 
             $.ajax({
                 type: "GET",
                 url: "/Config/GetDatatypesByFileExtension/" + self.FileExtensionId,
                 contentType: "application/json",
                 success: function (returnedData) {
-                    console.log("ValidDatatypes");
-                    console.log(returnedData);
+                    //console.log("ValidDatatypes");
+                    //console.log(returnedData);
+                    self.IsPositional(returnedData.IsPositional);
+                    self.IsFixedWidth(returnedData.IsFixedWidth);
                     self.DataTypes($.map(returnedData.ValidDatatypes, function (item) {
                         return new ValidDataType(item);
                     }));
@@ -668,7 +645,7 @@
             });
 
             self.setTagGroup = function (option, item) {
-                console.log(item);
+                //console.log(item);
                 if (item !== undefined && item.Tag()) {
                     var grp = $(option).parent("select").find("[label=\"" + item.Tag() + "\"]");
                     if (grp.length == 0) {
@@ -680,6 +657,38 @@
                 }
             };
 
+            self.SortRows = function () {
+                newVal = 0;
+                $('.parentContainer').each(function (index) {
+                    //console.log($(this).children().children().children('input[name="dataObjectField_Id"]').val());
+                    var httpItem = $(this).children().children().children('input[name="dataObjectField_Id"]').val();
+                    var match = ko.utils.arrayFirst(self.Rows(), function (item) {
+                        //console.log('itemFieldId: ' + item.DataObjectField_ID());
+                        //console.log('itemId: ' + item.Id());
+                        //console.log('inputFieldId: ' + httpItem);
+                        //console.log('inputId: ' + index);
+                        if (item.DataObjectField_ID() == httpItem && item.Position() != index + 1) {
+                            //console.log('update item');
+                            item.Position(index + 1);
+                        }
+                    })
+                    //console.log('match:');
+                    //console.log(match);
+                    //if (match) {
+                    //    console.log('found match');
+                    //    match();
+                    //}
+                    
+                    //console.log(index + ": " + $(this).children().children().children('h6').text());
+                })
+            }
+
+            self.SortableRows = ko.computed(function () {
+                return self.IsPositional() ? "sortable-fields-active" : "sortable-fields";
+            })
+            self.ClickableRows = ko.computed(function () {
+                return self.IsPositional() ? "clickable" : "";
+            })
         };
 
         var initialData = [
@@ -715,8 +724,6 @@
             //since we do not need example.com
             url_parts.shift();
 
-
-
             $.ajax({
                 type: "GET",
                 url: "/api/v1/metadata/datasets/" + url_parts[3] + "/schemas/" + url_parts[5] + "/columns" ,
@@ -738,19 +745,14 @@
                 async: false
             });
 
-
-            //$.ajax({
-            //    type: "GET",
-            //    url: "/Config/GetDatatypesByFileExtension/" + vm.FileExtensionId,
-            //    contentType: "application/json",
-            //    success: function (returnedData) {
-            //        console.log("ValidDatatypes");
-            //        console.log(returnedData);
-            //        vm.DataTypes = returnedData;
-            //    },
-            //    async: false
-            //});
-
+            $(document).ready(function () {
+                $(".sortable-fields-active").sortable({
+                    stop: function (event, ui) {
+                        vm.SortRows();
+                    }
+                });
+            });
+            
         });
        
     </script>
