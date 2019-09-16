@@ -193,18 +193,7 @@
 
             <hr />
 
-            <button type="button" class="btn btn-sm btn-success" data-bind='click: addRow' style="margin-bottom: 8px;"><i class="glyphicon glyphicon-plus"></i> Add a Field</button>
-            <span style="
-                font-size: 25px;
-                color: lightgray;
-                line-height: 2;
-            ">|</span>
-            <span>
-                <label for="checkForErrors">Check for Errors</label>
-                <span>
-                    <input id="checkForErrors" type="checkbox" data-bind="checked: checkForErrors" />
-                </span>
-            </span>
+            <button type="button" class="btn btn-sm btn-success" data-bind='click: addRow' style="margin-bottom: 8px;"><i class="glyphicon glyphicon-plus"></i> Add a Field</button>          
             <hr />
             <button class="btn btn-success" id="saveBtn" data-bind='click: save'>Save</button>
             <div id="buttonSpinner" style="
@@ -438,29 +427,20 @@
             self.Precision = ko.observable(indata.Precision);
             self.Scale = ko.observable(indata.Scale);
             self.Format = ko.observable(indata.Format);
+            self.DeleteInd = ko.observable(false);
 
             self.RowColor = ko.computed(function () {
                 var hasError = false;
 
                 if (parent.Errors !== undefined && parent.Errors().length > 0) {
                     parent.Errors.remove(function (item) {
-                        console.log('RowColor remove Type Error - itemId:' + item.Id + ' selfPosition:' + self.Position() + ' itemType:' + item.ErrorType);
                         if (item.Id === self.Position() && item.ErrorType == 'Type') {
-                            console.log('RowColor remove Type Error matched');
                             return item;
-                        }
-                        else {
-                            console.log('RowColor remove Type Error no match');
                         }
                     });
                     parent.Errors.remove(function (item) {
-                        console.log('RowColor remove Name Error - itemId:' + item.Id + ' selfPosition:' + self.Position() + ' itemType:' + item.ErrorType);
                         if (item.Id === self.Position() && item.ErrorType == 'Name') {
-                            console.log('RowColor remove Name Error matched');
                             return item;
-                        }
-                        else {
-                            console.log('RowColor remove Name Error no match');
                         }
                     });                    
                 }
@@ -481,7 +461,7 @@
                     hasError = true;
                 }
                 //Name is blank
-                if (parent.checkForErrors && (self.Name() === '' || self.Name() === undefined || self.Name() === null)) {
+                if (self.Name() === '' || self.Name() === undefined || self.Name() === null) {
                     parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' has no name.' });
                     hasError = true;
                 }
@@ -596,37 +576,33 @@
             self.Errors = ko.observableArray();
 
             self.Rows = ko.observableArray(ko.utils.arrayMap(incomingJson.rows, function (rowInfo) {
-                console.log('self Rows observablearray hit');
                 currentMax++;
                 return new Row(currentMax, rowInfo, self);
             }));
 
-            self.SortedRows = ko.computed(function () {
-                return self.Rows().sort(function (left, right) {
+            self.FilteredRows = ko.observableArray();
+            self.SortedRows = ko.observableArray();
+
+            self.RowSorter = ko.computed(function () {
+
+                self.SortedRows([]);
+
+                self.SortedRows(ko.utils.arrayFilter(self.Rows(), function (row) {
+                    return (row.DeleteInd() === false)
+                }).sort(function (left, right) {
                     return left.Position() === right.Position() ? 0 : (left.Position() < right.Position() ? -1 : 1);
-                });
-            });
+                }));
+            }); 
 
             self.HiveDatabaseName = ko.observable(incomingJson.HiveDatabaseName);
             self.HiveTableName = ko.observable(incomingJson.HiveTableName);
             self.FileExtensionId = incomingJson.FileExtension;
             self.RowCount = ko.observable(incomingJson.RowCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
 
-            self.checkForErrors = ko.observable(false);
-
             self.addRow = function () {
-                currentMax++;
-                console.log('Error count' + self.Errors().length);
-                console.log('Adding Row');  
-                
+                currentMax++;                  
                 var r = new Row(currentMax, { DataObjectField_ID: "new" + currentMax, Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }, self);
-
-                console.log('Error count' + self.Errors().length);
-                console.log('pushing row');
-
                 self.Rows.push(r);
-
-                console.log('Error count' + self.Errors().length)
             };
 
             self.removeRow = function (row) {
@@ -634,35 +610,20 @@
 
 
                 self.Errors.remove(function (item) {
-                    console.log('Remove Row: itemId:' + item.Id + ' row.Position:' + row.Position());
                     if (item.Id.toString() === row.Position().toString()) {
-                        console.log('Matched');
-                        return item;
-                    }
-                    else {
-                        console.log('No Match')
-                    }
-                });
-                //console.log(row.DataObjectField_ID());
-                //self.Rows.remove(function (item) { return (item.DataObjectField_ID().toString() === row.DataObjectField_ID().toString()); })
-
-                var newlist = $.grep(listCopy(), function(item) {
-                    console.log('item: ' + item.DataObjectField_ID());
-                    console.log('row: ' + row.DataObjectField_ID());
-                    if (item.DataObjectField_ID().toString() !== row.DataObjectField_ID().toString()) {
-                        console.log('returning item');
                         return item;
                     }
                 });
 
-                self.Rows(newlist);
-                //self.Rows.valueHasMutated();
+                row.DeleteInd(true);
+                self.Rows.valueHasMutated();
+                self.SortRows();
 
             };
 
             self.save = function () {
                 console.log(ko.toJS(vm.Rows));           
-                var a = JSON.stringify(ko.toJS(vm.Rows), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows', 'Position', 'Format']);
+                var a = JSON.stringify(ko.toJS(vm.Rows), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows', 'Position', 'Format', 'DeleteInd']);
                 console.log(a);
 
                 var url_parts = window.location.href.replace(/\/\s*$/, '').split('/');
@@ -679,7 +640,6 @@
                     contentType: "application/json",
                     success: function (returnedData) {
                         $('#buttonSpinner').hide();
-                        //console.log(returnedData);
                         window.location.href = "/Config/Dataset/@Model.DatasetId";
                     },
                     error: function (error) {
@@ -701,8 +661,6 @@
                 url: "/Config/GetDatatypesByFileExtension/" + self.FileExtensionId,
                 contentType: "application/json",
                 success: function (returnedData) {
-                    //console.log("ValidDatatypes");
-                    //console.log(returnedData);
                     self.IsPositional(returnedData.IsPositional);
                     self.IsFixedWidth(returnedData.IsFixedWidth);
                     self.DataTypes($.map(returnedData.ValidDatatypes, function (item) {
@@ -728,26 +686,12 @@
             self.SortRows = function () {
                 newVal = 0;
                 $('.parentContainer').each(function (index) {
-                    //console.log($(this).children().children().children('input[name="dataObjectField_Id"]').val());
-                    var httpItem = $(this).children().children().children('input[name="dataObjectField_Id"]').val();
-                    var match = ko.utils.arrayFirst(self.Rows(), function (item) {
-                        //console.log('itemFieldId: ' + item.DataObjectField_ID());
-                        //console.log('itemId: ' + item.Id());
-                        //console.log('inputFieldId: ' + httpItem);
-                        //console.log('inputId: ' + index);
+                    var httpItem = $(this).children().children().children().children('input[name="dataObjectField_Id"]').val();
+                    var match = ko.utils.arrayFirst(self.SortedRows(), function (item) {
                         if (item.DataObjectField_ID() == httpItem && item.Position() != index + 1) {
-                            //console.log('update item');
                             item.Position(index + 1);
                         }
                     })
-                    //console.log('match:');
-                    //console.log(match);
-                    //if (match) {
-                    //    console.log('found match');
-                    //    match();
-                    //}
-                    
-                    //console.log(index + ": " + $(this).children().children().children('h6').text());
                 })
             }
 

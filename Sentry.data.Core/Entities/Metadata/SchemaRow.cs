@@ -26,5 +26,6 @@ namespace Sentry.data.Core
         public Boolean? Nullable { get; set; }
         public List<SchemaRow> ChildRows { get; set; }
         public double LastUpdated { get; set; }
+        public bool DeleteInd { get; set; }
     }
 }
