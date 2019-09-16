@@ -423,6 +423,7 @@ namespace Sentry.data.Core
                     dof.DataObjectField_NME = sr.Name;
                     dof.DataObjectField_DSC = sr.Description;
                     dof.OrdinalPosition = sr.Position.ToString();
+                    dof.FieldFormat = sr.Format;
                     dof.LastUpdt_DTM = DateTime.Now;
                     dof.DataObjectFieldChange_DTM = DateTime.Now;
                 }
@@ -797,6 +798,8 @@ namespace Sentry.data.Core
                     if (b.Scale != null) { r.Scale = b.Scale ?? null; }
                     if (b.Nullable != null) { r.Nullable = b.Nullable ?? null; }
                     if (b.Length != null) { r.Length = b.Length ?? null; }
+                    r.Position = (b.OrdinalPosition != null) ? Int32.Parse(b.OrdinalPosition) : -1;
+                    if (b.FieldFormat != null) { r.Format = b.FieldFormat ?? null; }
                     rows.Add(r);
                 }
             }

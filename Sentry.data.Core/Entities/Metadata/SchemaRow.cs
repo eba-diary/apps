@@ -22,6 +22,7 @@ namespace Sentry.data.Core
         public string Precision { get; set; }
         public string Scale { get; set; }
         public int Position { get; set; }
+        public string Format { get; set; }
         public Boolean? Nullable { get; set; }
         public List<SchemaRow> ChildRows { get; set; }
         public double LastUpdated { get; set; }

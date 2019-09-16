@@ -184,7 +184,7 @@
         </ul>
 
         <div id="tablePanel" class="col-lg-12 fields-wrapper">
-            <ul class="rules-group-container row fields-sortable-ul" id="fields" data-bind="template: {name: 'RowTemplate' , foreach: Rows}, css: SortableRows()">
+            <ul class="rules-group-container row fields-sortable-ul" id="fields" data-bind="template: {name: 'RowTemplate' , foreach: SortedRows}, css: SortableRows()">
             </ul>
         </div>
 
@@ -221,14 +221,21 @@
     </div>
 
     <script type="text/html" id="RowTemplate">
-        <li class="col-lg-12 parentContainer ui-sortable-handle" data-bind="css: $parent.ClickableRows()">
+        <li class="col-lg-12 parentContainer ui-sortable-handle" data-bind="css: $parent.ClickableRows(), style : { 'background-color' : RowColor }">
             <div class="row">
-                <div data-bind="style : { 'background-color' : RowColor }" style="padding: 2px">
+                <div style="padding: 2px">
                     <h6 style="float: left; margin-right: 6px; line-height: 0.5; width: 15px;" data-bind="text: Position"></h6>
-                    <input class="col-lg-3 rowFieldName" data-bind="value: Name" placeholder="Field Name..." />
-                    <input class="col-lg-3" data-bind="value: Description" placeholder="Description..." />
-                    <select class="typeSelect" data-bind="options: $parent.DataTypes, optionsCaption: 'Choose Datatype', optionsValue: 'Name', optionsText: 'Name', optionsAfterRender: $parent.setTagGroup, value: DataType"></select>
-                    <input type="hidden" name="dataObjectField_Id" data-bind="value: DataObjectField_ID" />
+                    <div class="col-lg-2">
+                        <input class="col-lg-12 rowFieldName" data-bind="value: Name" placeholder="Field Name..." />
+                    </div>                    
+                    <div class="col-lg-3">
+                        <input class="col-lg-12" data-bind="value: Description" placeholder="Description..." />
+                    </div>                    
+                    <div class="col-lg-2">
+                        <select class="typeSelect col-lg-12" data-bind="options: $parent.DataTypes, optionsCaption: 'Choose Datatype', optionsValue: 'Name', optionsText: 'Name', optionsAfterRender: $parent.setTagGroup, value: DataType"></select>
+                        <input type="hidden" name="dataObjectField_Id" data-bind="value: DataObjectField_ID" />
+                    </div>
+                    
 
 
 
@@ -304,20 +311,24 @@
 
             </div>
         </div>*@
-                    <div class="showPandS" data-bind="visible: ShowPandS">
-                        <input class="precision" data-bind="value: Precision" type="number" min="1" placeholder="Precision" />
-                        <input class="scale" data-bind="value: Scale" type="number" min="1" placeholder="Scale" />
+                    <div class="showPandS col-lg-3" data-bind="visible: ShowPandS">
+                        <div class="precisionContainer col-lg-6">
+                            <input class="precision col-lg-12" data-bind="value: Precision" type="number" min="1" placeholder="Precision" />
+                        </div>
+                        <div class="scaleContainer col-lg-6">
+                            <input class="scale col-lg-12" data-bind="value: Scale" type="number" min="1" placeholder="Scale" />
+                        </div>                        
                     </div>
-                    <div class="showDateFormat" data-bind="visible: ShowDateFormat">
-                        <input class="dateFormat" data-bind="value: Format" placeholder="Format" />
+                    <div class="showDateFormat col-lg-3" data-bind="visible: ShowDateFormat">
+                        <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Format" />
                     </div>
 
-                    <div class="options">
+                    <div class="options col-lg-1">
                         <button class="rightButton" data-bind='click: addChild, visible: ShowAddChild'>Add a Child</button>
 
                         <div class="rightButton" data-bind="visible: $parent.Name === undefined">
 
-                            <button type="button" class="btn btn-xs btn-danger" data-bind='click: $root.removeRow'>
+                            <button type="button" class="btn btn-xs btn-danger" data-bind='click: $parent.removeRow'>
                                 <i class="glyphicon glyphicon-remove"></i>
                                 Delete
                             </button>
@@ -384,11 +395,11 @@
     }
 
     .precision {
-        width: 80px;
+        /*width: 80px;*/
     }
 
     .scale {
-        width: 60px;
+        /*width: 60px;*/
     }
 </style>
 
@@ -405,7 +416,7 @@
             var self = this;
             var parent = parent;
 
-            if (indata.Position == 0) {
+            if (indata.Position != undefined && indata.Position !== 0) {
                 self.Position = ko.observable(indata.Position);
             }
             else {
@@ -418,48 +429,66 @@
             self.ArrayType = ko.observable(indata.ArrayType);
             self.Precision = ko.observable(indata.Precision);
             self.Scale = ko.observable(indata.Scale);
-            self.Format = ko.observable();
+            self.Format = ko.observable(indata.Format);
 
             self.RowColor = ko.computed(function () {
                 var hasError = false;
 
-                if (parent.Errors !== undefined) {
-                    parent.Errors.remove(function (item) { return item.Id === self.Id() && item.ErrorType == 'Type'; });
-                    parent.Errors.remove(function (item) { return item.Id === self.Id() && item.ErrorType == 'Name'; });                    
+                if (parent.Errors !== undefined && parent.Errors().length > 0) {
+                    parent.Errors.remove(function (item) {
+                        console.log('RowColor remove Type Error - itemId:' + item.Id + ' selfPosition:' + self.Position() + ' itemType:' + item.ErrorType);
+                        if (item.Id === self.Position() && item.ErrorType == 'Type') {
+                            console.log('RowColor remove Type Error matched');
+                            return item;
+                        }
+                        else {
+                            console.log('RowColor remove Type Error no match');
+                        }
+                    });
+                    parent.Errors.remove(function (item) {
+                        console.log('RowColor remove Name Error - itemId:' + item.Id + ' selfPosition:' + self.Position() + ' itemType:' + item.ErrorType);
+                        if (item.Id === self.Position() && item.ErrorType == 'Name') {
+                            console.log('RowColor remove Name Error matched');
+                            return item;
+                        }
+                        else {
+                            console.log('RowColor remove Name Error no match');
+                        }
+                    });                    
                 }
 
                 //Has no children.  Error
                 if ((self.DataType() === 'STRUCT' || (self.DataType() === 'ARRAY' && self.ArrayType() === 'STRUCT')) && self.ChildRows !== undefined && self.ChildRows().length === 0) {
-                    parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Type', 'Description': ' has no children.  Please add a child or change data types.' });
+                    parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has no children.  Please add a child or change data types.' });
                     hasError = true;
                 }
                 //Has children when it shouldn't
                 else if (self.DataType() === 'ARRAY' && self.ArrayType() !== "STRUCT" && self.ChildRows !== undefined && self.ChildRows().length > 0) {
-                    parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to ARRAY<STRUCT>.' });
+                    parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to ARRAY<STRUCT>.' });
                     hasError = true;
                 }
                 //Has children when it shouldn't
                 else if (self.DataType() !== 'STRUCT' && (self.DataType() !== 'ARRAY' && self.ArrayType() !== "STRUCT") && self.ChildRows !== undefined && self.ChildRows().length > 0) {
-                    parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to STRUCT.' });
+                    parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to STRUCT.' });
                     hasError = true;
                 }
                 //Name is blank
                 if (parent.checkForErrors && (self.Name() === '' || self.Name() === undefined || self.Name() === null)) {
-                    parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Name', 'Description': ' has no name.' });
+                    parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' has no name.' });
                     hasError = true;
                 }
 
                 if (self.Name() !== undefined && self.Name() !== '' && self.Name() !== null) {
                     //Name contains spaces
                     if (self.Name().indexOf(' ') >= 0) {
-                        parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Name', 'Description': ' Name cannot contain Spaces.' });
+                        parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot contain Spaces.' });
                         hasError = true;
                     }
 
                     //Name contains special characters
                     var pattchar = new RegExp("[-:,;{}()]");
                     if (pattchar.test(self.Name())) {
-                        parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Name', 'Description': ' Name cannot special characters (-:,;{}()).' });
+                        parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot special characters (-:,;{}()).' });
                         hasError = true;
                     }
 
@@ -467,7 +496,7 @@
                     var pattupper = new RegExp("[A-Z]");
                     //var nme = self.Name();
                     if (pattupper.test(self.Name())) {
-                        parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Name', 'Description': ' Name cannot uppercase letters.' });
+                        parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot uppercase letters.' });
                         hasError = true;
                     }
                 }
@@ -559,9 +588,16 @@
             self.Errors = ko.observableArray();
 
             self.Rows = ko.observableArray(ko.utils.arrayMap(incomingJson.rows, function (rowInfo) {
+                console.log('self Rows observablearray hit');
                 currentMax++;
                 return new Row(currentMax, rowInfo, self);
             }));
+
+            self.SortedRows = ko.computed(function () {
+                return self.Rows().sort(function (left, right) {
+                    return left.Position() === right.Position() ? 0 : (left.Position() < right.Position() ? -1 : 1);
+                });
+            });
 
             self.HiveDatabaseName = ko.observable(incomingJson.HiveDatabaseName);
             self.HiveTableName = ko.observable(incomingJson.HiveTableName);
@@ -572,29 +608,53 @@
 
             self.addRow = function () {
                 currentMax++;
+                console.log('Error count' + self.Errors().length);
+                console.log('Adding Row');  
+                
                 var r = new Row(currentMax, { DataObjectField_ID: "new" + currentMax, Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }, self);
+
+                console.log('Error count' + self.Errors().length);
+                console.log('pushing row');
+
                 self.Rows.push(r);
+
+                console.log('Error count' + self.Errors().length)
             };
 
             self.removeRow = function (row) {
-                var newlist = self.Rows();
+                var listCopy = self.Rows;
 
 
-                //self.Errors.remove(function (item) { return item.Id === row.Position(); });
+                self.Errors.remove(function (item) {
+                    console.log('Remove Row: itemId:' + item.Id + ' row.Position:' + row.Position());
+                    if (item.Id.toString() === row.Position().toString()) {
+                        console.log('Matched');
+                        return item;
+                    }
+                    else {
+                        console.log('No Match')
+                    }
+                });
                 //console.log(row.DataObjectField_ID());
-                newlist = $.grep(newlist, function(item) {
+                //self.Rows.remove(function (item) { return (item.DataObjectField_ID().toString() === row.DataObjectField_ID().toString()); })
+
+                var newlist = $.grep(listCopy(), function(item) {
                     console.log('item: ' + item.DataObjectField_ID());
                     console.log('row: ' + row.DataObjectField_ID());
-                    return (item.DataObjectField_ID().toString() !== row.DataObjectField_ID().toString());
+                    if (item.DataObjectField_ID().toString() !== row.DataObjectField_ID().toString()) {
+                        console.log('returning item');
+                        return item;
+                    }
                 });
 
                 self.Rows(newlist);
+                //self.Rows.valueHasMutated();
 
             };
 
             self.save = function () {
                 console.log(ko.toJS(vm.Rows));           
-                var a = JSON.stringify(ko.toJS(vm.Rows), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows', 'Position']);
+                var a = JSON.stringify(ko.toJS(vm.Rows), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows', 'Position', 'Format']);
                 console.log(a);
 
                 var url_parts = window.location.href.replace(/\/\s*$/, '').split('/');

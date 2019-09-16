@@ -269,6 +269,7 @@ namespace Sentry.data.Web.Controllers
                             if (b.Nullable != null) { r.Nullable = b.Nullable ?? null; }
                             if (b.Length != null) { r.Length = b.Length ?? null; }
                             if (b.OrdinalPosition != null) { r.Position = Int32.Parse(b.OrdinalPosition); }
+                            if (b.FieldFormat != null) { r.Format = b.FieldFormat ?? null; }
                             s.rows.Add(r);
                         }
 
