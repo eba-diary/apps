@@ -226,14 +226,14 @@
                 <div style="padding: 2px">
                     <h6 style="float: left; margin-right: 6px; line-height: 0.5; width: 15px;" data-bind="text: Position"></h6>
                     <div class="col-lg-2">
-                        <input class="col-lg-12 rowFieldName" data-bind="value: Name" placeholder="Field Name..." />
+                        <input class="col-lg-12 rowFieldName" data-bind="value: Name" placeholder="Field Name..."  data-toggle="tooltip" data-placement="top" title="Field Name" />
                     </div>                    
                     <div class="col-lg-3">
-                        <input class="col-lg-12" data-bind="value: Description" placeholder="Description..." />
+                        <input class="col-lg-12" data-bind="value: Description" placeholder="Description..." data-toggle="tooltip" data-placement="top" title="Description" />
                     </div>                    
                     <div class="col-lg-2">
                         <select class="typeSelect col-lg-12" data-bind="options: $parent.DataTypes, optionsCaption: 'Choose Datatype', optionsValue: 'Name', optionsText: 'Name', optionsAfterRender: $parent.setTagGroup, value: DataType"></select>
-                        <input type="hidden" name="dataObjectField_Id" data-bind="value: DataObjectField_ID" />
+                        <input type="hidden" name="dataObjectField_Id" data-bind="value: DataObjectField_ID"  data-toggle="tooltip" data-placement="top" title="Data Type Selection" />
                     </div>
                     
 
@@ -311,16 +311,16 @@
 
             </div>
         </div>*@
-                    <div class="showPandS col-lg-3" data-bind="visible: ShowPandS">
+                    <div class="showPandS col-lg-2" data-bind="visible: ShowPandS">
                         <div class="precisionContainer col-lg-6">
-                            <input class="precision col-lg-12" data-bind="value: Precision" type="number" min="1" placeholder="Precision" />
+                            <input class="precision col-lg-12" data-bind="value: Precision" type="number" min="1" max="38" placeholder="Prec" data-toggle="tooltip" data-placement="top" title="Precision" />
                         </div>
                         <div class="scaleContainer col-lg-6">
-                            <input class="scale col-lg-12" data-bind="value: Scale" type="number" min="1" placeholder="Scale" />
+                            <input class="scale col-lg-12" data-bind="value: Scale" type="number" min="1" max="38" placeholder="Scale" data-toggle="tooltip" data-placement="top" title="Scale"/>
                         </div>                        
                     </div>
                     <div class="showDateFormat col-lg-3" data-bind="visible: ShowDateFormat">
-                        <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Format" />
+                        <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Format" data-toggle="tooltip" data-placement="top" title="Format" />
                     </div>
 
                     <div class="options col-lg-1">
@@ -394,12 +394,20 @@
         display: inline;
     }
 
+    .precisionContainer {
+        padding-left: 0px;
+    }
+
+    .scaleContainer {
+        padding-left: 0px;
+    }
+
     .precision {
-        /*width: 80px;*/
+        padding-right: 0px;
     }
 
     .scale {
-        /*width: 60px;*/
+        padding-right: 0px;
     }
 </style>
 
