@@ -33,10 +33,10 @@
             var val = $(this).val();
             if (val != "0" && val != null) {
                 $.ajax({
-                    url: "/Config/SourceDetails",
+                    url: "/Config/SourceDetails/" + $('#SelectedDataSource :selected').val(),
                     dataType: 'json',
                     type: "GET",
-                    data: { sourceId: $('#SelectedDataSource :selected').val() },
+                    //data: { Id: $('#SelectedDataSource :selected').val() },
                     success: function (datain) {
                         //Data Source is not restricted or user has permissions to use data source
                         if (!datain.IsSecured || (datain.IsSecured && datain.Security.CanUseDataSource)) {
