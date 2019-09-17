@@ -22,5 +22,7 @@ namespace Sentry.data.Core
         public bool IsInSAS { get; set; }
         public string Delimiter { get; set; }
         public bool HasHeader { get; set; }
+        public bool IsTrackableSchema { get; set; }
+        public IList<FileSchema> SchemaRevisions { get; set; }
     }
 }

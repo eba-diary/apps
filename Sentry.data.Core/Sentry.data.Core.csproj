@@ -100,6 +100,14 @@
     <Compile Include="Entities\Goldeneye\RunningTask.cs" />
     <Compile Include="Entities\Image.cs" />
     <Compile Include="Entities\MessageFormats\HiveTableDeleteModel.cs" />
+    <Compile Include="Entities\Schema\BaseField.cs" />
+    <Compile Include="Entities\Schema\DateField.cs" />
+    <Compile Include="Entities\Schema\DecimalField.cs" />
+    <Compile Include="Entities\Schema\FileSchema.cs" />
+    <Compile Include="Entities\Schema\IntegerField.cs" />
+    <Compile Include="Entities\Schema\StructField.cs" />
+    <Compile Include="Entities\Schema\TimestampField.cs" />
+    <Compile Include="Entities\Schema\VarcharField.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
     <Compile Include="Extensions\DatasetFileConfigExtensions.cs" />
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
@@ -108,10 +116,13 @@
     <Compile Include="GlobalEnums\HTTPMethods.cs" />
     <Compile Include="GlobalEnums\OAuthClaims.cs" />
     <Compile Include="GlobalEnums\OAuthGrantType.cs" />
+    <Compile Include="GlobalEnums\SchemaDatatypes.cs" />
+    <Compile Include="Interfaces\ISchemaField.cs" />
     <Compile Include="Interfaces\ITicketMonitorService.cs" />
     <Compile Include="Interfaces\IBaseTicketProvider.cs" />
     <Compile Include="Interfaces\ICherwellProvider.cs" />
     <Compile Include="Interfaces\IEncryptionService.cs" />
+    <Compile Include="Interfaces\ITrackableSchema.cs" />
     <Compile Include="Interfaces\Retriever\DataSourceProviders\IHttpsProvider.cs" />
     <Compile Include="Extensions\JobExtensions.cs" />
     <Compile Include="Entities\MessageFormats\HszDropLocationCreateModel.cs" />
@@ -287,6 +298,8 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
     <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
       <SubType>Designer</SubType>
     </None>

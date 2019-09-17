@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Sentry.data.Core
 {
-    public class DatasetFileConfig
+    public class DatasetFileConfig : ITrackableSchema
     {
         public DatasetFileConfig()
         {
@@ -26,6 +26,12 @@ namespace Sentry.data.Core
         public virtual IList<RetrieverJob> RetrieverJobs { get; set; }
         public virtual FileExtension FileExtension { get; set; }
         public virtual IList<DataElement> Schema { get; set; }
+
+
+        /* ITrackableSchema implementation */
+        public virtual bool IsSchemaTracked { get; set; }
+        public virtual List<FileSchema> SchemaRevisions { get; set; }
+
 
         /// <summary>
         /// Return path to current file

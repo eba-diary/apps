@@ -10,10 +10,13 @@
     [DeleteInd] BIT NOT NULL, 
     [DeleteIssuer] VARCHAR(8) NULL, 
     [DeleteIssueDTM] VARCHAR(100) NULL, 
+    [HasSchema] BIT NOT NULL, 
+    [Schema_Id] UNIQUEIDENTIFIER NULL, 
     CONSTRAINT [PK_DatasetFileConfigs] PRIMARY KEY CLUSTERED ([Config_ID] ASC),
     CONSTRAINT [FK_DatasetFileConfigs_Dataset] FOREIGN KEY ([Dataset_ID]) REFERENCES [dbo].[Dataset] ([Dataset_ID]),
     CONSTRAINT [FK_DatasetFileConfigs_DatasetScopeTypes] FOREIGN KEY ([DatasetScopeType_ID]) REFERENCES [dbo].[DatasetScopeTypes] ([ScopeType_ID]),
-    CONSTRAINT [FK_DatasetFileConfigs_FileExtension] FOREIGN KEY ([FileExtension_CDE]) REFERENCES [dbo].[FileExtension] ([Extension_Id])
+    CONSTRAINT [FK_DatasetFileConfigs_FileExtension] FOREIGN KEY ([FileExtension_CDE]) REFERENCES [dbo].[FileExtension] ([Extension_Id]), 
+    CONSTRAINT [FK_DatasetFileConfigs_FileSchema] FOREIGN KEY ([Schema_Id]) REFERENCES [FileSchema]([Schema_Id])
 );
 
 

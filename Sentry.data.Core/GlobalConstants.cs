@@ -210,5 +210,12 @@
             public const string INCLUDE_IN_SAS = "SAS_IND";
             public static string SAS_LIBRARY = "SASLibrary";
         }
+
+        public static class SchemaDataTypes
+        {
+            public const string STRUCT = "STRUCT";
+            public const string INTEGER = "INTEGER";
+            public const string VARCHAR = "VARCHAR";
+        }
     }
 }
