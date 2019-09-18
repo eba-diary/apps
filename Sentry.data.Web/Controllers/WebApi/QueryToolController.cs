@@ -632,14 +632,14 @@ namespace Sentry.data.Web.Controllers
                     }
                     qd.extensions = ds.DatasetFiles.Where(x => x.DatasetFileConfig.ConfigId == item.ConfigId).Select(x => Utilities.GetFileExtension(x.FileName)).Distinct().ToList();
                     qd.description = item.Description;
-                    qd.HasSchema = item.Schema.FirstOrDefault().DataObjects.Any();
+                    qd.HasSchema = item.Schemas.FirstOrDefault().DataObjects.Any();
 
-                    qd.HasQueryableSchema = item.Schema.FirstOrDefault().DataObjects.Any();
+                    qd.HasQueryableSchema = item.Schemas.FirstOrDefault().DataObjects.Any();
 
                     if (qd.HasSchema)
                     {
                         List<QueryableSchema> qslist = new List<QueryableSchema>();
-                        foreach (var sch in item.Schema)
+                        foreach (var sch in item.Schemas)
                         {
                             QueryableSchema qs = new QueryableSchema()
                             {

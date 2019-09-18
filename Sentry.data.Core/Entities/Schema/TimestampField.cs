@@ -1,4 +1,4 @@
-﻿namespace Sentry.data.Core.Entities.Schema
+﻿namespace Sentry.data.Core
 {
     public class TimestampField : BaseField, ISchemaField
     {

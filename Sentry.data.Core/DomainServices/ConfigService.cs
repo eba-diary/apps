@@ -54,20 +54,26 @@ namespace Sentry.data.Core
 
         private IS3ServiceProvider S3ServiceProvider { get; set; }
 
-        public SchemaDTO GetSchemaDTO(int id)
+        public SchemaApiDTO GetSchemaApiDTO(int id)
         {
             DataElement de = _datasetContext.GetById<DataElement>(id);
-            SchemaDTO dto = new SchemaDTO();
+            SchemaApiDTO dto = new SchemaApiDTO();
             MapToDto(de, dto);
             return dto;
         }
 
-        public SchemaDetailDTO GetSchemaDetailDTO(int id)
+        public SchemaDetaiApilDTO GetSchemaDetailDTO(int id)
         {
             DataElement de = _datasetContext.GetById<DataElement>(id);
-            SchemaDetailDTO dto = new SchemaDetailDTO();
+            SchemaDetaiApilDTO dto = new SchemaDetaiApilDTO();
             MaptToDetailDto(de, dto);
             return dto;
+        }
+
+        public SchemaDto GetSchemaDto(int id)
+        {
+            Schema s = _datasetContext.GetById<Schema>(id);            
+            return s.MapToSchemaDto();
         }
 
         public IList<ColumnDTO> GetColumnDTO(int id)
@@ -296,7 +302,7 @@ namespace Sentry.data.Core
             dfc.Description = dto.Description;
             dfc.FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId);
 
-            DataElement de = _datasetContext.DataElements.Where(w => w.DatasetFileConfig.ConfigId == dfc.ConfigId && w.DataElement_NME == dfc.Schema.FirstOrDefault().DataElement_NME).FirstOrDefault();
+            DataElement de = _datasetContext.DataElements.Where(w => w.DatasetFileConfig.ConfigId == dfc.ConfigId && w.DataElement_NME == dfc.Schemas.FirstOrDefault().DataElement_NME).FirstOrDefault();
             UpdateDataElement(dto, de);
         }
 
@@ -338,12 +344,12 @@ namespace Sentry.data.Core
                 ParentDataset = _datasetContext.GetById<Dataset>(dto.ParentDatasetId),
                 FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId),
                 DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId),
-                Schema = deList
+                Schemas = deList
             };
 
             de.DatasetFileConfig = dfc;
             deList.Add(de);
-            dfc.Schema = deList;
+            dfc.Schemas = deList;
 
             return dfc;
         }
@@ -595,7 +601,7 @@ namespace Sentry.data.Core
             try
             {
                 DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(id);
-                DataElement de = dfc.Schema.FirstOrDefault();
+                DataElement de = dfc.Schemas.FirstOrDefault();
 
                 if (logicalDelete)
                 {
@@ -715,7 +721,7 @@ namespace Sentry.data.Core
             de.DeleteIssueDTM = DateTime.Now;
         }
 
-        private void MapToDto(DataElement de, SchemaDTO dto)
+        private void MapToDto(DataElement de, SchemaApiDTO dto)
         {
             dto.SchemaID = de.DataElement_ID;
             dto.Format = de.FileFormat;
@@ -770,7 +776,7 @@ namespace Sentry.data.Core
             }
         }
 
-        private void MaptToDetailDto(DataElement de, SchemaDetailDTO dto)
+        private void MaptToDetailDto(DataElement de, SchemaDetaiApilDTO dto)
         {
             MapToDto(de, dto);
 
@@ -1066,10 +1072,11 @@ namespace Sentry.data.Core
             dto.ParentDatasetId = dfc.ParentDataset.DatasetId;
             dto.StorageCode = dfc.GetStorageCode();
             dto.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
-            dto.CreateCurrentView = (dfc.Schema.FirstOrDefault() != null) ? dfc.Schema.FirstOrDefault().CreateCurrentView : false;
-            dto.IsInSAS = (dfc.Schema.FirstOrDefault() != null) ? dfc.Schema.FirstOrDefault().IsInSAS : false;
-            dto.Delimiter = dfc.Schema.FirstOrDefault().Delimiter;
-            dto.HasHeader = (dfc.Schema.FirstOrDefault() != null) ? dfc.Schema.FirstOrDefault().HasHeader : false;
+            dto.CreateCurrentView = (dfc.Schemas.FirstOrDefault() != null) ? dfc.Schemas.FirstOrDefault().CreateCurrentView : false;
+            dto.IsInSAS = (dfc.Schemas.FirstOrDefault() != null) ? dfc.Schemas.FirstOrDefault().IsInSAS : false;
+            dto.Delimiter = dfc.Schemas.FirstOrDefault().Delimiter;
+            dto.HasHeader = (dfc.Schemas.FirstOrDefault() != null) ? dfc.Schemas.FirstOrDefault().HasHeader : false;
+            dto.Schema = GetSchemaDto(dfc.Schema.SchemaId);
         }
         #endregion
     }

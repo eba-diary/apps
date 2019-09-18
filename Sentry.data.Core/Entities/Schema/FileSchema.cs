@@ -1,17 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public class FileSchema
+    public class FileSchema : Schema
     {
-        public virtual Guid SchemaId { get; set; }
-        public virtual string SchemaEntity_NME { get; set; }
-        public virtual StructField SchemaStruct { get; set; }
-        public virtual string Name { get; set; }
+        public FileSchema() { }
+        public FileSchema(DatasetFileConfig config,IApplicationUser user) : base(config, user)
+        {
+            Extension = config.FileExtension;
+        }
         public virtual FileExtension Extension { get; set; }
-        public virtual int RevisionId { get; set; }
-        public virtual string RevisionName { get; set; }
-        public virtual IEnumerable<BaseField> Fields { get; set; }
     }
 }

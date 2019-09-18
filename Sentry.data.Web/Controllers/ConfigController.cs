@@ -55,15 +55,32 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Index(int id)
         {
             Dataset ds = _datasetContext.GetById(id);
+            DatasetDto dsDto = _DatasetService.GetDatasetDto(id);
+
+            //_configService.GetDatasetFileConfigDto(id);
+
+            List<DatasetFileConfigsModel> configModelList = new List<DatasetFileConfigsModel>();
+            foreach(DatasetFileConfig config in ds.DatasetFileConfigs)
+            {
+                configModelList.Add(new DatasetFileConfigsModel(config, true, false));
+            }
+
+            ManageConfigsModel mcm = new ManageConfigsModel()
+            {
+                DatasetId = dsDto.DatasetId,
+                DatasetName = dsDto.DatasetName,
+                CategoryColor = dsDto.CategoryColor,
+                DatasetFileConfigs = configModelList
+            };
 
             UserSecurity us = _DatasetService.GetUserSecurityForDataset(id);
 
-            ObsoleteDatasetModel bdm = new ObsoleteDatasetModel(ds, _associateInfoProvider, _datasetContext)
-            {
-                CanEditDataset = us.CanEditDataset,
-                CanUpload = us.CanUploadToDataset,
-                Security = us
-            };
+            //ObsoleteDatasetModel bdm = new ObsoleteDatasetModel(ds, _associateInfoProvider, _datasetContext)
+            //{
+            //    CanEditDataset = us.CanEditDataset,
+            //    CanUpload = us.CanUploadToDataset,
+            //    Security = us
+            //};
 
             Event e = new Event();
             e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
@@ -76,7 +93,7 @@ namespace Sentry.data.Web.Controllers
             e.Reason = "Viewed Dataset Configuration Page";
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
-            return View(bdm);
+            return View("Index", mcm);
         }
 
         [HttpGet]
@@ -1305,7 +1322,7 @@ namespace Sentry.data.Web.Controllers
 
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configId);
 
-            DataElement maxSchemaRevision = dfc.Schema.OrderByDescending(o => o.SchemaRevision).FirstOrDefault();
+            DataElement maxSchemaRevision = dfc.Schemas.OrderByDescending(o => o.SchemaRevision).FirstOrDefault();
             //Get raw file storage code
             string storageCode = dfc.GetStorageCode();
 
@@ -1337,7 +1354,7 @@ namespace Sentry.data.Web.Controllers
                         HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
                     };
 
-                    dfc.Schema.Add(de);
+                    dfc.Schemas.Add(de);
 
                     if (maxSchemaRevision != null)
                     {

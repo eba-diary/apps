@@ -8,7 +8,7 @@ namespace Sentry.data.Web
 {
     public class SchemaModel
     {
-        public SchemaModel(SchemaDTO dto)
+        public SchemaModel(SchemaApiDTO dto)
         {
             SchemaID = dto.SchemaID;
             Format = dto.Format;

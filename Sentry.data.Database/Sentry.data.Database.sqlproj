@@ -216,7 +216,7 @@
     <Build Include="Tables\SparkConverter.sql" />
     <Build Include="Tables\RetrieverJobs\AuthenticationClaims.sql" />
     <Build Include="Tables\DatasetFileReply.sql" />
-    <Build Include="Tables\Schema\FileSchema.sql" />
+    <Build Include="Tables\Schema\Schema.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

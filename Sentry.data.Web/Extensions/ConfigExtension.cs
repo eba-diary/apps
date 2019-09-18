@@ -91,7 +91,10 @@ namespace Sentry.data.Web
         public static Core.DatasetFileConfigDto ToDto(this DatasetFileConfigsModel model)
         {
             List<Core.DataElementDto> deList = new List<Core.DataElementDto>();
-            deList.Add(model.ToSchemaDto());
+            deList.Add(model.ToSchemaApiDto());
+
+            //List<Core.SchemaDto> schemaList = new List<Core.SchemaDto>();
+            //schemaList.Add(model.ToSchemaDto());
 
             return new Core.DatasetFileConfigDto()
             {
@@ -111,7 +114,7 @@ namespace Sentry.data.Web
             };
         }
 
-        public static Core.DataElementDto ToSchemaDto(this DatasetFileConfigsModel model)
+        public static Core.DataElementDto ToSchemaApiDto(this DatasetFileConfigsModel model)
         {
             return new Core.DataElementDto()
             {
@@ -128,6 +131,11 @@ namespace Sentry.data.Web
                 IsInSAS = model.IncludedInSAS,
                 SasLibrary = model.SasLibrary
             };
+        }
+
+        public static DatasetFileConfigsModel ToModel(this Core.DatasetFileConfigDto dto)
+        {
+            return new DatasetFileConfigsModel(dto);
         }
     }
 }

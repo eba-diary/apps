@@ -791,4 +791,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="[FK_DatasetFileConfigs_FileSchema]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="c2dd3f85-09d4-4ac2-aa2e-99989de83856" ChangeDateTime="09/18/2019 18:56:27">
+    <Property Name="ElementName" Value="[dbo].[DatasetFileConfigs].[HasSchema]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetFileConfigs]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="IsSchemaTracked" />
+  </Operation>
 </Operations>

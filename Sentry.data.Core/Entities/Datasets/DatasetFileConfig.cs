@@ -25,12 +25,12 @@ namespace Sentry.data.Core
         public virtual IList<DatasetFile> DatasetFiles { get; set; }
         public virtual IList<RetrieverJob> RetrieverJobs { get; set; }
         public virtual FileExtension FileExtension { get; set; }
-        public virtual IList<DataElement> Schema { get; set; }
+        public virtual IList<DataElement> Schemas { get; set; }
 
 
         /* ITrackableSchema implementation */
         public virtual bool IsSchemaTracked { get; set; }
-        public virtual List<FileSchema> SchemaRevisions { get; set; }
+        public virtual Schema Schema { get; set; }
 
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Sentry.data.Core
 
         public virtual DataElement GetLatestSchemaRevision()
         {
-            return Schema.OrderByDescending(o => o.SchemaRevision).Take(1).SingleOrDefault();
+            return Schemas.OrderByDescending(o => o.SchemaRevision).Take(1).SingleOrDefault();
         }
         public virtual string GetStorageCode()
         {

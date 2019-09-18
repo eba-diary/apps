@@ -162,7 +162,7 @@ namespace Sentry.data.Core
             DatasetFileConfig dfc = CreateDatasetFileConfig(dto, ds);
 
             de.DatasetFileConfig = dfc;
-            dfc.Schema = new List<DataElement> { de };
+            dfc.Schemas = new List<DataElement> { de };
 
             List<RetrieverJob> jobList = new List<RetrieverJob>();
             if (ds.DataClassification == GlobalEnums.DataClassificationType.HighlySensitive)
@@ -414,6 +414,8 @@ namespace Sentry.data.Core
                 DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId),
                 FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId)
             };
+            dfc.IsSchemaTracked = true;
+            dfc.Schema = new FileSchema(dfc, _userService.GetCurrentUser());
 
             return dfc;
         }
@@ -524,6 +526,7 @@ namespace Sentry.data.Core
             dto.DatasetInformation = ds.DatasetInformation;
             dto.DatasetType = ds.DatasetType;
             dto.DataClassification = ds.DataClassification;
+            dto.CategoryColor = ds.DatasetCategories.FirstOrDefault().Color;
 
             dto.CreationUserId = ds.CreationUserName;
             dto.CreationUserName = ds.CreationUserName;
@@ -540,7 +543,7 @@ namespace Sentry.data.Core
             dto.OriginationId = (int)Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode);
             dto.ConfigFileDesc = ds.DatasetFileConfigs?.First()?.Description;
             dto.ConfigFileName = ds.DatasetFileConfigs?.First()?.Name;
-            dto.Delimiter = ds.DatasetFileConfigs?.First()?.Schema?.First()?.Delimiter;
+            dto.Delimiter = ds.DatasetFileConfigs?.First()?.Schemas?.First()?.Delimiter;
             dto.FileExtensionId = ds.DatasetFileConfigs.First().FileExtension.Id;
             dto.DatasetScopeTypeId = ds.DatasetFileConfigs.First().DatasetScopeType.ScopeTypeId;
             dto.CategoryName = ds.DatasetCategories.First().Name;

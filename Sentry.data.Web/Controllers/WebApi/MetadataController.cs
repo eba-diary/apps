@@ -74,7 +74,7 @@ namespace Sentry.data.Web.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.OK,null,typeof(SchemaModel))]
         public async Task<IHttpActionResult> GetBasicMetadataInformationForSchema(int SchemaID)
         {
-            SchemaDTO dto = _configService.GetSchemaDTO(SchemaID);
+            SchemaApiDTO dto = _configService.GetSchemaApiDTO(SchemaID);
             SchemaModel sm = new SchemaModel(dto);
             return Ok(sm);            
         }
@@ -156,9 +156,9 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
 
-            if (config.Schema.Any(x => x.SchemaIsPrimary))
+            if (config.Schemas.Any(x => x.SchemaIsPrimary))
             {
-                DataElement schemarev = config.Schema.FirstOrDefault(x => x.SchemaIsPrimary);
+                DataElement schemarev = config.Schemas.FirstOrDefault(x => x.SchemaIsPrimary);
 
                 if (schemarev.HiveTable != null)
                 {
@@ -203,7 +203,7 @@ namespace Sentry.data.Web.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaDetailModel))]
         public async Task<IHttpActionResult> GetColumnSchemaInformationForSchema(int SchemaID)
         {
-            SchemaDetailDTO dto = _configService.GetSchemaDetailDTO(SchemaID);
+            SchemaDetaiApilDTO dto = _configService.GetSchemaDetailDTO(SchemaID);
             SchemaDetailModel sdm = new SchemaDetailModel(dto);
 
             return Ok(sdm);
@@ -215,25 +215,25 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
-                if (config.Schema.Any())
+                if (config.Schemas.Any())
                 {
-                    var a = config.Schema.ToList();
+                    var a = config.Schemas.ToList();
 
                     DataElement schema = null;
 
                     if (SchemaID != 0)
                     {
-                        schema = config.Schema.Where(x => x.DataElement_ID == SchemaID).FirstOrDefault();
+                        schema = config.Schemas.Where(x => x.DataElement_ID == SchemaID).FirstOrDefault();
                     }
                     else
                     {
-                        if (config.Schema.Any(x => x.SchemaIsPrimary))
+                        if (config.Schemas.Any(x => x.SchemaIsPrimary))
                         {
-                            schema = config.Schema.Where(x => x.SchemaIsPrimary).OrderBy(x => x.SchemaRevision).FirstOrDefault();
+                            schema = config.Schemas.Where(x => x.SchemaIsPrimary).OrderBy(x => x.SchemaRevision).FirstOrDefault();
                         }
                         else
                         {
-                            schema = config.Schema.OrderBy(x => x.SchemaRevision).FirstOrDefault();
+                            schema = config.Schemas.OrderBy(x => x.SchemaRevision).FirstOrDefault();
                         }
                     }
 
