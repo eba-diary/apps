@@ -913,6 +913,7 @@ namespace Sentry.data.Web.Controllers
 
         [HttpGet]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        [Route("Config/SourcesByType/")]
         public JsonResult SourcesByType(string sourceType)
         {
             return Json(DataSourcesByType(sourceType, null), JsonRequestBehavior.AllowGet);
@@ -1159,7 +1160,7 @@ namespace Sentry.data.Web.Controllers
             return output;
         }
 
-
+        [Route("Config/SourceTypeDescription/")]
         public JsonResult SourceTypeDescription(string sourceType)
         {
             var temp = _datasetContext.DataSourceTypes.Where(x => x.DiscrimatorValue == sourceType).Select(x => x.Description).FirstOrDefault();
@@ -1472,9 +1473,9 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        public JsonResult SourceDetails (int sourceId)
+        public JsonResult SourceDetails (int Id)
         {            
-            DataSourceDto dto = _configService.GetDataSourceDto(sourceId);
+            DataSourceDto dto = _configService.GetDataSourceDto(Id);
             DataSourceModel model = new DataSourceModel(dto);
 
             return Json(model, JsonRequestBehavior.AllowGet);
