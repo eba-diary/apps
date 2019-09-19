@@ -361,6 +361,7 @@
     <Compile Include="Models\DataAsset\BaseAssetNotificationModel.cs" />
     <Compile Include="Models\DataAsset\CreateAssetNotificationModel.cs" />
     <Compile Include="Models\DataAsset\EditAssetNotificationModel.cs" />
+    <Compile Include="Models\ApiModels\Datasets\DatasetApiModel.cs" />
     <Compile Include="Models\Dataset\BaseDatasetFileModel.cs" />
     <Compile Include="Models\Dataset\ColumnModel.cs" />
     <Compile Include="Models\Dataset\CreateDataFileModel.cs" />
@@ -1283,6 +1284,7 @@
   <ItemGroup>
     <Folder Include="App_Data\" />
     <Folder Include="Images\Home\" />
+    <Folder Include="Models\Dataset\ApiModels\" />
     <Folder Include="Properties\PublishProfiles\" />
     <Folder Include="Views\ExternalFile\" />
     <Folder Include="Views\Lineage\" />

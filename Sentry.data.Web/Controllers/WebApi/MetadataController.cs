@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using Swashbuckle.Swagger.Annotations;
+using Sentry.data.Web.Models.ApiModels.Datasets;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -19,16 +20,18 @@ namespace Sentry.data.Web.Controllers
         private IAssociateInfoProvider _associateInfoService;
         private UserService _userService;
         private IConfigService _configService;
+        private IDatasetService _datasetService;
 
         public MetadataController(MetadataRepositoryService metadataRepositoryService, IDatasetContext dsContext, 
                                 IAssociateInfoProvider associateInfoService, UserService userService,
-                                IConfigService configService)
+                                IConfigService configService, IDatasetService datasetService)
         {
             _metadataRepositoryService = metadataRepositoryService;
             _dsContext = dsContext;
             _associateInfoService = associateInfoService;
             _userService = userService;
             _configService = configService;
+            _datasetService = datasetService;
         }
 
         public class OutputSchema
@@ -79,6 +82,48 @@ namespace Sentry.data.Web.Controllers
             return Ok(sm);            
         }
 
+        /// <summary>
+        /// List of all datasets
+        /// </summary>
+        /// <param name="DatasetConfigID"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("dataset")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<DatasetInfoApiModel>))]
+        public async Task<IHttpActionResult> GetDatasets()
+        {
+            try
+            {
+                List<DatasetDto> dtoList = new List<DatasetDto>();
+                foreach (Dataset ds in _dsContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET && w.CanDisplay))
+                {
+                    dtoList.Add(_datasetService.GetDatasetDto(ds.DatasetId));
+                }
+                List<DatasetInfoApiModel> modelList = dtoList.ToApiModel();
+                return Ok(modelList);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }            
+        }
+
+        [HttpGet]
+        [Route("dataset/{datasetId}")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<DatasetInfoApiModel>))]
+        public async Task<IHttpActionResult> GetDatasetDetail(int datasetId)
+        {
+            try
+            {
+                DatasetDetailApiModel model = _datasetService.GetDatasetDto(datasetId);                
+
+                return Ok(model);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
+        }
         /// <summary>
         /// gets dataset metadata
         /// </summary>

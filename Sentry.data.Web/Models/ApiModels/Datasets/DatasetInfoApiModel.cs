@@ -1,0 +1,18 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Sentry.data.Web.Models.ApiModels.Datasets
+{
+    public class DatasetInfoApiModel
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public bool IsSecure { get; set; }
+        public string PrimaryContactName { get; set; }
+        public string PrimarContactEmail { get; set; }
+        public string PrimaryOwnerName { get; set; }
+    }
+}
