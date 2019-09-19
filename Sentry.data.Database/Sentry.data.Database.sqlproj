@@ -217,6 +217,8 @@
     <Build Include="Tables\RetrieverJobs\AuthenticationClaims.sql" />
     <Build Include="Tables\DatasetFileReply.sql" />
     <Build Include="Tables\Schema\Schema.sql" />
+    <Build Include="Tables\Schema\SchemaRevision.sql" />
+    <Build Include="Tables\Schema\SchemaField.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

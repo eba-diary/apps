@@ -2,15 +2,15 @@
 {
     public class VarcharField : BaseField, ISchemaField
     {
-        public override SchemaDatatypes Type
+        public override SchemaDatatypes FieldType
         {
             get
             {
                 return SchemaDatatypes.VARCHAR;
             }
-            set => Type = SchemaDatatypes.VARCHAR;
+            set => FieldType = SchemaDatatypes.VARCHAR;
         }
 
-        public int FieldLength { get; set; }
+        public virtual int FieldLength { get; set; }
     }
 }

@@ -2,13 +2,13 @@
 {
     public class StructField : BaseField, ISchemaField
     {
-        public override SchemaDatatypes Type
+        public override SchemaDatatypes FieldType
         {
             get
             {
                 return SchemaDatatypes.STRUCT;
             }
-            set => Type = SchemaDatatypes.STRUCT;
+            set => FieldType = SchemaDatatypes.STRUCT;
         }
     }
 }

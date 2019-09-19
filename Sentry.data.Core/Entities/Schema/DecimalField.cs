@@ -2,16 +2,16 @@
 {
     public class DecimalField : BaseField, ISchemaField
     {
-        public override SchemaDatatypes Type
+        public override SchemaDatatypes FieldType
         {
             get
             {
                 return SchemaDatatypes.DECIMAL;
             }
-            set => Type = SchemaDatatypes.DECIMAL;
+            set => FieldType = SchemaDatatypes.DECIMAL;
         }
         
-        public int Precision { get; set; }
-        public int Scale { get; set; }
+        public virtual int Precision { get; set; }
+        public virtual int Scale { get; set; }
     }
 }

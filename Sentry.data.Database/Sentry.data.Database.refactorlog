@@ -798,4 +798,39 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="IsSchemaTracked" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="767982d2-b3dd-473a-94aa-669f934c834b" ChangeDateTime="09/18/2019 20:12:54">
+    <Property Name="ElementName" Value="[dbo].[SchemaRevision].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SchemaRevision]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Revision_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="cdb3ede0-c93b-45ca-9863-4adbbe1d9d51" ChangeDateTime="09/19/2019 04:01:29">
+    <Property Name="ElementName" Value="[dbo].[SchemaField].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SchemaField]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Field_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="20d7c51c-5d38-4992-9246-ce1a4f994dbb" ChangeDateTime="09/19/2019 04:10:15">
+    <Property Name="ElementName" Value="[dbo].[SchemaField].[ParentFieldId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SchemaField]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ParentField" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="e90b9bab-e409-43c6-b1b3-f9e409ffaada" ChangeDateTime="09/19/2019 14:19:23">
+    <Property Name="ElementName" Value="[dbo].[SchemaRevision].[Revision_Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SchemaRevision]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SchemaRevision_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="bbffe80c-642a-4ee7-9171-296be952e974" ChangeDateTime="09/19/2019 14:20:57">
+    <Property Name="ElementName" Value="[dbo].[SchemaField].[ParentSchema]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SchemaField]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[ParentSchemaRevision]" />
+  </Operation>
 </Operations>

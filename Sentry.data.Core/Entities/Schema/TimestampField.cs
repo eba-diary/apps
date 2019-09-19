@@ -2,14 +2,14 @@
 {
     public class TimestampField : BaseField, ISchemaField
     {
-        public override SchemaDatatypes Type
+        public override SchemaDatatypes FieldType
         {
             get
             {
                 return SchemaDatatypes.TIMESTAMP;
             }
-            set => Type = SchemaDatatypes.TIMESTAMP;
+            set => FieldType = SchemaDatatypes.TIMESTAMP;
         }
-        public string SourceFormat { get; set; }
+        public virtual string SourceFormat { get; set; }
     }
 }

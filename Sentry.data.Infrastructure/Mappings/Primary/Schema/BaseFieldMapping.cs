@@ -13,7 +13,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             Id(x => x.FieldId, m =>
             {
                 m.Column("Field_Id");
-                m.Generator(Generators.GuidComb);
+                m.Generator(Generators.Identity);
             });
 
             Property((x) => x.Name, (m) => m.Column("Field_NME"));
@@ -24,7 +24,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             Property((x) => x.CreateDTM, (m) => m.Column("CreateDTM"));
             Property((x) => x.LastUpdateDTM, (m) => m.Column("LastUpdateDTM"));
             Property((x) => x.NullableIndicator, (m) => m.Column("NullableIndicator"));
-            Property((x) => x.Type, (m) => m.Column("Type"));
+            Discriminator(x => x.Column("Type"));
 
             ManyToOne((x) => x.ParentField, (m) =>
             {
@@ -39,6 +39,71 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 c.Access(Accessor.Field);
             },
             (m) => m.OneToMany());
+
+            this.ManyToOne(x => x.ParentSchemaRevision, m =>
+            {
+                m.Column("ParentSchemaRevision");
+                m.ForeignKey("FK_SchemaField_SchemaRevision");
+                //m.Cascade(Cascade.All);
+                m.Class(typeof(SchemaRevision));
+            });
+        }
+
+        public class StructFieldMapping : SubclassMapping<StructField>
+        {
+            public StructFieldMapping()
+            {
+                DiscriminatorValue("STRUCT");
+            }
+        }
+
+        public class IntegerFieldMapping : SubclassMapping<IntegerField>
+        {
+            public IntegerFieldMapping()
+            {
+                DiscriminatorValue("INTEGER");
+            }
+        }
+
+        public class DecimalFieldMapping : SubclassMapping<DecimalField>
+        {
+            public DecimalFieldMapping()
+            {
+                DiscriminatorValue("DECIMAL");
+
+                Property(x => x.Precision, m => m.Column("Precision"));
+                Property(x => x.Scale, m => m.Column("Scale"));
+            }
+        }
+
+        public class DateFieldMapping : SubclassMapping<DateField>
+        {
+            public DateFieldMapping()
+            {
+                DiscriminatorValue("DATE");
+
+                Property(x => x.SourceFormat, m => m.Column("SourceFormat"));
+            }
+        }
+
+        public class TimestampFieldMapping : SubclassMapping<TimestampField>
+        {
+            public TimestampFieldMapping()
+            {
+                DiscriminatorValue("TIMESTAMP");
+
+                Property(x => x.SourceFormat, m => m.Column("SourceFormat"));
+            }
+        }
+
+        public class VarcharFieldMapping : SubclassMapping<VarcharField>
+        {
+            public VarcharFieldMapping()
+            {
+                DiscriminatorValue("VARCHAR");
+
+                Property(x => x.FieldLength, m => m.Column("FieldLength"));
+            }
         }
     }
 }

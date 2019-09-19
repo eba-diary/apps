@@ -2,15 +2,15 @@
 {
     public class DateField : BaseField, ISchemaField
     {
-        public override SchemaDatatypes Type
+        public override SchemaDatatypes FieldType
         {
             get
             {
                 return SchemaDatatypes.DATE;
             }
-            set => Type = SchemaDatatypes.DATE;
+            set => FieldType = SchemaDatatypes.DATE;
         }
         
-        public string SourceFormat { get; set; }
+        public virtual string SourceFormat { get; set; }
     }
 }

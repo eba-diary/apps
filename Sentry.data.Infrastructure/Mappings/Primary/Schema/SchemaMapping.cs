@@ -21,16 +21,18 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             Property(x => x.CreatedBy, m => m.Column("CreatedBy"));
             Property(x => x.CreatedDTM, m => m.Column("Created_DTM"));
             Property(x => x.LastUpdatedDTM, m => m.Column("LastUpdatd_DTM"));
-            //Bag(x => x.Revisions, (m) =>
-            //{
-            //    m.Inverse(true);
-            //    m.Table("SchemaRevision");
-            //    m.Cascade(Cascade.All);
-            //    m.Key((k) =>
-            //    {
-            //        k.Column("Revision_Id");
-            //    });
-            //}, map => map.OneToMany(a => a.Class(typeof(SchemaRevision))));
+            this.Bag((x) => x.Revisions, (m) =>
+            {
+                m.Inverse(true);
+                m.Table("SchemaRevision");
+                m.Cascade(Cascade.All);
+                m.Cache(c => c.Usage(CacheUsage.ReadWrite));
+                m.Key((k) =>
+                {
+                    k.Column("ParentSchema_Id");
+                    k.ForeignKey("FK_SchemaRevision_Schema");
+                });
+            }, map => map.OneToMany(a => a.Class(typeof(SchemaRevision))));
         }
 
         public class FileSchemaMapping : SubclassMapping<FileSchema>

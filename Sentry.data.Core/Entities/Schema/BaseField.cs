@@ -9,7 +9,7 @@ namespace Sentry.data.Core
         private IList<BaseField> _childFields = new List<BaseField>();
 
 
-        public virtual Guid FieldId { get; set; }
+        public virtual int FieldId { get; set; }
         public virtual string Name { get; set; }
         public virtual BaseField ParentField
         {
@@ -46,8 +46,9 @@ namespace Sentry.data.Core
                 return _childFields;
             }
         }
+        public virtual SchemaRevision ParentSchemaRevision { get; set; }
 
         //abstract properties
-        public abstract SchemaDatatypes Type { get; set; }
+        public abstract SchemaDatatypes FieldType { get; set; }
     }
 }

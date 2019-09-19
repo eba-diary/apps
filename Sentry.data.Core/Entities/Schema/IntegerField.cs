@@ -2,13 +2,13 @@
 {
     public class IntegerField : BaseField, ISchemaField
     {
-        public override SchemaDatatypes Type
+        public override SchemaDatatypes FieldType
         {
             get
             {
                 return SchemaDatatypes.INTEGER;
             }
-            set => Type = SchemaDatatypes.INTEGER;
+            set => FieldType = SchemaDatatypes.INTEGER;
         }
     }
 }

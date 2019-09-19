@@ -391,6 +391,91 @@ namespace Sentry.data.Core
         public void UpdateFields(int configId, int schemaId, List<SchemaRow> schemaRows)
         {
             DatasetFileConfig config = _datasetContext.GetById<DatasetFileConfig>(configId);
+
+            try
+            {
+                SchemaRevision revision = new SchemaRevision()
+                {
+                    SchemaRevision_Name = "Another Revision " + (config.Schema.Revisions.Count() + 1).ToString(),
+                    CreatedBy = _userService.GetCurrentUser().AssociateId
+                };
+
+                foreach (var row in schemaRows)
+                {
+                    switch (row.DataType.ToUpper())
+                    {
+                        case "INTEGER":
+                            revision.Fields.Add(new IntegerField() {
+                                Name = row.Name,
+                                CreateDTM = DateTime.Now,
+                                LastUpdateDTM = DateTime.Now,
+                                ParentSchemaRevision = revision
+                            });                            
+                            break;
+                        case "DECIMAL":
+                            revision.Fields.Add(new DecimalField()
+                            {
+                                Name = row.Name,
+                                CreateDTM = DateTime.Now,
+                                LastUpdateDTM = DateTime.Now,
+                                ParentSchemaRevision = revision,
+                                Precision = Int32.Parse(row.Precision),
+                                Scale = Int32.Parse(row.Scale)
+                            });
+                            break;
+                        case "VARCHAR":
+                            revision.Fields.Add(new VarcharField()
+                            {
+                                Name = row.Name,
+                                CreateDTM = DateTime.Now,
+                                LastUpdateDTM = DateTime.Now,
+                                ParentSchemaRevision = revision
+                            });
+                            break;
+                        case "DATE":
+                            revision.Fields.Add(new DateField()
+                            {
+                                Name = row.Name,
+                                CreateDTM = DateTime.Now,
+                                LastUpdateDTM = DateTime.Now,
+                                ParentSchemaRevision = revision
+                            });
+                            break;
+                        case "TIMESTAMP":
+                            revision.Fields.Add(new TimestampField()
+                            {
+                                Name = row.Name,
+                                CreateDTM = DateTime.Now,
+                                LastUpdateDTM = DateTime.Now,
+                                ParentSchemaRevision = revision
+                            });
+                            break;
+                        case "STRUCT":
+                            revision.Fields.Add(new StructField()
+                            {
+                                Name = row.Name,
+                                CreateDTM = DateTime.Now,
+                                LastUpdateDTM = DateTime.Now,
+                                ParentSchemaRevision = revision
+                            });
+                            break;
+                        case "BIGINT":
+                        default:
+                            Logger.Info($"updatefields - datatype not supported ({row.DataType.ToUpper()})");
+                            break;
+                    }
+                }
+
+                config.Schema.AddRevision(revision);
+                _datasetContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("configservice_updatefields - add new revision failed", ex);
+            }
+            
+
+
             DataElement schema = _datasetContext.GetById<DataElement>(schemaId);
             DataElement newRevision = null;
             DataObject DOBJ = null;

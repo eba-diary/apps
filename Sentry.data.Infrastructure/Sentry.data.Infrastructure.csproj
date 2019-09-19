@@ -211,6 +211,7 @@
     <Compile Include="Mappings\Primary\Retriever\SubmissionMapping.cs" />
     <Compile Include="Mappings\Primary\Schema\BaseFieldMapping.cs" />
     <Compile Include="Mappings\Primary\Schema\SchemaMapping.cs" />
+    <Compile Include="Mappings\Primary\Schema\SchemaRevisionMapping.cs" />
     <Compile Include="Mappings\Primary\Security\PermissionMapping.cs" />
     <Compile Include="Mappings\Primary\Security\SecurityMapping.cs" />
     <Compile Include="Mappings\Primary\Security\SecurityPermissionMapping.cs" />
