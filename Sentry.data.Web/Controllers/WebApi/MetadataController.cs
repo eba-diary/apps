@@ -115,9 +115,9 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
-                DatasetDetailApiModel model = _datasetService.GetDatasetDto(datasetId);                
+                //DatasetDetailApiModel model = _datasetService.GetDatasetDto(datasetId);                
 
-                return Ok(model);
+                return Ok();
             }
             catch (Exception ex)
             {

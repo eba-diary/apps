@@ -361,7 +361,7 @@
     <Compile Include="Models\DataAsset\BaseAssetNotificationModel.cs" />
     <Compile Include="Models\DataAsset\CreateAssetNotificationModel.cs" />
     <Compile Include="Models\DataAsset\EditAssetNotificationModel.cs" />
-    <Compile Include="Models\ApiModels\Datasets\DatasetApiModel.cs" />
+    <Compile Include="Models\ApiModels\Datasets\DatasetInfoApiModel.cs" />
     <Compile Include="Models\Dataset\BaseDatasetFileModel.cs" />
     <Compile Include="Models\Dataset\ColumnModel.cs" />
     <Compile Include="Models\Dataset\CreateDataFileModel.cs" />
