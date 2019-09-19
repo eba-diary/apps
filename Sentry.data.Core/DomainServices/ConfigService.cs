@@ -444,6 +444,7 @@ namespace Sentry.data.Core
                             DataObjectField_NME = sr.Name,
                             DataObjectField_DSC = sr.Description,
                             OrdinalPosition = sr.Position.ToString(),
+                            FieldFormat = sr.Format,
                             LastUpdt_DTM = DateTime.Now,
                             DataObjectFieldChange_DTM = DateTime.Now
                         };
