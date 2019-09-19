@@ -1504,5 +1504,47 @@ namespace Sentry.data.Web.Controllers
                 return PartialView("_Success", new SuccessModel("Data Source access was successfully requested.", "HPSM Change Id: " + ticketId, true));
             }
         }
+
+        [HttpGet]
+        [Route("Config/GetDatatypesByFileExtension/{id}")]
+        public JsonResult GetDatatypesByFileExtension(int id)
+        {
+            FileExtension fe = _datasetContext.GetById<FileExtension>(id);
+            ValidDatatypesModel model = new ValidDatatypesModel();
+            model.FileExtension = fe;
+            switch (fe.Name)
+            {
+                case "CSV":
+                    model.IsPositional = true;
+                    model.IsFixedWidth = false;
+                    break;
+                case "ANY":
+                case "DELIMITED":
+                case "TXT":
+                    model.IsPositional = false;
+                    model.IsFixedWidth = false;
+                    break;
+                case "FIXEDWIDTH":
+                    model.IsFixedWidth = true;
+                    break;
+                case "JSON":
+                    model.IsPositional = false;
+                    model.IsFixedWidth = false;
+                    //model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.STRUCT, "A struct", "Complex Data Types"));
+                    break;
+                default:
+                    break;
+            }
+
+            //Common datatypes across all FileExtensions
+            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.VARCHAR, "A varying-length character string.", "String Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.INTEGER, "A signed four-byte integer.", "Numeric Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.BIGINT, "A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807.", "Numeric Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.DECIMAL, "A fixed-point decimal number, with 38 digits precision.", "Numeric Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.DATE, "An ANSI SQL date type. YYYY-MM-DD", "Date Time Data Types"));
+            model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.TIMESTAMP, "A UNIX timestamp with optional nanosecond precision. YYYY-MM-DD HH:MM:SS.sss", "Date Time Data Types"));
+
+            return Json(model, JsonRequestBehavior.AllowGet);
+        }
     }
 }

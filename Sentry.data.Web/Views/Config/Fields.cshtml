@@ -159,7 +159,6 @@
 {
     @Html.AntiForgeryToken()
     <h2 class="@color">Fields for @schema.SchemaName</h2>
-    <hr />
 
     @Html.ValidationSummary(false, "", new { @class = "text-danger" })
 
@@ -184,9 +183,9 @@
             </li>
         </ul>
 
-        <div id="tablePanel" class="col-lg-12">
-            <div class="rules-group-container row" id="tableSelection" data-bind="template: {name: 'RowTemplate' , foreach: Rows}">
-            </div>
+        <div id="tablePanel" class="col-lg-12 fields-wrapper">
+            <ul class="rules-group-container row fields-sortable-ul" id="fields" data-bind="template: {name: 'RowTemplate' , foreach: SortedRows}, css: SortableRows()">
+            </ul>
         </div>
 
 
@@ -194,18 +193,7 @@
 
             <hr />
 
-            <button type="button" class="btn btn-sm btn-success" data-bind='click: addRow' style="margin-bottom: 8px;"><i class="glyphicon glyphicon-plus"></i> Add a Field</button>
-            <span style="
-                font-size: 25px;
-                color: lightgray;
-                line-height: 2;
-            ">|</span>
-            <span>
-                <label for="checkForErrors">Check for Errors</label>
-                <span>
-                    <input id="checkForErrors" type="checkbox" data-bind="checked: checkForErrors" />
-                </span>
-            </span>
+            <button type="button" class="btn btn-sm btn-success" data-bind='click: addRow' style="margin-bottom: 8px;"><i class="glyphicon glyphicon-plus"></i> Add a Field</button>          
             <hr />
             <button class="btn btn-success" id="saveBtn" data-bind='click: save'>Save</button>
             <div id="buttonSpinner" style="
@@ -222,187 +210,136 @@
     </div>
 
     <script type="text/html" id="RowTemplate">
-        <div class="col-lg-12 parentContainer">
+        <li class="col-lg-12 parentContainer ui-sortable-handle" data-bind="css: $parent.ClickableRows(), style : { 'background-color' : RowColor }">
             <div class="row">
-                <div data-bind="style : { 'background-color' : RowColor }" style="padding: 2px">
-                    <h6 style="float: left; margin-right: 6px; line-height: 0.5; width: 15px;" data-bind="text: Id"></h6>
-                    <input class="col-lg-3 rowFieldName" data-bind="value: Name" placeholder="Field Name..." />
-                    <input class="col-lg-3" data-bind="value: Description" placeholder="Description..." />
-                    <select class="typeSelect" data-bind="value: DataType">
-                        <optgroup label="Numeric Data Types">
-                            <option title="A signed one-byte integer, from -128 to 127." value="TINYINT">
-                                TINYINT
-                            </option>
-                            <option title="A signed two-byte integer, from -32,768 to 32,767." value="SMALLINT">
-                                SMALLINT
-                            </option>
-                            <option title="A signed four-byte integer." value="INTEGER">
-                                INTEGER
-                            </option>
-                            <option title="A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807." value="BIGINT">
-                                BIGINT
-                            </option>
-                            <option title="A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807." value="LONG">
-                                LONG
-                            </option>
-                            <option title="A four-byte, single-precision floating-point number." value="FLOAT">
-                                FLOAT
-                            </option>
-                            <option title="An eight-byte, double-precision floating-point number." value="DOUBLE">
-                                DOUBLE
-                            </option>
-                            <option title="A fixed-point decimal number, with 38 digits precision." value="DECIMAL">
-                                DECIMAL
-                            </option>
-                        </optgroup>
-
-                        <optgroup label="String Data Types">
-                            <option title="A variable-length character string." value="STRING">
-                                STRING
-                            </option>
-                            <option title="A varying-length character string." value="VARCHAR">
-                                VARCHAR
-                            </option>
-                            <option title="A character string up to 255 characters." value="CHAR">
-                                CHAR
-                            </option>
-                        </optgroup>
-
-                        <optgroup label="Date/Time Data Types">
-                            <option title="An ANSI SQL date type. YYYY-MM-DD" value="DATE">
-                                DATE
-                            </option>
-                            <option title="A UNIX timestamp with optional nanosecond precision. YYYY-MM-DD HH:MM:SS.sss" value="TIMESTAMP">
-                                TIMESTAMP
-                            </option>
-                        </optgroup>
-
-                        <optgroup label="Misc. Data Types">
-                            <option title="A textual true or false value." value="BOOLEAN">
-                                BOOLEAN
-                            </option>
-                            <option title="A varying length binary string." value="BINARY">
-                                BINARY
-                            </option>
-                        </optgroup>
-
-                        @*<optgroup label="Complex Data Types">
-                            <option title="A complex data type that can represent an arbitrary number of ordered elements." value="ARRAY" disabled="disabled">
-                                ARRAY
-                            </option>
-                            <option title="A complex data type, representing multiple fields of a single item." value="STRUCT" disabled="disabled">
-                                STRUCT
-                            </option>
-                        </optgroup>*@
-                    </select>
+                <div style="padding: 2px">
+                    <h6 style="float: left; margin-right: 6px; line-height: 0.5; width: 15px;" data-bind="text: Position"></h6>
+                    <div class="col-lg-2">
+                        <input class="col-lg-12 rowFieldName" data-bind="value: Name" placeholder="Field Name..."  data-toggle="tooltip" data-placement="top" title="Field Name" />
+                    </div>                    
+                    <div class="col-lg-3">
+                        <input class="col-lg-12" data-bind="value: Description" placeholder="Description..." data-toggle="tooltip" data-placement="top" title="Description" />
+                    </div>                    
+                    <div class="col-lg-2">
+                        <select class="typeSelect col-lg-12" data-bind="options: $parent.DataTypes, optionsCaption: 'Choose Datatype', optionsValue: 'Name', optionsText: 'Name', optionsAfterRender: $parent.setTagGroup, value: DataType"></select>
+                        <input type="hidden" name="dataObjectField_Id" data-bind="value: DataObjectField_ID"  data-toggle="tooltip" data-placement="top" title="Data Type Selection" />
+                    </div>
+                    
 
 
 
-                    <div class="optionContainer">
-                        <div class="arrayTypeSelect" data-bind="visible: ShowArrayType">
-                            <select class="arrayTypeSelect" data-bind="value: ArrayType">
-                                <optgroup label="Numeric Data Types">
-                                    <option title="A signed one-byte integer, from -128 to 127." value="TINYINT">
-                                        TINYINT
-                                    </option>
-                                    <option title="A signed two-byte integer, from -32,768 to 32,767." value="SMALLINT">
-                                        SMALLINT
-                                    </option>
-                                    <option title="A signed four-byte integer." value="INTEGER">
-                                        INTEGER
-                                    </option>
-                                    <option title="A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807." value="BIGINT">
-                                        BIGINT
-                                    </option>
-                                    <option title="A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807." value="LONG">
-                                        LONG
-                                    </option>
-                                    <option title="A four-byte, single-precision floating-point number." value="FLOAT">
-                                        FLOAT
-                                    </option>
-                                    <option title="An eight-byte, double-precision floating-point number." value="DOUBLE">
-                                        DOUBLE
-                                    </option>
-                                    <option title="A fixed-point decimal number, with 38 digits precision." value="DECIMAL">
-                                        DECIMAL
-                                    </option>
-                                </optgroup>
+                    @*<div class="optionContainer">
+            <div class="arrayTypeSelect" data-bind="visible: ShowArrayType">
+                <select class="arrayTypeSelect" data-bind="value: ArrayType">
+                    <optgroup label="Numeric Data Types">
+                        <option title="A signed one-byte integer, from -128 to 127." value="TINYINT">
+                            TINYINT
+                        </option>
+                        <option title="A signed two-byte integer, from -32,768 to 32,767." value="SMALLINT">
+                            SMALLINT
+                        </option>
+                        <option title="A signed four-byte integer." value="INTEGER">
+                            INTEGER
+                        </option>
+                        <option title="A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807." value="BIGINT">
+                            BIGINT
+                        </option>
+                        <option title="A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807." value="LONG">
+                            LONG
+                        </option>
+                        <option title="A four-byte, single-precision floating-point number." value="FLOAT">
+                            FLOAT
+                        </option>
+                        <option title="An eight-byte, double-precision floating-point number." value="DOUBLE">
+                            DOUBLE
+                        </option>
+                        <option title="A fixed-point decimal number, with 38 digits precision." value="DECIMAL">
+                            DECIMAL
+                        </option>
+                    </optgroup>
 
-                                <optgroup label="String Data Types">
-                                    <option title="A variable-length character string." value="STRING">
-                                        STRING
-                                    </option>
-                                    <option title="A varying-length character string." value="VARCHAR">
-                                        VARCHAR
-                                    </option>
-                                    <option title="A character string up to 255 characters." value="CHAR">
-                                        CHAR
-                                    </option>
-                                </optgroup>
+                    <optgroup label="String Data Types">
+                        <option title="A variable-length character string." value="STRING">
+                            STRING
+                        </option>
+                        <option title="A varying-length character string." value="VARCHAR">
+                            VARCHAR
+                        </option>
+                        <option title="A character string up to 255 characters." value="CHAR">
+                            CHAR
+                        </option>
+                    </optgroup>
 
-                                <optgroup label="Date/Time Data Types">
-                                    <option title="An ANSI SQL date type. YYYY-MM-DD" value="DATE">
-                                        DATE
-                                    </option>
-                                    <option title="A UNIX timestamp with optional nanosecond precision. YYYY-MM-DD HH:MM:SS.sss" value="TIMESTAMP">
-                                        TIMESTAMP
-                                    </option>
-                                </optgroup>
+                    <optgroup label="Date/Time Data Types">
+                        <option title="An ANSI SQL date type. YYYY-MM-DD" value="DATE">
+                            DATE
+                        </option>
+                        <option title="A UNIX timestamp with optional nanosecond precision. YYYY-MM-DD HH:MM:SS.sss" value="TIMESTAMP">
+                            TIMESTAMP
+                        </option>
+                    </optgroup>
 
-                                <optgroup label="Misc. Data Types">
-                                    <option title="A textual true or false value." value="BOOLEAN">
-                                        BOOLEAN
-                                    </option>
-                                    <option title="A varying length binary string." value="BINARY">
-                                        BINARY
-                                    </option>
-                                </optgroup>
+                    <optgroup label="Misc. Data Types">
+                        <option title="A textual true or false value." value="BOOLEAN">
+                            BOOLEAN
+                        </option>
+                        <option title="A varying length binary string." value="BINARY">
+                            BINARY
+                        </option>
+                    </optgroup>
 
-                                <optgroup label="Complex Data Types">
-                                    <option title="A complex data type that can represent an arbitrary number of ordered elements." value="ARRAY" disabled="disabled">
-                                        ARRAY
-                                    </option>
-                                    <option title="A complex data type, representing multiple fields of a single item." value="STRUCT" disabled="disabled">
-                                        STRUCT
-                                    </option>
-                                </optgroup>
-                            </select>
+                    <optgroup label="Complex Data Types">
+                        <option title="A complex data type that can represent an arbitrary number of ordered elements." value="ARRAY" disabled="disabled">
+                            ARRAY
+                        </option>
+                        <option title="A complex data type, representing multiple fields of a single item." value="STRUCT" disabled="disabled">
+                            STRUCT
+                        </option>
+                    </optgroup>
+                </select>
 
+            </div>
+        </div>*@
+                    <div class="showPandS col-lg-2" data-bind="visible: ShowPandS">
+                        <div class="precisionContainer col-lg-6">
+                            <input class="precision col-lg-12" data-bind="value: Precision" type="number" min="1" max="38" placeholder="Prec" data-toggle="tooltip" data-placement="top" title="Precision" />
                         </div>
+                        <div class="scaleContainer col-lg-6">
+                            <input class="scale col-lg-12" data-bind="value: Scale" type="number" min="1" max="38" placeholder="Scale" data-toggle="tooltip" data-placement="top" title="Scale"/>
+                        </div>                        
+                    </div>
+                    <div class="showDateFormat col-lg-3" data-bind="visible: ShowDateFormat">
+                        <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Format" data-toggle="tooltip" data-placement="top" title="Format" />
+                    </div>
 
-                        <div class="showPandS" data-bind="visible: ShowPandS">
-                            <input class="precision" data-bind="value: Precision" type="number" min="1" placeholder="Precision" />
-                            <input class="scale" data-bind="value: Scale" type="number" min="1" placeholder="Scale" />
+                    <div class="options col-lg-1">
+                        <button class="rightButton" data-bind='click: addChild, visible: ShowAddChild'>Add a Child</button>
+
+                        <div class="rightButton" data-bind="visible: $parent.Name === undefined">
+
+                            <button type="button" class="btn btn-xs btn-danger" data-bind='click: $parent.removeRow'>
+                                <i class="glyphicon glyphicon-remove"></i>
+                                Delete
+                            </button>
                         </div>
-
-                        <div class="options">
-                            <button class="rightButton" data-bind='click: addChild, visible: ShowAddChild'>Add a Child</button>
-
-                            <div class="rightButton" data-bind="visible: $parent.Name === undefined">
-
-                                <button type="button" class="btn btn-xs btn-danger" data-bind='click: $root.removeRow'>
-                                    <i class="glyphicon glyphicon-remove"></i>
-                                    Delete
-                                </button>
-                            </div>
-                            <div class="rightButton" data-bind="visible: $parent.Name !== undefined">
-                                <button type="button" class="btn btn-xs btn-danger" data-bind='click: $parent.removeChild'>
-                                    <i class="glyphicon glyphicon-remove"></i>
-                                    Delete
-                                </button>
-                            </div>
+                        <div class="rightButton" data-bind="visible: $parent.Name !== undefined">
+                            <button type="button" class="btn btn-xs btn-danger" data-bind='click: $parent.removeChild'>
+                                <i class="glyphicon glyphicon-remove"></i>
+                                Delete
+                            </button>
                         </div>
                     </div>
                 </div>
+
                 <div class="childrenContainer" data-bind="template: {name: 'RowTemplate' , foreach: ChildRows}"></div>
+
             </div>
-        </div>
+        </li>
     </script>
 }
 
 <style>
     .parentContainer {
-        margin-top: 10px;
         background-color: rgba(0,0,0,0.05);
         padding: 5px;
         padding-left: 20px;
@@ -414,7 +351,7 @@
     }
 
     .typeSelect {
-        width: 100px;
+        width: auto;
         height: 26px;
         padding-left: 10px;
     }
@@ -425,7 +362,7 @@
 
     .arrayTypeSelect {
         display: inline;
-        width: 100px;
+        width: auto;
         height: 26px;
         padding-left: 10px;
     }
@@ -446,12 +383,20 @@
         display: inline;
     }
 
+    .precisionContainer {
+        padding-left: 0px;
+    }
+
+    .scaleContainer {
+        padding-left: 0px;
+    }
+
     .precision {
-        width: 80px;
+        padding-right: 0px;
     }
 
     .scale {
-        width: 60px;
+        padding-right: 0px;
     }
 </style>
 
@@ -459,6 +404,7 @@
 @section Scripts {
 
     <script>
+        data.Fields.Init();
 
         var currentMax = 0;
         var errorList = [];
@@ -467,7 +413,12 @@
             var self = this;
             var parent = parent;
 
-            self.Id = ko.observable(id);
+            if (indata.Position != undefined && indata.Position !== 0) {
+                self.Position = ko.observable(indata.Position);
+            }
+            else {
+                self.Position = ko.observable(id);
+            }            
             self.DataObjectField_ID = ko.observable(indata.DataObjectField_ID);
             self.Name = ko.observable(indata.Name).extend({ notify: 'always' });
             self.Description = ko.observable(indata.Description);
@@ -475,47 +426,57 @@
             self.ArrayType = ko.observable(indata.ArrayType);
             self.Precision = ko.observable(indata.Precision);
             self.Scale = ko.observable(indata.Scale);
+            self.Format = ko.observable(indata.Format);
+            self.DeleteInd = ko.observable(false);
 
             self.RowColor = ko.computed(function () {
                 var hasError = false;
 
-                if (parent.Errors !== undefined) {
-                    parent.Errors.remove(function (item) { return item.Id === self.Id() && item.ErrorType == 'Type'; });
-                    parent.Errors.remove(function (item) { return item.Id === self.Id() && item.ErrorType == 'Name'; });                    
+                if (parent.Errors !== undefined && parent.Errors().length > 0) {
+                    parent.Errors.remove(function (item) {
+                        if (item.Id === self.Position() && item.ErrorType == 'Type') {
+                            return item;
+                        }
+                    });
+                    parent.Errors.remove(function (item) {
+                        if (item.Id === self.Position() && item.ErrorType == 'Name') {
+                            return item;
+                        }
+                    });                    
                 }
 
                 //Has no children.  Error
                 if ((self.DataType() === 'STRUCT' || (self.DataType() === 'ARRAY' && self.ArrayType() === 'STRUCT')) && self.ChildRows !== undefined && self.ChildRows().length === 0) {
-                    parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Type', 'Description': ' has no children.  Please add a child or change data types.' });
+                    parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has no children.  Please add a child or change data types.' });
                     hasError = true;
                 }
                 //Has children when it shouldn't
                 else if (self.DataType() === 'ARRAY' && self.ArrayType() !== "STRUCT" && self.ChildRows !== undefined && self.ChildRows().length > 0) {
-                    parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to ARRAY<STRUCT>.' });
+                    parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to ARRAY<STRUCT>.' });
                     hasError = true;
                 }
                 //Has children when it shouldn't
                 else if (self.DataType() !== 'STRUCT' && (self.DataType() !== 'ARRAY' && self.ArrayType() !== "STRUCT") && self.ChildRows !== undefined && self.ChildRows().length > 0) {
-                    parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to STRUCT.' });
+                    parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to STRUCT.' });
                     hasError = true;
                 }
                 //Name is blank
-                if (parent.checkForErrors && (self.Name() === '' || self.Name() === undefined || self.Name() === null)) {
-                    parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Name', 'Description': ' has no name.' });
+                if (self.Name() === '' || self.Name() === undefined || self.Name() === null) {
+                    parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' has no name.' });
                     hasError = true;
                 }
 
                 if (self.Name() !== undefined && self.Name() !== '' && self.Name() !== null) {
                     //Name contains spaces
                     if (self.Name().indexOf(' ') >= 0) {
-                        parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Name', 'Description': ' Name cannot contain Spaces.' });
+                        parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot contain Spaces.' });
                         hasError = true;
                     }
 
                     //Name contains special characters
                     var pattchar = new RegExp("[-:,;{}()]");
                     if (pattchar.test(self.Name())) {
-                        parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Name', 'Description': ' Name cannot special characters (-:,;{}()).' });
+                        parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot special characters (-:,;{}()).' });
                         hasError = true;
                     }
 
@@ -523,7 +484,7 @@
                     var pattupper = new RegExp("[A-Z]");
                     //var nme = self.Name();
                     if (pattupper.test(self.Name())) {
-                        parent.Errors.push({ 'Id': self.Id(), 'ErrorType': 'Name', 'Description': ' Name cannot uppercase letters.' });
+                        parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot uppercase letters.' });
                         hasError = true;
                     }
                 }
@@ -542,7 +503,6 @@
 
             });
 
-
             self.ShowPandS = ko.computed(function () {
                 if (self.DataType() === 'DECIMAL') {
                     return true;
@@ -551,6 +511,15 @@
                     return false;
                 }
             });
+
+            self.ShowDateFormat = ko.computed(function () {
+                if (self.DataType() === 'DATE' || self.DataType() === 'TIMESTAMP') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            })
 
             self.ShowArrayType = ko.computed(function () {
                 if (self.DataType() === 'ARRAY') {
@@ -570,6 +539,14 @@
                 }
             });
 
+            self.ShowFixed = ko.computed(function () {
+                return parent.IsFixedWidth;
+            });
+
+            self.ShowPositional = ko.computed(function () {
+                return parent.IsPositional;
+            })
+
             self.ChildRows = ko.observableArray(ko.utils.arrayMap(data.ChildRows, function (rowInfo) {
                 currentMax++;
                 return new Row(currentMax, rowInfo, parent);
@@ -586,6 +563,13 @@
             };
         };
 
+        function ValidDataType(item) {
+            this.Name = ko.observable(item.Name);
+            this.Description = ko.observable(item.Description);
+            this.Tag = ko.observable(item.Tag);
+            return this;
+        }
+
         var viewModel = function (incomingJson) {
             var self = this;
 
@@ -596,24 +580,50 @@
                 return new Row(currentMax, rowInfo, self);
             }));
 
+            self.FilteredRows = ko.observableArray();
+            self.SortedRows = ko.observableArray();
+
+            self.RowSorter = ko.computed(function () {
+
+                self.SortedRows([]);
+
+                self.SortedRows(ko.utils.arrayFilter(self.Rows(), function (row) {
+                    return (row.DeleteInd() === false)
+                }).sort(function (left, right) {
+                    return left.Position() === right.Position() ? 0 : (left.Position() < right.Position() ? -1 : 1);
+                }));
+            }); 
+
             self.HiveDatabaseName = ko.observable(incomingJson.HiveDatabaseName);
             self.HiveTableName = ko.observable(incomingJson.HiveTableName);
+            self.FileExtensionId = incomingJson.FileExtension;
             self.RowCount = ko.observable(incomingJson.RowCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
 
-            self.checkForErrors = ko.observable(false);
-
             self.addRow = function () {
-                currentMax++;
-                self.Rows.push(new Row(currentMax, [{ DataObjectField_ID: "", Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }], self));
+                currentMax++;                  
+                var r = new Row(currentMax, { DataObjectField_ID: "new" + currentMax, Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }, self);
+                self.Rows.push(r);
             };
 
             self.removeRow = function (row) {
-                self.Errors.remove(function (item) { return item.Id === row.Id(); });
-                self.Rows.remove(row)
-            }
+                var listCopy = self.Rows;
+
+
+                self.Errors.remove(function (item) {
+                    if (item.Id.toString() === row.Position().toString()) {
+                        return item;
+                    }
+                });
+
+                row.DeleteInd(true);
+                self.Rows.valueHasMutated();
+                self.SortRows();
+
+            };
 
             self.save = function () {
-                var a = JSON.stringify(ko.toJS(vm.Rows), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows']);
+                console.log(ko.toJS(vm.Rows));           
+                var a = JSON.stringify(ko.toJS(vm.Rows), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows', 'Position', 'Format', 'DeleteInd']);
                 console.log(a);
 
                 var url_parts = window.location.href.replace(/\/\s*$/, '').split('/');
@@ -630,7 +640,6 @@
                     contentType: "application/json",
                     success: function (returnedData) {
                         $('#buttonSpinner').hide();
-                        console.log(returnedData);
                         window.location.href = "/Config/Dataset/@Model.DatasetId";
                     },
                     error: function (error) {
@@ -642,6 +651,56 @@
 
             };
 
+
+            self.DataTypes = ko.observableArray();
+            self.IsPositional = ko.observable();
+            self.IsFixedWidth = ko.observable();
+
+            $.ajax({
+                type: "GET",
+                url: "/Config/GetDatatypesByFileExtension/" + self.FileExtensionId,
+                contentType: "application/json",
+                success: function (returnedData) {
+                    self.IsPositional(returnedData.IsPositional);
+                    self.IsFixedWidth(returnedData.IsFixedWidth);
+                    self.DataTypes($.map(returnedData.ValidDatatypes, function (item) {
+                        return new ValidDataType(item);
+                    }));
+                },
+                async: false
+            });
+
+            self.setTagGroup = function (option, item) {
+                //console.log(item);
+                if (item !== undefined && item.Tag()) {
+                    var grp = $(option).parent("select").find("[label=\"" + item.Tag() + "\"]");
+                    if (grp.length == 0) {
+                        grp = $("<optGroup></optGroup>");
+                        grp.attr("label", item.Tag());
+                        $(option).parent("select").append(grp);
+                    }
+                    grp.append($(option));
+                }
+            };
+
+            self.SortRows = function () {
+                newVal = 0;
+                $('.parentContainer').each(function (index) {
+                    var httpItem = $(this).children().children().children().children('input[name="dataObjectField_Id"]').val();
+                    var match = ko.utils.arrayFirst(self.SortedRows(), function (item) {
+                        if (item.DataObjectField_ID() == httpItem && item.Position() != index + 1) {
+                            item.Position(index + 1);
+                        }
+                    })
+                })
+            }
+
+            self.SortableRows = ko.computed(function () {
+                return self.IsPositional() ? "sortable-fields-active" : "sortable-fields";
+            })
+            self.ClickableRows = ko.computed(function () {
+                return self.IsPositional() ? "clickable" : "";
+            })
         };
 
         var initialData = [
@@ -677,8 +736,6 @@
             //since we do not need example.com
             url_parts.shift();
 
-
-
             $.ajax({
                 type: "GET",
                 url: "/api/v1/metadata/datasets/" + url_parts[3] + "/schemas/" + url_parts[5] + "/columns" ,
@@ -699,6 +756,15 @@
                 },
                 async: false
             });
+
+            $(document).ready(function () {
+                $(".sortable-fields-active").sortable({
+                    stop: function (event, ui) {
+                        vm.SortRows();
+                    }
+                });
+            });
+            
         });
        
     </script>

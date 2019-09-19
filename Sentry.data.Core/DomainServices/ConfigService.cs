@@ -414,66 +414,77 @@ namespace Sentry.data.Core
 
             foreach (SchemaRow sr in schemaRows)
             {
-                DataObjectField dof = null;
-
-                //Update Row
-                if (sr.DataObjectField_ID != 0 && newRev == false)
+                if (sr.DeleteInd)
                 {
-                    dof = DOBJ.DataObjectFields.Where(w => w.DataObjectField_ID == sr.DataObjectField_ID).FirstOrDefault();
-                    dof.DataObjectField_NME = sr.Name;
-                    dof.DataObjectField_DSC = sr.Description;
-                    dof.LastUpdt_DTM = DateTime.Now;
-                    dof.DataObjectFieldChange_DTM = DateTime.Now;
-                }
-                //Add New Row
-                else
-                {
-                    dof = new DataObjectField();
-                    dof.DataObject = DOBJ;
-                    dof.DataObjectFieldCreate_DTM = DateTime.Now;
-                    dof.DataObjectField_NME = sr.Name;
-                    dof.DataObjectField_DSC = sr.Description;
-                    dof.LastUpdt_DTM = DateTime.Now;
-                    dof.DataObjectFieldChange_DTM = DateTime.Now;
-                }
-
-
-                if (sr.DataType != "ARRAY")
-                {
-                    dof.DataType = sr.DataType;
+                    //Delete Row
+                    _datasetContext.Remove(DOBJ.DataObjectFields.FirstOrDefault(w => w.DataObjectField_ID == sr.DataObjectField_ID));
                 }
                 else
                 {
-                    dof.DataType = sr.DataType + "<" + sr.ArrayType + ">";
-                }
+                    DataObjectField dof = null;
 
-                if (sr.Nullable != null) { dof.Nullable = sr.Nullable ?? null; }
-                if (sr.Precision != null)
-                {
-                    if (sr.DataType == "DECIMAL")
+                    //Update Row
+                    if (sr.DataObjectField_ID != 0 && newRev == false)
                     {
-                        dof.Precision = sr.Precision;
+                        dof = DOBJ.DataObjectFields.FirstOrDefault(w => w.DataObjectField_ID == sr.DataObjectField_ID);
+                        dof.DataObjectField_NME = sr.Name;
+                        dof.DataObjectField_DSC = sr.Description;
+                        dof.OrdinalPosition = sr.Position.ToString();
+                        dof.FieldFormat = sr.Format;
+                        dof.LastUpdt_DTM = DateTime.Now;
+                        dof.DataObjectFieldChange_DTM = DateTime.Now;
+                    }
+                    //Add New Row
+                    else
+                    {
+                        dof = new DataObjectField
+                        {
+                            DataObject = DOBJ,
+                            DataObjectFieldCreate_DTM = DateTime.Now,
+                            DataObjectField_NME = sr.Name,
+                            DataObjectField_DSC = sr.Description,
+                            OrdinalPosition = sr.Position.ToString(),
+                            FieldFormat = sr.Format,
+                            LastUpdt_DTM = DateTime.Now,
+                            DataObjectFieldChange_DTM = DateTime.Now
+                        };
+                    }
+
+
+                    if (sr.DataType != "ARRAY")
+                    {
+                        dof.DataType = sr.DataType;
                     }
                     else
                     {
-                        dof.Precision = null;
+                        dof.DataType = sr.DataType + "<" + sr.ArrayType + ">";
                     }
-                }
-                if (sr.Scale != null)
-                {
-                    if (sr.DataType == "DECIMAL")
+
+                    if (sr.Nullable != null) { dof.Nullable = sr.Nullable ?? null; }
+                    if (sr.Precision != null)
                     {
-                        dof.Scale = sr.Scale;
+                        if (sr.DataType == "DECIMAL")
+                        {
+                            dof.Precision = sr.Precision;
+                        }
+                        else
+                        {
+                            dof.Precision = null;
+                        }
                     }
-                    else
+                    if (sr.Scale != null)
                     {
-                        dof.Scale = null;
+                        if (sr.DataType == "DECIMAL")
+                        {
+                            dof.Scale = sr.Scale;
+                        }
+                        else
+                        {
+                            dof.Scale = null;
+                        }
                     }
+                    dofList.Add(dof);
                 }
-
-                dofList.Add(dof);
-
-
             }
 
             DOBJ.DataObjectFields = dofList;
@@ -795,6 +806,8 @@ namespace Sentry.data.Core
                     if (b.Scale != null) { r.Scale = b.Scale ?? null; }
                     if (b.Nullable != null) { r.Nullable = b.Nullable ?? null; }
                     if (b.Length != null) { r.Length = b.Length ?? null; }
+                    r.Position = (b.OrdinalPosition != null) ? Int32.Parse(b.OrdinalPosition) : -1;
+                    if (b.FieldFormat != null) { r.Format = b.FieldFormat ?? null; }
                     rows.Add(r);
                 }
             }
