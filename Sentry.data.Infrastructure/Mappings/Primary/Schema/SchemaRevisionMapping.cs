@@ -38,7 +38,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Cache(c => c.Usage(CacheUsage.ReadWrite));
                 m.Key((k) =>
                 {
-                    k.Column("ParentSchema");
+                    k.Column("ParentSchemaRevision");
                     k.ForeignKey("FK_SchemaField_SchemaRevision");
                 });
             }, map => map.OneToMany(a => a.Class(typeof(BaseField))));

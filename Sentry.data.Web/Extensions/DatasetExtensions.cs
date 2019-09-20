@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Sentry.data.Web.Models.ApiModels.Datasets;
+using Sentry.data.Web.Models.ApiModels.Dataset;
 
 
 namespace Sentry.data.Web
@@ -40,9 +40,9 @@ namespace Sentry.data.Web
             };
         }
 
-        public static List<DatasetInfoApiModel> ToApiModel(this List<Core.DatasetDto> dtoList)
+        public static List<DatasetInfoModel> ToApiModel(this List<Core.DatasetDto> dtoList)
         {
-            List<DatasetInfoApiModel> modelList = new List<DatasetInfoApiModel>();
+            List<DatasetInfoModel> modelList = new List<DatasetInfoModel>();
             foreach (Core.DatasetDto dto in dtoList)
             {                
                 modelList.Add(dto.ToApiModel());
@@ -50,9 +50,9 @@ namespace Sentry.data.Web
             return modelList;
         }
 
-        public static DatasetInfoApiModel ToApiModel(this Core.DatasetDto dto)
+        public static DatasetInfoModel ToApiModel(this Core.DatasetDto dto)
         {
-            return new DatasetInfoApiModel()
+            return new DatasetInfoModel()
             {
                 Id = dto.DatasetId,
                 Name = dto.DatasetName,

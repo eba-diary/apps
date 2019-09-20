@@ -331,6 +331,17 @@ namespace Sentry.data.Core
             return dto;
         }
 
+        public List<DatasetFileConfigDto> GetDatasetFileConfigDtoByDataset(int datasetId)
+        {
+            Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+            List<DatasetFileConfigDto> dtoList = new List<DatasetFileConfigDto>();
+            foreach(DatasetFileConfig config in ds.DatasetFileConfigs)
+            {
+                dtoList.Add(GetDatasetFileConfigDto(config.ConfigId));
+            }
+            return dtoList;
+        }
+
         private DatasetFileConfig CreateDatasetFileConfig(DatasetFileConfigDto dto)
         {
             List<DataElement> deList = new List<DataElement>();
@@ -1161,7 +1172,8 @@ namespace Sentry.data.Core
             dto.IsInSAS = (dfc.Schemas.FirstOrDefault() != null) ? dfc.Schemas.FirstOrDefault().IsInSAS : false;
             dto.Delimiter = dfc.Schemas.FirstOrDefault().Delimiter;
             dto.HasHeader = (dfc.Schemas.FirstOrDefault() != null) ? dfc.Schemas.FirstOrDefault().HasHeader : false;
-            dto.Schema = GetSchemaDto(dfc.Schema.SchemaId);
+            dto.IsTrackableSchema = dfc.IsSchemaTracked;
+            dto.Schema = (dfc.Schema != null) ? GetSchemaDto(dfc.Schema.SchemaId) : null;
         }
         #endregion
     }

@@ -8,7 +8,13 @@ using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Http.Description;
 using Swashbuckle.Swagger.Annotations;
-using Sentry.data.Web.Models.ApiModels.Datasets;
+using Sentry.data.Web.Models.ApiModels.Dataset;
+using Sentry.data.Web.Models.ApiModels.Config;
+using Sentry.data.Web.Models.ApiModels.Schema;
+using Sentry.data.Web.WebAPI;
+using Sentry.WebAPI.Versioning;
+using Sentry.Common.Logging;
+using Newtonsoft.Json;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -21,10 +27,12 @@ namespace Sentry.data.Web.Controllers
         private UserService _userService;
         private IConfigService _configService;
         private IDatasetService _datasetService;
+        private ISchemaService _schemaService;
 
         public MetadataController(MetadataRepositoryService metadataRepositoryService, IDatasetContext dsContext, 
                                 IAssociateInfoProvider associateInfoService, UserService userService,
-                                IConfigService configService, IDatasetService datasetService)
+                                IConfigService configService, IDatasetService datasetService,
+                                ISchemaService schemaService)
         {
             _metadataRepositoryService = metadataRepositoryService;
             _dsContext = dsContext;
@@ -32,6 +40,7 @@ namespace Sentry.data.Web.Controllers
             _userService = userService;
             _configService = configService;
             _datasetService = datasetService;
+            _schemaService = schemaService;
         }
 
         public class OutputSchema
@@ -67,29 +76,16 @@ namespace Sentry.data.Web.Controllers
             public Boolean IsEnabled { get; set; }
         }
 
-        /// <summary>
-        /// gets schema metadata
-        /// </summary>
-        /// <param name="SchemaID">Schema Id assigned to given schema</param>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("schemas/{SchemaID}")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK,null,typeof(SchemaModel))]
-        public async Task<IHttpActionResult> GetBasicMetadataInformationForSchema(int SchemaID)
-        {
-            SchemaApiDTO dto = _configService.GetSchemaApiDTO(SchemaID);
-            SchemaModel sm = new SchemaModel(dto);
-            return Ok(sm);            
-        }
-
+        #region Dataset_Endpoints
         /// <summary>
         /// List of all datasets
         /// </summary>
         /// <param name="DatasetConfigID"></param>
         /// <returns></returns>
         [HttpGet]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [Route("dataset")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<DatasetInfoApiModel>))]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<DatasetInfoModel>))]
         public async Task<IHttpActionResult> GetDatasets()
         {
             try
@@ -99,31 +95,145 @@ namespace Sentry.data.Web.Controllers
                 {
                     dtoList.Add(_datasetService.GetDatasetDto(ds.DatasetId));
                 }
-                List<DatasetInfoApiModel> modelList = dtoList.ToApiModel();
+                List<DatasetInfoModel> modelList = dtoList.ToApiModel();
                 return Ok(modelList);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.ToString());
-            }            
+            }
         }
 
         [HttpGet]
-        [Route("dataset/{datasetId}")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<DatasetInfoApiModel>))]
-        public async Task<IHttpActionResult> GetDatasetDetail(int datasetId)
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [Route("dataset/{datasetId}/config")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<ConfigInfoModel>))]
+        public async Task<IHttpActionResult> GetDatasetConfigs(int datasetId)
         {
             try
             {
-                //DatasetDetailApiModel model = _datasetService.GetDatasetDto(datasetId);                
-
-                return Ok();
+                List<DatasetFileConfigDto> dtoList = _configService.GetDatasetFileConfigDtoByDataset(datasetId);
+                List<ConfigInfoModel> modelList = dtoList.ToModel();
+                return Ok(modelList);
             }
             catch (Exception ex)
             {
                 return BadRequest(ex.ToString());
             }
         }
+
+        /// <summary>
+        /// Get list of schema for dataset
+        /// </summary>
+        /// <param name="datasetId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [Route("dataset/{datasetId}/schema")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaInfoModel>))]
+        public async Task<IHttpActionResult> GetSchemaByDataset(int datasetId)
+        {
+            List<DatasetFileConfigDto> dtoList = _configService.GetDatasetFileConfigDtoByDataset(datasetId);
+            List<SchemaInfoModel> modelList = dtoList.ToSchemaModel();
+            return Ok(modelList);
+        }
+
+        /// <summary>
+        /// Get schema metadata
+        /// </summary>
+        /// <param name="SchemaID">Schema Id assigned to given schema</param>
+        /// <returns></returns>
+        [HttpGet]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [Route("dataset/{datasetId}/schema/{schemaId}")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaInfoModel))]
+        public async Task<IHttpActionResult> GetSchema(int datasetId, int schemaId)
+        {
+            try
+            {
+                DatasetFileConfigDto dto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
+                if (dto == null)
+                {
+                    return NotFound();
+                }
+                SchemaInfoModel model = dto.ToSchemaModel();
+                return Ok(model);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"metdataapi_getschema - datasetId:{datasetId} schemaId{schemaId}", ex);
+                return InternalServerError();
+            }            
+        }
+
+        /// <summary>
+        /// Get list of revisions for schema
+        /// </summary>
+        /// <param name="datasetId"></param>
+        /// <param name="schemaId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [Route("dataset/{datasetId}/schema/{schemaId}/revision")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaRevisionModel>))]
+        public async Task<IHttpActionResult> GetSchemaRevisionBySchema(int datasetId, int schemaId)
+        {
+            try
+            {
+                DatasetFileConfigDto configDto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
+                if (configDto == null)
+                {
+                    Logger.Info($"metadataapi_getschemarevisionbyschema_schemanotfound - datasetId:{datasetId} schemaId:{schemaId}");
+                    return NotFound();
+                }
+
+                List<SchemaRevisionDto> revisionDto = _schemaService.GetSchemaRevisionDtoBySchema(schemaId);
+                if (configDto == null)
+                {
+                    Logger.Info($"metadataapi_getschemarevisionbyschema_revisionnotfound - datasetId:{datasetId} schemaId:{schemaId}");
+                    return NotFound();
+                }
+                List<SchemaRevisionModel> modelList = revisionDto.ToModel();
+                return Ok(modelList);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"metadataapi_getschemarevisionbyschema - datasetId:{datasetId} schemaId{schemaId}", ex);
+                return InternalServerError();
+            }
+        }
+
+        /// <summary>
+        /// Get schema revision detail
+        /// </summary>
+        /// <param name="datasetId"></param>
+        /// <param name="schemaId"></param>
+        /// <param name="revisionId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [Route("dataset/{datasetId}/schema/{schemaId}/revision/{revisionId}/fields")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaRevisionDetailModel>))]
+        public async Task<IHttpActionResult> GetSchemaRevision(int datasetId, int schemaId, int revisionId)
+        {
+            try
+            {
+                DatasetFileConfigDto configDto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
+                SchemaRevisionDto revisiondto = _schemaService.GetSchemaRevisionDto(revisionId);
+                SchemaRevisionDetailModel revisionDetailModel = revisiondto.ToSchemaDetailModel();
+                SchemaRevision revision = _dsContext.SchemaRevision.FirstOrDefault(w => w.SchemaRevision_Id == revisionId);
+
+                revisionDetailModel.fields_JSON = revision.Fields.ToList().ToString();
+
+                return Ok(revisionDetailModel);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
+        }
+
+
         /// <summary>
         /// gets dataset metadata
         /// </summary>
@@ -138,56 +248,6 @@ namespace Sentry.data.Web.Controllers
             return await GetMetadata(config);
         }
 
-
-        private async Task<IHttpActionResult> GetMetadata(DatasetFileConfig config)
-        {
-            try
-            {
-                Event e = new Event();
-                e.EventType = _dsContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-                e.Status = _dsContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-                e.TimeCreated = DateTime.Now;
-                e.TimeNotified = DateTime.Now;
-                e.IsProcessed = false;
-                e.UserWhoStartedEvent = RequestContext.Principal.Identity.Name;
-                e.DataConfig = config.ConfigId;
-                e.Reason = "Viewed Schema for Dataset";
-                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-
-                Metadata m = new Metadata();
-
-                m.Description = config.Description;
-                //m.DFSDropLocation = config.RetrieverJobs.Where(x => x.DataSource.Is<DfsBasic>()).Select(x => new DropLocation() { Location = x.Schedule, Name = x.DataSource.SourceType, JobId = x.Id }).FirstOrDefault();
-
-                //m.Views = _dsContext.Events.Where(x => x.Reason == "Viewed Schema for Dataset" && x.DataConfig == DatasetConfigID).Count();
-                //m.Downloads = _dsContext.Events.Where(x => x.EventType.Description == "Downloaded Data File" && x.DataConfig == DatasetConfigID).Count();
-
-                if (config.DatasetFiles.Any())
-                {
-                    m.DataLastUpdated = config.DatasetFiles.Max(x => x.ModifiedDTM).Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds;
-                }
-
-                if (config.RetrieverJobs.Any(x => x.DataSource.Is<S3Basic>()))
-                {
-                   // m.S3DropLocation = config.RetrieverJobs.Where(x => x.DataSource.Is<S3Basic>()).Select(x => new DropLocation() { Location = x.Schedule, Name = x.DataSource.SourceType, JobId = x.Id }).FirstOrDefault();
-                }
-
-               
-                if (config.RetrieverJobs.Any(x => !x.DataSource.Is<S3Basic>() && !x.DataSource.Is<DfsBasic>()))
-                {
-                    m.OtherJobs = config.RetrieverJobs.Where(x => !x.DataSource.Is<S3Basic>() && !x.DataSource.Is<DfsBasic>()).OrderBy(x => x.Id)
-                        .Select(x => new DropLocation() { Location = x.IsEnabled ? x.Schedule : "Disabled", Name = x.DataSource.SourceType, JobId = x.Id, IsEnabled = x.IsEnabled }).ToList();
-                }
-
-
-                return Ok(m);
-
-            }
-            catch(Exception ex)
-            {
-                return InternalServerError(ex);
-            }
-        }
 
         /// <summary>
         /// gets primary hive table
@@ -213,9 +273,10 @@ namespace Sentry.data.Web.Controllers
                 {
                     return NotFound();
                 }
-                
+
             }
-            else {
+            else
+            {
                 return NotFound();
             }
         }
@@ -237,6 +298,56 @@ namespace Sentry.data.Web.Controllers
             return await GetColumnSchema(config, SchemaID);
         }
 
+        #endregion
+
+        #region Schema_Endpoints
+        
+        /// <summary>
+        /// Gets schema information
+        /// </summary>
+        /// <param name="schemaId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [Route("schema/{schemaId}")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaInfoModel))]
+        public async Task<IHttpActionResult> GetSchemaInfo(int schemaId)
+        {
+            try
+            {
+                SchemaDto dto = _configService.GetSchemaDto(schemaId);
+                SchemaInfoModel model = dto.ToModel();
+                return Ok(model);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Get list all revisions for schema
+        /// </summary>
+        /// <param name="schemaId"></param>
+        /// <returns></returns>
+        [HttpGet]
+
+        [Route("schema/{schemaId}/revisions")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaInfoModel>))]
+        public async Task<IHttpActionResult> GetSchemaRevisions(int schemaId)
+        {
+            try
+            {
+                List<SchemaRevisionDto> revisionsList = _schemaService.GetSchemaRevisionDtoBySchema(schemaId);
+                List<SchemaRevisionModel> modelList = revisionsList.ToModel();
+                return Ok(modelList);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.ToString());
+            }
+        }
+
 
         /// <summary>
         /// ges column schema metadate form schema
@@ -253,9 +364,9 @@ namespace Sentry.data.Web.Controllers
 
             return Ok(sdm);
         }
+        #endregion
 
-
-
+        #region Private Methods
         private async Task<IHttpActionResult> GetColumnSchema(DatasetFileConfig config, int SchemaID)
         {
             try
@@ -333,11 +444,56 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
+        private async Task<IHttpActionResult> GetMetadata(DatasetFileConfig config)
+        {
+            try
+            {
+                Event e = new Event();
+                e.EventType = _dsContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+                e.Status = _dsContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+                e.TimeCreated = DateTime.Now;
+                e.TimeNotified = DateTime.Now;
+                e.IsProcessed = false;
+                e.UserWhoStartedEvent = RequestContext.Principal.Identity.Name;
+                e.DataConfig = config.ConfigId;
+                e.Reason = "Viewed Schema for Dataset";
+                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+
+                Metadata m = new Metadata();
+
+                m.Description = config.Description;
+                //m.DFSDropLocation = config.RetrieverJobs.Where(x => x.DataSource.Is<DfsBasic>()).Select(x => new DropLocation() { Location = x.Schedule, Name = x.DataSource.SourceType, JobId = x.Id }).FirstOrDefault();
+
+                //m.Views = _dsContext.Events.Where(x => x.Reason == "Viewed Schema for Dataset" && x.DataConfig == DatasetConfigID).Count();
+                //m.Downloads = _dsContext.Events.Where(x => x.EventType.Description == "Downloaded Data File" && x.DataConfig == DatasetConfigID).Count();
+
+                if (config.DatasetFiles.Any())
+                {
+                    m.DataLastUpdated = config.DatasetFiles.Max(x => x.ModifiedDTM).Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds;
+                }
+
+                if (config.RetrieverJobs.Any(x => x.DataSource.Is<S3Basic>()))
+                {
+                    // m.S3DropLocation = config.RetrieverJobs.Where(x => x.DataSource.Is<S3Basic>()).Select(x => new DropLocation() { Location = x.Schedule, Name = x.DataSource.SourceType, JobId = x.Id }).FirstOrDefault();
+                }
 
 
+                if (config.RetrieverJobs.Any(x => !x.DataSource.Is<S3Basic>() && !x.DataSource.Is<DfsBasic>()))
+                {
+                    m.OtherJobs = config.RetrieverJobs.Where(x => !x.DataSource.Is<S3Basic>() && !x.DataSource.Is<DfsBasic>()).OrderBy(x => x.Id)
+                        .Select(x => new DropLocation() { Location = x.IsEnabled ? x.Schedule : "Disabled", Name = x.DataSource.SourceType, JobId = x.Id, IsEnabled = x.IsEnabled }).ToList();
+                }
 
 
+                return Ok(m);
 
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
+        #endregion
 
     }
 }

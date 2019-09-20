@@ -307,6 +307,7 @@
     <Compile Include="Extensions\DatasetExtensions.cs" />
     <Compile Include="Extensions\FavoriteExtensions.cs" />
     <Compile Include="Extensions\ImageExtensions.cs" />
+    <Compile Include="Extensions\SchemaExtensions.cs" />
     <Compile Include="Extensions\Security\PermissionExtensions.cs" />
     <Compile Include="Extensions\Security\RequestAccessExtension.cs" />
     <Compile Include="Extensions\CategoryExtensions.cs" />
@@ -315,6 +316,7 @@
     <Compile Include="Filters\AuthorizationFilters\AuthorizeHangfireDashboard.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeAttribute.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeByPermissionAttribute.cs" />
+    <Compile Include="Filters\WebAPI\Version.cs" />
     <Compile Include="Helpers\LivyHelper.cs" />
     <Compile Include="Helpers\BeginCollectionItem.cs" />
     <Compile Include="Helpers\PredicateBuilder.cs" />
@@ -344,6 +346,11 @@
     <Compile Include="Helpers\TimeSpanFormattingExtensions.cs" />
     <Compile Include="Helpers\WebCurrentUserIdProvider.cs" />
     <Compile Include="HttpExceptions\NotAuthorizedException.cs" />
+    <Compile Include="Models\ApiModels\Dataset\DatasetDetailModel.cs" />
+    <Compile Include="Models\ApiModels\Config\ConfigInfoModel.cs" />
+    <Compile Include="Models\ApiModels\Schema\SchemaInfoModel.cs" />
+    <Compile Include="Models\ApiModels\Schema\SchemaRevisionDetailModel.cs" />
+    <Compile Include="Models\ApiModels\Schema\SchemaRevisionModel.cs" />
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceDetailModel.cs" />
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceModel.cs" />
     <Compile Include="Models\BusinessIntelligence\BusinessIntelligenceUIModel.cs" />
@@ -361,7 +368,7 @@
     <Compile Include="Models\DataAsset\BaseAssetNotificationModel.cs" />
     <Compile Include="Models\DataAsset\CreateAssetNotificationModel.cs" />
     <Compile Include="Models\DataAsset\EditAssetNotificationModel.cs" />
-    <Compile Include="Models\ApiModels\Datasets\DatasetInfoApiModel.cs" />
+    <Compile Include="Models\ApiModels\Dataset\DatasetInfoModel.cs" />
     <Compile Include="Models\Dataset\BaseDatasetFileModel.cs" />
     <Compile Include="Models\Dataset\ColumnModel.cs" />
     <Compile Include="Models\Dataset\CreateDataFileModel.cs" />

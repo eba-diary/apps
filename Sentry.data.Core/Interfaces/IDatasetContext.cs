@@ -45,6 +45,8 @@ namespace Sentry.data.Core
         IQueryable<RetrieverJob> RetrieverJob { get; }
         IQueryable<DatasetFileParquet> DatasetFileParquet { get; }
         IQueryable<DatasetFileReply> DatasetFileReply { get; }
+        IQueryable<Schema> Schema { get; }
+        IQueryable<SchemaRevision> SchemaRevision { get; }
         /** Datasets **/
 
         Dataset GetById(int id);

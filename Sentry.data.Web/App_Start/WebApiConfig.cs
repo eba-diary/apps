@@ -10,7 +10,7 @@ namespace Sentry.data.Web
         {
             var constraintResolver = new DefaultInlineConstraintResolver();
             Sentry.WebAPI.Versioning.Register.ConstraintMap(constraintResolver);
-            Sentry.WebAPI.Versioning.Register.ApiVersions(config, "1"); // Replace "1" with a different default API version if you desire
+            Sentry.WebAPI.Versioning.Register.ApiVersions(config, Sentry.data.Web.WebAPI.Version.v1); // Replace "1" with a different default API version if you desire
             config.MapHttpAttributeRoutes(constraintResolver);
 
             

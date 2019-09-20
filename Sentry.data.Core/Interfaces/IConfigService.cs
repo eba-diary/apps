@@ -23,7 +23,9 @@ namespace Sentry.data.Core
         AccessRequest GetDataSourceAccessRequest(int dataSourceId);
         string RequestAccessToDataSource(AccessRequest request);
         DatasetFileConfigDto GetDatasetFileConfigDto(int configId);
+        List<DatasetFileConfigDto> GetDatasetFileConfigDtoByDataset(int datasetId);
         bool Delete(int id, bool logicalDelete = true);
         UserSecurity GetUserSecurityForConfig(int id);
+        SchemaDto GetSchemaDto(int id);
     }
 }

@@ -17,5 +17,18 @@ namespace Sentry.data.Core
                 SchemaEntity_NME = scm.SchemaEntity_NME
             };
         }
+
+        public static SchemaRevisionDto ToDto(this SchemaRevision revision)
+        {
+            return new SchemaRevisionDto()
+            {
+                RevisionId = revision.SchemaRevision_Id,
+                RevisionNumber = revision.Revision_NBR,
+                SchemaRevisionName = revision.SchemaRevision_Name,
+                CreatedBy = revision.CreatedBy,
+                CreatedDTM = revision.CreatedDTM,
+                LastUpdatedDTM = revision.LastUpdatedDTM
+            };
+        }
     }
 }

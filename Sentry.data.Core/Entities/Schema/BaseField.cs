@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 namespace Sentry.data.Core
 {
+    [Serializable]
     public abstract class BaseField
     {
         private BaseField _parentField;
