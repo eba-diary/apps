@@ -31,5 +31,12 @@ namespace Sentry.data.Core.DomainServices
             }
             return dtoList;
         }
+
+        public List<BaseFieldDto> GetBaseFieldDtoBySchemaRevision(int revisionId)
+        {
+            SchemaRevision revision = _datasetContext.SchemaRevision.FirstOrDefault(w => w.SchemaRevision_Id == revisionId);
+
+            return revision.Fields.ToList().ToDto();
+        }
     }
 }

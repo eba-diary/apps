@@ -30,5 +30,34 @@ namespace Sentry.data.Core
                 LastUpdatedDTM = revision.LastUpdatedDTM
             };
         }
+
+        public static BaseFieldDto ToDto(this BaseField field)
+        {
+            BaseFieldDto dto = new BaseFieldDto()
+            {
+                FieldId = field.FieldId,
+                Name = field.Name,
+                CreateDTM = field.CreateDTM,
+                FieldType = field.FieldType.ToString()
+            };
+            List<BaseFieldDto> childList = new List<BaseFieldDto>();
+            foreach (BaseField childField in field.ChildFields)
+            {
+                childList.Add(childField.ToDto());
+            }
+            dto.ChildFields = childList;
+
+            return dto;
+        }
+
+        public static List<BaseFieldDto> ToDto(this List<BaseField> fields)
+        {
+            List<BaseFieldDto> dtoList = new List<BaseFieldDto>();
+            foreach (BaseField field in fields)
+            {
+                dtoList.Add(field.ToDto());
+            }
+            return dtoList;
+        }
     }
 }

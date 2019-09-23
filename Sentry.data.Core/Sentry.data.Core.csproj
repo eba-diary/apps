@@ -90,6 +90,7 @@
     <Compile Include="DTO\Favorites\FavoriteDto.cs" />
     <Compile Include="DTO\ImagesDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
+    <Compile Include="DTO\Schema\BaseFieldDto.cs" />
     <Compile Include="DTO\Schema\DataElementDTO.cs" />
     <Compile Include="DTO\Schema\SchemaDTO.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />

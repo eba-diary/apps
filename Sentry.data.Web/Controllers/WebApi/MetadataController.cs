@@ -223,7 +223,7 @@ namespace Sentry.data.Web.Controllers
                 SchemaRevisionDetailModel revisionDetailModel = revisiondto.ToSchemaDetailModel();
                 SchemaRevision revision = _dsContext.SchemaRevision.FirstOrDefault(w => w.SchemaRevision_Id == revisionId);
 
-                revisionDetailModel.fields_JSON = revision.Fields.ToList().ToString();
+                revisionDetailModel.fields = _schemaService.GetBaseFieldDtoBySchemaRevision(revisionId);
 
                 return Ok(revisionDetailModel);
             }
