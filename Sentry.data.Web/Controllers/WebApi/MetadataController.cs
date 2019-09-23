@@ -49,6 +49,7 @@ namespace Sentry.data.Web.Controllers
             public int RowCount { get; set; }
             public string HiveTableName { get; set; }
             public string HiveDatabaseName { get; set; }
+            public int FileExtension { get; set; }
         }
 
         public class Metadata
@@ -397,6 +398,8 @@ namespace Sentry.data.Web.Controllers
                     {
                         OutputSchema s = new OutputSchema();
 
+                        s.FileExtension = config.FileExtension.Id;
+
                         s.rows = new List<SchemaRow>();
 
                         if (schema.DataObjects.Any(x => x.RowCount != 0))
@@ -421,6 +424,8 @@ namespace Sentry.data.Web.Controllers
                             //r.Scale = (b.Scale != null && !String.IsNullOrEmpty(b.Scale)) ? b.Scale : null;
                             if (b.Nullable != null) { r.Nullable = b.Nullable ?? null; }
                             if (b.Length != null) { r.Length = b.Length ?? null; }
+                            if (b.OrdinalPosition != null) { r.Position = Int32.Parse(b.OrdinalPosition); }
+                            if (b.FieldFormat != null) { r.Format = b.FieldFormat ?? null; }
                             s.rows.Add(r);
                         }
 
@@ -430,6 +435,7 @@ namespace Sentry.data.Web.Controllers
                     {
                         OutputSchema s = new OutputSchema();
                         s.rows = new List<SchemaRow>();
+                        s.FileExtension = config.FileExtension.Id;
                         return Ok(s);
                     }
                 }

@@ -362,6 +362,7 @@
     <Compile Include="Models\Config\EditSchemaModel.cs" />
     <Compile Include="Models\Config\EditSourceModel.cs" />
     <Compile Include="Models\Config\FieldModel.cs" />
+    <Compile Include="Models\Config\ValidDatatypesModel.cs" />
     <Compile Include="Models\Config\ManageConfigsModel.cs" />
     <Compile Include="Models\ContactInfoModel.cs" />
     <Compile Include="Models\DataAsset\AssetUIModel.cs" />
@@ -420,10 +421,12 @@
     <Content Include="Content\css\select2.min.css" />
     <Content Include="Content\dataset-detail.css" />
     <Content Include="Content\favorites.css" />
+    <Content Include="Content\fields.css" />
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\home.css" />
     <Content Include="Content\jquery.json-viewer.css" />
     <Content Include="js\DataSource.js" />
+    <Content Include="js\Fields.js" />
     <Content Include="js\Job.js" />
     <Content Include="Scripts\jquery.json-viewer.js" />
     <Content Include="Content\query-builder.default.css" />
