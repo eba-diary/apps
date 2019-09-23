@@ -40,7 +40,7 @@ namespace Sentry.data.Core
         public virtual DateTime CreateDTM { get; set; }
         public virtual DateTime LastUpdateDTM { get; set; }
         public virtual bool NullableIndicator { get; set; }
-        public virtual IEnumerable<BaseField> ChildFields
+        public virtual IList<BaseField> ChildFields
         {
             get
             {

@@ -60,7 +60,7 @@ namespace Sentry.data.Web.Controllers
             //_configService.GetDatasetFileConfigDto(id);
 
             List<DatasetFileConfigsModel> configModelList = new List<DatasetFileConfigsModel>();
-            foreach(DatasetFileConfig config in ds.DatasetFileConfigs)
+            foreach(DatasetFileConfig config in ds.DatasetFileConfigs.Where(w => !w.DeleteInd))
             {
                 configModelList.Add(new DatasetFileConfigsModel(config, true, false));
             }

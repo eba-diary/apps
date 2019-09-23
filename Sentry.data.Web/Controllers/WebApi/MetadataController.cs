@@ -101,7 +101,8 @@ namespace Sentry.data.Web.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.ToString());
+                Logger.Error($"metadataapi_getdatasets_internalservererror", ex);
+                return InternalServerError();
             }
         }
 
@@ -114,12 +115,17 @@ namespace Sentry.data.Web.Controllers
             try
             {
                 List<DatasetFileConfigDto> dtoList = _configService.GetDatasetFileConfigDtoByDataset(datasetId);
+                if (dtoList == null)
+                {
+                    Logger.Info($"metadataapi_getdatasetconfigs_badrequest - datasetid:{datasetId}");
+                }
                 List<ConfigInfoModel> modelList = dtoList.ToModel();
                 return Ok(modelList);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.ToString());
+                Logger.Error($"metadataapi_getdatasetconfigs_internalservererror", ex);
+                return InternalServerError();
             }
         }
 
@@ -134,9 +140,17 @@ namespace Sentry.data.Web.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaInfoModel>))]
         public async Task<IHttpActionResult> GetSchemaByDataset(int datasetId)
         {
-            List<DatasetFileConfigDto> dtoList = _configService.GetDatasetFileConfigDtoByDataset(datasetId);
-            List<SchemaInfoModel> modelList = dtoList.ToSchemaModel();
-            return Ok(modelList);
+            try
+            {
+                List<DatasetFileConfigDto> dtoList = _configService.GetDatasetFileConfigDtoByDataset(datasetId);
+                List<SchemaInfoModel> modelList = dtoList.ToSchemaModel();
+                return Ok(modelList);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"metadataapi_getschemabydataset_internalservererror - datasetid:{datasetId}", ex);
+                return InternalServerError();
+            }
         }
 
         /// <summary>
@@ -162,7 +176,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch (Exception ex)
             {
-                Logger.Error($"metdataapi_getschema - datasetId:{datasetId} schemaId{schemaId}", ex);
+                Logger.Error($"metdataapi_getschema_internalserverserror - datasetId:{datasetId} schemaId{schemaId}", ex);
                 return InternalServerError();
             }            
         }
@@ -184,14 +198,14 @@ namespace Sentry.data.Web.Controllers
                 DatasetFileConfigDto configDto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
                 if (configDto == null)
                 {
-                    Logger.Info($"metadataapi_getschemarevisionbyschema_schemanotfound - datasetId:{datasetId} schemaId:{schemaId}");
+                    Logger.Info($"metadataapi_getschemarevisionbyschema_notfound schema - datasetId:{datasetId} schemaId:{schemaId}");
                     return NotFound();
                 }
 
                 List<SchemaRevisionDto> revisionDto = _schemaService.GetSchemaRevisionDtoBySchema(schemaId);
                 if (configDto == null)
                 {
-                    Logger.Info($"metadataapi_getschemarevisionbyschema_revisionnotfound - datasetId:{datasetId} schemaId:{schemaId}");
+                    Logger.Info($"metadataapi_getschemarevisionbyschema_notfound revision - datasetId:{datasetId} schemaId:{schemaId}");
                     return NotFound();
                 }
                 List<SchemaRevisionModel> modelList = revisionDto.ToModel();
@@ -199,7 +213,7 @@ namespace Sentry.data.Web.Controllers
             }
             catch (Exception ex)
             {
-                Logger.Error($"metadataapi_getschemarevisionbyschema - datasetId:{datasetId} schemaId{schemaId}", ex);
+                Logger.Error($"metadataapi_getschemarevisionbyschema_internalservererror - datasetId:{datasetId} schemaId{schemaId}", ex);
                 return InternalServerError();
             }
         }
@@ -230,10 +244,10 @@ namespace Sentry.data.Web.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.ToString());
+                Logger.Error($"metadataapi_getschemarevision_badrequest - datasetid:{datasetId} schemaid:{schemaId}", ex);
+                return InternalServerError();
             }
         }
-
 
         /// <summary>
         /// gets dataset metadata
@@ -417,7 +431,7 @@ namespace Sentry.data.Web.Controllers
                                 LastUpdated = b.LastUpdt_DTM.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds
                             };
 
-                            r.DataType = (!String.IsNullOrEmpty(b.DataType)) ? b.DataType.ToUpper() : "VARCHAR";
+                            r.DataType = (!String.IsNullOrEmpty(b.DataType)) ? b.DataType.ToUpper() : SchemaDatatypes.VARCHAR.ToString();
                             if (b.Precision != null) { r.Precision = b.Precision ?? null; }
                             if (b.Scale != null) { r.Scale = b.Scale ?? null; }
                             //r.Precision = (b.Precision != null && !String.IsNullOrEmpty(b.Precision)) ? b.Precision : null;

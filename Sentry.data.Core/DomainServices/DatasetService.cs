@@ -16,16 +16,19 @@ namespace Sentry.data.Core
         private readonly UserService _userService;
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
+        private readonly IConfigService _configService;
 
         public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, 
                             UserService userService, IMessagePublisher messagePublisher,
-                            IS3ServiceProvider s3ServiceProvider)
+                            IS3ServiceProvider s3ServiceProvider,
+                            IConfigService configService)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
             _userService = userService;
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
+            _configService = configService;
         }
 
 
@@ -157,28 +160,8 @@ namespace Sentry.data.Core
             Dataset ds = CreateDataset(dto);
             _datasetContext.Add(ds);
             dto.DatasetId = ds.DatasetId;
-
-            DataElement de = CreateDataElement(dto);
-            DatasetFileConfig dfc = CreateDatasetFileConfig(dto, ds);
-
-            de.DatasetFileConfig = dfc;
-            dfc.Schemas = new List<DataElement> { de };
-
-            List<RetrieverJob> jobList = new List<RetrieverJob>();
-            if (ds.DataClassification == GlobalEnums.DataClassificationType.HighlySensitive)
-            {
-                jobList.Add(CreateRetrieverJob(dfc, GlobalConstants.DataSourceName.DEFAULT_HSZ_DROP_LOCATION));
-            }
-            else
-            {
-                CreateRetrieverJob(dfc, GlobalConstants.DataSourceName.DEFAULT_DROP_LOCATION);
-            }
-
-            jobList.Add(CreateRetrieverJob(dfc, GlobalConstants.DataSourceName.DEFAULT_S3_DROP_LOCATION));
-
-            dfc.RetrieverJobs = jobList;
-
-            _datasetContext.Merge(dfc);
+          
+            _configService.CreateAndSaveDatasetFileConfig(dto.ToConfigDto());
             _datasetContext.SaveChanges();
 
             return ds.DatasetId;
@@ -404,6 +387,8 @@ namespace Sentry.data.Core
 
         private DatasetFileConfig CreateDatasetFileConfig(DatasetDto dto, Dataset ds)
         {
+            //DatasetFileConfigDto configDto = ToDto(dto, ds);
+
             DatasetFileConfig dfc = new DatasetFileConfig()
             {
                 ConfigId = 0,

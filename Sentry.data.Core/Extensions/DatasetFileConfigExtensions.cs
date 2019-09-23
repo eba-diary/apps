@@ -1,10 +1,32 @@
-﻿namespace Sentry.data.Core
+﻿using System.Collections.Generic;
+
+namespace Sentry.data.Core
 {
     public static class DatasetFileConfigExtensions
     {
         public static string GenerateSASLibaryName(this DatasetFileConfigDto dto, IDatasetContext dsContext)
         {
             return CommonExtensions.GenerateSASLibaryName(dsContext.GetById<Dataset>(dto.ParentDatasetId));
+        }
+
+        public static DatasetFileConfigDto ToConfigDto(this DatasetDto dsDto)
+        {
+            List<DataElementDto> delist = new List<DataElementDto>();
+            delist.Add(dsDto.ToDataElementDto());
+
+            DatasetFileConfigDto dto = new DatasetFileConfigDto()
+            {
+                Name = dsDto.ConfigFileName,
+                Description = dsDto.ConfigFileDesc,
+                FileTypeId = (int)Core.FileType.DataFile,
+                ParentDatasetId = dsDto.DatasetId,
+                DatasetScopeTypeId = dsDto.DatasetScopeTypeId,
+                FileExtensionId = dsDto.FileExtensionId,
+                Delimiter = dsDto.Delimiter,
+                HasHeader = dsDto.HasHeader
+            };
+            dto.Schemas = delist;
+            return dto;
         }
     }
 }

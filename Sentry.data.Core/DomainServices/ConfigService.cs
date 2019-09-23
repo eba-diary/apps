@@ -260,7 +260,7 @@ namespace Sentry.data.Core
                 dfc.RetrieverJobs = jobList;
 
                 Dataset parent = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
-                List<DatasetFileConfig> dfcList = parent.DatasetFileConfigs.ToList();
+                List<DatasetFileConfig> dfcList = (parent.DatasetFileConfigs == null) ? new List<DatasetFileConfig>() : parent.DatasetFileConfigs.ToList();
                 dfcList.Add(dfc);
                 parent.DatasetFileConfigs = dfcList;
 
@@ -335,7 +335,7 @@ namespace Sentry.data.Core
         {
             Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
             List<DatasetFileConfigDto> dtoList = new List<DatasetFileConfigDto>();
-            foreach(DatasetFileConfig config in ds.DatasetFileConfigs)
+            foreach(DatasetFileConfig config in ds.DatasetFileConfigs.Where(w => !w.DeleteInd))
             {
                 dtoList.Add(GetDatasetFileConfigDto(config.ConfigId));
             }
@@ -357,6 +357,8 @@ namespace Sentry.data.Core
                 DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId),
                 Schemas = deList
             };
+            dfc.IsSchemaTracked = true;
+            dfc.Schema = new FileSchema(dfc, _userService.GetCurrentUser());
 
             de.DatasetFileConfig = dfc;
             deList.Add(de);
@@ -403,6 +405,8 @@ namespace Sentry.data.Core
         {
             DatasetFileConfig config = _datasetContext.GetById<DatasetFileConfig>(configId);
 
+            #region Populate New Schema Structure
+            //Insert schema metadata into new structure
             try
             {
                 SchemaRevision revision = new SchemaRevision()
@@ -411,82 +415,25 @@ namespace Sentry.data.Core
                     CreatedBy = _userService.GetCurrentUser().AssociateId
                 };
 
+                config.Schema.AddRevision(revision);
+
+                _datasetContext.Add(revision);
+
                 foreach (var row in schemaRows)
                 {
-                    switch (row.DataType.ToUpper())
-                    {
-                        case "INTEGER":
-                            revision.Fields.Add(new IntegerField() {
-                                Name = row.Name,
-                                CreateDTM = DateTime.Now,
-                                LastUpdateDTM = DateTime.Now,
-                                ParentSchemaRevision = revision
-                            });                            
-                            break;
-                        case "DECIMAL":
-                            revision.Fields.Add(new DecimalField()
-                            {
-                                Name = row.Name,
-                                CreateDTM = DateTime.Now,
-                                LastUpdateDTM = DateTime.Now,
-                                ParentSchemaRevision = revision,
-                                Precision = Int32.Parse(row.Precision),
-                                Scale = Int32.Parse(row.Scale)
-                            });
-                            break;
-                        case "VARCHAR":
-                            revision.Fields.Add(new VarcharField()
-                            {
-                                Name = row.Name,
-                                CreateDTM = DateTime.Now,
-                                LastUpdateDTM = DateTime.Now,
-                                ParentSchemaRevision = revision
-                            });
-                            break;
-                        case "DATE":
-                            revision.Fields.Add(new DateField()
-                            {
-                                Name = row.Name,
-                                CreateDTM = DateTime.Now,
-                                LastUpdateDTM = DateTime.Now,
-                                ParentSchemaRevision = revision
-                            });
-                            break;
-                        case "TIMESTAMP":
-                            revision.Fields.Add(new TimestampField()
-                            {
-                                Name = row.Name,
-                                CreateDTM = DateTime.Now,
-                                LastUpdateDTM = DateTime.Now,
-                                ParentSchemaRevision = revision
-                            });
-                            break;
-                        case "STRUCT":
-                            revision.Fields.Add(new StructField()
-                            {
-                                Name = row.Name,
-                                CreateDTM = DateTime.Now,
-                                LastUpdateDTM = DateTime.Now,
-                                ParentSchemaRevision = revision
-                            });
-                            break;
-                        case "BIGINT":
-                        default:
-                            Logger.Info($"updatefields - datatype not supported ({row.DataType.ToUpper()})");
-                            break;
-                    }
+                    revision.Fields.Add(AddRevisionField(row, revision));
                 }
 
-                config.Schema.AddRevision(revision);
                 _datasetContext.SaveChanges();
             }
             catch (Exception ex)
             {
                 Logger.Error("configservice_updatefields - add new revision failed", ex);
             }
-            
+            #endregion
 
-
+            #region Populate Old Schema Structure
+            //Maintain metadata in old schema structure
             DataElement schema = _datasetContext.GetById<DataElement>(schemaId);
             DataElement newRevision = null;
             DataObject DOBJ = null;
@@ -599,6 +546,7 @@ namespace Sentry.data.Core
                 _datasetContext.Merge(newRevision);
                 _datasetContext.SaveChanges();
             }
+            #endregion
 
             //Send message to create hive table
             HiveTableCreateModel hiveCreate = new HiveTableCreateModel();
@@ -610,6 +558,69 @@ namespace Sentry.data.Core
 
         }
 
+        private BaseField AddRevisionField(SchemaRow row, SchemaRevision revision, BaseField parentRow = null)
+        {
+            BaseField newField = null;
+            switch (row.DataType.ToUpper())
+            {
+                case "INTEGER":
+                    newField = new IntegerField() { };
+                    break;
+                case "DECIMAL":
+                    newField = new DecimalField()
+                    {                        
+                        Precision = Int32.Parse(row.Precision),
+                        Scale = Int32.Parse(row.Scale)
+                    };
+                    break;
+                case "VARCHAR":
+                    newField = new VarcharField() { };
+                    break;
+                case "DATE":
+                    newField = new DateField()
+                    {
+                        SourceFormat = row.Format
+                    };
+                    break;
+                case "TIMESTAMP":
+                    newField = new TimestampField()
+                    {
+                        SourceFormat = row.Format
+                    };
+                    break;
+                case "STRUCT":
+                    newField = new StructField() { };
+                    break;
+                case "BIGINT":
+                    newField = new BigintField() { };
+                    break;
+                default:
+                    Logger.Info($"updatefields - datatype not supported ({row.DataType.ToUpper()})");
+                    break;
+            }
+
+            if (newField != null)
+            {
+                newField.Name = row.Name;
+                newField.CreateDTM = DateTime.Now;
+                newField.LastUpdateDTM = DateTime.Now;
+                newField.ParentSchemaRevision = revision;
+                newField.ParentField = parentRow;
+                newField.OrdinalPosition = row.Position;
+                newField.NullableIndicator = row.Nullable ?? false;
+                _datasetContext.Add(newField);
+            }
+
+            if (newField != null && row.ChildRows != null)
+            {
+                foreach (SchemaRow cRow in row.ChildRows)
+                {
+                    newField.ChildFields.Add(AddRevisionField(cRow, revision, newField));
+                }
+            }
+
+            return newField;
+        }
 
         public bool UpdateandSaveOAuthToken(HTTPSSource source, string newToken, DateTime tokenExpTime)
         {

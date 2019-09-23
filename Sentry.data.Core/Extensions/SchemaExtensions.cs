@@ -38,8 +38,36 @@ namespace Sentry.data.Core
                 FieldId = field.FieldId,
                 Name = field.Name,
                 CreateDTM = field.CreateDTM,
-                FieldType = field.FieldType.ToString()
+                LastUpdatedDTM = field.LastUpdateDTM,
+                FieldType = field.FieldType.ToString(),
+                Nullable = field.NullableIndicator,
+                OrdinalPosition = field.OrdinalPosition
             };
+
+            switch (field.FieldType)
+            {                
+                case SchemaDatatypes.STRUCT:
+                    dto.IsArray = ((StructField)field).IsArray;
+                    break;
+                case SchemaDatatypes.DECIMAL:
+                    dto.Precision = ((DecimalField)field).Precision;
+                    dto.Scale = ((DecimalField)field).Scale;
+                    break;
+                case SchemaDatatypes.DATE:
+                    dto.SourceFormat = ((DateField)field).SourceFormat;
+                    break;
+                case SchemaDatatypes.TIMESTAMP:
+                    dto.SourceFormat = ((TimestampField)field).SourceFormat;
+                    break;
+                case SchemaDatatypes.NONE:
+                case SchemaDatatypes.INTEGER:
+                case SchemaDatatypes.BIGINT:
+                case SchemaDatatypes.VARCHAR:
+                default:
+                    break;
+            }
+
+
             List<BaseFieldDto> childList = new List<BaseFieldDto>();
             foreach (BaseField childField in field.ChildFields)
             {
@@ -58,6 +86,22 @@ namespace Sentry.data.Core
                 dtoList.Add(field.ToDto());
             }
             return dtoList;
+        }
+
+        public static DataElementDto ToDataElementDto(this DatasetDto dsDto)
+        {
+            return new DataElementDto()
+            {
+                DataElementName = dsDto.ConfigFileName,
+                SchemaName = dsDto.ConfigFileName,
+                SchemaDescription = dsDto.ConfigFileDesc,
+                Delimiter = dsDto.Delimiter,
+                HasHeader = dsDto.HasHeader,
+                CreateCurrentView = true,
+                IsInSAS = dsDto.IsInSAS,
+                FileExtensionId = dsDto.FileExtensionId,
+                ParentDatasetId = dsDto.DatasetId
+            };
         }
     }
 }
