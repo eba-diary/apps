@@ -169,14 +169,19 @@ namespace Sentry.data.Web
             {
                 ConfigId = dto.ConfigId,
                 SchemaId = dto.Schema.SchemaId,
+                SchemaEntity_NME = dto.Schema.SchemaEntity_NME,
                 Description = dto.Description,
                 StorageCode = dto.StorageCode,
-                FileType = dto.FileExtensionId.ToString(),
-                CreateCurrentView = dto.CreateCurrentView,
+                Format = dto.FileExtensionName,
+                CurrentView = dto.CreateCurrentView,
                 IsInSAS = dto.IsInSAS,
                 Delimiter = dto.Delimiter,
                 HasHeader = dto.HasHeader,
-                IsTrackableSchema = dto.IsTrackableSchema
+                IsTrackableSchema = dto.IsTrackableSchema,
+                HiveTable = dto.HiveTable,
+                HiveDatabase = dto.HiveDatabase,
+                HiveTableStatus = dto.HiveTableStatus,
+                HiveLocation = dto.HiveLocation
             };
         }
 

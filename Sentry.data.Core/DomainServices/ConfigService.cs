@@ -1189,6 +1189,7 @@ namespace Sentry.data.Core
             dto.Description = dfc.Description;
             dto.DatasetScopeTypeId = dfc.DatasetScopeType.ScopeTypeId;
             dto.FileExtensionId = dfc.FileExtension.Id;
+            dto.FileExtensionName = dfc.FileExtension.Name;
             dto.ParentDatasetId = dfc.ParentDataset.DatasetId;
             dto.StorageCode = dfc.GetStorageCode();
             dto.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
@@ -1197,6 +1198,10 @@ namespace Sentry.data.Core
             dto.Delimiter = dfc.Schemas.FirstOrDefault().Delimiter;
             dto.HasHeader = (dfc.Schemas.FirstOrDefault() != null) ? dfc.Schemas.FirstOrDefault().HasHeader : false;
             dto.IsTrackableSchema = dfc.IsSchemaTracked;
+            dto.HiveTable = dfc.Schemas.First().HiveTable;
+            dto.HiveDatabase = dfc.Schemas.First().HiveDatabase;
+            dto.HiveLocation = dfc.Schemas.First().HiveLocation;
+            dto.HiveTableStatus = dfc.Schemas.First().HiveTableStatus;
             dto.Schema = (dfc.Schema != null) ? GetSchemaDto(dfc.Schema.SchemaId) : null;
         }
         #endregion

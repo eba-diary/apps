@@ -28,11 +28,12 @@ namespace Sentry.data.Web.Controllers
         private IConfigService _configService;
         private IDatasetService _datasetService;
         private ISchemaService _schemaService;
+        private ISecurityService _securityService;
 
         public MetadataController(MetadataRepositoryService metadataRepositoryService, IDatasetContext dsContext, 
                                 IAssociateInfoProvider associateInfoService, UserService userService,
                                 IConfigService configService, IDatasetService datasetService,
-                                ISchemaService schemaService)
+                                ISchemaService schemaService, ISecurityService securityService)
         {
             _metadataRepositoryService = metadataRepositoryService;
             _dsContext = dsContext;
@@ -41,6 +42,7 @@ namespace Sentry.data.Web.Controllers
             _configService = configService;
             _datasetService = datasetService;
             _schemaService = schemaService;
+            _securityService = securityService;
         }
 
         public class OutputSchema
@@ -140,6 +142,13 @@ namespace Sentry.data.Web.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaInfoModel>))]
         public async Task<IHttpActionResult> GetSchemaByDataset(int datasetId)
         {
+            UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
+
+            if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
+            {
+                return Unauthorized();
+            }
+
             try
             {
                 List<DatasetFileConfigDto> dtoList = _configService.GetDatasetFileConfigDtoByDataset(datasetId);
@@ -164,6 +173,13 @@ namespace Sentry.data.Web.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaInfoModel))]
         public async Task<IHttpActionResult> GetSchema(int datasetId, int schemaId)
         {
+            UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
+
+            if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
+            {
+                return Unauthorized();
+            }
+
             try
             {
                 DatasetFileConfigDto dto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
@@ -193,17 +209,23 @@ namespace Sentry.data.Web.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaRevisionModel>))]
         public async Task<IHttpActionResult> GetSchemaRevisionBySchema(int datasetId, int schemaId)
         {
+            UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
+
+            if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
+            {
+                return Unauthorized();
+            }
+
             try
             {
-                DatasetFileConfigDto configDto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
-                if (configDto == null)
+                if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId))
                 {
                     Logger.Info($"metadataapi_getschemarevisionbyschema_notfound schema - datasetId:{datasetId} schemaId:{schemaId}");
                     return NotFound();
                 }
 
                 List<SchemaRevisionDto> revisionDto = _schemaService.GetSchemaRevisionDtoBySchema(schemaId);
-                if (configDto == null)
+                if (revisionDto == null)
                 {
                     Logger.Info($"metadataapi_getschemarevisionbyschema_notfound revision - datasetId:{datasetId} schemaId:{schemaId}");
                     return NotFound();
@@ -231,15 +253,30 @@ namespace Sentry.data.Web.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaRevisionDetailModel>))]
         public async Task<IHttpActionResult> GetSchemaRevision(int datasetId, int schemaId, int revisionId)
         {
+            UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
+
+            if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
+            {
+                return Unauthorized();
+            }
+
             try
             {
-                DatasetFileConfigDto configDto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
-                SchemaRevisionDto revisiondto = _schemaService.GetSchemaRevisionDto(revisionId);
+                if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId))
+                {
+                    Logger.Info($"metadataapi_getschemarevision_notfound - datasetid:{datasetId} schemaid:{schemaId}");
+                    return NotFound();
+                }
+
+                SchemaRevisionDto revisiondto = _schemaService.GetSchemaRevisionDtoBySchema(schemaId).First(w => w.RevisionId == revisionId);
+                if (revisiondto == null)
+                {
+                    Logger.Info($"metadataapi_getschemarevision_notfound - datasetid:{datasetId} schemaid:{schemaId} revisionid:{revisionId}");
+                    return NotFound();
+                }
+
                 SchemaRevisionDetailModel revisionDetailModel = revisiondto.ToSchemaDetailModel();
-                SchemaRevision revision = _dsContext.SchemaRevision.FirstOrDefault(w => w.SchemaRevision_Id == revisionId);
-
                 revisionDetailModel.fields = _schemaService.GetBaseFieldDtoBySchemaRevision(revisionId);
-
                 return Ok(revisionDetailModel);
             }
             catch (Exception ex)
