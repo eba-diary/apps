@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public class SchemaDetailDTO : SchemaDTO
+    public class SchemaDetaiApilDTO : SchemaApiDTO
     {
         public List<SchemaRow> Rows { get; set; }
     }

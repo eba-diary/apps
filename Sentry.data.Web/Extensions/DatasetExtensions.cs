@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using Sentry.data.Web.Models.ApiModels.Dataset;
+
 
 namespace Sentry.data.Web
 {
@@ -37,5 +40,28 @@ namespace Sentry.data.Web
             };
         }
 
+        public static List<DatasetInfoModel> ToApiModel(this List<Core.DatasetDto> dtoList)
+        {
+            List<DatasetInfoModel> modelList = new List<DatasetInfoModel>();
+            foreach (Core.DatasetDto dto in dtoList)
+            {                
+                modelList.Add(dto.ToApiModel());
+            }
+            return modelList;
+        }
+
+        public static DatasetInfoModel ToApiModel(this Core.DatasetDto dto)
+        {
+            return new DatasetInfoModel()
+            {
+                Id = dto.DatasetId,
+                Name = dto.DatasetName,
+                Description = dto.DatasetDesc,
+                IsSecure = dto.IsSecured,
+                PrimaryContactName = dto.PrimaryContactName,
+                PrimarContactEmail = dto.PrimaryContactEmail,
+                PrimaryOwnerName = dto.PrimaryOwnerName
+            };
+        }
     }
 }

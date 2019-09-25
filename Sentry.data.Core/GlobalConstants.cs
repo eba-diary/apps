@@ -221,5 +221,12 @@
             public const string TIMESTAMP = "TIMESTAMP";
             public const string STRUCT = "STRUCT";
         }
+
+        public static class SchemaDataTypes
+        {
+            public const string STRUCT = "STRUCT";
+            public const string INTEGER = "INTEGER";
+            public const string VARCHAR = "VARCHAR";
+        }
     }
 }

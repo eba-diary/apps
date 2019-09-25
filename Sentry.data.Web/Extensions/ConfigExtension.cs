@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using Sentry.data.Web.Models.ApiModels.Config;
+using Sentry.data.Web.Models.ApiModels.Schema;
 
 namespace Sentry.data.Web
 {
@@ -91,7 +93,10 @@ namespace Sentry.data.Web
         public static Core.DatasetFileConfigDto ToDto(this DatasetFileConfigsModel model)
         {
             List<Core.DataElementDto> deList = new List<Core.DataElementDto>();
-            deList.Add(model.ToSchemaDto());
+            deList.Add(model.ToSchemaApiDto());
+
+            //List<Core.SchemaDto> schemaList = new List<Core.SchemaDto>();
+            //schemaList.Add(model.ToSchemaDto());
 
             return new Core.DatasetFileConfigDto()
             {
@@ -111,7 +116,7 @@ namespace Sentry.data.Web
             };
         }
 
-        public static Core.DataElementDto ToSchemaDto(this DatasetFileConfigsModel model)
+        public static Core.DataElementDto ToSchemaApiDto(this DatasetFileConfigsModel model)
         {
             return new Core.DataElementDto()
             {
@@ -128,6 +133,66 @@ namespace Sentry.data.Web
                 IsInSAS = model.IncludedInSAS,
                 SasLibrary = model.SasLibrary
             };
+        }
+
+        public static ConfigInfoModel ToModel(this Core.DatasetFileConfigDto dto)
+        {
+            return new ConfigInfoModel()
+            {
+                ConfigId = dto.ConfigId,
+                Name = dto.Name,
+                Description = dto.Description,
+                StorageCode = dto.StorageCode,
+                FileType = dto.FileTypeId.ToString(),
+                Delimiter = dto.Delimiter,
+                HasHeader = dto.HasHeader,
+                IsInSAS = dto.IsInSAS,
+                CreateCurrentView = dto.CreateCurrentView,
+                IsTrackableSchema = dto.IsTrackableSchema,
+                SchemaId = (dto.Schema != null) ? dto.Schema.SchemaId : -1
+            };
+        }
+
+        public static List<ConfigInfoModel> ToModel(this List<Core.DatasetFileConfigDto> dtoList)
+        {
+            List<ConfigInfoModel> modelList = new List<ConfigInfoModel>();
+            foreach(Core.DatasetFileConfigDto dto in dtoList)
+            {
+                modelList.Add(dto.ToModel());
+            }
+            return modelList;
+        }
+
+        public static SchemaInfoModel ToSchemaModel(this Core.DatasetFileConfigDto dto)
+        {
+            return new SchemaInfoModel()
+            {
+                ConfigId = dto.ConfigId,
+                SchemaId = dto.Schema.SchemaId,
+                SchemaEntity_NME = dto.Schema.SchemaEntity_NME,
+                Description = dto.Description,
+                StorageCode = dto.StorageCode,
+                Format = dto.FileExtensionName,
+                CurrentView = dto.CreateCurrentView,
+                IsInSAS = dto.IsInSAS,
+                Delimiter = dto.Delimiter,
+                HasHeader = dto.HasHeader,
+                IsTrackableSchema = dto.IsTrackableSchema,
+                HiveTable = dto.HiveTable,
+                HiveDatabase = dto.HiveDatabase,
+                HiveTableStatus = dto.HiveTableStatus,
+                HiveLocation = dto.HiveLocation
+            };
+        }
+
+        public static List<SchemaInfoModel> ToSchemaModel(this List<Core.DatasetFileConfigDto> dtoList)
+        {
+            List<SchemaInfoModel> modelList = new List<SchemaInfoModel>();
+            foreach (Core.DatasetFileConfigDto dto in dtoList)
+            {
+                modelList.Add(dto.ToSchemaModel());
+            }
+            return modelList;
         }
     }
 }

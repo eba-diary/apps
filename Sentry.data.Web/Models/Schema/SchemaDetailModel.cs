@@ -8,7 +8,7 @@ namespace Sentry.data.Web
 {
     public class SchemaDetailModel : SchemaModel
     {
-        public SchemaDetailModel(SchemaDetailDTO dto) : base(dto)
+        public SchemaDetailModel(SchemaDetaiApilDTO dto) : base(dto)
         {
             Rows = dto.Rows;
         }

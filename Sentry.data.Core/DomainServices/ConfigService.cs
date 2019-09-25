@@ -54,20 +54,26 @@ namespace Sentry.data.Core
 
         private IS3ServiceProvider S3ServiceProvider { get; set; }
 
-        public SchemaDTO GetSchemaDTO(int id)
+        public SchemaApiDTO GetSchemaApiDTO(int id)
         {
             DataElement de = _datasetContext.GetById<DataElement>(id);
-            SchemaDTO dto = new SchemaDTO();
+            SchemaApiDTO dto = new SchemaApiDTO();
             MapToDto(de, dto);
             return dto;
         }
 
-        public SchemaDetailDTO GetSchemaDetailDTO(int id)
+        public SchemaDetaiApilDTO GetSchemaDetailDTO(int id)
         {
             DataElement de = _datasetContext.GetById<DataElement>(id);
-            SchemaDetailDTO dto = new SchemaDetailDTO();
+            SchemaDetaiApilDTO dto = new SchemaDetaiApilDTO();
             MaptToDetailDto(de, dto);
             return dto;
+        }
+
+        public SchemaDto GetSchemaDto(int id)
+        {
+            Schema s = _datasetContext.GetById<Schema>(id);            
+            return s.MapToSchemaDto();
         }
 
         public IList<ColumnDTO> GetColumnDTO(int id)
@@ -254,7 +260,7 @@ namespace Sentry.data.Core
                 dfc.RetrieverJobs = jobList;
 
                 Dataset parent = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
-                List<DatasetFileConfig> dfcList = parent.DatasetFileConfigs.ToList();
+                List<DatasetFileConfig> dfcList = (parent.DatasetFileConfigs == null) ? new List<DatasetFileConfig>() : parent.DatasetFileConfigs.ToList();
                 dfcList.Add(dfc);
                 parent.DatasetFileConfigs = dfcList;
 
@@ -296,7 +302,7 @@ namespace Sentry.data.Core
             dfc.Description = dto.Description;
             dfc.FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId);
 
-            DataElement de = _datasetContext.DataElements.Where(w => w.DatasetFileConfig.ConfigId == dfc.ConfigId && w.DataElement_NME == dfc.Schema.FirstOrDefault().DataElement_NME).FirstOrDefault();
+            DataElement de = _datasetContext.DataElements.Where(w => w.DatasetFileConfig.ConfigId == dfc.ConfigId && w.DataElement_NME == dfc.Schemas.FirstOrDefault().DataElement_NME).FirstOrDefault();
             UpdateDataElement(dto, de);
         }
 
@@ -325,6 +331,17 @@ namespace Sentry.data.Core
             return dto;
         }
 
+        public List<DatasetFileConfigDto> GetDatasetFileConfigDtoByDataset(int datasetId)
+        {
+            Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+            List<DatasetFileConfigDto> dtoList = new List<DatasetFileConfigDto>();
+            foreach(DatasetFileConfig config in ds.DatasetFileConfigs.Where(w => !w.DeleteInd))
+            {
+                dtoList.Add(GetDatasetFileConfigDto(config.ConfigId));
+            }
+            return dtoList;
+        }
+
         private DatasetFileConfig CreateDatasetFileConfig(DatasetFileConfigDto dto)
         {
             List<DataElement> deList = new List<DataElement>();
@@ -338,12 +355,14 @@ namespace Sentry.data.Core
                 ParentDataset = _datasetContext.GetById<Dataset>(dto.ParentDatasetId),
                 FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId),
                 DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId),
-                Schema = deList
+                Schemas = deList
             };
+            dfc.IsSchemaTracked = true;
+            dfc.Schema = new FileSchema(dfc, _userService.GetCurrentUser());
 
             de.DatasetFileConfig = dfc;
             deList.Add(de);
-            dfc.Schema = deList;
+            dfc.Schemas = deList;
 
             return dfc;
         }
@@ -385,6 +404,36 @@ namespace Sentry.data.Core
         public void UpdateFields(int configId, int schemaId, List<SchemaRow> schemaRows)
         {
             DatasetFileConfig config = _datasetContext.GetById<DatasetFileConfig>(configId);
+
+            #region Populate New Schema Structure
+            //Insert schema metadata into new structure
+            try
+            {
+                SchemaRevision revision = new SchemaRevision()
+                {
+                    SchemaRevision_Name = "Another Revision " + (config.Schema.Revisions.Count() + 1).ToString(),
+                    CreatedBy = _userService.GetCurrentUser().AssociateId
+                };
+
+                config.Schema.AddRevision(revision);
+
+                _datasetContext.Add(revision);
+
+                foreach (var row in schemaRows)
+                {
+                    revision.Fields.Add(AddRevisionField(row, revision));
+                }
+
+                _datasetContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("configservice_updatefields - add new revision failed", ex);
+            }
+            #endregion
+
+            #region Populate Old Schema Structure
+            //Maintain metadata in old schema structure
             DataElement schema = _datasetContext.GetById<DataElement>(schemaId);
             DataElement newRevision = null;
             DataObject DOBJ = null;
@@ -497,6 +546,7 @@ namespace Sentry.data.Core
                 _datasetContext.Merge(newRevision);
                 _datasetContext.SaveChanges();
             }
+            #endregion
 
             //Send message to create hive table
             HiveTableCreateModel hiveCreate = new HiveTableCreateModel();
@@ -508,6 +558,69 @@ namespace Sentry.data.Core
 
         }
 
+        private BaseField AddRevisionField(SchemaRow row, SchemaRevision revision, BaseField parentRow = null)
+        {
+            BaseField newField = null;
+            switch (row.DataType.ToUpper())
+            {
+                case "INTEGER":
+                    newField = new IntegerField() { };
+                    break;
+                case "DECIMAL":
+                    newField = new DecimalField()
+                    {                        
+                        Precision = Int32.Parse(row.Precision),
+                        Scale = Int32.Parse(row.Scale)
+                    };
+                    break;
+                case "VARCHAR":
+                    newField = new VarcharField() { };
+                    break;
+                case "DATE":
+                    newField = new DateField()
+                    {
+                        SourceFormat = row.Format
+                    };
+                    break;
+                case "TIMESTAMP":
+                    newField = new TimestampField()
+                    {
+                        SourceFormat = row.Format
+                    };
+                    break;
+                case "STRUCT":
+                    newField = new StructField() { };
+                    break;
+                case "BIGINT":
+                    newField = new BigintField() { };
+                    break;
+                default:
+                    Logger.Info($"updatefields - datatype not supported ({row.DataType.ToUpper()})");
+                    break;
+            }
+
+            if (newField != null)
+            {
+                newField.Name = row.Name;
+                newField.CreateDTM = DateTime.Now;
+                newField.LastUpdateDTM = DateTime.Now;
+                newField.ParentSchemaRevision = revision;
+                newField.ParentField = parentRow;
+                newField.OrdinalPosition = row.Position;
+                newField.NullableIndicator = row.Nullable ?? false;
+                _datasetContext.Add(newField);
+            }
+
+            if (newField != null && row.ChildRows != null)
+            {
+                foreach (SchemaRow cRow in row.ChildRows)
+                {
+                    newField.ChildFields.Add(AddRevisionField(cRow, revision, newField));
+                }
+            }
+
+            return newField;
+        }
 
         public bool UpdateandSaveOAuthToken(HTTPSSource source, string newToken, DateTime tokenExpTime)
         {
@@ -606,7 +719,7 @@ namespace Sentry.data.Core
             try
             {
                 DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(id);
-                DataElement de = dfc.Schema.FirstOrDefault();
+                DataElement de = dfc.Schemas.FirstOrDefault();
 
                 if (logicalDelete)
                 {
@@ -726,7 +839,7 @@ namespace Sentry.data.Core
             de.DeleteIssueDTM = DateTime.Now;
         }
 
-        private void MapToDto(DataElement de, SchemaDTO dto)
+        private void MapToDto(DataElement de, SchemaApiDTO dto)
         {
             dto.SchemaID = de.DataElement_ID;
             dto.Format = de.FileFormat;
@@ -781,7 +894,7 @@ namespace Sentry.data.Core
             }
         }
 
-        private void MaptToDetailDto(DataElement de, SchemaDetailDTO dto)
+        private void MaptToDetailDto(DataElement de, SchemaDetaiApilDTO dto)
         {
             MapToDto(de, dto);
 
@@ -1076,13 +1189,20 @@ namespace Sentry.data.Core
             dto.Description = dfc.Description;
             dto.DatasetScopeTypeId = dfc.DatasetScopeType.ScopeTypeId;
             dto.FileExtensionId = dfc.FileExtension.Id;
+            dto.FileExtensionName = dfc.FileExtension.Name;
             dto.ParentDatasetId = dfc.ParentDataset.DatasetId;
             dto.StorageCode = dfc.GetStorageCode();
             dto.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
-            dto.CreateCurrentView = (dfc.Schema.FirstOrDefault() != null) ? dfc.Schema.FirstOrDefault().CreateCurrentView : false;
-            dto.IsInSAS = (dfc.Schema.FirstOrDefault() != null) ? dfc.Schema.FirstOrDefault().IsInSAS : false;
-            dto.Delimiter = dfc.Schema.FirstOrDefault().Delimiter;
-            dto.HasHeader = (dfc.Schema.FirstOrDefault() != null) ? dfc.Schema.FirstOrDefault().HasHeader : false;
+            dto.CreateCurrentView = (dfc.Schemas.FirstOrDefault() != null) ? dfc.Schemas.FirstOrDefault().CreateCurrentView : false;
+            dto.IsInSAS = (dfc.Schemas.FirstOrDefault() != null) ? dfc.Schemas.FirstOrDefault().IsInSAS : false;
+            dto.Delimiter = dfc.Schemas.FirstOrDefault().Delimiter;
+            dto.HasHeader = (dfc.Schemas.FirstOrDefault() != null) ? dfc.Schemas.FirstOrDefault().HasHeader : false;
+            dto.IsTrackableSchema = dfc.IsSchemaTracked;
+            dto.HiveTable = dfc.Schemas.First().HiveTable;
+            dto.HiveDatabase = dfc.Schemas.First().HiveDatabase;
+            dto.HiveLocation = dfc.Schemas.First().HiveLocation;
+            dto.HiveTableStatus = dfc.Schemas.First().HiveTableStatus;
+            dto.Schema = (dfc.Schema != null) ? GetSchemaDto(dfc.Schema.SchemaId) : null;
         }
         #endregion
     }

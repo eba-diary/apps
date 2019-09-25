@@ -80,7 +80,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 });
             }, map => map.OneToMany(a => a.Class(typeof(DatasetFile))));
 
-            this.Bag(x => x.Schema, (m) =>
+            this.Bag(x => x.Schemas, (m) =>
             {
                 m.Lazy(CollectionLazy.NoLazy);
                 m.Inverse(true);
@@ -92,6 +92,15 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                     k.Column("Config_ID");
                 });
             }, map => map.OneToMany(a => a.Class(typeof(DataElement))));
+
+            this.Property((x) => x.IsSchemaTracked, (m) => m.Column("IsSchemaTracked"));
+            this.ManyToOne(x => x.Schema, m =>
+            {
+                m.Column("Schema_ID");
+                m.ForeignKey("FK_DatasetFileConfigs_Schema");
+                m.Class(typeof(Schema));
+                m.Cascade(Cascade.All);
+            });
         }
     }
 }

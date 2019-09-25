@@ -27,5 +27,6 @@ namespace Sentry.data.Core
         public List<SchemaRow> ChildRows { get; set; }
         public double LastUpdated { get; set; }
         public bool DeleteInd { get; set; }
+        public bool IsArray { get; set; }
     }
 }
