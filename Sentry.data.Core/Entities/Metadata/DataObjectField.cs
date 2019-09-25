@@ -62,7 +62,19 @@ namespace Sentry.data.Core
             {
                 SetDataGetFieldDetailValue("OrdinalPosition_CDE", value);
             }
-        }        
+        }
+        public virtual string FieldFormat
+        {
+            get
+            {
+                DataObjectFieldDetail detail = GetFieldDetail("FieldFormat");
+                return (detail == null) ? null : detail.DataObjectFieldDetailType_VAL;
+            }
+            set
+            {
+                SetDataGetFieldDetailValue("FieldFormat", value);
+            }
+        }
         public virtual string Precision
         {
             get

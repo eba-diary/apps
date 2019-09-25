@@ -16,16 +16,19 @@ namespace Sentry.data.Core
         private readonly UserService _userService;
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
+        private readonly IConfigService _configService;
 
         public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, 
                             UserService userService, IMessagePublisher messagePublisher,
-                            IS3ServiceProvider s3ServiceProvider)
+                            IS3ServiceProvider s3ServiceProvider,
+                            IConfigService configService)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
             _userService = userService;
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
+            _configService = configService;
         }
 
 
@@ -46,6 +49,19 @@ namespace Sentry.data.Core
             MapToDetailDto(ds, dto);
 
             return dto;
+        }
+
+        public List<DatasetDto> GetAllDatasetDto()
+        {
+            List<Dataset> dsList = _datasetContext.Datasets.Where(x => x.CanDisplay && x.DatasetType == "DS").FetchAllChildren(_datasetContext).ToList();
+            List<DatasetDto> dtoList = new List<DatasetDto>();
+            foreach (Dataset ds in dsList)
+            {
+                DatasetDto dto = new DatasetDto();
+                MapToDto(ds, dto);
+                dtoList.Add(dto);
+            }
+            return dtoList;
         }
 
         public UserSecurity GetUserSecurityForDataset(int datasetId)
@@ -157,28 +173,8 @@ namespace Sentry.data.Core
             Dataset ds = CreateDataset(dto);
             _datasetContext.Add(ds);
             dto.DatasetId = ds.DatasetId;
-
-            DataElement de = CreateDataElement(dto);
-            DatasetFileConfig dfc = CreateDatasetFileConfig(dto, ds);
-
-            de.DatasetFileConfig = dfc;
-            dfc.Schema = new List<DataElement> { de };
-
-            List<RetrieverJob> jobList = new List<RetrieverJob>();
-            if (ds.DataClassification == GlobalEnums.DataClassificationType.HighlySensitive)
-            {
-                jobList.Add(CreateRetrieverJob(dfc, GlobalConstants.DataSourceName.DEFAULT_HSZ_DROP_LOCATION));
-            }
-            else
-            {
-                CreateRetrieverJob(dfc, GlobalConstants.DataSourceName.DEFAULT_DROP_LOCATION);
-            }
-
-            jobList.Add(CreateRetrieverJob(dfc, GlobalConstants.DataSourceName.DEFAULT_S3_DROP_LOCATION));
-
-            dfc.RetrieverJobs = jobList;
-
-            _datasetContext.Merge(dfc);
+          
+            _configService.CreateAndSaveDatasetFileConfig(dto.ToConfigDto());
             _datasetContext.SaveChanges();
 
             return ds.DatasetId;
@@ -404,6 +400,8 @@ namespace Sentry.data.Core
 
         private DatasetFileConfig CreateDatasetFileConfig(DatasetDto dto, Dataset ds)
         {
+            //DatasetFileConfigDto configDto = ToDto(dto, ds);
+
             DatasetFileConfig dfc = new DatasetFileConfig()
             {
                 ConfigId = 0,
@@ -414,6 +412,8 @@ namespace Sentry.data.Core
                 DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId),
                 FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId)
             };
+            dfc.IsSchemaTracked = true;
+            dfc.Schema = new FileSchema(dfc, _userService.GetCurrentUser());
 
             return dfc;
         }
@@ -524,6 +524,7 @@ namespace Sentry.data.Core
             dto.DatasetInformation = ds.DatasetInformation;
             dto.DatasetType = ds.DatasetType;
             dto.DataClassification = ds.DataClassification;
+            dto.CategoryColor = ds.DatasetCategories.FirstOrDefault().Color;
 
             dto.CreationUserId = ds.CreationUserName;
             dto.CreationUserName = ds.CreationUserName;
@@ -540,7 +541,7 @@ namespace Sentry.data.Core
             dto.OriginationId = (int)Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode);
             dto.ConfigFileDesc = ds.DatasetFileConfigs?.First()?.Description;
             dto.ConfigFileName = ds.DatasetFileConfigs?.First()?.Name;
-            dto.Delimiter = ds.DatasetFileConfigs?.First()?.Schema?.First()?.Delimiter;
+            dto.Delimiter = ds.DatasetFileConfigs?.First()?.Schemas?.First()?.Delimiter;
             dto.FileExtensionId = ds.DatasetFileConfigs.First().FileExtension.Id;
             dto.DatasetScopeTypeId = ds.DatasetFileConfigs.First().DatasetScopeType.ScopeTypeId;
             dto.CategoryName = ds.DatasetCategories.First().Name;

@@ -5,8 +5,8 @@ namespace Sentry.data.Core
 {
     public interface IConfigService
     {
-        SchemaDTO GetSchemaDTO(int id);
-        SchemaDetailDTO GetSchemaDetailDTO(int id);
+        SchemaApiDTO GetSchemaApiDTO(int id);
+        SchemaDetaiApilDTO GetSchemaDetailDTO(int id);
         IList<ColumnDTO> GetColumnDTO(int id);
         void UpdateFields(int configId, int schemaId, List<SchemaRow> schemaRows);
         List<string> Validate(DataElementDto dto);
@@ -23,7 +23,9 @@ namespace Sentry.data.Core
         AccessRequest GetDataSourceAccessRequest(int dataSourceId);
         string RequestAccessToDataSource(AccessRequest request);
         DatasetFileConfigDto GetDatasetFileConfigDto(int configId);
+        List<DatasetFileConfigDto> GetDatasetFileConfigDtoByDataset(int datasetId);
         bool Delete(int id, bool logicalDelete = true);
         UserSecurity GetUserSecurityForConfig(int id);
+        SchemaDto GetSchemaDto(int id);
     }
 }
