@@ -51,6 +51,19 @@ namespace Sentry.data.Core
             return dto;
         }
 
+        public List<DatasetDto> GetAllDatasetDto()
+        {
+            List<Dataset> dsList = _datasetContext.Datasets.Where(x => x.CanDisplay && x.DatasetType == "DS").FetchAllChildren(_datasetContext).ToList();
+            List<DatasetDto> dtoList = new List<DatasetDto>();
+            foreach (Dataset ds in dsList)
+            {
+                DatasetDto dto = new DatasetDto();
+                MapToDto(ds, dto);
+                dtoList.Add(dto);
+            }
+            return dtoList;
+        }
+
         public UserSecurity GetUserSecurityForDataset(int datasetId)
         {
             Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == datasetId && x.CanDisplay).FetchSecurityTree(_datasetContext).FirstOrDefault();

@@ -93,11 +93,7 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
-                List<DatasetDto> dtoList = new List<DatasetDto>();
-                foreach (Dataset ds in _dsContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET && w.CanDisplay))
-                {
-                    dtoList.Add(_datasetService.GetDatasetDto(ds.DatasetId));
-                }
+                List<DatasetDto> dtoList = _datasetService.GetAllDatasetDto();
                 List<DatasetInfoModel> modelList = dtoList.ToApiModel();
                 return Ok(modelList);
             }
