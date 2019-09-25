@@ -26,9 +26,12 @@ namespace Sentry.data.Web
             this.ScopeType = dsfc.DatasetScopeType;
             this.FileExtensionID = dsfc.FileExtension.Id;
             this.FileExtension = dsfc.FileExtension;
-            this.Schemas = dsfc.Schema;
+            this.Schemas = dsfc.Schemas;
             this.RawStorageId = dsfc.GetStorageCode();
-            this.SchemaId = dsfc.Schema.FirstOrDefault().DataElement_ID;
+            this.SchemaId = dsfc.Schemas.FirstOrDefault().DataElement_ID;
+            this.Delimiter = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().Delimiter;
+            this.CreateCurrentView = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().CreateCurrentView;
+            this.HasHeader = dsfc.Schemas.OrderByDescending(o => o.DataElementChange_DTM).FirstOrDefault().HasHeader;
 
             try
             {
@@ -83,12 +86,12 @@ namespace Sentry.data.Web
             this.ScopeType = dsfc.DatasetScopeType;
             this.FileExtensionID = dsfc.FileExtension.Id;
             this.FileExtension = dsfc.FileExtension;
-            this.Schemas = dsfc.Schema;
-            this.SchemaId = dsfc.Schema.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().DataElement_ID;
-            this.Delimiter = dsfc.Schema.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().Delimiter;
+            this.Schemas = dsfc.Schemas;
+            this.SchemaId = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().DataElement_ID;
+            this.Delimiter = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().Delimiter;
             this.RawStorageId = dsfc.GetStorageCode();
-            this.CreateCurrentView = dsfc.Schema.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().CreateCurrentView;
-            this.HasHeader = dsfc.Schema.OrderByDescending(o => o.DataElementChange_DTM).FirstOrDefault().HasHeader;
+            this.CreateCurrentView = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().CreateCurrentView;
+            this.HasHeader = dsfc.Schemas.OrderByDescending(o => o.DataElementChange_DTM).FirstOrDefault().HasHeader;
 
             try
             {

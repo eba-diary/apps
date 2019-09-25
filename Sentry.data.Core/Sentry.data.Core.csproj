@@ -84,12 +84,16 @@
     <Compile Include="DomainServices\ConfigService.cs" />
     <Compile Include="DomainServices\DatasetService.cs" />
     <Compile Include="DomainServices\JobService.cs" />
+    <Compile Include="DomainServices\SchemaService.cs" />
     <Compile Include="DTO\Config\DatasetFileConfigDto.cs" />
     <Compile Include="DTO\ContactInfoDto.cs" />
     <Compile Include="DTO\Favorites\FavoriteDto.cs" />
     <Compile Include="DTO\ImagesDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
+    <Compile Include="DTO\Schema\BaseFieldDto.cs" />
     <Compile Include="DTO\Schema\DataElementDTO.cs" />
+    <Compile Include="DTO\Schema\SchemaDTO.cs" />
+    <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />
     <Compile Include="Entities\Datasets\DatasetFileParquet.cs" />
     <Compile Include="Entities\Datasets\DatasetFileReply.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\Authentications\OAuthAuthentication.cs" />
@@ -100,18 +104,34 @@
     <Compile Include="Entities\Goldeneye\RunningTask.cs" />
     <Compile Include="Entities\Image.cs" />
     <Compile Include="Entities\MessageFormats\HiveTableDeleteModel.cs" />
+    <Compile Include="Entities\Schema\BaseField.cs" />
+    <Compile Include="Entities\Schema\BigintField.cs" />
+    <Compile Include="Entities\Schema\DateField.cs" />
+    <Compile Include="Entities\Schema\DecimalField.cs" />
+    <Compile Include="Entities\Schema\FileSchema.cs" />
+    <Compile Include="Entities\Schema\Schema.cs" />
+    <Compile Include="Entities\Schema\IntegerField.cs" />
+    <Compile Include="Entities\Schema\SchemaRevision.cs" />
+    <Compile Include="Entities\Schema\StructField.cs" />
+    <Compile Include="Entities\Schema\TimestampField.cs" />
+    <Compile Include="Entities\Schema\VarcharField.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
     <Compile Include="Extensions\DatasetFileConfigExtensions.cs" />
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\DataSourceQueryExtensions.cs" />
+    <Compile Include="Extensions\SchemaExtensions.cs" />
     <Compile Include="GlobalEnums\HttpDataFormat.cs" />
     <Compile Include="GlobalEnums\HTTPMethods.cs" />
     <Compile Include="GlobalEnums\OAuthClaims.cs" />
     <Compile Include="GlobalEnums\OAuthGrantType.cs" />
+    <Compile Include="GlobalEnums\SchemaDatatypes.cs" />
+    <Compile Include="Interfaces\ISchemaField.cs" />
+    <Compile Include="Interfaces\ISchemaService.cs" />
     <Compile Include="Interfaces\ITicketMonitorService.cs" />
     <Compile Include="Interfaces\IBaseTicketProvider.cs" />
     <Compile Include="Interfaces\ICherwellProvider.cs" />
     <Compile Include="Interfaces\IEncryptionService.cs" />
+    <Compile Include="Interfaces\ITrackableSchema.cs" />
     <Compile Include="Interfaces\Retriever\DataSourceProviders\IHttpsProvider.cs" />
     <Compile Include="Extensions\JobExtensions.cs" />
     <Compile Include="Entities\MessageFormats\HszDropLocationCreateModel.cs" />
@@ -121,10 +141,10 @@
     <Compile Include="DomainServices\TagService.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceDetailDTO.cs" />
     <Compile Include="DTO\Dataset\DatasetDetailDTO.cs" />
-    <Compile Include="DTO\Schema\SchemaDetailDTO.cs" />
+    <Compile Include="DTO\Schema\SchemaDetailApiDTO.cs" />
     <Compile Include="DTO\TagDto.cs" />
     <Compile Include="Entities\ColumnDTO.cs" />
-    <Compile Include="DTO\Schema\SchemaDTO.cs" />
+    <Compile Include="DTO\Schema\SchemaApiDTO.cs" />
     <Compile Include="Entities\Datasets\BusinessUnit.cs" />
     <Compile Include="Entities\Datasets\DatasetFunction.cs" />
     <Compile Include="Entities\HiveTableStatusEnum.cs" />
@@ -287,6 +307,8 @@
     <None Include="app.config">
       <SubType>Designer</SubType>
     </None>
+    <None Include="ClassDiagram1.cd" />
+    <None Include="ClassDiagram2.cd" />
     <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
       <SubType>Designer</SubType>
     </None>

@@ -330,6 +330,22 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<Schema> Schema
+        {
+            get
+            {
+                return Query<Schema>();
+            }
+        }
+
+        public IQueryable<SchemaRevision> SchemaRevision
+        {
+            get
+            {
+                return Query<SchemaRevision>();
+            }
+        }
+
         public IEnumerable<Dataset> GetDatasetByCategoryID(int id)
         {
             return Query<Dataset>().Where(w => w.DatasetCategories.Any(y=> y.Id == id)).Where(x => x.CanDisplay).AsEnumerable();

@@ -1,8 +1,8 @@
-﻿@model Sentry.data.Web.ObsoleteDatasetModel
+﻿@model Sentry.data.Web.ManageConfigsModel
 
 @{
     ViewBag.Title = "View Dataset Configuration Details";
-    string color = Model.DatasetCategory.Color;
+    string color = Model.CategoryColor;
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 <a class="backToList" href="/Dataset/Detail/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>  Back to Dataset Information</a>
@@ -17,25 +17,25 @@
                 <h1 class="detailName leftFloat @color">
                     @Model.DatasetName
 
-                    @if (Model.IsSecured)
+                    @*@if (Model.IsSecured)
                     {
                         <span class="glyphicon glyphicon-lock lockIcon" data-toggle="tooltip" data-placement="top" title="Secure"></span>
-                    }
+                    }*@
                 </h1>
 
-                @{
+                @*@{
                     foreach (string item in Model.DistinctFileExtensions())
                     {
                         <div class="extension detailExt bg_gray htCenter ext_@item">@item</div>
                     }
-                }
+                }*@
             </div>
         </div>
     </div>
 
     <br />
 
-    <div class="hidden-md hidden-lg">
+    @*<div class="hidden-md hidden-lg">
         <h1 class="detailName leftFloat @color">
             @Model.DatasetName
 
@@ -94,7 +94,7 @@
             </div>
         </div>
 
-    </div>
+    </div>*@
 
 </div>
 
@@ -103,8 +103,6 @@
 <p>Click any section header to begin:</p>
 
 @{
-    if (Model.CanEditDataset)
-    {
         <div id="configs">
 
 
@@ -369,7 +367,6 @@
             }
 
         </div>
-    }
 
         <div>
             @if (HttpContext.Current.IsDebuggingEnabled)

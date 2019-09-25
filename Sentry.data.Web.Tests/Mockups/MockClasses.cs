@@ -73,7 +73,7 @@ namespace Sentry.data.Web.Tests
             List<DataElement> deList = new List<DataElement>();
             deList.Add(MockDataElement(dfc));
 
-            dfc.Schema = deList;
+            dfc.Schemas = deList;
 
             return dfc;
         }
