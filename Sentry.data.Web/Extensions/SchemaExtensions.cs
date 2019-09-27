@@ -49,5 +49,39 @@ namespace Sentry.data.Web
                 Revision = dto.ToModel()
             };
         }
+
+        public static Core.SchemaRow ToModel(this Core.BaseFieldDto dto)
+        {
+            Core.SchemaRow row = new Core.SchemaRow()
+            {
+                Name = dto.Name,
+                Description = dto.Description,
+                DataType = (dto.FieldType != null) ? dto.FieldType.ToUpper() : Core.SchemaDatatypes.VARCHAR.ToString(),
+                Format = dto.SourceFormat,
+                IsArray = dto.IsArray,
+                Nullable = dto.Nullable,
+                Position = dto.OrdinalPosition,
+                Precision = dto.Precision.ToString(),
+                Scale = dto.Scale.ToString(),
+                LastUpdated = dto.LastUpdatedDTM.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds,
+                DataObjectField_ID = dto.FieldId
+            };
+
+            if (dto.ChildFields.Any())
+            {
+                List<Core.SchemaRow> childRows = new List<Core.SchemaRow>();
+                foreach (Core.BaseFieldDto childDto in dto.ChildFields)
+                {
+                    childRows.Add(childDto.ToModel());
+                }
+                row.ChildRows = childRows;
+            }
+            else
+            {
+                row.ChildRows = new List<Core.SchemaRow>();
+            }
+
+            return row;
+        }
     }
 }

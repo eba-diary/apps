@@ -116,6 +116,22 @@ namespace Sentry.data.Web
             };
         }
 
+        public static Core.FileSchemaDto ToSchema(this DatasetFileConfigsModel model)
+        {
+            return new Core.FileSchemaDto()
+            {
+                Name = model.ConfigFileName,
+                SchemaEntity_NME = "",
+                FileExtensionId = model.FileExtensionID,
+                Delimiter = model.Delimiter,
+                HasHeader = model.HasHeader,
+                CreateCurrentView = model.CreateCurrentView,
+                IsInSAS = model.IncludedInSAS,
+                SasLibrary = model.SasLibrary,
+                ParentDatasetId = model.DatasetId
+            };
+        }
+
         public static Core.DataElementDto ToSchemaApiDto(this DatasetFileConfigsModel model)
         {
             return new Core.DataElementDto()

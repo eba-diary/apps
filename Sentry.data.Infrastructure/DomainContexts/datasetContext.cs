@@ -338,6 +338,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<FileSchema> FileSchema
+        {
+            get
+            {
+                return Query<FileSchema>();
+            }
+        }
+
         public IQueryable<SchemaRevision> SchemaRevision
         {
             get

@@ -20,6 +20,7 @@ namespace Sentry.data.Core
         public virtual string CreatedBy { get; set; }
         public virtual DateTime CreatedDTM { get; set; }
         public virtual DateTime LastUpdatedDTM { get; set; }
+        public virtual string UpdatedBy { get; set; }
 
         public virtual IList<SchemaRevision> Revisions { get; set; }
 

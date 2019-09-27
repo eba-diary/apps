@@ -20,5 +20,6 @@ namespace Sentry.data.Core
         public bool IsArray { get; set; }
         public bool Nullable { get; set; }
         public int OrdinalPosition { get; set; }
+        public string Description { get; set; }
     }
 }

@@ -22,11 +22,13 @@ namespace Sentry.data.Core
         public IEmailService _emailService;
         private IS3ServiceProvider s3ServiceProvider;
         private readonly ISecurityService _securityService;
+        private readonly ISchemaService _schemaService;
 
         public ConfigService(IDatasetContext dsCtxt, IMessagePublisher publisher, 
             IUserService userService, IEventService eventService, IMessagePublisher messagePublisher,
             IEncryptionService encryptService, ISecurityService securityService,
-            IJobService jobService, IEmailService emailService, IS3ServiceProvider s3ServiceProvider)
+            IJobService jobService, IEmailService emailService, IS3ServiceProvider s3ServiceProvider,
+            ISchemaService schemaService)
         {
             _datasetContext = dsCtxt;
             _publisher = publisher;
@@ -38,6 +40,7 @@ namespace Sentry.data.Core
             JobService = jobService;
             _emailService = emailService;
             S3ServiceProvider = s3ServiceProvider;
+            _schemaService = schemaService;
         }
 
         private IJobService JobService
@@ -68,12 +71,6 @@ namespace Sentry.data.Core
             SchemaDetaiApilDTO dto = new SchemaDetaiApilDTO();
             MaptToDetailDto(de, dto);
             return dto;
-        }
-
-        public SchemaDto GetSchemaDto(int id)
-        {
-            Schema s = _datasetContext.GetById<Schema>(id);            
-            return s.MapToSchemaDto();
         }
 
         public IList<ColumnDTO> GetColumnDTO(int id)
@@ -358,7 +355,7 @@ namespace Sentry.data.Core
                 Schemas = deList
             };
             dfc.IsSchemaTracked = true;
-            dfc.Schema = new FileSchema(dfc, _userService.GetCurrentUser());
+            dfc.Schema = _datasetContext.GetById<Schema>(dto.SchemaId);
 
             de.DatasetFileConfig = dfc;
             deList.Add(de);
@@ -419,7 +416,8 @@ namespace Sentry.data.Core
 
                 _datasetContext.Add(revision);
 
-                foreach (var row in schemaRows)
+                //filter out fields marked for deletion
+                foreach (var row in schemaRows.Where(w => !w.DeleteInd))
                 {
                     revision.Fields.Add(AddRevisionField(row, revision));
                 }
@@ -608,6 +606,7 @@ namespace Sentry.data.Core
                 newField.ParentField = parentRow;
                 newField.OrdinalPosition = row.Position;
                 newField.NullableIndicator = row.Nullable ?? false;
+                newField.IsArray = row.IsArray;
                 _datasetContext.Add(newField);
             }
 
@@ -1202,7 +1201,7 @@ namespace Sentry.data.Core
             dto.HiveDatabase = dfc.Schemas.First().HiveDatabase;
             dto.HiveLocation = dfc.Schemas.First().HiveLocation;
             dto.HiveTableStatus = dfc.Schemas.First().HiveTableStatus;
-            dto.Schema = (dfc.Schema != null) ? GetSchemaDto(dfc.Schema.SchemaId) : null;
+            dto.Schema = (dfc.Schema != null) ? _schemaService.GetFileSchemaDto(dfc.Schema.SchemaId) : null;
         }
         #endregion
     }

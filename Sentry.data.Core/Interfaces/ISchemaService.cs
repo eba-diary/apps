@@ -11,5 +11,9 @@ namespace Sentry.data.Core
         SchemaRevisionDto GetSchemaRevisionDto(int id);
         List<SchemaRevisionDto> GetSchemaRevisionDtoBySchema(int id);
         List<BaseFieldDto> GetBaseFieldDtoBySchemaRevision(int revisionId);
+        SchemaRevisionDto GetLatestSchemaRevisionDtoBySchema(int schemaId);
+        int CreateAndSaveSchema(SchemaDto schemaDto);
+        bool UpdateAndSaveSchema(SchemaDto schemaDto);
+        FileSchemaDto GetFileSchemaDto(int id);
     }
 }

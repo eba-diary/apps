@@ -228,5 +228,10 @@
             public const string INTEGER = "INTEGER";
             public const string VARCHAR = "VARCHAR";
         }
+
+        public static class SchemaTypes
+        {
+            public const string FILESCHEMA = "FileSchema";
+        }
     }
 }

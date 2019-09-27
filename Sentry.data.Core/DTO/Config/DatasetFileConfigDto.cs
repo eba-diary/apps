@@ -24,6 +24,7 @@ namespace Sentry.data.Core
         public bool HasHeader { get; set; }
         public bool IsTrackableSchema { get; set; }
         public SchemaDto Schema { get; set; }
+        public int SchemaId { get; set; }
         public string FileExtensionName { get; set; }
         public string HiveTable { get; set; }
         public string HiveDatabase { get; set; }

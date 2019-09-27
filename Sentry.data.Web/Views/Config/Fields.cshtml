@@ -312,7 +312,7 @@
 
                     <div class="showArray col-lg-1" data-bind="visible: ShowArray">
                         <label>IsArray?</label>
-                        <input class="array col-lg-2" data-bind="value: IsArray" type="checkbox" />
+                        <input class="array col-lg-2" data-bind="checked: IsArray" type="checkbox" />
                     </div>
 
                     <div class="options col-lg-4">
@@ -445,7 +445,11 @@
             self.Scale = ko.observable(indata.Scale);
             self.Format = ko.observable(indata.Format);
             self.DeleteInd = ko.observable(false);
-            self.IsArray = ko.observable(false);
+            self.IsArray = ko.observable(indata.IsArray);
+            self.ChildRows = ko.observableArray(ko.utils.arrayMap(indata.ChildRows, function (rowInfo) {
+                currentMax++;
+                return new Row(currentMax, rowInfo, self);
+            }));
 
             self.RowColor = ko.computed(function () {
                 var hasError = false;
@@ -549,7 +553,7 @@
             });
 
             self.ShowArray = ko.computed(function () {
-                if (self.DataType() === 'STRUCT') {
+                if (parent.AllowArrays) {
                     return true;
                 }
                 else {
@@ -574,11 +578,6 @@
                 return parent.IsPositional;
             })
 
-            self.ChildRows = ko.observableArray(ko.utils.arrayMap(data.ChildRows, function (rowInfo) {
-                currentMax++;
-                return new Row(currentMax, rowInfo, parent);
-            }));
-
             self.addChild = function () {
                 //currentMax++;
                 //self.ChildRows.push(new Row(currentMax, [{ DataObjectField_ID: "", Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }], parent));
@@ -589,7 +588,7 @@
             };
 
             self.removeChild = function (row) {
-                parent.Errors.remove(function (item) { return item.Id === row.Id(); });
+                parent.Errors.remove(function (item) { return item.Id === row.Id; });
                 self.ChildRows.remove(row);
             };
         };
@@ -604,32 +603,43 @@
         var viewModel = function (incomingJson) {
             var self = this;
 
+            //Observables
             self.Errors = ko.observableArray();
-
+            self.DataTypes = ko.observableArray();
+            self.IsPositional = ko.observable();
+            self.IsFixedWidth = ko.observable();
+            self.FilteredRows = ko.observableArray();
+            self.SortedRows = ko.observableArray();
+            self.HiveDatabaseName = ko.observable(incomingJson.HiveDatabaseName);
+            self.HiveTableName = ko.observable(incomingJson.HiveTableName);
+            self.FileExtensionId = incomingJson.FileExtension;
             self.Rows = ko.observableArray(ko.utils.arrayMap(incomingJson.rows, function (rowInfo) {
                 currentMax++;
                 return new Row(currentMax, rowInfo, self);
             }));
+            self.RowCount = ko.observable(incomingJson.RowCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
+            self.FileExtensionName = ko.observable(incomingJson.FileExtensionName);
+            self.AllowArrays = ko.observable();
 
-            self.FilteredRows = ko.observableArray();
-            self.SortedRows = ko.observableArray();
 
+            //Computed properties
             self.RowSorter = ko.computed(function () {
-
                 self.SortedRows([]);
-
                 self.SortedRows(ko.utils.arrayFilter(self.Rows(), function (row) {
                     return (row.DeleteInd() === false)
                 }).sort(function (left, right) {
                     return left.Position() === right.Position() ? 0 : (left.Position() < right.Position() ? -1 : 1);
                 }));
-            }); 
+            });
+            self.SortableRows = ko.computed(function () {
+                return self.IsPositional() ? "sortable-fields-active" : "sortable-fields";
+            })
+            self.ClickableRows = ko.computed(function () {
+                return self.IsPositional() ? "clickable" : "";
+            })
+            
 
-            self.HiveDatabaseName = ko.observable(incomingJson.HiveDatabaseName);
-            self.HiveTableName = ko.observable(incomingJson.HiveTableName);
-            self.FileExtensionId = incomingJson.FileExtension;
-            self.RowCount = ko.observable(incomingJson.RowCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
-
+            //Functions
             self.addRow = function () {
                 currentMax++;                  
                 var r = new Row(currentMax, { DataObjectField_ID: "new" + currentMax, Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }, self);
@@ -654,7 +664,7 @@
 
             self.save = function () {
                 console.log(ko.toJS(vm.Rows));           
-                var a = JSON.stringify(ko.toJS(vm.Rows), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows', 'Position', 'Format', 'DeleteInd']);
+                var a = JSON.stringify(ko.toJS(vm.Rows), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows', 'Position', 'Format', 'DeleteInd', 'IsArray']);
                 console.log(a);
 
                 var url_parts = window.location.href.replace(/\/\s*$/, '').split('/');
@@ -682,25 +692,6 @@
 
             };
 
-
-            self.DataTypes = ko.observableArray();
-            self.IsPositional = ko.observable();
-            self.IsFixedWidth = ko.observable();
-
-            $.ajax({
-                type: "GET",
-                url: "/Config/GetDatatypesByFileExtension/" + self.FileExtensionId,
-                contentType: "application/json",
-                success: function (returnedData) {
-                    self.IsPositional(returnedData.IsPositional);
-                    self.IsFixedWidth(returnedData.IsFixedWidth);
-                    self.DataTypes($.map(returnedData.ValidDatatypes, function (item) {
-                        return new ValidDataType(item);
-                    }));
-                },
-                async: false
-            });
-
             self.setTagGroup = function (option, item) {
                 //console.log(item);
                 if (item !== undefined && item.Tag()) {
@@ -724,14 +715,24 @@
                         }
                     })
                 })
-            }
+            }            
 
-            self.SortableRows = ko.computed(function () {
-                return self.IsPositional() ? "sortable-fields-active" : "sortable-fields";
-            })
-            self.ClickableRows = ko.computed(function () {
-                return self.IsPositional() ? "clickable" : "";
-            })
+
+
+            $.ajax({
+                type: "GET",
+                url: "/Config/GetDatatypesByFileExtension/" + self.FileExtensionId,
+                contentType: "application/json",
+                success: function (returnedData) {
+                    self.IsPositional(returnedData.IsPositional);
+                    self.IsFixedWidth(returnedData.IsFixedWidth);
+                    self.AllowArrays(returnedData.AllowArrays);
+                    self.DataTypes($.map(returnedData.ValidDatatypes, function (item) {
+                        return new ValidDataType(item);
+                    }));
+                },
+                async: false
+            });
         };
 
         var initialData = [

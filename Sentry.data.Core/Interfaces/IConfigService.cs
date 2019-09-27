@@ -26,6 +26,5 @@ namespace Sentry.data.Core
         List<DatasetFileConfigDto> GetDatasetFileConfigDtoByDataset(int datasetId);
         bool Delete(int id, bool logicalDelete = true);
         UserSecurity GetUserSecurityForConfig(int id);
-        SchemaDto GetSchemaDto(int id);
     }
 }

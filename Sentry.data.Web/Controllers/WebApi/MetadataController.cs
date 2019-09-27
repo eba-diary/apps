@@ -237,6 +237,51 @@ namespace Sentry.data.Web.Controllers
         }
 
         /// <summary>
+        /// Get the latest schema revision detail
+        /// </summary>
+        /// <param name="datasetid"></param>
+        /// <param name="schemaId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        [Route("dataset/{datasetId}/schema/{schemaId}/revision/latest/fields")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaRevisionModel>))]
+        public async Task<IHttpActionResult> GetLatestSchemaRevisionDetail(int datasetId, int schemaId)
+        {
+            UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
+
+            if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
+            {
+                return Unauthorized();
+            }
+
+            try
+            {
+                if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId))
+                {
+                    Logger.Info($"metadataapi_getlatestschemarevisiondetail_notfound schema - datasetid:{datasetId} schemaid:{schemaId}");
+                    return NotFound();
+                }
+
+                SchemaRevisionDto revisiondto = _schemaService.GetLatestSchemaRevisionDtoBySchema(schemaId);
+                if (revisiondto == null)
+                {
+                    Logger.Info($"metadataapi_getlatestschemarevisiondetail_notfound revision - datasetid:{datasetId} schemaid:{schemaId}");
+                    return NotFound();
+                }
+
+                SchemaRevisionDetailModel revisionDetailModel = revisiondto.ToSchemaDetailModel();
+                revisionDetailModel.fields = _schemaService.GetBaseFieldDtoBySchemaRevision(revisiondto.RevisionId);
+                return Ok(revisionDetailModel);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"metadataapi_getlatestschemarevisiondetail_badrequest - datasetid:{datasetId} schemaid:{schemaId}", ex);
+                return InternalServerError();
+            }
+        }
+
+        /// <summary>
         /// Get schema revision detail
         /// </summary>
         /// <param name="datasetId"></param>
@@ -363,7 +408,7 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
-                SchemaDto dto = _configService.GetSchemaDto(schemaId);
+                SchemaDto dto = _schemaService.GetFileSchemaDto(schemaId);
                 SchemaInfoModel model = dto.ToModel();
                 return Ok(model);
             }
@@ -417,6 +462,37 @@ namespace Sentry.data.Web.Controllers
         #region Private Methods
         private async Task<IHttpActionResult> GetColumnSchema(DatasetFileConfig config, int SchemaID)
         {
+            if (config.Schema != null)
+            {
+                try
+                {
+                    //Get Schema for schema level info
+                    OutputSchema outSchema = new OutputSchema();
+                    FileSchemaDto fileSchemaDto = _schemaService.GetFileSchemaDto(config.Schema.SchemaId);
+
+                    outSchema.FileExtension = fileSchemaDto.FileExtensionId;
+
+                    //Get SchemaRevision
+                    SchemaRevisionDto revisionDto = _schemaService.GetLatestSchemaRevisionDtoBySchema(config.Schema.SchemaId);
+
+                    //Get revision fields
+                    List<BaseFieldDto> fieldDtoList = _schemaService.GetBaseFieldDtoBySchemaRevision(revisionDto.RevisionId);
+
+                    List<SchemaRow> rows = new List<SchemaRow>();
+                    foreach (BaseFieldDto dto in fieldDtoList)
+                    {
+                        rows.Add(dto.ToModel());
+                    }
+                    outSchema.rows = rows;
+
+                    return Ok(outSchema);
+                } catch (Exception ex)
+                {
+                    Logger.Error($"metadatacontroller-getcolumnschema", ex);
+                    return InternalServerError();
+                }                
+            }
+
             try
             {
                 if (config.Schemas.Any())
@@ -467,8 +543,6 @@ namespace Sentry.data.Web.Controllers
                             r.DataType = (!String.IsNullOrEmpty(b.DataType)) ? b.DataType.ToUpper() : SchemaDatatypes.VARCHAR.ToString();
                             if (b.Precision != null) { r.Precision = b.Precision ?? null; }
                             if (b.Scale != null) { r.Scale = b.Scale ?? null; }
-                            //r.Precision = (b.Precision != null && !String.IsNullOrEmpty(b.Precision)) ? b.Precision : null;
-                            //r.Scale = (b.Scale != null && !String.IsNullOrEmpty(b.Scale)) ? b.Scale : null;
                             if (b.Nullable != null) { r.Nullable = b.Nullable ?? null; }
                             if (b.Length != null) { r.Length = b.Length ?? null; }
                             if (b.OrdinalPosition != null) { r.Position = Int32.Parse(b.OrdinalPosition); }

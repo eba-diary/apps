@@ -17,11 +17,12 @@ namespace Sentry.data.Core
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly IConfigService _configService;
+        private readonly ISchemaService _schemaService;
 
         public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, 
                             UserService userService, IMessagePublisher messagePublisher,
                             IS3ServiceProvider s3ServiceProvider,
-                            IConfigService configService)
+                            IConfigService configService, ISchemaService schemaService)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
@@ -29,6 +30,7 @@ namespace Sentry.data.Core
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
             _configService = configService;
+            _schemaService = schemaService;
         }
 
 
@@ -173,8 +175,13 @@ namespace Sentry.data.Core
             Dataset ds = CreateDataset(dto);
             _datasetContext.Add(ds);
             dto.DatasetId = ds.DatasetId;
-          
-            _configService.CreateAndSaveDatasetFileConfig(dto.ToConfigDto());
+
+            DatasetFileConfigDto configDto = dto.ToConfigDto();
+            FileSchemaDto fileDto = dto.ToSchemaDto();
+            configDto.SchemaId = _schemaService.CreateAndSaveSchema(fileDto);
+            _configService.CreateAndSaveDatasetFileConfig(configDto);
+
+
             _datasetContext.SaveChanges();
 
             return ds.DatasetId;

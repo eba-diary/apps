@@ -30,11 +30,12 @@ namespace Sentry.data.Web.Controllers
         public IDatasetService _DatasetService;
         public IObsidianService _obsidianService;
         public ISecurityService _securityService;
+        public ISchemaService _schemaService;
 
         public ConfigController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService,
             ISASService sasService, IAssociateInfoProvider associateInfoService, IConfigService configService,
             IEventService eventService, IDatasetService datasetService, IObsidianService obsidianService,
-            ISecurityService securityService)
+            ISecurityService securityService, ISchemaService schemaService)
         {
             _cache = new CachingService();
             _datasetContext = dsCtxt;
@@ -47,6 +48,7 @@ namespace Sentry.data.Web.Controllers
             _DatasetService = datasetService;
             _obsidianService = obsidianService;
             _securityService = securityService;
+            _schemaService = schemaService;
         }
 
         [HttpGet]
@@ -133,9 +135,18 @@ namespace Sentry.data.Web.Controllers
 
             if (ModelState.IsValid)
             {
+                FileSchemaDto schemaDto = dfcm.ToSchema();
+
                 if (dto.ConfigId == 0)
                 { //Create Dataset File Config
-                    bool IsSuccessful = _configService.CreateAndSaveDatasetFileConfig(dto);
+                    bool IsSuccessful = false;
+                    int newSchemaId = _schemaService.CreateAndSaveSchema(schemaDto);
+                    if (newSchemaId != 0)
+                    {
+                        dto.SchemaId = newSchemaId;
+                        IsSuccessful = _configService.CreateAndSaveDatasetFileConfig(dto);
+                    }
+                    
                     if (IsSuccessful)
                     {
                         return RedirectToAction("Index", new { id = dto.ParentDatasetId });
@@ -143,7 +154,12 @@ namespace Sentry.data.Web.Controllers
                 }
                 else
                 { //Edit Dataset File Config
-                    bool IsSuccessful = _configService.UpdateAndSaveDatasetFileConfig(dto);
+                    bool IsSuccessful = false;
+                    if (_schemaService.UpdateAndSaveSchema(schemaDto))
+                    {
+                        IsSuccessful = _configService.UpdateAndSaveDatasetFileConfig(dto);
+                    }
+                    
                     if (IsSuccessful)
                     {
                         return RedirectToAction("Index", new { id = dto.ParentDatasetId });
@@ -1527,8 +1543,12 @@ namespace Sentry.data.Web.Controllers
         public JsonResult GetDatatypesByFileExtension(int id)
         {
             FileExtension fe = _datasetContext.GetById<FileExtension>(id);
-            ValidDatatypesModel model = new ValidDatatypesModel();
-            model.FileExtension = fe;
+            ValidDatatypesModel model = new ValidDatatypesModel
+            {
+                FileExtensionName = fe.Name,
+                FileExtension = fe
+            };
+
             switch (fe.Name)
             {
                 case "CSV":
@@ -1547,7 +1567,7 @@ namespace Sentry.data.Web.Controllers
                 case "JSON":
                     model.IsPositional = false;
                     model.IsFixedWidth = false;
-                    //model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.STRUCT, "A struct", "Complex Data Types"));
+                    model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.STRUCT, "A struct", "Complex Data Types"));
                     break;
                 default:
                     break;

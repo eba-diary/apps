@@ -14,5 +14,10 @@ namespace Sentry.data.Core
             Extension = config.FileExtension;
         }
         public virtual FileExtension Extension { get; set; }
+        public virtual string Delimiter { get; set; }
+        public virtual bool HasHeader { get; set; }
+        public virtual bool CreateCurrentView { get; set; }
+        public virtual bool IsInSAS { get; set; }
+        public virtual string SasLibrary { get; set; }
     }
 }

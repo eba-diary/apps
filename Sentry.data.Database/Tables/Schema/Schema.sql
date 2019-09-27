@@ -7,5 +7,10 @@
     [Created_DTM] DATETIME NOT NULL, 
     [LastUpdatd_DTM] DATETIME NOT NULL, 
     [FileExtension_Id] INT NULL, 
+    [Delimiter] VARCHAR(10) NULL, 
+    [HasHeader] BIT NULL, 
+    [CreateCurrentView] BIT NULL, 
+    [IsInSAS] BIT NULL, 
+    [SASLibrary] VARCHAR(50) NULL, 
     CONSTRAINT [FK_Schema_FileExtension] FOREIGN KEY ([FileExtension_Id]) REFERENCES [FileExtension]([Extension_Id]) 
 )

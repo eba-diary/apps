@@ -47,6 +47,11 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                     m.ForeignKey("FK_Schema_FileExtension");
                     m.Class(typeof(FileExtension));
                 });
+                Property(x => x.Delimiter, m => m.Column("Delimiter"));
+                Property(x => x.HasHeader, m => m.Column("HasHeader"));
+                Property(x => x.IsInSAS, m => m.Column("IsInSAS"));
+                Property(x => x.CreateCurrentView, m => m.Column("CreateCurrentView"));
+                Property(x => x.SasLibrary, m => m.Column("SASLibrary"));
             }
         }
     }

@@ -8,13 +8,19 @@ namespace Sentry.data.Core
 {
     public static class SchemaExtensions
     {
-        public static SchemaDto MapToSchemaDto(this Schema scm)
+        public static FileSchemaDto MapToDto(this FileSchema scm)
         {
-            return new SchemaDto()
+            return new FileSchemaDto()
             {
-                SchemaId = scm.SchemaId,
                 Name = scm.Name,
-                SchemaEntity_NME = scm.SchemaEntity_NME
+                CreateCurrentView = scm.CreateCurrentView,
+                Delimiter = scm.Delimiter,
+                FileExtensionId = scm.Extension.Id,
+                HasHeader = scm.HasHeader,
+                IsInSAS = scm.IsInSAS,
+                SasLibrary = scm.SasLibrary,
+                SchemaEntity_NME = scm.SchemaEntity_NME,
+                SchemaId = scm.SchemaId
             };
         }
 
