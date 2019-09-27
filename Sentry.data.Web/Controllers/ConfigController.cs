@@ -769,6 +769,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpPost]
+        [Route("Config/DataSourceForm")]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult DataSourceForm(DataSourceModel model)
         {
