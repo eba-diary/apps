@@ -65,6 +65,14 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             }
         }
 
+        public class BigintFieldMapping : SubclassMapping<BigintField>
+        {
+            public BigintFieldMapping()
+            {
+                DiscriminatorValue("BIGINT");
+            }
+        }
+
         public class DecimalFieldMapping : SubclassMapping<DecimalField>
         {
             public DecimalFieldMapping()

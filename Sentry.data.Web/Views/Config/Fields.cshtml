@@ -162,6 +162,14 @@
 
     @Html.ValidationSummary(false, "", new { @class = "text-danger" })
 
+    <div data-bind="visible: IsPositional" style="display:none;">
+        <p>This is a positional aware file type.&nbsp&nbspDrag and drop fields to change field order.</p>
+    </div>
+
+    <div data-bind="visible: AllowArrays" style="display:none;">
+        <p>This file type allows arrays.&nbsp&nbspCheck the "Is Array" option to signify an array.</p>
+    </div>
+
     <div data-bind="visible: HiveDatabaseName() !== null" style="display:none;">
         <h6 class="@color">This schema is currently tied to the Hive Table named <span data-bind="text: HiveDatabaseName"></span>.<span data-bind="text: HiveTableName"></span> with <span data-bind="text: RowCount"></span> rows.  <b>You cannot edit it.</b></h6>
     </div>
@@ -171,49 +179,36 @@
             <span class="sentry-spinner" style="height:100px"></span>
         </div>
     </div>
-    <div id="rowsContainer" style="display: none;">
-
-        <div data-bind="visible: Errors().length >= 1" style="display: none;">
-            <h6 style="color: red;">Errors:</h6>
-        </div>
-        <ul style="display: none; color: red;" data-bind="foreach: Errors().sort(function (l, r) { return (l.Id == r.Id) ? (l.Id > r.Id ? 1 : -1) : (l.Id > r.Id ? 1 : -1) }), visible: Errors().length >= 1">
-            <li>
-                <span>Row # <span data-bind="text: Id"></span></span> :
-                <span data-bind="text: Description"></span>
-            </li>
-        </ul>
-
-        <div id="tablePanel" class="col-lg-12 fields-wrapper">
-            <ul class="rules-group-container row fields-sortable-ul" id="fields" data-bind="template: {name: 'RowTemplate' , foreach: SortedRows}, css: SortableRows()">
-            </ul>
-        </div>
+    <div id="schemaPanel">
+        <ul class="rules-group-container row fields-sortable-ul" id="fields" data-bind="template: {name: 'RowTemplate' , foreach: SortedRows}, css: SortableRows()" style="list-style-type: none;margin-left:0px;padding-left: 15px;"></ul>
+    </div>
 
 
-        <div style="margin-top: 10px;" class="col-lg-12">
-
-            <hr />
-
-            <button type="button" class="btn btn-sm btn-success" data-bind='click: addRow' style="margin-bottom: 8px;"><i class="glyphicon glyphicon-plus"></i> Add a Field</button>          
-            <hr />
-            <button class="btn btn-success" id="saveBtn" data-bind='click: save'>Save</button>
-            <div id="buttonSpinner" style="
+    <div style="margin-top: 10px;" class="col-lg-12">
+        <hr />
+        <button type="button" class="btn btn-sm btn-success" data-bind='click: addRow' style="margin-bottom: 8px;"><i class="glyphicon glyphicon-plus"></i> Add a Field</button>
+        <hr />
+        <button class="btn btn-success" id="saveBtn" data-bind='click: save'>Save</button>
+        <div id="buttonSpinner" style="
                     display: inline-block;
                     margin-bottom: 24px;
                     margin-left: -20px;
                     display: none;
                 ">
-                <div class="sentry-spinner-container" style="width: 100px;display: inline-block;">
-                    <span class="sentry-spinner" style="height: 10px;width: 10px;"></span>
-                </div>
+            <div class="sentry-spinner-container" style="width: 100px;display: inline-block;">
+                <span class="sentry-spinner" style="height: 10px;width: 10px;"></span>
             </div>
         </div>
     </div>
 
     <script type="text/html" id="RowTemplate">
-        <li class="col-lg-12 parentContainer ui-sortable-handle" data-bind="css: $root.ClickableRows(), style : { 'background-color' : RowColor }">
-            <div class="row col-lg-12">
-                <div style="padding: 2px">
-                    <h6 style="float: left; margin-right: 6px; line-height: 0.5; width: 15px;" data-bind="text: Position"></h6>
+        <li class="ui-sortable-handle" data-bind="css: $root.ClickableRows(), style : { 'background-color' : RowColor }">
+            <div class="col-lg-12 schemaRow" data-bind="css: Color">
+                <div class="rowDetails">
+                    <button type="button" class="btn btn-xs btnExpandChildren" style="display: inline-block;  margin-bottom: 6px;" data-bind="click: ToggleChildren, visible: HasChildren, css : ButtonClass">
+                        <span id="icon_" class="glyphicon" data-bind="css : ButtonSpanClass"></span>
+                    </button>
+                    <h6 style="float: left; margin-right: 6px; line-height: 0.5; width: 15px; display:none;" data-bind="text: Position"></h6>
                     <div class="col-lg-2">
                         <input class="col-lg-12 rowFieldName" data-bind="value: Name" placeholder="Field Name..." data-toggle="tooltip" data-placement="top" title="Field Name" />
                     </div>
@@ -221,82 +216,6 @@
                         <select class="typeSelect col-lg-12" data-bind="options: $root.DataTypes, optionsCaption: 'Choose Datatype', optionsValue: 'Name', optionsText: 'Name', optionsAfterRender: $root.setTagGroup, value: DataType"></select>
                         <input type="hidden" name="dataObjectField_Id" data-bind="value: DataObjectField_ID" data-toggle="tooltip" data-placement="top" title="Data Type Selection" />
                     </div>
-
-
-
-
-                    @*<div class="optionContainer">
-            <div class="arrayTypeSelect" data-bind="visible: ShowArrayType">
-                <select class="arrayTypeSelect" data-bind="value: ArrayType">
-                    <optgroup label="Numeric Data Types">
-                        <option title="A signed one-byte integer, from -128 to 127." value="TINYINT">
-                            TINYINT
-                        </option>
-                        <option title="A signed two-byte integer, from -32,768 to 32,767." value="SMALLINT">
-                            SMALLINT
-                        </option>
-                        <option title="A signed four-byte integer." value="INTEGER">
-                            INTEGER
-                        </option>
-                        <option title="A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807." value="BIGINT">
-                            BIGINT
-                        </option>
-                        <option title="A signed eight-byte integer, from -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807." value="LONG">
-                            LONG
-                        </option>
-                        <option title="A four-byte, single-precision floating-point number." value="FLOAT">
-                            FLOAT
-                        </option>
-                        <option title="An eight-byte, double-precision floating-point number." value="DOUBLE">
-                            DOUBLE
-                        </option>
-                        <option title="A fixed-point decimal number, with 38 digits precision." value="DECIMAL">
-                            DECIMAL
-                        </option>
-                    </optgroup>
-
-                    <optgroup label="String Data Types">
-                        <option title="A variable-length character string." value="STRING">
-                            STRING
-                        </option>
-                        <option title="A varying-length character string." value="VARCHAR">
-                            VARCHAR
-                        </option>
-                        <option title="A character string up to 255 characters." value="CHAR">
-                            CHAR
-                        </option>
-                    </optgroup>
-
-                    <optgroup label="Date/Time Data Types">
-                        <option title="An ANSI SQL date type. YYYY-MM-DD" value="DATE">
-                            DATE
-                        </option>
-                        <option title="A UNIX timestamp with optional nanosecond precision. YYYY-MM-DD HH:MM:SS.sss" value="TIMESTAMP">
-                            TIMESTAMP
-                        </option>
-                    </optgroup>
-
-                    <optgroup label="Misc. Data Types">
-                        <option title="A textual true or false value." value="BOOLEAN">
-                            BOOLEAN
-                        </option>
-                        <option title="A varying length binary string." value="BINARY">
-                            BINARY
-                        </option>
-                    </optgroup>
-
-                    <optgroup label="Complex Data Types">
-                        <option title="A complex data type that can represent an arbitrary number of ordered elements." value="ARRAY" disabled="disabled">
-                            ARRAY
-                        </option>
-                        <option title="A complex data type, representing multiple fields of a single item." value="STRUCT" disabled="disabled">
-                            STRUCT
-                        </option>
-                    </optgroup>
-                </select>
-
-            </div>
-        </div>*@
                     <div class="showPandS col-lg-2" data-bind="visible: ShowPandS">
                         <div class="precisionContainer col-lg-6">
                             <input class="precision col-lg-12" data-bind="value: Precision" type="number" min="1" max="38" placeholder="Prec" data-toggle="tooltip" data-placement="top" title="Precision" />
@@ -306,43 +225,42 @@
                         </div>
                     </div>
 
-                    <div class="showDateFormat col-lg-3" data-bind="visible: ShowDateFormat">
+                    <div class="showDateFormat col-lg-2" data-bind="visible: ShowDateFormat">
                         <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Format" data-toggle="tooltip" data-placement="top" title="Format" />
                     </div>
 
-                    <div class="showArray col-lg-1" data-bind="visible: ShowArray">
-                        <label>IsArray?</label>
+                    <div class="showArray col-lg-2" data-bind="visible: $root.AllowArrays">
+                        <label class="arrayLabel">IsArray?</label>
                         <input class="array col-lg-2" data-bind="checked: IsArray" type="checkbox" />
                     </div>
 
                     <div class="options col-lg-4">
-                        <div class="col-lg-4" data-bind="visible: ShowAddChild">
-                            <button class="rightButton" data-bind='click: addChild'>Add a Child</button>
+                        <div class="col-lg-12" data-bind="if: ShowAddChild">
+                            <div class="col-lg-offset-2 col-lg-7" data-bind="visible: ShowAddChild">
+                                <button class="rightButton" data-bind='click: addChild'>Add a Child</button>
+                            </div>
                         </div>
+                    </div>
 
-                        <div class="rightButton col-lg-2" data-bind="visible: $parent.Name === undefined">
+                    <div class="descriptionContainer col-lg-12">
+                        <input class="col-lg-10" data-bind="value: Description" placeholder="Description..." data-toggle="tooltip" data-placement="top" title="Description" />
+                        <div class="rightButton col-lg-1 col-lg-offset-1" data-bind="visible: $parent.Name === undefined">
 
                             <button type="button" class="btn btn-xs btn-danger" data-bind='click: $parent.removeRow'>
                                 <i class="glyphicon glyphicon-remove"></i>
                                 Delete
                             </button>
                         </div>
-                        <div class="rightButton col-lg-2" data-bind="visible: $parent.Name !== undefined">
+                        <div class="rightButton col-lg-1 col-lg-offset-1" data-bind="visible: $parent.Name !== undefined">
                             <button type="button" class="btn btn-xs btn-danger" data-bind='click: $parent.removeChild'>
                                 <i class="glyphicon glyphicon-remove"></i>
                                 Delete
                             </button>
                         </div>
                     </div>
-
-                    <div class="descriptionContainer col-lg-10">
-                        <input class="col-lg-12 col-lg-offset-1" data-bind="value: Description" placeholder="Description..." data-toggle="tooltip" data-placement="top" title="Description" />
-                    </div>
                 </div>
-
-                <div class="childrenContainer" data-bind="template: {name: 'RowTemplate' , foreach: ChildRows}"></div>
-
             </div>
+            <ul class="childrenContainer" data-bind="template: {name: 'RowTemplate' , foreach: ChildRows}, visible: ShowChildren" style="list-style-type: none;margin-left:0px;padding-left: 10px;"></ul>
         </li>
     </script>
 
@@ -352,69 +270,6 @@
 }
 
 <style>
-    .descriptionContainer{
-        padding-top: 15px;
-    }
-    .parentContainer {
-        background-color: rgba(0,0,0,0.05);
-        padding: 5px;
-        padding-left: 20px;
-        padding-right: 20px;
-    }
-
-    .childrenContainer {
-        margin-left: 15px;
-        padding: 15px;
-    }
-
-    .typeSelect {
-        width: auto;
-        height: 26px;
-        padding-left: 10px;
-    }
-
-    .showPandS {
-        display: inline;
-    }
-
-    .arrayTypeSelect {
-        display: inline;
-        width: auto;
-        height: 26px;
-        padding-left: 10px;
-    }
-
-    .optionContainer {
-        float: right;
-    }
-
-    .rightButton {
-        display: inline;
-    }
-
-    .row {
-        margin-right: -20px;
-    }
-
-    .options {
-        display: inline;
-    }
-
-    .precisionContainer {
-        padding-left: 0px;
-    }
-
-    .scaleContainer {
-        padding-left: 0px;
-    }
-
-    .precision {
-        padding-right: 0px;
-    }
-
-    .scale {
-        padding-right: 0px;
-    }
 </style>
 
 
@@ -426,30 +281,35 @@
         var currentMax = 0;
         var errorList = [];
 
-        function Row(id, indata, parent) {
+        function Row(id, indata, parent, level) {
             var self = this;
             var parent = parent;
+            var thisLevel = ++level;
 
             if (indata.Position != undefined && indata.Position !== 0) {
                 self.Position = ko.observable(indata.Position);
+                self.Toggled = ko.observable(false);
             }
             else {
                 self.Position = ko.observable(id);
-            }            
+                self.Toggled = ko.observable(true);
+            }
             self.DataObjectField_ID = ko.observable(indata.DataObjectField_ID);
             self.Name = ko.observable(indata.Name).extend({ notify: 'always' });
             self.Description = ko.observable(indata.Description);
-            self.DataType = ko.observable(indata.DataType);
+            self.DataType = ko.observable(indata.DataType).extend({ notify: 'always'});
             self.ArrayType = ko.observable(indata.ArrayType);
             self.Precision = ko.observable(indata.Precision);
             self.Scale = ko.observable(indata.Scale);
             self.Format = ko.observable(indata.Format);
             self.DeleteInd = ko.observable(false);
             self.IsArray = ko.observable(indata.IsArray);
+            self.Level = ko.observable(thisLevel);
             self.ChildRows = ko.observableArray(ko.utils.arrayMap(indata.ChildRows, function (rowInfo) {
                 currentMax++;
-                return new Row(currentMax, rowInfo, self);
+                return new Row(currentMax, rowInfo, self, thisLevel);
             }));
+            
 
             self.RowColor = ko.computed(function () {
                 var hasError = false;
@@ -464,7 +324,11 @@
                         if (item.Id === self.Position() && item.ErrorType == 'Name') {
                             return item;
                         }
-                    });                    
+                    });
+                }
+
+                if (parent.Errors == undefined) {
+                    parent.Errors = ko.observableArray();
                 }
 
                 //Has no children.  Error
@@ -502,7 +366,7 @@
                         hasError = true;
                     }
 
-                    //Name contains uppercase 
+                    //Name contains uppercase
                     var pattupper = new RegExp("[A-Z]");
                     //var nme = self.Name();
                     if (pattupper.test(self.Name())) {
@@ -510,7 +374,7 @@
                         hasError = true;
                     }
                 }
-                
+
 
                 if (hasError) {
                     $('#saveBtn').hide();
@@ -518,7 +382,7 @@
                 }
                 else {
                     if (parent.Errors !== undefined && parent.Errors().length === 0) {
-                        $('#saveBtn').show(); 
+                        $('#saveBtn').show();
                     }
                     return '';
                 }
@@ -552,17 +416,8 @@
                 }
             });
 
-            self.ShowArray = ko.computed(function () {
-                if (parent.AllowArrays) {
-                    return true;
-                }
-                else {
-                    return false;
-                }
-            })
-
             self.ShowAddChild = ko.computed(function () {
-                if (self.DataType() === 'STRUCT' || (self.DataType() === 'ARRAY' && self.ArrayType() === 'STRUCT')) {
+                if ((self.DataType() === 'STRUCT' || (self.DataType() === 'ARRAY' && self.ArrayType() === 'STRUCT')) && self.Toggled) {
                     return true;
                 }
                 else {
@@ -578,13 +433,74 @@
                 return parent.IsPositional;
             })
 
+            self.ShowChildren = ko.computed(function () {
+                if (self.Toggled()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+
+            self.ShowSelf = ko.computed(function () {
+                if (self.Toggled()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+
+            self.ToggleChildren = function () {
+                if (self.Toggled()) {
+                    self.Toggled(false);
+                } else {
+                    self.Toggled(true);
+                }
+            }
+
+            self.ButtonClass = ko.computed(function () {
+                return 'btn-success';
+                //if (vm.ShowAllLayers()) {
+                //    return 'disabled';
+                //} else {
+                //    return 'btn-success';
+                //}
+            });
+
+            self.ButtonSpanClass = ko.computed(function () {
+                if (self.Toggled()) {
+                    return 'glyphicon-minus';
+                } else {
+                    return 'glyphicon-plus';
+                }
+            });
+
+            self.HasChildren = ko.computed(function () {
+                if (indata.DataType === 'STRUCT' || (indata.ChildRows !== undefined && indata.ChildRows.length > 0)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+
+            self.Color = ko.computed(function () {
+                if (self.Level() % 2 == 0) {
+                    return 'schemaColorEven';
+                }
+                else {
+                    return 'schemaColorOdd';
+                }
+            })
+
             self.addChild = function () {
                 //currentMax++;
                 //self.ChildRows.push(new Row(currentMax, [{ DataObjectField_ID: "", Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }], parent));
 
                 currentMax++;
-                var cr = new Row(currentMax, { DataObjectField_ID: "new" + currentMax, Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }, parent);
+                var cr = new Row(currentMax, { DataObjectField_ID: "new" + currentMax, Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }, parent, thisLevel);
                 self.ChildRows.push(cr);
+                if (!self.Toggled()) {
+                    self.ToggleChildren();
+                }
             };
 
             self.removeChild = function (row) {
@@ -615,7 +531,7 @@
             self.FileExtensionId = incomingJson.FileExtension;
             self.Rows = ko.observableArray(ko.utils.arrayMap(incomingJson.rows, function (rowInfo) {
                 currentMax++;
-                return new Row(currentMax, rowInfo, self);
+                return new Row(currentMax, rowInfo, self, 0);
             }));
             self.RowCount = ko.observable(incomingJson.RowCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
             self.FileExtensionName = ko.observable(incomingJson.FileExtensionName);
@@ -637,12 +553,12 @@
             self.ClickableRows = ko.computed(function () {
                 return self.IsPositional() ? "clickable" : "";
             })
-            
+
 
             //Functions
             self.addRow = function () {
-                currentMax++;                  
-                var r = new Row(currentMax, { DataObjectField_ID: "new" + currentMax, Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }, self);
+                currentMax++;
+                var r = new Row(currentMax, { DataObjectField_ID: "new" + currentMax, Name: "", Description: "", DataType: "", ArrayType: "", Precision: null, Scale: null }, self, 0);
                 self.Rows.push(r);
             };
 
@@ -663,7 +579,7 @@
             };
 
             self.save = function () {
-                console.log(ko.toJS(vm.Rows));           
+                console.log(ko.toJS(vm.Rows));
                 var a = JSON.stringify(ko.toJS(vm.Rows), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows', 'Position', 'Format', 'DeleteInd', 'IsArray']);
                 console.log(a);
 
@@ -715,7 +631,7 @@
                         }
                     })
                 })
-            }            
+            }
 
 
 
@@ -796,9 +712,9 @@
                     }
                 });
             });
-            
+
         });
-       
+
     </script>
 
 }
