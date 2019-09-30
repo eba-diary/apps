@@ -8,7 +8,7 @@ namespace Sentry.data.Core
 {
     public class FileSchema : Schema
     {
-        public FileSchema() { }
+        public FileSchema() : base() { }
         public FileSchema(DatasetFileConfig config,IApplicationUser user) : base(config, user)
         {
             Extension = config.FileExtension;

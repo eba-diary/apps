@@ -6,7 +6,11 @@ namespace Sentry.data.Core
 {
     public abstract class Schema
     {
-        protected Schema() { }
+        protected Schema()
+        {
+            CreatedDTM = DateTime.Now;
+            LastUpdatedDTM = DateTime.Now;
+        }
         protected Schema(DatasetFileConfig config, IApplicationUser user)
         {
             Name = config.Name;

@@ -126,6 +126,7 @@ namespace Sentry.data.Core
             FileSchema schema = new FileSchema()
             {
                 Name = dto.Name,
+                CreatedBy = _userService.GetCurrentUser().AssociateId,
                 SchemaEntity_NME = dto.SchemaEntity_NME,
                 Extension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId),
                 Delimiter = dto.Delimiter,
