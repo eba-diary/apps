@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Web;
 
-namespace Sentry.data.Core
+namespace Sentry.data.Web.Models.ApiModels.Schema
 {
-    public class BaseFieldDto
+    public class SchemaFieldModel
     {
-        public int FieldId { get; set; }
         public Guid FieldGuid { get; set; }
         public string Name { get; set; }
         public DateTime CreateDTM { get; set; }
@@ -16,7 +14,7 @@ namespace Sentry.data.Core
         public string FieldType { get; set; }
         public int Precision { get; set; }
         public int Scale { get; set; }
-        public List<BaseFieldDto> ChildFields { get; set; }
+        public List<SchemaFieldModel> Fields { get; set; }
         public string SourceFormat { get; set; }
         public bool IsArray { get; set; }
         public bool Nullable { get; set; }

@@ -30,7 +30,7 @@ namespace Sentry.data.Web.Controllers
         private ISchemaService _schemaService;
         private ISecurityService _securityService;
 
-        public MetadataController(MetadataRepositoryService metadataRepositoryService, IDatasetContext dsContext, 
+        public MetadataController(MetadataRepositoryService metadataRepositoryService, IDatasetContext dsContext,
                                 IAssociateInfoProvider associateInfoService, UserService userService,
                                 IConfigService configService, IDatasetService datasetService,
                                 ISchemaService schemaService, ISecurityService securityService)
@@ -67,8 +67,8 @@ namespace Sentry.data.Web.Controllers
             public List<DropLocation> OtherJobs { get; set; }
             public List<string> CronJobs { get; set; }
 
-         //   public int Views { get; set; }
-         //   public int Downloads { get; set; }
+            //   public int Views { get; set; }
+            //   public int Downloads { get; set; }
         }
 
         public class DropLocation
@@ -157,6 +157,26 @@ namespace Sentry.data.Web.Controllers
                 return InternalServerError();
             }
         }
+
+        //[HttpPut]
+        //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        //[Route("dataset/{datasetId}/schema")]
+        //[SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaInfoModel))]
+        //public async Task<IHttpActionResult> SchemaCreate(int datasetId, [FromBody] CreateSchemaModel CreateSchema)
+        //{
+        //    UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
+
+        //    if (!us.CanEditDataset)
+        //    {
+        //        return Unauthorized();
+        //    }
+
+        //    FileSchemaDto dto = CreateSchema.ToDto();
+        //    dto.ParentDatasetId = datasetId;
+        //    var newSchemaId = _schemaService.CreateAndSaveSchema(dto);
+        //    return Ok(_schemaService.GetFileSchemaDto(newSchemaId));
+        //}
+
 
         /// <summary>
         /// Get schema metadata
@@ -271,7 +291,8 @@ namespace Sentry.data.Web.Controllers
                 }
 
                 SchemaRevisionDetailModel revisionDetailModel = revisiondto.ToSchemaDetailModel();
-                revisionDetailModel.fields = _schemaService.GetBaseFieldDtoBySchemaRevision(revisiondto.RevisionId);
+                List<BaseFieldDto> fieldDtoList = _schemaService.GetBaseFieldDtoBySchemaRevision(revisiondto.RevisionId);
+                revisionDetailModel.Fields = fieldDtoList.ToSchemaFieldModel();
                 return Ok(revisionDetailModel);
             }
             catch (Exception ex)
@@ -317,7 +338,8 @@ namespace Sentry.data.Web.Controllers
                 }
 
                 SchemaRevisionDetailModel revisionDetailModel = revisiondto.ToSchemaDetailModel();
-                revisionDetailModel.fields = _schemaService.GetBaseFieldDtoBySchemaRevision(revisionId);
+                List<BaseFieldDto> fieldDtoList = _schemaService.GetBaseFieldDtoBySchemaRevision(revisionId);
+                revisionDetailModel.Fields = fieldDtoList.ToSchemaFieldModel();
                 return Ok(revisionDetailModel);
             }
             catch (Exception ex)
@@ -471,6 +493,13 @@ namespace Sentry.data.Web.Controllers
                     FileSchemaDto fileSchemaDto = _schemaService.GetFileSchemaDto(config.Schema.SchemaId);
 
                     outSchema.FileExtension = fileSchemaDto.FileExtensionId;
+
+                    if (!config.Schema.Revisions.Any())
+                    {
+                        outSchema.rows = new List<SchemaRow>();
+                        outSchema.FileExtension = config.FileExtension.Id;
+                        return Ok(outSchema);
+                    }
 
                     //Get SchemaRevision
                     SchemaRevisionDto revisionDto = _schemaService.GetLatestSchemaRevisionDtoBySchema(config.Schema.SchemaId);

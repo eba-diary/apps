@@ -14,6 +14,7 @@ namespace Sentry.data.Core
         }
         public override string SchemaEntity_NME { get; set; }
         public int FileExtensionId { get; set; }
+        public string FileExtenstionName { get; set; }
         public string Delimiter { get; set; }
         public bool HasHeader { get; set; }
         public bool CreateCurrentView { get; set; }

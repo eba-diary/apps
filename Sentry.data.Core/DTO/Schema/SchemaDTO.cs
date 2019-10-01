@@ -11,6 +11,7 @@ namespace Sentry.data.Core
         public int SchemaId { get; set; }
         public abstract string SchemaEntity_NME { get; set; }
         public string Name { get; set; }
+        public string Description { get; set; }
         public int ParentDatasetId { get; set; }
     }
 }

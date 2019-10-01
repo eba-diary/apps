@@ -833,4 +833,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="[ParentSchemaRevision]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="099fb8ff-4581-4b14-8de3-118b5203be4e" ChangeDateTime="09/30/2019 14:48:30">
+    <Property Name="ElementName" Value="[dbo].[SchemaField].[Guid]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SchemaField]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FieldGuid" />
+  </Operation>
 </Operations>

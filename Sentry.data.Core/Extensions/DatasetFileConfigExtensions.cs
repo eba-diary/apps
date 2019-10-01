@@ -37,7 +37,9 @@ namespace Sentry.data.Core
                 Delimiter = dsDto.Delimiter,
                 FileExtensionId = dsDto.FileExtensionId,
                 HasHeader = dsDto.HasHeader,
-                IsInSAS = dsDto.IsInSAS
+                IsInSAS = dsDto.IsInSAS,
+                Description = dsDto.ConfigFileDesc,
+                ParentDatasetId = dsDto.DatasetId
             };
         }
     }

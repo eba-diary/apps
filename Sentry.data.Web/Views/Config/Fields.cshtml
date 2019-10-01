@@ -259,14 +259,11 @@
                         </div>
                     </div>
                 </div>
+                <span class="fieldGuidText" data-bind="text: FieldGuid"></span>
             </div>
             <ul class="childrenContainer" data-bind="template: {name: 'RowTemplate' , foreach: ChildRows}, visible: ShowChildren" style="list-style-type: none;margin-left:0px;padding-left: 10px;"></ul>
         </li>
     </script>
-
-
-
-
 }
 
 <style>
@@ -296,6 +293,7 @@
             }
             self.DataObjectField_ID = ko.observable(indata.DataObjectField_ID);
             self.Name = ko.observable(indata.Name).extend({ notify: 'always' });
+            self.FieldGuid = ko.observable(indata.FieldGuid);
             self.Description = ko.observable(indata.Description);
             self.DataType = ko.observable(indata.DataType).extend({ notify: 'always'});
             self.ArrayType = ko.observable(indata.ArrayType);
@@ -475,7 +473,7 @@
             });
 
             self.HasChildren = ko.computed(function () {
-                if (indata.DataType === 'STRUCT' || (indata.ChildRows !== undefined && indata.ChildRows.length > 0)) {
+                if (indata.DataType === 'STRUCT' || (indata.ChildRows !== undefined && indata.ChildRows !== null && indata.ChildRows.length > 0)) {
                     return true;
                 } else {
                     return false;
@@ -580,7 +578,7 @@
 
             self.save = function () {
                 console.log(ko.toJS(vm.Rows));
-                var a = JSON.stringify(ko.toJS(vm.Rows), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows', 'Position', 'Format', 'DeleteInd', 'IsArray']);
+                var a = JSON.stringify(ko.toJS(vm.Rows), ['Name', 'DataObjectField_ID', 'Description', 'DataType', 'ArrayType', 'Precision', 'Scale', 'ChildRows', 'Position', 'Format', 'DeleteInd', 'IsArray', 'FieldGuid']);
                 console.log(a);
 
                 var url_parts = window.location.href.replace(/\/\s*$/, '').split('/');

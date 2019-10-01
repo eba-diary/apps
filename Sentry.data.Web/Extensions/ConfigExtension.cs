@@ -184,6 +184,7 @@ namespace Sentry.data.Web
             return new SchemaInfoModel()
             {
                 ConfigId = dto.ConfigId,
+                Name = dto.Name,
                 SchemaId = dto.Schema.SchemaId,
                 SchemaEntity_NME = dto.Schema.SchemaEntity_NME,
                 Description = dto.Description,

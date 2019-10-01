@@ -23,6 +23,7 @@ namespace Sentry.data.Core
         private IS3ServiceProvider s3ServiceProvider;
         private readonly ISecurityService _securityService;
         private readonly ISchemaService _schemaService;
+        private Guid _guid;
 
         public ConfigService(IDatasetContext dsCtxt, IMessagePublisher publisher, 
             IUserService userService, IEventService eventService, IMessagePublisher messagePublisher,
@@ -406,23 +407,32 @@ namespace Sentry.data.Core
             //Insert schema metadata into new structure
             try
             {
-                SchemaRevision revision = new SchemaRevision()
+                if (config.Schema != null)
                 {
-                    SchemaRevision_Name = "Another Revision " + (config.Schema.Revisions.Count() + 1).ToString(),
-                    CreatedBy = _userService.GetCurrentUser().AssociateId
-                };
+                    var revisionCnt = (config.Schema.Revisions.Any()) ? config.Schema.Revisions.Count() : 0;
 
-                config.Schema.AddRevision(revision);
+                    SchemaRevision latestRevision = _datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == config.Schema.SchemaId).OrderByDescending(o => o.Revision_NBR).Take(1).FirstOrDefault();
 
-                _datasetContext.Add(revision);
 
-                //filter out fields marked for deletion
-                foreach (var row in schemaRows.Where(w => !w.DeleteInd))
-                {
-                    revision.Fields.Add(AddRevisionField(row, revision));
+                    SchemaRevision revision = new SchemaRevision()
+                    {
+                        SchemaRevision_Name = "Another Revision " + (revisionCnt + 1).ToString(),
+                        CreatedBy = _userService.GetCurrentUser().AssociateId
+                    };
+
+                    config.Schema.AddRevision(revision);
+
+                    _datasetContext.Add(revision);
+
+                    
+                    //filter out fields marked for deletion
+                    foreach (var row in schemaRows.Where(w => !w.DeleteInd))
+                    {
+                        revision.Fields.Add(AddRevisionField(row, revision, null, latestRevision));
+                    }
+
+                    _datasetContext.SaveChanges();
                 }
-
-                _datasetContext.SaveChanges();
             }
             catch (Exception ex)
             {
@@ -556,9 +566,17 @@ namespace Sentry.data.Core
 
         }
 
-        private BaseField AddRevisionField(SchemaRow row, SchemaRevision revision, BaseField parentRow = null)
+        private BaseField AddRevisionField(SchemaRow row, SchemaRevision CurrentRevision, BaseField parentRow = null, SchemaRevision previousRevision = null)
         {
+            Guid g = Guid.NewGuid();
             BaseField newField = null;
+            //Should we perform comparison to previous based on is incoming field new
+            bool compare = (row.FieldGuid.ToString() != Guid.Empty.ToString() && previousRevision != null);
+
+            //if comparing, pull field from previous version
+            BaseField previousFieldVersion = (compare) ? previousRevision.Fields.FirstOrDefault(w => w.FieldGuid == row.FieldGuid) : null;
+            bool changed = false;
+
             switch (row.DataType.ToUpper())
             {
                 case "INTEGER":
@@ -567,9 +585,13 @@ namespace Sentry.data.Core
                 case "DECIMAL":
                     newField = new DecimalField()
                     {                        
-                        Precision = Int32.Parse(row.Precision),
-                        Scale = Int32.Parse(row.Scale)
+                        Precision = int.Parse(row.Precision),
+                        Scale = int.Parse(row.Scale)
                     };
+
+                    if (compare && changed != true && ((DecimalField)newField).Precision != ((DecimalField)previousFieldVersion).Precision) { changed = true; }
+                    if (compare && changed != true && ((DecimalField)newField).Scale != ((DecimalField)previousFieldVersion).Scale) { changed = true; }
+
                     break;
                 case "VARCHAR":
                     newField = new VarcharField() { };
@@ -579,12 +601,18 @@ namespace Sentry.data.Core
                     {
                         SourceFormat = row.Format
                     };
+
+                    if (compare && changed != true && ((DateField)newField).SourceFormat != ((DateField)previousFieldVersion).SourceFormat) { changed = true; }
+
                     break;
                 case "TIMESTAMP":
                     newField = new TimestampField()
                     {
                         SourceFormat = row.Format
                     };
+
+                    if (compare && changed != true && ((TimestampField)newField).SourceFormat != ((TimestampField)previousFieldVersion).SourceFormat) { changed = true; }
+
                     break;
                 case "STRUCT":
                     newField = new StructField() { };
@@ -593,28 +621,53 @@ namespace Sentry.data.Core
                     newField = new BigintField() { };
                     break;
                 default:
-                    Logger.Info($"updatefields - datatype not supported ({row.DataType.ToUpper()})");
+                    Logger.Error($"updatefields - datatype not supported ({row.DataType.ToUpper()})");
                     break;
             }
 
             if (newField != null)
             {
                 newField.Name = row.Name;
-                newField.CreateDTM = DateTime.Now;
-                newField.LastUpdateDTM = DateTime.Now;
-                newField.ParentSchemaRevision = revision;
+                newField.ParentSchemaRevision = CurrentRevision;
                 newField.ParentField = parentRow;
                 newField.OrdinalPosition = row.Position;
                 newField.NullableIndicator = row.Nullable ?? false;
                 newField.IsArray = row.IsArray;
+                newField.Description = row.Description;
+
+                //if incoming field data is new, then comparison will be set to false.  So set these fields appropriately
+                if (!compare)
+                {                    
+                    newField.FieldGuid = g;
+                    newField.CreateDTM = CurrentRevision.CreatedDTM;
+                    newField.LastUpdateDTM = CurrentRevision.CreatedDTM;
+                }
+                //incoming field is existing so we are perofmring comparison.  Deteremine if changes occurred on this field to correctly update lastupdateddtm.
+                else
+                {
+                    newField.CreateDTM = previousRevision.CreatedDTM;
+                    newField.FieldGuid = row.FieldGuid;
+                    if (previousFieldVersion != null)
+                    {
+                        if (changed != true && newField.Name != previousFieldVersion.Name) { changed = true; }
+                        if (changed != true && newField.OrdinalPosition != previousFieldVersion.OrdinalPosition) { changed = true; }
+                        if (changed != true && (parentRow != null) != (previousFieldVersion.ParentField != null) && (parentRow != null && previousFieldVersion.ParentField != null && parentRow.FieldGuid != previousFieldVersion.ParentField.FieldGuid)) { changed = true; }
+                        if (changed != true && newField.NullableIndicator != previousFieldVersion.NullableIndicator) { changed = true; }
+                        if (changed != true && newField.IsArray != previousFieldVersion.IsArray) { changed = true; }
+
+                        newField.LastUpdateDTM = (changed) ? CurrentRevision.LastUpdatedDTM : previousFieldVersion.LastUpdateDTM;
+                    }
+                }
+
                 _datasetContext.Add(newField);
             }
 
+            //if there are child rows, perform a recursive call to this function
             if (newField != null && row.ChildRows != null)
             {
                 foreach (SchemaRow cRow in row.ChildRows)
                 {
-                    newField.ChildFields.Add(AddRevisionField(cRow, revision, newField));
+                    newField.ChildFields.Add(AddRevisionField(cRow, CurrentRevision, newField, previousRevision));
                 }
             }
 

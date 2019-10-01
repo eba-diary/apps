@@ -123,3 +123,7 @@
     float: left;
     margin-right: 10px;
 }
+.fieldGuidText{
+    color: transparent;
+    font-size: x-small;
+}

@@ -28,5 +28,6 @@ namespace Sentry.data.Core
         public double LastUpdated { get; set; }
         public bool DeleteInd { get; set; }
         public bool IsArray { get; set; }
+        public Guid FieldGuid { get; set; }
     }
 }

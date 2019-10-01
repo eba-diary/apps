@@ -20,7 +20,8 @@ namespace Sentry.data.Core
                 IsInSAS = scm.IsInSAS,
                 SasLibrary = scm.SasLibrary,
                 SchemaEntity_NME = scm.SchemaEntity_NME,
-                SchemaId = scm.SchemaId
+                SchemaId = scm.SchemaId,
+                Description = scm.Description
             };
         }
 
@@ -42,12 +43,14 @@ namespace Sentry.data.Core
             BaseFieldDto dto = new BaseFieldDto()
             {
                 FieldId = field.FieldId,
+                FieldGuid = field.FieldGuid,
                 Name = field.Name,
                 CreateDTM = field.CreateDTM,
                 LastUpdatedDTM = field.LastUpdateDTM,
                 FieldType = field.FieldType.ToString(),
                 Nullable = field.NullableIndicator,
-                OrdinalPosition = field.OrdinalPosition
+                OrdinalPosition = field.OrdinalPosition,
+                Description = field.Description
             };
 
             switch (field.FieldType)

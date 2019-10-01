@@ -12,5 +12,6 @@
     [CreateCurrentView] BIT NULL, 
     [IsInSAS] BIT NULL, 
     [SASLibrary] VARCHAR(50) NULL, 
+    [Description] VARCHAR(250) NULL, 
     CONSTRAINT [FK_Schema_FileExtension] FOREIGN KEY ([FileExtension_Id]) REFERENCES [FileExtension]([Extension_Id]) 
 )

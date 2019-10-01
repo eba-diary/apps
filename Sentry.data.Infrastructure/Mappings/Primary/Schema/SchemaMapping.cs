@@ -21,6 +21,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             Property(x => x.CreatedBy, m => m.Column("CreatedBy"));
             Property(x => x.CreatedDTM, m => m.Column("Created_DTM"));
             Property(x => x.LastUpdatedDTM, m => m.Column("LastUpdatd_DTM"));
+            Property(x => x.Description, m => m.Column("Description"));
             this.Bag((x) => x.Revisions, (m) =>
             {
                 m.Inverse(true);
