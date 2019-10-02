@@ -302,52 +302,52 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        /// <summary>
-        /// Get schema revision detail
-        /// </summary>
-        /// <param name="datasetId"></param>
-        /// <param name="schemaId"></param>
-        /// <param name="revisionId"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
-        [Route("dataset/{datasetId}/schema/{schemaId}/revision/{revisionId}/fields")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaRevisionDetailModel))]
-        public async Task<IHttpActionResult> GetSchemaRevision(int datasetId, int schemaId, int revisionId)
-        {
-            UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
+        ///// <summary>
+        ///// Get schema revision detail
+        ///// </summary>
+        ///// <param name="datasetId"></param>
+        ///// <param name="schemaId"></param>
+        ///// <param name="revisionId"></param>
+        ///// <returns></returns>
+        //[HttpGet]
+        //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        //[Route("dataset/{datasetId}/schema/{schemaId}/revision/{revisionId}/fields")]
+        //[SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaRevisionDetailModel))]
+        //public async Task<IHttpActionResult> GetSchemaRevision(int datasetId, int schemaId, int revisionId)
+        //{
+        //    UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
 
-            if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
-            {
-                return Unauthorized();
-            }
+        //    if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
+        //    {
+        //        return Unauthorized();
+        //    }
 
-            try
-            {
-                if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId))
-                {
-                    Logger.Info($"metadataapi_getschemarevision_notfound - datasetid:{datasetId} schemaid:{schemaId}");
-                    return NotFound();
-                }
+        //    try
+        //    {
+        //        if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId))
+        //        {
+        //            Logger.Info($"metadataapi_getschemarevision_notfound - datasetid:{datasetId} schemaid:{schemaId}");
+        //            return NotFound();
+        //        }
 
-                SchemaRevisionDto revisiondto = _schemaService.GetSchemaRevisionDtoBySchema(schemaId).First(w => w.RevisionId == revisionId);
-                if (revisiondto == null)
-                {
-                    Logger.Info($"metadataapi_getschemarevision_notfound - datasetid:{datasetId} schemaid:{schemaId} revisionid:{revisionId}");
-                    return NotFound();
-                }
+        //        SchemaRevisionDto revisiondto = _schemaService.GetSchemaRevisionDtoBySchema(schemaId).First(w => w.RevisionId == revisionId);
+        //        if (revisiondto == null)
+        //        {
+        //            Logger.Info($"metadataapi_getschemarevision_notfound - datasetid:{datasetId} schemaid:{schemaId} revisionid:{revisionId}");
+        //            return NotFound();
+        //        }
 
-                SchemaRevisionDetailModel revisionDetailModel = revisiondto.ToSchemaDetailModel();
-                List<BaseFieldDto> fieldDtoList = _schemaService.GetBaseFieldDtoBySchemaRevision(revisionId);
-                revisionDetailModel.Fields = fieldDtoList.ToSchemaFieldModel();
-                return Ok(revisionDetailModel);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"metadataapi_getschemarevision_badrequest - datasetid:{datasetId} schemaid:{schemaId}", ex);
-                return InternalServerError();
-            }
-        }
+        //        SchemaRevisionDetailModel revisionDetailModel = revisiondto.ToSchemaDetailModel();
+        //        List<BaseFieldDto> fieldDtoList = _schemaService.GetBaseFieldDtoBySchemaRevision(revisionId);
+        //        revisionDetailModel.Fields = fieldDtoList.ToSchemaFieldModel();
+        //        return Ok(revisionDetailModel);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Error($"metadataapi_getschemarevision_badrequest - datasetid:{datasetId} schemaid:{schemaId}", ex);
+        //        return InternalServerError();
+        //    }
+        //}
 
         /// <summary>
         /// gets dataset metadata
