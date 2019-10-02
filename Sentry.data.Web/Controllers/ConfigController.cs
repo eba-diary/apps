@@ -75,7 +75,7 @@ namespace Sentry.data.Web.Controllers
                 DatasetFileConfigs = configModelList
             };
 
-            UserSecurity us = _DatasetService.GetUserSecurityForDataset(id);
+            mcm.Security = _DatasetService.GetUserSecurityForDataset(id);
 
             //ObsoleteDatasetModel bdm = new ObsoleteDatasetModel(ds, _associateInfoProvider, _datasetContext)
             //{
