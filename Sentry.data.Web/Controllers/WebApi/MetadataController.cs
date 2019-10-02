@@ -265,7 +265,7 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [Route("dataset/{datasetId}/schema/{schemaId}/revision/latest/fields")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaRevisionModel>))]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaRevisionDetailModel))]
         public async Task<IHttpActionResult> GetLatestSchemaRevisionDetail(int datasetId, int schemaId)
         {
             UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
@@ -312,7 +312,7 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [Route("dataset/{datasetId}/schema/{schemaId}/revision/{revisionId}/fields")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaRevisionDetailModel>))]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaRevisionDetailModel))]
         public async Task<IHttpActionResult> GetSchemaRevision(int datasetId, int schemaId, int revisionId)
         {
             UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
@@ -417,51 +417,51 @@ namespace Sentry.data.Web.Controllers
 
         #region Schema_Endpoints
         
-        /// <summary>
-        /// Gets schema information
-        /// </summary>
-        /// <param name="schemaId"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
-        [Route("schema/{schemaId}")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaInfoModel))]
-        public async Task<IHttpActionResult> GetSchemaInfo(int schemaId)
-        {
-            try
-            {
-                SchemaDto dto = _schemaService.GetFileSchemaDto(schemaId);
-                SchemaInfoModel model = dto.ToModel();
-                return Ok(model);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.ToString());
-            }
-        }
+        ///// <summary>
+        ///// Gets schema information
+        ///// </summary>
+        ///// <param name="schemaId"></param>
+        ///// <returns></returns>
+        //[HttpGet]
+        //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        //[Route("schema/{schemaId}")]
+        //[SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaInfoModel))]
+        //public async Task<IHttpActionResult> GetSchemaInfo(int schemaId)
+        //{
+        //    try
+        //    {
+        //        SchemaDto dto = _schemaService.GetFileSchemaDto(schemaId);
+        //        SchemaInfoModel model = dto.ToModel();
+        //        return Ok(model);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.ToString());
+        //    }
+        //}
 
-        /// <summary>
-        /// Get list all revisions for schema
-        /// </summary>
-        /// <param name="schemaId"></param>
-        /// <returns></returns>
-        [HttpGet]
+        ///// <summary>
+        ///// Get list all revisions for schema
+        ///// </summary>
+        ///// <param name="schemaId"></param>
+        ///// <returns></returns>
+        //[HttpGet]
 
-        [Route("schema/{schemaId}/revisions")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaInfoModel>))]
-        public async Task<IHttpActionResult> GetSchemaRevisions(int schemaId)
-        {
-            try
-            {
-                List<SchemaRevisionDto> revisionsList = _schemaService.GetSchemaRevisionDtoBySchema(schemaId);
-                List<SchemaRevisionModel> modelList = revisionsList.ToModel();
-                return Ok(modelList);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.ToString());
-            }
-        }
+        //[Route("schema/{schemaId}/revisions")]
+        //[SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaInfoModel>))]
+        //public async Task<IHttpActionResult> GetSchemaRevisions(int schemaId)
+        //{
+        //    try
+        //    {
+        //        List<SchemaRevisionDto> revisionsList = _schemaService.GetSchemaRevisionDtoBySchema(schemaId);
+        //        List<SchemaRevisionModel> modelList = revisionsList.ToModel();
+        //        return Ok(modelList);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.ToString());
+        //    }
+        //}
 
 
         /// <summary>
