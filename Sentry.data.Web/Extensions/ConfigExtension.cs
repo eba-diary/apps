@@ -117,7 +117,8 @@ namespace Sentry.data.Web
                 IsInSAS = model.IncludedInSAS,
                 SasLibrary = model.SasLibrary,
                 ParentDatasetId = model.DatasetId,
-                SchemaId = model.SchemaId
+                SchemaId = model.SchemaId,
+                Description = model.ConfigFileDesc
             };
         }
 
@@ -170,24 +171,25 @@ namespace Sentry.data.Web
 
         public static SchemaInfoModel ToSchemaModel(this Core.DatasetFileConfigDto dto)
         {
+            Core.FileSchemaDto schemaDto = dto.Schema;            
             return new SchemaInfoModel()
             {
                 ConfigId = dto.ConfigId,
-                Name = dto.Name,
-                SchemaId = dto.Schema.SchemaId,
-                SchemaEntity_NME = dto.Schema.SchemaEntity_NME,
-                Description = dto.Description,
-                StorageCode = dto.StorageCode,
-                Format = dto.FileExtensionName,
-                CurrentView = dto.CreateCurrentView,
-                IsInSAS = dto.IsInSAS,
-                Delimiter = dto.Delimiter,
-                HasHeader = dto.HasHeader,
+                Name = schemaDto.Name,
+                SchemaId = schemaDto.SchemaId,
+                SchemaEntity_NME = schemaDto.SchemaEntity_NME,
+                Description = schemaDto.Description,
+                StorageCode = schemaDto.StorageCode,
+                Format = schemaDto.FileExtenstionName,
+                CurrentView = schemaDto.CreateCurrentView,
+                IsInSAS = schemaDto.IsInSAS,
+                Delimiter = schemaDto.Delimiter,
+                HasHeader = schemaDto.HasHeader,
                 IsTrackableSchema = dto.IsTrackableSchema,
-                HiveTable = dto.HiveTable,
-                HiveDatabase = dto.HiveDatabase,
-                HiveTableStatus = dto.HiveTableStatus,
-                HiveLocation = dto.HiveLocation
+                HiveTable = schemaDto.HiveTable,
+                HiveDatabase = schemaDto.HiveDatabase,
+                HiveTableStatus = schemaDto.HiveStatus,
+                HiveLocation = schemaDto.HiveLocation
             };
         }
 

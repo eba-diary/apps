@@ -104,28 +104,28 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        [HttpGet]
-        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
-        [Route("dataset/{datasetId}/config")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<ConfigInfoModel>))]
-        public async Task<IHttpActionResult> GetDatasetConfigs(int datasetId)
-        {
-            try
-            {
-                List<DatasetFileConfigDto> dtoList = _configService.GetDatasetFileConfigDtoByDataset(datasetId);
-                if (dtoList == null)
-                {
-                    Logger.Info($"metadataapi_getdatasetconfigs_badrequest - datasetid:{datasetId}");
-                }
-                List<ConfigInfoModel> modelList = dtoList.ToModel();
-                return Ok(modelList);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"metadataapi_getdatasetconfigs_internalservererror", ex);
-                return InternalServerError();
-            }
-        }
+        //[HttpGet]
+        //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        //[Route("dataset/{datasetId}/config")]
+        //[SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<ConfigInfoModel>))]
+        //public async Task<IHttpActionResult> GetDatasetConfigs(int datasetId)
+        //{
+        //    try
+        //    {
+        //        List<DatasetFileConfigDto> dtoList = _configService.GetDatasetFileConfigDtoByDataset(datasetId);
+        //        if (dtoList == null)
+        //        {
+        //            Logger.Info($"metadataapi_getdatasetconfigs_badrequest - datasetid:{datasetId}");
+        //        }
+        //        List<ConfigInfoModel> modelList = dtoList.ToModel();
+        //        return Ok(modelList);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Error($"metadataapi_getdatasetconfigs_internalservererror", ex);
+        //        return InternalServerError();
+        //    }
+        //}
 
         /// <summary>
         /// Get list of schema for dataset

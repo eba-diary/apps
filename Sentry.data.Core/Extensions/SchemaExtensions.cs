@@ -24,7 +24,13 @@ namespace Sentry.data.Core
                 Description = scm.Description,
                 DeleteInd = scm.DeleteInd,
                 DeleteIssuer = scm.DeleteIssuer,
-                DeleteIssueDTM = scm.DeleteIssueDTM
+                DeleteIssueDTM = scm.DeleteIssueDTM,
+                HiveTable = scm.HiveTable,
+                HiveDatabase = scm.HiveDatabase,
+                HiveLocation = scm.HiveLocation,
+                HiveStatus = scm.HiveTableStatus,
+                StorageCode = scm.StorageCode,
+                FileExtenstionName = scm.Extension.Name,
             };
         }
 

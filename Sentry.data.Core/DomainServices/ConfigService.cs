@@ -778,7 +778,8 @@ namespace Sentry.data.Core
             try
             {
                 DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(id);
-                FileSchema de = (FileSchema)dfc.Schema;
+                FileSchema scm = _datasetContext.GetById<FileSchema>(dfc.Schema.SchemaId);
+                FileSchema de = dfc.Schema;
 
                 if (logicalDelete)
                 {
@@ -792,7 +793,7 @@ namespace Sentry.data.Core
                     //Mark Object for delete to ensure they are not displaed in UI
                     //Goldeneye service will perform delete after determined amount of time
                     MarkForDelete(dfc);
-                    MarkForDelete(de);
+                    MarkForDelete(scm);
                     _datasetContext.SaveChanges();
 
                     //Send message to create hive table
@@ -817,15 +818,15 @@ namespace Sentry.data.Core
 
                         Logger.Info($"configservice-delete-deleteparquetstorage - configid:{id} configname:{dfc.Name}");
                         //Delete all parquet files under schema storage code
-                        DeleteParquetFilesByStorageCode(de.StorageCode);
+                        DeleteParquetFilesByStorageCode(scm.StorageCode);
 
                         Logger.Info($"configservice-delete-deleterawstorage - configid:{id} configname:{dfc.Name}");
                         //Delete all raw data files under schema storage code
-                        DeleteRawFilesByStorageCode(de.StorageCode);
+                        DeleteRawFilesByStorageCode(scm.StorageCode);
 
                         Logger.Info($"configservice-delete-datasetfileparquetmetadata - configid:{id} configname:{dfc.Name}");
                         //Delete all DatasetFileParquet metadata  (inserts are managed outside of DSC code)
-                        List<DatasetFileParquet> parquetFileList = _datasetContext.DatasetFileParquet.Where(w => w.SchemaId == de.SchemaId).ToList();
+                        List<DatasetFileParquet> parquetFileList = _datasetContext.DatasetFileParquet.Where(w => w.SchemaId == scm.SchemaId).ToList();
                         Logger.Info($"configservice-delete-datasetfileparquetmetadata - recordsfound:{parquetFileList.Count} configid:{id} configname:{dfc.Name}");
                         foreach (DatasetFileParquet record in parquetFileList)
                         {
@@ -834,7 +835,7 @@ namespace Sentry.data.Core
 
                         Logger.Info($"configservice-delete-datasetfilereplymetadata - configid:{id} configname:{dfc.Name}");
                         //Delete all DatasetFileReply metadata  (inserts are managed outside of DSC code)
-                        List<DatasetFileReply> replyList = _datasetContext.DatasetFileReply.Where(w => w.SchemaID == de.SchemaId).ToList();
+                        List<DatasetFileReply> replyList = _datasetContext.DatasetFileReply.Where(w => w.SchemaID == scm.SchemaId).ToList();
                         Logger.Info($"configservice-delete-datasetfilereplymetadata - recordsfound:{parquetFileList.Count} configid:{id} configname:{dfc.Name}");
                         foreach (DatasetFileReply record in replyList)
                         {
