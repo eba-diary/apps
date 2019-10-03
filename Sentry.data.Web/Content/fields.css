@@ -123,7 +123,8 @@
     float: left;
     margin-right: 10px;
 }
-.fieldGuidText{
+.fieldGuidText {
     color: transparent;
     font-size: x-small;
+    display: block;
 }
