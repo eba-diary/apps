@@ -1250,33 +1250,43 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Fields(int configId, int schemaId)
         {
-            DatasetFileConfig config = _datasetContext.GetById<DatasetFileConfig>(configId);
+            DatasetFileConfigDto configDto = _configService.GetDatasetFileConfigDto(configId);
 
-            UserSecurity us = _DatasetService.GetUserSecurityForConfig(configId);
-
-
-            ObsoleteDatasetModel bdm = new ObsoleteDatasetModel(config.ParentDataset, _associateInfoProvider, _datasetContext)
+            if (configDto.Schema.SchemaId == schemaId)
             {
-                CanEditDataset = us.CanEditDataset,
-                CanUpload =us.CanUploadToDataset,
-                Security = us
-            };
+                UserSecurity us = _DatasetService.GetUserSecurityForConfig(configId);
 
-            Event e = new Event();
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.DataConfig = config.ConfigId;
-            e.Dataset = config.ParentDataset.DatasetId;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-            e.Reason = "Viewed Edit Fields";
-            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
-            ViewBag.Schema = _datasetContext.GetById<DataElement>(schemaId);
+                ObsoleteDatasetModel bdm = new ObsoleteDatasetModel(_datasetContext.GetById<Dataset>(configDto.ParentDatasetId), _associateInfoProvider, _datasetContext)
+                {
+                    CanEditDataset = us.CanEditDataset,
+                    CanUpload = us.CanUploadToDataset,
+                    Security = us
+                };
 
-            return View(bdm);
+                Event e = new Event();
+                e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+                e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+                e.TimeCreated = DateTime.Now;
+                e.TimeNotified = DateTime.Now;
+                e.IsProcessed = false;
+                e.DataConfig = configDto.ConfigId;
+                e.Dataset = configDto.ParentDatasetId;
+                e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+                e.Reason = "Viewed Edit Fields";
+                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+
+                ViewBag.Schema = _datasetContext.GetById<FileSchema>(schemaId);
+
+                return View(bdm);
+            }
+            else
+            {
+                return RedirectToAction("Index", new { id = configDto.ParentDatasetId });
+            }
+
+
+            
         }
 
         [HttpPost]
@@ -1405,33 +1415,41 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditSchema(int configId, int schemaId)
         {
-            DataElement schema = _datasetContext.GetById<DataElement>(schemaId);
-
-            int fileFormatId = _datasetContext.FileExtensions.FirstOrDefault(w => w.Name == schema.FileFormat).Id;
-            EditSchemaModel editSchemaModel = new EditSchemaModel()
+            DatasetFileConfigDto config = _configService.GetDatasetFileConfigDto(configId);
+            FileSchemaDto schema = (config.Schema.SchemaId == schemaId) ? config.Schema : null;
+            //DataElement schema = _datasetContext.GetById<DataElement>(schemaId);
+            if (schema != null)
             {
-                Name = schema.SchemaName,
-                Description = schema.SchemaDescription,
-                IsForceMatch = schema.SchemaIsForceMatch,
-                IsPrimary = schema.SchemaIsPrimary,
-                DatasetId = schema.DatasetFileConfig.ParentDataset.DatasetId,
-                Delimiter = schema.Delimiter,
-                DataElement_ID = schema.DataElement_ID,
-                HasHeader = schema.HasHeader,
-                FileTypeId = fileFormatId
-            };
+                EditSchemaModel editSchemaModel = new EditSchemaModel()
+                {
+                    Name = schema.Name,
+                    Description = schema.Description,
+                    IsForceMatch = false,
+                    IsPrimary = false,
+                    DatasetId = config.ParentDatasetId,
+                    Delimiter = schema.Delimiter,
+                    Schema_Id = schema.SchemaId,
+                    HasHeader = schema.HasHeader,
+                    FileTypeId = schema.FileExtensionId
+                };
 
-            Event e = new Event();
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-            e.Reason = "Viewed Retrieval Edit Page";
-            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+                Event e = new Event();
+                e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+                e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+                e.TimeCreated = DateTime.Now;
+                e.TimeNotified = DateTime.Now;
+                e.IsProcessed = false;
+                e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+                e.Reason = "Viewed Retrieval Edit Page";
+                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
-            return View(editSchemaModel);
+                return View(editSchemaModel);
+            }
+            else
+            {
+                return RedirectToAction("Index", new { id = config.ParentDatasetId});
+            }
+            
         }
 
         [HttpPost]
@@ -1439,29 +1457,15 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult EditSchema(int configId, int schemaId, EditSchemaModel esm)
         {
-
-            DataElementDto dto = esm.ToDto();
-
-            DataElement schema = _datasetContext.GetById<DataElement>(schemaId);
-
-
-
+            FileSchemaDto fileDto = _schemaService.GetFileSchemaDto(schemaId);
+            FileSchemaDto dto = esm.ToDto(fileDto);
             try
             {
                 AddCoreValidationExceptionsToModel(_configService.Validate(dto));
 
                 if (ModelState.IsValid)
                 {
-                    schema.SchemaName = esm.Name;
-                    schema.SchemaDescription = esm.Description;
-                    schema.SchemaIsForceMatch = esm.IsForceMatch;
-                    schema.SchemaIsPrimary = esm.IsPrimary;
-                    schema.Delimiter = esm.Delimiter;
-                    schema.DataElementChange_DTM = DateTime.Now;
-                    schema.HasHeader = esm.HasHeader;
-
-                    _datasetContext.Merge(schema);
-                    _datasetContext.SaveChanges();
+                    _schemaService.UpdateAndSaveSchema(dto);
 
                     return RedirectToAction("Index", new { id = esm.DatasetId });
                 }

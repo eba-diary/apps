@@ -142,7 +142,7 @@
                             @if (Model.Security.ShowAdminControls)
                             {
                                 <div class="col-md-3">Storage id: <b>@item.RawStorageId</b></div>
-                                <div class="col-md-3">Schema id: <b>@item.NewSchemaId</b> <i>(@item.SchemaId)</i></div>
+                                <div class="col-md-3">Schema id: <b>@item.SchemaId</b></div>
                             }
                             else
                             {
@@ -268,105 +268,72 @@
 
                         <a class="btn btn-success" href="/Config/@item.ConfigId/Job/Create">Add Job</a>
 
-                        @if (item.Schemas != null && item.Schemas.Any())
+                        @if (item.Schema != null)
                         {
                             <hr />
                             <h4 class="@color">Schema (columns, datatypes, delimiter, etc.)</h4>
                             <hr />
-                            foreach (var schema in item.Schemas.OrderByDescending(x => x.DataElementCreate_DTM))
-                            {
-                                <div class="retJob">
-                                    <div class="jobHeader categoryBanner-@color">
-                                        <h6>@schema.SchemaName</h6>
-                                        <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
-
-                                        @if (schema.SchemaIsPrimary)
-                                        {
-                                            <span style="float: right; margin-top: 10px;margin-righ t: 10px;"><span class="glyphicon glyphicon-ok"></span> This is the Primary Schema</span>
-                                        }
-                                        @*@if (schema.HiveTable.Any(x => x.IsPrimary))
-                        {
-                            <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-ok"></span> This Schema has the Primary Hive Table</span>
-                        }*@
-                                        @if (schema.SchemaIsForceMatch)
-                                        {
-                                            <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-ok"></span> Force Match</span>
-                                        }
-                                        else
-                                        {
-                                            <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-remove"></span> Force Match</span>
-                                        }
-
-
-
-                                    </div>
-                                    <div class="jobContainer" style="display:none;">
-
-                                        <p>@schema.SchemaDescription</p>
-                                        @*<p>This schema's current Delimiter is <b>@schema.Delimiter</b></p>
-                        <p>Raw files contain headers: <b>@schema.HasHeader</b></p>*@
-
-                                        @if (schema.DataObjects.Count() == 0)
-                                        {
-                                            @*<p>This schema Id is @schema.DataElement_ID.</p>*@
-                                            <p>This schema is not currently does not yet have any columns associated to it.</p>
-                                        }
-                                        @*else
-                        {
-                            <p>This schema Id is @schema.DataElement_ID.</p>
-                        }*@
-
-                                        <p>Created on: @schema.DataElementCreate_DTM</p>
-                                        <p>Last Modified on: @schema.DataElementChange_DTM</p>
-
-                                        @if (schema.SchemaIsForceMatch)
-                                        {
-                                            <p>This schema is currently set to force match for this data file config.</p>
-                                        }
-
-                                        @*@if (schema.HiveTables.Any())
-                        {
-                            <br />
-                            <h4 class="@color">Hive Tables</h4>
-                            <hr />
-
-                            foreach (var table in schema.HiveTables)
-                            {
-                                <div class="retJob">
-                                    <div class="jobHeader categoryBanner-@color">
-                                        <h6>@table.HiveDatabase_NME.@table.Hive_NME</h6>
-                                        <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
-                                        @if (table.IsPrimary)
-                                        {
-                                            <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-ok"></span> Primary Hive Table</span>
-                                        }
-                                    </div>
-                                    <div class="jobContainer" style="display:none;">
-                                        <p>@table.Hive_DSC</p>
-                                        <p>Created on: @table.Created_DTM</p>
-                                        <p>Last Modified on: @table.Changed_DTM</p>
-                                    </div>
+                            <div class="retJob">
+                                <div class="jobHeader categoryBanner-@color">
+                                    <h6>@item.Schema.Name</h6>
+                                    <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
                                 </div>
-                            }
-                            <hr />
-                        }*@
-                                        <p>
-                                            <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Edit">Edit Schema Metadata</a>
-                                            <br>
-                                            <br>
+                                <div class="jobContainer" style="display:none;">
 
-                                            @if (schema.DataObjects.Count() > 0)
-                                            {
-                                                <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Fields">Edit Columns and Fields</a>
-                                            }
-                                            @if (schema.DataObjects.Count() == 0)
-                                            {
-                                                <a class="btn btn-success" href="/Config/@item.ConfigId/Schema/@schema.DataElement_ID/Fields">Add Columns and Fields</a>
-                                            }
-                                        </p>
-                                    </div>
-                                </div>
+                                    <p>@item.Schema.Description</p>
+                                    @*<p>This schema's current Delimiter is <b>@schema.Delimiter</b></p>
+            <p>Raw files contain headers: <b>@schema.HasHeader</b></p>*@
+
+                                    @if (item.Schema.Revisions.Count() == 0)
+                                    {
+                                        @*<p>This schema Id is @schema.DataElement_ID.</p>*@
+                                        <p>This schema is not currently does not yet have any columns associated to it.</p>
+                                    }
+                                        <p>Created on: @item.Schema.CreatedDTM</p>
+                                        <p>Last Modified on: @item.Schema.LastUpdatedDTM</p>
+
+                                    @*@if (schema.HiveTables.Any())
+            {
+                <br />
+                <h4 class="@color">Hive Tables</h4>
+                <hr />
+
+                foreach (var table in schema.HiveTables)
+                {
+                    <div class="retJob">
+                        <div class="jobHeader categoryBanner-@color">
+                            <h6>@table.HiveDatabase_NME.@table.Hive_NME</h6>
+                            <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
+                            @if (table.IsPrimary)
+                            {
+                                <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-ok"></span> Primary Hive Table</span>
                             }
+                        </div>
+                        <div class="jobContainer" style="display:none;">
+                            <p>@table.Hive_DSC</p>
+                            <p>Created on: @table.Created_DTM</p>
+                            <p>Last Modified on: @table.Changed_DTM</p>
+                        </div>
+                    </div>
+                }
+                <hr />
+            }*@
+                                    <p>
+                                        <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Edit">Edit Schema Metadata</a>
+                                        <br>
+                                        <br>
+
+                                        @if (item.Schema.Revisions.Count() > 0)
+                                        {
+                                            <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields">Edit Columns and Fields</a>
+                                        }
+                                        @if (item.Schema.Revisions.Count() == 0)
+                                        {
+                                            <a class="btn btn-success" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields">Add Columns and Fields</a>
+                                        }
+                                    </p>
+                                </div>
+                            </div>
                         }
                     </div>
 

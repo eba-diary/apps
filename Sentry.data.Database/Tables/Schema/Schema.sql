@@ -13,5 +13,13 @@
     [IsInSAS] BIT NULL, 
     [SASLibrary] VARCHAR(50) NULL, 
     [Description] VARCHAR(250) NULL, 
+    [HiveTable] VARCHAR(250) NULL, 
+    [HiveDatabase] VARCHAR(250) NULL, 
+    [HiveLocation] VARCHAR(250) NULL, 
+    [StorageCode] VARCHAR(250) NULL, 
+    [DeleteInd] BIT NOT NULL, 
+    [DeleteIssuer] VARCHAR(10) NULL, 
+    [DeleteIssueDTM] DATETIME NULL, 
+    [HiveStatus] VARCHAR(50) NULL, 
     CONSTRAINT [FK_Schema_FileExtension] FOREIGN KEY ([FileExtension_Id]) REFERENCES [FileExtension]([Extension_Id]) 
 )

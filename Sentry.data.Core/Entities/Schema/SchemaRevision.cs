@@ -13,7 +13,7 @@ namespace Sentry.data.Core
         }
         public virtual int SchemaRevision_Id { get; set; }
         public virtual int Revision_NBR { get; set; }
-        public virtual Schema ParentSchema { get; set; }
+        public virtual FileSchema ParentSchema { get; set; }
         public virtual string SchemaRevision_Name { get; set; }
         public virtual string CreatedBy { get; set; }
         public virtual DateTime CreatedDTM { get; set; }

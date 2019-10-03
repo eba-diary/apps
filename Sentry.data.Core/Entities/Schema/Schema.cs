@@ -26,13 +26,16 @@ namespace Sentry.data.Core
         public virtual DateTime LastUpdatedDTM { get; set; }
         public virtual string UpdatedBy { get; set; }
         public virtual string Description { get; set; }
+        public virtual bool DeleteInd { get; set; }
+        public virtual string DeleteIssuer { get; set; }
+        public virtual DateTime DeleteIssueDTM { get; set; }
 
         public virtual IList<SchemaRevision> Revisions { get; set; }
 
         protected internal virtual void AddRevision(SchemaRevision revision)
         {
             revision.Revision_NBR = (Revisions.Any()) ? Revisions.Count + 1 : 1;
-            revision.ParentSchema = this;
+            revision.ParentSchema = this as FileSchema;
             Revisions.Add(revision);
         }
     }

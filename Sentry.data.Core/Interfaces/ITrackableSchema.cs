@@ -9,6 +9,6 @@ namespace Sentry.data.Core
     public interface ITrackableSchema
     {
         bool IsSchemaTracked { get; set; }
-        Schema Schema { get; set; }
+        FileSchema Schema { get; set; }
     }
 }

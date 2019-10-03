@@ -2,7 +2,7 @@
 
 @{
     ViewBag.Title = "Fields";
-    Sentry.data.Core.DataElement schema = ViewBag.Schema;
+    Sentry.data.Core.FileSchema schema = ViewBag.Schema;
     string color = Model.DatasetCategory.Color;
 }
 <a class="backToList" href="/Config/Dataset/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>  Back to Dataset Configuration</a>
@@ -158,7 +158,7 @@
 @using (Html.BeginForm("Fields", "Config", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
-    <h2 class="@color">Fields for @schema.SchemaName</h2>
+    <h2 class="@color">Fields for @schema.Name</h2>
 
     @Html.ValidationSummary(false, "", new { @class = "text-danger" })
 

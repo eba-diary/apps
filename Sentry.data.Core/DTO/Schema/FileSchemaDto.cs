@@ -20,5 +20,10 @@ namespace Sentry.data.Core
         public bool CreateCurrentView { get; set; }
         public bool IsInSAS { get; set; }
         public string SasLibrary { get; set; }
+        public string HiveTable { get; set; }
+        public string HiveDatabase { get; set; }
+        public string HiveLocation { get; set; }
+        public string HiveStatus { get; set; }
+        public string StorageCode { get; set; }
     }
 }

@@ -22,6 +22,9 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             Property(x => x.CreatedDTM, m => m.Column("Created_DTM"));
             Property(x => x.LastUpdatedDTM, m => m.Column("LastUpdatd_DTM"));
             Property(x => x.Description, m => m.Column("Description"));
+            Property(x => x.DeleteInd, m => m.Column("DeleteInd"));
+            Property(x => x.DeleteIssuer, m => m.Column("DeleteIssuer"));
+            Property(x => x.DeleteIssueDTM, m => m.Column("DeleteIssueDTM"));
             this.Bag((x) => x.Revisions, (m) =>
             {
                 m.Inverse(true);
@@ -53,6 +56,11 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 Property(x => x.IsInSAS, m => m.Column("IsInSAS"));
                 Property(x => x.CreateCurrentView, m => m.Column("CreateCurrentView"));
                 Property(x => x.SasLibrary, m => m.Column("SASLibrary"));
+                Property(x => x.HiveTable, m => m.Column("HiveTable"));
+                Property(x => x.HiveDatabase, m => m.Column("HiveDatabase"));
+                Property(x => x.HiveLocation, m => m.Column("HiveLocation"));
+                Property(x => x.StorageCode, m => m.Column("StorageCode"));
+                Property(x => x.HiveTableStatus, m => m.Column("HiveStatus"));
             }
         }
     }

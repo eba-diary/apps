@@ -7,34 +7,22 @@ namespace Sentry.data.Web
 {
     public static class ConfigExtension
     {
-        public static Core.DataElementDto ToDto(this EditSchemaModel model)
+        public static Core.FileSchemaDto ToDto(this EditSchemaModel model, Core.FileSchemaDto dto)
         {
-            return new Core.DataElementDto()
-            {
-                SchemaName = model.Name,
-                SchemaDescription = model.Description,
-                SchemaIsForceMatch = model.IsForceMatch,
-                SchemaIsPrimary = model.IsPrimary,
-                Delimiter = model.Delimiter,
-                DataElementChange_DTM = DateTime.Now,
-                HasHeader = model.HasHeader,
-                FileFormatId = model.FileTypeId
-            };            
+            dto.Name = model.Name;
+            dto.Description = model.Description;
+            return dto;
         }
 
-        public static Core.DataElementDto DatasetModelToDto(this DatasetModel model)
+        public static Core.FileSchemaDto DatasetModelToDto(this DatasetModel model)
         {
-            return new Core.DataElementDto()
+            return new Core.FileSchemaDto()
             {
-                SchemaName = model.ConfigFileName,
-                SchemaDescription = model.ConfigFileDesc,
-                SchemaIsForceMatch = false,
-                SchemaIsPrimary = true,
+                Name = model.ConfigFileName,
+                Description = model.ConfigFileDesc,
                 Delimiter = model.Delimiter,
-                DataElementChange_DTM = DateTime.Now,
                 HasHeader = model.HasHeader,
-                FileFormatId = model.FileExtensionId,
-                IsInSAS = model.IncludeInSas
+                FileExtensionId = model.FileExtensionId                
             };
         }
 
@@ -128,7 +116,8 @@ namespace Sentry.data.Web
                 CreateCurrentView = model.CreateCurrentView,
                 IsInSAS = model.IncludedInSAS,
                 SasLibrary = model.SasLibrary,
-                ParentDatasetId = model.DatasetId
+                ParentDatasetId = model.DatasetId,
+                SchemaId = model.SchemaId
             };
         }
 

@@ -18,16 +18,12 @@ namespace Sentry.data.Core
             _userService = userService;
         }
 
-        public int CreateAndSaveSchema(SchemaDto schemaDto)
+        public int CreateAndSaveSchema(FileSchemaDto schemaDto)
         {
             int newSchemaId = 0;
             try
             {
-                FileSchemaDto dto = schemaDto as FileSchemaDto;
-                if (dto != null)
-                {
-                    newSchemaId = CreateSchema(dto);
-                }
+                newSchemaId = CreateSchema(schemaDto);
 
                 _datasetContext.SaveChanges();
             }
@@ -40,20 +36,14 @@ namespace Sentry.data.Core
             return newSchemaId;            
         }
 
-        public bool UpdateAndSaveSchema(SchemaDto schemaDto)
+        public bool UpdateAndSaveSchema(FileSchemaDto schemaDto)
         {
             try
             {
-                FileSchemaDto dto = schemaDto as FileSchemaDto;
-                if (dto != null)
-                {
-                    FileSchema schema = _datasetContext.GetById<FileSchema>(dto.SchemaId);
-                    UpdateAndSaveSchema(dto, schema);
-                    _datasetContext.SaveChanges();
-                    return true;
-                }
-                Logger.Info("schemaservice-updateandsaveschema typenotfound");
-                return false;
+                FileSchema schema = _datasetContext.GetById<FileSchema>(schemaDto.SchemaId);
+                UpdateAndSaveSchema(schemaDto, schema);
+                _datasetContext.SaveChanges();
+                return true;
             }
             catch (Exception ex)
             {
@@ -70,9 +60,34 @@ namespace Sentry.data.Core
                 schema.Name = dto.Name;
                 chgDetected = true;
             };
+            if (schema.Delimiter != dto.Delimiter)
+            {
+                schema.Description = dto.Description;
+                chgDetected = true;
+            }
+            if (schema.CreateCurrentView != dto.CreateCurrentView)
+            {
+                schema.CreateCurrentView = dto.CreateCurrentView;
+                chgDetected = true;
+            }
+            if (schema.Description != dto.Description)
+            {
+                schema.Description = dto.Description;
+                chgDetected = true;
+            }
             if (schema.Extension.Id != dto.FileExtensionId)
             {
                 schema.Extension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId);
+                chgDetected = true;
+            }
+            if (schema.HasHeader != dto.HasHeader)
+            {
+                schema.HasHeader = dto.HasHeader;
+                chgDetected = true;
+            }
+            if (schema.IsInSAS != dto.IsInSAS)
+            {
+                schema.IsInSAS = dto.IsInSAS;
                 chgDetected = true;
             }
 
@@ -123,6 +138,8 @@ namespace Sentry.data.Core
 
         private int CreateSchema(FileSchemaDto dto)
         {
+            string storageCode = _datasetContext.GetNextStorageCDE().ToString();
+            Dataset parentDataset = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
             FileSchema schema = new FileSchema()
             {
                 Name = dto.Name,
@@ -133,7 +150,15 @@ namespace Sentry.data.Core
                 HasHeader = dto.HasHeader,
                 IsInSAS = dto.IsInSAS,
                 SasLibrary = CommonExtensions.GenerateSASLibaryName(_datasetContext.GetById<Dataset>(dto.ParentDatasetId)),
-                Description = dto.Description
+                Description = dto.Description,
+                StorageCode = storageCode,
+                HiveDatabase = "dsc_" + parentDataset.DatasetCategories.First().Name.ToLower(),
+                HiveTable = parentDataset.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dto.Name.Replace(" ", "").ToUpper(),
+                HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
+                HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
+                CreatedDTM = DateTime.Now,
+                LastUpdatedDTM = DateTime.Now,
+                DeleteIssueDTM = DateTime.MaxValue
             };
             _datasetContext.Add(schema);
             return schema.SchemaId;

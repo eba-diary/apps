@@ -471,7 +471,7 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("schemas/{SchemaID}/columns")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaDetailModel))]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(OutputSchema))]
         public async Task<IHttpActionResult> GetColumnSchemaInformationForSchema(int SchemaID)
         {
             SchemaDetaiApilDTO dto = _configService.GetSchemaDetailDTO(SchemaID);
@@ -486,11 +486,18 @@ namespace Sentry.data.Web.Controllers
         {
             if (config.Schema != null)
             {
+                int scmId = (SchemaID == 0) ? config.Schema.SchemaId : SchemaID; 
                 try
                 {
                     //Get Schema for schema level info
                     OutputSchema outSchema = new OutputSchema();
-                    FileSchemaDto fileSchemaDto = _schemaService.GetFileSchemaDto(config.Schema.SchemaId);
+                    FileSchemaDto fileSchemaDto = _schemaService.GetFileSchemaDto(scmId);
+
+                    if(fileSchemaDto == null)
+                    {
+                        Logger.Info($"metadatacontroller-getcolumnschema - notfound_fileschemadto");
+                        return NotFound();
+                    }
 
                     outSchema.FileExtension = fileSchemaDto.FileExtensionId;
 
@@ -502,7 +509,13 @@ namespace Sentry.data.Web.Controllers
                     }
 
                     //Get SchemaRevision
-                    SchemaRevisionDto revisionDto = _schemaService.GetLatestSchemaRevisionDtoBySchema(config.Schema.SchemaId);
+                    SchemaRevisionDto revisionDto = _schemaService.GetLatestSchemaRevisionDtoBySchema(scmId);
+
+                    if (revisionDto == null)
+                    {
+                        Logger.Info($"metadatacontroller-getcolumnschema - notfound_schemarevisiondto");
+                        return NotFound();
+                    }
 
                     //Get revision fields
                     List<BaseFieldDto> fieldDtoList = _schemaService.GetBaseFieldDtoBySchemaRevision(revisionDto.RevisionId);
@@ -515,86 +528,14 @@ namespace Sentry.data.Web.Controllers
                     outSchema.rows = rows;
 
                     return Ok(outSchema);
-                } catch (Exception ex)
+                }
+                catch (Exception ex)
                 {
                     Logger.Error($"metadatacontroller-getcolumnschema", ex);
                     return InternalServerError();
-                }                
-            }
-
-            try
-            {
-                if (config.Schemas.Any())
-                {
-                    var a = config.Schemas.ToList();
-
-                    DataElement schema = null;
-
-                    if (SchemaID != 0)
-                    {
-                        schema = config.Schemas.Where(x => x.DataElement_ID == SchemaID).FirstOrDefault();
-                    }
-                    else
-                    {
-                        if (config.Schemas.Any(x => x.SchemaIsPrimary))
-                        {
-                            schema = config.Schemas.Where(x => x.SchemaIsPrimary).OrderBy(x => x.SchemaRevision).FirstOrDefault();
-                        }
-                        else
-                        {
-                            schema = config.Schemas.OrderBy(x => x.SchemaRevision).FirstOrDefault();
-                        }
-                    }
-
-                    if (schema.DataObjects.Count > 0)
-                    {
-                        OutputSchema s = new OutputSchema();
-
-                        s.FileExtension = config.FileExtension.Id;
-
-                        s.rows = new List<SchemaRow>();
-
-                        if (schema.DataObjects.Any(x => x.RowCount != 0))
-                        {
-                            s.RowCount = Convert.ToInt32(schema.DataObjects.FirstOrDefault().RowCount);
-                        }
-
-                        foreach (DataObjectField b in schema.DataObjects.FirstOrDefault().DataObjectFields)
-                        {
-                            SchemaRow r = new SchemaRow()
-                            {
-                                Name = b.DataObjectField_NME,
-                                DataObjectField_ID = b.DataObjectField_ID,
-                                Description = b.DataObjectField_DSC,
-                                LastUpdated = b.LastUpdt_DTM.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds
-                            };
-
-                            r.DataType = (!String.IsNullOrEmpty(b.DataType)) ? b.DataType.ToUpper() : SchemaDatatypes.VARCHAR.ToString();
-                            if (b.Precision != null) { r.Precision = b.Precision ?? null; }
-                            if (b.Scale != null) { r.Scale = b.Scale ?? null; }
-                            if (b.Nullable != null) { r.Nullable = b.Nullable ?? null; }
-                            if (b.Length != null) { r.Length = b.Length ?? null; }
-                            if (b.OrdinalPosition != null) { r.Position = Int32.Parse(b.OrdinalPosition); }
-                            if (b.FieldFormat != null) { r.Format = b.FieldFormat ?? null; }
-                            s.rows.Add(r);
-                        }
-
-                        return Ok(s);
-                    }
-                    else
-                    {
-                        OutputSchema s = new OutputSchema();
-                        s.rows = new List<SchemaRow>();
-                        s.FileExtension = config.FileExtension.Id;
-                        return Ok(s);
-                    }
-                }
-                else
-                {
-                    return NotFound();
                 }
             }
-            catch (Exception ex)
+            else
             {
                 return NotFound();
             }

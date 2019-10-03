@@ -21,7 +21,10 @@ namespace Sentry.data.Core
                 SasLibrary = scm.SasLibrary,
                 SchemaEntity_NME = scm.SchemaEntity_NME,
                 SchemaId = scm.SchemaId,
-                Description = scm.Description
+                Description = scm.Description,
+                DeleteInd = scm.DeleteInd,
+                DeleteIssuer = scm.DeleteIssuer,
+                DeleteIssueDTM = scm.DeleteIssueDTM
             };
         }
 

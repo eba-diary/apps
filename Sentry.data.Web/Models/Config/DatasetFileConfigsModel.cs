@@ -29,8 +29,7 @@ namespace Sentry.data.Web
             this.Schemas = dsfc.Schemas;
             this.Schema = dsfc.Schema ?? null;
             this.RawStorageId = dsfc.GetStorageCode();
-            this.SchemaId = dsfc.Schemas.FirstOrDefault().DataElement_ID;
-            this.NewSchemaId = (dsfc.Schema != null) ? dsfc.Schema.SchemaId : 0;
+            this.SchemaId = (dsfc.Schema != null) ? dsfc.Schema.SchemaId : 0;
             this.Delimiter = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().Delimiter;
             this.CreateCurrentView = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().CreateCurrentView;
             this.HasHeader = dsfc.Schemas.OrderByDescending(o => o.DataElementChange_DTM).FirstOrDefault().HasHeader;
@@ -75,6 +74,7 @@ namespace Sentry.data.Web
             this.IncludedInSAS = dto.IsInSAS;
             this.Delimiter = dto.Delimiter;
             this.HasHeader = dto.HasHeader;
+            this.SchemaId = dto.Schema.SchemaId;
         }
 
         public DatasetFileConfigsModel(DatasetFileConfig dsfc, Boolean renderingForTable, Boolean renderingForPopup, IDatasetContext datasetContext)
@@ -89,9 +89,8 @@ namespace Sentry.data.Web
             this.FileExtensionID = dsfc.FileExtension.Id;
             this.FileExtension = dsfc.FileExtension;
             this.Schemas = dsfc.Schemas;
-            this.SchemaId = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().DataElement_ID;
+            this.SchemaId = (dsfc.Schema != null) ? dsfc.Schema.SchemaId : 0;
             this.Schema = dsfc.Schema ?? null;
-            this.NewSchemaId = (dsfc.Schema != null) ? dsfc.Schema.SchemaId : 0;
             this.Delimiter = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().Delimiter;
             this.RawStorageId = dsfc.GetStorageCode();
             this.CreateCurrentView = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().CreateCurrentView;
@@ -186,7 +185,7 @@ namespace Sentry.data.Web
         public IList<RetrieverJob> RetrieverJobs { get; set; }
 
         public IList<DataElement> Schemas { get; set; }  
-        public Schema Schema { get; set; }
+        public FileSchema Schema { get; set; }
 
         public IEnumerable<SelectListItem> AllDatasetScopeTypes { get; set; }
         public IEnumerable<SelectListItem> AllDataFileTypes { get; set; }

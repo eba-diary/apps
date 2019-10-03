@@ -13,5 +13,8 @@ namespace Sentry.data.Core
         public string Name { get; set; }
         public string Description { get; set; }
         public int ParentDatasetId { get; set; }
+        public virtual bool DeleteInd { get; set; }
+        public virtual string DeleteIssuer { get; set; }
+        public virtual DateTime DeleteIssueDTM { get; set; }
     }
 }
