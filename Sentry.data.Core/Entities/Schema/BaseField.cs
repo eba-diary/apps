@@ -12,6 +12,7 @@ namespace Sentry.data.Core
 
         public virtual int FieldId { get; set; }
         public virtual string Name { get; set; }
+        public virtual string Description { get; set; }
         public virtual BaseField ParentField
         {
             get
@@ -40,6 +41,7 @@ namespace Sentry.data.Core
         public virtual DateTime CreateDTM { get; set; }
         public virtual DateTime LastUpdateDTM { get; set; }
         public virtual bool NullableIndicator { get; set; }
+        public virtual Guid FieldGuid { get; set; }
         public virtual IList<BaseField> ChildFields
         {
             get

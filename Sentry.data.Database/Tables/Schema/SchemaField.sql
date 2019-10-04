@@ -16,6 +16,8 @@
     [SourceFormat] VARCHAR(50) NULL, 
     [ParentSchemaRevision] INT NOT NULL, 
     [FieldLength] INT NULL, 
+    [FieldGuid] UNIQUEIDENTIFIER NULL, 
+    [Description] VARCHAR(250) NULL, 
     CONSTRAINT [PK_SchemaField] PRIMARY KEY CLUSTERED (Field_Id ASC),
     CONSTRAINT [FK_SchemaField_SchemaField] FOREIGN KEY ([ParentField]) REFERENCES [SchemaField]([Field_Id]), 
     CONSTRAINT [FK_SchemaField_SchemaRevision] FOREIGN KEY ([ParentSchemaRevision]) REFERENCES [SchemaRevision]([SchemaRevision_Id])

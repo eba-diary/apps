@@ -8,6 +8,6 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
     public class SchemaRevisionDetailModel
     {
         public SchemaRevisionModel Revision { get; set; }
-        public List<Core.BaseFieldDto> fields { get; set; }
+        public List<SchemaFieldModel> Fields { get; set; }
     }
 }

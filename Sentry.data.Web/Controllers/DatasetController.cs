@@ -128,8 +128,8 @@ namespace Sentry.data.Web.Controllers
             //only validate config settings on dataset create
             if (model.DatasetId == 0)
             {
-                DataElementDto elementDto = model.DatasetModelToDto();
-                AddCoreValidationExceptionsToModel(_configService.Validate(elementDto));
+                FileSchemaDto schemaDto = model.DatasetModelToDto();
+                AddCoreValidationExceptionsToModel(_configService.Validate(schemaDto));
             }
 
             AddCoreValidationExceptionsToModel(_datasetService.Validate(dto));

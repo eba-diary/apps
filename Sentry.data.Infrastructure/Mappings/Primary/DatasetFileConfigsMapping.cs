@@ -98,7 +98,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             {
                 m.Column("Schema_ID");
                 m.ForeignKey("FK_DatasetFileConfigs_Schema");
-                m.Class(typeof(Schema));
+                m.Class(typeof(FileSchema));
                 m.Cascade(Cascade.All);
             });
         }
