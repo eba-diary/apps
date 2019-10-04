@@ -12,7 +12,7 @@
     [CreateCurrentView] BIT NULL, 
     [IsInSAS] BIT NULL, 
     [SASLibrary] VARCHAR(50) NULL, 
-    [Description] VARCHAR(250) NULL, 
+    [Description] VARCHAR(2000) NULL, 
     [HiveTable] VARCHAR(250) NULL, 
     [HiveDatabase] VARCHAR(250) NULL, 
     [HiveLocation] VARCHAR(250) NULL, 
