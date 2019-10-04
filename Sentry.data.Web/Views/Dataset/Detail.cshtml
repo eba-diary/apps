@@ -921,11 +921,11 @@
                 $.get(hiveTableURL, function (result) {
                     //logic to aboart ajax call additional call is triggered before original call finished.
                     //https://stackoverflow.com/a/4551178
-                    if (dataAjaxReqeust && dataAjaxReqeust.readyState != 4) {
-                        dataAjaxReqeust.abort()
+                    if (dataAjaxReq && dataAjaxReq.readyState != 4) {
+                        dataAjaxReq.abort()
                     }
 
-                    dataAjaxReqeust = $.ajax({
+                    dataAjaxReq = $.ajax({
                         type: "GET",
                         url: "/api/v1/queryTool/sessions/primary",
                         dataType: "json",
@@ -969,10 +969,10 @@
 
                 //logic to aboart ajax call additional call is triggered before original call finished.
                 //https://stackoverflow.com/a/4551178
-                if (schemaAjaxRequest && schemaAjaxRequest.readyState != 4) {
-                    schemaAjaxRequest.abort()
+                if (schemaAjaxReq && schemaAjaxReq.readyState != 4) {
+                    schemaAjaxReq.abort()
                 }
-                schemaAjaxRequest = $.get(schemaURL, function (result) {
+                schemaAjaxReq = $.get(schemaURL, function (result) {
                     if (result.RowCount) {
                         self.RowCount(result.RowCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
                     } else {
