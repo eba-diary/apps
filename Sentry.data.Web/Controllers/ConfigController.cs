@@ -56,46 +56,48 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Index(int id)
         {
+            
             Dataset ds = _datasetContext.GetById(id);
-            DatasetDto dsDto = _DatasetService.GetDatasetDto(id);
 
-            //_configService.GetDatasetFileConfigDto(id);
+            UserSecurity us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
 
-            List<DatasetFileConfigsModel> configModelList = new List<DatasetFileConfigsModel>();
-            foreach(DatasetFileConfig config in ds.DatasetFileConfigs.Where(w => !w.DeleteInd))
+            if (us != null && us.CanEditDataset)
             {
-                configModelList.Add(new DatasetFileConfigsModel(config, true, false));
+                DatasetDto dsDto = _DatasetService.GetDatasetDto(id);
+
+                List<DatasetFileConfigsModel> configModelList = new List<DatasetFileConfigsModel>();
+                foreach (DatasetFileConfig config in ds.DatasetFileConfigs.Where(w => !w.DeleteInd))
+                {
+                    configModelList.Add(new DatasetFileConfigsModel(config, true, false));
+                }
+
+                ManageConfigsModel mcm = new ManageConfigsModel()
+                {
+                    DatasetId = dsDto.DatasetId,
+                    DatasetName = dsDto.DatasetName,
+                    CategoryColor = dsDto.CategoryColor,
+                    DatasetFileConfigs = configModelList
+                };
+
+                mcm.Security = _DatasetService.GetUserSecurityForDataset(id);
+
+                Event e = new Event();
+                e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
+                e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
+                e.TimeCreated = DateTime.Now;
+                e.TimeNotified = DateTime.Now;
+                e.IsProcessed = false;
+                e.Dataset = ds.DatasetId;
+                e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+                e.Reason = "Viewed Dataset Configuration Page";
+                Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
+
+                return View("Index", mcm);
             }
-
-            ManageConfigsModel mcm = new ManageConfigsModel()
+            else
             {
-                DatasetId = dsDto.DatasetId,
-                DatasetName = dsDto.DatasetName,
-                CategoryColor = dsDto.CategoryColor,
-                DatasetFileConfigs = configModelList
-            };
-
-            mcm.Security = _DatasetService.GetUserSecurityForDataset(id);
-
-            //ObsoleteDatasetModel bdm = new ObsoleteDatasetModel(ds, _associateInfoProvider, _datasetContext)
-            //{
-            //    CanEditDataset = us.CanEditDataset,
-            //    CanUpload = us.CanUploadToDataset,
-            //    Security = us
-            //};
-
-            Event e = new Event();
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Viewed").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.Dataset = ds.DatasetId;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
-            e.Reason = "Viewed Dataset Configuration Page";
-            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-
-            return View("Index", mcm);
+                return View("Forbidden");
+            }
         }
 
         [HttpGet]
@@ -1571,7 +1573,10 @@ namespace Sentry.data.Web.Controllers
                 case "JSON":
                     model.IsPositional = false;
                     model.IsFixedWidth = false;
-                    model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.STRUCT, "A struct", "Complex Data Types"));
+                    if (Configuration.Config.GetHostSetting("ShowJSONComplexDataTypes").ToLower() == "true")
+                    {
+                        model.ValidDatatypes.Add(new DataTypeModel(GlobalConstants.Datatypes.STRUCT, "A struct", "Complex Data Types"));
+                    }
                     break;
                 default:
                     break;
