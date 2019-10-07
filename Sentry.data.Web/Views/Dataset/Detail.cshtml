@@ -641,6 +641,10 @@
         });
 
         var table;
+        //used to abort ajax request incase addition calls are made before original call is received
+        var schemaAjaxReq;
+        //used to abort ajax request incase addition calls are made before original call is received
+        var dataAjaxReq;
 
         function renderTable(input, push) {
             var filters = input.split("\n");
@@ -915,7 +919,13 @@
                 $('#dataSection').hide();
 
                 $.get(hiveTableURL, function (result) {
-                    $.ajax({
+                    //logic to aboart ajax call additional call is triggered before original call finished.
+                    //https://stackoverflow.com/a/4551178
+                    if (dataAjaxReq && dataAjaxReq.readyState != 4) {
+                        dataAjaxReq.abort()
+                    }
+
+                    dataAjaxReq = $.ajax({
                         type: "GET",
                         url: "/api/v1/queryTool/sessions/primary",
                         dataType: "json",
@@ -957,7 +967,12 @@
                     self.DataLoading.notifySubscribers();
                 });
 
-                $.get(schemaURL, function (result) {
+                //logic to aboart ajax call additional call is triggered before original call finished.
+                //https://stackoverflow.com/a/4551178
+                if (schemaAjaxReq && schemaAjaxReq.readyState != 4) {
+                    schemaAjaxReq.abort()
+                }
+                schemaAjaxReq = $.get(schemaURL, function (result) {
                     if (result.RowCount) {
                         self.RowCount(result.RowCount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ","));
                     } else {
