@@ -25,6 +25,7 @@
             @Html.HiddenFor(model => model.ConfigId, new { @name = "configId" })
             @Html.HiddenFor(model => model.ConfigFileName)
             @Html.HiddenFor(model => model.DatasetId)
+            @Html.HiddenFor(model => model.SchemaId)
 
             <div class="form-group">
                 @Html.LabelFor(m => m.ConfigFileName, htmlAttributes: new { @class = "control-label col-md-2" })

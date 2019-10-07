@@ -13,8 +13,9 @@ namespace Sentry.data.Core
         public virtual string FileName { get; set; }
 
         public virtual Dataset Dataset { get; set; }
+        public virtual SchemaRevision SchemaRevision { get; set; }
 
-        public virtual DataElement Schema { get; set; }
+        public virtual FileSchema Schema { get; set; }
 
         public virtual DatasetFileConfig DatasetFileConfig { get; set; }
 

@@ -7,144 +7,145 @@
 {
     @Html.AntiForgeryToken()
 
-    <div class="form-horizontal">
-        <br />
-        <h1>Dataset Retrieval Configuration</h1>
-        <br />
+<div class="form-horizontal">
+    <br />
+    <h1>Dataset Retrieval Configuration</h1>
+    <br />
 
-        @Html.DisplayFor((model) => ViewData.ModelState)
+    @Html.DisplayFor((model) => ViewData.ModelState)
 
-        @Html.HiddenFor(model => model.ConfigId)
-        @Html.HiddenFor(model => model.ParentDatasetName)
-        @Html.HiddenFor(model => model.DatasetId)
+    @Html.HiddenFor(model => model.ConfigId)
+    @Html.HiddenFor(model => model.ParentDatasetName)
+    @Html.HiddenFor(model => model.DatasetId)
+    @Html.HiddenFor(model => model.SchemaId)
 
-        <hr />
-        <div id="detailSectionHeader_Simple">
-            <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_Simple"></span>
-            <h5 class="detailSection">Basic Configuration</h5>
-        </div>
-        <div id="hide_detailSectionHeader_Simple">
+    <hr />
+    <div id="detailSectionHeader_Simple">
+        <span class="glyphicon glyphicon-chevron-down element detailSectionHeader section_arrow_datafiles" id="icon_detailSectionHeader_Simple"></span>
+        <h5 class="detailSection">Basic Configuration</h5>
+    </div>
+    <div id="hide_detailSectionHeader_Simple">
 
-            <div class="form-group">
-                @Html.LabelFor(model => model.ParentDatasetName, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.TextBoxFor(model => model.ParentDatasetName, new { @readonly = "readonly", @disabled = "disabled", @class = "form-control edit-dataset-row" })
-                </div>
-            </div>
-
-            <div class="form-group">
-                @Html.LabelFor(model => model.ConfigFileName, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.TextBoxFor(model => model.ConfigFileName, new { @value = "", @class = "form-control edit-dataset-row" })
-                    @Html.ValidationMessageFor(model => model.ConfigFileName, "", new { @class = "text-danger" })
-                </div>
-            </div>
-
-            <div class="form-group">
-                @Html.LabelFor(model => model.ConfigFileDesc, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.TextBoxFor(model => model.ConfigFileDesc, new { @value = "", @class = "form-control edit-dataset-row" })
-                    @Html.ValidationMessageFor(model => model.ConfigFileDesc, "", new { @class = "text-danger" })
-                </div>
-            </div>
-
-            <div class="form-group">
-                @Html.LabelFor(model => model.DatasetScopeTypeID, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.DropDownListFor(model => model.DatasetScopeTypeID, Model.AllDatasetScopeTypes, new { @value = "", @class = "form-control edit-dataset-row" })
-                    @Html.ValidationMessageFor(model => model.DatasetScopeTypeID, "", new { @class = "text-danger" })
-                </div>
-            </div>
-
-            <div class="form-group fieldDescription">
-                <label class="control-label col-md-2"></label>
-                <div class="col-md-10">
-                    <span class="text-muted">
-                        <em> Data.Sentry.com will create and manage a file share drop location.  Associates and\or applications can drop files to this location for upload to this dataset (See Drop Path below).</em>
-                    </span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                @Html.LabelFor(model => model.FileType, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.DropDownListFor((model) => model.FileType, Model.AllDataFileTypes, new { @class = "form-control edit-dataset-row" })
-                    @Html.ValidationMessageFor((model) => model.FileType, "", new { @class = "text-danger" })
-                </div>
-            </div>
-
-            <div class="form-group fieldDescription">
-                <label class="control-label col-md-2"></label>
-                <div class="col-md-10">
-                    <span class="text-muted"><em id="fileTypeInfo"></em></span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                @Html.LabelFor((model) => model.FileExtensionID, new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.DropDownListFor(model => model.FileExtensionID, Model.ExtensionList, new { @class = "form-control edit-dataset-row" })
-                </div>
-            </div>
-
-            <div class="form-group delimiter">
-                @Html.LabelFor((model) => model.Delimiter, new { @class = "control-label col-md-2 optional" })
-                <div class="col-md-10">
-                    @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control edit-dataset-row" })
-                </div>
-            </div>
-
-            <div class="form-group fieldDescription delimiter delimiterDescription">
-                <label class="control-label col-md-2"></label>
-                <div class="col-md-10">
-                    <span class="text-muted">
-                        <em id="fileTypeInfo"></em>The character or set of characters used to delimit a file.  Common delimiters include; tab (\t), pipe (|), tilda (~).
-                        <br />
-                        Note: If your file is comma (,) delimited please choose the CSV file extension option. 
-                    </span>
-                </div>
-            </div>
-
-            <div class="form-group">
-                @Html.LabelFor(model => model.HasHeader, new { @class = "control-label col-md-2 optional" })
-                <div class="col-md-1">
-                    @Html.CheckBoxFor(model => model.HasHeader, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                </div>
-                @Html.Label("Do incoming files contain a header row?", new { @class = "control-label col-md-9 optional text-muted", @style = "text-align: left" })
-            </div>
-
-            @if (Model.Security.ShowAdminControls)
-            {
-                <div class="form-group">
-                    @Html.LabelFor(model => model.CreateCurrentView, new { @class = "control-label col-md-2 optional" })
-                    <div class="col-md-1">
-                        @Html.CheckBoxFor(model => model.CreateCurrentView, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                    </div>
-                    @Html.Label("A view will be created filtering to data within latest file loaded into this schema", new { @class = "control-label col-md-9 optional text-muted", @style = "text-align: left" })
-                </div>
-
-            }
-            else
-            {
-                @Html.HiddenFor(model => model.CreateCurrentView)
-            }
-
-            <div class="form-group">
-                @Html.LabelFor(model => model.IncludedInSAS, new { @class = "control-label col-md-2 optional" })
-                <div class="col-md-1">
-                    @Html.CheckBoxFor(model => model.IncludedInSAS, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                </div>                   
-                @Html.Label("Schema will be added to SAS after columns are defined", new { @class = "control-label col-md-4 optional text-muted", @style = "text-align: left" })
-            </div>
-        </div>
-        <hr />
         <div class="form-group">
-            <div>
-                <input type="submit" value="Save" class="btn btn-success" />
-                <a class="btn btn-warning" href="/Config/Dataset/@Model.DatasetId">Cancel</a>
+            @Html.LabelFor(model => model.ParentDatasetName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.ParentDatasetName, new { @readonly = "readonly", @disabled = "disabled", @class = "form-control edit-dataset-row" })
             </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ConfigFileName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.ConfigFileName, new { @value = "", @class = "form-control edit-dataset-row" })
+                @Html.ValidationMessageFor(model => model.ConfigFileName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ConfigFileDesc, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.ConfigFileDesc, new { @value = "", @class = "form-control edit-dataset-row" })
+                @Html.ValidationMessageFor(model => model.ConfigFileDesc, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.DatasetScopeTypeID, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.DatasetScopeTypeID, Model.AllDatasetScopeTypes, new { @value = "", @class = "form-control edit-dataset-row" })
+                @Html.ValidationMessageFor(model => model.DatasetScopeTypeID, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group fieldDescription">
+            <label class="control-label col-md-2"></label>
+            <div class="col-md-10">
+                <span class="text-muted">
+                    <em> Data.Sentry.com will create and manage a file share drop location.  Associates and\or applications can drop files to this location for upload to this dataset (See Drop Path below).</em>
+                </span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.FileType, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor((model) => model.FileType, Model.AllDataFileTypes, new { @class = "form-control edit-dataset-row" })
+                @Html.ValidationMessageFor((model) => model.FileType, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group fieldDescription">
+            <label class="control-label col-md-2"></label>
+            <div class="col-md-10">
+                <span class="text-muted"><em id="fileTypeInfo"></em></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor((model) => model.FileExtensionID, new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownListFor(model => model.FileExtensionID, Model.ExtensionList, new { @class = "form-control edit-dataset-row" })
+            </div>
+        </div>
+
+        <div class="form-group delimiter">
+            @Html.LabelFor((model) => model.Delimiter, new { @class = "control-label col-md-2 optional" })
+            <div class="col-md-10">
+                @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control edit-dataset-row" })
+            </div>
+        </div>
+
+        <div class="form-group fieldDescription delimiter delimiterDescription">
+            <label class="control-label col-md-2"></label>
+            <div class="col-md-10">
+                <span class="text-muted">
+                    <em id="fileTypeInfo"></em>The character or set of characters used to delimit a file.  Common delimiters include; tab (\t), pipe (|), tilda (~).
+                    <br />
+                    Note: If your file is comma (,) delimited please choose the CSV file extension option. 
+                </span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.HasHeader, new { @class = "control-label col-md-2 optional" })
+            <div class="col-md-1">
+                @Html.CheckBoxFor(model => model.HasHeader, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+            </div>
+            @Html.Label("Do incoming files contain a header row?", new { @class = "control-label col-md-9 optional text-muted", @style = "text-align: left" })
+        </div>
+
+        @if (Model.Security.ShowAdminControls)
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.CreateCurrentView, new { @class = "control-label col-md-2 optional" })
+                <div class="col-md-1">
+                    @Html.CheckBoxFor(model => model.CreateCurrentView, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                </div>
+                @Html.Label("A view will be created filtering to data within latest file loaded into this schema", new { @class = "control-label col-md-9 optional text-muted", @style = "text-align: left" })
+            </div>
+
+        }
+        else
+        {
+            @Html.HiddenFor(model => model.CreateCurrentView)
+        }
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.IncludedInSAS, new { @class = "control-label col-md-2 optional" })
+            <div class="col-md-1">
+                @Html.CheckBoxFor(model => model.IncludedInSAS, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+            </div>
+            @Html.Label("Schema will be added to SAS after columns are defined", new { @class = "control-label col-md-4 optional text-muted", @style = "text-align: left" })
         </div>
     </div>
+    <hr />
+    <div class="form-group">
+        <div>
+            <input type="submit" value="Save" class="btn btn-success" />
+            <a class="btn btn-warning" href="/Config/Dataset/@Model.DatasetId">Cancel</a>
+        </div>
+    </div>
+</div>
 }
 
 @section Scripts {

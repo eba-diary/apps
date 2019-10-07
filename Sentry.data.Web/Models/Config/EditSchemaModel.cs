@@ -23,7 +23,7 @@ namespace Sentry.data.Web
         public virtual Boolean IsForceMatch { get; set; }
         public virtual Boolean IsPrimary { get; set; }
 
-        public virtual int DataElement_ID { get; set; }
+        public virtual int Schema_Id { get; set; }
         public virtual string FileType { get; set; }
         public virtual int FileTypeId { get; set; }
         public virtual string Delimiter { get; set; }
