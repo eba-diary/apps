@@ -136,6 +136,18 @@ namespace Sentry.data.Core
             return revision.ToDto();
         }
 
+        public List<DatasetFile> GetDatasetFilesBySchema(int schemaId)
+        {
+            List<DatasetFile> fileList = _datasetContext.DatasetFile.Where(w => w.Schema.SchemaId == schemaId).ToList();
+            return fileList;
+        }
+
+        public DatasetFile GetLatestDatasetFileBySchema(int schemaId)
+        {
+            DatasetFile file = _datasetContext.DatasetFile.OrderBy(x => x.CreateDTM).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
+            return file;
+        }
+
         private int CreateSchema(FileSchemaDto dto)
         {
             string storageCode = _datasetContext.GetNextStorageCDE().ToString();
