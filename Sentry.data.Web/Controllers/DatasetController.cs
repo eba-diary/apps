@@ -359,7 +359,7 @@ namespace Sentry.data.Web.Controllers
             return Redirect(Request.UrlReferrer.PathAndQuery);
         }
 
-        public JsonResult GetDatasetFileInfoForGrid(int Id, Boolean bundle, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
+        public JsonResult GetDatasetFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
             //IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
 
@@ -384,15 +384,8 @@ namespace Sentry.data.Web.Controllers
             int a = dtqa.GetDataTablesResponse().data.Count();
 
             Debug.WriteLine(a);
-
-            if (bundle)
-            {
-                return Json(dtqa.GetDataTablesResponse(true), JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
-            }
+            
+            return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
         }
 
         public JsonResult GetBundledFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
@@ -784,146 +777,6 @@ namespace Sentry.data.Web.Controllers
 
             return PartialView("_DatasetFileVersions", model);
 
-        }
-
-
-        [HttpPost]
-        public async Task<ActionResult> BundleFiles(string listOfIds, string newName, int datasetID)
-        {
-            string[] ids = listOfIds.Split(',');
-
-            List<DatasetFile> files = (from file in _datasetContext.DatasetFile.Where(x => x.ParentDatasetFileId == null).Fetch(x => x.DatasetFileConfig).ToList()
-                                       from id in ids
-                                       where file.DatasetFileId.ToString() == id
-                                       select file).ToList();
-
-            var extension = Path.GetExtension(files[0].FileName);
-
-
-            //Do all the files included in the list have the same exact extension.
-            Boolean sameExtension = files.All(x => Path.GetExtension(x.FileName) == extension) ? true : false;
-            Boolean allDataFiles = files.All(x => x.DatasetFileConfig.FileTypeId == (int)FileType.DataFile) ? true : false;
-
-            //Get the users permissions
-            Boolean errorsFound = false;
-            string errorString = "";
-
-            UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetID);
-
-            if (newName == "" || newName == null)
-            {
-                errorsFound = true;
-                errorString += "<p>Please supply a new name to give to your bundled file.</p>";
-            }
-
-            if (!allDataFiles)
-            {
-                errorsFound = true;
-                errorString += "<p>You cannot bundle files that are labeled as supplementary files, help documents, or usage manuals.</p>";
-            }
-
-            if (files.Count == 1)
-            {
-                errorsFound = true;
-                errorString += "<p>You cannot bundle just one file.</p>";
-            }
-            else if (files.Count == 0)
-            {
-                errorsFound = true;
-                errorString += "<p>You selected no files.</p>";
-            }
-
-            if (us.CanViewFullDataset)
-            {
-                errorsFound = true;
-                errorString += "<p>You do not have permission to download or bundle these files.</p>";
-            }
-
-            if (!sameExtension)
-            {
-                errorsFound = true;
-                errorString += "<p>The files did not have the same file extension. Bundling requires that all files have the same extension.  Please filter by putting the file extension in either the Name Column or the Search Box provided at the top right of the table.</p>";
-            }
-
-            try
-            {
-                if (!errorsFound)
-                {
-                    //Pass the list of files off to the File Bundler in S3.
-                    string userEmail = SharedContext.CurrentUser.EmailAddress;
-                    DatafileBundleProvider myBundleRequest = new DatafileBundleProvider();
-
-                    Dataset parentDataset = _datasetContext.GetById<Dataset>(files.FirstOrDefault().Dataset.DatasetId);
-
-                    //Passing UserID and Timestamp to hash method to ensure unqiue GUID for request
-                    BundleRequest _request = new BundleRequest(Utilities.GenerateHash($"{SharedContext.CurrentUser.AssociateId}_{DateTime.Now.ToString()}"));
-
-                    //string requestLocation = @"bundlework/intake/" + _request.RequestGuid;
-
-                    _request.DatasetID = files.FirstOrDefault().Dataset.DatasetId;
-                    _request.Bucket = Configuration.Config.GetHostSetting("AWSRootBucket");
-                    _request.DatasetFileConfigId = files.FirstOrDefault().DatasetFileConfig.ConfigId;
-                    _request.TargetFileName = newName;
-                    _request.Email = userEmail;
-                    _request.TargetFileLocation = Configuration.Config.GetSetting("S3BundlePrefix") + parentDataset.S3Key;
-                    _request.DatasetDropLocation = files.FirstOrDefault().DatasetFileConfig.RetrieverJobs.FirstOrDefault(x => x.DataSource.Is<DfsBasic>()).GetUri().LocalPath;
-                    _request.RequestInitiatorId = SharedContext.CurrentUser.AssociateId;
-
-                    foreach (DatasetFile df in files)
-                    {
-                        _request.SourceKeys.Add(Tuple.Create(df.FileLocation, df.VersionId));
-                    }
-
-                    _request.FileExtension = Path.GetExtension(_request.SourceKeys.FirstOrDefault().Item1);
-
-                    string jsonRequest = JsonConvert.SerializeObject(_request, Formatting.Indented);
-
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        StreamWriter writer = new StreamWriter(ms);
-
-                        writer.WriteLine(jsonRequest);
-                        writer.Flush();
-
-                        //You have to rewind the MemoryStream before copying
-                        ms.Seek(0, SeekOrigin.Begin);
-                        Logger.Info($"Sending Bundle Request to:{Path.Combine($"{Configuration.Config.GetHostSetting("DatasetBundleBaseLocation")}", "request", $"{_request.RequestGuid}.json")}");
-
-                        using (FileStream fs = new FileStream(Path.Combine($"{Configuration.Config.GetHostSetting("DatasetBundleBaseLocation")}", "request", $"{_request.RequestGuid}.json"), FileMode.CreateNew))
-                        {
-                            ms.CopyTo(fs);
-                            fs.Flush();
-                        }
-
-                    }
-
-                    //Create Bundle Started Event
-                    Event e = new Event();
-                    e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Bundle File Process").FirstOrDefault();
-                    e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Started").FirstOrDefault();
-                    e.TimeCreated = DateTime.Now;
-                    e.TimeNotified = DateTime.Now;
-                    e.IsProcessed = false;
-                    e.UserWhoStartedEvent = _request.RequestInitiatorId;
-                    e.Dataset = _request.DatasetID;
-                    e.DataConfig = _request.DatasetFileConfigId;
-                    e.Reason = $"Submitted bundle request for dataset [<b>{_datasetContext.GetById(_request.DatasetID).DatasetName}</b>] targeting file name [<b>{_request.TargetFileName}</b>]";
-                    e.Parent_Event = _request.RequestGuid;
-                    Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-
-                    return Json(new { Success = true, Message = "Successfully sent request to Dataset Bundler.  You will recieve notification when completed." });
-                }
-                else
-                {
-                    //Return an error to the user in the Client UI.
-                    return Json(new { Success = false, Message = errorString });
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error Processing Bundle Request", ex);
-                return Json(new { Success = false, Message = "An error occurred, please try later! : " + ex.Message });
-            }
         }
 
         [HttpGet()]
