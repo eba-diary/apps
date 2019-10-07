@@ -8,13 +8,29 @@ namespace Sentry.data.Core
 {
     public static class SchemaExtensions
     {
-        public static SchemaDto MapToSchemaDto(this Schema scm)
+        public static FileSchemaDto MapToDto(this FileSchema scm)
         {
-            return new SchemaDto()
+            return new FileSchemaDto()
             {
-                SchemaId = scm.SchemaId,
                 Name = scm.Name,
-                SchemaEntity_NME = scm.SchemaEntity_NME
+                CreateCurrentView = scm.CreateCurrentView,
+                Delimiter = scm.Delimiter,
+                FileExtensionId = scm.Extension.Id,
+                HasHeader = scm.HasHeader,
+                IsInSAS = scm.IsInSAS,
+                SasLibrary = scm.SasLibrary,
+                SchemaEntity_NME = scm.SchemaEntity_NME,
+                SchemaId = scm.SchemaId,
+                Description = scm.Description,
+                DeleteInd = scm.DeleteInd,
+                DeleteIssuer = scm.DeleteIssuer,
+                DeleteIssueDTM = scm.DeleteIssueDTM,
+                HiveTable = scm.HiveTable,
+                HiveDatabase = scm.HiveDatabase,
+                HiveLocation = scm.HiveLocation,
+                HiveStatus = scm.HiveTableStatus,
+                StorageCode = scm.StorageCode,
+                FileExtenstionName = scm.Extension.Name,
             };
         }
 
@@ -36,12 +52,14 @@ namespace Sentry.data.Core
             BaseFieldDto dto = new BaseFieldDto()
             {
                 FieldId = field.FieldId,
+                FieldGuid = field.FieldGuid,
                 Name = field.Name,
                 CreateDTM = field.CreateDTM,
                 LastUpdatedDTM = field.LastUpdateDTM,
                 FieldType = field.FieldType.ToString(),
                 Nullable = field.NullableIndicator,
-                OrdinalPosition = field.OrdinalPosition
+                OrdinalPosition = field.OrdinalPosition,
+                Description = field.Description
             };
 
             switch (field.FieldType)

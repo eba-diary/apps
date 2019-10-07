@@ -13,12 +13,13 @@ namespace Sentry.data.Core
         {
             EventType = "HIVE-TABLE-CREATE-REQUESTED";
         }
-
-        public SchemaModel Schema { get; set; }
-
+        
+        public string HiveStatus { get; set; }
+        public int SchemaID { get; set; }
+        
         public void UpdateStatus(HiveTableStatusEnum status)
         {
-            this.Schema.HiveStatus = status.ToString();
+            HiveStatus = status.ToString();
         }
     }
 }

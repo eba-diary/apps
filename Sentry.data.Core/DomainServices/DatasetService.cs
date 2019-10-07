@@ -17,11 +17,12 @@ namespace Sentry.data.Core
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly IConfigService _configService;
+        private readonly ISchemaService _schemaService;
 
         public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, 
                             UserService userService, IMessagePublisher messagePublisher,
                             IS3ServiceProvider s3ServiceProvider,
-                            IConfigService configService)
+                            IConfigService configService, ISchemaService schemaService)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
@@ -29,6 +30,7 @@ namespace Sentry.data.Core
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
             _configService = configService;
+            _schemaService = schemaService;
         }
 
 
@@ -173,8 +175,13 @@ namespace Sentry.data.Core
             Dataset ds = CreateDataset(dto);
             _datasetContext.Add(ds);
             dto.DatasetId = ds.DatasetId;
-          
-            _configService.CreateAndSaveDatasetFileConfig(dto.ToConfigDto());
+
+            DatasetFileConfigDto configDto = dto.ToConfigDto();
+            FileSchemaDto fileDto = dto.ToSchemaDto();
+            configDto.SchemaId = _schemaService.CreateAndSaveSchema(fileDto);
+            _configService.CreateAndSaveDatasetFileConfig(configDto);
+
+
             _datasetContext.SaveChanges();
 
             return ds.DatasetId;
@@ -365,145 +372,6 @@ namespace Sentry.data.Core
 
             return ds;
         }
-
-        private DataElement CreateDataElement(DatasetDto dto)
-        {
-            string storageCode = _datasetContext.GetNextStorageCDE().ToString();
-
-            DataElement de = new DataElement()
-            {
-                DataElementCreate_DTM = DateTime.Now,
-                DataElementChange_DTM = DateTime.Now,
-                DataElement_CDE = GlobalConstants.DataElementCode.DATA_FILE,
-                DataElement_DSC = GlobalConstants.DataElementDescription.DATA_FILE,
-                DataElement_NME = dto.ConfigFileName,
-                LastUpdt_DTM = DateTime.Now,
-                SchemaIsPrimary = true,
-                SchemaDescription = dto.ConfigFileDesc,
-                SchemaName = dto.ConfigFileName,
-                SchemaRevision = 1,
-                SchemaIsForceMatch = false,
-                FileFormat = _datasetContext.GetById<FileExtension>(dto.FileExtensionId).Name.ToUpper(),
-                Delimiter = dto.Delimiter,
-                StorageCode = storageCode,
-                HiveDatabase = "Default",
-                HiveTable = dto.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dto.ConfigFileName.Replace(" ", "").ToUpper(),
-                HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
-                HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
-                HasHeader = dto.HasHeader,
-                IsInSAS = dto.IsInSAS,
-                SasLibrary = (dto.IsInSAS) ? dto.GenerateSASLibary(_datasetContext) : null
-            };
-
-            return de;
-        }
-
-        private DatasetFileConfig CreateDatasetFileConfig(DatasetDto dto, Dataset ds)
-        {
-            //DatasetFileConfigDto configDto = ToDto(dto, ds);
-
-            DatasetFileConfig dfc = new DatasetFileConfig()
-            {
-                ConfigId = 0,
-                Name = dto.ConfigFileName,
-                Description = dto.ConfigFileDesc,
-                FileTypeId = (int)FileType.DataFile,
-                ParentDataset = ds,
-                DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId),
-                FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId)
-            };
-            dfc.IsSchemaTracked = true;
-            dfc.Schema = new FileSchema(dfc, _userService.GetCurrentUser());
-
-            return dfc;
-        }
-
-        private RetrieverJob CreateRetrieverJob(DatasetFileConfig dfc, string dataSourceName)
-        {
-            RetrieverJobOptions.Compression compression = new RetrieverJobOptions.Compression()
-            {
-                IsCompressed = false,
-                CompressionType = null,
-                FileNameExclusionList = new List<string>()
-            };
-
-            RetrieverJobOptions rjo = new RetrieverJobOptions()
-            {
-                OverwriteDataFile = false,
-                TargetFileName = "",
-                CreateCurrentFile = false,
-                IsRegexSearch = true,
-                SearchCriteria = "\\.",
-                CompressionOptions = compression
-            };
-
-            DataSource dataSource = _datasetContext.DataSources.First(x => x.Name.Contains(dataSourceName));
-
-            RetrieverJob rj = new RetrieverJob()
-            {
-                TimeZone = "Central Standard Time",
-                RelativeUri = null,
-                DataSource = dataSource,
-                DatasetConfig = dfc,
-                Created = DateTime.Now,
-                Modified = DateTime.Now,
-                IsGeneric = true,
-
-                JobOptions = rjo
-            };
-
-            // Config Drop location
-            if (dataSourceName == GlobalConstants.DataSourceName.DEFAULT_DROP_LOCATION)
-            {
-                CreateDropLocation(rj.GetUri().LocalPath, dfc);
-            }
-            else if (dataSourceName == GlobalConstants.DataSourceName.DEFAULT_HSZ_DROP_LOCATION)
-            {
-                //Send message to kafka for HSZ ingestion service to pickup and create directory
-                HszDropLocationCreateModel hszDropCreate = new HszDropLocationCreateModel();
-                rj.ToHszDropCreateModel(hszDropCreate);
-
-                _messagePublisher.PublishDSCEvent(rj.Id.ToString(), JsonConvert.SerializeObject(hszDropCreate));
-            }
-
-            //Set Schedule metadata
-            if (dataSource.Is<S3Basic>())
-            {
-                rj.Schedule = "*/1 * * * *";
-            }
-            else if (dataSource.Is<DfsBasic>() || dataSource.Is<DfsBasicHsz>())
-            {
-                rj.Schedule = "Instant";
-            }
-            else
-            {
-                throw new NotImplementedException("This method does not support this type of Data Source");
-            }
-
-            return rj;
-        }
-
-        private void CreateDropLocation(string path, DatasetFileConfig dfc)
-        {
-            try
-            {
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-            }
-            catch (Exception ex)
-            {
-                StringBuilder errmsg = new StringBuilder();
-                errmsg.AppendLine("Failed to Create Drop Location:");
-                errmsg.AppendLine($"DatasetId: {dfc.ParentDataset?.DatasetId}");
-                errmsg.AppendLine($"DatasetName: {dfc.ParentDataset?.DatasetName}");
-                errmsg.AppendLine($"DropLocation: {path}");
-
-                Logger.Error(errmsg.ToString(), ex);
-            }
-        }
-
 
         private void MapToDto(Dataset ds, DatasetDto dto)
         {

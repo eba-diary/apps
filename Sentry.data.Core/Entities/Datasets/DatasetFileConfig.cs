@@ -30,7 +30,7 @@ namespace Sentry.data.Core
 
         /* ITrackableSchema implementation */
         public virtual bool IsSchemaTracked { get; set; }
-        public virtual Schema Schema { get; set; }
+        public virtual FileSchema Schema { get; set; }
 
 
         /// <summary>
@@ -54,15 +54,16 @@ namespace Sentry.data.Core
               
         }
 
-        public virtual DataElement GetLatestSchemaRevision()
+        public virtual SchemaRevision GetLatestSchemaRevision()
         {
-            return Schemas.OrderByDescending(o => o.SchemaRevision).Take(1).SingleOrDefault();
+            return Schema.Revisions.OrderByDescending(o => o.Revision_NBR).Take(1).SingleOrDefault();
         }
         public virtual string GetStorageCode()
         {
-            if (ParentDataset.DatasetType == GlobalConstants.DataEntityCodes.DATASET)
+            FileSchema s = Schema as FileSchema;
+            if (Schema is FileSchema scm)
             {
-                return GetLatestSchemaRevision().StorageCode;
+                return scm.StorageCode;
             }
             else
             {

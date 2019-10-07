@@ -27,11 +27,13 @@ namespace Sentry.data.Web
             this.FileExtensionID = dsfc.FileExtension.Id;
             this.FileExtension = dsfc.FileExtension;
             this.Schemas = dsfc.Schemas;
+            this.Schema = dsfc.Schema ?? null;
             this.RawStorageId = dsfc.GetStorageCode();
-            this.SchemaId = dsfc.Schemas.FirstOrDefault().DataElement_ID;
+            this.SchemaId = (dsfc.Schema != null) ? dsfc.Schema.SchemaId : 0;
             this.Delimiter = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().Delimiter;
             this.CreateCurrentView = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().CreateCurrentView;
             this.HasHeader = dsfc.Schemas.OrderByDescending(o => o.DataElementChange_DTM).FirstOrDefault().HasHeader;
+            this.OldSchemaId = (Schemas != null) ? Schemas.FirstOrDefault().DataElement_ID : 0;
 
             try
             {
@@ -73,6 +75,8 @@ namespace Sentry.data.Web
             this.IncludedInSAS = dto.IsInSAS;
             this.Delimiter = dto.Delimiter;
             this.HasHeader = dto.HasHeader;
+            this.SchemaId = dto.Schema.SchemaId;
+            this.OldSchemaId = (dto.Schemas != null) ? dto.Schemas.FirstOrDefault().DataElementID : 0;
         }
 
         public DatasetFileConfigsModel(DatasetFileConfig dsfc, Boolean renderingForTable, Boolean renderingForPopup, IDatasetContext datasetContext)
@@ -87,11 +91,13 @@ namespace Sentry.data.Web
             this.FileExtensionID = dsfc.FileExtension.Id;
             this.FileExtension = dsfc.FileExtension;
             this.Schemas = dsfc.Schemas;
-            this.SchemaId = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().DataElement_ID;
+            this.SchemaId = (dsfc.Schema != null) ? dsfc.Schema.SchemaId : 0;
+            this.Schema = dsfc.Schema ?? null;
             this.Delimiter = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().Delimiter;
             this.RawStorageId = dsfc.GetStorageCode();
             this.CreateCurrentView = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().CreateCurrentView;
             this.HasHeader = dsfc.Schemas.OrderByDescending(o => o.DataElementChange_DTM).FirstOrDefault().HasHeader;
+            this.OldSchemaId = (Schemas != null) ? Schemas.FirstOrDefault().DataElement_ID : 0;
 
             try
             {
@@ -178,9 +184,11 @@ namespace Sentry.data.Web
         public FileExtension FileExtension { get; set; }
         public string RawStorageId { get; set; }
         public int SchemaId { get; set; }
+        public int OldSchemaId { get; set; }
         public IList<RetrieverJob> RetrieverJobs { get; set; }
 
-        public IList<DataElement> Schemas { get; set; }     
+        public IList<DataElement> Schemas { get; set; }  
+        public FileSchema Schema { get; set; }
 
         public IEnumerable<SelectListItem> AllDatasetScopeTypes { get; set; }
         public IEnumerable<SelectListItem> AllDataFileTypes { get; set; }

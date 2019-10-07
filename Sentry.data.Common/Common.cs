@@ -248,7 +248,7 @@ namespace Sentry.data.Common
             int df_id = 0;
             RetrieverJob job = null;
             IContainer _container;
-            DataElement latestSchemaRevision = null;
+            SchemaRevision latestSchemaRevision = null;
 
             using (_container = Bootstrapper.Container.GetNestedContainer())
             {
@@ -533,12 +533,14 @@ namespace Sentry.data.Common
                                 msg1.SourceBucket = Configuration.Config.GetHostSetting("AWSRootBucket");
                                 msg1.SourceKey = df_newParent.FileLocation;
                                 msg1.SourceVersionId = df_newParent.VersionId;
+                                msg1.SchemaId = df_newParent.DatasetFileConfig.Schema.SchemaId;
+                                msg1.DatasetId = df_newParent.DatasetFileConfig.ParentDataset.DatasetId;
 
-                                _publisher.PublishDSCEvent(df_newParent.Schema.DataElement_ID.ToString(), msg1.ToString());
+                                _publisher.PublishDSCEvent(df_newParent.DatasetFileConfig.Schema.SchemaId.ToString(), msg1.ToString());
                             }
                             catch (Exception ex)
                             {
-                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.DataElement_ID.ToString()} | DSCEvent topic | message:{msg1.ToString()})", ex);
+                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.SchemaId.ToString()} | DSCEvent topic | message:{msg1.ToString()})", ex);
                             }
 
                             Event f = new Event()
@@ -632,12 +634,14 @@ namespace Sentry.data.Common
                                 msg1.SourceBucket = Configuration.Config.GetHostSetting("AWSRootBucket");
                                 msg1.SourceKey = df_newParent.FileLocation;
                                 msg1.SourceVersionId = df_newParent.VersionId;
+                                msg1.SchemaId = df_newParent.DatasetFileConfig.Schema.SchemaId;
+                                msg1.DatasetId = df_newParent.DatasetFileConfig.ParentDataset.DatasetId;
 
-                                _publisher.PublishDSCEvent(df_newParent.Schema.DataElement_ID.ToString(), msg1.ToString());
+                                _publisher.PublishDSCEvent(df_newParent.DatasetFileConfig.Schema.SchemaId.ToString(), msg1.ToString());
                             }
                             catch (Exception ex)
                             {
-                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.DataElement_ID.ToString()} | DSCEvent topic | message:{msg1.ToString()})", ex);
+                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.SchemaId.ToString()} | DSCEvent topic | message:{msg1.ToString()})", ex);
                             }
 
                             Event f = new Event()
@@ -830,7 +834,8 @@ namespace Sentry.data.Common
                VersionId = null,
                IsBundled = isbundle,
                Size = 0,
-               Schema = dfc.GetLatestSchemaRevision()
+               SchemaRevision = dfc.GetLatestSchemaRevision(),
+               Schema = dfc.Schema
             };
 
             return out_df;
