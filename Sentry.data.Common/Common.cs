@@ -525,22 +525,24 @@ namespace Sentry.data.Common
                                 }
                             }
 
-                            dynamic msg1 = new JObject();
                             //Write file information to topic
+                            RawFileAddModel rawFileEvent = new RawFileAddModel();
                             try
                             {
-                                msg1.EventType = "SCHEMA-RAWFILE-ADD";
-                                msg1.SourceBucket = Configuration.Config.GetHostSetting("AWSRootBucket");
-                                msg1.SourceKey = df_newParent.FileLocation;
-                                msg1.SourceVersionId = df_newParent.VersionId;
-                                msg1.SchemaId = df_newParent.DatasetFileConfig.Schema.SchemaId;
-                                msg1.DatasetId = df_newParent.DatasetFileConfig.ParentDataset.DatasetId;
+                                rawFileEvent = new RawFileAddModel()
+                                {
+                                    SourceBucket = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                                    SourceKey = df_newParent.FileLocation,
+                                    SourceVersionId = df_newParent.VersionId,
+                                    SchemaID = df_newParent.DatasetFileConfig.Schema.SchemaId,
+                                    DatasetID = df_newParent.DatasetFileConfig.ParentDataset.DatasetId
+                                };
 
-                                _publisher.PublishDSCEvent(df_newParent.DatasetFileConfig.Schema.SchemaId.ToString(), msg1.ToString());
+                                _publisher.PublishDSCEvent(df_newParent.DatasetFileConfig.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(rawFileEvent));
                             }
                             catch (Exception ex)
                             {
-                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.SchemaId.ToString()} | DSCEvent topic | message:{msg1.ToString()})", ex);
+                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.SchemaId.ToString()} | DSCEvent topic | message:{JsonConvert.SerializeObject(rawFileEvent)})", ex);
                             }
 
                             Event f = new Event()
@@ -626,22 +628,24 @@ namespace Sentry.data.Common
                                 throw;
                             }
 
-                            dynamic msg1 = new JObject();
+                            RawFileAddModel rawFileEvent = new RawFileAddModel();
                             //Write file information to topic
                             try
                             {
-                                msg1.EventType = "SCHEMA-RAWFILE-ADD";
-                                msg1.SourceBucket = Configuration.Config.GetHostSetting("AWSRootBucket");
-                                msg1.SourceKey = df_newParent.FileLocation;
-                                msg1.SourceVersionId = df_newParent.VersionId;
-                                msg1.SchemaId = df_newParent.DatasetFileConfig.Schema.SchemaId;
-                                msg1.DatasetId = df_newParent.DatasetFileConfig.ParentDataset.DatasetId;
+                                rawFileEvent = new RawFileAddModel()
+                                {
+                                    SourceBucket = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                                    SourceKey = df_newParent.FileLocation,
+                                    SourceVersionId = df_newParent.VersionId,
+                                    SchemaID = df_newParent.DatasetFileConfig.Schema.SchemaId,
+                                    DatasetID = df_newParent.DatasetFileConfig.ParentDataset.DatasetId
+                                };
 
-                                _publisher.PublishDSCEvent(df_newParent.DatasetFileConfig.Schema.SchemaId.ToString(), msg1.ToString());
+                                _publisher.PublishDSCEvent(df_newParent.DatasetFileConfig.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(rawFileEvent));
                             }
                             catch (Exception ex)
                             {
-                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.SchemaId.ToString()} | DSCEvent topic | message:{msg1.ToString()})", ex);
+                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.SchemaId.ToString()} | DSCEvent topic | message:{JsonConvert.SerializeObject(rawFileEvent)})", ex);
                             }
 
                             Event f = new Event()

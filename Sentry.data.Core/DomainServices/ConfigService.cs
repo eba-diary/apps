@@ -799,7 +799,7 @@ namespace Sentry.data.Core
                     //Send message to create hive table
                     HiveTableDeleteModel hiveDelete = new HiveTableDeleteModel()
                     {
-                        SchemaId = dfc.Schema.SchemaId,
+                        SchemaID = dfc.Schema.SchemaId,
                         DatasetID = dfc.ParentDataset.DatasetId
                     };
                     _messagePublisher.PublishDSCEvent(dfc.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveDelete));

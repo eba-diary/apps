@@ -69,7 +69,7 @@ namespace Sentry.data.Core
                         HiveTableDeleteModel deleteEvent = JsonConvert.DeserializeObject<HiveTableDeleteModel>(msg);
                         Logger.Info($"HiveMetadataHandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(deleteEvent)}");
 
-                        de = _dsContext.GetById<FileSchema>(deleteEvent.SchemaId);
+                        de = _dsContext.GetById<FileSchema>(deleteEvent.SchemaID);
                         de.HiveTableStatus = HiveTableStatusEnum.DeleteRequested.ToString();
                         _dsContext.SaveChanges();
                         break;
@@ -77,7 +77,7 @@ namespace Sentry.data.Core
                         HiveTableDeleteModel deleteCompletedEvent = JsonConvert.DeserializeObject<HiveTableDeleteModel>(msg);
                         Logger.Info($"HiveMetadataHandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(deleteCompletedEvent)}");
 
-                        de = _dsContext.GetById<FileSchema>(deleteCompletedEvent.SchemaId);
+                        de = _dsContext.GetById<FileSchema>(deleteCompletedEvent.SchemaID);
 
                         switch (deleteCompletedEvent.HiveStatus.ToUpper())
                         {
