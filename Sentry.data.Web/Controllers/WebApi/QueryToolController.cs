@@ -643,11 +643,12 @@ namespace Sentry.data.Web.Controllers
                     qd.description = schemaDto.Description;
 
                     List<SchemaRevisionDto> schemaRevDtoList = _schemaService.GetSchemaRevisionDtoBySchema(schemaDto.SchemaId);
-                    qd.HasSchema = (schemaRevDtoList != null);
+                    qd.HasSchema = (schemaRevDtoList.Any());
                     qd.HasQueryableSchema = qd.HasSchema;
+                    
+                    List<QueryableSchema> qslist = new List<QueryableSchema>();
                     if (qd.HasSchema)
                     {
-                        List<QueryableSchema> qslist = new List<QueryableSchema>();
                         //only take the latest revision for now.  Need to revist if support for querying multiple revisions is needed
                         foreach (var sch in schemaRevDtoList.OrderByDescending(o => o.CreatedDTM).Take(1))
                         {
@@ -674,8 +675,8 @@ namespace Sentry.data.Web.Controllers
                             }
                             qslist.Add(qs);
                         }
-                        qd.Schemas = qslist;
                     }
+                    qd.Schemas = qslist;                    
                     reply.Add(qd);
                 }
             }
