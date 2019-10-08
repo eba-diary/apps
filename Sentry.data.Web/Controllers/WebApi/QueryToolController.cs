@@ -662,7 +662,11 @@ namespace Sentry.data.Web.Controllers
 
                             //This is assuming only a single hive table per schema revision.
                             // Checking status to ensure table is ready for querying.
-                            if (schemaDto.HiveTable != null && schemaDto.HiveStatus == "Available")
+                            if (schemaDto.HiveTable != null && 
+                                (schemaDto.HiveStatus == HiveTableStatusEnum.Pending.ToString() || 
+                                 schemaDto.HiveStatus == HiveTableStatusEnum.Requested.ToString() || 
+                                 schemaDto.HiveStatus == HiveTableStatusEnum.Available.ToString())
+                                 )
                             {
                                 qs.HiveDatabase = schemaDto.HiveDatabase;
                                 qs.HiveTable = schemaDto.HiveTable;
