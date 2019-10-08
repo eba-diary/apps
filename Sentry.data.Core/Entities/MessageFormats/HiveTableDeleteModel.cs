@@ -13,7 +13,7 @@ namespace Sentry.data.Core
         {
             EventType = "HIVE-TABLE-DELETE-REQUESTED";
         }
-        public int SchemaId { get; set; }
+        public int SchemaID{ get; set; }
         public string HiveStatus { get; set; }
     }
 }
