@@ -1254,6 +1254,7 @@ namespace Sentry.data.Core
             dto.FileExtensionName = dfc.FileExtension.Name;
             dto.ParentDatasetId = dfc.ParentDataset.DatasetId;
             dto.StorageCode = dfc.GetStorageCode();
+            dto.StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + dfc.GetStorageCode() + "\\";
             dto.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
             dto.CreateCurrentView = (dfc.Schemas.FirstOrDefault() != null) ? dfc.Schemas.FirstOrDefault().CreateCurrentView : false;
             dto.IsInSAS = (dfc.Schemas.FirstOrDefault() != null) ? dfc.Schemas.FirstOrDefault().IsInSAS : false;

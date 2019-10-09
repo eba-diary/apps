@@ -30,6 +30,7 @@ namespace Sentry.data.Core
                 HiveLocation = scm.HiveLocation,
                 HiveStatus = scm.HiveTableStatus,
                 StorageCode = scm.StorageCode,
+                StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
                 FileExtenstionName = scm.Extension.Name,
             };
         }

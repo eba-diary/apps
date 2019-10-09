@@ -25,5 +25,6 @@ namespace Sentry.data.Core
         public string HiveLocation { get; set; }
         public string HiveStatus { get; set; }
         public string StorageCode { get; set; }
+        public string StorageLocation { get; set; }
     }
 }

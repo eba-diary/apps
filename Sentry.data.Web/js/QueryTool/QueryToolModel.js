@@ -5,6 +5,7 @@
     this.DatasetCategory = ko.observable(data.datasetCategory);
 
     this.DatasetColor = ko.observable(data.datasetColor);
+    this.Security = ko.observable(data.Security);
 
     this.BannerColor = ko.computed(function () {
         return 'categoryBanner-' + data.datasetColor;

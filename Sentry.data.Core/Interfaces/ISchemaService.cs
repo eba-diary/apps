@@ -15,5 +15,7 @@ namespace Sentry.data.Core
         int CreateAndSaveSchema(FileSchemaDto schemaDto);
         bool UpdateAndSaveSchema(FileSchemaDto schemaDto);
         FileSchemaDto GetFileSchemaDto(int id);
+        List<DatasetFile> GetDatasetFilesBySchema(int schemaId);
+        DatasetFile GetLatestDatasetFileBySchema(int schemaId);
     }
 }
