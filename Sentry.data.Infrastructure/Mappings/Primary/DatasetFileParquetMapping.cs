@@ -17,6 +17,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.DatasetFileId, (m) => m.Column("DatasetFile_Id"));
             this.Property((x) => x.SchemaId, (m) => m.Column("Schema_ID"));
             this.Property((x) => x.FileLocation, (m) => m.Column("FileLocation"));
+            this.Property((x) => x.DatasetId, (m) => m.Column("Dataset_ID"));
         }
     }
 }
