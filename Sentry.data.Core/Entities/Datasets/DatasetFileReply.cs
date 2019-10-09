@@ -13,5 +13,6 @@ namespace Sentry.data.Core
         public virtual int SchemaID { get; set; }
         public virtual string FileLocation { get; set; }
         public virtual string ReplayStatus { get; set; }
+        public virtual int DatasetId { get; set; }
     }
 }
