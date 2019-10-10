@@ -8,11 +8,11 @@ namespace Sentry.data.Core.Entities.DataProcessing
 {
     public class DataFlow
     {
-        public int Id { get; set; }
-        public Guid FlowGuid { get; set; }
-        public string Name { get; set; }
-        public DateTime CreatedDTM { get; set; }
-        public string CreatedBy { get; set; }
-        public IList<DataFlowStep> Steps { get; set; }
+        public virtual int Id { get; set; }
+        public virtual Guid FlowGuid { get; set; }
+        public virtual string Name { get; set; }
+        public virtual DateTime CreatedDTM { get; set; }
+        public virtual string CreatedBy { get; set; }
+        public virtual IList<DataFlowStep> Steps { get; set; }
     }
 }

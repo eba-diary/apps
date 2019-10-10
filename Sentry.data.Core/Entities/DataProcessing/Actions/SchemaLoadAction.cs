@@ -7,7 +7,7 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public SchemaLoadAction()
         {
             TargetStoragePrefix = "temp-file/schemaload/";
-        }        
-        public List<JobSchemaMap> SchemaMaps { get; set; }
+        }
+        public virtual List<JobSchemaMap> SchemaMaps { get; set; }
     }
 }

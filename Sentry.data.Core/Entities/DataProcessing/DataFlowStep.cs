@@ -8,11 +8,11 @@ namespace Sentry.data.Core.Entities.DataProcessing
 {
     public class DataFlowStep
     {
-        public int Id { get; set; }
-        public DataFlow DataFlow { get; set; }
-        public DataActionType DataAction_Type_Id { get; set; }
-        public BaseAction Action { get; set; }
-        public int ExeuctionOrder { get; set; }
+        public virtual int Id { get; set; }
+        public virtual DataFlow DataFlow { get; set; }
+        public virtual DataActionType DataAction_Type_Id { get; set; }
+        public virtual BaseAction Action { get; set; }
+        public virtual int ExeuctionOrder { get; set; }
         //public IList<ActionExecution> Executions { get; set; }
     }
 }
