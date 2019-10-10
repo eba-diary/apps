@@ -12,12 +12,13 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             this.Id(x => x.Id, m =>
             {
-                m.Column("DataFlow_ID");
+                m.Column("Id");
                 m.Generator(Generators.Identity);
             });
 
             this.Property(x => x.Name, m => m.Column("Name"));
-            this.Property(x => x.CreatedDTM, m => m.Column("Created_DTM"));
+            this.Property(x => x.FlowGuid, m => m.Column("FlowGuid"));
+            this.Property(x => x.CreatedDTM, m => m.Column("Create_DTM"));
             this.Property(x => x.CreatedBy, m => m.Column("CreatedBy"));
 
             this.Bag(x => x.Steps, (m) =>

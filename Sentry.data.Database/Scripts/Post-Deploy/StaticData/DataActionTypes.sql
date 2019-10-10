@@ -1,6 +1,5 @@
 ﻿BEGIN TRAN    
     BEGIN TRY    
-		SET IDENTITY_INSERT [DataActionTypes] ON;  
         MERGE INTO [DataActionTypes] AS Target    
         USING (VALUES 
           (1, 'S3 Drop'),
@@ -21,17 +20,20 @@
         -- delete rows that are in the target but not the source    
         WHEN NOT MATCHED BY SOURCE THEN 
         DELETE;  
-		SET IDENTITY_INSERT [DataActionTypes] OFF;  
 	END TRY 
-	BEGIN CATCH   
+	BEGIN CATCH 
+		DECLARE @Merge_DataActionTypes_ErrorMessage NVARCHAR(4000); 
+		DECLARE @Merge_DataActionTypes_ErrorSeverity INT; 
+		DECLARE @Merge_DataActionTypes_ErrorState INT;   
+		  
 		SELECT 
-			@ErrorMessage = ERROR_MESSAGE(), 
-			@ErrorSeverity = ERROR_SEVERITY(), 
-			@ErrorState = ERROR_STATE(); 
+			@Merge_DataActionTypes_ErrorMessage = ERROR_MESSAGE(), 
+			@Merge_DataActionTypes_ErrorSeverity = ERROR_SEVERITY(), 
+			@Merge_DataActionTypes_ErrorState = ERROR_STATE(); 
   
-		RAISERROR (@ErrorMessage, 
-				   @ErrorSeverity, 
-				   @ErrorState 
+		RAISERROR (@Merge_DataActionTypes_ErrorMessage, 
+				   @Merge_DataActionTypes_ErrorSeverity, 
+				   @Merge_DataActionTypes_ErrorState 
 				   ); 
 
 	    PRINT ERROR_MESSAGE();

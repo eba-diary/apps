@@ -28,7 +28,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             this.ManyToOne(x => x.Action, m =>
             {
-                m.Column("DataAction_ID");
+                m.Column("Action_ID");
                 m.Class(typeof(BaseAction));
             });
         }

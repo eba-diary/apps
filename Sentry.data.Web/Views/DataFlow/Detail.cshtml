@@ -1,0 +1,23 @@
+﻿@model DataFlowDetailModel
+
+@{
+    ViewBag.Title = "Data Flow Detail";
+}
+
+<center>
+    <h2 style="margin: 80px;">Data Flow (@Model.Name) Details </h2>
+    <div class="col-lg-12">
+        <div class="col-lg-2"><span><b>ID: </b> @Model.Id</span></div>
+        <div class="col-lg-4"><span><b>GUID: </b> @Model.FlowGuid</span></div>
+        <div class="col-lg-3"><span><b>NAME: </b> @Model.Name</span></div>
+    </div>
+    
+    @foreach (DataFlowStepModel step in Model.Step)
+    {
+    <div class="col-lg-12" style="margin-left: 30px">
+        <div class="col-lg-2"><span><b>ID: </b> @step.Id</span></div>
+        <div class="col-lg-4"><span><b>ActionId: </b> @step.ActionId</span></div>
+        <div class="col-lg-3"><span><b>ExecutionOrder: </b> @step.ExecutionOrder</span></div>
+    </div>
+    }
+</center>
