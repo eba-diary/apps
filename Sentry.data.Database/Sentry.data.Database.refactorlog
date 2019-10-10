@@ -833,4 +833,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="[ParentSchemaRevision]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="714f8117-87e9-446a-bfdb-f433976f050d" ChangeDateTime="10/09/2019 20:35:50">
+    <Property Name="ElementName" Value="[dbo].[DataActionTypes].[Enabled]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataActionTypes]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CreatedDTM" />
+  </Operation>
 </Operations>

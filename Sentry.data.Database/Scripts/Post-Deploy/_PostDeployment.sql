@@ -20,6 +20,7 @@ All new files added for staic data or scripts should have it's properties update
 :r ..\Post-Deploy\StaticData\DatasetFunction.sql
 :r ..\Post-Deploy\StaticData\DataSourceType.sql
 :r ..\Post-Deploy\StaticData\AuthenticationType.sql
+:r ..\Post-Deploy\StaticData\DataActionTypes.sql
 
 
 --Now only run these scripts if the versioning allows us.

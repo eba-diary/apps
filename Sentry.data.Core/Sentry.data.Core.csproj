@@ -94,6 +94,18 @@
     <Compile Include="DTO\Schema\DataElementDTO.cs" />
     <Compile Include="DTO\Schema\SchemaDTO.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />
+    <Compile Include="Entities\DataProcessing\ActionExecution.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\BaseAction.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\ConvertToParquetAction.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\DataActionType.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\QueryStorageAction.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\RawStorageAction.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\S3DropAction.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\SchemaLoadAction.cs" />
+    <Compile Include="Entities\DataProcessing\DataFlow.cs" />
+    <Compile Include="Entities\DataProcessing\DataFlowStep.cs" />
+    <Compile Include="Entities\DataProcessing\DataFlowVersion.cs" />
+    <Compile Include="Entities\DataProcessing\JobSchemaMap.cs" />
     <Compile Include="Entities\Datasets\DatasetFileParquet.cs" />
     <Compile Include="Entities\Datasets\DatasetFileReply.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\Authentications\OAuthAuthentication.cs" />
@@ -125,6 +137,7 @@
     <Compile Include="GlobalEnums\OAuthClaims.cs" />
     <Compile Include="GlobalEnums\OAuthGrantType.cs" />
     <Compile Include="GlobalEnums\SchemaDatatypes.cs" />
+    <Compile Include="Interfaces\DataProcessing\IDataStep.cs" />
     <Compile Include="Interfaces\ISchemaField.cs" />
     <Compile Include="Interfaces\ISchemaService.cs" />
     <Compile Include="Interfaces\ITicketMonitorService.cs" />
@@ -309,6 +322,8 @@
     </None>
     <None Include="ClassDiagram1.cd" />
     <None Include="ClassDiagram2.cd" />
+    <None Include="ClassDiagram3.cd" />
+    <None Include="ClassDiagram4.cd" />
     <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
       <SubType>Designer</SubType>
     </None>

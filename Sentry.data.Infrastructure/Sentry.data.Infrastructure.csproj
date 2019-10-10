@@ -184,6 +184,14 @@
     <Compile Include="Mappings\Primary\AssetNotificationMapping.cs" />
     <Compile Include="Mappings\Primary\AssetSourceMapping.cs" />
     <Compile Include="Mappings\Primary\BusinessUnitMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\BaseActionMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\ConvertToParquetMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\QueryStorageActionMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\RawStorageActionMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\S3DropActionMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\SchemaLoadActionMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\DataFlowMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\DataFlowStepMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetFileConfigsMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetFileMapping.cs" />
     <Compile Include="Mappings\Primary\ComponentElementMapping.cs" />
