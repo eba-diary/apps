@@ -26,7 +26,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             });
 
             this.Property((x) => x.FileName, (m) => m.Column("File_NME"));
-            //this.Property((x) => x.DatasetId, (m) => m.Column("Dataset_ID"));
             this.Property((x) => x.UploadUserName, (m) => m.Column("UploadUser_NME"));
             this.Property((x) => x.CreateDTM, (m) => m.Column("Create_DTM"));
             this.Property((x) => x.ModifiedDTM, (m) => m.Column("Modified_DTM"));
@@ -52,7 +51,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.ManyToOne(x => x.Schema, m =>
             {
                 m.Column("Schema_ID");
-                m.Class(typeof(DataElement));
+                m.Class(typeof(FileSchema));
+            });
+            this.ManyToOne(x => x.SchemaRevision, m =>
+            {
+                m.Column("SchemaRevision_ID");
+                m.Class(typeof(SchemaRevision));
             });
         }
 

@@ -30,7 +30,7 @@ namespace Sentry.data.Web.Controllers
         private ISchemaService _schemaService;
         private ISecurityService _securityService;
 
-        public MetadataController(MetadataRepositoryService metadataRepositoryService, IDatasetContext dsContext, 
+        public MetadataController(MetadataRepositoryService metadataRepositoryService, IDatasetContext dsContext,
                                 IAssociateInfoProvider associateInfoService, UserService userService,
                                 IConfigService configService, IDatasetService datasetService,
                                 ISchemaService schemaService, ISecurityService securityService)
@@ -67,8 +67,8 @@ namespace Sentry.data.Web.Controllers
             public List<DropLocation> OtherJobs { get; set; }
             public List<string> CronJobs { get; set; }
 
-         //   public int Views { get; set; }
-         //   public int Downloads { get; set; }
+            //   public int Views { get; set; }
+            //   public int Downloads { get; set; }
         }
 
         public class DropLocation
@@ -104,28 +104,28 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        [HttpGet]
-        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
-        [Route("dataset/{datasetId}/config")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<ConfigInfoModel>))]
-        public async Task<IHttpActionResult> GetDatasetConfigs(int datasetId)
-        {
-            try
-            {
-                List<DatasetFileConfigDto> dtoList = _configService.GetDatasetFileConfigDtoByDataset(datasetId);
-                if (dtoList == null)
-                {
-                    Logger.Info($"metadataapi_getdatasetconfigs_badrequest - datasetid:{datasetId}");
-                }
-                List<ConfigInfoModel> modelList = dtoList.ToModel();
-                return Ok(modelList);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error($"metadataapi_getdatasetconfigs_internalservererror", ex);
-                return InternalServerError();
-            }
-        }
+        //[HttpGet]
+        //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        //[Route("dataset/{datasetId}/config")]
+        //[SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<ConfigInfoModel>))]
+        //public async Task<IHttpActionResult> GetDatasetConfigs(int datasetId)
+        //{
+        //    try
+        //    {
+        //        List<DatasetFileConfigDto> dtoList = _configService.GetDatasetFileConfigDtoByDataset(datasetId);
+        //        if (dtoList == null)
+        //        {
+        //            Logger.Info($"metadataapi_getdatasetconfigs_badrequest - datasetid:{datasetId}");
+        //        }
+        //        List<ConfigInfoModel> modelList = dtoList.ToModel();
+        //        return Ok(modelList);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Error($"metadataapi_getdatasetconfigs_internalservererror", ex);
+        //        return InternalServerError();
+        //    }
+        //}
 
         /// <summary>
         /// Get list of schema for dataset
@@ -157,6 +157,26 @@ namespace Sentry.data.Web.Controllers
                 return InternalServerError();
             }
         }
+
+        //[HttpPut]
+        //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        //[Route("dataset/{datasetId}/schema")]
+        //[SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaInfoModel))]
+        //public async Task<IHttpActionResult> SchemaCreate(int datasetId, [FromBody] CreateSchemaModel CreateSchema)
+        //{
+        //    UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
+
+        //    if (!us.CanEditDataset)
+        //    {
+        //        return Unauthorized();
+        //    }
+
+        //    FileSchemaDto dto = CreateSchema.ToDto();
+        //    dto.ParentDatasetId = datasetId;
+        //    var newSchemaId = _schemaService.CreateAndSaveSchema(dto);
+        //    return Ok(_schemaService.GetFileSchemaDto(newSchemaId));
+        //}
+
 
         /// <summary>
         /// Get schema metadata
@@ -237,17 +257,16 @@ namespace Sentry.data.Web.Controllers
         }
 
         /// <summary>
-        /// Get schema revision detail
+        /// Get the latest schema revision detail
         /// </summary>
-        /// <param name="datasetId"></param>
+        /// <param name="datasetid"></param>
         /// <param name="schemaId"></param>
-        /// <param name="revisionId"></param>
         /// <returns></returns>
         [HttpGet]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
-        [Route("dataset/{datasetId}/schema/{schemaId}/revision/{revisionId}/fields")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaRevisionDetailModel>))]
-        public async Task<IHttpActionResult> GetSchemaRevision(int datasetId, int schemaId, int revisionId)
+        [Route("dataset/{datasetId}/schema/{schemaId}/revision/latest/fields")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaRevisionDetailModel))]
+        public async Task<IHttpActionResult> GetLatestSchemaRevisionDetail(int datasetId, int schemaId)
         {
             UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
 
@@ -260,27 +279,75 @@ namespace Sentry.data.Web.Controllers
             {
                 if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId))
                 {
-                    Logger.Info($"metadataapi_getschemarevision_notfound - datasetid:{datasetId} schemaid:{schemaId}");
+                    Logger.Info($"metadataapi_getlatestschemarevisiondetail_notfound schema - datasetid:{datasetId} schemaid:{schemaId}");
                     return NotFound();
                 }
 
-                SchemaRevisionDto revisiondto = _schemaService.GetSchemaRevisionDtoBySchema(schemaId).First(w => w.RevisionId == revisionId);
+                SchemaRevisionDto revisiondto = _schemaService.GetLatestSchemaRevisionDtoBySchema(schemaId);
                 if (revisiondto == null)
                 {
-                    Logger.Info($"metadataapi_getschemarevision_notfound - datasetid:{datasetId} schemaid:{schemaId} revisionid:{revisionId}");
+                    Logger.Info($"metadataapi_getlatestschemarevisiondetail_notfound revision - datasetid:{datasetId} schemaid:{schemaId}");
                     return NotFound();
                 }
 
                 SchemaRevisionDetailModel revisionDetailModel = revisiondto.ToSchemaDetailModel();
-                revisionDetailModel.fields = _schemaService.GetBaseFieldDtoBySchemaRevision(revisionId);
+                List<BaseFieldDto> fieldDtoList = _schemaService.GetBaseFieldDtoBySchemaRevision(revisiondto.RevisionId);
+                revisionDetailModel.Fields = fieldDtoList.ToSchemaFieldModel();
                 return Ok(revisionDetailModel);
             }
             catch (Exception ex)
             {
-                Logger.Error($"metadataapi_getschemarevision_badrequest - datasetid:{datasetId} schemaid:{schemaId}", ex);
+                Logger.Error($"metadataapi_getlatestschemarevisiondetail_badrequest - datasetid:{datasetId} schemaid:{schemaId}", ex);
                 return InternalServerError();
             }
         }
+
+        ///// <summary>
+        ///// Get schema revision detail
+        ///// </summary>
+        ///// <param name="datasetId"></param>
+        ///// <param name="schemaId"></param>
+        ///// <param name="revisionId"></param>
+        ///// <returns></returns>
+        //[HttpGet]
+        //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        //[Route("dataset/{datasetId}/schema/{schemaId}/revision/{revisionId}/fields")]
+        //[SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaRevisionDetailModel))]
+        //public async Task<IHttpActionResult> GetSchemaRevision(int datasetId, int schemaId, int revisionId)
+        //{
+        //    UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
+
+        //    if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
+        //    {
+        //        return Unauthorized();
+        //    }
+
+        //    try
+        //    {
+        //        if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId))
+        //        {
+        //            Logger.Info($"metadataapi_getschemarevision_notfound - datasetid:{datasetId} schemaid:{schemaId}");
+        //            return NotFound();
+        //        }
+
+        //        SchemaRevisionDto revisiondto = _schemaService.GetSchemaRevisionDtoBySchema(schemaId).First(w => w.RevisionId == revisionId);
+        //        if (revisiondto == null)
+        //        {
+        //            Logger.Info($"metadataapi_getschemarevision_notfound - datasetid:{datasetId} schemaid:{schemaId} revisionid:{revisionId}");
+        //            return NotFound();
+        //        }
+
+        //        SchemaRevisionDetailModel revisionDetailModel = revisiondto.ToSchemaDetailModel();
+        //        List<BaseFieldDto> fieldDtoList = _schemaService.GetBaseFieldDtoBySchemaRevision(revisionId);
+        //        revisionDetailModel.Fields = fieldDtoList.ToSchemaFieldModel();
+        //        return Ok(revisionDetailModel);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Logger.Error($"metadataapi_getschemarevision_badrequest - datasetid:{datasetId} schemaid:{schemaId}", ex);
+        //        return InternalServerError();
+        //    }
+        //}
 
         /// <summary>
         /// gets dataset metadata
@@ -350,51 +417,51 @@ namespace Sentry.data.Web.Controllers
 
         #region Schema_Endpoints
         
-        /// <summary>
-        /// Gets schema information
-        /// </summary>
-        /// <param name="schemaId"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
-        [Route("schema/{schemaId}")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaInfoModel))]
-        public async Task<IHttpActionResult> GetSchemaInfo(int schemaId)
-        {
-            try
-            {
-                SchemaDto dto = _configService.GetSchemaDto(schemaId);
-                SchemaInfoModel model = dto.ToModel();
-                return Ok(model);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.ToString());
-            }
-        }
+        ///// <summary>
+        ///// Gets schema information
+        ///// </summary>
+        ///// <param name="schemaId"></param>
+        ///// <returns></returns>
+        //[HttpGet]
+        //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
+        //[Route("schema/{schemaId}")]
+        //[SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaInfoModel))]
+        //public async Task<IHttpActionResult> GetSchemaInfo(int schemaId)
+        //{
+        //    try
+        //    {
+        //        SchemaDto dto = _schemaService.GetFileSchemaDto(schemaId);
+        //        SchemaInfoModel model = dto.ToModel();
+        //        return Ok(model);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.ToString());
+        //    }
+        //}
 
-        /// <summary>
-        /// Get list all revisions for schema
-        /// </summary>
-        /// <param name="schemaId"></param>
-        /// <returns></returns>
-        [HttpGet]
+        ///// <summary>
+        ///// Get list all revisions for schema
+        ///// </summary>
+        ///// <param name="schemaId"></param>
+        ///// <returns></returns>
+        //[HttpGet]
 
-        [Route("schema/{schemaId}/revisions")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaInfoModel>))]
-        public async Task<IHttpActionResult> GetSchemaRevisions(int schemaId)
-        {
-            try
-            {
-                List<SchemaRevisionDto> revisionsList = _schemaService.GetSchemaRevisionDtoBySchema(schemaId);
-                List<SchemaRevisionModel> modelList = revisionsList.ToModel();
-                return Ok(modelList);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(ex.ToString());
-            }
-        }
+        //[Route("schema/{schemaId}/revisions")]
+        //[SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaInfoModel>))]
+        //public async Task<IHttpActionResult> GetSchemaRevisions(int schemaId)
+        //{
+        //    try
+        //    {
+        //        List<SchemaRevisionDto> revisionsList = _schemaService.GetSchemaRevisionDtoBySchema(schemaId);
+        //        List<SchemaRevisionModel> modelList = revisionsList.ToModel();
+        //        return Ok(modelList);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(ex.ToString());
+        //    }
+        //}
 
 
         /// <summary>
@@ -404,7 +471,7 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("schemas/{SchemaID}/columns")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaDetailModel))]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(OutputSchema))]
         public async Task<IHttpActionResult> GetColumnSchemaInformationForSchema(int SchemaID)
         {
             SchemaDetaiApilDTO dto = _configService.GetSchemaDetailDTO(SchemaID);
@@ -417,81 +484,58 @@ namespace Sentry.data.Web.Controllers
         #region Private Methods
         private async Task<IHttpActionResult> GetColumnSchema(DatasetFileConfig config, int SchemaID)
         {
-            try
+            if (config.Schema != null)
             {
-                if (config.Schemas.Any())
+                int scmId = (SchemaID == 0) ? config.Schema.SchemaId : SchemaID; 
+                try
                 {
-                    var a = config.Schemas.ToList();
+                    //Get Schema for schema level info
+                    OutputSchema outSchema = new OutputSchema();
+                    FileSchemaDto fileSchemaDto = _schemaService.GetFileSchemaDto(scmId);
 
-                    DataElement schema = null;
-
-                    if (SchemaID != 0)
+                    if(fileSchemaDto == null)
                     {
-                        schema = config.Schemas.Where(x => x.DataElement_ID == SchemaID).FirstOrDefault();
-                    }
-                    else
-                    {
-                        if (config.Schemas.Any(x => x.SchemaIsPrimary))
-                        {
-                            schema = config.Schemas.Where(x => x.SchemaIsPrimary).OrderBy(x => x.SchemaRevision).FirstOrDefault();
-                        }
-                        else
-                        {
-                            schema = config.Schemas.OrderBy(x => x.SchemaRevision).FirstOrDefault();
-                        }
+                        Logger.Info($"metadatacontroller-getcolumnschema - notfound_fileschemadto");
+                        return NotFound();
                     }
 
-                    if (schema.DataObjects.Count > 0)
+                    outSchema.FileExtension = fileSchemaDto.FileExtensionId;
+
+                    if (!config.Schema.Revisions.Any())
                     {
-                        OutputSchema s = new OutputSchema();
-
-                        s.FileExtension = config.FileExtension.Id;
-
-                        s.rows = new List<SchemaRow>();
-
-                        if (schema.DataObjects.Any(x => x.RowCount != 0))
-                        {
-                            s.RowCount = Convert.ToInt32(schema.DataObjects.FirstOrDefault().RowCount);
-                        }
-
-                        foreach (DataObjectField b in schema.DataObjects.FirstOrDefault().DataObjectFields)
-                        {
-                            SchemaRow r = new SchemaRow()
-                            {
-                                Name = b.DataObjectField_NME,
-                                DataObjectField_ID = b.DataObjectField_ID,
-                                Description = b.DataObjectField_DSC,
-                                LastUpdated = b.LastUpdt_DTM.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds
-                            };
-
-                            r.DataType = (!String.IsNullOrEmpty(b.DataType)) ? b.DataType.ToUpper() : SchemaDatatypes.VARCHAR.ToString();
-                            if (b.Precision != null) { r.Precision = b.Precision ?? null; }
-                            if (b.Scale != null) { r.Scale = b.Scale ?? null; }
-                            //r.Precision = (b.Precision != null && !String.IsNullOrEmpty(b.Precision)) ? b.Precision : null;
-                            //r.Scale = (b.Scale != null && !String.IsNullOrEmpty(b.Scale)) ? b.Scale : null;
-                            if (b.Nullable != null) { r.Nullable = b.Nullable ?? null; }
-                            if (b.Length != null) { r.Length = b.Length ?? null; }
-                            if (b.OrdinalPosition != null) { r.Position = Int32.Parse(b.OrdinalPosition); }
-                            if (b.FieldFormat != null) { r.Format = b.FieldFormat ?? null; }
-                            s.rows.Add(r);
-                        }
-
-                        return Ok(s);
+                        outSchema.rows = new List<SchemaRow>();
+                        outSchema.FileExtension = config.FileExtension.Id;
+                        return Ok(outSchema);
                     }
-                    else
+
+                    //Get SchemaRevision
+                    SchemaRevisionDto revisionDto = _schemaService.GetLatestSchemaRevisionDtoBySchema(scmId);
+
+                    if (revisionDto == null)
                     {
-                        OutputSchema s = new OutputSchema();
-                        s.rows = new List<SchemaRow>();
-                        s.FileExtension = config.FileExtension.Id;
-                        return Ok(s);
+                        Logger.Info($"metadatacontroller-getcolumnschema - notfound_schemarevisiondto");
+                        return NotFound();
                     }
+
+                    //Get revision fields
+                    List<BaseFieldDto> fieldDtoList = _schemaService.GetBaseFieldDtoBySchemaRevision(revisionDto.RevisionId);
+
+                    List<SchemaRow> rows = new List<SchemaRow>();
+                    foreach (BaseFieldDto dto in fieldDtoList)
+                    {
+                        rows.Add(dto.ToModel());
+                    }
+                    outSchema.rows = rows;
+
+                    return Ok(outSchema);
                 }
-                else
+                catch (Exception ex)
                 {
-                    return NotFound();
+                    Logger.Error($"metadatacontroller-getcolumnschema", ex);
+                    return InternalServerError();
                 }
             }
-            catch (Exception ex)
+            else
             {
                 return NotFound();
             }

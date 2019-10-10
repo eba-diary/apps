@@ -277,7 +277,7 @@ data.Dataset = {
             var params = Sentry.GetDataTableParamsForExport($('#datasetFilesTable').DataTable());
 
             $.ajax({
-                url: "/Dataset/GetDatasetFileInfoForGrid/?Id=" + Id + "&bundle=" + true,
+                url: "/Dataset/GetDatasetFileInfoForGrid/?Id=" + Id,
                 method: "POST",
                 data: params,
                 dataType: 'json',
@@ -724,7 +724,7 @@ data.Dataset = {
             destroy: true,
             rowId: 'Id',
             ajax: {
-                url: "/Dataset/GetDatasetFileInfoForGrid/?Id=" + Id + "&bundle=" + false,
+                url: "/Dataset/GetDatasetFileInfoForGrid/?Id=" + Id,
                 type: "POST"
             },
             iDisplayLength: 10,

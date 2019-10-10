@@ -92,6 +92,7 @@
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
     <Compile Include="DTO\Schema\BaseFieldDto.cs" />
     <Compile Include="DTO\Schema\DataElementDTO.cs" />
+    <Compile Include="DTO\Schema\FileSchemaDto.cs" />
     <Compile Include="DTO\Schema\SchemaDTO.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />
     <Compile Include="Entities\Datasets\DatasetFileParquet.cs" />
@@ -104,6 +105,7 @@
     <Compile Include="Entities\Goldeneye\RunningTask.cs" />
     <Compile Include="Entities\Image.cs" />
     <Compile Include="Entities\MessageFormats\HiveTableDeleteModel.cs" />
+    <Compile Include="Entities\MessageFormats\RawFileAddModel.cs" />
     <Compile Include="Entities\Schema\BaseField.cs" />
     <Compile Include="Entities\Schema\BigintField.cs" />
     <Compile Include="Entities\Schema\DateField.cs" />
