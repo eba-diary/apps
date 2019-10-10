@@ -13,9 +13,17 @@ namespace Sentry.data.Web
             ValidDatatypes = new List<DataTypeModel>();
         }
         public FileExtension FileExtension { get; set; }
+        public string FileExtensionName { get; set; }
         public bool IsPositional { get; set; }
         public List<DataTypeModel> ValidDatatypes { get; set; }
         public bool IsFixedWidth { get; set; }
+        public bool AllowArrays {
+            get
+            {
+                return (FileExtensionName == "JSON") ? true : false;
+            }
+            set => AllowArrays = (FileExtensionName == "JSON") ? true : false;            
+        }
     }
 
     public class DataTypeModel

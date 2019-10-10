@@ -26,7 +26,7 @@ namespace Sentry.data.Core
         void IMessageHandler<string>.Handle(string msg)
         {
             BaseEventMessage baseEvent = JsonConvert.DeserializeObject<BaseEventMessage>(msg);
-            DataElement de = null;
+            FileSchema de = null;
             try
             {
                 switch (baseEvent.EventType.ToUpper())
@@ -35,19 +35,19 @@ namespace Sentry.data.Core
                         HiveTableCreateModel hiveCreatedEvent = JsonConvert.DeserializeObject<HiveTableCreateModel>(msg);
                         Logger.Info("HiveMetadataHandler processing HIVE-TABLE-CREATE-COMPLETED message: " + JsonConvert.SerializeObject(hiveCreatedEvent));
 
-                        switch (hiveCreatedEvent.Schema.HiveStatus.ToUpper())
+                        switch (hiveCreatedEvent.HiveStatus.ToUpper())
                         {
                             case "CREATED":
                             case "EXISTED":
-                                de = _dsContext.GetById<DataElement>(hiveCreatedEvent.Schema.SchemaID);
+                                de = _dsContext.GetById<FileSchema>(hiveCreatedEvent.SchemaID);
                                 de.HiveTableStatus = HiveTableStatusEnum.Available.ToString();
                                 break;
                             case "FAILED":
-                                de = _dsContext.GetById<DataElement>(hiveCreatedEvent.Schema.SchemaID);
+                                de = _dsContext.GetById<FileSchema>(hiveCreatedEvent.SchemaID);
                                 de.HiveTableStatus = HiveTableStatusEnum.RequestFailed.ToString();
                                 break;
                             default:
-                                de = _dsContext.GetById<DataElement>(hiveCreatedEvent.Schema.SchemaID);
+                                de = _dsContext.GetById<FileSchema>(hiveCreatedEvent.SchemaID);
                                 de.HiveTableStatus = HiveTableStatusEnum.Pending.ToString();
                                 break;
                         }
@@ -59,7 +59,7 @@ namespace Sentry.data.Core
                         HiveTableCreateModel hiveReqeustedEvent = JsonConvert.DeserializeObject<HiveTableCreateModel>(msg);
                         Logger.Info($"HiveMetadataHandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(hiveReqeustedEvent)}");
 
-                        de = _dsContext.GetById<DataElement>(hiveReqeustedEvent.Schema.SchemaID);
+                        de = _dsContext.GetById<FileSchema>(hiveReqeustedEvent.SchemaID);
                         de.HiveTableStatus = HiveTableStatusEnum.Requested.ToString();
 
                         _dsContext.Merge(de);
@@ -69,7 +69,7 @@ namespace Sentry.data.Core
                         HiveTableDeleteModel deleteEvent = JsonConvert.DeserializeObject<HiveTableDeleteModel>(msg);
                         Logger.Info($"HiveMetadataHandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(deleteEvent)}");
 
-                        de = _dsContext.GetById<DataElement>(deleteEvent.SchemaId);
+                        de = _dsContext.GetById<FileSchema>(deleteEvent.SchemaID);
                         de.HiveTableStatus = HiveTableStatusEnum.DeleteRequested.ToString();
                         _dsContext.SaveChanges();
                         break;
@@ -77,7 +77,7 @@ namespace Sentry.data.Core
                         HiveTableDeleteModel deleteCompletedEvent = JsonConvert.DeserializeObject<HiveTableDeleteModel>(msg);
                         Logger.Info($"HiveMetadataHandler processing {baseEvent.EventType.ToUpper()} message: {JsonConvert.SerializeObject(deleteCompletedEvent)}");
 
-                        de = _dsContext.GetById<DataElement>(deleteCompletedEvent.SchemaId);
+                        de = _dsContext.GetById<FileSchema>(deleteCompletedEvent.SchemaID);
 
                         switch (deleteCompletedEvent.HiveStatus.ToUpper())
                         {

@@ -7,5 +7,6 @@ namespace Sentry.Messaging.Common
     public class BaseEventMessage
     {
         public string EventType { get; set; }
+        public int DatasetID { get; set; }
     }
 }

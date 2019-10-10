@@ -11,6 +11,7 @@ namespace Sentry.data.Core.Entities.Livy
         public List<QueryableConfig> Configs { get; set; }
         public string datasetCategory { get; set; }
         public string datasetColor { get; set; }
+        public UserSecurity Security { get; set; }
     }
 
     public class QueryableConfig

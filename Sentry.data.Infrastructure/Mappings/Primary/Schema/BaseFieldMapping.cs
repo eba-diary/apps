@@ -24,6 +24,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             Property((x) => x.CreateDTM, (m) => m.Column("CreateDTM"));
             Property((x) => x.LastUpdateDTM, (m) => m.Column("LastUpdateDTM"));
             Property((x) => x.NullableIndicator, (m) => m.Column("NullableIndicator"));
+            Property((x) => x.FieldGuid, (m) => m.Column("FieldGuid"));
+            Property((x) => x.Description, (m) => m.Column("Description"));
             Discriminator(x => x.Column("Type"));
 
             ManyToOne((x) => x.ParentField, (m) =>
@@ -62,6 +64,14 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             public IntegerFieldMapping()
             {
                 DiscriminatorValue("INTEGER");
+            }
+        }
+
+        public class BigintFieldMapping : SubclassMapping<BigintField>
+        {
+            public BigintFieldMapping()
+            {
+                DiscriminatorValue("BIGINT");
             }
         }
 
