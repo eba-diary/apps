@@ -29,8 +29,13 @@ namespace Sentry.data.Web.Controllers
         private S3ServiceProvider _s3Service;
         public LivyHelper _livy;
         public string _livyUrl;
+        private IConfigService _configService;
+        private ISchemaService _schemaService;
+        private ISecurityService _securityService;
 
-        public QueryToolController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, ISASService sasService, IAssociateInfoProvider associateInfoService)
+        public QueryToolController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, 
+            ISASService sasService, IAssociateInfoProvider associateInfoService, IConfigService configService,
+            ISchemaService schemaService, ISecurityService securityService)
         {
             _datasetContext = dsCtxt;
             _userService = userService;
@@ -38,6 +43,9 @@ namespace Sentry.data.Web.Controllers
             _livy = new LivyHelper(dsCtxt);
             _associateInfoProvider = associateInfoService;
             _livyUrl = Sentry.Configuration.Config.GetHostSetting("ApacheLivy");
+            _configService = configService;
+            _schemaService = schemaService;
+            _securityService = securityService;
         }
 
 
@@ -610,52 +618,59 @@ namespace Sentry.data.Web.Controllers
         public async Task<IHttpActionResult> GetS3Key(int datasetID)
         {
             Dataset ds = _datasetContext.GetById<Dataset>(datasetID);
+            UserSecurity us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+
+            List<DatasetFileConfigDto> configDtoList = _configService.GetDatasetFileConfigDtoByDataset(datasetID);
 
             List<QueryableConfig> reply = new List<QueryableConfig>();
 
-            foreach (var item in ds.DatasetFileConfigs.Where(w => w.DeleteInd == false))
+            foreach(DatasetFileConfigDto dto in configDtoList)
             {
-                if (item.FileTypeId != (int)FileType.Supplementary)
+                FileSchemaDto schemaDto = dto.Schema;
+                if (dto.FileTypeId != (int)FileType.Supplementary)
                 {
                     QueryableConfig qd = new QueryableConfig();
+                    qd.configName = schemaDto.Name;
+                    qd.bucket = Config.GetHostSetting("AWSRootBucket");
+                    qd.s3Key = schemaDto.StorageLocation;
 
-                    qd.configName = item.Name;
-                    qd.bucket = Sentry.Configuration.Config.GetHostSetting("AWSRootBucket");
-                    qd.s3Key = Utilities.GenerateLocationKey(item);
+                    List<DatasetFile> dfList = _schemaService.GetDatasetFilesBySchema(schemaDto.SchemaId).ToList();
 
+                    qd.fileCount = dfList.Count;
+                    DatasetFile latestFile = _schemaService.GetLatestDatasetFileBySchema(schemaDto.SchemaId);
+                    qd.primaryFileId = (latestFile != null) ? latestFile.DatasetFileId.ToString() : null;
+                    qd.extensions = dfList.Select(x => Utilities.GetFileExtension(x.FileName)).Distinct().ToList();
+                    qd.description = schemaDto.Description;
 
-                    qd.fileCount = ds.DatasetFiles.Where(x => x.DatasetFileConfig.ConfigId == item.ConfigId && x.ParentDatasetFileId == null).ToList().Count;
-
-                    if (ds.DatasetFiles.OrderBy(x => x.CreateDTM).FirstOrDefault(x => x.DatasetFileConfig.ConfigId == item.ConfigId) != null)
-                    {
-                        qd.primaryFileId = ds.DatasetFiles.OrderBy(x => x.CreateDTM).FirstOrDefault(x => x.DatasetFileConfig.ConfigId == item.ConfigId).DatasetFileId.ToString();
-                    }
-                    qd.extensions = ds.DatasetFiles.Where(x => x.DatasetFileConfig.ConfigId == item.ConfigId).Select(x => Utilities.GetFileExtension(x.FileName)).Distinct().ToList();
-                    qd.description = item.Description;
-                    qd.HasSchema = item.Schemas.FirstOrDefault().DataObjects.Any();
-
-                    qd.HasQueryableSchema = item.Schemas.FirstOrDefault().DataObjects.Any();
-
+                    List<SchemaRevisionDto> schemaRevDtoList = _schemaService.GetSchemaRevisionDtoBySchema(schemaDto.SchemaId);
+                    qd.HasSchema = (schemaRevDtoList.Any());
+                    qd.HasQueryableSchema = qd.HasSchema;
+                    
+                    List<QueryableSchema> qslist = new List<QueryableSchema>();
                     if (qd.HasSchema)
                     {
-                        List<QueryableSchema> qslist = new List<QueryableSchema>();
-                        foreach (var sch in item.Schemas)
+                        //only take the latest revision for now.  Need to revist if support for querying multiple revisions is needed
+                        foreach (var sch in schemaRevDtoList.OrderByDescending(o => o.CreatedDTM).Take(1))
                         {
                             QueryableSchema qs = new QueryableSchema()
                             {
-                                SchemaName = sch.SchemaName,
-                                SchemaDSC = sch.SchemaDescription,
-                                SchemaID = sch.DataElement_ID,
-                                RevisionID = sch.SchemaRevision
+                                SchemaName = schemaDto.Name,
+                                SchemaDSC = schemaDto.Description,
+                                SchemaID = schemaDto.SchemaId,
+                                RevisionID = sch.RevisionId
                             };
 
                             //This is assuming only a single hive table per schema revision.
                             // Checking status to ensure table is ready for querying.
-                            if (sch.HiveTable != null)
+                            if (schemaDto.HiveTable != null && 
+                                (schemaDto.HiveStatus == HiveTableStatusEnum.Pending.ToString() || 
+                                 schemaDto.HiveStatus == HiveTableStatusEnum.Requested.ToString() || 
+                                 schemaDto.HiveStatus == HiveTableStatusEnum.Available.ToString())
+                                 )
                             {
-                                qs.HiveDatabase = sch.HiveDatabase;
-                                qs.HiveTable = sch.HiveTable;
-                                qs.HiveTableStatus = sch.HiveTableStatus;
+                                qs.HiveDatabase = schemaDto.HiveDatabase;
+                                qs.HiveTable = schemaDto.HiveTable;
+                                qs.HiveTableStatus = schemaDto.HiveStatus;
                                 qs.HasTable = true;
                             }
                             else
@@ -664,18 +679,84 @@ namespace Sentry.data.Web.Controllers
                             }
                             qslist.Add(qs);
                         }
-                        qd.Schemas = qslist;
                     }
+                    qd.Schemas = qslist;                    
                     reply.Add(qd);
                 }
             }
 
             QueryableDataset output = new QueryableDataset() { Configs = reply };
 
+            output.Security = us;
             output.datasetCategory = ds.DatasetCategories.First().Name;
             output.datasetColor = ds.DatasetCategories.First().Color;
 
             return Ok(output);
+
+
+            //foreach (var item in ds.DatasetFileConfigs.Where(w => w.DeleteInd == false))
+            //{
+            //    if (item.FileTypeId != (int)FileType.Supplementary)
+            //    {
+            //        QueryableConfig qd = new QueryableConfig();
+
+            //        qd.configName = item.Name;
+            //        qd.bucket = Sentry.Configuration.Config.GetHostSetting("AWSRootBucket");
+            //        qd.s3Key = Utilities.GenerateLocationKey(item);
+
+
+            //        qd.fileCount = ds.DatasetFiles.Where(x => x.DatasetFileConfig.ConfigId == item.ConfigId && x.ParentDatasetFileId == null).ToList().Count;
+
+            //        if (ds.DatasetFiles.OrderBy(x => x.CreateDTM).FirstOrDefault(x => x.DatasetFileConfig.ConfigId == item.ConfigId) != null)
+            //        {
+            //            qd.primaryFileId = ds.DatasetFiles.OrderBy(x => x.CreateDTM).FirstOrDefault(x => x.DatasetFileConfig.ConfigId == item.ConfigId).DatasetFileId.ToString();
+            //        }
+            //        qd.extensions = ds.DatasetFiles.Where(x => x.DatasetFileConfig.ConfigId == item.ConfigId).Select(x => Utilities.GetFileExtension(x.FileName)).Distinct().ToList();
+            //        qd.description = item.Description;
+            //        qd.HasSchema = item.Schemas.FirstOrDefault().DataObjects.Any();
+
+            //        qd.HasQueryableSchema = item.Schemas.FirstOrDefault().DataObjects.Any();
+
+            //        if (qd.HasSchema)
+            //        {
+            //            List<QueryableSchema> qslist = new List<QueryableSchema>();
+            //            foreach (var sch in item.Schemas)
+            //            {
+            //                QueryableSchema qs = new QueryableSchema()
+            //                {
+            //                    SchemaName = sch.SchemaName,
+            //                    SchemaDSC = sch.SchemaDescription,
+            //                    SchemaID = sch.DataElement_ID,
+            //                    RevisionID = sch.SchemaRevision
+            //                };
+
+            //                //This is assuming only a single hive table per schema revision.
+            //                // Checking status to ensure table is ready for querying.
+            //                if (sch.HiveTable != null)
+            //                {
+            //                    qs.HiveDatabase = sch.HiveDatabase;
+            //                    qs.HiveTable = sch.HiveTable;
+            //                    qs.HiveTableStatus = sch.HiveTableStatus;
+            //                    qs.HasTable = true;
+            //                }
+            //                else
+            //                {
+            //                    qs.HasTable = false;
+            //                }
+            //                qslist.Add(qs);
+            //            }
+            //            qd.Schemas = qslist;
+            //        }
+            //        reply.Add(qd);
+            //    }
+            //}
+
+            //QueryableDataset output = new QueryableDataset() { Configs = reply };
+
+            //output.datasetCategory = ds.DatasetCategories.First().Name;
+            //output.datasetColor = ds.DatasetCategories.First().Color;
+
+            //return Ok(output);
         }
 
 

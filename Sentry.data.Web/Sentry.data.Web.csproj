@@ -348,6 +348,8 @@
     <Compile Include="HttpExceptions\NotAuthorizedException.cs" />
     <Compile Include="Models\ApiModels\Dataset\DatasetDetailModel.cs" />
     <Compile Include="Models\ApiModels\Config\ConfigInfoModel.cs" />
+    <Compile Include="Models\ApiModels\Schema\CreateSchemaModel.cs" />
+    <Compile Include="Models\ApiModels\Schema\SchemaFieldModel.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaInfoModel.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionDetailModel.cs" />
     <Compile Include="Models\ApiModels\Schema\SchemaRevisionModel.cs" />

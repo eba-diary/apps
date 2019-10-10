@@ -46,6 +46,7 @@ namespace Sentry.data.Core
         IQueryable<DatasetFileParquet> DatasetFileParquet { get; }
         IQueryable<DatasetFileReply> DatasetFileReply { get; }
         IQueryable<Schema> Schema { get; }
+        IQueryable<FileSchema> FileSchema { get; }
         IQueryable<SchemaRevision> SchemaRevision { get; }
         /** Datasets **/
 
@@ -62,7 +63,7 @@ namespace Sentry.data.Core
         IEnumerable<DatasetFile> GetDatasetFilesForDataset(int datasetId, Func<DatasetFile, bool> where);
         IEnumerable<DatasetFile> GetDatasetFilesForDatasetFileConfig(int configId, Func<DatasetFile, bool> where);
         int GetLatestDatasetFileIdForDataset(int id);
-        int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId, bool isBundled, string targetFileName = null, DataElement schema = null);
+        int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId, bool isBundled, string targetFileName = null, SchemaRevision schema = null);
         Category GetCategoryById(int id);
 
 

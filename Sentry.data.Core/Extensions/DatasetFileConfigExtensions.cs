@@ -28,5 +28,19 @@ namespace Sentry.data.Core
             dto.Schemas = delist;
             return dto;
         }
+
+        public static FileSchemaDto ToSchemaDto (this DatasetDto dsDto)
+        {
+            return new FileSchemaDto()
+            {
+                Name = dsDto.ConfigFileName,
+                Delimiter = dsDto.Delimiter,
+                FileExtensionId = dsDto.FileExtensionId,
+                HasHeader = dsDto.HasHeader,
+                IsInSAS = dsDto.IsInSAS,
+                Description = dsDto.ConfigFileDesc,
+                ParentDatasetId = dsDto.DatasetId
+            };
+        }
     }
 }
