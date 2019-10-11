@@ -198,14 +198,25 @@ namespace Sentry.data.Web.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaInfoModel))]
         public async Task<IHttpActionResult> GetSchema(int datasetId, int schemaId)
         {
-            UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
-
+            UserSecurity us;
+            try
+            {
+                us = _datasetService.GetUserSecurityForDataset(datasetId);
+                Logger.Info($"metadatacontroller-getschema retrieved user security object");
+                Logger.Info($"metadatacontroller-getschema schemaobject - preview:{us.CanPreviewDataset} edit:{us.CanEditDataset} create:{us.CanCreateDataset} upload:{us.CanUploadToDataset} fullaccess:{us.CanViewFullDataset}");
+            }
+            catch(Exception ex)
+            {
+                Logger.Error($"metadatacontroller-getschema failed to retrieve UserSecurity object", ex);
+                return InternalServerError();
+            }
+                        
             if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
             {
                 try
                 {
                     IApplicationUser user = _userService.GetCurrentUser();
-                    Logger.Info($"metadatacontroller-GetSchema unauthorized_access: username{user.DisplayName} Id:{user.AssociateId}");
+                    Logger.Info($"metadatacontroller-GetSchema unauthorized_access: Id:{user.AssociateId}");
                 }
                 catch (Exception ex)
                 {
