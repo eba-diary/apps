@@ -145,7 +145,7 @@ namespace Sentry.data.Web.Controllers
                 try
                 {
                     IApplicationUser user = _userService.GetCurrentUser();
-                    Logger.Info($"metadatacontroller-getschemabydataset unauthorized_access: username{user.DisplayName} Id:{user.AssociateId}");
+                    Logger.Info($"metadatacontroller-getschemabydataset unauthorized_access: Id:{user.AssociateId}");
                 }
                 catch (Exception ex)
                 {
@@ -198,14 +198,23 @@ namespace Sentry.data.Web.Controllers
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaInfoModel))]
         public async Task<IHttpActionResult> GetSchema(int datasetId, int schemaId)
         {
-            UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
-
+            UserSecurity us;
+            try
+            {
+                us = _datasetService.GetUserSecurityForDataset(datasetId);
+            }
+            catch(Exception ex)
+            {
+                Logger.Error($"metadatacontroller-getschema failed to retrieve UserSecurity object", ex);
+                return InternalServerError();
+            }
+                        
             if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
             {
                 try
                 {
                     IApplicationUser user = _userService.GetCurrentUser();
-                    Logger.Info($"metadatacontroller-GetSchema unauthorized_access: username{user.DisplayName} Id:{user.AssociateId}");
+                    Logger.Info($"metadatacontroller-GetSchema unauthorized_access: Id:{user.AssociateId}");
                 }
                 catch (Exception ex)
                 {
@@ -250,7 +259,7 @@ namespace Sentry.data.Web.Controllers
                 try
                 {
                     IApplicationUser user = _userService.GetCurrentUser();
-                    Logger.Info($"metadatacontroller-GetSchemaRevisionBySchema unauthorized_access: username{user.DisplayName} Id:{user.AssociateId}");
+                    Logger.Info($"metadatacontroller-GetSchemaRevisionBySchema unauthorized_access: Id:{user.AssociateId}");
                 }
                 catch (Exception ex)
                 {
@@ -302,7 +311,7 @@ namespace Sentry.data.Web.Controllers
                 try
                 {
                     IApplicationUser user = _userService.GetCurrentUser();
-                    Logger.Info($"metadatacontroller-GetLatestSchemaRevisionDetail unauthorized_access: username{user.DisplayName} Id:{user.AssociateId}");
+                    Logger.Info($"metadatacontroller-GetLatestSchemaRevisionDetail unauthorized_access: Id:{user.AssociateId}");
                 }
                 catch (Exception ex)
                 {
