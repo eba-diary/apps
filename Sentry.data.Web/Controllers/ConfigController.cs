@@ -401,6 +401,7 @@ namespace Sentry.data.Web.Controllers
             }
 
             cjm = CreateDropDownSetup(cjm);
+            cjm.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
             return View(cjm);
         }
 
