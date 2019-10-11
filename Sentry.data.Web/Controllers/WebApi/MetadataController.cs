@@ -145,7 +145,7 @@ namespace Sentry.data.Web.Controllers
                 try
                 {
                     IApplicationUser user = _userService.GetCurrentUser();
-                    Logger.Info($"metadatacontroller-getschemabydataset unauthorized_access: username{user.DisplayName} Id:{user.AssociateId}");
+                    Logger.Info($"metadatacontroller-getschemabydataset unauthorized_access: Id:{user.AssociateId}");
                 }
                 catch (Exception ex)
                 {
@@ -202,8 +202,6 @@ namespace Sentry.data.Web.Controllers
             try
             {
                 us = _datasetService.GetUserSecurityForDataset(datasetId);
-                Logger.Info($"metadatacontroller-getschema retrieved user security object");
-                Logger.Info($"metadatacontroller-getschema schemaobject - preview:{us.CanPreviewDataset} edit:{us.CanEditDataset} create:{us.CanCreateDataset} upload:{us.CanUploadToDataset} fullaccess:{us.CanViewFullDataset}");
             }
             catch(Exception ex)
             {
@@ -261,7 +259,7 @@ namespace Sentry.data.Web.Controllers
                 try
                 {
                     IApplicationUser user = _userService.GetCurrentUser();
-                    Logger.Info($"metadatacontroller-GetSchemaRevisionBySchema unauthorized_access: username{user.DisplayName} Id:{user.AssociateId}");
+                    Logger.Info($"metadatacontroller-GetSchemaRevisionBySchema unauthorized_access: Id:{user.AssociateId}");
                 }
                 catch (Exception ex)
                 {
@@ -313,7 +311,7 @@ namespace Sentry.data.Web.Controllers
                 try
                 {
                     IApplicationUser user = _userService.GetCurrentUser();
-                    Logger.Info($"metadatacontroller-GetLatestSchemaRevisionDetail unauthorized_access: username{user.DisplayName} Id:{user.AssociateId}");
+                    Logger.Info($"metadatacontroller-GetLatestSchemaRevisionDetail unauthorized_access: Id:{user.AssociateId}");
                 }
                 catch (Exception ex)
                 {
