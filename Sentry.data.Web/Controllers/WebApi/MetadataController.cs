@@ -142,6 +142,15 @@ namespace Sentry.data.Web.Controllers
 
             if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
             {
+                try
+                {
+                    IApplicationUser user = _userService.GetCurrentUser();
+                    Logger.Info($"metadatacontroller-getschemabydataset unauthorized_access: username{user.DisplayName} Id:{user.AssociateId}");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("metadatacontroller-getschemabydataset unauthorized_access", ex);
+                }
                 return Unauthorized();
             }
 
@@ -193,6 +202,15 @@ namespace Sentry.data.Web.Controllers
 
             if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
             {
+                try
+                {
+                    IApplicationUser user = _userService.GetCurrentUser();
+                    Logger.Info($"metadatacontroller-GetSchema unauthorized_access: username{user.DisplayName} Id:{user.AssociateId}");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("metadatacontroller-GetSchema unauthorized_access", ex);
+                }
                 return Unauthorized();
             }
 
@@ -229,6 +247,15 @@ namespace Sentry.data.Web.Controllers
 
             if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
             {
+                try
+                {
+                    IApplicationUser user = _userService.GetCurrentUser();
+                    Logger.Info($"metadatacontroller-GetSchemaRevisionBySchema unauthorized_access: username{user.DisplayName} Id:{user.AssociateId}");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("metadatacontroller-GetSchemaRevisionBySchema unauthorized_access", ex);
+                }
                 return Unauthorized();
             }
 
@@ -272,6 +299,15 @@ namespace Sentry.data.Web.Controllers
 
             if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
             {
+                try
+                {
+                    IApplicationUser user = _userService.GetCurrentUser();
+                    Logger.Info($"metadatacontroller-GetLatestSchemaRevisionDetail unauthorized_access: username{user.DisplayName} Id:{user.AssociateId}");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("metadatacontroller-GetLatestSchemaRevisionDetail unauthorized_access", ex);
+                }
                 return Unauthorized();
             }
 
