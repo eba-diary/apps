@@ -165,10 +165,12 @@
     <Compile Include="DomainContexts\datasetContext.cs" />
     <Compile Include="DomainContexts\dataAssetContext.cs" />
     <Compile Include="DomainContexts\RequestContext.cs" />
+    <Compile Include="Extensions\DataFlowStepExtensions.cs" />
     <Compile Include="Extensions\RestSharpExtensions.cs" />
     <Compile Include="Extensions\RetrieverJobExtensions.cs" />
     <Compile Include="HangfireFilters\DisableMultipleQueuedItemsFilter.cs" />
     <Compile Include="Helpers\TopicHelper.cs" />
+    <Compile Include="Interfaces\IDataFlowStepProvider.cs" />
     <Compile Include="Mappings\Metadata\DataElementDetailMapping.cs" />
     <Compile Include="Mappings\Metadata\DataElementMapping.cs" />
     <Compile Include="Mappings\Metadata\DataLineageMapping.cs" />
@@ -246,6 +248,12 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\ConvertToParquetProvider.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\DataFlowProvider.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\QueryStorageProvider.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\RawStorageProvider.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\S3DropProvider.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\SchemaLoadProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\BaseTicketProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\CherwellProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\CherwellService.cs" />
@@ -719,9 +727,7 @@
   <ItemGroup>
     <WebReferences Include="Web References\" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
       <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>

@@ -2,12 +2,11 @@
 
 namespace Sentry.data.Core.Entities.DataProcessing
 {
-    public class S3DropAction : BaseAction, IDataStep
+    public class S3DropAction : BaseAction
     {
         public S3DropAction()
         {
-            TargetStoragePrefix = "temp/s3drop/";
+            TargetStoragePrefix = GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX;
         }
-
     }
 }

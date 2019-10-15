@@ -47,6 +47,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sentry.data.Core.Tests", "S
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HSZGOLDENEYE", "HSZProcessor\HSZGOLDENEYE.csproj", "{4CEF5744-53D4-4A4D-8E2B-A47A68C52F05}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TESTING_CONSOLE", "TESTING_CONSOLE\TESTING_CONSOLE.csproj", "{7066B846-3BF7-4A09-B454-6E095C37520B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -104,6 +106,10 @@ Global
 		{4CEF5744-53D4-4A4D-8E2B-A47A68C52F05}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4CEF5744-53D4-4A4D-8E2B-A47A68C52F05}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4CEF5744-53D4-4A4D-8E2B-A47A68C52F05}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7066B846-3BF7-4A09-B454-6E095C37520B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7066B846-3BF7-4A09-B454-6E095C37520B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7066B846-3BF7-4A09-B454-6E095C37520B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7066B846-3BF7-4A09-B454-6E095C37520B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

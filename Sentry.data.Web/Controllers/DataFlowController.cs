@@ -16,7 +16,10 @@ namespace Sentry.data.Web.Controllers
         {
             _dataFlowService = dataFlowService;
         }
-        // GET: DataFlow        
+
+        // GET: DataFlow
+        [HttpGet]
+        [Route("DataFlow")]
         public ActionResult Index()
         {
             List<DataFlowDto> dtoList = _dataFlowService.ListDataFlows();
@@ -24,12 +27,50 @@ namespace Sentry.data.Web.Controllers
             return View(modelList);
         }
 
+        [HttpGet]
+        [Route("DataFlow/{id}/Detail")]
         public ActionResult Detail(int id)
         {
             DataFlowDetailDto dto = _dataFlowService.GetDataFlowDetailDto(id);
             DataFlowDetailModel model = new DataFlowDetailModel(dto);
 
             return View(model);
-        } 
+        }
+
+        [HttpGet]
+        [Route("DataFlow/Search/DataFlowStep/")]
+        public void DataStepSearch(string key)
+        {
+            List<DataFlowStepDto> stepDtoList = _dataFlowService.GetDataFlowStepDtoByTrigger("temp-file/s3drop/12/");
+        }
+
+        [HttpGet]
+        [Route("DataFlow/Create")]
+        public void Create()
+        {
+            bool success = _dataFlowService.CreateDataFlow();
+        }
+
+        [HttpGet]
+        [Route("DataFlow/{dataFlowId}/DataFlowStep/{dataFlowStepId}/ProcessFile")]
+        public bool RunDataFlowStep(int dataFlowId, int dataFlowStepId, string key, string bucket)
+        {
+            DataFlowDetailDto flowDto = _dataFlowService.GetDataFlowDetailDto(dataFlowId);
+            if (flowDto.steps.Any(w => w.Id == dataFlowStepId))
+            {
+                _dataFlowService.GenerateJobRequest(dataFlowStepId, bucket, key);
+            }
+            else
+            {
+                return false;
+            }
+            return true;
+        }
+    }
+
+    public class DataFlowStepFile
+    {
+        public string Bucket { get; set; }
+        public string Key { get; set; }
     }
 }

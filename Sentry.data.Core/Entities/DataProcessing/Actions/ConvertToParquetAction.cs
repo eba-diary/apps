@@ -4,7 +4,7 @@
     {
         public ConvertToParquetAction()
         {
-            TargetStoragePrefix = "parquet/";
+            TargetStoragePrefix = GlobalConstants.DataFlowTargetPrefixes.CONVERT_TO_PARQUET_PREFIX;
         }        
     }
 }

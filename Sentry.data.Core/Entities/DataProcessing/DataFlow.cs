@@ -8,6 +8,12 @@ namespace Sentry.data.Core.Entities.DataProcessing
 {
     public class DataFlow
     {
+        public DataFlow()
+        {
+            //Assign new guild value
+            Guid g = Guid.NewGuid();
+            FlowGuid = g;
+        }
         public virtual int Id { get; set; }
         public virtual Guid FlowGuid { get; set; }
         public virtual string Name { get; set; }

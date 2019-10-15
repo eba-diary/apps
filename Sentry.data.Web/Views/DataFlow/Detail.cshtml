@@ -15,9 +15,12 @@
     @foreach (DataFlowStepModel step in Model.Step)
     {
     <div class="col-lg-12" style="margin-left: 30px">
-        <div class="col-lg-2"><span><b>ID: </b> @step.Id</span></div>
-        <div class="col-lg-4"><span><b>ActionId: </b> @step.ActionId</span></div>
-        <div class="col-lg-3"><span><b>ExecutionOrder: </b> @step.ExecutionOrder</span></div>
+        <div class="col-lg-1"><span><b>ID: </b> @step.Id</span></div>
+        <div class="col-lg-2"><span><b>ActionId: </b> @step.ActionId</span></div>
+        <div class="col-lg-3"><span><b>ActionName: </b> @step.ActionName</span></div>
+        <div class="col-lg-2"><span><b>ExecOrder: </b> @step.ExecutionOrder</span></div>
+        <div class="col-lg-2"><span><b>Trigger: </b> @step.TriggetKey</span></div>
+        <div class="col-lg-2"><span><b>Target: </b> @step.TargetPrefix</span></div>
     </div>
     }
 </center>

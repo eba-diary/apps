@@ -19,6 +19,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property(x => x.ExeuctionOrder, m => m.Column("ExecutionOrder"));
             this.Property(x => x.DataAction_Type_Id,
                attr => attr.Type<EnumType<DataActionType>>());
+            this.Property(x => x.TriggerKey, m => m.Column("TriggerKey"));
+            this.Property(x => x.TargetPrefix, m => m.Column("TargetPrefix"));
 
             this.ManyToOne(x => x.DataFlow, m =>
             {

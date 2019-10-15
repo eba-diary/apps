@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sentry.data.Core.Entities.DataProcessing;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,8 +9,7 @@ namespace Sentry.data.Core.Interfaces.DataProcessing
 {
     public interface IDataStep
     {
-        string Name { get; set; }
-        string TargetStoragePrefix { get; set; }
-        string TargetStorageBucket { get; set; }
+        string TargetPrefix { get; set; }
+        BaseAction Action { get; set; }
     }
 }

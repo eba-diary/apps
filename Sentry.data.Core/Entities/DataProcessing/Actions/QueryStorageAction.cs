@@ -4,7 +4,7 @@
     {
         public QueryStorageAction()
         {
-            TargetStoragePrefix = "rawquery/";
+            TargetStoragePrefix = GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX;
         }
     }
 }

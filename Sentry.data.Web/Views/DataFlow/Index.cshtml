@@ -6,16 +6,16 @@
 
 <center>
     <h2 style="margin: 80px;">Listing of all dataset management data flows</h2>
-    <div class="col-lg-12">
-        @foreach (DataFlowModel flow in Model)
+    @foreach (DataFlowModel flow in Model)
         {
-            <div class="col-lg-2"><span><b>ID: </b> @flow.Id</span></div>
+        <div class="col-lg-12">
+            <div class="col-lg-2"><span><b>ID: </b> <a href="\DataFlow\@flow.Id\Detail\">@flow.Id</a></span></div>
             <div class="col-lg-4"><span><b>GUID: </b> @flow.FlowGuid</span></div>
             <div class="col-lg-3"><span><b>NAME: </b> @flow.Name</span></div>
-            //@Html.Display(item => flow, flow.FlowGuid)
+            @*@Html.Display(item => flow, flow.FlowGuid)*@
             @*@Html.DisplayFor(item => flow, flow.Name)
             @Html.DisplayFor(item => flow, flow.CreatedDTM)
             @Html.DisplayFor(item => flow, flow.CreatedBy)*@
+        </div>
         }
-    </div>
 </center>

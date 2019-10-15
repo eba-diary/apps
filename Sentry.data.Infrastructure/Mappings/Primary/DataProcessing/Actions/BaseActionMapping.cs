@@ -12,7 +12,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             this.Id(x => x.Id, m =>
             {
-                m.Column("DataAction_ID");
+                m.Column("Id");
                 m.Generator(Generators.Identity);
             });
             Discriminator(x => x.Column("ActionType"));

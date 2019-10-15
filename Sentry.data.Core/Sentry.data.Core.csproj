@@ -121,8 +121,10 @@
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DfsBasicHsz.cs" />
     <Compile Include="Entities\Goldeneye\RunningTask.cs" />
     <Compile Include="Entities\Image.cs" />
+    <Compile Include="Entities\MessageFormats\DataFlowStepEvent.cs" />
     <Compile Include="Entities\MessageFormats\HiveTableDeleteModel.cs" />
     <Compile Include="Entities\MessageFormats\RawFileAddModel.cs" />
+    <Compile Include="Entities\S3\S3ObjectCreatedEvent.cs" />
     <Compile Include="Entities\Schema\BaseField.cs" />
     <Compile Include="Entities\Schema\BigintField.cs" />
     <Compile Include="Entities\Schema\DateField.cs" />
@@ -145,6 +147,8 @@
     <Compile Include="GlobalEnums\OAuthClaims.cs" />
     <Compile Include="GlobalEnums\OAuthGrantType.cs" />
     <Compile Include="GlobalEnums\SchemaDatatypes.cs" />
+    <Compile Include="Interfaces\DataProcessing\IDataAction.cs" />
+    <Compile Include="Interfaces\DataProcessing\IDataFlowProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IDataFlowService.cs" />
     <Compile Include="Interfaces\DataProcessing\IDataStep.cs" />
     <Compile Include="Interfaces\ISchemaField.cs" />

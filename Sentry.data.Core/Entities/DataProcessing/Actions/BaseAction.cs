@@ -1,8 +1,9 @@
-﻿using System;
+﻿using Sentry.data.Core.Interfaces.DataProcessing;
+using System;
 
 namespace Sentry.data.Core.Entities.DataProcessing
 {
-    public abstract class BaseAction
+    public abstract class BaseAction : IDataAction
     {
         public virtual int Id { get; set; }
         public virtual Guid ActionGuid { get; set; }

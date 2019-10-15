@@ -233,5 +233,24 @@
         {
             public const string FILESCHEMA = "FileSchema";
         }
+
+        public static class DataFlowTargetPrefixes
+        {
+            public const string RAW_STORAGE_PREFIX = "data/";
+            public const string RAW_QUERY_STORAGE_PREFIX = "rawquery/";
+            public const string TEMP_FILE_PREFIX = "temp-file/";
+            public const string S3_DROP_PREFIX = TEMP_FILE_PREFIX + "s3drop/";
+            public const string SCHEMA_LOAD_PREFIX = TEMP_FILE_PREFIX + "schemaload/";
+            public const string CONVERT_TO_PARQUET_PREFIX = "parquet/";
+        }
+
+        public static class DataFlowStepEvent
+        {
+            public const string S3_DROP_START = "DATAFLOWSTEP_S3DROP_START";
+            public const string RAW_STORAGE_START = "DATAFLOWSTEP_RAWSTORAGE_START";
+            public const string QUERY_STORAGE = "DATAFLOWSTEP_QUERYSTORAGE_START";
+            public const string SCHEMA_LOAD = "DATAFLOWSTEP_SCHEMA_LOAD_START";
+            public const string CONVERT_TO_PARQUET = "DATAFLOWSTEP_CONVERTTOPARQUET_START";
+        }
     }
 }

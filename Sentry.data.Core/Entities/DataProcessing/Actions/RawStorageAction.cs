@@ -4,7 +4,7 @@
     {
         public RawStorageAction()
         {
-            TargetStoragePrefix = "data/";
+            TargetStoragePrefix = GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX;
         }
     }
 }
