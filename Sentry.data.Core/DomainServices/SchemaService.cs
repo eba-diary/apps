@@ -126,7 +126,7 @@ namespace Sentry.data.Core
         {
             SchemaRevision revision = _datasetContext.SchemaRevision.FirstOrDefault(w => w.SchemaRevision_Id == revisionId);
 
-            return revision.Fields.Where(w => w.ParentField == null).ToList().ToDto();
+            return revision.Fields.Where(w => w.ParentField == null).OrderBy(o => o.OrdinalPosition).ToList().ToDto();
         }
 
         public SchemaRevisionDto GetLatestSchemaRevisionDtoBySchema(int schemaId)
