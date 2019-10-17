@@ -195,7 +195,7 @@ namespace Sentry.data.Core
                 switch (step.DataAction_Type_Id)
                 {
                     case DataActionType.S3Drop:
-                        step.TriggerKey = $"droplocation/{step.DataFlow.Id}/";
+                        step.TriggerKey = $"{step.DataFlow.Id}/";
                         break;
                     //case DataActionType.None:
                     //case DataActionType.RawStorage:

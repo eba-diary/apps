@@ -33,7 +33,8 @@ namespace Sentry.data.Infrastructure
             IList<IMessageHandler<string>> handlers = new List<IMessageHandler<string>>
             {
                 //new HiveMetadataHandler(_dsContext)
-                new HiveMetadataService()
+                new HiveMetadataService(),
+                new S3EventService()
             };
 
             return handlers;

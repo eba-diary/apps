@@ -28,7 +28,7 @@ namespace TESTING_CONSOLE
 
                 DataFlowProvider provider = container.GetInstance<DataFlowProvider>();
 
-                provider.ExecuteDependencies("sentry-dataset-management-np-nr", "data/17/TestFile.csv");
+                provider.ExecuteDependenciesAsync("sentry-dataset-management-np-nr", "data/17/TestFile.csv");
             }
 
             Logger.Info("Console App completed successfully.");

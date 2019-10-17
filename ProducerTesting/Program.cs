@@ -1,0 +1,82 @@
+﻿using System;
+using System.Collections.Generic;
+using Sentry.Common.Logging;
+using Sentry.Configuration;
+using System.Linq;
+using System.Text;
+using StructureMap;
+using Sentry.data.Infrastructure;
+using Sentry.data.Core;
+using Newtonsoft.Json;
+using Sentry.data.Core.Entities.S3;
+using System.Threading;
+
+namespace ProducerTesting
+{
+    public class Class1
+    {
+
+        static void Main(string[] args)
+        {
+            Logger.LoggingFrameworkAdapter = new Sentry.Common.Logging.Adapters.Log4netAdapter(Config.GetHostSetting("AppLogger"));
+
+            //Call your bootstrapper to initialize your application
+            Bootstrapper.Init();
+            S3Event s3e = null;
+            //Droplocation event
+            //s3e = new S3Event
+            //{
+            //    EventType = "S3EVENT",
+            //    PayLoad = new S3ObjectEvent()
+            //    {
+            //        eventName = "ObjectCreated:Put",
+            //        s3 = new S3()
+            //        {
+            //            bucket = new Bucket()
+            //            {
+            //                name = "sentry-dataset-management-np-nr"
+            //            },
+            //            _object = new Sentry.data.Core.Entities.S3.Object()
+            //            {
+            //                key = "17/Testfile.csv"
+            //            }
+            //        }
+
+            //    }
+            //};
+
+            //S3drop event
+            s3e = new S3Event
+            {
+                EventType = "S3EVENT",
+                PayLoad = new S3ObjectEvent()
+                {
+                    eventName = "ObjectCreated:Put",
+                    s3 = new S3()
+                    {
+                        bucket = new Bucket()
+                        {
+                            name = "sentry-dataset-management-np-nr"
+                        },
+                        _object = new Sentry.data.Core.Entities.S3.Object()
+                        {
+                            key = "temp-file/s3drop/17/1571330063/Testfile.csv"
+                        }
+                    }
+                }
+            };
+            
+
+            using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+            {
+                IMessagePublisher _messagePublisher = container.GetInstance<IMessagePublisher>();
+
+                _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
+
+                Thread.Sleep(10000);
+            }
+
+            Logger.Info("Console App completed successfully.");
+        }
+    }
+}

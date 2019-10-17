@@ -11,6 +11,7 @@ namespace Sentry.data.Core
     {
         public int DataFlowId { get; set; }
         public string DataFlowGuid { get; set; }
+        public string ExecutionGuid { get; set; }
         public int ActionId { get; set; }
         public string ActionGuid { get; set; }
         public string SourceBucket { get; set; }

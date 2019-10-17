@@ -4,6 +4,6 @@ namespace Sentry.data.Infrastructure
 {
     public interface IDataFlowStepProvider
     {
-        void GenerateStartEvent(DataFlowStep step, string bucket, string key);
+        void GenerateStartEvent(DataFlowStep step, string bucket, string key, string FlowExecutionGuid);
     }
 }

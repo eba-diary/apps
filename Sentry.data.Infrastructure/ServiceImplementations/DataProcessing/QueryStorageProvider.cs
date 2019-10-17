@@ -13,12 +13,13 @@ namespace Sentry.data.Infrastructure
             _messagePublisher = messagePublisher;
         }
 
-        public void GenerateStartEvent(DataFlowStep step, string bucket, string key)
+        public void GenerateStartEvent(DataFlowStep step, string bucket, string key, string FlowExecutionGuid)
         {
             DataFlowStepEvent stepEvent = new DataFlowStepEvent()
             {
                 DataFlowId = step.DataFlow.Id,
                 DataFlowGuid = step.DataFlow.FlowGuid.ToString(),
+                ExecutionGuid = FlowExecutionGuid,
                 ActionId = step.Action.Id,
                 ActionGuid = step.Action.ActionGuid.ToString(),
                 SourceBucket = bucket,

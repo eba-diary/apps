@@ -9,7 +9,7 @@ namespace Sentry.data.Core.Entities.S3
     /// <summary>
     /// Used when eventName = ObjectCreated:Put
     /// </summary>
-    public class S3ObjectCreatedPutEvent
+    public class S3ObjectEvent
     {
         public string eventVersion { get; set; }
         public string eventSource { get; set; }

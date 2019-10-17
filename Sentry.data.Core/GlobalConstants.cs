@@ -252,5 +252,16 @@
             public const string SCHEMA_LOAD = "DATAFLOWSTEP_SCHEMA_LOAD_START";
             public const string CONVERT_TO_PARQUET = "DATAFLOWSTEP_CONVERTTOPARQUET_START";
         }
+
+        public static class AWSEventNotifications
+        {
+            public static class S3Events
+            {
+                public const string OBJECTCREATED_PUT = "OBJECTCREATED:PUT";
+                public const string OBJECTCREATED_POST= "OBJECTCREATED:POST";
+                public const string OBJECTCREATED_COPY = "OBJECTCREATED:COPY";
+                public const string OBJECTCREATED_COMPLETEMULTIPARTUPLOAD = "OBJECTCREATED:COMPLETEMULTIPARTUPLAOD";
+            }
+        }
     }
 }

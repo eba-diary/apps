@@ -108,12 +108,13 @@ namespace Sentry.data.Core
 
         bool IMessageHandler<string>.HandleComplete()
         {
+            Logger.Info("S3EventHandlerComplete");
             return true;
         }
 
         void IMessageHandler<string>.Init()
         {
-            //do nothing
+            Logger.Info("S3EventHandlerInitialized");
         }
 
         

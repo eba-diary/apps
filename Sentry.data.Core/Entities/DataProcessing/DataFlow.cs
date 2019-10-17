@@ -20,5 +20,6 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public virtual DateTime CreatedDTM { get; set; }
         public virtual string CreatedBy { get; set; }
         public virtual IList<DataFlowStep> Steps { get; set; }
+        public virtual IList<FlowExecution> Executions { get; set; }
     }
 }

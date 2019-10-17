@@ -86,6 +86,7 @@
     <Compile Include="DomainServices\DataProcessing\DataStepService.cs" />
     <Compile Include="DomainServices\DatasetService.cs" />
     <Compile Include="DomainServices\JobService.cs" />
+    <Compile Include="DomainServices\MessageHandlers\S3EventHandler.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
     <Compile Include="DTO\Config\DatasetFileConfigDto.cs" />
     <Compile Include="DTO\ContactInfoDto.cs" />
@@ -109,9 +110,11 @@
     <Compile Include="Entities\DataProcessing\Actions\S3DropAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\SchemaLoadAction.cs" />
     <Compile Include="Entities\DataProcessing\DataFlow.cs" />
+    <Compile Include="Entities\DataProcessing\FlowExecution.cs" />
     <Compile Include="Entities\DataProcessing\DataFlowStep.cs" />
     <Compile Include="Entities\DataProcessing\DataFlowVersion.cs" />
     <Compile Include="Entities\DataProcessing\JobSchemaMap.cs" />
+    <Compile Include="Entities\DataProcessing\RunInstance.cs" />
     <Compile Include="Entities\Datasets\DatasetFileParquet.cs" />
     <Compile Include="Entities\Datasets\DatasetFileReply.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\Authentications\OAuthAuthentication.cs" />
@@ -124,7 +127,8 @@
     <Compile Include="Entities\MessageFormats\DataFlowStepEvent.cs" />
     <Compile Include="Entities\MessageFormats\HiveTableDeleteModel.cs" />
     <Compile Include="Entities\MessageFormats\RawFileAddModel.cs" />
-    <Compile Include="Entities\S3\S3ObjectCreatedEvent.cs" />
+    <Compile Include="Entities\MessageFormats\S3Event.cs" />
+    <Compile Include="Entities\S3\S3ObjectEvent.cs" />
     <Compile Include="Entities\Schema\BaseField.cs" />
     <Compile Include="Entities\Schema\BigintField.cs" />
     <Compile Include="Entities\Schema\DateField.cs" />
