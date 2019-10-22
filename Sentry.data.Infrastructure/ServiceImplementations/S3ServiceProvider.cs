@@ -926,14 +926,14 @@ namespace Sentry.data.Infrastructure
             //Copy object file size upper limit is 5GB, if larger use multipartcopy command.
             if (objectSize > 5 * (long)Math.Pow(2, 30))
             {
-                Logger.Info($"Using MultiPartCopy method - FileSize({objectSize})");
+                Logger.Info($"Using MultiPartCopy - FileSize({objectSize})");
                 MultiPartCopy(srcKey, destKey).Wait();
 
                 return versionId;
             }
             else
             {
-                Logger.Info($"Using MultiPartCopy method - FileSize({objectSize})");
+                Logger.Info($"Using Copy Object Request - FileSize({objectSize})");
 
                 CopyObjectRequest request = new CopyObjectRequest
                 {

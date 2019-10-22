@@ -24,28 +24,6 @@ namespace ProducerTesting
             Bootstrapper.Init();
             S3Event s3e = null;
             //Droplocation event
-            //s3e = new S3Event
-            //{
-            //    EventType = "S3EVENT",
-            //    PayLoad = new S3ObjectEvent()
-            //    {
-            //        eventName = "ObjectCreated:Put",
-            //        s3 = new S3()
-            //        {
-            //            bucket = new Bucket()
-            //            {
-            //                name = "sentry-dataset-management-np-nr"
-            //            },
-            //            _object = new Sentry.data.Core.Entities.S3.Object()
-            //            {
-            //                key = "17/Testfile.csv"
-            //            }
-            //        }
-
-            //    }
-            //};
-
-            //S3drop event
             s3e = new S3Event
             {
                 EventType = "S3EVENT",
@@ -60,23 +38,80 @@ namespace ProducerTesting
                         },
                         _object = new Sentry.data.Core.Entities.S3.Object()
                         {
-                            key = "temp-file/s3drop/17/1571330063/Testfile.csv"
+                            key = "17/Testfile.csv"
                         }
                     }
+
                 }
             };
-            
 
+            SendMessage(s3e);
+
+            ////S3drop event
+            //s3e = new S3Event
+            //{
+            //    EventType = "S3EVENT",
+            //    PayLoad = new S3ObjectEvent()
+            //    {
+            //        eventName = "ObjectCreated:Put",
+            //        s3 = new S3()
+            //        {
+            //            bucket = new Bucket()
+            //            {
+            //                name = "sentry-dataset-management-np-nr"
+            //            },
+            //            _object = new Sentry.data.Core.Entities.S3.Object()
+            //            {
+            //                key = "temp-file/s3drop/17/1571330063/Testfile.csv"
+            //            }
+            //        }
+            //    }
+            //};
+
+            //SendMessage(s3e);
+
+            //S3drop event
+            //s3e = new S3Event
+            //{
+            //    EventType = "S3EVENT",
+            //    PayLoad = new S3ObjectEvent()
+            //    {
+            //        eventName = "ObjectCreated:Put",
+            //        s3 = new S3()
+            //        {
+            //            bucket = new Bucket()
+            //            {
+            //                name = "sentry-dataset-management-np-nr"
+            //            },
+            //            _object = new Sentry.data.Core.Entities.S3.Object()
+            //            {
+            //                key = "data/17/1571763616/Testfile.csv"
+            //            }
+            //        }
+            //    }
+            //};
+
+            //SendMessage(s3e);
+
+            Logger.Info("Console App completed successfully.");
+        }
+
+
+
+
+        private static void SendMessage(S3Event msg)
+        {
             using (IContainer container = Bootstrapper.Container.GetNestedContainer())
             {
                 IMessagePublisher _messagePublisher = container.GetInstance<IMessagePublisher>();
 
-                _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
+                _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(msg));
 
+                //sleep 10 seconds (10000)
                 Thread.Sleep(10000);
             }
-
-            Logger.Info("Console App completed successfully.");
         }
+
     }
+    
 }

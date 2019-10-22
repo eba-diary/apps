@@ -8,11 +8,17 @@ using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.S3;
 using Sentry.Common.Logging;
+using Sentry.data.Core.Interfaces.DataProcessing;
+using System.IO;
 
 namespace Sentry.data.Infrastructure
 {
     public class DataFlowProvider : IDataFlowProvider
     {
+
+        private List<DataFlow_Log> logs = new List<DataFlow_Log>();
+        private DataFlow _flow;
+
         public async Task ExecuteDependenciesAsync(S3ObjectEvent s3e)
         {
             await ExecuteDependenciesAsync(s3e.s3.bucket.name, s3e.s3._object.key);
@@ -20,63 +26,98 @@ namespace Sentry.data.Infrastructure
         }
         public async Task ExecuteDependenciesAsync(string bucket, string key)
         {
+            bool IsNewFile = true;
+
             using (IContainer container = Bootstrapper.Container.GetNestedContainer())
             {
                 IDatasetContext dsContext = container.GetInstance<IDatasetContext>();
                 IDataFlowService dfService = container.GetInstance<IDataFlowService>();
-                IMessagePublisher messagePublisher = container.GetInstance<IMessagePublisher>();
+                IDataStepService _stepService = container.GetInstance<IDataStepService>();
+                //IMessagePublisher messagePublisher = container.GetInstance<IMessagePublisher>();
 
                 Logger.Info($"start-method <executedependencies>");
 
                 //Get prefix
                 string stepPrefix = GetDataFlowStepPrefix(key);
-
+                string flowExecutionGuid = null;
                 if (stepPrefix != null)
                 {
-                    //Find Dependencies
-                    List<DataFlowStep> stepList = dsContext.DataFlowStep.Where(w => w.TriggerKey == stepPrefix).ToList();
-                    
-                    //Generate Start Events
-                    foreach (DataFlowStep step in stepList)
+                    try
                     {
-                        IDataFlowStepProvider provider = null;
-                        switch (step.DataAction_Type_Id)
+                        //Find Dependencies
+                        List<DataFlowStep> stepList = dsContext.DataFlowStep.Where(w => w.TriggerKey == stepPrefix).ToList();
+
+                        _flow = stepList.Select(s => s.DataFlow).Distinct().Single();
+
+                        //determine guid of DataFlow execution to ensure processing is tied.
+                        flowExecutionGuid = GetFlowGuid(key);
+                        if (flowExecutionGuid == null)
                         {
-                            case Core.Entities.DataProcessing.DataActionType.S3Drop:
-                                provider = container.GetInstance<S3DropProvider>();
-                                break;
-                            case Core.Entities.DataProcessing.DataActionType.RawStorage:
-                                provider = container.GetInstance<RawStorageProvider>();
-                                break;
-                            case Core.Entities.DataProcessing.DataActionType.QueryStorage:
-                                provider = container.GetInstance<QueryStorageProvider>();
-                                break;
-                            case Core.Entities.DataProcessing.DataActionType.SchemaLoad:
-                                provider = container.GetInstance<SchemaLoadProvider>();
-                                break;
-                            case Core.Entities.DataProcessing.DataActionType.ConvertParquet:
-                                provider = container.GetInstance<ConvertToParquetProvider>();
-                                break;
-                            case Core.Entities.DataProcessing.DataActionType.None:
-                            default:
-                                throw new NotImplementedException();
+                            int Epoch = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+                            flowExecutionGuid = Epoch.ToString();
+
+                            IsNewFile = true;
+
+                            _flow.Logs.Add(_flow.LogExecution(flowExecutionGuid, $"Initialize flow execution bucket:{bucket}, key:{key}, file:{Path.GetFileName(key)}", Log_Level.Info));
+                        };
+
+
+                        //log dependency steps
+                        LogDetectedSteps(key, stepList, flowExecutionGuid, _flow);
+
+                        //save new logs
+                        dsContext.SaveChanges();
+
+                        //Generate Start Events
+                        foreach (DataFlowStep step in stepList)
+                        {
+                            string RunInstanceGuid = null;
+                            //Check if rerun scenario, if so generate a runinstanceguid
+                            if (step.Executions.Where(w => w.FlowExecutionGuid == flowExecutionGuid).Any())
+                            {
+                                int InstanceEpoch = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
+                                RunInstanceGuid = InstanceEpoch.ToString();
+                            }
+
+                            ////step.GenerateStartEvent(bucket, key, flowExecutionGuid);
+                            //step.LogExecution(flowExecutionGuid, RunInstanceGuid, $"dataflowprovider-sendingstartevent", Log_Level.Debug);
+                            //dsContext.SaveChanges();
+                            _stepService.PublishStartEvent(step, bucket, key, flowExecutionGuid, RunInstanceGuid);
+                            //save new logs
+                            dsContext.SaveChanges();
                         }
-
-                        string flowExecutionGuid = GetFlowGuid(key);
-
-                        provider.GenerateStartEvent(step, bucket, key, flowExecutionGuid);
+                        _flow.LogExecution(flowExecutionGuid, $"end-method <executedependencies>", Log_Level.Info);
                     }
-                    Logger.Info($"end-method <executedependencies>");
+                    catch (Exception ex)
+                    {
+                        logs.Add(_flow.LogExecution(flowExecutionGuid, $"dataflowprovider-ExecuteDependenciesAsync-failed", Log_Level.Error, ex));
+                        foreach(var log in logs)
+                        {
+                            _flow.Logs.Add(log);
+                        }
+                    }                    
                 }
                 else
                 {
                     Logger.Info($"executedependencies - invalidstepprefix bucket: {bucket} key:{key}");
-                    Logger.Info($"end-method <executedependencies>");
                 }
+                Logger.Info($"end-method <executedependencies>");
             }
         }
 
         #region Private Methods
+
+        private void LogDetectedSteps(string key, List<DataFlowStep> stepList, string executionGuid, DataFlow flow)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"dataflowprovider_detecteddependencies {stepList.Count.ToString()} step(s) dependencies were detected for {key}");
+            foreach(DataFlowStep step in stepList)
+            {
+                sb.AppendLine(step.ToString());
+            }
+
+            logs.Add(flow.LogExecution(executionGuid, sb.ToString(), Log_Level.Info));
+        }
 
         protected string GetDataFlowStepPrefix(string key)
         {

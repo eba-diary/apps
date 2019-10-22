@@ -4,8 +4,11 @@ namespace Sentry.data.Core.Entities.DataProcessing
 {
     public class S3DropAction : BaseAction
     {
-        public S3DropAction()
+       private IS3DropProvider _s3DropProvider;
+       public S3DropAction() { }
+       public S3DropAction(IS3DropProvider s3DropProvider)
         {
+            _s3DropProvider = s3DropProvider;
             TargetStoragePrefix = GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX;
         }
     }

@@ -95,15 +95,16 @@ namespace Sentry.data.Core
         }
 
         
-        public bool GenerateJobRequest(int dataFlowStepId, string sourceBucket, string sourceKey)
-        {
-            DataFlowStep step = _datasetContext.GetById<DataFlowStep>(dataFlowStepId);
-            string JobEvent = step.GenerateStartEvent(sourceBucket, sourceKey);
+        //public bool GenerateJobRequest(int dataFlowStepId, string sourceBucket, string sourceKey, string executionGuid)
+        //{
+        //    DataFlowStep step = _datasetContext.GetById<DataFlowStep>(dataFlowStepId);
+        //    step.GenerateStartEvent(sourceBucket, sourceKey, executionGuid);
+        //    //string JobEvent = step.GenerateStartEvent(sourceBucket, sourceKey, );
 
-            _messagePublisher.PublishDSCEvent($"{step.DataFlow.Id}-{step.Id}", JobEvent);
+        //    //_messagePublisher.PublishDSCEvent($"{step.DataFlow.Id}-{step.Id}", JobEvent);
 
-            return true;
-        }
+        //    return true;
+        //}
 
         #region Private Methods
         private void MapToDtoList(List<DataFlow> dfList, List<DataFlowDto> dtoList)

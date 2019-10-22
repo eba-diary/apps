@@ -847,4 +847,32 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="CreatedDTM" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="f4bb76dc-8855-45d7-a5c6-f256903719c1" ChangeDateTime="10/22/2019 13:45:30">
+    <Property Name="ElementName" Value="[dbo].[DataFlowLog].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataFlowLog]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Log_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="352cdb73-671e-4a57-ae5c-584036339205" ChangeDateTime="10/22/2019 14:14:46">
+    <Property Name="ElementName" Value="[dbo].[DataFlowLog].[LogLevel_Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataFlowLog]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Level" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="b965a3db-7cad-4445-8a0f-0384d7c029c2" ChangeDateTime="10/22/2019 15:01:11">
+    <Property Name="ElementName" Value="[dbo].[DataFlowLog].[DataAction_Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataFlowLog]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DataFlowStep_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="50162c18-186e-4e7e-ad16-84a64d92ee53" ChangeDateTime="10/22/2019 15:35:26">
+    <Property Name="ElementName" Value="[dbo].[DataFlowLog].[CreateDTM]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataFlowLog]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CreatedDTM" />
+  </Operation>
 </Operations>

@@ -32,6 +32,17 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                     k.Column("DataFlow_ID");
                 });
             }, map => map.OneToMany(a => a.Class(typeof(DataFlowStep))));
+
+            this.Bag(x => x.Logs, (m) =>
+            {
+                m.Inverse(true);
+                m.Table("DataFlowLog");
+                m.Cascade(Cascade.All);
+                m.Key((k) =>
+                {
+                    k.Column("DataFlow_Id");
+                });
+            }, map => map.OneToMany(a => a.Class(typeof(DataFlow_Log))));
         }
     }
 }

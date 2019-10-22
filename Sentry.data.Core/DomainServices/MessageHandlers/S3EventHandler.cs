@@ -1,17 +1,15 @@
-﻿using System;
-using System.Threading.Tasks;
-using Sentry.Messaging.Common;
+﻿using Newtonsoft.Json;
 using Sentry.Common.Logging;
-using Newtonsoft.Json;
-using StructureMap;
-using Sentry.data.Core;
+using Sentry.Messaging.Common;
+using System;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
     public class S3EventHandler : IMessageHandler<string>
     {
         #region Declarations
-        IDataFlowProvider _dataFlowProvider;
+        private IDataFlowProvider _dataFlowProvider;
         #endregion
 
         #region Constructor
@@ -26,31 +24,30 @@ namespace Sentry.data.Core
             BaseEventMessage baseEvent = JsonConvert.DeserializeObject<BaseEventMessage>(msg);
             try
             {
-                switch (baseEvent.EventType.ToUpper())
+                if (baseEvent.EventType.ToUpper() == "S3EVENT")
                 {
-                    case "S3EVENT":
-                        S3Event s3Event = JsonConvert.DeserializeObject<S3Event>(msg);
-                        Logger.Info("S3EventHandler processing S3EVENT message: " + JsonConvert.SerializeObject(s3Event));
+                    S3Event s3Event = JsonConvert.DeserializeObject<S3Event>(msg);
+                    Logger.Info("S3EventHandler processing S3EVENT message: " + JsonConvert.SerializeObject(s3Event));
 
-                        switch (s3Event.PayLoad.eventName.ToUpper())
-                        {
-                            case GlobalConstants.AWSEventNotifications.S3Events.OBJECTCREATED_PUT:
-                            case GlobalConstants.AWSEventNotifications.S3Events.OBJECTCREATED_POST:
-                            case GlobalConstants.AWSEventNotifications.S3Events.OBJECTCREATED_COPY:
-                            case GlobalConstants.AWSEventNotifications.S3Events.OBJECTCREATED_COMPLETEMULTIPARTUPLOAD:
-                                Logger.Info($"S3EventHandler processing AWS event - {s3Event}");
-                                Task.Factory.StartNew(() => _dataFlowProvider.ExecuteDependenciesAsync(s3Event.PayLoad),
-                                                                        TaskCreationOptions.LongRunning).ContinueWith(TaskException,
-                                                                        TaskContinuationOptions.OnlyOnFaulted);
-                                break;
-                            default:                                
-                                Logger.Info($"S3EventHandler not configured to handle AWS event type ({s3Event.EventType}), skipping event.");
-                                break;
-                        }
-                        break;
-                    default:
-                        Logger.Info($"S3EventHandler not configured to handle {baseEvent.EventType.ToUpper()} event type, skipping event.");
-                        break;
+                    switch (s3Event.PayLoad.eventName.ToUpper())
+                    {
+                        case GlobalConstants.AWSEventNotifications.S3Events.OBJECTCREATED_PUT:
+                        case GlobalConstants.AWSEventNotifications.S3Events.OBJECTCREATED_POST:
+                        case GlobalConstants.AWSEventNotifications.S3Events.OBJECTCREATED_COPY:
+                        case GlobalConstants.AWSEventNotifications.S3Events.OBJECTCREATED_COMPLETEMULTIPARTUPLOAD:
+                            Logger.Info($"S3EventHandler processing AWS event - {JsonConvert.SerializeObject(s3Event)}");
+                            Task.Factory.StartNew(() => _dataFlowProvider.ExecuteDependenciesAsync(s3Event.PayLoad),
+                                                                    TaskCreationOptions.LongRunning).ContinueWith(TaskException,
+                                                                    TaskContinuationOptions.OnlyOnFaulted);
+                            break;
+                        default:
+                            Logger.Info($"S3EventHandler not configured to handle AWS event type ({s3Event.EventType}), skipping event.");
+                            break;
+                    }
+                }
+                else
+                {
+                    Logger.Info($"S3EventHandler not configured to handle {baseEvent.EventType.ToUpper()} event type, skipping event.");
                 }
             }
             catch (Exception ex)

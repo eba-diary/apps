@@ -1,8 +1,11 @@
-﻿namespace Sentry.data.Core.Entities.DataProcessing
+﻿using Sentry.data.Core.Interfaces.DataProcessing;
+
+namespace Sentry.data.Core.Entities.DataProcessing
 {
     public class RawStorageAction : BaseAction
     {
-        public RawStorageAction()
+        public RawStorageAction() { }
+        public RawStorageAction(IRawStorageProvider rawStorageProvider) : base(rawStorageProvider)
         {
             TargetStoragePrefix = GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX;
         }

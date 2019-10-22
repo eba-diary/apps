@@ -51,21 +51,21 @@ namespace Sentry.data.Web.Controllers
             bool success = _dataFlowService.CreateDataFlow();
         }
 
-        [HttpGet]
-        [Route("DataFlow/{dataFlowId}/DataFlowStep/{dataFlowStepId}/ProcessFile")]
-        public bool RunDataFlowStep(int dataFlowId, int dataFlowStepId, string key, string bucket)
-        {
-            DataFlowDetailDto flowDto = _dataFlowService.GetDataFlowDetailDto(dataFlowId);
-            if (flowDto.steps.Any(w => w.Id == dataFlowStepId))
-            {
-                _dataFlowService.GenerateJobRequest(dataFlowStepId, bucket, key);
-            }
-            else
-            {
-                return false;
-            }
-            return true;
-        }
+        //[HttpGet]
+        //[Route("DataFlow/{dataFlowId}/DataFlowExecution/{executionGuid}/DataFlowStep/{dataFlowStepId}/ProcessFile")]
+        //public bool RunDataFlowStep(int dataFlowId, int dataFlowStepId, string key, string bucket, string executionGuid)
+        //{
+        //    DataFlowDetailDto flowDto = _dataFlowService.GetDataFlowDetailDto(dataFlowId);
+        //    if (flowDto.steps.Any(w => w.Id == dataFlowStepId))
+        //    {
+        //        _dataFlowService.GenerateJobRequest(dataFlowStepId, bucket, key, executionGuid);
+        //    }
+        //    else
+        //    {
+        //        return false;
+        //    }
+        //    return true;
+        //}
     }
 
     public class DataFlowStepFile

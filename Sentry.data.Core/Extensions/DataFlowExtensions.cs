@@ -33,44 +33,44 @@ namespace Sentry.data.Core
             };
         }
 
-        public static string GenerateStartEvent(this DataFlowStep step, string bucket, string key)
-        {
-            DataFlowStepEvent stepEvent = new DataFlowStepEvent()
-            {
-                DataFlowId = step.DataFlow.Id,
-                DataFlowGuid = step.DataFlow.FlowGuid.ToString(),
-                ActionId = step.Action.Id,
-                ActionGuid = step.Action.ActionGuid.ToString(),
-                SourceBucket = bucket,
-                SourceKey = key,
-                TargetBucket = step.Action.TargetStorageBucket,
-                TargetPrefix = step.Action.TargetStoragePrefix
-            };
+        //public static string GenerateStartEvent(this DataFlowStep step, string bucket, string key)
+        //{
+        //    DataFlowStepEvent stepEvent = new DataFlowStepEvent()
+        //    {
+        //        DataFlowId = step.DataFlow.Id,
+        //        DataFlowGuid = step.DataFlow.FlowGuid.ToString(),
+        //        ActionId = step.Action.Id,
+        //        ActionGuid = step.Action.ActionGuid.ToString(),
+        //        SourceBucket = bucket,
+        //        SourceKey = key,
+        //        TargetBucket = step.Action.TargetStorageBucket,
+        //        TargetPrefix = step.Action.TargetStoragePrefix
+        //    };
 
-            switch (step.DataAction_Type_Id)
-            {
-                case DataActionType.S3Drop:
-                    stepEvent.EventType = GlobalConstants.DataFlowStepEvent.S3_DROP_START;
-                    break;
-                case DataActionType.RawStorage:
-                    stepEvent.EventType = GlobalConstants.DataFlowStepEvent.RAW_STORAGE_START;
-                    break;
-                case DataActionType.QueryStorage:
-                    stepEvent.EventType = GlobalConstants.DataFlowStepEvent.QUERY_STORAGE;
-                    break;
-                case DataActionType.SchemaLoad:
-                    stepEvent.EventType = GlobalConstants.DataFlowStepEvent.SCHEMA_LOAD;
-                    break;
-                case DataActionType.ConvertParquet:
-                    stepEvent.EventType = GlobalConstants.DataFlowStepEvent.CONVERT_TO_PARQUET;
-                    break;
-                case DataActionType.None:
-                default:
-                    throw new NotImplementedException();
-            }
+        //    switch (step.DataAction_Type_Id)
+        //    {
+        //        case DataActionType.S3Drop:
+        //            stepEvent.EventType = GlobalConstants.DataFlowStepEvent.S3_DROP_START;
+        //            break;
+        //        case DataActionType.RawStorage:
+        //            stepEvent.EventType = GlobalConstants.DataFlowStepEvent.RAW_STORAGE_START;
+        //            break;
+        //        case DataActionType.QueryStorage:
+        //            stepEvent.EventType = GlobalConstants.DataFlowStepEvent.QUERY_STORAGE;
+        //            break;
+        //        case DataActionType.SchemaLoad:
+        //            stepEvent.EventType = GlobalConstants.DataFlowStepEvent.SCHEMA_LOAD;
+        //            break;
+        //        case DataActionType.ConvertParquet:
+        //            stepEvent.EventType = GlobalConstants.DataFlowStepEvent.CONVERT_TO_PARQUET;
+        //            break;
+        //        case DataActionType.None:
+        //        default:
+        //            throw new NotImplementedException();
+        //    }
 
-            return JsonConvert.SerializeObject(stepEvent);
-        }
+        //    return JsonConvert.SerializeObject(stepEvent);
+        //}
 
         public static string GetDataFlowStepPrefix(string key)
         {
