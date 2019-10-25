@@ -12,6 +12,7 @@ using Newtonsoft.Json;
 using Sentry.data.Core.Entities.Livy;
 using Swashbuckle.Swagger.Annotations;
 using Sentry.Common.Logging;
+using System.Web.Http.Description;
 
 namespace Sentry.data.Web.Controllers
 {
@@ -21,11 +22,13 @@ namespace Sentry.data.Web.Controllers
     {
         private IDatasetContext _datasetContext;
         private UserService _userService;
+        private IDataFlowService _dataFlowService;
 
-        public JobController(IDatasetContext datasetContext, UserService userService)
+        public JobController(IDatasetContext datasetContext, UserService userService, IDataFlowService dataFlowService)
         {
             _datasetContext = datasetContext;
             _userService = userService;
+            _dataFlowService = dataFlowService;
         }
         /// <summary>
         /// Gets all Jobs
@@ -586,6 +589,6 @@ namespace Sentry.data.Web.Controllers
             public string ExecutorMemory { get; set; }
             public int? ExecutorCores { get; set; }
             public int? NumExecutors { get; set; }
-        }
+        }        
     }
 }

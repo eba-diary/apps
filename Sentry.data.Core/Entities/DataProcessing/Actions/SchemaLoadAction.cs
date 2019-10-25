@@ -10,6 +10,6 @@ namespace Sentry.data.Core.Entities.DataProcessing
         {
             TargetStoragePrefix = GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX;
         }
-        public virtual List<JobSchemaMap> SchemaMaps { get; set; }
+        public virtual List<SchemaMap> SchemaMaps { get; set; }
     }
 }

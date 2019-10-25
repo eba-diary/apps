@@ -15,7 +15,7 @@ namespace Sentry.data.Infrastructure
             _messagePublisher = messagePublisher;
         }
 
-        public void ExecuteAction(IDataStep step, DataFlowStepEvent stepEvent)
+        public void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
             throw new System.NotImplementedException();
         }
@@ -30,7 +30,8 @@ namespace Sentry.data.Infrastructure
                 {
                     DataFlowId = step.DataFlow.Id,
                     DataFlowGuid = step.DataFlow.FlowGuid.ToString(),
-                    ExecutionGuid = flowExecutionGuid,
+                    FlowExecutionGuid = flowExecutionGuid,
+                    RunInstanceGuid = runInstanceGuid,
                     StepId = step.Id,
                     ActionId = step.Action.Id,
                     ActionGuid = step.Action.ActionGuid.ToString(),

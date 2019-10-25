@@ -12,6 +12,7 @@ namespace Sentry.data.Core
         DataFlowDetailDto GetDataFlowDetailDto(int id);
         List<DataFlowStepDto> GetDataFlowStepDtoByTrigger(string key);
         bool CreateDataFlow();
+        void PublishMessage(string key, string message);
         //bool GenerateJobRequest(int dataFlowStepId, string sourceBucket, string sourceKey, string executionGuid);
     }
 }

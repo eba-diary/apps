@@ -29,11 +29,13 @@ namespace Sentry.data.Web.Controllers
         private IDatasetService _datasetService;
         private ISchemaService _schemaService;
         private ISecurityService _securityService;
+        private IDataFlowService _dataFlowService;
 
         public MetadataController(MetadataRepositoryService metadataRepositoryService, IDatasetContext dsContext,
                                 IAssociateInfoProvider associateInfoService, UserService userService,
                                 IConfigService configService, IDatasetService datasetService,
-                                ISchemaService schemaService, ISecurityService securityService)
+                                ISchemaService schemaService, ISecurityService securityService,
+                                IDataFlowService dataFlowService)
         {
             _metadataRepositoryService = metadataRepositoryService;
             _dsContext = dsContext;
@@ -43,8 +45,10 @@ namespace Sentry.data.Web.Controllers
             _datasetService = datasetService;
             _schemaService = schemaService;
             _securityService = securityService;
+            _dataFlowService = dataFlowService;
         }
 
+        #region Classes
         public class OutputSchema
         {
             public List<SchemaRow> rows { get; set; }
@@ -78,6 +82,14 @@ namespace Sentry.data.Web.Controllers
             public int JobId { get; set; }
             public Boolean IsEnabled { get; set; }
         }
+
+        public class KafkaMessage
+        {
+            public string Key { get; set; }
+            public string Message { get; set; }
+        }
+        #endregion
+
 
         #region Dataset_Endpoints
         /// <summary>
@@ -523,6 +535,32 @@ namespace Sentry.data.Web.Controllers
             SchemaDetailModel sdm = new SchemaDetailModel(dto);
 
             return Ok(sdm);
+        }
+        #endregion
+
+        #region Messaging Endpoints
+
+        /// <summary>
+        /// Publish message to messaging queue
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        [HttpPost]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
+        [SwaggerResponseRemoveDefaults]
+        [Route("PublishMessage")]
+        public IHttpActionResult PublishMessage([FromBody] KafkaMessage message)
+        {
+            try
+            {
+                _dataFlowService.PublishMessage(message.Key, message.Message);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"jobcontroller-publishmessage failure", ex);
+                return InternalServerError();
+            }
         }
         #endregion
 

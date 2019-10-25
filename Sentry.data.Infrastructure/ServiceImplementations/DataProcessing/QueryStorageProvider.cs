@@ -4,6 +4,8 @@ using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.S3;
 using Sentry.data.Core.Interfaces.DataProcessing;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
 namespace Sentry.data.Infrastructure
@@ -17,7 +19,7 @@ namespace Sentry.data.Infrastructure
             _messagePublisher = messagePublisher;
         }
 
-        public void ExecuteAction(IDataStep step, DataFlowStepEvent stepEvent)
+        public void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
             string fileName = Path.GetFileName(stepEvent.SourceKey);
             //Mock for testing... sent mock s3object created 
@@ -47,15 +49,19 @@ namespace Sentry.data.Infrastructure
 
         public void PublishStartEvent(DataFlowStep step, string bucket, string key, string flowExecutionGuid, string runInstanceGuid)
         {
+            List<DataFlow_Log> logs = new List<DataFlow_Log>();
+
             try
             {
-                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"start-method <querystorageprovider-publishstartevent", Log_Level.Debug);
+                DateTime startTime = DateTime.Now;
+                logs.Add(step.LogExecution(flowExecutionGuid, runInstanceGuid, $"start-method <{step.DataAction_Type_Id.ToString()}>-publishstartevent", Log_Level.Debug));
 
                 DataFlowStepEvent stepEvent = new DataFlowStepEvent()
                 {
                     DataFlowId = step.DataFlow.Id,
                     DataFlowGuid = step.DataFlow.FlowGuid.ToString(),
-                    ExecutionGuid = flowExecutionGuid,
+                    FlowExecutionGuid = flowExecutionGuid,
+                    RunInstanceGuid = runInstanceGuid,
                     StepId = step.Id,
                     ActionId = step.Action.Id,
                     ActionGuid = step.Action.ActionGuid.ToString(),
@@ -66,19 +72,22 @@ namespace Sentry.data.Infrastructure
                     EventType = GlobalConstants.DataFlowStepEvent.QUERY_STORAGE
                 };
 
-                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"querystorageprovider-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Info);
+                logs.Add(step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Info));
 
                 _messagePublisher.PublishDSCEvent($"{step.DataFlow.Id}-{step.Id}", JsonConvert.SerializeObject(stepEvent));
+                DateTime endTime = DateTime.Now;
 
-                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <querystorageprovider-publishstartevent", Log_Level.Debug);
+                step.Executions.Add(step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-publishstartevent-successful  start:{startTime} end:{endTime} duration:{endTime - startTime}", Log_Level.Info));
             }
             catch (Exception ex)
             {
-                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"querystorageprovider-publishstartevent failed", Log_Level.Error, ex);
-                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <querystorageprovider-publishstartevent", Log_Level.Debug);
-
-            }
-            
+                logs.Add(step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-publishstartevent failed", Log_Level.Error, ex));
+                logs.Add(step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <{step.DataAction_Type_Id.ToString()}>-publishstartevent", Log_Level.Debug));
+                foreach (var log in logs)
+                {
+                    step.Executions.Add(log);
+                }
+            }            
         }
     }
 }

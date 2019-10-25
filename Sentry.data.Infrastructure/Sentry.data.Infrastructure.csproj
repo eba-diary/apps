@@ -195,6 +195,7 @@
     <Compile Include="Mappings\Primary\DataProcessing\DataFlowLogMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\DataFlowMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\DataFlowStepMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\SchemaMapMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetFileConfigsMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetFileMapping.cs" />
     <Compile Include="Mappings\Primary\ComponentElementMapping.cs" />

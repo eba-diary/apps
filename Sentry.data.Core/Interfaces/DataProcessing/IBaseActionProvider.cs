@@ -9,7 +9,7 @@ namespace Sentry.data.Core.Interfaces.DataProcessing
 {
     public interface IBaseActionProvider
     {
-        void ExecuteAction(IDataStep step, DataFlowStepEvent stepEvent);
+        void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent);
         void PublishStartEvent(DataFlowStep step, string bucket, string key, string FlowExecutionGuid, string runInstanceGuid);
     }
 }

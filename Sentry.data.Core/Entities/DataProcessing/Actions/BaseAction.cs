@@ -22,7 +22,7 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public virtual string TargetStoragePrefix { get; set; }
         public virtual string TargetStorageBucket { get; set; }
 
-        public virtual void ExecuteAction(IDataStep step, DataFlowStepEvent stepEvent, string ExecutionGuid)
+        public virtual void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent, string ExecutionGuid)
         {
             _baseActionProvider.ExecuteAction(step, stepEvent);
         }

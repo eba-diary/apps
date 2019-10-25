@@ -24,6 +24,7 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public virtual IList<DataFlow_Log> Logs { get; set; }
         public virtual DataFlow_Log LogExecution(string executionGuid, string log, Log_Level level, Exception ex = null)
         {
+            string logMsg = $"{executionGuid}{((runInstanceGuid != null) ? "-" + runInstanceGuid : String.Empty)} {log}";
             switch (level)
             {
                 case Log_Level.Info:

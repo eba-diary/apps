@@ -115,7 +115,7 @@
     <Compile Include="Entities\DataProcessing\FlowExecution.cs" />
     <Compile Include="Entities\DataProcessing\DataFlowStep.cs" />
     <Compile Include="Entities\DataProcessing\DataFlowVersion.cs" />
-    <Compile Include="Entities\DataProcessing\JobSchemaMap.cs" />
+    <Compile Include="Entities\DataProcessing\SchemaMap.cs" />
     <Compile Include="Entities\DataProcessing\Log_Level.cs" />
     <Compile Include="Entities\DataProcessing\RunInstance.cs" />
     <Compile Include="Entities\Datasets\DatasetFileParquet.cs" />

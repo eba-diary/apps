@@ -4,7 +4,7 @@ namespace Sentry.data.Core.Interfaces.DataProcessing
 {
     public interface IDataAction
     {
-        void ExecuteAction(IDataStep step, DataFlowStepEvent stepEvent, string ExecutionGuid);
+        void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent, string ExecutionGuid);
         void PublishStartEvent(DataFlowStep step, string bucket, string key, string FlowExecutionGuid, string runInstanceGuid);
     }
 }

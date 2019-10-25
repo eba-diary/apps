@@ -45,6 +45,8 @@ namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
 
                 _provider.ExecuteAction(step, stepEvent);
 
+                dsContext.SaveChanges();
+
                 //step.ProcessEvent(stepEvent, stepEvent.ExecutionGuid);
             }
         }
@@ -61,7 +63,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
                     DateTime startTime = DateTime.Now;
                     SetStepProvider(step.DataAction_Type_Id);
 
-                    step.LogExecution(flowExecutionGuid, runInstanceGuid, $"start-method <datastepservice-publishstartevent", Log_Level.Debug);
+                    step.LogExecution(flowExecutionGuid, runInstanceGuid, $"start-method <datastepservice-publishstartevent>", Log_Level.Debug);
 
                     _provider.PublishStartEvent(step, bucket, key, flowExecutionGuid, runInstanceGuid);
                     DateTime endTime = DateTime.Now;
@@ -73,11 +75,12 @@ namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
                     //}
 
                     //step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-step-success start:{startTime} end:{endTime} duration:{endTime - startTime}", Log_Level.Debug);
+                    step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <datastepservice-publishstartevent>", Log_Level.Debug);
                     _dsContext.SaveChanges();
                 }
                 catch
                 {
-                    step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <datastepservice-publishstartevent", Log_Level.Debug);
+                    step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <datastepservice-publishstartevent>", Log_Level.Debug);
                     _dsContext.SaveChanges();
                 }
             }

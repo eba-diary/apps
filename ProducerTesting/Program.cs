@@ -38,14 +38,14 @@ namespace ProducerTesting
                         },
                         _object = new Sentry.data.Core.Entities.S3.Object()
                         {
-                            key = "17/Testfile.csv"
+                            key = "25/Testfile.csv"
                         }
                     }
 
                 }
             };
 
-            SendMessage(s3e);
+            //SendMessage(s3e);
 
             ////S3drop event
             //s3e = new S3Event
@@ -62,13 +62,13 @@ namespace ProducerTesting
             //            },
             //            _object = new Sentry.data.Core.Entities.S3.Object()
             //            {
-            //                key = "temp-file/s3drop/17/1571330063/Testfile.csv"
+            //                key = "data/25/1571855649-1571855999/Testfile.csv"
             //            }
             //        }
             //    }
             //};
 
-            //SendMessage(s3e);
+            SendMessage(s3e);
 
             //S3drop event
             //s3e = new S3Event

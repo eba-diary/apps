@@ -18,7 +18,7 @@ namespace Sentry.data.Infrastructure
             _messagePublisher = messagePublisher;
         }
 
-        public void ExecuteAction(IDataStep step, DataFlowStepEvent stepEvent)
+        public void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
             string fileName = Path.GetFileName(stepEvent.SourceKey);
             //Mock for testing... sent mock s3object created 
@@ -58,14 +58,15 @@ namespace Sentry.data.Infrastructure
                 {
                     DataFlowId = step.DataFlow.Id,
                     DataFlowGuid = step.DataFlow.FlowGuid.ToString(),
-                    ExecutionGuid = flowExecutionGuid,
+                    FlowExecutionGuid = flowExecutionGuid,
+                    RunInstanceGuid = runInstanceGuid,
                     StepId = step.Id,
                     ActionId = step.Action.Id,
                     ActionGuid = step.Action.ActionGuid.ToString(),
                     SourceBucket = bucket,
                     SourceKey = key,
                     TargetBucket = step.Action.TargetStorageBucket,
-                    TargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.Id}/{flowExecutionGuid}/",
+                    TargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.Id}/" + $"{flowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid)}/",
                     EventType = GlobalConstants.DataFlowStepEvent.RAW_STORAGE_START
                 };
 

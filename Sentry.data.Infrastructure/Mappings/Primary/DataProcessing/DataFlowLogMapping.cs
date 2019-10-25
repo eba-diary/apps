@@ -24,6 +24,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             });
 
             this.Property(x => x.FlowExecutionGuid, c => c.Column("FlowExecutionGuid"));
+            this.Property(x => x.RunInstanceGuid, c => c.Column("RunInstanceGuid"));
             this.Property(x => x.Level, c =>
             {
                 c.Column("Level");

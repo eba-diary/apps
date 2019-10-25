@@ -228,6 +228,7 @@
     <Build Include="Tables\DataProcessing\DataAction.sql" />
     <Build Include="Tables\DataProcessing\FlowExecution.sql" />
     <Build Include="Tables\DataProcessing\DataFlowLog.sql" />
+    <Build Include="Tables\DataProcessing\DataStepToSchema.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

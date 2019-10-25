@@ -18,6 +18,8 @@ namespace Sentry.data.Infrastructure
 
         private List<DataFlow_Log> logs = new List<DataFlow_Log>();
         private DataFlow _flow;
+        private string flowExecutionGuid = null;
+        private string runInstanceGuid = null;
 
         public async Task ExecuteDependenciesAsync(S3ObjectEvent s3e)
         {
@@ -39,7 +41,6 @@ namespace Sentry.data.Infrastructure
 
                 //Get prefix
                 string stepPrefix = GetDataFlowStepPrefix(key);
-                string flowExecutionGuid = null;
                 if (stepPrefix != null)
                 {
                     try
@@ -49,8 +50,11 @@ namespace Sentry.data.Infrastructure
 
                         _flow = stepList.Select(s => s.DataFlow).Distinct().Single();
 
-                        //determine guid of DataFlow execution to ensure processing is tied.
-                        flowExecutionGuid = GetFlowGuid(key);
+
+
+                        //determine DataFlow execution and run instance guids to ensure processing is tied.
+                        GetExecutionGuids(key);
+
                         if (flowExecutionGuid == null)
                         {
                             int Epoch = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
@@ -71,37 +75,38 @@ namespace Sentry.data.Infrastructure
                         //Generate Start Events
                         foreach (DataFlowStep step in stepList)
                         {
-                            string RunInstanceGuid = null;
                             //Check if rerun scenario, if so generate a runinstanceguid
-                            if (step.Executions.Where(w => w.FlowExecutionGuid == flowExecutionGuid).Any())
+                            if (step.Executions.Where(w => w.FlowExecutionGuid == flowExecutionGuid).Any() && runInstanceGuid == null)
                             {
                                 int InstanceEpoch = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
-                                RunInstanceGuid = InstanceEpoch.ToString();
+                                runInstanceGuid = InstanceEpoch.ToString();
                             }
 
                             ////step.GenerateStartEvent(bucket, key, flowExecutionGuid);
                             //step.LogExecution(flowExecutionGuid, RunInstanceGuid, $"dataflowprovider-sendingstartevent", Log_Level.Debug);
                             //dsContext.SaveChanges();
-                            _stepService.PublishStartEvent(step, bucket, key, flowExecutionGuid, RunInstanceGuid);
-                            //save new logs
-                            dsContext.SaveChanges();
+                            _stepService.PublishStartEvent(step, bucket, key, flowExecutionGuid, runInstanceGuid);
                         }
                         _flow.LogExecution(flowExecutionGuid, $"end-method <executedependencies>", Log_Level.Info);
+                        //save new logs
+                        dsContext.SaveChanges();
                     }
                     catch (Exception ex)
                     {
                         logs.Add(_flow.LogExecution(flowExecutionGuid, $"dataflowprovider-ExecuteDependenciesAsync-failed", Log_Level.Error, ex));
-                        foreach(var log in logs)
+                        _flow.LogExecution(flowExecutionGuid, $"end-method <executedependencies>", Log_Level.Info);
+                        foreach (var log in logs)
                         {
                             _flow.Logs.Add(log);
                         }
+                        dsContext.SaveChanges();
                     }                    
                 }
                 else
                 {
                     Logger.Info($"executedependencies - invalidstepprefix bucket: {bucket} key:{key}");
-                }
-                Logger.Info($"end-method <executedependencies>");
+                    Logger.Info($"end-method <executedependencies>");
+                }                
             }
         }
 
@@ -171,17 +176,23 @@ namespace Sentry.data.Infrastructure
             return filePrefix;            
         }
 
-        private string GetFlowGuid(string key)
+        private void GetExecutionGuids(string key)
         {
             Logger.Info($"start-method <getflowguid>");
 
             string guidPrefix = null;
 
+            //four level prefixes - temp locations
+            if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX))
+            {
+                int strtIdx = GetNthIndex(key, '/', 4);
+                int endIdx = GetNthIndex(key, '/', 5);
+                guidPrefix = key.Substring(strtIdx + 1, (endIdx - strtIdx) - 1);
+            }
+
             //three level prefixes - temp locations
             // example -  <temp-file prefix>/<step prefix>/<data flow id>/
-            if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX) || 
-                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX) ||
-                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX)
+            if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX)
                )
             {
                 int strtIdx = GetNthIndex(key, '/', 3);
@@ -191,15 +202,27 @@ namespace Sentry.data.Infrastructure
 
             //two level prefixes - non-temp locations
             // example -  <rawstorage prefix>/<job Id>/
-            if (guidPrefix == null && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX))
+            if (guidPrefix == null && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX))
             {
                 int strtIdx = GetNthIndex(key, '/', 2);
                 int endIdx = GetNthIndex(key, '/', 3);
                 guidPrefix = key.Substring(strtIdx + 1, (endIdx - strtIdx) - 1);
             }
 
-            Logger.Info($"end-method <getflowguid>");
-            return guidPrefix;
+            //populate runinstance guid
+            if (guidPrefix != null)
+            {
+                int strtIdx = GetNthIndex(guidPrefix, '-', 1);
+
+                //if a dash exists, extract the run instance guid
+                runInstanceGuid = (strtIdx > 0) ? guidPrefix.Substring(strtIdx + 1, (guidPrefix.Length - strtIdx) - 1) : null;
+
+                //if a dash exists, extract the flow execution guid
+                flowExecutionGuid = (strtIdx > 0) ? guidPrefix.Substring(0, strtIdx) : guidPrefix;
+            }
+
+            Logger.Info($"end-method <getflowguid>");            
         }
 
 
