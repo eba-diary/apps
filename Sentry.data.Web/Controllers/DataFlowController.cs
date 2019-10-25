@@ -45,10 +45,10 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        [Route("DataFlow/Create")]
-        public void Create()
+        [Route("DataFlow/Create/{schemaId}/")]
+        public void Create(int schemaId)
         {
-            bool success = _dataFlowService.CreateDataFlow();
+            bool success = _dataFlowService.CreateDataFlow(schemaId);
         }
 
         //[HttpGet]

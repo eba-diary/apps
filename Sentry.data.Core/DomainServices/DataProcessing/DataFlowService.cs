@@ -45,7 +45,7 @@ namespace Sentry.data.Core
             return dtoList;
         }
 
-        public bool CreateDataFlow()
+        public bool CreateDataFlow(int schemaId)
         {
             int cnt = _datasetContext.DataFlow.Count();
             DataFlow df = new DataFlow()
@@ -80,7 +80,7 @@ namespace Sentry.data.Core
             SchemaMap mapping = new SchemaMap()
             {
                 DataFlowStepId = step2,
-                MappedSchema = _datasetContext.FileSchema.Where(w => w.SchemaId == 1093).FirstOrDefault(),
+                MappedSchema = _datasetContext.FileSchema.Where(w => w.SchemaId == schemaId).FirstOrDefault(),
                 SearchCriteria = "Testfile.csv"
             };
             _datasetContext.Add(mapping);
