@@ -75,8 +75,7 @@ namespace Sentry.data.Infrastructure
                 _messagePublisher.PublishDSCEvent($"{step.DataFlow.Id}-{step.Id}", JsonConvert.SerializeObject(stepEvent));
                 DateTime endTime = DateTime.Now;
 
-                step.Executions.Add(step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-publishstartevent-successful start:{startTime} end:{endTime} duration:{endTime - startTime}", Log_Level.Info));
-                logs = null;
+                step.Executions.Add(step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-publishstartevent-successful start:{startTime} end:{endTime} duration:{endTime - startTime}", Log_Level.Info));                
             }
             catch (Exception ex)
             {
@@ -87,7 +86,7 @@ namespace Sentry.data.Infrastructure
                 {
                     step.Executions.Add(log);
                 }
-            }            
+            }
         }
     }
 }
