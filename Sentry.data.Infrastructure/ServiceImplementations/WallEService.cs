@@ -17,9 +17,14 @@ namespace Sentry.data.Infrastructure
         {
             _runGuid = Guid.NewGuid();
             Logger.Info($"walleservice-run-initiated - guid:{_runGuid}");
+            List<Task> tasks = new List<Task>();
 
-            await Task.Factory.StartNew(() => { DeleteSchemas(); });
-            
+            tasks.Add(Task.Factory.StartNew(() => { DeleteSchemas(); }));
+            tasks.Add(Task.Factory.StartNew(() => { DeleteDatasets(); }));
+
+            await Task.WhenAll(tasks);
+
+            Logger.Info($"walleservice-run-completed - guid:{_runGuid}");
         }
 
         private static void DeleteSchemas()
@@ -35,17 +40,53 @@ namespace Sentry.data.Infrastructure
                     foreach (DatasetFileConfig config in DeleteSchemaList)
                     {
                         Logger.Info($"walleservice-schemadelete-start - DatasetId:{config.ParentDataset.DatasetId} DatasetName:{config.ParentDataset.DatasetName} ConfigId:{config.ConfigId} ConfigName:{config.Name} guid:{_runGuid}");
-                        configService.Delete(config.ConfigId, false);
-                        Logger.Info($"walleservice-schemadelete-end - DatasetId:{config.ParentDataset.DatasetId} DatasetName:{config.ParentDataset.DatasetName} ConfigId:{config.ConfigId} ConfigName:{config.Name} guid:{_runGuid}");
+                        bool IsSuccessful = configService.Delete(config.ConfigId, false, false);
+                        if (!IsSuccessful)
+                        {
+                            Logger.Info($"walleservice-schemadelete ended with failures - DatasetId:{config.ParentDataset.DatasetId} DatasetName:{config.ParentDataset.DatasetName} ConfigId:{config.ConfigId} ConfigName:{config.Name} guid:{_runGuid}");
+                        }
+                        else
+                        {
+                            Logger.Info($"walleservice-schemadelete-end - DatasetId:{config.ParentDataset.DatasetId} DatasetName:{config.ParentDataset.DatasetName} ConfigId:{config.ConfigId} ConfigName:{config.Name} guid:{_runGuid}");
+                        }
                     }
                 }
                 else
                 {
                     Logger.Info($"walleservice-schemadeletes-notdetected - guid:{_runGuid}");
                 }
-
-                Logger.Info($"walleservice-run-completed - guid:{_runGuid}");
             }            
+        }
+
+        private static void DeleteDatasets()
+        {
+            using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+            {
+                IDatasetService datasetService = container.GetInstance<IDatasetService>();
+                List<Dataset> deleteDatasetList = datasetService.GetDatasetMarkedDeleted();
+
+                if (deleteDatasetList != null && deleteDatasetList.Count > 0)
+                {
+                    Logger.Info($"walleservice-datasetdeletes-detected - {deleteDatasetList.Count} datasets found - guid:{_runGuid}");
+                    foreach (var ds in deleteDatasetList)
+                    {
+                        Logger.Info($"walleservice-datasetdelete-start - DatasetId:{ds.DatasetId} DatasetName:{ds.DatasetName} guid:{_runGuid}");
+                        bool IsSuccessful = datasetService.Delete(ds.DatasetId, false);
+                        if (!IsSuccessful)
+                        {
+                            Logger.Info($"walleservice-datasetdelete-end - DatasetId:{ds.DatasetId} DatasetName:{ds.DatasetName} guid:{_runGuid}");
+                        }
+                        else
+                        {
+                            Logger.Warn($"walleservice-datasetdelete ended with failures - DatasetId:{ds.DatasetId} DatasetName:{ds.DatasetName} guid:{_runGuid}");
+                        }                        
+                    }
+                }
+                else
+                {
+                    Logger.Info($"walleservice-datasetdeletes-notdetected - guid:{_runGuid}");
+                }
+            }
         }
     }
 }

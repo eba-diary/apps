@@ -47,10 +47,16 @@ namespace Sentry.data.Core
         {
             Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id && x.CanDisplay).FetchAllChildren(_datasetContext).FirstOrDefault();
 
-            DatasetDetailDto dto = new DatasetDetailDto();
-            MapToDetailDto(ds, dto);
-
-            return dto;
+            if (ds != null)
+            {
+                DatasetDetailDto dto = new DatasetDetailDto();
+                MapToDetailDto(ds, dto);
+                return dto;
+            }
+            else
+            {
+                return null;
+            }            
         }
 
         public List<DatasetDto> GetAllDatasetDto()
@@ -187,7 +193,6 @@ namespace Sentry.data.Core
             return ds.DatasetId;
         }
 
-
         public void UpdateAndSaveDataset(DatasetDto dto)
         {
             Dataset ds = _datasetContext.GetById<Dataset>(dto.DatasetId);
@@ -266,7 +271,67 @@ namespace Sentry.data.Core
             _datasetContext.SaveChanges();
         }
 
+        public bool Delete(int datasetId, bool logicalDelete = true)
+        {            
+            Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
 
+            if (logicalDelete)
+            {
+                Logger.Info($"datasetservice-delete-logical - datasetid:{datasetId} datasetname:{ds.DatasetName}");
+
+                try
+                {
+                    //Mark dataset for soft delete
+                    MarkForDelete(ds);
+
+                    //Remove any favorite links to ensure users do not get dead link
+                    foreach(var fav in ds.Favorities)
+                    {
+                        _datasetContext.RemoveById<Favorite>(fav.FavoriteId);
+                    }
+                    
+                    //Mark Configs for soft delete to ensure no editing and jobs are disabled
+                    foreach (DatasetFileConfig config in ds.DatasetFileConfigs)
+                    {
+                        _configService.Delete(config.ConfigId, logicalDelete, true);
+                    }
+
+                    _datasetContext.SaveChanges();
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"datasetservice-delete-logical failed", ex);
+                    return false;
+                }
+                    
+            }
+            else
+            {
+                Logger.Info($"datasetservice-delete-physical - datasetid:{datasetId} datasetname:{ds.DatasetName}");
+
+                try
+                {
+                    foreach (DatasetFileConfig config in ds.DatasetFileConfigs)
+                    {
+                        _configService.Delete(config.ConfigId, logicalDelete, true);
+                    }
+
+                    _datasetContext.RemoveById<Dataset>(ds.DatasetId);
+                    _datasetContext.SaveChanges();
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"datasetservice-delete failed", ex);
+                    return false;
+                }                    
+            }
+            
+        }
+        
         public List<string> Validate(DatasetDto dto)
         {
             List<string> errors = new List<string>();
@@ -288,6 +353,12 @@ namespace Sentry.data.Core
             }
 
             return errors;
+        }
+
+        public List<Dataset> GetDatasetMarkedDeleted()
+        {
+            List<Dataset> dsList = _datasetContext.Datasets.Where(w => w.DeleteInd && w.DeleteIssueDTM < DateTime.Now.AddDays(Double.Parse(Configuration.Config.GetHostSetting("DatasetDeleteWaitDays")))).ToList();
+            return dsList;
         }
 
         //public bool DeleteDatasetFile(int datasetFileId)
@@ -314,7 +385,7 @@ namespace Sentry.data.Core
         //            Logger.Error($"deletedatasetfile-")
         //            return false;
         //        }
-                
+
         //    }
         //    else
         //    {
@@ -324,6 +395,13 @@ namespace Sentry.data.Core
         //}
 
         #region "private functions"
+        private void MarkForDelete(Dataset ds)
+        {
+            ds.CanDisplay = false;
+            ds.DeleteInd = true;
+            ds.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
+            ds.DeleteIssueDTM = DateTime.Now;
+        }
 
         private Dataset CreateDataset(DatasetDto dto)
         {
@@ -346,7 +424,9 @@ namespace Sentry.data.Core
                 IsSecured = dto.IsSecured,
                 CanDisplay = true,
                 DatasetFiles = null,
-                DatasetFileConfigs = null
+                DatasetFileConfigs = null,
+                DeleteInd = false,
+                DeleteIssueDTM = DateTime.MaxValue
             };
 
             switch (dto.DataClassification)
@@ -438,6 +518,7 @@ namespace Sentry.data.Core
             dto.DataClassificationDescription = ds.DataClassification.GetDescription();
             dto.CategoryColor = ds.DatasetCategories.First().Color;
             dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
+            dto.GroupAccessCount = _securityService.GetGroupAccessCount(ds);
             if (ds.DatasetFiles.Any())
             {
                 dto.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);

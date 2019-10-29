@@ -30,7 +30,8 @@ namespace Sentry.data.Core
 
         public virtual ValidationResults ValidateForDelete()
         { //We should never delete this record.
-            throw new NotImplementedException();
+            ValidationResults results = new ValidationResults();
+            return results;
         }
 
         public virtual ValidationResults ValidateForSave()
