@@ -392,7 +392,7 @@ data.Dataset = {
                             dataType: 'json',
                             success: function (obj) {
                                 Sentry.ShowModalAlert(obj.Message, function () {
-                                    window.location.href('Dataset/');
+                                    window.location = "/Dataset";
                                 })
                             },
                             failure: function (obj) {
@@ -1314,5 +1314,4 @@ data.Dataset = {
 
         returnLink.attr('href', returnUrl);
     }
-
 };
