@@ -289,6 +289,12 @@ namespace Sentry.data.Core
                     {
                         _datasetContext.RemoveById<Favorite>(fav.FavoriteId);
                     }
+
+                    //Remove any notification subscriptions to dataset
+                    foreach (var subscib in _datasetContext.GetSubscriptionsForDataset(ds.DatasetId))
+                    {
+                        _datasetContext.RemoveById<DatasetSubscription>(subscib.ID);
+                    }
                     
                     //Mark Configs for soft delete to ensure no editing and jobs are disabled
                     foreach (DatasetFileConfig config in ds.DatasetFileConfigs)
