@@ -927,7 +927,7 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public void DisableJob(int JobId)
+        public bool DisableJob(int JobId)
         {
             RetrieverJob job = null;
 
@@ -948,6 +948,8 @@ namespace Sentry.data.Infrastructure
 
                     job.JobLoggerMessage("INFO", $"Job set to Disabled - JobId:{JobId} JobName:{job.JobName()}");
                 }
+
+                return true;
             }
             catch (Exception ex)
             {
@@ -958,7 +960,8 @@ namespace Sentry.data.Infrastructure
                 else
                 {
                     job.JobLoggerMessage("ERROR", $"Failed Disabling Job - JobId:{JobId} JobName:{job.JobName()}", ex);
-                }                
+                }
+                return false;
             }            
         }
 
