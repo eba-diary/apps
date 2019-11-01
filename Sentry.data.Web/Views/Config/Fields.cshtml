@@ -158,6 +158,17 @@
 @using (Html.BeginForm("Fields", "Config", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
+
+    <div data-bind="visible: Errors().length >= 1" style="display: none;">
+        <h6 style="color: red;">Errors:</h6>
+    </div>
+    <ul style="display: none; color: red;" data-bind="foreach: Errors().sort(function (l, r) { return (l.Id == r.Id) ? (l.Id > r.Id ? 1 : -1) : (l.Id > r.Id ? 1 : -1) }), visible: Errors().length >= 1">
+        <li>
+            <span>Row # <span data-bind="text: Id"></span></span> :
+            <span data-bind="text: Description"></span>
+        </li>
+    </ul>
+
     <h2 class="@color">Fields for @schema.Name</h2>
 
     @Html.ValidationSummary(false, "", new { @class = "text-danger" })
@@ -179,6 +190,8 @@
             <span class="sentry-spinner" style="height:100px"></span>
         </div>
     </div>
+
+
     <div id="schemaPanel">
         <ul class="rules-group-container row fields-sortable-ul" id="fields" data-bind="template: {name: 'RowTemplate' , foreach: SortedRows}, css: SortableRows()" style="list-style-type: none;margin-left:0px;padding-left: 15px;"></ul>
     </div>
@@ -307,7 +320,7 @@
                 currentMax++;
                 return new Row(currentMax, rowInfo, self, thisLevel);
             }));
-            
+
 
             self.RowColor = ko.computed(function () {
                 var hasError = false;
