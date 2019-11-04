@@ -588,6 +588,7 @@ namespace Sentry.data.Infrastructure
                 IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
 
                 _job.JobLoggerMessage("Info", $"newfileslastexecution.search executiontime:{lastExecution.Created.ToString("s")} sourcelocation:{_job.GetUri().AbsoluteUri}");
+                _job.JobLoggerMessage("Info", $"Source directory content: {JsonConvert.SerializeObject(resultList)}");
 
                 List<RemoteFile> matchList;
 
@@ -600,6 +601,11 @@ namespace Sentry.data.Infrastructure
                 {
                     _job.JobLoggerMessage("Info", $"newfileslastexecution.search executiontime:noexecutionhistory sourcelocation:{_job.GetUri().AbsoluteUri}");
                     matchList = resultList.ToList();
+                }
+
+                if (matchList.Any())
+                {
+                    _job.JobLoggerMessage("Info", $"Matched files: {JsonConvert.SerializeObject(matchList)}");
                 }
 
                 _job.JobLoggerMessage("Info", $"newfileslastexecution.search.count {matchList.Count}");
