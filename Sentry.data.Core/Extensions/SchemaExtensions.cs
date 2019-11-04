@@ -60,14 +60,12 @@ namespace Sentry.data.Core
                 FieldType = field.FieldType.ToString(),
                 Nullable = field.NullableIndicator,
                 OrdinalPosition = field.OrdinalPosition,
-                Description = field.Description
+                Description = field.Description,
+                IsArray = field.IsArray
             };
 
             switch (field.FieldType)
-            {                
-                case SchemaDatatypes.STRUCT:
-                    dto.IsArray = ((StructField)field).IsArray;
-                    break;
+            {                 
                 case SchemaDatatypes.DECIMAL:
                     dto.Precision = ((DecimalField)field).Precision;
                     dto.Scale = ((DecimalField)field).Scale;
@@ -78,6 +76,7 @@ namespace Sentry.data.Core
                 case SchemaDatatypes.TIMESTAMP:
                     dto.SourceFormat = ((TimestampField)field).SourceFormat;
                     break;
+                case SchemaDatatypes.STRUCT:
                 case SchemaDatatypes.NONE:
                 case SchemaDatatypes.INTEGER:
                 case SchemaDatatypes.BIGINT:
