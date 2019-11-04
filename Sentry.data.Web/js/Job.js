@@ -206,7 +206,9 @@
                     $('.httpPostPanel').hide();
                     $('.jobquestion.compression').show();
                     break;
-                case "DFSCustom":
+                case "s3basic":
+                case "dfsbasic":
+                case "dfscustom":
                     $('.jobquestion.ftpPattern').hide();
                     $('.jobquestion.compression').show();
             }
