@@ -584,11 +584,16 @@ namespace Sentry.data.Infrastructure
                     _job.JobLoggerMessage("Error", "Job terminating - Uri does not end with forward slash.");
                     return;
                 }
-
-                IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
+                IList<RemoteFile> resultList = new List<RemoteFile>();
+                resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
 
                 _job.JobLoggerMessage("Info", $"newfileslastexecution.search executiontime:{lastExecution.Created.ToString("s")} sourcelocation:{_job.GetUri().AbsoluteUri}");
-                _job.JobLoggerMessage("Info", $"Source directory content: {JsonConvert.SerializeObject(resultList)}");
+                _job.JobLoggerMessage("Info", $"Source directory count {resultList.Count.ToString()}");
+
+                if (resultList.Any())
+                {
+                    _job.JobLoggerMessage("Info", $"Source directory content: {JsonConvert.SerializeObject(resultList)}");
+                }                
 
                 List<RemoteFile> matchList;
 
