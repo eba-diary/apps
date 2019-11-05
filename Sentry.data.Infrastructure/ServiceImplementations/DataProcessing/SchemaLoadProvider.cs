@@ -35,7 +35,7 @@ namespace Sentry.data.Infrastructure
                 string fileName = Path.GetFileName(stepEvent.SourceKey);
                 logs.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()} processing event - {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Debug));
 
-                string versionKey = _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, stepEvent.TargetBucket, $"{stepEvent.TargetPrefix}{Path.GetFileName(stepEvent.SourceKey)}");
+                string versionKey = _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, stepEvent.TargetBucket, $"{stepEvent.TargetPrefix}{fileName}");
                 DateTime endTime = DateTime.Now;
 
                 //Mock for testing... sent mock s3object created 
@@ -98,7 +98,7 @@ namespace Sentry.data.Infrastructure
                     SourceKey = key,
                     TargetBucket = step.Action.TargetStorageBucket,
                     //<targetstorageprefix>/<dataflowid>/<storagecode>/<flow execution guid>[-<run instance guid>]/
-                    TargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.Id}/{mapping.MappedSchema.StorageCode}/{ flowExecutionGuid }{ ((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid) }/ ",
+                    TargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.Id}/{mapping.MappedSchema.StorageCode}/{GenerateGuid(flowExecutionGuid, runInstanceGuid)}/ ",
                     EventType = GlobalConstants.DataFlowStepEvent.SCHEMA_LOAD
                 };
 
@@ -106,12 +106,24 @@ namespace Sentry.data.Infrastructure
 
                 _messagePublisher.PublishDSCEvent($"{step.DataFlow.Id}-{step.Id}", JsonConvert.SerializeObject(stepEvent));
 
-                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <schemaloadprovider-publishstartevent", Log_Level.Debug);
+                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <schemaloadprovider-publishstartevent>", Log_Level.Debug);
             }
             catch (Exception ex)
             {
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"schemaloadprovider-publishstartevent failed", Log_Level.Error, ex);
-                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <schemaloadprovider-publishstartevent", Log_Level.Debug);
+                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <schemaloadprovider-publishstartevent>", Log_Level.Debug);
+            }            
+        }
+
+        private string GenerateGuid(string executionGuid, string instanceGuid)
+        {
+            if (instanceGuid == null)
+            {
+                return executionGuid;
+            }
+            else
+            {
+                return executionGuid + "-" + instanceGuid;
             }            
         }
     }
