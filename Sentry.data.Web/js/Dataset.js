@@ -364,6 +364,51 @@ data.Dataset = {
             });
         });
 
+
+
+        $('body').on('click', '#btnDeleteDataset', function () {
+            var dataset = $(this);
+            var UserAccessMessage;
+
+            if (dataset.attr("data-IsSecured") === "False") {
+                UserAccessMessage = "This is a public dataset, all users have access.";                
+            }
+            else {
+                UserAccessMessage = "There are " + dataset.attr("data-grpCnt") + " active directory groups with access to this dataset.";                
+            }
+
+            var ConfirmMessage = "<p>Are you sure?</p><p><h3><b><font color=\"red\">THIS IS NOT A REVERSIBLE ACTION!</font></b></h3></p> </br> <p>" + UserAccessMessage + "</p>  Deleting the dataset will remove all associated schemas, data files, hive consumption layers, and metadata.  If at a later point " +
+                "this is needed, dataset and schema(s) will need to be recreated along with all files resent from source."
+            
+
+            Sentry.ShowModalCustom("Delete Dataset", ConfirmMessage, {
+                Confirm: {
+                    label: "Confirm",
+                    className: "btn-danger",
+                    callback: function () {
+                        $.ajax({
+                            url: "/Dataset/" + dataset.attr("data-id") + "/Delete",
+                            method: "DELETE",
+                            dataType: 'json',
+                            success: function (obj) {
+                                Sentry.ShowModalAlert(obj.Message, function () {
+                                    window.location = "/Dataset";
+                                })
+                            },
+                            failure: function (obj) {
+                                alert("failure");
+                                Sentry.ShowModalAlert(
+                                    obj.Message, function () { })
+                            },
+                            error: function (obj) {
+                                Sentry.ShowModalAlert(
+                                    obj.Message, function () { })
+                            }
+                        });
+                    }
+                }
+            });
+        });
     },
 
     AccessRequest: function (datasetId) {
@@ -1269,5 +1314,4 @@ data.Dataset = {
 
         returnLink.attr('href', returnUrl);
     }
-
 };

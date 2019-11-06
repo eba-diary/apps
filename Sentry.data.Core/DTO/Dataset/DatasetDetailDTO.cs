@@ -12,5 +12,6 @@ namespace Sentry.data.Core
         public int DatasetFileCount { get; set; }
         public string OriginationCode { get; set; }
         public string DataClassificationDescription { get; set; }
+        public int GroupAccessCount { get; set; }
     }
 }

@@ -48,6 +48,7 @@
             public const string VIEWED_DATASET = "Viewed Dataset";
             public const string CREATED_DATASET = "Created Dataset";
             public const string UPDATED_DATASET = "Updated Dataset";
+            public const string DELETE_DATASET = "Deleted Dataset";
 
             public const string DELETE_DATASET_SCHEMA = "Deleted Dataset Schema";
 

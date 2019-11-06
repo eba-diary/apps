@@ -8,6 +8,7 @@ namespace Sentry.data.Core
     {
         string RequestPermission(AccessRequest model);
         UserSecurity GetUserSecurity(ISecurable securable, IApplicationUser user);
+        int GetGroupAccessCount(ISecurable securable);
         void ApproveTicket(SecurityTicket ticket, string approveId);
         void CloseTicket(SecurityTicket ticket, string RejectorId, string rejectedReason, string status);
     }

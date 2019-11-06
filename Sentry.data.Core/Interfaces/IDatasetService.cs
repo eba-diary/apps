@@ -6,6 +6,7 @@ namespace Sentry.data.Core
     {
         List<string> Validate(DatasetDto dto);
         int CreateAndSaveNewDataset(DatasetDto dto);
+        bool Delete(int datasetId, bool logicalDelete = true);
         DatasetDto GetDatasetDto(int id);
         List<DatasetDto> GetAllDatasetDto();
         DatasetDetailDto GetDatesetDetailDto(int id);
@@ -15,5 +16,6 @@ namespace Sentry.data.Core
         AccessRequest GetAccessRequest(int datasetId);
         string RequestAccessToDataset(AccessRequest request);
         List<Dataset> GetDatasetsForQueryTool();
+        List<Dataset> GetDatasetMarkedDeleted();
     }
 }

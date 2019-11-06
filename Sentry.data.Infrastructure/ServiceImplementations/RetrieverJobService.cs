@@ -584,12 +584,17 @@ namespace Sentry.data.Infrastructure
                     _job.JobLoggerMessage("Error", "Job terminating - Uri does not end with forward slash.");
                     return;
                 }
+                IList<RemoteFile> resultList = new List<RemoteFile>();
+                resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
 
-                IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
+                _job.JobLoggerMessage("Info", $"newfileslastexecution.search source.directory.count {resultList.Count.ToString()}");
 
-                _job.JobLoggerMessage("Info", $"newfileslastexecution.search executiontime:{lastExecution.Created.ToString("s")} sourcelocation:{_job.GetUri().AbsoluteUri}");
+                if (resultList.Any())
+                {
+                    _job.JobLoggerMessage("Info", $"newfileslastexecution.search source.directory.content: {JsonConvert.SerializeObject(resultList)}");
+                }                
 
-                List<RemoteFile> matchList;
+                List<RemoteFile> matchList = new List<RemoteFile>();
 
                 if (lastExecution != null)
                 {
@@ -602,11 +607,16 @@ namespace Sentry.data.Infrastructure
                     matchList = resultList.ToList();
                 }
 
-                _job.JobLoggerMessage("Info", $"newfileslastexecution.search.count {matchList.Count}");
+                _job.JobLoggerMessage("Info", $"newfileslastexecution.search match.count {matchList.Count}");
+
+                if (matchList.Any())
+                {
+                    _job.JobLoggerMessage("Info", $"newfileslastexecution.search matchlist.content: {JsonConvert.SerializeObject(matchList)}");
+                }                               
 
                 foreach (RemoteFile file in matchList)
                 {
-                    _job.JobLoggerMessage("Info", $"newfileslastexecution.processing.file {file.Name}");
+                    _job.JobLoggerMessage("Info", $"newfileslastexecution.search processing.file {file.Name}");
                     string remoteUrl = _job.GetUri().AbsoluteUri + file.Name;
                     RetrieveFTPFile(remoteUrl);
                 }
@@ -634,11 +644,19 @@ namespace Sentry.data.Infrastructure
                     return;
                 }
 
-                IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
+                IList<RemoteFile> resultList = new List<RemoteFile>();
+                resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
+
+                _job.JobLoggerMessage("Info", $"regexlastexecution.search source.directory.count {resultList.Count.ToString()}");
+
+                if (resultList.Any())
+                {
+                    _job.JobLoggerMessage("Info", $"regexlastexecution.search source.directory.content: {JsonConvert.SerializeObject(resultList)}");
+                }
 
                 var rx = new Regex(_job.JobOptions.SearchCriteria, RegexOptions.IgnoreCase);
 
-                List<RemoteFile> matchList;
+                List<RemoteFile> matchList = new List<RemoteFile>();
 
                 if (lastExecution != null)
                 {
@@ -651,11 +669,16 @@ namespace Sentry.data.Infrastructure
                     matchList = resultList.Where(w => rx.IsMatch(w.Name)).ToList();
                 }
 
-                _job.JobLoggerMessage("Info", $"regexlastexecution.search.count {matchList.Count}");
+                _job.JobLoggerMessage("Info", $"regexlastexecution.search match.count {matchList.Count}");
+
+                if (matchList.Any())
+                {
+                    _job.JobLoggerMessage("Info", $"regexlastexecution.search matchlist.content: {JsonConvert.SerializeObject(matchList)}");
+                }
 
                 foreach (RemoteFile file in matchList)
                 {
-                    _job.JobLoggerMessage("Info", $"regexlastexecution.processing.file {file.Name}");
+                    _job.JobLoggerMessage("Info", $"regexlastexecution.search processing.file {file.Name}");
                     string remoteUrl = _job.GetUri().AbsoluteUri + file.Name;
                     RetrieveFTPFile(remoteUrl);
                 }
@@ -734,16 +757,25 @@ namespace Sentry.data.Infrastructure
 
             IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
 
+            _job.JobLoggerMessage("Info", $"specificfile.search search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_job.GetUri().AbsoluteUri}");
+            _job.JobLoggerMessage("Info", $"specificfile.search source.directory.count {resultList.Count.ToString()}");
+
+            if (resultList.Any())
+            {
+                _job.JobLoggerMessage("Info", $"specificfile.search source.directory.content: {JsonConvert.SerializeObject(resultList)}");
+            }
+
             var rx = new Regex(_job.JobOptions.SearchCriteria, RegexOptions.IgnoreCase);
 
-            _job.JobLoggerMessage("Info", $"Searching for file matching {_job.JobOptions.SearchCriteria} within {_job.GetUri().AbsoluteUri}");
+            List<RemoteFile> matchList = new List<RemoteFile>();
+            matchList = resultList.Where(w => rx.IsMatch(w.Name)).ToList();
 
-            List<RemoteFile> matchList = resultList.Where(w => rx.IsMatch(w.Name)).ToList();
-
-            _job.JobLoggerMessage("Info", $"Found {matchList.Count} matching files");
+            _job.JobLoggerMessage("Info", $"specificfile.search match.count {matchList.Count}");
+            _job.JobLoggerMessage("Info", $"specificfile.search matchlist.content {JsonConvert.SerializeObject(matchList)}");
 
             foreach (RemoteFile file in matchList)
             {
+                _job.JobLoggerMessage("Info", $"specificfile.search.processing.file {file.Name}");
                 string remoteUrl = _job.GetUri().AbsoluteUri + file.Name;
                 RetrieveFTPFile(remoteUrl);
             }
@@ -927,7 +959,7 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public void DisableJob(int JobId)
+        public bool DisableJob(int JobId)
         {
             RetrieverJob job = null;
 
@@ -948,6 +980,8 @@ namespace Sentry.data.Infrastructure
 
                     job.JobLoggerMessage("INFO", $"Job set to Disabled - JobId:{JobId} JobName:{job.JobName()}");
                 }
+
+                return true;
             }
             catch (Exception ex)
             {
@@ -958,7 +992,8 @@ namespace Sentry.data.Infrastructure
                 else
                 {
                     job.JobLoggerMessage("ERROR", $"Failed Disabling Job - JobId:{JobId} JobName:{job.JobName()}", ex);
-                }                
+                }
+                return false;
             }            
         }
 
@@ -994,6 +1029,29 @@ namespace Sentry.data.Infrastructure
                 {
                     job.JobLoggerMessage("ERROR", $"Failed Enabling Job - JobId:{JobId} JobName:{job.JobName()}", ex);
                 }
+            }
+        }
+
+        public void DeleteJob(int JobId)
+        {
+            try
+            {
+                using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+                {
+                    IDatasetContext dsContext = container.GetInstance<IDatasetContext>();
+
+                    RetrieverJob job = dsContext.GetById<RetrieverJob>(JobId);
+
+                    BackgroundJob.Delete(job.JobName());
+
+                    dsContext.Remove(job);
+                    dsContext.SaveChanges();
+                }
+                    Logger.Info($"retrieverjobservice-deletejob-success");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"retrieverjobservice-deletejob-failed", ex);
             }
         }
 

@@ -16,9 +16,11 @@ namespace Sentry.data.Web
             OriginationCode = dto.OriginationCode;
             DistinctFileExtensions = dto.DistinctFileExtensions;
             DataClassificationDescription = dto.DataClassificationDescription;
+            GroupAccessCount = dto.GroupAccessCount;
         }
 
         public int Downloads { get; set; }
+        public int GroupAccessCount { get; set; }
         public string OriginationCode { get; set; }
         public int DatasetFileCount { get; set; }
         public Dictionary<string, string> DatasetFileConfigNames { get; set; }

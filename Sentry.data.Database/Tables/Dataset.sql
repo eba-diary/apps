@@ -18,6 +18,9 @@
     [PrimaryContact_ID] VARCHAR(8) NOT NULL DEFAULT '000000', 
     [IsSecured_IND] BIT NOT NULL DEFAULT 0 , 
     [Security_ID] UNIQUEIDENTIFIER NULL, 
+    [DeleteInd] BIT NOT NULL DEFAULT 0, 
+    [DeleteIssuer] VARCHAR(10) NULL, 
+    [DeleteIssueDTM] DATETIME NOT NULL, 
     PRIMARY KEY CLUSTERED 
 (
 	[Dataset_ID] ASC

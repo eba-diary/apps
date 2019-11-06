@@ -283,7 +283,7 @@ namespace Sentry.data.Goldeneye
                     if ((DateTime.Now - config.LastRunMinute).TotalMinutes >= 1 || firstRun)
                     {
                         //Reload and modifed\new jobs
-                        List<RetrieverJob> JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && w.IsEnabled && (w.Created > config.LastRunMinute || w.Modified > config.LastRunMinute)).ToList();
+                        List<RetrieverJob> JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && w.IsEnabled && (w.Created > config.LastRunMinute.AddSeconds(-5) || w.Modified > config.LastRunMinute.AddSeconds(-5))).ToList();
 
                         foreach (RetrieverJob Job in JobList)
                         {
@@ -314,7 +314,7 @@ namespace Sentry.data.Goldeneye
                         }
 
                         //Remove disabled jobs
-                        List<RetrieverJob> DisabledJobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && !w.IsEnabled && (w.Created > config.LastRunMinute || w.Modified > config.LastRunMinute)).ToList();
+                        List<RetrieverJob> DisabledJobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && !w.IsEnabled && (w.Created > config.LastRunMinute.AddSeconds(-5) || w.Modified > config.LastRunMinute.AddSeconds(-5))).ToList();
 
                         foreach (RetrieverJob Job in DisabledJobList)
                         {

@@ -260,9 +260,10 @@ namespace Sentry.data.Core
                 Dataset parent = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
                 List<DatasetFileConfig> dfcList = (parent.DatasetFileConfigs == null) ? new List<DatasetFileConfig>() : parent.DatasetFileConfigs.ToList();
                 dfcList.Add(dfc);
+                _datasetContext.Add(dfc);
                 parent.DatasetFileConfigs = dfcList;
 
-                _datasetContext.Merge(parent);
+                //_datasetContext.Merge(parent);
                 _datasetContext.SaveChanges();
 
 
@@ -773,7 +774,7 @@ namespace Sentry.data.Core
             return string.Empty;
         }
 
-        public bool Delete(int id, bool logicalDelete = true)
+        public bool Delete(int id, bool logicalDelete = true, bool parentDriven = false)
         {
             try
             {
@@ -806,51 +807,58 @@ namespace Sentry.data.Core
                 }
                 else
                 {
-                    Logger.Info($"configservice-delete-physical - configid:{id} configname:{dfc.Name}");
+                    Logger.Info($"configservice-delete-physical - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                     try
                     {
-                        Logger.Info($"configservice-delete-disabledjobs - configid:{id} configname:{dfc.Name}");
+                        Logger.Info($"configservice-delete-disabledjobs - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         //Ensure all associated RetrieverJobs are disabled
                         foreach (var job in dfc.RetrieverJobs)
                         {
-                            _jobService.DisableJob(job.Id);
+                            _jobService.DeleteJob(job.Id);
                         }
 
-                        Logger.Info($"configservice-delete-deleteparquetstorage - configid:{id} configname:{dfc.Name}");
+                        Logger.Info($"configservice-delete-deleteparquetstorage - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         //Delete all parquet files under schema storage code
                         DeleteParquetFilesByStorageCode(scm.StorageCode);
 
-                        Logger.Info($"configservice-delete-deleterawstorage - configid:{id} configname:{dfc.Name}");
+                        Logger.Info($"configservice-delete-deleterawstorage - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         //Delete all raw data files under schema storage code
                         DeleteRawFilesByStorageCode(scm.StorageCode);
 
-                        Logger.Info($"configservice-delete-datasetfileparquetmetadata - configid:{id} configname:{dfc.Name}");
+                        Logger.Info($"configservice-delete-deletepreviewstorage - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
+                        DeletePreviewFilesByStorageCode(scm.StorageCode);
+
+                        Logger.Info($"configservice-delete-datasetfileparquetmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         //Delete all DatasetFileParquet metadata  (inserts are managed outside of DSC code)
                         List<DatasetFileParquet> parquetFileList = _datasetContext.DatasetFileParquet.Where(w => w.SchemaId == scm.SchemaId).ToList();
-                        Logger.Info($"configservice-delete-datasetfileparquetmetadata - recordsfound:{parquetFileList.Count} configid:{id} configname:{dfc.Name}");
+                        Logger.Info($"configservice-delete-datasetfileparquetmetadata - recordsfound:{parquetFileList.Count} datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         foreach (DatasetFileParquet record in parquetFileList)
                         {
                             _datasetContext.Remove(record);
                         }
 
-                        Logger.Info($"configservice-delete-datasetfilereplymetadata - configid:{id} configname:{dfc.Name}");
+                        Logger.Info($"configservice-delete-datasetfilereplymetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         //Delete all DatasetFileReply metadata  (inserts are managed outside of DSC code)
                         List<DatasetFileReply> replyList = _datasetContext.DatasetFileReply.Where(w => w.SchemaID == scm.SchemaId).ToList();
-                        Logger.Info($"configservice-delete-datasetfilereplymetadata - recordsfound:{parquetFileList.Count} configid:{id} configname:{dfc.Name}");
+                        Logger.Info($"configservice-delete-datasetfilereplymetadata - recordsfound:{parquetFileList.Count} datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         foreach (DatasetFileReply record in replyList)
                         {
                             _datasetContext.Remove(record);
                         }
 
-                        Logger.Info($"configservice-delete-configmetadata - configid:{id} configname:{dfc.Name}");
+                        Logger.Info($"configservice-delete-configmetadata - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}");
                         //Delete all Schema metadata (will cascade delete to datafiles, dataelement, dataobject, dataobjectfield tables (including detail tables))
-                        _datasetContext.Remove(dfc);
+
+                        if (!parentDriven)
+                        {
+                            _datasetContext.Remove(dfc);
+                        }                        
                         _datasetContext.SaveChanges();
 
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error($"configservice-delete-permanant-failed - configid:{id} configname:{dfc.Name}", ex);
+                        Logger.Error($"configservice-delete-permanant-failed - datasetid:{dfc.ParentDataset.DatasetId} configid:{id} configname:{dfc.Name}", ex);
                         return false;
                     }
                 }
@@ -870,10 +878,27 @@ namespace Sentry.data.Core
             return _securityService.GetUserSecurity(dfc.ParentDataset, _userService.GetCurrentUser());
         }
 
+        /// <summary>
+        /// Returns list of DatasetFileConfig objects where they are marked for delete, DeleteIssueDTM older than SchemaDeleteWaitDays, and parent dataset not marked for delete.
+        /// </summary>
+        /// <returns></returns>
         public List<DatasetFileConfig> GetSchemaMarkedDeleted()
         {
             List<DatasetFileConfig> configList = _datasetContext.DatasetFileConfigs.Where(w => w.DeleteInd && w.DeleteIssueDTM < DateTime.Now.AddDays(Double.Parse(Configuration.Config.GetHostSetting("SchemaDeleteWaitDays")))).ToList();
-            return configList;
+            List<DatasetFileConfig> deleteList = new List<DatasetFileConfig>();
+            foreach (var config in configList)
+            {
+                if (!config.ParentDataset.DeleteInd)
+                {
+                    deleteList.Add(config);
+                }
+            }
+            return deleteList;
+        }
+
+        private void DeletePreviewFilesByStorageCode(string storageCode)
+        {
+            S3ServiceProvider.DeleteS3Prefix($"{Configuration.Config.GetSetting("S3PreviewPrefix")}{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
         }
 
         public void DeleteParquetFilesByStorageCode(string storageCode)
