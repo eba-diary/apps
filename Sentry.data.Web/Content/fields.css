@@ -70,6 +70,10 @@
     display: inline;
 }
 
+.schemaRowContainer {
+    border-radius: 10px;
+}
+
 .schemaRow {
     /*margin-right: -20px;*/
     padding: 10px;
