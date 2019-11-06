@@ -1021,15 +1021,22 @@ namespace Sentry.data.Web.Controllers
             {
                 RetrieverJobService jobservice = new RetrieverJobService();
 
-                jobservice.DisableJob(id);
+                bool IsSuccessful = jobservice.DisableJob(id);
+
+                if (IsSuccessful)
+                {
+                    return Json(new { Success = true, Message = "Job has been marked as disabled and will be removed from the job scheduler." });
+                }
+                else
+                {
+                    return Json(new { Success = false, Message = "Failed disabling job.  If problem persists, please contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a>." });
+                }
             }
             catch (Exception ex)
             {
                 Logger.Error($"Error disabling retriever job ({id}).", ex);
                 return Json(new { Success = false, Message = "Failed disabling job.  If problem persists, please contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a>." });
-            }
-
-            return Json(new { Success = true, Message = "Job has been marked as disabled and will be removed from the job scheduler." });
+            }            
         }
 
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
