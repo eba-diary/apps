@@ -27,8 +27,8 @@ namespace Sentry.data.Web
                 SchemaRevisionName = dto.SchemaRevisionName,
                 CreatedBy = dto.CreatedBy,
                 CreatedByName = dto.CreatedByName,
-                CreatedDTM = dto.CreatedDTM,
-                LastUpdatedDTM = dto.LastUpdatedDTM
+                CreatedDTM = dto.CreatedDTM.ToString("s"),
+                LastUpdatedDTM = dto.LastUpdatedDTM.ToString("s")
             };
         }
 
@@ -59,8 +59,8 @@ namespace Sentry.data.Web
                 FieldGuid = dto.FieldGuid,
                 FieldType = dto.FieldType,
                 IsArray = dto.IsArray,
-                CreateDTM = dto.CreateDTM,
-                LastUpdatedDTM = dto.LastUpdatedDTM,
+                CreateDTM = dto.CreateDTM.ToString("s"),
+                LastUpdatedDTM = dto.LastUpdatedDTM.ToString("s"),
                 Nullable = dto.Nullable,
                 OrdinalPosition = dto.OrdinalPosition,
                 Precision = dto.Precision,
