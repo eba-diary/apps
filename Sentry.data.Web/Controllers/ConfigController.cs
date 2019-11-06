@@ -518,7 +518,7 @@ namespace Sentry.data.Web.Controllers
                     {
                         Body = ejm.HttpRequestBody,
                         RequestMethod = ejm.SelectedRequestMethod,
-                        RequestDataFormat = ejm.SelectedRequestDataFormat
+                        RequestDataFormat =  (HttpDataFormat)ejm.SelectedRequestDataFormat
                     };
 
                     rj.JobOptions = new RetrieverJobOptions()
