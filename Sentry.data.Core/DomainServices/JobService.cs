@@ -172,5 +172,20 @@ namespace Sentry.data.Core
                 throw;
             }            
         }
+
+        public void DeleteJob(int id)
+        {
+            try
+            {
+                RetrieverJob job = _datasetContext.GetById<RetrieverJob>(id);
+
+                
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"jobservice-deletejob-failed - jobid:{id}", ex);
+                throw;
+            }
+        }
     }
 }

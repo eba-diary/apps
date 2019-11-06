@@ -118,6 +118,23 @@ namespace Sentry.data.Core
             return us;
         }
 
+        /// <summary>
+        /// Returns count of ad groups with access to securable
+        /// </summary>
+        /// <param name="securable"></param>
+        /// <returns></returns>
+        public int GetGroupAccessCount(ISecurable securable)
+        {
+            if (securable.Security?.Tickets != null)
+            {
+                var groups = securable.Security.Tickets.Select(x => new { adGroup = x.AdGroupName, permissions = x.Permissions.Where(y => y.IsEnabled).ToList() }).ToList();
+                return groups.Select(s => s.adGroup).Distinct().Count();
+            }
+            else
+            {
+                return 0;                
+            }
+        }
 
         public void ApproveTicket(SecurityTicket ticket, string approveId)
         {

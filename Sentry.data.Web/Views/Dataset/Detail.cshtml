@@ -107,9 +107,8 @@
                                         @if (Model.Security.CanEditDataset)
                                         {
                                             <li>
-                                                <a href="/Config/Dataset/@Model.DatasetId">
-                                                    Manage Schemas
-                                                </a>
+                                                <a href="/Config/Dataset/@Model.DatasetId">Manage Schemas</a>
+                                                <a id="btnDeleteDataset" data-id="@Model.DatasetId" data-grpCnt="@Model.GroupAccessCount" data-IsSecured="@Model.IsSecured">Delete Dataset</a>
                                             </li>
                                         }
                                         @if (Model.Security.CanQueryDataset)
