@@ -194,7 +194,7 @@ namespace Sentry.data.Web.Controllers
 
                 if (us != null && us.CanEditDataset)
                 {
-                    _configService.Delete(id);
+                    _configService.Delete(id, true, false);
                     _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.DELETE_DATASET_SCHEMA, SharedContext.CurrentUser.AssociateId, "Deleted Dataset Schema", id);
                     return Json(new { Success = true, Message = "Schema was successfully deleted" });
                 }

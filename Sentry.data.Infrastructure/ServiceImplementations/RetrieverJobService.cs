@@ -997,6 +997,29 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public void DeleteJob(int JobId)
+        {
+            try
+            {
+                using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+                {
+                    IDatasetContext dsContext = container.GetInstance<IDatasetContext>();
+
+                    RetrieverJob job = dsContext.GetById<RetrieverJob>(JobId);
+
+                    BackgroundJob.Delete(job.JobName());
+
+                    dsContext.Remove(job);
+                    dsContext.SaveChanges();
+                }
+                    Logger.Info($"retrieverjobservice-deletejob-success");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"retrieverjobservice-deletejob-failed", ex);
+            }
+        }
+
         private string GetTargetPath(RetrieverJob basicJob)
         {
             string basepath;

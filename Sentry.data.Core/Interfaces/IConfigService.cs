@@ -24,7 +24,14 @@ namespace Sentry.data.Core
         string RequestAccessToDataSource(AccessRequest request);
         DatasetFileConfigDto GetDatasetFileConfigDto(int configId);
         List<DatasetFileConfigDto> GetDatasetFileConfigDtoByDataset(int datasetId);
-        bool Delete(int id, bool logicalDelete = true);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id">DatasetFileConfig identifier</param>
+        /// <param name="logicalDelete">Perform soft or hard delete</param>
+        /// <param name="parentDriven">Is this driven by parent object</param>
+        /// <returns></returns>
+        bool Delete(int id, bool logicalDelete = true, bool parentDriven = false);
         UserSecurity GetUserSecurityForConfig(int id);
     }
 }
