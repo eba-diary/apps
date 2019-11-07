@@ -918,7 +918,7 @@ namespace Sentry.data.Web.Controllers
             
             if (hiveDatabaseName != null)
             {
-                python = $"spark.sql('SELECT * FROM {hiveDatabaseName}.{hiveTableName}').show({rows}, True)";
+                python = $"spark.sql('SELECT * FROM {hiveDatabaseName}.{hiveTableName}').show({rows}, False)";
             }
             else
             {
