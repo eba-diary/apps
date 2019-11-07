@@ -119,6 +119,31 @@ namespace Sentry.data.Web.Controllers
             return View("Forbidden");
         }
 
+        [HttpDelete]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        [Route("Dataset/{id}/Delete")]
+        public JsonResult Delete(int id)
+        {
+            try
+            {
+                UserSecurity us = _datasetService.GetUserSecurityForDataset(id);
+
+                if (us.CanEditDataset)
+                {
+                    //Issue logical delete
+                    _datasetService.Delete(id);
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.DELETE_DATASET, SharedContext.CurrentUser.AssociateId, "Deleted Dataset", id);
+                    return Json(new { Success = true, Message = "Dataset successfully deleted" });
+                }
+                return Json(new { Success = false, Message = "You do not have permissions to delete this dataset" });
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to delete dataset - DatasetId:{id} RequestorId:{SharedContext.CurrentUser.AssociateId} RequestorName:{SharedContext.CurrentUser.DisplayName}", ex);
+                return Json(new { Success = false, Message = "We failed to delete the dataset.  Please try again later.  Please contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a> if problem persists." });
+            }
+        }
+
         [HttpPost]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult DatasetForm(DatasetModel model)
@@ -165,10 +190,19 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Detail(int id)
         {
             DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
-            DatasetDetailModel model = new DatasetDetailModel(dto);
 
-            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Page", dto.DatasetId);
-            return View(model);
+            if (dto != null)
+            {
+                DatasetDetailModel model = new DatasetDetailModel(dto);
+
+                _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Page", dto.DatasetId);
+
+                return View(model);
+            }
+            else
+            {
+                return HttpNotFound("Invalid Dataset Id"); 
+            }
         }
 
         [HttpGet]
@@ -488,8 +522,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         #endregion
-
-
+        
         #region Helpers
 
         [HttpGet()]
@@ -988,15 +1021,22 @@ namespace Sentry.data.Web.Controllers
             {
                 RetrieverJobService jobservice = new RetrieverJobService();
 
-                jobservice.DisableJob(id);
+                bool IsSuccessful = jobservice.DisableJob(id);
+
+                if (IsSuccessful)
+                {
+                    return Json(new { Success = true, Message = "Job has been marked as disabled and will be removed from the job scheduler." });
+                }
+                else
+                {
+                    return Json(new { Success = false, Message = "Failed disabling job.  If problem persists, please contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a>." });
+                }
             }
             catch (Exception ex)
             {
                 Logger.Error($"Error disabling retriever job ({id}).", ex);
                 return Json(new { Success = false, Message = "Failed disabling job.  If problem persists, please contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a>." });
-            }
-
-            return Json(new { Success = true, Message = "Job has been marked as disabled and will be removed from the job scheduler." });
+            }            
         }
 
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
@@ -1069,8 +1109,7 @@ namespace Sentry.data.Web.Controllers
 
             return Json(sList, JsonRequestBehavior.AllowGet);
         }
-
-
+        
         public JsonResult GetSourceDescription(string DiscrimatorValue)
         {
             var obj = _datasetContext.DataSourceTypes.Where(x => x.DiscrimatorValue == DiscrimatorValue).Select(x => x.Description);

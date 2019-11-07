@@ -82,13 +82,14 @@ namespace Sentry.data.Core
         public virtual string PrimaryContactId { get; set; }
         public virtual bool IsSecured { get; set; }
         public virtual Security Security { get; set; }
-
-
-
+        public virtual bool DeleteInd { get; set; }
+        public virtual string DeleteIssuer { get; set; }
+        public virtual DateTime DeleteIssueDTM { get; set; }
 
         public virtual ValidationResults ValidateForDelete()
         {
-            return new ValidationResults();
+            ValidationResults results = new ValidationResults();
+            return results;
         }
 
         public virtual ValidationResults ValidateForSave()

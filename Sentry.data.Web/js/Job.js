@@ -121,12 +121,21 @@
             }
         });
 
-        if ($("#JobID").val() != "0" && $("#JobID").val() != undefined) {
-            $("#SelectedDataSource").trigger('change');
-            data.Job.targetFileNameDescUpdate();
-            if ($("#SelectedSourceType").val().toLowerCase() === "ftp") {
-                data.Job.SetFtpPatternDefaults($('#FtpPattern').val());
-            }
+        if ($("#JobID").val() != undefined && $("#JobID").val() != "0") {
+            $.ajax({
+                url: "/Config/SourceDetails/" + $('#SelectedDataSource :selected').val(),
+                dataType: 'json',
+                type: "GET",
+                //data: { Id: $('#SelectedDataSource :selected').val() },
+                success: function (datain) {
+                    data.Job.SetDataSourceSpecificPanels(datain.SourceType);
+                    data.Job.DisplayHttpPostPanel();
+                    data.Job.targetFileNameDescUpdate();
+                    if ($("#SelectedSourceType").val().toLowerCase() === "ftp") {
+                        data.Job.SetFtpPatternDefaults($('#FtpPattern').val());
+                    };
+                }
+            });            
         };
 
         $("#compressionPanel").toggle($("#IsSourceCompressed").is(':checked'));
@@ -185,17 +194,22 @@
                     $('.jobquestion.targetFileName').hide();
                     break;
                 case "googleapi":
+                    $('.jobquestion.ftpPattern').hide();
                     $('.jobquestion.targetFileName').show();
                     $('.httpSourcePanel').show();
                     $('.httpPostPanel').hide();
                     break;
                 case "https":
+                    $('.jobquestion.ftpPattern').hide();
                     $('.jobquestion.targetFileName').show();
                     $('.httpSourcePanel').show();
                     $('.httpPostPanel').hide();
                     $('.jobquestion.compression').show();
                     break;
-                case "DFSCustom":
+                case "s3basic":
+                case "dfsbasic":
+                case "dfscustom":
+                    $('.jobquestion.ftpPattern').hide();
                     $('.jobquestion.compression').show();
             }
 
@@ -303,7 +317,7 @@
     DisplayHttpPostPanel: function () {
         var val = $('#SelectedRequestMethod :selected').text();
         if (val.toUpperCase() === 'POST') {
-            data.Job.RequestDataFormatDropdownPopulate();
+            //data.Job.RequestDataFormatDropdownPopulate();
             $('.httpPostPanel').show();
         }
         else {
@@ -312,17 +326,18 @@
     },
 
     RequestDataFormatDropdownPopulate: function () {
-        var val = $('#SelectedSourceType :selected').val();
+        if ($("#JobID").val() === undefined || $("#JobID").val() === "0") {
+            var val = $('#SelectedSourceType :selected').val();
 
+            $.getJSON(encodeURI("/Config/RequestDataFormatByType/" + val), function (data) {
+                var subItems = "";
+                $.each(data, function (index, item) {
+                    subItems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+                });
 
-        $.getJSON(encodeURI("/Config/RequestDataFormatByType/" + val), function (data) {
-            var subItems = "";
-            $.each(data, function (index, item) {
-                subItems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
+                $('#SelectedRequestDataFormat').html(subItems);
             });
-
-            $('#SelectedRequestDataFormat').html(subItems);
-        });
+        }        
     },
 
     targetFileNameDescUpdate: function () {

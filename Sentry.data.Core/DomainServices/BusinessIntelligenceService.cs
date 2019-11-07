@@ -104,7 +104,7 @@ namespace Sentry.data.Core
                 Dataset ds = _datasetContext.GetById<Dataset>(dto.DatasetId);
 
                 UpdateDataset(dto, ds);
-                UpdateDatasetFileConfig(dto, ds);
+                //UpdateDatasetFileConfig(dto, ds);
 
                 _datasetContext.SaveChanges();
             }
@@ -374,31 +374,36 @@ namespace Sentry.data.Core
             };
         }
 
-        private void UpdateDatasetFileConfig(BusinessIntelligenceDto dto, Dataset ds)
+        //private void UpdateDatasetFileConfig(BusinessIntelligenceDto dto, Dataset ds)
+        //{
+        //    MapDatasetFileConig(dto, ds);
+        //}
+        private void CreateDatasetFileConfig(BusinessIntelligenceDto dto, DatasetFileConfig dfc)
         {
-            MapDatasetFileConig(dto, ds);
-        }
-        private void CreateDatasetFileConfig(BusinessIntelligenceDto dto, Dataset ds)
-        {
-            ds.DatasetFileConfigs = new List<DatasetFileConfig> { new DatasetFileConfig() };
-            MapDatasetFileConig(dto, ds);
+            MapDatasetFileConig(dto, dfc);
         }
 
-        private void MapDatasetFileConig(BusinessIntelligenceDto dto, Dataset ds)
+        private void MapDatasetFileConig(BusinessIntelligenceDto dto, DatasetFileConfig dfc)
         {
-            ds.DatasetFileConfigs.First().Name = dto.DatasetName;
-            ds.DatasetFileConfigs.First().Description = dto.DatasetDesc;
-            ds.DatasetFileConfigs.First().FileTypeId = dto.FileTypeId;
-            ds.DatasetFileConfigs.First().ParentDataset = ds;
-            ds.DatasetFileConfigs.First().DatasetScopeType = _datasetContext.DatasetScopeTypes.Where(w => w.Name == "Point-in-Time").FirstOrDefault();
-            ds.DatasetFileConfigs.First().FileExtension = _datasetContext.FileExtensions.Where(w => w.Name == "ANY").FirstOrDefault();
+            dfc.Name = dto.DatasetName;
+            dfc.Description = dto.DatasetDesc;
+            dfc.FileTypeId = dto.FileTypeId;
+            dfc.ParentDataset = _datasetContext.GetById<Dataset>(dto.DatasetId);
+            dfc.DatasetScopeType = _datasetContext.DatasetScopeTypes.Where(w => w.Name == "Point-in-Time").FirstOrDefault();
+            dfc.FileExtension = _datasetContext.FileExtensions.Where(w => w.Name == "ANY").FirstOrDefault();
         }
 
         private void CreateDataset(BusinessIntelligenceDto dto)
         {
             Dataset ds = MapDataset(dto, new Dataset());
-            CreateDatasetFileConfig(dto, ds);
             _datasetContext.Add(ds);
+            dto.DatasetId = ds.DatasetId;
+
+            DatasetFileConfig config = new DatasetFileConfig();
+            CreateDatasetFileConfig(dto, config);
+            _datasetContext.Add(config);
+            ds.DatasetFileConfigs = new List<DatasetFileConfig>() { config };
+
             CreateImages(dto, ds);
         }
 
@@ -458,6 +463,8 @@ namespace Sentry.data.Core
                 }
             };
             ds.Tags = _datasetContext.Tags.Where(x => dto.TagIds.Contains(x.TagId.ToString())).ToList();
+            ds.DeleteInd = false;
+            ds.DeleteIssueDTM = DateTime.MaxValue;
 
             return ds;
         }
