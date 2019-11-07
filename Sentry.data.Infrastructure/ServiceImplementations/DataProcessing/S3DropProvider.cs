@@ -32,10 +32,11 @@ namespace Sentry.data.Infrastructure
         public void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
             List<DataFlow_Log> logs = new List<DataFlow_Log>();
+            Stopwatch stopWatch = new Stopwatch();
             step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"start-method <{step.DataAction_Type_Id.ToString()}>-executeaction", Log_Level.Debug);
             try
             {
-                Stopwatch stopWatch = new Stopwatch();
+                
 
                 stopWatch.Start();
                 DateTime startTime = DateTime.Now;
@@ -70,22 +71,30 @@ namespace Sentry.data.Infrastructure
 
                 _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
 
+                Logger.AddContextVariable(new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds));
                 step.Executions.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-successful  start:{startTime} end:{endTime} duration:{endTime - startTime}",Log_Level.Info));
             }
             catch (Exception ex)
             {
-                step.Executions.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction failed", Log_Level.Error, ex));
+                Logger.AddContextVariable(new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds));
+                step.Executions.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-failed", Log_Level.Error, ex));
                 step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"end-method <{step.DataAction_Type_Id.ToString()}>-executeaction", Log_Level.Debug);
+            }
+            finally
+            {
+                Logger.RemoveContextVariable("stepduration");
             }
         }
 
         public void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
             List<DataFlow_Log> logs = new List<DataFlow_Log>();
+            Stopwatch stopWatch = new Stopwatch();
             string objectKey = s3Event.s3._object.key;
             string keyBucket = s3Event.s3.bucket.name;
             try
             {
+                stopWatch.Start();
                 DateTime startTime = DateTime.Now;
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"start-method <{step.DataAction_Type_Id.ToString()}>-publishstartevent", Log_Level.Debug);
 
@@ -112,14 +121,21 @@ namespace Sentry.data.Infrastructure
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Debug);
 
                 _messagePublisher.PublishDSCEvent($"{step.DataFlow.Id}-{step.Id}", JsonConvert.SerializeObject(stepEvent));
+                stopWatch.Stop();
                 DateTime endTime = DateTime.Now;
 
+                Logger.AddContextVariable(new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds));
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-publishstartevent-successful  start:{startTime} end:{endTime} duration:{endTime - startTime}", Log_Level.Info);
             }
             catch (Exception ex)
             {
-                step.Executions.Add(step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-publishstartevent failed", Log_Level.Error, ex));
+                Logger.AddContextVariable(new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds));
+                step.Executions.Add(step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-publishstartevent-failed", Log_Level.Error, ex));
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <{step.DataAction_Type_Id.ToString()}>-publishstartevent", Log_Level.Debug);
+            }
+            finally
+            {
+                Logger.RemoveContextVariable("stepduration");
             }
         }
     }

@@ -12,10 +12,12 @@ namespace Sentry.data.Core
     public class DataStepProcessorHandler : IMessageHandler<string>
     {
         private IDataStepService _dataStepProvider;
+        private IDataFlowProvider _dataFlowProvider;
 
-        public DataStepProcessorHandler(IDataStepService dataStepProvider)
+        public DataStepProcessorHandler(IDataStepService dataStepProvider, IDataFlowProvider dataFlowProvider)
         {
             _dataStepProvider = dataStepProvider;
+            _dataFlowProvider = dataFlowProvider;
         }
         public void Handle(string msg)
         {
@@ -26,7 +28,7 @@ namespace Sentry.data.Core
                 {
                     DataFlowStepEvent stepEvent = JsonConvert.DeserializeObject<DataFlowStepEvent>(msg);
                     Logger.Info("DataStepProcessorHandler processing DATAFLOWSTEP message: " + JsonConvert.SerializeObject(stepEvent));
-                    Task.Factory.StartNew(() => _dataStepProvider.ExecuteStep(stepEvent),
+                    Task.Factory.StartNew(() => _dataFlowProvider.ExecuteStep(stepEvent),
                                                                     TaskCreationOptions.LongRunning).ContinueWith(TaskException,
                                                                     TaskContinuationOptions.OnlyOnFaulted);
                 }

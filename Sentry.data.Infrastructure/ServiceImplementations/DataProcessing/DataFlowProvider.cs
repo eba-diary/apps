@@ -11,6 +11,7 @@ using Sentry.Common.Logging;
 using Sentry.data.Core.Interfaces.DataProcessing;
 using System.IO;
 using System.Diagnostics;
+using Newtonsoft.Json;
 
 namespace Sentry.data.Infrastructure
 {
@@ -125,19 +126,33 @@ namespace Sentry.data.Infrastructure
 
         public async Task ExecuteStep(DataFlowStepEvent stepEvent)
         {
-            using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+            try
             {
-                IDataStepService stepService = container.GetInstance<IDataStepService>();
-
-                GetExecutionGuids(stepEvent.SourceKey);
-                Logger.AddContextVariable(new TextVariable("flowexecutionguid", flowExecutionGuid));
-                if (runInstanceGuid != null)
+                using (IContainer container = Bootstrapper.Container.GetNestedContainer())
                 {
-                    Logger.AddContextVariable(new TextVariable("runinstanceguid", runInstanceGuid));
-                }
+                    IDataStepService stepService = container.GetInstance<IDataStepService>();
 
-                stepService.ExecuteStep(stepEvent);
-            }   
+                    //GetExecutionGuids(stepEvent.SourceKey);
+                    Logger.AddContextVariable(new TextVariable("flowexecutionguid", stepEvent.FlowExecutionGuid));
+
+                    S3ObjectEvent s3Event = JsonConvert.DeserializeObject<S3ObjectEvent>(stepEvent.OriginalS3Event);
+                    Logger.AddContextVariable(new LongVariable("objectsize", (long)s3Event.s3._object.size));
+                    if (stepEvent.RunInstanceGuid != null)
+                    {
+                        Logger.AddContextVariable(new TextVariable("runinstanceguid", stepEvent.RunInstanceGuid));
+                    }
+
+                    stepService.ExecuteStep(stepEvent);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"dataflowprovider-executestep failed", ex);
+            }
+            finally
+            {
+                Logger.RemoveContextVariable("objectsize");
+            }
         }
 
         #region Private Methods

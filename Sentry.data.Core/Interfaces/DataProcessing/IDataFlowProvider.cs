@@ -11,5 +11,6 @@ namespace Sentry.data.Core
     {
         Task ExecuteDependenciesAsync(string bucket, string key, S3ObjectEvent s3Event);
         Task ExecuteDependenciesAsync(S3ObjectEvent s3e);
+        Task ExecuteStep(DataFlowStepEvent stepEvent);
     }
 }
