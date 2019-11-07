@@ -53,6 +53,7 @@ namespace Sentry.data.Infrastructure
                         //determine DataFlow execution and run instance guids to ensure processing is tied.
                         GetExecutionGuids(key);
 
+                        //establish flow execution guid if null and log data flow level initalization message
                         if (flowExecutionGuid == null)
                         {
                             int Epoch = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
@@ -68,7 +69,6 @@ namespace Sentry.data.Infrastructure
                             Logger.AddContextVariable(new TextVariable("flowexecutionguid", flowExecutionGuid));
                         }
 
-
                         //log dependency steps
                         LogDetectedSteps(key, stepList, flowExecutionGuid, _flow);
 
@@ -78,7 +78,7 @@ namespace Sentry.data.Infrastructure
                         //Generate Start Events
                         foreach (DataFlowStep step in stepList)
                         {
-                            //Check if rerun scenario, if so generate a runinstanceguid
+                            //Generate new runinstance quid if in rerun scenario
                             if (step.Executions.Where(w => w.FlowExecutionGuid == flowExecutionGuid).Any() && runInstanceGuid == null)
                             {
                                 int InstanceEpoch = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
@@ -95,18 +95,23 @@ namespace Sentry.data.Infrastructure
                             //dsContext.SaveChanges();
                             _stepService.PublishStartEvent(step, flowExecutionGuid, runInstanceGuid, s3Event);
                         }
+
                         _flow.LogExecution(flowExecutionGuid, $"end-method <executedependencies>", Log_Level.Info);
+
                         //save new logs
                         dsContext.SaveChanges();
                     }
                     catch (Exception ex)
                     {
                         logs.Add(_flow.LogExecution(flowExecutionGuid, $"dataflowprovider-ExecuteDependenciesAsync-failed", Log_Level.Error, ex));
+
                         _flow.LogExecution(flowExecutionGuid, $"end-method <executedependencies>", Log_Level.Info);
+
                         foreach (var log in logs)
                         {
                             _flow.Logs.Add(log);
                         }
+
                         dsContext.SaveChanges();
                     }                    
                 }
