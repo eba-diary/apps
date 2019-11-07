@@ -9,8 +9,8 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
     {
         public Guid FieldGuid { get; set; }
         public string Name { get; set; }
-        public DateTime CreateDTM { get; set; }
-        public DateTime LastUpdatedDTM { get; set; }
+        public string CreateDTM { get; set; }
+        public string LastUpdatedDTM { get; set; }
         public string FieldType { get; set; }
         public int Precision { get; set; }
         public int Scale { get; set; }
