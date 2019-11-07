@@ -47,7 +47,7 @@ namespace Sentry.data.Infrastructure
             _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
         }
 
-        public void PublishStartEvent(DataFlowStep step, string bucket, string key, string flowExecutionGuid, string runInstanceGuid)
+        public void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
             List<DataFlow_Log> logs = new List<DataFlow_Log>();
 
@@ -55,6 +55,8 @@ namespace Sentry.data.Infrastructure
             {
                 DateTime startTime = DateTime.Now;
                 logs.Add(step.LogExecution(flowExecutionGuid, runInstanceGuid, $"start-method <{step.DataAction_Type_Id.ToString()}>-publishstartevent", Log_Level.Debug));
+                string objectKey = s3Event.s3._object.key;
+                string keyBucket = s3Event.s3.bucket.name;
 
                 DataFlowStepEvent stepEvent = new DataFlowStepEvent()
                 {
@@ -65,11 +67,14 @@ namespace Sentry.data.Infrastructure
                     StepId = step.Id,
                     ActionId = step.Action.Id,
                     ActionGuid = step.Action.ActionGuid.ToString(),
-                    SourceBucket = bucket,
-                    SourceKey = key,
+                    SourceBucket = keyBucket,
+                    SourceKey = objectKey,
                     TargetBucket = step.Action.TargetStorageBucket,
                     TargetPrefix = step.Action.TargetStoragePrefix,
-                    EventType = GlobalConstants.DataFlowStepEvent.QUERY_STORAGE
+                    EventType = GlobalConstants.DataFlowStepEvent.QUERY_STORAGE,
+                    FileSize = s3Event.s3._object.size.ToString(),
+                    S3EventTime = s3Event.eventTime.ToString("s"),
+                    OriginalS3Event = JsonConvert.SerializeObject(s3Event)
                 };
 
                 logs.Add(step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Info));

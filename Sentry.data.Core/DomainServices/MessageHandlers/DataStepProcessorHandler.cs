@@ -26,7 +26,9 @@ namespace Sentry.data.Core
                 {
                     DataFlowStepEvent stepEvent = JsonConvert.DeserializeObject<DataFlowStepEvent>(msg);
                     Logger.Info("DataStepProcessorHandler processing DATAFLOWSTEP message: " + JsonConvert.SerializeObject(stepEvent));
-                    _dataStepProvider.ExecuteStep(stepEvent);
+                    Task.Factory.StartNew(() => _dataStepProvider.ExecuteStep(stepEvent),
+                                                                    TaskCreationOptions.LongRunning).ContinueWith(TaskException,
+                                                                    TaskContinuationOptions.OnlyOnFaulted);
                 }
                 else
                 {
@@ -48,6 +50,10 @@ namespace Sentry.data.Core
         public void Init()
         {
             throw new NotImplementedException();
+        }
+        private void TaskException(Task t)
+        {
+            Logger.Fatal("Exception occurred on main Windows Service Task. Stopping Service immediately.", t.Exception);
         }
     }
 }

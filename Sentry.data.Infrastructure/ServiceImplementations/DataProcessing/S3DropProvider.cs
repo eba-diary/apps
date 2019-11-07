@@ -9,6 +9,7 @@ using Sentry.data.Core.Entities.S3;
 using System.IO;
 using StructureMap;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Sentry.data.Infrastructure
 {
@@ -34,12 +35,16 @@ namespace Sentry.data.Infrastructure
             step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"start-method <{step.DataAction_Type_Id.ToString()}>-executeaction", Log_Level.Debug);
             try
             {
+                Stopwatch stopWatch = new Stopwatch();
+
+                stopWatch.Start();
                 DateTime startTime = DateTime.Now;
                 string fileName = Path.GetFileName(stepEvent.SourceKey);
                 step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()} processing event - {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Debug);
 
                 string versionKey = _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, stepEvent.TargetBucket, $"{stepEvent.TargetPrefix}{Path.GetFileName(stepEvent.SourceKey)}");
                 DateTime endTime = DateTime.Now;
+                stopWatch.Stop();
 
                 //Mock for testing... sent mock s3object created 
                 S3Event s3e = null;
@@ -74,9 +79,11 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public void PublishStartEvent(DataFlowStep step, string bucket, string key, string flowExecutionGuid, string runInstanceGuid)
+        public void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
             List<DataFlow_Log> logs = new List<DataFlow_Log>();
+            string objectKey = s3Event.s3._object.key;
+            string keyBucket = s3Event.s3.bucket.name;
             try
             {
                 DateTime startTime = DateTime.Now;
@@ -91,12 +98,15 @@ namespace Sentry.data.Infrastructure
                     StepId = step.Id,
                     ActionId = step.Action.Id,
                     ActionGuid = step.Action.ActionGuid.ToString(),
-                    SourceBucket = bucket,
-                    SourceKey = key,
+                    SourceBucket = keyBucket,
+                    SourceKey = objectKey,
                     TargetBucket = step.Action.TargetStorageBucket,
                     //add run instance (separated by dash) if not null
-                    TargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.Id.ToString()}/" + $"{flowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-"+runInstanceGuid)}/",
-                    EventType = GlobalConstants.DataFlowStepEvent.S3_DROP_START
+                    TargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.Id.ToString()}/" + $"{flowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid)}/",
+                    EventType = GlobalConstants.DataFlowStepEvent.S3_DROP_START,
+                    FileSize = s3Event.s3._object.size.ToString(),
+                    S3EventTime = s3Event.eventTime.ToString("s"),
+                    OriginalS3Event = JsonConvert.SerializeObject(s3Event)
                 };
 
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Debug);

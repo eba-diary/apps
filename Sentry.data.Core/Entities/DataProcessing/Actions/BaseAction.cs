@@ -1,4 +1,5 @@
-﻿using Sentry.data.Core.Interfaces.DataProcessing;
+﻿using Sentry.data.Core.Entities.S3;
+using Sentry.data.Core.Interfaces.DataProcessing;
 using System;
 
 namespace Sentry.data.Core.Entities.DataProcessing
@@ -26,9 +27,9 @@ namespace Sentry.data.Core.Entities.DataProcessing
         {
             _baseActionProvider.ExecuteAction(step, stepEvent);
         }
-        public virtual void PublishStartEvent(DataFlowStep step, string bucket, string key, string FlowExecutionGuid, string runInstanceGuid)
+        public virtual void PublishStartEvent(DataFlowStep step, string FlowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
-            _baseActionProvider.PublishStartEvent(step, bucket, key, FlowExecutionGuid, runInstanceGuid);
+            _baseActionProvider.PublishStartEvent(step, FlowExecutionGuid, runInstanceGuid, s3Event);
         }
     }
 }

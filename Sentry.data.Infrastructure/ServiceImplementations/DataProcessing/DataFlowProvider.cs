@@ -10,6 +10,7 @@ using Sentry.data.Core.Entities.S3;
 using Sentry.Common.Logging;
 using Sentry.data.Core.Interfaces.DataProcessing;
 using System.IO;
+using System.Diagnostics;
 
 namespace Sentry.data.Infrastructure
 {
@@ -23,10 +24,10 @@ namespace Sentry.data.Infrastructure
 
         public async Task ExecuteDependenciesAsync(S3ObjectEvent s3e)
         {
-            await ExecuteDependenciesAsync(s3e.s3.bucket.name, s3e.s3._object.key);
+            await ExecuteDependenciesAsync(s3e.s3.bucket.name, s3e.s3._object.key, s3e);
             //await ExecuteDependenciesAsync("sentry-dataset-management-np-nr", "data/17/TestFile.csv");
         }
-        public async Task ExecuteDependenciesAsync(string bucket, string key)
+        public async Task ExecuteDependenciesAsync(string bucket, string key, S3ObjectEvent s3Event)
         {
             bool IsNewFile = true;
 
@@ -35,7 +36,6 @@ namespace Sentry.data.Infrastructure
                 IDatasetContext dsContext = container.GetInstance<IDatasetContext>();
                 IDataFlowService dfService = container.GetInstance<IDataFlowService>();
                 IDataStepService _stepService = container.GetInstance<IDataStepService>();
-                //IMessagePublisher messagePublisher = container.GetInstance<IMessagePublisher>();
 
                 Logger.Info($"start-method <executedependencies>");
 
@@ -50,8 +50,6 @@ namespace Sentry.data.Infrastructure
 
                         _flow = stepList.Select(s => s.DataFlow).Distinct().Single();
 
-
-
                         //determine DataFlow execution and run instance guids to ensure processing is tied.
                         GetExecutionGuids(key);
 
@@ -62,8 +60,13 @@ namespace Sentry.data.Infrastructure
 
                             IsNewFile = true;
 
+                            Logger.AddContextVariable(new TextVariable("flowexecutionguid", flowExecutionGuid));
                             _flow.Logs.Add(_flow.LogExecution(flowExecutionGuid, $"Initialize flow execution bucket:{bucket}, key:{key}, file:{Path.GetFileName(key)}", Log_Level.Info));
-                        };
+                        }
+                        else
+                        {
+                            Logger.AddContextVariable(new TextVariable("flowexecutionguid", flowExecutionGuid));
+                        }
 
 
                         //log dependency steps
@@ -82,10 +85,15 @@ namespace Sentry.data.Infrastructure
                                 runInstanceGuid = InstanceEpoch.ToString();
                             }
 
+                            if (runInstanceGuid != null)
+                            {
+                                Logger.AddContextVariable(new TextVariable("runinstanceguid", runInstanceGuid));
+                            }
+
                             ////step.GenerateStartEvent(bucket, key, flowExecutionGuid);
                             //step.LogExecution(flowExecutionGuid, RunInstanceGuid, $"dataflowprovider-sendingstartevent", Log_Level.Debug);
                             //dsContext.SaveChanges();
-                            _stepService.PublishStartEvent(step, bucket, key, flowExecutionGuid, runInstanceGuid);
+                            _stepService.PublishStartEvent(step, flowExecutionGuid, runInstanceGuid, s3Event);
                         }
                         _flow.LogExecution(flowExecutionGuid, $"end-method <executedependencies>", Log_Level.Info);
                         //save new logs
@@ -108,6 +116,23 @@ namespace Sentry.data.Infrastructure
                     Logger.Info($"end-method <executedependencies>");
                 }                
             }
+        }
+
+        public async Task ExecuteStep(DataFlowStepEvent stepEvent)
+        {
+            using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+            {
+                IDataStepService stepService = container.GetInstance<IDataStepService>();
+
+                GetExecutionGuids(stepEvent.SourceKey);
+                Logger.AddContextVariable(new TextVariable("flowexecutionguid", flowExecutionGuid));
+                if (runInstanceGuid != null)
+                {
+                    Logger.AddContextVariable(new TextVariable("runinstanceguid", runInstanceGuid));
+                }
+
+                stepService.ExecuteStep(stepEvent);
+            }   
         }
 
         #region Private Methods

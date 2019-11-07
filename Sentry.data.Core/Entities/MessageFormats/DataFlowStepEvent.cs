@@ -20,5 +20,8 @@ namespace Sentry.data.Core
         public string SourceKey { get; set; }
         public string TargetPrefix { get; set; }
         public string TargetBucket { get; set; }
+        public string FileSize { get; set; }
+        public string S3EventTime { get; set; }
+        public string OriginalS3Event { get; set; }
     }
 }

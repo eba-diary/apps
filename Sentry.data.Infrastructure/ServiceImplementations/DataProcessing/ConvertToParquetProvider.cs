@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Entities.S3;
 using Sentry.data.Core.Interfaces.DataProcessing;
 using System;
 
@@ -20,11 +21,13 @@ namespace Sentry.data.Infrastructure
             throw new System.NotImplementedException();
         }
 
-        public void PublishStartEvent(DataFlowStep step, string bucket, string key, string flowExecutionGuid, string runInstanceGuid)
+        public void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
             try
             {
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"start-method <converttoparquetprovider-publishstartevent", Log_Level.Debug);
+                string objectKey = s3Event.s3._object.key;
+                string keyBucket = s3Event.s3.bucket.name;
 
                 DataFlowStepEvent stepEvent = new DataFlowStepEvent()
                 {
@@ -35,11 +38,14 @@ namespace Sentry.data.Infrastructure
                     StepId = step.Id,
                     ActionId = step.Action.Id,
                     ActionGuid = step.Action.ActionGuid.ToString(),
-                    SourceBucket = bucket,
-                    SourceKey = key,
+                    SourceBucket = keyBucket,
+                    SourceKey = objectKey,
                     TargetBucket = step.Action.TargetStorageBucket,
                     TargetPrefix = step.Action.TargetStoragePrefix,
-                    EventType = GlobalConstants.DataFlowStepEvent.CONVERT_TO_PARQUET
+                    EventType = GlobalConstants.DataFlowStepEvent.CONVERT_TO_PARQUET,
+                    FileSize = s3Event.s3._object.size.ToString(),
+                    S3EventTime = s3Event.eventTime.ToString("s"),
+                    OriginalS3Event = JsonConvert.SerializeObject(s3Event)
                 };
 
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"converttoparquetprovider-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Info);
