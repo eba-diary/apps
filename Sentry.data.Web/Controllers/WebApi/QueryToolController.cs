@@ -915,8 +915,15 @@ namespace Sentry.data.Web.Controllers
         public async Task<IHttpActionResult> GetHiveTable(int SessionID, int configID, int rows, int skip, string hiveTableName, string hiveDatabaseName)
         {
             String python;
-
-            python = "spark.sql('SELECT * FROM " + hiveTableName + "').show(" + rows + ", False)";
+            
+            if (hiveDatabaseName != null)
+            {
+                python = $"spark.sql('SELECT * FROM {hiveDatabaseName}.{hiveTableName}').show({rows}, True)";
+            }
+            else
+            {
+                python = $"spark.sql('SELECT * FROM {hiveTableName}').show({rows}, True)";
+            }            
 
             String quoted = System.Web.Helpers.Json.Encode(python);
             quoted = quoted.Substring(1, quoted.Length - 2);
