@@ -238,8 +238,12 @@
                         </div>
                     </div>
 
-                    <div class="showDateFormat col-lg-2" data-bind="visible: ShowDateFormat">
-                        <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Format" data-toggle="tooltip" data-placement="top" title="Format" />
+                    <div class="showDateFormat col-lg-4" data-bind="visible: ShowDateFormat">
+                        <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Default is yyyy-MM-dd" data-toggle="tooltip" data-placement="top" title="Format" />
+                    </div>
+
+                    <div class="showTimestampFormat col-lg-4" data-bind="visible: ShowTimestampFormat">
+                        <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Default is yyyy/MM/dd HH:mm:ss.SSS" data-toggle="tooltip" data-placement="top" title="Format" />
                     </div>
 
                     <div class="showArray col-lg-2" data-bind="visible: $root.AllowArrays">
@@ -419,13 +423,22 @@
             });
 
             self.ShowDateFormat = ko.computed(function () {
-                if (self.DataType() === 'DATE' || self.DataType() === 'TIMESTAMP') {
+                if (self.DataType() === 'DATE') {
                     return true;
                 }
                 else {
                     return false;
                 }
-            })
+            });
+
+            self.ShowTimestampFormat = ko.computed(function () {
+                if (self.DataType() === 'TIMESTAMP') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            });
 
             self.ShowArrayType = ko.computed(function () {
                 if (self.DataType() === 'ARRAY') {
