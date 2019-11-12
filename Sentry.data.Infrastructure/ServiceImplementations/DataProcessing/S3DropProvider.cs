@@ -63,7 +63,8 @@ namespace Sentry.data.Infrastructure
                             },
                             _object = new Sentry.data.Core.Entities.S3.Object()
                             {
-                                key = $"{stepEvent.TargetPrefix}{fileName}"
+                                key = $"{stepEvent.TargetPrefix}{fileName}",
+                                size = 100123
                             }
                         }
                     }
@@ -71,18 +72,16 @@ namespace Sentry.data.Infrastructure
 
                 _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
 
-                Logger.AddContextVariable(new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds));
-                step.Executions.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-successful  start:{startTime} end:{endTime} duration:{endTime - startTime}",Log_Level.Info));
+                step.Executions.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-successful  start:{startTime} end:{endTime} duration:{endTime - startTime}",Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }));
             }
             catch (Exception ex)
             {
-                Logger.AddContextVariable(new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds));
-                step.Executions.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-failed", Log_Level.Error, ex));
+                if (stopWatch.IsRunning)
+                {
+                    stopWatch.Stop();
+                }
+                step.Executions.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-failed", Log_Level.Error, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, ex));
                 step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"end-method <{step.DataAction_Type_Id.ToString()}>-executeaction", Log_Level.Debug);
-            }
-            finally
-            {
-                Logger.RemoveContextVariable("stepduration");
             }
         }
 
@@ -124,18 +123,12 @@ namespace Sentry.data.Infrastructure
                 stopWatch.Stop();
                 DateTime endTime = DateTime.Now;
 
-                Logger.AddContextVariable(new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds));
-                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-publishstartevent-successful  start:{startTime} end:{endTime} duration:{endTime - startTime}", Log_Level.Info);
+                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-publishstartevent-successful  start:{startTime} end:{endTime} duration:{endTime - startTime}", Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) });
             }
             catch (Exception ex)
             {
-                Logger.AddContextVariable(new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds));
-                step.Executions.Add(step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-publishstartevent-failed", Log_Level.Error, ex));
+                step.Executions.Add(step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-publishstartevent-failed", Log_Level.Error, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, ex));
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <{step.DataAction_Type_Id.ToString()}>-publishstartevent", Log_Level.Debug);
-            }
-            finally
-            {
-                Logger.RemoveContextVariable("stepduration");
             }
         }
     }
