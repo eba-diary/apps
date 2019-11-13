@@ -229,17 +229,24 @@
                         <select class="typeSelect col-lg-12" data-bind="options: $root.DataTypes, optionsCaption: 'Choose Datatype', optionsValue: 'Name', optionsText: 'Name', optionsAfterRender: $root.setTagGroup, value: DataType"></select>
                         <input type="hidden" name="dataObjectField_Id" data-bind="value: DataObjectField_ID" data-toggle="tooltip" data-placement="top" title="Data Type Selection" />
                     </div>
-                    <div class="showPandS col-lg-2" data-bind="visible: ShowPandS">
-                        <div class="precisionContainer col-lg-6">
-                            <input class="precision col-lg-12" data-bind="value: Precision" type="number" min="1" max="38" placeholder="Prec" data-toggle="tooltip" data-placement="top" title="Precision" />
+                    <div class="showPandS col-lg-4" data-bind="visible: ShowPandS">
+                        <div class="precisionContainer col-lg-2">
+                            <input class="precision col-lg-12" data-bind="textInput: Precision" placeholder="Prec" data-toggle="tooltip" data-placement="top" title="Precision" />
                         </div>
-                        <div class="scaleContainer col-lg-6">
-                            <input class="scale col-lg-12" data-bind="value: Scale" type="number" min="1" max="38" placeholder="Scale" data-toggle="tooltip" data-placement="top" title="Scale" />
+                        <div class="scaleContainer col-lg-2">
+                            <input class="scale col-lg-12" data-bind="textInput: Scale" placeholder="Scale" data-toggle="tooltip" data-placement="top" title="Scale" />
+                        </div>
+                        <div class="col-lg-8">
+                            <span>1234.56 = Precision:6  Scale:2</span>
                         </div>
                     </div>
 
-                    <div class="showDateFormat col-lg-2" data-bind="visible: ShowDateFormat">
-                        <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Format" data-toggle="tooltip" data-placement="top" title="Format" />
+                    <div class="showDateFormat col-lg-4" data-bind="visible: ShowDateFormat">
+                        <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Default is yyyy-MM-dd" data-toggle="tooltip" data-placement="top" title="Format" />
+                    </div>
+
+                    <div class="showTimestampFormat col-lg-4" data-bind="visible: ShowTimestampFormat">
+                        <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Default is yyyy/MM/dd HH:mm:ss.SSS" data-toggle="tooltip" data-placement="top" title="Format" />
                     </div>
 
                     <div class="showArray col-lg-2" data-bind="visible: $root.AllowArrays">
@@ -291,6 +298,47 @@
         var currentMax = 0;
         var errorList = [];
 
+        ko.extenders.numeric = function (target, options) {
+                //create a writable computed observable to intercept writes to our observable
+            var precision = options.precision,
+                min = options.min,
+                max = options.max;
+            
+            var result = ko.pureComputed({
+                read: target,  //always return the original observables value
+                write: function (newValue) {
+                    var current = target(),
+                        roundingMultiplier = Math.pow(10, precision),
+                        newValueAsNum = isNaN(newValue) ? 0 : parseFloat(+newValue),
+                        valueToWrite = Math.round(newValueAsNum * roundingMultiplier) / roundingMultiplier;
+
+                    if ((min != undefined || min != null) && valueToWrite < min) {
+                        valueToWrite = min;
+                    }
+
+                    if ((max != undefined || max != null) && valueToWrite > max) {
+                        valueToWrite = max;
+                    }
+
+                    //only write if it changed
+                    if (valueToWrite !== current) {
+                        target(valueToWrite);
+                    } else {
+                        //if the rounded value is the same, but a different value was written, force a notification for the current field
+                        if (newValue !== current) {
+                            target.notifySubscribers(valueToWrite);
+                        }
+                    }
+                }
+            }).extend({ notify: 'always' });
+
+            //initialize with current value to make sure it is rounded appropriately
+            result(target());
+
+            //return the new computed observable
+            return result;
+            };
+
         function Row(id, indata, parent, level) {
             var self = this;
             var parent = parent;
@@ -310,8 +358,8 @@
             self.Description = ko.observable(indata.Description);
             self.DataType = ko.observable(indata.DataType).extend({ notify: 'always'});
             self.ArrayType = ko.observable(indata.ArrayType);
-            self.Precision = ko.observable(indata.Precision);
-            self.Scale = ko.observable(indata.Scale);
+            self.Precision = ko.observable(indata.Precision).extend({ numeric: { precision: 0, min: 1, max: 38 }});
+            self.Scale = ko.observable(indata.Scale).extend({ numeric: { precision: 0, min: 1, max: 38 }});
             self.Format = ko.observable(indata.Format);
             self.DeleteInd = ko.observable(false);
             self.IsArray = ko.observable(indata.IsArray);
@@ -396,6 +444,18 @@
                     hasError = true;
                 }
 
+                if (self.DataType() === 'DECIMAL') {
+                    if (self.Scale() > self.Precision()) {
+                        parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Datatype', 'Description': 'Scale need to be less than or equal to Precision.' });
+                        hasError = true;
+                    }
+
+                    if (self.Precision() <= 0) {
+                        parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Datatype', 'Description': 'Precision need to be greater than 0.' });
+                        hasError = true;
+                    }                    
+                }
+
                 if (hasError) {
                     $('#saveBtn').hide();
                     return 'rgba(255, 0, 0, 0.8)';
@@ -419,13 +479,22 @@
             });
 
             self.ShowDateFormat = ko.computed(function () {
-                if (self.DataType() === 'DATE' || self.DataType() === 'TIMESTAMP') {
+                if (self.DataType() === 'DATE') {
                     return true;
                 }
                 else {
                     return false;
                 }
-            })
+            });
+
+            self.ShowTimestampFormat = ko.computed(function () {
+                if (self.DataType() === 'TIMESTAMP') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            });
 
             self.ShowArrayType = ko.computed(function () {
                 if (self.DataType() === 'ARRAY') {
