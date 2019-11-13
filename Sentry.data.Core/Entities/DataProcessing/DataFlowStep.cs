@@ -41,26 +41,22 @@ namespace Sentry.data.Core.Entities.DataProcessing
         }
 
         public virtual DataFlow_Log LogExecution(string executionGuid, string runInstanceGuid, string log, Log_Level level, List<Variable> contextVariables, Exception ex = null)
-        {
-            foreach(Variable contVar in contextVariables)
-            {
-                Logger.AddContextVariable(contVar);
-            }
+        {            
             //string logMsg = $"{executionGuid}{((runInstanceGuid != null) ? "-" + runInstanceGuid : String.Empty)} {log}";
             switch (level)
             {
                 case Log_Level.Info:
-                    Logger.Info(log);
+                    Logger.Info(log, contextVariables.ToArray());
                     break;
                 case Log_Level.Warning:
-                    Logger.Warn(log);
+                    Logger.Warn(log, contextVariables.ToArray());
                     break;
                 case Log_Level.Debug:
-                    Logger.Debug(log);
+                    Logger.Debug(log, contextVariables.ToArray());
                     break;
                 default:
                 case Log_Level.Error:
-                    Logger.Error(log, ex);
+                    Logger.Error(log, ex, contextVariables.ToArray());
                     break;
             }
 
