@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
@@ -12,7 +13,7 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
         public string SchemaRevisionName { get; set; }
         public string CreatedBy { get; set; }
         public string CreatedByName { get; set; }
-        public DateTime CreatedDTM { get; set; }
-        public DateTime LastUpdatedDTM { get; set; }
+        public string CreatedDTM { get; set; }
+        public string LastUpdatedDTM { get; set; }
     }
 }

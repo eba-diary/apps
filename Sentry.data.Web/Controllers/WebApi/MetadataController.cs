@@ -431,24 +431,15 @@ namespace Sentry.data.Web.Controllers
         [Route("datasets/{DatasetConfigID}/schemas/{SchemaID}/hive")]
         public async Task<IHttpActionResult> GetPrimaryHiveTableFor(int DatasetConfigID, int SchemaID = 0)
         {
-            DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
-
-            if (config.Schemas.Any(x => x.SchemaIsPrimary))
+            try
             {
-                DataElement schemarev = config.Schemas.FirstOrDefault(x => x.SchemaIsPrimary);
+                DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
 
-                if (schemarev.HiveTable != null)
-                {
-                    return Ok(new { HiveDatabaseName = schemarev.HiveDatabase, HiveTableName = schemarev.HiveTable });
-                }
-                else
-                {
-                    return NotFound();
-                }
-
+                return Ok(new { HiveDatabaseName = config.Schema.HiveDatabase, HiveTableName = config.Schema.HiveTable });
             }
-            else
+            catch(Exception ex)
             {
+                Logger.Error("metadatacontroller-datasets_schemas_hive failed", ex);
                 return NotFound();
             }
         }
