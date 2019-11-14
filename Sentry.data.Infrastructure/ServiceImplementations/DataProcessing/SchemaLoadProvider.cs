@@ -35,6 +35,7 @@ namespace Sentry.data.Infrastructure
             try
             {
                 DateTime startTime = DateTime.Now;
+                stopWatch.Start();
                 string fileName = Path.GetFileName(stepEvent.SourceKey);
                 logs.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()} processing event - {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Debug));
 
@@ -67,7 +68,7 @@ namespace Sentry.data.Infrastructure
 
                 _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
 
-                step.Executions.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-successful  start:{startTime} end:{endTime} duration:{endTime - startTime}", Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds)}, null));
+                step.Executions.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-successful", Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds)}, null));
                 logs = null;
             }
             catch (Exception ex)
