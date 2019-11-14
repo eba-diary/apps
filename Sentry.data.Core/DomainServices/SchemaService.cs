@@ -11,11 +11,13 @@ namespace Sentry.data.Core
     {
         public IDatasetContext _datasetContext;
         public IUserService _userService;
+        public IEmailService _emailService;
 
-        public SchemaService(IDatasetContext dsContext, IUserService userService)
+        public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService)
         {
             _datasetContext = dsContext;
             _userService = userService;
+            _emailService = emailService;
         }
 
         public int CreateAndSaveSchema(FileSchemaDto schemaDto)
@@ -38,11 +40,28 @@ namespace Sentry.data.Core
 
         public bool UpdateAndSaveSchema(FileSchemaDto schemaDto)
         {
+            var sendSASEmail = false;
             try
             {
                 FileSchema schema = _datasetContext.GetById<FileSchema>(schemaDto.SchemaId);
+
+                //determine whether to send email to SAS Admins 
+                if (schemaDto.IsInSAS == true && 
+                    schema.IsInSAS != schemaDto.IsInSAS && 
+                    _datasetContext.SchemaRevision.Where(w => w.ParentSchema == schema).Any())
+                {
+                    sendSASEmail = true;
+                }
+
                 UpdateAndSaveSchema(schemaDto, schema);
                 _datasetContext.SaveChanges();
+
+                //if (sendSASEmail)
+                //{
+                //    SchemaRevision rev = _datasetContext.SchemaRevision.Where(w => w.ParentSchema == schema).OrderByDescending(o => o.Revision_NBR).Take(1).FirstOrDefault();
+                //    rev.SendIncludeInSasEmail(false, _userService.GetCurrentUser(), _emailService);
+                //}
+
                 return true;
             }
             catch (Exception ex)

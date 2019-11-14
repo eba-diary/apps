@@ -22,11 +22,11 @@ namespace Sentry.data.Core
 
                 if (IsNew)
                 {
-                    bodySb.Append($"<p>{user.DisplayName} has requested {schema.HiveTable} be added to {schema.SasLibrary}.</p>");
+                    bodySb.Append($"<p>{user.DisplayName} has requested vw_{schema.HiveTable} be added to {schema.SasLibrary}.</p>");
                 }
                 else
                 {
-                    bodySb.Append($"<p>{user.DisplayName} has updated {schema.HiveTable} schema.  Can you please refresh {schema.HiveTable} within {schema.SasLibrary} library.</p>");
+                    bodySb.Append($"<p>{user.DisplayName} has updated {schema.HiveTable} schema.  Can you please refresh vw_{schema.HiveTable} within {schema.SasLibrary} library.</p>");
                 }
 
                 bodySb.Append($"<p>Thank you from your friendly data.sentry.com Administration team</p>");
