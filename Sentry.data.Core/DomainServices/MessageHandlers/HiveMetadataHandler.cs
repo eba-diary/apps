@@ -16,14 +16,16 @@ namespace Sentry.data.Core
         private IDatasetContext _dsContext;
         private UserService _userService;
         private IEmailService _emailService;
+        private ISchemaService _schemaService;
         #endregion
 
         #region Constructor
-        public HiveMetadataHandler(IDatasetContext dsContext, UserService userService, IEmailService emailService)
+        public HiveMetadataHandler(IDatasetContext dsContext, UserService userService, IEmailService emailService, ISchemaService schemaService)
         {
             _dsContext = dsContext;
             _userService = userService;
             _emailService = emailService;
+            _schemaService = schemaService;
         }
         #endregion
 
@@ -48,20 +50,12 @@ namespace Sentry.data.Core
 
                                 if (de.IsInSAS)
                                 {
-                                    SchemaRevision rev = null;
-                                    try
+                                    bool IsSuccessful = _schemaService.SasUpdateNotification(hiveCreatedEvent.SchemaID, hiveCreatedEvent.RevisionID);
+
+                                    if (!IsSuccessful)
                                     {
-                                        rev = _dsContext.SchemaRevision.Where(w => w.SchemaRevision_Id == hiveCreatedEvent.RevisionID && w.ParentSchema.SchemaId == hiveCreatedEvent.SchemaID).FirstOrDefault();
-                                        if (rev.Fields.Where(w => w.LastUpdateDTM == rev.LastUpdatedDTM).Any())
-                                        {
-                                            rev.SendIncludeInSasEmail(true, _userService.GetByAssociateId(rev.CreatedBy), _emailService);
-                                        }
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        int revisionId = (rev != null) ? rev.SchemaRevision_Id : 0;
-                                        Logger.Error($"HiveMetadataHandler failed sending SAS email - revision:{revisionId}", ex);
-                                    }
+                                        Logger.Error($"HiveMetadataHandler failed sending SAS email - revision:{hiveCreatedEvent.RevisionID}");
+                                    }                                    
                                 }
                                 break;
                             case "FAILED":
