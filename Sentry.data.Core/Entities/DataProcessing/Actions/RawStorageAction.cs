@@ -7,7 +7,7 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public RawStorageAction() { }
         public RawStorageAction(IRawStorageProvider rawStorageProvider) : base(rawStorageProvider)
         {
-            TargetStoragePrefix = GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX;
+            TargetStoragePrefix = GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX + Configuration.Config.GetHostSetting("S3DataPrefix");
         }
     }
 }

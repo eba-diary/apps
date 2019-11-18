@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -147,6 +148,71 @@ namespace Sentry.data.Core
             DatasetFile file = _datasetContext.DatasetFile.OrderBy(x => x.CreateDTM).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
             return file;
         }
+
+        public FileSchema GetFileSchemaByStorageCode(string storageCode)
+        {
+            FileSchema schema = _datasetContext.FileSchema.Where(w => w.StorageCode == storageCode).FirstOrDefault();
+            return schema;
+        }
+
+        public bool RegisterRawFile(FileSchema schema, string objectKey, string versionId, DataFlowStepEvent stepEvent)
+        {
+            if (objectKey == null)
+            {
+                Logger.Debug($"schemaservice-registerrawfile no-objectkey-input");
+                return false;
+            }
+
+            if (schema == null)
+            {
+                Logger.Debug($"schemaservice-registerrawfile no-schema-input");
+                return false;
+            }
+
+            if (stepEvent == null)
+            {
+                Logger.Debug($"schemaservice-registerrawfile no-stepevent-input");
+            }
+
+            try
+            {
+                DatasetFile file = new DatasetFile();
+
+                MapToDatasetFile(stepEvent, objectKey, versionId, file);
+
+                _datasetContext.Add(file);
+                _datasetContext.SaveChanges();
+            }
+            catch(Exception ex)
+            {
+                Logger.Error($"schemaservice-registerrawfile-failed", ex);
+
+                return false;
+            }           
+
+            return true;
+        }
+
+        private void MapToDatasetFile(DataFlowStepEvent stepEvent, string fileKey, string fileVersionId, DatasetFile file)
+        {
+            file.DatasetFileId = 0;
+            file.FileName = Path.GetFileName(fileKey);
+            file.Dataset = _datasetContext.GetById<Dataset>(stepEvent.DatasetID);
+            file.UploadUserName = "";
+            file.DatasetFileConfig = null;
+            file.FileLocation = stepEvent.TargetPrefix + Path.GetFileName(stepEvent.SourceKey);
+            file.CreateDTM = DateTime.Now;
+            file.ModifiedDTM = DateTime.Now;
+            file.ParentDatasetFileId = null;
+            file.VersionId = fileVersionId;
+            file.IsBundled = false;
+            file.Size = long.Parse(stepEvent.FileSize);
+            file.Schema = _datasetContext.GetById<FileSchema>(stepEvent.SchemaId);
+            file.SchemaRevision = file.Schema.Revisions.OrderByDescending(o => o.Revision_NBR).Take(1).SingleOrDefault();
+            file.DatasetFileConfig = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == stepEvent.SchemaId).FirstOrDefault();
+        }
+
+        
 
         private int CreateSchema(FileSchemaDto dto)
         {

@@ -181,7 +181,7 @@ namespace Sentry.data.Infrastructure
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX)
                )
             {
-                int idx = GetNthIndex(key, '/', 3);
+                int idx = GetNthIndex(key, '/', 4);
                 filePrefix = key.Substring(0, (idx + 1));
             }
             //two level prefixes - non-temp locations
@@ -190,7 +190,7 @@ namespace Sentry.data.Infrastructure
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CONVERT_TO_PARQUET_PREFIX)
                )
             {
-                int idx = GetNthIndex(key, '/', 2);
+                int idx = GetNthIndex(key, '/', 3);
                 filePrefix = key.Substring(0, (idx + 1));
             }
 
@@ -230,8 +230,8 @@ namespace Sentry.data.Infrastructure
             //four level prefixes - temp locations
             if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX))
             {
-                int strtIdx = GetNthIndex(key, '/', 4);
-                int endIdx = GetNthIndex(key, '/', 5);
+                int strtIdx = GetNthIndex(key, '/', 5);
+                int endIdx = GetNthIndex(key, '/', 6);
                 guidPrefix = key.Substring(strtIdx + 1, (endIdx - strtIdx) - 1);
             }
 
@@ -240,8 +240,8 @@ namespace Sentry.data.Infrastructure
             if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX)
                )
             {
-                int strtIdx = GetNthIndex(key, '/', 3);
-                int endIdx = GetNthIndex(key, '/', 4);
+                int strtIdx = GetNthIndex(key, '/', 4);
+                int endIdx = GetNthIndex(key, '/', 5);
                 guidPrefix = key.Substring(strtIdx + 1, (endIdx - strtIdx) - 1);
             }
 
@@ -250,8 +250,8 @@ namespace Sentry.data.Infrastructure
             if (guidPrefix == null && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX))
             {
-                int strtIdx = GetNthIndex(key, '/', 2);
-                int endIdx = GetNthIndex(key, '/', 3);
+                int strtIdx = GetNthIndex(key, '/', 3);
+                int endIdx = GetNthIndex(key, '/', 4);
                 guidPrefix = key.Substring(strtIdx + 1, (endIdx - strtIdx) - 1);
             }
 

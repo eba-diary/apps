@@ -26,6 +26,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Class(typeof(DataFlowStep));
             });
 
+            this.ManyToOne(x => x.Dataset, m =>
+            {
+                m.Column("DatasetId");
+                m.Class(typeof(Dataset));
+            });
+
             this.ManyToOne(x => x.MappedSchema, m =>
             {
                 m.Column("SchemaId");

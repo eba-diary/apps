@@ -136,6 +136,20 @@ namespace Sentry.data.Infrastructure
             }            
         }
 
+        public string GetStorageCodeFromKey(string key)
+        {
+            string storageCode = string.Empty;
+            //temp-file/schemaloade/<flowId>/<storagecode>/<guids>/
+            if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX))
+            {
+                int strtIdx = GetNthIndex(key, '/', 4);
+                int endIdx = GetNthIndex(key, '/', 5);
+                storageCode = key.Substring(strtIdx + 1, (endIdx - strtIdx) - 1);
+            }
+
+            return storageCode;
+        }
+
         private string GenerateGuid(string executionGuid, string instanceGuid)
         {
             if (instanceGuid == null)
@@ -146,6 +160,23 @@ namespace Sentry.data.Infrastructure
             {
                 return executionGuid + "-" + instanceGuid;
             }            
+        }
+
+        private int GetNthIndex(string s, char t, int n)
+        {
+            int count = 0;
+            for (int i = 0; i < s.Length; i++)
+            {
+                if (s[i] == t)
+                {
+                    count++;
+                    if (count == n)
+                    {
+                        return i;
+                    }
+                }
+            }
+            return -1;
         }
     }
 }

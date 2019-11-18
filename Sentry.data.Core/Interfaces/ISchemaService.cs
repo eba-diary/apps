@@ -17,5 +17,7 @@ namespace Sentry.data.Core
         FileSchemaDto GetFileSchemaDto(int id);
         List<DatasetFile> GetDatasetFilesBySchema(int schemaId);
         DatasetFile GetLatestDatasetFileBySchema(int schemaId);
+        FileSchema GetFileSchemaByStorageCode(string storageCode);
+        bool RegisterRawFile(FileSchema schema, string objectKey, string versionId, DataFlowStepEvent stepEvent);
     }
 }

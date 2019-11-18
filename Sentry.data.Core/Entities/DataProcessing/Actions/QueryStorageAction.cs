@@ -7,7 +7,7 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public QueryStorageAction() { }
         public QueryStorageAction(IQueryStorageProvider queryStorageProvider) : base(queryStorageProvider)
         {
-            TargetStoragePrefix = GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX;
+            TargetStoragePrefix = GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX + Configuration.Config.GetHostSetting("S3DataPrefix");
         }
     }
 }

@@ -67,6 +67,16 @@ namespace Sentry.data.Core
             AddDataFlowStep(df, step1);
             _datasetContext.Add(step1);
 
+            DataFlowStep step3 = new DataFlowStep()
+            {
+                DataFlow = df,
+                Action = _datasetContext.RawStorageAction.FirstOrDefault(),
+                DataAction_Type_Id = DataActionType.RawStorage
+            };
+
+            AddDataFlowStep(df, step3);
+            _datasetContext.Add(step3);
+
             DataFlowStep step2 = new DataFlowStep()
             {
                 DataFlow = df,
@@ -81,22 +91,13 @@ namespace Sentry.data.Core
             {
                 DataFlowStepId = step2,
                 MappedSchema = _datasetContext.FileSchema.Where(w => w.SchemaId == schemaId).FirstOrDefault(),
+                Dataset = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaId).Select(s => s.ParentDataset).FirstOrDefault(),
                 SearchCriteria = "Testfile.csv"
             };
             _datasetContext.Add(mapping);
             List<SchemaMap> maps = new List<SchemaMap>();
             maps.Add(mapping);
             step2.SchemaMappings = maps;
-
-            DataFlowStep step3 = new DataFlowStep()
-            {
-                DataFlow = df,
-                Action = _datasetContext.RawStorageAction.FirstOrDefault(),
-                DataAction_Type_Id = DataActionType.RawStorage
-            };
-
-            AddDataFlowStep(df, step3);
-            _datasetContext.Add(step3);
 
             DataFlowStep step4 = new DataFlowStep()
             {
@@ -107,8 +108,6 @@ namespace Sentry.data.Core
 
             AddDataFlowStep(df, step4);
             _datasetContext.Add(step4);
-
-
 
             _datasetContext.SaveChanges();
 

@@ -10,6 +10,7 @@ using Sentry.data.Core;
 using System.IO;
 using Sentry.Common.Logging;
 using Amazon.S3.IO;
+using System.Diagnostics;
 
 namespace Sentry.data.Infrastructure
 {
@@ -918,39 +919,62 @@ namespace Sentry.data.Infrastructure
 
         public string CopyObject(string srcBucket, string srcKey, string destBucket, string destKey)
         {
+            Stopwatch stopWatch = new Stopwatch();            
 
-            Dictionary<string, string> resp = GetObjectMetadata(srcKey);
-
-            long objectSize = Convert.ToInt64(resp["ContentLength"]);
-
-            //Copy object file size upper limit is 5GB, if larger use multipartcopy command.
-            if (objectSize > 5 * (long)Math.Pow(2, 30))
+            try
             {
-                Logger.Info($"Using MultiPartCopy - FileSize({objectSize})");
-                MultiPartCopy(srcKey, destKey).Wait();
+                stopWatch.Start();
+                Logger.Debug("s3serviceprovider-copyobject-startmethod");
+                Logger.Debug($"s3serviceprovider-copyobject processing sourcebucket:{srcBucket} sourcekey:{srcKey} targetbucket:{destBucket} targetkey:{destKey}");
+                
+                Dictionary<string, string> resp = GetObjectMetadata(srcKey);
 
-                return versionId;
-            }
-            else
-            {
-                Logger.Info($"Using Copy Object Request - FileSize({objectSize})");
+                long objectSize = Convert.ToInt64(resp["ContentLength"]);
 
-                CopyObjectRequest request = new CopyObjectRequest
+                //Copy object file size upper limit is 5GB, if larger use multipartcopy command.
+                if (objectSize > 5 * (long)Math.Pow(2, 30))
                 {
-                    SourceBucket = srcBucket,
-                    SourceKey = srcKey,
-                    DestinationBucket = destBucket,
-                    DestinationKey = destKey,
-                    ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256
-                };
+                    Logger.Info($"Using MultiPartCopy - FileSize({objectSize})");
+                    MultiPartCopy(srcKey, destKey).Wait();
+                    stopWatch.Stop();
 
-                CopyObjectResponse response = S3Client.CopyObject(request);
-                if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
-                {
-                    resp = GetObjectMetadata(destKey, null);
+                    Logger.Debug($"s3serviceprovider-copyobject-successful", new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }.ToArray());
+                    return versionId;
                 }
-                return (resp != null) ? Convert.ToString(resp["VersionId"]) : null;
-            }            
+                else
+                {
+                    Logger.Info($"Using Copy Object Request - FileSize({objectSize})");
+
+                    CopyObjectRequest request = new CopyObjectRequest
+                    {
+                        SourceBucket = srcBucket,
+                        SourceKey = srcKey,
+                        DestinationBucket = destBucket,
+                        DestinationKey = destKey,
+                        ServerSideEncryptionMethod = ServerSideEncryptionMethod.AES256
+                    };
+
+                    CopyObjectResponse response = S3Client.CopyObject(request);
+                    if (response.HttpStatusCode == System.Net.HttpStatusCode.OK)
+                    {
+                        resp = GetObjectMetadata(destKey, null);
+                    }
+                    stopWatch.Stop();
+
+                    Logger.Debug($"s3serviceprovider-copyobject-successful", new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }.ToArray());
+                    return (resp != null) ? Convert.ToString(resp["VersionId"]) : null;
+                }
+            }
+            catch(Exception ex)
+            {
+                if (stopWatch.IsRunning)
+                {
+                    stopWatch.Stop();
+                }
+                Logger.Error($"s3serviceprovider-copyobject failed", ex, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }.ToArray());
+                throw;
+            }
+                        
         }
 
         public List<KeyValuePair<string, string>> GetObjectTags(string bucket, string key, string versionId = null)

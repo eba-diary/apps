@@ -8,7 +8,7 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public SchemaLoadAction() { }
         public SchemaLoadAction(ISchemaLoadProvider schemaLoadProvider) : base(schemaLoadProvider)
         {
-            TargetStoragePrefix = GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX;
+            TargetStoragePrefix = GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX + Configuration.Config.GetHostSetting("S3DataPrefix");
         }
         public virtual List<SchemaMap> SchemaMaps { get; set; }
     }

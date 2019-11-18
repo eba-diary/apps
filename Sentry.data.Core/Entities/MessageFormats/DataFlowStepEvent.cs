@@ -23,5 +23,6 @@ namespace Sentry.data.Core
         public string FileSize { get; set; }
         public string S3EventTime { get; set; }
         public string OriginalS3Event { get; set; }
+        public int SchemaId { get; set; }
     }
 }
