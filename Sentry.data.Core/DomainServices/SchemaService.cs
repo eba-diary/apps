@@ -179,8 +179,26 @@ namespace Sentry.data.Core
                 DatasetFile file = new DatasetFile();
 
                 MapToDatasetFile(stepEvent, objectKey, versionId, file);
-
                 _datasetContext.Add(file);
+
+                //if this is a reprocess scenario, set previous dataset files ParentDatasetFileID to this datasetfile
+                //  this will ensure only the latest file version shows within UI
+                if (stepEvent.RunInstanceGuid != null || stepEvent.RunInstanceGuid != string.Empty)
+                {
+                    List<DatasetFile> previousFileList = new List<DatasetFile>();
+                    previousFileList = _datasetContext.DatasetFile.Where(w => w.Schema.SchemaId == stepEvent.SchemaId && w.FileName == file.FileName && w.ParentDatasetFileId == null && w.DatasetFileId != file.DatasetFileId).ToList();
+
+                    if (previousFileList.Any())
+                    {
+                        Logger.Debug($"schemaservice-registerrawfile setting-parentdatasetfileid detected {previousFileList.Count} file(s) to be updated");
+                    }
+
+                    foreach (DatasetFile item in previousFileList)
+                    {
+                        item.ParentDatasetFileId = file.DatasetFileId;
+                    }
+                }
+                                
                 _datasetContext.SaveChanges();
             }
             catch(Exception ex)
@@ -210,6 +228,8 @@ namespace Sentry.data.Core
             file.Schema = _datasetContext.GetById<FileSchema>(stepEvent.SchemaId);
             file.SchemaRevision = file.Schema.Revisions.OrderByDescending(o => o.Revision_NBR).Take(1).SingleOrDefault();
             file.DatasetFileConfig = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == stepEvent.SchemaId).FirstOrDefault();
+            file.FlowExecutionGuid = stepEvent.FlowExecutionGuid;
+            file.RunInstanceGuid = (stepEvent.RunInstanceGuid) ?? null;
         }
 
         

@@ -15,6 +15,8 @@
     [Size_AMT] BIGINT NULL, 
     [Schema_ID] INT NULL, 
     [SchemaRevision_ID] INT NULL, 
+    [FlowExecutionGuid] VARCHAR(100) NULL, 
+    [RunInstanceGuid] VARCHAR(100) NULL, 
     CONSTRAINT [FK_DatasetFile_Dataset] FOREIGN KEY (Dataset_ID) REFERENCES Dataset(Dataset_ID), 
     CONSTRAINT [FK_DatasetFile_DatasetFileConfigs] FOREIGN KEY ([DatasetFileConfig_ID]) REFERENCES [DatasetFileConfigs]([Config_ID])
 )

@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Sentry.Common.Logging;
 using System.Diagnostics;
+using System.Text.RegularExpressions;
 
 namespace Sentry.data.Infrastructure
 {
@@ -97,32 +98,49 @@ namespace Sentry.data.Infrastructure
                 string keyBucket = s3Event.s3.bucket.name;
                 SchemaMap mapping = step.SchemaMappings.FirstOrDefault();
 
-                DataFlowStepEvent stepEvent = new DataFlowStepEvent()
+                //Evaluate incoming file matches search criteria of any SchemaMappings for Data Step
+                List<SchemaMap> validMappings = GetMatchingSchemaMappings(Path.GetFileName(objectKey), step.SchemaMappings);
+                
+                if (validMappings.Any())
                 {
-                    DataFlowId = step.DataFlow.Id,
-                    DataFlowGuid = step.DataFlow.FlowGuid.ToString(),
-                    FlowExecutionGuid = flowExecutionGuid,
-                    RunInstanceGuid = runInstanceGuid,
-                    StepId = step.Id,
-                    ActionId = step.Action.Id,
-                    ActionGuid = step.Action.ActionGuid.ToString(),
-                    SourceBucket = keyBucket,
-                    SourceKey = objectKey,
-                    TargetBucket = step.Action.TargetStorageBucket,
-                    //<targetstorageprefix>/<dataflowid>/<storagecode>/<flow execution guid>[-<run instance guid>]/
-                    TargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.Id}/{mapping.MappedSchema.StorageCode}/{GenerateGuid(flowExecutionGuid, runInstanceGuid)}/ ",
-                    EventType = GlobalConstants.DataFlowStepEvent.SCHEMA_LOAD,
-                    FileSize = s3Event.s3._object.size.ToString(),
-                    S3EventTime = s3Event.eventTime.ToString("s"),
-                    OriginalS3Event = JsonConvert.SerializeObject(s3Event)
-                };
+                    step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()} schemamapping-match {validMappings.Count} matching schema maps for {objectKey}", Log_Level.Debug);
+                }
+                else
+                {
+                    step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()} schemamapping-notdetected file will not be processed - {objectKey}", Log_Level.Warning);
+                }                
 
-                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Info);
+                foreach (SchemaMap item in validMappings)
+                {
+                    DataFlowStepEvent stepEvent = new DataFlowStepEvent()
+                    {
+                        DataFlowId = step.DataFlow.Id,
+                        DataFlowGuid = step.DataFlow.FlowGuid.ToString(),
+                        FlowExecutionGuid = flowExecutionGuid,
+                        RunInstanceGuid = runInstanceGuid,
+                        StepId = step.Id,
+                        ActionId = step.Action.Id,
+                        ActionGuid = step.Action.ActionGuid.ToString(),
+                        SourceBucket = keyBucket,
+                        SourceKey = objectKey,
+                        TargetBucket = step.Action.TargetStorageBucket,
+                        //<targetstorageprefix>/<dataflowid>/<storagecode>/<flow execution guid>[-<run instance guid>]/
+                        TargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.Id}/{mapping.MappedSchema.StorageCode}/{GenerateGuid(flowExecutionGuid, runInstanceGuid)}/ ",
+                        EventType = GlobalConstants.DataFlowStepEvent.SCHEMA_LOAD,
+                        FileSize = s3Event.s3._object.size.ToString(),
+                        S3EventTime = s3Event.eventTime.ToString("s"),
+                        OriginalS3Event = JsonConvert.SerializeObject(s3Event)
+                    };
 
-                _messagePublisher.PublishDSCEvent($"{step.DataFlow.Id}-{step.Id}", JsonConvert.SerializeObject(stepEvent));
+                    step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Info);
+
+                    _messagePublisher.PublishDSCEvent($"{step.DataFlow.Id}-{step.Id}", JsonConvert.SerializeObject(stepEvent));
+
+                }
                 stopWatch.Stop();
 
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-publishstartevent-successful  duration:{stopWatch.Elapsed.TotalSeconds.ToString()}", Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, null);
+
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <{step.DataAction_Type_Id.ToString()}-publishstartevent>", Log_Level.Debug);
             }
             catch (Exception ex)
@@ -134,6 +152,19 @@ namespace Sentry.data.Infrastructure
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-publishstartevent-failed", Log_Level.Error, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, ex);
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <{step.DataAction_Type_Id.ToString()}-publishstartevent>", Log_Level.Debug);
             }            
+        }
+
+        private List<SchemaMap> GetMatchingSchemaMappings(string fileName, IList<SchemaMap> schemaMappings)
+        {
+            List<SchemaMap> matches = new List<SchemaMap>();
+            foreach (SchemaMap map in schemaMappings)
+            {
+                if (Regex.IsMatch(fileName, map.SearchCriteria))
+                {
+                    matches.Add(map);
+                }
+            }
+            return matches;
         }
 
         public string GetStorageCodeFromKey(string key)
