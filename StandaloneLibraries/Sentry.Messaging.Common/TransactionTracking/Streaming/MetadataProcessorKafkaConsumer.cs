@@ -15,7 +15,7 @@ namespace Sentry.Messaging.Common
         #region BaseKafkaConsumer Overrides
         protected override void _consumer_OnMessage(object sender, Message<string, string> e)
         {
-            Logger.Info($"Key:{e.Value}");
+            Logger.Info($"Topic:{e.Topic} Partition:{e.Partition} Offset:{e.Offset} Key:{e.Key}, Value:{e.Value}");
             BaseEventMessage msg = null;
             try
             {
