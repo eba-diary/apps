@@ -16,6 +16,7 @@ namespace Sentry.data.Core
         
         public string HiveStatus { get; set; }
         public int SchemaID { get; set; }
+        public int RevisionID { get; set; }
         
         public void UpdateStatus(HiveTableStatusEnum status)
         {
