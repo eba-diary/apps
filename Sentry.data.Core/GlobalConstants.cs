@@ -264,5 +264,11 @@
                 public const string OBJECTCREATED_COMPLETEMULTIPARTUPLOAD = "OBJECTCREATED:COMPLETEMULTIPARTUPLAOD";
             }
         }
+
+        public static class DataFlowGuidConfiguration
+        {
+            public const string GUID_CULTURE = "en-US";
+            public const string GUID_FORMAT = "yyyyMMddHHmmssfff";
+        }
     }
 }

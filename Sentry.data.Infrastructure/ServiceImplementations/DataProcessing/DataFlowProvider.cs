@@ -57,8 +57,7 @@ namespace Sentry.data.Infrastructure
                         //establish flow execution guid if null and log data flow level initalization message
                         if (flowExecutionGuid == null)
                         {
-                            int Epoch = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
-                            flowExecutionGuid = Epoch.ToString();
+                            flowExecutionGuid = GetNewGuid();
 
                             IsNewFile = true;
 
@@ -82,8 +81,7 @@ namespace Sentry.data.Infrastructure
                             //Generate new runinstance quid if in rerun scenario
                             if (step.Executions.Where(w => w.FlowExecutionGuid == flowExecutionGuid).Any() && runInstanceGuid == null)
                             {
-                                int InstanceEpoch = (int)(DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds;
-                                runInstanceGuid = InstanceEpoch.ToString();
+                                runInstanceGuid = GetNewGuid();
                             }
 
                             if (runInstanceGuid != null)
@@ -286,6 +284,11 @@ namespace Sentry.data.Infrastructure
                 }
             }
             return -1;
+        }
+
+        private string GetNewGuid()
+        {
+            return DateTime.UtcNow.ToString(GlobalConstants.DataFlowGuidConfiguration.GUID_FORMAT);
         }
         #endregion
     }

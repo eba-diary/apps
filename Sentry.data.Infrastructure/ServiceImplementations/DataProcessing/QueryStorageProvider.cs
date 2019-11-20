@@ -8,6 +8,7 @@ using StructureMap;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 
@@ -183,7 +184,8 @@ namespace Sentry.data.Infrastructure
 
         private DateTime ConvertFlowGuidToDateTime()
         {
-            DateTime flowGuidDTM = FromUnixTime(long.Parse(_flowGuid));
+            CultureInfo provider = new CultureInfo(GlobalConstants.DataFlowGuidConfiguration.GUID_CULTURE);
+            DateTime flowGuidDTM = DateTime.ParseExact(_flowGuid, GlobalConstants.DataFlowGuidConfiguration.GUID_FORMAT, provider);
             return flowGuidDTM;
         }
 
