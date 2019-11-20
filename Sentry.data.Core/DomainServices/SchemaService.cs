@@ -87,7 +87,7 @@ namespace Sentry.data.Core
                 //Send notification to SAS
                 if (SendSASNotification)
                 {
-                    SasNotification(schema, SASNotificationType, CurrentViewNotificationType);
+                    SasNotification(schema, SASNotificationType, CurrentViewNotificationType, _userService.GetCurrentUser());
                 }
 
                 return true;
@@ -232,11 +232,11 @@ namespace Sentry.data.Core
                 bool fieldChanges = rev.Fields.Where(w => w.LastUpdateDTM == rev.LastUpdatedDTM).Any();
                 if (fieldChanges && rev.Revision_NBR == 1)
                 {
-                    SasNotification(rev.ParentSchema, "ADD", null);
+                    SasNotification(rev.ParentSchema, "ADD", null, _userService.GetByAssociateId(rev.CreatedBy));
                 }
                 else if (fieldChanges)
                 {
-                    SasNotification(rev.ParentSchema, "UPDATE", null);
+                    SasNotification(rev.ParentSchema, "UPDATE", null, _userService.GetByAssociateId(rev.CreatedBy));
                 }
 
                 return true;
@@ -251,11 +251,11 @@ namespace Sentry.data.Core
         }
 
 
-        private void SasNotification(FileSchema schema, string sasNotificationType, string currentViewNotificationType)
+        private void SasNotification(FileSchema schema, string sasNotificationType, string currentViewNotificationType, IApplicationUser changeInitiator)
         {
             StringBuilder bodySb = new StringBuilder();
             string subject = null;
-            IApplicationUser user = _userService.GetCurrentUser();
+            IApplicationUser user = changeInitiator;
             //Ensure properties are initialized
             sasNotificationType = (sasNotificationType == null) ? string.Empty : sasNotificationType;
             currentViewNotificationType = (currentViewNotificationType == null) ? string.Empty : currentViewNotificationType;
