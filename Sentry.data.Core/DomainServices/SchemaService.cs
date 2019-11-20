@@ -74,7 +74,7 @@ namespace Sentry.data.Core
                  *      set notification trigger to true
                  *      set type of notification
                  */
-                if (SchemaRevisionExists && (schemaDto.IsInSAS || SASNotificationType.ToUpper() == "REMOVE") && schema.CreateCurrentView != schemaDto.CreateCurrentView)
+                if (SchemaRevisionExists && (schemaDto.IsInSAS || (SASNotificationType != null && SASNotificationType.ToUpper() == "REMOVE")) && schema.CreateCurrentView != schemaDto.CreateCurrentView)
                 {
                     SendSASNotification = true;
                     CurrentViewNotificationType = (schemaDto.CreateCurrentView) ? "ADD" : "REMOVE";
