@@ -373,10 +373,18 @@
                     //What is the primary function of clicking on the tile if its a Report
                     //And you did not click on a button.
                     if ($(e.target).hasClass("disregardParentClick") === false) {
-                        if (self.LocationType === "file") {
+                        if (self.LocationType === "file") {                           
                             vm.GetFile(self);
                         }
                         else {
+                            $.ajax({
+                                url: '/Event/PublishSuccessEventByDatasetId?eventType=' + encodeURI('Viewed Report') + '&reason=' + encodeURI('Viewed Report from Search Tile') + '&datasetId=' + encodeURI(self.DatasetId),
+                                method: "GET",
+                                dataType: 'json',
+                                success: function () {                                    
+                                }
+                            });
+
                             var win = window.open(data.Location, '_blank');
                             if (win) {
                                 //Browser has allowed it to be opened
@@ -1312,10 +1320,24 @@
                     dataType: 'json',
                     success: function (obj) {
                         if (obj.HasPermission) {
+                             $.ajax({
+                                url: '/Event/PublishSuccessEventByDatasetId?eventType=' + encodeURI('Downloaded Report') + '&reason=' + encodeURI('Downloaded Report from Search Tile') + '&datasetId=' + encodeURI(data.DatasetId),
+                                method: "GET",
+                                dataType: 'json',
+                                success: function () {                                    
+                                }
+                            });
                             var url = '/ExternalFile/DownloadExternalFile?pathAndFilename=' + encodeURIComponent(data.Location);
                             window.open(url);
                         }
                         else {
+                             $.ajax({
+                                url: '/Event/PublishSuccessEventByDatasetId?eventType=' + encodeURI('Downloaded Report') + '&reason=' + encodeURI('Insufficient Permissions to Download Report') + '&datasetId=' + encodeURI(data.DatasetId),
+                                method: "GET",
+                                dataType: 'json',
+                                success: function () {                                    
+                                }
+                            });
                             Sentry.ShowModalAlert(
                                 "User does not have sufficient permissions to selected file. </br></br>  Contact <b>" + data.SentryOwner + "</b> to request access to exhibit."
                             );
