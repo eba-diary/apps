@@ -615,10 +615,10 @@ namespace Sentry.data.Core
                     changed = compare && TryConvertTo<VarcharField>(previousFieldVersion) == null;
                     break;
                 case "DATE":
-                    newField = new DateField()
-                    {
-                        SourceFormat = (row.Format == null || row.Format == string.Empty) ? "yyyy/MM/dd" : row.Format
-                    };
+                    newField = new DateField();
+                    //{
+                    //    SourceFormat = (row.Format == null || row.Format == string.Empty) ? "yyyy/MM/dd" : row.Format
+                    //};
 
                     if (compare && TryConvertTo<DateField>(previousFieldVersion) != null)
                     {
@@ -631,10 +631,10 @@ namespace Sentry.data.Core
 
                     break;
                 case "TIMESTAMP":
-                    newField = new TimestampField()
-                    {
-                        SourceFormat = (row.Format == null || row.Format == string.Empty) ? "yyyy/MM/dd HH:mm:ss.SSS" : row.Format
-                    };
+                    newField = new TimestampField();
+                    //{
+                    //    SourceFormat = (row.Format == null || row.Format == string.Empty) ? "yyyy/MM/dd HH:mm:ss.SSS" : row.Format
+                    //};
 
                     if (compare && TryConvertTo<TimestampField>(previousFieldVersion) != null)
                     {
