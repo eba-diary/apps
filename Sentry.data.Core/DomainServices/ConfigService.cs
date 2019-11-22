@@ -617,7 +617,7 @@ namespace Sentry.data.Core
                 case "DATE":
                     newField = new DateField()
                     {
-                        SourceFormat = (row.Format == null || row.Format == string.Empty) ? "yyyy/MM/dd" : row.Format
+                        SourceFormat = row.Format
                     };
 
                     if (compare && TryConvertTo<DateField>(previousFieldVersion) != null)
@@ -633,7 +633,7 @@ namespace Sentry.data.Core
                 case "TIMESTAMP":
                     newField = new TimestampField()
                     {
-                        SourceFormat = (row.Format == null || row.Format == string.Empty) ? "yyyy/MM/dd HH:mm:ss.SSS" : row.Format
+                        SourceFormat = row.Format
                     };
 
                     if (compare && TryConvertTo<TimestampField>(previousFieldVersion) != null)

@@ -4,6 +4,8 @@
     ViewBag.Title = "Fields";
     Sentry.data.Core.FileSchema schema = ViewBag.Schema;
     string color = Model.DatasetCategory.Color;
+    string dateDefault = ViewBag.Date_Default;
+    string timestampDefault = ViewBag.Timestamp_Default;
 }
 <a class="backToList" href="/Config/Dataset/@Model.DatasetId"><span class="glyphicon glyphicon-chevron-left"></span>  Back to Dataset Configuration</a>
 
@@ -242,11 +244,11 @@
                     </div>
 
                     <div class="showDateFormat col-lg-4" data-bind="visible: ShowDateFormat">
-                        <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Default is yyyy-MM-dd" data-toggle="tooltip" data-placement="top" title="Format" />
+                        <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Not Specified (default is @dateDefault)" data-toggle="tooltip" data-placement="top" title="Format" />
                     </div>
 
                     <div class="showTimestampFormat col-lg-4" data-bind="visible: ShowTimestampFormat">
-                        <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Default is yyyy/MM/dd HH:mm:ss.SSS" data-toggle="tooltip" data-placement="top" title="Format" />
+                        <input class="dateFormat col-lg-12" data-bind="value: Format" placeholder="Not Specified (default is @timestampDefault)" data-toggle="tooltip" data-placement="top" title="Format" />
                     </div>
 
                     <div class="showArray col-lg-2" data-bind="visible: $root.AllowArrays">
