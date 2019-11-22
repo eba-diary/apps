@@ -221,6 +221,12 @@
             public const string DATE = "DATE";
             public const string TIMESTAMP = "TIMESTAMP";
             public const string STRUCT = "STRUCT";
+
+            public static class Defaults
+            {                
+                public const string DATE_DEFAULT = "yyyy-MM-dd";
+                public const string TIMESTAMP_DEFAULT = DATE_DEFAULT +" HH:mm:ss.SSS";
+            }
         }
 
         public static class SchemaDataTypes
