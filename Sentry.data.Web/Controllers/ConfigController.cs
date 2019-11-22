@@ -1281,6 +1281,8 @@ namespace Sentry.data.Web.Controllers
                 Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
                 ViewBag.Schema = _datasetContext.GetById<FileSchema>(schemaId);
+                ViewBag.Date_Default = GlobalConstants.Datatypes.Defaults.DATE_DEFAULT;
+                ViewBag.Timestamp_Default = GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT;
 
                 return View(bdm);
             }
