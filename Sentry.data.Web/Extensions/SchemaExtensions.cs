@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using Sentry.data.Web.Models.ApiModels.Schema;
 
+
 namespace Sentry.data.Web
 {
     public static class SchemaExtensions
@@ -65,7 +66,7 @@ namespace Sentry.data.Web
                 OrdinalPosition = dto.OrdinalPosition,
                 Precision = dto.Precision,
                 Scale = dto.Scale,
-                SourceFormat = dto.SourceFormat
+                SourceFormat = (dto.FieldType.ToUpper() == Core.SchemaDatatypes.TIMESTAMP.ToString() || dto.FieldType.ToUpper() == Core.SchemaDatatypes.DATE.ToString()) ? SetFieldDefaults(dto.FieldType, dto.SourceFormat) : dto.SourceFormat
             };
 
             if (dto.ChildFields.Any())
@@ -79,6 +80,22 @@ namespace Sentry.data.Web
                 model.Fields = childList;
             }
             return model;
+        }
+
+        private static string SetFieldDefaults(string fieldType, string sourceFormat)
+        {
+            if (fieldType.ToUpper() == Core.SchemaDatatypes.DATE.ToString().ToUpper())
+            {
+                return (sourceFormat != null) ? sourceFormat : Core.GlobalConstants.Datatypes.Defaults.DATE_DEFAULT;
+            }
+            else if(fieldType.ToUpper() == Core.SchemaDatatypes.TIMESTAMP.ToString().ToUpper())
+            {
+                return (sourceFormat != null) ? sourceFormat : Core.GlobalConstants.Datatypes.Defaults.TIMESTAMP_DEFAULT;
+            }
+            else
+            {
+                return sourceFormat;
+            }
         }
 
         public static List<SchemaFieldModel> ToSchemaFieldModel(this List<Core.BaseFieldDto> fieldDtoList)
