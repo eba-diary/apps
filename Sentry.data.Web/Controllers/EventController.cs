@@ -36,17 +36,17 @@ namespace Sentry.data.Web.Controllers
                 }
                 else
                 {
-                    return Json(new { Success = false, Message = "Invalid Event Type" });
+                    return Json(Json(new { Success = false, Message = "Invalid Event Type" }), JsonRequestBehavior.AllowGet);
                 }
                 
             }
             catch (Exception ex)
             {
                 Logger.Error($"eventcontroller-publishsuccesseventbydatasetid failed eventtype:{eventType} reason:{reason} datasetid:{datasetId}", ex);
-                return Json(new { Success = false, Message = "Failed to pushish event" });
-            }            
-
-            return Json(new { Success = true, Message = "Event published successfully" });
+                return Json(Json(new { Success = false, Message = "Failed to pushish event" }), JsonRequestBehavior.AllowGet);
+            }
+            
+            return Json(Json(new { Success = true, Message = "Event published successfully" }), JsonRequestBehavior.AllowGet);
         }
 
         private string MapToEventType(string eventType)
