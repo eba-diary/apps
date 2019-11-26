@@ -17,5 +17,6 @@ namespace Sentry.data.Core
         FileSchemaDto GetFileSchemaDto(int id);
         List<DatasetFile> GetDatasetFilesBySchema(int schemaId);
         DatasetFile GetLatestDatasetFileBySchema(int schemaId);
+        bool SasUpdateNotification(int schemaId, int revisionId);
     }
 }

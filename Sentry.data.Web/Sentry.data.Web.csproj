@@ -282,6 +282,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Content Include="Content\checkbox.css" />
     <Content Include="Content\creat-edit-datasets.css" />
+    <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\FavoritesController.cs" />
     <Compile Include="Controllers\WebApi\ApplicationController.cs" />
     <Compile Include="Controllers\WebApi\AssetController.cs" />
