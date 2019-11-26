@@ -15,7 +15,10 @@ namespace Sentry.data.Web
                 CanEditDataset = core.CanEditDataset,
                 CanCreateDataset = core.CanCreateDataset,
                 CanEditReport = core.CanEditReport,
-                CanCreateReport = core.CanCreateReport
+                CanCreateReport = core.CanCreateReport,
+                CanEditDataSource = core.CanEditDataSource,
+                CanCreateDataSource = core.CanCreateDataSource,
+                CanUseDataSource = core.CanUseDataSource
             };
         }
 

@@ -26,7 +26,7 @@ namespace Sentry.data.Goldeneye
         private CancellationToken _token;
         private IContainer _container;
         private IRequestContext _requestContext;
-        private IHpsmMonitoringService _hpsmMonitoringService;
+        private ITicketMonitorService _ticketMonitorService;
         private Scheduler _backgroundJobServer;
         private List<RunningTask> currentTasks = new List<RunningTask>();
 
@@ -88,6 +88,14 @@ namespace Sentry.data.Goldeneye
             //Initialize the Bootstrapper
             Bootstrapper.Init();
 
+            var registry = new StructureMap.Registry();
+
+            //adding ThreadCurrentUserIdProvider similar to how Web app adds this to context.
+            Bootstrapper.Container.Configure((x) =>
+            {
+                x.AddRegistry(registry);
+                x.For<ICurrentUserIdProvider>().Use<ThreadCurrentUserIdProvider>();
+            });
             //Start all the internal processes.
 
             //Get or Create the Runtime Configuration
@@ -112,7 +120,7 @@ namespace Sentry.data.Goldeneye
                         try
                         {
                             _requestContext = _container.GetInstance<IRequestContext>();
-                            _hpsmMonitoringService = _container.GetInstance<IHpsmMonitoringService>();
+                            _ticketMonitorService = _container.GetInstance<ITicketMonitorService>();
                             complete = true;
                         }
                         catch (Exception ex)
@@ -178,8 +186,10 @@ namespace Sentry.data.Goldeneye
 
                             //Schedule the Hpsm Monitor to run every 15 min.
                             int timeInterval = int.Parse(Config.GetHostSetting("HpsmTicketMonitorTimeInterval"));
-                            RecurringJob.AddOrUpdate("HPSMTicketMonitor", () => _hpsmMonitoringService.CheckHpsmTicketStatus(), Cron.MinuteInterval(timeInterval), TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                            RecurringJob.AddOrUpdate("HPSMTicketMonitor", () => _ticketMonitorService.CheckTicketStatus(), Cron.MinuteInterval(timeInterval), TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
 
+                            //Schedule WallEService every day at midnight
+                            RecurringJob.AddOrUpdate("WallEService", () => WallEService.Run(), "00 0 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
                             //Load all scheduled and enabled jobs into hangfire on startup to ensure all jobs are registered
                             List<RetrieverJob> JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && w.IsEnabled).ToList();
 
@@ -272,17 +282,8 @@ namespace Sentry.data.Goldeneye
                     //Run All the Processes that MUST BE run once per MINUTE
                     if ((DateTime.Now - config.LastRunMinute).TotalMinutes >= 1 || firstRun)
                     {
-
-                        //DatasetLoader Back Pressure
-                        if (true)
-                        {
-                            int files = Directory.GetFiles(Sentry.Configuration.Config.GetHostSetting("LoaderRequestPath"), "*", SearchOption.AllDirectories).Where(w => !w.Contains(Config.GetHostSetting("LoaderRequestPath") + Config.GetHostSetting("ProcessedFilePrefix"))).Count();
-                            Console.WriteLine($"Dataset Loader Back Pressure: {files}");
-                            Logger.Info($"Dataset Loader Back Pressure: {files}");
-                        }
-
                         //Reload and modifed\new jobs
-                        List<RetrieverJob> JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && w.IsEnabled && (w.Created > config.LastRunMinute || w.Modified > config.LastRunMinute)).ToList();
+                        List<RetrieverJob> JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && w.IsEnabled && (w.Created > config.LastRunMinute.AddSeconds(-5) || w.Modified > config.LastRunMinute.AddSeconds(-5))).ToList();
 
                         foreach (RetrieverJob Job in JobList)
                         {
@@ -313,7 +314,7 @@ namespace Sentry.data.Goldeneye
                         }
 
                         //Remove disabled jobs
-                        List<RetrieverJob> DisabledJobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && !w.IsEnabled && (w.Created > config.LastRunMinute || w.Modified > config.LastRunMinute)).ToList();
+                        List<RetrieverJob> DisabledJobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && !w.IsEnabled && (w.Created > config.LastRunMinute.AddSeconds(-5) || w.Modified > config.LastRunMinute.AddSeconds(-5))).ToList();
 
                         foreach (RetrieverJob Job in DisabledJobList)
                         {
@@ -335,7 +336,7 @@ namespace Sentry.data.Goldeneye
 
 
 
-                            rtjob = _requestContext.RetrieverJob.Where(w => (w.DataSource is DfsBasic || w.DataSource is DfsCustom) && w.Schedule == "Instant" && w.IsEnabled).ToList();
+                            rtjob = _requestContext.RetrieverJob.Where(w => (!(w.DataSource is DfsBasicHsz) && (w.DataSource is DfsBasic || w.DataSource is DfsCustom)) && w.Schedule == "Instant" && w.IsEnabled).ToList();
 
 
 

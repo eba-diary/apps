@@ -66,6 +66,7 @@ namespace Sentry.data.Web.Tests
             var mockSharedContextModel = MockRepository.GenerateStub<SharedContextModel>();
 
             var mockDatasetService = MockRepository.GenerateStub<IDatasetService>();
+            var mockConfigService = MockRepository.GenerateStub<IConfigService>();
             
             var mockEventService = MockRepository.GenerateStub<IEventService>();
 
@@ -102,7 +103,7 @@ namespace Sentry.data.Web.Tests
 
             mockUserService.Stub(x => x.GetCurrentUser()).Return(user);
 
-            var dsc = new DatasetController(mockDatasetContext, mockS3Provider, mockUserService, mockSasProvider, mockAssociateService, mockObsidianService, mockDatasetService, mockEventService);
+            var dsc = new DatasetController(mockDatasetContext, mockS3Provider, mockUserService, mockSasProvider, mockAssociateService, mockObsidianService, mockDatasetService, mockEventService, mockConfigService);
             dsc.SharedContext = mockSharedContextModel;
 
             return dsc;
@@ -124,6 +125,9 @@ namespace Sentry.data.Web.Tests
             var mockUserService = MockRepository.GenerateStub<UserService>(mockDataAssetContext, mockExtendedUserInfoProvider, mockCurrentUserIdProvider);
             var mockSharedContextModel = MockRepository.GenerateStub<SharedContextModel>();
             var mockDatasetService = MockRepository.GenerateStub<IDatasetService>();
+            var mockObsidianService = MockRepository.GenerateStub<IObsidianService>();
+            var mockSecurityService = MockRepository.GenerateStub<ISecurityService>();
+            var mockSchemaService = MockRepository.GenerateStub<ISchemaService>();
 
             mockSharedContextModel.CurrentUser = user;
 
@@ -151,7 +155,7 @@ namespace Sentry.data.Web.Tests
 
             mockUserService.Stub(x => x.GetCurrentUser()).Return(user != null ? user : MockUsers.App_DataMgmt_Admin_User());
 
-            var cc = new ConfigController(mockDatasetContext, mockS3Provider, mockUserService, mockSasProvider, mockAssociateService, mockConfigService, mockEvensService, mockDatasetService);
+            var cc = new ConfigController(mockDatasetContext, mockS3Provider, mockUserService, mockSasProvider, mockAssociateService, mockConfigService, mockEvensService, mockDatasetService, mockObsidianService, mockSecurityService, mockSchemaService);
             cc.SharedContext = mockSharedContextModel;
 
             return cc;

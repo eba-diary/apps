@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Sentry.Configuration;
 
 namespace Sentry.data.Core
 {
@@ -9,34 +10,18 @@ namespace Sentry.data.Core
     {
 
         private readonly IDatasetContext _datasetContext;
-        private readonly IHpsmProvider _hpsmProvider;
+        //BaseTicketProvider implementation is determined within Bootstrapper and could be either ICherwellProvider or IHPSMProvider
+        private readonly IBaseTicketProvider _baseTicketProvider;
 
-        public SecurityService(IDatasetContext datasetContext, IHpsmProvider hpsmProvider)
+        public SecurityService(IDatasetContext datasetContext, IBaseTicketProvider baseTicketProvider)
         {
             _datasetContext = datasetContext;
-            _hpsmProvider = hpsmProvider;
+            _baseTicketProvider = baseTicketProvider;
         }
-
 
         public string RequestPermission(AccessRequest model)
         {
-            //Lets format the business reason here before passing it into the hpsm service.
-            StringBuilder sb = new StringBuilder();
-            if (!string.IsNullOrWhiteSpace(model.AdGroupName))
-            {
-                sb.Append($"Please grant the Ad Group {model.AdGroupName} the following permissions for Data.sentry.com.{ Environment.NewLine}");
-            }
-            else
-            {
-                sb.Append($"Please grant user {model.PermissionForUserName} ({model.PermissionForUserId}) the following permissions for Data.sentry.com.{ Environment.NewLine}");
-            }
-            model.Permissions.ForEach(x => sb.Append($"{x.PermissionName} - {x.PermissionDescription} { Environment.NewLine}"));
-            sb.Append($"Business Reason: {model.BusinessReason}{ Environment.NewLine}");
-            sb.Append($"Requestor: {model.RequestorsId} - {model.RequestorsName}");
-
-            model.BusinessReason = sb.ToString();
-
-            string ticketId = _hpsmProvider.CreateHpsmTicket(model);
+            string ticketId = _baseTicketProvider.CreateChangeTicket(model);
             if (!string.IsNullOrWhiteSpace(ticketId))
             {
                 Security security = _datasetContext.Security.FirstOrDefault(x => x.SecurityId == model.SecurityId);
@@ -90,8 +75,11 @@ namespace Sentry.data.Core
             {
                 CanEditDataset = (user.CanModifyDataset && IsOwner) || IsAdmin,
                 CanCreateDataset = user.CanModifyDataset || IsAdmin,
-                CanEditReport = (user.CanManageReports && IsOwner) || IsAdmin,
-                CanCreateReport = user.CanManageReports || IsAdmin
+                CanEditReport = user.CanManageReports || IsAdmin,
+                CanCreateReport = user.CanManageReports || IsAdmin,
+                CanEditDataSource = (user.CanModifyDataset && IsOwner) || IsAdmin,
+                CanCreateDataSource = user.CanModifyDataset || IsAdmin,
+                ShowAdminControls = IsAdmin
             };
 
             //if it is not secure, it should be wide open except for upload and notifications. call everything out for visibility.
@@ -102,6 +90,7 @@ namespace Sentry.data.Core
                 us.CanViewFullDataset = true;
                 us.CanUploadToDataset = IsOwner || IsAdmin;
                 us.CanModifyNotifications = false;
+                us.CanUseDataSource = true;
                 return us;
             }
 
@@ -137,9 +126,28 @@ namespace Sentry.data.Core
             us.CanQueryDataset = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_QUERY_DATASET) || IsOwner || IsAdmin;
             us.CanUploadToDataset = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_UPLOAD_TO_DATASET) || IsOwner || IsAdmin;
             us.CanModifyNotifications = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_MODIFY_NOTIFICATIONS) || IsOwner || IsAdmin;
+            us.CanUseDataSource = userPermissions.Contains(GlobalConstants.PermissionCodes.CAN_USE_DATA_SOURCE) || IsOwner || IsAdmin;
+
             return us;
         }
 
+        /// <summary>
+        /// Returns count of ad groups with access to securable
+        /// </summary>
+        /// <param name="securable"></param>
+        /// <returns></returns>
+        public int GetGroupAccessCount(ISecurable securable)
+        {
+            if (securable.Security?.Tickets != null)
+            {
+                var groups = securable.Security.Tickets.Select(x => new { adGroup = x.AdGroupName, permissions = x.Permissions.Where(y => y.IsEnabled).ToList() }).ToList();
+                return groups.Select(s => s.adGroup).Distinct().Count();
+            }
+            else
+            {
+                return 0;                
+            }
+        }
 
         public void ApproveTicket(SecurityTicket ticket, string approveId)
         {

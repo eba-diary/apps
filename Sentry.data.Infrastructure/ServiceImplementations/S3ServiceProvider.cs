@@ -639,16 +639,17 @@ namespace Sentry.data.Infrastructure
                 dosReq.BucketName = Configuration.Config.GetHostSetting("AWSRootBucket");
                 dosReq.Objects = objects;
                 DeleteObjectsResponse dosRsp = S3Client.DeleteObjects(dosReq);
-                Logger.Info($"No. of objects successfully deleted = {dosRsp.DeletedObjects.Count()}");
+                Logger.Info($"No. of objects successfully deleted = {dosRsp.DeletedObjects.Count}");
 
                 foreach (DeletedObject dobj in dosRsp.DeletedObjects)
                 {
-                    ObjectKeyVersion newItem = new ObjectKeyVersion();
-                    newItem.key = dobj.Key;
-                    newItem.versionId = dobj.VersionId;
+                    ObjectKeyVersion newItem = new ObjectKeyVersion
+                    {
+                        key = dobj.Key,
+                        versionId = dobj.VersionId
+                    };
                     deletedObjects.Add(newItem);
                 }
-
             }
             catch (DeleteObjectsException e)
             {
@@ -658,8 +659,8 @@ namespace Sentry.data.Infrastructure
                 {
                     sb.Append($"Object Key: {error.Key} Object VersionID: {error.VersionId} Code: {error.Code} Message:{error.Message}");
                 }
-                Logger.Error($"Successfully deleted = {dosRsp.DeletedObjects.Count()} : Failed to Delete = {dosRsp.DeleteErrors.Count()}", new Exception(sb.ToString()));
-                throw new Exception($"Failed DeleteMultipleS3keys: Failed to Delete {dosRsp.DeleteErrors.Count()} keys", new Exception(sb.ToString()));
+                Logger.Error($"Successfully deleted = {dosRsp.DeletedObjects.Count} : Failed to Delete = {dosRsp.DeleteErrors.Count}", new Exception(sb.ToString()));
+                throw new Exception($"Failed DeleteMultipleS3keys: Failed to Delete {dosRsp.DeleteErrors.Count} keys", new Exception(sb.ToString()));
             }
             catch (AmazonS3Exception amazonS3Exception)
             {
@@ -679,7 +680,20 @@ namespace Sentry.data.Infrastructure
             }
         }
         #endregion
-        
+        public void DeleteMulitpleS3keys(List<string> keys)
+        {
+            List<ObjectKeyVersion> keyList = new List<ObjectKeyVersion>();
+            foreach (string key in keys)
+            {
+                keyList.Add(new ObjectKeyVersion()
+                {
+                    key = key,
+                    versionId = null
+                });
+            }
+
+            DeleteMultipleS3keys(keyList);
+        }
         /// <summary>
         /// Get list of datasets currently on S3, within the given parentDir
         /// </summary>
@@ -1036,6 +1050,34 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public void DeleteParquetFilesByStorageCode(string storageCode)
+        {
+            S3DirectoryInfo S3DirectoryToDelete = new S3DirectoryInfo(S3Client, Configuration.Config.GetHostSetting("AWSRootBucket"), $"parquet/{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
+            S3DirectoryToDelete.Delete(true);
+        }
+
+        public void DeleteS3Prefix(string prefix)
+        {
+            List<ObjectKeyVersion> s3Keys = ConvertToObjectKeyVersion(ListObjects(Configuration.Config.GetHostSetting("AWSRootBucket"), prefix).ToList());
+            if (s3Keys.Count == 0)
+            {
+                Logger.Info($"deleteS3Prefix-nofilesdetected - prefix:{prefix}");
+            }
+            else
+            {
+                Logger.Info($"deleteS3Prefix-detectedfiles - prefix:{prefix} count:{s3Keys.Count.ToString()}");
+                DeleteMultipleS3keys(s3Keys);
+            }
+        }
+
+        public void DeleteS3Prefix(List<string> prefixList)
+        {
+            foreach (string prefix in prefixList)
+            {
+                DeleteS3Prefix(prefix);
+            }
+        }
+
         #region Helpers
 
         private KeyVersion ToKeyVersion (ObjectKeyVersion input)
@@ -1067,6 +1109,20 @@ namespace Sentry.data.Infrastructure
 
         }
         
+        private List<ObjectKeyVersion> ConvertToObjectKeyVersion(List<string> keyList)
+        {
+            List<ObjectKeyVersion> keyVersionList = new List<ObjectKeyVersion>();
+            foreach (var key in keyList)
+            {
+                keyVersionList.Add(new ObjectKeyVersion()
+                {
+                    key = key,
+                    versionId = null
+                });
+            }
+
+            return keyVersionList;
+        }
         #endregion
         
     }

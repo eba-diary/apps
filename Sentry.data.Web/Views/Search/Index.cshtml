@@ -3,7 +3,6 @@
 @model Sentry.data.Web.SearchIndexModel
 
 @{
-    ViewBag.Title = "Datasets";
     @Html.AntiForgeryToken()
 }
 
@@ -27,9 +26,21 @@
 
                         @* foreach of the category filters *@
                         <div class="dataset-list-filter-category panel-body" data-bind="attr: {id : HeadHide }" style="display: none;">
-                            <!-- ko if: OrderedFilters().length > 0 -->
+                            <!-- ko if: (OrderedFilters().length > 0) -->
                             <ul class="list-unstyled ul-filter-list">
-
+                                <!-- ko if: !ShowMore -->
+                                <!-- ko foreach: OrderedFilters -->
+                                <li class="list-unstyled li-filter-disabled filterList" data-bind="css: { notAllowed: Count() == 0 }">
+                                    <label data-bind="attr: { id: id }">
+                                        <input type="checkbox" class="filterChbx"
+                                               data-bind="value: id, checked: window.vm.SelectedFilters, attr: { id: id, disabled: Count() == 0 }" />
+                                        <strong data-bind="text : Title"></strong>
+                                        <span class="filter-tile-count">(<!--ko text: Count--><!--/ko-->)</span>
+                                    </label>
+                                </li>
+                                <!-- /ko -->
+                                <!-- /ko -->
+                                <!-- ko if: ShowMore -->
                                 <!-- ko foreach: OrderedFilters -->
                                 <li class="list-unstyled li-filter-disabled filterList" data-bind="visible: $index() < 6, css: { notAllowed: Count() == 0 }">
                                     <label data-bind="attr: { id: id }">
@@ -55,10 +66,11 @@
                                     </ul>
                                     <!-- /ko -->
                                 </li>
+                                <!-- /ko -->
 
                             </ul>
                             <!-- /ko -->
-                            <!-- ko if: OrderedFilters().length > 6 -->
+                            <!-- ko if: (OrderedFilters().length > 6 && ShowMore) -->
                             <a href="#" class="filterMore" data-bind="attr: { id:  HiddenId}">
                                 <div class="glyphicon glyphicon-plus-sign inlineBlock moreIcon leftFloat" data-bind="attr : {id : IconMore}"></div>
                                 <div class="leftFloat txt_filterMore" data-bind="attr: {id: TxtMore}">Show More</div>
@@ -152,57 +164,61 @@
 
                         <ul class="list-unstyled" id="listOfDatasets" data-bind="foreach: searchResults.pageItems">
                             <li class="ul-dataset-list-item borderSide_gray boxShadowSm" data-bind="css : BorderColor, click: TileClicked, attr: { title: PrimaryTitle }">
-                                <div data-bind="if: $index > 20"></div>
-                                <div class="category-type-wrap">
-                                    <div class="glyphicon glyphicon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none"></div>
-                                    <div class="glyphicon glyphicon-star-empty btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite == false" style="display: none"></div>
-                                    <div class="category-type" data-bind="css: BannerColor, attr: {title: AbbreviatedCategory}">
-                                        <span data-bind="text: AbbreviatedCategory" />
+                                <div>
+                                    <div data-bind="if: $index > 20"></div>
+                                    <div class="category-type-wrap">
+                                        <div class="glyphicon glyphicon-star btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite" style="display: none" title="Click to toggle favorite"></div>
+                                        <div class="glyphicon glyphicon-star-empty btnFavorite disregardParentClick" id="btnFavorite" data-bind="attr: {data: DatasetId}, visible: IsFavorite == false" style="display: none" title="Click to toggle favorite"></div>
+                                        <div class="category-type" data-bind="css: BannerColor, attr: {title: AbbreviatedCategory}">
+                                            <span data-bind="text: AbbreviatedCategory" />
+                                        </div>
                                     </div>
-                                </div>
-                                <div></div>
-                                <div class="dataset-list-content">
-                                    <!-- ko foreach: DistinctFileExtensions -->
-                                    <div class="extension bg_gray" data-bind="css : $data">
-                                        <span data-bind="text: $data" />
+                                    <div></div>
+                                    <div class="dataset-list-content">
+                                        <!-- ko foreach: DistinctFileExtensions -->
+                                        <div class="extension bg_gray" data-bind="css : $data">
+                                            <span data-bind="text: $data" />
+                                        </div>
+                                        <!-- /ko -->
+                                        <span class="search-dataset-name" data-bind="text: DatasetName"></span>
+                                        <!-- ko if: IsSecured-->
+                                        <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure"></i>
+                                        <!-- /ko -->
                                     </div>
-                                    <!-- /ko -->
-                                    <span class="search-dataset-name" data-bind="text: DatasetName"></span>
-                                    <!-- ko if: IsSecured-->
-                                    <i class="glyphicon glyphicon-lock text-primary" data-toggle="tooltip" data-placement="bottom" title="Secure"></i>
-                                    <!-- /ko -->
-                                </div>
 
-                                <div class="dataset-list-content">
-                                    <div class="dataset-list-content-label"></div>
-                                    <div class="dataset-list-content-value listDesc">
-                                        <span data-bind="text: DatasetDesc"></span>
+                                    <div class="dataset-list-content">
+                                        <div class="dataset-list-content-value ">
+                                            <span data-bind="text: DatasetDesc"></span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="dataset-list-content">
-                                    <span class="custom-glyphiconz" aria-hidden="true" />
-                                    <div class="dataset-list-content-label">
+                                    <div class="dataset-list-content dataset-detail-content-info">
                                         <div>
-                                            <div class="ownerDate">
-                                                <span class="bold ownerDate" data-bind="css : Color">Sentry Owner:&nbsp;</span>
+                                            <!-- ko ifnot: Type === "RPT" -->
+                                            <div class="SentryOwner col-lg-5 dataset-detail-content-info-row">
+                                                <span class="bold ownerDate" data-bind="css : Color">Sentry Owner:</span>
                                                 <span data-bind="text: SentryOwner"></span>
-
-                                                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-
-                                                <!-- ko ifnot: Type === "RPT" -->
-                                                <span class=" bold ownerDate" data-bind="css : Color">Last Activity Date:&nbsp;</span>
-                                                <span data-bind="text: ChangedDtm"></span>
-                                                <!-- /ko -->
-                                                <!-- ko if: Type === "RPT" -->
-                                                <span class=" bold ownerDate" data-bind="css : Color">Refresh Frequency:&nbsp;</span>
-                                                <span data-bind="text: UpdateFrequency"></span>
-
-                                                &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-                                                <span class="bold ownerDate link-btn btn btn-sm btn-info disregardParentClick" title="Go to the detail page">
-                                                    <span class="disregardParentClick">Detail</span>
-                                                </span>
-                                                <!-- /ko -->
                                             </div>
+                                            <div class="col-lg-5 dataset-detail-content-info-row">
+                                                <span class=" bold ownerDate" data-bind="css : Color">Last Activity Date:</span>
+                                                <span data-bind="text: ChangedDtm"></span>
+                                            </div>
+                                            <!-- /ko -->
+                                            <!-- ko if: Type === "RPT" -->
+                                            <div class="SentryOwner col-lg-12 dataset-detail-content-info-row">
+                                                <span class="bold dataset-detail-contact-label" data-bind="css : Color">Refresh Frequency:</span>
+                                                <span class="info-detail" data-bind="text: UpdateFrequency"></span>
+                                            </div>
+                                            <div class="contacts col-lg-10 dataset-detail-content-info-row">
+                                                <span class="bold dataset-detail-contact-label" data-bind="css : Color">Contact:</span>
+                                                <div class="info-detail">
+                                                    <span class="info-detail" data-bind="text: ContactNames()"></span>
+                                                    <span class="moreContacts info-detail" data-bind="text: moreContactInfo, attr: { title: AdditionalContacts}" title="Additional contact names"></span>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-2 dataset-detail-content-info-row">
+                                                <a href="#" class="home-tile-link-bi disregardParentClick" title="Click to view details">View Details ></a>
+                                            </div>
+                                            <!-- /ko -->
                                         </div>
                                     </div>
                                 </div>
@@ -301,7 +317,7 @@
 
 
             $('#filterSelector').on('select2:select', function (e) {
-                
+
                 var data = e.params.data;
 
                 // push the selected filter Id to the observable array
@@ -309,7 +325,7 @@
             });
 
             $('#filterSelector').on('select2:unselect', function (e) {
-                
+
                 var data = e.params.data;
 
                 // remove the selected filter Id from the observable array
@@ -407,6 +423,36 @@
             self.UpdateFrequency = data.UpdateFrequency;
             self.CanEditDataset = data.CanEditDataset;
             self.IsFavorite = data.IsFavorite;
+            self.ContactDetails = data.ContactDetails;
+            self.AdditionalContacts = "";
+            self.moreContactInfo = "";
+
+            self.ContactNames = ko.computed(function () {
+                if (self.ContactDetails != null && self.ContactDetails.length > 0) {
+                    var moreItems = self.ContactDetails.length;
+                    var maxLength = 80;
+                    var result = "";
+                    var firstMoreItem = true;
+                    ko.utils.arrayForEach(self.ContactDetails, function (item) {
+                        if ((result.length + item.Name.length) <= maxLength) {
+                            if (moreItems < self.ContactDetails.length) { result += ", " + item.Name; }
+                            else { result += item.Name; }
+                            moreItems -= 1;
+                        }
+                        else {
+                            if (firstMoreItem) { self.AdditionalContacts += item.Name; firstMoreItem = false;}
+                            else { self.AdditionalContacts += ", " + item.Name; }
+                        }
+                    })
+
+                    if (moreItems > 0) { self.moreContactInfo = " and " + moreItems + " more"; }
+
+                    return result;
+                }
+                else {
+                    return "No contacts defined";
+                }
+            })
 
             self.TagNames = [];
             if (data.Tags !== null && data.Tags.length !== 0) {
@@ -473,12 +519,12 @@
                 var buMatch = IsSelectedFiltersAMatch(selectedBusinessUnits, exhibit.BusinessUnits, true);
                 var extensionMatch = IsSelectedFiltersAMatch(selectedExtensions, exhibit.DistinctFileExtensions, true);
                 var functionMatch = IsSelectedFiltersAMatch(selectedFunctions, exhibit.DatasetFunctions, true);
-                var ownerMatch = IsSelectedFiltersAMatch(selectedOwners, exhibit.SentryOwner.split(", "), true);
+                var ownerMatch = IsSelectedFiltersAMatch(selectedOwners, exhibit.SentryOwner, true);
 
                 //now filter the rest of the exhibits on the groups that are 'AND'ed together.
                 var tagMatch = IsSelectedFiltersAMatch(selectedTags, exhibit.TagNames, false);
 
-                return categoryMatch && buMatch && functionMatch && extensionMatch && ownerMatch && tagMatch;
+                return categoryMatch && buMatch && functionMatch && extensionMatch && tagMatch & ownerMatch;
             });
 
             return data.Search.SortTheResults(sortVal,
@@ -511,22 +557,42 @@
                 var temp = [];
                 var pageType = '1_';
 
+                //Guarentee order of categories to ensure filter numbering is consistent
+                //https://stackoverflow.com/a/13359705
+                //pulling all unique category values from observablearray
+                var uniqueCategories = ko.dependentObservable(function () {
+                    var categories = ko.utils.arrayMap(datasets, function (item) { return item.Category });
+                    return ko.utils.arrayGetDistinctValues(categories).sort();
+                })
+
                 //CATEGORY FILTER
-                for (var item, i = 0; item = datasets[i++];) {
-                    var category = item.Category;
+                var uniqueCatCnt = 1;
+                var newCatFilterList = [];
+                var newSelectedCatFilterList = [];
+                for (var item, i = 0; item = uniqueCategories()[i++];) {
+                    var category = item;
 
                     if (!(category in categoryLookup)) {
                         categoryLookup[category] = 1;
-                        self.CategoryFilters.push(new data.Search.Filter(pageType + '0_' + i, category, 'Category'));
 
-                        temp.push(new data.Search.Filter(pageType + '0_' + i, category, 'Category'));
+                        //self.CategoryFilters.push(new data.Search.Filter(pageType + '0_' + uniqueCatCnt, category, 'Category'));
+                        newCatFilterList.push(new data.Search.Filter(pageType + '0_' + uniqueCatCnt, category, 'Category'));
+
+                        temp.push(new data.Search.Filter(pageType + '0_' + uniqueCatCnt, category, 'Category'));
 
                         // compare the category to what may have been passed along in the URL; if there's a match, push it to the SelectedFilters observable array
                         if (category === data.Search.GetParameterByName('category')) {
-                            self.SelectedFilters.push(pageType + '0_' + i);
+                            //self.SelectedFilters.push(pageType + '0_' + uniqueCatCnt);
+                            newSelectedCatFilterList.push(pageType + '0_' + uniqueCatCnt);
                         }
+
+                        uniqueCatCnt++;
                     }
                 }
+
+                self.CategoryFilters.push.apply(self.CategoryFilters, newCatFilterList);
+                self.SelectedFilters.push.apply(self.SelectedFilters, newSelectedCatFilterList);
+
 
                 var item;
 
@@ -540,13 +606,20 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new data.Search.FilterCategory('Category', temp, 1));
+                self.AllFilters.push(new data.Search.FilterCategory('Category', temp, 1, true));
                 temp = [];
 
 
+                //Guarentee order of Owners to ensure filter numbering is consistent
+                //https://stackoverflow.com/a/13359705
+                //pulling all unique category values from observablearray
+                var uniqueOwners = ko.dependentObservable(function () {
+                    var Owners = ko.utils.arrayMap(datasets, function (item) { return item.SentryOwner });
+                    return ko.utils.arrayGetDistinctValues(Owners).sort();
+                })
                 //SENTRYOWNER FILTER
-                for (var item, i = 0; item = datasets[i++];) {
-                    var owner = item.SentryOwner;
+                for (var item, i = 0; item = uniqueOwners()[i++];) {
+                    var owner = item;
 
                     if (!(owner in ownerLookup)) {
                         ownerLookup[owner] = 1;
@@ -565,7 +638,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Sentry Owner', temp, 2));
+                self.AllFilters.push(new data.Search.FilterCategory('Sentry Owner', temp, 2, true));
                 temp = [];
 
 
@@ -591,7 +664,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Extension', temp, 3));
+                self.AllFilters.push(new data.Search.FilterCategory('Extension', temp, 3, true));
 
                 // sort the filters by Sequence
                 self.AllFilters.sort(function (left, right) {
@@ -603,111 +676,134 @@
                 var temp = [];
                 var pageType = '2_'
                 var item;
+                var newAllFiltersList = [];
+
+                //Guarentee order of categories to ensure filter numbering is consistent
+                //https://stackoverflow.com/a/13359705
+                //pulling all unique category values from observablearray
+                var uniqueCategories = ko.computed(function () {
+                    var categories = [];
+                    ko.utils.arrayForEach(exhibits, function (item) {
+                        ko.utils.arrayMap(item.Categories, function (innercats) { return categories.push(innercats) });
+                    });
+                    return ko.utils.arrayGetDistinctValues(categories).sort();
+                });
 
                 //CATEGORY FILTER
-                for (var item, i = 0; item = exhibits[i++];) {
-                    for (var cat, j = 0; cat = item.Categories[j++];) {
-                        if (!(cat in categoryLookup)) {
-                            categoryLookup[cat] = 1;
-                            self.CategoryFilters.push(new data.Search.Filter(pageType + '0_' + i, cat, 'Category'));
+                var newCatFilterList = [];
+                var newSelectedCatFilterList = [];
+                for (var cat, i = 0; cat = uniqueCategories()[i++];) {
+                    if (!(cat in categoryLookup)) {
+                        categoryLookup[cat] = 1;
+                        newCatFilterList.push(new data.Search.Filter(pageType + '0_' + i, cat, 'Category'));
 
-                            // compare the category to what may have been passed in the URL; if there's a match, push it to the SelectedFilters observable array
-                            if (cat === data.Search.GetParameterByName('category')) {
-                                self.SelectedFilters.push(pageType + '0_' + i);
-                            }
-
-                            temp.push(new data.Search.Filter(pageType + '0_' + i, cat, 'Category'));
+                        // compare the category to what may have been passed in the URL; if there's a match, push it to the SelectedFilters observable array
+                        if (cat === data.Search.GetParameterByName('category')) {
+                            newSelectedCatFilterList.push(pageType + '0_' + i);
                         }
+
+                        temp.push(new data.Search.Filter(pageType + '0_' + i, cat, 'Category'));
                     }
                 }
-                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+
+                self.CategoryFilters.push.apply(self.CategoryFilters, newCatFilterList);
+                self.SelectedFilters.push.apply(self.SelectedFilters, newSelectedCatFilterList);
+
+                ko.utils.arrayForEach(newAllFiltersList, function (v) {
                     if (v.Name == 'Category') {
                         item = v;
                     }
                 });
                 if (item !== undefined) {
                     temp = item.Filters().concat(temp);
-                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                    ko.utils.arrayRemoveItem(newAllFiltersList, item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Category', temp, 1));
+                newAllFiltersList.push(new data.Search.FilterCategory('Category', temp, 1, true));
+
                 temp = [];
 
 
                 //BUSINESS UNIT FILTER
+                var newBusinessUnitFilterList = [];
                 counter = 0; //reset counter
                 for (var item, i = 0; item = exhibits[i++];) {
                     for (var bu, j = 0; bu = item.BusinessUnits[j++];) {
                         if (!(bu in businessUnitLookup)) {
                             businessUnitLookup[bu] = 1;
-                            self.BusinessUnitFilters.push(new data.Search.Filter(pageType + '5_' + counter, bu, 'Business Unit'));
+                            newBusinessUnitFilterList.push(new data.Search.Filter(pageType + '5_' + counter, bu, 'Business Unit'));
 
                             temp.push(new data.Search.Filter(pageType + '5_' + counter, bu, 'Business Unit'));
                             counter++;
                         }
                     }
                 }
-                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                ko.utils.arrayForEach(newAllFiltersList, function (v) {
                     if (v.Name == 'Business Unit') {
                         item = v;
                     }
                 });
                 if (item !== undefined) {
                     temp = item.Filters().concat(temp);
-                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                    ko.utils.arrayRemoveItem(newAllFiltersList, item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Business Unit', temp, 2));
+                self.BusinessUnitFilters.push.apply(self.BusinessUnitFilters, newBusinessUnitFilterList)
+                newAllFiltersList.push(new data.Search.FilterCategory('Business Unit', temp, 2, false));
                 temp = [];
 
 
                 //DATASET FUNCTION FILTER
+                var newdatasetFunctionFilters = [];
                 counter = 0; //reset counter
                 for (var item, i = 0; item = exhibits[i++];) {
                     for (var fn, j = 0; fn = item.DatasetFunctions[j++];) {
                         if (!(fn in datasetFunctionLookup)) {
                             datasetFunctionLookup[fn] = 1;
-                            self.DatasetFunctionFilters.push(new data.Search.Filter(pageType + '6_' + counter, fn, 'Function'));
+                            newdatasetFunctionFilters.push(new data.Search.Filter(pageType + '6_' + counter, fn, 'Function'));
 
                             temp.push(new data.Search.Filter(pageType + '6_' + counter, fn, 'Function'));
                             counter++;
                         }
                     }
                 }
-                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                ko.utils.arrayForEach(newAllFiltersList, function (v) {
                     if (v.Name == 'Function') {
                         item = v;
                     }
                 });
                 if (item !== undefined) {
                     temp = item.Filters().concat(temp);
-                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                    ko.utils.arrayRemoveItem(newAllFiltersList, item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Function', temp, 3));
+                self.DatasetFunctionFilters.push.apply(self.DatasetFunctionFilters, newdatasetFunctionFilters);
+                newAllFiltersList.push(new data.Search.FilterCategory('Function', temp, 3, false));
                 temp = [];
 
 
                 //REPORT TYPE FILTER
+                var newExtensionFiltersList = [];
                 counter = 0; // reset the counter
                 for (var item, i = 0; item = exhibits[i++];) {
                     for (var ext, j = 0; ext = item.DistinctFileExtensions[j++];) {
                         if (!(ext in extensionLookup)) {
                             extensionLookup[ext] = 1;
-                            self.ExtensionFilters.push(new data.Search.Filter(pageType + '2_' + counter, ext, 'Report Type'));
+                            newExtensionFiltersList.push(new data.Search.Filter(pageType + '2_' + counter, ext, 'Report Type'));
 
                             temp.push(new data.Search.Filter(pageType + '2_' + counter, ext, 'Report Type'));
                             counter++;
                         }
                     }
                 }
-                ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                ko.utils.arrayForEach(newAllFiltersList, function (v) {
                     if (v.Name == 'Report Type') {
                         item = v;
                     }
                 });
                 if (item !== undefined) {
                     temp = item.Filters().concat(temp);
-                    ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                    ko.utils.arrayRemoveItem(newAllFiltersList, item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Report Type', temp, 4));
+                self.ExtensionFilters.push.apply(self.ExtensionFilters, newExtensionFiltersList);
+                newAllFiltersList.push(new data.Search.FilterCategory('Report Type', temp, 4, true));
                 temp = [];
 
 
@@ -735,9 +831,11 @@
                 array_move(tagGroups, tagGroups.indexOf('Other'), tagGroups.length - 1)
 
 
-                counter = 0; //Needs seperate counter as multiple objects can appear per iteration
+                counter = 0;
+                //Needs seperate counter as multiple objects can appear per iteration
                 //Loop through each tag group, add all tags for the group which are associated
                 // with each exhibit
+                var newTagFilterList = [];
                 for (var group, g = 0; group = tagGroups[g++];) {
                     for (var item, i = 0; item = exhibits[i++];) {
                         if (item.Tags != null) {
@@ -746,32 +844,37 @@
                             for (var tag, j = 0; tag = Tags[j++];) {
                                 if (tag.Group == group && !(tag.Name in tagLookup)) {
                                     tagLookup[tag.Name] = 1;
-                                    self.TagFilters.push(new data.Search.Filter(pageType + '3_' + counter, tag.Name, group));
+                                    newTagFilterList.push(new data.Search.Filter(pageType + '3_' + counter, tag.Name, group));
 
                                     temp.push(new data.Search.Filter(pageType + '3_' + counter, tag.Name, group));
                                     counter++;
                                 }
                             }
+
                         }
                     }
-                    ko.utils.arrayForEach(self.AllFilters(), function (v) {
+                    ko.utils.arrayForEach(newAllFiltersList, function (v) {
                         if (v.Name == group) {
                             item = v;
                         }
                     });
                     if (item !== undefined) {
                         temp = item.Filters().concat(temp);
-                        ko.utils.arrayRemoveItem(self.AllFilters(), item);
+                        ko.utils.arrayRemoveItem(newAllFiltersList, item);
                     }
-                    self.AllFilters.push(new data.Search.FilterCategory(group, temp, 5));
+                    newAllFiltersList.push(new data.Search.FilterCategory(group, temp, 5, true));
 
                     temp = [];
                 }
 
+                self.TagFilters.push.apply(self.TagFilters, newTagFilterList);
+
                 // sort the filters by Sequence
-                self.AllFilters.sort(function (left, right) {
+                newAllFiltersList.sort(function (left, right) {
                     return left.Sequence - right.Sequence;
                 });
+
+                self.AllFilters.push.apply(self.AllFilters, newAllFiltersList);
             };
 
             self.PopulateGenericFilters = function (allObjects) {
@@ -808,7 +911,7 @@
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
 
-                self.AllFilters.push(new data.Search.FilterCategory('Category', temp, 1));
+                self.AllFilters.push(new data.Search.FilterCategory('Category', temp, 1, true));
                 temp = [];
 
 
@@ -833,7 +936,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Business Unit', temp, 2));
+                self.AllFilters.push(new data.Search.FilterCategory('Business Unit', temp, 2, false));
 
 
                 //SENTRYOWNER FILTER
@@ -857,7 +960,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Sentry Owner', temp, 3));
+                self.AllFilters.push(new data.Search.FilterCategory('Sentry Owner', temp, 3, true));
                 temp = [];
 
 
@@ -883,7 +986,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Extension', temp, 4));
+                self.AllFilters.push(new data.Search.FilterCategory('Extension', temp, 4, true));
 
                 //TAG FILTER
                 counter = 0; //Needs seperate counter as multiple objects can appear per iteration
@@ -911,7 +1014,7 @@
                     temp = item.Filters().concat(temp);
                     ko.utils.arrayRemoveItem(self.AllFilters(), item);
                 }
-                self.AllFilters.push(new data.Search.FilterCategory('Tag', temp, 5));
+                self.AllFilters.push(new data.Search.FilterCategory('Tag', temp, 5, true));
                 temp = [];
 
                 // sort the filters by Sequence
@@ -965,7 +1068,7 @@
             $.getJSON( "/Search/" + self.SearchType() + "/List", function (allData) {
                 var mappedTasks = $.map(allData, function (item) { return new Dataset(item) });
 
-                self.datasets(self.datasets().concat(mappedTasks));
+                self.datasets(mappedTasks);
 
                 self.populateFilters();
 
@@ -974,16 +1077,35 @@
                 $('#filterSelector').val(self.SelectedFilters()).trigger('change');
             });
 
+            self.SortByVal = function () {
+                if (!loaded) {
+                    //on initial load
+                    //look at url to determine if sort param exists, if so set local storage
+                    // and selected Sort By value.
+                    if (data.Search.GetParameterByName('sort')) {
+                        localStorage.setItem("sortByVal", (data.Search.GetParameterByName('sort')));
+                        $("#sort-results").val(data.Search.GetParameterByName('sort'));
+                    }
+                }
+
+                //pull sortby value from local storage
+                var val = localStorage.getItem("sortByVal");
+
+                if (val !== undefined) {
+                    return val;
+                }
+                else {
+                    return '0';
+                }
+            }
+
             self.searchResults = ko.computed(function () {
 
                 if (!loaded) {
                     var list = JSON.parse(localStorage.getItem("filteredIds"));
 
                     if (list != undefined) {
-
-                        for (var i = 0; i < list.length; i++) {
-                            self.SelectedFilters.push(list[i]);
-                        }
+                        self.SelectedFilters.push.apply(self.SelectedFilters, list)
                     }
 
                     if (data.Search.GetParameterByName('searchPhrase')) {
@@ -999,13 +1121,16 @@
                             self.Query(searchText);
                         }
                     }
-                    loaded = true;
                 }
                 else {
                     localStorage.setItem("searchText", self.Query());
                 }
 
-                var searchQuery = self.Query().split(" ");
+                //var searchQuery = self.Query().split(" ");
+                var searchQuery = self.Query().match(/".*?"|\w+/g);
+                if (jQuery.isEmptyObject(searchQuery)) {
+                    searchQuery = [""];
+                }
 
                 var temp = [];
 
@@ -1015,24 +1140,117 @@
                     var count = 0;
                     var dataset = self.datasets()[i];
 
-                    for (var j = 0; j < searchQuery.length; j++) {
-                        var desc = dataset.DatasetDesc.toString();
-                        var name = dataset.DatasetName.toString();
-                        var owner = dataset.SentryOwner.toString();
 
-                        if (desc.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0) {
-                            keywordFound = true;
-                            count++;
+                        for (var j = 0; j < searchQuery.length; j++) {
+                            //var search = searchQuery[j];
+                            var search = searchQuery[j].replace(/"/g, "");
+
+                            /*******************************************
+                             * Shared metadata between BI and Datasets *
+                            ********************************************/
+                            var desc = dataset.DatasetDesc.toString();
+                            var name = dataset.DatasetName.toString();
+                            if (!jQuery.isEmptyObject(dataset.SentryOwner)) {
+                                var owner = dataset.SentryOwner.toString();
+                            };
+
+                            if (desc.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
+                                keywordFound = true;
+                                count++;
+                            }
+
+                            //Search Dataset Name
+                            if (name.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
+                                keywordFound = true;
+                                count++;
+                            }
+
+                            //Search Extensions
+                            ko.utils.arrayForEach(dataset.DistinctFileExtensions, function (v) {
+                                if (v.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
+                                    keywordFound = true;
+                                    count++;
+                                }
+                            })
+
+                            //Search Category
+                            ko.utils.arrayForEach(dataset.Categories, function (v) {
+                                if (v.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
+                                    keywordFound = true;
+                                    count++;
+                                }
+                            });
+
+
+                            /*************************
+                             * BI Specific metadata or searches *
+                            **************************/
+                            //Search Owner
+                            //  Only users which can edit reports can see the owner
+                            //  therefore we need to inlucde it only if current user
+                            //  has permissions to edit reports
+                            if (dataset.Type == 'RPT' && dataset.CanEditDataset && !jQuery.isEmptyObject(owner) && owner.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
+                                keywordFound = true;
+                                count++;
+                            }
+
+                            //Search Tags
+                            if (!jQuery.isEmptyObject(dataset.TagNames)) {
+                                ko.utils.arrayForEach(dataset.TagNames, function (v) {
+                                    if (v.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
+                                        keywordFound = true;
+                                        count++;
+                                    }
+                                });
+                            }
+
+                            //Search Contact Name
+                            if (!jQuery.isEmptyObject(dataset.ContactDetails)) {
+                                ko.utils.arrayForEach(dataset.ContactDetails, function (v) {
+                                    if (v.Name.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
+                                        keywordFound = true;
+                                        count++;
+                                    }
+                                });
+                            }
+
+                            //Search Business Units
+                            if (!jQuery.isEmptyObject(dataset.BusinessUnits)) {
+                                ko.utils.arrayForEach(dataset.BusinessUnits, function (v) {
+                                    if (v.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
+                                        keywordFound = true;
+                                        count++;
+                                    }
+                                })
+                            }
+
+                            //Search Functions
+                            if (!jQuery.isEmptyObject(dataset.DatasetFunctions)) {
+                                ko.utils.arrayForEach(dataset.DatasetFunctions, function (v) {
+                                    if (v.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
+                                        keywordFound = true;
+                                        count++;
+                                    }
+                                })
+                            }
+
+                            //Search Update Frequency
+                            if (!jQuery.isEmptyObject(dataset.UpdateFrequency)) {
+                                if (dataset.UpdateFrequency.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
+                                    keywordFound = true;
+                                    count++;
+                                }
+                            }
+
+                            /*****************************
+                             * Dataset Specific metadata or searches *
+                            ******************************/
+                            if (dataset.Type == 'DS' && !jQuery.isEmptyObject(owner) && owner.toLowerCase().indexOf(search.toLowerCase()) >= 0) {
+                                keywordFound = true;
+                                count++;
+                            }
                         }
-                        if (owner.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0) {
-                            keywordFound = true;
-                            count++;
-                        }
-                        if (name.toLowerCase().indexOf(searchQuery[j].toLowerCase()) >= 0) {
-                            keywordFound = true;
-                            count++;
-                        }
-                    }
+
                     if (keywordFound) {
                         temp.push({ dataset: dataset, count: count });
                     }
@@ -1044,7 +1262,7 @@
 
                 queryResults = temp.map(x => x.dataset);
 
-                queryResults = self.FilterExhibits(queryResults, $("#sort-results").val());
+                queryResults = self.FilterExhibits(queryResults, self.SortByVal());
 
                 $("#SearchText").attr("placeholder", "Search " + queryResults.length + " Datasets...");
 
@@ -1053,7 +1271,10 @@
             // go to https://github.com/ErikSchierboom/knockout-paging for information on the plugin
 
             self.sortExhibits = function () {
-                self.datasets.valueHasMutated();
+                if (loaded) {
+                    localStorage.setItem("sortByVal", $('#sort-results').val());
+                    self.datasets.valueHasMutated();
+                }
             };
 
             self.limitSearchResults = function () {
@@ -1062,9 +1283,12 @@
 
                 // determine number of results to return in the search results using the value selected in the drop-down
                 if ($("#search-results-choices").val() === "All") {
-                    nbrResults = self.searchResults.itemCount();
+                    nbrResults = 100000;
+                    localStorage.setItem("itemsToShow", "All");
+                    //localStorage.setItem("itemCount", self.searchResults.itemCount());
                 } else {
                     nbrResults = parseInt($("#search-results-choices").val());
+                    localStorage.setItem("itemsToShow", nbrResults);
                 }
 
                 self.searchResults.pageSize(nbrResults);
@@ -1074,6 +1298,10 @@
             self.SelectedFilters.subscribe(function () {
                 localStorage.setItem("filteredIds", ko.toJSON(self.SelectedFilters()));
                 $('#filterSelector').val(self.SelectedFilters()).trigger('change');
+
+                if (localStorage.getItem("pageSelection")) {
+                    data.Search.setPageNumber(localStorage.getItem("pageSelection"), true);
+                }
 
             });
 
@@ -1098,9 +1326,30 @@
                     }
                 });
             };
+
+            self.CurrentPageSelection = self.searchResults.pageNumber.subscribe(function () {
+                localStorage.setItem("pageSelection", ko.toJSON(self.searchResults.pageNumber()));
+            });
+
+
+            //items that need to be run only on initial load of page
+            if (loaded === false) {
+                if (data.Search.GetParameterByName('itemsToShow')) {
+                    //on initial load of view model, check url
+                    var selection = data.Search.GetParameterByName('itemsToShow').replace(/'/g, '');
+                    $("#search-results-choices").val(selection);
+                    if (selection === "All") {
+                        self.searchResults.pageSize(100000);
+                    }
+                    else { console.log("setting page size:" + selection); self.searchResults.pageSize(selection); }
+                }
+            }
+
+            loaded = true;
         }
 
         $(document).ready(function () {
+            console.log("pre-init");
             data.Search.Init();
         });
 

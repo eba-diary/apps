@@ -20,20 +20,20 @@ using System.Net.Http;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 using Sentry.Core;
+using RestSharp;
 
 namespace Sentry.data.Infrastructure
 {
     public class RetrieverJobService
     {
         private RetrieverJob _job;
+        private Submission _submission;
         private IFtpProvider _ftpProvider;
         private string _tempFile;
         private readonly List<KeyValuePair<string, string>> _dropLocationTags = new List<KeyValuePair<string, string>>()
         {
             new KeyValuePair<string, string>("ProcessingStatus","NotStarted")
         };
-
-        static private IContainer Container { get; set; }
 
         /// <summary>
         /// Implementation of core job logic for each DataSOurce type.
@@ -46,17 +46,41 @@ namespace Sentry.data.Infrastructure
             {
                 token.ThrowIfCancellationRequested();
 
-                using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                using (IContainer Container = Bootstrapper.Container.GetNestedContainer())
                 {
-                    IRequestContext _requestContext = Container.GetInstance<IRequestContext>();
+                    IDatasetContext _requestContext = Container.GetInstance<IDatasetContext>();
+                    IJobService _jobService = Container.GetInstance<IJobService>();
 
                     //Retrieve job details
-                    _job = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).Fetch(f => f.DataSource).Where(w => w.Id == JobId).FirstOrDefault();
+                    _job = _requestContext.RetrieverJob.Where(w => w.Id == JobId).FetchAllConfiguration(_requestContext).FirstOrDefault();
+
+                    //if logic only needed until all sources are converted to this Source\Provider pattern
+                    switch (_job.DataSource.SourceType)
+                    {
+                        case GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE:
+                        case GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE:
+                            IBaseJobProvider _jobProvider = Container.GetInstance<IBaseJobProvider>(_job.DataSource.SourceType);
+
+                            // Execute job
+                            if (_jobProvider != null)
+                            {
+                                _jobProvider.Execute(_job);
+                            }
+                            break;
+                        default:
+                            _job.JobLoggerMessage("Info", "Job not configured for new Source\\Provider pattern");
+                            break;
+                    }
+                    
 
                     if (_job.DataSource.Is<FtpSource>())
                     {
+                        _submission = _jobService.SaveSubmission(_job, "");
+
                         _ftpProvider = Container.GetInstance<IFtpProvider>();
                         _ftpProvider.SetCredentials(_job.DataSource.SourceAuthType.GetCredentials(_job));
+
+                        _job.JobLoggerMessage("Info", $"ftp.job.options - ftppatter:{_job.JobOptions.FtpPattern.ToString()} isregexsearch:{_job.JobOptions.IsRegexSearch.ToString()} searchcriteria:{_job.JobOptions.SearchCriteria}");
 
                         //Setup temporary work space for job
                         var tempFile = SetupTempWorkSpace();
@@ -67,24 +91,31 @@ namespace Sentry.data.Infrastructure
                             switch (_job.JobOptions.FtpPattern)
                             {
                                 case 
-                                FtpPattern.NoPattern:
+                                FtpPattern.NoPattern: /* #0*/
                                 default:
                                     RetrieveFTPFile(_job.GetUri().AbsoluteUri);                                    
                                     break;
-                                case FtpPattern.SpecificFileNoDelete:
-                                    ProcessSpecificFileNoDelete();
+                                //case FtpPattern.SpecificFileNoDelete:
+                                //    ProcessSpecificFileNoDelete();
+                                //    break;
+                                case FtpPattern.RegexFileNoDelete:  /* #4*/
+                                    ProcessRegexFileNoDelete(); 
                                     break;
-                                case FtpPattern.RegexFileNoDelete:
-                                    ProcessRegexFileNoDelete();
+                                //case FtpPattern.SpecificFileArchive:  /* #5*/
+                                //    ProcessSpecificFileArchive(); 
+                                //    break;
+                                case FtpPattern.RegexFileSinceLastExecution:
+                                    ProcessRegexFileSinceLastExecution();
                                     break;
-                                case FtpPattern.SpecificFileArchive:
-                                    ProcessSpecificFileArchive();
+                                case FtpPattern.NewFilesSinceLastexecution:
+                                    ProcessNewFilesSinceLastExecution();
                                     break;
                             }
                         }
                         catch (Exception ex)
                         {
                             _job.JobLoggerMessage("Error", $"Retriever Job Failed", ex);
+                            _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_FAILED_STATE);
                         }                        
                     }
                     else if (_job.DataSource.Is<SFtpSource>())
@@ -317,139 +348,126 @@ namespace Sentry.data.Infrastructure
                             }
                         }
                     }
-                    else if (_job.DataSource.Is<HTTPSSource>())
-                    {                        
-                        //set up HTTP Request
-                        HTTPSProvider requestProvider = new HTTPSProvider(_job, null);
-                        HttpWebResponse resp = requestProvider.SendRequest();                        
-                        if (resp.StatusCode != HttpStatusCode.OK)
-                        {
-                            throw new WebException($"HTTPS call returned {resp.StatusCode} with description {resp.StatusDescription}");
-                        }
+                    //else if (_job.DataSource.Is<HTTPSSource>())
+                    //{
+                    //    //set up HTTP Request
+                    //    IBaseHttpsProvider _requestProvider = Container.GetInstance<IBaseHttpsProvider>();
+                    //    _requestProvider.ConfigureProvider(_job);
 
-                        //Setup temporary work space for job
-                        var tempFile = SetupTempWorkSpace();
+                    //    IRestResponse resp = _requestProvider.SendRequest();
 
-                        //Find appropriate drop location (S3Basic or DfsBasic)
-                        RetrieverJob targetJob = FindBasicJob();
+                    //    //Setup temporary work space for job
+                    //    var tempFile = SetupTempWorkSpace();
 
-                        //Get target path based on basic job found
-                        string extension = ParseContentType(resp.ContentType);
+                    //    //Find appropriate drop location (S3Basic or DfsBasic)
+                    //    RetrieverJob targetJob = FindBasicJob();
 
-                        string targetFullPath = $"{GetTargetPath(targetJob)}.{extension}";
+                    //    //Get target path based on basic job found
+                    //    string extension = ParseContentType(resp.ContentType);
 
-                        if (_job.JobOptions != null && _job.JobOptions.CompressionOptions.IsCompressed)
-                        {
-                            _job.JobLoggerMessage("Info", $"Compressed option is detected... Streaming to temp location");
+                    //    string targetFullPath = $"{GetTargetPath(targetJob)}.{extension}";
 
-                            try
-                            {
-                                //Stream file to work location
-                                using (Stream ftpstream = requestProvider.SendRequest().GetResponseStream())
-                                {
-                                    using (Stream filestream = new FileStream(tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
-                                    {
-                                        ftpstream.CopyTo(filestream);
-                                    }
-                                }
+                    //    if (_job.JobOptions != null && _job.JobOptions.CompressionOptions.IsCompressed)
+                    //    {
+                    //        _job.JobLoggerMessage("Info", $"Compressed option is detected... Streaming to temp location");
 
-                                //Create a fire-forget Hangfire job to decompress the file and drop extracted file into drop locations
-                                //Jaws will cleanup the source temporary file after it completes processing file.
-                                BackgroundJob.Enqueue<JawsService>(x => x.UncompressRetrieverJob(_job.Id, tempFile));
-                            }
-                            catch (Exception ex)
-                            {
-                                _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
-                                _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
+                    //        try
+                    //        {
+                    //            using (Stream filestream = new FileStream(tempFile, FileMode.OpenOrCreate, FileAccess.ReadWrite))
+                    //            {
+                    //                _requestProvider.CopyToStream(filestream);                                
+                    //            }
 
-                                //Cleanup target file if exists
-                                if (File.Exists(tempFile))
-                                {
-                                    File.Delete(tempFile);
-                                }
-                            }
-                        }
-                        else
-                        {
-                            if (targetJob.DataSource.Is<S3Basic>())
-                            {
-                                _job.JobLoggerMessage("Info", "Sending file to S3 drop location");
+                    //            //Create a fire-forget Hangfire job to decompress the file and drop extracted file into drop locations
+                    //            //Jaws will cleanup the source temporary file after it completes processing file.
+                    //            BackgroundJob.Enqueue<JawsService>(x => x.UncompressRetrieverJob(_job.Id, tempFile));
+                    //        }
+                    //        catch (Exception ex)
+                    //        {
+                    //            _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
+                    //            _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
 
-                                try
-                                {
-                                    using (Stream s = requestProvider.SendRequest().GetResponseStream())
-                                    {
-                                        //Overwrite target temp file if it exists
-                                        using (Stream filestream = new FileStream(tempFile, FileMode.Create, FileAccess.ReadWrite))
-                                        {
-                                            s.CopyTo(filestream);
-                                        }
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    _job.JobLoggerMessage("Error", "Retriever job failed streaming temp location.", ex);
-                                    _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
+                    //            //Cleanup target file if exists
+                    //            if (File.Exists(tempFile))
+                    //            {
+                    //                File.Delete(tempFile);
+                    //            }
+                    //        }
+                    //    }
+                    //    else
+                    //    {
+                    //        if (targetJob.DataSource.Is<S3Basic>())
+                    //        {
+                    //            _job.JobLoggerMessage("Info", "Sending file to S3 drop location");
 
-                                    //Cleanup temp file if exists
-                                    if (File.Exists(tempFile))
-                                    {
-                                        File.Delete(tempFile);
-                                    }
-                                }
+                    //            try
+                    //            {
+                    //                using (Stream filestream = new FileStream(tempFile, FileMode.Create, FileAccess.ReadWrite))
+                    //                {
+                    //                    _requestProvider.CopyToStream(filestream);
+                    //                }
+                    //            }
+                    //            catch (Exception ex)
+                    //            {
+                    //                _job.JobLoggerMessage("Error", "Retriever job failed streaming temp location.", ex);
+                    //                _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
 
-                                S3ServiceProvider s3Service = new S3ServiceProvider();
-                                string targetkey = targetFullPath;
-                                var versionId = s3Service.UploadDataFile(tempFile, targetkey);
+                    //                //Cleanup temp file if exists
+                    //                if (File.Exists(tempFile))
+                    //                {
+                    //                    File.Delete(tempFile);
+                    //                }
+                    //            }
 
-                                _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
+                    //            S3ServiceProvider s3Service = new S3ServiceProvider();
+                    //            string targetkey = targetFullPath;
+                    //            var versionId = s3Service.UploadDataFile(tempFile, targetkey);
 
-                                //Cleanup temp file if exists
-                                if (File.Exists(tempFile))
-                                {
-                                    File.Delete(tempFile);
-                                }
-                            }
-                            else if (targetJob.DataSource.Is<DfsBasic>())
-                            {
-                                _job.JobLoggerMessage("Info", "Sending file to DFS drop location");
+                    //            _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
 
-                                try
-                                {
-                                    using (Stream ftpstream = requestProvider.SendRequest().GetResponseStream())
-                                    {
-                                        using (Stream filestream = new FileStream(targetFullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
-                                        {
-                                            ftpstream.CopyTo(filestream);
-                                        }
-                                    }
-                                }
-                                catch (WebException ex)
-                                {
-                                    _job.JobLoggerMessage("Error", "Web request return error", ex);
-                                    _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
+                    //            //Cleanup temp file if exists
+                    //            if (File.Exists(tempFile))
+                    //            {
+                    //                File.Delete(tempFile);
+                    //            }
+                    //        }
+                    //        else if (targetJob.DataSource.Is<DfsBasic>())
+                    //        {
+                    //            _job.JobLoggerMessage("Info", "Sending file to DFS drop location");
 
-                                    //Cleanup target file if exists
-                                    if (File.Exists(targetFullPath))
-                                    {
-                                        File.Delete(targetFullPath);
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
-                                    _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
+                    //            try
+                    //            {
+                    //                using (Stream filestream = new FileStream(targetFullPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.Read))
+                    //                {
+                    //                    _requestProvider.CopyToStream(filestream);
+                    //                }
+                    //            }
+                    //            catch (WebException ex)
+                    //            {
+                    //                _job.JobLoggerMessage("Error", "Web request return error", ex);
+                    //                _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
 
-                                    //Cleanup target file if exists
-                                    if (File.Exists(targetFullPath))
-                                    {
-                                        File.Delete(targetFullPath);
-                                    }
+                    //                //Cleanup target file if exists
+                    //                if (File.Exists(targetFullPath))
+                    //                {
+                    //                    File.Delete(targetFullPath);
+                    //                }
+                    //            }
+                    //            catch (Exception ex)
+                    //            {
+                    //                _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
+                    //                _job.JobLoggerMessage("Info", "Performing HTTPS post-failure cleanup.");
 
-                                }
-                            }                        
-                        }
-                    }
+                    //                //Cleanup target file if exists
+                    //                if (File.Exists(targetFullPath))
+                    //                {
+                    //                    File.Delete(targetFullPath);
+                    //                }
+
+                    //            }
+                    //        }                        
+                    //    }
+                    //}
                 }
             }
             catch (OperationCanceledException)
@@ -459,69 +477,274 @@ namespace Sentry.data.Infrastructure
             }
             catch (Exception ex)
             {
-                Logger.Error($"Retriever Job Failed to initialize", ex);
+                Logger.Error($"Retriever Job Failed to initialize - Job:{JobId}", ex);
             }
         }
 
+        /// <summary>
+        /// Used to run HSZ retriever jobs
+        /// </summary>
+        /// <param name="JobId"></param>
+        /// <param name="token"></param>
+        /// <param name="filePath"></param>
+        public void RunHszRetrieverJob(RetrieverJob job, CancellationToken token, string filePath = null)
+        {
+            try
+            {
+                token.ThrowIfCancellationRequested();
+
+                using (IContainer Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                {
+                    IRequestContext _requestContext = Container.GetInstance<IRequestContext>();
+                    IS3ServiceProvider _s3ServiceProvider = Container.GetInstance<IS3ServiceProvider>();
+
+                    //set job details
+                    _job = job;
+
+                    try
+                    {
+                        RetrieverJob targetJob = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).ThenFetch(d => d.ParentDataset).Fetch(f => f.DataSource).FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is S3Basic);
+                        //Get target path based on basic job found
+                        //string targetFullPath = GetTargetPath(targetJob);
+
+                        //Set directory search
+                        var dirSearchCriteria = (String.IsNullOrEmpty(filePath)) ? "*" : Path.GetFileName(filePath);
+
+                        //Only search top directory and source files not locked and does not start with two exclamaition points !!
+                        foreach (var a in Directory.GetFiles(_job.GetUri().LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w) && !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
+                        {
+                            if (_job.JobOptions.CompressionOptions.IsCompressed)
+                            {
+                                //TODO: Revisit delete source file logic to handle not deleting source file
+                                ProcessCompressedFile(a, true);
+                            }
+                            else
+                            {
+                                //check for searchcriteria for filtering incoming files
+                                if (!_job.FilterIncomingFile(Path.GetFileName(a)))
+                                {
+
+                                    string processingFile = GenerateProcessingFileName(filePath);
+
+                                    //Rename file to indicate a request has been sent to Dataset Loader
+                                    File.Move(filePath, processingFile);
+
+                                    //generate targetkey, remove processing indicator from filename
+                                    string targetkey = $"{targetJob.DataSource.GetDropPrefix(targetJob)}{_job.GetTargetFileName(Path.GetFileName(filePath).Replace(Configuration.Config.GetHostSetting("ProcessedFilePrefix"),""))}";
+                                    var versionId = _s3ServiceProvider.UploadDataFile(processingFile, targetkey);
+
+                                    //Cleanup target file if exists
+                                    if (File.Exists(processingFile))
+                                    {
+                                        File.Delete(processingFile);
+                                    }
+
+                                    _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
+
+                                }
+                                else
+                                {
+                                    _job.JobLoggerMessage("Info", $"Filtered file from processing ({a})");
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _job.JobLoggerMessage("Error", $"Retriever Job Failed", ex);
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                Logger.Info($"Retriever Job Cancelled - Job:{job.Id}");
+                throw;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Retriever Job Failed to initialize - Job:{job.Id}", ex);
+            }
+        }
         #region FTP Processing
-        private void ProcessSpecificFileArchive()
+
+        private void ProcessNewFilesSinceLastExecution()
         {
-            //throw new NotImplementedException();
-            //Process specific file
-            ProcessSpecificFileNoDelete();
+            using (IContainer Container = Bootstrapper.Container.GetNestedContainer())
+            {
+                IJobService _jobService = Container.GetInstance<IJobService>();
 
-            //Archive specific file
-            ArchiveSpecificFile(_job.GetUri().AbsoluteUri);
+                _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_STARTED_STATE);
 
+                JobHistory lastExecution = _jobService.GetLastExecution(_job);
+
+                string fileName = Path.GetFileName(_job.GetUri().AbsoluteUri);
+
+                if (fileName != "")
+                {
+                    _job.JobLoggerMessage("Error", "Job terminating - Uri does not end with forward slash.");
+                    return;
+                }
+                IList<RemoteFile> resultList = new List<RemoteFile>();
+                resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
+
+                _job.JobLoggerMessage("Info", $"newfileslastexecution.search source.directory.count {resultList.Count.ToString()}");
+
+                if (resultList.Any())
+                {
+                    _job.JobLoggerMessage("Info", $"newfileslastexecution.search source.directory.content: {JsonConvert.SerializeObject(resultList)}");
+                }                
+
+                List<RemoteFile> matchList = new List<RemoteFile>();
+
+                if (lastExecution != null)
+                {
+                    _job.JobLoggerMessage("Info", $"newfileslastexecution.search executiontime:{lastExecution.Created.ToString("s")} sourcelocation:{_job.GetUri().AbsoluteUri}");
+                    matchList = resultList.Where(w => w.Modified > lastExecution.Created.AddSeconds(-10)).ToList();
+                }
+                else
+                {
+                    _job.JobLoggerMessage("Info", $"newfileslastexecution.search executiontime:noexecutionhistory sourcelocation:{_job.GetUri().AbsoluteUri}");
+                    matchList = resultList.ToList();
+                }
+
+                _job.JobLoggerMessage("Info", $"newfileslastexecution.search match.count {matchList.Count}");
+
+                if (matchList.Any())
+                {
+                    _job.JobLoggerMessage("Info", $"newfileslastexecution.search matchlist.content: {JsonConvert.SerializeObject(matchList)}");
+                }                               
+
+                foreach (RemoteFile file in matchList)
+                {
+                    _job.JobLoggerMessage("Info", $"newfileslastexecution.search processing.file {file.Name}");
+                    string remoteUrl = _job.GetUri().AbsoluteUri + file.Name;
+                    RetrieveFTPFile(remoteUrl);
+                }
+
+                _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE);
+            }
         }
 
-        private void ArchiveSpecificFile(string sourceUrl)
+        private void ProcessRegexFileSinceLastExecution()
         {
-            //throw new NotImplementedException();
-            //Remove filename from job URI
-            string baseDir = sourceUrl.Replace(Path.GetFileName(sourceUrl), "");
-
-            //Add archive directory name to URI
-            string archiveDir = baseDir + "archive/";
-
-            //Determine if Archive directory exists
-            IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(baseDir, "directories");
-
-            if (!resultList.Where(w => w.Name == "archive").Any())
+            using (IContainer Container = Bootstrapper.Container.GetNestedContainer())
             {
-                _job.JobLoggerMessage("Error", $"FTP archive directory does not exist, ask vendor to create archive directory in url - url:{archiveDir}");
-            }
+                IJobService _jobService = Container.GetInstance<IJobService>();
 
-            _ftpProvider.RenameFile(sourceUrl, "ftp://ftp.cabfinancial.com/PublicData/PublicData20121231/ISS_History_Test.zip");
+
+                _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_STARTED_STATE);
+
+                JobHistory lastExecution = _jobService.GetLastExecution(_job);
+
+                string fileName = Path.GetFileName(_job.GetUri().AbsoluteUri);
+
+                if (fileName != "")
+                {
+                    _job.JobLoggerMessage("Error", "Job terminating - Uri does not end with forward slash.");
+                    return;
+                }
+
+                IList<RemoteFile> resultList = new List<RemoteFile>();
+                resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
+
+                _job.JobLoggerMessage("Info", $"regexlastexecution.search source.directory.count {resultList.Count.ToString()}");
+
+                if (resultList.Any())
+                {
+                    _job.JobLoggerMessage("Info", $"regexlastexecution.search source.directory.content: {JsonConvert.SerializeObject(resultList)}");
+                }
+
+                var rx = new Regex(_job.JobOptions.SearchCriteria, RegexOptions.IgnoreCase);
+
+                List<RemoteFile> matchList = new List<RemoteFile>();
+
+                if (lastExecution != null)
+                {
+                    _job.JobLoggerMessage("Info", $"regexlastexecution.search executiontime:{lastExecution.Created.ToString("s")} search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_job.GetUri().AbsoluteUri}");
+                    matchList = resultList.Where(w => rx.IsMatch(w.Name) && w.Modified > lastExecution.Created.AddSeconds(-10)).ToList();
+                }
+                else
+                {
+                    _job.JobLoggerMessage("Info", $"regexlastexecution.search executiontime:noexecutionhistory search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_job.GetUri().AbsoluteUri}");
+                    matchList = resultList.Where(w => rx.IsMatch(w.Name)).ToList();
+                }
+
+                _job.JobLoggerMessage("Info", $"regexlastexecution.search match.count {matchList.Count}");
+
+                if (matchList.Any())
+                {
+                    _job.JobLoggerMessage("Info", $"regexlastexecution.search matchlist.content: {JsonConvert.SerializeObject(matchList)}");
+                }
+
+                foreach (RemoteFile file in matchList)
+                {
+                    _job.JobLoggerMessage("Info", $"regexlastexecution.search processing.file {file.Name}");
+                    string remoteUrl = _job.GetUri().AbsoluteUri + file.Name;
+                    RetrieveFTPFile(remoteUrl);
+                }
+
+                _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE);
+            }
         }
 
-        private void ProcessSpecificFileNoDelete()
-        {
-            string remoteDir = null;
+        //private void ProcessSpecificFileArchive()
+        //{
+        //    //throw new NotImplementedException();
+        //    //Process specific file
+        //    ProcessSpecificFileNoDelete();
 
-            string fileName = Path.GetFileName(_job.GetUri().AbsoluteUri);
-            if (fileName != "")
-            {
-                remoteDir = _job.GetUri().AbsoluteUri.Replace(fileName, "");
-            }
-            else
-            {
-                _job.JobLoggerMessage("Error", "Job terminating - Uri does not contain file name.");
-                throw new ArgumentNullException("RelativeUri", "Uri does not contain file name");
-            }
+        //    //Archive specific file
+        //    ArchiveSpecificFile(_job.GetUri().AbsoluteUri);
 
-            IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(remoteDir, "files");
+        //}
 
-            if (resultList.Where(w => w.Name == fileName).Any())
-            {
-                RetrieveFTPFile(_job.GetUri().AbsoluteUri);
-            }
-            else
-            {
-                _job.JobLoggerMessage("Info", $"Remote file does not exist - FileName:{fileName}");
-                throw new FileNotFoundException($"Remote file does not exist - FileName:{fileName}");
-            }
-        }
+        //private void ArchiveSpecificFile(string sourceUrl)
+        //{
+        //    //throw new NotImplementedException();
+        //    //Remove filename from job URI
+        //    string baseDir = sourceUrl.Replace(Path.GetFileName(sourceUrl), "");
+
+        //    //Add archive directory name to URI
+        //    string archiveDir = baseDir + "archive/";
+
+        //    //Determine if Archive directory exists
+        //    IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(baseDir, "directories");
+
+        //    if (!resultList.Where(w => w.Name == "archive").Any())
+        //    {
+        //        _job.JobLoggerMessage("Error", $"FTP archive directory does not exist, ask vendor to create archive directory in url - url:{archiveDir}");
+        //    }
+
+        //    _ftpProvider.RenameFile(sourceUrl, "ftp://ftp.cabfinancial.com/PublicData/PublicData20121231/ISS_History_Test.zip");
+        //}
+
+        //private void ProcessSpecificFileNoDelete()
+        //{
+        //    string remoteDir = null;
+
+        //    string fileName = Path.GetFileName(_job.GetUri().AbsoluteUri);
+        //    if (fileName != "")
+        //    {
+        //        remoteDir = _job.GetUri().AbsoluteUri.Replace(fileName, "");
+        //    }
+        //    else
+        //    {
+        //        _job.JobLoggerMessage("Error", "Job terminating - Uri does not contain file name.");
+        //        throw new ArgumentNullException("RelativeUri", "Uri does not contain file name");
+        //    }
+
+        //    IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(remoteDir, "files");
+
+        //    if (resultList.Where(w => w.Name == fileName).Any())
+        //    {
+        //        RetrieveFTPFile(_job.GetUri().AbsoluteUri);
+        //    }
+        //    else
+        //    {
+        //        _job.JobLoggerMessage("Info", $"Remote file does not exist - FileName:{fileName}");
+        //        throw new FileNotFoundException($"Remote file does not exist - FileName:{fileName}");
+        //    }
+        //}
 
         private void ProcessRegexFileNoDelete()
         {
@@ -534,16 +757,25 @@ namespace Sentry.data.Infrastructure
 
             IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
 
+            _job.JobLoggerMessage("Info", $"specificfile.search search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_job.GetUri().AbsoluteUri}");
+            _job.JobLoggerMessage("Info", $"specificfile.search source.directory.count {resultList.Count.ToString()}");
+
+            if (resultList.Any())
+            {
+                _job.JobLoggerMessage("Info", $"specificfile.search source.directory.content: {JsonConvert.SerializeObject(resultList)}");
+            }
+
             var rx = new Regex(_job.JobOptions.SearchCriteria, RegexOptions.IgnoreCase);
 
-            _job.JobLoggerMessage("Info", $"Searching for file matching {_job.JobOptions.SearchCriteria} within {_job.GetUri().AbsoluteUri}");
+            List<RemoteFile> matchList = new List<RemoteFile>();
+            matchList = resultList.Where(w => rx.IsMatch(w.Name)).ToList();
 
-            List<RemoteFile> matchList = resultList.Where(w => rx.IsMatch(w.Name)).ToList();
-
-            _job.JobLoggerMessage("Info", $"Found {matchList.Count} matching files");
+            _job.JobLoggerMessage("Info", $"specificfile.search match.count {matchList.Count}");
+            _job.JobLoggerMessage("Info", $"specificfile.search matchlist.content {JsonConvert.SerializeObject(matchList)}");
 
             foreach (RemoteFile file in matchList)
             {
+                _job.JobLoggerMessage("Info", $"specificfile.search.processing.file {file.Name}");
                 string remoteUrl = _job.GetUri().AbsoluteUri + file.Name;
                 RetrieveFTPFile(remoteUrl);
             }
@@ -694,7 +926,7 @@ namespace Sentry.data.Infrastructure
         {
             try
             {
-                using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                using (IContainer Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
                 {
                     IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
 
@@ -707,7 +939,7 @@ namespace Sentry.data.Infrastructure
                     using (var client = new HttpClient(handler))
                     {
 
-                        var tasks = _datasetContext.JobHistory.Where(w => w.Active).ToList().Select(s => client.GetAsync($"{Configuration.Config.GetHostSetting("WebApiUrl")}/api/v1/jobs/{s.JobId.Id}/batches/{s.BatchId}"));
+                        var tasks = _datasetContext.JobHistory.Where(w => w.Active && w.BatchId != 0).ToList().Select(s => client.GetAsync($"{Configuration.Config.GetHostSetting("WebApiUrl")}/api/v1/jobs/{s.JobId.Id}/batches/{s.BatchId}"));
 
                         var results = await Task.WhenAll(tasks);
 
@@ -727,37 +959,13 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        private string ParseContentType(string contentType)
-        {
-            //Mime types
-            //https://technet.microsoft.com/en-us/library/cc995276.aspx
-            //https://www.iana.org/assignments/media-types/media-types.xhtml
-
-            var content = new ContentType(contentType);
-
-            using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
-            {
-                IDatasetContext _datasetContext = Container.GetInstance<IDatasetContext>();
-
-                MediaTypeExtension extensions = _datasetContext.MediaTypeExtensions.Where(w => w.Key == content.MediaType).FirstOrDefault();
-
-                if (extensions == null)
-                {
-                    _job.JobLoggerMessage("Warn", $"Detected new MediaType ({content.MediaType}), defaulting to txt");
-                    return "txt";
-                }
-
-                return extensions.Value;
-            }
-        }
-
-        public void DisableJob(int JobId)
+        public bool DisableJob(int JobId)
         {
             RetrieverJob job = null;
 
             try
             {
-                using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                using (IContainer Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
                 {
                     //Goldeneye will monitor for modified jobs and perform necessary actions to ensure hangfire reflects job changes
 
@@ -772,6 +980,8 @@ namespace Sentry.data.Infrastructure
 
                     job.JobLoggerMessage("INFO", $"Job set to Disabled - JobId:{JobId} JobName:{job.JobName()}");
                 }
+
+                return true;
             }
             catch (Exception ex)
             {
@@ -782,7 +992,8 @@ namespace Sentry.data.Infrastructure
                 else
                 {
                     job.JobLoggerMessage("ERROR", $"Failed Disabling Job - JobId:{JobId} JobName:{job.JobName()}", ex);
-                }                
+                }
+                return false;
             }            
         }
 
@@ -792,7 +1003,7 @@ namespace Sentry.data.Infrastructure
 
             try
             {
-                using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+                using (IContainer Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
                 {
                     //Goldeneye will monitor for modified jobs and perform necessary actions to ensure hangfire reflects job changes
 
@@ -821,6 +1032,29 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public void DeleteJob(int JobId)
+        {
+            try
+            {
+                using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+                {
+                    IDatasetContext dsContext = container.GetInstance<IDatasetContext>();
+
+                    RetrieverJob job = dsContext.GetById<RetrieverJob>(JobId);
+
+                    BackgroundJob.Delete(job.JobName());
+
+                    dsContext.Remove(job);
+                    dsContext.SaveChanges();
+                }
+                    Logger.Info($"retrieverjobservice-deletejob-success");
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"retrieverjobservice-deletejob-failed", ex);
+            }
+        }
+
         private string GetTargetPath(RetrieverJob basicJob)
         {
             string basepath;
@@ -845,13 +1079,15 @@ namespace Sentry.data.Infrastructure
                 filename = _job.GetTargetFileName(_job.GetTargetFileName(String.Empty));
                 targetPath = $"{basepath}{_job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString()))}";
             }
+            else if (_job.DataSource.Is<DfsBasicHsz>())
+            {
+                targetPath = basepath;
+            }
             else
             {
                 filename = _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString()));
                 targetPath = Path.Combine(basepath, _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString())));
-            }
-
-            
+            }            
 
             return targetPath;
         }
@@ -860,16 +1096,16 @@ namespace Sentry.data.Infrastructure
         {
             RetrieverJob basicJob = null;
 
-            using (Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
+            using (IContainer Container = Sentry.data.Infrastructure.Bootstrapper.Container.GetNestedContainer())
             {
-                IRequestContext _requestContext = Container.GetInstance<IRequestContext>();
+                IDatasetContext _requestContext = Container.GetInstance<IDatasetContext>();
                 
-                basicJob = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).ThenFetch(d => d.ParentDataset).Fetch(f => f.DataSource).FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is S3Basic);
-                
+                basicJob = _requestContext.RetrieverJob.Where(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is S3Basic).FetchAllConfiguration(_requestContext).SingleOrDefault();
+
                 if (basicJob == null)
                 {
                     _job.JobLoggerMessage("Info", "No S3Basic job found for Schema... Finding DfsBasic job");
-                    basicJob = _requestContext.RetrieverJob.Fetch(f => f.DatasetConfig).ThenFetch(d => d.ParentDataset).Fetch(f => f.DataSource).FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is DfsBasic);
+                    basicJob = _requestContext.RetrieverJob.Where(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is DfsBasic).FetchAllConfiguration(_requestContext).SingleOrDefault();
 
                     if (basicJob == null)
                     {
@@ -994,6 +1230,23 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        private string GenerateProcessingFileName(string filepath)
+        {
+            var orginalPath = Path.GetFullPath(filepath).Replace(Path.GetFileName(filepath), "");
+            var origFileName = Path.GetFileName(filepath);
+            return orginalPath + Configuration.Config.GetHostSetting("ProcessedFilePrefix") + origFileName;
+        }
+
+        private string GetFileOwner(string filepath)
+        {
+            var fsecurity = File.GetAccessControl(filepath);
+            var sid = fsecurity.GetOwner(typeof(SecurityIdentifier));
+            var ntAccount = sid.Translate(typeof(NTAccount));
+
+            //remove domain
+            return ntAccount.ToString().Replace(@"SHOESD01\", "");
+        }
+
         private void SubmitLoaderRequest(string filepath)
         {
             string processingFile = null;
@@ -1001,16 +1254,8 @@ namespace Sentry.data.Infrastructure
 
             if (_job.DataSource.Is<DfsBasic>() || _job.DataSource.Is<DfsCustom>())
             {
-                var orginalPath = Path.GetFullPath(filepath).Replace(Path.GetFileName(filepath), "");
-                var origFileName = Path.GetFileName(filepath);
-                processingFile = orginalPath + Configuration.Config.GetHostSetting("ProcessedFilePrefix") + origFileName;
-
-                var fsecurity = File.GetAccessControl(filepath);
-                var sid = fsecurity.GetOwner(typeof(SecurityIdentifier));
-                var ntAccount = sid.Translate(typeof(NTAccount));
-
-                //remove domain
-                fileOwner = ntAccount.ToString().Replace(@"SHOESD01\", "");
+                processingFile = GenerateProcessingFileName(filepath);
+                fileOwner = GetFileOwner(filepath);
 
                 //Rename file to indicate a request has been sent to Dataset Loader
                 File.Move(filepath, processingFile);

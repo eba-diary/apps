@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
 using Sentry.Common.Logging;
 using Sentry.Core;
 
@@ -13,12 +14,23 @@ namespace Sentry.data.Core
         private readonly IDatasetContext _datasetContext;
         private readonly ISecurityService _securityService;
         private readonly UserService _userService;
+        private readonly IMessagePublisher _messagePublisher;
+        private readonly IS3ServiceProvider _s3ServiceProvider;
+        private readonly IConfigService _configService;
+        private readonly ISchemaService _schemaService;
 
-        public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, UserService userService)
+        public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, 
+                            UserService userService, IMessagePublisher messagePublisher,
+                            IS3ServiceProvider s3ServiceProvider,
+                            IConfigService configService, ISchemaService schemaService)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
             _userService = userService;
+            _messagePublisher = messagePublisher;
+            _s3ServiceProvider = s3ServiceProvider;
+            _configService = configService;
+            _schemaService = schemaService;
         }
 
 
@@ -35,10 +47,29 @@ namespace Sentry.data.Core
         {
             Dataset ds = _datasetContext.Datasets.Where(x => x.DatasetId == id && x.CanDisplay).FetchAllChildren(_datasetContext).FirstOrDefault();
 
-            DatasetDetailDto dto = new DatasetDetailDto();
-            MapToDetailDto(ds, dto);
+            if (ds != null)
+            {
+                DatasetDetailDto dto = new DatasetDetailDto();
+                MapToDetailDto(ds, dto);
+                return dto;
+            }
+            else
+            {
+                return null;
+            }            
+        }
 
-            return dto;
+        public List<DatasetDto> GetAllDatasetDto()
+        {
+            List<Dataset> dsList = _datasetContext.Datasets.Where(x => x.CanDisplay && x.DatasetType == "DS").FetchAllChildren(_datasetContext).ToList();
+            List<DatasetDto> dtoList = new List<DatasetDto>();
+            foreach (Dataset ds in dsList)
+            {
+                DatasetDto dto = new DatasetDto();
+                MapToDto(ds, dto);
+                dtoList.Add(dto);
+            }
+            return dtoList;
         }
 
         public UserSecurity GetUserSecurityForDataset(int datasetId)
@@ -62,8 +93,7 @@ namespace Sentry.data.Core
         {
             //get all datasets where the there is a CanQueryData permission on the security
             //OR all public datasets (no security object)
-            var query = _datasetContext.Datasets.Where(x => x.DatasetType == GlobalConstants.DataEntityCodes.DATASET &&
-                                                                                        (x.Security == null || x.Security.Tickets.Any(y => y.Permissions.Any(z => z.Permission.PermissionCode == GlobalConstants.PermissionCodes.CAN_QUERY_DATASET && z.IsEnabled))));
+            var query = _datasetContext.Datasets.Where(x => x.DatasetType == GlobalConstants.DataEntityCodes.DATASET && x.CanDisplay);
 
             query.FetchMany(x => x.DatasetCategories).ToFuture();
             List<Dataset> datasets = query.FetchSecurityTree(_datasetContext);
@@ -127,36 +157,41 @@ namespace Sentry.data.Core
                 request.ApproverId = request.SelectedApprover;
                 request.Permissions = _datasetContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
                                                                                                                 x.SecurableObject == GlobalConstants.SecurableEntityName.DATASET).ToList();
+
+                if (Configuration.Config.GetHostSetting("UseCherwell") == "false")
+                {
+                    //Format the business reason here.
+                    StringBuilder sb = new StringBuilder();
+                    sb.Append($"Please grant the Ad Group {request.AdGroupName} the following permissions to {request.SecurableObjectName} dataset within Data.sentry.com.{ Environment.NewLine}");
+                    request.Permissions.ForEach(x => sb.Append($"{x.PermissionName} - {x.PermissionDescription} { Environment.NewLine}"));
+                    sb.Append($"Business Reason: {request.BusinessReason}{ Environment.NewLine}");
+                    sb.Append($"Requestor: {request.RequestorsId} - {request.RequestorsName}");
+
+                    request.BusinessReason = sb.ToString();
+                }
+                
                 return _securityService.RequestPermission(request);
             }
 
             return string.Empty;
         }
+
         public int CreateAndSaveNewDataset(DatasetDto dto)
         {
             Dataset ds = CreateDataset(dto);
             _datasetContext.Add(ds);
+            dto.DatasetId = ds.DatasetId;
 
-            DataElement de = CreateDataElement(dto);
-            DatasetFileConfig dfc = CreateDatasetFileConfig(dto, ds);
+            DatasetFileConfigDto configDto = dto.ToConfigDto();
+            FileSchemaDto fileDto = dto.ToSchemaDto();
+            configDto.SchemaId = _schemaService.CreateAndSaveSchema(fileDto);
+            _configService.CreateAndSaveDatasetFileConfig(configDto);
 
-            de.DatasetFileConfig = dfc;
-            dfc.Schema = new List<DataElement> { de };
 
-            List<RetrieverJob> jobList = new List<RetrieverJob>
-            {
-                CreateRetrieverJob(dfc, GlobalConstants.DataSourceName.DEFAULT_DROP_LOCATION),
-                CreateRetrieverJob(dfc, GlobalConstants.DataSourceName.DEFAULT_S3_DROP_LOCATION)
-            };
-
-            dfc.RetrieverJobs = jobList;
-
-            _datasetContext.Merge(dfc);
             _datasetContext.SaveChanges();
 
             return ds.DatasetId;
         }
-
 
         public void UpdateAndSaveDataset(DatasetDto dto)
         {
@@ -181,10 +216,6 @@ namespace Sentry.data.Core
             if (dto.DatasetDtm > DateTime.MinValue)
             {
                 ds.DatasetDtm = dto.DatasetDtm;
-            }
-            if (null != dto.DatasetName && dto.DatasetName.Length > 0)
-            {
-                ds.DatasetName = dto.DatasetName;
             }
             if (null != dto.PrimaryOwnerId && dto.PrimaryOwnerId.Length > 0)
             {
@@ -240,7 +271,73 @@ namespace Sentry.data.Core
             _datasetContext.SaveChanges();
         }
 
+        public bool Delete(int datasetId, bool logicalDelete = true)
+        {            
+            Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
 
+            if (logicalDelete)
+            {
+                Logger.Info($"datasetservice-delete-logical - datasetid:{datasetId} datasetname:{ds.DatasetName}");
+
+                try
+                {
+                    //Mark dataset for soft delete
+                    MarkForDelete(ds);
+
+                    //Remove any favorite links to ensure users do not get dead link
+                    foreach(var fav in ds.Favorities)
+                    {
+                        _datasetContext.RemoveById<Favorite>(fav.FavoriteId);
+                    }
+
+                    //Remove any notification subscriptions to dataset
+                    foreach (var subscib in _datasetContext.GetSubscriptionsForDataset(ds.DatasetId))
+                    {
+                        _datasetContext.RemoveById<DatasetSubscription>(subscib.ID);
+                    }
+                    
+                    //Mark Configs for soft delete to ensure no editing and jobs are disabled
+                    foreach (DatasetFileConfig config in ds.DatasetFileConfigs)
+                    {
+                        _configService.Delete(config.ConfigId, logicalDelete, true);
+                    }
+
+                    _datasetContext.SaveChanges();
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"datasetservice-delete-logical failed", ex);
+                    return false;
+                }
+                    
+            }
+            else
+            {
+                Logger.Info($"datasetservice-delete-physical - datasetid:{datasetId} datasetname:{ds.DatasetName}");
+
+                try
+                {
+                    foreach (DatasetFileConfig config in ds.DatasetFileConfigs)
+                    {
+                        _configService.Delete(config.ConfigId, logicalDelete, true);
+                    }
+
+                    _datasetContext.RemoveById<Dataset>(ds.DatasetId);
+                    _datasetContext.SaveChanges();
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error($"datasetservice-delete failed", ex);
+                    return false;
+                }                    
+            }
+            
+        }
+        
         public List<string> Validate(DatasetDto dto)
         {
             List<string> errors = new List<string>();
@@ -251,22 +348,66 @@ namespace Sentry.data.Core
                 errors.Add("Dataset name already exists within category");
             }
 
-            var currentFileExtension = _datasetContext.FileExtensions.FirstOrDefault(x => x.Id == dto.FileExtensionId).Name.ToLower();
-
-            if (currentFileExtension == "csv" && dto.Delimiter != ",")
+            if (String.IsNullOrWhiteSpace(dto.PrimaryOwnerId))
             {
-                errors.Add("File Extension CSV and it's delimiter do not match.");
+                errors.Add("Owner is requried.");
             }
 
-            if (currentFileExtension == "delimited" && string.IsNullOrWhiteSpace(dto.Delimiter))
+            if (String.IsNullOrWhiteSpace(dto.PrimaryContactId))
             {
-                errors.Add("File Extension Delimited is missing it's delimiter.");
+                errors.Add("Contact is requried.");
             }
-            
+
             return errors;
         }
 
+        public List<Dataset> GetDatasetMarkedDeleted()
+        {
+            List<Dataset> dsList = _datasetContext.Datasets.Where(w => w.DeleteInd && w.DeleteIssueDTM < DateTime.Now.AddDays(Double.Parse(Configuration.Config.GetHostSetting("DatasetDeleteWaitDays")))).ToList();
+            return dsList;
+        }
+
+        //public bool DeleteDatasetFile(int datasetFileId)
+        //{
+        //    DatasetFile df = _datasetContext.DatasetFile.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
+
+        //    if (df != null)
+        //    {
+        //        try
+        //        {
+        //            //Find associated parquet prefixes and delete from S3
+        //            List<DatasetFileParquet> parquetFileList = _datasetContext.DatasetFileParquet.Where(w => w.DatasetFileId == df.DatasetFileId).ToList();
+        //            List<string> s3PrefixList = parquetFileList.ToObjectKeyVersion();
+        //            _s3ServiceProvider.DeleteS3Prefix(s3PrefixList);
+
+
+        //            _datasetContext.Remove(df);
+        //            _datasetContext.SaveChanges();
+        //            return true;
+        //        }
+        //        catch (Exception ex)
+        //        {
+
+        //            Logger.Error($"deletedatasetfile-")
+        //            return false;
+        //        }
+
+        //    }
+        //    else
+        //    {
+        //        Logger.Info($"deletedatasetfile-nofilefound = datasetfileid:{datasetFileId}");
+        //        return true;
+        //    }
+        //}
+
         #region "private functions"
+        private void MarkForDelete(Dataset ds)
+        {
+            ds.CanDisplay = false;
+            ds.DeleteInd = true;
+            ds.DeleteIssuer = _userService.GetCurrentUser().AssociateId;
+            ds.DeleteIssueDTM = DateTime.Now;
+        }
 
         private Dataset CreateDataset(DatasetDto dto)
         {
@@ -289,7 +430,9 @@ namespace Sentry.data.Core
                 IsSecured = dto.IsSecured,
                 CanDisplay = true,
                 DatasetFiles = null,
-                DatasetFileConfigs = null
+                DatasetFileConfigs = null,
+                DeleteInd = false,
+                DeleteIssueDTM = DateTime.MaxValue
             };
 
             switch (dto.DataClassification)
@@ -316,129 +459,6 @@ namespace Sentry.data.Core
             return ds;
         }
 
-        private DataElement CreateDataElement(DatasetDto dto)
-        {
-            string storageCode = _datasetContext.GetNextStorageCDE().ToString();
-
-            DataElement de = new DataElement()
-            {
-                DataElementCreate_DTM = DateTime.Now,
-                DataElementChange_DTM = DateTime.Now,
-                DataElement_CDE = GlobalConstants.DataElementCode.DATA_FILE,
-                DataElement_DSC = GlobalConstants.DataElementDescription.DATA_FILE,
-                DataElement_NME = dto.ConfigFileName,
-                LastUpdt_DTM = DateTime.Now,
-                SchemaIsPrimary = true,
-                SchemaDescription = dto.ConfigFileDesc,
-                SchemaName = dto.ConfigFileName,
-                SchemaRevision = 1,
-                SchemaIsForceMatch = false,
-                FileFormat = _datasetContext.GetById<FileExtension>(dto.FileExtensionId).Name.ToUpper(),
-                Delimiter = dto.Delimiter,
-                StorageCode = storageCode,
-                HiveDatabase = "Default",
-                HiveTable = dto.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dto.ConfigFileName.Replace(" ", "").ToUpper(),
-                HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
-                HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode
-            };
-
-            return de;
-        }
-
-        private DatasetFileConfig CreateDatasetFileConfig(DatasetDto dto, Dataset ds)
-        {
-            DatasetFileConfig dfc = new DatasetFileConfig()
-            {
-                ConfigId = 0,
-                Name = dto.ConfigFileName,
-                Description = dto.ConfigFileDesc,
-                FileTypeId = (int)FileType.DataFile,
-                ParentDataset = ds,
-                DatasetScopeType = _datasetContext.GetById<DatasetScopeType>(dto.DatasetScopeTypeId),
-                FileExtension = _datasetContext.GetById<FileExtension>(dto.FileExtensionId)
-            };
-
-            return dfc;
-        }
-
-        private RetrieverJob CreateRetrieverJob(DatasetFileConfig dfc, string dataSourceName)
-        {
-            RetrieverJobOptions.Compression compression = new RetrieverJobOptions.Compression()
-            {
-                IsCompressed = false,
-                CompressionType = null,
-                FileNameExclusionList = new List<string>()
-            };
-
-            RetrieverJobOptions rjo = new RetrieverJobOptions()
-            {
-                OverwriteDataFile = false,
-                TargetFileName = "",
-                CreateCurrentFile = false,
-                IsRegexSearch = true,
-                SearchCriteria = "\\.",
-                CompressionOptions = compression
-            };
-
-            DataSource dataSource = _datasetContext.DataSources.First(x => x.Name.Contains(dataSourceName));
-
-            RetrieverJob rj = new RetrieverJob()
-            {
-                TimeZone = "Central Standard Time",
-                RelativeUri = null,
-                DataSource = dataSource,
-                DatasetConfig = dfc,
-                Created = DateTime.Now,
-                Modified = DateTime.Now,
-                IsGeneric = true,
-
-                JobOptions = rjo
-            };
-
-            // Config Drop location
-            if (dataSourceName == GlobalConstants.DataSourceName.DEFAULT_DROP_LOCATION)
-            {
-                CreateDropLocation(rj.GetUri().LocalPath, dfc);
-            }
-
-            if (dataSource.Is<S3Basic>())
-            {
-                rj.Schedule = "*/1 * * * *";
-            }
-            else if (dataSource.Is<DfsBasic>())
-            {
-                rj.Schedule = "Instant";
-            }
-            else
-            {
-                throw new NotImplementedException("This method does not support this type of Data Source");
-            }
-
-            return rj;
-        }
-
-        private void CreateDropLocation(string path, DatasetFileConfig dfc)
-        {
-            try
-            {
-                if (!Directory.Exists(path))
-                {
-                    Directory.CreateDirectory(path);
-                }
-            }
-            catch (Exception ex)
-            {
-                StringBuilder errmsg = new StringBuilder();
-                errmsg.AppendLine("Failed to Create Drop Location:");
-                errmsg.AppendLine($"DatasetId: {dfc.ParentDataset?.DatasetId}");
-                errmsg.AppendLine($"DatasetName: {dfc.ParentDataset?.DatasetName}");
-                errmsg.AppendLine($"DropLocation: {path}");
-
-                Logger.Error(errmsg.ToString(), ex);
-            }
-        }
-
-
         private void MapToDto(Dataset ds, DatasetDto dto)
         {
             IApplicationUser primaryOwner = _userService.GetByAssociateId(ds.PrimaryOwnerId);
@@ -458,6 +478,7 @@ namespace Sentry.data.Core
             dto.DatasetInformation = ds.DatasetInformation;
             dto.DatasetType = ds.DatasetType;
             dto.DataClassification = ds.DataClassification;
+            dto.CategoryColor = ds.DatasetCategories.FirstOrDefault().Color;
 
             dto.CreationUserId = ds.CreationUserName;
             dto.CreationUserName = ds.CreationUserName;
@@ -474,11 +495,12 @@ namespace Sentry.data.Core
             dto.OriginationId = (int)Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode);
             dto.ConfigFileDesc = ds.DatasetFileConfigs?.First()?.Description;
             dto.ConfigFileName = ds.DatasetFileConfigs?.First()?.Name;
-            dto.Delimiter = ds.DatasetFileConfigs?.First()?.Schema?.First()?.Delimiter;
+            dto.Delimiter = ds.DatasetFileConfigs?.First()?.Schemas?.First()?.Delimiter;
             dto.FileExtensionId = ds.DatasetFileConfigs.First().FileExtension.Id;
             dto.DatasetScopeTypeId = ds.DatasetFileConfigs.First().DatasetScopeType.ScopeTypeId;
             dto.CategoryName = ds.DatasetCategories.First().Name;
             dto.MailtoLink = "mailto:?Subject=Dataset%20-%20" + ds.DatasetName + "&body=%0D%0A" + Configuration.Config.GetHostSetting("SentryDataBaseUrl") + "/Dataset/Detail/" + ds.DatasetId;
+            dto.CategoryNames = ds.DatasetCategories.Select(s => s.Name).ToList();
         }
 
 
@@ -494,7 +516,7 @@ namespace Sentry.data.Core
             dto.AmountOfSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, dto.DatasetId).Count;
             dto.Views = _datasetContext.Events.Where(x => x.EventType.Description == GlobalConstants.EventType.VIEWED && x.Dataset == ds.DatasetId).Count();
             dto.IsFavorite = ds.Favorities.Any(w => w.UserId == user.AssociateId);
-            dto.DatasetFileConfigNames = ds.DatasetFileConfigs.ToDictionary(x => x.ConfigId.ToString(), y => y.Name);
+            dto.DatasetFileConfigNames = ds.DatasetFileConfigs.Where(w => w.DeleteInd == false).ToDictionary(x => x.ConfigId.ToString(), y => y.Name);
             dto.DatasetScopeTypeNames = ds.DatasetScopeType.ToDictionary(x => x.Name, y => y.Description);
             dto.DistinctFileExtensions = ds.DatasetFiles.Select(x => Path.GetExtension(x.FileName).TrimStart('.').ToLower()).Distinct().ToList();
             dto.DatasetFileCount = ds.DatasetFiles.Count();
@@ -502,6 +524,7 @@ namespace Sentry.data.Core
             dto.DataClassificationDescription = ds.DataClassification.GetDescription();
             dto.CategoryColor = ds.DatasetCategories.First().Color;
             dto.CategoryNames = ds.DatasetCategories.Select(x => x.Name).ToList();
+            dto.GroupAccessCount = _securityService.GetGroupAccessCount(ds);
             if (ds.DatasetFiles.Any())
             {
                 dto.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);

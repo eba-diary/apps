@@ -1,16 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public class SchemaDTO
+    public abstract class SchemaDto
     {
-        public int SchemaID { get; set; }
-        public string Format { get; set; }
-        public string Header { get; set; }
-        public string Delimiter { get; set; }
-        public string HiveTable { get; set; }
-        public string HiveDatabase { get; set; }
-        public string HiveStatus { get; set; }
-        public string HiveLocation { get; set; }
+        public int SchemaId { get; set; }
+        public abstract string SchemaEntity_NME { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
+        public int ParentDatasetId { get; set; }
+        public virtual bool DeleteInd { get; set; }
+        public virtual string DeleteIssuer { get; set; }
+        public virtual DateTime DeleteIssueDTM { get; set; }
     }
 }

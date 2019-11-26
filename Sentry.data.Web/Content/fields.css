@@ -1,0 +1,134 @@
+﻿.fields-sortable-ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    border-bottom: 1px solid #aaa;
+}
+
+    .fields-sortable-ul li {
+        display: table;
+        width: 100%;
+        /*background-color: #fff;
+        border-top: 1px solid #aaa;*/
+        /*padding: 15px;*/
+    }
+
+        .sortable-ul li span {
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+.fields-wrapper {
+    margin-top: 20px;
+}
+
+.parentContainer {
+    /*background-color: rgba(0,0,0,0.05);
+    padding: 5px;
+    padding-left: 20px;
+    padding-right: 20px;*/
+    padding-left: 10px;
+    border-radius: 10px;
+    margin-bottom: 5px
+}
+
+.descriptionContainer {
+    padding-top: 15px;
+}
+
+
+.childrenContainer {
+    /*margin-left: 15px;
+    padding: 15px;*/
+    padding-left: 10px;
+    border-radius: 10px;
+    margin-bottom: 5px
+}
+
+.typeSelect {
+    width: auto;
+    height: 26px;
+    padding-left: 10px;
+}
+
+.showPandS {
+    display: inline;
+}
+
+.arrayTypeSelect {
+    display: inline;
+    width: auto;
+    height: 26px;
+    padding-left: 10px;
+}
+
+.optionContainer {
+    float: right;
+}
+
+.rightButton {
+    display: inline;
+}
+
+.schemaRowContainer {
+    border-radius: 10px;
+}
+
+.schemaRow {
+    /*margin-right: -20px;*/
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    margin-left: 0px;
+}
+
+.options {
+    display: inline;
+    float: right;
+}
+
+.precisionContainer {
+    padding-left: 0px;
+}
+
+.scaleContainer {
+    padding-left: 0px;
+}
+
+.precision {
+    padding-right: 0px;
+}
+
+.scale {
+    padding-right: 0px;
+}
+
+.schemaRowColor {
+    background-color: rgba(229,114,0,0.5);
+}
+
+.schemaColorOdd {
+    background-color: rgba(229,114,0,0.5);
+}
+
+.schemaColorEven {
+    background-color: rgba(137,171,227,0.5);
+}
+
+.array {
+    width: auto;
+}
+.arrayLabel {
+    float: left;
+    padding-right: 10px;
+}
+
+.btnExpandChildren {
+    float: left;
+    margin-right: 10px;
+}
+.fieldGuidText {
+    color: transparent;
+    font-size: x-small;
+    display: block;
+}

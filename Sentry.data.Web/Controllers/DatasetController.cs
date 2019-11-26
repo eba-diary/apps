@@ -37,6 +37,7 @@ namespace Sentry.data.Web.Controllers
         private readonly IObsidianService _obsidianService;
         private readonly IDatasetService _datasetService;
         private readonly IEventService _eventService;
+        private readonly IConfigService _configService;
 
         public DatasetController(
             IDatasetContext dsCtxt,
@@ -46,7 +47,8 @@ namespace Sentry.data.Web.Controllers
             IAssociateInfoProvider associateInfoService,
             IObsidianService obsidianService,
             IDatasetService datasetService,
-            IEventService eventService)
+            IEventService eventService,
+            IConfigService configService)
         {
             _datasetContext = dsCtxt;
             _s3Service = dsSvc;
@@ -56,6 +58,7 @@ namespace Sentry.data.Web.Controllers
             _obsidianService = obsidianService;
             _datasetService = datasetService;
             _eventService = eventService;
+            _configService = configService;
         }
 
         public ActionResult Index()
@@ -90,6 +93,8 @@ namespace Sentry.data.Web.Controllers
 
             _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Creation Page", cdm.DatasetId);
 
+            ViewData["Title"] = "Create Dataset";
+
             return View("DatasetForm", cdm);
         }
 
@@ -105,10 +110,38 @@ namespace Sentry.data.Web.Controllers
                 Utility.SetupLists(_datasetContext, model);
 
                 _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Edit Page", id);
+                
+                ViewData["Title"] = "Edit Dataset";
+
                 return View("DatasetForm", model);
             }
 
             return View("Forbidden");
+        }
+
+        [HttpDelete]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        [Route("Dataset/{id}/Delete")]
+        public JsonResult Delete(int id)
+        {
+            try
+            {
+                UserSecurity us = _datasetService.GetUserSecurityForDataset(id);
+
+                if (us.CanEditDataset)
+                {
+                    //Issue logical delete
+                    _datasetService.Delete(id);
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.DELETE_DATASET, SharedContext.CurrentUser.AssociateId, "Deleted Dataset", id);
+                    return Json(new { Success = true, Message = "Dataset successfully deleted" });
+                }
+                return Json(new { Success = false, Message = "You do not have permissions to delete this dataset" });
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"Failed to delete dataset - DatasetId:{id} RequestorId:{SharedContext.CurrentUser.AssociateId} RequestorName:{SharedContext.CurrentUser.DisplayName}", ex);
+                return Json(new { Success = false, Message = "We failed to delete the dataset.  Please try again later.  Please contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a> if problem persists." });
+            }
         }
 
         [HttpPost]
@@ -117,7 +150,15 @@ namespace Sentry.data.Web.Controllers
         {
             DatasetDto dto = model.ToDto();
 
+            //only validate config settings on dataset create
+            if (model.DatasetId == 0)
+            {
+                FileSchemaDto schemaDto = model.DatasetModelToDto();
+                AddCoreValidationExceptionsToModel(_configService.Validate(schemaDto));
+            }
+
             AddCoreValidationExceptionsToModel(_datasetService.Validate(dto));
+
             if (ModelState.IsValid)
             {
 
@@ -149,10 +190,19 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Detail(int id)
         {
             DatasetDetailDto dto = _datasetService.GetDatesetDetailDto(id);
-            DatasetDetailModel model = new DatasetDetailModel(dto);
 
-            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Page", dto.DatasetId);
-            return View(model);
+            if (dto != null)
+            {
+                DatasetDetailModel model = new DatasetDetailModel(dto);
+
+                _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Detail Page", dto.DatasetId);
+
+                return View(model);
+            }
+            else
+            {
+                return HttpNotFound("Invalid Dataset Id"); 
+            }
         }
 
         [HttpGet]
@@ -175,7 +225,7 @@ namespace Sentry.data.Web.Controllers
             }
             else
             {
-                return PartialView("_Success", new SuccessModel("Dataset access was successfully requested.", "HPSM Change Id: " + ticketId, true));
+                return PartialView("_Success", new SuccessModel("Dataset access was successfully requested.", "Change Id: " + ticketId, true));
             }
         }
 
@@ -343,7 +393,7 @@ namespace Sentry.data.Web.Controllers
             return Redirect(Request.UrlReferrer.PathAndQuery);
         }
 
-        public JsonResult GetDatasetFileInfoForGrid(int Id, Boolean bundle, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
+        public JsonResult GetDatasetFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
             //IEnumerable < DatasetFileGridModel > files = _datasetContext.GetAllDatasetFiles().ToList().
 
@@ -368,15 +418,8 @@ namespace Sentry.data.Web.Controllers
             int a = dtqa.GetDataTablesResponse().data.Count();
 
             Debug.WriteLine(a);
-
-            if (bundle)
-            {
-                return Json(dtqa.GetDataTablesResponse(true), JsonRequestBehavior.AllowGet);
-            }
-            else
-            {
-                return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
-            }
+            
+            return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
         }
 
         public JsonResult GetBundledFileInfoForGrid(int Id, [ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
@@ -479,8 +522,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         #endregion
-
-
+        
         #region Helpers
 
         [HttpGet()]
@@ -770,146 +812,6 @@ namespace Sentry.data.Web.Controllers
 
         }
 
-
-        [HttpPost]
-        public async Task<ActionResult> BundleFiles(string listOfIds, string newName, int datasetID)
-        {
-            string[] ids = listOfIds.Split(',');
-
-            List<DatasetFile> files = (from file in _datasetContext.DatasetFile.Where(x => x.ParentDatasetFileId == null).Fetch(x => x.DatasetFileConfig).ToList()
-                                       from id in ids
-                                       where file.DatasetFileId.ToString() == id
-                                       select file).ToList();
-
-            var extension = Path.GetExtension(files[0].FileName);
-
-
-            //Do all the files included in the list have the same exact extension.
-            Boolean sameExtension = files.All(x => Path.GetExtension(x.FileName) == extension) ? true : false;
-            Boolean allDataFiles = files.All(x => x.DatasetFileConfig.FileTypeId == (int)FileType.DataFile) ? true : false;
-
-            //Get the users permissions
-            Boolean errorsFound = false;
-            string errorString = "";
-
-            UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetID);
-
-            if (newName == "" || newName == null)
-            {
-                errorsFound = true;
-                errorString += "<p>Please supply a new name to give to your bundled file.</p>";
-            }
-
-            if (!allDataFiles)
-            {
-                errorsFound = true;
-                errorString += "<p>You cannot bundle files that are labeled as supplementary files, help documents, or usage manuals.</p>";
-            }
-
-            if (files.Count == 1)
-            {
-                errorsFound = true;
-                errorString += "<p>You cannot bundle just one file.</p>";
-            }
-            else if (files.Count == 0)
-            {
-                errorsFound = true;
-                errorString += "<p>You selected no files.</p>";
-            }
-
-            if (us.CanViewFullDataset)
-            {
-                errorsFound = true;
-                errorString += "<p>You do not have permission to download or bundle these files.</p>";
-            }
-
-            if (!sameExtension)
-            {
-                errorsFound = true;
-                errorString += "<p>The files did not have the same file extension. Bundling requires that all files have the same extension.  Please filter by putting the file extension in either the Name Column or the Search Box provided at the top right of the table.</p>";
-            }
-
-            try
-            {
-                if (!errorsFound)
-                {
-                    //Pass the list of files off to the File Bundler in S3.
-                    string userEmail = SharedContext.CurrentUser.EmailAddress;
-                    DatafileBundleProvider myBundleRequest = new DatafileBundleProvider();
-
-                    Dataset parentDataset = _datasetContext.GetById<Dataset>(files.FirstOrDefault().Dataset.DatasetId);
-
-                    //Passing UserID and Timestamp to hash method to ensure unqiue GUID for request
-                    BundleRequest _request = new BundleRequest(Utilities.GenerateHash($"{SharedContext.CurrentUser.AssociateId}_{DateTime.Now.ToString()}"));
-
-                    //string requestLocation = @"bundlework/intake/" + _request.RequestGuid;
-
-                    _request.DatasetID = files.FirstOrDefault().Dataset.DatasetId;
-                    _request.Bucket = Configuration.Config.GetHostSetting("AWSRootBucket");
-                    _request.DatasetFileConfigId = files.FirstOrDefault().DatasetFileConfig.ConfigId;
-                    _request.TargetFileName = newName;
-                    _request.Email = userEmail;
-                    _request.TargetFileLocation = Configuration.Config.GetSetting("S3BundlePrefix") + parentDataset.S3Key;
-                    _request.DatasetDropLocation = files.FirstOrDefault().DatasetFileConfig.RetrieverJobs.FirstOrDefault(x => x.DataSource.Is<DfsBasic>()).GetUri().LocalPath;
-                    _request.RequestInitiatorId = SharedContext.CurrentUser.AssociateId;
-
-                    foreach (DatasetFile df in files)
-                    {
-                        _request.SourceKeys.Add(Tuple.Create(df.FileLocation, df.VersionId));
-                    }
-
-                    _request.FileExtension = Path.GetExtension(_request.SourceKeys.FirstOrDefault().Item1);
-
-                    string jsonRequest = JsonConvert.SerializeObject(_request, Formatting.Indented);
-
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        StreamWriter writer = new StreamWriter(ms);
-
-                        writer.WriteLine(jsonRequest);
-                        writer.Flush();
-
-                        //You have to rewind the MemoryStream before copying
-                        ms.Seek(0, SeekOrigin.Begin);
-                        Logger.Info($"Sending Bundle Request to:{Path.Combine($"{Configuration.Config.GetHostSetting("DatasetBundleBaseLocation")}", "request", $"{_request.RequestGuid}.json")}");
-
-                        using (FileStream fs = new FileStream(Path.Combine($"{Configuration.Config.GetHostSetting("DatasetBundleBaseLocation")}", "request", $"{_request.RequestGuid}.json"), FileMode.CreateNew))
-                        {
-                            ms.CopyTo(fs);
-                            fs.Flush();
-                        }
-
-                    }
-
-                    //Create Bundle Started Event
-                    Event e = new Event();
-                    e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Bundle File Process").FirstOrDefault();
-                    e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Started").FirstOrDefault();
-                    e.TimeCreated = DateTime.Now;
-                    e.TimeNotified = DateTime.Now;
-                    e.IsProcessed = false;
-                    e.UserWhoStartedEvent = _request.RequestInitiatorId;
-                    e.Dataset = _request.DatasetID;
-                    e.DataConfig = _request.DatasetFileConfigId;
-                    e.Reason = $"Submitted bundle request for dataset [<b>{_datasetContext.GetById(_request.DatasetID).DatasetName}</b>] targeting file name [<b>{_request.TargetFileName}</b>]";
-                    e.Parent_Event = _request.RequestGuid;
-                    Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-
-                    return Json(new { Success = true, Message = "Successfully sent request to Dataset Bundler.  You will recieve notification when completed." });
-                }
-                else
-                {
-                    //Return an error to the user in the Client UI.
-                    return Json(new { Success = false, Message = errorString });
-                }
-            }
-            catch (Exception ex)
-            {
-                Logger.Error("Error Processing Bundle Request", ex);
-                return Json(new { Success = false, Message = "An error occurred, please try later! : " + ex.Message });
-            }
-        }
-
         [HttpGet()]
         public int GetLatestDatasetFileIdForDataset(int id)
         {
@@ -1070,10 +972,10 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        [HttpGet()]
-        public ActionResult GetDatasetUploadPartialView(int datasetId)
+        [HttpGet]
+        [Route("Dataset/Upload/{datasetId}/Config/{configId}")]
+        public ActionResult Upload(int datasetId, int configId = 0)
         {
-
             UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
             if (!us.CanUploadToDataset)
             {
@@ -1084,17 +986,17 @@ namespace Sentry.data.Web.Controllers
             //If a value was passed, load appropriate information
             if (datasetId != 0)
             {
-                cd = new CreateDataFileModel(_datasetService.GetDatasetDto(datasetId));
+                cd = new CreateDataFileModel(_datasetService.GetDatesetDetailDto(datasetId));
             }
 
-            ViewBag.Categories = Utility.GetCategoryList(_datasetContext);
+            ViewBag.CurrentConfigId = configId;
 
             return PartialView("_UploadDataFile", cd);
         }
 
         #endregion
 
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)] 
         [HttpPost]
         public ActionResult RunRetrieverJob(int id)
         {
@@ -1119,15 +1021,22 @@ namespace Sentry.data.Web.Controllers
             {
                 RetrieverJobService jobservice = new RetrieverJobService();
 
-                jobservice.DisableJob(id);
+                bool IsSuccessful = jobservice.DisableJob(id);
+
+                if (IsSuccessful)
+                {
+                    return Json(new { Success = true, Message = "Job has been marked as disabled and will be removed from the job scheduler." });
+                }
+                else
+                {
+                    return Json(new { Success = false, Message = "Failed disabling job.  If problem persists, please contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a>." });
+                }
             }
             catch (Exception ex)
             {
                 Logger.Error($"Error disabling retriever job ({id}).", ex);
                 return Json(new { Success = false, Message = "Failed disabling job.  If problem persists, please contact <a href=\"mailto:DSCSupport@sentry.com\">Site Administration</a>." });
-            }
-
-            return Json(new { Success = true, Message = "Job has been marked as disabled and will be removed from the job scheduler." });
+            }            
         }
 
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
@@ -1200,8 +1109,7 @@ namespace Sentry.data.Web.Controllers
 
             return Json(sList, JsonRequestBehavior.AllowGet);
         }
-
-
+        
         public JsonResult GetSourceDescription(string DiscrimatorValue)
         {
             var obj = _datasetContext.DataSourceTypes.Where(x => x.DiscrimatorValue == DiscrimatorValue).Select(x => x.Description);
@@ -1211,7 +1119,10 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult QueryTool()
         {
+            IApplicationUser user = _userService.GetCurrentUser();
+
             ViewBag.LivyURL = Sentry.Configuration.Config.GetHostSetting("ApacheLivy");
+            ViewBag.IsAdmin = user.IsAdmin;
 
             _eventService.PublishSuccessEvent(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Query Tool Page");
 

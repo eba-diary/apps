@@ -1,6 +1,10 @@
-﻿using System.Web.Http;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Web.Http;
+using System.Web.Http.Description;
 using System.Web.Http.Routing;
 using Swashbuckle.Application;
+using Swashbuckle.Swagger;
 
 namespace Sentry.data.Web
 {
@@ -10,7 +14,7 @@ namespace Sentry.data.Web
         {
             var constraintResolver = new DefaultInlineConstraintResolver();
             Sentry.WebAPI.Versioning.Register.ConstraintMap(constraintResolver);
-            Sentry.WebAPI.Versioning.Register.ApiVersions(config, "1"); // Replace "1" with a different default API version if you desire
+            Sentry.WebAPI.Versioning.Register.ApiVersions(config, Sentry.data.Web.WebAPI.Version.v1); // Replace "1" with a different default API version if you desire
             config.MapHttpAttributeRoutes(constraintResolver);
 
             
@@ -23,6 +27,9 @@ namespace Sentry.data.Web
                     c.IncludeXmlComments(GetXmlCommentsPath());
 
                     c.DescribeAllEnumsAsStrings(camelCase: false);
+
+                    c.DocumentFilter<CustomDocumentFilter>();
+
                 })
                 .EnableSwaggerUi(c =>
                 {
@@ -34,6 +41,15 @@ namespace Sentry.data.Web
         private static string GetXmlCommentsPath()
         {
             return $"{System.AppDomain.CurrentDomain.BaseDirectory}\\bin\\Sentry.data.Web.xml";
+        }
+    }
+
+    public class CustomDocumentFilter : IDocumentFilter
+    {
+        public void Apply(SwaggerDocument swaggerDoc, SchemaRegistry schemaRegistry, IApiExplorer apiExplorer)
+        {
+            var paths = swaggerDoc.paths.OrderBy(e => e.Key).ToList();
+            swaggerDoc.paths = paths.ToDictionary(e => e.Key, e => e.Value);
         }
     }
 } 

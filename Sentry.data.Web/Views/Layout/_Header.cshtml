@@ -140,6 +140,7 @@ else
                                 <li class="divider"></li>
                                 <li class="dropdown-header">Dataset Administration</li>
                                 <li><a href="/Config/Manage">Manage Configs</a></li>
+                                <li><a href="/Config/Source/Create">Create Retriever Source</a></li>
                             }
                         </ul>
                     </li>
@@ -233,13 +234,12 @@ else
                         </ul>
                     </li>
                 }
-
-                <li>
-                    <a href="~/Dataset/QueryTool" class="">Query Tool</a>
-                </li>
-
-
-
+                @if (Model.CanViewDataset || Model.CanEditDataset)
+                {
+                    <li>
+                        <a href="~/Dataset/QueryTool" class="">Query Tool</a>
+                    </li>
+                }
 
                 <li class="dropdown-xs">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Help <b class="caret"></b></a>
@@ -259,14 +259,11 @@ else
                                         <li class="text-right"><a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/DataAssetAlertNotificationUserGuide.docx?Web=1">Alert Notifications</a></li>
                                     </ul>
                                 </li>
-                                @*<li class="dropdown-submenu">
-            <a data-toggle="dropdown">Dataset Management</a>
-            <ul class="dropdown-menu">
-                <li class="text-right"><a href="#" onclick="">Coming Soon!</a></li>
-            </ul>
-        </li>*@
                                 <li><a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/SiteAccess.docx?Web=1">Access Guide</a></li>
+                                <li><a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/DSCRolesResponsibilities.docx?Web=1">Roles and Responsiblities</a></li>
                                 <li><a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/ChromeBrowserFileTypeOpen.docx?Web=1">Open Files with Chrome</a></li>
+                                <li><a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/RetrievalJobUserGuide.docx?Web=1">Retriever Jobs</a></li>
+                                <li><a target="_blank" href="http://sharepoint.sentry.com/it/DataArch/Shared%20Documents/Data.Sentry.com/099.%20DSC%20Site%20Documents/QueryToolUserGuide.docx?Web=1">Query Tool</a></li>
                             </ul>
                         </li>
 

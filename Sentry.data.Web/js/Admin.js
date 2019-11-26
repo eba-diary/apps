@@ -26,6 +26,6 @@ data.Admin = {
         $("[id^='Complete_']").on("click", function () {
             data.Admin.CompleteAuction($(this).data("id"));
         });
-    },
+    }
 
 }

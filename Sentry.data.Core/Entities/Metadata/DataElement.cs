@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -185,6 +186,82 @@ namespace Sentry.data.Core
                 SetDataElementDetailValue("HasHeader", value.ToString());
             }
         }
+        public bool CreateCurrentView
+        {
+            get
+            {
+                DataElementDetail detail = GetElementDetail(GlobalConstants.DataElementDetailCodes.CREATE_CURRENT_VIEW);
+                return (detail == null || detail.DataElementDetailType_VAL.ToLower() == "false") ? false : true;
+            }
+            set
+            {
+                SetDataElementDetailValue(GlobalConstants.DataElementDetailCodes.CREATE_CURRENT_VIEW, value.ToString());
+            }
+        }
+
+        public virtual Boolean DeleteInd
+        {
+            get
+            {
+                return Boolean.Parse(GetElementDetail(GlobalConstants.DataElementDetailCodes.DELETE_INDICATOR).DataElementDetailType_VAL);
+            }
+            set
+            {
+                SetDataElementDetailValue(GlobalConstants.DataElementDetailCodes.DELETE_INDICATOR, (value) ? "True" : "False");
+            }
+        }
+        public virtual string DeleteIssuer
+        {
+            get
+            {
+                DataElementDetail detail = GetElementDetail(GlobalConstants.DataElementDetailCodes.DELETE_ISSUER);
+                return detail?.DataElementDetailType_VAL;
+            }
+            set
+            {
+                SetDataElementDetailValue(GlobalConstants.DataElementDetailCodes.DELETE_ISSUER, value);
+            }
+        }
+        public virtual DateTime? DeleteIssueDTM
+        {
+            //https://stackoverflow.com/a/41410797
+            get
+            {
+                DataElementDetail detail = GetElementDetail(GlobalConstants.DataElementDetailCodes.DELETE_ISSUE_DTM);
+                return DateTime.ParseExact(detail.DataElementDetailType_VAL, "O", CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind);
+            }
+            set
+            {
+                SetDataElementDetailValue(GlobalConstants.DataElementDetailCodes.DELETE_ISSUE_DTM, value?.ToString("O"));
+            }
+        }
+        public virtual Boolean IsInSAS
+        {
+            get
+            {
+                DataElementDetail detail = GetElementDetail(GlobalConstants.DataElementDetailCodes.INCLUDE_IN_SAS);
+                return (detail == null || detail.DataElementDetailType_VAL.ToLower() == "false") ? false : true;
+            }
+            set
+            {
+                SetDataElementDetailValue(GlobalConstants.DataElementDetailCodes.INCLUDE_IN_SAS, (value) ? "True" : "False");
+            }
+        }
+        public string SasLibrary
+        {
+            get
+            {
+                DataElementDetail detail = GetElementDetail(GlobalConstants.DataElementDetailCodes.SAS_LIBRARY);
+                return detail?.DataElementDetailType_VAL;
+            }
+            set
+            {
+                SetDataElementDetailValue(GlobalConstants.DataElementDetailCodes.SAS_LIBRARY, value);
+            }
+        }
+
+
+
         #region DataElementDetailHelpers
         private DataElementDetail GetElementDetail(string typeCDE)
         {

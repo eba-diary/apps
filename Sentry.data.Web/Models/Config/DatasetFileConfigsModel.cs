@@ -6,6 +6,7 @@ using Sentry.data.Core;
 using System.ComponentModel.DataAnnotations;
 using System.Web.Mvc;
 using System.ComponentModel;
+using Sentry.Core;
 
 namespace Sentry.data.Web
 {
@@ -25,8 +26,14 @@ namespace Sentry.data.Web
             this.ScopeType = dsfc.DatasetScopeType;
             this.FileExtensionID = dsfc.FileExtension.Id;
             this.FileExtension = dsfc.FileExtension;
-            this.Schemas = dsfc.Schema;
+            this.Schemas = dsfc.Schemas;
+            this.Schema = dsfc.Schema ?? null;
             this.RawStorageId = dsfc.GetStorageCode();
+            this.SchemaId = (dsfc.Schema != null) ? dsfc.Schema.SchemaId : 0;
+            this.Delimiter = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().Delimiter;
+            this.CreateCurrentView = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().CreateCurrentView;
+            this.HasHeader = dsfc.Schemas.OrderByDescending(o => o.DataElementChange_DTM).FirstOrDefault().HasHeader;
+            this.OldSchemaId = (Schemas != null) ? Schemas.FirstOrDefault().DataElement_ID : 0;
 
             try
             {
@@ -48,10 +55,28 @@ namespace Sentry.data.Web
                     }
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 throw;
             }
+        }
+        public DatasetFileConfigsModel(DatasetFileConfigDto dto)
+        {
+            this.ConfigId = dto.ConfigId;
+            this.FileTypeId = dto.FileTypeId;
+            this.ConfigFileName = dto.Name;
+            this.ConfigFileDesc = dto.Description;
+            this.DatasetId = dto.ParentDatasetId;
+            this.DatasetScopeTypeID = dto.DatasetScopeTypeId;
+            this.FileExtensionID = dto.FileExtensionId;
+            this.RawStorageId = dto.StorageCode;
+            this.Security = dto.Security;
+            this.CreateCurrentView = dto.CreateCurrentView;
+            this.IncludedInSAS = dto.IsInSAS;
+            this.Delimiter = dto.Delimiter;
+            this.HasHeader = dto.HasHeader;
+            this.SchemaId = dto.Schema.SchemaId;
+            this.OldSchemaId = (dto.Schemas != null) ? dto.Schemas.FirstOrDefault().DataElementID : 0;
         }
 
         public DatasetFileConfigsModel(DatasetFileConfig dsfc, Boolean renderingForTable, Boolean renderingForPopup, IDatasetContext datasetContext)
@@ -65,8 +90,14 @@ namespace Sentry.data.Web
             this.ScopeType = dsfc.DatasetScopeType;
             this.FileExtensionID = dsfc.FileExtension.Id;
             this.FileExtension = dsfc.FileExtension;
-            this.Schemas = dsfc.Schema;
+            this.Schemas = dsfc.Schemas;
+            this.SchemaId = (dsfc.Schema != null) ? dsfc.Schema.SchemaId : 0;
+            this.Schema = dsfc.Schema ?? null;
+            this.Delimiter = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().Delimiter;
             this.RawStorageId = dsfc.GetStorageCode();
+            this.CreateCurrentView = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().CreateCurrentView;
+            this.HasHeader = dsfc.Schemas.OrderByDescending(o => o.DataElementChange_DTM).FirstOrDefault().HasHeader;
+            this.OldSchemaId = (Schemas != null) ? Schemas.FirstOrDefault().DataElement_ID : 0;
 
             try
             {
@@ -107,11 +138,11 @@ namespace Sentry.data.Web
         public string FileType {
             get
             {
-                return ((FileType) FileTypeId).ToString();
+                return ((FileType)FileTypeId).ToString();
             }
             set
             {
-                FileTypeId = (int) Enum.Parse(typeof(FileType), value); ;
+                FileTypeId = (int)Enum.Parse(typeof(FileType), value); ;
             }
         }
 
@@ -121,11 +152,11 @@ namespace Sentry.data.Web
 
         [DisplayName("Description")]
         public string ConfigFileDesc { get; set; }
-
+        [DisplayName("Delimiter")]
         public string Delimiter { get; set; }
+        [DisplayName("Includes Header Row")]
         public bool HasHeader { get; set; }
 
-        public int DatasetId { get; set; }
         public string EditHref
         {
             get
@@ -138,21 +169,32 @@ namespace Sentry.data.Web
 
         [DisplayName("Parent Dataset")]
         public string ParentDatasetName { get; set; }
-
-        public DatasetScopeType ScopeType { get; set; }
         [DisplayName("Data Scope Type")]
         public int DatasetScopeTypeID { get; set; }
-
-        public FileExtension FileExtension { get; set; }
+        [DisplayName("File Extension")]
         public int FileExtensionID { get; set; }
-        public string RawStorageId { get; set; }
+        [DisplayName("Create Current View")]
+        public bool CreateCurrentView { get; set; }
+        [DisplayName("Add to SAS")]
+        public bool IncludedInSAS { get; set; }
 
+
+        public int DatasetId { get; set; }
+        public DatasetScopeType ScopeType { get; set; }
+        public FileExtension FileExtension { get; set; }
+        public string RawStorageId { get; set; }
+        public int SchemaId { get; set; }
+        public int OldSchemaId { get; set; }
         public IList<RetrieverJob> RetrieverJobs { get; set; }
 
-        public IList<DataElement> Schemas { get; set; }     
+        public IList<DataElement> Schemas { get; set; }  
+        public FileSchema Schema { get; set; }
 
         public IEnumerable<SelectListItem> AllDatasetScopeTypes { get; set; }
         public IEnumerable<SelectListItem> AllDataFileTypes { get; set; }
         public IEnumerable<SelectListItem> ExtensionList { get; set; }
+
+        public UserSecurity Security { get; set; }
+        public string SasLibrary { get; set; }
     }
 }

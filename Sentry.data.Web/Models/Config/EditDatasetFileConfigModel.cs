@@ -12,6 +12,7 @@ namespace Sentry.data.Web
         public EditDatasetFileConfigModel() { }
         public EditDatasetFileConfigModel(DatasetFileConfig dfc) : base(dfc, false, false)
         { }
+        public EditDatasetFileConfigModel(DatasetFileConfigDto dto) : base(dto) { }
         public string DeleteHref
         {
             get

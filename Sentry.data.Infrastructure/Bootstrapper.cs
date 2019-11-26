@@ -59,7 +59,7 @@ namespace Sentry.data.Infrastructure
             StructureMap.Registry registry = new StructureMap.Registry();
             registry.Scan((scanner) =>
             {
-                scanner.AssemblyContainingType<dataAssetContext>();
+                scanner.AssemblyContainingType<DataAssetContext>();
                 scanner.AssemblyContainingType<IDataAssetContext>();
                 scanner.AssemblyContainingType<DatasetContext>();
                 scanner.AssemblyContainingType<IDatasetContext>();
@@ -72,13 +72,17 @@ namespace Sentry.data.Infrastructure
             });
 
             //Repeat the following line once per database / domain context
-            registry.For<IDataAssetContext>().Use(() => new dataAssetContext(_defaultSessionFactory.OpenSession()));
+            registry.For<IDataAssetContext>().Use(() => new DataAssetContext(_defaultSessionFactory.OpenSession()));
             registry.For<IDatasetContext>().Use(() => new DatasetContext(_defaultSessionFactory.OpenSession()));
             registry.For<IDataFeedContext>().Use(() => new DataFeedProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IMetadataRepositoryProvider>().Use(() => new MetadataRepositoryProvider(_defaultSessionFactory.OpenStatelessSession()));
             registry.For<IODCFileProvider>().Use(() => new ODCFileProvider(_defaultSessionFactory.OpenSession()));
             registry.For<IRequestContext>().Use(() => new RequestContext(_defaultSessionFactory.OpenSession()));
-
+            registry.For<IBaseJobProvider>().AddInstances(x =>
+            {
+                x.Type<GenericHttpsProvider>().Named(GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE);
+                x.Type<GoogleApiProvider>().Named(GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE);
+            });
             //Register other services
             Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider obsidianUserProvider = new Sentry.Web.CachedObsidianUserProvider.ObsidianUserProvider();
             obsidianUserProvider.CacheTimeoutSeconds = int.Parse(Sentry.Configuration.Config.GetHostSetting("ObsidianUserCacheTimeoutMinutes")) * 60;
@@ -89,6 +93,15 @@ namespace Sentry.data.Infrastructure
             registry.For<IFtpProvider>().Singleton().Use<FtpProvider>();
             registry.For<IS3ServiceProvider>().Singleton().Use<S3ServiceProvider>();
             registry.For<IMessagePublisher>().Singleton().Use<KafkaMessagePublisher>();
+
+            if (Sentry.Configuration.Config.GetHostSetting("UseCherwell") == "true")
+            {
+                registry.For<IBaseTicketProvider>().Singleton().Use<CherwellProvider>();
+            }
+            else
+            {
+                registry.For<IBaseTicketProvider>().Singleton().Use<HpsmProvider>();
+            }
             //Create the StructureMap container
             _container = new StructureMap.Container(registry);
 

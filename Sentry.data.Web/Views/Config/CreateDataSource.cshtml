@@ -1,5 +1,5 @@
 ﻿@using Sentry.data.Core;
-@model Sentry.data.Web.CreateSourceModel
+@model Sentry.data.Web.DataSourceModel
 
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -24,13 +24,15 @@
 
 </div>
 
-@using (Html.BeginForm("CreateSource", "Config", FormMethod.Post))
+@using (Html.BeginForm("DataSourceForm", "Config", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
 
     @Html.ValidationSummary(false, "", new { @class = "text-danger" })
 
     @Html.HiddenFor(model => model.ReturnUrl)
+    @Html.HiddenFor(model => model.PrimaryOwnerId)
+    @Html.HiddenFor(model => model.PrimaryContactId)
 
     <h1>Create Data Source</h1>
     <hr />
@@ -54,6 +56,29 @@
             </div>
 
             <div class="form-group">
+                @Html.LabelFor(model => model.PrimaryOwnerName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.PrimaryOwnerName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
+                    @Html.ValidationMessageFor(model => model.PrimaryOwnerName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.PrimaryContactName, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.PrimaryContactName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
+                    @Html.ValidationMessageFor(model => model.PrimaryContactName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(m => m.IsSecured, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.CheckBoxFor(m => m.IsSecured)
+                </div>
+            </div>
+
+            <div class="form-group">
                 @Html.LabelFor((model) => model.SourceType, new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
                     @Html.DropDownListFor((model) => model.SourceType, Model.SourceTypesDropdown, new { @class = "form-control edit-dataset-row" })
@@ -73,7 +98,7 @@
             <div class="form-group">
                 @Html.LabelFor(model => model.BaseUri, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
-                    @Html.TextBoxFor(model => model.BaseUri, new { @value = "", @class = "form-control edit-dataset-row "})
+                    @Html.TextBoxFor(model => model.BaseUri, new { @value = "", @class = "form-control edit-dataset-row " })
                     @Html.ValidationMessageFor(model => model.BaseUri, "", new { @class = "text-danger" })
                 </div>
             </div>
@@ -127,7 +152,45 @@
                     </div>
                 </div>
             </div>
-            
+
+            <div id="OAuthPanel">
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ClientId, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor((model) => model.ClientId, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.ClientId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.ClientPrivateId, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor((model) => model.ClientPrivateId, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.ClientPrivateId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.TokenUrl, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor((model) => model.TokenUrl, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.TokenUrl, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.TokenExp, new { @class = "control-label col-md-2" })
+                    <div class="col-md-2">
+                        @Html.EditorFor((model) => model.TokenExp, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.TokenExp, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Scope, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextBoxFor((model) => model.Scope, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.Scope, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+
             <div id="portNumberPanel">
                 <div class="form-group">
                     @Html.LabelFor(model => model.PortNumber, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -148,20 +211,20 @@
                     </div>
                 </div>
             </div>
-            
+
             <div id="requestHeaderPanel">
                 <div class="form-group">
-                        @Html.LabelFor((model) => model.Headers, htmlAttributes: new { @class = "control-label col-md-2"})
+                    @Html.LabelFor((model) => model.Headers, htmlAttributes: new { @class = "control-label col-md-2" })
                     <div id="requestHeader" class="col-md-10">
                         <div class="form-group col-md-10 headerEntry">
                             <a class="addHeader" style="display: inline-block; margin-left: 10px;"><span class="glyphicon glyphicon-plus"></span> Add Header</a>
                         </div>
-                            <div class="col-md-5 headerEntryLabel">
-                                @Html.Label("Header Name", new { @value = "", @class = "col-md-5 headerEntryLabel" })
-                            </div>
-                            <div class="col-md-5 headerEntryLabel">
-                                @Html.Label("Header Value", new { @value = "", @class = "col-md-5 headerEntryLabel" })
-                            </div>
+                        <div class="col-md-5 headerEntryLabel">
+                            @Html.Label("Header Name", new { @value = "", @class = "col-md-5 headerEntryLabel" })
+                        </div>
+                        <div class="col-md-5 headerEntryLabel">
+                            @Html.Label("Header Value", new { @value = "", @class = "col-md-5 headerEntryLabel" })
+                        </div>
                         @*This approach is described at the site http://ivanz.com/2011/06/16/editing-variable-length-reorderable-collections-in-asp-net-mvc-part-1/*@
                         @foreach (RequestHeader header in Model.Headers)
                         {
@@ -169,7 +232,7 @@
                         }
                     </div>
                 </div>
-            </div>            
+            </div>
         </div>
     </div>
 
@@ -185,11 +248,13 @@
 }
 
 <style>
-    .credentialWarning{
+    .credentialWarning {
     }
-    .addHeader{
-        padding-top: 6px; 
+
+    .addHeader {
+        padding-top: 6px;
     }
+
     .headerEntry, .headerEntryLabel {
         padding-left: 0px;
     }
@@ -201,13 +266,16 @@
     <script>
         $(document).ready(function () {
 
+            data.DataSource.FormInit('@(Model.HrempServiceUrl)' , '@(Model.HrempServiceEnv)');
+
             function setSourceTypeDefaults(sourceType) {
-                if (sourceType == "SFTP" || sourceType == "FTP" || sourceType == "HTTPS") {
+                if (sourceType == "SFTP" || sourceType == "FTP" || sourceType == "HTTPS" || sourceType == "GOOGLEAPI") {
 
                     $('#portNumberPanel').show();
                     $('#userPassPanel').hide();
                     $('#authPanel').show();
                     $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').hide();
                     $('#requestHeaderPanel').hide();
 
                     //User\Pass is required, so check and disable for changing
@@ -226,7 +294,7 @@
                         //Setting default values for port number
                         $('#PortNumber').val('21');
                     }
-                    else if (sourceType == "HTTPS") {
+                    else if (sourceType == "HTTPS" || sourceType == "GOOGLEAPI") {
                         //Setting default values for port number
                         $('#PortNumber').val('443');
                         $('#requestHeaderPanel').show();
@@ -252,6 +320,7 @@
                     $('#portNumberPanel').hide();
                     $('#userPassPanel').hide();
                     $('#authPanel').hide();
+                    $('#OAuthPanel').hide();
                     $('#requestHeaderPanel').hide();
                 }
                 else {
@@ -263,6 +332,7 @@
                     $('#userPassPanel').hide();
                     $('#authPanel').hide();
                     $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').hide();
                     $('#requestHeaderPanel').hide();
                 }
             }
@@ -309,6 +379,7 @@
                     userpasschkbx.attr('disabled', true);
                     $('#userPassPanel').hide();
                     $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').hide();
                 }
                 else if (txt == 'Basic Authentication') {
                     var userpasschkbx = $('#IsUserPassRequired');
@@ -317,6 +388,7 @@
                     userpasschkbx.trigger("change");
                     $('#userPassPanel').show();
                     $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').hide();
                 }
                 else if (txt == 'Token Authentication') {
                     var userpasschkbx = $('#IsUserPassRequired');
@@ -325,6 +397,16 @@
                     userpasschkbx.trigger("change");
                     $('#userPassPanel').hide();
                     $('#tokenAuthPanel').show();
+                    $('#OAuthPanel').hide();
+                }
+                else if (txt == 'OAuth 2.0 Authentication') {
+                    var userpasschkbx = $('#IsUserPassRequired');
+                    userpasschkbx.prop('checked', false);
+                    userpasschkbx.attr('disabled', true);
+                    userpasschkbx.trigger("change");
+                    $('#userPassPanel').hide();
+                    $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').show();
                 }
                 else {
                     var userpasschkbx = $('#IsUserPassRequired');
@@ -333,6 +415,7 @@
                     $("#authDescription").text('');
                     $('#userPassPanel').show();
                     $('#tokenAuthPanel').hide();
+                    $('#OAuthPanel').hide();
                 }
             });
 

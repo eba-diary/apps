@@ -32,6 +32,9 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.DatasetInformation, (m) => m.Column("Information_DSC"));
             this.Property((x) => x.DatasetType, (m) => m.Column("Dataset_TYP"));
             this.Property((x) => x.DataClassification, (m) => m.Column("DataClassification_CDE"));
+            this.Property((x) => x.DeleteInd, (m) => m.Column("DeleteInd"));
+            this.Property((x) => x.DeleteIssuer, (m) => m.Column("DeleteIssuer"));
+            this.Property((x) => x.DeleteIssueDTM, (m) => m.Column("DeleteIssueDTM"));
             Property(x => x.Metadata, m =>
             {
                 m.Column("Metadata");
@@ -46,6 +49,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             {
                 b.Table("DatasetCategory");
                 b.Inverse(false);
+                //b.Cascade(Cascade.DeleteOrphans);
                 b.Key((k) =>
                 {
                     k.Column("Dataset_Id");
@@ -96,7 +100,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Lazy(CollectionLazy.Lazy);
                 m.Inverse(true);
                 m.Table("DatasetFile");
-                m.Cascade(Cascade.All);
                 m.Cache(c => c.Usage(CacheUsage.ReadWrite));
                 m.Key((k) =>
                 {
@@ -153,6 +156,19 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                     k.ForeignKey("FK_DatasetFile_Dataset");
                 });
             }, map => map.OneToMany(a => a.Class(typeof(Favorite))));
+
+            this.Bag(x => x.Images, (m) =>
+            {
+                m.Lazy(CollectionLazy.Lazy);
+                m.Inverse(true);
+                m.Table("Image");
+                m.Cascade(Cascade.DeleteOrphans);
+                m.Key((k) =>
+                {
+                    k.Column("ParentDataset");
+                    k.ForeignKey("FK_Image_Dataset");
+                });
+            }, map => map.OneToMany(a => a.Class(typeof(Image))));
 
 
             //ISecurable Mapping

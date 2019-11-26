@@ -4,9 +4,12 @@ using System.Linq;
 
 namespace Sentry.data.Core
 {
-    public class DatasetFileConfig
+    public class DatasetFileConfig : ITrackableSchema
     {
-        public DatasetFileConfig() {}        
+        public DatasetFileConfig()
+        {
+            DeleteInd = false;
+        }       
  
         
         public virtual int ConfigId { get; set; }
@@ -15,11 +18,20 @@ namespace Sentry.data.Core
         public virtual int FileTypeId { get; set; }
         public virtual Dataset ParentDataset { get; set; }
         public virtual DatasetScopeType DatasetScopeType { get; set; }
+        public virtual bool DeleteInd { get; set; }
+        public virtual string DeleteIssuer { get; set; }
+        public virtual DateTime? DeleteIssueDTM { get; set; }
 
         public virtual IList<DatasetFile> DatasetFiles { get; set; }
         public virtual IList<RetrieverJob> RetrieverJobs { get; set; }
         public virtual FileExtension FileExtension { get; set; }
-        public virtual IList<DataElement> Schema { get; set; }
+        public virtual IList<DataElement> Schemas { get; set; }
+
+
+        /* ITrackableSchema implementation */
+        public virtual bool IsSchemaTracked { get; set; }
+        public virtual FileSchema Schema { get; set; }
+
 
         /// <summary>
         /// Return path to current file
@@ -42,15 +54,16 @@ namespace Sentry.data.Core
               
         }
 
-        public virtual DataElement GetLatestSchemaRevision()
+        public virtual SchemaRevision GetLatestSchemaRevision()
         {
-            return Schema.OrderByDescending(o => o.SchemaRevision).Take(1).SingleOrDefault();
+            return Schema.Revisions.OrderByDescending(o => o.Revision_NBR).Take(1).SingleOrDefault();
         }
         public virtual string GetStorageCode()
         {
-            if (ParentDataset.DatasetType == GlobalConstants.DataEntityCodes.DATASET)
+            FileSchema s = Schema as FileSchema;
+            if (Schema is FileSchema scm)
             {
-                return GetLatestSchemaRevision().StorageCode;
+                return scm.StorageCode;
             }
             else
             {

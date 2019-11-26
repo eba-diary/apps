@@ -8,7 +8,7 @@ namespace Sentry.data.Web
 {
     public class SchemaModel
     {
-        public SchemaModel(SchemaDTO dto)
+        public SchemaModel(SchemaApiDTO dto)
         {
             SchemaID = dto.SchemaID;
             Format = dto.Format;
@@ -18,6 +18,7 @@ namespace Sentry.data.Web
             HiveDatabase = dto.HiveDatabase;
             HiveTableStatus = dto.HiveStatus;
             HiveLocation = dto.HiveLocation;
+            CurrentView = dto.CurrentView;
         }
 
         public int SchemaID { get; set; }
@@ -28,5 +29,6 @@ namespace Sentry.data.Web
         public string HiveDatabase { get; set; }
         public string HiveTableStatus { get; set; }
         public string HiveLocation { get; set; }
+        public bool CurrentView { get; set; }
     }
 }

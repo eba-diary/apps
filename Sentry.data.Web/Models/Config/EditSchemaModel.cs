@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 
-namespace Sentry.data.Web.Models.Config
+namespace Sentry.data.Web
 {
     public class EditSchemaModel
     {
@@ -23,7 +23,9 @@ namespace Sentry.data.Web.Models.Config
         public virtual Boolean IsForceMatch { get; set; }
         public virtual Boolean IsPrimary { get; set; }
 
-        public virtual int DataElement_ID { get; set; }
+        public virtual int Schema_Id { get; set; }
+        public virtual string FileType { get; set; }
+        public virtual int FileTypeId { get; set; }
         public virtual string Delimiter { get; set; }
         public virtual Boolean HasHeader { get; set; }
 

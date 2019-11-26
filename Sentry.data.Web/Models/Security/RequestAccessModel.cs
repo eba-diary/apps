@@ -13,7 +13,13 @@ namespace Sentry.data.Web
 
         public string SecurableObjectName { get; set; }
 
-        
+        [DisplayName("Dataset")]
+        public string DatasetName { get; set; }
+
+        [Required]
+        [MaxLength(64)]
+        [DisplayName("AD Group")]
+        public string AdGroupName { get; set; }
 
         [Required]
         [MaxLength(512)]

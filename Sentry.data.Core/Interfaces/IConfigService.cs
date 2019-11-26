@@ -1,12 +1,37 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Sentry.data.Core
 {
     public interface IConfigService
     {
-        SchemaDTO GetSchemaDTO(int id);
-        SchemaDetailDTO GetSchemaDetailDTO(int id);
+        SchemaApiDTO GetSchemaApiDTO(int id);
+        SchemaDetaiApilDTO GetSchemaDetailDTO(int id);
         IList<ColumnDTO> GetColumnDTO(int id);
         void UpdateFields(int configId, int schemaId, List<SchemaRow> schemaRows);
+        List<string> Validate(FileSchemaDto dto);
+        List<string> Validate(DataSourceDto dto);
+        List<string> Validate(DatasetFileConfigDto dto);
+        bool UpdateandSaveOAuthToken(HTTPSSource source, string newToken, DateTime tokenExpTime);
+        bool CreateAndSaveNewDataSource(DataSourceDto dto);
+        bool UpdateAndSaveDataSource(DataSourceDto dto);
+        bool CreateAndSaveDatasetFileConfig(DatasetFileConfigDto dto);
+        bool UpdateAndSaveDatasetFileConfig(DatasetFileConfigDto dto);
+        List<DatasetFileConfig> GetSchemaMarkedDeleted();
+        DataSourceDto GetDataSourceDto(int Id);
+        UserSecurity GetUserSecurityForDataSource(int id);
+        AccessRequest GetDataSourceAccessRequest(int dataSourceId);
+        string RequestAccessToDataSource(AccessRequest request);
+        DatasetFileConfigDto GetDatasetFileConfigDto(int configId);
+        List<DatasetFileConfigDto> GetDatasetFileConfigDtoByDataset(int datasetId);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="id">DatasetFileConfig identifier</param>
+        /// <param name="logicalDelete">Perform soft or hard delete</param>
+        /// <param name="parentDriven">Is this driven by parent object</param>
+        /// <returns></returns>
+        bool Delete(int id, bool logicalDelete = true, bool parentDriven = false);
+        UserSecurity GetUserSecurityForConfig(int id);
     }
 }

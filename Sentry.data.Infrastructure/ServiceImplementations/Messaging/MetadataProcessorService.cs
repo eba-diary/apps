@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Sentry.Messaging.Common;
 using Sentry.data.Core;
+using System.IO;
 
 namespace Sentry.data.Infrastructure
 {
@@ -21,7 +22,7 @@ namespace Sentry.data.Infrastructure
 
             IMessageConsumer<string> consumer;
 
-            consumer = GetKafkamessageConsumer(Configuration.Config.GetHostSetting("KafkaConsumerGroup"));
+            consumer = GetKafkamessageConsumer(Configuration.Config.GetHostSetting("MetadataProcessorConsumerGroup"));
 
             Messaging.Common.MetadataProcessorService service = new Messaging.Common.MetadataProcessorService(consumer, GetMessageHandlers(), cfg);
             service.ConsumeMessages();
@@ -45,9 +46,11 @@ namespace Sentry.data.Infrastructure
                                             Configuration.Config.GetHostSetting("KafkaBootstrapServers"),
                                             Sentry.data.Infrastructure.TopicHelper.GetDSCEventTopic(),
                                             Configuration.Config.GetHostSetting("EnvironmentName").ToUpper(),
-                                            (Configuration.Config.GetHostSetting("KafkaDebugLogging").ToLower() == "true") ? true : false, 
-                                            null, 
-                                            0 /*This is not used for consumers*/
+                                            (Configuration.Config.GetHostSetting("KafkaDebugLogging").ToLower() == "true") ? true : false,
+                                            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Configuration.Config.GetHostSetting("CertPath")), 
+                                            0, /*This is not used for consumers*/
+                                            (Configuration.Config.GetHostSetting("KafkaSSL").ToLower() == "true") ? true : false,
+                                            Configuration.Config.GetHostSetting("sasl_kerberos_service_name")
                                             );
 
             return new MetadataProcessorKafkaConsumer(settings);

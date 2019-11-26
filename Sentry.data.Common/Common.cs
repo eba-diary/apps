@@ -248,18 +248,13 @@ namespace Sentry.data.Common
             int df_id = 0;
             RetrieverJob job = null;
             IContainer _container;
-            DataElement latestSchemaRevision = null;
+            SchemaRevision latestSchemaRevision = null;
 
             using (_container = Bootstrapper.Container.GetNestedContainer())
             {
                 IDatasetContext _dscontext = _container.GetInstance<IDatasetContext>();
                 IRequestContext _requestContext = _container.GetInstance<IRequestContext>();
                 IMessagePublisher _publisher = _container.GetInstance<IMessagePublisher>();
-
-                if (response.RetrieverJobId > 0)
-                {
-                    job = _requestContext.RetrieverJob.Where(w => w.Id == response.RetrieverJobId).FirstOrDefault();
-                }
 
                 DateTime startTime = DateTime.Now;
 
@@ -331,7 +326,14 @@ namespace Sentry.data.Common
                         {
                             //Version the Old Parent DatasetFile
                             int df_newParentId = _dscontext.GetLatestDatasetFileIdForDatasetByDatasetFileConfig(dfc.ParentDataset.DatasetId, dfc.ConfigId, isBundled, null, latestSchemaRevision);
-                            df_Orig.ParentDatasetFileId = df_newParentId;
+                            if (df_Orig != null)
+                            {
+                                df_Orig.ParentDatasetFileId = df_newParentId;
+                            }
+                            else
+                            {
+                                throw new ArgumentException("Original Datafile was not found");
+                            }
 
                             //Write dataset to database
                             _dscontext.Merge(df_Orig);
@@ -342,9 +344,12 @@ namespace Sentry.data.Common
                         {
                             StringBuilder builder = new StringBuilder();
                             builder.Append("Failed to set ParentDatasetFile_ID on Original Parent in Dataset Management.");
-                            builder.Append($"DatasetFile_ID: {df_Orig.DatasetFileId}");
-                            builder.Append($"File_NME: {df_Orig.FileName}");
-                            builder.Append($"ParentDatasetFile_ID: {df_Orig.ParentDatasetFileId}");
+                            if (df_Orig != null)
+                            {
+                                builder.Append($"DatasetFile_ID: {df_Orig.DatasetFileId}");
+                                builder.Append($"File_NME: {df_Orig.FileName}");
+                                builder.Append($"ParentDatasetFile_ID: {df_Orig.ParentDatasetFileId}");
+                            }
 
                             Sentry.Common.Logging.Logger.Error(builder.ToString(), ex);
                         }
@@ -367,6 +372,15 @@ namespace Sentry.data.Common
                 }
                 else if (!isBundled)
                 {
+                    if (response.RetrieverJobId > 0)
+                    {
+                        job = _requestContext.RetrieverJob.Where(w => w.Id == response.RetrieverJobId).FirstOrDefault();
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Job ID is invalid");
+                    }
+
                     Logger.Debug("ProcessFile: Detected Dataset file");
 
                     latestSchemaRevision = job.DatasetConfig.GetLatestSchemaRevision();
@@ -511,20 +525,24 @@ namespace Sentry.data.Common
                                 }
                             }
 
-                            dynamic msg1 = new JObject();
                             //Write file information to topic
+                            RawFileAddModel rawFileEvent = new RawFileAddModel();
                             try
                             {
-                                msg1.EventType = "SCHEMA-RAWFILE-ADD";
-                                msg1.SourceBucket = Configuration.Config.GetHostSetting("AWSRootBucket");
-                                msg1.SourceKey = df_newParent.FileLocation;
-                                msg1.SourceVersionId = df_newParent.VersionId;
+                                rawFileEvent = new RawFileAddModel()
+                                {
+                                    SourceBucket = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                                    SourceKey = df_newParent.FileLocation,
+                                    SourceVersionId = df_newParent.VersionId,
+                                    SchemaID = df_newParent.DatasetFileConfig.Schema.SchemaId,
+                                    DatasetID = df_newParent.DatasetFileConfig.ParentDataset.DatasetId
+                                };
 
-                                _publisher.PublishDSCEvent(df_newParent.Schema.DataElement_ID.ToString(), msg1.ToString());
+                                _publisher.PublishDSCEvent(df_newParent.DatasetFileConfig.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(rawFileEvent));
                             }
                             catch (Exception ex)
                             {
-                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.DataElement_ID.ToString()} | DSCEvent topic | message:{msg1.ToString()})", ex);
+                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.SchemaId.ToString()} | DSCEvent topic | message:{JsonConvert.SerializeObject(rawFileEvent)})", ex);
                             }
 
                             Event f = new Event()
@@ -610,20 +628,24 @@ namespace Sentry.data.Common
                                 throw;
                             }
 
-                            dynamic msg1 = new JObject();
+                            RawFileAddModel rawFileEvent = new RawFileAddModel();
                             //Write file information to topic
                             try
                             {
-                                msg1.EventType = "SCHEMA-RAWFILE-ADD";
-                                msg1.SourceBucket = Configuration.Config.GetHostSetting("AWSRootBucket");
-                                msg1.SourceKey = df_newParent.FileLocation;
-                                msg1.SourceVersionId = df_newParent.VersionId;
+                                rawFileEvent = new RawFileAddModel()
+                                {
+                                    SourceBucket = Configuration.Config.GetHostSetting("AWSRootBucket"),
+                                    SourceKey = df_newParent.FileLocation,
+                                    SourceVersionId = df_newParent.VersionId,
+                                    SchemaID = df_newParent.DatasetFileConfig.Schema.SchemaId,
+                                    DatasetID = df_newParent.DatasetFileConfig.ParentDataset.DatasetId
+                                };
 
-                                _publisher.PublishDSCEvent(df_newParent.Schema.DataElement_ID.ToString(), msg1.ToString());
+                                _publisher.PublishDSCEvent(df_newParent.DatasetFileConfig.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(rawFileEvent));
                             }
                             catch (Exception ex)
                             {
-                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.DataElement_ID.ToString()} | DSCEvent topic | message:{msg1.ToString()})", ex);
+                                job.JobLoggerMessage("ERROR", $"Failed writing SCHEMA-RAWFILE-ADD event - key:{df_newParent.Schema.SchemaId.ToString()} | DSCEvent topic | message:{JsonConvert.SerializeObject(rawFileEvent)})", ex);
                             }
 
                             Event f = new Event()
@@ -816,7 +838,8 @@ namespace Sentry.data.Common
                VersionId = null,
                IsBundled = isbundle,
                Size = 0,
-               Schema = dfc.GetLatestSchemaRevision()
+               SchemaRevision = dfc.GetLatestSchemaRevision(),
+               Schema = dfc.Schema
             };
 
             return out_df;

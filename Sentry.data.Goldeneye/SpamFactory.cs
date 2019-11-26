@@ -143,7 +143,7 @@ namespace Sentry.data.Goldeneye
                         }
                     }
 
-                    Logger.Debug("Marking events as processed");
+                   //Marking events as processed
                     foreach (Event _event in events)
                     {
                         if (_event.IsProcessed == false)
@@ -152,21 +152,17 @@ namespace Sentry.data.Goldeneye
                             _event.TimeNotified = DateTime.Now;
                         }
                     }
-                    Logger.Debug("Marked events as processed, continuing on...");
 
-                    Logger.Debug("Sending event emails");
+                    //Sending event emails
                     foreach (UserEvent ue in userEvents)
                     {
                         Logger.Debug($"{ue.email} is being sent {ue.events.Count} events.");
                         es.SendEmail(ue.email, interval," Events", ue.events);
                         Console.WriteLine(ue.email + " is being sent " + ue.events.Count + " events.");
                     }
-                    Logger.Debug("Sent event emails, continuing on...");
 
-                    Logger.Debug("Committing event changes to database");
+                    //Committing event changes to database
                     _datasetContext.SaveChanges();
-                    Logger.Debug("Committed event changes to database, continuing on...");
-
                 }
             }
             catch (Exception ex)

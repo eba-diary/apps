@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using System.ComponentModel;
 using static Sentry.data.Core.RetrieverJobOptions;
 using Sentry.data.Core.GlobalEnums;
+using System.Text;
 
 namespace Sentry.data.Web.Helpers
 {
@@ -239,7 +240,7 @@ namespace Sentry.data.Web.Helpers
 
             RetrieverJobOptions rjo = new RetrieverJobOptions()
             {
-                OverwriteDataFile = true,
+                OverwriteDataFile = false,
                 TargetFileName = "",
                 CreateCurrentFile = false,
                 IsRegexSearch = true,
@@ -298,6 +299,10 @@ namespace Sentry.data.Web.Helpers
             {
                 items.Add(new SelectListItem() { Text = defaultText, Value = "", Selected = true });
             }
+            else if (defaultText != null && defaultText == "")
+            {
+                items.Add(new SelectListItem() { Text = "", Value = ""});
+            }
 
             list.ForEach(x => items.Add(new SelectListItem() { Text = x.Value, Value = x.Key }));
 
@@ -330,6 +335,115 @@ namespace Sentry.data.Web.Helpers
             }
 
             return classifications;
+        }
+
+        public static string FormatCategoryList(List<string> Categories)
+        {
+            if(Categories != null)
+            {
+                StringBuilder catNames = new StringBuilder();
+                bool firstCat = true;
+                foreach (string item in Categories)
+                {
+                    if (firstCat)
+                    {
+                        catNames.Append(item);
+                        firstCat = false;
+                    }
+                    else
+                    {
+                        catNames.Append(", " + item);
+                    }
+                }
+                return catNames.ToString();
+            }
+            else
+            {
+                return "No Category Assigned";
+            }            
+        }
+
+        public static IEnumerable<SelectListItem> BuildRequestMethodDropdown(HttpMethods requestMethod)
+        {
+            List<SelectListItem> requestMethodList = new List<SelectListItem>();
+
+            if (requestMethod == HttpMethods.none) {
+                requestMethodList.Add(new SelectListItem()
+                {
+                    Text = "Pick a Method",
+                    Value = "0",
+                    Selected = true,
+                    Disabled = true
+                });
+            }
+
+            foreach(HttpMethods item in Enum.GetValues(typeof(HttpMethods)))
+            {
+                requestMethodList.Add(new SelectListItem()
+                {
+                    Text = item.GetDescription(),
+                    Value = ((int)item).ToString(),
+                    Selected = requestMethod == item
+                });
+            }
+
+            return requestMethodList;
+        }
+
+        public static IEnumerable<SelectListItem> BuildRequestDataFormatDropdown(HttpDataFormat requestDataMethod)
+        {
+            List<SelectListItem> requestDataMethodList = new List<SelectListItem>();
+
+            if (requestDataMethod == HttpDataFormat.none)
+            {
+                requestDataMethodList.Add(new SelectListItem()
+                {
+                    Text = "Pick a Data Format",
+                    Value = "0",
+                    Selected = true,
+                    Disabled = true
+                });
+            }
+
+            foreach (HttpDataFormat item in Enum.GetValues(typeof(HttpDataFormat)))
+            {
+                requestDataMethodList.Add(new SelectListItem()
+                {
+                    Text = item.GetDescription(),
+                    Value = ((int)item).ToString(),
+                    Selected = requestDataMethod == item
+                });
+            }
+
+            return requestDataMethodList;
+        }
+
+        public static List<SelectListItem> BuildFtpPatternSelectList(FtpPattern selectedType)
+        {
+            List<SelectListItem> patterns = new List<SelectListItem>();
+
+            if (selectedType == FtpPattern.NoPattern)
+            {
+                patterns.Add(new SelectListItem()
+                {
+                    Text = "Pick a ftp pattern",
+                    Value = "0",
+                    Selected = true,
+                    Disabled = true
+                });
+            }
+
+            foreach (FtpPattern item in Enum.GetValues(typeof(FtpPattern)))
+            {
+                patterns.Add(new SelectListItem()
+                {
+                    Text = item.GetDescription(),
+                    Value = ((int)item).ToString(),
+                    Selected = selectedType == item
+                });
+            }
+
+            return patterns;
         }
     }
 

@@ -756,4 +756,137 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="[PrimaryContact_ID]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="076ebcd4-d84f-4db7-b176-02003a40a51a" ChangeDateTime="06/03/2019 20:03:16">
+    <Property Name="ElementName" Value="[dbo].[DataSource].[CurrentTokenIat]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DataSource]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CurrentTokenExp" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="ee952397-d4df-4874-adef-5a0a3829c1e0" ChangeDateTime="08/21/2019 16:57:35">
+    <Property Name="ElementName" Value="[dbo].[DatasetFileConfigs].[DeleteIssue]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetFileConfigs]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DeleteIssuer" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="dd885b03-a519-4eb0-b7c3-644054c6716b" ChangeDateTime="08/21/2019 16:58:09">
+    <Property Name="ElementName" Value="[dbo].[DatasetFileConfigs].[D]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetFileConfigs]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="DeleteIssueDTM" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="21888d1d-2121-452e-8ee3-cef6c708d16c" ChangeDateTime="09/17/2019 17:56:06">
+    <Property Name="ElementName" Value="[dbo].[FileSchema].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FileSchema]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Schema_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="19375ed2-35c6-4d03-ae44-90d1bf08a3b4" ChangeDateTime="09/17/2019 17:58:03">
+    <Property Name="ElementName" Value="[dbo].[FileSchema].[Created_DTM]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FileSchema]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Schema_NME" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="d0d8f1d4-71d5-47c0-9864-8d2f608af2e3" ChangeDateTime="09/17/2019 18:01:02">
+    <Property Name="ElementName" Value="[dbo].[FileSchema].[FileExtensionId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FileSchema]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FileExtension_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="fa0b22f2-37c8-4671-a270-26e45f277576" ChangeDateTime="09/17/2019 18:01:07">
+    <Property Name="ElementName" Value="[dbo].[FileSchema].[SchemaStructId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FileSchema]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SchemaStruct_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c660902c-3392-4b71-9b1c-95af7a0f35ce" ChangeDateTime="09/17/2019 18:01:11">
+    <Property Name="ElementName" Value="[dbo].[FileSchema].[RevisionId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FileSchema]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Revision_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="5f630fee-152c-4fe8-b498-7a7be33ad9df" ChangeDateTime="09/17/2019 18:01:34">
+    <Property Name="ElementName" Value="[dbo].[FileSchema].[RevisionName]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[FileSchema]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Revision_NME" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="8205a863-cef7-4f4a-9f15-cc0f9369fedb" ChangeDateTime="09/17/2019 19:18:29">
+    <Property Name="ElementName" Value="[dbo].[DatasetFileConfigs].[Schema_ID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetFileConfigs]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="IsSchemaTrackable" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c1d2b9ef-4085-4c85-8076-d1db7c2a3e5e" ChangeDateTime="09/17/2019 19:19:16">
+    <Property Name="ElementName" Value="[dbo].[DatasetFileConfigs].[IsSchemaTrackable]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetFileConfigs]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="HasSchema" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="319d6161-0d40-47ac-b111-5b310400cd68" ChangeDateTime="09/17/2019 19:52:58">
+    <Property Name="ElementName" Value="[dbo].[FK_DatasetFileConfigs_ToTable]" />
+    <Property Name="ElementType" Value="SqlForeignKeyConstraint" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetFileConfigs]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[FK_DatasetFileConfigs_FileSchema]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="c2dd3f85-09d4-4ac2-aa2e-99989de83856" ChangeDateTime="09/18/2019 18:56:27">
+    <Property Name="ElementName" Value="[dbo].[DatasetFileConfigs].[HasSchema]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[DatasetFileConfigs]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="IsSchemaTracked" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="767982d2-b3dd-473a-94aa-669f934c834b" ChangeDateTime="09/18/2019 20:12:54">
+    <Property Name="ElementName" Value="[dbo].[SchemaRevision].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SchemaRevision]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Revision_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="cdb3ede0-c93b-45ca-9863-4adbbe1d9d51" ChangeDateTime="09/19/2019 04:01:29">
+    <Property Name="ElementName" Value="[dbo].[SchemaField].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SchemaField]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Field_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="20d7c51c-5d38-4992-9246-ce1a4f994dbb" ChangeDateTime="09/19/2019 04:10:15">
+    <Property Name="ElementName" Value="[dbo].[SchemaField].[ParentFieldId]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SchemaField]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="ParentField" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="e90b9bab-e409-43c6-b1b3-f9e409ffaada" ChangeDateTime="09/19/2019 14:19:23">
+    <Property Name="ElementName" Value="[dbo].[SchemaRevision].[Revision_Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SchemaRevision]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="SchemaRevision_Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="bbffe80c-642a-4ee7-9171-296be952e974" ChangeDateTime="09/19/2019 14:20:57">
+    <Property Name="ElementName" Value="[dbo].[SchemaField].[ParentSchema]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SchemaField]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[ParentSchemaRevision]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="099fb8ff-4581-4b14-8de3-118b5203be4e" ChangeDateTime="09/30/2019 14:48:30">
+    <Property Name="ElementName" Value="[dbo].[SchemaField].[Guid]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[SchemaField]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="FieldGuid" />
+  </Operation>
 </Operations>

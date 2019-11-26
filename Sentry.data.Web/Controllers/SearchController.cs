@@ -39,8 +39,17 @@ namespace Sentry.data.Web.Controllers
         private ISASService _sasService;
         private IAppCache _cache;
         private IRequestContext _requestContext;
+        private IDatasetService _datasetService;
 
-        public SearchController(IDatasetContext dsCtxt, S3ServiceProvider dsSvc, UserService userService, ISASService sasService, IAssociateInfoProvider associateInfoService, IRequestContext requestContext)
+        private string Title { get; set; }
+
+        public SearchController(IDatasetContext dsCtxt, 
+            S3ServiceProvider dsSvc, 
+            UserService userService, 
+            ISASService sasService, 
+            IAssociateInfoProvider associateInfoService, 
+            IRequestContext requestContext,
+            IDatasetService datasetService)
         {
             _cache = new CachingService();
             _datasetContext = dsCtxt;
@@ -49,6 +58,7 @@ namespace Sentry.data.Web.Controllers
             _sasService = sasService;
             _associateInfoProvider = associateInfoService;
             _requestContext = requestContext;
+            _datasetService = datasetService;
         }
 
         // GET: Search
@@ -60,10 +70,35 @@ namespace Sentry.data.Web.Controllers
         // GET: Search/Datasets/searchParms
         [Route("Search/{searchType?}/Index")]
         [Route("Search/{searchType?}/")]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_VIEW)]
         public ActionResult Index(string searchType, string category, string searchPhrase, string ids)
         {
             SearchIndexModel model = new SearchIndexModel();
+            IApplicationUser user = _userService.GetCurrentUser();
+
+            //validate user has permissions
+            if ((searchType == GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH && !user.CanViewReports) ||
+                (searchType == GlobalConstants.SearchType.DATASET_SEARCH && !user.CanViewDataset))
+            {
+                return View("Forbidden");
+            }
+
+            switch (searchType)
+            {
+                case GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH:
+                    ViewBag.Title = "Business Intelligence";
+                    break;
+                case GlobalConstants.SearchType.DATASET_SEARCH:
+                    ViewBag.Title = "Dataset";
+                    break;
+                default:
+                    if (user.IsAdmin)
+                    {
+                        ViewBag.Title = "Search";
+                        break;
+                    }
+                    else { return View("Forbidden"); }
+            }            
+
             return View(model);
         }
 
@@ -111,6 +146,16 @@ namespace Sentry.data.Web.Controllers
         {
 
             List<SearchModel> models = new List<SearchModel>();
+
+            //validate user has permissions
+            // return empty list if user does not have permissions
+            IApplicationUser user = _userService.GetCurrentUser();
+            if ((searchType == GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH && !user.CanViewReports) ||
+                (searchType == GlobalConstants.SearchType.DATASET_SEARCH && !user.CanViewDataset))
+            {
+                return Json(models, JsonRequestBehavior.AllowGet);
+            }
+
             IQueryable<Dataset> dsQuery;
 
             switch (searchType)
@@ -122,8 +167,12 @@ namespace Sentry.data.Web.Controllers
                     dsQuery = _datasetContext.Datasets.Where(w => w.DatasetType == GlobalConstants.DataEntityCodes.DATASET && w.CanDisplay);
                     break;
                 default:
-                    dsQuery = _datasetContext.Datasets.Where(x=> x.CanDisplay);
-                    break;
+                    if (user.IsAdmin)
+                    {
+                        dsQuery = _datasetContext.Datasets.Where(x => x.CanDisplay);
+                        break;
+                    }
+                    else { return Json(models, JsonRequestBehavior.AllowGet); }
             }
 
             var dsList = dsQuery.FetchAllChildren(_datasetContext);
@@ -140,7 +189,8 @@ namespace Sentry.data.Web.Controllers
                 SearchModel sm = new SearchModel(ds, _associateInfoProvider)
                 {
                     IsFavorite = ds.Favorities.Any(w => w.UserId == SharedContext.CurrentUser.AssociateId),
-                    PageViews = events.Count(x => x.Dataset == ds.DatasetId)
+                    PageViews = events.Count(x => x.Dataset == ds.DatasetId),
+                    CanEditDataset = (searchType == GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH) ? SharedContext.CurrentUser.CanManageReports : false
                 };
                 models.Add(sm);
             }

@@ -25,13 +25,16 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             this.Property((x) => x.FileTypeId, (m) => m.Column("FileType_ID"));
             this.Property((x) => x.Name, (m) => m.Column("Config_NME"));
-            this.Property((x) => x.Description, (m) => m.Column("Config_DSC"));            
+            this.Property((x) => x.Description, (m) => m.Column("Config_DSC"));
+            this.Property((x) => x.DeleteInd, (m) => m.Column("DeleteInd"));
+            this.Property((x) => x.DeleteIssuer, (m) => m.Column("DeleteIssuer"));
+            this.Property((x) => x.DeleteIssueDTM, (m) => m.Column("DeleteIssueDTM"));
 
             this.ManyToOne(x => x.ParentDataset, m =>
             {
                 m.Column("Dataset_ID");
                 m.ForeignKey("FK_DatasetFileConfigs_Dataset");
-                m.Cascade(Cascade.All);
+                //m.Cascade(Cascade.All);
                 m.Class(typeof(Dataset));
             });
 
@@ -77,7 +80,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 });
             }, map => map.OneToMany(a => a.Class(typeof(DatasetFile))));
 
-            this.Bag(x => x.Schema, (m) =>
+            this.Bag(x => x.Schemas, (m) =>
             {
                 m.Lazy(CollectionLazy.NoLazy);
                 m.Inverse(true);
@@ -89,6 +92,15 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                     k.Column("Config_ID");
                 });
             }, map => map.OneToMany(a => a.Class(typeof(DataElement))));
+
+            this.Property((x) => x.IsSchemaTracked, (m) => m.Column("IsSchemaTracked"));
+            this.ManyToOne(x => x.Schema, m =>
+            {
+                m.Column("Schema_ID");
+                m.ForeignKey("FK_DatasetFileConfigs_Schema");
+                m.Class(typeof(FileSchema));
+                m.Cascade(Cascade.All);
+            });
         }
     }
 }

@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\packages\librdkafka.redist.0.11.5\build\librdkafka.redist.props" Condition="Exists('..\packages\librdkafka.redist.0.11.5\build\librdkafka.redist.props')" />
+  <Import Project="..\packages\librdkafka.redist.0.11.6\build\librdkafka.redist.props" Condition="Exists('..\packages\librdkafka.redist.0.11.6\build\librdkafka.redist.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -50,8 +50,11 @@
       <HintPath>..\packages\AWSSDK.S3.3.3.5.10\lib\net45\AWSSDK.S3.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Confluent.Kafka, Version=0.11.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Confluent.Kafka.0.11.5\lib\net46\Confluent.Kafka.dll</HintPath>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.5.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
+      <HintPath>..\packages\BouncyCastle.1.8.5\lib\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="Confluent.Kafka, Version=0.11.6.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Confluent.Kafka.0.11.6\lib\net46\Confluent.Kafka.dll</HintPath>
     </Reference>
     <Reference Include="Hangfire.Core, Version=1.6.17.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Hangfire.Core.1.6.17\lib\net45\Hangfire.Core.dll</HintPath>
@@ -96,8 +99,8 @@
       <HintPath>..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RestSharp.105.2.3\lib\net46\RestSharp.dll</HintPath>
+    <Reference Include="RestSharp, Version=106.6.9.0, Culture=neutral, PublicKeyToken=598062e77f915f75, processorArchitecture=MSIL">
+      <HintPath>..\packages\RestSharp.106.6.9\lib\net452\RestSharp.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.Associates, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Associates.1.3.0\lib\net35\Sentry.Associates.dll</HintPath>
@@ -107,8 +110,7 @@
       <HintPath>..\packages\Sentry.Common.1.3.10\lib\net35\Sentry.Common.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.Configuration, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.Configuration.2.1.7.1\lib\net40\Sentry.Configuration.dll</HintPath>
-      <Private>True</Private>
+      <HintPath>..\packages\Sentry.Configuration.2.1.7.2\lib\net40\Sentry.Configuration.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -163,6 +165,8 @@
     <Compile Include="DomainContexts\datasetContext.cs" />
     <Compile Include="DomainContexts\dataAssetContext.cs" />
     <Compile Include="DomainContexts\RequestContext.cs" />
+    <Compile Include="Extensions\RestSharpExtensions.cs" />
+    <Compile Include="Extensions\RetrieverJobExtensions.cs" />
     <Compile Include="HangfireFilters\DisableMultipleQueuedItemsFilter.cs" />
     <Compile Include="Helpers\TopicHelper.cs" />
     <Compile Include="Mappings\Metadata\DataElementDetailMapping.cs" />
@@ -190,12 +194,16 @@
     <Compile Include="Mappings\Primary\ConsumptionLayerTypeMapping.cs" />
     <Compile Include="Mappings\Primary\DataAssetMapping.cs" />
     <Compile Include="Mappings\Primary\DataFeedMapping.cs" />
+    <Compile Include="Mappings\Primary\DatasetFileParquetMapping.cs" />
+    <Compile Include="Mappings\Primary\DatasetFileReplyMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetScopeTypeMapping.cs" />
     <Compile Include="Mappings\Primary\FavoriteMapping.cs" />
     <Compile Include="Mappings\Primary\FileExtensionMapping.cs" />
     <Compile Include="Mappings\Primary\ApplicationConfigurationMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetFunctionMapping.cs" />
+    <Compile Include="Mappings\Primary\ImageMapping.cs" />
+    <Compile Include="Mappings\Primary\Retriever\OAuthClaimMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\AuthenticationTypeMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\DataSourceMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\DataSourceTypeMapping.cs" />
@@ -204,6 +212,9 @@
     <Compile Include="Mappings\Primary\Retriever\RetrieverJobArchiveMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\RetrieverJobMapping.cs" />
     <Compile Include="Mappings\Primary\Retriever\SubmissionMapping.cs" />
+    <Compile Include="Mappings\Primary\Schema\BaseFieldMapping.cs" />
+    <Compile Include="Mappings\Primary\Schema\SchemaMapping.cs" />
+    <Compile Include="Mappings\Primary\Schema\SchemaRevisionMapping.cs" />
     <Compile Include="Mappings\Primary\Security\PermissionMapping.cs" />
     <Compile Include="Mappings\Primary\Security\SecurityMapping.cs" />
     <Compile Include="Mappings\Primary\Security\SecurityPermissionMapping.cs" />
@@ -229,6 +240,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
+    <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
+    <Compile Include="ServiceImplementations\TicketProvider\BaseTicketProvider.cs" />
+    <Compile Include="ServiceImplementations\TicketProvider\CherwellProvider.cs" />
+    <Compile Include="ServiceImplementations\TicketProvider\CherwellService.cs" />
+    <Compile Include="ServiceImplementations\DataSourceProviders\GenericHttpsProvider.cs" />
+    <Compile Include="ServiceImplementations\DataSourceProviders\GoogleApiProvider.cs" />
     <Compile Include="ServiceImplementations\HpsmMonitoringService.cs" />
     <Compile Include="ServiceImplementations\HpsmProvider.cs" />
     <Compile Include="ServiceImplementations\CubeProvider.cs" />
@@ -236,15 +253,16 @@
     <Compile Include="ServiceImplementations\EncryptionService.cs" />
     <Compile Include="ServiceImplementations\EventService.cs" />
     <Compile Include="ServiceImplementations\FtpProvider.cs" />
-    <Compile Include="ServiceImplementations\HTTPSProvider.cs" />
+    <Compile Include="ServiceImplementations\HszFileWatchService.cs" />
+    <Compile Include="ServiceImplementations\DataSourceProviders\BaseHttpsProvider.cs" />
     <Compile Include="ServiceImplementations\JawsService.cs" />
     <Compile Include="ServiceImplementations\KafkaMessagePublisher.cs" />
     <Compile Include="ServiceImplementations\Messaging\HiveMetadataService.cs" />
     <Compile Include="ServiceImplementations\Messaging\MetadataProcessorService.cs" />
+    <Compile Include="ServiceImplementations\Messaging\ProducerDeliveryHandler.cs" />
     <Compile Include="ServiceImplementations\MetadataRepositoryProvider.cs" />
     <Compile Include="ServiceImplementations\ObsidianService.cs" />
     <Compile Include="ServiceImplementations\ODCFileProvider.cs" />
-    <Compile Include="ServiceImplementations\RestAPIProvider.cs" />
     <Compile Include="ServiceImplementations\RetrieverJobService.cs" />
     <Compile Include="ServiceImplementations\SftpProvider.cs" />
     <Compile Include="ServiceImplementations\TableauProvider.cs" />
@@ -262,6 +280,8 @@
     <Compile Include="ServiceImplementations\S3ServiceProvider.cs" />
     <Compile Include="ServiceImplementations\SASProvider.cs" />
     <Compile Include="ServiceImplementations\SASServiceProvider.cs" />
+    <Compile Include="ServiceImplementations\TicketProvider\TicketMonitorService.cs" />
+    <Compile Include="ServiceImplementations\WallEService.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
@@ -710,7 +730,7 @@
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\WinSCP.5.13.2\build\WinSCP.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\WinSCP.5.13.2\build\WinSCP.targets'))" />
-    <Error Condition="!Exists('..\packages\librdkafka.redist.0.11.5\build\librdkafka.redist.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\librdkafka.redist.0.11.5\build\librdkafka.redist.props'))" />
+    <Error Condition="!Exists('..\packages\librdkafka.redist.0.11.6\build\librdkafka.redist.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\librdkafka.redist.0.11.6\build\librdkafka.redist.props'))" />
   </Target>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

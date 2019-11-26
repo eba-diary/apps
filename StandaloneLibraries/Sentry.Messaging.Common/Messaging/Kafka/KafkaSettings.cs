@@ -12,6 +12,7 @@ namespace Sentry.Messaging.Common
         public bool UseLogging { get; set; }
         public string CertPath { get; set; }
         public int TopicPartitions { get; set; }
+        public string KerberosServiceName { get; set; }
         //public Func<AsyncCommandProcessor.AsyncCommandProcessor> StatTracker { get; set; } = () => new EmptyQueueStatCommandProcessor();
 
         public KafkaSettings(string groupId, 
@@ -20,7 +21,9 @@ namespace Sentry.Messaging.Common
                             string env, 
                             bool useLogging, 
                             string certPath, 
-                            int partitions//, 
+                            int partitions,
+                            bool isSSL,
+                            string kerberosServiceName//, 
                             //,Func<AsyncCommandProcessor.AsyncCommandProcessor> statTracker
                             )
         {
@@ -28,10 +31,11 @@ namespace Sentry.Messaging.Common
             BootstrapServers = bootstrapServers;
             TopicName = topicName;
             Environment = env;
-            IsSSL = bootstrapServers.Contains(":6668");
+            IsSSL = isSSL;
             UseLogging = useLogging;
             CertPath = certPath;
             TopicPartitions = partitions;
+            KerberosServiceName = kerberosServiceName;
             //StatTracker = statTracker;
         }
     }

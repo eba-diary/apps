@@ -26,7 +26,8 @@ namespace Sentry.data.Web
                         Include("~/Scripts/jQuery.extendext.min.js").
                         Include("~/Scripts/jquery.validate.js").
                         Include("~/Scripts/jquery.validate.unobtrusive.js").
-                        Include("~/Scripts/jquery.validate.unobtrusive.sentry.js"));
+                        Include("~/Scripts/jquery.validate.unobtrusive.sentry.js").
+                        Include("~/Scripts/jquery.json-viewer.js"));
 
             //This bundle contains basic bootstrap stuff and some common plugins specific to bootstrap
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").
@@ -93,13 +94,15 @@ namespace Sentry.data.Web
                         Include("~/Content/datasets.css").
                         Include("~/Content/dataset-detail.css").
                         Include("~/Content/favorites.css").
+                        Include("~/Content/fields.css").
                         Include("~/Content/home.css").
                         Include("~/Content/search.css").
                         Include("~/Content/business-area.css").
                         Include("~/Content/system-notifications.css").
                         Include("~/Content/checkbox.css").
                         Include("~/Content/business-intelligence.css").
-                        Include("~/Content/site.css"));
+                        Include("~/Content/site.css").
+                        Include("~/Content/jquery.json-viewer.css"));
 
             /* If you want to see content bundled/minimized when running locally, uncomment the EnableOptimizations 
                line below.  Otherwise, bundling/optimization will be driven by the compilation debug property.

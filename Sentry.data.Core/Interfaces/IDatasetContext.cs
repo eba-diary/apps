@@ -27,6 +27,7 @@ namespace Sentry.data.Core
         IQueryable<Event> Events { get; }
         IQueryable<Status> EventStatus { get; }
         IQueryable<DataElement> DataElements { get; }
+        IQueryable<DataElementDetail> DataElementDetails { get; }
         IQueryable<DataObject> DataObjects { get; }
         IQueryable<DatasetFile> DatasetFile { get; }
         IQueryable<FileExtension> FileExtensions { get; }
@@ -43,7 +44,14 @@ namespace Sentry.data.Core
         IQueryable<ApplicationConfiguration> ApplicationConfigurations { get; }
         IQueryable<BusinessAreaTileRow> BusinessAreaTileRows { get; }
 
+        IQueryable<Favorite> Favorites { get; }
+        IQueryable<OAuthClaim> OAuthClaims { get; }
         IQueryable<RetrieverJob> RetrieverJob { get; }
+        IQueryable<DatasetFileParquet> DatasetFileParquet { get; }
+        IQueryable<DatasetFileReply> DatasetFileReply { get; }
+        IQueryable<Schema> Schema { get; }
+        IQueryable<FileSchema> FileSchema { get; }
+        IQueryable<SchemaRevision> SchemaRevision { get; }
         /** Datasets **/
 
         Dataset GetById(int id);
@@ -55,9 +63,11 @@ namespace Sentry.data.Core
         IEnumerable<DatasetScopeType> GetAllDatasetScopeTypes();
         IEnumerable<DatasetFileConfig> getAllDatasetFileConfigs();
         DatasetFileConfig getDatasetFileConfigs(int configId);
+
+        IEnumerable<DatasetFile> GetDatasetFilesForDataset(int datasetId, Func<DatasetFile, bool> where);
         IEnumerable<DatasetFile> GetDatasetFilesForDatasetFileConfig(int configId, Func<DatasetFile, bool> where);
         int GetLatestDatasetFileIdForDataset(int id);
-        int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId, bool isBundled, string targetFileName = null, DataElement schema = null);
+        int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId, bool isBundled, string targetFileName = null, SchemaRevision schema = null);
         Category GetCategoryById(int id);
 
 
@@ -66,8 +76,18 @@ namespace Sentry.data.Core
         Interval GetInterval(string description);
         List<Interval> GetAllIntervals();
         Interval GetInterval(int id);
+        Status GetStatus(string description);
+        Status GetStatus(int id);
+        List<Status> GetAllStatuses();
+        List<Event> GetEvents(string reason);
+        Event GetEvent(int id);
+        List<Event> GetEventsStartedByUser(string SentryOwnerName);
         bool IsUserSubscribedToDataset(string SentryOwnerName, int datasetID);
         List<DatasetSubscription> GetAllUserSubscriptionsForDataset(string SentryOwnerName, int datasetID);
+        bool IsUserSubscribedToDataAsset(string SentryOwnerName, int dataAssetID);
+        List<DataAssetSubscription> GetAllUserSubscriptionsForDataAsset(string SentryOwnerName, int dataAssetID);
+        List<DatasetSubscription> GetSubscriptionsForDataset(int datasetID);
+        List<DataAssetSubscription> GetSubscriptionsForDataAsset(int dataAssetID);
         List<DatasetSubscription> GetAllSubscriptions();
         List<Event> EventsSince(DateTime time, Boolean IsProcessed);
         int GetNextStorageCDE();

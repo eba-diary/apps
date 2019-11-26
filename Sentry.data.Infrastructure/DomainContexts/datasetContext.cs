@@ -196,6 +196,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<DataElementDetail> DataElementDetails
+        {
+            get
+            {
+                return Query<DataElementDetail>();
+            }
+        }
+
         public IQueryable<DataObject> DataObjects
         {
             get
@@ -267,6 +275,20 @@ namespace Sentry.data.Infrastructure
                 return Query<RetrieverJob>();
             }
         }
+        public IQueryable<DatasetFileParquet> DatasetFileParquet
+        {
+            get
+            {
+                return Query<DatasetFileParquet>();
+            }
+        }
+        public IQueryable<DatasetFileReply> DatasetFileReply
+        {
+            get
+            {
+                return Query<DatasetFileReply>();
+            }
+        }
 
         public IQueryable<JobHistory> JobHistory
         {
@@ -316,6 +338,46 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<Favorite> Favorites
+        {
+            get
+            {
+                return Query<Favorite>();
+            }
+        }
+
+        public IQueryable<OAuthClaim> OAuthClaims
+        {
+            get
+            {
+                return Query<OAuthClaim>();
+            }
+        }
+
+        public IQueryable<Schema> Schema
+        {
+            get
+            {
+                return Query<Schema>();
+            }
+        }
+
+        public IQueryable<FileSchema> FileSchema
+        {
+            get
+            {
+                return Query<FileSchema>();
+            }
+        }
+
+        public IQueryable<SchemaRevision> SchemaRevision
+        {
+            get
+            {
+                return Query<SchemaRevision>();
+            }
+        }
+
         public IEnumerable<Dataset> GetDatasetByCategoryID(int id)
         {
             return Query<Dataset>().Where(w => w.DatasetCategories.Any(y=> y.Id == id)).Where(x => x.CanDisplay).AsEnumerable();
@@ -354,6 +416,24 @@ namespace Sentry.data.Infrastructure
             string key = Query<DatasetFile>().Where(x => x.DatasetFileId == id).FirstOrDefault().FileLocation;
             return Configuration.Config.GetSetting("S3PreviewPrefix") + key;
         }
+        /// <summary>
+        /// Returns all datasetfiles for dataset
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public IEnumerable<DatasetFile> GetDatasetFilesForDataset(int datasetId, Func<DatasetFile, bool> where)
+        {
+            IEnumerable<DatasetFile> list = 
+                Query<DatasetFile>().Where
+                (
+                    x => x.Dataset.DatasetId == datasetId && 
+                    x.ParentDatasetFileId == null
+                ).Where(where)
+
+                .AsEnumerable();
+
+            return list;
+        }
 
         /// <summary>
         /// Returns all datasetfiles for data file config
@@ -384,17 +464,22 @@ namespace Sentry.data.Infrastructure
             return Query<DatasetScopeType>().AsEnumerable();
         }
 
+        public DatasetScopeType GetDatasetScopeById(int id)
+        {
+            return Query<DatasetScopeType>().Where(w => w.ScopeTypeId == id).FirstOrDefault();
+        }
+
         public IEnumerable<DatasetFileConfig> getAllDatasetFileConfigs()
         {
             IEnumerable<DatasetFileConfig> dfcList = Query<DatasetFileConfig>().AsEnumerable();
             return dfcList;
         }
 
-        public int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId, bool isBundled, string targetFileName = null, DataElement schema = null)
+        public int GetLatestDatasetFileIdForDatasetByDatasetFileConfig(int datasetId, int dataFileConfigId, bool isBundled, string targetFileName = null, SchemaRevision schemaRevision = null)
         {
             int dfId = Query<DatasetFile>()
                 .Where(w => w.Dataset.DatasetId == datasetId  && w.DatasetFileConfig.ConfigId == dataFileConfigId && w.ParentDatasetFileId == null && w.IsBundled == isBundled)
-                .Where(w => ((targetFileName != null && w.FileName == targetFileName) || (targetFileName == null)) && ((schema != null && w.Schema == schema) || (schema == null)))
+                .Where(w => ((targetFileName != null && w.FileName == targetFileName) || (targetFileName == null)) && ((schemaRevision != null && w.Schema == schemaRevision.ParentSchema) || (schemaRevision == null)))
                 .GroupBy(x => x.Dataset.DatasetId)
                 .ToList()
                 .Select(s => s.OrderByDescending(g => g.CreateDTM).Take(1))
@@ -424,9 +509,44 @@ namespace Sentry.data.Infrastructure
             return Query<Interval>().Cacheable().FirstOrDefault(x => x.Interval_ID == id);
         }
 
+        public Status GetStatus(string description)
+        {
+            return Query<Status>().Cacheable().FirstOrDefault(x => x.Description.ToLower().Contains(description.ToLower()));
+        }
+
+        public Status GetStatus(int id)
+        {
+            return Query<Status>().Cacheable().FirstOrDefault(x => x.Status_ID == id);
+        }
+
+        public List<Status> GetAllStatuses()
+        {
+            return Query<Status>().Cacheable().ToList();
+        }
+
+        public List<Event> GetEvents(string reason)
+        {
+            return Query<Event>().Cacheable().Where(x => x.Reason.ToLower().Contains(reason.ToLower())).ToList();
+        }
+
+        public Event GetEvent(int id)
+        {
+            return Query<Event>().Cacheable().FirstOrDefault(x => x.EventID == id);
+        }
+
+        public List<Event> GetEventsStartedByUser(string SentryOwnerName)
+        {
+            return Query<Event>().Cacheable().Where(x => x.UserWhoStartedEvent == SentryOwnerName).ToList();
+        }
+
         public bool IsUserSubscribedToDataset(string SentryOwnerName, int datasetID)
         {
             return Query<DatasetSubscription>().Cacheable().Any(x => x.SentryOwnerName == SentryOwnerName && x.Dataset.DatasetId == datasetID);
+        }
+
+        public bool IsUserSubscribedToDataAsset(string SentryOwnerName, int dataAssetID)
+        {
+            return Query<DataAssetSubscription>().Cacheable().Any(x => x.SentryOwnerName == SentryOwnerName && x.DataAsset.Id == dataAssetID);
         }
 
         public List<DatasetSubscription> GetAllUserSubscriptionsForDataset(string SentryOwnerName, int datasetID)
@@ -434,9 +554,25 @@ namespace Sentry.data.Infrastructure
             return Query<DatasetSubscription>().Cacheable().Where(x => x.SentryOwnerName == SentryOwnerName && x.Dataset.DatasetId == datasetID).ToList();
         }
 
+        public List<DataAssetSubscription> GetAllUserSubscriptionsForDataAsset(string SentryOwnerName, int dataAssetID)
+        {
+            return Query<DataAssetSubscription>().Cacheable().Where(x => x.SentryOwnerName == SentryOwnerName && x.DataAsset.Id == dataAssetID).ToList();
+        }
+
         public List<DatasetSubscription> GetAllSubscriptions()
         {
             return Query<DatasetSubscription>().Cacheable().ToList();
+        }
+
+
+        public List<DatasetSubscription> GetSubscriptionsForDataset(int datasetID)
+        {
+            return Query<DatasetSubscription>().Cacheable().Where(x => x.Dataset.DatasetId == datasetID).ToList();
+        }
+
+        public List<DataAssetSubscription> GetSubscriptionsForDataAsset(int dataAssetID)
+        {
+            return Query<DataAssetSubscription>().Cacheable().Where(x => x.DataAsset.Id == dataAssetID).ToList();
         }
 
         public List<Event> EventsSince(DateTime time, Boolean IsProcessed)

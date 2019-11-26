@@ -185,23 +185,23 @@ namespace Sentry.data.Core
                 if (filterfile) { this.JobLoggerMessage("Info","Incoming file was filtered (search criteria)"); }
             }
 
-            //if Job options already is filtering file, no need to check if file extension is correct
-            if (!filterfile)
-            {
-                switch (DatasetConfig.FileExtension.Name.ToLower().Trim())
-                {
-                    case "any":
-                    case "delimited":
-                        //do not perform any extension checking
-                        break;
-                    default:
-                        //Check if incoming extension matches
-                        filterfile = (DatasetConfig.FileExtension.Name.ToLower().Trim() != Path.GetExtension(fileName).Replace(".", ""));
-                        break;
-                }
+            ////if Job options already is filtering file, no need to check if file extension is correct
+            //if (!filterfile)
+            //{
+            //    switch (DatasetConfig.FileExtension.Name.ToLower().Trim())
+            //    {
+            //        case "any":
+            //        case "delimited":
+            //            //do not perform any extension checking
+            //            break;
+            //        default:
+            //            //Check if incoming extension matches
+            //            filterfile = (DatasetConfig.FileExtension.Name.ToLower().Trim() != Path.GetExtension(fileName).Replace(".", ""));
+            //            break;
+            //    }
 
-                if (filterfile) { this.JobLoggerMessage("Info", "Incoming file was filtered (file extension)"); }
-            }                     
+            //    if (filterfile) { this.JobLoggerMessage("Info", "Incoming file was filtered (file extension)"); }
+            //}                     
 
             return filterfile;
         }
@@ -246,7 +246,8 @@ namespace Sentry.data.Core
 
         public virtual ValidationResults ValidateForDelete()
         {
-            throw new NotImplementedException();
+            return new ValidationResults();
+            //throw new NotImplementedException();
         }
         public class ValidationErrors
         {

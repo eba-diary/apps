@@ -43,10 +43,20 @@
             public const string VIEWED_REPORT = "Viewed Report";
             public const string CREATED_REPORT = "Created Report";
             public const string UPDATED_REPORT = "Updated Report";
+            public const string DELETED_REPORT = "Deleted Report";
 
             public const string VIEWED_DATASET = "Viewed Dataset";
             public const string CREATED_DATASET = "Created Dataset";
             public const string UPDATED_DATASET = "Updated Dataset";
+            public const string DELETE_DATASET = "Deleted Dataset";
+
+            public const string DELETE_DATASET_SCHEMA = "Deleted Dataset Schema";
+
+            public const string CREATED_TAG = "Created Tag";
+            public const string UPDATED_TAG = "Updated Tag";
+
+            public const string CREATED_DATASOURCE = "Created Data Source";
+            public const string UPDATED_DATASOURCE = "Updated Data Source";
         }
 
         public static class Statuses
@@ -70,6 +80,22 @@
         {
             public const string DEFAULT_DROP_LOCATION = "Default Drop Location";
             public const string DEFAULT_S3_DROP_LOCATION = "Default S3 Drop Location";
+            public const string DEFAULT_HSZ_DROP_LOCATION = "Default HSZ Drop Location";
+        }
+
+        public static class DataSoureDiscriminator
+        {
+            public const string DFS_SOURCE = "DFS";
+            public const string DEFAULT_DROP_LOCATION = "DFSBasic";
+            public const string DFS_CUSTOM = "DFSCustom";
+            public const string DEFAULT_S3_DROP_LOCATION = "S3Basic";
+            public const string FTP_SOURCE = "FTP";
+            public const string S3_SOURCE = "S3";
+            public const string SFTP_SOURCE = "SFTP";
+            public const string HTTPS_SOURCE = "HTTPS";
+            public const string JAVA_APP_SOURCE = "JavaApp";
+            public const string GOOGLE_API_SOURCE = "GOOGLEAPI";
+            public const string DEFAULT_HSZ_DROP_LOCATION = "DFSBasicHsz";
         }
 
         public static class DataFeedType
@@ -104,6 +130,7 @@
         {
             public const string DATASET = "Dataset";
             public const string DATA_ASSET = "DataAsset";
+            public const string DATASOURCE = "DataSource";
         }
 
         public static class PermissionCodes
@@ -114,6 +141,7 @@
             public const string CAN_CONNECT_TO_DATASET = "CanConnectToDataset";
             public const string CAN_UPLOAD_TO_DATASET = "CanUploadToDataset";
             public const string CAN_MODIFY_NOTIFICATIONS = "CanModifyNotification";
+            public const string CAN_USE_DATA_SOURCE = "CanUseDataSource";
 
             public const string USE_APP = "UseApp";
 
@@ -134,5 +162,85 @@
             public const string PARQUET_STORAGE_PREFIX = "parquet";
         }
 
+        public static class SearchType
+        {
+            public const string BUSINESS_INTELLIGENCE_SEARCH = "BusinessIntelligence";
+            public const string DATASET_SEARCH = "Datasets";
+        }
+
+        public static class StoragePrefixes
+        {
+            public const string DATASET_IMAGE_STORAGE_PREFIX = "images";
+        }
+
+        public static class JobStates
+        {
+            public const string RETRIEVERJOB_STARTED_STATE = "Started";
+            public const string RETRIEVERJOB_RUNNING_STATE = "Running";
+            public const string RETRIEVERJOB_SUCCESS_STATE = "Success";
+            public const string RETRIEVERJOB_FAILED_STATE = "Failed";
+        }
+
+        public static class CherwellBusinessObjectNames
+        {
+            public const string CHANGE_REQUEST = "ChangeRequest";
+            public const string APPROVAL = "Approval";
+            public const string USER = "UserInfo";
+            public const string CUSTOMER = "CustomerInternal";
+        }
+
+        public static class CherwellChangeStatusNames
+        {
+            public const string LOGGING_AND_PREP = "Logging and Prep";
+            public const string APPROVAL = "Approval";
+            public const string IMPLEMENTING = "Implementing";
+            public const string CLOSED = "Closed";
+        }
+
+        public static class CherwellChangeStatusOrder
+        {
+            public const string LOGGING_AND_PREP = "1";
+            public const string APPROVAL = "2";
+            public const string IMPLEMENTING = "3";
+            public const string CLOSED = "4";
+        }
+        public static class DataElementDetailCodes
+        {
+            public const string CREATE_CURRENT_VIEW = "CreateCurrentView";
+            public const string DELETE_INDICATOR = "DeleteInd";
+            public const string DELETE_ISSUER = "DeleteIssuer";
+            public const string DELETE_ISSUE_DTM = "DeleteIssueDTM";
+            public const string INCLUDE_IN_SAS = "SAS_IND";
+            public static string SAS_LIBRARY = "SASLibrary";
+        }
+
+        public static class Datatypes
+        {
+            public const string VARCHAR = "VARCHAR";
+            public const string INTEGER = "INTEGER";
+            public const string BIGINT = "BIGINT";
+            public const string DECIMAL = "DECIMAL";
+            public const string DATE = "DATE";
+            public const string TIMESTAMP = "TIMESTAMP";
+            public const string STRUCT = "STRUCT";
+
+            public static class Defaults
+            {                
+                public const string DATE_DEFAULT = "yyyy-MM-dd";
+                public const string TIMESTAMP_DEFAULT = DATE_DEFAULT +" HH:mm:ss.SSS";
+            }
+        }
+
+        public static class SchemaDataTypes
+        {
+            public const string STRUCT = "STRUCT";
+            public const string INTEGER = "INTEGER";
+            public const string VARCHAR = "VARCHAR";
+        }
+
+        public static class SchemaTypes
+        {
+            public const string FILESCHEMA = "FileSchema";
+        }
     }
 }

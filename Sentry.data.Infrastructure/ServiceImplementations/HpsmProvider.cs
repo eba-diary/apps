@@ -8,7 +8,7 @@ using Sentry.data.Infrastructure.HPMSChangeManagement;
 
 namespace Sentry.data.Infrastructure
 {
-    public class HpsmProvider : IHpsmProvider
+    public class HpsmProvider : BaseTicketProvider, IBaseTicketProvider
     {
 
 
@@ -21,12 +21,18 @@ namespace Sentry.data.Infrastructure
             {
                 if (_service is null)
                 {
-                    _service = new ChangeManagementClient();
-                    _service.ClientCredentials.UserName.UserName = Configuration.Config.GetHostSetting("HpsmServiceId");
-                    _service.ClientCredentials.UserName.Password = Configuration.Config.GetHostSetting("HpsmServicePassword");
-                    _service.ClientCredentials.UseIdentityConfiguration = true;
-                    _service.Endpoint.Address = new EndpointAddress(Configuration.Config.GetHostSetting("HpsmServiceUrl"));
-
+                    try
+                    {
+                        _service = new ChangeManagementClient();
+                        _service.ClientCredentials.UserName.UserName = Configuration.Config.GetHostSetting("HpsmServiceId");
+                        _service.ClientCredentials.UserName.Password = Configuration.Config.GetHostSetting("HpsmServicePassword");
+                        _service.ClientCredentials.UseIdentityConfiguration = true;
+                        _service.Endpoint.Address = new EndpointAddress(Configuration.Config.GetHostSetting("HpsmServiceUrl"));
+                    }
+                    catch(Exception ex)
+                    {
+                        Logger.Fatal("HPSMProvider failed loading configuration", ex);
+                    }
                 }
                 return _service;
             }
@@ -35,7 +41,7 @@ namespace Sentry.data.Infrastructure
         /// <summary>
         /// Creates a new HPSM Change ticket.
         /// </summary>
-        public string CreateHpsmTicket(AccessRequest model)
+        public override string CreateChangeTicket(AccessRequest model)
         {
             try
             {
@@ -58,7 +64,7 @@ namespace Sentry.data.Infrastructure
 
 
 
-        public HpsmTicket RetrieveTicket(string hpsmChangeId)
+        public override HpsmTicket RetrieveTicket(string ticketId)
         {
 
             RetrieveChangeRequest request = new RetrieveChangeRequest()
@@ -68,7 +74,7 @@ namespace Sentry.data.Infrastructure
                     instance = new ChangeInstanceType(),
                     keys = new ChangeKeysType()
                     {
-                        ChangeID = GetHpsmString(hpsmChangeId)
+                        ChangeID = GetHpsmString(ticketId)
                     }
                 },
                 ignoreEmptyElements = true,
@@ -85,7 +91,7 @@ namespace Sentry.data.Infrastructure
         }
 
 
-        public void CloseHpsmTicket(string hpsmChangeId, bool wasTicketDenied = false)
+        public override void CloseTicket(string ticketId, bool wasTicketDenied = false)
         {
             string message = wasTicketDenied ? "Denied" : "Successful";
 
@@ -103,7 +109,7 @@ namespace Sentry.data.Infrastructure
                     },
                     keys = new ChangeKeysType()
                     {
-                        ChangeID = GetHpsmString(hpsmChangeId)
+                        ChangeID = GetHpsmString(ticketId)
                     }
                 },
                 ignoreEmptyElements = true

@@ -12,6 +12,17 @@ data.Search = {
         window.vm = new ListViewModel();
         ko.applyBindings(vm);
 
+        //needed to set page number on initial page load
+        // setPageNumber loop is needed as it is unknow when ko will load
+        //   all pages for pagination.
+        if (data.Search.GetParameterByName('page')) {
+            localStorage.setItem("pageSelection", (data.Search.GetParameterByName('page')));
+            data.Search.setPageNumber(localStorage.getItem("pageSelection"), true);
+        }
+        else {
+            localStorage.setItem("pageSelection", 1);
+        }
+
         if (window.location.href.match(/&ids=/)) {
             // do nothing
         }
@@ -265,12 +276,13 @@ data.Search = {
 
     },
 
-    FilterCategory: function (Name, Filters, Sequence) {
+    FilterCategory: function (Name, Filters, Sequence, ShowMore) {
 
         var self = this;
 
         self.Name = Name;
         self.Sequence = Sequence;
+        self.ShowMore = ShowMore;
 
         self.Filters = ko.observableArray(Filters);
 
@@ -295,6 +307,27 @@ data.Search = {
             });
         });
 
+    },
+
+    setPageNumber: function (targetpage, initload) {
+        //There is a delay in all pages showing up, therefore, we need a loop
+        var pages = vm.searchResults.pageCount();
+
+        //On initial load, wait 500 ms and then call setPageNumber function again
+        if (pages < targetpage && initload === true) {
+            //setTimeout(data.Search.setPageNumber, 500, targetpage);
+            setTimeout(function() {
+                data.Search.setPageNumber(targetpage, false);
+            }, 500)
+        }
+        //On second call of function, set page number to 1 if targetpage is greater than pages.
+        else if (pages < targetpage && initload === false) {
+            vm.searchResults.pageNumber(1);
+            localStorage.setItem("pageSelection", 1);
+        }
+        else {
+            vm.searchResults.pageNumber(targetpage);
+        }
     }
     
 };
