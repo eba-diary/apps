@@ -48,6 +48,41 @@ data.Home = {
             window.location = '/Favorites/EditFavorites';
         });
 
+        $(document).on("click", ".favorite-link", function (e) {
+            e.preventDefault();
+            var link = $(this);
+            var type = link.attr("data-type");
+            var dsId = link.attr("data-id");
+            var eventType = "";
+            var reason = "";
+            var sendEvent = false;
+
+            if (type.toUpperCase()  === "DS") {
+                eventType = "Viewed Dataset";
+                reason = 'Viewed dataset from favorite link';
+                sendEvent = true;
+            }
+            else if (type.toUpperCase() === "HTTPS") {
+                eventType = 'Viewed Report';
+                reason = 'Viewed report from favorite link';
+                sendEvent = true;
+            }           
+
+            if (sendEvent) {
+                $.ajax({
+                    url: '/Event/PublishSuccessEventByDatasetId?eventType=' + encodeURI(eventType) + '&reason=' + encodeURI(reason) + '&datasetId=' + encodeURI(dsId),
+                    method: "GET",
+                    dataType: 'json',
+                    success: function (obj) {
+                    }
+                });
+
+                window.open(link.attr("href"));
+            }
+
+            return false;
+        });
+
         ////Does not work for less then 100% magnifcation. DO NOT ZOOM OUT.  div.scrollTop is not happy with floating point pixels.
         //var div = $('div.feedBox');
         //var scroller = setInterval(function () {
