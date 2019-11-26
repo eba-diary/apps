@@ -286,6 +286,7 @@
     <Content Include="Content\creat-edit-datasets.css" />
     <Compile Include="Controllers\AccessRequestController.cs" />
     <Compile Include="Controllers\BusinessAreaController.cs" />
+    <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\FavoritesController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
     <Compile Include="Controllers\WebApi\ApplicationController.cs" />

@@ -132,18 +132,33 @@
         });
 
 
-        function GetFile(location) {
-
+        function GetFile(location, datasetId) {
+            var link = $(this);
+            console.log(link.attr("data-id"));
             $.ajax({
                 url: '/ExternalFile/HasReadPermissions?pathAndFilename=' + encodeURIComponent(location),
                 method: "GET",
                 dataType: 'json',
                 success: function (obj) {
                     if (obj.HasPermission) {
+                        $.ajax({
+                            url: '/Event/PublishSuccessEventByDatasetId?eventType=' + encodeURI('Downloaded Report') + '&reason=' + encodeURI('Downloaded Report from Favorites') + '&datasetId=' + encodeURI(datasetId),
+                            method: "GET",
+                            dataType: 'json',
+                            success: function (obj) {
+                            }
+                        });
                         var url = '/ExternalFile/DownloadExternalFile?pathAndFilename=' + encodeURIComponent(location);
                         window.open(url);
                     }
                     else {
+                        $.ajax({
+                            url: '/Event/PublishSuccessEventByDatasetId?eventType=' + encodeURI('Downloaded Report') + '&reason=' + encodeURI('Insufficient Permissions to Download Report') + '&datasetId=' + encodeURI(datasetId),
+                            method: "GET",
+                            dataType: 'json',
+                            success: function (obj) {
+                            }
+                        });
                         Sentry.ShowModalAlert(
                             "User does not have sufficient permissions to selected file."
                         );
