@@ -290,7 +290,7 @@ namespace Sentry.data.Core
                 case "UPDATE":
                     Logger.Debug($"Configuring SAS Notification to UDPATE all view(s)");
                     subject = $"Library Refresh Request from {schema.SasLibrary}";
-                    bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be removed from {schema.SasLibrary}:</p>");
+                    bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be updated in {schema.SasLibrary}:</p>");
                     bodySb.AppendLine($"<p>- vw_{schema.HiveTable}</p>");
                     if (schema.CreateCurrentView)
                     {
