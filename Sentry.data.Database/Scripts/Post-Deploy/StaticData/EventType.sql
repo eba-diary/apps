@@ -26,7 +26,8 @@
 									(21, 'Deleted Report', 1,0),
 									(22, 'Created Data Source', 1,0),
 									(23, 'Updated Data Source', 1,0),
-									(24, 'Deleted Dataset', 1,0)
+									(24, 'Deleted Dataset', 1,0),
+									(25, 'Downloaded Report', 1,0)
 								)
 								AS Source ([Type_ID], [Description], Severity, Display_IND) 
 
