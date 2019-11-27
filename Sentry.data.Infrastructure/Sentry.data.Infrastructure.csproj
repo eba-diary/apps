@@ -183,9 +183,12 @@
     <Compile Include="Mappings\Metadata\MetadataAssetMapping.cs" />
     <Compile Include="Mappings\Metadata\MetadataTagMapping.cs" />
     <Compile Include="Mappings\Metadata\TagGroupMapping.cs" />
-    <Compile Include="Mappings\Primary\AssetNotificationMapping.cs" />
+    <Compile Include="Mappings\Primary\NotificationMapping.cs" />
     <Compile Include="Mappings\Primary\AssetSourceMapping.cs" />
+    <Compile Include="Mappings\Primary\BusinessAreaMapping.cs" />
+    <Compile Include="Mappings\Primary\BusinessAreaTileRowMapping.cs" />
     <Compile Include="Mappings\Primary\BusinessUnitMapping.cs" />
+    <Compile Include="Mappings\Primary\BusinessAreaTileMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\BaseActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\ConvertToParquetMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\QueryStorageActionMapping.cs" />

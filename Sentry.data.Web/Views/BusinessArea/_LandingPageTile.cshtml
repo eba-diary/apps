@@ -1,0 +1,15 @@
+﻿@using Sentry.data.Web;
+@model BusinessAreaTileRowModel
+
+<div class="row">
+
+    @foreach (BusinessAreaTileModel tile in Model.Tiles)
+    {
+        <div class="col-sm-12 col-md-@tile.BootstrapSpan col-lg-@tile.BootstrapSpan">
+            <p class="landing-pg-tile-title @tile.TileColor">@tile.Title</p>
+            <div class="landing-pg-image" style="background-image: url('/Images/BusinessAreaTiles/@tile.ImageName');"></div>
+            <p class="landing-pg-hyperlink"><a target="_blank" href="@tile.Hyperlink" class="@tile.TileColor">@tile.LinkText &gt;</a></p>
+        </div>
+    }
+
+</div>

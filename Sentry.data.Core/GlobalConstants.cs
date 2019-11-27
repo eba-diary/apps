@@ -130,6 +130,7 @@
         public static class SecurableEntityName
         {
             public const string DATASET = "Dataset";
+            public const string DATA_ASSET = "DataAsset";
             public const string DATASOURCE = "DataSource";
         }
 
@@ -140,6 +141,7 @@
             public const string CAN_QUERY_DATASET = "CanQueryDataset";
             public const string CAN_CONNECT_TO_DATASET = "CanConnectToDataset";
             public const string CAN_UPLOAD_TO_DATASET = "CanUploadToDataset";
+            public const string CAN_MODIFY_NOTIFICATIONS = "CanModifyNotification";
             public const string CAN_USE_DATA_SOURCE = "CanUseDataSource";
 
             public const string USE_APP = "UseApp";
@@ -170,6 +172,12 @@
         public static class StoragePrefixes
         {
             public const string DATASET_IMAGE_STORAGE_PREFIX = "images";
+        }
+
+        public static class Notifications
+        {
+            public const string DATAASSET_TYPE = "DA";
+            public const string BUSINESSAREA_TYPE = "BA";
         }
 
         public static class JobStates

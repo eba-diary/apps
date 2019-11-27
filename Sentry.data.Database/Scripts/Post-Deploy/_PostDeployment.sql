@@ -20,6 +20,11 @@ All new files added for staic data or scripts should have it's properties update
 :r ..\Post-Deploy\StaticData\DatasetFunction.sql
 :r ..\Post-Deploy\StaticData\DataSourceType.sql
 :r ..\Post-Deploy\StaticData\AuthenticationType.sql
+:r ..\Post-Deploy\StaticData\DataAsset.sql
+:r ..\Post-Deploy\StaticData\BusinessArea.sql
+:r ..\Post-Deploy\StaticData\BusinessAreaTile.sql
+:r ..\Post-Deploy\StaticData\BusinessAreaTileRow.sql
+:r ..\Post-Deploy\StaticData\BusinessAreaTileRow_BusinessAreaTile.sql
 :r ..\Post-Deploy\StaticData\DataActionTypes.sql
 
 
@@ -37,7 +42,6 @@ DECLARE @ErrorState INT;
 SET @ScriptVersion = '2019.10.30.01_PostDeploy'
 
 BEGIN TRAN 
-  
 IF NOT EXISTS (SELECT * FROM [Version] where Version_CDE=@ScriptVersion) 
 BEGIN TRY 
 
@@ -60,5 +64,6 @@ BEGIN CATCH
     ROLLBACK TRAN 
     RETURN
 END CATCH 
-  
+
 COMMIT TRAN
+
