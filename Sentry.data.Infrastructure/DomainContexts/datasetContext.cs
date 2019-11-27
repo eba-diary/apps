@@ -407,6 +407,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<SchemaMap> SchemaMap
+        {
+            get
+            {
+                return Query<SchemaMap>();
+            }
+        }
+
         public IEnumerable<Dataset> GetDatasetByCategoryID(int id)
         {
             return Query<Dataset>().Where(w => w.DatasetCategories.Any(y=> y.Id == id)).Where(x => x.CanDisplay).AsEnumerable();
