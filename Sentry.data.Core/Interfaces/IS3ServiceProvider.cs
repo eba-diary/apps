@@ -72,6 +72,8 @@ namespace Sentry.data.Core
         /// </summary>
         /// <param name="prefixList"></param>
         void DeleteS3Prefix(List<string> prefixList);
+
+        string CopyObject(string srcBucket, string srcKey, string destBucket, string destKey);
     }
 
 }
