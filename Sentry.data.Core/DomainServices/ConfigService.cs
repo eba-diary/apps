@@ -557,22 +557,21 @@ namespace Sentry.data.Core
             HiveTableCreateModel hiveCreate = new HiveTableCreateModel()
             {
                 SchemaID = revision.ParentSchema.SchemaId,
+                RevisionID = revision.SchemaRevision_Id,
                 DatasetID = config.ParentDataset.DatasetId,
                 HiveStatus = null
             };
             _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
 
             //Send Email to have hive table added to SAS if option is checked
-            if (latestRevision == null)
-            {
-                revision.SendIncludeInSasEmail(true, _userService.GetCurrentUser(), _emailService);
-            }
-            else
-            {
-                revision.SendIncludeInSasEmail(false, _userService.GetCurrentUser(), _emailService);
-            }
-            
-
+            //if (latestRevision == null)
+            //{
+            //    revision.SendIncludeInSasEmail(true, _userService.GetCurrentUser(), _emailService);
+            //}
+            //else
+            //{
+            //    revision.SendIncludeInSasEmail(false, _userService.GetCurrentUser(), _emailService);
+            //}
         }
 
         private BaseField AddRevisionField(SchemaRow row, SchemaRevision CurrentRevision, BaseField parentRow = null, SchemaRevision previousRevision = null)
@@ -617,7 +616,7 @@ namespace Sentry.data.Core
                 case "DATE":
                     newField = new DateField()
                     {
-                        SourceFormat = (row.Format == null || row.Format == string.Empty) ? "yyyy/MM/dd" : row.Format
+                        SourceFormat = row.Format
                     };
 
                     if (compare && TryConvertTo<DateField>(previousFieldVersion) != null)
@@ -633,7 +632,7 @@ namespace Sentry.data.Core
                 case "TIMESTAMP":
                     newField = new TimestampField()
                     {
-                        SourceFormat = (row.Format == null || row.Format == string.Empty) ? "yyyy/MM/dd HH:mm:ss.SSS" : row.Format
+                        SourceFormat = row.Format
                     };
 
                     if (compare && TryConvertTo<TimestampField>(previousFieldVersion) != null)

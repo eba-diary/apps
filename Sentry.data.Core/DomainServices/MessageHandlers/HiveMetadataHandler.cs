@@ -14,19 +14,25 @@ namespace Sentry.data.Core
     {
         #region Declarations
         private IDatasetContext _dsContext;
+        private UserService _userService;
+        private IEmailService _emailService;
+        private ISchemaService _schemaService;
         #endregion
 
         #region Constructor
-        public HiveMetadataHandler(IDatasetContext dsContext)
+        public HiveMetadataHandler(IDatasetContext dsContext, UserService userService, IEmailService emailService, ISchemaService schemaService)
         {
             _dsContext = dsContext;
+            _userService = userService;
+            _emailService = emailService;
+            _schemaService = schemaService;
         }
         #endregion
 
         void IMessageHandler<string>.Handle(string msg)
         {
             BaseEventMessage baseEvent = JsonConvert.DeserializeObject<BaseEventMessage>(msg);
-            FileSchema de = null;
+            FileSchema de = null;            
             try
             {
                 switch (baseEvent.EventType.ToUpper())
@@ -39,8 +45,18 @@ namespace Sentry.data.Core
                         {
                             case "CREATED":
                             case "EXISTED":
-                                de = _dsContext.GetById<FileSchema>(hiveCreatedEvent.SchemaID);
+                                de = _dsContext.FileSchema.Where(w => w.SchemaId == hiveCreatedEvent.SchemaID).FirstOrDefault();
                                 de.HiveTableStatus = HiveTableStatusEnum.Available.ToString();
+
+                                if (de.IsInSAS)
+                                {
+                                    bool IsSuccessful = _schemaService.SasUpdateNotification(hiveCreatedEvent.SchemaID, hiveCreatedEvent.RevisionID);
+
+                                    if (!IsSuccessful)
+                                    {
+                                        Logger.Error($"HiveMetadataHandler failed sending SAS email - revision:{hiveCreatedEvent.RevisionID}");
+                                    }                                    
+                                }
                                 break;
                             case "FAILED":
                                 de = _dsContext.GetById<FileSchema>(hiveCreatedEvent.SchemaID);

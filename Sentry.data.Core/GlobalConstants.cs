@@ -44,6 +44,7 @@
             public const string CREATED_REPORT = "Created Report";
             public const string UPDATED_REPORT = "Updated Report";
             public const string DELETED_REPORT = "Deleted Report";
+            public const string DOWNLOADED_REPORT = "Downloaded Report";
 
             public const string VIEWED_DATASET = "Viewed Dataset";
             public const string CREATED_DATASET = "Created Dataset";
@@ -221,6 +222,12 @@
             public const string DATE = "DATE";
             public const string TIMESTAMP = "TIMESTAMP";
             public const string STRUCT = "STRUCT";
+
+            public static class Defaults
+            {                
+                public const string DATE_DEFAULT = "yyyy-MM-dd";
+                public const string TIMESTAMP_DEFAULT = DATE_DEFAULT +" HH:mm:ss.SSS";
+            }
         }
 
         public static class SchemaDataTypes
@@ -263,6 +270,12 @@
                 public const string OBJECTCREATED_COPY = "OBJECTCREATED:COPY";
                 public const string OBJECTCREATED_COMPLETEMULTIPARTUPLOAD = "OBJECTCREATED:COMPLETEMULTIPARTUPLAOD";
             }
+        }
+
+        public static class DataFlowGuidConfiguration
+        {
+            public const string GUID_CULTURE = "en-US";
+            public const string GUID_FORMAT = "yyyyMMddHHmmssfff";
         }
     }
 }

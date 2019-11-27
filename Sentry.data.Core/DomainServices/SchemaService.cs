@@ -12,11 +12,13 @@ namespace Sentry.data.Core
     {
         public IDatasetContext _datasetContext;
         public IUserService _userService;
+        public IEmailService _emailService;
 
-        public SchemaService(IDatasetContext dsContext, IUserService userService)
+        public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService)
         {
             _datasetContext = dsContext;
             _userService = userService;
+            _emailService = emailService;
         }
 
         public int CreateAndSaveSchema(FileSchemaDto schemaDto)
@@ -39,11 +41,56 @@ namespace Sentry.data.Core
 
         public bool UpdateAndSaveSchema(FileSchemaDto schemaDto)
         {
+            
+            var SendSASNotification = false;
+            string SASNotificationType = null;
+            string CurrentViewNotificationType = null;
             try
             {
                 FileSchema schema = _datasetContext.GetById<FileSchema>(schemaDto.SchemaId);
+                var SchemaRevisionExists = _datasetContext.SchemaRevision.Where(w => w.ParentSchema == schema).Any();
+
+                #region SAS Notification Determination Logic
+                //      This logic needs to be determine prior to mapping DTO to schema so change detection occurs properly
+                //      Notification logic occurs after changes successfully saved to database
+
+                /*
+                 * Detect change within IsInSAS property when
+                 *      Schema Revision exists
+                 * if change,
+                 *      set notification trigger to true
+                 *      set type of notification
+                 */
+                if (SchemaRevisionExists && schema.IsInSAS != schemaDto.IsInSAS)
+                {
+                    SendSASNotification = true;
+                    SASNotificationType = (schemaDto.IsInSAS) ? "ADD" : "REMOVE";
+                }
+
+                /*
+                 * Determine change within CurrentView property when 
+                 *      Schema Revision exists
+                 *      IsInSAS is true or when IsInSAS has changed to false
+                 * if change,
+                 *      set notification trigger to true
+                 *      set type of notification
+                 */
+                if (SchemaRevisionExists && (schemaDto.IsInSAS || (SASNotificationType != null && SASNotificationType.ToUpper() == "REMOVE")) && schema.CreateCurrentView != schemaDto.CreateCurrentView)
+                {
+                    SendSASNotification = true;
+                    CurrentViewNotificationType = (schemaDto.CreateCurrentView) ? "ADD" : "REMOVE";
+                }
+                #endregion
+
                 UpdateAndSaveSchema(schemaDto, schema);
                 _datasetContext.SaveChanges();
+
+                //Send notification to SAS
+                if (SendSASNotification)
+                {
+                    SasNotification(schema, SASNotificationType, CurrentViewNotificationType, _userService.GetCurrentUser());
+                }
+
                 return true;
             }
             catch (Exception ex)
@@ -218,7 +265,7 @@ namespace Sentry.data.Core
             file.Dataset = _datasetContext.GetById<Dataset>(stepEvent.DatasetID);
             file.UploadUserName = "";
             file.DatasetFileConfig = null;
-            file.FileLocation = stepEvent.TargetPrefix + Path.GetFileName(stepEvent.SourceKey);
+            file.FileLocation = stepEvent.TargetPrefix + Path.GetFileName(stepEvent.SourceKey).Trim();
             file.CreateDTM = DateTime.Now;
             file.ModifiedDTM = DateTime.Now;
             file.ParentDatasetFileId = null;
@@ -289,6 +336,115 @@ namespace Sentry.data.Core
                 FileExtenstionName = scm.Extension.Name
             };
 
+        }
+
+        public bool SasUpdateNotification(int schemaId, int revisionId)
+        {
+            SchemaRevision rev = null;
+            try
+            {
+                rev = _datasetContext.SchemaRevision.Where(w => w.SchemaRevision_Id == revisionId && w.ParentSchema.SchemaId == schemaId).FirstOrDefault();
+                bool fieldChanges = rev.Fields.Where(w => w.LastUpdateDTM == rev.LastUpdatedDTM).Any();
+                if (fieldChanges && rev.Revision_NBR == 1)
+                {
+                    SasNotification(rev.ParentSchema, "ADD", null, _userService.GetByAssociateId(rev.CreatedBy));
+                }
+                else if (fieldChanges)
+                {
+                    SasNotification(rev.ParentSchema, "UPDATE", null, _userService.GetByAssociateId(rev.CreatedBy));
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                int revId = (rev != null) ? rev.SchemaRevision_Id : 0;
+                Logger.Error($"Failed sending SAS email - revision:{revId}", ex);
+
+                return false;
+            }
+        }
+
+
+        private void SasNotification(FileSchema schema, string sasNotificationType, string currentViewNotificationType, IApplicationUser changeInitiator)
+        {
+            StringBuilder bodySb = new StringBuilder();
+            string subject = null;
+            IApplicationUser user = changeInitiator;
+            //Ensure properties are initialized
+            sasNotificationType = (sasNotificationType == null) ? string.Empty : sasNotificationType;
+            currentViewNotificationType = (currentViewNotificationType == null) ? string.Empty : currentViewNotificationType;
+
+            switch (sasNotificationType.ToUpper())
+            {
+                //Addition of all schema views to SAS
+                case "ADD":
+                    Logger.Debug($"Configuring SAS Notification to ADD all view(s)");
+                    subject = $"Library Add Request to {schema.SasLibrary}";
+                    bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be added to {schema.SasLibrary}:</p>");
+                    bodySb.AppendLine($"<p>- vw_{schema.HiveTable}</p>");
+                    //Include current view if checked
+                    if (currentViewNotificationType == "ADD" || schema.CreateCurrentView)
+                    {
+                        bodySb.AppendLine($"<p>- vw_{schema.HiveTable}_cur</p>");
+                    }
+                    break;
+                //Removal of all schema views from SAS
+                case "REMOVE":
+                    Logger.Debug($"Configuring SAS Notification to REMOVE all view(s)");
+                    subject = $"Library Remove Request from {schema.SasLibrary}";
+                    bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be removed from {schema.SasLibrary}:</p>");
+                    bodySb.AppendLine($"<p>- vw_{schema.HiveTable}</p>");
+                    //if current view is being updated to unchecked or is currently checked, ensure it is removed from SAS
+                    if (currentViewNotificationType.ToUpper() == "REMOVE" || schema.CreateCurrentView)
+                    {
+                        bodySb.AppendLine($"<p>- vw_{schema.HiveTable}_cur</p>");
+                    }
+                    break;
+                //Update of all SAS libraries
+                case "UPDATE":
+                    Logger.Debug($"Configuring SAS Notification to UDPATE all view(s)");
+                    subject = $"Library Refresh Request from {schema.SasLibrary}";
+                    bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be updated in {schema.SasLibrary}:</p>");
+                    bodySb.AppendLine($"<p>- vw_{schema.HiveTable}</p>");
+                    if (schema.CreateCurrentView)
+                    {
+                        bodySb.AppendLine($"<p>- vw_{schema.HiveTable}_cur</p>");
+                    }
+                    break;
+                //Current View propery can be changed independently of IsInSAS property
+                //  Ensure notification is sent for current view propery changes if IsInSAS is checked
+                default:
+                    if (schema.IsInSAS && currentViewNotificationType.ToUpper() == "ADD")
+                    {
+                        Logger.Debug($"Configuring SAS Notification to ADD current view");
+                        subject = $"Library Add Request from {schema.SasLibrary}";
+                        bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be added to {schema.SasLibrary}:</p>");
+                        bodySb.AppendLine($"<p>- vw_{schema.HiveTable}_cur</p>");
+                    }
+                    else if (schema.IsInSAS && currentViewNotificationType.ToUpper() == "REMOVE")
+                    {
+                        Logger.Debug($"Configuring SAS Notification to REMOVE current view");
+                        subject = $"Library Remove Request from {schema.SasLibrary}";
+                        bodySb.AppendLine($"<p>{user.DisplayName} has requested the following to be removed from {schema.SasLibrary}:</p>");
+                        bodySb.AppendLine($"<p>- vw_{schema.HiveTable}_cur</p>");
+                    }
+                    break;
+            }
+
+            string ccEmailList = Configuration.Config.GetHostSetting("EmailDSCSupportAsCC") == "true" ? $"{user.EmailAddress};DSCSupport@sentry.com" : $"{user.EmailAddress}";
+
+            if (bodySb.Length > 0)
+            {
+                bodySb.Append($"<p>Thank you from your friendly data.sentry.com Administration team</p>");
+
+                _emailService.SendGenericEmail(Configuration.Config.GetHostSetting("SASAdministrationEmail"), subject, bodySb.ToString(), ccEmailList);
+
+            }
+            else
+            {
+                Logger.Warn($"SAS Notification was not configured");
+            }
         }
     }
 }
