@@ -1,17 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using NHibernate;
+﻿using NHibernate;
 using NHibernate.Linq;
-using Sentry.NHibernate;
 using Sentry.data.Core;
-using System.Threading.Tasks;
-using System.Reflection;
-using System.Collections;
-using System.Web;
-using System.Linq.Expressions;
 using Sentry.data.Core.Entities;
+using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.NHibernate;
+using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace Sentry.data.Infrastructure
 {
@@ -383,6 +380,70 @@ namespace Sentry.data.Infrastructure
             get
             {
                 return Query<SchemaRevision>();
+            }
+        }
+
+        public IQueryable<DataFlow> DataFlow
+        {
+            get
+            {
+                return Query<DataFlow>();
+            }
+        }
+
+        public IQueryable<DataFlowStep> DataFlowStep
+        {
+            get
+            {
+                return Query<DataFlowStep>();
+            }
+        }
+
+        public IQueryable<S3DropAction> S3DropAction
+        {
+            get
+            {
+                return Query<S3DropAction>();
+            }
+        }
+
+        public IQueryable<SchemaLoadAction> SchemaLoadAction
+        {
+            get
+            {
+                return Query<SchemaLoadAction>();
+            }
+        }
+
+        public IQueryable<RawStorageAction> RawStorageAction
+        {
+            get
+            {
+                return Query<RawStorageAction>();
+            }
+        }
+
+        public IQueryable<QueryStorageAction> QueryStorageAction
+        {
+            get
+            {
+                return Query<QueryStorageAction>();
+            }
+        }
+
+        public IQueryable<ConvertToParquetAction> ConvertToParquetAction
+        {
+            get
+            {
+                return Query<ConvertToParquetAction>();
+            }
+        }
+
+        public IQueryable<SchemaMap> SchemaMap
+        {
+            get
+            {
+                return Query<SchemaMap>();
             }
         }
 
