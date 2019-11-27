@@ -35,6 +35,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.IsBundled, (m) => m.Column("isBundled_IND"));
             this.Property((x) => x.Information, (m) => m.Column("Information_DSC"));
             this.Property((x) => x.Size, (m) => m.Column("Size_AMT"));
+            this.Property((x) => x.FlowExecutionGuid, (m) => m.Column("FlowExecutionGuid"));
+            this.Property((x) => x.RunInstanceGuid, (m) => m.Column("RunInstanceGuid"));
 
             this.ManyToOne(x => x.Dataset, m =>
             {
