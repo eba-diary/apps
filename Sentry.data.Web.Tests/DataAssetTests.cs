@@ -96,7 +96,7 @@ namespace Sentry.data.Web.Tests
 
             var an = MockClasses.GetMockAssetNotifications(da);
 
-            Assert.IsTrue(an.ParentDataAsset.Id == da.Id);
+            Assert.IsTrue(an.ParentObject == da.Id);
         }
 
         [TestMethod]

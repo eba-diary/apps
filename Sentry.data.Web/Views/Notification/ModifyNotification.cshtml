@@ -26,61 +26,67 @@ else
     @Html.HiddenFor(m => m.CreateUser)
     @Html.HiddenFor(model => model.NotificationId)
 
-    <div class="form-horizontal">
-        @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+<div class="form-horizontal">
+    @Html.ValidationSummary(false, "", new { @class = "text-danger" })
 
 
 
-        <br />
+    <br />
 
-        <div class="form-group">
-            @Html.LabelFor((model) => model.DataAssetId, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownListFor(model => model.DataAssetId, Model.AllDataAssets, new { @class = "form-control" })
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.StartTime, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(m => m.StartTime, new { @class = "form-control edit-dataset-row", @style = "width: 92%; display: inline-block;" })
-                <span class="input-group-addon" style="display: inline-block;">
-                    <span class="glyphicon glyphicon-calendar"></span>
-                </span>
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor(m => m.ExpirationTime, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextBoxFor(m => m.ExpirationTime, new { @class = "form-control edit-dataset-row", @style = "width: 92%; display: inline-block;" })
-                <span class="input-group-addon" style="display: inline-block;">
-                    <span class="glyphicon glyphicon-calendar"></span>
-                </span>
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor((model) => model.MessageSeverity, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.DropDownListFor(model => model.MessageSeverity, Model.AllSeverities, new { @class = "form-control edit-dataset-row" })
-            </div>
-        </div>
-        <div class="form-group">
-            @Html.LabelFor((model) => model.Message, htmlAttributes: new { @class = "control-label col-md-2" })
-            <div class="col-md-10">
-                @Html.TextAreaFor((model) => model.Message, new { @class = "form-control edit-dataset-row" })
-            </div>
-        </div>
-        <div class="form-group">
-            <span class="text-muted"><em>** Fields in <b>Bold</b> are Required</em></span>
-        </div>
-        <br />
-        <div class="form-group">
-            <div>
-                <input type="submit" value="Submit" class="btn btn-primary" />
-                <a class="btn btn-warning" href="/Notification/ManageNotification">Cancel</a>
-            </div>
-
+    <div class="form-group">
+        @Html.LabelFor((model) => model.ObjectId, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownListFor(model => model.ObjectId, Model.AllDataAssets, new { @class = "form-control" })
         </div>
     </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.StartTime, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(m => m.StartTime, new { @class = "form-control edit-dataset-row", @style = "width: 92%; display: inline-block;" })
+            <span class="input-group-addon" style="display: inline-block;">
+                <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.ExpirationTime, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor(m => m.ExpirationTime, new { @class = "form-control edit-dataset-row", @style = "width: 92%; display: inline-block;" })
+            <span class="input-group-addon" style="display: inline-block;">
+                <span class="glyphicon glyphicon-calendar"></span>
+            </span>
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor((model) => model.MessageSeverity, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.DropDownListFor(model => model.MessageSeverity, Model.AllSeverities, new { @class = "form-control edit-dataset-row" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor((model) => model.Title, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextBoxFor((model) => model.Title, new { @class = "form-control edit-dataset-row" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor((model) => model.Message, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-10">
+            @Html.TextAreaFor((model) => model.Message, new { @class = "form-control edit-dataset-row" })
+        </div>
+    </div>
+    <div class="form-group">
+        <span class="text-muted"><em>** Fields in <b>Bold</b> are Required</em></span>
+    </div>
+    <br />
+    <div class="form-group">
+        <div>
+            <input type="submit" value="Submit" class="btn btn-primary" />
+            <a class="btn btn-warning" href="/Notification/ManageNotification">Cancel</a>
+        </div>
+
+    </div>
+</div>
 }
 @section Scripts {
     <script>

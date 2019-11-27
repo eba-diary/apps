@@ -174,6 +174,12 @@
             public const string DATASET_IMAGE_STORAGE_PREFIX = "images";
         }
 
+        public static class Notifications
+        {
+            public const string DATAASSET_TYPE = "DA";
+            public const string BUSINESSAREA_TYPE = "BA";
+        }
+
         public static class JobStates
         {
             public const string RETRIEVERJOB_STARTED_STATE = "Started";

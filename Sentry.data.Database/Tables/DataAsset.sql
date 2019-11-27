@@ -15,5 +15,5 @@
     [PrimaryOwner_ID] VARCHAR(8) NOT NULL DEFAULT '000000', 
     [PrimaryContact_ID] VARCHAR(8) NOT NULL DEFAULT '000000',
 	[Security_ID] UNIQUEIDENTIFIER NULL, 
-	CONSTRAINT [FK_DataAsset_Security] FOREIGN KEY ([Security_ID]) REFERENCES [Security]([Security_Id])
+	CONSTRAINT [FK_DataAsset_Security] FOREIGN KEY ([Security_ID]) REFERENCES [Security]([Security_ID])
 )

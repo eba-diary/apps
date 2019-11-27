@@ -3,11 +3,11 @@
 		
 		MERGE INTO BusinessAreaTile AS Target 
 		USING (VALUES 
-									(1, 'PL Report & Data Requests', 'blue', 'Collaboration5.jpg', 'http://www.google.com/', 1, 'View Requests'),
-									(2, 'Business Intelligence', 'lt_blue', 'Meeting2.jpg', 'https://data.sentry.com/Search/BusinessIntelligence/Index?category=Personal%20Lines', 2, 'View Business Intelligence'),
-									(3, 'Training', 'green', 'LearningBooks.jpg', 'http://sharepoint.sentry.com/', 3, 'View Training Materials'),
-									(4, 'PL Data Services Backlog', 'gold', 'ConceptVariety2.jpg', 'https://jira.sentry.com/', 4, 'View Current Items'),
-									(5, 'PL BI Backlog', 'gray', 'Collaboration1.jpg', 'https://jira.sentry.com/', 5, 'View Current Items')
+									(1, 'PL Report & Data Requests', 'blue', 'Collaboration5.jpg', 'http://sharepoint.sentry.com/cp/EDWBusInf/Lists/EDW%20Information%20Request/Quick%20View.aspx', 1, 'View Requests'),
+									(2, 'Business Intelligence', 'lt_blue', 'Meeting2.jpg', 'https://data.sentry.com/Search/BusinessIntelligence/Index?category=Personal%20Lines', 3, 'View Business Intelligence'),
+									(3, 'Training', 'green', 'LearningBooks.jpg', '\\MADESS01\Wkgroups\Management Reports\- - - SERA PL Connections and Training Guides - - -', 3, 'View Training Materials'),
+									(4, 'PL Data Services Business Dashboard', 'gold', 'ConceptVariety2.jpg', 'https://jira.sentry.com/secure/Dashboard.jspa?selectPageId=19211', 4, 'View Current Items'),
+									(5, 'PL Data Questions', 'gray', 'Collaboration1.jpg', 'http://sharepoint.sentry.com/cp/EDWBusInf/Lists/PL%20Data%20Questions/AllItems.aspx', 2, 'View Current Items')
 								)
 								AS Source ([BusinessAreaTile_ID], [Title_DSC], [TileColor_DSC], [Image_NME], [Hyperlink_URL], [Order_SEQ], [Hyperlink_DSC]) 
 

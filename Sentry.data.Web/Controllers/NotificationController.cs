@@ -60,14 +60,24 @@ namespace Sentry.data.Web.Controllers
                 return View("ManageNotification", vm);
             }
 
+            List<SelectListItem> AreaList = new List<SelectListItem>();
+            foreach (var item in _notificationService.GetAssetsForUserSecurity())
+            {
+                AreaList.Add(new SelectListItem { Text = item.DisplayName, Value = Core.GlobalConstants.Notifications.DATAASSET_TYPE + "_" + item.Id });
+            }
+            foreach (var item in _notificationService.GetBusinessAreasForUserSecurity())
+            {
+                AreaList.Add(new SelectListItem { Text = item.Name, Value = Core.GlobalConstants.Notifications.BUSINESSAREA_TYPE + "_" + item.Id });
+            }
+
             model.AllSeverities = default(NotificationSeverity).ToEnumSelectList();
-            model.AllDataAssets = _notificationService.GetAssetsForUserSecurity().Select(v => new SelectListItem { Text = v.DisplayName, Value = v.Id.ToString() }).ToList();
+            model.AllDataAssets = AreaList;
             return View("ModifyNotification",model);
         }
 
         public JsonResult GetNotificationInfoForGrid([ModelBinder(typeof(DataTablesBinder))] IDataTablesRequest dtRequest)
         {
-            List<NotificationModel> files = _notificationService.GetNotificationsForDataAsset().ToWeb();
+            List<NotificationModel> files = _notificationService.GetAllNotifications().ToWeb();
             DataTablesQueryableAdapter<NotificationModel> dtqa = new DataTablesQueryableAdapter<NotificationModel>(files.AsQueryable(), dtRequest);
             return Json(dtqa.GetDataTablesResponse(), JsonRequestBehavior.AllowGet);
         }

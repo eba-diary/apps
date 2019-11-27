@@ -87,9 +87,6 @@
     <Compile Include="DomainServices\JobService.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
     <Compile Include="DTO\Config\DatasetFileConfigDto.cs" />
-    <Compile Include="DTO\ContactInfoDto.cs" />
-    <Compile Include="DTO\Favorites\FavoriteDto.cs" />
-    <Compile Include="DTO\ImagesDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
     <Compile Include="DTO\Schema\BaseFieldDto.cs" />
     <Compile Include="DTO\Schema\DataElementDTO.cs" />
@@ -140,6 +137,9 @@
     <Compile Include="Entities\MessageFormats\HszDropLocationCreateModel.cs" />
     <Compile Include="Extensions\RetrieverJobExtensions.cs" />
     <Compile Include="Interfaces\ITagService.cs" />
+    <Compile Include="DTO\ContactInfoDto.cs" />
+    <Compile Include="DTO\Favorites\FavoriteDto.cs" />
+    <Compile Include="DTO\ImagesDto.cs" />
     <Compile Include="DomainServices\NotificationService.cs" />
     <Compile Include="DomainServices\SecurityService.cs" />
     <Compile Include="DTO\BusinessArea\BusinessAreaTileDto.cs" />
@@ -255,7 +255,7 @@
     <Compile Include="Entities\Subscriptions\DataAssetSubscription.cs" />
     <Compile Include="Entities\Subscriptions\DatasetSubscription.cs" />
     <Compile Include="Entities\Subscriptions\Event.cs" />
-    <Compile Include="Entities\DataAssets\AssetNotifications.cs" />
+    <Compile Include="Entities\Notification.cs" />
     <Compile Include="Entities\DataAssets\AssetSource.cs" />
     <Compile Include="Entities\Goldeneye\BundleRequest.cs" />
     <Compile Include="Entities\Goldeneye\BundleResponse.cs" />

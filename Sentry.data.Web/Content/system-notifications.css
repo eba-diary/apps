@@ -48,6 +48,29 @@
 }
 
 
+/*****  PREVIEW  *****/
+#standard-notification-carousel-preview {
+    min-height: 140px;
+    padding: 8px 50px;
+}
+
+#preview-system-notification-wrapper .critical-notification-container {
+    background-color: #e2e2e2;
+    color: #000000;
+    border-bottom: 1px solid #afafaf;
+    margin-bottom: 0px;
+}
+
+#preview-system-notification-wrapper .carousel {
+    background-color: #e1e2e4;
+}
+
+#preview-system-notification-wrapper .critical-notification-title {
+    background-color: #9e9e9e;
+    color: #000000;
+}
+
+
 /*****  PERSONAL LINES  *****/
 #pl-system-notification-wrapper .critical-notification-container {
     background-color: #d7d7df;

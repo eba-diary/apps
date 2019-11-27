@@ -7,9 +7,9 @@ namespace Sentry.data.Core
     public static class NotificationExtensions
     {
 
-        public static NotificationModel ToModel(this AssetNotifications core)
+        public static NotificationModel ToModel(this Notification core)
         {
-            return new NotificationModel()
+            NotificationModel model = new NotificationModel()
             {
                 CreateUser = core.CreateUser,
                 ExpirationTime = core.ExpirationTime,
@@ -18,37 +18,68 @@ namespace Sentry.data.Core
                 MessageSeverityDescription = core.MessageSeverity.ToString(),
                 NotificationId = core.NotificationId,
                 StartTime = core.StartTime,
-                DataAssetId = core.ParentDataAsset.Id,
-                DataAssetName = core.ParentDataAsset.Name,
-                IsActive = core.StartTime <= DateTime.Now && core.ExpirationTime > DateTime.Now
+                IsActive = core.StartTime <= DateTime.Now && core.ExpirationTime > DateTime.Now,
+                NotificationType = core.NotificationType,
+                ObjectId = core.NotificationType + "_" + core.ParentObject.ToString(),
+                Title = core.Title                
             };
+
+            return model;
         }
 
-        public static List<NotificationModel> ToModels(this List<AssetNotifications> cores)
+        public static List<NotificationModel> ToModels(this List<Notification> cores, IDatasetContext domainContext, ISecurityService securityService, UserService userService)
         {
+
+            IApplicationUser user = userService.GetCurrentUser();
             List<NotificationModel> models = new List<NotificationModel>();
-            cores.ForEach(x => models.Add(x.ToModel()));
+
+            foreach (var notification in cores)
+            {
+                NotificationModel model = notification.ToModel();
+
+                switch (model.NotificationType)
+                {
+                    case GlobalConstants.Notifications.DATAASSET_TYPE:
+                        DataAsset da = domainContext.GetById<DataAsset>(notification.ParentObject);
+                        model.ObjectName = da.DisplayName;
+                        UserSecurity us = securityService.GetUserSecurity(da, user);
+                        model.CanEdit = us.CanModifyNotifications;
+                        break;
+                    case GlobalConstants.Notifications.BUSINESSAREA_TYPE:
+                        BusinessArea ba = domainContext.GetById<BusinessArea>(notification.ParentObject);
+                        model.ObjectName = ba.Name;
+                        //UserSecurity us = _securityService.GetUserSecurity(notification.ParentObject, user);
+                        //model.CanEdit = us.CanModifyNotifications;
+                        model.CanEdit = true;
+                        break;
+                    default:
+                        break;
+                }
+                models.Add(model);
+            }
             return models;
         }
 
-        public static List<NotificationModel> ToModels(this IQueryable<AssetNotifications> cores)
-        {
-            return cores.ToList().ToModels();
-        }
+        //public static List<NotificationModel> ToModels(this IQueryable<Notification> cores)
+        //{
+        //    return cores.ToList().ToModels();
+        //}
 
 
-        public static AssetNotifications ToCore(this NotificationModel model)
+        public static Notification ToCore(this NotificationModel model)
         {
-            return new AssetNotifications()
+            return new Notification()
             {
                 CreateUser = model.CreateUser,
                 ExpirationTime = model.ExpirationTime,
                 Message = model.Message,
                 MessageSeverity = model.MessageSeverity,
                 NotificationId = model.NotificationId,
-                StartTime = model.StartTime
+                StartTime = model.StartTime,
+                NotificationType = model.NotificationType,
+                ParentObject = int.Parse(model.ObjectId),
+                Title = model.Title
             };
         }
-
     }
 }

@@ -311,9 +311,9 @@
     <Compile Include="Extensions\BusinessIntelligenceExtensions.cs" />
     <Compile Include="Extensions\ConfigExtension.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
-    <Compile Include="Extensions\NotificationExtensions.cs" />
     <Compile Include="Extensions\FavoriteExtensions.cs" />
     <Compile Include="Extensions\ImageExtensions.cs" />
+    <Compile Include="Extensions\NotificationExtensions.cs" />
     <Compile Include="Extensions\SchemaExtensions.cs" />
     <Compile Include="Extensions\Security\PermissionExtensions.cs" />
     <Compile Include="Extensions\Security\RequestAccessExtension.cs" />
@@ -1271,8 +1271,6 @@
     <Content Include="Views\Dataset\_DatasetFileVersions.cshtml" />
     <Content Include="Views\Config\Manage.cshtml" />
     <Content Include="Views\Config\_EditConfigFile.cshtml" />
-    <Content Include="Views\DataAsset\EditAssetNotification.cshtml" />
-    <Content Include="Views\DataAsset\CreateAssetNotification.cshtml" />
     <Content Include="Views\Dataset\_BundleFilename.cshtml" />
     <Content Include="Views\Dataset\EditDataFile.cshtml" />
     <Content Include="Views\Config\Create.cshtml" />

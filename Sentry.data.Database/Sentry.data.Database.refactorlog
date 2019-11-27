@@ -889,4 +889,18 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="FieldGuid" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="c53ee5f4-c73b-4fdf-8ded-cab89afcb88a" ChangeDateTime="04/09/2019 17:15:51">
+    <Property Name="ElementName" Value="[dbo].[AssetNotifications].[DataAsset_ID]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[AssetNotifications]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[Object_ID]" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="272025c4-8c74-4f6f-b76b-63e8d33238c0" ChangeDateTime="04/09/2019 17:22:31">
+    <Property Name="ElementName" Value="[dbo].[AssetNotifications]" />
+    <Property Name="ElementType" Value="SqlTable" />
+    <Property Name="ParentElementName" Value="[dbo]" />
+    <Property Name="ParentElementType" Value="SqlSchema" />
+    <Property Name="NewName" Value="[Notifications]" />
+  </Operation>
 </Operations>

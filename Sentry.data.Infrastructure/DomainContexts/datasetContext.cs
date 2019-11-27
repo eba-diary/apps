@@ -132,11 +132,11 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public IQueryable<AssetNotifications> Notification
+        public IQueryable<Notification> Notification
         {
             get
             {
-                return Query<AssetNotifications>();
+                return Query<Notification>();
             }
         }
 
@@ -330,6 +330,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<Favorite> Favorites
+        {
+            get
+            {
+                return Query<Favorite>();
+            }
+        }
+
         public IQueryable<BusinessAreaTileRow> BusinessAreaTileRows
         {
             get
@@ -338,11 +346,11 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public IQueryable<Favorite> Favorites
+        public IQueryable<BusinessArea> BusinessAreas
         {
             get
             {
-                return Query<Favorite>();
+                return Query<BusinessArea>().Cacheable();
             }
         }
 

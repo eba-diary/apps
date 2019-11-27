@@ -15,7 +15,7 @@
     [JobOptions]       NVARCHAR (MAX) NULL,
 	[IsEnabled] BIT NULL,
 	PRIMARY KEY CLUSTERED ([Archive_Id] ASC),
-	CONSTRAINT [FK_RetrieverJobArchive_RetrieverJob] FOREIGN KEY ([Job_ID]) REFERENCES [RetrieverJob]([Job_Id]),
+	CONSTRAINT [FK_RetrieverJobArchive_RetrieverJob] FOREIGN KEY ([Job_Id]) REFERENCES [RetrieverJob]([Job_ID]),
 	CONSTRAINT [FK_RetrieverJobArchive_DatasetFileConfigs] FOREIGN KEY ([Config_ID]) REFERENCES [dbo].[DatasetFileConfigs] ([Config_ID]),
     CONSTRAINT [FK_RetrieverJobArchive_DataSource] FOREIGN KEY ([DataSource_ID]) REFERENCES [dbo].[DataSource] ([DataSource_Id])
 )

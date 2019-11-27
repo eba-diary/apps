@@ -3,8 +3,8 @@
 		
 		MERGE INTO BusinessAreaTileRow AS Target 
 		USING (VALUES 
-									(1, 2, 1, 1),
-									(2, 3, 1, 2)
+									(1, 3, 1, 1),
+									(2, 2, 1, 2)
 								)
 								AS Source ([BusinessAreaTileRow_ID], [NbrOfColumns_CNT], [BusinessArea_ID], [Order_SEQ]) 
 
