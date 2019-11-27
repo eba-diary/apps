@@ -156,7 +156,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Sentry.Common, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.Common.1.3.10\lib\net35\Sentry.Common.dll</HintPath>
+      <HintPath>..\packages\Sentry.Common.1.6.0-beta-02\lib\net452\Sentry.Common.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.Configuration, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Configuration.2.1.7.2\lib\net40\Sentry.Configuration.dll</HintPath>
@@ -282,6 +282,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Content Include="Content\checkbox.css" />
     <Content Include="Content\creat-edit-datasets.css" />
+    <Compile Include="Controllers\DataFlowController.cs" />
     <Compile Include="Controllers\FavoritesController.cs" />
     <Compile Include="Controllers\WebApi\ApplicationController.cs" />
     <Compile Include="Controllers\WebApi\AssetController.cs" />
@@ -304,6 +305,7 @@
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Extensions\BusinessIntelligenceExtensions.cs" />
     <Compile Include="Extensions\ConfigExtension.cs" />
+    <Compile Include="Extensions\DataFlowExtensions.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
     <Compile Include="Extensions\FavoriteExtensions.cs" />
     <Compile Include="Extensions\ImageExtensions.cs" />
@@ -372,6 +374,9 @@
     <Compile Include="Models\DataAsset\CreateAssetNotificationModel.cs" />
     <Compile Include="Models\DataAsset\EditAssetNotificationModel.cs" />
     <Compile Include="Models\ApiModels\Dataset\DatasetInfoModel.cs" />
+    <Compile Include="Models\DataProcessing\DataFlowDetailModel.cs" />
+    <Compile Include="Models\DataProcessing\DataFlowModel.cs" />
+    <Compile Include="Models\DataProcessing\DataFlowStepModel.cs" />
     <Compile Include="Models\Dataset\BaseDatasetFileModel.cs" />
     <Compile Include="Models\Dataset\ColumnModel.cs" />
     <Compile Include="Models\Dataset\CreateDataFileModel.cs" />
@@ -1292,6 +1297,8 @@
     </Content>
     <Content Include="Views\Shared\DatasetAccessRequest.cshtml" />
     <Content Include="Views\Shared\DataSourceAccessRequest.cshtml" />
+    <Content Include="Views\DataFlow\Index.cshtml" />
+    <Content Include="Views\DataFlow\Detail.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
