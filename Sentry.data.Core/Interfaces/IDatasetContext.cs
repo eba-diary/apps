@@ -56,6 +56,7 @@ namespace Sentry.data.Core
         IQueryable<RawStorageAction> RawStorageAction { get; }
         IQueryable<QueryStorageAction> QueryStorageAction { get; }
         IQueryable<ConvertToParquetAction> ConvertToParquetAction { get; }
+        IQueryable<SchemaMap> SchemaMap { get; }
         /** Datasets **/
 
         Dataset GetById(int id);
