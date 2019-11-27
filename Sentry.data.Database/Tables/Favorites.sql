@@ -5,7 +5,7 @@
     [UserId] CHAR(6) NOT NULL, 
     [Created] DATETIME NOT NULL, 
     [Sequence] INT NOT NULL DEFAULT 0, 
-    CONSTRAINT [FK_Favorites_Dataset] FOREIGN KEY ([DatasetId]) REFERENCES [Dataset]([Dataset_Id])
+    CONSTRAINT [FK_Favorites_Dataset] FOREIGN KEY ([DatasetId]) REFERENCES [Dataset]([Dataset_ID])
 )
 
 GO

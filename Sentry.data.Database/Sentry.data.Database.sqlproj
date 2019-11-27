@@ -120,6 +120,7 @@
     <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_19_2_1" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_19_2_2" />
     <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_19_2_2" />
+    <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_19_3_1" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_19_4_1" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_19_3_1" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_19_3_4" />
@@ -152,7 +153,7 @@
     <Build Include="Tables\DatasetScopeTypes.sql" />
     <Build Include="Tables\DatasetFileConfigs.sql" />
     <Build Include="Tables\AssetSource.sql" />
-    <Build Include="Tables\AssetNotifications.sql" />
+    <Build Include="Tables\Notifications.sql" />
     <Build Include="Tables\Subscriptions\DataAsset_Subscription.sql" />
     <Build Include="Tables\Subscriptions\Dataset_Subscription.sql" />
     <Build Include="Tables\Subscriptions\Event.sql" />
@@ -230,6 +231,11 @@
     <Build Include="Tables\DataProcessing\FlowExecution.sql" />
     <Build Include="Tables\DataProcessing\DataFlowLog.sql" />
     <Build Include="Tables\DataProcessing\DataStepToSchema.sql" />
+    <Build Include="Tables\BusinessArea.sql" />
+    <Build Include="Tables\BusinessAreaTile.sql" />
+    <Build Include="Tables\BusinessAreaTileRow.sql" />
+    <Build Include="Tables\BusinessAreaTileRow_BusinessAreaTile.sql" />
+    <None Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_19_3_1\InsertSecurities.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />
@@ -254,6 +260,11 @@
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_19_04_04\ConvertSchemaDataTypes.sql" />
     <None Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_19_04_05\TruncateDatasetFileParquet.sql" />
     <None Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_19_04_05\TruncateDatasetFileReply.sql" />
+    <None Include="Scripts\Post-Deploy\StaticData\BusinessArea.sql" />
+    <None Include="Scripts\Post-Deploy\StaticData\BusinessAreaTile.sql" />
+    <None Include="Scripts\Post-Deploy\StaticData\BusinessAreaTileRow.sql" />
+    <None Include="Scripts\Post-Deploy\StaticData\BusinessAreaTileRow_BusinessAreaTile.sql" />
+    <None Include="Scripts\Post-Deploy\StaticData\DataAsset.sql" />
     <None Include="Scripts\Post-Deploy\StaticData\DataActionTypes.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_19_04_06\InsertDataActions.sql" />
   </ItemGroup>

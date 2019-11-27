@@ -12,6 +12,8 @@ namespace Sentry.data.Core
         /** IQueryables **/
 
         IQueryable<Dataset> Datasets { get; }
+        IQueryable<DataAsset> DataAsset { get; }
+        IQueryable<Notification> Notification { get; }
         IQueryable<DatasetFileConfig> DatasetFileConfigs { get; }
         IQueryable<SecurityTicket> HpsmTickets { get; }
         IQueryable<Security> Security { get; }
@@ -42,6 +44,8 @@ namespace Sentry.data.Core
         IQueryable<TagGroup> TagGroups { get; }
         IQueryable<ApplicationConfiguration> ApplicationConfigurations { get; }
         IQueryable<Favorite> Favorites { get; }
+        IQueryable<BusinessAreaTileRow> BusinessAreaTileRows { get; }
+        IQueryable<BusinessArea> BusinessAreas { get; }
         IQueryable<OAuthClaim> OAuthClaims { get; }
         IQueryable<RetrieverJob> RetrieverJob { get; }
         IQueryable<DatasetFileParquet> DatasetFileParquet { get; }

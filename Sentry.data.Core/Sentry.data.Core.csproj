@@ -81,6 +81,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DomainServices\BusinessAreaService.cs" />
     <Compile Include="DomainServices\ConfigService.cs" />
     <Compile Include="DomainServices\DataProcessing\DataFlowService.cs" />
     <Compile Include="DomainServices\DataProcessing\DataStepService.cs" />
@@ -90,12 +91,9 @@
     <Compile Include="DomainServices\MessageHandlers\S3EventHandler.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
     <Compile Include="DTO\Config\DatasetFileConfigDto.cs" />
-    <Compile Include="DTO\ContactInfoDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDetailDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowStepDto.cs" />
-    <Compile Include="DTO\Favorites\FavoriteDto.cs" />
-    <Compile Include="DTO\ImagesDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
     <Compile Include="DTO\Schema\BaseFieldDto.cs" />
     <Compile Include="DTO\Schema\DataElementDTO.cs" />
@@ -177,10 +175,21 @@
     <Compile Include="Entities\MessageFormats\HszDropLocationCreateModel.cs" />
     <Compile Include="Extensions\RetrieverJobExtensions.cs" />
     <Compile Include="Interfaces\ITagService.cs" />
+    <Compile Include="DTO\ContactInfoDto.cs" />
+    <Compile Include="DTO\Favorites\FavoriteDto.cs" />
+    <Compile Include="DTO\ImagesDto.cs" />
+    <Compile Include="DomainServices\NotificationService.cs" />
     <Compile Include="DomainServices\SecurityService.cs" />
+    <Compile Include="DTO\BusinessArea\BusinessAreaTileDto.cs" />
+    <Compile Include="DTO\BusinessArea\BusinessAreaTileRowDto.cs" />
     <Compile Include="DomainServices\TagService.cs" />
     <Compile Include="DTO\BusinessIntelligence\BusinessIntelligenceDetailDTO.cs" />
     <Compile Include="DTO\Dataset\DatasetDetailDTO.cs" />
+    <Compile Include="Entities\BusinessArea\BusinessArea.cs" />
+    <Compile Include="Entities\BusinessArea\BusinessAreaTile.cs" />
+    <Compile Include="Entities\BusinessArea\BusinessAreaTileRow.cs" />
+    <Compile Include="Entities\BusinessArea\BusinessAreaType.cs" />
+    <Compile Include="DTO\Notification\ModifyNotificationModel.cs" />
     <Compile Include="DTO\Schema\SchemaDetailApiDTO.cs" />
     <Compile Include="DTO\TagDto.cs" />
     <Compile Include="Entities\ColumnDTO.cs" />
@@ -198,15 +207,19 @@
     <Compile Include="Entities\Security\Security.cs" />
     <Compile Include="Entities\Security\UserSecurity.cs" />
     <Compile Include="Extensions\CommonExtensions.cs" />
+    <Compile Include="Extensions\DataAssetQueryExtensions.cs" />
     <Compile Include="Extensions\DatasetQueryExtensions.cs" />
     <Compile Include="Extensions\DataElementExtensions.cs" />
+    <Compile Include="Extensions\NotificationExtensions.cs" />
     <Compile Include="GlobalEnums\DataClassificationType.cs" />
     <Compile Include="Interfaces\IHpsmProvider.cs" />
     <Compile Include="GlobalEnums\DatasetSortByOption.cs" />
     <Compile Include="Interfaces\IAssociateInfoProvider.cs" />
+    <Compile Include="Interfaces\IBusinessAreaService.cs" />
     <Compile Include="Interfaces\IConfigService.cs" />
     <Compile Include="Interfaces\IDatasetService.cs" />
     <Compile Include="Interfaces\IEventService.cs" />
+    <Compile Include="Interfaces\INotificationService.cs" />
     <Compile Include="Interfaces\IObsidianService.cs" />
     <Compile Include="Interfaces\ISecurable.cs" />
     <Compile Include="Interfaces\ISecurityService.cs" />
@@ -280,7 +293,7 @@
     <Compile Include="Entities\Subscriptions\DataAssetSubscription.cs" />
     <Compile Include="Entities\Subscriptions\DatasetSubscription.cs" />
     <Compile Include="Entities\Subscriptions\Event.cs" />
-    <Compile Include="Entities\DataAssets\AssetNotifications.cs" />
+    <Compile Include="Entities\Notification.cs" />
     <Compile Include="Entities\DataAssets\AssetSource.cs" />
     <Compile Include="Entities\Goldeneye\BundleRequest.cs" />
     <Compile Include="Entities\Goldeneye\BundleResponse.cs" />
@@ -301,7 +314,7 @@
     <Compile Include="Entities\Datasets\DatasetScopeTypes.cs" />
     <Compile Include="Entities\User\DomainUser.cs" />
     <Compile Include="Entities\Datasets\FileType.cs" />
-    <Compile Include="Entities\DataAssets\NotificationSeverity.cs" />
+    <Compile Include="GlobalEnums\NotificationSeverity.cs" />
     <Compile Include="Entities\Subscriptions\EventType.cs" />
     <Compile Include="Entities\Subscriptions\Interval.cs" />
     <Compile Include="Entities\Subscriptions\Status.cs" />

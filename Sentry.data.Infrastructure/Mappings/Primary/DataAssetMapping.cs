@@ -1,11 +1,6 @@
 ﻿using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
 using Sentry.data.Core;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Sentry.data.Infrastructure.Mappings.Primary
 {
@@ -15,7 +10,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
         {
             this.Table("DataAsset");
 
-            this.Cache(c => c.Usage(CacheUsage.ReadOnly));
+            this.Cache(c => c.Usage(CacheUsage.ReadWrite));
 
             this.Id(x => x.Id, m =>
             {
@@ -69,7 +64,21 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                     k.Column("DataAsset_ID");
                     k.ForeignKey("FK_AssetNotifications_DataAsset");
                 });
-            }, map => map.OneToMany(a => a.Class(typeof(AssetNotifications))));
+            }, map => map.OneToMany(a => a.Class(typeof(Notification))));
+
+
+            //ISecurable Mapping
+            this.Property((x) => x.IsSecured, (m) => m.Column("IsSecured_IND"));
+            this.Property((x) => x.PrimaryOwnerId, (m) => m.Column("PrimaryOwner_ID"));
+            this.Property((x) => x.PrimaryContactId, (m) => m.Column("PrimaryContact_ID"));
+            this.ManyToOne(x => x.Security, m =>
+            {
+                m.Column("Security_ID");
+                m.ForeignKey("FK_DataAsset_Security");
+                m.Class(typeof(Security));
+                m.Cascade(Cascade.All);
+            });
+
         }
     }
 }

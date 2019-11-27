@@ -121,6 +121,22 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<DataAsset> DataAsset
+        {
+            get
+            {
+                return Query<DataAsset>();
+            }
+        }
+
+        public IQueryable<Notification> Notification
+        {
+            get
+            {
+                return Query<Notification>();
+            }
+        }
+
         public IQueryable<DatasetFileConfig> DatasetFileConfigs
         {
             get
@@ -319,6 +335,22 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<BusinessAreaTileRow> BusinessAreaTileRows
+        {
+            get
+            {
+                return Query<BusinessAreaTileRow>().Cacheable();
+            }
+        }
+
+        public IQueryable<BusinessArea> BusinessAreas
+        {
+            get
+            {
+                return Query<BusinessArea>().Cacheable();
+            }
+        }
+
         public IQueryable<OAuthClaim> OAuthClaims
         {
             get
@@ -425,10 +457,8 @@ namespace Sentry.data.Infrastructure
             return Query<Category>().Where(w => w.Id == id).FirstOrDefault();
         }
 
-
         public int GetDatasetCount()
         {
-
             return Query<Dataset>().Count(x => x.CanDisplay && x.DatasetType == GlobalConstants.DataEntityCodes.DATASET);
         }
 
@@ -487,7 +517,6 @@ namespace Sentry.data.Infrastructure
                     x => x.DatasetFileConfig.ConfigId == configId &&
                     x.ParentDatasetFileId == null
                 ).Where(where)
-
                 .AsEnumerable();
 
             return list;
@@ -533,8 +562,6 @@ namespace Sentry.data.Infrastructure
         {
             return Query<DatasetFileConfig>().Where(w => w.ConfigId == configId).FirstOrDefault();
         }
-
-
 
         public Interval GetInterval(string description)
         {
