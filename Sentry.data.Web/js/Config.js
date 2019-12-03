@@ -107,6 +107,37 @@ data.Config = {
             });
         });
 
+        $('body').on('click', "#btnSyncSchema", function () {
+            var syncBtn = $(this);
+            var datasetId = syncBtn.attr("data-datasetId");
+            var schemaId = syncBtn.attr("data-schemaId");
+
+            var request = $.ajax({
+                url: "/api/v2/metadata/dataset/0/schema/" + schemaId + "/syncconsumptionlayer",
+                method: "POST",
+                dataType: 'json',
+                success: function (obj) {
+                    Sentry.ShowModalAlert(
+                        obj, function () { })
+                },
+                failure: function (obj) {
+                    Sentry.ShowModalAlert(
+                        "Failed to submit request", function () { })
+                },
+                error: function (obj) {
+                    var msg;
+                    if(obj.status === 400) {
+                        msg = obj.responseJSON.Message;
+                    }
+                    else {
+                        msg = "Failed to submit request";
+                    };
+                    Sentry.ShowModalAlert(
+                        msg, function () { })
+                }
+            });
+        });
+
         //Disable delete functionality if only 1 Schema exists
         if ($('.configHeader').length === 1) {
             $('#btnDeleteConfig').removeClass("btn-danger");
