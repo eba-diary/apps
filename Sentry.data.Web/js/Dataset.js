@@ -416,30 +416,33 @@ data.Dataset = {
             var syncBtn = $(this);
             var datasetId = syncBtn.attr("data-id");
 
-            var request = $.ajax({
-                url: "/api/v2/metadata/dataset/" + datasetId + "/schema/0/syncconsumptionlayer",
-                method: "POST",
-                dataType: 'json',
-                success: function (obj) {
-                    Sentry.ShowModalAlert(
-                        obj, function () { })
-                },
-                failure: function (obj) {
-                    Sentry.ShowModalAlert(
-                        "Failed to submit request", function () { })
-                },
-                error: function (obj) {
-                    var msg;
-                    if (obj.status === 400) {
-                        msg = obj.responseJSON.Message;
+            var warningMsg = `<p><b><h3><font color=\"red\">WARNING</font color></h3></b></p><p>Performing this action will re-generate all hive consumption layer tables\\views from current schema.</p>
+            <p>In addition, this will generate notification to SAS Administration to refresh associated metadata.  Depending on schema change, this
+            may break SAS processes referencing these libraries.</p>`;
+
+            Sentry.ShowModalConfirmation(warningMsg, function () {
+                var request = $.ajax({
+                    url: "/api/v2/metadata/dataset/" + datasetId + "/schema/0/syncconsumptionlayer",
+                    method: "POST",
+                    dataType: 'json',
+                    success: function (obj) {
+                        Sentry.ShowModalAlert(obj, function () { });
+                    },
+                    failure: function (obj) {
+                        Sentry.ShowModalAlert("Failed to submit request", function () { });
+                    },
+                    error: function (obj) {
+                        var msg;
+                        if (obj.status === 400) {
+                            msg = obj.responseJSON.Message;
+                        }
+                        else {
+                            msg = "Failed to submit request";
+                        };
+                        Sentry.ShowModalAlert(msg, function () { });
                     }
-                    else {
-                        msg = "Failed to submit request";
-                    };
-                    Sentry.ShowModalAlert(
-                        msg, function () { })
-                }
-            });
+                });
+            });            
         });
     },
 
