@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -149,7 +150,7 @@ namespace Sentry.data.Core
         public FileSchemaDto GetFileSchemaDto(int id)
         {
             FileSchema scm = _datasetContext.FileSchema.Where(w => w.SchemaId == id).FirstOrDefault();
-            return scm.MapToDto();
+            return MapToDto(scm);
         }
 
         public SchemaRevisionDto GetSchemaRevisionDto(int id)
@@ -195,6 +196,91 @@ namespace Sentry.data.Core
             return file;
         }
 
+        public FileSchema GetFileSchemaByStorageCode(string storageCode)
+        {
+            FileSchema schema = _datasetContext.FileSchema.Where(w => w.StorageCode == storageCode).FirstOrDefault();
+            return schema;
+        }
+
+        public bool RegisterRawFile(FileSchema schema, string objectKey, string versionId, DataFlowStepEvent stepEvent)
+        {
+            if (objectKey == null)
+            {
+                Logger.Debug($"schemaservice-registerrawfile no-objectkey-input");
+                return false;
+            }
+
+            if (schema == null)
+            {
+                Logger.Debug($"schemaservice-registerrawfile no-schema-input");
+                return false;
+            }
+
+            if (stepEvent == null)
+            {
+                Logger.Debug($"schemaservice-registerrawfile no-stepevent-input");
+            }
+
+            try
+            {
+                DatasetFile file = new DatasetFile();
+
+                MapToDatasetFile(stepEvent, objectKey, versionId, file);
+                _datasetContext.Add(file);
+
+                //if this is a reprocess scenario, set previous dataset files ParentDatasetFileID to this datasetfile
+                //  this will ensure only the latest file version shows within UI
+                if (stepEvent.RunInstanceGuid != null || stepEvent.RunInstanceGuid != string.Empty)
+                {
+                    List<DatasetFile> previousFileList = new List<DatasetFile>();
+                    previousFileList = _datasetContext.DatasetFile.Where(w => w.Schema.SchemaId == stepEvent.SchemaId && w.FileName == file.FileName && w.ParentDatasetFileId == null && w.DatasetFileId != file.DatasetFileId).ToList();
+
+                    if (previousFileList.Any())
+                    {
+                        Logger.Debug($"schemaservice-registerrawfile setting-parentdatasetfileid detected {previousFileList.Count} file(s) to be updated");
+                    }
+
+                    foreach (DatasetFile item in previousFileList)
+                    {
+                        item.ParentDatasetFileId = file.DatasetFileId;
+                    }
+                }
+                                
+                _datasetContext.SaveChanges();
+            }
+            catch(Exception ex)
+            {
+                Logger.Error($"schemaservice-registerrawfile-failed", ex);
+
+                return false;
+            }           
+
+            return true;
+        }
+
+        private void MapToDatasetFile(DataFlowStepEvent stepEvent, string fileKey, string fileVersionId, DatasetFile file)
+        {
+            file.DatasetFileId = 0;
+            file.FileName = Path.GetFileName(fileKey);
+            file.Dataset = _datasetContext.GetById<Dataset>(stepEvent.DatasetID);
+            file.UploadUserName = "";
+            file.DatasetFileConfig = null;
+            file.FileLocation = stepEvent.TargetPrefix + Path.GetFileName(stepEvent.SourceKey).Trim();
+            file.CreateDTM = DateTime.Now;
+            file.ModifiedDTM = DateTime.Now;
+            file.ParentDatasetFileId = null;
+            file.VersionId = fileVersionId;
+            file.IsBundled = false;
+            file.Size = long.Parse(stepEvent.FileSize);
+            file.Schema = _datasetContext.GetById<FileSchema>(stepEvent.SchemaId);
+            file.SchemaRevision = file.Schema.Revisions.OrderByDescending(o => o.Revision_NBR).Take(1).SingleOrDefault();
+            file.DatasetFileConfig = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == stepEvent.SchemaId).FirstOrDefault();
+            file.FlowExecutionGuid = stepEvent.FlowExecutionGuid;
+            file.RunInstanceGuid = (stepEvent.RunInstanceGuid) ?? null;
+        }
+
+        
+
         private int CreateSchema(FileSchemaDto dto)
         {
             string storageCode = _datasetContext.GetNextStorageCDE().ToString();
@@ -221,6 +307,35 @@ namespace Sentry.data.Core
             };
             _datasetContext.Add(schema);
             return schema.SchemaId;
+        }
+
+        private FileSchemaDto MapToDto(FileSchema scm)
+        {
+            return new FileSchemaDto()
+            {
+                Name = scm.Name,
+                CreateCurrentView = scm.CreateCurrentView,
+                Delimiter = scm.Delimiter,
+                FileExtensionId = scm.Extension.Id,
+                HasHeader = scm.HasHeader,
+                IsInSAS = scm.IsInSAS,
+                SasLibrary = scm.SasLibrary,
+                SchemaEntity_NME = scm.SchemaEntity_NME,
+                SchemaId = scm.SchemaId,
+                Description = scm.Description,
+                DeleteInd = scm.DeleteInd,
+                DeleteIssuer = scm.DeleteIssuer,
+                DeleteIssueDTM = scm.DeleteIssueDTM,
+                HiveTable = scm.HiveTable,
+                HiveDatabase = scm.HiveDatabase,
+                HiveLocation = scm.HiveLocation,
+                HiveStatus = scm.HiveTableStatus,
+                StorageCode = scm.StorageCode,
+                StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
+                RawQueryStorage = (Configuration.Config.GetHostSetting("EnableRawQueryStorageInQueryTool").ToLower() == "true" && _datasetContext.SchemaMap.Any(w => w.MappedSchema.SchemaId == scm.SchemaId)) ? GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX + Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\" : Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
+                FileExtenstionName = scm.Extension.Name
+            };
+
         }
 
         public bool SasUpdateNotification(int schemaId, int revisionId)

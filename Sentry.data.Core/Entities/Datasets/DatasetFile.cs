@@ -36,6 +36,10 @@ namespace Sentry.data.Core
         public virtual string Information { get; set; }
 
         public virtual long Size { get; set; }
+
+        public virtual string FlowExecutionGuid { get; set; }
+
+        public virtual string RunInstanceGuid { get; set; }
     }
 
 }

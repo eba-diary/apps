@@ -1,17 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Collections.Generic;
-using NHibernate;
+﻿using NHibernate;
 using NHibernate.Linq;
-using Sentry.NHibernate;
 using Sentry.data.Core;
-using System.Threading.Tasks;
-using System.Reflection;
-using System.Collections;
-using System.Web;
-using System.Linq.Expressions;
 using Sentry.data.Core.Entities;
+using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.NHibernate;
+using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
+using System.Linq.Expressions;
 
 namespace Sentry.data.Infrastructure
 {
@@ -121,6 +118,22 @@ namespace Sentry.data.Infrastructure
             get
             {
                 return Query<Dataset>();
+            }
+        }
+
+        public IQueryable<DataAsset> DataAsset
+        {
+            get
+            {
+                return Query<DataAsset>();
+            }
+        }
+
+        public IQueryable<Notification> Notification
+        {
+            get
+            {
+                return Query<Notification>();
             }
         }
 
@@ -322,6 +335,22 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<BusinessAreaTileRow> BusinessAreaTileRows
+        {
+            get
+            {
+                return Query<BusinessAreaTileRow>().Cacheable();
+            }
+        }
+
+        public IQueryable<BusinessArea> BusinessAreas
+        {
+            get
+            {
+                return Query<BusinessArea>().Cacheable();
+            }
+        }
+
         public IQueryable<OAuthClaim> OAuthClaims
         {
             get
@@ -354,6 +383,70 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<DataFlow> DataFlow
+        {
+            get
+            {
+                return Query<DataFlow>();
+            }
+        }
+
+        public IQueryable<DataFlowStep> DataFlowStep
+        {
+            get
+            {
+                return Query<DataFlowStep>();
+            }
+        }
+
+        public IQueryable<S3DropAction> S3DropAction
+        {
+            get
+            {
+                return Query<S3DropAction>();
+            }
+        }
+
+        public IQueryable<SchemaLoadAction> SchemaLoadAction
+        {
+            get
+            {
+                return Query<SchemaLoadAction>();
+            }
+        }
+
+        public IQueryable<RawStorageAction> RawStorageAction
+        {
+            get
+            {
+                return Query<RawStorageAction>();
+            }
+        }
+
+        public IQueryable<QueryStorageAction> QueryStorageAction
+        {
+            get
+            {
+                return Query<QueryStorageAction>();
+            }
+        }
+
+        public IQueryable<ConvertToParquetAction> ConvertToParquetAction
+        {
+            get
+            {
+                return Query<ConvertToParquetAction>();
+            }
+        }
+
+        public IQueryable<SchemaMap> SchemaMap
+        {
+            get
+            {
+                return Query<SchemaMap>();
+            }
+        }
+
         public IEnumerable<Dataset> GetDatasetByCategoryID(int id)
         {
             return Query<Dataset>().Where(w => w.DatasetCategories.Any(y=> y.Id == id)).Where(x => x.CanDisplay).AsEnumerable();
@@ -364,10 +457,8 @@ namespace Sentry.data.Infrastructure
             return Query<Category>().Where(w => w.Id == id).FirstOrDefault();
         }
 
-
         public int GetDatasetCount()
         {
-
             return Query<Dataset>().Count(x => x.CanDisplay && x.DatasetType == GlobalConstants.DataEntityCodes.DATASET);
         }
 
@@ -426,7 +517,6 @@ namespace Sentry.data.Infrastructure
                     x => x.DatasetFileConfig.ConfigId == configId &&
                     x.ParentDatasetFileId == null
                 ).Where(where)
-
                 .AsEnumerable();
 
             return list;
@@ -472,8 +562,6 @@ namespace Sentry.data.Infrastructure
         {
             return Query<DatasetFileConfig>().Where(w => w.ConfigId == configId).FirstOrDefault();
         }
-
-
 
         public Interval GetInterval(string description)
         {

@@ -23,8 +23,6 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property((x) => x.DatasetName, (m) => m.Column("Dataset_NME"));
             this.Property((x) => x.DatasetDesc, (m) => m.Column("Dataset_DSC"));
             this.Property((x) => x.CreationUserName, (m) => m.Column("FileCreator_NME"));
-            this.Property((x) => x.PrimaryOwnerId, (m) => m.Column("PrimaryOwner_ID"));
-            this.Property((x) => x.PrimaryContactId, (m) => m.Column("PrimaryContact_ID"));
             this.Property((x) => x.UploadUserName, (m) => m.Column("UploadedBy_NME"));
             this.Property((x) => x.OriginationCode, (m) => m.Column("Origination_CDE"));
             this.Property((x) => x.DatasetDtm, (m) => m.Column("Dataset_DTM"));
@@ -175,6 +173,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             //ISecurable Mapping
             this.Property((x) => x.IsSecured, (m) => m.Column("IsSecured_IND"));
+            this.Property((x) => x.PrimaryOwnerId, (m) => m.Column("PrimaryOwner_ID"));
+            this.Property((x) => x.PrimaryContactId, (m) => m.Column("PrimaryContact_ID"));
             this.ManyToOne(x => x.Security, m =>
             {
                 m.Column("Security_ID");
