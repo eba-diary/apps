@@ -16,6 +16,8 @@
                 <div class="critical-notification-body">@Html.Raw(notification.Message)</div>
             </div>
         </div>
+
+
     }
 }
 
@@ -48,4 +50,16 @@
             <span class="sr-only">Next</span>
         </a>
     </div>
+
+
+}
+
+@section Scripts {
+    <script type="text/javascript">
+
+        $(function () {
+            data.BusinessArea.PersonalLinesInit();
+        });
+
+    </script>
 }

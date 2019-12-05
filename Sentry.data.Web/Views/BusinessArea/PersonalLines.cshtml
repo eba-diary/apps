@@ -5,37 +5,55 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<div id="pl-landing-pg-wrapper">
+    <div id="pl-landing-pg-wrapper">
 
-    <div class="row">
-        <div class="col-sm-11 col-md-11 col-lg-11"><img id="dairyland-logo" alt="Dairyland Logo" src="~/Images/dairyland_logo.png" width="220" /></div>
-        <div class="col-sm-1 col-md-1 col-lg-1"><img alt="System Notification" src="~/Images/Icons/pl_notification_alert_icon.png" /></div>
-    </div>
+        <div class="row">
+            <div class="col-sm-11 col-md-11 col-lg-11"><img id="dairyland-logo" alt="Dairyland Logo" src="~/Images/dairyland_logo.png" width="220" /></div>
+            <div class="col-sm-1 col-md-1 col-lg-1"><img alt="System Notification" src="~/Images/Icons/pl_notification_alert_icon.png" /></div>
 
-    @if (Model.HasActiveNotification)
-    {
-        <div class="row system-notification-container">
-            <div class="col-sm-12 col-md-12 col-lg-12">
-                <div id="pl-system-notification-wrapper">
-                    @Html.Partial("_SystemNotifications", Model.Notifications)
+        </div>
+
+        @* in order to get toastr to live inside another DIV you have to name the DIV an id=toast-container. It is important to keep the relative position*@
+        @*<div id="toast-container" style="position:relative">
+        </div>*@
+
+        @if (Model.HasActiveNotification)
+        {
+            <div class="row system-notification-container">
+                <div class="col-sm-12 col-md-12 col-lg-12">
+                    <div id="pl-system-notification-wrapper">
+                        @Html.Partial("_SystemNotifications", Model.Notifications)
+                    </div>
                 </div>
             </div>
-        </div>
-    }
 
-    <div class="row">
-        <div class="col-sm-12 col-md-9 col-lg-9">
 
-            @* loop through each row in the model *@
-            @foreach (BusinessAreaTileRowModel row in Model.Rows)
-            {
-                @Html.Partial("_LandingPageTile", row)
-            }
+        }
 
+        <div class="row">
+            <div sho class="col-sm-12 col-md-9 col-lg-9">
+
+                @* loop through each row in the model *@
+                @foreach (BusinessAreaTileRowModel row in Model.Rows)
+                {
+                    @Html.Partial("_LandingPageTile", row)
+                }
+
+            </div>
+            <div class="col-sm-12 col-md-3 col-lg-3">
+                @Html.Partial("_WhatsNew")
+            </div>
         </div>
-        <div class="col-sm-12 col-md-3 col-lg-3">
-            @Html.Partial("_WhatsNew")
-        </div>
+
     </div>
 
-</div>
+
+@section Scripts {
+    <script type="text/javascript">
+
+        $(function () {
+            data.BusinessArea.PersonalLinesInit();
+        });
+
+    </script>
+}
