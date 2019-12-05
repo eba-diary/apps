@@ -107,7 +107,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Sentry.Common, Version=1.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Sentry.Common.1.3.10\lib\net35\Sentry.Common.dll</HintPath>
+      <HintPath>..\packages\Sentry.Common.1.6.0-beta-02\lib\net452\Sentry.Common.dll</HintPath>
     </Reference>
     <Reference Include="Sentry.Configuration, Version=2.0.5.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sentry.Configuration.2.1.7.2\lib\net40\Sentry.Configuration.dll</HintPath>
@@ -165,10 +165,12 @@
     <Compile Include="DomainContexts\datasetContext.cs" />
     <Compile Include="DomainContexts\dataAssetContext.cs" />
     <Compile Include="DomainContexts\RequestContext.cs" />
+    <Compile Include="Extensions\DataFlowStepExtensions.cs" />
     <Compile Include="Extensions\RestSharpExtensions.cs" />
     <Compile Include="Extensions\RetrieverJobExtensions.cs" />
     <Compile Include="HangfireFilters\DisableMultipleQueuedItemsFilter.cs" />
     <Compile Include="Helpers\TopicHelper.cs" />
+    <Compile Include="Interfaces\IDataFlowStepProvider.cs" />
     <Compile Include="Mappings\Metadata\DataElementDetailMapping.cs" />
     <Compile Include="Mappings\Metadata\DataElementMapping.cs" />
     <Compile Include="Mappings\Metadata\DataLineageMapping.cs" />
@@ -181,9 +183,22 @@
     <Compile Include="Mappings\Metadata\MetadataAssetMapping.cs" />
     <Compile Include="Mappings\Metadata\MetadataTagMapping.cs" />
     <Compile Include="Mappings\Metadata\TagGroupMapping.cs" />
-    <Compile Include="Mappings\Primary\AssetNotificationMapping.cs" />
+    <Compile Include="Mappings\Primary\NotificationMapping.cs" />
     <Compile Include="Mappings\Primary\AssetSourceMapping.cs" />
+    <Compile Include="Mappings\Primary\BusinessAreaMapping.cs" />
+    <Compile Include="Mappings\Primary\BusinessAreaTileRowMapping.cs" />
     <Compile Include="Mappings\Primary\BusinessUnitMapping.cs" />
+    <Compile Include="Mappings\Primary\BusinessAreaTileMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\BaseActionMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\ConvertToParquetMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\QueryStorageActionMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\RawStorageActionMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\S3DropActionMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\SchemaLoadActionMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\DataFlowLogMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\DataFlowMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\DataFlowStepMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\SchemaMapMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetFileConfigsMapping.cs" />
     <Compile Include="Mappings\Primary\DatasetFileMapping.cs" />
     <Compile Include="Mappings\Primary\ComponentElementMapping.cs" />
@@ -238,6 +253,15 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\ConvertToParquetProvider.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\DataFlowProvider.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\DataStepService.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\QueryStorageProvider.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\RawStorageProvider.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\S3DropProvider.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\SchemaLoadProvider.cs" />
+    <Compile Include="ServiceImplementations\Messaging\DataStepProcessorService.cs" />
+    <Compile Include="ServiceImplementations\Messaging\S3EventService.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\BaseTicketProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\CherwellProvider.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\CherwellService.cs" />
@@ -711,9 +735,7 @@
   <ItemGroup>
     <WebReferences Include="Web References\" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\Sentry.data.Core\Sentry.data.Core.csproj">
       <Project>{ea9ee762-ce32-4410-b2b6-367a0985645b}</Project>

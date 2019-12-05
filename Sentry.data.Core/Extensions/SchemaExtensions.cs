@@ -8,32 +8,6 @@ namespace Sentry.data.Core
 {
     public static class SchemaExtensions
     {
-        public static FileSchemaDto MapToDto(this FileSchema scm)
-        {
-            return new FileSchemaDto()
-            {
-                Name = scm.Name,
-                CreateCurrentView = scm.CreateCurrentView,
-                Delimiter = scm.Delimiter,
-                FileExtensionId = scm.Extension.Id,
-                HasHeader = scm.HasHeader,
-                IsInSAS = scm.IsInSAS,
-                SasLibrary = scm.SasLibrary,
-                SchemaEntity_NME = scm.SchemaEntity_NME,
-                SchemaId = scm.SchemaId,
-                Description = scm.Description,
-                DeleteInd = scm.DeleteInd,
-                DeleteIssuer = scm.DeleteIssuer,
-                DeleteIssueDTM = scm.DeleteIssueDTM,
-                HiveTable = scm.HiveTable,
-                HiveDatabase = scm.HiveDatabase,
-                HiveLocation = scm.HiveLocation,
-                HiveStatus = scm.HiveTableStatus,
-                StorageCode = scm.StorageCode,
-                StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
-                FileExtenstionName = scm.Extension.Name,
-            };
-        }
 
         public static SchemaRevisionDto ToDto(this SchemaRevision revision)
         {

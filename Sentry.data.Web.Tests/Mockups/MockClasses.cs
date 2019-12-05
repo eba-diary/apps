@@ -1,4 +1,5 @@
 ﻿using Sentry.data.Core;
+using Sentry.data.Core.GlobalEnums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -297,7 +298,7 @@ namespace Sentry.data.Web.Tests
             da.DisplayName = "Mock Asset";
             da.Description = "This is a description";
 
-            List<AssetNotifications> anList = new List<AssetNotifications>();
+            List<Notification> anList = new List<Notification>();
             anList.Add(GetMockAssetNotifications(da));
 
             da.AssetNotifications = anList;
@@ -305,15 +306,17 @@ namespace Sentry.data.Web.Tests
             return da;
         }
 
-        public static AssetNotifications GetMockAssetNotifications(DataAsset da, IApplicationUser user = null)
+        public static Notification GetMockAssetNotifications(DataAsset da, IApplicationUser user = null)
         {
-            AssetNotifications an = new AssetNotifications();
+            Notification an = new Notification();
             an.NotificationId = 1;
-            an.ParentDataAsset = da;
-            an.MessageSeverity = 1;
+            an.ParentObject = da.Id;
+            an.MessageSeverity = NotificationSeverity.Danger;
             an.Message = "Alert Message";
             an.StartTime = DateTime.Now.AddHours(-1).AddMinutes(1);
             an.ExpirationTime = DateTime.Now.AddDays(1);
+            an.NotificationType = GlobalConstants.Notifications.DATAASSET_TYPE;
+            an.Title = "Alert Title";
 
             if(user != null)
             {

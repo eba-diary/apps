@@ -632,7 +632,8 @@ namespace Sentry.data.Web.Controllers
                     QueryableConfig qd = new QueryableConfig();
                     qd.configName = schemaDto.Name;
                     qd.bucket = Config.GetHostSetting("AWSRootBucket");
-                    qd.s3Key = schemaDto.StorageLocation;
+
+                    qd.s3Key = schemaDto.RawQueryStorage;
 
                     List<DatasetFile> dfList = _schemaService.GetDatasetFilesBySchema(schemaDto.SchemaId).ToList();
 

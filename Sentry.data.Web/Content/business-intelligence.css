@@ -1,0 +1,101 @@
+﻿#bi-page-wrapper {
+    margin-bottom: 150px;
+}
+
+#bi-welcome-text {
+    margin: 30px 0px 50px 0px;
+}
+
+#bi-search-wrapper {
+    margin-bottom: 40px;
+}
+
+#bi-search-input-wrapper {
+    width: 50%;
+    margin: 5px 0px;
+}
+
+.bi-search-icon {
+    width: 50px;
+    height: 50px;
+}
+
+.bi-search-textbox {
+    height: 50px;
+}
+
+#bi-tile-wrapper .col-md-3 {
+    padding: 0;
+}
+
+#bi-tile-wrapper .row.text-center > div {
+    display: inline-block;
+    float: none;
+}
+
+#bi-tile-wrapper .tile {
+    background: #fff;
+    margin: 30px;
+    opacity: 0.80;
+}
+    #bi-tile-wrapper .tile:hover {
+        opacity: 0.95;
+        background: lightgray;
+    }
+    #bi-tile-wrapper .tile a {
+        height: 100%;
+        width: 100%;
+        display: block;
+        text-decoration: none !important;
+    }
+
+#bi-tile-wrapper .commercial_linesTile:hover {
+    background-color: #fafcfe;
+}
+#bi-tile-wrapper .personal_linesTile:hover {
+    background-color: #fef9f3;
+}
+#bi-tile-wrapper .claimsTile:hover {
+    background-color: #fefcf3;
+}
+#bi-tile-wrapper .corporateTile:hover {
+    background-color: #fafcf3;
+}
+#bi-tile-wrapper ._401kTile:hover {
+    background-color: #f3fbfd;
+}
+#bi-tile-wrapper .itTile:hover {
+    background-color: #fcfafc;
+}
+
+.bi-tile-image {
+    width: 100px;
+    padding: 10px;
+    filter: invert(100%);
+    height: 115px;
+}
+
+.bi-tile-header {
+    font-size: 1.5em;
+    color: #000;
+}
+
+.bi-tile-description {
+    font-size: .8em;
+    max-height: 4.5em;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 15px;
+    color: rgb(0, 0, 0);
+    max-height: 4.5em;
+    -webkit-line-clamp: 3;
+}
+
+.bi-upload-row {
+    background-color: rgba(255,255,255,0.2);
+    padding: 10px;
+}
+
+.bi-operation-button {
+    font-size: 20px;
+}

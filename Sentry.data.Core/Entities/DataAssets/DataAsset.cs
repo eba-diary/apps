@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Sentry.data.Core
 {
-    public class DataAsset
+    public class DataAsset : ISecurable
     {
         private List<DataAssetHealth> _assetHealth;
 
@@ -13,11 +13,9 @@ namespace Sentry.data.Core
             Components = new List<ConsumptionLayerComponent>();
         }
 
-        public virtual List<DataElement> DataElements { get; set; }
 
         //ID From the Sentry Datasets Database
         public virtual int Id { get; set; }
-
         public virtual string Name { get; set; }
         public virtual string DisplayName { get; set; }
         public virtual DateTime LastUpdated { get; set; }
@@ -30,7 +28,16 @@ namespace Sentry.data.Core
         public virtual string Description { get; set; }
         public virtual string MetadataRepAssetName { get; set; }
         public virtual IList<AssetSource> AssetSource{ get; set;}
-        public virtual IList<AssetNotifications> AssetNotifications { get; set; }
+        public virtual IList<Notification> AssetNotifications { get; set; }
+
+        //ISecurable
+        public virtual bool IsSecured { get; set; }
+        public virtual string PrimaryOwnerId { get; set; }
+        public virtual string PrimaryContactId { get; set; }
+        public virtual Security Security { get; set; }
+
+
+
 
         public virtual List<DataAssetHealth> AssetHealth
         {
@@ -39,47 +46,32 @@ namespace Sentry.data.Core
                 if (_assetHealth == null)
                 {
                     _assetHealth = MetadataRepositoryService.GetByAssetName(MetadataRepAssetName, AssetSource.Where(w => w.IsVisiable).ToList()).OrderBy(o => o.SourceSystem).ToList();
-                    return _assetHealth;
                 }
-                else
-                {
-                    return _assetHealth;
-                }
-                
+                return _assetHealth;
             }
         }
-        public virtual Boolean HealthIncludesSourceSystems {
+        public virtual Boolean HealthIncludesSourceSystems
+        {
             get
-            {                
+            {
                 if (this.AssetHealth.Count > 1 || (this.AssetHealth.Count == 1 && this.AssetHealth.FirstOrDefault().SourceSystem != ""))
                 {
                     return true;
                 }
-                else
-                {
-                    return false;
-                }         
+                return false;
             }
         }
-        public virtual DateTime MaxProcessTime {
+        public virtual DateTime MaxProcessTime
+        {
             get
             {
                 if (this.AssetHealth.Count > 0)
                 {
-                    if (this.AssetHealth.Count == 1)
-                    {
-                        return this.AssetHealth[0].AssetUpdtDTM;
-                    }
-                    else
-                    {
-                        return this.AssetHealth.Max(m => m.AssetUpdtDTM);
-                    }                    
+                    return this.AssetHealth.Max(m => m.AssetUpdtDTM);
                 }
-                else
-                {
-                    return DateTime.MinValue;
-                }
+                return DateTime.MinValue;
             }
         }
+
     }
 }
