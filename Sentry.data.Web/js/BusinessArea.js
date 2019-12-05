@@ -1,7 +1,10 @@
 ﻿data.BusinessArea = {
 
 
-    PersonalLinesInit: function () {
+    PersonalLinesInit: function (model) {
+
+        console.log(model);
+
 
         toastr.options = {
             "closeButton": false,
@@ -21,7 +24,7 @@
             "hideMethod": "fadeOut"
         }
 
-        toastr["error"]("Message Test", "Austin");
+        toastr["error"]("Message Test1", "Austin");
 
         toastr["error"]("Message Test2", "Austin2");
     }

@@ -52,7 +52,7 @@
     <script type="text/javascript">
 
         $(function () {
-            data.BusinessArea.PersonalLinesInit();
+            data.BusinessArea.PersonalLinesInit(@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model)) );
         });
 
     </script>
