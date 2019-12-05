@@ -44,6 +44,7 @@
             public const string CREATED_REPORT = "Created Report";
             public const string UPDATED_REPORT = "Updated Report";
             public const string DELETED_REPORT = "Deleted Report";
+            public const string DOWNLOADED_REPORT = "Downloaded Report";
 
             public const string VIEWED_DATASET = "Viewed Dataset";
             public const string CREATED_DATASET = "Created Dataset";
@@ -129,6 +130,7 @@
         public static class SecurableEntityName
         {
             public const string DATASET = "Dataset";
+            public const string DATA_ASSET = "DataAsset";
             public const string DATASOURCE = "DataSource";
         }
 
@@ -139,6 +141,7 @@
             public const string CAN_QUERY_DATASET = "CanQueryDataset";
             public const string CAN_CONNECT_TO_DATASET = "CanConnectToDataset";
             public const string CAN_UPLOAD_TO_DATASET = "CanUploadToDataset";
+            public const string CAN_MODIFY_NOTIFICATIONS = "CanModifyNotification";
             public const string CAN_USE_DATA_SOURCE = "CanUseDataSource";
 
             public const string USE_APP = "UseApp";
@@ -169,6 +172,12 @@
         public static class StoragePrefixes
         {
             public const string DATASET_IMAGE_STORAGE_PREFIX = "images";
+        }
+
+        public static class Notifications
+        {
+            public const string DATAASSET_TYPE = "DA";
+            public const string BUSINESSAREA_TYPE = "BA";
         }
 
         public static class JobStates
@@ -221,6 +230,12 @@
             public const string DATE = "DATE";
             public const string TIMESTAMP = "TIMESTAMP";
             public const string STRUCT = "STRUCT";
+
+            public static class Defaults
+            {                
+                public const string DATE_DEFAULT = "yyyy-MM-dd";
+                public const string TIMESTAMP_DEFAULT = DATE_DEFAULT +" HH:mm:ss.SSS";
+            }
         }
 
         public static class SchemaDataTypes
@@ -233,6 +248,42 @@
         public static class SchemaTypes
         {
             public const string FILESCHEMA = "FileSchema";
+        }
+
+        public static class DataFlowTargetPrefixes
+        {
+            public const string RAW_STORAGE_PREFIX = "raw/";
+            public const string RAW_QUERY_STORAGE_PREFIX = "rawquery/";
+            public const string TEMP_FILE_PREFIX = "temp-file/";
+            public const string S3_DROP_PREFIX = TEMP_FILE_PREFIX + "s3drop/";
+            public const string SCHEMA_LOAD_PREFIX = TEMP_FILE_PREFIX + "schemaload/";
+            public const string CONVERT_TO_PARQUET_PREFIX = "parquet/";
+        }
+
+        public static class DataFlowStepEvent
+        {
+            public const string S3_DROP_START = "DATAFLOWSTEP_S3DROP_START";
+            public const string RAW_STORAGE_START = "DATAFLOWSTEP_RAWSTORAGE_START";
+            public const string QUERY_STORAGE = "DATAFLOWSTEP_QUERYSTORAGE_START";
+            public const string SCHEMA_LOAD = "DATAFLOWSTEP_SCHEMA_LOAD_START";
+            public const string CONVERT_TO_PARQUET = "DATAFLOWSTEP_CONVERTTOPARQUET_START";
+        }
+
+        public static class AWSEventNotifications
+        {
+            public static class S3Events
+            {
+                public const string OBJECTCREATED_PUT = "OBJECTCREATED:PUT";
+                public const string OBJECTCREATED_POST= "OBJECTCREATED:POST";
+                public const string OBJECTCREATED_COPY = "OBJECTCREATED:COPY";
+                public const string OBJECTCREATED_COMPLETEMULTIPARTUPLOAD = "OBJECTCREATED:COMPLETEMULTIPARTUPLAOD";
+            }
+        }
+
+        public static class DataFlowGuidConfiguration
+        {
+            public const string GUID_CULTURE = "en-US";
+            public const string GUID_FORMAT = "yyyyMMddHHmmssfff";
         }
     }
 }

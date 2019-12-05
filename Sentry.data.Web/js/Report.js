@@ -1,13 +1,15 @@
 ﻿/******************************************************************************************
- * Javascript methods for the Asset-related pages
+ * Javascript methods for the Business Intelligence-related pages
  ******************************************************************************************/
 
 data.Report = {
 
     IndexInit: function () {
-        /// Initialize the Index page for data assets (with the categories)
+        /// Initialize the Index page for business intelligence
 
-        $("[id^='CreateDataset']").off('click').on('click', function (e) {
+        $(".sentry-app-version").hide();
+
+        $("[id^='CreateExhibit']").off('click').on('click', function (e) {
             e.preventDefault();
             window.location = data.Report.CreateLink();
         });

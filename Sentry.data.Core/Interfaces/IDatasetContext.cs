@@ -3,6 +3,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Sentry.data.Core.Entities;
+using Sentry.data.Core.Entities.DataProcessing;
 
 namespace Sentry.data.Core
 {
@@ -11,6 +12,8 @@ namespace Sentry.data.Core
         /** IQueryables **/
 
         IQueryable<Dataset> Datasets { get; }
+        IQueryable<DataAsset> DataAsset { get; }
+        IQueryable<Notification> Notification { get; }
         IQueryable<DatasetFileConfig> DatasetFileConfigs { get; }
         IQueryable<SecurityTicket> HpsmTickets { get; }
         IQueryable<Security> Security { get; }
@@ -41,6 +44,8 @@ namespace Sentry.data.Core
         IQueryable<TagGroup> TagGroups { get; }
         IQueryable<ApplicationConfiguration> ApplicationConfigurations { get; }
         IQueryable<Favorite> Favorites { get; }
+        IQueryable<BusinessAreaTileRow> BusinessAreaTileRows { get; }
+        IQueryable<BusinessArea> BusinessAreas { get; }
         IQueryable<OAuthClaim> OAuthClaims { get; }
         IQueryable<RetrieverJob> RetrieverJob { get; }
         IQueryable<DatasetFileParquet> DatasetFileParquet { get; }
@@ -48,6 +53,14 @@ namespace Sentry.data.Core
         IQueryable<Schema> Schema { get; }
         IQueryable<FileSchema> FileSchema { get; }
         IQueryable<SchemaRevision> SchemaRevision { get; }
+        IQueryable<DataFlow> DataFlow { get; }
+        IQueryable<DataFlowStep> DataFlowStep { get; }
+        IQueryable<S3DropAction> S3DropAction { get; }
+        IQueryable<SchemaLoadAction> SchemaLoadAction { get; }
+        IQueryable<RawStorageAction> RawStorageAction { get; }
+        IQueryable<QueryStorageAction> QueryStorageAction { get; }
+        IQueryable<ConvertToParquetAction> ConvertToParquetAction { get; }
+        IQueryable<SchemaMap> SchemaMap { get; }
         /** Datasets **/
 
         Dataset GetById(int id);

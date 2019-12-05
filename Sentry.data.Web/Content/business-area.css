@@ -1,0 +1,31 @@
+﻿#pl-landing-pg-wrapper #dairyland-logo {
+    margin-left: -15px;
+}
+
+.landing-pg-tile-title {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+
+.landing-pg-image {
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    background-size: 100%;
+    height: 180px;
+}
+
+.landing-pg-hyperlink {
+    font-size: 15px;
+    margin-top: 10px;
+    margin-bottom: 60px;
+}
+
+#whats-new-wrapper h2 {
+    color: #472c70;
+    margin-top: 0px;
+}
+
+.border-btm-pl {
+    border-bottom: 4px solid #d7d7df;
+}

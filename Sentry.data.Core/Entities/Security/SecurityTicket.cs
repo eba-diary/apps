@@ -23,6 +23,8 @@ namespace Sentry.data.Core
         public virtual bool IsAddingPermission { get; set; }
         public virtual bool IsRemovingPermission { get; set; }
         public virtual string AdGroupName { get; set; }
+        public virtual bool IsSecuredAtUserLevel { get; set; }
+        public virtual string GrantPermissionToUserId { get; set; }
 
         public virtual Security ParentSecurity { get; set; }
 
@@ -55,10 +57,6 @@ namespace Sentry.data.Core
             if (string.IsNullOrWhiteSpace(TicketStatus))
             {
                 vr.Add("TicketStatus", "Ticket Status is required");
-            }
-            if (string.IsNullOrWhiteSpace(AdGroupName))
-            {
-                vr.Add("AdGroupName", "AD Group is required");
             }
             if(Permissions == null || Permissions.Count == 0)
             {

@@ -91,12 +91,16 @@ namespace Sentry.data.Web
                         Include("~/Content/sentry-internal.min.css", new CssRewriteUrlTransform()).
                         Include("~/Content/query-builder.default.min.css").
                         Include("~/Content/query-tool.css").
+                        Include("~/Content/datasets.css").
                         Include("~/Content/dataset-detail.css").
                         Include("~/Content/favorites.css").
                         Include("~/Content/fields.css").
                         Include("~/Content/home.css").
                         Include("~/Content/search.css").
+                        Include("~/Content/business-area.css").
+                        Include("~/Content/system-notifications.css").
                         Include("~/Content/checkbox.css").
+                        Include("~/Content/business-intelligence.css").
                         Include("~/Content/site.css").
                         Include("~/Content/jquery.json-viewer.css"));
 
