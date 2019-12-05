@@ -954,7 +954,7 @@ namespace Sentry.data.Core
                     _eventService.PublishSuccessEventByConfigId(GlobalConstants.EventType.SYNC_DATASET_SCHEMA, _userService.GetCurrentUser().AssociateId, "Sync specific schema", configList.First().ConfigId);
                 }
 
-                foreach (DatasetFileConfig config in configList)
+                foreach (DatasetFileConfig config in configList.Where(w => w.Schema.Revisions.Any()))
                 {
                     HiveTableCreateModel hiveModel = new HiveTableCreateModel()
                     {

@@ -411,6 +411,36 @@ data.Dataset = {
                 }
             });
         });
+
+        $('body').on('click', "#btnSyncConsumptionLayers", function () {
+            var syncBtn = $(this);
+            var datasetId = syncBtn.attr("data-id");
+
+            var request = $.ajax({
+                url: "/api/v2/metadata/dataset/" + datasetId + "/schema/0/syncconsumptionlayer",
+                method: "POST",
+                dataType: 'json',
+                success: function (obj) {
+                    Sentry.ShowModalAlert(
+                        obj, function () { })
+                },
+                failure: function (obj) {
+                    Sentry.ShowModalAlert(
+                        "Failed to submit request", function () { })
+                },
+                error: function (obj) {
+                    var msg;
+                    if (obj.status === 400) {
+                        msg = obj.responseJSON.Message;
+                    }
+                    else {
+                        msg = "Failed to submit request";
+                    };
+                    Sentry.ShowModalAlert(
+                        msg, function () { })
+                }
+            });
+        });
     },
 
     CancelLink: function (id) {

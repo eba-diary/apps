@@ -113,7 +113,7 @@ data.Config = {
             var schemaId = syncBtn.attr("data-schemaId");
 
             var request = $.ajax({
-                url: "/api/v2/metadata/dataset/0/schema/" + schemaId + "/syncconsumptionlayer",
+                url: "/api/v2/metadata/dataset/" + datasetId + "/schema/" + schemaId + "/syncconsumptionlayer",
                 method: "POST",
                 dataType: 'json',
                 success: function (obj) {
