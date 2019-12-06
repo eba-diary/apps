@@ -56,7 +56,7 @@ namespace Sentry.data.Web.Controllers
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult Index(int id)
         {
-            
+
             Dataset ds = _datasetContext.GetById(id);
 
             UserSecurity us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
@@ -148,7 +148,7 @@ namespace Sentry.data.Web.Controllers
                         dto.SchemaId = newSchemaId;
                         IsSuccessful = _configService.CreateAndSaveDatasetFileConfig(dto);
                     }
-                    
+
                     if (IsSuccessful)
                     {
                         return RedirectToAction("Index", new { id = dto.ParentDatasetId });
@@ -161,7 +161,7 @@ namespace Sentry.data.Web.Controllers
                     {
                         IsSuccessful = _configService.UpdateAndSaveDatasetFileConfig(dto);
                     }
-                    
+
                     if (IsSuccessful)
                     {
                         return RedirectToAction("Index", new { id = dto.ParentDatasetId });
@@ -418,9 +418,9 @@ namespace Sentry.data.Web.Controllers
                 Disabled = true
             });
 
-            cjm.SourceTypesDropdown = temp.Where(x => 
-                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_DROP_LOCATION && 
-                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION && 
+            cjm.SourceTypesDropdown = temp.Where(x =>
+                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_DROP_LOCATION &&
+                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION &&
                 x.Value != GlobalConstants.DataSoureDiscriminator.JAVA_APP_SOURCE &&
                 x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_HSZ_DROP_LOCATION).OrderBy(x => x.Value);
 
@@ -518,7 +518,7 @@ namespace Sentry.data.Web.Controllers
                     {
                         Body = ejm.HttpRequestBody,
                         RequestMethod = ejm.SelectedRequestMethod,
-                        RequestDataFormat =  (HttpDataFormat)ejm.SelectedRequestDataFormat
+                        RequestDataFormat = (HttpDataFormat)ejm.SelectedRequestDataFormat
                     };
 
                     rj.JobOptions = new RetrieverJobOptions()
@@ -531,7 +531,7 @@ namespace Sentry.data.Web.Controllers
                         CompressionOptions = compression,
                         HttpOptions = hOptions,
                         FtpPattern = ejm.FtpPattern
-                    };                    
+                    };
 
                     rj.Schedule = ejm.Schedule;
                     rj.TimeZone = "Central Standard Time";
@@ -719,7 +719,7 @@ namespace Sentry.data.Web.Controllers
             Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
 
             return View("CreateDataSource", dsm);
-        }        
+        }
 
         public ActionResult HeaderEntryRow()
         {
@@ -749,9 +749,9 @@ namespace Sentry.data.Web.Controllers
                 Disabled = true
             });
 
-            csm.SourceTypesDropdown = temp.Where(x => 
-                    x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_DROP_LOCATION && 
-                    x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION && 
+            csm.SourceTypesDropdown = temp.Where(x =>
+                    x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_DROP_LOCATION &&
+                    x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION &&
                     x.Value != GlobalConstants.DataSoureDiscriminator.JAVA_APP_SOURCE &&
                     x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_HSZ_DROP_LOCATION).OrderBy(x => x.Value);
 
@@ -782,7 +782,7 @@ namespace Sentry.data.Web.Controllers
                     Disabled = true
                 });
 
-                csm.AuthTypesDropdown = temp2.OrderBy(x => x.Value);                
+                csm.AuthTypesDropdown = temp2.OrderBy(x => x.Value);
             }
             return csm;
         }
@@ -813,7 +813,7 @@ namespace Sentry.data.Web.Controllers
                         {
                             return Redirect("/");
                         }
-                    }                    
+                    }
                 }
                 else
                 {
@@ -829,7 +829,7 @@ namespace Sentry.data.Web.Controllers
                         {
                             return Redirect("/");
                         }
-                    }                    
+                    }
                 }
             }
 
@@ -866,7 +866,7 @@ namespace Sentry.data.Web.Controllers
                 return View("EditDataSource", model);
             }
 
-            return View("Forbidden");                        
+            return View("Forbidden");
         }
 
 
@@ -906,15 +906,15 @@ namespace Sentry.data.Web.Controllers
                 foreach (MediaTypeExtension extension in deleteList)
                 {
                     _datasetContext.RemoveById<MediaTypeExtension>(extension.Id);
-                    
+
                     Logger.Info($"Deleting Extension Mapping - Key:{extension.Key} Value:{extension.Value} Requestor:{SharedContext.CurrentUser.AssociateId}");
                     changeCnt++;
-                }                
+                }
 
-                if(changeCnt > 0)
+                if (changeCnt > 0)
                 {
                     _datasetContext.SaveChanges();
-                }                
+                }
             }
             catch (Exception ex)
             {
@@ -929,7 +929,7 @@ namespace Sentry.data.Web.Controllers
             else
             {
                 return Json(new { Success = true, Message = $"Successfully saved {changeCnt} changes" });
-            }            
+            }
         }
 
         private void EditSourceDropDown(DataSourceModel model)
@@ -944,7 +944,7 @@ namespace Sentry.data.Web.Controllers
 
             int intvalue;
             var temp2 = AuthenticationTypesByType(model.SourceType, Int32.TryParse(model.AuthID, out intvalue) ? (int?)intvalue : null);
-            
+
             model.AuthTypesDropdown = temp2.OrderBy(x => x.Value);
         }
 
@@ -991,7 +991,7 @@ namespace Sentry.data.Web.Controllers
             {
                 case "HTTPS":
                     HTTPSSource https = new HTTPSSource();
-                    methodList = https.ValidHttpMethods;                    
+                    methodList = https.ValidHttpMethods;
                     break;
                 case "GOOGLEAPI":
                     GoogleApiSource gapi = new GoogleApiSource();
@@ -1016,7 +1016,7 @@ namespace Sentry.data.Web.Controllers
         {
             return Json(GetRequestDataFormat(sourceType, null), JsonRequestBehavior.AllowGet);
         }
-        
+
         private List<SelectListItem> GetRequestDataFormat(string sourceType, int? selectedId)
         {
             List<SelectListItem> output = new List<SelectListItem>();
@@ -1069,13 +1069,13 @@ namespace Sentry.data.Web.Controllers
                     Selected = true,
                     Disabled = true
                 });
-            }            
+            }
 
             switch (sourceType)
             {
                 case "FTP":
                     FtpSource ftp = new FtpSource();
-                    foreach(AuthenticationType authtype in ftp.ValidAuthTypes)
+                    foreach (AuthenticationType authtype in ftp.ValidAuthTypes)
                     {
                         output.Add(GetAuthSelectedListItem(authtype, selectedId));
                     }
@@ -1148,7 +1148,7 @@ namespace Sentry.data.Web.Controllers
         {
             List<SelectListItem> output = new List<SelectListItem>();
 
-            if(selectedId != null || selectedId != 0)
+            if (selectedId != null || selectedId != 0)
             {
                 output.Add(new SelectListItem() { Text = "Pick a Data Source", Value = "0" });
             }
@@ -1292,7 +1292,7 @@ namespace Sentry.data.Web.Controllers
             }
 
 
-            
+
         }
 
         [HttpPost]
@@ -1325,7 +1325,7 @@ namespace Sentry.data.Web.Controllers
             //Schema schema = _datasetContext.GetById<Schema>(schemaId);
 
             DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(configId);
-                        
+
 
             CreateSchemaModel createSchemaModel = new CreateSchemaModel()
             {
@@ -1374,7 +1374,7 @@ namespace Sentry.data.Web.Controllers
                         DataElement_DSC = csm.Description,
                         DatasetFileConfig = dfc,
                         Delimiter = csm.Delimiter,
-                        HasHeader= csm.HasHeader,
+                        HasHeader = csm.HasHeader,
                         SchemaName = csm.Name,
                         SchemaDescription = csm.Description,
                         SchemaIsForceMatch = csm.IsForceMatch,
@@ -1453,9 +1453,9 @@ namespace Sentry.data.Web.Controllers
             }
             else
             {
-                return RedirectToAction("Index", new { id = config.ParentDatasetId});
+                return RedirectToAction("Index", new { id = config.ParentDatasetId });
             }
-            
+
         }
 
         [HttpPost]
