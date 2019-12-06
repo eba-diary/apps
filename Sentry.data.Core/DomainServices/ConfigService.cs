@@ -559,7 +559,8 @@ namespace Sentry.data.Core
                 SchemaID = revision.ParentSchema.SchemaId,
                 RevisionID = revision.SchemaRevision_Id,
                 DatasetID = config.ParentDataset.DatasetId,
-                HiveStatus = null
+                HiveStatus = null,
+                InitiatorID = _userService.GetCurrentUser().AssociateId
             };
             _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
 
@@ -962,7 +963,8 @@ namespace Sentry.data.Core
                         {
                             DatasetID = config.ParentDataset.DatasetId,
                             SchemaID = config.Schema.SchemaId,
-                            RevisionID = config.GetLatestSchemaRevision().SchemaRevision_Id
+                            RevisionID = config.GetLatestSchemaRevision().SchemaRevision_Id,
+                            InitiatorID = _userService.GetCurrentUser().AssociateId
                         };
 
                         _messagePublisher.PublishDSCEvent(hiveModel.SchemaID.ToString(), JsonConvert.SerializeObject(hiveModel));
