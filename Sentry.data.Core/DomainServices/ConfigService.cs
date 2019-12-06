@@ -941,7 +941,7 @@ namespace Sentry.data.Core
 
             try
             {
-                List<DatasetFileConfig> configList = new List<DatasetFileConfig>();
+                List<DatasetFileConfig> configList;
                 if (schemaId == 0)
                 {
                     configList = _datasetContext.DatasetFileConfigs.Where(w => w.ParentDataset.DatasetId == datasetId).ToList();
@@ -954,19 +954,26 @@ namespace Sentry.data.Core
                     _eventService.PublishSuccessEventByConfigId(GlobalConstants.EventType.SYNC_DATASET_SCHEMA, _userService.GetCurrentUser().AssociateId, "Sync specific schema", configList.First().ConfigId);
                 }
 
-                foreach (DatasetFileConfig config in configList.Where(w => w.Schema.Revisions.Any()))
+                if (configList != null)
                 {
-                    HiveTableCreateModel hiveModel = new HiveTableCreateModel()
+                    foreach (DatasetFileConfig config in configList.Where(w => w.Schema.Revisions.Any()))
                     {
-                        DatasetID = config.ParentDataset.DatasetId,
-                        SchemaID = config.Schema.SchemaId,
-                        RevisionID = config.GetLatestSchemaRevision().SchemaRevision_Id
-                    };
+                        HiveTableCreateModel hiveModel = new HiveTableCreateModel()
+                        {
+                            DatasetID = config.ParentDataset.DatasetId,
+                            SchemaID = config.Schema.SchemaId,
+                            RevisionID = config.GetLatestSchemaRevision().SchemaRevision_Id
+                        };
 
-                    _messagePublisher.PublishDSCEvent(hiveModel.SchemaID.ToString(), JsonConvert.SerializeObject(hiveModel));
+                        _messagePublisher.PublishDSCEvent(hiveModel.SchemaID.ToString(), JsonConvert.SerializeObject(hiveModel));
+                    }
+
+                    return true;
                 }
-
-                return true;
+                else
+                {
+                    return false;
+                }                
             }
             catch (Exception ex)
             {

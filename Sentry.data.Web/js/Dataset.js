@@ -421,14 +421,14 @@ data.Dataset = {
             may break SAS processes referencing these libraries.</p>`;
 
             Sentry.ShowModalConfirmation(warningMsg, function () {
-                var request = $.ajax({
+                $.ajax({
                     url: "/api/v2/metadata/dataset/" + datasetId + "/schema/0/syncconsumptionlayer",
                     method: "POST",
                     dataType: 'json',
                     success: function (obj) {
                         Sentry.ShowModalAlert(obj, function () { });
                     },
-                    failure: function (obj) {
+                    failure: function () {
                         Sentry.ShowModalAlert("Failed to submit request", function () { });
                     },
                     error: function (obj) {
@@ -442,7 +442,7 @@ data.Dataset = {
                         Sentry.ShowModalAlert(msg, function () { });
                     }
                 });
-            });            
+            });
         });
     },
 
@@ -1076,7 +1076,7 @@ data.Dataset = {
     PushToBundler: function (dataSetID, listOfFilesToBundle) {
 
         function DoWork(dataSetID, listOfFilesToBundle, newName) {
-            var request = $.ajax({
+            $.ajax({
                 url: "/Dataset/BundleFiles/?listOfIds=" + encodeURI(listOfFilesToBundle) + "&newName=" + encodeURI(newName) + "&datasetID=" + encodeURI(dataSetID),
                 method: "POST",
                 success: function (obj) {

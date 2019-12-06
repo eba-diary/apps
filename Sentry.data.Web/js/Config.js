@@ -117,17 +117,17 @@ data.Config = {
             may break SAS processes referencing this library.</p>`;
 
             Sentry.ShowModalConfirmation(warningMsg, function () {
-                var request = $.ajax({
+                $.ajax({
                     url: "/api/v2/metadata/dataset/" + datasetId + "/schema/" + schemaId + "/syncconsumptionlayer",
                     method: "POST",
                     dataType: 'json',
                     success: function (obj) {
                         Sentry.ShowModalAlert(
-                            obj, function () { })
+                            obj, function () { });
                     },
-                    failure: function (obj) {
+                    failure: function () {
                         Sentry.ShowModalAlert(
-                            "Failed to submit request", function () { })
+                            "Failed to submit request", function () { });
                     },
                     error: function (obj) {
                         var msg;
@@ -138,36 +138,9 @@ data.Config = {
                             msg = "Failed to submit request";
                         };
                         Sentry.ShowModalAlert(
-                            msg, function () { })
+                            msg, function () { });
                     }
                 });
-            }); 
-
-
-
-            var request = $.ajax({
-                url: "/api/v2/metadata/dataset/" + datasetId + "/schema/" + schemaId + "/syncconsumptionlayer",
-                method: "POST",
-                dataType: 'json',
-                success: function (obj) {
-                    Sentry.ShowModalAlert(
-                        obj, function () { })
-                },
-                failure: function (obj) {
-                    Sentry.ShowModalAlert(
-                        "Failed to submit request", function () { })
-                },
-                error: function (obj) {
-                    var msg;
-                    if(obj.status === 400) {
-                        msg = obj.responseJSON.Message;
-                    }
-                    else {
-                        msg = "Failed to submit request";
-                    };
-                    Sentry.ShowModalAlert(
-                        msg, function () { })
-                }
             });
         });
 
