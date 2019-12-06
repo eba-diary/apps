@@ -411,6 +411,39 @@ data.Dataset = {
                 }
             });
         });
+
+        $('body').on('click', "#btnSyncConsumptionLayers", function () {
+            var syncBtn = $(this);
+            var datasetId = syncBtn.attr("data-id");
+
+            var warningMsg = `<p><b><h3><font color=\"red\">WARNING</font color></h3></b></p><p>Performing this action will re-generate all hive consumption layer tables and views for associated schemas.</p>
+            <p>In addition, this will generate notification to SAS Administration to refresh associated metadata.  Depending on schema change, this
+            may break SAS processes referencing these libraries.</p>`;
+
+            Sentry.ShowModalConfirmation(warningMsg, function () {
+                $.ajax({
+                    url: "/api/v2/metadata/dataset/" + datasetId + "/schema/0/syncconsumptionlayer",
+                    method: "POST",
+                    dataType: 'json',
+                    success: function (obj) {
+                        Sentry.ShowModalAlert(obj, function () { });
+                    },
+                    failure: function () {
+                        Sentry.ShowModalAlert("Failed to submit request", function () { });
+                    },
+                    error: function (obj) {
+                        var msg;
+                        if (obj.status === 400) {
+                            msg = obj.responseJSON.Message;
+                        }
+                        else {
+                            msg = "Failed to submit request";
+                        };
+                        Sentry.ShowModalAlert(msg, function () { });
+                    }
+                });
+            });
+        });
     },
 
     CancelLink: function (id) {
@@ -1043,7 +1076,7 @@ data.Dataset = {
     PushToBundler: function (dataSetID, listOfFilesToBundle) {
 
         function DoWork(dataSetID, listOfFilesToBundle, newName) {
-            var request = $.ajax({
+            $.ajax({
                 url: "/Dataset/BundleFiles/?listOfIds=" + encodeURI(listOfFilesToBundle) + "&newName=" + encodeURI(newName) + "&datasetID=" + encodeURI(dataSetID),
                 method: "POST",
                 success: function (obj) {

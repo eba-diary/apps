@@ -359,6 +359,56 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
+        /// <summary>
+        /// Syncs the hive consumption layer with latest schema metadata
+        /// </summary>
+        /// <param name="datasetId">Non-Zero value required</param>
+        /// <param name="schemaId">0 value will refresh all schemas under dataset. Non-zero value will refresh specific schema under dataset.</param>
+        /// <returns></returns>
+        [HttpPost]
+        [ApiVersionBegin(WebAPI.Version.v2)]
+        [Route("dataset/{datasetId}/schema/{schemaId}/syncconsumptionlayer")]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        public async Task<IHttpActionResult> SyncConsumptionLayer(int datasetId, int schemaId)
+        {
+            try
+            {
+                //If datasetId == 0, fail request
+                if (datasetId == 0)
+                {
+                    return BadRequest("datasetId is required");
+                    //return Json(new { Success = false, Message = "Dataset Id required" });
+                }
+
+                //Does user have permissions to dataset
+                UserSecurity us = _securityService.GetUserSecurity(_dsContext.GetById<Dataset>(datasetId), _userService.GetCurrentUser());
+                if (!us.CanEditDataset)
+                {
+                    return Unauthorized();
+                    //return Json(new { Success = false, Message = "User does not have necessary dataset permissions" });
+                }
+
+                bool isSuccessful = _configService.SyncConsumptionLayer(datasetId, schemaId);
+
+                if (isSuccessful)
+                {
+                    return Ok("Sync request successfully submitted");
+                    //return Json(new { Success = true, Message = "Sync request successfully submitted" });
+                }
+                else
+                {
+                    return BadRequest("Something went wrong, sync request was unsuccessful.");
+                    //return Json(new { Success = false, Message = "Something went wrong, sync request was unsuccessful." });
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("configcontroller-syncconsumptionlayer failed", ex);
+                return InternalServerError();
+                //return Json(new { Success = false, Message = "Something went wrong, failed to submit sync request." });
+            }
+        }
+
         ///// <summary>
         ///// Get schema revision detail
         ///// </summary>
