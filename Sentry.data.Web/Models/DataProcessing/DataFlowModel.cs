@@ -19,6 +19,8 @@ namespace Sentry.data.Web
         [DisplayName("How will data be ingested into DSC?")]
         public IngestionType IngestionType { get; set; }
 
+        public string SelectedIngestionType { get; set; }
+
         /// <summary>
         /// Is the incoming data compressed?
         /// </summary>

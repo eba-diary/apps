@@ -446,6 +446,7 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\home.css" />
     <Content Include="Content\jquery.json-viewer.css" />
+    <Content Include="js\DataFlow.js" />
     <Content Include="js\DataSource.js" />
     <Content Include="js\Fields.js" />
     <Content Include="js\Job.js" />

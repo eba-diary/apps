@@ -10,11 +10,11 @@
 
 
     @*<div class="form-group">
-        <div>
-            <input type="submit" value="Submit" class="btn btn-primary" />
-            <a id="CancelButton" class="btn btn-warning" href="">Cancel</a>
-        </div>
-    </div>*@
+            <div>
+                <input type="submit" value="Submit" class="btn btn-primary" />
+                <a id="CancelButton" class="btn btn-warning" href="">Cancel</a>
+            </div>
+        </div>*@
 
     <div class="form-group col-md-12">
         @Html.LabelFor(model => model.IngestionType, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -24,12 +24,13 @@
         </div>
     </div>
 
+    @Html.HiddenFor(model => model.IsCompressed)
     <div class="form-group col-md-12">
         @Html.LabelFor(model => model.IsCompressed, htmlAttributes: new { @class = "control-label col-md-2" })
         <div class="col-md-1">
             <div class="form-group">
                 <label class="col-sm-10 checkbox-container">
-                    <input type="checkbox" value="model.IsCompressed"/>
+                    <input id="IsCompressedCheckbox" type="checkbox" value="@Model.IsCompressed" />
                     <span class="checkmark"></span>
                 </label>
 
@@ -43,4 +44,12 @@
             <a id="CancelButton" class="btn btn-warning" href="">Cancel</a>
         </div>
     </div>
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        $(function () {
+            data.DataFlow.DataFlowFormInit();
+        });
+    </script>
 }

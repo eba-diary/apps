@@ -54,7 +54,10 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public ViewResult Create()
         {
-            DataFlowModel model = new DataFlowModel();
+            DataFlowModel model = new DataFlowModel()
+            {
+                IsCompressed = true
+            };
 
             return View("DataFlowForm", model);
 
