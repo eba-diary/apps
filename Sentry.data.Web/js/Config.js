@@ -112,7 +112,7 @@ data.Config = {
             var datasetId = syncBtn.attr("data-datasetId");
             var schemaId = syncBtn.attr("data-schemaId");
 
-            var warningMsg = `<p><b><h3><font color=\"red\">WARNING</font color></h3></b></p><p>Performing this action will re-generate hive consumption layer table\\views for current schema.</p>
+            var warningMsg = `<p><b><h3><font color=\"red\">WARNING</font color></h3></b></p><p>Performing this action will re-generate hive consumption layer table and views for current schema.</p>
             <p>In addition, this will generate notification to SAS Administration to refresh associated metadata.  Depending on schema change, this
             may break SAS processes referencing this library.</p>`;
 
