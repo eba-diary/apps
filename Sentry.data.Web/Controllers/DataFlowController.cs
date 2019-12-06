@@ -23,7 +23,7 @@ namespace Sentry.data.Web.Controllers
         public ActionResult Index()
         {
             List<DataFlowDto> dtoList = _dataFlowService.ListDataFlows();
-            List<DataFlowModel> modelList = dtoList.ToModelList();
+            List<DFModel> modelList = dtoList.ToModelList();
             return View(modelList);
         }
 
@@ -49,6 +49,21 @@ namespace Sentry.data.Web.Controllers
         public void Create(int schemaId)
         {
             bool success = _dataFlowService.CreateDataFlow(schemaId);
+        }
+
+        [HttpGet]
+        public ViewResult Create()
+        {
+            DataFlowModel model = new DataFlowModel();
+
+            return View("DataFlowForm", model);
+
+        }
+
+        [HttpPost]
+        public ActionResult DataFlowForm(DataFlowModel model)
+        {
+            return RedirectToAction("Index");
         }
 
         //[HttpGet]

@@ -1,28 +1,34 @@
-﻿using System;
+﻿using Sentry.data.Core.GlobalEnums;
+using System;
 using System.Collections.Generic;
-using System.Web.Mvc;
-using Sentry.data.Core;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel;
-using Sentry.data.Core;
+using System.Linq;
+using System.Web;
+
 
 namespace Sentry.data.Web
 {
     public class DataFlowModel
     {
-        public DataFlowModel(DataFlowDto dto)
-        {
-            Id = dto.Id;
-            FlowGuid = dto.FlowGuid;
-            Name = dto.Name;
-            CreatedBy = dto.CreatedBy;
-            CreatedDTM = dto.CreateDTM;
-        }
+        public DataFlowModel() { }
 
-        public int Id { get; set; }
-        public Guid FlowGuid { get; set; }
-        public string Name { get; set; }
-        public string CreatedBy { get; set; }
-        public DateTime CreatedDTM { get; set; }
+        /// <summary>
+        /// How is data getting into DSC (Push or Pull)
+        /// </summary>
+        /// 
+        [DisplayName("How will data be ingested into DSC?")]
+        public IngestionType IngestionType { get; set; }
+
+        /// <summary>
+        /// Is the incoming data compressed?
+        /// </summary>
+        /// 
+        [DisplayName("Is incoming data compressed?")]
+        public bool IsCompressed { get; set; }
+
+        /// <summary>
+        /// Target
+        /// </summary>
+        public int SchemaId { get; set; }
     }
 }

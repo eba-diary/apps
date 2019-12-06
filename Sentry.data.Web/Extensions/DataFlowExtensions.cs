@@ -8,18 +8,18 @@ namespace Sentry.data.Web
 {
     public static class DataFlowExtensions
     {
-        public static List<DataFlowModel> ToModelList(this List<Core.DataFlowDto> dtoList)
+        public static List<DFModel> ToModelList(this List<Core.DataFlowDto> dtoList)
         {
-            List<DataFlowModel> modelList = new List<DataFlowModel>();
+            List<DFModel> modelList = new List<DFModel>();
             foreach (Core.DataFlowDto dto in dtoList)
             {
                 modelList.Add(dto.ToModel());
             }
             return modelList;
         }
-        public static DataFlowModel ToModel(this Core.DataFlowDto dto)
+        public static DFModel ToModel(this Core.DataFlowDto dto)
         {
-            return new DataFlowModel(dto) { };
+            return new DFModel(dto) { };
         }
     }
 }

@@ -383,6 +383,7 @@
     <Compile Include="Models\ApiModels\Dataset\DatasetInfoModel.cs" />
     <Compile Include="Models\DataProcessing\DataFlowDetailModel.cs" />
     <Compile Include="Models\DataProcessing\DataFlowModel.cs" />
+    <Compile Include="Models\DataProcessing\DFModel.cs" />
     <Compile Include="Models\DataProcessing\DataFlowStepModel.cs" />
     <Compile Include="Models\Dataset\BaseDatasetFileModel.cs" />
     <Compile Include="Models\Dataset\ColumnModel.cs" />
@@ -1328,6 +1329,8 @@
     <Content Include="Views\Shared\DataSourceAccessRequest.cshtml" />
     <Content Include="Views\DataFlow\Index.cshtml" />
     <Content Include="Views\DataFlow\Detail.cshtml" />
+    <Content Include="Views\DataFlow\DataFlowForm.cshtml" />
+    <Content Include="Views\DataFlow\EditorTemplates\Enum.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
