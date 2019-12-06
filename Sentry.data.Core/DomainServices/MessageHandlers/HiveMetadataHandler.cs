@@ -50,7 +50,7 @@ namespace Sentry.data.Core
 
                                 if (de.IsInSAS)
                                 {
-                                    bool IsSuccessful = _schemaService.SasUpdateNotification(hiveCreatedEvent.SchemaID, hiveCreatedEvent.RevisionID);
+                                    bool IsSuccessful = _schemaService.SasUpdateNotification(hiveCreatedEvent.SchemaID, hiveCreatedEvent.RevisionID, hiveCreatedEvent.InitiatorID);
 
                                     if (!IsSuccessful)
                                     {

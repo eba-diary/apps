@@ -19,6 +19,6 @@ namespace Sentry.data.Core
         DatasetFile GetLatestDatasetFileBySchema(int schemaId);
         FileSchema GetFileSchemaByStorageCode(string storageCode);
         bool RegisterRawFile(FileSchema schema, string objectKey, string versionId, DataFlowStepEvent stepEvent);
-        bool SasUpdateNotification(int schemaId, int revisionId);
+        bool SasUpdateNotification(int schemaId, int revisionId, string initiatorId);
     }
 }
