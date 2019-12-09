@@ -13,23 +13,6 @@
 
         </div>
 
-        @* in order to get toastr to live inside another DIV you have to name the DIV an id=toast-container. It is important to keep the relative position*@
-        @*<div id="toast-container" style="position:relative">
-        </div>*@
-
-        @if (Model.HasActiveNotification)
-        {
-            <div class="row system-notification-container">
-                <div class="col-sm-12 col-md-12 col-lg-12">
-                    <div id="pl-system-notification-wrapper">
-                        @Html.Partial("_SystemNotifications", Model.Notifications)
-                    </div>
-                </div>
-            </div>
-
-
-        }
-
         <div class="row">
             <div sho class="col-sm-12 col-md-9 col-lg-9">
 
@@ -52,7 +35,7 @@
     <script type="text/javascript">
 
         $(function () {
-            data.BusinessArea.PersonalLinesInit(@Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model)) );
+            data.BusinessArea.PersonalLinesInit();
         });
 
     </script>
