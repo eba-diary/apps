@@ -1318,7 +1318,6 @@
     <Content Include="Views\BusinessArea\PersonalLines.cshtml" />
     <Content Include="Views\BusinessArea\_LandingPageTile.cshtml" />
     <Content Include="Views\BusinessArea\_WhatsNew.cshtml" />
-    <Content Include="Views\Shared\_SystemNotifications.cshtml" />
     <Content Include="Views\Notification\ModifyNotification.cshtml" />
     <Content Include="Views\Notification\ManageNotification.cshtml" />
     <Content Include="Views\Shared\NotFound.cshtml" />
