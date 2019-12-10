@@ -21,7 +21,6 @@ namespace HSZGOLDENEYE
         private CancellationTokenSource _tokenSource;
         private CancellationToken _token;
         private IContainer _container;
-        private IDatasetContext _datasetContext;
         private List<RunningTask> currentTasks = new List<RunningTask>();
 
         /// <summary>
@@ -56,7 +55,7 @@ namespace HSZGOLDENEYE
 
                 using (_container = Bootstrapper.Container.GetNestedContainer())
                 {
-                    _datasetContext = _container.GetInstance<IDatasetContext>();
+                    IDatasetContext _datasetContext = _container.GetInstance<IDatasetContext>();
                     //_hszFileWatchService = _container.GetInstance<IHszFileWatchService>();
 
                     //If it's completed dispose of it.
