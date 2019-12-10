@@ -108,7 +108,6 @@ data.Notification = {
 
     },
 
-
     initNotifications: function ()
     {
         toastr.options = {
@@ -127,39 +126,40 @@ data.Notification = {
             "hideEasing": "linear",
             "showMethod": "fadeIn",
             "hideMethod": "fadeOut"
-        }
-
+        };
     },
 
     displayNotifications: function (businessAreaType)
     {
         this.initNotifications();
 
-        if (businessAreaType == 1)  //personal = 1
+        if (businessAreaType === 1)  //personal = 1
+        {
             $.get("/Notification/GetPersonalLinesNotifications", this.displayNotificationsPersonalLines);
+        }
     },
-
 
     displayNotificationsPersonalLines: function (e)
     {
-        for (i = 0; i < e.CriticalNotifications.length; i++)
+        for (let i = 0; i < e.CriticalNotifications.length; i++)
         {
             toastr["error"](e.CriticalNotifications[i].Message, e.CriticalNotifications[i].Title);
         }
 
-        for (i = 0; i < e.StandardNotifications.length; i++)
+        for (let i = 0; i < e.StandardNotifications.length; i++)
         {
-            if (e.StandardNotifications[i].MessageSeverity == "Warning")
+            if (e.StandardNotifications[i].MessageSeverity === "Warning")
+            {
                 toastr["warning"](e.StandardNotifications[i].Message, e.StandardNotifications[i].Title);
+            }
         }
 
-        for (i = 0; i < e.StandardNotifications.length; i++)
+        for (let i = 0; i < e.StandardNotifications.length; i++)
         {
-            if (e.StandardNotifications[i].MessageSeverity == "Info")
+            if (e.StandardNotifications[i].MessageSeverity === "Info")
+            {
                 toastr["info"](e.StandardNotifications[i].Message, e.StandardNotifications[i].Title);
+            }
         }
-
     },
-
-
 };
