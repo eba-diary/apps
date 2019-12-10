@@ -11,10 +11,12 @@ namespace Sentry.data.Web.Controllers
     public class DataFlowController : Controller
     {
         private readonly IDataFlowService _dataFlowService;
+        private readonly IDatasetService _datasetService;
 
-        public DataFlowController(IDataFlowService dataFlowService)
+        public DataFlowController(IDataFlowService dataFlowService, IDatasetService datasetService)
         {
             _dataFlowService = dataFlowService;
+            _datasetService = datasetService;
         }
 
         // GET: DataFlow
@@ -56,7 +58,7 @@ namespace Sentry.data.Web.Controllers
         {
             DataFlowModel model = new DataFlowModel()
             {
-                IsCompressed = true
+                IsCompressed = true,
             };
 
             return View("DataFlowForm", model);
@@ -67,6 +69,31 @@ namespace Sentry.data.Web.Controllers
         public ActionResult DataFlowForm(DataFlowModel model)
         {
             return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public PartialViewResult NewSchemaMap()
+        {
+            List<SelectListItem> sList = new List<SelectListItem>();
+
+            var groupedDatasets = _datasetService.GetDatasetsForQueryTool().GroupBy(x => x.DatasetCategories.First());
+
+            foreach (var ds in groupedDatasets)
+            {
+                sList.AddRange(ds.Select(m => new SelectListItem()
+                {
+                    Text = m.DatasetName,
+                    Value = m.DatasetId.ToString(),
+                    Group = new SelectListGroup() { Name = ds.Key.Name }
+                }));
+            }
+
+            SchemaMapModel model = new SchemaMapModel()
+            {
+                AllDatasets = sList
+            };
+
+            return PartialView("_SchemaMap", model);
         }
 
         //[HttpGet]

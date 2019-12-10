@@ -10,7 +10,10 @@ namespace Sentry.data.Web
 {
     public class DataFlowModel
     {
-        public DataFlowModel() { }
+        public DataFlowModel()
+        {
+            SchemaMaps = new List<SchemaMapModel>();
+        }
 
         /// <summary>
         /// How is data getting into DSC (Push or Pull)
@@ -32,5 +35,7 @@ namespace Sentry.data.Web
         /// Target
         /// </summary>
         public int SchemaId { get; set; }
+
+        public List<SchemaMapModel> SchemaMaps { get; set; }
     }
 }

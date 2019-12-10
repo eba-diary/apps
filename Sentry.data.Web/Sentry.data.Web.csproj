@@ -385,6 +385,7 @@
     <Compile Include="Models\DataProcessing\DataFlowModel.cs" />
     <Compile Include="Models\DataProcessing\DFModel.cs" />
     <Compile Include="Models\DataProcessing\DataFlowStepModel.cs" />
+    <Compile Include="Models\DataProcessing\SchemaMapModel.cs" />
     <Compile Include="Models\Dataset\BaseDatasetFileModel.cs" />
     <Compile Include="Models\Dataset\ColumnModel.cs" />
     <Compile Include="Models\Dataset\CreateDataFileModel.cs" />
@@ -439,6 +440,7 @@
     <Content Include="Content\bootstrap-datetimepicker.css" />
     <Content Include="Content\css\select2.css" />
     <Content Include="Content\css\select2.min.css" />
+    <Content Include="Content\dataflow.css" />
     <Content Include="Content\dataset-detail.css" />
     <Content Include="Content\datasets.css" />
     <Content Include="Content\favorites.css" />
@@ -1332,6 +1334,7 @@
     <Content Include="Views\DataFlow\Detail.cshtml" />
     <Content Include="Views\DataFlow\DataFlowForm.cshtml" />
     <Content Include="Views\DataFlow\EditorTemplates\Enum.cshtml" />
+    <Content Include="Views\DataFlow\_SchemaMap.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
