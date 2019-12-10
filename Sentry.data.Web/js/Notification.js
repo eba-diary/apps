@@ -14,8 +14,6 @@ data.Notification = {
 
     },
 
-    
-
     NotificationTableInit: function () {
         $('#notificationTable tbody').on('click', 'td.details-control', function () {
             var tr = $(this).closest('tr');
@@ -161,5 +159,5 @@ data.Notification = {
                 toastr["info"](e.StandardNotifications[i].Message, e.StandardNotifications[i].Title);
             }
         }
-    },
+    }
 };
