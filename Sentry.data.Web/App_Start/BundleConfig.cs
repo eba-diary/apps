@@ -27,7 +27,8 @@ namespace Sentry.data.Web
                         Include("~/Scripts/jquery.validate.js").
                         Include("~/Scripts/jquery.validate.unobtrusive.js").
                         Include("~/Scripts/jquery.validate.unobtrusive.sentry.js").
-                        Include("~/Scripts/jquery.json-viewer.js"));
+                        Include("~/Scripts/jquery.json-viewer.js").
+                        Include("~/Scripts/toastr.min.js"));
 
             //This bundle contains basic bootstrap stuff and some common plugins specific to bootstrap
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").
@@ -89,6 +90,7 @@ namespace Sentry.data.Web
             bundles.Add(new StyleBundle("~/bundles/css/site").
                  Include("~/Content/bootstrap-datetimepicker.css", new CssRewriteUrlTransform()).
                         Include("~/Content/sentry-internal.min.css", new CssRewriteUrlTransform()).
+                        Include("~/Content/toastr.min.css").
                         Include("~/Content/query-builder.default.min.css").
                         Include("~/Content/query-tool.css").
                         Include("~/Content/datasets.css").
@@ -110,6 +112,7 @@ namespace Sentry.data.Web
             https://stackoverflow.com/questions/21270834/asp-net-mvc-bundle-not-rendering-script-files-on-staging-server-it-works-on-dev
             BundleTable.EnableOptimizations = false;
             */
+            
 
         }
     }
