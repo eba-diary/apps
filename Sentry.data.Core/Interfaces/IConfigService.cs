@@ -33,5 +33,12 @@ namespace Sentry.data.Core
         /// <returns></returns>
         bool Delete(int id, bool logicalDelete = true, bool parentDriven = false);
         UserSecurity GetUserSecurityForConfig(int id);
+        /// <summary>
+        /// Generates necessary trigger to regenerate consumption layer components.
+        /// </summary>
+        /// <param name="datasetId">Non-Zero value required</param>
+        /// <param name="schemaId"></param>
+        /// <returns></returns>
+        bool SyncConsumptionLayer(int datasetId, int schemaId);
     }
 }

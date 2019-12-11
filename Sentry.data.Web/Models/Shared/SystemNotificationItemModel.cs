@@ -10,5 +10,6 @@ namespace Sentry.data.Web
         public string Title { get; set; }
         public string Message { get; set; }
         public string NotificationDate { get; set; }
+        public string MessageSeverity { get; set; }
     }
 }

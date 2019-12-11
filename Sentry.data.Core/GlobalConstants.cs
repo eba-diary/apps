@@ -52,6 +52,7 @@
             public const string DELETE_DATASET = "Deleted Dataset";
 
             public const string DELETE_DATASET_SCHEMA = "Deleted Dataset Schema";
+            public const string SYNC_DATASET_SCHEMA = "Sync Schema";
 
             public const string CREATED_TAG = "Created Tag";
             public const string UPDATED_TAG = "Updated Tag";
@@ -234,7 +235,7 @@
             public static class Defaults
             {                
                 public const string DATE_DEFAULT = "yyyy-MM-dd";
-                public const string TIMESTAMP_DEFAULT = DATE_DEFAULT +" HH:mm:ss.SSS";
+                public const string TIMESTAMP_DEFAULT = DATE_DEFAULT +" HH:mm:ss";
             }
         }
 

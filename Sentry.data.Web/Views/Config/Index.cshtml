@@ -281,43 +281,14 @@
                                 <div class="jobContainer" style="display:none;">
 
                                     <p>@item.Schema.Description</p>
-                                    @*<p>This schema's current Delimiter is <b>@schema.Delimiter</b></p>
-            <p>Raw files contain headers: <b>@schema.HasHeader</b></p>*@
 
                                     @if (item.Schema.Revisions.Count() == 0)
                                     {
-                                        @*<p>This schema Id is @schema.DataElement_ID.</p>*@
                                         <p>This schema is not currently does not yet have any columns associated to it.</p>
                                     }
-                                        <p>Created on: @item.Schema.CreatedDTM</p>
-                                        <p>Last Modified on: @item.Schema.LastUpdatedDTM</p>
-
-                                    @*@if (schema.HiveTables.Any())
-            {
-                <br />
-                <h4 class="@color">Hive Tables</h4>
-                <hr />
-
-                foreach (var table in schema.HiveTables)
-                {
-                    <div class="retJob">
-                        <div class="jobHeader categoryBanner-@color">
-                            <h6>@table.HiveDatabase_NME.@table.Hive_NME</h6>
-                            <i class="retJobDetails tracker-menu-icon glyphicon glyphicon-menu-up"></i>
-                            @if (table.IsPrimary)
-                            {
-                                <span style="float: right; margin-top: 10px;margin-right: 10px;"><span class="glyphicon glyphicon-ok"></span> Primary Hive Table</span>
-                            }
-                        </div>
-                        <div class="jobContainer" style="display:none;">
-                            <p>@table.Hive_DSC</p>
-                            <p>Created on: @table.Created_DTM</p>
-                            <p>Last Modified on: @table.Changed_DTM</p>
-                        </div>
-                    </div>
-                }
-                <hr />
-            }*@
+                                    <p>Created on: @item.Schema.CreatedDTM</p>
+                                    <p>Last Modified on: @item.Schema.LastUpdatedDTM</p>
+                                    
                                     <p>
                                         <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Edit">Edit Schema Metadata</a>
                                         <br>
@@ -326,6 +297,7 @@
                                         @if (item.Schema.Revisions.Count() > 0)
                                         {
                                             <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields">Edit Columns and Fields</a>
+                                            <a class="btn btn-primary" id="btnSyncSchema" data-datasetId="@Model.DatasetId" data-schemaId="@item.Schema.SchemaId">Sync Consumption Layer</a>                                            
                                         }
                                         @if (item.Schema.Revisions.Count() == 0)
                                         {
