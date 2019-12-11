@@ -235,7 +235,7 @@
             public static class Defaults
             {                
                 public const string DATE_DEFAULT = "yyyy-MM-dd";
-                public const string TIMESTAMP_DEFAULT = DATE_DEFAULT +" HH:mm:ss.SSS";
+                public const string TIMESTAMP_DEFAULT = DATE_DEFAULT +" HH:mm:ss";
             }
         }
 
