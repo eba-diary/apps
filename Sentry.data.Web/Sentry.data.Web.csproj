@@ -445,6 +445,9 @@
     <Content Include="Content\fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Content\home.css" />
     <Content Include="Content\jquery.json-viewer.css" />
+    <Content Include="Content\toastr.css" />
+    <Content Include="Content\toastr.min.css" />
+    <Content Include="js\BusinessArea.js" />
     <Content Include="js\DataSource.js" />
     <Content Include="js\Fields.js" />
     <Content Include="js\Job.js" />
@@ -572,6 +575,8 @@
     <Content Include="Scripts\query-builder.min.js" />
     <Content Include="Scripts\select2.js" />
     <Content Include="Scripts\select2.min.js" />
+    <Content Include="Scripts\toastr.js" />
+    <Content Include="Scripts\toastr.min.js" />
     <Content Include="Views\Dataset\_PreviewData.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -921,6 +926,8 @@
     <None Include="ConfigSchemas\EnvironmentSettingsSchema.xsd">
       <SubType>Designer</SubType>
     </None>
+    <Content Include="Content\toastr.less" />
+    <Content Include="Content\toastr.scss" />
     <None Include="Scripts\jquery-3.1.0-vsdoc.js" />
     <Content Include="Images\Category\claim.png" />
     <Content Include="Images\Category\claim.svg" />
@@ -1311,7 +1318,6 @@
     <Content Include="Views\BusinessArea\PersonalLines.cshtml" />
     <Content Include="Views\BusinessArea\_LandingPageTile.cshtml" />
     <Content Include="Views\BusinessArea\_WhatsNew.cshtml" />
-    <Content Include="Views\Shared\_SystemNotifications.cshtml" />
     <Content Include="Views\Notification\ModifyNotification.cshtml" />
     <Content Include="Views\Notification\ManageNotification.cshtml" />
     <Content Include="Views\Shared\NotFound.cshtml" />

@@ -11,8 +11,8 @@ data.Notification = {
             e.preventDefault();
             data.AccessRequest.InitForNotification();
         });
-    },
 
+    },
 
     NotificationTableInit: function () {
         $('#notificationTable tbody').on('click', 'td.details-control', function () {
@@ -104,5 +104,60 @@ data.Notification = {
 
         return div.childNodes;
 
+    },
+
+    initNotifications: function ()
+    {
+        toastr.options = {
+            "closeButton": false,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": false,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "0",
+            "hideDuration": "0",
+            "timeOut": "0",
+            "extendedTimeOut": "0",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+    },
+
+    displayNotifications: function (businessAreaType)
+    {
+        this.initNotifications();
+
+        if (businessAreaType === 1)  //personal = 1
+        {
+            $.get("/Notification/GetPersonalLinesNotifications", this.displayNotificationsPersonalLines);
+        }
+    },
+
+    displayNotificationsPersonalLines: function (e)
+    {
+        for (let i = 0; i < e.CriticalNotifications.length; i++)
+        {
+            toastr["error"](e.CriticalNotifications[i].Message, e.CriticalNotifications[i].Title);
+        }
+
+        for (let i = 0; i < e.StandardNotifications.length; i++)
+        {
+            if (e.StandardNotifications[i].MessageSeverity === "Warning")
+            {
+                toastr["warning"](e.StandardNotifications[i].Message, e.StandardNotifications[i].Title);
+            }
+        }
+
+        for (let i = 0; i < e.StandardNotifications.length; i++)
+        {
+            if (e.StandardNotifications[i].MessageSeverity === "Info")
+            {
+                toastr["info"](e.StandardNotifications[i].Message, e.StandardNotifications[i].Title);
+            }
+        }
     }
 };
