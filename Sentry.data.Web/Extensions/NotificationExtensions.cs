@@ -115,7 +115,9 @@ namespace Sentry.data.Web
             {
                 Title = (String.IsNullOrWhiteSpace(notification.Title)) ? "Alert" : notification.Title,
                 Message = notification.Message,
-                NotificationDate = notification.StartTime.ToShortDateString()
+                NotificationDate = notification.StartTime.ToShortDateString(),
+                MessageSeverity = notification.MessageSeverity.ToString()
+
             };
         }
 

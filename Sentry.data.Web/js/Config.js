@@ -107,6 +107,43 @@ data.Config = {
             });
         });
 
+        $('body').on('click', "#btnSyncSchema", function () {
+            var syncBtn = $(this);
+            var datasetId = syncBtn.attr("data-datasetId");
+            var schemaId = syncBtn.attr("data-schemaId");
+
+            var warningMsg = `<p><b><h3><font color=\"red\">WARNING</font color></h3></b></p><p>Performing this action will re-generate hive consumption layer table and views for current schema.</p>
+            <p>In addition, this will generate notification to SAS Administration to refresh associated metadata.  Depending on schema change, this
+            may break SAS processes referencing this library.</p>`;
+
+            Sentry.ShowModalConfirmation(warningMsg, function () {
+                $.ajax({
+                    url: "/api/v2/metadata/dataset/" + datasetId + "/schema/" + schemaId + "/syncconsumptionlayer",
+                    method: "POST",
+                    dataType: 'json',
+                    success: function (obj) {
+                        Sentry.ShowModalAlert(
+                            obj, function () { });
+                    },
+                    failure: function () {
+                        Sentry.ShowModalAlert(
+                            "Failed to submit request", function () { });
+                    },
+                    error: function (obj) {
+                        var msg;
+                        if (obj.status === 400) {
+                            msg = obj.responseJSON.Message;
+                        }
+                        else {
+                            msg = "Failed to submit request";
+                        };
+                        Sentry.ShowModalAlert(
+                            msg, function () { });
+                    }
+                });
+            });
+        });
+
         //Disable delete functionality if only 1 Schema exists
         if ($('.configHeader').length === 1) {
             $('#btnDeleteConfig').removeClass("btn-danger");
