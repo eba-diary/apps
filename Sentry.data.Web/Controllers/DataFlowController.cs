@@ -78,6 +78,7 @@ namespace Sentry.data.Web.Controllers
 
             var groupedDatasets = _datasetService.GetDatasetsForQueryTool().GroupBy(x => x.DatasetCategories.First());
 
+            sList.Add(new SelectListItem() { Text = "Select Dataset", Value = "0", Group = new SelectListGroup() { Name = "Sentry" }, Selected = true });
             foreach (var ds in groupedDatasets)
             {
                 sList.AddRange(ds.Select(m => new SelectListItem()
