@@ -103,6 +103,7 @@ namespace Sentry.data.Web
                         Include("~/Content/system-notifications.css").
                         Include("~/Content/checkbox.css").
                         Include("~/Content/business-intelligence.css").
+                        Include("~/Content/dataflow.css").
                         Include("~/Content/site.css").
                         Include("~/Content/jquery.json-viewer.css"));
 

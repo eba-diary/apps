@@ -1,0 +1,108 @@
+﻿@model DataFlowModel
+
+@{
+    ViewBag.Title = "Data Flow Form";
+}
+
+@using (Html.BeginForm("DataFlowForm", "DataFlow", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+
+    @*<div class="form-group">
+            <div>
+                <input type="submit" value="Submit" class="btn btn-primary" />
+                <a id="CancelButton" class="btn btn-warning" href="">Cancel</a>
+            </div>
+        </div>*@
+
+    <div class="form-group col-md-12">
+        @Html.LabelFor(model => model.IngestionType, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-4">
+            @Html.EditorFor(m => m.IngestionType)
+            @*@Html.RadioButtonFor(model => model.IngestionType, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })*@
+        </div>
+    </div>
+
+    @Html.HiddenFor(model => model.IsCompressed)
+    <div class="form-group col-md-12">
+        @Html.LabelFor(model => model.IsCompressed, htmlAttributes: new { @class = "control-label col-md-2" })
+        <div class="col-md-1">
+            <div class="form-group">
+                <label class="col-sm-10 checkbox-container">
+                    <input id="IsCompressedCheckbox" type="checkbox" value="@Model.IsCompressed" />
+                    <span class="checkmark"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group col-md-12">
+        @Html.Label("Where should this data be loaded?", htmlAttributes: new { @class = "control-label col-md-2" })
+        <a id="btnAddSchemaMap" class="btn btn-primary">Add Schema Mapping</a>
+    </div>
+    <br />
+    <div id="schemaMapPanel" class="form-group col-md-12">
+        <ul class="schemaMapList">
+            @foreach (SchemaMapModel mapModel in Model.SchemaMaps)
+            {
+                @Html.Partial("_SchemaMap", mapModel)             
+            }
+        </ul>        
+    </div>
+
+
+    @*<div class="col-lg-12">
+        <table id="schema_map" class="table table-striped table-bordered table-hover">
+            <thead>
+                <tr>
+                    <td>Search Criteria</td>
+                    <td>Dataset</td>
+                    <td>Schema</td>
+                </tr>
+            </thead>
+            <tbody id="schemaMapRows">
+                @for (int i = 0; i < Model.SchemaMaps.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            @Html.EditorFor(m => m.SchemaMaps[i].SearchCriteria, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                        </td>
+                        <td>
+                            @Html.DropDownListFor(m => m.SchemaMaps[i].SelectedDataset, Model.SchemaMaps[i].AllDatasets, new { @class = "form-control edit-dataset-row" })
+                        </td>
+                        <td>
+                            @Html.DropDownListFor(m => m.SchemaMaps[i].SelectedSchema, Model.SchemaMaps[i].AllSchemas, new { @class = "form-control edit-dataset-row" })
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>*@
+
+    <br />
+    <div class="form-group">
+        <div>
+            <input type="submit" value="Submit" class="btn btn-primary" />
+            <a id="CancelButton" class="btn btn-warning" href="">Cancel</a>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script type="text/javascript">
+        $(function () {
+            data.DataFlow.DataFlowFormInit();
+
+            $(document).ready(function () {
+            $('[id$=__SelectedDataset]').change(function () {
+                var val = $(this).val();
+                console.log(val);
+            });
+        });
+        });
+
+        
+        
+    </script>
+}

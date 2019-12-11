@@ -1,0 +1,21 @@
+﻿.schemaMapPanel {
+    padding-left: 45px;
+}
+
+.schemaMapList {
+    list-style-type: none;
+}
+
+.schemaMapLine {
+    list-style-type: none;
+    border-radius: 10px;
+}
+
+.schemaMapLineItem {
+    background-color: #00A3E0;
+    padding: 10px;
+    border-bottom: 1px solid #aaa;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    margin-left: 30px;
+}

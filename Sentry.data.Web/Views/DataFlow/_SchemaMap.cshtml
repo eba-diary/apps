@@ -1,0 +1,66 @@
+﻿﻿@model Sentry.data.Web.SchemaMapModel
+@using (Html.BeginCollectionItem("SchemaMaps"))
+{
+    <li class="schemaMapLine">
+        <div class="schemaMapLineItem form-group col-md-12">
+            @*<div class="form-group col-md-12">*@
+                @*@Html.LabelFor(model => model.SearchCriteria, htmlAttributes: new { @class = "control-label col-md-2" })*@
+                <div class="col-md-4">
+                    @Html.EditorFor(m => m.SearchCriteria, new { htmlAttributes = new { @class = "control-label col-md-12", @style = "min-height: 32px;", @placeholder = "Enter Search Regex" } })
+                    @Html.ValidationMessageFor((model) => model.SearchCriteria, "", new { @class = "text-danger" })
+                </div>
+
+                @*@Html.LabelFor(model => model.SelectedDataset, htmlAttributes: new { @class = "control-label col-md-2" })*@
+                <div class="col-md-3">
+                    @Html.DropDownListFor((model) => model.SelectedDataset, Model.AllDatasets, new { @class = "form-control edit-dataset-row" })
+                    @Html.ValidationMessageFor((model) => model.SelectedDataset, "", new { @class = "text-danger" })
+                </div>
+
+                @*@Html.LabelFor(model => model.SelectedSchema, htmlAttributes: new { @class = "control-label col-md-2" })*@
+                <div class="col-md-4">
+                    @Html.DropDownListFor((model) => model.SelectedSchema, Model.AllSchemas, new { @class = "form-control edit-dataset-row" })
+                    @Html.ValidationMessageFor((model) => model.SelectedSchema, "", new { @class = "text-danger" })
+                </div>
+                <div class="col-md-1">
+                    <a class="btn btn-danger">Remove</a>
+                </div>
+            @*</div>*@
+        </div>
+    </li>
+}
+
+@*<div class="form-group col-md-4">
+    <div class="col-md-12">
+        @Html.EditorFor(m => m.SearchCriteria, new { htmlAttributes = new { @class = "control-label col-md-12" } })
+        @Html.ValidationMessageFor((model) => model.SearchCriteria, "", new { @class = "text-danger" })
+    </div>
+</div>
+
+<div class="form-group col-md-4">
+    <div class="col-md-12">
+        @Html.DropDownListFor((model) => model.SelectedDataset, Model.AllDatasets, new { @class = "form-control edit-dataset-row" })
+        @Html.ValidationMessageFor((model) => model.SelectedDataset, "", new { @class = "text-danger" })
+    </div>
+</div>
+
+<div class="form-group col-md-4">
+    <div class="col-md-12">
+        @Html.DropDownListFor((model) => model.SelectedSchema, Model.AllSchemas, new { @class = "form-control edit-dataset-row" })
+        @Html.ValidationMessageFor((model) => model.SelectedSchema, "", new { @class = "text-danger" })
+    </div>
+</div>*@
+
+@*<tr>
+        <td>
+            @Html.EditorFor(m => m.SearchCriteria, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+        </td>
+
+        <td>
+            @Html.DropDownListFor((model) => model.SelectedDataset, Model.AllDatasets, new { @class = "form-control edit-dataset-row" })
+        </td>
+
+        <td>
+            @Html.DropDownListFor((model) => model.SelectedSchema, Model.AllSchemas, new { @class = "form-control edit-dataset-row" })
+        </td>
+    </tr>*@
+
