@@ -6,7 +6,7 @@ using Sentry.data.Core;
 
 namespace Sentry.data.Web
 {
-    public class DataFlowDetailModel : DataFlowModel
+    public class DataFlowDetailModel : DFModel
     {
         public DataFlowDetailModel(DataFlowDetailDto dto) : base(dto)
         {
