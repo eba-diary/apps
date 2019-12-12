@@ -122,9 +122,9 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetPersonalLinesNotifications()
+        public JsonResult GetNotifications(BusinessAreaType businessAreaType)
         {
-            return Json(_notificationService.GetNotificationForBusinessArea(BusinessAreaType.PersonalLines).ToModel(), JsonRequestBehavior.AllowGet);
+            return Json(_notificationService.GetNotificationForBusinessArea(businessAreaType).ToModel(), JsonRequestBehavior.AllowGet);
         }
 
     }
