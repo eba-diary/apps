@@ -130,11 +130,9 @@ data.Notification = {
     displayNotifications: function (businessAreaType)
     {
         this.initNotifications();
-
-        if (businessAreaType === 1)  //personal = 1
-        {
-            $.get("/Notification/GetPersonalLinesNotifications", this.displayNotificationsPersonalLines);
-        }
+     
+        $.get("/Notification/GetNotifications/?businessAreaType=" + businessAreaType, this.displayNotificationsPersonalLines);
+        
     },
 
     displayNotificationsPersonalLines: function (e)
