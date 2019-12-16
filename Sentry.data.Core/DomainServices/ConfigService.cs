@@ -1345,24 +1345,24 @@ namespace Sentry.data.Core
         private void MapToDatasetFileConfigDto(DatasetFileConfig dfc, DatasetFileConfigDto dto)
         {
             dto.ConfigId = dfc.ConfigId;
-            dto.Name = dfc.Name;
-            dto.Description = dfc.Description;
+            dto.Name = dfc.Schema.Name;
+            dto.Description = dfc.Schema.Description;
             dto.DatasetScopeTypeId = dfc.DatasetScopeType.ScopeTypeId;
-            dto.FileExtensionId = dfc.FileExtension.Id;
-            dto.FileExtensionName = dfc.FileExtension.Name;
+            dto.FileExtensionId = dfc.Schema.Extension.Id;
+            dto.FileExtensionName = dfc.Schema.Extension.Name;
             dto.ParentDatasetId = dfc.ParentDataset.DatasetId;
-            dto.StorageCode = dfc.GetStorageCode();
+            dto.StorageCode = dfc.Schema.StorageCode;
             dto.StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + dfc.GetStorageCode() + "\\";
             dto.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
-            dto.CreateCurrentView = (dfc.Schemas.FirstOrDefault() != null) ? dfc.Schemas.FirstOrDefault().CreateCurrentView : false;
-            dto.IsInSAS = (dfc.Schemas.FirstOrDefault() != null) ? dfc.Schemas.FirstOrDefault().IsInSAS : false;
-            dto.Delimiter = dfc.Schemas.FirstOrDefault().Delimiter;
-            dto.HasHeader = (dfc.Schemas.FirstOrDefault() != null) ? dfc.Schemas.FirstOrDefault().HasHeader : false;
+            dto.CreateCurrentView = (dfc.Schema != null) ? dfc.Schema.CreateCurrentView : false;
+            dto.IsInSAS = (dfc.Schema != null) ? dfc.Schema.IsInSAS : false;
+            dto.Delimiter = dfc.Schema?.Delimiter;
+            dto.HasHeader = (dfc.Schema != null) ? dfc.Schema.HasHeader : false;
             dto.IsTrackableSchema = dfc.IsSchemaTracked;
-            dto.HiveTable = dfc.Schemas.First().HiveTable;
-            dto.HiveDatabase = dfc.Schemas.First().HiveDatabase;
-            dto.HiveLocation = dfc.Schemas.First().HiveLocation;
-            dto.HiveTableStatus = dfc.Schemas.First().HiveTableStatus;
+            dto.HiveTable = dfc.Schema?.HiveTable;
+            dto.HiveDatabase = dfc.Schema?.HiveDatabase;
+            dto.HiveLocation = dfc.Schema?.HiveLocation;
+            dto.HiveTableStatus = dfc.Schema?.HiveTableStatus;
             dto.Schema = (dfc.Schema != null) ? _schemaService.GetFileSchemaDto(dfc.Schema.SchemaId) : null;
         }
 
