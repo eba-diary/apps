@@ -13,7 +13,7 @@ namespace Sentry.data.Core
     {
         private readonly IDatasetContext _datasetContext;
         private readonly IMessagePublisher _messagePublisher;
-        
+
 
         public DataFlowService(IDatasetContext datasetContext, IMessagePublisher messagePublisher)
         {
@@ -119,16 +119,18 @@ namespace Sentry.data.Core
             _messagePublisher.PublishDSCEvent(key, message);
         }
 
-        //public bool GenerateJobRequest(int dataFlowStepId, string sourceBucket, string sourceKey, string executionGuid)
-        //{
-        //    DataFlowStep step = _datasetContext.GetById<DataFlowStep>(dataFlowStepId);
-        //    step.GenerateStartEvent(sourceBucket, sourceKey, executionGuid);
-        //    //string JobEvent = step.GenerateStartEvent(sourceBucket, sourceKey, );
+        public IQueryable<DataSourceType> GetDataSourceTypes()
+        {
+            return _datasetContext.DataSourceTypes;
+        }
 
-        //    //_messagePublisher.PublishDSCEvent($"{step.DataFlow.Id}-{step.Id}", JobEvent);
+        public IQueryable<DataSource> GetDataSources()
+        {
+            return _datasetContext.DataSources;
+        }
 
-        //    return true;
-        //}
+
+
 
         #region Private Methods
         private void MapToDtoList(List<DataFlow> dfList, List<DataFlowDto> dtoList)

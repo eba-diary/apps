@@ -445,6 +445,27 @@ namespace Sentry.data.Web.Helpers
 
             return patterns;
         }
+
+        public static IEnumerable<SelectListItem> BuildCompressionDropdown(bool isCompressed)
+        {
+            List<SelectListItem> compressionList = new List<SelectListItem>();
+            
+            compressionList.Add(new SelectListItem()
+            {
+                Text = "Yes",
+                Value = "true",
+                Selected = isCompressed == true
+            });
+
+            compressionList.Add(new SelectListItem()
+            {
+                Text = "No",
+                Value = "false",
+                Selected = isCompressed == false
+            });
+
+            return compressionList;
+        }
     }
 
 }

@@ -15,70 +15,93 @@
                 <a id="CancelButton" class="btn btn-warning" href="">Cancel</a>
             </div>
         </div>*@
-
+    <div id="dataflow-home-wrapper" class="col-md-12 col-lg-12">
+        <div class="dataflow-home-photo bg-photo-dataflow">
+        </div>
+    </div>
+    @*<h2>How Will DSC Ingest Data?</h2>*@
     <div class="form-group col-md-12">
-        @Html.LabelFor(model => model.IngestionType, htmlAttributes: new { @class = "control-label col-md-2" })
+        @*@Html.LabelFor(model => model.IngestionType, htmlAttributes: new { @class = "control-label col-md-2" })*@
         <div class="col-md-4">
-            @Html.EditorFor(m => m.IngestionType)
+            @*@Html.EditorFor(m => m.IngestionType)*@
+            @Html.EnumDropDownListFor(
+                x => x.IngestionType,
+                "Select Ingestion Type",
+                new { @class = "form-control" })
             @*@Html.RadioButtonFor(model => model.IngestionType, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })*@
         </div>
     </div>
-
-    @Html.HiddenFor(model => model.IsCompressed)
-    <div class="form-group col-md-12">
-        @Html.LabelFor(model => model.IsCompressed, htmlAttributes: new { @class = "control-label col-md-2" })
-        <div class="col-md-1">
-            <div class="form-group">
-                <label class="col-sm-10 checkbox-container">
-                    <input id="IsCompressedCheckbox" type="checkbox" value="@Model.IsCompressed" />
-                    <span class="checkmark"></span>
-                </label>
+    <br />
+    <div class="compressionPanel" style="display:none;">
+        @*@Html.HiddenFor(model => model.IsCompressed)*@
+        <div class="form-group col-md-12">
+            @Html.LabelFor(model => model.IsCompressed, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-1">
+                @Html.DropDownListFor((m) => m.IsCompressed, Model.CompressionDropdown, new { @class = "form-control edit-dataset-row" })
+                @*<div class="form-group">
+                        <label class="col-sm-10 checkbox-container">
+                            <input id="IsCompressedCheckbox" type="checkbox" value="@Model.IsCompressed" />
+                            <span class="checkmark"></span>
+                        </label>
+                    </div>*@
             </div>
         </div>
     </div>
-
-    <div class="form-group col-md-12">
-        @Html.Label("Where should this data be loaded?", htmlAttributes: new { @class = "control-label col-md-2" })
-        <a id="btnAddSchemaMap" class="btn btn-primary">Add Schema Mapping</a>
+    <br />
+    <div class="form-group col-md-11 col-md-offset-1 retrieverPanel" style="display:none">
+        <div id="retrieverJobPanel">
+            @if (Model.RetrieverJob != null)
+            {
+                @Html.Partial("_RetrieverJob", Model.RetrieverJob)
+            }
+        </div>
     </div>
     <br />
-    <div id="schemaMapPanel" class="form-group col-md-12">
-        <ul class="schemaMapList">
-            @foreach (SchemaMapModel mapModel in Model.SchemaMaps)
-            {
-                @Html.Partial("_SchemaMap", mapModel)             
-            }
-        </ul>        
+    <div class="schemaMapPanel" style="display:none;">
+        <div class="form-group col-md-12">
+            @Html.LabelFor(model => model.SchemaMaps, htmlAttributes: new { @class = "control-label col-md-2" })
+            <a id="btnAddSchemaMap" class="btn btn-primary">Add Schema Mapping</a>
+        </div>
+        <br />
+        <div id="schemaMapPanel" class="form-group col-md-12">
+            <ul class="schemaMapList">
+                @foreach (SchemaMapModel mapModel in Model.SchemaMaps)
+                {
+                    @Html.Partial("_SchemaMap", mapModel)
+                }
+            </ul>
+        </div>
     </div>
+
 
 
     @*<div class="col-lg-12">
-        <table id="schema_map" class="table table-striped table-bordered table-hover">
-            <thead>
-                <tr>
-                    <td>Search Criteria</td>
-                    <td>Dataset</td>
-                    <td>Schema</td>
-                </tr>
-            </thead>
-            <tbody id="schemaMapRows">
-                @for (int i = 0; i < Model.SchemaMaps.Count; i++)
-                {
+            <table id="schema_map" class="table table-striped table-bordered table-hover">
+                <thead>
                     <tr>
-                        <td>
-                            @Html.EditorFor(m => m.SchemaMaps[i].SearchCriteria, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
-                        </td>
-                        <td>
-                            @Html.DropDownListFor(m => m.SchemaMaps[i].SelectedDataset, Model.SchemaMaps[i].AllDatasets, new { @class = "form-control edit-dataset-row" })
-                        </td>
-                        <td>
-                            @Html.DropDownListFor(m => m.SchemaMaps[i].SelectedSchema, Model.SchemaMaps[i].AllSchemas, new { @class = "form-control edit-dataset-row" })
-                        </td>
+                        <td>Search Criteria</td>
+                        <td>Dataset</td>
+                        <td>Schema</td>
                     </tr>
-                }
-            </tbody>
-        </table>
-    </div>*@
+                </thead>
+                <tbody id="schemaMapRows">
+                    @for (int i = 0; i < Model.SchemaMaps.Count; i++)
+                    {
+                        <tr>
+                            <td>
+                                @Html.EditorFor(m => m.SchemaMaps[i].SearchCriteria, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                            </td>
+                            <td>
+                                @Html.DropDownListFor(m => m.SchemaMaps[i].SelectedDataset, Model.SchemaMaps[i].AllDatasets, new { @class = "form-control edit-dataset-row" })
+                            </td>
+                            <td>
+                                @Html.DropDownListFor(m => m.SchemaMaps[i].SelectedSchema, Model.SchemaMaps[i].AllSchemas, new { @class = "form-control edit-dataset-row" })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>*@
 
     <br />
     <div class="form-group">
@@ -90,19 +113,19 @@
 }
 
 @section Scripts {
+    @Scripts.Render("~/bundles/prettyCron")
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.css">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/timepicker/1.3.5/jquery.timepicker.min.js"></script>
     <script type="text/javascript">
         $(function () {
             data.DataFlow.DataFlowFormInit();
 
             $(document).ready(function () {
-            $('[id$=__SelectedDataset]').change(function () {
-                var val = $(this).val();
-                console.log(val);
+                $('[id$=__SelectedDataset]').change(function () {
+                    var val = $(this).val();
+                    console.log(val);
+                });
             });
         });
-        });
-
-        
-        
     </script>
 }

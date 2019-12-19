@@ -14,5 +14,7 @@ namespace Sentry.data.Core
         bool CreateDataFlow(int schemaId);
         void PublishMessage(string key, string message);
         //bool GenerateJobRequest(int dataFlowStepId, string sourceBucket, string sourceKey, string executionGuid);
+        IQueryable<DataSourceType> GetDataSourceTypes();
+        IQueryable<DataSource> GetDataSources();
     }
 }
