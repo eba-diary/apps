@@ -163,13 +163,8 @@
 
     <div data-bind="visible: Errors().length >= 1" style="display: none;">
         <h6 style="color: red;">Errors:</h6>
+        <ul data-bind="template: {name: 'ErrorTemplate' , foreach: Errors()}"></ul>
     </div>
-    <ul style="display: none; color: red;" data-bind="foreach: Errors().sort(function (l, r) { return (l.Id == r.Id) ? (l.Id > r.Id ? 1 : -1) : (l.Id > r.Id ? 1 : -1) }), visible: Errors().length >= 1">
-        <li>
-            <span>Row # <span data-bind="text: Id"></span></span> :
-            <span data-bind="text: Description"></span>
-        </li>
-    </ul>
 
     <h2 class="@color">Fields for @schema.Name</h2>
 
@@ -215,6 +210,13 @@
             </div>
         </div>
     </div>
+
+    <script type="text/html" id="ErrorTemplate">
+        <li>
+            <span>Row # <span data-bind="text: Id"></span></span> :
+            <span data-bind="text: Description"></span>
+        </li>
+    </script>
 
     <script type="text/html" id="RowTemplate">
         <li class="ui-sortable-handle schemaRowContainer" data-bind="css: $root.ClickableRows(), style : { 'background-color' : RowColor }">
@@ -305,7 +307,7 @@
             var precision = options.precision,
                 min = options.min,
                 max = options.max;
-            
+
             var result = ko.pureComputed({
                 read: target,  //always return the original observables value
                 write: function (newValue) {
@@ -343,7 +345,7 @@
 
         function Row(id, indata, parent, level) {
             var self = this;
-            var parent = parent;
+            var parentvm = parent;
             var thisLevel = ++level;
 
             if (indata.Position != undefined && indata.Position !== 0) {
@@ -368,67 +370,54 @@
             self.Level = ko.observable(thisLevel);
             self.ChildRows = ko.observableArray(ko.utils.arrayMap(indata.ChildRows, function (rowInfo) {
                 currentMax++;
-                return new Row(currentMax, rowInfo, self, thisLevel);
+                return new Row(currentMax, rowInfo, parentvm, thisLevel);
             }));
 
 
             self.RowColor = ko.computed(function () {
                 var hasError = false;
 
-                if (parent.Errors !== undefined && parent.Errors().length > 0) {
-                    parent.Errors.remove(function (item) {
-                        if (item.Id === self.Position() && item.ErrorType == 'Type') {
-                            return item;
-                        }
-                    });
-                    parent.Errors.remove(function (item) {
-                        if (item.Id === self.Position() && item.ErrorType == 'Name') {
-                            return item;
-                        }
-                    });
-                    parent.Errors.remove(function (item) {
-                        if (item.Id === self.Position() && item.ErrorType == 'Datatype') {
-                            return item;
-                        }
-                    });
+                if (parentvm.Errors === undefined) {
+                    parentvm.Errors = ko.observableArray();
                 }
-
-                if (parent.Errors == undefined) {
-                    parent.Errors = ko.observableArray();
+                else {
+                    parentvm.Errors.remove(function (item) {
+                    return item.Id === self.Position();
+                    });
                 }
 
                 //Has no children.  Error
                 if ((self.DataType() === 'STRUCT' || (self.DataType() === 'ARRAY' && self.ArrayType() === 'STRUCT')) && self.ChildRows !== undefined && self.ChildRows().length === 0) {
-                    parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has no children.  Please add a child or change data types.' });
+                    parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has no children.  Please add a child or change data types.' });
                     hasError = true;
                 }
                 //Has children when it shouldn't
                 else if (self.DataType() === 'ARRAY' && self.ArrayType() !== "STRUCT" && self.ChildRows !== undefined && self.ChildRows().length > 0) {
-                    parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to ARRAY<STRUCT>.' });
+                    parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to ARRAY<STRUCT>.' });
                     hasError = true;
                 }
                 //Has children when it shouldn't
                 else if (self.DataType() !== 'STRUCT' && (self.DataType() !== 'ARRAY' && self.ArrayType() !== "STRUCT") && self.ChildRows !== undefined && self.ChildRows().length > 0) {
-                    parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to STRUCT.' });
+                    parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Type', 'Description': ' has children when it should not.  Please remove the children or change data types to STRUCT.' });
                     hasError = true;
                 }
                 //Name is blank
                 if (self.Name() === '' || self.Name() === undefined || self.Name() === null) {
-                    parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' has no name.' });
+                    parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' has no name.' });
                     hasError = true;
                 }
 
                 if (self.Name() !== undefined && self.Name() !== '' && self.Name() !== null) {
                     //Name contains spaces
                     if (self.Name().indexOf(' ') >= 0) {
-                        parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot contain Spaces.' });
+                        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot contain Spaces.' });
                         hasError = true;
                     }
 
                     //Name contains special characters
                     var pattchar = new RegExp("[-:,;{}()]");
                     if (pattchar.test(self.Name())) {
-                        parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot special characters (-:,;{}()).' });
+                        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot special characters (-:,;{}()).' });
                         hasError = true;
                     }
 
@@ -436,26 +425,26 @@
                     var pattupper = new RegExp("[A-Z]");
                     //var nme = self.Name();
                     if (pattupper.test(self.Name())) {
-                        parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot uppercase letters.' });
+                        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot uppercase letters.' });
                         hasError = true;
                     }
                 }
 
                 if (self.DataType() === undefined) {
-                    parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Datatype', 'Description': ' Datatype selection required.' });
+                    parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Datatype', 'Description': ' Datatype selection required.' });
                     hasError = true;
                 }
 
                 if (self.DataType() === 'DECIMAL') {
                     if (self.Scale() > self.Precision()) {
-                        parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Datatype', 'Description': 'Scale need to be less than or equal to Precision.' });
+                        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Datatype', 'Description': 'Scale need to be less than or equal to Precision.' });
                         hasError = true;
                     }
 
                     if (self.Precision() <= 0) {
-                        parent.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Datatype', 'Description': 'Precision need to be greater than 0.' });
+                        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Datatype', 'Description': 'Precision need to be greater than 0.' });
                         hasError = true;
-                    }                    
+                    }
                 }
 
                 if (hasError) {
@@ -463,7 +452,7 @@
                     return 'rgba(255, 0, 0, 0.8)';
                 }
                 else {
-                    if (parent.Errors !== undefined && parent.Errors().length === 0) {
+                    if (parentvm.Errors !== undefined && parentvm.Errors().length === 0) {
                         $('#saveBtn').show();
                     }
                     return '';
@@ -595,9 +584,23 @@
             };
 
             self.removeChild = function (row) {
-                parent.Errors.remove(function (item) { return item.Id === row.Id; });
+                parentvm.Errors.remove(function (item) { return item.Id === row.Position(); });
                 self.ChildRows.remove(row);
             };
+
+            self.removeChildren = function () {
+                self.ChildRows().forEach(function (cRow) {
+                    if (cRow.HasChildren) {
+                        cRow.removeChildren();
+                    }
+
+                    parentvm.Errors.remove(function (item) {
+                        return item.Id === cRow.Position();
+                    });
+
+                    cRow.DeleteInd(true);
+                });
+            }
         };
 
         function ValidDataType(item) {
@@ -611,6 +614,7 @@
             var self = this;
 
             //Observables
+            //self.ErrorsCopy = ko.observableArray();
             self.Errors = ko.observableArray();
             self.DataTypes = ko.observableArray();
             self.IsPositional = ko.observable();
@@ -654,19 +658,20 @@
             };
 
             self.removeRow = function (row) {
-                var listCopy = self.Rows;
+                var position = row.Position();
 
+                if (row.HasChildren) {
+                    row.removeChildren();
+                }
+                
 
                 self.Errors.remove(function (item) {
-                    if (item.Id.toString() === row.Position().toString()) {
-                        return item;
-                    }
-                });
+                    return item.Id === position;
+                })
 
                 row.DeleteInd(true);
                 self.Rows.valueHasMutated();
                 self.SortRows();
-
             };
 
             self.save = function () {

@@ -358,6 +358,11 @@ namespace Sentry.data.Core
                 errors.Add("Contact is requried.");
             }
 
+            if (dto.DatasetCategoryIds.Count == 1 && dto.DatasetCategoryIds[0].Equals(0))
+            {
+                errors.Add("Category is required");
+            }
+
             return errors;
         }
 
