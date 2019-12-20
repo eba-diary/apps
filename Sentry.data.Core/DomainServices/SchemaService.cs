@@ -303,7 +303,8 @@ namespace Sentry.data.Core
                 HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
                 CreatedDTM = DateTime.Now,
                 LastUpdatedDTM = DateTime.Now,
-                DeleteIssueDTM = DateTime.MaxValue
+                DeleteIssueDTM = DateTime.MaxValue,
+                CreateCurrentView = dto.CreateCurrentView
             };
             _datasetContext.Add(schema);
             return schema.SchemaId;
@@ -338,20 +339,32 @@ namespace Sentry.data.Core
 
         }
 
-        public bool SasUpdateNotification(int schemaId, int revisionId)
+        public bool SasUpdateNotification(int schemaId, int revisionId, string initiatorId)
         {
             SchemaRevision rev = null;
+            IApplicationUser user;
             try
             {
                 rev = _datasetContext.SchemaRevision.Where(w => w.SchemaRevision_Id == revisionId && w.ParentSchema.SchemaId == schemaId).FirstOrDefault();
                 bool fieldChanges = rev.Fields.Where(w => w.LastUpdateDTM == rev.LastUpdatedDTM).Any();
+                
+                //Use incoming initiator id.  If invalid or not supplied, use CreatedBy id on revision.
+                if (!string.IsNullOrWhiteSpace(initiatorId))
+                {
+                    user = _userService.GetByAssociateId(initiatorId);
+                }
+                else
+                {
+                    user = _userService.GetByAssociateId(rev.CreatedBy);
+                }
+                
                 if (fieldChanges && rev.Revision_NBR == 1)
                 {
-                    SasNotification(rev.ParentSchema, "ADD", null, _userService.GetByAssociateId(rev.CreatedBy));
+                    SasNotification(rev.ParentSchema, "ADD", null, user);
                 }
                 else if (fieldChanges)
                 {
-                    SasNotification(rev.ParentSchema, "UPDATE", null, _userService.GetByAssociateId(rev.CreatedBy));
+                    SasNotification(rev.ParentSchema, "UPDATE", null, user);
                 }
 
                 return true;

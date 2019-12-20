@@ -108,7 +108,8 @@
                                         {
                                             <li>
                                                 <a href="/Config/Dataset/@Model.DatasetId">Manage Schemas</a>
-                                                <a id="btnDeleteDataset" data-id="@Model.DatasetId" data-grpCnt="@Model.GroupAccessCount" data-IsSecured="@Model.IsSecured">Delete Dataset</a>
+                                                <a class="btn" id="btnSyncConsumptionLayers" data-id="@Model.DatasetId" style="text-align: left">Sync All Consumption Layers</a>
+                                                <a class="btn" id="btnDeleteDataset" data-id="@Model.DatasetId" data-grpCnt="@Model.GroupAccessCount" data-IsSecured="@Model.IsSecured" style="text-align: left">Delete Dataset</a>
                                             </li>
                                         }
                                         @if (Model.Security.CanQueryDataset)

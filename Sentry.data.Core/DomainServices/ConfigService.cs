@@ -559,7 +559,8 @@ namespace Sentry.data.Core
                 SchemaID = revision.ParentSchema.SchemaId,
                 RevisionID = revision.SchemaRevision_Id,
                 DatasetID = config.ParentDataset.DatasetId,
-                HiveStatus = null
+                HiveStatus = null,
+                InitiatorID = _userService.GetCurrentUser().AssociateId
             };
             _messagePublisher.PublishDSCEvent(config.Schema.SchemaId.ToString(), JsonConvert.SerializeObject(hiveCreate));
 
@@ -932,6 +933,57 @@ namespace Sentry.data.Core
             S3ServiceProvider.DeleteS3Prefix($"{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
         }
 
+        public bool SyncConsumptionLayer(int datasetId, int schemaId)
+        {
+            if (datasetId == 0)
+            {
+                throw new ArgumentException("Argument is required", "datasetId");
+            }
+
+            try
+            {
+                List<DatasetFileConfig> configList;
+                if (schemaId == 0)
+                {
+                    configList = _datasetContext.DatasetFileConfigs.Where(w => w.ParentDataset.DatasetId == datasetId).ToList();
+                    _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.SYNC_DATASET_SCHEMA, _userService.GetCurrentUser().AssociateId, "Sync all schemas for dataset", datasetId);
+
+                }
+                else
+                {
+                    configList = _datasetContext.DatasetFileConfigs.Where(w => w.ParentDataset.DatasetId == datasetId && w.Schema.SchemaId == schemaId).ToList();
+                    _eventService.PublishSuccessEventByConfigId(GlobalConstants.EventType.SYNC_DATASET_SCHEMA, _userService.GetCurrentUser().AssociateId, "Sync specific schema", configList.First().ConfigId);
+                }
+
+                if (configList != null)
+                {
+                    foreach (DatasetFileConfig config in configList.Where(w => w.Schema.Revisions.Any()))
+                    {
+                        HiveTableCreateModel hiveModel = new HiveTableCreateModel()
+                        {
+                            DatasetID = config.ParentDataset.DatasetId,
+                            SchemaID = config.Schema.SchemaId,
+                            RevisionID = config.GetLatestSchemaRevision().SchemaRevision_Id,
+                            InitiatorID = _userService.GetCurrentUser().AssociateId
+                        };
+
+                        _messagePublisher.PublishDSCEvent(hiveModel.SchemaID.ToString(), JsonConvert.SerializeObject(hiveModel));
+                    }
+
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }                
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("configservice-syncconsumptionlayer failed", ex);
+                return false;
+            }
+        }
+
         #region PrivateMethods
         private void MarkForDelete(DatasetFileConfig dfc)
         {
@@ -1293,24 +1345,24 @@ namespace Sentry.data.Core
         private void MapToDatasetFileConfigDto(DatasetFileConfig dfc, DatasetFileConfigDto dto)
         {
             dto.ConfigId = dfc.ConfigId;
-            dto.Name = dfc.Name;
-            dto.Description = dfc.Description;
+            dto.Name = dfc.Schema.Name;
+            dto.Description = dfc.Schema.Description;
             dto.DatasetScopeTypeId = dfc.DatasetScopeType.ScopeTypeId;
-            dto.FileExtensionId = dfc.FileExtension.Id;
-            dto.FileExtensionName = dfc.FileExtension.Name;
+            dto.FileExtensionId = dfc.Schema.Extension.Id;
+            dto.FileExtensionName = dfc.Schema.Extension.Name;
             dto.ParentDatasetId = dfc.ParentDataset.DatasetId;
-            dto.StorageCode = dfc.GetStorageCode();
+            dto.StorageCode = dfc.Schema.StorageCode;
             dto.StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + dfc.GetStorageCode() + "\\";
             dto.Security = _securityService.GetUserSecurity(null, _userService.GetCurrentUser());
-            dto.CreateCurrentView = (dfc.Schemas.FirstOrDefault() != null) ? dfc.Schemas.FirstOrDefault().CreateCurrentView : false;
-            dto.IsInSAS = (dfc.Schemas.FirstOrDefault() != null) ? dfc.Schemas.FirstOrDefault().IsInSAS : false;
-            dto.Delimiter = dfc.Schemas.FirstOrDefault().Delimiter;
-            dto.HasHeader = (dfc.Schemas.FirstOrDefault() != null) ? dfc.Schemas.FirstOrDefault().HasHeader : false;
+            dto.CreateCurrentView = (dfc.Schema != null) ? dfc.Schema.CreateCurrentView : false;
+            dto.IsInSAS = (dfc.Schema != null) ? dfc.Schema.IsInSAS : false;
+            dto.Delimiter = dfc.Schema?.Delimiter;
+            dto.HasHeader = (dfc.Schema != null) ? dfc.Schema.HasHeader : false;
             dto.IsTrackableSchema = dfc.IsSchemaTracked;
-            dto.HiveTable = dfc.Schemas.First().HiveTable;
-            dto.HiveDatabase = dfc.Schemas.First().HiveDatabase;
-            dto.HiveLocation = dfc.Schemas.First().HiveLocation;
-            dto.HiveTableStatus = dfc.Schemas.First().HiveTableStatus;
+            dto.HiveTable = dfc.Schema?.HiveTable;
+            dto.HiveDatabase = dfc.Schema?.HiveDatabase;
+            dto.HiveLocation = dfc.Schema?.HiveLocation;
+            dto.HiveTableStatus = dfc.Schema?.HiveTableStatus;
             dto.Schema = (dfc.Schema != null) ? _schemaService.GetFileSchemaDto(dfc.Schema.SchemaId) : null;
         }
 

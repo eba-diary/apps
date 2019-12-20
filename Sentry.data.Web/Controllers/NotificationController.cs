@@ -121,5 +121,11 @@ namespace Sentry.data.Web.Controllers
             return Json(owners, JsonRequestBehavior.AllowGet);
         }
 
+        [HttpGet]
+        public JsonResult GetNotifications(BusinessAreaType businessAreaType)
+        {
+            return Json(_notificationService.GetNotificationForBusinessArea(businessAreaType).ToModel(), JsonRequestBehavior.AllowGet);
+        }
+
     }
 }
