@@ -58,8 +58,12 @@ namespace Sentry.data.Web.Controllers
         public ViewResult Create()
         {
             DataFlowModel model = new DataFlowModel();
-
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
+
+            //Every dataflow requires at least one schemamap, therefore, load a default empty schemamapmodel
+            SchemaMapModel schemaModel = new SchemaMapModel();
+            SetSchemaModelLists(schemaModel);
+            model.SchemaMaps.Add(schemaModel);
 
             return View("DataFlowForm", model);
         }
@@ -67,6 +71,16 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public ActionResult DataFlowForm(DataFlowModel model)
         {
+            DataFlowDto dfDto = model.ToDto();
+
+            //if (ModelState.IsValid)
+            //{
+            //    if (dfDto.Id == 0)
+            //    {
+            //        _dataFlowService.CreateDataFlow();
+            //    }
+            //}
+
             return RedirectToAction("Index");
         }
 
@@ -74,6 +88,8 @@ namespace Sentry.data.Web.Controllers
         public PartialViewResult NewSchemaMap()
         {
             List<SelectListItem> sList = new List<SelectListItem>();
+            SchemaMapModel modela = new SchemaMapModel();
+            SetSchemaModelLists(modela);
 
             var groupedDatasets = _datasetService.GetDatasetsForQueryTool().GroupBy(x => x.DatasetCategories.First());
 
@@ -94,6 +110,25 @@ namespace Sentry.data.Web.Controllers
             };
 
             return PartialView("_SchemaMap", model);
+        }
+
+        private void SetSchemaModelLists(SchemaMapModel model)
+        {
+            List<SelectListItem> sList = new List<SelectListItem>();
+            var groupedDatasets = _datasetService.GetDatasetsForQueryTool().GroupBy(x => x.DatasetCategories.First());
+
+            sList.Add(new SelectListItem() { Text = "Select Dataset", Value = "0", Group = new SelectListGroup() { Name = "Sentry" }, Selected = true });
+            foreach (var ds in groupedDatasets)
+            {
+                sList.AddRange(ds.Select(m => new SelectListItem()
+                {
+                    Text = m.DatasetName,
+                    Value = m.DatasetId.ToString(),
+                    Group = new SelectListGroup() { Name = ds.Key.Name }
+                }));
+            }
+
+            model.AllDatasets = sList;
         }
 
         public PartialViewResult NewRetrieverJob()

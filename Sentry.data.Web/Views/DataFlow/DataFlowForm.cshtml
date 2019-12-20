@@ -35,20 +35,20 @@
     <div class="compressionPanel" style="display:none;">
         @*@Html.HiddenFor(model => model.IsCompressed)*@
         <div class="form-group col-md-12">
-            @Html.LabelFor(model => model.IsCompressed, htmlAttributes: new { @class = "control-label col-md-2" })
+            <h4>Is Your Incoming Data Compressed?</h4>
             <div class="col-md-1">
                 @Html.DropDownListFor((m) => m.IsCompressed, Model.CompressionDropdown, new { @class = "form-control edit-dataset-row" })
                 @*<div class="form-group">
-                        <label class="col-sm-10 checkbox-container">
-                            <input id="IsCompressedCheckbox" type="checkbox" value="@Model.IsCompressed" />
-                            <span class="checkmark"></span>
-                        </label>
-                    </div>*@
+                <label class="col-sm-10 checkbox-container">
+                    <input id="IsCompressedCheckbox" type="checkbox" value="@Model.IsCompressed" />
+                    <span class="checkmark"></span>
+                </label>
+            </div>*@
             </div>
         </div>
     </div>
     <br />
-    <div class="form-group col-md-11 col-md-offset-1 retrieverPanel" style="display:none">
+    <div class="form-group col-md-12 retrieverPanel" style="display:none">
         <div id="retrieverJobPanel">
             @if (Model.RetrieverJob != null)
             {
@@ -59,18 +59,17 @@
     <br />
     <div class="schemaMapPanel" style="display:none;">
         <div class="form-group col-md-12">
-            @Html.LabelFor(model => model.SchemaMaps, htmlAttributes: new { @class = "control-label col-md-2" })
-            <a id="btnAddSchemaMap" class="btn btn-primary">Add Schema Mapping</a>
-        </div>
-        <br />
-        <div id="schemaMapPanel" class="form-group col-md-12">
-            <ul class="schemaMapList">
+            <h4>Where Do You Want The Data to Go?</h4>
+            @*@Html.LabelFor(model => model.SchemaMaps, htmlAttributes: new { @class = "control-label col-md-2" })*@
+            @*<a id="btnAddSchemaMap" class="btn btn-primary">Add Schema Mapping</a>*@
+            <div id="schemaMapPanel" class="form-group col-md-12">
                 @foreach (SchemaMapModel mapModel in Model.SchemaMaps)
                 {
                     @Html.Partial("_SchemaMap", mapModel)
                 }
-            </ul>
-        </div>
+                <button><span class="glyphicon glyphicon-plus"></span></button>
+            </div>
+        </div>        
     </div>
 
 
