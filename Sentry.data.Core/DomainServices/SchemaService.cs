@@ -303,7 +303,8 @@ namespace Sentry.data.Core
                 HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
                 CreatedDTM = DateTime.Now,
                 LastUpdatedDTM = DateTime.Now,
-                DeleteIssueDTM = DateTime.MaxValue
+                DeleteIssueDTM = DateTime.MaxValue,
+                CreateCurrentView = dto.CreateCurrentView
             };
             _datasetContext.Add(schema);
             return schema.SchemaId;

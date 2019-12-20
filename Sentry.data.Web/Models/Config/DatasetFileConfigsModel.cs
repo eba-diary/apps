@@ -19,20 +19,20 @@ namespace Sentry.data.Web
         {
             this.ConfigId = dsfc.ConfigId;
             this.FileTypeId = dsfc.FileTypeId;
-            this.ConfigFileName = dsfc.Name;
-            this.ConfigFileDesc = dsfc.Description;
+            this.ConfigFileName = dsfc.Schema.Name;
+            this.ConfigFileDesc = dsfc.Schema.Description;
             this.ParentDatasetName = dsfc.ParentDataset.DatasetName;
             this.DatasetScopeTypeID = dsfc.DatasetScopeType.ScopeTypeId;
             this.ScopeType = dsfc.DatasetScopeType;
-            this.FileExtensionID = dsfc.FileExtension.Id;
-            this.FileExtension = dsfc.FileExtension;
+            this.FileExtensionID = dsfc.Schema.Extension.Id;
+            this.FileExtension = dsfc.Schema.Extension;
             this.Schemas = dsfc.Schemas;
             this.Schema = dsfc.Schema ?? null;
-            this.RawStorageId = dsfc.GetStorageCode();
+            this.RawStorageId = dsfc.Schema.StorageCode;
             this.SchemaId = (dsfc.Schema != null) ? dsfc.Schema.SchemaId : 0;
-            this.Delimiter = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().Delimiter;
-            this.CreateCurrentView = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().CreateCurrentView;
-            this.HasHeader = dsfc.Schemas.OrderByDescending(o => o.DataElementChange_DTM).FirstOrDefault().HasHeader;
+            this.Delimiter = dsfc.Schema?.Delimiter;
+            this.CreateCurrentView = (dsfc.Schema != null) ? dsfc.Schema.CreateCurrentView : false;
+            this.HasHeader = (dsfc.Schema != null) ? dsfc.Schema.HasHeader : false;
             this.OldSchemaId = (Schemas != null) ? Schemas.FirstOrDefault().DataElement_ID : 0;
 
             try
