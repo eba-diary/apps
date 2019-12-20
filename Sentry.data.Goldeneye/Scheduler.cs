@@ -21,10 +21,21 @@ namespace Sentry.data.Goldeneye
             var options = new SqlServerStorageOptions
             {
                 //Turn off automatic creation of HangFire database schema
-                PrepareSchemaIfNecessary = false
+                PrepareSchemaIfNecessary = false,
+                SchemaName = "HangFire7",
+                UsePageLocksOnDequeue = true, // Migration to Schema 7 is required
+                DisableGlobalLocks = true,    // Migration to Schema 7 is required
+                EnableHeavyMigrations = false // Default value: false
             };
 
-            GlobalConfiguration.Configuration.UseSqlServerStorage(Configuration.Config.GetHostSetting("DatabaseConnectionString"), options);
+            GlobalConfiguration.Configuration
+                .UseSqlServerStorage(Configuration.Config.GetHostSetting("DatabaseConnectionString"), options)
+                .UseLog4NetLogProvider()
+
+                //https://docs.hangfire.io/en/latest/upgrade-guides/upgrading-to-hangfire-1.7.html#updating-configuration
+                .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
+                .UseSimpleAssemblyNameTypeSerializer()
+                .UseRecommendedSerializerSettings();
 
         }
 
