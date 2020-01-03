@@ -127,5 +127,47 @@ namespace Sentry.data.Web.Controllers
             return Json(_notificationService.GetNotificationForBusinessArea(businessAreaType).ToModel(), JsonRequestBehavior.AllowGet);
         }
 
+
+        [HttpGet]
+        public ActionResult Subscribe(int eventTypeGroup)
+        {
+
+            SubscriptionModel sm = new SubscriptionModel();
+
+
+            //sm.AllEventTypes = _datasetContext.EventTypes.Where(w => w.Display).Select((c) => new SelectListItem { Text = c.Description, Value = c.Type_ID.ToString() });
+            //sm.AllIntervals = _datasetContext.GetAllIntervals().Select((c) => new SelectListItem { Text = c.Description, Value = c.Interval_ID.ToString() });
+
+            //sm.CurrentSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, id);
+
+            //sm.datasetID = ds.DatasetId;
+
+            //sm.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
+
+
+            //foreach (Core.EventType et in _datasetContext.EventTypes.Where(w => w.Display))
+            //{
+            //    if (!sm.CurrentSubscriptions.Any(x => x.EventType.Type_ID == et.Type_ID))
+            //    {
+            //        DatasetSubscription subscription = new DatasetSubscription();
+            //        subscription.Dataset = ds;
+            //        subscription.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
+            //        subscription.EventType = et;
+            //        subscription.Interval = _datasetContext.GetInterval("Never");
+            //        subscription.ID = 0;
+
+            //        sm.CurrentSubscriptions.Add(subscription);
+            //    }
+            //}
+
+            return PartialView("_Subscribe", sm);
+
+
+            
+
+            
+
+        }
+
     }
 }
