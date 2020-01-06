@@ -381,6 +381,7 @@
     <Compile Include="Models\ContactInfoModel.cs" />
     <Compile Include="Models\DataAsset\AssetUIModel.cs" />
     <Compile Include="Models\ApiModels\Dataset\DatasetInfoModel.cs" />
+    <Compile Include="Models\DataProcessing\CompressionModel.cs" />
     <Compile Include="Models\DataProcessing\DataFlowDetailModel.cs" />
     <Compile Include="Models\DataProcessing\DataFlowModel.cs" />
     <Compile Include="Models\DataProcessing\DFModel.cs" />
@@ -1345,6 +1346,7 @@
     <Content Include="Views\DataFlow\EditorTemplates\Enum.cshtml" />
     <Content Include="Views\DataFlow\_SchemaMap.cshtml" />
     <Content Include="Views\DataFlow\_RetrieverJob.cshtml" />
+    <Content Include="Views\DataFlow\_CompressionJob.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
