@@ -1,8 +1,8 @@
 ﻿.schemaMapPanel {
-    padding-left: 45px;
 }
 
 .schemaMapList {
+    /*padding-left: 45px;*/
     list-style-type: none;
 }
 
@@ -17,5 +17,16 @@
     border-bottom: 1px solid #aaa;
     border-radius: 10px;
     margin-bottom: 5px;
-    margin-left: 30px;
+    /*margin-left: 30px;*/
+}
+
+.dataflow-home-photo {
+    background-repeat: no-repeat;
+    height: 340px;
+}
+
+.bg-photo-dataflow {
+    /*background-image: url(/Images/DataFlow/ConceptTeamwork1.jpg);
+    background-position: 50% 48%;*/
+    background: #fff url(/Images/DataFlow/ConceptTeamwork1.jpg) center center/cover;
 }

@@ -15,7 +15,7 @@ namespace Sentry.data.Web
             AllSchemas = new List<SelectListItem>();
         }
 
-        public string Id { get; set; }
+        public int Id { get; set; }
         public string SearchCriteria { get; set; }
         
         public int SelectedDataset { get; set; }

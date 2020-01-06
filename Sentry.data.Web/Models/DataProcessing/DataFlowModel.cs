@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Web;
-
+using System.Web.Mvc;
 
 namespace Sentry.data.Web
 {
@@ -13,6 +13,7 @@ namespace Sentry.data.Web
         public DataFlowModel()
         {
             SchemaMaps = new List<SchemaMapModel>();
+            IsCompressed = false;
         }
 
         /// <summary>
@@ -36,6 +37,15 @@ namespace Sentry.data.Web
         /// </summary>
         public int SchemaId { get; set; }
 
+        [DisplayName("Where should this data be loaded?")]
         public List<SchemaMapModel> SchemaMaps { get; set; }
+        public JobModel RetrieverJob { get; set; }
+        public string CreatedBy { get; set; }
+        public DateTime CreatedDTM { get; set; }
+        public int DataFlowId { get; set; }
+
+
+
+        public IEnumerable<SelectListItem> CompressionDropdown { get; set; }
     }
 }

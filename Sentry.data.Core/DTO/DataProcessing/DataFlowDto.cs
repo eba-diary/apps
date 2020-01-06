@@ -13,5 +13,8 @@ namespace Sentry.data.Core
         public string Name { get; set; }
         public DateTime CreateDTM { get; set; }
         public string CreatedBy { get; set; }
+        public string DFQuestionnaire { get; set; }
+        public List<SchemaMapDto> SchemaMap { get; set; }
+        public RetrieverJobDto RetrieverJob { get; set; }
     }
 }

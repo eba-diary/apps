@@ -3,13 +3,31 @@
     DataFlowFormInit: function () {
         console.log("hi");
 
-        $("#IsCompressedCheckbox").change(function () {
-            if ($(this).is(":checked")) {
-                $("#IsCompressed").val(true);
+        //data.DataFlow.InitCompressionCheckbox();
+
+        $("[id$=IngestionType]").on('change', function () {
+            if ($(this).val() === "2") {
+                $('.retrieverPanel').show();
+                Sentry.InjectSpinner($("#retrieverJobPanel"));
+                $.get("/DataFlow/NewRetrieverJob", function (e) {
+                    $("#retrieverJobPanel").replaceWith(e);
+                    data.Job.FormInit();
+                });
             }
             else {
-                $("#IsCompressed").val(false);
+                $('.retrieverPanel').hide();
             }
+            $('.compressionPanel').show();
+            $('.schemaMapPanel').show();
+        });
+
+        $("#IsCompressed").change(function () {
+            //if ($(this).is(":checked")) {
+            //    $("#IsCompressed").val(true);                
+            //}
+            //else {
+            //    $("#IsCompressed").val(false);
+            //}
         });
 
         $("#btnAddSchemaMap").on('click', function () {
