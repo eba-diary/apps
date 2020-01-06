@@ -43,5 +43,15 @@ namespace Sentry.data.Core
                 stream.CopyTo(targetStream);
             }                      
         }
+
+        public static List<RetrieverJob> FetchParentMetadata(this IQueryable<RetrieverJob> query, IDatasetContext datasetContext)
+        {
+            var datasetfileconfigs = datasetContext.DatasetFileConfigs.Where(w => query.Any(d => w.ConfigId == d.DatasetConfig.ConfigId));
+            var dataset = datasetContext.Datasets.Where(w => datasetfileconfigs.Any(d => w.DatasetId == d.ParentDataset.DatasetId));
+
+            var tree = query.Fetch(f => f.DatasetConfig).ThenFetch(x => x.ParentDataset).ToFuture();
+
+            return tree.ToList();
+        }
     }
 }

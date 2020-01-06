@@ -48,15 +48,19 @@ namespace Sentry.data.Infrastructure
                     // instantiate a new shared client
                     AWSConfigsS3.UseSignatureVersion4 = true;
                     AmazonS3Config s3config = new AmazonS3Config();
-                    // s3config.RegionEndpoint = RegionEndpoint.GetBySystemName("us-east-1");
                     s3config.RegionEndpoint = RegionEndpoint.GetBySystemName(Configuration.Config.GetSetting("AWSRegion"));
-                    //s3config.UseHttp = true;
-                    s3config.ProxyHost = Configuration.Config.GetHostSetting("SentryS3ProxyHost");
-                    s3config.ProxyPort = int.Parse(Configuration.Config.GetSetting("SentryS3ProxyPort"));
+                    //proxy only needed when not running on AWS.  Calling code expected to pass empty value if proxy host not needed.
+                    if (!String.IsNullOrWhiteSpace(Configuration.Config.GetHostSetting("SentryS3ProxyHost")))
+                    {
+                        s3config.ProxyHost = Configuration.Config.GetHostSetting("SentryS3ProxyHost");
+                        s3config.ProxyPort = int.Parse(Configuration.Config.GetSetting("SentryS3ProxyPort"));
+                    }
                     s3config.ProxyCredentials = System.Net.CredentialCache.DefaultNetworkCredentials;
                     string awsAccessKey = Configuration.Config.GetHostSetting("AWSAccessKey");
                     string awsSecretKey = Configuration.Config.GetHostSetting("AWSSecretKey");
                     _s3client = new AmazonS3Client(awsAccessKey, awsSecretKey, s3config);
+
+                    Logger.Info($"s3serviceprovider-clientinit regionendpoint:{s3config.RegionEndpoint},proxyhost:{s3config.ProxyHost},proxyport:{s3config.ProxyPort.ToString()}");
                 }
                 return _s3client;
             }

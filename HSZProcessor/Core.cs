@@ -8,6 +8,7 @@ using System;
 using StructureMap;
 using System.Collections.Generic;
 using System.Linq;
+using Sentry.Core;
 
 namespace HSZGOLDENEYE
 {
@@ -20,9 +21,7 @@ namespace HSZGOLDENEYE
         private CancellationTokenSource _tokenSource;
         private CancellationToken _token;
         private IContainer _container;
-        private IRequestContext _requestContext;
         private List<RunningTask> currentTasks = new List<RunningTask>();
-        private IHszFileWatchService _hszFileWatchService;
 
         /// <summary>
         /// Start the core worker
@@ -56,7 +55,7 @@ namespace HSZGOLDENEYE
 
                 using (_container = Bootstrapper.Container.GetNestedContainer())
                 {
-                    _requestContext = _container.GetInstance<IRequestContext>();
+                    IDatasetContext _datasetContext = _container.GetInstance<IDatasetContext>();
                     //_hszFileWatchService = _container.GetInstance<IHszFileWatchService>();
 
                     //If it's completed dispose of it.
@@ -67,7 +66,7 @@ namespace HSZGOLDENEYE
                     List<RetrieverJob> rtjob = null;
 
 
-                    rtjob = _requestContext.RetrieverJob.Where(w => (w.DataSource is DfsBasicHsz) && w.Schedule == "Instant" && w.IsEnabled).ToList();
+                    rtjob = _datasetContext.RetrieverJob.Where(w => (w.DataSource is DfsBasicHsz) && w.Schedule == "Instant" && w.IsEnabled).FetchParentMetadata(_datasetContext);
 
                     foreach (RetrieverJob job in rtjob)
                     {
@@ -110,10 +109,9 @@ namespace HSZGOLDENEYE
                             );
                         }
                     }
-
                 }
 
-                } while (!_token.IsCancellationRequested);
+            } while (!_token.IsCancellationRequested);
             Logger.Info("Worker task stopped.");
         }
 
@@ -136,6 +134,5 @@ namespace HSZGOLDENEYE
             Logger.Fatal("Exception occurred on main Windows Service Task. Stopping Service immediately.", t.Exception);
             Environment.Exit(10001);
         }
-
     }
 }
