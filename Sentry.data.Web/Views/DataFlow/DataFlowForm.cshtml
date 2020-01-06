@@ -16,12 +16,14 @@
             </div>
         </div>*@
     <div id="dataflow-home-wrapper" class="col-md-12 col-lg-12">
-        <div class="dataflow-home-photo bg-photo-dataflow">
+        <div class="dataflow-home-photo bg-photo-dataflow ic">
+            <span>Do you have data that you want to use and share with others? <br /> We can help. First, you'll need to tell us about your data.</span>
         </div>
     </div>
     @*<h2>How Will DSC Ingest Data?</h2>*@
     <div class="form-group col-md-12">
         @*@Html.LabelFor(model => model.IngestionType, htmlAttributes: new { @class = "control-label col-md-2" })*@
+        <h4>How Will The Data be Sent to Us?</h4>
         <div class="col-md-4">
             @*@Html.EditorFor(m => m.IngestionType)*@
             @Html.EnumDropDownListFor(
@@ -103,7 +105,7 @@
         </div>*@
 
     <br />
-    <div class="form-group">
+    <div class="form-group formSubmitButtons" style="display: none;">
         <div>
             <input type="submit" value="Submit" class="btn btn-primary" />
             <a id="CancelButton" class="btn btn-warning" href="">Cancel</a>

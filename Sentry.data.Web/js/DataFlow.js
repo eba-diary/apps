@@ -19,6 +19,7 @@
             }
             $('.compressionPanel').show();
             $('.schemaMapPanel').show();
+            $('.formSubmitButtons').show();
         });
 
         $("#IsCompressed").change(function () {
