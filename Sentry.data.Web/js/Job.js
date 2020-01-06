@@ -118,7 +118,7 @@
                 $('#TargetFileName').val("");
             }
             
-            if (!$(this).is(':checked') && $("[id$='SelectedSourceType']").val().toLowerCase() != "ftp") {
+            if (!$(this).is(':checked') && $("[id$='SelectedSourceType']").val().toLowerCase() !== "ftp") {
                 $('.jobquestion.targetFileName').show();
             }
         });
@@ -442,7 +442,7 @@
 
         function updateFutureTimes() {
 
-            if ($("[id$='Schedule']").val() != 0) {
+            if ($("[id$='Schedule']").val() !== 0) {
 
                 $('#scheduledTimes').empty();
                 later.date.localTime();
@@ -472,7 +472,7 @@
             dynamic: false,
             dropdown: true,
             scrollbar: true,
-            change: function (ev) {
+            change: function () {
 
                 if ($(this).timepicker('getTime')) {
                     var d = new Date($(this).timepicker('getTime'));
@@ -487,7 +487,7 @@
 
 
         $('#cronWeeklyDayPicker').bind('input', function () {
-            changeWeek()
+            changeWeek();
         });
 
         function changeWeek() {
@@ -513,7 +513,7 @@
             dynamic: false,
             dropdown: true,
             scrollbar: true,
-            change: function (ev) {
+            change: function () {
                 changeWeek();
             }
         });
@@ -544,7 +544,7 @@
             dynamic: false,
             dropdown: true,
             scrollbar: true,
-            change: function (ev) {
+            change: function () {
                 changeMonth();
             }
         });
@@ -593,7 +593,7 @@
             dynamic: false,
             dropdown: true,
             scrollbar: true,
-            change: function (ev) {
+            change: function () {
                 changeYear();
             }
         });
