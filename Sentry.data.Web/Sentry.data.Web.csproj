@@ -385,6 +385,7 @@
     <Compile Include="Models\DataProcessing\DataFlowModel.cs" />
     <Compile Include="Models\DataProcessing\DFModel.cs" />
     <Compile Include="Models\DataProcessing\DataFlowStepModel.cs" />
+    <Compile Include="Models\DataProcessing\JobModel.cs" />
     <Compile Include="Models\DataProcessing\SchemaMapModel.cs" />
     <Compile Include="Models\Dataset\BaseDatasetFileModel.cs" />
     <Compile Include="Models\Dataset\ColumnModel.cs" />
@@ -450,6 +451,7 @@
     <Content Include="Content\jquery.json-viewer.css" />
     <Content Include="Content\toastr.css" />
     <Content Include="Content\toastr.min.css" />
+    <Content Include="Images\DataFlow\ConceptTeamwork1.jpg" />
     <Content Include="js\BusinessArea.js" />
     <Content Include="js\DataFlow.js" />
     <Content Include="js\DataSource.js" />
@@ -1341,6 +1343,7 @@
     <Content Include="Views\DataFlow\DataFlowForm.cshtml" />
     <Content Include="Views\DataFlow\EditorTemplates\Enum.cshtml" />
     <Content Include="Views\DataFlow\_SchemaMap.cshtml" />
+    <Content Include="Views\DataFlow\_RetrieverJob.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
