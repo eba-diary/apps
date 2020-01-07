@@ -789,6 +789,7 @@ namespace Sentry.data.Infrastructure
             if (_job.JobOptions != null && _job.JobOptions.CompressionOptions.IsCompressed)
             {
                 _job.JobLoggerMessage("Debug", $"Compressed option is detected... Streaming to temp location");
+                _job.JobLoggerMessage("Debug", $"retrieveftpfile absoluteuri:{absoluteUri}");
 
                 try
                 {
@@ -799,6 +800,16 @@ namespace Sentry.data.Infrastructure
                         {
                             ftpstream.CopyTo(filestream);
                         }
+                    }
+
+                    //check if target directory contains file
+                    var parentDir = Directory.GetParent(tempFile);
+                    var fcount = Directory.GetFiles(parentDir.FullName, "*", SearchOption.TopDirectoryOnly).Length;
+
+                    if (fcount == 0)
+                    {
+                        _job.JobLoggerMessage("Warn", $"RetrieveFTPFile targetfileextractcount:{fcount.ToString()}");
+                        throw new FileNotFoundException("File not found in temp file target <retrieveftpfile>");
                     }
 
                     //Create a fire-forget Hangfire job to decompress the file and drop extracted file into drop locations
