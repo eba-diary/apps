@@ -32,6 +32,7 @@ namespace Sentry.data.Infrastructure
                     _job = _requestContext.RetrieverJob.FirstOrDefault(w => w.Id == jobId);
 
                     _job.JobLoggerMessage("Info", "Jaws processing triggered");
+                    _job.JobLoggerMessage("Info", $"uncompressretrieverjob incomingfile:{filePath}");
 
                     //This can be triggered by various jobs, we need to pick the drop location to move the uncompressed files too.
                     // Since GoleneEye will be running on AWS and Jaw decompression takes place on a local directory of the EC2 instance,
@@ -77,12 +78,18 @@ namespace Sentry.data.Infrastructure
                                     Directory.CreateDirectory(extractPath);
                                 }
 
+                                _job.JobLoggerMessage("Info", $"uncompressedretrieverjob extractpath:{extractPath}");
+
                                 try
                                 {
+                                    _job.JobLoggerMessage("Info", "uncompressretrieverjob starting_extraction");
                                     //Do we need to exclude any files from zip archive?  If not extract all files to target directory
                                     if (_job.JobOptions.CompressionOptions.FileNameExclusionList != null && _job.JobOptions.CompressionOptions.FileNameExclusionList.Count > 0)
                                     {
+                                        
                                         List<String> ExclusionList = _job.JobOptions.CompressionOptions.FileNameExclusionList;
+
+                                        _job.JobLoggerMessage("Info", $"uncompressretrieverjob filenameexclusions_detected  count:{ExclusionList.Count}");
 
                                         using (ZipArchive archive = ZipFile.OpenRead(filePath))
                                         {
@@ -102,6 +109,17 @@ namespace Sentry.data.Infrastructure
                                         ZipFile.ExtractToDirectory(filePath, extractPath);
                                     }
 
+                                    int fcount = Directory.GetFiles(extractPath, "*", SearchOption.TopDirectoryOnly).Length;
+
+                                    if (fcount == 0)
+                                    {
+                                        _job.JobLoggerMessage("Warn", $"uncompressretrieverjob uncompressed_file_count:{fcount.ToString()} extractpath:{extractPath}");
+                                    }
+
+                                    _job.JobLoggerMessage("Info", "uncompressretrieverjob completed_extraction");
+                                    _job.JobLoggerMessage("Info", $"uncompressretrieverjob uncompressed file count: {Directory.GetFiles(extractPath, "*", SearchOption.TopDirectoryOnly).Length.ToString()}");
+                                    
+                                    
                                     //Upload all extracted files to S3 drop location
                                     foreach (string file in Directory.GetFiles(extractPath))
                                     {
