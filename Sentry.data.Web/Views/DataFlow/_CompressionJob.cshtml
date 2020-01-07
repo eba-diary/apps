@@ -1,7 +1,7 @@
 ﻿@model Sentry.data.Web.CompressionModel
 @using (Html.BeginCollectionItem("CompressionJob"))
 {
-    <div class="jobquestion compression">
+    <div class="compressionJobQuestion">
         @*<div class="form-group configQuestion">
             <div class="col-md-12">
                 <hr />
@@ -17,7 +17,8 @@
             </div>
         </div>*@
 
-        <div id="compressionPanel">
+        <hr />
+        <div id="compressionJobQuestion">
             <div class="form-group">
                 @Html.LabelFor(model => model.CompressionType, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-10">
@@ -29,7 +30,7 @@
             @Html.HiddenFor(model => model.FileNameExclusionList)
             @Html.HiddenFor(model => model.NewFileNameExclusionList)
 
-            <div class="form-group">
+            @*<div class="form-group">
                 <label class="control-label col-md-2" style="font-weight: 100;">File Names to Exclude</label>
                 <div id="fileNamePanel" class="col-md-10">
 
@@ -62,7 +63,7 @@
                 <div class="col-md-10">
                     <a class="addFileName"><span class="glyphicon glyphicon-plus"></span> Add File to Exclude</a>
                 </div>
-            </div>
+            </div>*@
         </div>
     </div>
 }

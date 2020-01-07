@@ -25,7 +25,7 @@
         $("#IsCompressed").change(function () {
             if ($(this).val() === "true") {
                 $('.compressionJobPanel').show();
-                if ($('.jobquestion.compression').length === 0) {
+                if ($('.compressionJobQuestion').length === 0) {
                     $.get("/DataFlow/NewCompressionJob", function (e) {
                         $("#compressionJobPanel").append(e);
                     });
