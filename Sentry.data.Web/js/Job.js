@@ -106,9 +106,9 @@
             
             data.Job.AccessRequest($("[id$='SelectedDataSource'] :selected").val());
         });
-
-        $('#FtpPattern').change(function () {
-            data.Job.SetFtpPatternDefaults($('#FtpPattern').val());
+        
+        $("[id$='FtpPattern']").change(function () {
+            data.Job.SetFtpPatternDefaults($("[id$='FtpPattern']").val());
         })
 
         $('#IsSourceCompressed').on('change', function () {
@@ -196,6 +196,8 @@
                     $('.jobquestion.ftpPattern').show();
                     $('.jobquestion.compression').show();
                     $('.jobquestion.targetFileName').hide();
+                    $('.httpSourcePanel').hide();
+                    $('.httpPostPanel').hide();
                     break;
                 case "googleapi":
                     $('.jobquestion.ftpPattern').hide();
