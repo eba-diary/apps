@@ -816,10 +816,10 @@ namespace Sentry.data.Infrastructure
                         _job.JobLoggerMessage("Debug", $"retrieveftpfile detectedfilesintargetdir targetdir:{parentDir.FullName} filecount:{fcount}");
                         var files = parentDir.EnumerateFiles();
                         StringBuilder sb = new StringBuilder();
-                        sb.Append($"Files detected in {parentDir.FullName}");
+                        sb.AppendLine($"Files detected in {parentDir.FullName}");
                         foreach(var f in files)
                         {
-                            sb.Append(f.FullName);
+                            sb.Append($"{f.FullName}\t{f.Length}");
                         }
                         _job.JobLoggerMessage("Debug", sb.ToString());
                     }
