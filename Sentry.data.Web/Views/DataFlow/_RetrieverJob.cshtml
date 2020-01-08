@@ -6,7 +6,7 @@
     <hr />
     <div class="form-group col-md-12">
         @Html.LabelFor((model) => model.SelectedSourceType, new { @class = "control-label col-md-2" })
-        <div class="col-md-10">
+        <div class="col-md-2">
             @Html.DropDownListFor((model) => model.SelectedSourceType, Model.SourceTypesDropdown, new { @class = "form-control edit-dataset-row" })
             @Html.ValidationMessageFor((model) => model.SelectedSourceType, "", new { @class = "text-danger" })
         </div>
@@ -132,9 +132,9 @@
         </div>
 
         <div class="jobquestion ftpPattern">
-            <div class="form-group">
+            <div class="form-group col-md-12">
                 @Html.LabelFor((model) => model.FtpPattern, new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
+                <div class="col-md-3">
                     @Html.DropDownListFor((model) => model.FtpPattern, Model.FtpPatternDropDown, new { @class = "form-control edit-dataset-row" })
                     @Html.ValidationMessageFor((model) => model.FtpPattern, "", new { @class = "text-danger" })
                 </div>
@@ -146,7 +146,7 @@
             <div class="form-group configQuestion">
                 <div class="col-md-12">
                     <hr />
-                    <h6>Should selective files be processed?</h6>
+                    <h5>Should selective files be processed?</h5>
                 </div>
             </div>
 
@@ -160,7 +160,7 @@
             </div>
 
             <div class="searchCriteria searchCriteriaIsRegex">
-                <div class="form-group">
+                <div class="form-group col-md-12">
                     @Html.LabelFor(model => model.IsRegexSearch, htmlAttributes: new { @class = "control-label col-md-2 optional" })
                     <div class="col-md-10">
                         @Html.CheckBoxFor(model => model.IsRegexSearch, new { @class = "" })
@@ -292,34 +292,35 @@
             <div id="schedulePanel">
                 <div class="form-group configQuestion">
                     <div class="col-md-12">
-                        <hr />
                         <h5>How often would you like us to pull the data?</h5>
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group col-md-12">
                     @Html.LabelFor(model => model.SchedulePicker, htmlAttributes: new { @class = "control-label col-md-2" })
-                    <div class="col-md-10">
+                    <div class="col-md-2">
                         @Html.DropDownListFor(model => model.SchedulePicker, Model.SchedulePickerDropdown, new { @class = "form-control edit-dataset-row", })
                         @Html.ValidationMessageFor(model => model.SchedulePicker, "", new { @class = "text-danger" })
                     </div>
                 </div>
 
-                <div class="form-group scheduler" id="hourlyPicker">
+                <div class="form-group scheduler col-md-12" id="hourlyPicker">
                     <label class="control-label col-md-2">Every Hour at</label>
                     <div class="col-md-10">
                         <input id="cronHourlyTimePicker" type="number" max="59" min="0" class="form-control" style="width:10%;" placeholder="Minute" />
                     </div>
                 </div>
 
-                <div class="form-group scheduler" id="dailyPicker">
+                <div class="form-group scheduler col-md-12" id="dailyPicker">
                     <label class="control-label col-md-2">Every Day at</label>
                     <div class="col-md-10">
-                        <input class="timepicker timepicker-with-dropdown text-center form-control edit-dataset-row" id="cronDailyJobTimePicker" style="width:15%;" />
-                        CST
+                        <input class="timepicker timepicker-with-dropdown text-center form-control edit-dataset-row col-md-4" id="cronDailyJobTimePicker" style="width:15%;" />
+                        <div class="col-md-2">
+                            <span>CST</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="form-group scheduler" id="weeklyPicker">
+                <div class="form-group scheduler col-md-12" id="weeklyPicker">
                     <label class="control-label col-md-2">Every Week on</label>
                     <div class="col-md-10">
                         <select id="cronWeeklyDayPicker" class="form-control edit-dataset-row" style="width:25%; display: inline-block;">
@@ -338,7 +339,7 @@
                     </div>
                 </div>
 
-                <div class="form-group scheduler" id="monthlyPicker">
+                <div class="form-group scheduler col-md-12" id="monthlyPicker">
                     <label class="control-label col-md-2">Every Month on</label>
                     <div class="col-md-10">
                         <input id="cronMonthlyDayPicker" type="number" max="31" min="1" class="form-control" style="width:20%; display: inline-block;" placeholder="Day of the Month" />
@@ -348,7 +349,7 @@
                     </div>
                 </div>
 
-                <div class="form-group scheduler" id="yearlyPicker">
+                <div class="form-group scheduler col-md-12" id="yearlyPicker">
                     <label class="control-label col-md-2">Every Year on</label>
                     <div class="col-md-10">
                         <select id="cronYearlyMonthPicker" class="form-control edit-dataset-row" style="width:25%; display: inline-block;">
@@ -373,7 +374,7 @@
                     </div>
                 </div>
 
-                <div id="scheduleRow" class="form-group" style="display: none;">
+                <div id="scheduleRow" class="form-group col-md-12" style="display: none;">
                     <label class="control-label col-md-2">The next four scheduled times will be in your local Time</label>
                     <div id="scheduledTimes" class="col-md-10">
                     </div>
