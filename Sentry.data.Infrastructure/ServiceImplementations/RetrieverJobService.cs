@@ -811,6 +811,18 @@ namespace Sentry.data.Infrastructure
                         _job.JobLoggerMessage("Warn", $"RetrieveFTPFile targetfileextractcount:{fcount.ToString()}");
                         throw new FileNotFoundException("File not found in temp file target <retrieveftpfile>");
                     }
+                    else
+                    {
+                        _job.JobLoggerMessage("Debug", $"retrieveftpfile detectedfilesintargetdir targetdir:{parentDir.FullName} filecount:{fcount}");
+                        var files = parentDir.EnumerateFiles();
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append($"Files detected in {parentDir.FullName}");
+                        foreach(var f in files)
+                        {
+                            sb.Append(f.FullName);
+                        }
+                        _job.JobLoggerMessage("Debug", sb.ToString());
+                    }
 
                     //Create a fire-forget Hangfire job to decompress the file and drop extracted file into drop locations
                     BackgroundJob.Enqueue<JawsService>(x => x.UncompressRetrieverJob(_job.Id, tempFile));
