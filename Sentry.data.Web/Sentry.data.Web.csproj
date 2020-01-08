@@ -1342,6 +1342,7 @@
     <Content Include="Views\DataFlow\DataFlowForm.cshtml" />
     <Content Include="Views\DataFlow\EditorTemplates\Enum.cshtml" />
     <Content Include="Views\DataFlow\_SchemaMap.cshtml" />
+    <Content Include="Views\Notification\_SubscribeNotification.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

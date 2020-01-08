@@ -15,10 +15,12 @@ namespace Sentry.data.Web.Controllers
     {
 
         private readonly INotificationService _notificationService;
+        private readonly UserService _userService;
 
-        public NotificationController(INotificationService notificationService)
+        public NotificationController(INotificationService notificationService, UserService userService)
         {
             _notificationService = notificationService;
+            _userService = userService;
         }
 
         public ActionResult ManageNotification()
@@ -129,43 +131,44 @@ namespace Sentry.data.Web.Controllers
 
 
         [HttpGet]
-        public ActionResult Subscribe(int eventTypeGroup)
+        public ActionResult Subscribe()
         {
+            int businessAreaType = 1;
+            BusinessAreaType bat = (BusinessAreaType) businessAreaType;
 
             SubscriptionModel sm = new SubscriptionModel();
 
-
-            //sm.AllEventTypes = _datasetContext.EventTypes.Where(w => w.Display).Select((c) => new SelectListItem { Text = c.Description, Value = c.Type_ID.ToString() });
-            //sm.AllIntervals = _datasetContext.GetAllIntervals().Select((c) => new SelectListItem { Text = c.Description, Value = c.Interval_ID.ToString() });
-
-            //sm.CurrentSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, id);
-
-            //sm.datasetID = ds.DatasetId;
-
-            //sm.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
+            sm.CurrentSubscriptionsBusinessArea = _notificationService.GetAllUserSubscriptionsForBusinessArea();
+            sm.AllEventTypes = _notificationService.GetEventTypes().Select((c) =>   new SelectListItem { Text = c.Description, Value = c.Type_ID.ToString() });
+            sm.AllIntervals  = _notificationService.GetAllIntervals().Select((c) => new SelectListItem { Text = c.Description, Value = c.Interval_ID.ToString() });
+            sm.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
 
 
-            //foreach (Core.EventType et in _datasetContext.EventTypes.Where(w => w.Display))
-            //{
-            //    if (!sm.CurrentSubscriptions.Any(x => x.EventType.Type_ID == et.Type_ID))
-            //    {
-            //        DatasetSubscription subscription = new DatasetSubscription();
-            //        subscription.Dataset = ds;
-            //        subscription.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
-            //        subscription.EventType = et;
-            //        subscription.Interval = _datasetContext.GetInterval("Never");
-            //        subscription.ID = 0;
-
-            //        sm.CurrentSubscriptions.Add(subscription);
-            //    }
-            //}
-
-            return PartialView("_Subscribe", sm);
+            sm.businessAreaID = businessAreaType;
 
 
-            
+            foreach (Core.EventType et in _notificationService.GetEventTypes())
+            {
+                if (!sm.CurrentSubscriptionsBusinessArea.Any(x => x.EventType.Type_ID == et.Type_ID))
+                {
+                    BusinessAreaSubscription subscription = new BusinessAreaSubscription();
+                    subscription.BusinessAreaType = bat;
+                    subscription.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
+                    subscription.EventType = et;
+                    subscription.Interval = _notificationService.GetInterval("Never");
+                    subscription.ID = 0;
 
-            
+                    sm.CurrentSubscriptionsBusinessArea.Add(subscription);
+                }
+            }
+
+            return PartialView("_SubscribeNotification", sm);
+            //return PartialView("_Subscribe", sm);
+
+
+
+
+
 
         }
 
