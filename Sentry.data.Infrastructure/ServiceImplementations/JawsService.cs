@@ -112,11 +112,15 @@ namespace Sentry.data.Infrastructure
                                     }
 
                                     int fcount = Directory.GetFiles(extractPath, "*", SearchOption.TopDirectoryOnly).Length;
+                                    int dcount = Directory.GetDirectories(extractPath, "*", SearchOption.AllDirectories).Length;
 
                                     if (fcount == 0)
                                     {
                                         _job.JobLoggerMessage("Warn", $"uncompressretrieverjob uncompressed_file_count:{fcount.ToString()} extractpath:{extractPath}");
                                     }
+
+                                    _job.JobLoggerMessage("Debug", $"uncompressretrieverjob uncompressed_dir_count:{fcount.ToString()} extractpath:{extractPath}");
+                                    
 
                                     _job.JobLoggerMessage("Info", $"uncompressretrieverjob uncompressed file count: {Directory.GetFiles(extractPath, "*", SearchOption.TopDirectoryOnly).Length.ToString()}");
                                     
