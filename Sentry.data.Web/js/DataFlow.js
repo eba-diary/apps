@@ -1,7 +1,6 @@
 ﻿data.DataFlow = {
 
     DataFlowFormInit: function () {
-        console.log("hi");
 
         //data.DataFlow.InitCompressionCheckbox();
 
@@ -34,19 +33,15 @@
             else {
                 $('.compressionJobPanel').hide();  
             }
-
-            //$.get("/DataFlow/NewSchemaMap", function (e) { });
         });
 
         $("#btnAddSchemaMap").on('click', function () {
             $.get("/DataFlow/NewSchemaMap", function (e) {
-                $(e).insertBefore($("#btnAddSchemaMap"))
-                //$("#schemaMapPanel").append(e);
+                $(e).insertBefore($("#btnAddSchemaMap"));
                 $('[id$=__SelectedDataset]').change(function () {
                     var curRow = $(this).parent().parent();
                     var schemaSelectionDropDown = curRow.find("[id$=__SelectedSchema]");
                     var val = $(this).val();
-                    console.log(val);
 
                     $.getJSON("/api/v2/metadata/dataset/" + val + "/schema", function (result) {
                         var subItems;

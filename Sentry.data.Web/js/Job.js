@@ -109,7 +109,7 @@
         
         $("[id$='FtpPattern']").change(function () {
             data.Job.SetFtpPatternDefaults($("[id$='FtpPattern']").val());
-        })
+        });
 
         $('#IsSourceCompressed').on('change', function () {
             $("#compressionPanel").toggle($("#IsSourceCompressed").is(':checked'));
