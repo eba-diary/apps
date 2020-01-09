@@ -61,7 +61,7 @@ namespace Sentry.data.Web.Helpers
         {
             var temp = GetCategoryList(_datasetContext).ToList();
 
-            if(model.DatasetCategoryIds?.Count == 1)
+            if(model.DatasetCategoryIds?.Count == 1 && model.DatasetCategoryIds[0] != 0)
             {
                 temp.First(x => x.Value == model.DatasetCategoryIds.First().ToString()).Selected = true;
             }

@@ -132,3 +132,8 @@
     font-size: x-small;
     display: block;
 }
+
+.rowNumberIdentifier {
+    float: left;
+    padding-right: 10px;
+}
