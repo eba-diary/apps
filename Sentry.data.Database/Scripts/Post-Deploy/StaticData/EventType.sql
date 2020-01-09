@@ -1,35 +1,38 @@
 ﻿BEGIN TRAN 
 	BEGIN TRY 
+
+		DECLARE	@GroupDATASET VARCHAR(25)			= 'DATASET'
+				,@GroupBUSINESSAREA VARCHAR(25)		= 'BUSINESSAREA'
 		
 		MERGE INTO EventType AS Target 
 		USING (VALUES 
-									(1, 'Created File', 1,1,'DATASET'),
-									(2, 'Bundle File Process', 1,0,'DATASET'),
-									(3, 'Upload Failure', 5,1,'DATASET'),
-									(4, 'Modified Dataset', 2,0,'DATASET'),
-									(5, 'Current File Created', 1,0,'DATASET'),
-									(6, 'Viewed', 1,0,'DATASET'),
-									(7, 'Search', 1,0,'DATASET'),
-									(8, 'Created Dataset', 1,0,'DATASET'),
-									(9, 'Downloaded Data File', 1,0,'DATASET'),
-									(10, 'Previewed Data File', 1,0,'DATASET'),
-									(11, 'Edited Data File', 1,0,'DATASET'),
-									(12, 'Pushed Data File to SAS', 1,0,'DATASET'),
-									(13, 'Clicked Item in Feed', 1,0,'DATASET'),
-									(14, 'Created Report', 1,0,'DATASET'),
-									(15, 'Updated Report', 1,0,'DATASET'),
-									(16, 'Updated Dataset', 1,0,'DATASET'),
-									(17, 'Viewed Report', 1,0,'DATASET'),
-									(18, 'Viewed Dataset', 1,0,'DATASET'),
-									(19, 'Created Tag', 1,0,'DATASET'),
-									(20, 'Updated Tag', 1,0,'DATASET'),
-									(21, 'Deleted Report', 1,0,'DATASET'),
-									(22, 'Created Data Source', 1,0,'DATASET'),
-									(23, 'Updated Data Source', 1,0,'DATASET'),
-									(24, 'Deleted Dataset', 1,0,'DATASET'),
-									(25, 'Downloaded Report', 1,0,'DATASET'),
-									(26, 'Sync Schema', 1,0,'DATASET'),
-									(27, 'Notifications', 1,1,'BUSINESSAREA')
+									(1, 'Created File', 1,1,@GroupDATASET),
+									(2, 'Bundle File Process', 1,0,@GroupDATASET),
+									(3, 'Upload Failure', 5,1,@GroupDATASET),
+									(4, 'Modified Dataset', 2,0,@GroupDATASET),
+									(5, 'Current File Created', 1,0,@GroupDATASET),
+									(6, 'Viewed', 1,0,@GroupDATASET),
+									(7, 'Search', 1,0,@GroupDATASET),
+									(8, 'Created Dataset', 1,0,@GroupDATASET),
+									(9, 'Downloaded Data File', 1,0,@GroupDATASET),
+									(10, 'Previewed Data File', 1,0,@GroupDATASET),
+									(11, 'Edited Data File', 1,0,@GroupDATASET),
+									(12, 'Pushed Data File to SAS', 1,0,@GroupDATASET),
+									(13, 'Clicked Item in Feed', 1,0,@GroupDATASET),
+									(14, 'Created Report', 1,0,@GroupDATASET),
+									(15, 'Updated Report', 1,0,@GroupDATASET),
+									(16, 'Updated Dataset', 1,0,@GroupDATASET),
+									(17, 'Viewed Report', 1,0,@GroupDATASET),
+									(18, 'Viewed Dataset', 1,0,@GroupDATASET),
+									(19, 'Created Tag', 1,0,@GroupDATASET),
+									(20, 'Updated Tag', 1,0,@GroupDATASET),
+									(21, 'Deleted Report', 1,0,@GroupDATASET),
+									(22, 'Created Data Source', 1,0,@GroupDATASET),
+									(23, 'Updated Data Source', 1,0,@GroupDATASET),
+									(24, 'Deleted Dataset', 1,0,@GroupDATASET),
+									(25, 'Downloaded Report', 1,0,@GroupDATASET),
+									(26, 'Sync Schema', 1,0,@GroupDATASET),
+									(27, 'Notifications', 1,1,@GroupBUSINESSAREA)
 								)
 								AS Source ([Type_ID], [Description], Severity, Display_IND, [Group_CDE]) 
 

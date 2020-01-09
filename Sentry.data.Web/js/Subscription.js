@@ -3,7 +3,7 @@
     init: function (eventTypeGroup)
     {
         //associate click event with SubscribeModal btn
-        $("[id^='SubscribeModal']").click(function (e)
+        $("[id^='SubscribeModal']").click(function()
         {
             data.Subscription.SubscribeModal(eventTypeGroup);
         });
@@ -13,12 +13,14 @@
     SubscribeModal: function (eventTypeGroup)
     {
         var modal = Sentry.ShowModalWithSpinner("Subscribe");
-        $.get("/Notification/Subscribe/", function (e)
+
+        //for now only BUSINESSAREA EXISTS
+        if (eventTypeGroup === 'BUSINESSAREA')
         {
-            modal.ReplaceModalBody(e);
-        });
-
-    },
-
-    
+            $.get("/Notification/Subscribe/", function (e)
+            {
+                modal.ReplaceModalBody(e);
+            });
+        }
+    }
 };   

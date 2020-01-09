@@ -4,6 +4,6 @@
     {
         data.Notification.displayNotifications(businessAreaType);
 
-        data.Subscription.init("1");
+        data.Subscription.init("BUSINESSAREA");
     }
 };   
