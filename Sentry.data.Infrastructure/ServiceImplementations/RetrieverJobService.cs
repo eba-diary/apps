@@ -1173,7 +1173,9 @@ namespace Sentry.data.Infrastructure
                 //... process compressed file
                 _job.JobLoggerMessage("Info", $"Compressed option is detected... Streaming to temp location");
 
-                var tempFile = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Path.GetFileName(filepath));
+                //var tempFile = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Path.GetFileName(filepath));
+
+                var tempFile = SetupTempWorkSpace();
 
                 //TODO: Revisit delete source file logic to handle not deleting source file
                 if (deleteSrcFile)
@@ -1192,8 +1194,8 @@ namespace Sentry.data.Infrastructure
                         //Rename file to indicate a request is being processed
                         File.Move(filepath, processingFile);
 
-                        //Create temp directory if exists
-                        Directory.CreateDirectory(Path.GetDirectoryName(tempFile));
+                        ////Create temp directory if exists
+                        //Directory.CreateDirectory(Path.GetDirectoryName(tempFile));
 
                         //Stream file to work location
                         using (Stream incomingfs = new FileStream(processingFile, FileMode.Open, FileAccess.Read))
@@ -1202,6 +1204,29 @@ namespace Sentry.data.Infrastructure
                             {
                                 incomingfs.CopyTo(newfs);
                             }
+                        }
+
+
+                        //check if target directory contains file
+                        var parentDir = Directory.GetParent(tempFile);
+                        var fcount = Directory.GetFiles(parentDir.FullName, "*", SearchOption.TopDirectoryOnly).Length;
+
+                        if (fcount == 0)
+                        {
+                            _job.JobLoggerMessage("Warn", $"processcompressedfile targetfileextractcount:{fcount.ToString()}");
+                            throw new FileNotFoundException("File not found in temp file target <processcompressedfile>");
+                        }
+                        else
+                        {
+                            _job.JobLoggerMessage("Debug", $"processcompressedfile detectedfilesintargetdir targetdir:{parentDir.FullName} filecount:{fcount}");
+                            var files = parentDir.EnumerateFiles();
+                            StringBuilder sb = new StringBuilder();
+                            sb.AppendLine($"Files detected in {parentDir.FullName}");
+                            foreach (var f in files)
+                            {
+                                sb.Append($"{f.FullName}\t{f.Length}");
+                            }
+                            _job.JobLoggerMessage("Debug", sb.ToString());
                         }
 
                         //Delete file within drop location

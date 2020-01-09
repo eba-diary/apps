@@ -99,6 +99,7 @@ namespace Sentry.data.Infrastructure
                                                 if (!ExclusionList.Contains(entry.FullName) && !_job.FilterIncomingFile(entry.FullName))
                                                 {
                                                     //extract to local work directory, overrwrite file if exists
+                                                    _job.JobLoggerMessage("Debug", $"uncompressretrieverjob extractfile entry:{entry.FullName} to:{Path.Combine(extractPath, entry.FullName)}");
                                                     entry.ExtractToFile(Path.Combine(extractPath, entry.FullName), true);
                                                 }
                                             }
@@ -106,6 +107,7 @@ namespace Sentry.data.Infrastructure
                                     }
                                     else
                                     {
+                                        _job.JobLoggerMessage("Debug", $"uncompressretrieverjob extractdirectory source:{filePath} to:{extractPath}");
                                         ZipFile.ExtractToDirectory(filePath, extractPath);
                                     }
 
