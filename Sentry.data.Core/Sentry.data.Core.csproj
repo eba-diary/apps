@@ -94,7 +94,9 @@
     <Compile Include="DTO\DataProcessing\DataFlowDetailDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowStepDto.cs" />
+    <Compile Include="DTO\DataProcessing\SchemaMapDto.cs" />
     <Compile Include="DTO\Retriever\DataSourceDto.cs" />
+    <Compile Include="DTO\Retriever\RetrieverJobDto.cs" />
     <Compile Include="DTO\Schema\BaseFieldDto.cs" />
     <Compile Include="DTO\Schema\DataElementDTO.cs" />
     <Compile Include="DTO\Schema\FileSchemaDto.cs" />

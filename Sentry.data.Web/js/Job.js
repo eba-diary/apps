@@ -1,23 +1,24 @@
 ﻿data.Job = {
 
-    FormInit: function () {
-        $("#SelectedSourceType").change(function () {
+    FormInit: function () {        
+        $("[id$='SelectedSourceType']").change(function () {
+            var selectBox = this;
             data.Job.SetDataSourceSpecificPanels();
             data.Job.SetFtpPatternDefaults();
             $('.questionairePanel').hide();
             $(".editDataSourceLink").hide();
             $('#btnCreateDataset').hide();
             $('.dataSourceInfoPanel').hide();
-            var val = $('#SelectedSourceType :selected').val();
+            var val = $(selectBox).val();
 
             $.getJSON("/Config/SourcesByType", { sourceType: val }, function (data) {
                 var subItems = "";
                 $.each(data, function (index, item) {
                     subItems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
                 });
-
-                $("#SelectedDataSource").html(subItems);
-                $("#SelectedDataSource select").val("0");
+                
+                $("[id$='SelectedDataSource']").html(subItems);
+                $("[id$='SelectedDataSource'] select").val("0");
             });
 
             data.Job.RequestMethodDropdownPopulate();
@@ -28,12 +29,12 @@
         $('#SelectedRequestMethod').change(function () {
             data.Job.DisplayHttpPostPanel();
         });
-
-        $("#SelectedDataSource").change(function () {
+        
+        $("[id$='SelectedDataSource']").change(function () {
             var val = $(this).val();
             if (val != "0" && val != null) {
-                $.ajax({
-                    url: "/Config/SourceDetails/" + $('#SelectedDataSource :selected').val(),
+                $.ajax({                    
+                    url: "/Config/SourceDetails/" + $("[id$='SelectedDataSource'] :selected").val(),
                     dataType: 'json',
                     type: "GET",
                     //data: { Id: $('#SelectedDataSource :selected').val() },
@@ -101,7 +102,8 @@
 
         $("[id^='RequestAccessButton']").off('click').on('click', function (e) {
             e.preventDefault();
-            data.Job.AccessRequest($('#SelectedDataSource :selected').val());
+            
+            data.Job.AccessRequest($("[id$='SelectedDataSource'] :selected").val());
         });
 
         $('#FtpPattern').change(function () {
@@ -115,15 +117,15 @@
                 $('.jobquestion.targetFileName').hide();
                 $('#TargetFileName').val("");
             }
-
-            if (!$(this).is(':checked') && $("#SelectedSourceType").val().toLowerCase() != "ftp") {
+            
+            if (!$(this).is(':checked') && $("[id$='SelectedSourceType']").val().toLowerCase() !== "ftp") {
                 $('.jobquestion.targetFileName').show();
             }
         });
 
         if ($("#JobID").val() != undefined && $("#JobID").val() != "0") {
-            $.ajax({
-                url: "/Config/SourceDetails/" + $('#SelectedDataSource :selected').val(),
+            $.ajax({                
+                url: "/Config/SourceDetails/" + $("[id$='SelectedDataSource'] :selected").val(),
                 dataType: 'json',
                 type: "GET",
                 //data: { Id: $('#SelectedDataSource :selected').val() },
@@ -131,7 +133,8 @@
                     data.Job.SetDataSourceSpecificPanels(datain.SourceType);
                     data.Job.DisplayHttpPostPanel();
                     data.Job.targetFileNameDescUpdate();
-                    if ($("#SelectedSourceType").val().toLowerCase() === "ftp") {
+                    
+                    if ($("[id$='SelectedSourceType']").val().toLowerCase() === "ftp") {
                         data.Job.SetFtpPatternDefaults($('#FtpPattern').val());
                     };
                 }
@@ -216,6 +219,7 @@
             //show common questions
             $('.jobquestion.sourceLocation').show();
             $('.jobquestion.schedule').show();
+            data.Job.SchedulePickerInit();
         }
     },
 
@@ -300,22 +304,24 @@
     },
 
     RequestMethodDropdownPopulate: function () {
-        var val = $('#SelectedSourceType :selected').val();
+        
+        var val = $("[id$='SelectedSourceType'] :selected").val();
 
         $.getJSON(encodeURI("/Config/RequestMethodByType/" + val), function (data) {
             var subItems = "";
             $.each(data, function (index, item) {
                 subItems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
             });
-
-            $('#SelectedRequestMethod').html(subItems);
+            
+            $("[id$='SelectedRequestMethod']").html(subItems);
         });
 
         data.Job.DisplayHttpPostPanel();
     },
 
     DisplayHttpPostPanel: function () {
-        var val = $('#SelectedRequestMethod :selected').text();
+        
+        var val = $("[id$='SelectedRequestMethod'] :selected").text();
         if (val.toUpperCase() === 'POST') {
             //data.Job.RequestDataFormatDropdownPopulate();
             $('.httpPostPanel').show();
@@ -327,21 +333,23 @@
 
     RequestDataFormatDropdownPopulate: function () {
         if ($("#JobID").val() === undefined || $("#JobID").val() === "0") {
-            var val = $('#SelectedSourceType :selected').val();
+            
+            var val = $("[id$='SelectedSourceType'] :selected").val();
 
             $.getJSON(encodeURI("/Config/RequestDataFormatByType/" + val), function (data) {
                 var subItems = "";
                 $.each(data, function (index, item) {
                     subItems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
                 });
-
-                $('#SelectedRequestDataFormat').html(subItems);
+                
+                $("[id$ ='SelectedRequestDataFormat']").html(subItems);
             });
         }        
     },
 
     targetFileNameDescUpdate: function () {
-        var val = $('#SelectedSourceType :selected').val().toLowerCase();
+        
+        var val = $("[id$='SelectedSourceType'] :selected").val().toLowerCase();
 
         if (val == 'https' || val == 'googleapi') {
             $("#targetfilenamequestion").text("What should target file be named?");
@@ -353,5 +361,243 @@
             $("#targetfilenamedesc").text("The incoming file will be renamed to Target File Name supplied.  If left blank, original source file name will used when saved to data.sentry.com.");
             $('#targetfilenamelabel').addClass("optional");
         }
+    },
+
+    SchedulePickerInit: function () {
+        $('#hourlyPicker').hide();
+        $('#dailyPicker').hide();
+        $('#weeklyPicker').hide();
+        $('#monthlyPicker').hide();
+        $('#yearlyPicker').hide();
+        
+        var a = $("[id$='Schedule']").val().split(' ');
+        var e = jQuery.Event("keydown");
+        e.which = 13; // # Some key code value
+
+        
+        switch ($("[id$='SchedulePicker']").val()) {
+            case "0":
+                $('#cronHourlyTimePicker').val(a[0]);
+                $('#hourlyPicker').show();
+                break;
+            case "1":
+                $('#cronDailyJobTimePicker').val(a[1] + ":" + a[0]);
+                $("#cronDailyJobTimePicker").trigger(e);
+                $('#dailyPicker').show();
+                break;
+            case "2":
+                $('#cronWeeklyDayPicker').val(a[4]);
+                $("#cronWeeklyJobTimePicker").val(a[1] + ":" + a[0]);
+                $("#cronWeeklyJobTimePicker").trigger(e);
+                $('#weeklyPicker').show();
+                break;
+            case "3":
+                $('#cronMonthlyDayPicker').val(a[2]);
+                $('#cronMonthlyJobTimePicker').val(a[1] + ":" + a[0]);
+                $("#cronMonthlyJobTimePicker").trigger(e);
+                $('#monthlyPicker').show();
+                break;
+            case "4":
+                $('#cronYearlyMonthPicker').val(a[3]);
+                $('#cronYearlyDayPicker').val(a[2]);
+                $('#cronYearlyJobTimePicker').val(a[1] + ":" + a[0]);
+                $("#cronYearlyJobTimePicker").trigger(e);
+                $('#yearlyPicker').show();
+                break;
+        }
+        
+        $("[id$='SchedulePicker']").change(function () {
+
+            $('#hourlyPicker').hide();
+            $('#dailyPicker').hide();
+            $('#weeklyPicker').hide();
+            $('#monthlyPicker').hide();
+            $('#yearlyPicker').hide();
+
+            switch ($(this).val()) {
+                case "0":
+                    $('#hourlyPicker').show();
+                    break;
+                case "1":
+                    $('#dailyPicker').show();
+                    break;
+                case "2":
+                    $('#weeklyPicker').show();
+                    break;
+                case "3":
+                    $('#monthlyPicker').show();
+                    break;
+                case "4":
+                default:
+                    $('#yearlyPicker').show();
+                    break;
+            }
+        });
+
+
+        $('#cronHourlyTimePicker').bind('input', function () {
+            $("[id$='Schedule']").val($(this).val() + ' * * * *');
+            updateFutureTimes();
+        });
+
+        function updateFutureTimes() {
+
+            if ($("[id$='Schedule']").val() !== 0) {
+
+                $('#scheduledTimes').empty();
+                later.date.localTime();
+                var schedule = later.parse.cron($("[id$='Schedule']").val());
+                var futureScheduleUTC = later.schedule(schedule).next(4);
+
+                $(futureScheduleUTC).each(function (index, element) {
+
+                    $('#scheduledTimes').append("<p>" + element + "</p>");
+                });
+
+                $('#scheduleRow').show();
+            } else {
+                $('#scheduleRow').hide();
+            }
+        }
+
+
+
+        $('#cronDailyJobTimePicker').timepicker({
+            timeFormat: 'h:mm p',
+            interval: 60,
+            minTime: '0',
+            maxTime: '23:59',
+            defaultTime: '11',
+            startTime: '0',
+            dynamic: false,
+            dropdown: true,
+            scrollbar: true,
+            change: function () {
+
+                if ($(this).timepicker('getTime')) {
+                    var d = new Date($(this).timepicker('getTime'));
+                    var h = d.getHours();
+                    var m = d.getMinutes();
+
+                    $("[id$='Schedule']").val(m + ' ' + h + ' * * *');
+                }
+                updateFutureTimes();
+            }
+        });
+
+
+        $('#cronWeeklyDayPicker').bind('input', function () {
+            changeWeek();
+        });
+
+        function changeWeek() {
+            if ($('#cronWeeklyJobTimePicker').timepicker('getTime')) {
+                var d = new Date($('#cronWeeklyJobTimePicker').timepicker('getTime'));
+                var h = d.getHours();
+                var m = d.getMinutes();
+                var d = $('#cronWeeklyDayPicker').val();
+
+
+                $("[id$='Schedule']").val(m + ' ' + h + ' * * ' + d);
+            }
+            updateFutureTimes();
+        }
+
+        $('#cronWeeklyJobTimePicker').timepicker({
+            timeFormat: 'h:mm p',
+            interval: 60,
+            minTime: '0',
+            maxTime: '23:59',
+            defaultTime: '11',
+            startTime: '0',
+            dynamic: false,
+            dropdown: true,
+            scrollbar: true,
+            change: function () {
+                changeWeek();
+            }
+        });
+
+        $('#cronMonthlyDayPicker').bind('input', function () {
+            changeMonth();
+        });
+
+        function changeMonth() {
+            if ($('#cronMonthlyJobTimePicker').timepicker('getTime')) {
+                var d = new Date($('#cronMonthlyJobTimePicker').timepicker('getTime'));
+                var h = d.getHours();
+                var m = d.getMinutes();
+                var d = $('#cronMonthlyDayPicker').val();
+
+
+                $("[id$='Schedule']").val(m + ' ' + h + ' ' + d + ' * *');
+            }
+            updateFutureTimes();
+        }
+        $('#cronMonthlyJobTimePicker').timepicker({
+            timeFormat: 'h:mm p',
+            interval: 60,
+            minTime: '0',
+            maxTime: '23:59',
+            defaultTime: '11',
+            startTime: '0',
+            dynamic: false,
+            dropdown: true,
+            scrollbar: true,
+            change: function () {
+                changeMonth();
+            }
+        });
+
+        $('#cronYearlyDayPicker').bind('input', function () {
+            changeYear();
+        });
+
+        $('#cronYearlyMonthPicker').bind('input', function () {
+            changeYear();
+        });
+
+        function changeYear() {
+            if ($('#cronYearlyJobTimePicker').timepicker('getTime')) {
+                var d = new Date($('#cronYearlyJobTimePicker').timepicker('getTime'));
+                var hour = d.getHours();
+                var minute = d.getMinutes();
+                var day = $('#cronYearlyDayPicker').val();
+                var month = $('#cronYearlyMonthPicker').val();
+
+                if (!day) {
+                    day = '*';
+                }
+
+                if (!month) {
+                    month = '*';
+                }
+
+
+                if (hour != null && minute != null && month != null && day != null) {
+                    $("[id$='Schedule']").val(minute + ' ' + hour + ' ' + day + ' ' + month + ' *');
+                } else {
+                    $("[id$='Schedule']").val();
+                }
+
+            }
+            updateFutureTimes();
+        }
+        $('#cronYearlyJobTimePicker').timepicker({
+            timeFormat: 'h:mm p',
+            interval: 60,
+            minTime: '0',
+            maxTime: '23:59',
+            defaultTime: '11',
+            startTime: '0',
+            dynamic: false,
+            dropdown: true,
+            scrollbar: true,
+            change: function () {
+                changeYear();
+            }
+        });
+
+        $("#cronJobDatePicker").datepicker();
     }
 }

@@ -129,6 +129,7 @@
     <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_19_04_05" />
     <Folder Include="Tables\DataProcessing" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_19_04_06" />
+    <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_01_04" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -268,6 +269,7 @@
     <None Include="Scripts\Post-Deploy\StaticData\DataAsset.sql" />
     <None Include="Scripts\Post-Deploy\StaticData\DataActionTypes.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_19_04_06\InsertDataActions.sql" />
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_01_04\Create_HangFire_1_7_6_Schema.sql" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="Sentry.data.Database.refactorlog" />
