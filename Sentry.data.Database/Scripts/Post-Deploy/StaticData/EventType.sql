@@ -31,7 +31,7 @@
 									(26, 'Sync Schema', 1,0,'DATASET'),
 									(27, 'Notifications', 1,1,'BUSINESSAREA')
 								)
-								AS Source ([Type_ID], [Description], Severity, Display_IND) 
+								AS Source ([Type_ID], [Description], Severity, Display_IND, [Group_CDE]) 
 
 		ON Target.[Type_ID] = Source.[Type_ID]
 		WHEN MATCHED THEN 
@@ -40,12 +40,13 @@
 				[Type_ID] = Source.[Type_ID],  
 				[Description] = Source.[Description],
 				Severity = Source.Severity,
-				Display_IND = Source.Display_IND
+				Display_IND = Source.Display_IND,
+				[Group_CDE] = Source.[Group_CDE]
 
 		WHEN NOT MATCHED BY TARGET THEN 
 			-- insert new rows 
-			INSERT ([Type_ID], [Description], Severity, Display_IND) 
-			VALUES ([Type_ID], [Description], Severity, Display_IND)  
+			INSERT ([Type_ID], [Description], Severity, Display_IND,[Group_CDE]) 
+			VALUES ([Type_ID], [Description], Severity, Display_IND,[Group_CDE])  
 					  
 		WHEN NOT MATCHED BY SOURCE THEN 
 			-- delete rows that are in the target but not the source 
