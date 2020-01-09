@@ -118,7 +118,6 @@ namespace Sentry.data.Infrastructure
                                         _job.JobLoggerMessage("Warn", $"uncompressretrieverjob uncompressed_file_count:{fcount.ToString()} extractpath:{extractPath}");
                                     }
 
-                                    _job.JobLoggerMessage("Info", "uncompressretrieverjob completed_extraction");
                                     _job.JobLoggerMessage("Info", $"uncompressretrieverjob uncompressed file count: {Directory.GetFiles(extractPath, "*", SearchOption.TopDirectoryOnly).Length.ToString()}");
                                     
                                     
@@ -130,6 +129,8 @@ namespace Sentry.data.Infrastructure
                                         var versionId = s3Service.UploadDataFile(file, targetkey);
                                         _job.JobLoggerMessage("Info", $"Extracted File contents to S3 Drop Location (key:{targetkey} | versionId:{versionId})");
                                     }
+
+                                    _job.JobLoggerMessage("Info", "uncompressretrieverjob completed_extraction");
                                 }
                                 catch (Exception ex)
                                 {
@@ -269,6 +270,8 @@ namespace Sentry.data.Infrastructure
                         throw new NotImplementedException();
                     }
                 }
+
+                Logger.Info($"Completed JawsService for Job Id : {jobId}");
             }
             catch (Exception ex)
             {
