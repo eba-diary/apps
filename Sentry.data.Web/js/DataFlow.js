@@ -31,7 +31,7 @@
                 }
             }
             else {
-                $('.compressionJobPanel').hide();  
+                $('.compressionJobPanel').hide();
             }
         });
 

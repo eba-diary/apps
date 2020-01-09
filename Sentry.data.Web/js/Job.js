@@ -25,7 +25,7 @@
 
             data.Job.targetFileNameDescUpdate();
         });
-        
+
         $("[id$='SelectedRequestMethod']").change(function () {
             data.Job.DisplayHttpPostPanel();
         });
@@ -91,8 +91,7 @@
 
         $('#jsonPreview').on('click', function () {
             try {
-                
-                var data = JSON.parse($("[id$='HttpRequestBody']").val());                
+                var data = JSON.parse($("[id$='HttpRequestBody']").val());
                 $("[id$='json-viewer']").jsonViewer(data);
                 $('.jsonValidateResultsPanel').show();
             }
