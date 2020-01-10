@@ -18,5 +18,10 @@ namespace Sentry.data.Core
         List<Permission> GetPermissionsForAccessRequest();
         string RequestAccess(AccessRequest request);
         List<KeyValuePair<string, string>> GetApproversByDataAsset(int dataAssetId);
+
+        List<BusinessAreaSubscription> GetAllUserSubscriptionsForBusinessArea();
+        IEnumerable<EventType> GetEventTypes();
+        List<Interval> GetAllIntervals();
+        Interval GetInterval(string description);
     }
 }

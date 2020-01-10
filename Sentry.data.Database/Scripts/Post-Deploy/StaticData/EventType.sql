@@ -1,36 +1,40 @@
 ﻿BEGIN TRAN 
 	BEGIN TRY 
+
+		DECLARE	@GroupDATASET VARCHAR(25)			= 'DATASET'
+				,@GroupBUSINESSAREA VARCHAR(25)		= 'BUSINESSAREA'
 		
 		MERGE INTO EventType AS Target 
 		USING (VALUES 
-									(1, 'Created File', 1,1),
-									(2, 'Bundle File Process', 1,1),
-									(3, 'Upload Failure', 5,1),
-									(4, 'Modified Dataset', 2,0),
-									(5, 'Current File Created', 1,0),
-									(6, 'Viewed', 1,0),
-									(7, 'Search', 1,0),
-									(8, 'Created Dataset', 1,0),
-									(9, 'Downloaded Data File', 1,0),
-									(10, 'Previewed Data File', 1,0),
-									(11, 'Edited Data File', 1,0),
-									(12, 'Pushed Data File to SAS', 1,0),
-									(13, 'Clicked Item in Feed', 1,0),
-									(14, 'Created Report', 1,0),
-									(15, 'Updated Report', 1,0),
-									(16, 'Updated Dataset', 1,0),
-									(17, 'Viewed Report', 1,0),
-									(18, 'Viewed Dataset', 1,0),
-									(19, 'Created Tag', 1,0),
-									(20, 'Updated Tag', 1,0),
-									(21, 'Deleted Report', 1,0),
-									(22, 'Created Data Source', 1,0),
-									(23, 'Updated Data Source', 1,0),
-									(24, 'Deleted Dataset', 1,0),
-									(25, 'Downloaded Report', 1,0),
-									(26, 'Sync Schema', 1,0)
+									(1, 'Created File', 1,1,@GroupDATASET),
+									(2, 'Bundle File Process', 1,0,@GroupDATASET),
+									(3, 'Upload Failure', 5,1,@GroupDATASET),
+									(4, 'Modified Dataset', 2,0,@GroupDATASET),
+									(5, 'Current File Created', 1,0,@GroupDATASET),
+									(6, 'Viewed', 1,0,@GroupDATASET),
+									(7, 'Search', 1,0,@GroupDATASET),
+									(8, 'Created Dataset', 1,0,@GroupDATASET),
+									(9, 'Downloaded Data File', 1,0,@GroupDATASET),
+									(10, 'Previewed Data File', 1,0,@GroupDATASET),
+									(11, 'Edited Data File', 1,0,@GroupDATASET),
+									(12, 'Pushed Data File to SAS', 1,0,@GroupDATASET),
+									(13, 'Clicked Item in Feed', 1,0,@GroupDATASET),
+									(14, 'Created Report', 1,0,@GroupDATASET),
+									(15, 'Updated Report', 1,0,@GroupDATASET),
+									(16, 'Updated Dataset', 1,0,@GroupDATASET),
+									(17, 'Viewed Report', 1,0,@GroupDATASET),
+									(18, 'Viewed Dataset', 1,0,@GroupDATASET),
+									(19, 'Created Tag', 1,0,@GroupDATASET),
+									(20, 'Updated Tag', 1,0,@GroupDATASET),
+									(21, 'Deleted Report', 1,0,@GroupDATASET),
+									(22, 'Created Data Source', 1,0,@GroupDATASET),
+									(23, 'Updated Data Source', 1,0,@GroupDATASET),
+									(24, 'Deleted Dataset', 1,0,@GroupDATASET),
+									(25, 'Downloaded Report', 1,0,@GroupDATASET),
+									(26, 'Sync Schema', 1,0,@GroupDATASET),
+									(27, 'Notifications', 1,1,@GroupBUSINESSAREA)
 								)
-								AS Source ([Type_ID], [Description], Severity, Display_IND) 
+								AS Source ([Type_ID], [Description], Severity, Display_IND, [Group_CDE]) 
 
 		ON Target.[Type_ID] = Source.[Type_ID]
 		WHEN MATCHED THEN 
@@ -39,12 +43,13 @@
 				[Type_ID] = Source.[Type_ID],  
 				[Description] = Source.[Description],
 				Severity = Source.Severity,
-				Display_IND = Source.Display_IND
+				Display_IND = Source.Display_IND,
+				[Group_CDE] = Source.[Group_CDE]
 
 		WHEN NOT MATCHED BY TARGET THEN 
 			-- insert new rows 
-			INSERT ([Type_ID], [Description], Severity, Display_IND) 
-			VALUES ([Type_ID], [Description], Severity, Display_IND)  
+			INSERT ([Type_ID], [Description], Severity, Display_IND,[Group_CDE]) 
+			VALUES ([Type_ID], [Description], Severity, Display_IND,[Group_CDE])  
 					  
 		WHEN NOT MATCHED BY SOURCE THEN 
 			-- delete rows that are in the target but not the source 
