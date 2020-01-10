@@ -381,6 +381,7 @@
     <Compile Include="Models\ContactInfoModel.cs" />
     <Compile Include="Models\DataAsset\AssetUIModel.cs" />
     <Compile Include="Models\ApiModels\Dataset\DatasetInfoModel.cs" />
+    <Compile Include="Models\DataProcessing\CompressionModel.cs" />
     <Compile Include="Models\DataProcessing\DataFlowDetailModel.cs" />
     <Compile Include="Models\DataProcessing\DataFlowModel.cs" />
     <Compile Include="Models\DataProcessing\DFModel.cs" />
@@ -452,6 +453,7 @@
     <Content Include="Content\toastr.css" />
     <Content Include="Content\toastr.min.css" />
     <Content Include="Images\DataFlow\ConceptTeamwork1.jpg" />
+    <Content Include="Images\DataFlow\Conversation12.jpg" />
     <Content Include="js\BusinessArea.js" />
     <Content Include="js\DataFlow.js" />
     <Content Include="js\DataSource.js" />
@@ -1346,6 +1348,7 @@
     <Content Include="Views\DataFlow\_SchemaMap.cshtml" />
     <Content Include="Views\DataFlow\_RetrieverJob.cshtml" />
     <Content Include="Views\Notification\_SubscribeNotification.cshtml" />
+    <Content Include="Views\DataFlow\_CompressionJob.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
