@@ -26,7 +26,7 @@
             data.Job.targetFileNameDescUpdate();
         });
 
-        $('#SelectedRequestMethod').change(function () {
+        $("[id$='SelectedRequestMethod']").change(function () {
             data.Job.DisplayHttpPostPanel();
         });
         
@@ -91,8 +91,8 @@
 
         $('#jsonPreview').on('click', function () {
             try {
-                var data = JSON.parse($('#HttpRequestBody').val());
-                $('#json-viewer').jsonViewer(data);
+                var data = JSON.parse($("[id$='HttpRequestBody']").val());
+                $("[id$='json-viewer']").jsonViewer(data);
                 $('.jsonValidateResultsPanel').show();
             }
             catch (error) {
@@ -105,10 +105,10 @@
             
             data.Job.AccessRequest($("[id$='SelectedDataSource'] :selected").val());
         });
-
-        $('#FtpPattern').change(function () {
-            data.Job.SetFtpPatternDefaults($('#FtpPattern').val());
-        })
+        
+        $("[id$='FtpPattern']").change(function () {
+            data.Job.SetFtpPatternDefaults($("[id$='FtpPattern']").val());
+        });
 
         $('#IsSourceCompressed').on('change', function () {
             $("#compressionPanel").toggle($("#IsSourceCompressed").is(':checked'));
@@ -195,6 +195,8 @@
                     $('.jobquestion.ftpPattern').show();
                     $('.jobquestion.compression').show();
                     $('.jobquestion.targetFileName').hide();
+                    $('.httpSourcePanel').hide();
+                    $('.httpPostPanel').hide();
                     break;
                 case "googleapi":
                     $('.jobquestion.ftpPattern').hide();
@@ -353,7 +355,7 @@
 
         if (val == 'https' || val == 'googleapi') {
             $("#targetfilenamequestion").text("What should target file be named?");
-            $("#targetfilenamedesc").text("Due to the type of data source, a target file name is required as we are receiving a message not retrieving specific file.");
+            $("#targetfilenamedesc").text("Due to the type of data source, a target file name is required as we are receiving raw data and not a file.");
             $('#targetfilenamelabel').removeClass("optional");
         }
         else {

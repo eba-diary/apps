@@ -85,6 +85,7 @@ namespace Sentry.data.Web.Controllers
         }
 
         [HttpGet]
+        [Route("DataFlow/NewSchemaMap/")]
         public PartialViewResult NewSchemaMap()
         {
             List<SelectListItem> sList = new List<SelectListItem>();
@@ -110,6 +111,18 @@ namespace Sentry.data.Web.Controllers
             };
 
             return PartialView("_SchemaMap", model);
+        }
+
+        [HttpGet]
+        [Route("DataFlow/NewCompressionJob/")]
+        public PartialViewResult NewCompressionJob()
+        {
+            CompressionModel model = new CompressionModel();
+
+            CreateDropDownList(model);
+
+            return PartialView("_CompressionJob", model);
+
         }
 
         private void SetSchemaModelLists(SchemaMapModel model)
@@ -194,6 +207,12 @@ namespace Sentry.data.Web.Controllers
             model.RequestDataFormatDropdown = Utility.BuildRequestDataFormatDropdown(model.SelectedRequestDataFormat);
 
             model.FtpPatternDropDown = Utility.BuildFtpPatternSelectList(model.FtpPattern);
+        }
+
+        private void CreateDropDownList(CompressionModel model)
+        {
+            model.CompressionTypesDropdown = Enum.GetValues(typeof(CompressionTypes)).Cast<CompressionTypes>().Select(v
+                => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
         }
 
         private List<SelectListItem> DataSourcesByType(string sourceType, int? selectedId)
