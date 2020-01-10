@@ -93,6 +93,9 @@ namespace Sentry.data.Core
         List<Event> GetEventsStartedByUser(string SentryOwnerName);
         bool IsUserSubscribedToDataset(string SentryOwnerName, int datasetID);
         List<DatasetSubscription> GetAllUserSubscriptionsForDataset(string SentryOwnerName, int datasetID);
+        
+        List<BusinessAreaSubscription> GetAllUserSubscriptionsForBusinessArea(string SentryOwnerName);
+
         bool IsUserSubscribedToDataAsset(string SentryOwnerName, int dataAssetID);
         List<DataAssetSubscription> GetAllUserSubscriptionsForDataAsset(string SentryOwnerName, int dataAssetID);
         List<DatasetSubscription> GetSubscriptionsForDataset(int datasetID);
