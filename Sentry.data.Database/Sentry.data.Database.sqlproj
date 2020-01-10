@@ -237,6 +237,7 @@
     <Build Include="Tables\BusinessAreaTileRow.sql" />
     <Build Include="Tables\BusinessAreaTileRow_BusinessAreaTile.sql" />
     <None Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_19_3_1\InsertSecurities.sql" />
+    <Build Include="Tables\Subscriptions\BusinessArea_Subscription.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

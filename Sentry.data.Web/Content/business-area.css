@@ -29,3 +29,9 @@
 .border-btm-pl {
     border-bottom: 4px solid #d7d7df;
 }
+
+.hamburger-man {
+    bottom: 0%;
+    position: absolute;
+    right: 1%;
+}

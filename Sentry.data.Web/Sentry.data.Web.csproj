@@ -459,6 +459,7 @@
     <Content Include="js\DataSource.js" />
     <Content Include="js\Fields.js" />
     <Content Include="js\Job.js" />
+    <Content Include="js\Subscription.js" />
     <Content Include="Scripts\jquery.json-viewer.js" />
     <Content Include="Content\query-builder.default.css" />
     <Content Include="Content\query-builder.default.min.css" />
@@ -1346,6 +1347,7 @@
     <Content Include="Views\DataFlow\EditorTemplates\Enum.cshtml" />
     <Content Include="Views\DataFlow\_SchemaMap.cshtml" />
     <Content Include="Views\DataFlow\_RetrieverJob.cshtml" />
+    <Content Include="Views\Notification\_SubscribeNotification.cshtml" />
     <Content Include="Views\DataFlow\_CompressionJob.cshtml" />
   </ItemGroup>
   <ItemGroup>
