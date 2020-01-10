@@ -111,16 +111,26 @@ namespace Sentry.data.Infrastructure
                                         ZipFile.ExtractToDirectory(filePath, extractPath);
                                     }
 
-                                    int fcount = Directory.GetFiles(extractPath, "*", SearchOption.TopDirectoryOnly).Length;
+                                    string[] extractedFileList = Directory.GetFiles(extractPath, "*", SearchOption.AllDirectories);
+                                    int fcount = extractedFileList.Length;
                                     int dcount = Directory.GetDirectories(extractPath, "*", SearchOption.AllDirectories).Length;
 
                                     if (fcount == 0)
                                     {
                                         _job.JobLoggerMessage("Warn", $"uncompressretrieverjob uncompressed_file_count:{fcount.ToString()} extractpath:{extractPath}");
                                     }
-
-                                    _job.JobLoggerMessage("Debug", $"uncompressretrieverjob uncompressed_dir_count:{fcount.ToString()} extractpath:{extractPath}");
-                                    
+                                    else
+                                    {
+                                        _job.JobLoggerMessage("Debug", $"uncompressretrieverjob uncompressed_dir_count:{fcount.ToString()} extractpath:{extractPath}");
+                                        StringBuilder sb = new StringBuilder();
+                                        sb.AppendLine($"uncompressretrieverjob uncompress_dir_content: {extractPath}");
+                                        foreach(string f in extractedFileList)
+                                        {
+                                            FileInfo fi = new FileInfo(f);
+                                            sb.AppendLine($"name:{f}\tsize:{fi.Length}");
+                                        }
+                                        _job.JobLoggerMessage("Debug", sb.ToString());
+                                    }
 
                                     _job.JobLoggerMessage("Info", $"uncompressretrieverjob uncompressed file count: {Directory.GetFiles(extractPath, "*", SearchOption.TopDirectoryOnly).Length.ToString()}");
                                     
