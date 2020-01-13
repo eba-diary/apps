@@ -8,29 +8,53 @@
     <div id="pl-landing-pg-wrapper">
 
         <div class="row">
-            <div class="col-sm-12 col-md-12 col-lg-12"><img id="dairyland-logo" alt="Dairyland Logo" src="~/Images/dairyland_logo.png" width="220" /></div>
-        </div>
+            <div class="col-sm-12 col-md-12 col-lg-12">
+                <img id="dairyland-logo" alt="Dairyland Logo" src="~/Images/dairyland_logo.png" width="220" />
 
-        <div class="row">
-            <div sho class="col-sm-12 col-md-12 col-lg-12">
+                    
 
-                @* loop through each row in the model *@
-                @foreach (BusinessAreaTileRowModel row in Model.Rows)
-                {
-                    @Html.Partial("_LandingPageTile", row)
-                }
 
+                        <div class="btn-group dataset-operation-button hamburger-man"  data-toggle="tooltip" data-placement="top" title="Additional Actions">
+                            <button type="button"
+                                    class="btn btn-default borderdk_gray borderdk_blueGray dropdown"
+                                    data-toggle="dropdown">
+                                <span class="glyphicon glyphicon-menu-hamburger"></span>
+                            </button>
+                            <ul class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 50px, 0px); top: -10px; left: 0px; will-change: transform;">
+                                <li id="SubscribeModal" style="cursor: pointer;" data-id="1" data-placement="top" title="Subscribe">
+                                    <a>
+                                        Subscribe
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+
+                    
+
+                </div>
             </div>
-        </div>
-    </div>
 
 
-@section Scripts {
-    <script type="text/javascript">
+            <div class="row">
+                <div sho class="col-sm-12 col-md-12 col-lg-12">
 
-        $(function () {
-            data.BusinessArea.init(1);
-        });
+                    @* loop through each row in the model *@
+                    @foreach (BusinessAreaTileRowModel row in Model.Rows)
+                    {
+                        @Html.Partial("_LandingPageTile", row)
+                    }
 
-    </script>
-}
+                </div>
+            </div>
+     </div>
+
+
+        @section Scripts {
+            <script type="text/javascript">
+
+                $(function () {
+                    data.BusinessArea.init(1);
+                });
+
+            </script>
+        }

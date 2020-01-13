@@ -40,6 +40,7 @@ namespace Sentry.data.Web
         [DisplayName("Where should this data be loaded?")]
         public List<SchemaMapModel> SchemaMaps { get; set; }
         public JobModel RetrieverJob { get; set; }
+        public CompressionModel CompressionJob { get; set; }
         public string CreatedBy { get; set; }
         public DateTime CreatedDTM { get; set; }
         public int DataFlowId { get; set; }
