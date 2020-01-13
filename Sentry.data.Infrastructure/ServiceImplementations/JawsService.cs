@@ -82,61 +82,13 @@ namespace Sentry.data.Infrastructure
 
                                 try
                                 {
-                                    _job.JobLoggerMessage("Info", "uncompressretrieverjob starting_extraction");
-                                    //Do we need to exclude any files from zip archive?  If not extract all files to target directory
-                                    if (_job.JobOptions.CompressionOptions.FileNameExclusionList != null && _job.JobOptions.CompressionOptions.FileNameExclusionList.Count > 0)
-                                    {
-                                        
-                                        List<String> ExclusionList = _job.JobOptions.CompressionOptions.FileNameExclusionList;
+                                    UncompressZipFile(filePath, extractPath);
 
-                                        _job.JobLoggerMessage("Info", $"uncompressretrieverjob filenameexclusions_detected  count:{ExclusionList.Count}");
+                                    string[] extractedFileList = GetAllFilesWithinDirectory(extractPath, true);
+                                    LogExtractionContents(extractPath, extractedFileList);
 
-                                        using (ZipArchive archive = ZipFile.OpenRead(filePath))
-                                        {
-                                            foreach (ZipArchiveEntry entry in archive.Entries)
-                                            {
-                                                //Exclude file if name exists in ExclusionList or does not match job search criteria
-                                                if (!ExclusionList.Contains(entry.FullName) && !_job.FilterIncomingFile(entry.FullName))
-                                                {
-                                                    //extract to local work directory, overrwrite file if exists
-                                                    _job.JobLoggerMessage("Debug", $"uncompressretrieverjob extractfile entry:{entry.FullName} to:{Path.Combine(extractPath, entry.FullName)}");
-                                                    entry.ExtractToFile(Path.Combine(extractPath, entry.FullName), true);
-                                                }
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        _job.JobLoggerMessage("Debug", $"uncompressretrieverjob extractdirectory source:{filePath} to:{extractPath}");
-                                        ZipFile.ExtractToDirectory(filePath, extractPath);
-                                    }
-
-                                    string[] extractedFileList = Directory.GetFiles(extractPath, "*", SearchOption.AllDirectories);
-                                    int fcount = extractedFileList.Length;
-                                    int dcount = Directory.GetDirectories(extractPath, "*", SearchOption.AllDirectories).Length;
-
-                                    if (fcount == 0)
-                                    {
-                                        _job.JobLoggerMessage("Warn", $"uncompressretrieverjob uncompressed_file_count:{fcount.ToString()} extractpath:{extractPath}");
-                                    }
-                                    else
-                                    {
-                                        _job.JobLoggerMessage("Debug", $"uncompressretrieverjob uncompressed_dir_count:{fcount.ToString()} extractpath:{extractPath}");
-                                        StringBuilder sb = new StringBuilder();
-                                        sb.AppendLine($"uncompressretrieverjob uncompress_dir_content: {extractPath}");
-                                        foreach(string f in extractedFileList)
-                                        {
-                                            FileInfo fi = new FileInfo(f);
-                                            sb.AppendLine($"name:{f}\tsize:{fi.Length}");
-                                        }
-                                        _job.JobLoggerMessage("Debug", sb.ToString());
-                                    }
-
-                                    _job.JobLoggerMessage("Info", $"uncompressretrieverjob uncompressed file count: {Directory.GetFiles(extractPath, "*", SearchOption.TopDirectoryOnly).Length.ToString()}");
-                                    
-                                    
                                     //Upload all extracted files to S3 drop location
-                                    foreach (string file in Directory.GetFiles(extractPath))
+                                    foreach (string file in extractedFileList)
                                     {
                                         _job.JobLoggerMessage("Info", $"uncompressretrieverjob preparing_file_upload file:{Path.GetFileName(file)}");
                                         string targetkey = $"{defaultjob.DataSource.GetDropPrefix(defaultjob)}{_job.GetTargetFileName(Path.GetFileName(file))}";
@@ -166,27 +118,10 @@ namespace Sentry.data.Infrastructure
                                 //Set target path based on DfsBasic URI
                                 string targetPath = defaultjob.GetUri().LocalPath;
 
-                                if (_job.JobOptions.CompressionOptions.FileNameExclusionList != null && _job.JobOptions.CompressionOptions.FileNameExclusionList.Count > 0)
-                                {
-                                    List<String> ExclusionList = _job.JobOptions.CompressionOptions.FileNameExclusionList;
+                                UncompressZipFile(filePath, targetPath);
 
-                                    using (ZipArchive archive = ZipFile.OpenRead(filePath))
-                                    {
-                                        foreach (ZipArchiveEntry entry in archive.Entries)
-                                        {
-                                            //Exclude file if name exists in ExclusionList or does not match job search criteria
-                                            if (!ExclusionList.Contains(entry.FullName) && !_job.FilterIncomingFile(entry.FullName))
-                                            {
-                                                //extract to DfsBasic drop location
-                                                entry.ExtractToFile(Path.Combine(targetPath, entry.FullName));
-                                            }
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    ZipFile.ExtractToDirectory(filePath, targetPath);
-                                }
+                                string[] extractedFileList = GetAllFilesWithinDirectory(targetPath, true);
+                                LogExtractionContents(targetPath, extractedFileList);
 
                                 //cleanup temp file after successful processing
                                 CleanupTempFile(filePath);
@@ -290,6 +225,87 @@ namespace Sentry.data.Infrastructure
             catch (Exception ex)
             {
                 _job.JobLoggerMessage("Error", "uncompressretrieverjob failed", ex);
+            }            
+        }
+
+        private void LogExtractionContents(string extractPath, string[] extractedFileList)
+        {
+            int fcount = extractedFileList.Length;
+            int dcount = Directory.GetDirectories(extractPath, "*", SearchOption.AllDirectories).Length;
+
+            if (fcount == 0)
+            {
+                _job.JobLoggerMessage("Warn", $"uncompressretrieverjob uncompressed_file_count:{fcount.ToString()} extractpath:{extractPath}");
+            }
+            else
+            {
+                _job.JobLoggerMessage("Debug", $"uncompressretrieverjob uncompressed_file_count:{fcount.ToString()} extractpath:{extractPath}");
+
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine($"uncompressretrieverjob uncompress_dir_content: {extractPath}");
+                foreach (string f in extractedFileList)
+                {
+                    FileInfo fi = new FileInfo(f);
+                    sb.AppendLine($"name:{f}\tsize:{fi.Length}");
+                }
+                _job.JobLoggerMessage("Debug", sb.ToString());
+            }
+        }
+
+        private void UncompressZipFile(string filePath, string extractPath)
+        {
+            try
+            {
+                _job.JobLoggerMessage("Info", "uncompresszipfile starting_extraction");
+                //Do we need to exclude any files from zip archive?  If not extract all files to target directory
+                if (_job.JobOptions.CompressionOptions.FileNameExclusionList != null && _job.JobOptions.CompressionOptions.FileNameExclusionList.Count > 0)
+                {
+
+                    List<string> ExclusionList = _job.JobOptions.CompressionOptions.FileNameExclusionList;
+
+                    _job.JobLoggerMessage("Info", $"uncompresszipfile filenameexclusions_detected  count:{ExclusionList.Count}");
+
+                    using (ZipArchive archive = ZipFile.OpenRead(filePath))
+                    {
+                        foreach (ZipArchiveEntry entry in archive.Entries)
+                        {
+                            //Exclude file if name exists in ExclusionList or does not match job search criteria
+                            if (!ListContainsValue(ExclusionList, Path.GetFileName(entry.FullName)) && !_job.FilterIncomingFile(entry.FullName))
+                            {
+                                //extract to local work directory, overrwrite file if exists
+                                _job.JobLoggerMessage("Debug", $"uncompresszipfile extractfile entry:{entry.FullName} to:{Path.Combine(extractPath, Path.GetFileName(entry.FullName))}");
+                                entry.ExtractToFile(Path.Combine(extractPath, Path.GetFileName(entry.FullName)), true);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    _job.JobLoggerMessage("Debug", $"uncompresszipfile extractdirectory source:{filePath} to:{extractPath}");
+                    ZipFile.ExtractToDirectory(filePath, extractPath);
+                }
+            }
+            catch (Exception ex)
+            {
+                _job.JobLoggerMessage("Debug", $"uncompresszipfile failedextraction source:{filePath} to:{extractPath}", ex);
+            }            
+        }
+
+        private static bool ListContainsValue(List<string> list, string value)
+        {
+            bool v = list.Any(w => w.Contains(value));
+            return v;
+        } 
+
+        private static string[] GetAllFilesWithinDirectory(string extractPath, bool recursively)
+        {
+            if (recursively)
+            {
+                return Directory.GetFiles(extractPath, "*", SearchOption.AllDirectories);
+            }
+            else
+            {
+                return Directory.GetFiles(extractPath, "*", SearchOption.TopDirectoryOnly);
             }            
         }
 
