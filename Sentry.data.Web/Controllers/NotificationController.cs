@@ -131,44 +131,45 @@ namespace Sentry.data.Web.Controllers
 
 
         [HttpGet]
-        public ActionResult Subscribe()
+        public ActionResult SubscribeDisplay(int group)
         {
-            int businessAreaType = 1;
-            BusinessAreaType bat = (BusinessAreaType) businessAreaType;
-
             SubscriptionModel sm = new SubscriptionModel();
-
-            sm.CurrentSubscriptionsBusinessArea = _notificationService.GetAllUserSubscriptionsForBusinessArea();
-            sm.AllEventTypes = _notificationService.GetEventTypes().Select((c) =>   new SelectListItem { Text = c.Description, Value = c.Type_ID.ToString() });
+            sm.group = (Group) group;                                                                                                               //need to teach MODEL what KIND of Subscription it is,either DATASET=1 or BUSINESSAREA=2
+            sm.CurrentSubscriptionsBusinessArea = _notificationService.GetAllUserSubscriptions(sm.group);
+            sm.AllEventTypes = _notificationService.GetEventTypes(sm.group).Select((c) =>   new SelectListItem { Text = c.Description, Value = c.Type_ID.ToString() });
             sm.AllIntervals  = _notificationService.GetAllIntervals().Select((c) => new SelectListItem { Text = c.Description, Value = c.Interval_ID.ToString() });
             sm.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
 
-
-            sm.businessAreaID = businessAreaType;
-
-
-            foreach (Core.EventType et in _notificationService.GetEventTypes())
+            //BUSINESSAREA      AUSTIN:  FUTURE we will put DATASET in here too, you can maybe even add another function to pass stuff here and make below even more generic
+            if(sm.group == Group.BusinessArea)
             {
-                if (!sm.CurrentSubscriptionsBusinessArea.Any(x => x.EventType.Type_ID == et.Type_ID))
+                BusinessAreaType bat = BusinessAreaType.PersonalLines;
+                sm.businessAreaID = (int)BusinessAreaType.PersonalLines;
+                foreach (Core.EventType et in _notificationService.GetEventTypes(sm.group))
                 {
-                    BusinessAreaSubscription subscription = new BusinessAreaSubscription();
-                    subscription.BusinessAreaType = bat;
-                    subscription.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
-                    subscription.EventType = et;
-                    subscription.Interval = _notificationService.GetInterval("Never");
-                    subscription.ID = 0;
+                    if (!sm.CurrentSubscriptionsBusinessArea.Any(x => x.EventType.Type_ID == et.Type_ID))
+                    {
+                        BusinessAreaSubscription subscription = new BusinessAreaSubscription();
+                        subscription.BusinessAreaType = bat;
+                        subscription.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
+                        subscription.EventType = et;
+                        subscription.Interval = _notificationService.GetInterval("Never");
+                        subscription.ID = 0;
 
-                    sm.CurrentSubscriptionsBusinessArea.Add(subscription);
+                        sm.CurrentSubscriptionsBusinessArea.Add(subscription);
+                    }
                 }
             }
+            
+            return PartialView("_SubscribeHero", sm);
+        }
 
-            return PartialView("_SubscribeNotification", sm);
-            //return PartialView("_Subscribe", sm);
-
-
-
-
-
+        [HttpPost]
+        public ActionResult SubscribeUpdate(SubscriptionModel sm)
+        {
+            SubscriptionModelDTO dto = sm.ToDto();
+            bool b = _notificationService.CreateSubscription(dto);
+            return Redirect(Request.UrlReferrer.PathAndQuery);
 
         }
 

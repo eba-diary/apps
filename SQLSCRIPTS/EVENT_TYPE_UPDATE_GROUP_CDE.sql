@@ -2,7 +2,7 @@ select * from Dataset
 select * from EventType
 select * from BusinessArea
 select * from BusinessArea_Subscription where SentryOwner_NME = '072186'
-select * from Dataset_Subscription where SentryOwner_NME = '072186'
+select * from Dataset_Subscription where SentryOwner_NME = '072186' and Dataset_ID = 195;
 select * from IntervalType
 
 

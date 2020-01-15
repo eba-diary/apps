@@ -3,7 +3,7 @@
     ViewBag.Title = "Subscriptions";
 }
 
-@using (Html.BeginForm(null, null, FormMethod.Post))
+@using (Html.BeginForm("SubscribeUpdate", "Notification", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
 
@@ -11,6 +11,7 @@
 
         @Html.HiddenFor(model => model.businessAreaID)
         @Html.HiddenFor(model => model.SentryOwnerName)
+        @Html.HiddenFor(model => model.group)
 
         @Html.DisplayFor((model) => ViewData.ModelState)
 

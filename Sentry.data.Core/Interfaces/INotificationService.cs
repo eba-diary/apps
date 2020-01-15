@@ -19,9 +19,10 @@ namespace Sentry.data.Core
         string RequestAccess(AccessRequest request);
         List<KeyValuePair<string, string>> GetApproversByDataAsset(int dataAssetId);
 
-        List<BusinessAreaSubscription> GetAllUserSubscriptionsForBusinessArea();
-        IEnumerable<EventType> GetEventTypes();
+        List<BusinessAreaSubscription> GetAllUserSubscriptions(Group group);
+        IEnumerable<EventType> GetEventTypes(Group group);
         List<Interval> GetAllIntervals();
         Interval GetInterval(string description);
+        bool CreateSubscription(SubscriptionModelDTO dto);
     }
 }

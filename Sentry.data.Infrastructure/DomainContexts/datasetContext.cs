@@ -623,11 +623,14 @@ namespace Sentry.data.Infrastructure
             return Query<DatasetSubscription>().Cacheable().Where(x => x.SentryOwnerName == SentryOwnerName && x.Dataset.DatasetId == datasetID).ToList();
         }
 
-        public List<BusinessAreaSubscription> GetAllUserSubscriptionsForBusinessArea(string SentryOwnerName)
+        public List<BusinessAreaSubscription> GetAllUserSubscriptions(string SentryOwnerName,Group group)
         {
-            return Query<BusinessAreaSubscription>().Cacheable().Where(x => x.SentryOwnerName == SentryOwnerName).ToList();
-        }
 
+            if (group == Group.BusinessArea)
+                return Query<BusinessAreaSubscription>().Cacheable().Where(x => x.SentryOwnerName == SentryOwnerName).ToList();
+            else
+                return null;
+        }
 
         public List<DataAssetSubscription> GetAllUserSubscriptionsForDataAsset(string SentryOwnerName, int dataAssetID)
         {

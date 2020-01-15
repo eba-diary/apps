@@ -32,7 +32,9 @@
 									(24, 'Deleted Dataset', 1,0,@GroupDATASET),
 									(25, 'Downloaded Report', 1,0,@GroupDATASET),
 									(26, 'Sync Schema', 1,0,@GroupDATASET),
-									(27, 'Notifications', 1,1,@GroupBUSINESSAREA)
+									(27, 'Critical Notifications', 1,1,@GroupBUSINESSAREA),
+									(28, 'Warning Notifications', 1,1,@GroupBUSINESSAREA),
+									(29, 'Info Notifications', 1,1,@GroupBUSINESSAREA)
 								)
 								AS Source ([Type_ID], [Description], Severity, Display_IND, [Group_CDE]) 
 

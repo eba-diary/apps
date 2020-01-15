@@ -248,15 +248,15 @@ namespace Sentry.data.Core
         //    return models;
         //}
 
-
-        public List<BusinessAreaSubscription> GetAllUserSubscriptionsForBusinessArea()
+        public List<BusinessAreaSubscription> GetAllUserSubscriptions(Group group)
         {
-            return _domainContext.GetAllUserSubscriptionsForBusinessArea(_userService.GetCurrentUser().AssociateId);
+            return _domainContext.GetAllUserSubscriptions(_userService.GetCurrentUser().AssociateId,group);
+            
         }
 
-        public IEnumerable<EventType> GetEventTypes()
+        public IEnumerable<EventType> GetEventTypes(Group group)
         {
-            IQueryable<EventType> et = _domainContext.EventTypes.Where( w => w.Display && w.Group == "BUSINESSAREA" );
+            IQueryable<EventType> et = _domainContext.EventTypes.Where( w => w.Display && w.Group == group.GetDescription() );
             return et;
         }
 
@@ -270,6 +270,50 @@ namespace Sentry.data.Core
         {
             Interval i = _domainContext.GetInterval(description);
             return i;
+        }
+
+        public bool CreateSubscription(SubscriptionModelDTO newSubs)
+        {
+            List<BusinessAreaSubscription>  oldSubs = GetAllUserSubscriptions(newSubs.group);
+
+            foreach (BusinessAreaSubscription sub in newSubs.CurrentSubscriptionsBusinessArea)
+            {
+                bool insert = true;
+                if(oldSubs != null)
+                {
+                    foreach (BusinessAreaSubscription bs in oldSubs)
+                    {
+                        if (sub.EventType.Type_ID == bs.EventType.Type_ID)
+                        {
+                            bs.Interval = sub.Interval;
+                            insert = false;
+                            break;
+                        }
+                    }
+
+
+                }
+
+
+                if (insert)
+                {
+                    _domainContext.Merge<BusinessAreaSubscription>
+                    (
+                        new BusinessAreaSubscription
+                        (
+                            BusinessAreaType.PersonalLines,
+                            sub.EventType,
+                            sub.Interval,
+                            _userService.GetCurrentUser().AssociateId
+                         )
+                    );
+                }
+
+            }
+
+            _domainContext.SaveChanges();
+
+            return true;
         }
 
 

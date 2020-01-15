@@ -322,6 +322,7 @@
     <Compile Include="Extensions\CategoryExtensions.cs" />
     <Compile Include="Extensions\HiveExtensions.cs" />
     <Compile Include="Extensions\Security\UserSecurityExtensions.cs" />
+    <Compile Include="Extensions\SubscriptionExtensions.cs" />
     <Compile Include="Filters\AuthorizationFilters\AuthorizeHangfireDashboard.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeAttribute.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeByPermissionAttribute.cs" />
@@ -1345,7 +1346,7 @@
     <Content Include="Views\DataFlow\EditorTemplates\Enum.cshtml" />
     <Content Include="Views\DataFlow\_SchemaMap.cshtml" />
     <Content Include="Views\DataFlow\_RetrieverJob.cshtml" />
-    <Content Include="Views\Notification\_SubscribeNotification.cshtml" />
+    <Content Include="Views\Shared\_SubscribeHero.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
