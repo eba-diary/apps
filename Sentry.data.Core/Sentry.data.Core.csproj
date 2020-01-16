@@ -143,6 +143,10 @@
     <Compile Include="Entities\Schema\StructField.cs" />
     <Compile Include="Entities\Schema\TimestampField.cs" />
     <Compile Include="Entities\Schema\VarcharField.cs" />
+    <Compile Include="Exceptions\DatasetNotFound.cs" />
+    <Compile Include="Exceptions\DatasetUnauthorizedAccess.cs" />
+    <Compile Include="Exceptions\SchemaNotFound.cs" />
+    <Compile Include="Exceptions\SchemaUnauthorizedAccess.cs" />
     <Compile Include="Extensions\DataFlowExtensions.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
     <Compile Include="Extensions\DatasetFileConfigExtensions.cs" />

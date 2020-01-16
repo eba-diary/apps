@@ -5,9 +5,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Http;
 
-namespace Sentry.data.Web.Controllers
+namespace Sentry.data.Web.WebApi.Controllers
 {
     [RoutePrefix(WebConstants.Routes.VERSION_TAG)]
+    [WebApiAuthorizeUseApp]
     public class TagController : BaseWebApiController
     {
         private MetadataRepositoryService _metadataRepositoryService;
@@ -89,6 +90,7 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         [Route("{name}/{description}")]
         //[SwaggerResponse(HttpStatusCode.OK, Type = typeof(List<SearchableTag>))]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> AddNewTag(string name, string description)
         {
             Boolean reply = _dsContext.Tags.Count(x => x.Name.ToLower() == name.ToLower()) == 0 ? true : false;

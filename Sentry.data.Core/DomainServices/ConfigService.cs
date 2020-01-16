@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Sentry.Common.Logging;
 using StructureMap;
+using Sentry.data.Core.Exceptions;
 
 namespace Sentry.data.Core
 {
@@ -324,14 +325,51 @@ namespace Sentry.data.Core
             return dto;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="datasetId"></param>
+        /// <returns></returns>
+        /// <exception cref="DatasetUnauthorizedAccess">Thrown when user does not have access to dataset</exception>
         public List<DatasetFileConfigDto> GetDatasetFileConfigDtoByDataset(int datasetId)
         {
+            UserSecurity us;
+            try
+            {
+                us = _securityService.GetUserSecurity(_datasetContext.GetById<Dataset>(datasetId), _userService.GetCurrentUser());
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"metadatacontroller-validateviewpermissionsfordataset failed to retrieve UserSecurity object", ex);
+                throw new DatasetUnauthorizedAccess();
+            }
+
+            if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
+            {
+                try
+                {
+                    IApplicationUser user = _userService.GetCurrentUser();
+                    Logger.Info($"metadatacontroller-validateviewpermissionsfordataset unauthorized_access: Id:{user.AssociateId}");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("metadatacontroller-validateviewpermissionsfordataset unauthorized_access", ex);
+                }
+                throw new DatasetUnauthorizedAccess();
+            }
+
             Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
+            if(ds == null)
+            {
+                throw new DatasetNotFound();
+            }
+
             List<DatasetFileConfigDto> dtoList = new List<DatasetFileConfigDto>();
             foreach(DatasetFileConfig config in ds.DatasetFileConfigs.Where(w => !w.DeleteInd))
             {
                 dtoList.Add(GetDatasetFileConfigDto(config.ConfigId));
             }
+
             return dtoList;
         }
 

@@ -2,7 +2,7 @@
 using System.Web.Http;
 using System.Web.Http.Results;
 
-namespace Sentry.data.Web.Controllers
+namespace Sentry.data.Web.WebApi.Controllers
 {
     public class BaseWebApiController : ApiController
     {
