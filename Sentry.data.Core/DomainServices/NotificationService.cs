@@ -272,51 +272,57 @@ namespace Sentry.data.Core
             return i;
         }
 
-        public bool CreateSubscription(SubscriptionModelDTO newSubs)
+        public bool CreateUpdateSubscription(SubscriptionModelDTO newSubs)
         {
-            List<BusinessAreaSubscription>  oldSubs = GetAllUserSubscriptions(newSubs.group);
-
-            foreach (BusinessAreaSubscription sub in newSubs.CurrentSubscriptionsBusinessArea)
+            
+            if(newSubs.group == Group.BusinessArea)
             {
-                bool insert = true;
-                if(oldSubs != null)
+                List<BusinessAreaSubscription> oldSubs = GetAllUserSubscriptions(newSubs.group);
+
+                foreach (BusinessAreaSubscription newSub in newSubs.CurrentSubscriptionsBusinessArea)
                 {
-                    foreach (BusinessAreaSubscription bs in oldSubs)
+                    bool insertMe = true;
+
+                    if (oldSubs != null)
                     {
-                        if (sub.EventType.Type_ID == bs.EventType.Type_ID)
+                        BusinessAreaSubscription oldSub = (BusinessAreaSubscription)oldSubs.Where(w => w.ID == newSub.ID).FirstOrDefault();
+                        if (oldSub != null)
                         {
-                            bs.Interval = sub.Interval;
-                            insert = false;
-                            break;
+                            if (oldSub.Interval.Interval_ID != newSub.Interval.Interval_ID)
+                                oldSub.Interval = newSub.Interval;
+
+                            insertMe = false;
                         }
                     }
 
-
-                }
-
-
-                if (insert)
-                {
-                    _domainContext.Merge<BusinessAreaSubscription>
-                    (
-                        new BusinessAreaSubscription
+                    if (insertMe)
+                    {
+                        _domainContext.Merge<BusinessAreaSubscription>
                         (
-                            BusinessAreaType.PersonalLines,
-                            sub.EventType,
-                            sub.Interval,
-                            _userService.GetCurrentUser().AssociateId
-                         )
-                    );
+                            new BusinessAreaSubscription
+                            (
+                                newSub.BusinessAreaType,
+                                newSub.EventType,
+                                newSub.Interval,
+                                _userService.GetCurrentUser().AssociateId
+                             )
+                        );
+                    }
+
+                    
+                }
+                
+                List<BusinessAreaSubscription> delSubs = oldSubs.Where(w => w.Interval.Interval_ID == 5).ToList();
+                if (delSubs != null)
+                {
+                    foreach (BusinessAreaSubscription delSub in delSubs)
+                        oldSubs.Remove(delSub);
                 }
 
+                _domainContext.SaveChanges();
             }
-
-            _domainContext.SaveChanges();
-
+            
             return true;
         }
-
-
-
     }
 }

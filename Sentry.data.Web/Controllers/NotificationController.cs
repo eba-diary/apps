@@ -135,7 +135,6 @@ namespace Sentry.data.Web.Controllers
         {
             SubscriptionModel sm = new SubscriptionModel();
             sm.group = (Group) group;                                                                                                               //need to teach MODEL what KIND of Subscription it is,either DATASET=1 or BUSINESSAREA=2
-            sm.CurrentSubscriptionsBusinessArea = _notificationService.GetAllUserSubscriptions(sm.group);
             sm.AllEventTypes = _notificationService.GetEventTypes(sm.group).Select((c) =>   new SelectListItem { Text = c.Description, Value = c.Type_ID.ToString() });
             sm.AllIntervals  = _notificationService.GetAllIntervals().Select((c) => new SelectListItem { Text = c.Description, Value = c.Interval_ID.ToString() });
             sm.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
@@ -145,6 +144,8 @@ namespace Sentry.data.Web.Controllers
             {
                 BusinessAreaType bat = BusinessAreaType.PersonalLines;
                 sm.businessAreaID = (int)BusinessAreaType.PersonalLines;
+                sm.CurrentSubscriptionsBusinessArea = _notificationService.GetAllUserSubscriptions(sm.group);
+              
                 foreach (Core.EventType et in _notificationService.GetEventTypes(sm.group))
                 {
                     if (!sm.CurrentSubscriptionsBusinessArea.Any(x => x.EventType.Type_ID == et.Type_ID))
@@ -168,9 +169,8 @@ namespace Sentry.data.Web.Controllers
         public ActionResult SubscribeUpdate(SubscriptionModel sm)
         {
             SubscriptionModelDTO dto = sm.ToDto();
-            bool b = _notificationService.CreateSubscription(dto);
+            bool b = _notificationService.CreateUpdateSubscription(dto);
             return Redirect(Request.UrlReferrer.PathAndQuery);
-
         }
 
     }

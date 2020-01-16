@@ -26,6 +26,9 @@
 
                 @for (var subId = 0; subId < Model.CurrentSubscriptionsBusinessArea.Count(); subId++)
                 {
+                    @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessArea[subId].BusinessAreaType)
+                    @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessArea[subId].ID)
+
                     string cssClass = "";
                     if (Model.CurrentSubscriptionsBusinessArea[subId].Interval.Description.ToLower().Contains("never"))
                     {
