@@ -144,11 +144,14 @@ namespace Sentry.data.Web.Controllers
             {
                 BusinessAreaType bat = BusinessAreaType.PersonalLines;
                 sm.businessAreaID = (int)BusinessAreaType.PersonalLines;
-                sm.CurrentSubscriptionsBusinessArea = _notificationService.GetAllUserSubscriptions(sm.group);
-              
+
+                //get list of subscriptions the user has saved
+                List<BusinessAreaSubscription> tempCurrentSubscriptionsBusinessArea = _notificationService.GetAllUserSubscriptions(sm.group).OrderBy(o => o.EventType.Type_ID).ToList();
+
+                //add any missing subscriptions the user may not have saved
                 foreach (Core.EventType et in _notificationService.GetEventTypes(sm.group))
                 {
-                    if (!sm.CurrentSubscriptionsBusinessArea.Any(x => x.EventType.Type_ID == et.Type_ID))
+                    if (!tempCurrentSubscriptionsBusinessArea.Any(x => x.EventType.Type_ID == et.Type_ID))
                     {
                         BusinessAreaSubscription subscription = new BusinessAreaSubscription();
                         subscription.BusinessAreaType = bat;
@@ -157,9 +160,11 @@ namespace Sentry.data.Web.Controllers
                         subscription.Interval = _notificationService.GetInterval("Never");
                         subscription.ID = 0;
 
-                        sm.CurrentSubscriptionsBusinessArea.Add(subscription);
+                        tempCurrentSubscriptionsBusinessArea.Add(subscription);
                     }
                 }
+
+                sm.CurrentSubscriptionsBusinessArea = tempCurrentSubscriptionsBusinessArea.OrderBy(o => o.EventType.Type_ID).ToList();
             }
             
             return PartialView("_SubscribeHero", sm);

@@ -250,13 +250,12 @@ namespace Sentry.data.Core
 
         public List<BusinessAreaSubscription> GetAllUserSubscriptions(Group group)
         {
-            return _domainContext.GetAllUserSubscriptions(_userService.GetCurrentUser().AssociateId,group);
-            
+            return _domainContext.GetAllUserSubscriptions(_userService.GetCurrentUser().AssociateId, group);
         }
 
         public IEnumerable<EventType> GetEventTypes(Group group)
         {
-            IQueryable<EventType> et = _domainContext.EventTypes.Where( w => w.Display && w.Group == group.GetDescription() );
+            IQueryable<EventType> et = _domainContext.EventTypes.Where( w => w.Display && w.Group == group.GetDescription());
             return et;
         }
 
@@ -308,15 +307,14 @@ namespace Sentry.data.Core
                              )
                         );
                     }
-
-                    
                 }
                 
                 List<BusinessAreaSubscription> delSubs = oldSubs.Where(w => w.Interval.Interval_ID == 5).ToList();
                 if (delSubs != null)
                 {
                     foreach (BusinessAreaSubscription delSub in delSubs)
-                        oldSubs.Remove(delSub);
+                        //oldSubs.Remove(delSub);
+                        _domainContext.Remove<BusinessAreaSubscription>(delSub);
                 }
 
                 _domainContext.SaveChanges();
