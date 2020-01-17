@@ -1,7 +1,6 @@
 ﻿data.DataFlow = {
 
     DataFlowFormInit: function () {
-        console.log("hi");
 
         //data.DataFlow.InitCompressionCheckbox();
 
@@ -19,48 +18,32 @@
             }
             $('.compressionPanel').show();
             $('.schemaMapPanel').show();
+            $('.formSubmitButtons').show();
         });
 
         $("#IsCompressed").change(function () {
-            //if ($(this).is(":checked")) {
-            //    $("#IsCompressed").val(true);                
-            //}
-            //else {
-            //    $("#IsCompressed").val(false);
-            //}
+            if ($(this).val() === "true") {
+                $('.compressionJobPanel').show();
+                if ($('.compressionJobQuestion').length === 0) {
+                    $.get("/DataFlow/NewCompressionJob", function (e) {
+                        $("#compressionJobPanel").append(e);
+                    });
+                }
+            }
+            else {
+                $('.compressionJobPanel').hide();
+            }
         });
 
         $("#btnAddSchemaMap").on('click', function () {
             $.get("/DataFlow/NewSchemaMap", function (e) {
-                $("#schemaMapPanel").append(e);
+                $(e).insertBefore($("#btnAddSchemaMap"));
                 $('[id$=__SelectedDataset]').change(function () {
                     var curRow = $(this).parent().parent();
                     var schemaSelectionDropDown = curRow.find("[id$=__SelectedSchema]");
                     var val = $(this).val();
-                    console.log(val);
 
                     $.getJSON("/api/v2/metadata/dataset/" + val + "/schema", function (result) {
-                        //var optgroup = $('<optgroup>');
-
-                        //var previousOpt = '';
-                        //$.each(result, function (index, inData) {
-
-                        //    if (inData. != previousOpt) {
-                        //        if (previousOpt != '') {
-                        //            schemaSelectionDropDown.append(optgroup);
-                        //        }
-                        //        optgroup = $('<optgroup>');
-                        //        optgroup.attr('label', inData.Group.Name);
-                        //        previousOpt = inData.Group.Name;
-                        //    }
-
-                        //    optgroup.append($('<option/>', {
-                        //        value: inData.Value,
-                        //        text: inData.Text
-                        //    }));
-                        //});
-
-                        //schemaSelectionDropDown.append(optgroup);
                         var subItems;
                         subItems += "<option value='0'>Select Schema</option>";
                         $.each(result, function (index, item) {
@@ -71,6 +54,45 @@
                         schemaSelectionDropDown.val("0");
                     });
                 });
+            });
+        });
+
+        $('[id$=__SelectedDataset]').change(function () {
+            var curRow = $(this).parent().parent();
+            var schemaSelectionDropDown = curRow.find("[id$=__SelectedSchema]");
+            var val = $(this).val();
+            console.log(val);
+
+            $.getJSON("/api/v2/metadata/dataset/" + val + "/schema", function (result) {
+                //var optgroup = $('<optgroup>');
+
+                //var previousOpt = '';
+                //$.each(result, function (index, inData) {
+
+                //    if (inData. != previousOpt) {
+                //        if (previousOpt != '') {
+                //            schemaSelectionDropDown.append(optgroup);
+                //        }
+                //        optgroup = $('<optgroup>');
+                //        optgroup.attr('label', inData.Group.Name);
+                //        previousOpt = inData.Group.Name;
+                //    }
+
+                //    optgroup.append($('<option/>', {
+                //        value: inData.Value,
+                //        text: inData.Text
+                //    }));
+                //});
+
+                //schemaSelectionDropDown.append(optgroup);
+                var subItems;
+                subItems += "<option value='0'>Select Schema</option>";
+                $.each(result, function (index, item) {
+                    subItems += "<option value='" + item.SchemaId + "'>" + item.Name + "</option>";
+                });
+
+                schemaSelectionDropDown.html(subItems);
+                schemaSelectionDropDown.val("0");
             });
         });
 

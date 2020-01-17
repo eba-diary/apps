@@ -24,5 +24,9 @@ namespace Sentry.data.Core
         /// Indicates whether to display this event type
         /// </summary>
         public virtual Boolean Display { get; set; }
+
+        //AUSTIN:  this is the new column
+        public virtual string Group { get; set; }
+
     }
 }

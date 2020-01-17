@@ -247,5 +247,32 @@ namespace Sentry.data.Core
         //    }
         //    return models;
         //}
+
+
+        public List<BusinessAreaSubscription> GetAllUserSubscriptionsForBusinessArea()
+        {
+            return _domainContext.GetAllUserSubscriptionsForBusinessArea(_userService.GetCurrentUser().AssociateId);
+        }
+
+        public IEnumerable<EventType> GetEventTypes()
+        {
+            IQueryable<EventType> et = _domainContext.EventTypes.Where( w => w.Display && w.Group == "BUSINESSAREA" );
+            return et;
+        }
+
+        public List<Interval> GetAllIntervals()
+        {
+            List<Interval> i = _domainContext.GetAllIntervals();
+            return i;
+        }
+
+        public Interval GetInterval(string description)
+        {
+            Interval i = _domainContext.GetInterval(description);
+            return i;
+        }
+
+
+
     }
 }
