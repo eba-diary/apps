@@ -1349,7 +1349,6 @@
     <Content Include="Views\DataFlow\_SchemaMap.cshtml" />
     <Content Include="Views\DataFlow\_RetrieverJob.cshtml" />
     <Content Include="Views\Shared\_SubscribeHero.cshtml" />
-    <Content Include="Views\Notification\_SubscribeNotification.cshtml" />
     <Content Include="Views\DataFlow\_CompressionJob.cshtml" />
   </ItemGroup>
   <ItemGroup>
