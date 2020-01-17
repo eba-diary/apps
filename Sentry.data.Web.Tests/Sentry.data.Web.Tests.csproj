@@ -150,7 +150,6 @@
     <Compile Include="DatasetTests.cs" />
     <Compile Include="DomainModelUnitTests.cs" />
     <Compile Include="LiveDatabaseUnitTests.cs" />
-    <Compile Include="MetadataTests.cs" />
     <Compile Include="MockBasedUnitTests.cs" />
     <Compile Include="Mockups\MockClasses.cs" />
     <Compile Include="Mockups\MockControllers.cs" />
