@@ -271,14 +271,14 @@ namespace Sentry.data.Core
             return i;
         }
 
-        public bool CreateUpdateSubscription(SubscriptionModelDTO newSubs)
+        public void CreateUpdateSubscription(SubscriptionModelDto dto)
         {
             
-            if(newSubs.group == Group.BusinessArea)
+            if(dto.group == Group.BusinessArea)
             {
-                List<BusinessAreaSubscription> oldSubs = GetAllUserSubscriptions(newSubs.group);
+                List<BusinessAreaSubscription> oldSubs = GetAllUserSubscriptions(dto.group);
 
-                foreach (BusinessAreaSubscription newSub in newSubs.CurrentSubscriptionsBusinessArea)
+                foreach (BusinessAreaSubscription newSub in dto.CurrentSubscriptionsBusinessArea)
                 {
                     bool insertMe = true;
 
@@ -313,14 +313,14 @@ namespace Sentry.data.Core
                 if (delSubs != null)
                 {
                     foreach (BusinessAreaSubscription delSub in delSubs)
-                        //oldSubs.Remove(delSub);
+                    {
+                        oldSubs.Remove(delSub);
                         _domainContext.Remove<BusinessAreaSubscription>(delSub);
+                    }
                 }
 
                 _domainContext.SaveChanges();
             }
-            
-            return true;
         }
     }
 }

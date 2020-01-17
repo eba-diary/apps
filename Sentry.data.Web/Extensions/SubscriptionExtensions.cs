@@ -7,14 +7,14 @@ namespace Sentry.data.Web
 {
     public static class SubscriptionExtensions
     {
-        public static Core.SubscriptionModelDTO ToDto(this SubscriptionModel model)
+        public static Core.SubscriptionModelDto ToDto(this SubscriptionModel model)
         {
             if (model == null) 
             { 
-                return new Core.SubscriptionModelDTO(); 
+                return new Core.SubscriptionModelDto(); 
             }
 
-            Core.SubscriptionModelDTO dto = new Core.SubscriptionModelDTO();
+            Core.SubscriptionModelDto dto = new Core.SubscriptionModelDto();
             dto.group = model.group;
             dto.datasetID = model.datasetID;
             dto.businessAreaID = model.businessAreaID;

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core
 {
-    public class SubscriptionModelDTO
+    public class SubscriptionModelDto
     {
 
         public Group group { get; set; }                        

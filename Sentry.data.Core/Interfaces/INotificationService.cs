@@ -23,6 +23,6 @@ namespace Sentry.data.Core
         IEnumerable<EventType> GetEventTypes(Group group);
         List<Interval> GetAllIntervals();
         Interval GetInterval(string description);
-        bool CreateUpdateSubscription(SubscriptionModelDTO dto);
+        void CreateUpdateSubscription(SubscriptionModelDto dto);
     }
 }
