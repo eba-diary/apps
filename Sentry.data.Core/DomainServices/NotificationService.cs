@@ -314,7 +314,6 @@ namespace Sentry.data.Core
                 {
                     foreach (BusinessAreaSubscription delSub in delSubs)
                     {
-                        oldSubs.Remove(delSub);
                         _domainContext.Remove<BusinessAreaSubscription>(delSub);
                     }
                 }
