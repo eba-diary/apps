@@ -75,7 +75,7 @@ namespace Sentry.data.Web.Controllers
                     });
                     
                     _eventService.PublishSuccessEventByDataAsset(_dataSetContext.EventTypes.Where(w => w.Description == "Search").FirstOrDefault().Description,
-                                    RequestContext.Principal.Identity.Name, "Searched Lineage", DataAsset_ID ?? default, LineCDE, search);
+                                    RequestContext.Principal.Identity.Name, "Searched Lineage", DataAsset_ID ?? 0, LineCDE, search);
                     
                     return Ok(allLineage);
                 }
