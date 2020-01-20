@@ -35,32 +35,15 @@ namespace Sentry.data.Web.Controllers
         public IAssociateInfoProvider _associateInfoProvider;
         public IDatasetContext _datasetContext;
         private UserService _userService;
-        private S3ServiceProvider _s3Service;
-        private ISASService _sasService;
-        private IAppCache _cache;
-        private IRequestContext _requestContext;
-        private IDatasetService _datasetService;
-        private IEventService _eventService;
+        private readonly IEventService _eventService;
 
         private string Title { get; set; }
 
-        public SearchController(IDatasetContext dsCtxt, 
-            S3ServiceProvider dsSvc, 
-            UserService userService, 
-            ISASService sasService, 
-            IAssociateInfoProvider associateInfoService, 
-            IRequestContext requestContext,
-            IDatasetService datasetService,
-            IEventService eventService)
+        public SearchController(IDatasetContext dsCtxt, UserService userService, IAssociateInfoProvider associateInfoService, IEventService eventService)
         {
-            _cache = new CachingService();
             _datasetContext = dsCtxt;
-            _s3Service = dsSvc;
             _userService = userService;
-            _sasService = sasService;
             _associateInfoProvider = associateInfoService;
-            _requestContext = requestContext;
-            _datasetService = datasetService;
             _eventService = eventService;
         }
 
@@ -136,7 +119,7 @@ namespace Sentry.data.Web.Controllers
                     break;
             }
 
-            string search = JsonConvert.SerializeObject(new SearchTerms()
+            string searchValue = JsonConvert.SerializeObject(new SearchTerms()
             {
                 Category_Filters = categoryFilters.Split(',').Where(x => !String.IsNullOrWhiteSpace(x)).ToList(),
                 Sentry_Owners = (!String.IsNullOrWhiteSpace(sentryOwners)) ? sentryOwners.Split('|').Where(x => !String.IsNullOrWhiteSpace(x)).ToList() : null,
@@ -149,7 +132,7 @@ namespace Sentry.data.Web.Controllers
             });
 
             _eventService.PublishSuccessEvent(_datasetContext.EventTypes.Where(w => w.Description == "Search").FirstOrDefault().Description, SharedContext.CurrentUser.AssociateId,
-                                            reason, null, search);
+                                            reason, null, searchValue);
 
             return Json(true, JsonRequestBehavior.AllowGet);
         }

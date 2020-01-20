@@ -23,7 +23,7 @@ namespace Sentry.data.Web.Controllers
 
         public readonly IAssociateInfoProvider _associateInfoService;
         public readonly UserService _userService;
-        public readonly IEventService _eventService;
+        private readonly IEventService _eventService;
 
         public LineageController(MetadataRepositoryService metadataRepositoryService, IDataAssetContext dataAssetContext, 
                         IDatasetContext datasetContext, IAssociateInfoProvider associateInfoService, UserService userService,
