@@ -337,7 +337,7 @@ namespace Sentry.data.Web.Controllers
             sm.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
 
 
-            foreach (Core.EventType et in _datasetContext.EventTypes.Where(w => w.Display))
+            foreach (Core.EventType et in _datasetContext.EventTypes.Where(w => w.Display && w.Group == "DATASET"))
             {
                 if (!sm.CurrentSubscriptions.Any(x => x.EventType.Type_ID == et.Type_ID))
                 {
