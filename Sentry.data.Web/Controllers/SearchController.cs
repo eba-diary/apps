@@ -35,30 +35,16 @@ namespace Sentry.data.Web.Controllers
         public IAssociateInfoProvider _associateInfoProvider;
         public IDatasetContext _datasetContext;
         private UserService _userService;
-        private S3ServiceProvider _s3Service;
-        private ISASService _sasService;
-        private IAppCache _cache;
-        private IRequestContext _requestContext;
-        private IDatasetService _datasetService;
+        private readonly IEventService _eventService;
 
         private string Title { get; set; }
 
-        public SearchController(IDatasetContext dsCtxt, 
-            S3ServiceProvider dsSvc, 
-            UserService userService, 
-            ISASService sasService, 
-            IAssociateInfoProvider associateInfoService, 
-            IRequestContext requestContext,
-            IDatasetService datasetService)
+        public SearchController(IDatasetContext dsCtxt, UserService userService, IAssociateInfoProvider associateInfoService, IEventService eventService)
         {
-            _cache = new CachingService();
             _datasetContext = dsCtxt;
-            _s3Service = dsSvc;
             _userService = userService;
-            _sasService = sasService;
             _associateInfoProvider = associateInfoService;
-            _requestContext = requestContext;
-            _datasetService = datasetService;
+            _eventService = eventService;
         }
 
         // GET: Search
@@ -86,9 +72,11 @@ namespace Sentry.data.Web.Controllers
             {
                 case GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH:
                     ViewBag.Title = "Business Intelligence";
+                    model.SearchType = searchType;
                     break;
                 case GlobalConstants.SearchType.DATASET_SEARCH:
                     ViewBag.Title = "Dataset";
+                    model.SearchType = searchType;
                     break;
                 default:
                     if (user.IsAdmin)
@@ -107,35 +95,44 @@ namespace Sentry.data.Web.Controllers
             public List<string> Category_Filters { get; set; }
             public List<string> Sentry_Owners { get; set; }
             public List<string> Extensions { get; set; }
+            public List<string> BusinessUnits { get; set; }
+            public List<string> DatasetFunctions { get; set; }
+            public List<string> Tags { get; set; }
             public String Search_Term { get; set; }
             public int Results_Returned { get; set; }
         }
 
         [HttpPost]
-        [Route("Search/SearchEvent")]
-        public JsonResult SearchEvent(string categoryFilters, string sentryOwners, string extensions, String searchTerm, int resultsReturned)
+        [Route("Search/SearchEvent/{searchType}")]
+        public JsonResult SearchEvent(string searchType, string categoryFilters, string sentryOwners, string extensions, string businessUnits, string datasetFunctions, string tags, String searchTerm, int resultsReturned)
         {
-            Event e = new Event();
-            e.EventType = _datasetContext.EventTypes.Where(w => w.Description == "Search").FirstOrDefault();
-            e.Status = _datasetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-            e.TimeCreated = DateTime.Now;
-            e.TimeNotified = DateTime.Now;
-            e.IsProcessed = false;
-            e.UserWhoStartedEvent = SharedContext.CurrentUser.AssociateId;
+            string reason = null;
+            switch (searchType)
+            {
+                case GlobalConstants.SearchType.BUSINESS_INTELLIGENCE_SEARCH:
+                    reason = "Searched Exhibits";
+                    break;
+                case GlobalConstants.SearchType.DATASET_SEARCH:
+                    reason = "Searched Datasets";
+                    break;
+                default:
+                    break;
+            }
 
-            e.Search = JsonConvert.SerializeObject(new SearchTerms()
+            string searchValue = JsonConvert.SerializeObject(new SearchTerms()
             {
                 Category_Filters = categoryFilters.Split(',').Where(x => !String.IsNullOrWhiteSpace(x)).ToList(),
-
                 Sentry_Owners = (!String.IsNullOrWhiteSpace(sentryOwners)) ? sentryOwners.Split('|').Where(x => !String.IsNullOrWhiteSpace(x)).ToList() : null,
                 Extensions = extensions.Split(',').Where(x => !String.IsNullOrWhiteSpace(x)).ToList(),
+                BusinessUnits = businessUnits.Split(',').Where(x => !String.IsNullOrWhiteSpace(x)).ToList(),
+                DatasetFunctions = datasetFunctions.Split(',').Where(x => !String.IsNullOrWhiteSpace(x)).ToList(),
+                Tags = tags.Split(',').Where(x => !String.IsNullOrWhiteSpace(x)).ToList(),
                 Search_Term = searchTerm,
                 Results_Returned = resultsReturned
             });
 
-            e.Reason = "Searched Datasets";
-            Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-
+            _eventService.PublishSuccessEvent(_datasetContext.EventTypes.Where(w => w.Description == "Search").FirstOrDefault().Description, SharedContext.CurrentUser.AssociateId,
+                                            reason, null, searchValue);
 
             return Json(true, JsonRequestBehavior.AllowGet);
         }
