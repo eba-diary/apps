@@ -271,7 +271,7 @@ namespace Sentry.data.Core
             return i;
         }
 
-        public void CreateUpdateSubscription(SubscriptionModelDto dto)
+        public void CreateUpdateSubscription(SubscriptionDto dto)
         {
             
             if(dto.group == Group.BusinessArea)

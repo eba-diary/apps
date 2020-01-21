@@ -182,7 +182,7 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public ActionResult SubscribeUpdate(SubscriptionModel sm)
         {
-            SubscriptionModelDto dto = sm.ToDto();
+            SubscriptionDto dto = sm.ToDto();
             _notificationService.CreateUpdateSubscription(dto);
             return Redirect(Request.UrlReferrer.PathAndQuery);
         }
