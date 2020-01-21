@@ -11,23 +11,26 @@ namespace Sentry.data.Infrastructure
     {
         public void PublishSuccessEventByConfigId(string eventType, string userId, string reason, int configId)
         {
-            Task.Factory.StartNew(() => PublishSuccessEvent(eventType, userId, reason, 0, configId), TaskCreationOptions.RunContinuationsAsynchronously);
+            Task.Factory.StartNew(() => PublishSuccessEvent(eventType, userId, reason, 0, configId, 0), TaskCreationOptions.RunContinuationsAsynchronously);
         }
 
 
         public void PublishSuccessEventByDatasetId(string eventType, string userId, string reason, int datasetId)
         {
-            Task.Factory.StartNew(() => PublishSuccessEvent(eventType, userId, reason, datasetId, 0), TaskCreationOptions.RunContinuationsAsynchronously);
+            Task.Factory.StartNew(() => PublishSuccessEvent(eventType, userId, reason, datasetId, 0, 0), TaskCreationOptions.RunContinuationsAsynchronously);
         }
 
-        public void PublishSuccessEvent(string eventType, string userId, string reason)
+        public void PublishSuccessEventByDataAsset(string eventType, string userId, string reason, int dataAssetId, string lineCde = null, string search = null)
         {
-            Task.Factory.StartNew(() => PublishSuccessEvent(eventType, userId, reason, 0, 0), TaskCreationOptions.RunContinuationsAsynchronously);
+            Task.Factory.StartNew(() => PublishSuccessEvent(eventType, userId, reason, 0, 0, dataAssetId, lineCde, search), TaskCreationOptions.RunContinuationsAsynchronously);
         }
 
+        public void PublishSuccessEvent(string eventType, string userId, string reason, string lineCde = null, string search = null)
+        {
+            Task.Factory.StartNew(() => PublishSuccessEvent(eventType, userId, reason, 0, 0, 0, lineCde, search), TaskCreationOptions.RunContinuationsAsynchronously);
+        }
 
-
-        private void PublishSuccessEvent(string eventType, string userId, string reason, int datasetId, int configId)
+        private void PublishSuccessEvent(string eventType, string userId, string reason, int datasetId, int configId, int dataAssetId, string lineCde = null, string search = null)
         {
             using (IDatasetContext _datasetContext = Bootstrapper.Container.GetNestedContainer().GetInstance<IDatasetContext>())
             {
@@ -46,14 +49,14 @@ namespace Sentry.data.Infrastructure
                     configId = (dfc == null)? 0 : dfc.ConfigId;
                 }
 
-                Event evt = CreateAndSaveEvent(et, status, userId, reason, datasetId, configId);
+                Event evt = CreateAndSaveEvent(et, status, userId, reason, datasetId, configId, dataAssetId, lineCde, search);
 
                 _datasetContext.Add(evt);
                 _datasetContext.SaveChanges();
             }
         }
 
-        private Event CreateAndSaveEvent(EventType eventType, Status status, string userId, string reason, int? datasetId, int? configId)
+        private Event CreateAndSaveEvent(EventType eventType, Status status, string userId, string reason, int? datasetId, int? configId, int? dataAssetId, string lineCde, string search)
         {
             return new Event()
             {
@@ -65,7 +68,10 @@ namespace Sentry.data.Infrastructure
                 DataConfig = configId,
                 Dataset = datasetId,
                 UserWhoStartedEvent = userId,
-                Reason = reason
+                Reason = reason,
+                DataAsset = dataAssetId,
+                Line_CDE = lineCde,
+                Search = search
             };
         }
 

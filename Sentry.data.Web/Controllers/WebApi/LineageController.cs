@@ -26,14 +26,18 @@ namespace Sentry.data.Web.WebApi.Controllers
 
         public readonly IAssociateInfoProvider _associateInfoService;
         public readonly UserService _userService;
+        private readonly IEventService _eventService;
 
-        public LineageController(MetadataRepositoryService metadataRepositoryService, IDataAssetContext dataAssetContext, IDatasetContext datasetContext, IAssociateInfoProvider associateInfoService, UserService userService)
+        public LineageController(MetadataRepositoryService metadataRepositoryService, IDataAssetContext dataAssetContext, 
+                        IDatasetContext datasetContext, IAssociateInfoProvider associateInfoService, UserService userService,
+                        IEventService eventService)
         {
             _metadataRepositoryService = metadataRepositoryService;
             _dataAssetContext = dataAssetContext;
             _dataSetContext = datasetContext;
             _associateInfoService = associateInfoService;
             _userService = userService;
+            _eventService = eventService;
         }
 
         private class SearchTerms {
@@ -66,29 +70,17 @@ namespace Sentry.data.Web.WebApi.Controllers
                 if (!String.IsNullOrWhiteSpace(DataElement_NME) || !String.IsNullOrWhiteSpace(DataObject_NME) || !String.IsNullOrWhiteSpace(DataObjectField_NME))
                 {
                     var allLineage = _dataAssetContext.Lineage(GlobalConstants.DataElementDescription.LINEAGE, DataAsset_ID, DataElement_NME, DataObject_NME, DataObjectField_NME, LineCDE);
-
-
-                    Event e = new Event();
-                    e.EventType = _dataSetContext.EventTypes.Where(w => w.Description == "Search").FirstOrDefault();
-                    e.Status = _dataSetContext.EventStatus.Where(w => w.Description == "Success").FirstOrDefault();
-                    e.TimeCreated = DateTime.Now;
-                    e.TimeNotified = DateTime.Now;
-                    e.IsProcessed = false;
-                    e.UserWhoStartedEvent = RequestContext.Principal.Identity.Name;
-                    e.DataAsset = DataAsset_ID;
-                    e.Line_CDE = LineCDE;
-
-                    e.Search = JsonConvert.SerializeObject(new SearchTerms() {
+                    
+                    string search = JsonConvert.SerializeObject(new SearchTerms() {
                         Business_Term = HttpUtility.UrlDecode(DataObjectField_NME),
                         Consumption_Layer = HttpUtility.UrlDecode(DataElement_NME),
                         Lineage_Table = HttpUtility.UrlDecode(DataObject_NME),
                         Results_Returned = allLineage.Count
                     });
-
-                    e.Reason = "Searched Lineage";
-                    Task.Factory.StartNew(() => Utilities.CreateEventAsync(e), TaskCreationOptions.LongRunning);
-                
-
+                    
+                    _eventService.PublishSuccessEventByDataAsset(_dataSetContext.EventTypes.Where(w => w.Description == "Search").FirstOrDefault().Description,
+                                    RequestContext.Principal.Identity.Name, "Searched Lineage", DataAsset_ID ?? 0, LineCDE, search);
+                    
                     return Ok(allLineage);
                 }
                 else
