@@ -25,6 +25,10 @@ namespace Sentry.data.Infrastructure
             Task.Factory.StartNew(() => PublishSuccessEvent(eventType, userId, reason, 0, 0), TaskCreationOptions.RunContinuationsAsynchronously);
         }
 
+        public void PublishSuccessEventByNotificationId(string eventType, string userId, string reason, int notificationId)
+        {
+            Task.Factory.StartNew(() => PublishSuccessEventNotification(eventType, userId, reason, notificationId), TaskCreationOptions.RunContinuationsAsynchronously);
+        }
 
 
         private void PublishSuccessEvent(string eventType, string userId, string reason, int datasetId, int configId)
@@ -52,6 +56,26 @@ namespace Sentry.data.Infrastructure
                 _datasetContext.SaveChanges();
             }
         }
+
+        private void PublishSuccessEventNotification(string eventType, string userId, string reason, int notificationId)
+        {
+            using (IDatasetContext _datasetContext = Bootstrapper.Container.GetNestedContainer().GetInstance<IDatasetContext>())
+            {
+                EventType et = _datasetContext.EventTypes.Where(w => w.Description == eventType).FirstOrDefault();
+                Status status = _datasetContext.EventStatus.Where(w => w.Description == GlobalConstants.Statuses.SUCCESS).FirstOrDefault();
+
+                
+                Event evt = CreateAndSaveEvent(et, status, userId, reason, 0, 0);
+
+                _datasetContext.Add(evt);
+                _datasetContext.SaveChanges();
+            }
+        }
+
+
+
+
+
 
         private Event CreateAndSaveEvent(EventType eventType, Status status, string userId, string reason, int? datasetId, int? configId)
         {

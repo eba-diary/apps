@@ -16,11 +16,13 @@ namespace Sentry.data.Web.Controllers
 
         private readonly INotificationService _notificationService;
         private readonly UserService _userService;
+        private readonly IEventService _eventService;
 
-        public NotificationController(INotificationService notificationService, UserService userService)
+        public NotificationController(INotificationService notificationService, UserService userService, IEventService eventService)
         {
             _notificationService = notificationService;
             _userService = userService;
+            _eventService = eventService;
         }
 
         public ActionResult ManageNotification()
@@ -59,6 +61,13 @@ namespace Sentry.data.Web.Controllers
                 {
                     CanModifyNotifications = _notificationService.CanUserModifyNotifications()
                 };
+
+                string eventTypeMe="";
+
+                //model.
+
+                //_eventService.PublishSuccessEventByNotificationId(eventTypeMe, SharedContext.CurrentUser.AssociateId, "Notification Created", model.NotificationId) ;
+
                 return View("ManageNotification", vm);
             }
 

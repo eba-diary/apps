@@ -59,6 +59,12 @@
 
             public const string CREATED_DATASOURCE = "Created Data Source";
             public const string UPDATED_DATASOURCE = "Updated Data Source";
+
+            public const string CRITICAL_NOTIFICATION = "Critical Notification";
+            public const string WARNING_NOTIFICATION = "Warning Notification";
+            public const string INFO_NOTIFICATION = "Info Notification";
+
+
         }
 
         public static class Statuses
