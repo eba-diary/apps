@@ -11,10 +11,10 @@ namespace Sentry.data.Core
 {
     public class SchemaService : ISchemaService
     {
-        public IDatasetContext _datasetContext;
-        public IUserService _userService;
-        public IEmailService _emailService;
-        public ISecurityService _securityService;
+        private readonly IDatasetContext _datasetContext;
+        private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
+        private readonly ISecurityService _securityService;
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
                             ISecurityService securityService)
@@ -169,7 +169,7 @@ namespace Sentry.data.Core
             Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == id).Select(s => s.ParentDataset).FirstOrDefault();
             if (ds == null)
             {
-                throw new SchemaNotFound();
+                throw new SchemaNotFoundException();
             }
 
             try
@@ -187,13 +187,13 @@ namespace Sentry.data.Core
                     {
                         Logger.Error("schemacontroller-fetSchemarevisiondtobyschema unauthorized_access", ex);
                     }
-                    throw new SchemaUnauthorizedAccess();
+                    throw new SchemaUnauthorizedAccessException();
                 }
             }
             catch (Exception ex)
             {
                 Logger.Error($"schemacontroller-fetSchemarevisiondtobyschema failed to retrieve UserSecurity object", ex);
-                throw new SchemaUnauthorizedAccess();
+                throw new SchemaUnauthorizedAccessException();
             }
 
             List<SchemaRevisionDto> dtoList = new List<SchemaRevisionDto>();
@@ -235,13 +235,13 @@ namespace Sentry.data.Core
                     {
                         Logger.Error("schemacontroller-getlatestschemarevisiondtobyschema unauthorized_access", ex);
                     }
-                    throw new SchemaUnauthorizedAccess();
+                    throw new SchemaUnauthorizedAccessException();
                 }
             }
             catch (Exception ex)
             {
                 Logger.Error($"schemacontroller-getlatestschemarevisiondtobyschema failed to retrieve UserSecurity object", ex);
-                throw new SchemaUnauthorizedAccess();
+                throw new SchemaUnauthorizedAccessException();
             }
 
             SchemaRevision revision = _datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == schemaId).OrderByDescending(o => o.Revision_NBR).Take(1).FirstOrDefault();

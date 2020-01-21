@@ -21,17 +21,11 @@ namespace Sentry.data.Web.WebApi.Controllers
     [WebApiAuthorizeUseApp]
     public class JobController : BaseWebApiController
     {
-        private IDatasetContext _datasetContext;
-        private UserService _userService;
-        private IDataFlowService _dataFlowService;
-        private ISecurityService _securityService;
+        private readonly IDatasetContext _datasetContext;
 
-        public JobController(IDatasetContext datasetContext, UserService userService, IDataFlowService dataFlowService, ISecurityService securityService)
+        public JobController(IDatasetContext datasetContext)
         {
             _datasetContext = datasetContext;
-            _userService = userService;
-            _dataFlowService = dataFlowService;
-            _securityService = securityService;
         }
         /// <summary>
         /// Gets all Jobs

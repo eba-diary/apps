@@ -20,7 +20,9 @@ namespace Sentry.data.Web.WebApi
                     var userService = DependencyResolver.Current.GetService<UserService>();
                     var user = userService.GetCurrentUser();
                     if (!DoesUserHaveAccess(user))
+                    {
                         HandleUnauthorizedRequest(actionContext, user);
+                    }
                 }
                 catch (NotAuthorizedException)
                 {
@@ -52,7 +54,9 @@ namespace Sentry.data.Web.WebApi
         {
             if (actionContext.ActionDescriptor.GetCustomAttributes<AllowUnAuthorizedAttribute>(false).Any() ||
                 actionContext.ActionDescriptor.ControllerDescriptor.GetCustomAttributes<AllowAnonymousAttribute>(false).Any())
+            {
                 return false;
+            }                
 
             return true;
         }

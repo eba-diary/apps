@@ -142,11 +142,11 @@ namespace Sentry.data.Web.WebApi.Controllers
                 List<SchemaInfoModel> modelList = dtoList.ToSchemaModel();
                 return Ok(modelList);
             }
-            catch (DatasetNotFound)
+            catch (DatasetNotFoundException)
             {
                 return NotFound();
             }
-            catch(DatasetUnauthorizedAccess duax)
+            catch(DatasetUnauthorizedAccessException duax)
             {
                 throw new UnauthorizedAccessException("Unauthroized Access to Dataset", duax);
             }
@@ -183,11 +183,11 @@ namespace Sentry.data.Web.WebApi.Controllers
                 SchemaInfoModel model = dto.ToSchemaModel();
                 return Ok(model);
             }
-            catch (DatasetNotFound)
+            catch (DatasetNotFoundException)
             {
                 return Content(System.Net.HttpStatusCode.NotFound, "Dataset not found");
             }
-            catch (DatasetUnauthorizedAccess duax)
+            catch (DatasetUnauthorizedAccessException duax)
             {
                 throw new UnauthorizedAccessException("Unauthroized Access to Dataset", duax);
             }
@@ -217,19 +217,22 @@ namespace Sentry.data.Web.WebApi.Controllers
                         
             try
             {
-                _configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId);
+                if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId))
+                {
+                    throw new SchemaNotFoundException();
+                }
 
-                List<SchemaRevisionDto> revisionDto = _schemaService.GetSchemaRevisionDtoBySchema(schemaId);                
+                List<SchemaRevisionDto> revisionDto = _schemaService.GetSchemaRevisionDtoBySchema(schemaId);
 
                 List<SchemaRevisionModel> modelList = revisionDto.ToModel();
                 return Ok(modelList);
             }
-            catch (DatasetNotFound)
+            catch (DatasetNotFoundException)
             {
                 Logger.Info($"metadataapi_getschemarevisionbyschema_notfound schema - datasetId:{datasetId} schemaId:{schemaId}");
                 return Content(System.Net.HttpStatusCode.NotFound, "Dataset not found");
             }
-            catch (SchemaNotFound)
+            catch (SchemaNotFoundException)
             {
                 Logger.Info($"metadataapi_getschemarevisionbyschema_notfound revision - datasetId:{datasetId} schemaId:{schemaId}");
                 return Content(System.Net.HttpStatusCode.NotFound, "Schema not found");
@@ -261,7 +264,10 @@ namespace Sentry.data.Web.WebApi.Controllers
 
             try
             {
-                _configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId);                
+                if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId))
+                {
+                    throw new SchemaNotFoundException();
+                }
 
                 SchemaRevisionDto revisiondto = _schemaService.GetLatestSchemaRevisionDtoBySchema(schemaId);
                 if (revisiondto == null)
@@ -275,11 +281,15 @@ namespace Sentry.data.Web.WebApi.Controllers
                 revisionDetailModel.Fields = fieldDtoList.ToSchemaFieldModel();
                 return Ok(revisionDetailModel);
             }
-            catch (DatasetNotFound)
+            catch (DatasetNotFoundException)
             {
                 return Content(System.Net.HttpStatusCode.NotFound, "Dataset not found");
             }
-            catch (SchemaUnauthorizedAccess authex)
+            catch (SchemaNotFoundException)
+            {
+                return Content(System.Net.HttpStatusCode.NotFound, "Schema not found");
+            }
+            catch (SchemaUnauthorizedAccessException authex)
             {
                 throw new UnauthorizedAccessException("Unauthroized Access to Schema", authex);
             }
@@ -327,7 +337,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                     return BadRequest("Something went wrong, sync request was unsuccessful.");
                 }
             }
-            catch (DatasetUnauthorizedAccess duaEx)
+            catch (DatasetUnauthorizedAccessException duaEx)
             {
                 throw new UnauthorizedAccessException("Unauthroized Access to Dataset", duaEx);
             }
@@ -667,7 +677,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// 
         /// </summary>
         /// <param name="datasetId"></param>
-        /// <exception cref="DatasetUnauthorizedAccess">Thrown when user does not have edit permissions to dataset</exception>
+        /// <exception cref="DatasetUnauthorizedAccessException">Thrown when user does not have edit permissions to dataset</exception>
         /// <exception cref="InternalServerErrorResult">Thrown when unhandled exception occurs</exception>
         private void ValidateModifyPermissionsForDataset(int datasetId)
         {
@@ -685,7 +695,7 @@ namespace Sentry.data.Web.WebApi.Controllers
 
             if (!us.CanEditDataset)
             {
-                throw new DatasetUnauthorizedAccess();
+                throw new DatasetUnauthorizedAccessException();
             }
         }
         #endregion

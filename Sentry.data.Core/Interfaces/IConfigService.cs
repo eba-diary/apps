@@ -30,8 +30,8 @@ namespace Sentry.data.Core
         /// </summary>
         /// <param name="datasetId"></param>
         /// <returns></returns>
-        /// <exception cref="DatasetUnauthorizedAccess">Thrown when user does not have access to dataset</exception>
-        /// <exception cref="DatasetNotFound">Thrown when user does not have access to dataset</exception>
+        /// <exception cref="DatasetUnauthorizedAccessException">Thrown when user does not have access to dataset</exception>
+        /// <exception cref="DatasetNotFoundException">Thrown when user does not have access to dataset</exception>
         List<DatasetFileConfigDto> GetDatasetFileConfigDtoByDataset(int datasetId);
         /// <summary>
         /// 

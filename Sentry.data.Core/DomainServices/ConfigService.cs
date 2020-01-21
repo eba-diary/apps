@@ -330,7 +330,7 @@ namespace Sentry.data.Core
         /// </summary>
         /// <param name="datasetId"></param>
         /// <returns></returns>
-        /// <exception cref="DatasetUnauthorizedAccess">Thrown when user does not have access to dataset</exception>
+        /// <exception cref="DatasetUnauthorizedAccessException">Thrown when user does not have access to dataset</exception>
         public List<DatasetFileConfigDto> GetDatasetFileConfigDtoByDataset(int datasetId)
         {
             UserSecurity us;
@@ -341,7 +341,7 @@ namespace Sentry.data.Core
             catch (Exception ex)
             {
                 Logger.Error($"metadatacontroller-validateviewpermissionsfordataset failed to retrieve UserSecurity object", ex);
-                throw new DatasetUnauthorizedAccess();
+                throw new DatasetUnauthorizedAccessException();
             }
 
             if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
@@ -355,13 +355,13 @@ namespace Sentry.data.Core
                 {
                     Logger.Error("metadatacontroller-validateviewpermissionsfordataset unauthorized_access", ex);
                 }
-                throw new DatasetUnauthorizedAccess();
+                throw new DatasetUnauthorizedAccessException();
             }
 
             Dataset ds = _datasetContext.GetById<Dataset>(datasetId);
             if(ds == null)
             {
-                throw new DatasetNotFound();
+                throw new DatasetNotFoundException();
             }
 
             List<DatasetFileConfigDto> dtoList = new List<DatasetFileConfigDto>();

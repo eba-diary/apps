@@ -9,7 +9,7 @@ namespace Sentry.data.Web.WebApi
     /// </summary>
     public class WebApiAuthorizeByPermissionAttribute : WebApiAuthorizeAttribute
     {
-        private List<string> _permissions = new List<string>();
+        private readonly List<string> _permissions = new List<string>();
 
         public WebApiAuthorizeByPermissionAttribute(string permission)
         {
