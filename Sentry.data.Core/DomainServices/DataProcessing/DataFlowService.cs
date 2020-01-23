@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using Sentry.Common.Logging;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Interfaces.DataProcessing;
 
@@ -13,12 +14,14 @@ namespace Sentry.data.Core
     {
         private readonly IDatasetContext _datasetContext;
         private readonly IMessagePublisher _messagePublisher;
+        private readonly UserService _userService;
 
 
-        public DataFlowService(IDatasetContext datasetContext, IMessagePublisher messagePublisher)
+        public DataFlowService(IDatasetContext datasetContext, IMessagePublisher messagePublisher, UserService userService)
         {
             _datasetContext = datasetContext;
             _messagePublisher = messagePublisher;
+            _userService = userService;
         }
 
         public List<DataFlowDto> ListDataFlows()
@@ -45,6 +48,23 @@ namespace Sentry.data.Core
             return dtoList;
         }
 
+        public bool CreateandSaveDataFlow(DataFlowDto dto)
+        {
+            try
+            {
+                CreateDataFlow(dto);
+
+                _datasetContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("dataflowservice-createandsavedataflow failed to save dataflow", ex);
+                return false;
+            }
+
+            return true;
+        }
+
         public bool CreateDataFlow(int schemaId)
         {
             int cnt = _datasetContext.DataFlow.Count();
@@ -52,7 +72,7 @@ namespace Sentry.data.Core
             {
                 Name = "CreateDataFlowTest_" + cnt.ToString(),
                 CreatedBy = "072984",
-                CreatedDTM = DateTime.Now
+                CreatedDTM = DateTime.Now,
             };
 
             _datasetContext.Add(df);
@@ -133,6 +153,191 @@ namespace Sentry.data.Core
 
 
         #region Private Methods
+        private void CreateDataFlow(DataFlowDto dto)
+        {           
+            DataFlow df = MapToDataFlow(dto);
+        }
+
+        public void CreateDataFlowForSchema(FileSchema scm)
+        {
+            DataFlow df = MapToDataFlow(scm);
+        }
+
+
+        private DataFlow MapToDataFlow(DataFlowDto dto)
+        {
+            DataFlow df = new DataFlow
+            {
+                Id = dto.Id,
+                Name = dto.Name,
+                CreatedDTM = DateTime.Now,
+                CreatedBy = _userService.GetCurrentUser().AssociateId
+            };
+
+            _datasetContext.Add(df);
+
+            switch (dto.IngestionType)
+            {
+                case GlobalEnums.IngestionType.User_Push:
+                    MapDataFlowStepsForPush(dto, df);
+                    break;
+                case GlobalEnums.IngestionType.DSC_Pull:
+                    break;
+                default:
+                    break;
+            }
+
+            return df;
+        }
+
+        private DataFlow MapToDataFlow(FileSchema scm)
+        {
+            DataFlow df = new DataFlow
+            {
+                Id = 0,
+                Name = "",
+                CreatedDTM = DateTime.Now,
+                CreatedBy = _userService.GetCurrentUser().AssociateId
+            };
+
+            return df;
+        }
+
+        private void MapDataFlowStepsForPush(DataFlowDto dto, DataFlow df)
+        {
+            //This type of dataflow does not need to worry about retrieving data from external sources
+
+            //Generate ingestion steps (get file to raw location)
+            MapToS3DropStep(dto, df);
+            MapToRawStorageStep(dto, df);
+
+            //Generate preprocessing steps (i.e. uncompress, encoding, etc.)
+            //MapPreProcessingSteps(dto, df);
+            if (dto.IsCompressed)
+            {
+                MapToUnCompressStep(dto.CompressionJob, df);
+            }
+
+            //Generate DSC registering step
+            MapToSchemaLoadStep(dto, df);
+            MapToRawQueryStorageStep(dto, df);
+
+            //Generate consumption layer steps
+            MapToParquetConverterStep(dto, df);
+            
+        }
+
+        public void MapToUnCompressStep(CompressionJobDto dto, DataFlow df)
+        {
+            BaseAction action;
+            DataActionType actionType;
+            switch (dto.CompressionType)
+            {
+                case CompressionTypes.ZIP:
+                    action = _datasetContext.UncompressZipAction.FirstOrDefault();
+                    actionType = DataActionType.UncompressZip;
+                    break;
+                case CompressionTypes.GZIP:
+                default:
+                    throw new Exception();
+            }
+
+            DataFlowStep step = new DataFlowStep()
+            {
+                DataFlow = df,
+                Action = action,
+                DataAction_Type_Id = actionType
+            };
+
+            AddDataFlowStep(df, step);
+            _datasetContext.Add(step);
+        }
+
+        public void MapToParquetConverterStep(DataFlowDto dto, DataFlow df)
+        {
+            DataFlowStep step = new DataFlowStep()
+            {
+                DataFlow = df,
+                Action = _datasetContext.ConvertToParquetAction.FirstOrDefault(),
+                DataAction_Type_Id = DataActionType.ConvertParquet
+            };
+
+            AddDataFlowStep(df, step);
+            _datasetContext.Add(step);
+        }
+
+        public void MapToRawQueryStorageStep(DataFlowDto dto, DataFlow df)
+        {
+            DataFlowStep step = new DataFlowStep()
+            {
+                DataFlow = df,
+                Action = _datasetContext.QueryStorageAction.FirstOrDefault(),
+                DataAction_Type_Id = DataActionType.QueryStorage
+            };
+
+            AddDataFlowStep(df, step);
+            _datasetContext.Add(step);
+
+        }
+
+        private void MapToSchemaLoadStep(DataFlowDto dto, DataFlow df)
+        {
+            DataFlowStep step = new DataFlowStep()
+            {
+                DataFlow = df,
+                Action = _datasetContext.SchemaLoadAction.FirstOrDefault(),
+                DataAction_Type_Id = DataActionType.SchemaLoad
+            };
+
+            AddDataFlowStep(df, step);
+
+            foreach (SchemaMapDto mapDto in dto.SchemaMap)
+            {
+                MapToSchemaMap(mapDto, step);
+            }
+        }
+
+        private void MapToSchemaMap(SchemaMapDto dto, DataFlowStep step)
+        {
+            SchemaMap map =  new SchemaMap()
+            {
+                DataFlowStepId = step,
+                MappedSchema = _datasetContext.FileSchema.Where(w => w.SchemaId == dto.SchemaId).FirstOrDefault(),
+                Dataset = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == dto.SchemaId).Select(s => s.ParentDataset).FirstOrDefault(),
+                SearchCriteria = dto.SearchCriteria
+            };
+
+            _datasetContext.Add(map);
+
+            //step.SchemaMappings.Add(map);
+        }
+
+        private void MapToRawStorageStep(DataFlowDto dto, DataFlow df)
+        {
+            DataFlowStep step = new DataFlowStep()
+            {
+                DataFlow = df,
+                Action = _datasetContext.RawStorageAction.FirstOrDefault(),
+                DataAction_Type_Id = DataActionType.RawStorage
+            };
+
+            AddDataFlowStep(df, step);
+            _datasetContext.Add(step);
+        }
+
+        private void MapToS3DropStep(DataFlowDto dto, DataFlow df)
+        {
+            DataFlowStep step = new DataFlowStep()
+            {
+                DataFlow = df,
+                Action = _datasetContext.S3DropAction.FirstOrDefault(),
+                DataAction_Type_Id = DataActionType.S3Drop
+            };
+
+            AddDataFlowStep(df, step);
+            _datasetContext.Add(step);
+        }
+
         private void MapToDtoList(List<DataFlow> dfList, List<DataFlowDto> dtoList)
         {
             foreach (DataFlow df in dfList)

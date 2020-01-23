@@ -20,7 +20,12 @@
             <span>Do you have data that you want to use and share with others? <br /> We can help. First, you'll need to tell us about your data.</span>
         </div>
     </div>
-    @*<h2>How Will DSC Ingest Data?</h2>*@
+
+    <div class="col-md-12">
+        @*Show the custom validation summary*@
+        @Html.DisplayFor((model) => ViewData.ModelState)
+    </div>
+
     <div class="form-group col-md-12">
         @*@Html.LabelFor(model => model.IngestionType, htmlAttributes: new { @class = "control-label col-md-2" })*@
         <h4>How Will The Data be Sent to Us?</h4>
@@ -41,11 +46,11 @@
             <div class="col-md-1">
                 @Html.DropDownListFor((m) => m.IsCompressed, Model.CompressionDropdown, new { @class = "form-control edit-dataset-row" })
                 @*<div class="form-group">
-                    <label class="col-sm-10 checkbox-container">
-                        <input id="IsCompressedCheckbox" type="checkbox" value="@Model.IsCompressed" />
-                        <span class="checkmark"></span>
-                    </label>
-                </div>*@
+                        <label class="col-sm-10 checkbox-container">
+                            <input id="IsCompressedCheckbox" type="checkbox" value="@Model.IsCompressed" />
+                            <span class="checkmark"></span>
+                        </label>
+                    </div>*@
             </div>
         </div>
         <br />
@@ -53,7 +58,11 @@
             <div id="compressionJobPanel">
                 @if (Model.CompressionJob != null)
                 {
-                    @Html.Partial("_CompressionJob", Model.CompressionJob)
+                    @Html.Partial("_CompressionJob", Model.CompressionJob.First())
+                }
+                else
+                {
+                    @Html.Partial("_CompressionJob", new CompressionModel())
                 }
             </div>
         </div>
@@ -63,7 +72,7 @@
         <div id="retrieverJobPanel">
             @if (Model.RetrieverJob != null)
             {
-                @Html.Partial("_RetrieverJob", Model.RetrieverJob)
+                @Html.Partial("_RetrieverJob", Model.RetrieverJob.First())
             }
         </div>
     </div>
@@ -80,7 +89,7 @@
                 }
                 <button type="button" id="btnAddSchemaMap" class="btn btn-success"><span>Add Another Target</span></button>
             </div>
-        </div>        
+        </div>
     </div>
 
 

@@ -1,25 +1,15 @@
 ﻿data.DataFlow = {
+    DataFlow_DatasetSubmitInit: function () {
+
+        SubmitFunciton = function () {
+
+        }
+
+    },
 
     DataFlowFormInit: function () {
 
         //data.DataFlow.InitCompressionCheckbox();
-
-        $("[id$=IngestionType]").on('change', function () {
-            if ($(this).val() === "2") {
-                $('.retrieverPanel').show();
-                Sentry.InjectSpinner($("#retrieverJobPanel"));
-                $.get("/DataFlow/NewRetrieverJob", function (e) {
-                    $("#retrieverJobPanel").replaceWith(e);
-                    data.Job.FormInit();
-                });
-            }
-            else {
-                $('.retrieverPanel').hide();
-            }
-            $('.compressionPanel').show();
-            $('.schemaMapPanel').show();
-            $('.formSubmitButtons').show();
-        });
 
         $("#IsCompressed").change(function () {
             if ($(this).val() === "true") {
@@ -35,66 +25,7 @@
             }
         });
 
-        $("#btnAddSchemaMap").on('click', function () {
-            $.get("/DataFlow/NewSchemaMap", function (e) {
-                $(e).insertBefore($("#btnAddSchemaMap"));
-                $('[id$=__SelectedDataset]').change(function () {
-                    var curRow = $(this).parent().parent();
-                    var schemaSelectionDropDown = curRow.find("[id$=__SelectedSchema]");
-                    var val = $(this).val();
-
-                    $.getJSON("/api/v2/metadata/dataset/" + val + "/schema", function (result) {
-                        var subItems;
-                        subItems += "<option value='0'>Select Schema</option>";
-                        $.each(result, function (index, item) {
-                            subItems += "<option value='" + item.SchemaId + "'>" + item.Name + "</option>";
-                        });
-
-                        schemaSelectionDropDown.html(subItems);
-                        schemaSelectionDropDown.val("0");
-                    });
-                });
-            });
-        });
-
-        $('[id$=__SelectedDataset]').change(function () {
-            var curRow = $(this).parent().parent();
-            var schemaSelectionDropDown = curRow.find("[id$=__SelectedSchema]");
-            var val = $(this).val();
-            console.log(val);
-
-            $.getJSON("/api/v2/metadata/dataset/" + val + "/schema", function (result) {
-                //var optgroup = $('<optgroup>');
-
-                //var previousOpt = '';
-                //$.each(result, function (index, inData) {
-
-                //    if (inData. != previousOpt) {
-                //        if (previousOpt != '') {
-                //            schemaSelectionDropDown.append(optgroup);
-                //        }
-                //        optgroup = $('<optgroup>');
-                //        optgroup.attr('label', inData.Group.Name);
-                //        previousOpt = inData.Group.Name;
-                //    }
-
-                //    optgroup.append($('<option/>', {
-                //        value: inData.Value,
-                //        text: inData.Text
-                //    }));
-                //});
-
-                //schemaSelectionDropDown.append(optgroup);
-                var subItems;
-                subItems += "<option value='0'>Select Schema</option>";
-                $.each(result, function (index, item) {
-                    subItems += "<option value='" + item.SchemaId + "'>" + item.Name + "</option>";
-                });
-
-                schemaSelectionDropDown.html(subItems);
-                schemaSelectionDropDown.val("0");
-            });
-        });
+        data.DataFlow.InitSchemaMap();
 
         
 
@@ -121,5 +52,119 @@
 
         //    data.Job.targetFileNameDescUpdate();
         //});
+    },
+
+    InitIngestionType() {
+        var selection = $("[id$=IngestionType]").val();
+
+        if (selection === "2") {
+            $('.retrieverPanel').show();
+            $('.compressionPanel').show();
+            $('.schemaMapPanel').show();
+            $('.formSubmitButtons').show();
+        }
+        else if (selection === "1") {
+            $('.retrieverPanel').hide();
+            $('.compressionPanel').show();
+            $('.schemaMapPanel').show();
+            $('.formSubmitButtons').show();
+        }
+
+        if (selection === "0") {
+            $('.compressionPanel').hide();
+            $('.schemaMapPanel').hide();
+            $('.formSubmitButtons').hide();
+        }
+        else {
+            $('.compressionPanel').show();
+            $('.schemaMapPanel').show();
+            $('.formSubmitButtons').show();
+        }            
+
+        $("[id$=IngestionType]").on('change', function () {
+            if ($(this).val() === "2") {
+                $('.retrieverPanel').show();
+                Sentry.InjectSpinner($("#retrieverJobPanel"));
+                $.get("/DataFlow/NewRetrieverJob", function (e) {
+                    $("#retrieverJobPanel").replaceWith(e);
+                    data.Job.FormInit();
+                });
+            }
+            else {
+                $('.retrieverPanel').hide();
+            }
+            $('.compressionPanel').show();
+            $('.schemaMapPanel').show();
+            $('.formSubmitButtons').show();
+        });
+    },
+
+    InitSchemaMap() {
+        $("#btnAddSchemaMap").on('click', function () {
+            $.get("/DataFlow/NewSchemaMap", function (e) {
+                $(e).insertBefore($("#btnAddSchemaMap"));
+                $('[id$=__SelectedDataset]').change(function () {
+                    var curRow = $(this).parent().parent();
+                    var schemaSelectionDropDown = curRow.find("[id$=__SelectedSchema]");
+                    var datasetId = $(this).val();
+
+                    data.DataFlow.PopulateSchemas(datasetId, schemaSelectionDropDown);
+                });
+            });
+        });
+
+        $('[id$=__SelectedDataset]').change(function () {
+            var curRow = $(this).parent().parent();
+            var schemaSelectionDropDown = curRow.find("[id$=__SelectedSchema]");
+            var datasetId = $(this).val();
+
+            data.DataFlow.PopulateSchemas(datasetId, schemaSelectionDropDown);
+
+        });
+
+        $('[id$=__SelectedDataset]').each(function (index) {
+            var datasetId = $(this).val();
+            var curRow = $(this).parent().parent();
+            var schemaSelectionDropDown = curRow.find("[id$=__SelectedSchema]");
+
+            data.DataFlow.PopulateSchemas(datasetId, schemaSelectionDropDown);
+
+            //if (datasetId !== "0") {                
+            //    var schemaId = schemaSelectionDropDown.val();
+            //    if (schemaId === null) {
+                    
+            //    }
+            //}
+        });
+
+    },
+
+    PopulateSchemas(datasetId, targetElement) {
+        if (datasetId !== null) {
+            var schemaId = targetElement.val();
+            if (schemaId === null || schemaId === "0") {
+                $.getJSON("/api/v2/metadata/dataset/" + datasetId + "/schema", function (result) {
+                    var subItems;
+                    subItems += "<option value='0'>Select Schema</option>";
+                    $.each(result, function (index, item) {
+                        subItems += "<option value='" + item.SchemaId + "'>" + item.Name + "</option>";
+                    });
+
+                    targetElement.html(subItems);
+                    targetElement.val("0");
+                });
+            }
+            if (schemaId !== null && schemaId !== "0") {
+                $.getJSON("/api/v2/metadata/dataset/" + datasetId + "/schema", function (result) {
+                    var subItems;                    
+                    $.each(result, function (index, item) {
+                        subItems += "<option value='" + item.SchemaId + "'>" + item.Name + "</option>";
+                    });
+
+                    targetElement.html(subItems);
+                    targetElement.val(schemaId);
+                });
+            }
+        }        
     }
 }
