@@ -9,7 +9,7 @@ namespace Sentry.data.Core
     public class SubscriptionDto
     {
 
-        public Group group { get; set; }                        
+        public EventTypeGroup group { get; set; }                        
 
         public int datasetID { get; set; }
 

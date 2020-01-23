@@ -145,7 +145,7 @@
     <Compile Include="Entities\Schema\TimestampField.cs" />
     <Compile Include="Entities\Schema\VarcharField.cs" />
     <Compile Include="Entities\Subscriptions\BusinessAreaSubscription.cs" />
-    <Compile Include="Entities\Subscriptions\Group.cs" />
+    <Compile Include="Entities\Subscriptions\EventTypeGroup.cs" />
     <Compile Include="Extensions\DataFlowExtensions.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
     <Compile Include="Extensions\DatasetFileConfigExtensions.cs" />
@@ -195,7 +195,7 @@
     <Compile Include="Entities\BusinessArea\BusinessAreaTile.cs" />
     <Compile Include="Entities\BusinessArea\BusinessAreaTileRow.cs" />
     <Compile Include="Entities\BusinessArea\BusinessAreaType.cs" />
-    <Compile Include="DTO\Notification\ModifyNotificationModel.cs" />
+    <Compile Include="DTO\Notification\NotificationDto.cs" />
     <Compile Include="DTO\Schema\SchemaDetailApiDTO.cs" />
     <Compile Include="DTO\TagDto.cs" />
     <Compile Include="Entities\ColumnDTO.cs" />

@@ -7,7 +7,7 @@ using System.ComponentModel;
 
 namespace Sentry.data.Core
 {
-    public enum Group
+    public enum EventTypeGroup
     {
         [Description("DATASET")]   
         DataSet = 1,

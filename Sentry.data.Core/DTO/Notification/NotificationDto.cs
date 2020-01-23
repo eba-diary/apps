@@ -4,9 +4,9 @@ using Sentry.data.Core.GlobalEnums;
 
 namespace Sentry.data.Core
 {
-    public class NotificationModel
+    public class NotificationDto
     {
-        public NotificationModel() { }
+        public NotificationDto() { }
 
 
 

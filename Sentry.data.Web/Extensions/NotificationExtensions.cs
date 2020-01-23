@@ -10,7 +10,7 @@ namespace Sentry.data.Web
     {
 
 
-        public static NotificationModel ToWeb(this Core.NotificationModel core)
+        public static NotificationModel ToWeb(this Core.NotificationDto core)
         {
             List<SelectListItem> AreaList = new List<SelectListItem>();
             foreach (var item in core.AllDataAssets)
@@ -42,7 +42,7 @@ namespace Sentry.data.Web
             };
         }
 
-        public static List<NotificationModel> ToWeb(this List<Core.NotificationModel> cores)
+        public static List<NotificationModel> ToWeb(this List<Core.NotificationDto> cores)
         {
             List<NotificationModel> models = new List<NotificationModel>();
             cores.ForEach(x => models.Add(x.ToWeb()));
@@ -50,9 +50,9 @@ namespace Sentry.data.Web
         }
 
 
-        public static Core.NotificationModel ToCore(this NotificationModel model)
+        public static Core.NotificationDto ToCore(this NotificationModel model)
         {
-            return new Core.NotificationModel()
+            return new Core.NotificationDto()
             {
                 CreateUser = model.CreateUser,
                 ExpirationTime = model.ExpirationTime,
@@ -92,16 +92,16 @@ namespace Sentry.data.Web
         //    });
         //}
 
-        public static SystemNotificationModel ToModel(this List<Core.NotificationModel> models)
+        public static SystemNotificationModel ToModel(this List<Core.NotificationDto> models)
         {
             SystemNotificationModel model = new SystemNotificationModel();
 
-            foreach (var notification in models.Where(w => w.IsActive && w.MessageSeverity == NotificationSeverity.Danger))
+            foreach (var notification in models.Where(w => w.IsActive && w.MessageSeverity == NotificationSeverity.Critical))
             {
                 model.CriticalNotifications.Add(notification.ToModel());
             }
 
-            foreach (var notificaiton in models.Where(w => w.IsActive && w.MessageSeverity != NotificationSeverity.Danger))
+            foreach (var notificaiton in models.Where(w => w.IsActive && w.MessageSeverity != NotificationSeverity.Critical))
             {
                 model.StandardNotifications.Add(notificaiton.ToModel());
             }
@@ -109,7 +109,7 @@ namespace Sentry.data.Web
             return model;
         }
 
-        public static SystemNotificationItemModel ToModel(this Core.NotificationModel notification)
+        public static SystemNotificationItemModel ToModel(this Core.NotificationDto notification)
         {
             return new SystemNotificationItemModel()
             {

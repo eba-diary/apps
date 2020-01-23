@@ -9,7 +9,7 @@ namespace Sentry.data.Web
 {
     public class SubscriptionModel
     {
-        public Group group { get; set; }                        //this will identify whether we are dealing with either DATASET=1 or BUSINESSAREA=2 EventTypes
+        public EventTypeGroup group { get; set; }                        //this will identify whether we are dealing with either DATASET=1 or BUSINESSAREA=2 EventTypes
 
         public int datasetID { get; set; }
         

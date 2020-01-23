@@ -16,13 +16,11 @@ namespace Sentry.data.Web.Controllers
 
         private readonly INotificationService _notificationService;
         private readonly UserService _userService;
-        private readonly IEventService _eventService;
 
-        public NotificationController(INotificationService notificationService, UserService userService, IEventService eventService)
+        public NotificationController(INotificationService notificationService, UserService userService)
         {
             _notificationService = notificationService;
             _userService = userService;
-            _eventService = eventService;
         }
 
         public ActionResult ManageNotification()
@@ -56,17 +54,12 @@ namespace Sentry.data.Web.Controllers
             AddCoreValidationExceptionsToModel(model.Validate());
             if (ModelState.IsValid)
             {
-                _notificationService.SubmitNotification(model.ToCore());
+                model.NotificationId = _notificationService.SubmitNotification(model.ToCore());
+
                 ManageNotificationViewModel vm = new ManageNotificationViewModel()
                 {
                     CanModifyNotifications = _notificationService.CanUserModifyNotifications()
                 };
-
-                string eventTypeMe="";
-
-                //model.
-
-                //_eventService.PublishSuccessEventByNotificationId(eventTypeMe, SharedContext.CurrentUser.AssociateId, "Notification Created", model.NotificationId) ;
 
                 return View("ManageNotification", vm);
             }
@@ -143,13 +136,13 @@ namespace Sentry.data.Web.Controllers
         public ActionResult SubscribeDisplay(int group)
         {
             SubscriptionModel sm = new SubscriptionModel();
-            sm.group = (Group) group;                                                                                                               //need to teach MODEL what KIND of Subscription it is,either DATASET=1 or BUSINESSAREA=2
+            sm.group = (EventTypeGroup) group;                                                                                                               //need to teach MODEL what KIND of Subscription it is,either DATASET=1 or BUSINESSAREA=2
             sm.AllEventTypes = _notificationService.GetEventTypes(sm.group).Select((c) =>   new SelectListItem { Text = c.Description, Value = c.Type_ID.ToString() });
             sm.AllIntervals  = _notificationService.GetAllIntervals().Select((c) => new SelectListItem { Text = c.Description, Value = c.Interval_ID.ToString() });
             sm.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
 
             //BUSINESSAREA      AUSTIN:  FUTURE we will put DATASET in here too, you can maybe even add another function to pass stuff here and make below even more generic
-            if(sm.group == Group.BusinessArea)
+            if(sm.group == EventTypeGroup.BusinessArea)
             {
                 BusinessAreaType bat = BusinessAreaType.PersonalLines;
                 sm.businessAreaID = (int)BusinessAreaType.PersonalLines;
