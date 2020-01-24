@@ -1349,6 +1349,7 @@
     <Content Include="Views\DataFlow\_RetrieverJob.cshtml" />
     <Content Include="Views\Notification\_SubscribeNotification.cshtml" />
     <Content Include="Views\DataFlow\_CompressionJob.cshtml" />
+    <Content Include="Views\Dataset\_DatasetCreateEdit.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

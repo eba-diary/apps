@@ -14,5 +14,6 @@ namespace Sentry.data.Web.Models.ApiModels.Dataset
         public string PrimaryContactName { get; set; }
         public string PrimarContactEmail { get; set; }
         public string PrimaryOwnerName { get; set; }
+        public string Category { get; set; }
     }
 }

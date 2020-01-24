@@ -128,7 +128,7 @@ namespace Sentry.data.Web.Controllers
                 AllDatasets = sList
             };
 
-            return PartialView("_SchemaMap", model);
+            return PartialView("_SchemaMap", modela);
         }
 
         [HttpGet]
@@ -151,18 +151,25 @@ namespace Sentry.data.Web.Controllers
 
             if (model.SelectedDataset == 0)
             {
-                dsList.Add(new SelectListItem() { Text = "Select Dataset", Value = "0", Group = new SelectListGroup() { Name = "Sentry" }, Selected = true });
+                dsList.Add(new SelectListItem() { Text = "Create New Dataset", Value = "-1", Selected = true });
+                dsList.Add(new SelectListItem() { Text = "Select Dataset", Value = "0", Selected = true });
             }
 
-            foreach (var ds in groupedDatasets)
+            foreach (var group in groupedDatasets)
             {
-                dsList.AddRange(ds.Select(m => new SelectListItem()
+                SelectListGroup curGroup = new SelectListGroup()
                 {
-                    Text = m.DatasetName,
-                    Value = m.DatasetId.ToString(),
-                    Group = new SelectListGroup() { Name = ds.Key.Name },
-                    Selected = (m.DatasetId == model.SelectedDataset)
-                }));
+                    Name = group.Key.Name
+                };
+
+                dsList.AddRange(group.OrderBy(o => o.DatasetName).Select(m => new SelectListItem()
+                    {
+                        Text = m.DatasetName,
+                        Value = m.DatasetId.ToString(),
+                        Group = curGroup,
+                        Selected = (m.DatasetId == model.SelectedDataset)
+                    }
+                ));
             }
 
             model.AllDatasets = dsList;
@@ -174,7 +181,7 @@ namespace Sentry.data.Web.Controllers
 
             if (model.SelectedDataset > 0)
             {
-                var datasetSchemaList = _configService.GetDatasetFileConfigDtoByDataset(model.SelectedDataset);
+                var datasetSchemaList = _configService.GetDatasetFileConfigDtoByDataset(model.SelectedDataset).OrderBy(o => o.Name);
 
                 foreach (var scm in datasetSchemaList)
                 {
