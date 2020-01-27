@@ -26,33 +26,14 @@
             }
         });
 
-        data.DataFlow.InitSchemaMap();
+        $("#btnAddSchemaMap").on('click', function () {
+            $.get("/DataFlow/NewSchemaMap", function (e) {
+                $(e).insertBefore($("#btnAddSchemaMap"));
+                data.DataFlow.InitSchemaMaps();
+            });
+        });
 
-        
-
-        //$("#SelectedSourceType").change(function () {
-        //    data.Job.SetDataSourceSpecificPanels();
-        //    data.Job.SetFtpPatternDefaults();
-        //    $('.questionairePanel').hide();
-        //    $(".editDataSourceLink").hide();
-        //    $('#btnCreateDataset').hide();
-        //    $('.dataSourceInfoPanel').hide();
-        //    var val = $('#SelectedSourceType :selected').val();
-
-        //    $.getJSON("/Config/SourcesByType", { sourceType: val }, function (data) {
-        //        var subItems = "";
-        //        $.each(data, function (index, item) {
-        //            subItems += "<option value='" + item.Value + "'>" + item.Text + "</option>";
-        //        });
-
-        //        $("#SelectedDataSource").html(subItems);
-        //        $("#SelectedDataSource select").val("0");
-        //    });
-
-        //    data.Job.RequestMethodDropdownPopulate();
-
-        //    data.Job.targetFileNameDescUpdate();
-        //});
+        data.DataFlow.InitSchemaMaps();
     },
 
     InitIngestionType() {
@@ -99,54 +80,7 @@
             $('.formSubmitButtons').show();
         });
     },
-
-    InitSchemaMap() {
-        $("#btnAddSchemaMap").on('click', function () {
-            $.get("/DataFlow/NewSchemaMap", function (e) {
-                $(e).insertBefore($("#btnAddSchemaMap"));
-                $('[id$=__SelectedDataset]').change(function () {
-                    var curRow = $(this).parent().parent();
-                    var schemaSelectionDropDown = curRow.find("[id$=__SelectedSchema]");
-                    var datasetId = $(this).val();
-
-                    data.DataFlow.PopulateSchemas(datasetId, schemaSelectionDropDown);
-                });
-            });
-        });
-
-        $('[id$=__SelectedDataset]').change(function () {
-            var curRow = $(this).parent().parent();
-            var schemaSelectionDropDown = curRow.find("[id$=__SelectedSchema]");
-            var datasetId = $(this).val();
-
-            //if Create New Dataset Selected
-            if (datasetId === "-1") {
-                $('#DataFlowFormContainer').hide();
-                data.DataFlow.RenderDatasetCreatePage();
-            }
-            else {
-                data.DataFlow.PopulateSchemas(datasetId, schemaSelectionDropDown);
-            }
-
-        });
-
-        $('[id$=__SelectedDataset]').each(function (index) {
-            var datasetId = $(this).val();
-            var curRow = $(this).parent().parent();
-            var schemaSelectionDropDown = curRow.find("[id$=__SelectedSchema]");
-
-            data.DataFlow.PopulateSchemas(datasetId, schemaSelectionDropDown);
-
-            //if (datasetId !== "0") {                
-            //    var schemaId = schemaSelectionDropDown.val();
-            //    if (schemaId === null) {
-                    
-            //    }
-            //}
-        });
-
-    },
-
+        
     RenderDatasetCreatePage() {
         $.get("/Dataset/_DatasetCreateEdit", function (result) {
             $('#DatasetFormContent').html(result);
@@ -160,6 +94,9 @@
     DatasetFormCancelInit: function () {
         $('#DataFlowFormContainer').show();
         $('#DatasetFormContainer').hide();
+
+        data.DataFlow.InitSchemaMaps("0");
+
     },
 
     DatasetFormSubmitInit: function () {
@@ -174,14 +111,7 @@
                     $('#DataFlowFormContainer').show();
                     $('#DatasetFormContainer').hide();
 
-                    //find dataset dropdown with -1 value and set back to 0
-                    //$('[id$=__SelectedDataset]').each(function (index) {
-                    //    var datasetId = $(this).val();
-                    //    if (datasetId === "-1") {
-                    //        $(this).val(0);
-                    //    }
-                    //});
-                    data.DataFlow.RefreshDatasetLists(obj.dataset_id);
+                    data.DataFlow.InitSchemaMaps(obj.dataset_id);
                 }
                 else {
                     $('#DatasetFormContent').replaceWith(obj);
@@ -202,13 +132,13 @@
     },
 
     PopulateSchemas(datasetId, targetElement) {
-        if (datasetId !== null && datasetId !== "-1") {
+        if (datasetId !== null && datasetId !== "-1" && datasetId !== "0") {
             var schemaId = targetElement.val();
             $.getJSON("/api/v2/metadata/dataset/" + datasetId + "/schema", function (result) {
                 var subItems;
-                var groupName;
-                var schemaCount = result.length;
-                var sortedResults = data.DataFlow.sortJSON(result, 'Name', '123')
+                var sortedResults = result.sort(
+                    firstBy("Name")
+                );
 
                 // Add initial value
                 subItems += "<option value='0'>Select Schema</option>";
@@ -227,15 +157,26 @@
                 }
             });
         }
+        else {
+            var subItems;
+            subItems += "<option value='0'>Select Dataset First</option>";
+            targetElement.html(subItems);
+        }
     },
 
-    RefreshDatasetLists(datasetId) {
+    InitSchemaMaps(datasetId) {
         $.getJSON("/api/v2/metadata/dataset", function (result) {
             var newSubItems;
             var groupName;
             var datasetCount = result.length;
-            console.log(result);
-            var sortedResult = data.DataFlow.sortJSON(result, 'Category', '123');
+            var sortedResult = result.sort(
+                firstBy("Category")
+                    .thenBy("Name")
+            );
+
+            newSubItems += "<option value='-1'>Create Dataset</option>";
+            newSubItems += "<option value='0'>Select Dataset</option>";
+
             $.each(sortedResult, function (index, item) {
                 //initial pass inializes group and sets first group element
                 if (groupName === null) {
@@ -263,20 +204,40 @@
                 var cur = $(this);
                 var curVal = cur.val();
                 cur.html(newSubItems);
-                if (curVal === "-1") {
-                    cur.val(datasetId);
+
+                if (curVal === null || curVal === undefined) {
                     var curRow = cur.parent().parent();
+                    $(this).val(0);
+                    data.DataFlow.PopulateSchemas("0", curRow.find("[id$=__SelectedSchema]"));
+                }
+                else if (curVal == "-1") {
+                    var curRow = cur.parent().parent();
+                    $(this).val(datasetId);
                     data.DataFlow.PopulateSchemas(datasetId, curRow.find("[id$=__SelectedSchema]"));
                 }
+                else {
+                    cur.val(curVal);
+                    var curRow = cur.parent().parent();
+                    data.DataFlow.PopulateSchemas(curVal, curRow.find("[id$=__SelectedSchema]"));
+                }
             });
-        });
-    },
 
-    sortJSON(data, key, way) {
-        return data.sort(function (a, b) {
-            var x = a[key]; var y = b[key];
-            if (way === '123') { return ((x < y) ? -1 : ((x > y) ? 1 : 0)); }
-            if (way === '321') { return ((x > y) ? -1 : ((x < y) ? 1 : 0)); }
+
+            $('[id$=__SelectedDataset]').change(function () {
+                var curRow = $(this).parent().parent();
+                var schemaSelectionDropDown = curRow.find("[id$=__SelectedSchema]");
+                var datasetId = $(this).val();
+
+                //if Create New Dataset Selected
+                if (datasetId === "-1") {
+                    $('#DataFlowFormContainer').hide();
+                    data.DataFlow.RenderDatasetCreatePage();
+                }
+                else {
+                    data.DataFlow.PopulateSchemas(datasetId, schemaSelectionDropDown);
+                }
+
+            });
         });
     }
 }

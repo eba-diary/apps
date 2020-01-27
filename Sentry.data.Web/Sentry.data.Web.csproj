@@ -584,6 +584,7 @@
     <Content Include="Scripts\query-builder.min.js" />
     <Content Include="Scripts\select2.js" />
     <Content Include="Scripts\select2.min.js" />
+    <Content Include="Scripts\thenBy.min.js" />
     <Content Include="Scripts\toastr.js" />
     <Content Include="Scripts\toastr.min.js" />
     <Content Include="Views\Dataset\_PreviewData.cshtml" />

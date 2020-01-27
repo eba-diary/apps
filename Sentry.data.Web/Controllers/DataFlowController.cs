@@ -63,8 +63,10 @@ namespace Sentry.data.Web.Controllers
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
 
             //Every dataflow requires at least one schemamap, therefore, load a default empty schemamapmodel
-            SchemaMapModel schemaModel = new SchemaMapModel();
-            SetSchemaModelLists(schemaModel);
+            SchemaMapModel schemaModel = new SchemaMapModel
+            {
+                SelectedDataset = 0
+            };
             model.SchemaMaps.Add(schemaModel);
 
             return View("DataFlowForm", model);
@@ -106,26 +108,9 @@ namespace Sentry.data.Web.Controllers
         [Route("DataFlow/NewSchemaMap/")]
         public PartialViewResult NewSchemaMap()
         {
-            List<SelectListItem> sList = new List<SelectListItem>();
-            SchemaMapModel modela = new SchemaMapModel();
-            SetSchemaModelLists(modela);
-
-            var groupedDatasets = _datasetService.GetDatasetsForQueryTool().GroupBy(x => x.DatasetCategories.First());
-
-            sList.Add(new SelectListItem() { Text = "Select Dataset", Value = "0", Group = new SelectListGroup() { Name = "Sentry" }, Selected = true });
-            foreach (var ds in groupedDatasets)
+            SchemaMapModel modela = new SchemaMapModel
             {
-                sList.AddRange(ds.Select(m => new SelectListItem()
-                {
-                    Text = m.DatasetName,
-                    Value = m.DatasetId.ToString(),
-                    Group = new SelectListGroup() { Name = ds.Key.Name }
-                }));
-            }
-
-            SchemaMapModel model = new SchemaMapModel()
-            {
-                AllDatasets = sList
+                SelectedDataset = 0
             };
 
             return PartialView("_SchemaMap", modela);
