@@ -4,9 +4,9 @@ namespace Sentry.data.Core
 {
     public interface IEventService
     {
-        void PublishSuccessEvent(string eventType, string userId, string reason);
+        void PublishSuccessEvent(string eventType, string userId, string reason, string lineCde = null, string search = null);
         void PublishSuccessEventByConfigId(string eventType, string userId, string reason, int configId);
         void PublishSuccessEventByDatasetId(string eventType, string userId, string reason, int datasetId);
-        void PublishSuccessEventByNotificationId(string eventType, string userId, string reason, int notificationId);
+        void PublishSuccessEventByDataAsset(string eventType, string userId, string reason, int dataAssetId, string lineCde = null, string search = null);
     }
 }
