@@ -8,7 +8,7 @@ namespace Sentry.data.Core
         bool CanUserModifyNotifications();
         NotificationDto GetNotificationModelForModify(int notificationId);
         NotificationDto GetNotificationModelForDisplay(int notificationId);
-        int SubmitNotification(NotificationDto model);
+        int SubmitNotification(NotificationDto dto);
         List<NotificationDto> GetNotificationsForDataAsset();
         List<NotificationDto> GetNotificationForBusinessArea(BusinessAreaType type);
         List<NotificationDto> GetAllNotifications();

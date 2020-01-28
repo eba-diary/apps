@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Sentry.Core;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.Common.Logging;
 
 
 namespace Sentry.data.Core
@@ -102,8 +103,8 @@ namespace Sentry.data.Core
             //equal to the EventType.Description, this is sort of strange because the actual event service then grabs
             //the appropriate EventType based on the description here, because i need to move on I will use this design
             //pattern because it works, so don't judge me.
-            string eventTypeDescription = "";
-            
+            string eventTypeDescription = null;
+
             switch (dto.MessageSeverity)
             {
                 case NotificationSeverity.Critical:
@@ -115,9 +116,13 @@ namespace Sentry.data.Core
                 case NotificationSeverity.Info:
                     eventTypeDescription = addNotification == true ? GlobalConstants.EventType.NOTIFICATION_INFO_ADD : GlobalConstants.EventType.NOTIFICATION_INFO_UPDATE;
                     break;
+                default:
+                    Logger.Error("Notification Severity Not Found to log EventType of " + dto.MessageSeverity.ToString() + " for NotificationId = " + dto.NotificationId.ToString());
+                    break;
             }
 
-            _eventService.PublishSuccessEventByNotificationId(eventTypeDescription, _userService.GetCurrentUser().AssociateId, eventTypeDescription, dto.NotificationId);
+            if(eventTypeDescription != null)
+                _eventService.PublishSuccessEventByNotificationId(eventTypeDescription, _userService.GetCurrentUser().AssociateId, eventTypeDescription, dto.NotificationId);
 
             return dto.NotificationId;
         }
@@ -282,7 +287,7 @@ namespace Sentry.data.Core
 
         public List<BusinessAreaSubscription> GetAllUserSubscriptions(EventTypeGroup group)
         {
-            return _domainContext.GetAllUserSubscriptions(_userService.GetCurrentUser().AssociateId, group);
+            return _domainContext.GetAllUserSubscriptionsByEventTypeGroup(_userService.GetCurrentUser().AssociateId, group);
         }
 
         public IEnumerable<EventType> GetEventTypes(EventTypeGroup group)
@@ -316,7 +321,7 @@ namespace Sentry.data.Core
 
                     if (oldSubs != null)
                     {
-                        BusinessAreaSubscription oldSub = (BusinessAreaSubscription)oldSubs.Where(w => w.ID == newSub.ID).FirstOrDefault();
+                        BusinessAreaSubscription oldSub = (BusinessAreaSubscription)oldSubs.FirstOrDefault(w => w.ID == newSub.ID);
                         if (oldSub != null)
                         {
                             if (oldSub.Interval.Interval_ID != newSub.Interval.Interval_ID)

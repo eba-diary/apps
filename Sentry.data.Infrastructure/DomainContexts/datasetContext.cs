@@ -623,7 +623,7 @@ namespace Sentry.data.Infrastructure
             return Query<DatasetSubscription>().Cacheable().Where(x => x.SentryOwnerName == SentryOwnerName && x.Dataset.DatasetId == datasetID).ToList();
         }
 
-        public List<BusinessAreaSubscription> GetAllUserSubscriptions(string SentryOwnerName,EventTypeGroup group)
+        public List<BusinessAreaSubscription> GetAllUserSubscriptionsByEventTypeGroup(string SentryOwnerName,EventTypeGroup group)
         {
 
             if (group == EventTypeGroup.BusinessArea)
