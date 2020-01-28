@@ -7,9 +7,9 @@ namespace Sentry.data.Core
     public static class NotificationExtensions
     {
 
-        public static NotificationModel ToModel(this Notification core)
+        public static NotificationDto ToModel(this Notification core)
         {
-            NotificationModel model = new NotificationModel()
+            NotificationDto model = new NotificationDto()
             {
                 CreateUser = core.CreateUser,
                 ExpirationTime = core.ExpirationTime,
@@ -27,15 +27,15 @@ namespace Sentry.data.Core
             return model;
         }
 
-        public static List<NotificationModel> ToModels(this List<Notification> cores, IDatasetContext domainContext, ISecurityService securityService, UserService userService)
+        public static List<NotificationDto> ToModels(this List<Notification> cores, IDatasetContext domainContext, ISecurityService securityService, UserService userService)
         {
 
             IApplicationUser user = userService.GetCurrentUser();
-            List<NotificationModel> models = new List<NotificationModel>();
+            List<NotificationDto> models = new List<NotificationDto>();
 
             foreach (var notification in cores)
             {
-                NotificationModel model = notification.ToModel();
+                NotificationDto model = notification.ToModel();
 
                 switch (model.NotificationType)
                 {
@@ -66,7 +66,7 @@ namespace Sentry.data.Core
         //}
 
 
-        public static Notification ToCore(this NotificationModel model)
+        public static Notification ToCore(this NotificationDto model)
         {
             return new Notification()
             {

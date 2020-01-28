@@ -15,14 +15,14 @@ namespace Sentry.data.Core
         public virtual int ParentObject { get; set; }
         public virtual string NotificationType { get; set; }
         public virtual string Title { get; set; }
-
+        
         public virtual string DisplayMessage
         {
             get
             {
                 switch (MessageSeverity)
                 {
-                    case NotificationSeverity.Danger:
+                    case NotificationSeverity.Critical:
                         return $"<strong class=\"alertHeading\">Alert!</strong> {Message}";
                     case NotificationSeverity.Warning:
                         return $"<strong class=\"alertHeading\">Warning!</strong> {Message}";

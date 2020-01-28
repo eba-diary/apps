@@ -102,6 +102,7 @@
     <Compile Include="DTO\Schema\FileSchemaDto.cs" />
     <Compile Include="DTO\Schema\SchemaDTO.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />
+    <Compile Include="DTO\Subscription\SubscriptionDto.cs" />
     <Compile Include="Entities\DataProcessing\DataFlow_Log.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ActionTypeAttribute.cs" />
     <Compile Include="Entities\DataProcessing\Actions\BaseAction.cs" />
@@ -148,6 +149,7 @@
     <Compile Include="Exceptions\DatasetUnauthorizedAccessException.cs" />
     <Compile Include="Exceptions\SchemaNotFoundException.cs" />
     <Compile Include="Exceptions\SchemaUnauthorizedAccessException.cs" />
+    <Compile Include="Entities\Subscriptions\EventTypeGroup.cs" />
     <Compile Include="Extensions\DataFlowExtensions.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
     <Compile Include="Extensions\DatasetFileConfigExtensions.cs" />
@@ -197,7 +199,7 @@
     <Compile Include="Entities\BusinessArea\BusinessAreaTile.cs" />
     <Compile Include="Entities\BusinessArea\BusinessAreaTileRow.cs" />
     <Compile Include="Entities\BusinessArea\BusinessAreaType.cs" />
-    <Compile Include="DTO\Notification\ModifyNotificationModel.cs" />
+    <Compile Include="DTO\Notification\NotificationDto.cs" />
     <Compile Include="DTO\Schema\SchemaDetailApiDTO.cs" />
     <Compile Include="DTO\TagDto.cs" />
     <Compile Include="Entities\ColumnDTO.cs" />
@@ -386,6 +388,7 @@
       <Name>Sentry.Messaging.Common</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

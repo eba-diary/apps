@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Sentry.Core;
+using Sentry.data.Core.GlobalEnums;
+using Sentry.Common.Logging;
+
 
 namespace Sentry.data.Core
 {
@@ -10,12 +13,14 @@ namespace Sentry.data.Core
         private readonly IDatasetContext _domainContext;
         private readonly ISecurityService _securityService;
         private readonly UserService _userService;
+        private readonly IEventService _eventService;
 
-        public NotificationService(IDatasetContext domainContext, ISecurityService securityService, UserService userService)
+        public NotificationService(IDatasetContext domainContext, ISecurityService securityService, UserService userService, IEventService eventService)
         {
             _domainContext = domainContext;
             _securityService = securityService;
             _userService = userService;
+            _eventService = eventService;
         }
 
 
@@ -35,14 +40,14 @@ namespace Sentry.data.Core
             return false;
         }
 
-        public NotificationModel GetNotificationModelForDisplay(int notificationId)
+        public NotificationDto GetNotificationModelForDisplay(int notificationId)
         {
             IApplicationUser user = _userService.GetCurrentUser();
-            NotificationModel model;
+            NotificationDto model;
 
             if (notificationId == 0)
             {
-                model = new NotificationModel()
+                model = new NotificationDto()
                 {
                     CreateUser = user.AssociateId,
                     StartTime = DateTime.Now,
@@ -57,40 +62,72 @@ namespace Sentry.data.Core
             return model;
         }
 
-        public NotificationModel GetNotificationModelForModify(int notificationId)
+        public NotificationDto GetNotificationModelForModify(int notificationId)
         {
-            NotificationModel model = GetNotificationModelForDisplay(notificationId);
+            NotificationDto model = GetNotificationModelForDisplay(notificationId);
             model.AllDataAssets = GetAssetsForUserSecurity();
             model.AllBusinessAreas = GetBusinessAreasForUserSecurity();
             return model;
         }
 
-        public void SubmitNotification(NotificationModel model)
+        public int SubmitNotification(NotificationDto dto)
         {
-            Notification an = null;
+            Notification notification = null;
 
-            if (model.NotificationId == 0)
+            bool addNotification = true;
+            
+            if (dto.NotificationId == 0)
             {
-                an = model.ToCore();
-                an.CreateUser = _userService.GetCurrentUser().AssociateId;
-                _domainContext.Add(an);
+                notification = dto.ToCore();
+                notification.CreateUser = _userService.GetCurrentUser().AssociateId;
+                _domainContext.Add(notification);
+                dto.NotificationId = notification.NotificationId;
             }
             else
             {
-                an = _domainContext.Notification.FirstOrDefault(x => x.NotificationId == model.NotificationId);
-                an.ExpirationTime = model.ExpirationTime;
-                an.StartTime = model.StartTime;
-                an.MessageSeverity = model.MessageSeverity;
-                an.Message = model.Message;
-                an.NotificationType = model.NotificationType;
-                an.ParentObject = int.Parse(model.ObjectId);
-                an.Title = model.Title;
+                notification = _domainContext.Notification.FirstOrDefault(x => x.NotificationId == dto.NotificationId);
+                notification.ExpirationTime = dto.ExpirationTime;
+                notification.StartTime = dto.StartTime;
+                notification.MessageSeverity = dto.MessageSeverity;
+                notification.Message = dto.Message;
+                notification.NotificationType = dto.NotificationType;
+                notification.ParentObject = int.Parse(dto.ObjectId);
+                notification.Title = dto.Title;
+
+                addNotification = false;
             }
 
             _domainContext.SaveChanges();
+
+            //the way that other components work when publishing events is to pass a constant which is essentially 
+            //equal to the EventType.Description, this is sort of strange because the actual event service then grabs
+            //the appropriate EventType based on the description here, because i need to move on I will use this design
+            //pattern because it works, so don't judge me.
+            string eventTypeDescription = null;
+
+            switch (dto.MessageSeverity)
+            {
+                case NotificationSeverity.Critical:
+                    eventTypeDescription = addNotification == true ? GlobalConstants.EventType.NOTIFICATION_CRITICAL_ADD : GlobalConstants.EventType.NOTIFICATION_CRITICAL_UPDATE;
+                    break;
+                case NotificationSeverity.Warning:
+                    eventTypeDescription = addNotification == true ? GlobalConstants.EventType.NOTIFICATION_WARNING_ADD : GlobalConstants.EventType.NOTIFICATION_WARNING_UPDATE;
+                    break;
+                case NotificationSeverity.Info:
+                    eventTypeDescription = addNotification == true ? GlobalConstants.EventType.NOTIFICATION_INFO_ADD : GlobalConstants.EventType.NOTIFICATION_INFO_UPDATE;
+                    break;
+                default:
+                    Logger.Error("Notification Severity Not Found to log EventType of " + dto.MessageSeverity.ToString() + " for NotificationId = " + dto.NotificationId.ToString());
+                    break;
+            }
+
+            if(eventTypeDescription != null)
+                _eventService.PublishSuccessEventByNotificationId(eventTypeDescription, _userService.GetCurrentUser().AssociateId, eventTypeDescription, dto.NotificationId);
+
+            return dto.NotificationId;
         }
 
-        public List<NotificationModel> GetNotificationsForDataAsset()
+        public List<NotificationDto> GetNotificationsForDataAsset()
         {
             throw new NotImplementedException();
             //List<NotificationModel> models = new List<NotificationModel>();
@@ -117,17 +154,17 @@ namespace Sentry.data.Core
             //return models;
         }
 
-        public List<NotificationModel> GetNotificationForBusinessArea(BusinessAreaType type)
+        public List<NotificationDto> GetNotificationForBusinessArea(BusinessAreaType type)
         {
             BusinessArea ba = _domainContext.BusinessAreas.Where(w => w.Id == (int)type).FirstOrDefault();
-            List<NotificationModel> notifications = _domainContext.Notification.Where(w => w.ParentObject == ba.Id).ToList().ToModels(_domainContext, _securityService, _userService);
+            List<NotificationDto> notifications = _domainContext.Notification.Where(w => w.ParentObject == ba.Id).ToList().ToModels(_domainContext, _securityService, _userService);
             return notifications;
         }
 
-        public List<NotificationModel> GetAllNotifications()
+        public List<NotificationDto> GetAllNotifications()
         {
             List<Notification> notifications = _domainContext.Notification.ToList();
-            List<NotificationModel> models = notifications.ToModels(_domainContext, _securityService, _userService);
+            List<NotificationDto> models = notifications.ToModels(_domainContext, _securityService, _userService);
 
             return models;
         }
@@ -248,15 +285,14 @@ namespace Sentry.data.Core
         //    return models;
         //}
 
-
-        public List<BusinessAreaSubscription> GetAllUserSubscriptionsForBusinessArea()
+        public List<BusinessAreaSubscription> GetAllUserSubscriptions(EventTypeGroup group)
         {
-            return _domainContext.GetAllUserSubscriptionsForBusinessArea(_userService.GetCurrentUser().AssociateId);
+            return _domainContext.GetAllUserSubscriptionsByEventTypeGroup(_userService.GetCurrentUser().AssociateId, group);
         }
 
-        public IEnumerable<EventType> GetEventTypes()
+        public IEnumerable<EventType> GetEventTypes(EventTypeGroup group)
         {
-            IQueryable<EventType> et = _domainContext.EventTypes.Where( w => w.Display && w.Group == "BUSINESSAREA" );
+            IQueryable<EventType> et = _domainContext.EventTypes.Where( w => w.Display && w.Group == group.GetDescription());
             return et;
         }
 
@@ -272,7 +308,55 @@ namespace Sentry.data.Core
             return i;
         }
 
+        public void CreateUpdateSubscription(SubscriptionDto dto)
+        {
+            
+            if(dto.group == EventTypeGroup.BusinessArea)
+            {
+                List<BusinessAreaSubscription> oldSubs = GetAllUserSubscriptions(dto.group);
 
+                foreach (BusinessAreaSubscription newSub in dto.CurrentSubscriptionsBusinessArea)
+                {
+                    bool insertMe = true;
 
+                    if (oldSubs != null)
+                    {
+                        BusinessAreaSubscription oldSub = (BusinessAreaSubscription)oldSubs.FirstOrDefault(w => w.ID == newSub.ID);
+                        if (oldSub != null)
+                        {
+                            if (oldSub.Interval.Interval_ID != newSub.Interval.Interval_ID)
+                                oldSub.Interval = newSub.Interval;
+
+                            insertMe = false;
+                        }
+                    }
+
+                    if (insertMe)
+                    {
+                        _domainContext.Merge<BusinessAreaSubscription>
+                        (
+                            new BusinessAreaSubscription
+                            (
+                                newSub.BusinessAreaType,
+                                newSub.EventType,
+                                newSub.Interval,
+                                _userService.GetCurrentUser().AssociateId
+                             )
+                        );
+                    }
+                }
+                
+                List<BusinessAreaSubscription> delSubs = oldSubs.Where(w => w.Interval.Interval_ID == 5).ToList();
+                if (delSubs != null)
+                {
+                    foreach (BusinessAreaSubscription delSub in delSubs)
+                    {
+                        _domainContext.Remove<BusinessAreaSubscription>(delSub);
+                    }
+                }
+
+                _domainContext.SaveChanges();
+            }
+        }
     }
 }

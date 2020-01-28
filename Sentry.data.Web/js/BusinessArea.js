@@ -4,6 +4,7 @@
     {
         data.Notification.displayNotifications(businessAreaType);
 
-        data.Subscription.init("BUSINESSAREA");
+        //1=DATASET 2=BUSINESSAREA
+        data.Subscription.init(2);
     }
 };   

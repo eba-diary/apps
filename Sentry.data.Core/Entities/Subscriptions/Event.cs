@@ -39,5 +39,9 @@ namespace Sentry.data.Core
         public virtual string Line_CDE { get; set; }
 
         public virtual string Search { get; set; }
+
+        public virtual int? Notification { get; set; }
+
+
     }
 }
