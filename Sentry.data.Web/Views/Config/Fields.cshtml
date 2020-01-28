@@ -430,7 +430,7 @@
                     var pattupper = new RegExp("[A-Z]");
                     //var nme = self.Name();
                     if (pattupper.test(self.Name())) {
-                        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot uppercase letters.' });
+                        parentvm.Errors.push({ 'Id': self.Position(), 'ErrorType': 'Name', 'Description': ' Name cannot contain uppercase letters.' });
                         hasError = true;
                     }
                 }

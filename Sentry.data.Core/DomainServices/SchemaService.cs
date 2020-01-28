@@ -297,8 +297,8 @@ namespace Sentry.data.Core
                 SasLibrary = CommonExtensions.GenerateSASLibaryName(_datasetContext.GetById<Dataset>(dto.ParentDatasetId)),
                 Description = dto.Description,
                 StorageCode = storageCode,
-                HiveDatabase = "dsc_" + parentDataset.DatasetCategories.First().Name.ToLower(),
-                HiveTable = parentDataset.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dto.Name.Replace(" ", "").ToUpper(),
+                HiveDatabase = GenerateHiveDatabaseName(parentDataset.DatasetCategories.First()),
+                HiveTable = FormatHiveTableNamePart(parentDataset.DatasetName) + "_" + FormatHiveTableNamePart(dto.Name),
                 HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
                 HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
                 CreatedDTM = DateTime.Now,
@@ -458,6 +458,16 @@ namespace Sentry.data.Core
             {
                 Logger.Warn($"SAS Notification was not configured");
             }
+        }
+
+        private string FormatHiveTableNamePart(string part)
+        {
+            return part.Replace(" ", "").Replace("_", "").Replace("-", "").ToUpper();
+        }
+
+        private string GenerateHiveDatabaseName(Category cat)
+        {            
+            return "dsc_" + cat.Name.ToLower();
         }
     }
 }
