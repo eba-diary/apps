@@ -104,9 +104,6 @@ namespace Sentry.data.Core
             //pattern because it works, so don't judge me.
             string eventTypeDescription = "";
             
-            //if(dto.MessageSeverity == )
-
-
             switch (dto.MessageSeverity)
             {
                 case NotificationSeverity.Critical:
