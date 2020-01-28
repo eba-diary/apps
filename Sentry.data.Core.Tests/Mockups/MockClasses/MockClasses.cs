@@ -355,7 +355,7 @@ namespace Sentry.data.Core.Tests
             Notification an = new Notification();
             an.NotificationId = 1;
             an.ParentObject = da.Id;
-            an.MessageSeverity = NotificationSeverity.Danger;
+            an.MessageSeverity = NotificationSeverity.Critical;
             an.Message = "Alert Message";
             an.StartTime = DateTime.Now.AddHours(-1).AddMinutes(1);
             an.ExpirationTime = DateTime.Now.AddDays(1);

@@ -38,6 +38,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
 
             this.Property((x) => x.UserWhoStartedEvent, (m) => m.Column("CreatedUser"));
 
+            this.Property((x) => x.Notification, (m) => m.Column("Notification_ID"));
 
             this.ManyToOne(x => x.EventType, m =>
             {

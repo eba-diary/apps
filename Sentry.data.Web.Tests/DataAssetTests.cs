@@ -202,9 +202,9 @@ namespace Sentry.data.Web.Tests
 
             string mock = "This is a Mock Test.  Way different then the Mock.";
             an.Message = mock;
-            an.MessageSeverity = NotificationSeverity.Danger;
+            an.MessageSeverity = NotificationSeverity.Critical;
 
-            Assert.IsTrue(an.MessageSeverityTag == NotificationSeverity.Danger.ToString());
+            Assert.IsTrue(an.MessageSeverityTag == NotificationSeverity.Critical.ToString());
             Assert.IsTrue(an.DisplayMessage.Contains("Alert!"));
             Assert.IsTrue(an.DisplayMessage.EndsWith(mock));
 
