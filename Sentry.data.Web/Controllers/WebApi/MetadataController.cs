@@ -11,14 +11,18 @@ using Swashbuckle.Swagger.Annotations;
 using Sentry.data.Web.Models.ApiModels.Dataset;
 using Sentry.data.Web.Models.ApiModels.Config;
 using Sentry.data.Web.Models.ApiModels.Schema;
-using Sentry.data.Web.WebAPI;
 using Sentry.WebAPI.Versioning;
 using Sentry.Common.Logging;
 using Newtonsoft.Json;
+using Sentry.data.Web.WebApi;
+using Sentry.data.Core.Exceptions;
+using System.Web.Http.Results;
 
-namespace Sentry.data.Web.Controllers
+namespace Sentry.data.Web.WebApi.Controllers
 {
     [RoutePrefix(WebConstants.Routes.VERSION_METADATA)]
+    //Users need aleast UseApp permission to access any endpoint on this controller
+    [WebApiAuthorizeUseApp]
     public class MetadataController : BaseWebApiController
     {
         private MetadataRepositoryService _metadataRepositoryService;
@@ -101,6 +105,7 @@ namespace Sentry.data.Web.Controllers
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [Route("dataset")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<DatasetInfoModel>))]
+        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
         public async Task<IHttpActionResult> GetDatasets()
         {
             try
@@ -116,29 +121,6 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        //[HttpGet]
-        //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
-        //[Route("dataset/{datasetId}/config")]
-        //[SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<ConfigInfoModel>))]
-        //public async Task<IHttpActionResult> GetDatasetConfigs(int datasetId)
-        //{
-        //    try
-        //    {
-        //        List<DatasetFileConfigDto> dtoList = _configService.GetDatasetFileConfigDtoByDataset(datasetId);
-        //        if (dtoList == null)
-        //        {
-        //            Logger.Info($"metadataapi_getdatasetconfigs_badrequest - datasetid:{datasetId}");
-        //        }
-        //        List<ConfigInfoModel> modelList = dtoList.ToModel();
-        //        return Ok(modelList);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Logger.Error($"metadataapi_getdatasetconfigs_internalservererror", ex);
-        //        return InternalServerError();
-        //    }
-        //}
-
         /// <summary>
         /// Get list of schema for dataset
         /// </summary>
@@ -148,23 +130,11 @@ namespace Sentry.data.Web.Controllers
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [Route("dataset/{datasetId}/schema")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaInfoModel>))]
+        [SwaggerResponse(System.Net.HttpStatusCode.NotFound, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.Unauthorized, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
         public async Task<IHttpActionResult> GetSchemaByDataset(int datasetId)
         {
-            UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
-
-            if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
-            {
-                try
-                {
-                    IApplicationUser user = _userService.GetCurrentUser();
-                    Logger.Info($"metadatacontroller-getschemabydataset unauthorized_access: Id:{user.AssociateId}");
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error("metadatacontroller-getschemabydataset unauthorized_access", ex);
-                }
-                return Unauthorized();
-            }
 
             try
             {
@@ -172,78 +142,54 @@ namespace Sentry.data.Web.Controllers
                 List<SchemaInfoModel> modelList = dtoList.ToSchemaModel();
                 return Ok(modelList);
             }
+            catch (DatasetNotFoundException)
+            {
+                return NotFound();
+            }
+            catch(DatasetUnauthorizedAccessException duax)
+            {
+                throw new UnauthorizedAccessException("Unauthroized Access to Dataset", duax);
+            }
             catch (Exception ex)
             {
                 Logger.Error($"metadataapi_getschemabydataset_internalservererror - datasetid:{datasetId}", ex);
-                return InternalServerError();
+                return InternalServerError(ex);
             }
         }
-
-        //[HttpPut]
-        //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
-        //[Route("dataset/{datasetId}/schema")]
-        //[SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaInfoModel))]
-        //public async Task<IHttpActionResult> SchemaCreate(int datasetId, [FromBody] CreateSchemaModel CreateSchema)
-        //{
-        //    UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
-
-        //    if (!us.CanEditDataset)
-        //    {
-        //        return Unauthorized();
-        //    }
-
-        //    FileSchemaDto dto = CreateSchema.ToDto();
-        //    dto.ParentDatasetId = datasetId;
-        //    var newSchemaId = _schemaService.CreateAndSaveSchema(dto);
-        //    return Ok(_schemaService.GetFileSchemaDto(newSchemaId));
-        //}
-
 
         /// <summary>
         /// Get schema metadata
         /// </summary>
-        /// <param name="SchemaID">Schema Id assigned to given schema</param>
+        /// <param name="datasetId"></param>
+        /// <param name="schemaId"></param>
         /// <returns></returns>
         [HttpGet]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [Route("dataset/{datasetId}/schema/{schemaId}")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaInfoModel))]
+        [SwaggerResponse(System.Net.HttpStatusCode.NotFound, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.Unauthorized, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
         public async Task<IHttpActionResult> GetSchema(int datasetId, int schemaId)
         {
-            UserSecurity us;
-            try
-            {
-                us = _datasetService.GetUserSecurityForDataset(datasetId);
-            }
-            catch(Exception ex)
-            {
-                Logger.Error($"metadatacontroller-getschema failed to retrieve UserSecurity object", ex);
-                return InternalServerError();
-            }
-                        
-            if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
-            {
-                try
-                {
-                    IApplicationUser user = _userService.GetCurrentUser();
-                    Logger.Info($"metadatacontroller-GetSchema unauthorized_access: Id:{user.AssociateId}");
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error("metadatacontroller-GetSchema unauthorized_access", ex);
-                }
-                return Unauthorized();
-            }
 
             try
             {
                 DatasetFileConfigDto dto = _configService.GetDatasetFileConfigDtoByDataset(datasetId).FirstOrDefault(w => w.Schema.SchemaId == schemaId);
                 if (dto == null)
                 {
-                    return NotFound();
+                    return Content(System.Net.HttpStatusCode.NotFound, "Schema not found");
                 }
                 SchemaInfoModel model = dto.ToSchemaModel();
                 return Ok(model);
+            }
+            catch (DatasetNotFoundException)
+            {
+                return Content(System.Net.HttpStatusCode.NotFound, "Dataset not found");
+            }
+            catch (DatasetUnauthorizedAccessException duax)
+            {
+                throw new UnauthorizedAccessException("Unauthroized Access to Dataset", duax);
             }
             catch (Exception ex)
             {
@@ -262,40 +208,34 @@ namespace Sentry.data.Web.Controllers
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [Route("dataset/{datasetId}/schema/{schemaId}/revision")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(List<SchemaRevisionModel>))]
+        [SwaggerResponse(System.Net.HttpStatusCode.NotFound, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.Unauthorized, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
         public async Task<IHttpActionResult> GetSchemaRevisionBySchema(int datasetId, int schemaId)
         {
-            UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
-
-            if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
-            {
-                try
-                {
-                    IApplicationUser user = _userService.GetCurrentUser();
-                    Logger.Info($"metadatacontroller-GetSchemaRevisionBySchema unauthorized_access: Id:{user.AssociateId}");
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error("metadatacontroller-GetSchemaRevisionBySchema unauthorized_access", ex);
-                }
-                return Unauthorized();
-            }
-
+            ValidateViewPermissionsForDataset(datasetId);
+                        
             try
             {
                 if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId))
                 {
-                    Logger.Info($"metadataapi_getschemarevisionbyschema_notfound schema - datasetId:{datasetId} schemaId:{schemaId}");
-                    return NotFound();
+                    throw new SchemaNotFoundException();
                 }
 
                 List<SchemaRevisionDto> revisionDto = _schemaService.GetSchemaRevisionDtoBySchema(schemaId);
-                if (revisionDto == null)
-                {
-                    Logger.Info($"metadataapi_getschemarevisionbyschema_notfound revision - datasetId:{datasetId} schemaId:{schemaId}");
-                    return NotFound();
-                }
+
                 List<SchemaRevisionModel> modelList = revisionDto.ToModel();
                 return Ok(modelList);
+            }
+            catch (DatasetNotFoundException)
+            {
+                Logger.Info($"metadataapi_getschemarevisionbyschema_notfound schema - datasetId:{datasetId} schemaId:{schemaId}");
+                return Content(System.Net.HttpStatusCode.NotFound, "Dataset not found");
+            }
+            catch (SchemaNotFoundException)
+            {
+                Logger.Info($"metadataapi_getschemarevisionbyschema_notfound revision - datasetId:{datasetId} schemaId:{schemaId}");
+                return Content(System.Net.HttpStatusCode.NotFound, "Schema not found");
             }
             catch (Exception ex)
             {
@@ -309,48 +249,49 @@ namespace Sentry.data.Web.Controllers
         /// </summary>
         /// <param name="datasetid"></param>
         /// <param name="schemaId"></param>
-        /// <returns></returns>
+        /// <response code="401">Unauthroized Access</response>
+        /// <returns>Latest field metadata for schema.</returns>
         [HttpGet]
         [ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
         [Route("dataset/{datasetId}/schema/{schemaId}/revision/latest/fields")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaRevisionDetailModel))]
+        [SwaggerResponse(System.Net.HttpStatusCode.NotFound, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.Unauthorized, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
         public async Task<IHttpActionResult> GetLatestSchemaRevisionDetail(int datasetId, int schemaId)
         {
-            UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
-
-            if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
-            {
-                try
-                {
-                    IApplicationUser user = _userService.GetCurrentUser();
-                    Logger.Info($"metadatacontroller-GetLatestSchemaRevisionDetail unauthorized_access: Id:{user.AssociateId}");
-                }
-                catch (Exception ex)
-                {
-                    Logger.Error("metadatacontroller-GetLatestSchemaRevisionDetail unauthorized_access", ex);
-                }
-                return Unauthorized();
-            }
+            ValidateViewPermissionsForDataset(datasetId);
 
             try
             {
                 if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId))
                 {
-                    Logger.Info($"metadataapi_getlatestschemarevisiondetail_notfound schema - datasetid:{datasetId} schemaid:{schemaId}");
-                    return NotFound();
+                    throw new SchemaNotFoundException();
                 }
 
                 SchemaRevisionDto revisiondto = _schemaService.GetLatestSchemaRevisionDtoBySchema(schemaId);
                 if (revisiondto == null)
                 {
                     Logger.Info($"metadataapi_getlatestschemarevisiondetail_notfound revision - datasetid:{datasetId} schemaid:{schemaId}");
-                    return NotFound();
+                    return Content(System.Net.HttpStatusCode.NotFound, "Schema revisions not found");
                 }
 
                 SchemaRevisionDetailModel revisionDetailModel = revisiondto.ToSchemaDetailModel();
                 List<BaseFieldDto> fieldDtoList = _schemaService.GetBaseFieldDtoBySchemaRevision(revisiondto.RevisionId);
                 revisionDetailModel.Fields = fieldDtoList.ToSchemaFieldModel();
                 return Ok(revisionDetailModel);
+            }
+            catch (DatasetNotFoundException)
+            {
+                return Content(System.Net.HttpStatusCode.NotFound, "Dataset not found");
+            }
+            catch (SchemaNotFoundException)
+            {
+                return Content(System.Net.HttpStatusCode.NotFound, "Schema not found");
+            }
+            catch (SchemaUnauthorizedAccessException authex)
+            {
+                throw new UnauthorizedAccessException("Unauthroized Access to Schema", authex);
             }
             catch (Exception ex)
             {
@@ -368,7 +309,11 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         [ApiVersionBegin(WebAPI.Version.v2)]
         [Route("dataset/{datasetId}/schema/{schemaId}/syncconsumptionlayer")]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(string))]
+        [SwaggerResponse(System.Net.HttpStatusCode.BadRequest, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.NotFound, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.Unauthorized, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
         public async Task<IHttpActionResult> SyncConsumptionLayer(int datasetId, int schemaId)
         {
             try
@@ -377,84 +322,31 @@ namespace Sentry.data.Web.Controllers
                 if (datasetId == 0)
                 {
                     return BadRequest("datasetId is required");
-                    //return Json(new { Success = false, Message = "Dataset Id required" });
                 }
 
-                //Does user have permissions to dataset
-                UserSecurity us = _securityService.GetUserSecurity(_dsContext.GetById<Dataset>(datasetId), _userService.GetCurrentUser());
-                if (!us.CanEditDataset)
-                {
-                    return Unauthorized();
-                    //return Json(new { Success = false, Message = "User does not have necessary dataset permissions" });
-                }
+                ValidateModifyPermissionsForDataset(datasetId);
 
                 bool isSuccessful = _configService.SyncConsumptionLayer(datasetId, schemaId);
 
                 if (isSuccessful)
                 {
                     return Ok("Sync request successfully submitted");
-                    //return Json(new { Success = true, Message = "Sync request successfully submitted" });
                 }
                 else
                 {
                     return BadRequest("Something went wrong, sync request was unsuccessful.");
-                    //return Json(new { Success = false, Message = "Something went wrong, sync request was unsuccessful." });
                 }
+            }
+            catch (DatasetUnauthorizedAccessException duaEx)
+            {
+                throw new UnauthorizedAccessException("Unauthroized Access to Dataset", duaEx);
             }
             catch (Exception ex)
             {
                 Logger.Error("configcontroller-syncconsumptionlayer failed", ex);
                 return InternalServerError();
-                //return Json(new { Success = false, Message = "Something went wrong, failed to submit sync request." });
             }
         }
-
-        ///// <summary>
-        ///// Get schema revision detail
-        ///// </summary>
-        ///// <param name="datasetId"></param>
-        ///// <param name="schemaId"></param>
-        ///// <param name="revisionId"></param>
-        ///// <returns></returns>
-        //[HttpGet]
-        //[ApiVersionBegin(Sentry.data.Web.WebAPI.Version.v2)]
-        //[Route("dataset/{datasetId}/schema/{schemaId}/revision/{revisionId}/fields")]
-        //[SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaRevisionDetailModel))]
-        //public async Task<IHttpActionResult> GetSchemaRevision(int datasetId, int schemaId, int revisionId)
-        //{
-        //    UserSecurity us = _datasetService.GetUserSecurityForDataset(datasetId);
-
-        //    if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
-        //    {
-        //        return Unauthorized();
-        //    }
-
-        //    try
-        //    {
-        //        if (!_configService.GetDatasetFileConfigDtoByDataset(datasetId).Any(w => w.Schema.SchemaId == schemaId))
-        //        {
-        //            Logger.Info($"metadataapi_getschemarevision_notfound - datasetid:{datasetId} schemaid:{schemaId}");
-        //            return NotFound();
-        //        }
-
-        //        SchemaRevisionDto revisiondto = _schemaService.GetSchemaRevisionDtoBySchema(schemaId).First(w => w.RevisionId == revisionId);
-        //        if (revisiondto == null)
-        //        {
-        //            Logger.Info($"metadataapi_getschemarevision_notfound - datasetid:{datasetId} schemaid:{schemaId} revisionid:{revisionId}");
-        //            return NotFound();
-        //        }
-
-        //        SchemaRevisionDetailModel revisionDetailModel = revisiondto.ToSchemaDetailModel();
-        //        List<BaseFieldDto> fieldDtoList = _schemaService.GetBaseFieldDtoBySchemaRevision(revisionId);
-        //        revisionDetailModel.Fields = fieldDtoList.ToSchemaFieldModel();
-        //        return Ok(revisionDetailModel);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Logger.Error($"metadataapi_getschemarevision_badrequest - datasetid:{datasetId} schemaid:{schemaId}", ex);
-        //        return InternalServerError();
-        //    }
-        //}
 
         /// <summary>
         /// gets dataset metadata
@@ -463,9 +355,15 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("datasets/{DatasetConfigID}")]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(Metadata))]
+        [SwaggerResponse(System.Net.HttpStatusCode.Unauthorized, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
         public async Task<IHttpActionResult> GetBasicMetadataInformationFor(int DatasetConfigID)
         {
             DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
+
+            //Does user have permissions to dataset
+            ValidateViewPermissionsForDataset(config.ParentDataset.DatasetId);
 
             return await GetMetadata(config);
         }
@@ -479,11 +377,16 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("datasets/{DatasetConfigID}/schemas/{SchemaID}/hive")]
+        [SwaggerResponse(System.Net.HttpStatusCode.NotFound, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.Unauthorized, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
         public async Task<IHttpActionResult> GetPrimaryHiveTableFor(int DatasetConfigID, int SchemaID = 0)
         {
             try
             {
                 DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
+
+                ValidateViewPermissionsForDataset(config.ParentDataset.DatasetId);
 
                 return Ok(new { HiveDatabaseName = config.Schema.HiveDatabase, HiveTableName = config.Schema.HiveTable });
             }
@@ -504,9 +407,14 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         [Route("datasets/{DatasetConfigID}/schemas/{SchemaID}/columns")]
         [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(OutputSchema))]
+        [SwaggerResponse(System.Net.HttpStatusCode.NotFound, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.Unauthorized, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
         public async Task<IHttpActionResult> GetColumnSchemaInformationFor(int DatasetConfigID, int SchemaID = 0)
         {
             DatasetFileConfig config = _dsContext.GetById<DatasetFileConfig>(DatasetConfigID);
+
+            ValidateViewPermissionsForDataset(config.ParentDataset.DatasetId);
 
             return await GetColumnSchema(config, SchemaID);
         }
@@ -569,9 +477,22 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [Route("schemas/{SchemaID}/columns")]
-        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(OutputSchema))]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, typeof(SchemaDetailModel))]
+        [SwaggerResponse(System.Net.HttpStatusCode.Unauthorized, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
         public async Task<IHttpActionResult> GetColumnSchemaInformationForSchema(int SchemaID)
         {
+            DatasetFileConfig dfc = _dsContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == SchemaID).FirstOrDefault();
+
+            if (dfc != null)
+            {
+                ValidateViewPermissionsForDataset(dfc.ParentDataset.DatasetId);
+            }
+            else
+            {
+                throw new HttpResponseException(System.Net.HttpStatusCode.InternalServerError);
+            }
+
             SchemaDetaiApilDTO dto = _configService.GetSchemaDetailDTO(SchemaID);
             SchemaDetailModel sdm = new SchemaDetailModel(dto);
 
@@ -587,8 +508,11 @@ namespace Sentry.data.Web.Controllers
         /// <param name="message"></param>
         /// <returns></returns>
         [HttpPost]
-        [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.Unauthorized, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         [Route("PublishMessage")]
         public IHttpActionResult PublishMessage([FromBody] KafkaMessage message)
         {
@@ -714,7 +638,68 @@ namespace Sentry.data.Web.Controllers
                 return InternalServerError(ex);
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="datasetId"></param>
+        /// <exception cref="UnauthorizedAccessException">Thrown when user does not have access to dataset</exception>
+        /// <exception cref="InternalServerErrorResult">Thrown for unhandled exceptions</exception>
+        private void ValidateViewPermissionsForDataset(int datasetId)
+        {
+            UserSecurity us;
+            try
+            {
+                us = _securityService.GetUserSecurity(_dsContext.GetById<Dataset>(datasetId), _userService.GetCurrentUser());
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"metadatacontroller-validateviewpermissionsfordataset failed to retrieve UserSecurity object", ex);
+                throw new HttpResponseException(System.Net.HttpStatusCode.InternalServerError);
+            }
+
+            if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
+            {
+                try
+                {
+                    IApplicationUser user = _userService.GetCurrentUser();
+                    Logger.Info($"metadatacontroller-validateviewpermissionsfordataset unauthorized_access: Id:{user.AssociateId}");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error("metadatacontroller-validateviewpermissionsfordataset unauthorized_access", ex);
+                }
+                throw new UnauthorizedAccessException();
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="datasetId"></param>
+        /// <exception cref="DatasetUnauthorizedAccessException">Thrown when user does not have edit permissions to dataset</exception>
+        /// <exception cref="InternalServerErrorResult">Thrown when unhandled exception occurs</exception>
+        private void ValidateModifyPermissionsForDataset(int datasetId)
+        {
+            //Does user have permissions to dataset
+            UserSecurity us;
+            try
+            {
+                us = _securityService.GetUserSecurity(_dsContext.GetById<Dataset>(datasetId), _userService.GetCurrentUser());
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"metadatacontroller-validateviewpermissionsfordataset failed to retrieve UserSecurity object", ex);
+                throw new HttpResponseException(System.Net.HttpStatusCode.InternalServerError);
+            }
+
+            if (!us.CanEditDataset)
+            {
+                throw new DatasetUnauthorizedAccessException();
+            }
+        }
         #endregion
+
 
     }
 }

@@ -18,9 +18,10 @@ using Sentry.data.Core.Entities.Livy;
 using Sentry.data.Web.Helpers;
 using Sentry.data.Core.Entities;
 
-namespace Sentry.data.Web.Controllers
+namespace Sentry.data.Web.WebApi.Controllers
 {
     [RoutePrefix(WebConstants.Routes.VERSION_QUERYTOOL)]
+    [WebApiAuthorizeUseApp]
     public class QueryToolController : BaseWebApiController
     {
         public IAssociateInfoProvider _associateInfoProvider;
