@@ -143,19 +143,8 @@ data.Tags = {
         return tag.Name || tag.text;
     },
 
-    sendNewTagToDatabase: function () {
-        $.ajax({
-            type: "POST",
-            url: "/api/v1/tags/" + $("#tagName").val() + "/" + $("#tagDescription").val(),
-            dataType: "json",
-            success: function (msg) { },
-            error: function (e) { }
-        });
-    },
-
     showModal: function () {
         console.log("entered showModal");
-        //var modal = Sentry.ShowModalConfirmation("Create New Tag", function () { data.Tags.sendNewTagToDatabase(); });
         var modal = Sentry.ShowModalWithSpinner("Create New Tag");
         var url = "/BusinessIntelligence/CreateTag"
 

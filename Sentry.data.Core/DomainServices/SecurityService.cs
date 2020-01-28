@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Sentry.Configuration;
+using Sentry.data.Core.Exceptions;
 
 namespace Sentry.data.Core
 {
@@ -169,6 +170,5 @@ namespace Sentry.data.Core
             ticket.RejectedReason = rejectedReason;
             ticket.TicketStatus = status;
         }
-
     }
 }

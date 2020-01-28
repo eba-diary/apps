@@ -290,7 +290,6 @@
     <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\FavoritesController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
-    <Compile Include="Controllers\WebApi\ApplicationController.cs" />
     <Compile Include="Controllers\WebApi\AssetController.cs" />
     <Compile Include="Controllers\DataAssetController.cs" />
     <Compile Include="Controllers\DatasetController.cs" />
@@ -327,6 +326,9 @@
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeAttribute.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeByPermissionAttribute.cs" />
     <Compile Include="Filters\WebAPI\Version.cs" />
+    <Compile Include="Filters\WebAPI\WebApiAuthorizeAttribute.cs" />
+    <Compile Include="Filters\WebAPI\WebApiAuthorizeByPermissionAttribute.cs" />
+    <Compile Include="Filters\WebAPI\WebApiAuthorizeUseAppAttribute.cs" />
     <Compile Include="Helpers\LivyHelper.cs" />
     <Compile Include="Helpers\BeginCollectionItem.cs" />
     <Compile Include="Helpers\PredicateBuilder.cs" />

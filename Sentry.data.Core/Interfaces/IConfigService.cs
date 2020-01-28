@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Sentry.data.Core.Exceptions;
 
 namespace Sentry.data.Core
 {
@@ -23,6 +24,14 @@ namespace Sentry.data.Core
         AccessRequest GetDataSourceAccessRequest(int dataSourceId);
         string RequestAccessToDataSource(AccessRequest request);
         DatasetFileConfigDto GetDatasetFileConfigDto(int configId);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="datasetId"></param>
+        /// <returns></returns>
+        /// <exception cref="DatasetUnauthorizedAccessException">Thrown when user does not have access to dataset</exception>
+        /// <exception cref="DatasetNotFoundException">Thrown when user does not have access to dataset</exception>
         List<DatasetFileConfigDto> GetDatasetFileConfigDtoByDataset(int datasetId);
         /// <summary>
         /// 
