@@ -122,6 +122,25 @@ namespace Sentry.data.Web.Controllers
             return View(dfcm);
         }
 
+        [HttpGet]
+        public PartialViewResult _DatasetFileConfigCreate(int id)
+        {
+            Dataset parent = _datasetContext.GetById<Dataset>(id);
+
+            DatasetFileConfigsModel dfcm = new DatasetFileConfigsModel
+            {
+                DatasetId = id,
+                ParentDatasetName = parent.DatasetName,
+                AllDatasetScopeTypes = Utility.GetDatasetScopeTypesListItems(_datasetContext),
+                AllDataFileTypes = Enum.GetValues(typeof(FileType)).Cast<FileType>().Select(v => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList(),
+                ExtensionList = Utility.GetFileExtensionListItems(_datasetContext),
+                Security = _securityService.GetUserSecurity(null, SharedContext.CurrentUser)
+            };
+
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED, SharedContext.CurrentUser.AssociateId, "Viewed Configuration Creation Page", dfcm.DatasetId);
+
+            return PartialView("_DatasetFileConfigCreate", dfcm);
+        }
 
         [HttpPost]
         [Route("Config/DatasetFileConfigForm")]
@@ -151,7 +170,8 @@ namespace Sentry.data.Web.Controllers
 
                     if (IsSuccessful)
                     {
-                        return RedirectToAction("Index", new { id = dto.ParentDatasetId });
+                        //return RedirectToAction("Index", new { id = dto.ParentDatasetId });
+                        return Json(new { Success = true, dataset_id = dto.ParentDatasetId, schema_id = dto.SchemaId });
                     }
                 }
                 else
@@ -176,7 +196,8 @@ namespace Sentry.data.Web.Controllers
 
             if (dto.ConfigId == 0)
             {
-                return View("Create", dfcm);
+                return PartialView("_DatasetFileConfigCreate", dfcm);
+                //return View("Create", dfcm);
             }
             else
             {
