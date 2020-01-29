@@ -384,7 +384,7 @@ namespace Sentry.data.Web.Tests
 
             subscription.Dataset = ds;
             subscription.SentryOwnerName = user != null ? user.AssociateId : "012345";
-            subscription.EventType = MockEventTypes()[2];
+            subscription.EventType = MockEventTypes()[0];
             subscription.Interval = MockIntervals()[0];
             subscription.ID = 0;
 
