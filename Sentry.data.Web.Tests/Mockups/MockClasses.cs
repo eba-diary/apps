@@ -334,12 +334,6 @@ namespace Sentry.data.Web.Tests
             et.Display = false;
             et.Type_ID = 1;
 
-            EventType et2 = new EventType();
-            et2.Description = "Searched";
-            et2.Severity = 1;
-            et2.Display = false;
-            et2.Type_ID = 1;
-
             EventType et3 = new EventType();
             et3.Description = "Created File";
             et3.Severity = 1;         
@@ -348,7 +342,6 @@ namespace Sentry.data.Web.Tests
 
             List<EventType> types = new List<EventType>();
             types.Add(et);
-            types.Add(et2);
             types.Add(et3);
 
             return types;
