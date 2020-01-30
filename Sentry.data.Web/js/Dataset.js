@@ -49,31 +49,25 @@ data.Dataset = {
     },
 
     FormSubmitInit: function () {
-        alert('Dataset form submit function');
-
         $.ajax({
             url: "/Dataset/DatasetForm",
             method: "POST",
             data: $("#DatasetForm").serialize(),
             dataType: 'json',
             success: function (obj) {
-                alert('Dataset ForSubmitAjax successcatch');
                 if (Sentry.WasAjaxSuccessful(obj)) {
-                    alert('Dataset FormSubmitAjax was successful');
                     Sentry.HideAllModals();
                     //redirect to dataset detail page
                     window.location.href = "/Dataset/Detail/" + obj.dataset_id;
                 }
                 else {
-                    alert('Dataset FormSubmitAjax was not successful');
                     $('#DatasetFormContent').replaceWith(obj);
                 }
             },
             failure: function () {
-                alert('Dataset FormSubmitAjax faliurecatch');
+                alert('An error occured submiting your request.  Please try again.');
             },
             error: function (obj) {
-                alert('Dataset FormSubmitAjax errorcatch');
                 $('#DatasetFormContent').replaceWith(obj.responseText);
                 var hrEnv = $('#HrempServiceEnv').val()
                 var hrUrl = $('#HrempServiceUrl').val()
@@ -437,7 +431,6 @@ data.Dataset = {
                                 })
                             },
                             failure: function (obj) {
-                                alert("failure");
                                 Sentry.ShowModalAlert(
                                     obj.Message, function () { })
                             },

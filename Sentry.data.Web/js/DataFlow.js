@@ -126,7 +126,6 @@
             failure: function () {
             },
             error: function (obj) {
-                alert('You messed up!')
                 $('#DatasetFormContent').replaceWith(obj.responseText);
                 var hrEnv = $('#HrempServiceEnv').val()
                 var hrUrl = $('#HrempServiceUrl').val()
@@ -158,7 +157,6 @@
             failure: function () {
             },
             error: function (obj) {
-                alert('You messed up!')
                 $('#DatasetFileConfigFormContent').replaceWith(obj.responseText);
                 //init the form passing the submit function specific for DataFlow page
                 data.Config.CreateFormSubmitInit(data.DataFlow.DatasetFileConfigFormSubmitInit, data.DataFlow.DatasetFileConfigFormCancelInit);
