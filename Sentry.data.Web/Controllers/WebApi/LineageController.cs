@@ -3,14 +3,17 @@ using Sentry.Common.Logging;
 using Sentry.data.Common;
 using Sentry.data.Core;
 using Sentry.data.Infrastructure;
+using Swashbuckle.Swagger.Annotations;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 
 
-namespace Sentry.data.Web.Controllers
+namespace Sentry.data.Web.WebApi.Controllers
 {
     [RoutePrefix(WebConstants.Routes.VERSION_LINEAGE)]
     public class LineageController : BaseWebApiController
@@ -56,6 +59,7 @@ namespace Sentry.data.Web.Controllers
         /// <param name="LineCDE"></param>
         /// <returns></returns>
         [HttpGet]
+        [SwaggerResponse(HttpStatusCode.BadRequest, null, typeof(string))]
         [Route("lineage")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS4014")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS1998")]
@@ -100,6 +104,7 @@ namespace Sentry.data.Web.Controllers
         /// <param name="DataObjectField_NME"></param>
         /// <returns></returns>
         [HttpGet]
+        [SwaggerResponse(HttpStatusCode.BadRequest, null, typeof(List<LineageCreation>))]
         [Route("populateFirst")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS4014")]
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Await.Warning", "CS1998")]

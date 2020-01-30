@@ -54,11 +54,13 @@ namespace Sentry.data.Web.Controllers
             AddCoreValidationExceptionsToModel(model.Validate());
             if (ModelState.IsValid)
             {
-                _notificationService.SubmitNotification(model.ToCore());
+                model.NotificationId = _notificationService.SubmitNotification(model.ToCore());
+
                 ManageNotificationViewModel vm = new ManageNotificationViewModel()
                 {
                     CanModifyNotifications = _notificationService.CanUserModifyNotifications()
                 };
+
                 return View("ManageNotification", vm);
             }
 
@@ -131,45 +133,51 @@ namespace Sentry.data.Web.Controllers
 
 
         [HttpGet]
-        public ActionResult Subscribe()
+        public ActionResult SubscribeDisplay(int group)
         {
-            int businessAreaType = 1;
-            BusinessAreaType bat = (BusinessAreaType) businessAreaType;
-
             SubscriptionModel sm = new SubscriptionModel();
-
-            sm.CurrentSubscriptionsBusinessArea = _notificationService.GetAllUserSubscriptionsForBusinessArea();
-            sm.AllEventTypes = _notificationService.GetEventTypes().Select((c) =>   new SelectListItem { Text = c.Description, Value = c.Type_ID.ToString() });
+            sm.group = (EventTypeGroup) group;                                                                                                               //need to teach MODEL what KIND of Subscription it is,either DATASET=1 or BUSINESSAREA=2
+            sm.AllEventTypes = _notificationService.GetEventTypes(sm.group).Select((c) =>   new SelectListItem { Text = c.Description, Value = c.Type_ID.ToString() });
             sm.AllIntervals  = _notificationService.GetAllIntervals().Select((c) => new SelectListItem { Text = c.Description, Value = c.Interval_ID.ToString() });
             sm.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
 
-
-            sm.businessAreaID = businessAreaType;
-
-
-            foreach (Core.EventType et in _notificationService.GetEventTypes())
+            //BUSINESSAREA      AUSTIN:  FUTURE we will put DATASET in here too, you can maybe even add another function to pass stuff here and make below even more generic
+            if(sm.group == EventTypeGroup.BusinessArea)
             {
-                if (!sm.CurrentSubscriptionsBusinessArea.Any(x => x.EventType.Type_ID == et.Type_ID))
+                BusinessAreaType bat = BusinessAreaType.PersonalLines;
+                sm.businessAreaID = (int)BusinessAreaType.PersonalLines;
+
+                //get list of subscriptions the user has saved
+                List<BusinessAreaSubscription> tempCurrentSubscriptionsBusinessArea = _notificationService.GetAllUserSubscriptions(sm.group).OrderBy(o => o.EventType.Type_ID).ToList();
+
+                //add any missing subscriptions the user may not have saved
+                foreach (Core.EventType et in _notificationService.GetEventTypes(sm.group))
                 {
-                    BusinessAreaSubscription subscription = new BusinessAreaSubscription();
-                    subscription.BusinessAreaType = bat;
-                    subscription.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
-                    subscription.EventType = et;
-                    subscription.Interval = _notificationService.GetInterval("Never");
-                    subscription.ID = 0;
+                    if (!tempCurrentSubscriptionsBusinessArea.Any(x => x.EventType.Type_ID == et.Type_ID))
+                    {
+                        BusinessAreaSubscription subscription = new BusinessAreaSubscription();
+                        subscription.BusinessAreaType = bat;
+                        subscription.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
+                        subscription.EventType = et;
+                        subscription.Interval = _notificationService.GetInterval("Never");
+                        subscription.ID = 0;
 
-                    sm.CurrentSubscriptionsBusinessArea.Add(subscription);
+                        tempCurrentSubscriptionsBusinessArea.Add(subscription);
+                    }
                 }
+
+                sm.CurrentSubscriptionsBusinessArea = tempCurrentSubscriptionsBusinessArea.OrderBy(o => o.EventType.Type_ID).ToList();
             }
+            
+            return PartialView("_SubscribeHero", sm);
+        }
 
-            return PartialView("_SubscribeNotification", sm);
-            //return PartialView("_Subscribe", sm);
-
-
-
-
-
-
+        [HttpPost]
+        public ActionResult SubscribeUpdate(SubscriptionModel sm)
+        {
+            SubscriptionDto dto = sm.ToDto();
+            _notificationService.CreateUpdateSubscription(dto);
+            return Redirect(Request.UrlReferrer.PathAndQuery);
         }
 
     }

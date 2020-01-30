@@ -13,22 +13,19 @@ using Sentry.data.Core.Entities.Livy;
 using Swashbuckle.Swagger.Annotations;
 using Sentry.Common.Logging;
 using System.Web.Http.Description;
+using Sentry.data.Web.Filters.AuthorizationFilters;
 
-namespace Sentry.data.Web.Controllers
+namespace Sentry.data.Web.WebApi.Controllers
 {
     [RoutePrefix(WebConstants.Routes.VERSION_JOB)]
-    [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
+    [WebApiAuthorizeUseApp]
     public class JobController : BaseWebApiController
     {
-        private IDatasetContext _datasetContext;
-        private UserService _userService;
-        private IDataFlowService _dataFlowService;
+        private readonly IDatasetContext _datasetContext;
 
-        public JobController(IDatasetContext datasetContext, UserService userService, IDataFlowService dataFlowService)
+        public JobController(IDatasetContext datasetContext)
         {
             _datasetContext = datasetContext;
-            _userService = userService;
-            _dataFlowService = dataFlowService;
         }
         /// <summary>
         /// Gets all Jobs
@@ -39,8 +36,8 @@ namespace Sentry.data.Web.Controllers
         [Route("")]
         public IHttpActionResult GetJobs()
         {
-            throw new System.NotImplementedException();
-           // return Ok(_datasetContext.Jobs.Select(x => x.JobOptions).ToList());
+            return StatusCode(HttpStatusCode.NoContent);
+            // return Ok(_datasetContext.Jobs.Select(x => x.JobOptions).ToList());
         }
 
         /// <summary>
@@ -54,7 +51,7 @@ namespace Sentry.data.Web.Controllers
         [Route("{JobId}")]
         public IHttpActionResult GetJob(int JobId)
         {
-            throw new System.NotImplementedException();
+            return StatusCode(HttpStatusCode.NoContent);
             //RetrieverJob job = _datasetContext.GetById<RetrieverJob>(JobId);
 
             //return Ok(job.JobOptions);
@@ -67,13 +64,19 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpGet]
         [SwaggerResponseRemoveDefaults]
-        //[SwaggerResponse(HttpStatusCode.OK, Type = typeof())]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(List<Submission>))]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
+        [SwaggerResponse(HttpStatusCode.InternalServerError)]
         [Route("{JobId}/Submissions")]
         public IHttpActionResult GetJobSubmissions(int JobId)
         {
             try
             {
                 RetrieverJob job = _datasetContext.GetById<RetrieverJob>(JobId);
+                if (job == null)
+                {
+                    return NotFound();
+                }
 
                 return Ok(job.Submissions.Select(x => new {
                     x.SubmissionId,
@@ -81,11 +84,11 @@ namespace Sentry.data.Web.Controllers
                     x.JobGuid,
                     x.Created,
                     x.Serialized_Job_Options
-                }));
+                }).OrderByDescending(o => o.Created).ToList());
             }
             catch(Exception ex)
             {
-                return BadRequest(ex.Message);
+                return InternalServerError(ex);
             }
         }
 
@@ -95,11 +98,16 @@ namespace Sentry.data.Web.Controllers
         /// <param name="SubmissionId"></param>
         [HttpGet]
         [SwaggerResponseRemoveDefaults]
-        //[SwaggerResponse(HttpStatusCode.OK, Type = typeof())]
+        [SwaggerResponse(HttpStatusCode.NotFound)]
         [Route("submissions/{SubmissionId}")]
         public IHttpActionResult GetJobSubmission(int SubmissionId)
         {
             Submission sub = _datasetContext.GetById<Submission>(SubmissionId);
+
+            if (sub == null)
+            {
+                return NotFound();
+            }
 
             var a = new
             {
@@ -201,7 +209,7 @@ namespace Sentry.data.Web.Controllers
         [Route("{jobId}")]
         public IHttpActionResult UpdateJob(int jobId)
         {
-            return StatusCode(HttpStatusCode.NoContent);
+            return NoContent();
         }
 
         /// <summary>
@@ -215,8 +223,9 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [SwaggerResponseRemoveDefaults]
-        //[SwaggerResponse(HttpStatusCode.OK, Type = typeof(int))]
+        [SwaggerResponse(HttpStatusCode.OK, null, typeof(int))]
         [Route("{App_Id}/{App_Guid}/{Schedule}/{isEnabled}")]
+        [WebApiAuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public IHttpActionResult CreateNewJob(
             int App_Id, 
             int? App_Guid = null, 
@@ -224,6 +233,7 @@ namespace Sentry.data.Web.Controllers
             Boolean isEnabled = false, 
             [FromBody] JavaOptionsOverride javaOptionsOverride = null)
         {
+
             Dataset ds = _datasetContext.GetById<Dataset>(App_Id);
 
             //JavaOptions jo = new JavaOptions()
@@ -281,8 +291,11 @@ namespace Sentry.data.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [SwaggerResponseRemoveDefaults]
-        //[SwaggerResponse(HttpStatusCode.OK, Type = typeof(string))]
+        [SwaggerResponse(HttpStatusCode.OK, null, typeof(string))]
+        [SwaggerResponse(HttpStatusCode.BadRequest, null, typeof(string))]
+        [SwaggerResponse(HttpStatusCode.InternalServerError)]
         [Route("{JobId}/submit/{JobGuid}")]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
         public async Task<IHttpActionResult> SubmitJob(int JobId, Guid JobGuid, [FromBody] JavaOptionsOverride javaOptionsOverride)
         {
             try
@@ -457,6 +470,112 @@ namespace Sentry.data.Web.Controllers
                 return InternalServerError(ex);
             }
         }
+        
+        /// <summary>
+        /// Gets a batch from a job
+        /// </summary>
+        /// <param name="jobId"></param>
+        /// <param name="batchId"></param>
+        /// <returns></returns>
+        [HttpGet]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.OK)]
+        [SwaggerResponse(HttpStatusCode.BadRequest, null, typeof(string))]
+        [SwaggerResponse(HttpStatusCode.InternalServerError)]
+        [Route("{jobId}/batches/{batchId}")]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
+        public async Task<IHttpActionResult> GetBatchState(int jobId, int batchId)
+        {
+            try
+            {
+                JobHistory hr = _datasetContext.JobHistory.Where(w => w.JobId.Id == jobId && w.BatchId == batchId && w.Active).FirstOrDefault();
+
+                if (hr == null)
+                {
+                    return BadRequest("No history of Job\\Batch ID combination");
+                }
+
+                using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
+                using (var client = new HttpClient(handler))
+                {
+
+                    HttpResponseMessage response = await client.GetAsync(Sentry.Configuration.Config.GetHostSetting("ApacheLivy") + $"/batches/{batchId}");
+
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        string result = response.Content.ReadAsStringAsync().Result;
+
+                        if (result == $"Session '{batchId}' not found.")
+                        {
+                            return BadRequest("Session not found");
+                        }
+
+                        LivyReply lr = JsonConvert.DeserializeObject<LivyReply>(result);
+
+                        //create history record and set it active
+                        JobHistory histRecord = new JobHistory()
+                        {
+                            JobId = hr.JobId,
+                            BatchId = hr.BatchId,
+                            Created = hr.Created,
+                            Modified = DateTime.Now,
+                            State = lr.state,
+                            LivyAppId = lr.appId,
+                            LivyDriverLogUrl = lr.appInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault(),
+                            LivySparkUiUrl = lr.appInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault()
+                        };
+
+                        if (lr.state == "dead" || lr.state == "error" || lr.state == "success")
+                        {
+                            histRecord.Active = false;
+                        }
+                        else
+                        {
+                            histRecord.Active = true;
+                        }
+
+                        _datasetContext.Merge(histRecord);
+
+                        //set previous active record to inactive
+                        hr.Modified = DateTime.Now;
+                        hr.Active = false;
+
+                        _datasetContext.SaveChanges();
+                    }
+                    else if (response.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        //create new history record, however, set active to false as livy did not find any record of it
+                        JobHistory histRecord = new JobHistory()
+                        {
+                            JobId = hr.JobId,
+                            BatchId = hr.BatchId,
+                            Created = hr.Created,
+                            Modified = DateTime.Now,
+                            State = "Unknown",
+                            LivyAppId = hr.LivyAppId,
+                            LivyDriverLogUrl = hr.LivyDriverLogUrl,
+                            LivySparkUiUrl = hr.LivySparkUiUrl,
+                            LogInfo = "Livy did not return a status for this batch job.",
+                            Active = false
+                        };
+
+                        _datasetContext.Merge(histRecord);
+
+                        //set previous active record to inactive
+                        hr.Modified = DateTime.Now;
+                        hr.Active = false;
+
+                        _datasetContext.SaveChanges();
+                    }
+                    return Ok();
+                }
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
+        }
 
         private static void GenerateArguments(string[] arguments, StringBuilder json)
         {
@@ -469,104 +588,6 @@ namespace Sentry.data.Web.Controllers
                 json.Append(argString);
                 iteration++;
             }
-        }
-
-
-        /// <summary>
-        /// Gets a batch from a job
-        /// </summary>
-        /// <param name="jobId"></param>
-        /// <param name="batchId"></param>
-        /// <returns></returns>
-        [HttpGet]
-        [SwaggerResponseRemoveDefaults]
-        //[SwaggerResponse(HttpStatusCode.OK, Type = typeof(int))]
-        [Route("{jobId}/batches/{batchId}")]
-        public async Task<IHttpActionResult> GetBatchState(int jobId, int batchId)
-        {
-
-            JobHistory hr = _datasetContext.JobHistory.Where(w => w.JobId.Id == jobId && w.BatchId == batchId && w.Active).FirstOrDefault();
-
-            if (hr == null)
-            {
-                return BadRequest("No history of Job\\Batch ID combination");
-            }
-
-            using (var handler = new HttpClientHandler { UseDefaultCredentials = true })
-            using (var client = new HttpClient(handler))
-            {
-
-                HttpResponseMessage response = await client.GetAsync(Sentry.Configuration.Config.GetHostSetting("ApacheLivy") + $"/batches/{batchId}");
-
-
-                if (response.IsSuccessStatusCode)
-                {
-                    string result = response.Content.ReadAsStringAsync().Result;
-
-                    if (result == $"Session '{batchId}' not found.")
-                    {
-                        return BadRequest("Session not found");
-                    }
-
-                    LivyReply lr = JsonConvert.DeserializeObject<LivyReply>(result);
-
-                    //create history record and set it active
-                    JobHistory histRecord = new JobHistory()
-                    {
-                        JobId = hr.JobId,
-                        BatchId = hr.BatchId,
-                        Created = hr.Created,
-                        Modified = DateTime.Now,
-                        State = lr.state,
-                        LivyAppId = lr.appId,
-                        LivyDriverLogUrl = lr.appInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault(),
-                        LivySparkUiUrl = lr.appInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault()
-                    };
-
-                    if (lr.state == "dead" || lr.state == "error" || lr.state == "success")
-                    {
-                        histRecord.Active = false;
-                    }
-                    else
-                    {
-                        histRecord.Active = true;
-                    }
-
-                    _datasetContext.Merge(histRecord);
-
-                    //set previous active record to inactive
-                    hr.Modified = DateTime.Now;
-                    hr.Active = false;
-
-                    _datasetContext.SaveChanges();
-                }
-                else if (response.StatusCode == HttpStatusCode.NotFound)
-                {
-                    //create new history record, however, set active to false as livy did not find any record of it
-                    JobHistory histRecord = new JobHistory()
-                    {
-                        JobId = hr.JobId,
-                        BatchId = hr.BatchId,
-                        Created = hr.Created,
-                        Modified = DateTime.Now,
-                        State = "Unknown",
-                        LivyAppId = hr.LivyAppId,
-                        LivyDriverLogUrl = hr.LivyDriverLogUrl,
-                        LivySparkUiUrl = hr.LivySparkUiUrl,
-                        LogInfo = "Livy did not return a status for this batch job.",
-                        Active = false
-                    };
-
-                    _datasetContext.Merge(histRecord);
-
-                    //set previous active record to inactive
-                    hr.Modified = DateTime.Now;
-                    hr.Active = false;
-
-                    _datasetContext.SaveChanges();
-                }
-            }
-            return Ok();
         }
 
         private class LivyBatch
