@@ -39,8 +39,8 @@ namespace Sentry.data.Web
 
         [DisplayName("Where should this data be loaded?")]
         public List<SchemaMapModel> SchemaMaps { get; set; }
-        public JobModel RetrieverJob { get; set; }
-        public CompressionModel CompressionJob { get; set; }
+        public List<JobModel> RetrieverJob { get; set; }
+        public List<CompressionModel> CompressionJob { get; set; }
         public string CreatedBy { get; set; }
         public DateTime CreatedDTM { get; set; }
         public int DataFlowId { get; set; }
@@ -48,5 +48,42 @@ namespace Sentry.data.Web
 
 
         public IEnumerable<SelectListItem> CompressionDropdown { get; set; }
+
+        public List<string> Validate()
+        {
+            List<string> errors = new List<string>();
+
+            if (SchemaMaps == null || SchemaMaps.Count == 0)
+            {
+                errors.Add("Must contain atleast one schema mapping");
+            }
+            else if (SchemaMaps.Count > 0)
+            {
+                bool dsSelectionErr = false;
+                bool scmSelectionErr = false;
+                foreach (SchemaMapModel model in SchemaMaps)
+                {
+                    if (model.SelectedDataset == 0)
+                    {
+                        dsSelectionErr = true;
+                    }
+                    if (model.SelectedSchema == 0)
+                    {
+                        dsSelectionErr = true;
+                    }
+                }
+
+                if (dsSelectionErr)
+                {
+                    errors.Add("Must select dataset for schema mapping");
+                }
+                if (scmSelectionErr)
+                {
+                    errors.Add("Must select schema for schema mapping");
+                }
+            }
+
+            return errors;
+        }
     }
 }

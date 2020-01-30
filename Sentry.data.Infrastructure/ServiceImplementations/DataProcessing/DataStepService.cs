@@ -108,6 +108,9 @@ namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
                     case DataActionType.ConvertParquet:
                         _provider = container.GetInstance<IConvertToParquetProvider>();
                         break;
+                    case DataActionType.UncompressZip:
+                        _provider = container.GetInstance<IUncompressZipProvider>();
+                        break;
                     case DataActionType.None:
                     default:
                         break;

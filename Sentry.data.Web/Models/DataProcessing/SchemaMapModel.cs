@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -16,9 +17,10 @@ namespace Sentry.data.Web
         }
 
         public int Id { get; set; }
-        public string SearchCriteria { get; set; }
-        
+        public string SearchCriteria { get; set; }        
+        //[Required]
         public int SelectedDataset { get; set; }
+        //[Required]
         public int SelectedSchema { get; set; }
 
         public IEnumerable<SelectListItem> AllDatasets { get; set; }

@@ -28,7 +28,8 @@ namespace Sentry.data.Web
                         Include("~/Scripts/jquery.validate.unobtrusive.js").
                         Include("~/Scripts/jquery.validate.unobtrusive.sentry.js").
                         Include("~/Scripts/jquery.json-viewer.js").
-                        Include("~/Scripts/toastr.min.js"));
+                        Include("~/Scripts/toastr.min.js").
+                        Include("~/Scripts/thenBy.min.js"));
 
             //This bundle contains basic bootstrap stuff and some common plugins specific to bootstrap
             bundles.Add(new ScriptBundle("~/bundles/bootstrap").

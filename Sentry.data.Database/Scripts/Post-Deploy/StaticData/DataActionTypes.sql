@@ -6,8 +6,10 @@
 		  (2, 'Raw Storage'),
 		  (3, 'Query Storage'),
 		  (4, 'Schema Load'),
-		  (5, 'Convert to Parquet')
-        )    
+		  (5, 'Convert to Parquet'),
+		  (6, 'Uncompress Zip'),
+		  (7, 'Uncompress Gzip')
+        )
         AS Source ([ID], [Name])
         ON Target.[ID] = Source.[ID]   
         -- update matched rows    

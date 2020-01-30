@@ -104,6 +104,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Cascade(Cascade.All);
             });
 
+
         }
 
         //http://notherdev.blogspot.com/2012/01/mapping-by-code-inheritance.html

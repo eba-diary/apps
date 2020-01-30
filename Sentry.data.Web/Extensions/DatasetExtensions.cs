@@ -56,6 +56,7 @@ namespace Sentry.data.Web
             {
                 Id = dto.DatasetId,
                 Name = dto.DatasetName,
+                Category = dto.CategoryName,
                 Description = dto.DatasetDesc,
                 IsSecure = dto.IsSecured,
                 PrimaryContactName = dto.PrimaryContactName,

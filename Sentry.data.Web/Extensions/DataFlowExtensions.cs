@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Sentry.data.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +32,9 @@ namespace Sentry.data.Web
                 Name = "Blah",
                 DFQuestionnaire = JsonConvert.SerializeObject(model),
                 CreatedBy = model.CreatedBy,
-                CreateDTM = model.CreatedDTM
+                CreateDTM = model.CreatedDTM,
+                IngestionType = model.IngestionType,
+                IsCompressed = model.IsCompressed
             };
 
             if (model.SchemaMaps != null)
@@ -41,10 +44,24 @@ namespace Sentry.data.Web
 
             if (model.RetrieverJob != null)
             {
-                dto.RetrieverJob = model.RetrieverJob.ToDto();
+                dto.RetrieverJob = model.RetrieverJob.First().ToDto();
+            }
+
+            if (model.CompressionJob != null)
+            {
+                dto.CompressionJob = model.CompressionJob.First().ToDto();
             }
 
             return dto;
+        }
+
+        private static Core.CompressionJobDto ToDto(this CompressionModel model)
+        {
+            return new Core.CompressionJobDto()
+            {
+                CompressionType = (CompressionTypes)Enum.Parse(typeof(CompressionTypes), model.CompressionType),
+                FileNameExclusionList = model.FileNameExclusionList
+            };
         }
 
         public static List<Core.SchemaMapDto> ToDto(this List<SchemaMapModel> modelList)

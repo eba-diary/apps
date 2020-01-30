@@ -587,6 +587,7 @@
     <Content Include="Scripts\query-builder.min.js" />
     <Content Include="Scripts\select2.js" />
     <Content Include="Scripts\select2.min.js" />
+    <Content Include="Scripts\thenBy.min.js" />
     <Content Include="Scripts\toastr.js" />
     <Content Include="Scripts\toastr.min.js" />
     <Content Include="Views\Dataset\_PreviewData.cshtml" />
@@ -1352,6 +1353,8 @@
     <Content Include="Views\DataFlow\_RetrieverJob.cshtml" />
     <Content Include="Views\Shared\_SubscribeHero.cshtml" />
     <Content Include="Views\DataFlow\_CompressionJob.cshtml" />
+    <Content Include="Views\Dataset\_DatasetCreateEdit.cshtml" />
+    <Content Include="Views\Config\_DatasetFileConfigCreate.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

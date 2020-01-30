@@ -286,6 +286,7 @@
             public const string QUERY_STORAGE = "DATAFLOWSTEP_QUERYSTORAGE_START";
             public const string SCHEMA_LOAD = "DATAFLOWSTEP_SCHEMA_LOAD_START";
             public const string CONVERT_TO_PARQUET = "DATAFLOWSTEP_CONVERTTOPARQUET_START";
+            public const string UNCOMPRESS_ZIP = "DATAFLOWSTEP_UNCOMPRESSZIP_START";
         }
 
         public static class AWSEventNotifications
