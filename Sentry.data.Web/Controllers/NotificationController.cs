@@ -137,7 +137,6 @@ namespace Sentry.data.Web.Controllers
         {
             SubscriptionModel sm = new SubscriptionModel();
             sm.group = (EventTypeGroup) group;                                                                                                               //need to teach MODEL what KIND of Subscription it is,either DATASET=1 or BUSINESSAREA=2
-            sm.AllEventTypes = _notificationService.GetEventTypes(sm.group).Select((c) =>   new SelectListItem { Text = c.Description, Value = c.Type_ID.ToString() });
             sm.AllIntervals  = _notificationService.GetAllIntervals().Select((c) => new SelectListItem { Text = c.Description, Value = c.Interval_ID.ToString() });
             sm.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
 
