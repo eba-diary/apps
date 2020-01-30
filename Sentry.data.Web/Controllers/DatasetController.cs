@@ -144,6 +144,27 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
+        [HttpGet]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
+        public PartialViewResult _DatasetCreateEdit()
+        {
+            DatasetModel cdm = new DatasetModel()
+            {
+                //these are defaluted for now and disbled on UI but will change to open field.
+                ConfigFileName = "Default",
+                ConfigFileDesc = "Default Config for Dataset.  Uploaded files that do not match any configs will default to this config",
+                UploadUserId = SharedContext.CurrentUser.AssociateId,
+            };
+
+            Utility.SetupLists(_datasetContext, cdm);
+
+            _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.VIEWED_DATASET, SharedContext.CurrentUser.AssociateId, "Viewed Dataset Creation Page", cdm.DatasetId);
+
+            ViewData["Title"] = "Create Dataset";
+
+            return PartialView("_DatasetCreateEdit", cdm);
+        }
+
         [HttpPost]
         [AuthorizeByPermission(GlobalConstants.PermissionCodes.DATASET_MODIFY)]
         public ActionResult DatasetForm(DatasetModel model)
@@ -167,21 +188,24 @@ namespace Sentry.data.Web.Controllers
                     int datasetId = _datasetService.CreateAndSaveNewDataset(dto);
 
                     _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.CREATED_DATASET, SharedContext.CurrentUser.AssociateId, dto.DatasetName + " was created.", datasetId);
-                    return RedirectToAction("Detail", new { id = datasetId });
+                    return Json(new { Success = true, dataset_id = datasetId});
+                    //return RedirectToAction("Detail", new { id = datasetId });
                 }
                 else
                 {
                     _datasetService.UpdateAndSaveDataset(dto);
 
                     _eventService.PublishSuccessEventByDatasetId(GlobalConstants.EventType.UPDATED_DATASET, SharedContext.CurrentUser.AssociateId, dto.DatasetName + " was created.", dto.DatasetId);
-                    return RedirectToAction("Detail", new { id = dto.DatasetId });
+                    return Json(new { Success = true, dataset_id = dto.DatasetId });
+                    //return RedirectToAction("Detail", new { id = dto.DatasetId });
                 }
 
             }
 
             Utility.SetupLists(_datasetContext, model);
 
-            return View(model);
+            return PartialView("_DatasetCreateEdit", model);
+            //return View(model);
         }
 
 
@@ -327,15 +351,10 @@ namespace Sentry.data.Web.Controllers
             Dataset ds = _datasetContext.GetById(id);
             SubscriptionModel sm = new SubscriptionModel();
 
-            sm.AllEventTypes = _datasetContext.EventTypes.Where(w => w.Display).Select((c) => new SelectListItem { Text = c.Description, Value = c.Type_ID.ToString() });
             sm.AllIntervals = _datasetContext.GetAllIntervals().Select((c) => new SelectListItem { Text = c.Description, Value = c.Interval_ID.ToString() });
-
             sm.CurrentSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, id);
-
             sm.datasetID = ds.DatasetId;
-
             sm.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
-
 
             foreach (Core.EventType et in _datasetContext.EventTypes.Where(w => w.Display && w.Group == "DATASET"))
             {

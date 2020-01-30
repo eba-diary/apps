@@ -290,7 +290,6 @@
     <Compile Include="Controllers\EventController.cs" />
     <Compile Include="Controllers\FavoritesController.cs" />
     <Compile Include="Controllers\NotificationController.cs" />
-    <Compile Include="Controllers\WebApi\ApplicationController.cs" />
     <Compile Include="Controllers\WebApi\AssetController.cs" />
     <Compile Include="Controllers\DataAssetController.cs" />
     <Compile Include="Controllers\DatasetController.cs" />
@@ -322,10 +321,14 @@
     <Compile Include="Extensions\CategoryExtensions.cs" />
     <Compile Include="Extensions\HiveExtensions.cs" />
     <Compile Include="Extensions\Security\UserSecurityExtensions.cs" />
+    <Compile Include="Extensions\SubscriptionExtensions.cs" />
     <Compile Include="Filters\AuthorizationFilters\AuthorizeHangfireDashboard.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeAttribute.cs" />
     <Compile Include="Filters\AuthorizationFilters\WebApiAuthorizeByPermissionAttribute.cs" />
     <Compile Include="Filters\WebAPI\Version.cs" />
+    <Compile Include="Filters\WebAPI\WebApiAuthorizeAttribute.cs" />
+    <Compile Include="Filters\WebAPI\WebApiAuthorizeByPermissionAttribute.cs" />
+    <Compile Include="Filters\WebAPI\WebApiAuthorizeUseAppAttribute.cs" />
     <Compile Include="Helpers\LivyHelper.cs" />
     <Compile Include="Helpers\BeginCollectionItem.cs" />
     <Compile Include="Helpers\PredicateBuilder.cs" />
@@ -584,6 +587,7 @@
     <Content Include="Scripts\query-builder.min.js" />
     <Content Include="Scripts\select2.js" />
     <Content Include="Scripts\select2.min.js" />
+    <Content Include="Scripts\thenBy.min.js" />
     <Content Include="Scripts\toastr.js" />
     <Content Include="Scripts\toastr.min.js" />
     <Content Include="Views\Dataset\_PreviewData.cshtml" />
@@ -1347,8 +1351,10 @@
     <Content Include="Views\DataFlow\EditorTemplates\Enum.cshtml" />
     <Content Include="Views\DataFlow\_SchemaMap.cshtml" />
     <Content Include="Views\DataFlow\_RetrieverJob.cshtml" />
-    <Content Include="Views\Notification\_SubscribeNotification.cshtml" />
+    <Content Include="Views\Shared\_SubscribeHero.cshtml" />
     <Content Include="Views\DataFlow\_CompressionJob.cshtml" />
+    <Content Include="Views\Dataset\_DatasetCreateEdit.cshtml" />
+    <Content Include="Views\Config\_DatasetFileConfigCreate.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -91,6 +91,7 @@
     <Compile Include="DomainServices\MessageHandlers\S3EventHandler.cs" />
     <Compile Include="DomainServices\SchemaService.cs" />
     <Compile Include="DTO\Config\DatasetFileConfigDto.cs" />
+    <Compile Include="DTO\DataProcessing\CompressionJobDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDetailDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowDto.cs" />
     <Compile Include="DTO\DataProcessing\DataFlowStepDto.cs" />
@@ -102,6 +103,8 @@
     <Compile Include="DTO\Schema\FileSchemaDto.cs" />
     <Compile Include="DTO\Schema\SchemaDTO.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />
+    <Compile Include="DTO\Subscription\SubscriptionDto.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\UncompressZip.cs" />
     <Compile Include="Entities\DataProcessing\DataFlow_Log.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ActionTypeAttribute.cs" />
     <Compile Include="Entities\DataProcessing\Actions\BaseAction.cs" />
@@ -144,6 +147,11 @@
     <Compile Include="Entities\Schema\TimestampField.cs" />
     <Compile Include="Entities\Schema\VarcharField.cs" />
     <Compile Include="Entities\Subscriptions\BusinessAreaSubscription.cs" />
+    <Compile Include="Exceptions\DatasetNotFoundException.cs" />
+    <Compile Include="Exceptions\DatasetUnauthorizedAccessException.cs" />
+    <Compile Include="Exceptions\SchemaNotFoundException.cs" />
+    <Compile Include="Exceptions\SchemaUnauthorizedAccessException.cs" />
+    <Compile Include="Entities\Subscriptions\EventTypeGroup.cs" />
     <Compile Include="Extensions\DataFlowExtensions.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
     <Compile Include="Extensions\DatasetFileConfigExtensions.cs" />
@@ -167,6 +175,7 @@
     <Compile Include="Interfaces\DataProcessing\IRawStorageProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IS3DropProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\ISchemaLoadProvider.cs" />
+    <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
     <Compile Include="Interfaces\ISchemaField.cs" />
     <Compile Include="Interfaces\ISchemaService.cs" />
     <Compile Include="Interfaces\ITicketMonitorService.cs" />
@@ -193,7 +202,7 @@
     <Compile Include="Entities\BusinessArea\BusinessAreaTile.cs" />
     <Compile Include="Entities\BusinessArea\BusinessAreaTileRow.cs" />
     <Compile Include="Entities\BusinessArea\BusinessAreaType.cs" />
-    <Compile Include="DTO\Notification\ModifyNotificationModel.cs" />
+    <Compile Include="DTO\Notification\NotificationDto.cs" />
     <Compile Include="DTO\Schema\SchemaDetailApiDTO.cs" />
     <Compile Include="DTO\TagDto.cs" />
     <Compile Include="Entities\ColumnDTO.cs" />
@@ -381,6 +390,9 @@
       <Project>{bd4b0624-03a2-4896-b46e-4eb35e9efe6c}</Project>
       <Name>Sentry.Messaging.Common</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Exceptions\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
