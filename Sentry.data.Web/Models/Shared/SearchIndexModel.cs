@@ -14,6 +14,7 @@ namespace Sentry.data.Web
         }
 
         public List<SelectListItem> SortByOptions { get; set; }
+        public string SearchType { get; set; }
 
     }
 }
