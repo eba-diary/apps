@@ -9,15 +9,17 @@ using Sentry.data.Web.Helpers;
 namespace Sentry.data.Web.Controllers
 {
     [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
-    public class DataFlowController : Controller
+    public class DataFlowController : BaseController
     {
         private readonly IDataFlowService _dataFlowService;
         private readonly IDatasetService _datasetService;
+        private readonly IConfigService _configService;
 
-        public DataFlowController(IDataFlowService dataFlowService, IDatasetService datasetService)
+        public DataFlowController(IDataFlowService dataFlowService, IDatasetService datasetService, IConfigService configService)
         {
             _dataFlowService = dataFlowService;
             _datasetService = datasetService;
+            _configService = configService;
         }
 
         // GET: DataFlow
@@ -61,8 +63,10 @@ namespace Sentry.data.Web.Controllers
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
 
             //Every dataflow requires at least one schemamap, therefore, load a default empty schemamapmodel
-            SchemaMapModel schemaModel = new SchemaMapModel();
-            SetSchemaModelLists(schemaModel);
+            SchemaMapModel schemaModel = new SchemaMapModel
+            {
+                SelectedDataset = 0
+            };
             model.SchemaMaps.Add(schemaModel);
 
             return View("DataFlowForm", model);
@@ -71,46 +75,45 @@ namespace Sentry.data.Web.Controllers
         [HttpPost]
         public ActionResult DataFlowForm(DataFlowModel model)
         {
-            DataFlowDto dfDto = model.ToDto();
+            AddCoreValidationExceptionsToModel(model.Validate());
 
-            //if (ModelState.IsValid)
-            //{
-            //    if (dfDto.Id == 0)
-            //    {
-            //        _dataFlowService.CreateDataFlow();
-            //    }
-            //}
+            if (ModelState.IsValid)
+            {
+                DataFlowDto dfDto = model.ToDto();
+                
+                if (dfDto.Id == 0)
+                {
+                    _dataFlowService.CreateandSaveDataFlow(dfDto);
+                }
 
-            return RedirectToAction("Index");
+                return RedirectToAction("Index");
+            }
+
+            model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
+            if (model.RetrieverJob != null)
+            {
+                CreateDropDownSetup(model.RetrieverJob.First());
+            }  
+            if (model.SchemaMaps != null && model.SchemaMaps.Count > 0)
+            {
+                foreach (SchemaMapModel mapModel in model.SchemaMaps)
+                {
+                    SetSchemaModelLists(mapModel);
+                }
+            }
+            return View("DataFlowForm", model);
         }
 
         [HttpGet]
         [Route("DataFlow/NewSchemaMap/")]
         public PartialViewResult NewSchemaMap()
         {
-            List<SelectListItem> sList = new List<SelectListItem>();
-            SchemaMapModel modela = new SchemaMapModel();
-            SetSchemaModelLists(modela);
-
-            var groupedDatasets = _datasetService.GetDatasetsForQueryTool().GroupBy(x => x.DatasetCategories.First());
-
-            sList.Add(new SelectListItem() { Text = "Select Dataset", Value = "0", Group = new SelectListGroup() { Name = "Sentry" }, Selected = true });
-            foreach (var ds in groupedDatasets)
+            SchemaMapModel modela = new SchemaMapModel
             {
-                sList.AddRange(ds.Select(m => new SelectListItem()
-                {
-                    Text = m.DatasetName,
-                    Value = m.DatasetId.ToString(),
-                    Group = new SelectListGroup() { Name = ds.Key.Name }
-                }));
-            }
-
-            SchemaMapModel model = new SchemaMapModel()
-            {
-                AllDatasets = sList
+                SelectedDataset = 0
             };
 
-            return PartialView("_SchemaMap", model);
+            return PartialView("_SchemaMap", modela);
         }
 
         [HttpGet]
@@ -127,21 +130,56 @@ namespace Sentry.data.Web.Controllers
 
         private void SetSchemaModelLists(SchemaMapModel model)
         {
-            List<SelectListItem> sList = new List<SelectListItem>();
+            List<SelectListItem> dsList = new List<SelectListItem>();
+            List<SelectListItem> scmList = new List<SelectListItem>();
             var groupedDatasets = _datasetService.GetDatasetsForQueryTool().GroupBy(x => x.DatasetCategories.First());
 
-            sList.Add(new SelectListItem() { Text = "Select Dataset", Value = "0", Group = new SelectListGroup() { Name = "Sentry" }, Selected = true });
-            foreach (var ds in groupedDatasets)
+            if (model.SelectedDataset == 0)
             {
-                sList.AddRange(ds.Select(m => new SelectListItem()
-                {
-                    Text = m.DatasetName,
-                    Value = m.DatasetId.ToString(),
-                    Group = new SelectListGroup() { Name = ds.Key.Name }
-                }));
+                dsList.Add(new SelectListItem() { Text = "Create New Dataset", Value = "-1", Selected = true });
+                dsList.Add(new SelectListItem() { Text = "Select Dataset", Value = "0", Selected = true });
             }
 
-            model.AllDatasets = sList;
+            foreach (var group in groupedDatasets)
+            {
+                SelectListGroup curGroup = new SelectListGroup()
+                {
+                    Name = group.Key.Name
+                };
+
+                dsList.AddRange(group.OrderBy(o => o.DatasetName).Select(m => new SelectListItem()
+                    {
+                        Text = m.DatasetName,
+                        Value = m.DatasetId.ToString(),
+                        Group = curGroup,
+                        Selected = (m.DatasetId == model.SelectedDataset)
+                    }
+                ));
+            }
+
+            model.AllDatasets = dsList;
+
+            if (model.SelectedDataset > 0 && model.SelectedSchema == 0)
+            {
+                scmList.Add(new SelectListItem() { Text = "Select Schema", Value = "0", Selected = true });
+            }
+
+            if (model.SelectedDataset > 0)
+            {
+                var datasetSchemaList = _configService.GetDatasetFileConfigDtoByDataset(model.SelectedDataset).OrderBy(o => o.Name);
+
+                foreach (var scm in datasetSchemaList)
+                {
+                    scmList.Add(new SelectListItem()
+                    {
+                        Text = scm.Name,
+                        Value = scm.Schema.SchemaId.ToString(),
+                        Selected = (scm.Schema.SchemaId == model.SelectedSchema)
+                    });
+                }
+
+                model.AllSchemas = scmList;
+            }
         }
 
         public PartialViewResult NewRetrieverJob()
@@ -189,18 +227,18 @@ namespace Sentry.data.Web.Controllers
 
             model.SourcesForDropdown = temp2.OrderBy(x => x.Value);
 
-            model.CompressionTypesDropdown = Enum.GetValues(typeof(CompressionTypes)).Cast<CompressionTypes>().Select(v
-                => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
+            //model.CompressionTypesDropdown = Enum.GetValues(typeof(CompressionTypes)).Cast<CompressionTypes>().Select(v
+            //    => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
 
-            if (model.NewFileNameExclusionList != null)
-            {
-                model.FileNameExclusionList = model.NewFileNameExclusionList.Split('|').Where(x => !String.IsNullOrWhiteSpace(x)).ToList();
-            }
-            else
-            {
-                model.NewFileNameExclusionList = "";
-                model.FileNameExclusionList = new List<string>();
-            }
+            //if (model.NewFileNameExclusionList != null)
+            //{
+            //    model.FileNameExclusionList = model.NewFileNameExclusionList.Split('|').Where(x => !String.IsNullOrWhiteSpace(x)).ToList();
+            //}
+            //else
+            //{
+            //    model.NewFileNameExclusionList = "";
+            //    model.FileNameExclusionList = new List<string>();
+            //}
 
             model.RequestMethodDropdown = Utility.BuildRequestMethodDropdown(model.SelectedRequestMethod);
 

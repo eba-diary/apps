@@ -27,10 +27,14 @@ namespace Sentry.data.Core
 
         public int CreateAndSaveSchema(FileSchemaDto schemaDto)
         {
-            int newSchemaId = 0;
+            FileSchema newSchema;
             try
             {
-                newSchemaId = CreateSchema(schemaDto);
+                newSchema = CreateSchema(schemaDto);
+
+                //_dataFlowService.CreateandSaveDataFlow(MapToDataFlowDto(newSchema));
+
+                //_dataFlowService.CreateDataFlowForSchema(newSchema);
 
                 _datasetContext.SaveChanges();
             }
@@ -40,7 +44,7 @@ namespace Sentry.data.Core
                 return 0;
             }
 
-            return newSchemaId;            
+            return newSchema.SchemaId;
         }
 
         public bool UpdateAndSaveSchema(FileSchemaDto schemaDto)
@@ -346,7 +350,7 @@ namespace Sentry.data.Core
 
         
 
-        private int CreateSchema(FileSchemaDto dto)
+        private FileSchema CreateSchema(FileSchemaDto dto)
         {
             string storageCode = _datasetContext.GetNextStorageCDE().ToString();
             Dataset parentDataset = _datasetContext.GetById<Dataset>(dto.ParentDatasetId);
@@ -372,7 +376,7 @@ namespace Sentry.data.Core
                 CreateCurrentView = dto.CreateCurrentView
             };
             _datasetContext.Add(schema);
-            return schema.SchemaId;
+            return schema;
         }
 
         private FileSchemaDto MapToDto(FileSchema scm)
@@ -523,6 +527,25 @@ namespace Sentry.data.Core
             {
                 Logger.Warn($"SAS Notification was not configured");
             }
+        }
+
+        private DataFlowDto MapToDataFlowDto(FileSchema scm)
+        {
+            DataFlowDto dto = new DataFlowDto()
+            {
+                CreatedBy = _userService.GetCurrentUser().AssociateId,
+                CreateDTM = DateTime.Now,
+                Name = $"SchemaFlow_{scm.StorageCode}",
+                IngestionType = GlobalEnums.IngestionType.User_Push
+            };
+
+            SchemaMapDto scmDto = new SchemaMapDto()
+            {
+                SchemaId = scm.SchemaId,
+                SearchCriteria = "\\.",
+            };
+
+            return dto;
         }
 
         private string FormatHiveTableNamePart(string part)

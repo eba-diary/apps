@@ -33,7 +33,7 @@ namespace Sentry.data.Web
             this.Delimiter = dsfc.Schema?.Delimiter;
             this.CreateCurrentView = (dsfc.Schema != null) ? dsfc.Schema.CreateCurrentView : false;
             this.HasHeader = (dsfc.Schema != null) ? dsfc.Schema.HasHeader : false;
-            this.OldSchemaId = (Schemas != null) ? Schemas.FirstOrDefault().DataElement_ID : 0;
+            this.OldSchemaId = (Schemas.Any()) ? Schemas.FirstOrDefault().DataElement_ID : 0;
 
             try
             {

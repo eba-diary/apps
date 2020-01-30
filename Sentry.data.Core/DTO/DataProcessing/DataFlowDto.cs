@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Sentry.data.Core.GlobalEnums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,7 +15,10 @@ namespace Sentry.data.Core
         public DateTime CreateDTM { get; set; }
         public string CreatedBy { get; set; }
         public string DFQuestionnaire { get; set; }
+        public IngestionType IngestionType { get; set; }
         public List<SchemaMapDto> SchemaMap { get; set; }
         public RetrieverJobDto RetrieverJob { get; set; }
+        public bool IsCompressed { get; set; }
+        public CompressionJobDto CompressionJob { get; set; }
     }
 }

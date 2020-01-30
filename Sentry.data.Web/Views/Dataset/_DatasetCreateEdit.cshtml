@@ -1,0 +1,305 @@
+﻿@model DatasetModel
+
+@* This partial view it intended to be used in multiple places.  Therefore,
+    it requires the calling page to wire up an ajax call to 
+    post this form to the controller.  The data portion of the ajax call will
+    be $('#DatasetForm').serialize().*@
+@using (Html.BeginForm(null, null, FormMethod.Post, new { @id = "DatasetForm" }))
+{
+    <div id="DatasetFormContent">
+        @Html.AntiForgeryToken()
+
+        <p>Please fill out the following fields describing your dataset.  Before starting check to see if your dataset is not already on this site by using our <a href="~/Search/Datasets">search tool.</a></p>
+
+        @*Show the custom validation summary*@
+        @Html.DisplayFor((model) => ViewData.ModelState)
+
+
+        <div id="myTabContent">
+            <div id="informationPanel" class="form-horizontal">
+
+                <br />
+                <h4>Dataset Information</h4>
+                <br />
+
+                @Html.HiddenFor(model => model.DatasetId)
+                @Html.HiddenFor(model => model.PrimaryOwnerId)
+                @Html.HiddenFor(model => model.PrimaryContactId)
+                @Html.HiddenFor(model => model.UploadUserId)
+                @Html.HiddenFor(model => model.HrempServiceUrl)
+                @Html.HiddenFor(model => model.HrempServiceEnv)
+
+                @* Category *@
+                <div class="form-group">
+                    @Html.LabelFor((model) => model.DatasetCategoryIds, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @* Ensures Category cannot be changed on edit *@
+                        @if (Model.DatasetId == 0)
+                        {
+                            <select id="DatasetCategoryIds" name="DatasetCategoryIds" class="form-control edit-dataset-row">
+                                @foreach (var item in Model.AllCategories)
+                                {
+                                    <option selected="@item.Selected" value="@item.Value">@item.Text</option>}
+                            </select>
+                            @Html.ValidationMessageFor((model) => model.DatasetCategoryIds, "", new { @class = "text-danger" })
+                        }
+                        else
+                        {
+                            for (int i = 0; i < Model.DatasetCategoryIds.Count; i++)
+                            {
+                                <input type="hidden" name="DatasetCategoryIds" value="@Model.DatasetCategoryIds[i]" />
+                            }
+                            <div class="textReadOnly">
+                                @Html.Raw(Sentry.data.Web.Helpers.Utility.FormatCategoryList(Model.CategoryNames))
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                @* DatasetName *@
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DatasetName, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @* Ensures DatasetName cannot be changed on edit *@
+                        @if (Model.DatasetId == 0)
+                        {
+                            @Html.EditorFor(model => model.DatasetName, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                            @Html.ValidationMessageFor(model => model.DatasetName, "", new { @class = "text-danger" })
+                        }
+                        else
+                        {
+                            <div class="textReadOnly">
+                                @Html.HiddenFor(model => model.DatasetName)
+                                @Html.DisplayFor(model => model.DatasetName)
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DatasetDesc, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.TextAreaFor(model => model.DatasetDesc, new { @class = "form-control edit-dataset-row", @style = "min-width: 100%; max-width: 100%; width: 100%;" })
+                        @Html.ValidationMessageFor(model => model.DatasetDesc, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group fieldDescription">
+                    <label class="control-label col-md-2"></label>
+                    <div class="col-md-10">
+                        <span class="text-muted">
+                            <em>This description will be shown on the Dataset List and Search Page and at the top of your Dataset Detail Page.</em>
+                        </span>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.DatasetInformation, htmlAttributes: new { @class = "control-label col-md-2 optional" })
+                    <div class="col-md-10">
+                        @Html.TextAreaFor(model => model.DatasetInformation, new { @class = "form-control edit-dataset-row", @style = "min-width: 100%; max-width: 100%; width: 100%;" })
+                        @Html.ValidationMessageFor(model => model.DatasetInformation, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group fieldDescription">
+                    <label class="control-label col-md-2"></label>
+                    <div class="col-md-10">
+                        <span class="text-muted">
+                            <em>Please roughly describe how users can use your dataset.</em>
+                        </span>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.CreationUserId, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.CreationUserId, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                        @Html.ValidationMessageFor(model => model.CreationUserId, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group fieldDescription">
+                    <label class="control-label col-md-2"></label>
+                    <div class="col-md-10">
+                        <span class="text-muted">
+                            <em>This is the original creator of the data. For Example: External data sources like Mitchell or Internal Data Sources like CustomerOne.</em>
+                        </span>
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    @Html.LabelFor((model) => model.OriginationID, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor((model) => model.OriginationID, Model.AllOriginationCodes, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.OriginationID, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor((model) => model.DataClassification, new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.DropDownListFor((model) => model.DataClassification, Model.AllDataClassifications, new { @class = "form-control edit-dataset-row" })
+                        @Html.ValidationMessageFor((model) => model.DataClassification, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group" style="display:none">
+                    @Html.LabelFor(m => m.IsSecured, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.CheckBoxFor(m => m.IsSecured)
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="control-label col-md-2"></label>
+                    <div class="col-md-10">
+                        <span class="text-muted"><em id="dataClassInfo"></em></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.PrimaryOwnerName, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.PrimaryOwnerName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
+                        @Html.ValidationMessageFor(model => model.PrimaryOwnerName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group">
+                    @Html.LabelFor(model => model.PrimaryContactName, htmlAttributes: new { @class = "control-label col-md-2" })
+                    <div class="col-md-10">
+                        @Html.EditorFor(model => model.PrimaryContactName, new { htmlAttributes = new { @class = "form-control edit-dataset-row", @placeholder = "Associate Name or Sentry ID (i.e. 072984)" } })
+                        @Html.ValidationMessageFor(model => model.PrimaryContactName, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="form-group fieldDescription">
+                    <label class="control-label col-md-2"></label>
+                    <div class="col-md-10">
+                        <span class="text-muted">
+                            <p>
+                                Dataset Security is very important to this site and Sentry as a whole.
+                                It is <b>imperative</b> that you know what you are uploading to this site and what the data is.
+                                Data.Sentry.com uploads data to the cloud so no sensitive data can be uploaded through our site.
+                                To find out what data is sensitive and what classification your data is <a target="_blank" href="http://sharepoint.sentry.com/Security/Security%20Architecture/Security%20Policies/Published/Policy-Data%20Classification%20and%20Handling.pdf">click here.</a>
+                                Data that is sensitive can be uploaded after it has been tokenized by the information security web service.
+                            </p>
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+            <hr />
+            @if (Model.DatasetId == 0)
+            {
+                <div id="retrievalPanel" class="form-horizontal">
+                    <br />
+                    <h4>Dataset Retrieval</h4>
+                    <br />
+
+                    <div id="hide_detailSectionHeader_Simple">
+
+                        <div class="form-group">
+                            @Html.LabelFor((model) => model.DatasetScopeTypeId, new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownListFor((model) => model.DatasetScopeTypeId, Model.AllDatasetScopeTypes, new { @class = "form-control edit-dataset-row" })
+                                @Html.ValidationMessageFor((model) => model.DatasetScopeTypeId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ConfigFileName, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.ConfigFileName, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
+                                @Html.ValidationMessageFor(model => model.ConfigFileName, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.ConfigFileDesc, htmlAttributes: new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.EditorFor(model => model.ConfigFileDesc, new { htmlAttributes = new { @readonly = "readonly", @class = "form-control edit-dataset-row" } })
+                                @Html.ValidationMessageFor(model => model.ConfigFileDesc, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+
+
+                        <div class="form-group">
+                            @Html.LabelFor((model) => model.FileExtensionId, new { @class = "control-label col-md-2" })
+                            <div class="col-md-10">
+                                @Html.DropDownListFor((model) => model.FileExtensionId, Model.AllExtensions, new { @class = "form-control edit-dataset-row" })
+                                @Html.ValidationMessageFor((model) => model.FileExtensionId, "", new { @class = "text-danger" })
+                            </div>
+                        </div>
+                        <div class="form-group fieldDescription">
+                            <label class="control-label col-md-2"></label>
+                            <div class="col-md-10">
+                                <span class="text-muted">
+                                    <em id="fileExtensionInfo"></em>
+                                    File extension which will be loaded into this configuration.
+                                    Extensions not matching this file extension will not be processed.
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="form-group delimiter">
+                            @Html.LabelFor((model) => model.Delimiter, new { @class = "control-label col-md-2 optional" })
+                            <div class="col-md-10">
+                                @Html.TextBoxFor((model) => model.Delimiter, new { @class = "form-control edit-dataset-row" })
+                            </div>
+                        </div>
+
+                        <div class="form-group fieldDescription delimiter delimiterDescription">
+                            <label class="control-label col-md-2"></label>
+                            <div class="col-md-10">
+                                <span class="text-muted">
+                                    <em id="DelimiterInfo"></em>The character or set of characters used to delimit a file.
+                                    <br />
+                                    Note: When uploading a tab ( \t ) or pipe ( | ) delimited file please choose the DELIMITED file extension option.  If your file is comma delimited please choose the CSV file extension option.
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor((model) => model.HasHeader, new { @class = "control-label col-md-2 optional" })
+                            <div class="col-md-1">
+                                @Html.CheckBoxFor((model) => model.HasHeader, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.IncludeInSas, new { @class = "control-label col-md-2 optional" })
+                            <div class="col-md-1">
+                                @Html.CheckBoxFor(model => model.IncludeInSas, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })
+                            </div>
+                            @Html.Label("Schema will be added to SAS after columns are defined", new { @class = "control-label col-md-4 optional text-muted", @style = "text-align: left" })
+                        </div>
+                    </div>
+                </div>
+                <hr />
+            }
+
+
+
+            @*This is being kept for a shell which might be used later.*@
+            @*<div id="columnPanel" class="form-horizontal">
+                <br /><h4>Column Metadata</h4><br />
+                <div class="form-group">
+                    <label for="DatasetFileUpload" class="control-label col-md-2">Example File</label>
+                    <div class="col-md-10">
+                        <input type="file" class="edit-dataset-row file-load" id="DatasetFileUpload" />
+                    </div>
+                </div>
+                <button type="button" class="btn btn-primary" id="btnUploadFile" data-id="0">Upload Example Data File</button>
+            </div>*@
+
+
+        </div>
+        <div class="form-group">
+            <span class="text-muted"><em>** Fields in <b>Bold</b> are Required</em></span>
+        </div>
+        <div class="form-group">
+            <div>
+                <input type="button" value="Submit" class="btn btn-primary" id="SubmitDatasetForm" />
+                <input type="button" value="Cancel" class="btn btn-warning" id="CancelButton" data-id="@Model.DatasetId" />
+            </div>
+        </div>
+    </div>
+}
+

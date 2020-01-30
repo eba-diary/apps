@@ -439,6 +439,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<UncompressZipAction> UncompressZipAction
+        {
+            get
+            {
+                return Query<UncompressZipAction>();
+            }
+        }
+
         public IQueryable<SchemaMap> SchemaMap
         {
             get
