@@ -180,9 +180,7 @@ namespace Sentry.data.Web.Tests
             var model = (result.Model as SubscriptionModel);
 
             Assert.IsTrue(model.CurrentSubscriptions.Count == MockClasses.MockEventTypes().Count(x => x.Display));
-            Assert.IsTrue(model.AllEventTypes.Count() == MockClasses.MockEventTypes().Count(x => x.Display));
             Assert.IsTrue(model.AllIntervals.Count() == MockClasses.MockIntervals().Count);
-
             Assert.IsTrue(model.datasetID == ds.DatasetId);
             Assert.IsTrue(model.SentryOwnerName == user.AssociateId);
         }

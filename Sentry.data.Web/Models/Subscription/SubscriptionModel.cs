@@ -21,8 +21,6 @@ namespace Sentry.data.Web
        
         public List<BusinessAreaSubscription> CurrentSubscriptionsBusinessArea { get; set; }
 
-        public IEnumerable<SelectListItem> AllEventTypes { get; set; }
-
         public IEnumerable<SelectListItem> AllIntervals { get; set; }
     }
 }
