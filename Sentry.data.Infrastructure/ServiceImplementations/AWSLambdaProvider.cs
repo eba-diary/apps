@@ -5,6 +5,7 @@ using Sentry.Common.Logging;
 using System;
 using System.Text;
 using Sentry.data.Core;
+using Sentry.data.Core.Exceptions;
 
 namespace Sentry.data.Infrastructure
 {
@@ -65,23 +66,23 @@ namespace Sentry.data.Infrastructure
             }
             catch (InvalidParameterValueException paramEx)
             {
-                Logger.Error("One of the parameters in the request is invalid.", paramEx);
+                throw new AWSLambdaInvalidParameterException("One of the parameters in the request is invalid.", paramEx);
             }
             catch (ResourceNotFoundException resourceEx)
             {
-                Logger.Error("The resource specified in the request does not exist.", resourceEx);
+                throw new AWSLambdaNotFoundException("The resource specified in the request does not exist.", resourceEx);
             }
             catch (ServiceException serviceEx)
             {
-                Logger.Error("The AWS Lambda service encountered an internal error.", serviceEx);
+                throw new AWSLambdaServiceException("The AWS Lambda service encountered an internal error.", serviceEx);
             }
             catch (TooManyRequestsException requestLimitEx)
             {
-                Logger.Error("The request throughput limit was exceeded.", requestLimitEx);
+                throw new AWSLambdaRequestLimitException("The request throughput limit was exceeded.", requestLimitEx);
             }
             catch (Exception ex)
             {
-                Logger.Error("The request throughput limit was exceeded.", ex);
+                throw new AWSLambdaException("Error Unknown", ex);
             }
         }
     }

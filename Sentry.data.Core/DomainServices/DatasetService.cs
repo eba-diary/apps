@@ -378,11 +378,19 @@ namespace Sentry.data.Core
 
         public void GenerateDatasetFilePreview(DatasetFile df)
         {
-            _awsLambdaProvider.ConfigureClient(Configuration.Config.GetSetting("AWSRegion"), Configuration.Config.GetHostSetting("AWSAccessKey"), Configuration.Config.GetHostSetting("AWSSecretKey"));
-            _awsLambdaProvider.SetFunctionName(Configuration.Config.GetHostSetting("AWSPreviewLambdaName"));
-            _awsLambdaProvider.SetInvocationType("RequestResponse");
-            _awsLambdaProvider.SetLogType("Tail");
-            _awsLambdaProvider.InvokeFunction(GeneratePreviewLambdaTriggerEvent(Configuration.Config.GetHostSetting("AWSRootBucket"), df));
+            //Failure to generate preview files should not hold up any processing
+            try
+            {
+                _awsLambdaProvider.ConfigureClient(Configuration.Config.GetSetting("AWSRegion"), Configuration.Config.GetHostSetting("AWSAccessKey"), Configuration.Config.GetHostSetting("AWSSecretKey"));
+                _awsLambdaProvider.SetFunctionName(Configuration.Config.GetHostSetting("AWSPreviewLambdaName"));
+                _awsLambdaProvider.SetInvocationType("RequestResponse");
+                _awsLambdaProvider.SetLogType("Tail");
+                _awsLambdaProvider.InvokeFunction(GeneratePreviewLambdaTriggerEvent(Configuration.Config.GetHostSetting("AWSRootBucket"), df));
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("datasetservice-generatedatasetfilepreview failed to generate preview", ex);
+            }
         }
 
         //public bool DeleteDatasetFile(int datasetFileId)
