@@ -131,6 +131,7 @@
     <Compile Include="Entities\MessageFormats\HiveTableDeleteModel.cs" />
     <Compile Include="Entities\MessageFormats\RawFileAddModel.cs" />
     <Compile Include="Entities\MessageFormats\S3Event.cs" />
+    <Compile Include="Entities\S3\S3LambdaEvent.cs" />
     <Compile Include="Entities\S3\S3ObjectEvent.cs" />
     <Compile Include="Entities\Schema\BaseField.cs" />
     <Compile Include="Entities\Schema\BigintField.cs" />
@@ -167,6 +168,7 @@
     <Compile Include="Interfaces\DataProcessing\IRawStorageProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IS3DropProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\ISchemaLoadProvider.cs" />
+    <Compile Include="Interfaces\IAWSLambdaProvider.cs" />
     <Compile Include="Interfaces\ISchemaField.cs" />
     <Compile Include="Interfaces\ISchemaService.cs" />
     <Compile Include="Interfaces\ITicketMonitorService.cs" />

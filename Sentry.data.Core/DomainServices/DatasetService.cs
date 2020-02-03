@@ -6,6 +6,7 @@ using System.Text;
 using Newtonsoft.Json;
 using Sentry.Common.Logging;
 using Sentry.Core;
+using Sentry.data.Core.Entities.S3;
 
 namespace Sentry.data.Core
 {
@@ -18,11 +19,13 @@ namespace Sentry.data.Core
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly IConfigService _configService;
         private readonly ISchemaService _schemaService;
+        private readonly IAWSLambdaProvider _awsLambdaProvider;
 
         public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, 
                             UserService userService, IMessagePublisher messagePublisher,
                             IS3ServiceProvider s3ServiceProvider,
-                            IConfigService configService, ISchemaService schemaService)
+                            IConfigService configService, ISchemaService schemaService,
+                            IAWSLambdaProvider awsLambdaProvider)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
@@ -31,6 +34,7 @@ namespace Sentry.data.Core
             _s3ServiceProvider = s3ServiceProvider;
             _configService = configService;
             _schemaService = schemaService;
+            _awsLambdaProvider = awsLambdaProvider;
         }
 
 
@@ -372,6 +376,15 @@ namespace Sentry.data.Core
             return dsList;
         }
 
+        public void GenerateDatasetFilePreview(DatasetFile df)
+        {
+            _awsLambdaProvider.ConfigureClient(Configuration.Config.GetSetting("AWSRegion"), Configuration.Config.GetHostSetting("AWSAccessKey"), Configuration.Config.GetHostSetting("AWSSecretKey"));
+            _awsLambdaProvider.SetFunctionName(Configuration.Config.GetHostSetting("AWSPreviewLambdaName"));
+            _awsLambdaProvider.SetInvocationType("RequestResponse");
+            _awsLambdaProvider.SetLogType("Tail");
+            _awsLambdaProvider.InvokeFunction(GeneratePreviewLambdaTriggerEvent(Configuration.Config.GetHostSetting("AWSRootBucket"), df));
+        }
+
         //public bool DeleteDatasetFile(int datasetFileId)
         //{
         //    DatasetFile df = _datasetContext.DatasetFile.Where(w => w.DatasetFileId == datasetFileId).FirstOrDefault();
@@ -534,6 +547,33 @@ namespace Sentry.data.Core
             {
                 dto.ChangedDtm = ds.DatasetFiles.Max(x => x.ModifiedDTM);
             }
+        }
+
+        private string GeneratePreviewLambdaTriggerEvent(string bucket, DatasetFile dsf)
+        {
+            S3LamdaEvent lambdaEvent = new S3LamdaEvent()
+            {
+                Records = new List<S3ObjectEvent>()
+                {
+                    new S3ObjectEvent()
+                    {
+                        eventName = "ObjectCreated:Put",
+                        s3 = new S3()
+                        {
+                            bucket = new Bucket()
+                            {
+                                name = bucket
+                            },
+                            _object = new data.Core.Entities.S3.Object()
+                            {
+                                key = dsf.FileLocation
+                            }
+                        }
+                    }
+                }
+            };
+
+            return JsonConvert.SerializeObject(lambdaEvent);
         }
 
         #endregion
