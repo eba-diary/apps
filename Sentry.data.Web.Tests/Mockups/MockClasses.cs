@@ -311,7 +311,7 @@ namespace Sentry.data.Web.Tests
             Notification an = new Notification();
             an.NotificationId = 1;
             an.ParentObject = da.Id;
-            an.MessageSeverity = NotificationSeverity.Danger;
+            an.MessageSeverity = NotificationSeverity.Critical;
             an.Message = "Alert Message";
             an.StartTime = DateTime.Now.AddHours(-1).AddMinutes(1);
             an.ExpirationTime = DateTime.Now.AddDays(1);
@@ -334,12 +334,6 @@ namespace Sentry.data.Web.Tests
             et.Display = false;
             et.Type_ID = 1;
 
-            EventType et2 = new EventType();
-            et2.Description = "Searched";
-            et2.Severity = 1;
-            et2.Display = false;
-            et2.Type_ID = 1;
-
             EventType et3 = new EventType();
             et3.Description = "Created File";
             et3.Severity = 1;         
@@ -348,7 +342,6 @@ namespace Sentry.data.Web.Tests
 
             List<EventType> types = new List<EventType>();
             types.Add(et);
-            types.Add(et2);
             types.Add(et3);
 
             return types;
@@ -391,7 +384,7 @@ namespace Sentry.data.Web.Tests
 
             subscription.Dataset = ds;
             subscription.SentryOwnerName = user != null ? user.AssociateId : "012345";
-            subscription.EventType = MockEventTypes()[2];
+            subscription.EventType = MockEventTypes()[0];
             subscription.Interval = MockIntervals()[0];
             subscription.ID = 0;
 

@@ -14,6 +14,8 @@ namespace Sentry.data.Core.Entities.DataProcessing
         [Description("Schema Load")]
         SchemaLoad = 4,
         [Description("Convert to Parquet")]
-        ConvertParquet = 5
+        ConvertParquet = 5,
+        [Description("Uncompress Zip")]
+        UncompressZip = 6
     }
 }

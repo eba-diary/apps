@@ -185,6 +185,7 @@
     <Compile Include="Mappings\Metadata\MetadataAssetMapping.cs" />
     <Compile Include="Mappings\Metadata\MetadataTagMapping.cs" />
     <Compile Include="Mappings\Metadata\TagGroupMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\UncompressZipActionMapping.cs" />
     <Compile Include="Mappings\Primary\NotificationMapping.cs" />
     <Compile Include="Mappings\Primary\AssetSourceMapping.cs" />
     <Compile Include="Mappings\Primary\BusinessAreaMapping.cs" />
@@ -264,6 +265,7 @@
     <Compile Include="ServiceImplementations\DataProcessing\RawStorageProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\S3DropProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\SchemaLoadProvider.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\UncompressZipProvider.cs" />
     <Compile Include="ServiceImplementations\Messaging\DataStepProcessorService.cs" />
     <Compile Include="ServiceImplementations\Messaging\S3EventService.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\BaseTicketProvider.cs" />

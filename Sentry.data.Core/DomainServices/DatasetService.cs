@@ -513,7 +513,7 @@ namespace Sentry.data.Core
             dto.OriginationId = (int)Enum.Parse(typeof(DatasetOriginationCode), ds.OriginationCode);
             dto.ConfigFileDesc = ds.DatasetFileConfigs?.First()?.Description;
             dto.ConfigFileName = ds.DatasetFileConfigs?.First()?.Name;
-            dto.Delimiter = ds.DatasetFileConfigs?.First()?.Schemas?.First()?.Delimiter;
+            dto.Delimiter = ds.DatasetFileConfigs?.First()?.Schema?.Delimiter;
             dto.FileExtensionId = ds.DatasetFileConfigs.First().FileExtension.Id;
             dto.DatasetScopeTypeId = ds.DatasetFileConfigs.First().DatasetScopeType.ScopeTypeId;
             dto.CategoryName = ds.DatasetCategories.First().Name;

@@ -3,7 +3,7 @@
     ViewBag.Title = "Subscriptions";
 }
 
-@using (Html.BeginForm(null, null, FormMethod.Post))
+@using (Html.BeginForm("SubscribeUpdate", "Notification", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
 
@@ -11,6 +11,7 @@
 
         @Html.HiddenFor(model => model.businessAreaID)
         @Html.HiddenFor(model => model.SentryOwnerName)
+        @Html.HiddenFor(model => model.group)
 
         @Html.DisplayFor((model) => ViewData.ModelState)
 
@@ -25,6 +26,9 @@
 
                 @for (var subId = 0; subId < Model.CurrentSubscriptionsBusinessArea.Count(); subId++)
                 {
+                    @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessArea[subId].BusinessAreaType)
+                    @Html.HiddenFor(model => model.CurrentSubscriptionsBusinessArea[subId].ID)
+
                     string cssClass = "";
                     if (Model.CurrentSubscriptionsBusinessArea[subId].Interval.Description.ToLower().Contains("never"))
                     {

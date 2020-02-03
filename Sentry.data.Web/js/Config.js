@@ -209,7 +209,11 @@ data.Config = {
         }   
     },
 
-    CreateInit: function () {
+    CreateInit: function (PageSubmitFunction, PageCancelFunction) {
+
+        $("[id='SubmitDatasetFileConfigForm']").click(PageSubmitFunction);
+
+        $("[id^='CancelDatasetFileConfigForm']").off('click').on('click', PageCancelFunction);
 
         data.Config.SetFileExtensionProperites($('#FileExtensionID option:selected').text());
 
@@ -228,6 +232,45 @@ data.Config = {
                 Sentry.ShowModalAlert("\"Current View\" option has been unchecked.  <p>This will remove the current view SAS library associated with this schema, if saved.</p>");
             }
         });
+    },
+
+    CreateFormSubmitInit: function () {
+        $.ajax({
+            url: "/Config/DatasetFileConfigForm",
+            method: "POST",
+            data: $("#DatasetFileConfigForm").serialize(),
+            dataType: 'json',
+            success: function (obj) {
+                if (Sentry.WasAjaxSuccessful(obj)) {
+                    //redirect to dataset detail page
+                    window.location.href = "/Dataset/Detail/" + encodeURIComponent(obj.dataset_id);
+                }
+                else {
+                    $('#DatasetFileConfigForm').replaceWith(obj);
+                    data.Config.CreateInit(data.Config.CreateFormSubmit, data.Config.CreateFormCancel);
+                }
+            },
+            failure: function () {
+                alert('An error occured submiting your request.  Please try again.');
+            },
+            error: function (obj) {
+                $('#DatasetFileConfigForm').replaceWith(obj.responseText);
+                data.Config.CreateInit(data.Config.CreateFormSubmitInit, data.Config.CreateFormCancelInit);
+            }
+        });
+    },
+
+    CreateFormCancelInit: function (e) {
+        e.preventDefault();
+        window.location = data.Config.CancelLink($(this).data("id"));
+    },
+
+    CancelLink: function (id) {
+        if (id === undefined || id === 0) {
+            return "/Dataset/Index";
+        } else {
+            return "/Config/Dataset/" + encodeURIComponent(id);
+        }
     },
 
     EditInit: function () {

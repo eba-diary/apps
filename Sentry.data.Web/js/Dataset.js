@@ -45,10 +45,47 @@ data.Dataset = {
         $('.input-group-addon').click(function (e) {
             $('#DatasetSearch').submit();
         });
+
     },
 
-    FormInit: function (hrEmpUrl, hrEmpEnv) {
+    FormSubmitInit: function () {
+        $.ajax({
+            url: "/Dataset/DatasetForm",
+            method: "POST",
+            data: $("#DatasetForm").serialize(),
+            dataType: 'json',
+            success: function (obj) {
+                if (Sentry.WasAjaxSuccessful(obj)) {
+                    Sentry.HideAllModals();
+                    //redirect to dataset detail page
+                    window.location.href = "/Dataset/Detail/" + obj.dataset_id;
+                }
+                else {
+                    $('#DatasetFormContent').replaceWith(obj);
+                }
+            },
+            failure: function () {
+                alert('An error occured submiting your request.  Please try again.');
+            },
+            error: function (obj) {
+                $('#DatasetFormContent').replaceWith(obj.responseText);
+                var hrEnv = $('#HrempServiceEnv').val()
+                var hrUrl = $('#HrempServiceUrl').val()
+                data.Dataset.FormInit(hrUrl, hrEnv, data.Dataset.FormSubmitInit);
+            }
+        });
+    },
+
+    FormCancelInit: function (e) {
+        e.preventDefault();
+        window.location = data.Dataset.CancelLink($(this).data("id"));
+    },
+
+    FormInit: function (hrEmpUrl, hrEmpEnv, PageSubmitFunction, PageCancelFunction) {
         /// Initialize the Create Dataset view
+        
+        //SubmitDatasetForm
+        $("[id='SubmitDatasetForm']").click(PageSubmitFunction);
 
         if ($("#DatasetId").val() !== undefined && $("#DatasetId").val() > 0) {
             $("#DatasetScopeTypeId").attr('readonly', 'readonly');
@@ -118,11 +155,7 @@ data.Dataset = {
             }
         }).change();
 
-        //determine the cancel button url
-        $("[id^='CancelButton']").off('click').on('click', function (e) {
-            e.preventDefault();
-            window.location = data.Dataset.CancelLink($(this).data("id"));
-        });
+        $("[id^='CancelButton']").off('click').on('click', PageCancelFunction);
 
         $("#DatasetFileUpload").change(function () {
 
@@ -398,7 +431,6 @@ data.Dataset = {
                                 })
                             },
                             failure: function (obj) {
-                                alert("failure");
                                 Sentry.ShowModalAlert(
                                     obj.Message, function () { })
                             },
