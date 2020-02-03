@@ -663,7 +663,8 @@ namespace Sentry.data.Infrastructure
 
         public List<Event> EventsSince(DateTime time, Boolean IsProcessed)
         {
-            return Query<Event>().Cacheable().Where(e => e.TimeCreated >= time && e.IsProcessed == IsProcessed && e.EventType.Display).ToList();
+            List<Event> events = Query<Event>().Where(e => e.TimeCreated >= time && e.IsProcessed == IsProcessed && (e.EventType.Display)).ToList();
+            return events;
         }
 
         public int GetReportCount()
