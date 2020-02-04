@@ -114,7 +114,7 @@ namespace Sentry.data.Goldeneye
                             //UserEvent for Subscribers OR AuthorSubscribers who didn't process yet
                             if
                             (   _event.UserWhoStartedEvent.Trim() != ds.SentryOwnerName.Trim()
-                                || (_event.UserWhoStartedEvent.Trim() == ds.SentryOwnerName.Trim() && authorProcessed == false) 
+                                || (_event.UserWhoStartedEvent.Trim() == ds.SentryOwnerName.Trim() && !authorProcessed) 
                             )
                             {
                                 UserEvent ue;
