@@ -466,6 +466,30 @@ namespace Sentry.data.Web.Helpers
 
             return compressionList;
         }
-    }
 
+        internal static IEnumerable<SelectListItem> BuildSchedulePickerDropdown(string schedule)
+        {
+            List<SelectListItem> ScheduleOptions = new List<SelectListItem>();
+
+            ScheduleOptions.Add(new SelectListItem()
+            {
+                Text = "Pick a Schedule",
+                Value = "0",
+                Selected = String.IsNullOrEmpty(schedule),
+                Disabled = true
+            });
+
+            foreach (RetrieverJobScheduleTypes item in Enum.GetValues(typeof(RetrieverJobScheduleTypes)))
+            {
+                ScheduleOptions.Add(new SelectListItem()
+                {
+                    Text = item.GetDescription(),
+                    Value = ((int)item).ToString(),
+                    Selected = schedule == item.GetDescription()
+                });
+            }
+
+            return ScheduleOptions;
+        }
+    }
 }

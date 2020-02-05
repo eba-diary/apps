@@ -130,6 +130,16 @@
                 type: "GET",
                 //data: { Id: $('#SelectedDataSource :selected').val() },
                 success: function (datain) {
+
+                    $('#primaryOwner').text(datain.PrimaryOwnerName);
+                    $('#dataSourceContactEmail').attr("href", datain.MailToLink)
+                    $('#dataSourceContactEmail').text(datain.PrimaryContactName);
+                    $("#editDataSource").attr("href", "/Config/Source/Edit/" + $("[id$='SelectedDataSource'] :selected").val());
+
+                    if (datain.Security.CanEditDataSource) {
+                        $(".editDataSourceLink").show();
+                    }
+
                     data.Job.SetDataSourceSpecificPanels(datain.SourceType);
                     data.Job.DisplayHttpPostPanel();
                     data.Job.targetFileNameDescUpdate();
@@ -188,6 +198,7 @@
             $('.ftpSourcePanel').hide();
             $('#IsSourceCompressed').prop('checked', false);
             $("#compressionPanel").toggle($("#IsSourceCompressed").is(':checked'));
+            $('#scheduleRow').hide();
         }
         else {
             switch (sourceType.toLowerCase()) {
@@ -378,28 +389,28 @@
 
         
         switch ($("[id$='SchedulePicker']").val()) {
-            case "0":
+            case "1":
                 $('#cronHourlyTimePicker').val(a[0]);
                 $('#hourlyPicker').show();
                 break;
-            case "1":
+            case "2":
                 $('#cronDailyJobTimePicker').val(a[1] + ":" + a[0]);
                 $("#cronDailyJobTimePicker").trigger(e);
                 $('#dailyPicker').show();
                 break;
-            case "2":
+            case "3":
                 $('#cronWeeklyDayPicker').val(a[4]);
                 $("#cronWeeklyJobTimePicker").val(a[1] + ":" + a[0]);
                 $("#cronWeeklyJobTimePicker").trigger(e);
                 $('#weeklyPicker').show();
                 break;
-            case "3":
+            case "4":
                 $('#cronMonthlyDayPicker').val(a[2]);
                 $('#cronMonthlyJobTimePicker').val(a[1] + ":" + a[0]);
                 $("#cronMonthlyJobTimePicker").trigger(e);
                 $('#monthlyPicker').show();
                 break;
-            case "4":
+            case "5":
                 $('#cronYearlyMonthPicker').val(a[3]);
                 $('#cronYearlyDayPicker').val(a[2]);
                 $('#cronYearlyJobTimePicker').val(a[1] + ":" + a[0]);
@@ -417,19 +428,19 @@
             $('#yearlyPicker').hide();
 
             switch ($(this).val()) {
-                case "0":
+                case "1":
                     $('#hourlyPicker').show();
                     break;
-                case "1":
+                case "2":
                     $('#dailyPicker').show();
                     break;
-                case "2":
+                case "3":
                     $('#weeklyPicker').show();
                     break;
-                case "3":
+                case "4":
                     $('#monthlyPicker').show();
                     break;
-                case "4":
+                case "5":
                 default:
                     $('#yearlyPicker').show();
                     break;
