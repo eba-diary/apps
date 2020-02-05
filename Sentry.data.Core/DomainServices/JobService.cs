@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Sentry.Common.Logging;
+using Sentry.data.Core.Entities.DataProcessing;
 
 namespace Sentry.data.Core
 {
@@ -86,7 +87,7 @@ namespace Sentry.data.Core
             return basicJob;
         }
 
-        public RetrieverJob InstantiateJobsForCreation(DatasetFileConfig dfc, DataSource dataSource)
+        private RetrieverJob InstantiateJob(DatasetFileConfig dfc, DataSource dataSource, FileSchema scm)
         {
             RetrieverJobOptions.Compression compression = new RetrieverJobOptions.Compression()
             {
@@ -104,16 +105,17 @@ namespace Sentry.data.Core
                 SearchCriteria = "\\.",
                 CompressionOptions = compression
             };
+
             RetrieverJob rj = new RetrieverJob()
             {
                 TimeZone = "Central Standard Time",
                 RelativeUri = null,
                 DataSource = dataSource,
                 DatasetConfig = dfc,
+                FileSchema = scm,
                 Created = DateTime.Now,
                 Modified = DateTime.Now,
                 IsGeneric = true,
-
                 JobOptions = rjo
             };
 
@@ -121,7 +123,7 @@ namespace Sentry.data.Core
             {
                 rj.Schedule = "*/1 * * * *";
             }
-            else if (dataSource.Is<DfsBasic>())
+            else if (dataSource.Is<DfsBasic>() || dataSource.Is<DfsDataFlowBasic>())
             {
                 rj.Schedule = "Instant";
             }
@@ -131,6 +133,16 @@ namespace Sentry.data.Core
             }
 
             return rj;
+        }
+
+        public RetrieverJob InstantiateJobsForCreation(DatasetFileConfig dfc, DataSource dataSource)
+        {
+            return InstantiateJob(dfc, dataSource, dfc.Schema);
+        }
+
+        public RetrieverJob InstantiateJobsForCreation(FileSchema scm, DataSource dataSource)
+        {
+            return InstantiateJob(null, dataSource, scm);
         }
 
 

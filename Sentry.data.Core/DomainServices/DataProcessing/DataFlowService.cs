@@ -15,13 +15,16 @@ namespace Sentry.data.Core
         private readonly IDatasetContext _datasetContext;
         private readonly IMessagePublisher _messagePublisher;
         private readonly UserService _userService;
+        private readonly IJobService _jobService;
 
 
-        public DataFlowService(IDatasetContext datasetContext, IMessagePublisher messagePublisher, UserService userService)
+        public DataFlowService(IDatasetContext datasetContext, IMessagePublisher messagePublisher, 
+            UserService userService, IJobService jobService)
         {
             _datasetContext = datasetContext;
             _messagePublisher = messagePublisher;
             _userService = userService;
+            _jobService = jobService;
         }
 
         public List<DataFlowDto> ListDataFlows()
@@ -158,12 +161,6 @@ namespace Sentry.data.Core
             DataFlow df = MapToDataFlow(dto);
         }
 
-        public void CreateDataFlowForSchema(FileSchema scm)
-        {
-            DataFlow df = MapToDataFlow(scm);
-        }
-
-
         private DataFlow MapToDataFlow(DataFlowDto dto)
         {
             DataFlow df = new DataFlow
@@ -171,7 +168,8 @@ namespace Sentry.data.Core
                 Id = dto.Id,
                 Name = dto.Name,
                 CreatedDTM = DateTime.Now,
-                CreatedBy = _userService.GetCurrentUser().AssociateId
+                CreatedBy = _userService.GetCurrentUser().AssociateId,
+                Questionnaire = dto.DFQuestionnaire
             };
 
             _datasetContext.Add(df);
@@ -186,19 +184,6 @@ namespace Sentry.data.Core
                 default:
                     break;
             }
-
-            return df;
-        }
-
-        private DataFlow MapToDataFlow(FileSchema scm)
-        {
-            DataFlow df = new DataFlow
-            {
-                Id = 0,
-                Name = "",
-                CreatedDTM = DateTime.Now,
-                CreatedBy = _userService.GetCurrentUser().AssociateId
-            };
 
             return df;
         }
@@ -444,6 +429,79 @@ namespace Sentry.data.Core
             }
 
         }
+
+        #region SchemaFlowMappings
+        public void CreateDataFlowForSchema(FileSchema scm)
+        {
+            DataFlow df = MapToDataFlow(scm);
+        }
+
+        private DataFlow MapToDataFlow(FileSchema scm)
+        {
+            DataFlow df = new DataFlow
+            {
+                Id = 0,
+                Name = GenerateDataFlowNameForFileSchema(scm),
+                CreatedDTM = DateTime.Now,
+                CreatedBy = _userService.GetCurrentUser().AssociateId
+            };
+
+            _datasetContext.Add(df);
+
+            MapDataFlowStepsForFileSchema(scm, df);
+
+            return df;
+        }
+
+        private string GenerateDataFlowNameForFileSchema(FileSchema scm)
+        {
+            return $"FileSchemaFlow_{scm.SchemaId}_{scm.StorageCode}";
+        }
+
+
+        private void MapDataFlowStepsForFileSchema(FileSchema scm, DataFlow df)
+        {
+            //Add default DFS drop location for data flow
+            RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(scm, _datasetContext.DataSources.First(x => x.Name.Contains(GlobalConstants.DataSourceName.DEFAULT_DATAFLOW_DFS_DROP_LOCATION)));
+            dfsDataFlowBasic.DataFlowId
+            _datasetContext.Add(dfsDataFlowBasic);
+
+            //Generate ingestion steps (get file to raw location)
+            MapToS3DropStep(null, df);
+            MapToRawStorageStep(null, df);
+
+            //Generate preprocessing steps (i.e. uncompress, encoding, etc.)
+            //MapPreProcessingSteps(dto, df);
+            //if (dto.IsCompressed)
+            //{
+            //    MapToUnCompressStep(dto.CompressionJob, df);
+            //}
+
+            //Generate DSC registering step
+            MapToSchemaLoadStep(MapToDto(scm), df);
+            MapToRawQueryStorageStep(null, df);
+
+            ////Generate consumption layer steps
+            //MapToParquetConverterStep(dto, df);
+
+        }
+
+        private DataFlowDto MapToDto(FileSchema scm)
+        {
+            return new DataFlowDto()
+            {
+                SchemaMap = new List<SchemaMapDto>()
+                {
+                    new SchemaMapDto()
+                    {
+                        SchemaId = scm.SchemaId,
+                        SearchCriteria = "\\."
+                    }
+                }
+            };
+        }
+        #endregion
+
         #endregion
     }
 }

@@ -263,6 +263,7 @@
     <Compile Include="ServiceImplementations\DataProcessing\S3DropProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\SchemaLoadProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\UncompressZipProvider.cs" />
+    <Compile Include="ServiceImplementations\DataSourceProviders\DfsDataFlowBasicProvider.cs" />
     <Compile Include="ServiceImplementations\Messaging\DataStepProcessorService.cs" />
     <Compile Include="ServiceImplementations\Messaging\S3EventService.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\BaseTicketProvider.cs" />

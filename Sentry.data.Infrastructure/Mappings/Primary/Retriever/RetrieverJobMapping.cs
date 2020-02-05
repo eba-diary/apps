@@ -60,6 +60,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.Type(NHibernateUtil.StringClob);
             });
 
+            ManyToOne(x => x.FileSchema, m =>
+            {
+                m.Column("Schema_Id");
+                m.Class(typeof(FileSchema));
+            });
+
             ManyToOne(x => x.DataSource, m =>
             {
                 m.Column("DataSource_ID");
