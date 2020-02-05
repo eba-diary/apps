@@ -70,7 +70,7 @@ namespace Sentry.data.Goldeneye
                         *********************************************************************************************************************************/
                         int n;
                         bool authorProcessed = false;
-                        if (_event.UserWhoStartedEvent != null && int.TryParse(_event.UserWhoStartedEvent.Trim(), out n) && _event.IsProcessed == false)
+                        if (_event.UserWhoStartedEvent != null && int.TryParse(_event.UserWhoStartedEvent.Trim(), out n) && !_event.IsProcessed)
 #endif
                         {
                             Console.WriteLine("UserWhoStartedEvent : " + _event.UserWhoStartedEvent);
