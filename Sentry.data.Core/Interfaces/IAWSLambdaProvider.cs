@@ -8,7 +8,7 @@ namespace Sentry.data.Core
 {
     public interface IAWSLambdaProvider
     {
-        void ConfigureClient(string awsRegion, string accessKey, string secretKey);
+        void ConfigureClient(LambdaClientConfig config);
         void SetInvocationType(string invocationType);
         void SetLogType(string logType);
         void SetFunctionName(string functionName);

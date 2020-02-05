@@ -381,7 +381,16 @@ namespace Sentry.data.Core
             //Failure to generate preview files should not hold up any processing
             try
             {
-                _awsLambdaProvider.ConfigureClient(Configuration.Config.GetSetting("AWSRegion"), Configuration.Config.GetHostSetting("AWSAccessKey"), Configuration.Config.GetHostSetting("AWSSecretKey"));
+                LambdaClientConfig lConfig = new LambdaClientConfig()
+                {
+                    AWSRegion = Configuration.Config.GetSetting("AWSRegion"),
+                    AccessKey = Configuration.Config.GetHostSetting("AWSAccessKey"),
+                    SecretKey = Configuration.Config.GetHostSetting("AWSSecretKey"),
+                    ProxyHost = Configuration.Config.GetHostSetting("SentryAWSLambdaProxyHost"),
+                    ProxyPort = Configuration.Config.GetHostSetting("SentryAWSLambdaProxyPort")
+                };
+
+                _awsLambdaProvider.ConfigureClient(lConfig);
                 _awsLambdaProvider.SetFunctionName(Configuration.Config.GetHostSetting("AWSPreviewLambdaName"));
                 _awsLambdaProvider.SetInvocationType("RequestResponse");
                 _awsLambdaProvider.SetLogType("Tail");

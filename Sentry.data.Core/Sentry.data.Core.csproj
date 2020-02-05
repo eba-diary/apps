@@ -170,6 +170,7 @@
     <Compile Include="GlobalEnums\OAuthClaims.cs" />
     <Compile Include="GlobalEnums\OAuthGrantType.cs" />
     <Compile Include="GlobalEnums\SchemaDatatypes.cs" />
+    <Compile Include="Helpers\LambdaClientConfig.cs" />
     <Compile Include="Interfaces\DataProcessing\IBaseActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IConvertToParquetProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IDataAction.cs" />

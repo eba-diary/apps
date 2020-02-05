@@ -18,19 +18,19 @@ namespace Sentry.data.Infrastructure
 
         public AWSLambdaProvider() { }
 
-        public void ConfigureClient(string awsRegion, string accessKey, string secretKey)
+        public void ConfigureClient(LambdaClientConfig config)
         {
             AmazonLambdaConfig ldConfig = new AmazonLambdaConfig();
-            ldConfig.RegionEndpoint = RegionEndpoint.GetBySystemName(awsRegion);
+            ldConfig.RegionEndpoint = RegionEndpoint.GetBySystemName(config.AWSRegion);
             //proxy only needed when not running on AWS.  Calling code expected to pass empty value if proxy host not needed.
-            if (!String.IsNullOrWhiteSpace(Configuration.Config.GetHostSetting("SentryS3ProxyHost")))
+            if (!String.IsNullOrWhiteSpace(config.ProxyHost))
             {
-                ldConfig.ProxyHost = Configuration.Config.GetHostSetting("SentryS3ProxyHost");
-                ldConfig.ProxyPort = int.Parse(Configuration.Config.GetSetting("SentryS3ProxyPort"));
+                ldConfig.ProxyHost = config.ProxyHost;
+                ldConfig.ProxyPort = int.Parse(config.ProxyPort);
             }
             ldConfig.ProxyCredentials = System.Net.CredentialCache.DefaultCredentials;
 
-            _lambdaClient = new AmazonLambdaClient(accessKey, secretKey, ldConfig);
+            _lambdaClient = new AmazonLambdaClient(config.AccessKey, config.SecretKey, ldConfig);
         }
 
         public void SetInvocationType(string invocationType)
@@ -84,6 +84,6 @@ namespace Sentry.data.Infrastructure
             {
                 throw new AWSLambdaException("Error Unknown", ex);
             }
-        }
+        }               
     }
 }
