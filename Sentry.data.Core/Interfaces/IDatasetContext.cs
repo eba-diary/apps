@@ -102,6 +102,8 @@ namespace Sentry.data.Core
         List<DatasetSubscription> GetSubscriptionsForDataset(int datasetID);
         List<DataAssetSubscription> GetSubscriptionsForDataAsset(int dataAssetID);
         List<DatasetSubscription> GetAllSubscriptions();
+        List<Subscription> GetAllSubscriptionsForReal();
+
         List<Event> EventsSince(DateTime time, Boolean IsProcessed);
         int GetNextStorageCDE();
         int GetReportCount();
