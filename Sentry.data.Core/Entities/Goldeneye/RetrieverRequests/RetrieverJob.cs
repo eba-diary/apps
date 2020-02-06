@@ -108,6 +108,7 @@ namespace Sentry.data.Core
         public virtual IList<JobHistory> JobHistory { get; set; }
 
         public virtual IList<Submission> Submissions { get; set; }
+        public virtual FileSchema FileSchema { get; set; }
 
         public virtual Uri GetUri()
         {

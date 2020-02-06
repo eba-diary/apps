@@ -13,34 +13,29 @@ namespace Sentry.data.Core
     public class ConfigService : IConfigService
     {
         public IDatasetContext _datasetContext;
-        public IMessagePublisher _publisher;
         public IUserService _userService;
         public IEventService _eventService;
         public IMessagePublisher _messagePublisher;
         public IEncryptionService _encryptService;
         public IJobService _jobService;
-        public IEmailService _emailService;
-        private IS3ServiceProvider s3ServiceProvider;
+        private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly ISecurityService _securityService;
         private readonly ISchemaService _schemaService;
         private Guid _guid;
 
-        public ConfigService(IDatasetContext dsCtxt, IMessagePublisher publisher, 
-            IUserService userService, IEventService eventService, IMessagePublisher messagePublisher,
-            IEncryptionService encryptService, ISecurityService securityService,
-            IJobService jobService, IEmailService emailService, IS3ServiceProvider s3ServiceProvider,
+        public ConfigService(IDatasetContext dsCtxt, IUserService userService, IEventService eventService, 
+            IMessagePublisher messagePublisher, IEncryptionService encryptService, ISecurityService securityService,
+            IJobService jobService, IS3ServiceProvider s3ServiceProvider,
             ISchemaService schemaService)
         {
             _datasetContext = dsCtxt;
-            _publisher = publisher;
             _userService = userService;
             _eventService = eventService;
             _messagePublisher = messagePublisher;
             _encryptService = encryptService;
             _securityService = securityService;
             JobService = jobService;
-            _emailService = emailService;
-            S3ServiceProvider = s3ServiceProvider;
+            _s3ServiceProvider = s3ServiceProvider;
             _schemaService = schemaService;
         }
 
@@ -55,8 +50,6 @@ namespace Sentry.data.Core
                 _jobService = value;
             }
         }
-
-        private IS3ServiceProvider S3ServiceProvider { get; set; }
 
         public SchemaApiDTO GetSchemaApiDTO(int id)
         {
@@ -920,17 +913,17 @@ namespace Sentry.data.Core
 
         private void DeletePreviewFilesByStorageCode(string storageCode)
         {
-            S3ServiceProvider.DeleteS3Prefix($"{Configuration.Config.GetSetting("S3PreviewPrefix")}{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
+            _s3ServiceProvider.DeleteS3Prefix($"{Configuration.Config.GetSetting("S3PreviewPrefix")}{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
         }
 
         public void DeleteParquetFilesByStorageCode(string storageCode)
         {
-            S3ServiceProvider.DeleteS3Prefix($"parquet/{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
+            _s3ServiceProvider.DeleteS3Prefix($"parquet/{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
         }
 
         public void DeleteRawFilesByStorageCode(string storageCode)
         {
-            S3ServiceProvider.DeleteS3Prefix($"{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
+            _s3ServiceProvider.DeleteS3Prefix($"{Configuration.Config.GetHostSetting("S3DataPrefix")}{storageCode}");
         }
 
         public bool SyncConsumptionLayer(int datasetId, int schemaId)

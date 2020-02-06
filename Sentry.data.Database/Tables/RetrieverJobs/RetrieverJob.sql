@@ -3,7 +3,7 @@
     [RelativeUri_DSC]  NVARCHAR (255) NULL,
     [Schedule]         NVARCHAR (255) NULL,
     [DataSource_ID]    INT            NOT NULL,
-    [Config_ID]        INT            NOT NULL,
+    [Config_ID]        INT            NULL,
     [IsCompressed_IND] BIT            NULL,
     [Compression_TYP]  CHAR (10)      NULL,
     [Created_DTM]      DATETIME       NOT NULL,
@@ -12,6 +12,7 @@
     [JobOptions]       NVARCHAR (MAX) NULL,
     [IsEnabled] BIT NULL, 
     [Job_Guid] UNIQUEIDENTIFIER NULL, 
+    [Schema_ID] INT NULL, 
     PRIMARY KEY CLUSTERED ([Job_ID] ASC),
     CONSTRAINT [FK_RetrieverJob_DatasetFileConfigs] FOREIGN KEY ([Config_ID]) REFERENCES [dbo].[DatasetFileConfigs] ([Config_ID]),
     CONSTRAINT [FK_RetrieverJob_DataSource] FOREIGN KEY ([DataSource_ID]) REFERENCES [dbo].[DataSource] ([DataSource_Id])

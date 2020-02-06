@@ -24,6 +24,7 @@ namespace Sentry.data.Core
         public Boolean CreateCurrentFile { get; set; }
         public Boolean IsRegexSearch { get; set; }
         public string SearchCriteria { get; set; }
+        public int TargetDataFlow { get; set; }
         public FtpPattern FtpPattern { get; set; }
 
         public virtual Compression CompressionOptions

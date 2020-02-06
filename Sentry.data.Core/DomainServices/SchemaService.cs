@@ -10,20 +10,25 @@ namespace Sentry.data.Core
 {
     public class SchemaService : ISchemaService
     {
-        public IDatasetContext _datasetContext;
-        public IUserService _userService;
-        public IEmailService _emailService;
-        //public readonly IDataFlowService _dataFlowService;
+        public readonly IDataFlowService _dataFlowService;
+        public readonly IJobService _jobService;
+        private readonly IDatasetContext _datasetContext;
+        private readonly IUserService _userService;
+        private readonly IEmailService _emailService;
+        private readonly ISecurityService _securityService;
 
         public SchemaService(IDatasetContext dsContext, IUserService 
-            userService, IEmailService emailService//,
-            //IDataFlowService dataFlowService
+            userService, IEmailService emailService,
+            IDataFlowService dataFlowService,
+            IJobService jobService, ISecurityService securityService
             )
         {
             _datasetContext = dsContext;
             _userService = userService;
             _emailService = emailService;
-            //_dataFlowService = dataFlowService;
+            _dataFlowService = dataFlowService;
+            _jobService = jobService;
+            _securityService = securityService;
         }
 
         public int CreateAndSaveSchema(FileSchemaDto schemaDto)
@@ -35,7 +40,7 @@ namespace Sentry.data.Core
 
                 //_dataFlowService.CreateandSaveDataFlow(MapToDataFlowDto(newSchema));
 
-                //_dataFlowService.CreateDataFlowForSchema(newSchema);
+                _dataFlowService.CreateDataFlowForSchema(newSchema);
 
                 _datasetContext.SaveChanges();
             }
@@ -171,6 +176,36 @@ namespace Sentry.data.Core
 
         public List<SchemaRevisionDto> GetSchemaRevisionDtoBySchema(int id)
         {
+            Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == id).Select(s => s.ParentDataset).FirstOrDefault();
+            if (ds == null)
+            {
+                throw new SchemaNotFoundException();
+            }
+
+            try
+            {
+                UserSecurity us;
+                us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+                if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
+                {
+                    try
+                    {
+                        IApplicationUser user = _userService.GetCurrentUser();
+                        Logger.Info($"schemacontroller-fetSchemarevisiondtobyschema unauthorized_access: Id:{user.AssociateId}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error("schemacontroller-fetSchemarevisiondtobyschema unauthorized_access", ex);
+                    }
+                    throw new SchemaUnauthorizedAccessException();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"schemacontroller-fetSchemarevisiondtobyschema failed to retrieve UserSecurity object", ex);
+                throw new SchemaUnauthorizedAccessException();
+            }
+
             List<SchemaRevisionDto> dtoList = new List<SchemaRevisionDto>();
             foreach (SchemaRevision revision in _datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == id).ToList())
             {
@@ -188,6 +223,37 @@ namespace Sentry.data.Core
 
         public SchemaRevisionDto GetLatestSchemaRevisionDtoBySchema(int schemaId)
         {
+            Dataset ds = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaId).Select(s => s.ParentDataset).FirstOrDefault();
+
+            if (ds == null)
+            {
+                return null;
+            }
+            
+            try
+            {
+                UserSecurity us;
+                us = _securityService.GetUserSecurity(ds, _userService.GetCurrentUser());
+                if (!(us.CanPreviewDataset || us.CanViewFullDataset || us.CanUploadToDataset || us.CanEditDataset))
+                {
+                    try
+                    {
+                        IApplicationUser user = _userService.GetCurrentUser();
+                        Logger.Info($"schemacontroller-getlatestschemarevisiondtobyschema unauthorized_access: Id:{user.AssociateId}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error("schemacontroller-getlatestschemarevisiondtobyschema unauthorized_access", ex);
+                    }
+                    throw new SchemaUnauthorizedAccessException();
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"schemacontroller-getlatestschemarevisiondtobyschema failed to retrieve UserSecurity object", ex);
+                throw new SchemaUnauthorizedAccessException();
+            }
+
             SchemaRevision revision = _datasetContext.SchemaRevision.Where(w => w.ParentSchema.SchemaId == schemaId).OrderByDescending(o => o.Revision_NBR).Take(1).FirstOrDefault();
 
             return revision.ToDto();
@@ -306,8 +372,8 @@ namespace Sentry.data.Core
                 SasLibrary = CommonExtensions.GenerateSASLibaryName(_datasetContext.GetById<Dataset>(dto.ParentDatasetId)),
                 Description = dto.Description,
                 StorageCode = storageCode,
-                HiveDatabase = "dsc_" + parentDataset.DatasetCategories.First().Name.ToLower(),
-                HiveTable = parentDataset.DatasetName.Replace(" ", "").Replace("_", "").ToUpper() + "_" + dto.Name.Replace(" ", "").ToUpper(),
+                HiveDatabase = GenerateHiveDatabaseName(parentDataset.DatasetCategories.First()),
+                HiveTable = FormatHiveTableNamePart(parentDataset.DatasetName) + "_" + FormatHiveTableNamePart(dto.Name),
                 HiveTableStatus = HiveTableStatusEnum.NameReserved.ToString(),
                 HiveLocation = Configuration.Config.GetHostSetting("AWSRootBucket") + "/" + GlobalConstants.ConvertedFileStoragePrefix.PARQUET_STORAGE_PREFIX + "/" + Configuration.Config.GetHostSetting("S3DataPrefix") + storageCode,
                 CreatedDTM = DateTime.Now,
@@ -486,6 +552,16 @@ namespace Sentry.data.Core
             };
 
             return dto;
+        }
+
+        private string FormatHiveTableNamePart(string part)
+        {
+            return part.Replace(" ", "").Replace("_", "").Replace("-", "").ToUpper();
+        }
+
+        private string GenerateHiveDatabaseName(Category cat)
+        {            
+            return "dsc_" + cat.Name.ToLower();
         }
     }
 }

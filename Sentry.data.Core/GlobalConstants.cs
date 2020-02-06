@@ -83,12 +83,14 @@
             public const string DEFAULT_DROP_LOCATION = "Default Drop Location";
             public const string DEFAULT_S3_DROP_LOCATION = "Default S3 Drop Location";
             public const string DEFAULT_HSZ_DROP_LOCATION = "Default HSZ Drop Location";
+            public const string DEFAULT_DATAFLOW_DFS_DROP_LOCATION = "Default DataFlow DFS Drop Location";
         }
 
         public static class DataSoureDiscriminator
         {
             public const string DFS_SOURCE = "DFS";
             public const string DEFAULT_DROP_LOCATION = "DFSBasic";
+            public const string DEFAULT_DATAFLOW_DFS_DROP_LOCATION = "DFSDataFlowBasic";
             public const string DFS_CUSTOM = "DFSCustom";
             public const string DEFAULT_S3_DROP_LOCATION = "S3Basic";
             public const string FTP_SOURCE = "FTP";
@@ -259,6 +261,7 @@
             public const string S3_DROP_PREFIX = TEMP_FILE_PREFIX + "s3drop/";
             public const string SCHEMA_LOAD_PREFIX = TEMP_FILE_PREFIX + "schemaload/";
             public const string CONVERT_TO_PARQUET_PREFIX = "parquet/";
+            public const string SCHEMA_MAP_PREFIX = TEMP_FILE_PREFIX + "schemamap/";
         }
 
         public static class DataFlowStepEvent
@@ -267,6 +270,7 @@
             public const string RAW_STORAGE_START = "DATAFLOWSTEP_RAWSTORAGE_START";
             public const string QUERY_STORAGE = "DATAFLOWSTEP_QUERYSTORAGE_START";
             public const string SCHEMA_LOAD = "DATAFLOWSTEP_SCHEMA_LOAD_START";
+            public const string SCHEMA_MAP = "DATAFLOWSTEP_SCHEMA_MAP_START";
             public const string CONVERT_TO_PARQUET = "DATAFLOWSTEP_CONVERTTOPARQUET_START";
             public const string UNCOMPRESS_ZIP = "DATAFLOWSTEP_UNCOMPRESSZIP_START";
         }

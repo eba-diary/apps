@@ -86,45 +86,6 @@ namespace Sentry.data.Infrastructure
 
         }
 
-        private string AddPageToken(string body)
-        {
-            JObject x = JObject.Parse(body);
-            JArray reportReqeusts = (JArray)x["reportRequests"];
-            JObject reportReq = (JObject)reportReqeusts[0];
-            reportReq.Add("pageToken", _nextVal);
-
-            return x.ToString();
-        }
-
-        private string AddPageSize(string body)
-        {
-            JObject x = JObject.Parse(body);
-            JArray reportReqeusts = (JArray)x["reportRequests"];
-            JObject reportReq = (JObject)reportReqeusts[0];
-            reportReq.Add("pageSize", 1);
-            
-            return x.ToString();
-        }
-
-        private void ConfigurePaging()
-        {
-            if (_job.JobOptions.HttpOptions.Body != null)
-            {
-                string requestBody = _job.JobOptions.HttpOptions.Body;
-
-                if (((GoogleApiSource)_job.DataSource).PagingEnabled)
-                {
-                    ConfigurePaging();
-                    requestBody = AddPageSize(requestBody);
-                    if (_nextVal != "0")
-                    {
-                        requestBody = AddPageToken(requestBody);
-                    };
-                }
-                _request.AddJsonBody(requestBody);
-            }
-        }
-
         public override void Execute(RetrieverJob job)
         {
             //Set Job
@@ -239,6 +200,10 @@ namespace Sentry.data.Infrastructure
             } while (_hasNext);
         }
 
+        public override void Execute(RetrieverJob job, string filePath)
+        {
+            throw new NotImplementedException();
+        }
 
         public override List<IRestResponse> SendPagingRequest()
         {
@@ -368,6 +333,45 @@ namespace Sentry.data.Infrastructure
 
             segments.Add(Base64UrlEncode(signature));
             return string.Join(".", segments.ToArray());
+        }
+
+        private string AddPageToken(string body)
+        {
+            JObject x = JObject.Parse(body);
+            JArray reportReqeusts = (JArray)x["reportRequests"];
+            JObject reportReq = (JObject)reportReqeusts[0];
+            reportReq.Add("pageToken", _nextVal);
+
+            return x.ToString();
+        }
+
+        private string AddPageSize(string body)
+        {
+            JObject x = JObject.Parse(body);
+            JArray reportReqeusts = (JArray)x["reportRequests"];
+            JObject reportReq = (JObject)reportReqeusts[0];
+            reportReq.Add("pageSize", 1);
+
+            return x.ToString();
+        }
+
+        private void ConfigurePaging()
+        {
+            if (_job.JobOptions.HttpOptions.Body != null)
+            {
+                string requestBody = _job.JobOptions.HttpOptions.Body;
+
+                if (((GoogleApiSource)_job.DataSource).PagingEnabled)
+                {
+                    ConfigurePaging();
+                    requestBody = AddPageSize(requestBody);
+                    if (_nextVal != "0")
+                    {
+                        requestBody = AddPageToken(requestBody);
+                    };
+                }
+                _request.AddJsonBody(requestBody);
+            }
         }
     }
 }

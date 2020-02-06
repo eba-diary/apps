@@ -111,6 +111,9 @@ namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
                     case DataActionType.UncompressZip:
                         _provider = container.GetInstance<IUncompressZipProvider>();
                         break;
+                    case DataActionType.SchemaMap:
+                        _provider = container.GetInstance<ISchemaMapProvider>();
+                        break;
                     case DataActionType.None:
                     default:
                         break;

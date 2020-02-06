@@ -415,6 +415,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<SchemaMapAction> SchemaMapAction
+        {
+            get
+            {
+                return Query<SchemaMapAction>();
+            }
+        }
+
         public IQueryable<RawStorageAction> RawStorageAction
         {
             get

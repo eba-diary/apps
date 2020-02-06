@@ -8,7 +8,8 @@
 		  (4, 'Schema Load'),
 		  (5, 'Convert to Parquet'),
 		  (6, 'Uncompress Zip'),
-		  (7, 'Uncompress Gzip')
+		  (7, 'Uncompress Gzip'),
+		  (8, 'Schema Map')
         )
         AS Source ([ID], [Name])
         ON Target.[ID] = Source.[ID]   

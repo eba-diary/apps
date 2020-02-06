@@ -6,11 +6,14 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Entities.DataProcessing.Actions;
 using Sentry.data.Core.Entities.S3;
 using Sentry.data.Core.Interfaces.DataProcessing;
 
 namespace Sentry.data.Infrastructure
 {
+    //ActionType attribute utilized to map entity to provider within DataStepProvider.cs
+    [ActionType(DataActionType.UncompressZip)]
     public class UncompressZipProvider : IUncompressZipProvider
     {
         private readonly IMessagePublisher _messagePublisher;

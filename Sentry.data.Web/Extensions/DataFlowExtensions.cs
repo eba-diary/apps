@@ -30,7 +30,6 @@ namespace Sentry.data.Web
             {
                 Id = model.DataFlowId,
                 Name = "Blah",
-                DFQuestionnaire = JsonConvert.SerializeObject(model),
                 CreatedBy = model.CreatedBy,
                 CreateDTM = model.CreatedDTM,
                 IngestionType = model.IngestionType,
@@ -51,6 +50,8 @@ namespace Sentry.data.Web
             {
                 dto.CompressionJob = model.CompressionJob.First().ToDto();
             }
+
+            dto.DFQuestionnaire = JsonConvert.SerializeObject(dto);
 
             return dto;
         }
