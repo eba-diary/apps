@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core.Exceptions
 {
-    public class AWSLambdaRequestLimitException : Exception
+    public class AWSLambdaRequestLimitException : Exception, ISerializable
     {
         public AWSLambdaRequestLimitException() { }
         public AWSLambdaRequestLimitException(string message) : base(message) { }

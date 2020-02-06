@@ -15,23 +15,17 @@ namespace Sentry.data.Core
         private readonly IDatasetContext _datasetContext;
         private readonly ISecurityService _securityService;
         private readonly UserService _userService;
-        private readonly IMessagePublisher _messagePublisher;
-        private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly IConfigService _configService;
         private readonly ISchemaService _schemaService;
         private readonly IAWSLambdaProvider _awsLambdaProvider;
 
         public DatasetService(IDatasetContext datasetContext, ISecurityService securityService, 
-                            UserService userService, IMessagePublisher messagePublisher,
-                            IS3ServiceProvider s3ServiceProvider,
-                            IConfigService configService, ISchemaService schemaService,
-                            IAWSLambdaProvider awsLambdaProvider)
+                            UserService userService, IConfigService configService, 
+                            ISchemaService schemaService, IAWSLambdaProvider awsLambdaProvider)
         {
             _datasetContext = datasetContext;
             _securityService = securityService;
             _userService = userService;
-            _messagePublisher = messagePublisher;
-            _s3ServiceProvider = s3ServiceProvider;
             _configService = configService;
             _schemaService = schemaService;
             _awsLambdaProvider = awsLambdaProvider;

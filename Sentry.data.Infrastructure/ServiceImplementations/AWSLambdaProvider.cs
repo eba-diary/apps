@@ -9,7 +9,7 @@ using Sentry.data.Core.Exceptions;
 
 namespace Sentry.data.Infrastructure
 {
-    public class AWSLambdaProvider : IAWSLambdaProvider
+    public class AWSLambdaProvider : IAWSLambdaProvider, IDisposable
     {
         private IAmazonLambda _lambdaClient;
         private string _invocationType;
@@ -61,8 +61,7 @@ namespace Sentry.data.Infrastructure
             try
             {
                 InvokeResponse resp = _lambdaClient.Invoke(req);
-                var logResult = Encoding.UTF8.GetString(Convert.FromBase64String(resp.LogResult));
-                var payloadResult = Encoding.UTF8.GetString(resp.Payload.ToArray());
+                Logger.Debug($"awslambdaprovider-invokefunction lambdafunction:{req.FunctionName} logresult:{Encoding.UTF8.GetString(Convert.FromBase64String(resp.LogResult))} payloadresult:{Encoding.UTF8.GetString(resp.Payload.ToArray())}");
             }
             catch (InvalidParameterValueException paramEx)
             {
@@ -84,6 +83,11 @@ namespace Sentry.data.Infrastructure
             {
                 throw new AWSLambdaException("Error Unknown", ex);
             }
-        }               
+        }
+
+        public void Dispose()
+        {
+            _lambdaClient.Dispose();
+        }
     }
 }

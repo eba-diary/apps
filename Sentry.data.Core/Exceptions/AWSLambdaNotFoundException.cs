@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core.Exceptions
 {
-    public class AWSLambdaNotFoundException : Exception
+    public class AWSLambdaNotFoundException : Exception, ISerializable
     {
         public AWSLambdaNotFoundException() { }
         public AWSLambdaNotFoundException(string message) : base(message) { }
