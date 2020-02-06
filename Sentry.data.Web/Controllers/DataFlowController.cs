@@ -49,12 +49,12 @@ namespace Sentry.data.Web.Controllers
             List<DataFlowStepDto> stepDtoList = _dataFlowService.GetDataFlowStepDtoByTrigger("temp-file/s3drop/12/");
         }
 
-        [HttpGet]
-        [Route("DataFlow/Create/{schemaId}/")]
-        public void Create(int schemaId)
-        {
-            bool success = _dataFlowService.CreateDataFlow(schemaId);
-        }
+        //[HttpGet]
+        //[Route("DataFlow/Create/{schemaId}/")]
+        //public void Create(int schemaId)
+        //{
+        //    bool success = _dataFlowService.CreateDataFlow(schemaId);
+        //}
 
         [HttpGet]
         public ViewResult Create()

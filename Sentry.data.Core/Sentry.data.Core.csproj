@@ -104,6 +104,7 @@
     <Compile Include="DTO\Schema\SchemaDTO.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />
     <Compile Include="DTO\Subscription\SubscriptionDto.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\SchemaMapAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\UncompressZip.cs" />
     <Compile Include="Entities\DataProcessing\DataFlow_Log.cs" />
     <Compile Include="Entities\DataProcessing\Actions\ActionTypeAttribute.cs" />
@@ -148,11 +149,11 @@
     <Compile Include="Entities\Schema\TimestampField.cs" />
     <Compile Include="Entities\Schema\VarcharField.cs" />
     <Compile Include="Entities\Subscriptions\BusinessAreaSubscription.cs" />
+    <Compile Include="Entities\Subscriptions\EventTypeGroup.cs" />
     <Compile Include="Exceptions\DatasetNotFoundException.cs" />
     <Compile Include="Exceptions\DatasetUnauthorizedAccessException.cs" />
     <Compile Include="Exceptions\SchemaNotFoundException.cs" />
     <Compile Include="Exceptions\SchemaUnauthorizedAccessException.cs" />
-    <Compile Include="Entities\Subscriptions\EventTypeGroup.cs" />
     <Compile Include="Extensions\DataFlowExtensions.cs" />
     <Compile Include="Extensions\DatasetExtensions.cs" />
     <Compile Include="Extensions\DatasetFileConfigExtensions.cs" />
@@ -164,6 +165,7 @@
     <Compile Include="GlobalEnums\IngestionType.cs" />
     <Compile Include="GlobalEnums\OAuthClaims.cs" />
     <Compile Include="GlobalEnums\OAuthGrantType.cs" />
+    <Compile Include="GlobalEnums\RetrieverJobScheduleTypes.cs" />
     <Compile Include="GlobalEnums\SchemaDatatypes.cs" />
     <Compile Include="Interfaces\DataProcessing\IBaseActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IConvertToParquetProvider.cs" />
@@ -176,6 +178,7 @@
     <Compile Include="Interfaces\DataProcessing\IRawStorageProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IS3DropProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\ISchemaLoadProvider.cs" />
+    <Compile Include="Interfaces\DataProcessing\ISchemaMapProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
     <Compile Include="Interfaces\ISchemaField.cs" />
     <Compile Include="Interfaces\ISchemaService.cs" />

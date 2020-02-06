@@ -153,6 +153,12 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public override void Execute(RetrieverJob job, string filePath)
+        {
+            //This is not utilized by this type
+            throw new NotImplementedException();
+        }
+
         public override List<IRestResponse> SendPagingRequest()
         {
             throw new NotImplementedException();

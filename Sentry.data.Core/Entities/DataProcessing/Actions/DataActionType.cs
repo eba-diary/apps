@@ -16,6 +16,10 @@ namespace Sentry.data.Core.Entities.DataProcessing
         [Description("Convert to Parquet")]
         ConvertParquet = 5,
         [Description("Uncompress Zip")]
-        UncompressZip = 6
+        UncompressZip = 6,
+        [Description("Uncompress GZip")]
+        UncompressGZip = 7,
+        [Description("Schema Map")]
+        SchemaMap = 8
     }
 }

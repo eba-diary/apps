@@ -279,6 +279,7 @@
             public const string S3_DROP_PREFIX = TEMP_FILE_PREFIX + "s3drop/";
             public const string SCHEMA_LOAD_PREFIX = TEMP_FILE_PREFIX + "schemaload/";
             public const string CONVERT_TO_PARQUET_PREFIX = "parquet/";
+            public const string SCHEMA_MAP_PREFIX = TEMP_FILE_PREFIX + "schemamap/";
         }
 
         public static class DataFlowStepEvent
@@ -287,6 +288,7 @@
             public const string RAW_STORAGE_START = "DATAFLOWSTEP_RAWSTORAGE_START";
             public const string QUERY_STORAGE = "DATAFLOWSTEP_QUERYSTORAGE_START";
             public const string SCHEMA_LOAD = "DATAFLOWSTEP_SCHEMA_LOAD_START";
+            public const string SCHEMA_MAP = "DATAFLOWSTEP_SCHEMA_MAP_START";
             public const string CONVERT_TO_PARQUET = "DATAFLOWSTEP_CONVERTTOPARQUET_START";
             public const string UNCOMPRESS_ZIP = "DATAFLOWSTEP_UNCOMPRESSZIP_START";
         }

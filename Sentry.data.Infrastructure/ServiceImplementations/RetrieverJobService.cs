@@ -76,7 +76,7 @@ namespace Sentry.data.Infrastructure
                             }
                             break;
                         default:
-                            _job.JobLoggerMessage("Info", "Job not configured for new Source\\Provider pattern");
+                            //_job.JobLoggerMessage("Info", "Job not configured for new Source\\Provider pattern");
                             break;
                     }
                     
@@ -90,12 +90,8 @@ namespace Sentry.data.Infrastructure
 
                         _job.JobLoggerMessage("Info", $"ftp.job.options - ftppatter:{_job.JobOptions.FtpPattern.ToString()} isregexsearch:{_job.JobOptions.IsRegexSearch.ToString()} searchcriteria:{_job.JobOptions.SearchCriteria}");
 
-                        //Setup temporary work space for job
-                        var tempFile = SetupTempWorkSpace();
-
                         try
                         {
-
                             switch (_job.JobOptions.FtpPattern)
                             {
                                 case 
@@ -327,11 +323,14 @@ namespace Sentry.data.Infrastructure
 
                         if (objectList == null)
                         {
-                            _job.JobLoggerMessage("Info", "S3 Basic job detected 0 new files");
+                            //_job.JobLoggerMessage("Info", "S3 Basic job detected 0 new files");
                         }
                         else
                         {
-                            _job.JobLoggerMessage("Info", $"S3 Basic job detected {objectList.Count.ToString()} new files");
+                            if (objectList.Count > 0)
+                            {
+                                _job.JobLoggerMessage("Info", $"S3 Basic job detected {objectList.Count.ToString()} new files");
+                            }
 
                             foreach (string a in objectList)
                             {
@@ -672,7 +671,7 @@ namespace Sentry.data.Infrastructure
         private void RetrieveFTPFile(string absoluteUri)
         {
             //Setup temporary work space for job
-            var tempFile = SetupTempWorkSpace();
+            var tempFile = SetupTempWorkSpace(absoluteUri);
 
             if (_job.JobOptions != null && _job.JobOptions.CompressionOptions.IsCompressed)
             {
@@ -1032,9 +1031,22 @@ namespace Sentry.data.Infrastructure
         /// Generates temp work location and removes temp file if already exists
         /// </summary>
         /// <returns></returns>
-        public string SetupTempWorkSpace()
+        public string SetupTempWorkSpace(string fileName = null)
         {
-            string tempFile = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), (Guid.NewGuid().ToString() + ".txt"));
+            //Generates the following directory structure and file name
+            // if filename passed
+            //  <GoldeneyeWorkDir>/Jobs/<JobId>/<Unique Guid>/<Original File Name w/o extension>.txt
+            // If filename not passed
+            //  <GoldeneyeWorkDir>/Jobs/<JobId>/<Unique Guid>/<Unique Guid>.txt
+            string tempFile;
+            if (string.IsNullOrEmpty(fileName))
+            {
+                tempFile = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Guid.NewGuid().ToString(), (Guid.NewGuid().ToString() + ".txt"));
+            }
+            else
+            {
+                tempFile = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Guid.NewGuid().ToString(), (Path.GetFileNameWithoutExtension(fileName) + ".txt"));
+            }
 
             //Create temp directory if exists
             Directory.CreateDirectory(Path.GetDirectoryName(tempFile));
@@ -1063,7 +1075,7 @@ namespace Sentry.data.Infrastructure
 
                 //var tempFile = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Path.GetFileName(filepath));
 
-                var tempFile = SetupTempWorkSpace();
+                var tempFile = SetupTempWorkSpace(filepath);
 
                 //TODO: Revisit delete source file logic to handle not deleting source file
                 if (deleteSrcFile)

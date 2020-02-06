@@ -38,7 +38,7 @@ namespace ProducerTesting
                         },
                         _object = new Sentry.data.Core.Entities.S3.Object()
                         {
-                            key = "25/Testfile.csv"
+                            key = "64/Testfile.csv"
                         }
                     }
 
