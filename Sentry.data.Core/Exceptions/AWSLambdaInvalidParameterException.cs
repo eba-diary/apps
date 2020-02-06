@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace Sentry.data.Core.Exceptions
 {
+    [Serializable]
     public class AWSLambdaInvalidParameterException : ArgumentException, ISerializable
     {
         public AWSLambdaInvalidParameterException() { }
