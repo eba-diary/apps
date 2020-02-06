@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Sentry.Common.Logging;
+using Sentry.data.Core.Exceptions;
 
 namespace Sentry.data.Core
 {
@@ -17,11 +18,9 @@ namespace Sentry.data.Core
         private readonly IEmailService _emailService;
         private readonly ISecurityService _securityService;
 
-        public SchemaService(IDatasetContext dsContext, IUserService 
-            userService, IEmailService emailService,
+        public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
             IDataFlowService dataFlowService,
-            IJobService jobService, ISecurityService securityService
-            )
+            IJobService jobService, ISecurityService securityService)
         {
             _datasetContext = dsContext;
             _userService = userService;

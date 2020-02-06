@@ -59,6 +59,24 @@
 
             public const string CREATED_DATASOURCE = "Created Data Source";
             public const string UPDATED_DATASOURCE = "Updated Data Source";
+
+            public const string NOTIFICATION_CRITICAL = "Critical Notification";
+            public const string NOTIFICATION_WARNING = "Warning Notification";
+            public const string NOTIFICATION_INFO = "Info Notification";
+
+            public const string NOTIFICATION_CRITICAL_ADD = "Critical Notification Add";
+            public const string NOTIFICATION_WARNING_ADD = "Warning Notification Add";
+            public const string NOTIFICATION_INFO_ADD = "Info Notification Add";
+
+            public const string NOTIFICATION_CRITICAL_UPDATE = "Critical Notification Update";
+            public const string NOTIFICATION_WARNING_UPDATE = "Warning Notification Update";
+            public const string NOTIFICATION_INFO_UPDATE = "Info Notification Update";
+
+
+            //public const string NOTIFICATION_CREATE = "Notification Create";
+            //public const string NOTIFICATION_UPDATE = "Notification Update";
+
+
         }
 
         public static class Statuses

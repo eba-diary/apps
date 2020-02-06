@@ -342,6 +342,14 @@
             return FilterExhibits(window.vm.datasets(), "0", selectedFilters);
         }
 
+        function FilterTitlesToArray(selectedFilters) {
+            return selectedFilters.map(obj => {
+                    let rObj = "";
+                    rObj = obj.Title;
+                    return rObj;
+                });
+        }
+
         function Dataset(data) {
             var self = this;
 
@@ -557,7 +565,7 @@
             self.ExtensionFilters = ko.observableArray([]);
             self.TagFilters = ko.observableArray([]);
 
-            self.FilterExhibits = function (exhibits, sortVal) {
+            self.FilterExhibits = function (exhibits, sortVal) {                
                 return FilterExhibits(exhibits, sortVal, self.SelectedFilters());
             };
 
@@ -1271,6 +1279,23 @@
                 queryResults = temp.map(x => x.dataset);
 
                 queryResults = self.FilterExhibits(queryResults, self.SortByVal());
+                
+                if ($('#dataColumn').is(":visible")) {
+                    $.ajax({
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8",
+                        type: 'POST',
+                        url: '/Search/SearchEvent/' + self.SearchType() +
+                            '?categoryFilters=' + FilterTitlesToArray(data.Search.GetSelectedFiltersFromGroup(self.CategoryFilters, self.SelectedFilters())) +
+                            '&sentryOwners=' + FilterTitlesToArray(data.Search.GetSelectedFiltersFromGroup(self.OwnerFilters, self.SelectedFilters())) +
+                            '&extensions=' + FilterTitlesToArray(data.Search.GetSelectedFiltersFromGroup(self.ExtensionFilters, self.SelectedFilters())) +
+                            '&businessUnits=' + FilterTitlesToArray(data.Search.GetSelectedFiltersFromGroup(self.BusinessUnitFilters, self.SelectedFilters())) +
+                            '&datasetFunctions=' + FilterTitlesToArray(data.Search.GetSelectedFiltersFromGroup(self.DatasetFunctionFilters, self.SelectedFilters())) + 
+                            '&tags=' + FilterTitlesToArray(data.Search.GetSelectedFiltersFromGroup(self.TagFilters, self.SelectedFilters())) + 
+                            '&searchTerm=' + window.vm.Query() +
+                            '&resultsReturned=' + queryResults.length
+                    });
+                }
 
                 $("#SearchText").attr("placeholder", "Search " + queryResults.length + " Datasets...");
 

@@ -1,23 +1,23 @@
 ﻿data.Subscription =
 {
-    init: function (eventTypeGroup)
+    init: function (group)
     {
         //associate click event with SubscribeModal btn
         $("[id^='SubscribeModal']").click(function()
         {
-            data.Subscription.SubscribeModal(eventTypeGroup);
+            data.Subscription.SubscribeModal(group);
         });
     },
 
     //this function is executed when SubscribeModal BTN is clicked
-    SubscribeModal: function (eventTypeGroup)
+    SubscribeModal: function (group)
     {
         var modal = Sentry.ShowModalWithSpinner("Subscribe");
 
         //for now only BUSINESSAREA EXISTS
-        if (eventTypeGroup === 'BUSINESSAREA')
+        if (group === 2)
         {
-            $.get("/Notification/Subscribe/", function (e)
+            $.get("/Notification/SubscribeDisplay/?group=" + group, function (e)
             {
                 modal.ReplaceModalBody(e);
             });

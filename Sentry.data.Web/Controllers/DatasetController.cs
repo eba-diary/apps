@@ -351,15 +351,10 @@ namespace Sentry.data.Web.Controllers
             Dataset ds = _datasetContext.GetById(id);
             SubscriptionModel sm = new SubscriptionModel();
 
-            sm.AllEventTypes = _datasetContext.EventTypes.Where(w => w.Display).Select((c) => new SelectListItem { Text = c.Description, Value = c.Type_ID.ToString() });
             sm.AllIntervals = _datasetContext.GetAllIntervals().Select((c) => new SelectListItem { Text = c.Description, Value = c.Interval_ID.ToString() });
-
             sm.CurrentSubscriptions = _datasetContext.GetAllUserSubscriptionsForDataset(_userService.GetCurrentUser().AssociateId, id);
-
             sm.datasetID = ds.DatasetId;
-
             sm.SentryOwnerName = _userService.GetCurrentUser().AssociateId;
-
 
             foreach (Core.EventType et in _datasetContext.EventTypes.Where(w => w.Display && w.Group == "DATASET"))
             {

@@ -9,6 +9,8 @@ namespace Sentry.data.Web
 {
     public class SubscriptionModel
     {
+        public EventTypeGroup group { get; set; }                        //this will identify whether we are dealing with either DATASET=1 or BUSINESSAREA=2 EventTypes
+
         public int datasetID { get; set; }
         
         public int businessAreaID { get; set; }
@@ -19,9 +21,6 @@ namespace Sentry.data.Web
        
         public List<BusinessAreaSubscription> CurrentSubscriptionsBusinessArea { get; set; }
 
-        public IEnumerable<SelectListItem> AllEventTypes { get; set; }
-
         public IEnumerable<SelectListItem> AllIntervals { get; set; }
-
     }
 }

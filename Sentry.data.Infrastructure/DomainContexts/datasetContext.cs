@@ -52,7 +52,7 @@ namespace Sentry.data.Infrastructure
         {
             get
             {
-                return Query<EventType>().Cacheable();
+                return Query<EventType>();
             }
         }
 
@@ -581,17 +581,17 @@ namespace Sentry.data.Infrastructure
 
         public Interval GetInterval(string description)
         {
-            return Query<Interval>().Cacheable().FirstOrDefault(x => x.Description.ToLower().Contains(description.ToLower()));
+            return Query<Interval>().FirstOrDefault(x => x.Description.ToLower().Contains(description.ToLower()));
         }
 
         public List<Interval> GetAllIntervals()
         {
-            return Query<Interval>().Cacheable().ToList();
+            return Query<Interval>().ToList();
         }
 
         public Interval GetInterval(int id)
         {
-            return Query<Interval>().Cacheable().FirstOrDefault(x => x.Interval_ID == id);
+            return Query<Interval>().FirstOrDefault(x => x.Interval_ID == id);
         }
 
         public Status GetStatus(string description)
@@ -636,29 +636,32 @@ namespace Sentry.data.Infrastructure
 
         public List<DatasetSubscription> GetAllUserSubscriptionsForDataset(string SentryOwnerName, int datasetID)
         {
-            return Query<DatasetSubscription>().Cacheable().Where(x => x.SentryOwnerName == SentryOwnerName && x.Dataset.DatasetId == datasetID).ToList();
+            return Query<DatasetSubscription>().Where(x => x.SentryOwnerName == SentryOwnerName && x.Dataset.DatasetId == datasetID).ToList();
         }
 
-        public List<BusinessAreaSubscription> GetAllUserSubscriptionsForBusinessArea(string SentryOwnerName)
+        public List<BusinessAreaSubscription> GetAllUserSubscriptionsByEventTypeGroup(string SentryOwnerName,EventTypeGroup group)
         {
-            return Query<BusinessAreaSubscription>().Cacheable().Where(x => x.SentryOwnerName == SentryOwnerName).ToList();
-        }
 
+            if (group == EventTypeGroup.BusinessArea)
+                return Query<BusinessAreaSubscription>().Where(x => x.SentryOwnerName == SentryOwnerName).ToList();
+            else
+                return null;
+        }
 
         public List<DataAssetSubscription> GetAllUserSubscriptionsForDataAsset(string SentryOwnerName, int dataAssetID)
         {
-            return Query<DataAssetSubscription>().Cacheable().Where(x => x.SentryOwnerName == SentryOwnerName && x.DataAsset.Id == dataAssetID).ToList();
+            return Query<DataAssetSubscription>().Where(x => x.SentryOwnerName == SentryOwnerName && x.DataAsset.Id == dataAssetID).ToList();
         }
 
         public List<DatasetSubscription> GetAllSubscriptions()
         {
-            return Query<DatasetSubscription>().Cacheable().ToList();
+            return Query<DatasetSubscription>().ToList();
         }
 
 
         public List<DatasetSubscription> GetSubscriptionsForDataset(int datasetID)
         {
-            return Query<DatasetSubscription>().Cacheable().Where(x => x.Dataset.DatasetId == datasetID).ToList();
+            return Query<DatasetSubscription>().Where(x => x.Dataset.DatasetId == datasetID).ToList();
         }
 
         public List<DataAssetSubscription> GetSubscriptionsForDataAsset(int dataAssetID)
@@ -668,7 +671,8 @@ namespace Sentry.data.Infrastructure
 
         public List<Event> EventsSince(DateTime time, Boolean IsProcessed)
         {
-            return Query<Event>().Cacheable().Where(e => e.TimeCreated >= time && e.IsProcessed == IsProcessed && e.EventType.Display).ToList();
+            List<Event> events = Query<Event>().Where(e => e.TimeCreated >= time && e.IsProcessed == IsProcessed && (e.EventType.Display)).ToList();
+            return events;
         }
 
         public int GetReportCount()
