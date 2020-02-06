@@ -123,7 +123,7 @@
             }
         });
 
-        if ($("#JobID").val() != undefined && $("#JobID").val() != "0") {
+        if (($("#JobID").val() !== undefined && $("#JobID").val() !== "0") || ($('#JobID').val() === 0 && $("[id$='SelectedDataSource'] :selected").val() !== "0")) {
             $.ajax({                
                 url: "/Config/SourceDetails/" + $("[id$='SelectedDataSource'] :selected").val(),
                 dataType: 'json',
@@ -135,6 +135,7 @@
                     $('#dataSourceContactEmail').attr("href", datain.MailToLink)
                     $('#dataSourceContactEmail').text(datain.PrimaryContactName);
                     $("#editDataSource").attr("href", "/Config/Source/Edit/" + $("[id$='SelectedDataSource'] :selected").val());
+                    $("#dataSourceDescription").text(datain.Description);
 
                     if (datain.Security.CanEditDataSource) {
                         $(".editDataSourceLink").show();
@@ -387,38 +388,6 @@
         var e = jQuery.Event("keydown");
         e.which = 13; // # Some key code value
 
-        
-        switch ($("[id$='SchedulePicker']").val()) {
-            case "1":
-                $('#cronHourlyTimePicker').val(a[0]);
-                $('#hourlyPicker').show();
-                break;
-            case "2":
-                $('#cronDailyJobTimePicker').val(a[1] + ":" + a[0]);
-                $("#cronDailyJobTimePicker").trigger(e);
-                $('#dailyPicker').show();
-                break;
-            case "3":
-                $('#cronWeeklyDayPicker').val(a[4]);
-                $("#cronWeeklyJobTimePicker").val(a[1] + ":" + a[0]);
-                $("#cronWeeklyJobTimePicker").trigger(e);
-                $('#weeklyPicker').show();
-                break;
-            case "4":
-                $('#cronMonthlyDayPicker').val(a[2]);
-                $('#cronMonthlyJobTimePicker').val(a[1] + ":" + a[0]);
-                $("#cronMonthlyJobTimePicker").trigger(e);
-                $('#monthlyPicker').show();
-                break;
-            case "5":
-                $('#cronYearlyMonthPicker').val(a[3]);
-                $('#cronYearlyDayPicker').val(a[2]);
-                $('#cronYearlyJobTimePicker').val(a[1] + ":" + a[0]);
-                $("#cronYearlyJobTimePicker").trigger(e);
-                $('#yearlyPicker').show();
-                break;
-        }
-        
         $("[id$='SchedulePicker']").change(function () {
 
             $('#hourlyPicker').hide();
@@ -447,7 +416,6 @@
             }
         });
 
-
         $('#cronHourlyTimePicker').bind('input', function () {
             $("[id$='Schedule']").val($(this).val() + ' * * * *');
             updateFutureTimes();
@@ -473,8 +441,6 @@
             }
         }
 
-
-
         $('#cronDailyJobTimePicker').timepicker({
             timeFormat: 'h:mm p',
             interval: 60,
@@ -497,7 +463,6 @@
                 updateFutureTimes();
             }
         });
-
 
         $('#cronWeeklyDayPicker').bind('input', function () {
             changeWeek();
@@ -547,6 +512,7 @@
             }
             updateFutureTimes();
         }
+
         $('#cronMonthlyJobTimePicker').timepicker({
             timeFormat: 'h:mm p',
             interval: 60,
@@ -586,16 +552,15 @@
                     month = '*';
                 }
 
-
                 if (hour != null && minute != null && month != null && day != null) {
                     $("[id$='Schedule']").val(minute + ' ' + hour + ' ' + day + ' ' + month + ' *');
                 } else {
                     $("[id$='Schedule']").val();
                 }
-
             }
             updateFutureTimes();
         }
+
         $('#cronYearlyJobTimePicker').timepicker({
             timeFormat: 'h:mm p',
             interval: 60,
@@ -606,11 +571,48 @@
             dynamic: false,
             dropdown: true,
             scrollbar: true,
-            change: function () {
+            change: function (ev) {
                 changeYear();
             }
         });
 
         $("#cronJobDatePicker").datepicker();
+
+        var d = new Date();
+        d.setHours(a[1], a[0]);
+        switch ($("[id$='SchedulePicker']").val()) {
+            case "1":
+                $('#hourlyPicker').show();
+                $('#cronHourlyTimePicker').val(a[0]);
+                break;
+            case "2":
+                $('#dailyPicker').show();
+                $('#cronDailyJobTimePicker').val(a[1] + ":" + a[0]);
+                $('#cronDailyJobTimePicker').timepicker('setTime', d);
+                $("#cronDailyJobTimePicker").trigger(e);
+                break;
+            case "3":
+                $('#weeklyPicker').show();
+                $('#cronWeeklyDayPicker').val(a[4]);
+                $("#cronWeeklyJobTimePicker").val(a[1] + ":" + a[0]);
+                $('#cronWeeklyJobTimePicker').timepicker('setTime', d);
+                $("#cronWeeklyJobTimePicker").trigger(e);
+                break;
+            case "4":
+                $('#monthlyPicker').show();
+                $('#cronMonthlyDayPicker').val(a[2]);
+                //$('#cronMonthlyJobTimePicker').val(a[1] + ":" + a[0]);
+                $('#cronMonthlyJobTimePicker').timepicker('setTime', d);
+                $("#cronMonthlyJobTimePicker").trigger(e);
+                break;
+            case "5":
+                $('#yearlyPicker').show();
+                $('#cronYearlyMonthPicker').val(a[3]);
+                $('#cronYearlyDayPicker').val(a[2]);
+                //$('#cronYearlyJobTimePicker').val(a[1] + ":" + a[0]);
+                $('#cronYearlyJobTimePicker').timepicker('setTime', d);
+                $("#cronYearlyJobTimePicker").trigger(e);
+                break;
+        }
     }
 }

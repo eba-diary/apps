@@ -349,6 +349,8 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
+                AddCoreValidationExceptionsToModel(cjm.Validate());
+
                 if (ModelState.IsValid)
                 {
                     DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(cjm.DatasetConfigID);
@@ -525,6 +527,8 @@ namespace Sentry.data.Web.Controllers
 
             try
             {
+                AddCoreValidationExceptionsToModel(ejm.Validate());
+
                 if (ModelState.IsValid)
                 {
                     DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(ejm.DatasetConfigID);
