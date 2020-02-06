@@ -349,6 +349,8 @@ namespace Sentry.data.Web.Controllers
         {
             try
             {
+                AddCoreValidationExceptionsToModel(cjm.Validate());
+
                 if (ModelState.IsValid)
                 {
                     DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(cjm.DatasetConfigID);
@@ -481,6 +483,8 @@ namespace Sentry.data.Web.Controllers
 
             cjm.FtpPatternDropDown = Utility.BuildFtpPatternSelectList(cjm.FtpPattern);
 
+            cjm.SchedulePickerDropdown = Utility.BuildSchedulePickerDropdown(null);
+
             return cjm;
         }
 
@@ -523,6 +527,8 @@ namespace Sentry.data.Web.Controllers
 
             try
             {
+                AddCoreValidationExceptionsToModel(ejm.Validate());
+
                 if (ModelState.IsValid)
                 {
                     DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(ejm.DatasetConfigID);
@@ -651,40 +657,8 @@ namespace Sentry.data.Web.Controllers
             ejm.SourceTypesDropdown = temp.OrderBy(x => x.Value);
             ejm.SourcesForDropdown = temp2.OrderBy(x => x.Value);
 
-            string[] schedules = new string[5] { "Hourly", "Daily", "Weekly", "Monthly", "Yearly" };
-
-            List<SelectListItem> ScheduleOptions = new List<SelectListItem>();
-            int counter = 1;
-
-            ScheduleOptions.Add(new SelectListItem()
-            {
-                Text = "Pick a Schedule",
-                Value = "0",
-                Selected = false,
-                Disabled = true
-            });
-
-
-
-            foreach (string s in schedules)
-            {
-                ScheduleOptions.Add(new SelectListItem()
-                {
-                    Text = s,
-                    Value = counter.ToString(),
-                    Selected = retrieverJob.ReadableSchedule == s,
-                    Disabled = false
-                });
-
-                if (retrieverJob.ReadableSchedule == s)
-                {
-                    ejm.SchedulePicker = counter;
-                }
-
-                counter++;
-            }
-
-            ejm.ScheduleOptions = ScheduleOptions;
+            ejm.ScheduleOptions = Utility.BuildSchedulePickerDropdown(retrieverJob.ReadableSchedule);
+            ejm.SchedulePicker = ejm.ScheduleOptions.Where(w => w.Selected).Select(s => Int32.Parse(s.Value)).FirstOrDefault();
 
             ejm.CompressionTypesDropdown = Enum.GetValues(typeof(CompressionTypes)).Cast<CompressionTypes>().Select(v
                 => new SelectListItem { Text = v.ToString(), Value = ((int)v).ToString() }).ToList();
@@ -1226,6 +1200,7 @@ namespace Sentry.data.Web.Controllers
             return Json(temp, JsonRequestBehavior.AllowGet);
         }
 
+        [Route("Config/DataSourceDescription/")]
         public JsonResult DataSourceDescription(int sourceId)
         {
             var temp = _datasetContext.DataSources.Where(x => x.Id == sourceId).Select(x => new { Description = x.Description, BaseUri = x.BaseUri }).FirstOrDefault();
