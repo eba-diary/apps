@@ -70,7 +70,8 @@ namespace Sentry.data.Infrastructure
                                 S3ServiceProvider s3Service = new S3ServiceProvider();
 
                                 //local directory where compressed file contents will be extracted
-                                var extractPath = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Path.GetFileNameWithoutExtension(filePath));
+                                //Adding guid to path to ensure concurrent processing of zip file with same name
+                                var extractPath = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Guid.NewGuid().ToString(), Path.GetFileNameWithoutExtension(filePath));
 
                                 //create local extraction directory
                                 if (!Directory.Exists(extractPath))
@@ -91,7 +92,10 @@ namespace Sentry.data.Infrastructure
                                     foreach (string file in extractedFileList)
                                     {
                                         _job.JobLoggerMessage("Info", $"uncompressretrieverjob preparing_file_upload file:{Path.GetFileName(file)}");
-                                        string targetkey = $"{defaultjob.DataSource.GetDropPrefix(defaultjob)}{_job.GetTargetFileName(Path.GetFileName(file))}";
+
+                                        //Adding parent directory to targetkey to ensure concurrent processing of extracted files with same name
+                                        // an additional parent folder named with a GUID is added to ensure concurrent processing of same zip file name
+                                        string targetkey = $"{defaultjob.DataSource.GetDropPrefix(defaultjob)}{Guid.NewGuid().ToString()}/{Directory.GetParent(file).Name}/{_job.GetTargetFileName(Path.GetFileName(file))}";
                                         var versionId = s3Service.UploadDataFile(file, targetkey);
                                         _job.JobLoggerMessage("Info", $"Extracted File contents to S3 Drop Location (key:{targetkey} | versionId:{versionId})");
                                     }
@@ -107,11 +111,13 @@ namespace Sentry.data.Infrastructure
                                     _job.JobLoggerMessage("Info", $"Deleting all files in extract directory ({extractPath})");
 
                                     //cleanup local extracts
-                                    CleanupTempDir(extractPath);
+                                    //  Need to send the parent directory since we generate an additional layer, to support
+                                    //  concurrency, containing a unique GUID as the folder name
+                                    CleanupTempDir(Directory.GetParent(extractPath).FullName);
                                 }
 
                                 //cleanup Source temp file after successful processing
-                                CleanupTempFile(filePath);
+                                CleanupTempDir(Directory.GetParent(filePath).FullName);
                             }
                             else if (defaultjob.DataSource.Is<DfsBasic>())
                             {
@@ -124,7 +130,7 @@ namespace Sentry.data.Infrastructure
                                 LogExtractionContents(targetPath, extractedFileList);
 
                                 //cleanup temp file after successful processing
-                                CleanupTempFile(filePath);
+                                CleanupTempDir(Directory.GetParent(filePath).FullName);
                             }
                         }
                         catch (System.IO.InvalidDataException ex)
@@ -211,7 +217,7 @@ namespace Sentry.data.Infrastructure
                         }
 
                         //cleanup temp compressed file after successful processing
-                        CleanupTempFile(filePath);
+                        CleanupTempDir(Directory.GetParent(filePath).FullName);
                     }
                     //Extension does not match configured compression logic
                     else
@@ -307,20 +313,6 @@ namespace Sentry.data.Infrastructure
             {
                 return Directory.GetFiles(extractPath, "*", SearchOption.TopDirectoryOnly);
             }            
-        }
-
-        private void CleanupTempFile(string filePath)
-        {
-            try
-            {
-                _job.JobLoggerMessage("Info", $"Cleaning up job temp file ({filePath})");
-                File.Delete(filePath);                
-            }
-            catch (Exception ex)
-            {
-                // Log error but allow process to continue successfully
-                _job.JobLoggerMessage("Warn", $"Failed Deleting Job Temp file ({filePath})", ex);
-            }
         }
 
         private void CleanupTempDir(string dirPath)
