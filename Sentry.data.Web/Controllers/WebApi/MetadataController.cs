@@ -518,6 +518,16 @@ namespace Sentry.data.Web.WebApi.Controllers
         {
             try
             {
+                if (message == null)
+                {
+                    Logger.Error($"jobcontroller-publishmessage null message");
+                    throw new ArgumentException("message parameter is null");
+                }
+                else
+                {
+                    Logger.Debug($"message:{message.ToString()}");
+                }
+
                 _dataFlowService.PublishMessage(message.Key, message.Message);
                 return Ok();
             }
