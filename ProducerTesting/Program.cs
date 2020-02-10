@@ -36,7 +36,7 @@ namespace ProducerTesting
                         {
                             name = "sentry-dataset-management-np-nr"
                         },
-                        _object = new Sentry.data.Core.Entities.S3.Object()
+                        Object = new Sentry.data.Core.Entities.S3.Object()
                         {
                             key = "25/Testfile.csv"
                         }

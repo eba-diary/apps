@@ -58,7 +58,7 @@ namespace Sentry.data.Infrastructure
                             {
                                 name = stepEvent.TargetBucket
                             },
-                            _object = new Sentry.data.Core.Entities.S3.Object()
+                            Object = new Sentry.data.Core.Entities.S3.Object()
                             {
                                 key = $"{stepEvent.TargetPrefix}{fileName}",
                                 size = 200124
@@ -94,7 +94,7 @@ namespace Sentry.data.Infrastructure
             {
                 stopWatch.Start();
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"start-method <{step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
-                string objectKey = s3Event.s3._object.key;
+                string objectKey = s3Event.s3.Object.key;
                 string keyBucket = s3Event.s3.bucket.name;
 
                 //Evaluate incoming file matches search criteria of any SchemaMappings for Data Step
@@ -126,7 +126,7 @@ namespace Sentry.data.Infrastructure
                         //<targetstorageprefix>/<dataflowid>/<storagecode>/<flow execution guid>[-<run instance guid>]/
                         TargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.Id}/{item.MappedSchema.StorageCode}/{GenerateGuid(flowExecutionGuid, runInstanceGuid)}/ ",
                         EventType = GlobalConstants.DataFlowStepEvent.SCHEMA_LOAD,
-                        FileSize = s3Event.s3._object.size.ToString(),
+                        FileSize = s3Event.s3.Object.size.ToString(),
                         S3EventTime = s3Event.eventTime.ToString("s"),
                         OriginalS3Event = JsonConvert.SerializeObject(s3Event)
                     };

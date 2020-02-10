@@ -61,7 +61,7 @@ namespace Sentry.data.Infrastructure
                             {
                                 name = stepEvent.TargetBucket
                             },
-                            _object = new Sentry.data.Core.Entities.S3.Object()
+                            Object = new Sentry.data.Core.Entities.S3.Object()
                             {
                                 key = $"{stepEvent.TargetPrefix}{fileName}",
                                 size = 100123
@@ -89,7 +89,7 @@ namespace Sentry.data.Infrastructure
         {
             List<DataFlow_Log> logs = new List<DataFlow_Log>();
             Stopwatch stopWatch = new Stopwatch();
-            string objectKey = s3Event.s3._object.key;
+            string objectKey = s3Event.s3.Object.key;
             string keyBucket = s3Event.s3.bucket.name;
             try
             {
@@ -112,7 +112,7 @@ namespace Sentry.data.Infrastructure
                     //add run instance (separated by dash) if not null
                     TargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.Id.ToString()}/" + $"{flowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid)}/",
                     EventType = GlobalConstants.DataFlowStepEvent.S3_DROP_START,
-                    FileSize = s3Event.s3._object.size.ToString(),
+                    FileSize = s3Event.s3.Object.size.ToString(),
                     S3EventTime = s3Event.eventTime.ToString("s"),
                     OriginalS3Event = JsonConvert.SerializeObject(s3Event)
                 };
