@@ -49,29 +49,29 @@ namespace Sentry.data.Infrastructure
 
                 stopWatch.Stop();
 
-                //Mock for testing... sent mock s3object created 
-                S3Event s3e = null;
-                s3e = new S3Event
-                {
-                    EventType = "S3EVENT",
-                    PayLoad = new S3ObjectEvent()
-                    {
-                        eventName = "ObjectCreated:Put",
-                        s3 = new S3()
-                        {
-                            bucket = new Bucket()
-                            {
-                                name = stepEvent.TargetBucket
-                            },
-                            Object = new Sentry.data.Core.Entities.S3.Object()
-                            {
-                                key = $"{stepEvent.TargetPrefix}{fileName}"
-                            }
-                        }
-                    }
-                };
+                ////Mock for testing... sent mock s3object created 
+                //S3Event s3e = null;
+                //s3e = new S3Event
+                //{
+                //    EventType = "S3EVENT",
+                //    PayLoad = new S3ObjectEvent()
+                //    {
+                //        eventName = "ObjectCreated:Put",
+                //        s3 = new S3()
+                //        {
+                //            bucket = new Bucket()
+                //            {
+                //                name = stepEvent.TargetBucket
+                //            },
+                //            Object = new Sentry.data.Core.Entities.S3.Object()
+                //            {
+                //                key = $"{stepEvent.TargetPrefix}{fileName}"
+                //            }
+                //        }
+                //    }
+                //};
 
-                _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
+                //_messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
 
                 _step.Executions.Add(_step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{_step.DataAction_Type_Id.ToString()}-executeaction-success", Log_Level.Debug, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }));
             }
