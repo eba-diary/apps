@@ -176,7 +176,8 @@ namespace Sentry.data.Infrastructure
             // example -  <temp-file prefix>/<step prefix>/<data flow id>/
             if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX) || 
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX) ||
-                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX)
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.UNCOMPRESS_ZIP_PREFIX)
                )
             {
                 int idx = GetNthIndex(key, '/', 4);

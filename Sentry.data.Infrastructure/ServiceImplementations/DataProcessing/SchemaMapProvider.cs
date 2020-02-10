@@ -24,7 +24,8 @@ namespace Sentry.data.Infrastructure
         private string _runInstGuid;
 
 
-        public SchemaMapProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, IDataFlowService dataFlowService)
+        public SchemaMapProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, 
+            IDataFlowService dataFlowService)
         {
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
@@ -47,6 +48,7 @@ namespace Sentry.data.Infrastructure
                 DateTime endTime = DateTime.Now;
                 stopWatch.Stop();
 
+#if (DEBUG)
                 //Mock for testing... sent mock s3object created 
                 S3Event s3e = null;
                 s3e = new S3Event
@@ -69,7 +71,7 @@ namespace Sentry.data.Infrastructure
                         }
                     }
                 };
-
+#endif
                 _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
 
                 step.Executions.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-successful", Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, null));
@@ -103,7 +105,10 @@ namespace Sentry.data.Infrastructure
                     stopWatch.Start();
                     DateTime startTime = DateTime.Now;
 
-                    DataFlowStep s3DropStep = _dataFlowService.GetS3DropByFileSchema(scmMap.MappedSchema);
+                    DataFlowStep s3DropStep = _dataFlowService.GetS3DropStepForFileSchema(scmMap.MappedSchema);
+
+                    //DataFlow df = _dataFlowService.GetDataFlowByName(_dataFlowService.GetDataFlowNameForFileSchema(scmMap.MappedSchema));
+                    //DataFlowStep s3DropStep = _dataFlowService.GetDataFlowStepForDataFlowByActionType(df.Id, DataActionType.S3Drop);
 
                     string targetSchemaS3DropPrefix = s3DropStep.TargetPrefix;
 

@@ -43,7 +43,7 @@ namespace Sentry.data.Infrastructure
                 string versionKey = _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, stepEvent.TargetBucket, $"{stepEvent.TargetPrefix}{fileName}");
                 DateTime endTime = DateTime.Now;
                 stopWatch.Stop();
-
+#if (DEBUG)
                 //Mock for testing... sent mock s3object created 
                 S3Event s3e = null;
                 s3e = new S3Event
@@ -66,7 +66,7 @@ namespace Sentry.data.Infrastructure
                         }
                     }
                 };
-
+#endif
                 _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
 
                 step.Executions.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-successful", Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds)}, null));

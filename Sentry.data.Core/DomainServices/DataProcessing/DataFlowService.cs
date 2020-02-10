@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Sentry.Common.Logging;
 using Sentry.data.Core.Entities.DataProcessing;
+using Sentry.data.Core.Exceptions;
 using Sentry.data.Core.Interfaces.DataProcessing;
 
 
@@ -159,11 +160,65 @@ namespace Sentry.data.Core
             return _datasetContext.DataSources;
         }
 
-        public DataFlowStep GetS3DropByFileSchema(FileSchema scm)
+        public string GetDataFlowNameForFileSchema(FileSchema scm)
         {
             string dataFlowName = GenerateDataFlowNameForFileSchema(scm);
-            DataFlow df = _datasetContext.DataFlow.Where(w => w.Name == dataFlowName).FirstOrDefault();
-            DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.DataFlow == df && w.DataAction_Type_Id == DataActionType.S3Drop).FirstOrDefault();
+            return dataFlowName;
+        }
+
+        public DataFlowStep GetS3DropStepForFileSchema(FileSchema scm)
+        {
+            if(scm == null)
+            {
+                throw new ArgumentNullException("FileSchema is required");
+            }
+
+            string schemaFlowName = GenerateDataFlowNameForFileSchema(scm);
+            DataFlow flow = _datasetContext.DataFlow.Where(w => w.Name == schemaFlowName).FirstOrDefault();
+            DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.DataFlow == flow && w.DataAction_Type_Id == DataActionType.S3Drop).FirstOrDefault();
+
+            if (step == null)
+            {
+                throw new DataFlowStepNotFound();
+            }
+
+            return step;
+        }
+
+        public DataFlow GetDataFlowByName(string schemaFlowName)
+        {
+            if (string.IsNullOrEmpty(schemaFlowName))
+            {
+                throw new ArgumentNullException("schemaFlowName not specified");
+            }
+
+            DataFlow flow = _datasetContext.DataFlow.Where(w => w.Name == schemaFlowName).FirstOrDefault();
+
+            if (flow == null)
+            {
+                throw new DataFlowNotFound();
+            }
+
+            return flow;
+        }
+
+        public DataFlowStep GetDataFlowStepForDataFlowByActionType(int dataFlowId, DataActionType actionType)
+        {
+            if (dataFlowId == 0)
+            {
+                throw new ArgumentNullException("dataFlowId is not specified");
+            }
+            if (actionType == DataActionType.None)
+            {
+                throw new ArgumentNullException("actionType is not specified");
+            }
+
+            DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.DataFlow.Id == dataFlowId && w.DataAction_Type_Id == actionType).FirstOrDefault();
+            if (step == null)
+            {
+                throw new DataFlowStepNotFound();
+            }
+
             return step;
         }
 

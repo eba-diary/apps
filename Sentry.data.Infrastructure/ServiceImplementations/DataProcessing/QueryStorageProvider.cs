@@ -60,7 +60,7 @@ namespace Sentry.data.Infrastructure
 
                     IsRegisterSuccessful = schemaSerivce.RegisterRawFile(schema, targetKey, versionKey, stepEvent);
                 }
-
+#if (DEBUG)
                 //Mock for testing... sent mock s3object created 
                 S3Event s3e = null;
                 s3e = new S3Event
@@ -82,7 +82,7 @@ namespace Sentry.data.Infrastructure
                         }
                     }
                 };
-
+#endif
                 _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
                 stopWatch.Stop();
 

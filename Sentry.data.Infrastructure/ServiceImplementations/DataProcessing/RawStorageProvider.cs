@@ -49,6 +49,7 @@ namespace Sentry.data.Infrastructure
 
                 stopWatch.Stop();
 
+#if (DEBUG)
                 //Mock for testing... sent mock s3object created 
                 S3Event s3e = null;
                 s3e = new S3Event
@@ -70,7 +71,7 @@ namespace Sentry.data.Infrastructure
                         }
                     }
                 };
-
+#endif
                 _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
 
                 _step.Executions.Add(_step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{_step.DataAction_Type_Id.ToString()}-executeaction-success", Log_Level.Debug, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }));

@@ -280,6 +280,7 @@
             public const string SCHEMA_LOAD_PREFIX = TEMP_FILE_PREFIX + "schemaload/";
             public const string CONVERT_TO_PARQUET_PREFIX = "parquet/";
             public const string SCHEMA_MAP_PREFIX = TEMP_FILE_PREFIX + "schemamap/";
+            public const string UNCOMPRESS_ZIP_PREFIX = TEMP_FILE_PREFIX + "uncompresszip/";
         }
 
         public static class DataFlowStepEvent

@@ -150,6 +150,8 @@
     <Compile Include="Entities\Schema\VarcharField.cs" />
     <Compile Include="Entities\Subscriptions\BusinessAreaSubscription.cs" />
     <Compile Include="Entities\Subscriptions\EventTypeGroup.cs" />
+    <Compile Include="Exceptions\DataFlowNotFound.cs" />
+    <Compile Include="Exceptions\DataFlowStepNotFound.cs" />
     <Compile Include="Exceptions\DatasetNotFoundException.cs" />
     <Compile Include="Exceptions\DatasetUnauthorizedAccessException.cs" />
     <Compile Include="Exceptions\SchemaNotFoundException.cs" />
@@ -395,9 +397,7 @@
       <Name>Sentry.Messaging.Common</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Exceptions\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
