@@ -525,7 +525,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 }
                 else
                 {
-                    Logger.Debug($"jobcontroller-publishmessage message:{message.ToString()}");
+                    Logger.Debug($"jobcontroller-publishmessage message:{ JsonConvert.SerializeObject(message) }");
                 }
 
                 _dataFlowService.PublishMessage(message.Key, message.Message);
