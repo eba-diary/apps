@@ -25,7 +25,7 @@ namespace Sentry.data.Infrastructure
 
         public async Task ExecuteDependenciesAsync(S3ObjectEvent s3e)
         {
-            await ExecuteDependenciesAsync(s3e.s3.bucket.name, s3e.s3._object.key, s3e);
+            await ExecuteDependenciesAsync(s3e.s3.bucket.name, s3e.s3.Object.key, s3e);
             //await ExecuteDependenciesAsync("sentry-dataset-management-np-nr", "data/17/TestFile.csv");
         }
         public async Task ExecuteDependenciesAsync(string bucket, string key, S3ObjectEvent s3Event)
@@ -134,7 +134,7 @@ namespace Sentry.data.Infrastructure
                     Logger.AddContextVariable(new TextVariable("flowexecutionguid", stepEvent.FlowExecutionGuid));
 
                     S3ObjectEvent s3Event = JsonConvert.DeserializeObject<S3ObjectEvent>(stepEvent.OriginalS3Event);
-                    Logger.AddContextVariable(new LongVariable("objectsize", (long)s3Event.s3._object.size));
+                    Logger.AddContextVariable(new LongVariable("objectsize", (long)s3Event.s3.Object.size));
                     if (stepEvent.RunInstanceGuid != null)
                     {
                         Logger.AddContextVariable(new TextVariable("runinstanceguid", stepEvent.RunInstanceGuid));

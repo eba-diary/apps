@@ -109,7 +109,7 @@ namespace Sentry.data.Infrastructure
             string storageCode;
             FileSchema schema;
             Dataset _dataset;
-            string objectKey = s3Event.s3._object.key;
+            string objectKey = s3Event.s3.Object.key;
             string keyBucket = s3Event.s3.bucket.name;
 
             try
@@ -149,7 +149,7 @@ namespace Sentry.data.Infrastructure
                         //key structure /<storage prefix>/<storage code>/<YYYY>/<MM>/<DD>/<sourceFileName>_<FlowExecutionGuid>.<sourcefileextension>                    
                         TargetPrefix = _step.Action.TargetStoragePrefix + $"{storageCode}/{flowGuidDTM.Year.ToString()}/{flowGuidDTM.Month.ToString()}/{flowGuidDTM.Day.ToString()}/",
                         EventType = GlobalConstants.DataFlowStepEvent.QUERY_STORAGE,
-                        FileSize = s3Event.s3._object.size.ToString(),
+                        FileSize = s3Event.s3.Object.size.ToString(),
                         S3EventTime = s3Event.eventTime.ToString("s"),
                         OriginalS3Event = JsonConvert.SerializeObject(s3Event),
                         SchemaId = schema.SchemaId,

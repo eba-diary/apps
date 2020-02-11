@@ -16,7 +16,7 @@ namespace ConsoleAppProducer
             s3e.EventType = "S3EVENT";
             s3e.PayLoad.eventName = "ObjectCreated:Put";
             s3e.PayLoad.s3.bucket.name = "sentry-dataset-management-np-nr";
-            s3e.PayLoad.s3._object.key = "droplocation/77/";
+            s3e.PayLoad.s3.Object.key = "droplocation/77/";
 
             using (IContainer container = Bootstrapper.Container.GetNestedContainer())
             {

@@ -26,7 +26,7 @@ namespace Sentry.data.Infrastructure
             try
             {
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"start-method <converttoparquetprovider-publishstartevent", Log_Level.Debug);
-                string objectKey = s3Event.s3._object.key;
+                string objectKey = s3Event.s3.Object.key;
                 string keyBucket = s3Event.s3.bucket.name;
 
                 DataFlowStepEvent stepEvent = new DataFlowStepEvent()
@@ -43,7 +43,7 @@ namespace Sentry.data.Infrastructure
                     TargetBucket = step.Action.TargetStorageBucket,
                     TargetPrefix = step.Action.TargetStoragePrefix,
                     EventType = GlobalConstants.DataFlowStepEvent.CONVERT_TO_PARQUET,
-                    FileSize = s3Event.s3._object.size.ToString(),
+                    FileSize = s3Event.s3.Object.size.ToString(),
                     S3EventTime = s3Event.eventTime.ToString("s"),
                     OriginalS3Event = JsonConvert.SerializeObject(s3Event)
                 };

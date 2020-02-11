@@ -518,7 +518,57 @@ namespace Sentry.data.Web.WebApi.Controllers
         {
             try
             {
+                if (message == null)
+                {
+                    Logger.Error($"jobcontroller-publishmessage null message");
+                    throw new ArgumentException("message parameter is null");
+                }
+                else
+                {
+                    Logger.Debug($"jobcontroller-publishmessage message:{ JsonConvert.SerializeObject(message) }");
+                }
+
                 _dataFlowService.PublishMessage(message.Key, message.Message);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error($"jobcontroller-publishmessage failure", ex);
+                return InternalServerError();
+            }
+        }
+        
+        /// <summary>
+         /// Publish message to messaging queue
+         /// </summary>
+         /// <param name="message"></param>
+         /// <returns></returns>
+        [HttpPost]
+        [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(System.Net.HttpStatusCode.OK, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.Unauthorized, null, null)]
+        [SwaggerResponse(System.Net.HttpStatusCode.InternalServerError, null, null)]
+        [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
+        [Route("PublishMessageAsString")]
+        public IHttpActionResult PublishMessageAsString([FromBody] string message)
+        {
+            try
+            {
+                KafkaMessage kMsg;
+
+                if (message == null)
+                {
+                    Logger.Error($"jobcontroller-publishmessage null message");
+                    throw new ArgumentException("message parameter is null");
+                }
+                else
+                {
+                    Logger.Debug($"jobcontroller-publishmessage message:{message.ToString()}");
+
+                    kMsg = JsonConvert.DeserializeObject<KafkaMessage>(message);
+                }
+
+                _dataFlowService.PublishMessage(kMsg.Key, kMsg.Message);
                 return Ok();
             }
             catch (Exception ex)

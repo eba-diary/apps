@@ -94,7 +94,7 @@ namespace Sentry.data.Infrastructure
             _step = step;
             _flowGuid = flowExecutionGuid;
             _runInstGuid = runInstanceGuid;
-            string objectKey = s3Event.s3._object.key;
+            string objectKey = s3Event.s3.Object.key;
             string keyBucket = s3Event.s3.bucket.name;
 
             try
@@ -116,7 +116,7 @@ namespace Sentry.data.Infrastructure
                     TargetBucket = _step.Action.TargetStorageBucket,                  
                     TargetPrefix = _step.Action.TargetStoragePrefix + $"{step.DataFlow.Id}/" + $"{flowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid)}/",
                     EventType = GlobalConstants.DataFlowStepEvent.RAW_STORAGE_START,
-                    FileSize = s3Event.s3._object.size.ToString(),
+                    FileSize = s3Event.s3.Object.size.ToString(),
                     S3EventTime = s3Event.eventTime.ToString("s"),
                     OriginalS3Event = JsonConvert.SerializeObject(s3Event)
                 };
