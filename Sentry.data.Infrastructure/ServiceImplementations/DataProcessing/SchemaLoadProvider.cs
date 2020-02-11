@@ -58,7 +58,7 @@ namespace Sentry.data.Infrastructure
                             {
                                 name = stepEvent.TargetBucket
                             },
-                            _object = new Sentry.data.Core.Entities.S3.Object()
+                            Object = new Sentry.data.Core.Entities.S3.Object()
                             {
                                 key = $"{stepEvent.TargetPrefix}{fileName}",
                                 size = 200124
@@ -124,7 +124,7 @@ namespace Sentry.data.Infrastructure
                         SourceKey = objectKey,
                         TargetBucket = step.Action.TargetStorageBucket,
                         //<targetstorageprefix>/<dataflowid>/<storagecode>/<flow execution guid>[-<run instance guid>]/
-                        TargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.Id}/{item.MappedSchema.StorageCode}/{GenerateGuid(flowExecutionGuid, runInstanceGuid)}/ ",
+                        TargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.Id}/{item.MappedSchema.StorageCode}/{GenerateGuid(flowExecutionGuid, runInstanceGuid)}/",
                         EventType = GlobalConstants.DataFlowStepEvent.SCHEMA_LOAD,
                         FileSize = s3Event.s3.Object.size.ToString(),
                         S3EventTime = s3Event.eventTime.ToString("s"),

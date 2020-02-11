@@ -61,7 +61,7 @@ namespace Sentry.data.Infrastructure
                             {
                                 name = stepEvent.TargetBucket
                             },
-                            _object = new Sentry.data.Core.Entities.S3.Object()
+                            Object = new Sentry.data.Core.Entities.S3.Object()
                             {
                                 key = $"{stepEvent.TargetPrefix}{fileName}",
                                 size = 100123
@@ -69,9 +69,8 @@ namespace Sentry.data.Infrastructure
                         }
                     }
                 };
-
-#endif
                 _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
+#endif
 
                 step.Executions.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-successful  start:{startTime} end:{endTime} duration:{endTime - startTime}",Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }));
             }

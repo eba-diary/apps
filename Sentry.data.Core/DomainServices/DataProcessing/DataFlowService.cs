@@ -395,7 +395,12 @@ namespace Sentry.data.Core
                 case DataActionType.SchemaLoad:
                     action = _datasetContext.SchemaLoadAction.FirstOrDefault();
                     actionType = DataActionType.SchemaLoad;
-                    return MapToDataFlowStep(df, action, actionType);
+                    DataFlowStep schemaLoadStep = MapToDataFlowStep(df, action, actionType);
+                    foreach (SchemaMapDto mapDto in dto.SchemaMap)
+                    {
+                        MapToSchemaMap(mapDto, schemaLoadStep);
+                    }
+                    return schemaLoadStep;
                 case DataActionType.ConvertParquet:
                     action = _datasetContext.ConvertToParquetAction.FirstOrDefault();
                     actionType = DataActionType.ConvertParquet;

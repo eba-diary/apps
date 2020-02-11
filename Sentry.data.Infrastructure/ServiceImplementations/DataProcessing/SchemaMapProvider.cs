@@ -5,10 +5,12 @@ using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.DataProcessing.Actions;
 using Sentry.data.Core.Entities.S3;
 using Sentry.data.Core.Interfaces.DataProcessing;
+using StructureMap;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 
 namespace Sentry.data.Infrastructure
 {
@@ -63,7 +65,7 @@ namespace Sentry.data.Infrastructure
                             {
                                 name = stepEvent.TargetBucket
                             },
-                            _object = new Sentry.data.Core.Entities.S3.Object()
+                            Object = new Sentry.data.Core.Entities.S3.Object()
                             {
                                 key = $"{stepEvent.TargetPrefix}{fileName}",
                                 size = 200124
@@ -71,8 +73,8 @@ namespace Sentry.data.Infrastructure
                         }
                     }
                 };
-#endif
                 _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
+#endif
 
                 step.Executions.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-successful", Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, null));
                 logs = null;
@@ -96,7 +98,7 @@ namespace Sentry.data.Infrastructure
         {
             List<DataFlow_Log> logs = new List<DataFlow_Log>();
             Stopwatch stopWatch = new Stopwatch();
-            string objectKey = s3Event.s3._object.key;
+            string objectKey = s3Event.s3.Object.key;
             string keyBucket = s3Event.s3.bucket.name;
             try
             {
@@ -105,10 +107,17 @@ namespace Sentry.data.Infrastructure
                     stopWatch.Start();
                     DateTime startTime = DateTime.Now;
 
-                    DataFlowStep s3DropStep = _dataFlowService.GetS3DropStepForFileSchema(scmMap.MappedSchema);
+                    DataFlowStep s3DropStep;
+                    //DataFlowStep s3DropStep = _dataFlowService.GetS3DropStepForFileSchema(scmMap.MappedSchema);
+                    using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+                    {
+                        IDatasetContext datasetContext = container.GetInstance<IDatasetContext>();
 
-                    //DataFlow df = _dataFlowService.GetDataFlowByName(_dataFlowService.GetDataFlowNameForFileSchema(scmMap.MappedSchema));
-                    //DataFlowStep s3DropStep = _dataFlowService.GetDataFlowStepForDataFlowByActionType(df.Id, DataActionType.S3Drop);
+                        string schemaFlowName = _dataFlowService.GetDataFlowNameForFileSchema(scmMap.MappedSchema);
+                        DataFlow flow = datasetContext.DataFlow.Where(w => w.Name == schemaFlowName).FirstOrDefault();
+                        s3DropStep = datasetContext.DataFlowStep.Where(w => w.DataFlow == flow && w.DataAction_Type_Id == DataActionType.S3Drop).FirstOrDefault();
+                    }
+
 
                     string targetSchemaS3DropPrefix = s3DropStep.TargetPrefix;
 
@@ -127,9 +136,9 @@ namespace Sentry.data.Infrastructure
                         SourceKey = objectKey,
                         TargetBucket = step.Action.TargetStorageBucket,
                         //add run instance (separated by dash) if not null
-                        TargetPrefix = targetSchemaS3DropPrefix + $"{s3DropStep.DataFlow.Id.ToString()}/" + $"{FlowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid)}/",
+                        TargetPrefix = targetSchemaS3DropPrefix + $"{FlowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid)}/",
                         EventType = GlobalConstants.DataFlowStepEvent.SCHEMA_MAP,
-                        FileSize = s3Event.s3._object.size.ToString(),
+                        FileSize = s3Event.s3.Object.size.ToString(),
                         S3EventTime = s3Event.eventTime.ToString("s"),
                         OriginalS3Event = JsonConvert.SerializeObject(s3Event)
                     };
