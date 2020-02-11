@@ -208,7 +208,8 @@ namespace Sentry.data.Web.Controllers
                 x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_DROP_LOCATION &&
                 x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION &&
                 x.Value != GlobalConstants.DataSoureDiscriminator.JAVA_APP_SOURCE &&
-                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_HSZ_DROP_LOCATION).OrderBy(x => x.Value);
+                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_HSZ_DROP_LOCATION &&
+                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION).OrderBy(x => x.Value);
 
             List<SelectListItem> temp2 = new List<SelectListItem>();
 
