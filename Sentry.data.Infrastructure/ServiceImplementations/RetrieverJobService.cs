@@ -55,31 +55,53 @@ namespace Sentry.data.Infrastructure
                     _job = _requestContext.RetrieverJob.Where(w => w.Id == JobId).FetchAllConfiguration(_requestContext).FirstOrDefault();
                     IBaseJobProvider _jobProvider;
                     //if logic only needed until all sources are converted to this Source\Provider pattern
-                    switch (_job.DataSource.SourceType)
-                    {
-                        case GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE:
-                        case GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE:
-                            _jobProvider = Container.GetInstance<IBaseJobProvider>(_job.DataSource.SourceType);
 
-                            // Execute job
-                            if (_jobProvider != null)
-                            {
-                                _jobProvider.Execute(_job);
-                            }
-                            break;
-                        case GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION:
-                            _jobProvider = Container.GetInstance<IBaseJobProvider>(_job.DataSource.SourceType);
-                            // Execute job
-                            if (_jobProvider != null)
-                            {
-                                _jobProvider.Execute(_job, filePath);
-                            }
-                            break;
-                        default:
-                            //_job.JobLoggerMessage("Info", "Job not configured for new Source\\Provider pattern");
-                            break;
+                    //verify if job is configured for new provider pattern, otherwise handled via legacy code.
+                    if (_job.DataFlow == null)
+                    {
+                        switch (_job.DataSource.SourceType)
+                        {
+                            case GlobalConstants.DataSoureDiscriminator.GOOGLE_API_SOURCE:
+                            case GlobalConstants.DataSoureDiscriminator.HTTPS_SOURCE:
+                            case GlobalConstants.DataSoureDiscriminator.FTP_DATAFLOW_SOURCE:
+                                _jobProvider = Container.GetInstance<IBaseJobProvider>(_job.DataSource.SourceType);
+
+                                // Execute job
+                                if (_jobProvider != null)
+                                {
+                                    _jobProvider.Execute(_job);
+                                }
+                                break;
+                            case GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION:
+                                _jobProvider = Container.GetInstance<IBaseJobProvider>(_job.DataSource.SourceType);
+                                // Execute job
+                                if (_jobProvider != null)
+                                {
+                                    _jobProvider.Execute(_job, filePath);
+                                }
+                                break;
+                            default:
+                                break;
+                        }
                     }
-                    
+                    else
+                    {
+                        switch (_job.DataSource.SourceType)
+                        {
+                            //Map exising source type to new Dataflow Provider
+                            case GlobalConstants.DataSoureDiscriminator.FTP_SOURCE:
+                                _jobProvider = Container.GetInstance<IBaseJobProvider>(GlobalConstants.DataSoureDiscriminator.FTP_DATAFLOW_SOURCE);
+                                // Execute job
+                                if (_jobProvider != null)
+                                {
+                                    _jobProvider.Execute(_job);
+                                }
+                                break;
+                            default:
+                                _job.JobLoggerMessage("Debug", $"RetrieverJobService not configured for source type  - jobid:{_job.Id} sourcetype:{_job.DataSource.SourceType}");
+                                throw new NotImplementedException($"RetrieverJobService not configured for source type - jobid:{_job.Id} sourcetype:{_job.DataSource.SourceType}");
+                        }
+                    }
 
                     if (_job.DataSource.Is<FtpSource>())
                     {

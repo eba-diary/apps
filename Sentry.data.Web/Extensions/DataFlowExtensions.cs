@@ -94,10 +94,23 @@ namespace Sentry.data.Web
         {
             Core.RetrieverJobDto dto = new Core.RetrieverJobDto()
             {
+                DataSourceId = model.SelectedDataSource,
+                DataSourceType = model.SelectedSourceType,
+                IsCompressed = false, //for the data flow compression is handled outside of retriever job logic
+                CreateCurrentFile = model.CreateCurrentFile,
+                DatasetFileConfig = 0, //jobs for the data flow are linked via data flow id not datasetfileconfig
+                FileNameExclusionList = null,
+                FileSchema = 0,
+                FtpPatrn = model.FtpPattern,
+                HttpRequestBody = model.HttpRequestBody,
+                JobId = 0,
+                RelativeUri = model.RelativeUri,
+                RequestDataFormat = model.SelectedRequestDataFormat,
+                RequestMethod = model.SelectedRequestMethod,
                 Schedule = model.Schedule,
-                SchedulePicker = model.SchedulePicker,
-                RelativeUri = model.RelativeUri
-            };
+                SearchCriteria = model.SearchCriteria,
+                TargetFileName = model.TargetFileName
+        };
 
             return dto;
         }

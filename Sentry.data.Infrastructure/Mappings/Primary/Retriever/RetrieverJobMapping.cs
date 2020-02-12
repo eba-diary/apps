@@ -7,7 +7,7 @@ using NHibernate.Mapping.ByCode;
 using NHibernate.Mapping.ByCode.Conformist;
 using Sentry.data.Core;
 using NHibernate;
-
+using Sentry.data.Core.Entities.DataProcessing;
 
 namespace Sentry.data.Infrastructure.Mappings.Primary
 {
@@ -64,6 +64,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             {
                 m.Column("Schema_Id");
                 m.Class(typeof(FileSchema));
+            });
+
+            ManyToOne(x => x.DataFlow, m =>
+            {
+                m.Column("DataFlow_ID");
+                m.Class(typeof(DataFlow));
             });
 
             ManyToOne(x => x.DataSource, m =>

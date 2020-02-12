@@ -126,6 +126,7 @@
     <Compile Include="Entities\Datasets\DatasetFileReply.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\Authentications\OAuthAuthentication.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\DfsDataFlowBasic.cs" />
+    <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\FtpDataFlowSource.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\DataSources\GoogleAPISource.cs" />
     <Compile Include="Entities\Goldeneye\RetrieverRequests\OAuthClaim.cs" />
     <Compile Include="Entities\Goldeneye\FileProcess.cs" />

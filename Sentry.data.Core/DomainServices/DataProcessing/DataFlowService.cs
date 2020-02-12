@@ -233,6 +233,7 @@ namespace Sentry.data.Core
                     MapDataFlowStepsForPush(dto, df);
                     break;
                 case GlobalEnums.IngestionType.DSC_Pull:
+                    MapDataFlowStepsForPull(dto, df);
                     break;
                 default:
                     break;
@@ -289,6 +290,44 @@ namespace Sentry.data.Core
             AddDataFlowStep(dto, df, DataActionType.SchemaMap);
         }
 
+        private void MapDataFlowStepsForPull(DataFlowDto dto, DataFlow df)
+        {
+            //RetrieverJobDto jobDto = new RetrieverJobDto();
+            //MaptToDto(dto, jobDto);
+            //jobDto.DataFlow = df.Id;
+            dto.RetrieverJob.DataFlow = df.Id;
+            _jobService.CreateAndSaveRetrieverJob(dto.RetrieverJob);
+
+            //Generate ingestion steps (get file to raw location)
+            AddDataFlowStep(dto, df, DataActionType.S3Drop);
+
+            //MapToRawStorageStep(dto, df);
+            AddDataFlowStep(dto, df, DataActionType.RawStorage);
+
+            //Generate preprocessing steps (i.e. uncompress, encoding, etc.)
+            //MapPreProcessingSteps(dto, df);
+            //MapToUnCompressStep(dto.CompressionJob, df);
+            if (dto.IsCompressed)
+            {
+                switch (dto.CompressionJob.CompressionType)
+                {
+                    case CompressionTypes.ZIP:
+                        AddDataFlowStep(dto, df, DataActionType.UncompressZip);
+                        break;
+                    case CompressionTypes.GZIP:
+                        AddDataFlowStep(dto, df, DataActionType.UncompressGZip);
+                        break;
+                    default:
+                        break;
+                }
+            }
+
+            //Generate Schema Map step to send files to schema specific data flow
+            //MapToSchemaMapStep(dto, df);
+            AddDataFlowStep(dto, df, DataActionType.SchemaMap);
+
+        }
+
         private void MapToSchemaMap(SchemaMapDto dto, DataFlowStep step)
         {
             SchemaMap map =  new SchemaMap()
@@ -321,6 +360,26 @@ namespace Sentry.data.Core
             dto.Name = df.Name;
             dto.CreateDTM = df.CreatedDTM;
             dto.CreatedBy = df.CreatedBy;
+        }
+
+        private void MaptToDto(DataFlowDto dto, RetrieverJobDto jobDto)
+        {
+            jobDto.DataSourceId = dto.RetrieverJob.DataSourceId;
+            jobDto.DataSourceType = dto.RetrieverJob.DataSourceType;
+            jobDto.IsCompressed = false; //for the data flow compression is handled outside of retriever job logic
+            jobDto.CreateCurrentFile = dto.RetrieverJob.CreateCurrentFile;
+            jobDto.DatasetFileConfig = 0; //jobs for the data flow are linked via data flow id not datasetfileconfig
+            jobDto.FileNameExclusionList = dto.RetrieverJob.FileNameExclusionList;
+            jobDto.FileSchema = dto.RetrieverJob.FileSchema;
+            jobDto.FtpPatrn = dto.RetrieverJob.FtpPatrn;
+            jobDto.HttpRequestBody = dto.RetrieverJob.HttpRequestBody;
+            jobDto.JobId = dto.RetrieverJob.JobId;
+            jobDto.RelativeUri = dto.RetrieverJob.RelativeUri;
+            jobDto.RequestDataFormat = dto.RetrieverJob.RequestDataFormat;
+            jobDto.RequestMethod = dto.RetrieverJob.RequestMethod;
+            jobDto.Schedule = dto.RetrieverJob.Schedule;
+            jobDto.SearchCriteria = dto.RetrieverJob.SearchCriteria;
+            jobDto.TargetFileName = dto.RetrieverJob.TargetFileName;
         }
 
         private void MapToDetailDto(DataFlow flow, DataFlowDetailDto dto)
@@ -504,7 +563,7 @@ namespace Sentry.data.Core
             DataFlowDto dto = MapToDto(scm);
 
             //Add default DFS drop location for data flow
-            RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(scm, _datasetContext.DataSources.First(x => x.Name.Contains(GlobalConstants.DataSourceName.DEFAULT_DATAFLOW_DFS_DROP_LOCATION)));
+            RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, _datasetContext.DataSources.First(x => x.Name.Contains(GlobalConstants.DataSourceName.DEFAULT_DATAFLOW_DFS_DROP_LOCATION)));
             _datasetContext.Add(dfsDataFlowBasic);
 
             //Generate ingestion steps (get file to raw location)

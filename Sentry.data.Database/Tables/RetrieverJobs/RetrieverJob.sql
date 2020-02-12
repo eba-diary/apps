@@ -13,6 +13,7 @@
     [IsEnabled] BIT NULL, 
     [Job_Guid] UNIQUEIDENTIFIER NULL, 
     [Schema_ID] INT NULL, 
+    [DataFlow_ID] INT NULL, 
     PRIMARY KEY CLUSTERED ([Job_ID] ASC),
     CONSTRAINT [FK_RetrieverJob_DatasetFileConfigs] FOREIGN KEY ([Config_ID]) REFERENCES [dbo].[DatasetFileConfigs] ([Config_ID]),
     CONSTRAINT [FK_RetrieverJob_DataSource] FOREIGN KEY ([DataSource_ID]) REFERENCES [dbo].[DataSource] ([DataSource_Id])

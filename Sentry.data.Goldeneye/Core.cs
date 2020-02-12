@@ -196,8 +196,6 @@ namespace Sentry.data.Goldeneye
 
                             foreach (RetrieverJob Job in JobList)
                             {
-                                var datasetName = Job.DatasetConfig.ParentDataset.DatasetName;
-                                var configName = Job.DatasetConfig.Name;
                                 try
                                 {
                                     // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
