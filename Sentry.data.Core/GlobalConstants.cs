@@ -72,11 +72,6 @@
             public const string NOTIFICATION_WARNING_UPDATE = "Warning Notification Update";
             public const string NOTIFICATION_INFO_UPDATE = "Info Notification Update";
 
-
-            //public const string NOTIFICATION_CREATE = "Notification Create";
-            //public const string NOTIFICATION_UPDATE = "Notification Update";
-
-
         }
 
         public static class Statuses

@@ -653,8 +653,9 @@ namespace Sentry.data.Infrastructure
 
         public List<Subscription> GetAllSubscriptionsForReal()
         {
-            List<Subscription> subscriptions = Query<DatasetSubscription>().Cast<Subscription>().ToList();
+            List<Subscription> subscriptions = new List<Subscription>();
             subscriptions.AddRange(Query<BusinessAreaSubscription>().Cast<Subscription>().ToList());
+            subscriptions.AddRange(Query<DatasetSubscription>().Cast<Subscription>().ToList());
             return subscriptions;
         }
 

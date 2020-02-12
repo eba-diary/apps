@@ -197,42 +197,42 @@ namespace Sentry.data.Goldeneye
                             //Load all scheduled and enabled jobs into hangfire on startup to ensure all jobs are registered
                             List<RetrieverJob> JobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && w.IsEnabled).ToList();
 
-                            foreach (RetrieverJob Job in JobList)
-                            {
-                                var datasetName = Job.DatasetConfig.ParentDataset.DatasetName;
-                                var configName = Job.DatasetConfig.Name;
-                                try
-                                {
-                                    // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
-                                    RecurringJob.AddOrUpdate<RetrieverJobService>($"{Job.JobName()}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, JobCancellationToken.Null, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-                                    Job.JobLoggerMessage("Info", "Goldeneye initialization, performing AddOrUpdate to Hangfire");
-                                }
-                                catch (Exception ex)
-                                {
-                                    Job.JobLoggerMessage("Error", "Failed to AddOrUpdate job on Goldeneye initialization", ex);
-                                }
-                            }
+                            //foreach (RetrieverJob Job in JobList)
+                            //{
+                            //    var datasetName = Job.DatasetConfig.ParentDataset.DatasetName;
+                            //    var configName = Job.DatasetConfig.Name;
+                            //    try
+                            //    {
+                            //        // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
+                            //        RecurringJob.AddOrUpdate<RetrieverJobService>($"{Job.JobName()}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, JobCancellationToken.Null, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                            //        Job.JobLoggerMessage("Info", "Goldeneye initialization, performing AddOrUpdate to Hangfire");
+                            //    }
+                            //    catch (Exception ex)
+                            //    {
+                            //        Job.JobLoggerMessage("Error", "Failed to AddOrUpdate job on Goldeneye initialization", ex);
+                            //    }
+                            //}
 
-                            //Remove all jobs that are marked as disabled
-                            List<RetrieverJob> DisabledJobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && !w.IsEnabled).ToList();
+                            ////Remove all jobs that are marked as disabled
+                            //List<RetrieverJob> DisabledJobList = _requestContext.RetrieverJob.Where(w => w.Schedule != null && w.Schedule != "Instant" && !w.IsEnabled).ToList();
 
-                            foreach (RetrieverJob Job in DisabledJobList)
-                            {
-                                try
-                                {
-                                    RecurringJob.RemoveIfExists($"{Job.JobName()}");
-                                    Job.JobLoggerMessage("Info", "Marked as disabled, performing RemoveIfExists from Hangfire");
-                                }
-                                catch (Exception ex)
-                                {
-                                    Job.JobLoggerMessage("Error", "Failed to remove disabled job on Goldeneye initialization", ex);
-                                }
-                            }
+                            //foreach (RetrieverJob Job in DisabledJobList)
+                            //{
+                            //    try
+                            //    {
+                            //        RecurringJob.RemoveIfExists($"{Job.JobName()}");
+                            //        Job.JobLoggerMessage("Info", "Marked as disabled, performing RemoveIfExists from Hangfire");
+                            //    }
+                            //    catch (Exception ex)
+                            //    {
+                            //        Job.JobLoggerMessage("Error", "Failed to remove disabled job on Goldeneye initialization", ex);
+                            //    }
+                            //}
 
                             //Starting MetadataProcessor Consumer
-                            MetadataProcessorService metaProcessor = new MetadataProcessorService();
-                            currentTasks.Add(new RunningTask(
-                                            Task.Factory.StartNew(() => metaProcessor.Run(), TaskCreationOptions.LongRunning), "metadataProcessor"));                            
+                            //MetadataProcessorService metaProcessor = new MetadataProcessorService();
+                            //currentTasks.Add(new RunningTask(
+                            //                Task.Factory.StartNew(() => metaProcessor.Run(), TaskCreationOptions.LongRunning), "metadataProcessor"));                            
                         }
 
                         ////Dataset Loader
