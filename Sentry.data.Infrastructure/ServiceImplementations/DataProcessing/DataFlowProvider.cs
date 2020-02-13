@@ -173,7 +173,7 @@ namespace Sentry.data.Infrastructure
 
             string filePrefix = null;
             //three level prefixes - temp locations
-            // example -  <temp-file prefix>/<step prefix>/<data flow id>/
+            // example -  <temp-file prefix>/<step prefix>/<env ind>/<data flow id>/
             if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX) || 
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX) ||
@@ -184,37 +184,22 @@ namespace Sentry.data.Infrastructure
                 filePrefix = key.Substring(0, (idx + 1));
             }
             //two level prefixes - non-temp locations
-            // example -  <rawstorage prefix>/<job Id>/
+            // example -  <rawstorage prefix>/<env ind>/<job Id>/
+            // droplocation follows the same level pattern - <droplocation prefix>/<env ind>/<job id>/
             if (filePrefix == null && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX) ||
-                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CONVERT_TO_PARQUET_PREFIX)
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CONVERT_TO_PARQUET_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.DROP_LOCATION_PREFIX)
                )
             {
                 int idx = GetNthIndex(key, '/', 3);
                 filePrefix = key.Substring(0, (idx + 1));
             }
 
-            //For drop location prefixes
-            // single level prefix
-            // example = <data flow id>/
-            if (filePrefix == null)
+            if (filePrefix == null && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.DROP_LOCATION_PREFIX))
             {
-                int idx = GetNthIndex(key, '/', 1);
-                bool IsInt = int.TryParse(key.Substring(0, (idx)), out int jobId);
-                bool validFlowId = false;
-                if (IsInt)
-                {                    
-                    using (IContainer container = Bootstrapper.Container.GetNestedContainer())
-                    {
-                        IDatasetContext dsContext = container.GetInstance<IDatasetContext>();
-                        validFlowId = dsContext.DataFlow.Any(a => a.Id == jobId);
-                    }
-                }
 
-                if (validFlowId)
-                {
-                    filePrefix = key.Substring(0, (idx + 1));
-                }                
             }
+
             Logger.Info($"end-method <getdataflowstepprefix>");
 
             return filePrefix;            

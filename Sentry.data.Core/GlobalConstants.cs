@@ -275,6 +275,7 @@
 
         public static class DataFlowTargetPrefixes
         {
+            public const string DROP_LOCATION_PREFIX = "droplocation/";
             public const string RAW_STORAGE_PREFIX = "raw/";
             public const string RAW_QUERY_STORAGE_PREFIX = "rawquery/";
             public const string TEMP_FILE_PREFIX = "temp-file/";
