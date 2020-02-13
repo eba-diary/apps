@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Mvc;
 
@@ -33,7 +34,6 @@ namespace Sentry.data.Web
 
         }
 
-        [Required]
         public string Schedule { get; set; }
 
         [Required]
@@ -95,38 +95,35 @@ namespace Sentry.data.Web
         public IEnumerable<SelectListItem> RequestMethodDropdown { get; set; }
         public IEnumerable<SelectListItem> RequestDataFormatDropdown { get; set; }
         public IEnumerable<SelectListItem> FtpPatternDropDown { get; internal set; }
-
-        public IEnumerable<SelectListItem> SchedulePickerDropdown
-        {
-            get
-            {
-                List<SelectListItem> list = new List<SelectListItem>();
-                String[] picker = new String[5] { "Hourly", "Daily", "Weekly", "Monthly", "Yearly" };
-
-                int i = 0;
-                SelectListItem sli = new SelectListItem()
-                {
-                    Text = "Pick a Schedule",
-                    Selected = true,
-                    Disabled = true
-                };
-                list.Add(sli);
-                foreach (String s in picker)
-                {
-                    sli = new SelectListItem() {
-                        Text = s,
-                        Value = i.ToString()
-                    };
-                    list.Add(sli);
-                    i++;
-                }
-
-                return list;
-            }
-        }
-
+        public IEnumerable<SelectListItem> SchedulePickerDropdown { get; set; }
         public List<string> SourceIds { get; set; }
 
         public UserSecurity Security { get; set; }
+
+        public List<string> Validate()
+        {
+            List<string> errors = new List<string>();
+
+            if (this.SchedulePicker == 0)
+            {
+                errors.Add("Need to pick a Schedule");
+            }
+            if (this.SchedulePicker > 0 && String.IsNullOrEmpty(this.Schedule))
+            {
+                errors.Add("Need to specify when to execute job");
+            }
+            if (!String.IsNullOrEmpty(this.Schedule) && this.SchedulePicker != 0)
+            {
+                // pulled regex from https://stackoverflow.com/a/17858524/9694826
+                var rx = new Regex("^(\\*|([0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9])|\\*\\/([0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9])) (\\*|([0-9]|1[0-9]|2[0-3])|\\*\\/([0-9]|1[0-9]|2[0-3])) (\\*|([1-9]|1[0-9]|2[0-9]|3[0-1])|\\*\\/([1-9]|1[0-9]|2[0-9]|3[0-1])) (\\*|([1-9]|1[0-2])|\\*\\/([1-9]|1[0-2])) (\\*|([0-6])|\\*\\/([0-6]))$");
+
+                if (!rx.IsMatch(this.Schedule))
+                {
+                    errors.Add($"Generated schedule is not valid ({Schedule}), specify valid schedule");
+                }
+            }
+
+            return errors;
+        }
     }
 }
