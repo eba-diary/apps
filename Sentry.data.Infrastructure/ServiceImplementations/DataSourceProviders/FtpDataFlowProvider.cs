@@ -81,10 +81,9 @@ namespace Sentry.data.Infrastructure
             var tempFile = SetupTempWorkSpace(absoluteUri);
 
             //Find the target prefix (s3) from S3DropAction on the DataFlow attached to RetrieverJob
-            DataFlowStep s3DropStep = _job.DataFlow.Steps.Where(w => w.DataAction_Type_Id == Core.Entities.DataProcessing.DataActionType.S3Drop).FirstOrDefault();
+            DataFlowStep s3DropStep = _job.DataFlow.Steps.Where(w => w.DataAction_Type_Id == DataActionType.S3Drop).FirstOrDefault();
 
-
-            _job.JobLoggerMessage("Info", "Sending file to S3 drop location");
+            _job.JobLoggerMessage("Info", "Sending file to Temp location");
 
             try
             {
@@ -98,7 +97,7 @@ namespace Sentry.data.Infrastructure
             }
             catch (Exception ex)
             {
-                _job.JobLoggerMessage("Error", "Retriever job failed streaming temp location.", ex);
+                _job.JobLoggerMessage("Error", "Retriever job failed streaming to temp location.", ex);
                 _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
 
                 //Cleanup temp file if exists
@@ -109,8 +108,10 @@ namespace Sentry.data.Infrastructure
 
                 throw;
             }
-            
-            string targetkey = $"{s3DropStep.TargetPrefix}{_job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString()))}";
+
+            _job.JobLoggerMessage("Info", "Sending file to S3 drop location");
+
+            string targetkey = $"{s3DropStep.TargetPrefix}{Path.GetFileName(absoluteUri)}";
             var versionId = _s3ServiceProvider.UploadDataFile(tempFile, targetkey);
 
             _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
