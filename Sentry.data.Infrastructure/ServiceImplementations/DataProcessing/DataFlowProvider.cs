@@ -39,7 +39,7 @@ namespace Sentry.data.Infrastructure
                 IDataStepService _stepService = container.GetInstance<IDataStepService>();
 
                 Logger.Info($"start-method <executedependencies>");
-
+                Logger.Debug($"<executedependencies> bucket:{bucket} key:{key} s3Event:{JsonConvert.SerializeObject(s3Event)}");
                 //Get prefix
                 string stepPrefix = GetDataFlowStepPrefix(key);
                 if (stepPrefix != null)
