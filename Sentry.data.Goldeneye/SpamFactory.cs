@@ -79,25 +79,25 @@ namespace Sentry.data.Goldeneye
                         if (_event.UserWhoStartedEvent != null && int.TryParse(_event.UserWhoStartedEvent.Trim(), out n) && !_event.IsProcessed)
 #endif
                         {
-                            //Console.WriteLine("UserWhoStartedEvent : " + _event.UserWhoStartedEvent);
-                            //var user = _associateInfoProvider.GetAssociateInfo(_event.UserWhoStartedEvent.Trim());
-                            //authorProcessed = true;
+                            Console.WriteLine("UserWhoStartedEvent : " + _event.UserWhoStartedEvent);
+                            var user = _associateInfoProvider.GetAssociateInfo(_event.UserWhoStartedEvent.Trim());
+                            authorProcessed = true;
 
-                            //UserEvent ue;
-                            ////attach Event to existing UserEvent if it already exists
-                            //if (userEvents.Any(x => x.email == user.WorkEmailAddress))                      
-                            //{
-                            //    ue = userEvents.FirstOrDefault(x => x.email == user.WorkEmailAddress);
-                            //    ue.events.Add(_event);
-                            //}
-                            //else
-                            //{
-                            //    ue = new UserEvent();
-                            //    ue.events = new List<Event>();
-                            //    ue.events.Add(_event);
-                            //    ue.email = user.WorkEmailAddress;
-                            //    userEvents.Add(ue);
-                            //}
+                            UserEvent ue;
+                            //attach Event to existing UserEvent if it already exists
+                            if (userEvents.Any(x => x.email == user.WorkEmailAddress))
+                            {
+                                ue = userEvents.FirstOrDefault(x => x.email == user.WorkEmailAddress);
+                                ue.events.Add(_event);
+                            }
+                            else
+                            {
+                                ue = new UserEvent();
+                                ue.events = new List<Event>();
+                                ue.events.Add(_event);
+                                ue.email = user.WorkEmailAddress;
+                                userEvents.Add(ue);
+                            }
                         }
 
 
@@ -107,23 +107,23 @@ namespace Sentry.data.Goldeneye
                         -IF AUTHOR is SUBSCRIBED, SEND AS WELL (ONLY IF they didn't get UserEvent from above)
                         //********************************************************************************************************************************/
                         var subsThatMatch = _datasetContext.GetAllSubscriptionsForReal().Where
-                        (   w =>
-                            (
-                                    //DATASET CRITERIA
-                                    (
-                                        (w as DatasetSubscription)?.Dataset.DatasetId == _event.Dataset
-                                        && w.EventType.Type_ID == _event.EventType.Type_ID
-                                    )
-                                    
-                                    || 
-                                   
-                                    //BUSINESSAREA CRITERIA
-                                    (   w.EventType.Description == _notificationService.FindEventTypeParent(_event.EventType).Description
-                                        && (w as BusinessAreaSubscription)?.BusinessAreaType == (BusinessAreaType)_datasetContext.Notification.FirstOrDefault(d => d.NotificationId == _event.Notification).ParentObject
-                                    )
-                             )   
-                                &&  w.Interval == _datasetContext.GetInterval(interval)
-                            ); 
+                        (w =>
+                                (
+                                     //DATASET CRITERIA
+                                     (
+                                         (w as DatasetSubscription)?.Dataset.DatasetId == _event.Dataset
+                                         && w.EventType.Type_ID == _event.EventType.Type_ID
+                                     )
+
+                                     ||
+
+                                     //BUSINESSAREA CRITERIA
+                                     (w.EventType.Description == _notificationService.FindEventTypeParent(_event.EventType).Description
+                                         && (w as BusinessAreaSubscription)?.BusinessAreaType == (BusinessAreaType) _event.Notification.ParentObject
+                                     )
+                                )
+                                && w.Interval == _datasetContext.GetInterval(interval)
+                        );  
                         
                         foreach (Subscription ds in subsThatMatch)
                         {

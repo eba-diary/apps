@@ -122,7 +122,7 @@ namespace Sentry.data.Core
             }
 
             if(eventTypeDescription != null)
-                _eventService.PublishSuccessEventByNotificationId(eventTypeDescription, _userService.GetCurrentUser().AssociateId, eventTypeDescription, dto.NotificationId);
+                _eventService.PublishSuccessEventByNotificationId(eventTypeDescription, _userService.GetCurrentUser().AssociateId, eventTypeDescription, notification);
 
             return dto.NotificationId;
         }

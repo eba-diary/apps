@@ -40,7 +40,7 @@ namespace Sentry.data.Core
 
         public virtual string Search { get; set; }
 
-        public virtual int? Notification { get; set; }
+        public virtual Notification Notification { get; set; }
 
 
     }
