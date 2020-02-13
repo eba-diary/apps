@@ -81,6 +81,7 @@ namespace Sentry.data.Infrastructure
                                 }
                                 break;
                             default:
+                                ExecuteLegacyProcessing(filePath);
                                 break;
                         }
                     }
@@ -102,281 +103,283 @@ namespace Sentry.data.Infrastructure
                                 throw new NotImplementedException($"RetrieverJobService not configured for source type - jobid:{_job.Id} sourcetype:{_job.DataSource.SourceType}");
                         }
                     }
+                    #region OldLegacyCode
 
-                    if (_job.DataSource.Is<FtpSource>())
-                    {
-                        _submission = _jobService.SaveSubmission(_job, "");
+                    //if (_job.DataSource.Is<FtpSource>())
+                    //{
+                    //    _submission = _jobService.SaveSubmission(_job, "");
 
-                        _ftpProvider = Container.GetInstance<IFtpProvider>();
-                        _ftpProvider.SetCredentials(_job.DataSource.SourceAuthType.GetCredentials(_job));
+                    //    _ftpProvider = Container.GetInstance<IFtpProvider>();
+                    //    _ftpProvider.SetCredentials(_job.DataSource.SourceAuthType.GetCredentials(_job));
 
-                        _job.JobLoggerMessage("Info", $"ftp.job.options - ftppatter:{_job.JobOptions.FtpPattern.ToString()} isregexsearch:{_job.JobOptions.IsRegexSearch.ToString()} searchcriteria:{_job.JobOptions.SearchCriteria}");
+                    //    _job.JobLoggerMessage("Info", $"ftp.job.options - ftppatter:{_job.JobOptions.FtpPattern.ToString()} isregexsearch:{_job.JobOptions.IsRegexSearch.ToString()} searchcriteria:{_job.JobOptions.SearchCriteria}");
 
-                        try
-                        {
-                            switch (_job.JobOptions.FtpPattern)
-                            {
-                                case 
-                                FtpPattern.NoPattern: /* #0*/
-                                default:
-                                    RetrieveFTPFile(_job.GetUri().AbsoluteUri);                                    
-                                    break;
-                                //case FtpPattern.SpecificFileNoDelete:
-                                //    ProcessSpecificFileNoDelete();
-                                //    break;
-                                case FtpPattern.RegexFileNoDelete:  /* #4*/
-                                    ProcessRegexFileNoDelete(); 
-                                    break;
-                                //case FtpPattern.SpecificFileArchive:  /* #5*/
-                                //    ProcessSpecificFileArchive(); 
-                                //    break;
-                                case FtpPattern.RegexFileSinceLastExecution:
-                                    ProcessRegexFileSinceLastExecution();
-                                    break;
-                                case FtpPattern.NewFilesSinceLastexecution:
-                                    ProcessNewFilesSinceLastExecution();
-                                    break;
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            _job.JobLoggerMessage("Error", $"Retriever Job Failed", ex);
-                            _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_FAILED_STATE);
-                        }                        
-                    }
-                    else if (_job.DataSource.Is<SFtpSource>())
-                    {
-                        //WinSCP (dll used for SFTP Transfers) does not expose file transfer as a stream.  When transfering to S3, file will be transfered
-                        //  to a local temp folder, then streamed to the S3 drop location.  For DfsBasic targets, the file will be transfered
-                        //  directly to the DfsBasic GetUri() location.
-                        try
-                        {
-                            SftpProvider _sftpProvider = new SftpProvider();
-                            var tempFile = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Path.GetFileName(_job.GetUri().ToString()));
+                    //    try
+                    //    {
+                    //        switch (_job.JobOptions.FtpPattern)
+                    //        {
+                    //            case 
+                    //            FtpPattern.NoPattern: /* #0*/
+                    //            default:
+                    //                RetrieveFTPFile(_job.GetUri().AbsoluteUri);                                    
+                    //                break;
+                    //            //case FtpPattern.SpecificFileNoDelete:
+                    //            //    ProcessSpecificFileNoDelete();
+                    //            //    break;
+                    //            case FtpPattern.RegexFileNoDelete:  /* #4*/
+                    //                ProcessRegexFileNoDelete(); 
+                    //                break;
+                    //            //case FtpPattern.SpecificFileArchive:  /* #5*/
+                    //            //    ProcessSpecificFileArchive(); 
+                    //            //    break;
+                    //            case FtpPattern.RegexFileSinceLastExecution:
+                    //                ProcessRegexFileSinceLastExecution();
+                    //                break;
+                    //            case FtpPattern.NewFilesSinceLastexecution:
+                    //                ProcessNewFilesSinceLastExecution();
+                    //                break;
+                    //        }
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
+                    //        _job.JobLoggerMessage("Error", $"Retriever Job Failed", ex);
+                    //        _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_FAILED_STATE);
+                    //    }                        
+                    //}
+                    //else if (_job.DataSource.Is<SFtpSource>())
+                    //{
+                    //    //WinSCP (dll used for SFTP Transfers) does not expose file transfer as a stream.  When transfering to S3, file will be transfered
+                    //    //  to a local temp folder, then streamed to the S3 drop location.  For DfsBasic targets, the file will be transfered
+                    //    //  directly to the DfsBasic GetUri() location.
+                    //    try
+                    //    {
+                    //        SftpProvider _sftpProvider = new SftpProvider();
+                    //        var tempFile = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Path.GetFileName(_job.GetUri().ToString()));
 
-                            //If source file is compressed, need to save to temp location and send job to JAWS
-                            if (_job.JobOptions != null && _job.JobOptions.CompressionOptions.IsCompressed)
-                            {
-                                _job.JobLoggerMessage("Info", $"Compressed option is detected... Streaming to temp location");
+                    //        //If source file is compressed, need to save to temp location and send job to JAWS
+                    //        if (_job.JobOptions != null && _job.JobOptions.CompressionOptions.IsCompressed)
+                    //        {
+                    //            _job.JobLoggerMessage("Info", $"Compressed option is detected... Streaming to temp location");
 
-                                //Create temp directory if exists
-                                _job.JobLoggerMessage("Info", $"Creating temp work directory - Directory:{Path.GetDirectoryName(tempFile)}");
-                                Directory.CreateDirectory(Path.GetDirectoryName(tempFile));
+                    //            //Create temp directory if exists
+                    //            _job.JobLoggerMessage("Info", $"Creating temp work directory - Directory:{Path.GetDirectoryName(tempFile)}");
+                    //            Directory.CreateDirectory(Path.GetDirectoryName(tempFile));
 
-                                //Delete tempFile if exits
-                                if (File.Exists(tempFile)) {
-                                    File.Delete(tempFile);
-                                }
+                    //            //Delete tempFile if exits
+                    //            if (File.Exists(tempFile)) {
+                    //                File.Delete(tempFile);
+                    //            }
 
-                                try
-                                {
-                                    _sftpProvider.GetFile(_job, tempFile);
+                    //            try
+                    //            {
+                    //                _sftpProvider.GetFile(_job, tempFile);
 
-                                    //Create a fire-forget Hangfire job to decompress the file and drop extracted file into drop locations
-                                    BackgroundJob.Enqueue<JawsService>(x => x.UncompressRetrieverJob(_job.Id, tempFile));
-                                }
-                                catch (Exception ex)
-                                {
-                                    _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
-                                    _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
+                    //                //Create a fire-forget Hangfire job to decompress the file and drop extracted file into drop locations
+                    //                BackgroundJob.Enqueue<JawsService>(x => x.UncompressRetrieverJob(_job.Id, tempFile));
+                    //            }
+                    //            catch (Exception ex)
+                    //            {
+                    //                _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
+                    //                _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
 
-                                    //Cleanup any files created
-                                    if (File.Exists(tempFile))
-                                    {
-                                        File.Delete(tempFile);
-                                    }
-                                }
-                                
-                            }
-                            else
-                            {
-                                //Find the DFSBasic job for the config the SFTP Job is assigned too.  Use the GetUri() from the DFSBasic job as target path, combined with the SFTP job GetTargetFileName().
-                                RetrieverJob TargetJob = null;
-                                string targetpath = null;
-                                TargetJob = _requestContext.RetrieverJob.FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is S3Basic);
-                                
-                                // If an S3Basic job was not found, find the DfsBasic job to drop the file
-                                if (TargetJob == null)
-                                {
-                                    _job.JobLoggerMessage("Info", "No S3Basic job found for Schema... Finding DfsBasic job");
-                                    TargetJob = _requestContext.RetrieverJob.FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is DfsBasic);
-                                         
-                                    if (TargetJob == null)
-                                    {
-                                        throw new NotImplementedException("Failed to find generic S3 Basic job");
-                                    }
+                    //                //Cleanup any files created
+                    //                if (File.Exists(tempFile))
+                    //                {
+                    //                    File.Delete(tempFile);
+                    //                }
+                    //            }
 
-                                    _job.JobLoggerMessage("Info", "Found DfsBasic job for schema");
-                                    targetpath = Path.Combine(TargetJob.GetUri().LocalPath, _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString())));
+                    //        }
+                    //        else
+                    //        {
+                    //            //Find the DFSBasic job for the config the SFTP Job is assigned too.  Use the GetUri() from the DFSBasic job as target path, combined with the SFTP job GetTargetFileName().
+                    //            RetrieverJob TargetJob = null;
+                    //            string targetpath = null;
+                    //            TargetJob = _requestContext.RetrieverJob.FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is S3Basic);
 
-                                    try
-                                    {
-                                        _sftpProvider.GetFile(_job, targetpath);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
-                                        _job.JobLoggerMessage("Info", "Performing SFTP post-failure cleanup.");
+                    //            // If an S3Basic job was not found, find the DfsBasic job to drop the file
+                    //            if (TargetJob == null)
+                    //            {
+                    //                _job.JobLoggerMessage("Info", "No S3Basic job found for Schema... Finding DfsBasic job");
+                    //                TargetJob = _requestContext.RetrieverJob.FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is DfsBasic);
 
-                                        //Cleanup any files created
-                                        if (File.Exists(targetpath))
-                                        {
-                                            File.Delete(targetpath);
-                                        }
-                                    }
-                                    
-                                }
-                                else
-                                {
-                                    _job.JobLoggerMessage("Info", "Found S3Basic job for schema");
+                    //                if (TargetJob == null)
+                    //                {
+                    //                    throw new NotImplementedException("Failed to find generic S3 Basic job");
+                    //                }
 
-                                    try
-                                    {
-                                        _sftpProvider.GetFile(_job, targetpath);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
-                                        _job.JobLoggerMessage("Info", "Performing SFTP post-failure cleanup.");
+                    //                _job.JobLoggerMessage("Info", "Found DfsBasic job for schema");
+                    //                targetpath = Path.Combine(TargetJob.GetUri().LocalPath, _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString())));
 
-                                        //Cleanup any files created
-                                        if (File.Exists(targetpath))
-                                        {
-                                            File.Delete(targetpath);
-                                        }
-                                    }
-                                    
+                    //                try
+                    //                {
+                    //                    _sftpProvider.GetFile(_job, targetpath);
+                    //                }
+                    //                catch (Exception ex)
+                    //                {
+                    //                    _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
+                    //                    _job.JobLoggerMessage("Info", "Performing SFTP post-failure cleanup.");
 
-                                    S3ServiceProvider s3Service = new S3ServiceProvider();
-                                    string targetkey = $"{TargetJob.DataSource.GetDropPrefix(TargetJob)}{_job.GetTargetFileName(Path.GetFileNameWithoutExtension(filePath))}";
-                                    var versionId = s3Service.UploadDataFile(tempFile, targetkey);
+                    //                    //Cleanup any files created
+                    //                    if (File.Exists(targetpath))
+                    //                    {
+                    //                        File.Delete(targetpath);
+                    //                    }
+                    //                }
 
-                                    _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
-                                }                                
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            _job.JobLoggerMessage("Error", "Retriever Job Failed", ex);
-                        }
-                    }
-                    else if (_job.DataSource.Is<DfsBasic>())
-                    {
-                        try
-                        {
-                            //This logic will only be hit when a DFSBasic job has a schedule defined instead of "Instant" (directory monitory executed via watch.cs)
+                    //            }
+                    //            else
+                    //            {
+                    //                _job.JobLoggerMessage("Info", "Found S3Basic job for schema");
 
-                            //Set directory search
-                            var dirSearchCriteria = (String.IsNullOrEmpty(filePath)) ? "*" : filePath;
+                    //                try
+                    //                {
+                    //                    _sftpProvider.GetFile(_job, targetpath);
+                    //                }
+                    //                catch (Exception ex)
+                    //                {
+                    //                    _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
+                    //                    _job.JobLoggerMessage("Info", "Performing SFTP post-failure cleanup.");
 
-                            //Only search top directory and source files not locked and does not start with two exclamaition points !!
-                            foreach (var a in Directory.GetFiles(_job.GetUri().LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w) && !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
-                            {
-                                if (_job.JobOptions.CompressionOptions.IsCompressed)
-                                {
-                                    //TODO: Revisit delete source file logic to handle not deleting source file
-                                    ProcessCompressedFile(a, true);
-                                }
-                                else
-                                {
-                                    //check for searchcriteria for filtering incoming files
-                                    if (!_job.FilterIncomingFile(Path.GetFileName(a)))
-                                    {
-                                        //Submit Loader Request
-                                        SubmitLoaderRequest(a);
-                                    }
-                                    else
-                                    {
-                                        _job.JobLoggerMessage("Info", $"Filtered file from processing ({a})");
-                                    }
-                                }
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            _job.JobLoggerMessage("Error", $"Retriever Job Failed", ex);                            
-                        }                        
-                    }
-                    else if (_job.DataSource.Is<DfsCustom>())
-                    {
-                        //Set directory search
-                        var dirSearchCriteria = (String.IsNullOrEmpty(filePath)) ? "*" : filePath;
+                    //                    //Cleanup any files created
+                    //                    if (File.Exists(targetpath))
+                    //                    {
+                    //                        File.Delete(targetpath);
+                    //                    }
+                    //                }
 
-                        //Only search top directory and source files not locked and does not start with two exclamaition points !!
-                        foreach (var b in Directory.GetFiles(_job.GetUri().LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w) && !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
-                        {                            
-                            if (_job.JobOptions.CompressionOptions.IsCompressed)
-                            {
-                                //File filtering will take place on decompressed files
-                                //TODO: Revisit delete source file logic to handle not deleting source file
-                                ProcessCompressedFile(b, true);
-                            }
-                            else
-                            {
-                                //check for searchcriteria for filtering incoming files
-                                if (!_job.FilterIncomingFile(Path.GetFileName(b)))
-                                {
-                                    //Submit Loader Request
-                                    SubmitLoaderRequest(b);
-                                }
-                                else
-                                {
-                                    _job.JobLoggerMessage("Info", $"Filtered file from processing ({b})");
-                                }
-                            }                            
-                        }
-                    }
-                    else if (_job.DataSource.Is<S3Basic>())
-                    {
-                        S3ServiceProvider s3Service = new S3ServiceProvider();
 
-                        List<string> objectList = new List<string>();
+                    //                S3ServiceProvider s3Service = new S3ServiceProvider();
+                    //                string targetkey = $"{TargetJob.DataSource.GetDropPrefix(TargetJob)}{_job.GetTargetFileName(Path.GetFileNameWithoutExtension(filePath))}";
+                    //                var versionId = s3Service.UploadDataFile(tempFile, targetkey);
 
-                        //filter any keys which contain a ProcessingStatus tag
-                        foreach (string key in s3Service.ListObjects(_job.DataSource.Bucket, _job.DataSource.GetDropPrefix(_job)))
-                        {
-                            if(!s3Service.GetObjectTags(_job.DataSource.Bucket, key).Any(w => w.Key == "ProcessingStatus"))
-                            {
-                                //Add ProcessingStatus tag to signify object is being process and subsequent S3BasicJobs do not pick up file for processing
-                                s3Service.AddObjectTag(_job.DataSource.Bucket, key, _dropLocationTags);
-                                objectList.Add(key);
-                            }
-                        }
+                    //                _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
+                    //            }                                
+                    //        }
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
+                    //        _job.JobLoggerMessage("Error", "Retriever Job Failed", ex);
+                    //    }
+                    //}
+                    //else if (_job.DataSource.Is<DfsBasic>())
+                    //{
+                    //    try
+                    //    {
+                    //        //This logic will only be hit when a DFSBasic job has a schedule defined instead of "Instant" (directory monitory executed via watch.cs)
 
-                        if (objectList == null)
-                        {
-                            //_job.JobLoggerMessage("Info", "S3 Basic job detected 0 new files");
-                        }
-                        else
-                        {
-                            if (objectList.Count > 0)
-                            {
-                                _job.JobLoggerMessage("Info", $"S3 Basic job detected {objectList.Count.ToString()} new files");
-                            }
+                    //        //Set directory search
+                    //        var dirSearchCriteria = (String.IsNullOrEmpty(filePath)) ? "*" : filePath;
 
-                            foreach (string a in objectList)
-                            {
-                                if (_job.JobOptions.CompressionOptions.IsCompressed)
-                                {
-                                    //File filtering takes place on decompressed files
-                                    //TODO: Revisit delete source file logic to handle not deleting source file
-                                    ProcessCompressedFile(a, true);
-                                }
-                                else
-                                {
-                               if (!_job.FilterIncomingFile(Path.GetFileName(a)))
-                                    {
-                                        //Submit Loader Request
-                                        SubmitLoaderRequest(a);
-                                    }
-                                    else
-                                    {
-                                        _job.JobLoggerMessage("Info", $"Filtered file from processing ({a})");
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    //        //Only search top directory and source files not locked and does not start with two exclamaition points !!
+                    //        foreach (var a in Directory.GetFiles(_job.GetUri().LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w) && !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
+                    //        {
+                    //            if (_job.JobOptions.CompressionOptions.IsCompressed)
+                    //            {
+                    //                //TODO: Revisit delete source file logic to handle not deleting source file
+                    //                ProcessCompressedFile(a, true);
+                    //            }
+                    //            else
+                    //            {
+                    //                //check for searchcriteria for filtering incoming files
+                    //                if (!_job.FilterIncomingFile(Path.GetFileName(a)))
+                    //                {
+                    //                    //Submit Loader Request
+                    //                    SubmitLoaderRequest(a);
+                    //                }
+                    //                else
+                    //                {
+                    //                    _job.JobLoggerMessage("Info", $"Filtered file from processing ({a})");
+                    //                }
+                    //            }
+                    //        }
+                    //    }
+                    //    catch (Exception ex)
+                    //    {
+                    //        _job.JobLoggerMessage("Error", $"Retriever Job Failed", ex);                            
+                    //    }                        
+                    //}
+                    //else if (_job.DataSource.Is<DfsCustom>())
+                    //{
+                    //    //Set directory search
+                    //    var dirSearchCriteria = (String.IsNullOrEmpty(filePath)) ? "*" : filePath;
+
+                    //    //Only search top directory and source files not locked and does not start with two exclamaition points !!
+                    //    foreach (var b in Directory.GetFiles(_job.GetUri().LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w) && !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
+                    //    {                            
+                    //        if (_job.JobOptions.CompressionOptions.IsCompressed)
+                    //        {
+                    //            //File filtering will take place on decompressed files
+                    //            //TODO: Revisit delete source file logic to handle not deleting source file
+                    //            ProcessCompressedFile(b, true);
+                    //        }
+                    //        else
+                    //        {
+                    //            //check for searchcriteria for filtering incoming files
+                    //            if (!_job.FilterIncomingFile(Path.GetFileName(b)))
+                    //            {
+                    //                //Submit Loader Request
+                    //                SubmitLoaderRequest(b);
+                    //            }
+                    //            else
+                    //            {
+                    //                _job.JobLoggerMessage("Info", $"Filtered file from processing ({b})");
+                    //            }
+                    //        }                            
+                    //    }
+                    //}
+                    //else if (_job.DataSource.Is<S3Basic>())
+                    //{
+                    //    S3ServiceProvider s3Service = new S3ServiceProvider();
+
+                    //    List<string> objectList = new List<string>();
+
+                    //    //filter any keys which contain a ProcessingStatus tag
+                    //    foreach (string key in s3Service.ListObjects(_job.DataSource.Bucket, _job.DataSource.GetDropPrefix(_job)))
+                    //    {
+                    //        if(!s3Service.GetObjectTags(_job.DataSource.Bucket, key).Any(w => w.Key == "ProcessingStatus"))
+                    //        {
+                    //            //Add ProcessingStatus tag to signify object is being process and subsequent S3BasicJobs do not pick up file for processing
+                    //            s3Service.AddObjectTag(_job.DataSource.Bucket, key, _dropLocationTags);
+                    //            objectList.Add(key);
+                    //        }
+                    //    }
+
+                    //    if (objectList == null)
+                    //    {
+                    //        //_job.JobLoggerMessage("Info", "S3 Basic job detected 0 new files");
+                    //    }
+                    //    else
+                    //    {
+                    //        if (objectList.Count > 0)
+                    //        {
+                    //            _job.JobLoggerMessage("Info", $"S3 Basic job detected {objectList.Count.ToString()} new files");
+                    //        }
+
+                    //        foreach (string a in objectList)
+                    //        {
+                    //            if (_job.JobOptions.CompressionOptions.IsCompressed)
+                    //            {
+                    //                //File filtering takes place on decompressed files
+                    //                //TODO: Revisit delete source file logic to handle not deleting source file
+                    //                ProcessCompressedFile(a, true);
+                    //            }
+                    //            else
+                    //            {
+                    //           if (!_job.FilterIncomingFile(Path.GetFileName(a)))
+                    //                {
+                    //                    //Submit Loader Request
+                    //                    SubmitLoaderRequest(a);
+                    //                }
+                    //                else
+                    //                {
+                    //                    _job.JobLoggerMessage("Info", $"Filtered file from processing ({a})");
+                    //                }
+                    //            }
+                    //        }
+                    //    }
+                    //}
+                    #endregion
                 }
             }
             catch (OperationCanceledException)
@@ -474,6 +477,293 @@ namespace Sentry.data.Infrastructure
                 Logger.Error($"Retriever Job Failed to initialize - Job:{job.Id}", ex);
             }
         }
+        
+        private void ExecuteLegacyProcessing(string filePath)
+        {
+            using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+            {
+                IJobService _jobService = container.GetInstance<IJobService>();
+                IRequestContext _requestContext = container.GetInstance<IRequestContext>();
+
+                if (_job.DataSource.Is<FtpSource>())
+                {
+                    _submission = _jobService.SaveSubmission(_job, "");
+
+                    _ftpProvider = container.GetInstance<IFtpProvider>();
+                    _ftpProvider.SetCredentials(_job.DataSource.SourceAuthType.GetCredentials(_job));
+
+                    _job.JobLoggerMessage("Info", $"ftp.job.options - ftppatter:{_job.JobOptions.FtpPattern.ToString()} isregexsearch:{_job.JobOptions.IsRegexSearch.ToString()} searchcriteria:{_job.JobOptions.SearchCriteria}");
+
+                    try
+                    {
+                        switch (_job.JobOptions.FtpPattern)
+                        {
+                            case
+                            FtpPattern.NoPattern: /* #0*/
+                            default:
+                                RetrieveFTPFile(_job.GetUri().AbsoluteUri);
+                                break;
+                            //case FtpPattern.SpecificFileNoDelete:
+                            //    ProcessSpecificFileNoDelete();
+                            //    break;
+                            case FtpPattern.RegexFileNoDelete:  /* #4*/
+                                ProcessRegexFileNoDelete();
+                                break;
+                            //case FtpPattern.SpecificFileArchive:  /* #5*/
+                            //    ProcessSpecificFileArchive(); 
+                            //    break;
+                            case FtpPattern.RegexFileSinceLastExecution:
+                                ProcessRegexFileSinceLastExecution();
+                                break;
+                            case FtpPattern.NewFilesSinceLastexecution:
+                                ProcessNewFilesSinceLastExecution();
+                                break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _job.JobLoggerMessage("Error", $"Retriever Job Failed", ex);
+                        _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_FAILED_STATE);
+                    }
+                }
+                else if (_job.DataSource.Is<SFtpSource>())
+                {
+                    //WinSCP (dll used for SFTP Transfers) does not expose file transfer as a stream.  When transfering to S3, file will be transfered
+                    //  to a local temp folder, then streamed to the S3 drop location.  For DfsBasic targets, the file will be transfered
+                    //  directly to the DfsBasic GetUri() location.
+                    try
+                    {
+                        SftpProvider _sftpProvider = new SftpProvider();
+                        var tempFile = Path.Combine(Configuration.Config.GetHostSetting("GoldenEyeWorkDir"), "Jobs", _job.Id.ToString(), Path.GetFileName(_job.GetUri().ToString()));
+
+                        //If source file is compressed, need to save to temp location and send job to JAWS
+                        if (_job.JobOptions != null && _job.JobOptions.CompressionOptions.IsCompressed)
+                        {
+                            _job.JobLoggerMessage("Info", $"Compressed option is detected... Streaming to temp location");
+
+                            //Create temp directory if exists
+                            _job.JobLoggerMessage("Info", $"Creating temp work directory - Directory:{Path.GetDirectoryName(tempFile)}");
+                            Directory.CreateDirectory(Path.GetDirectoryName(tempFile));
+
+                            //Delete tempFile if exits
+                            if (File.Exists(tempFile))
+                            {
+                                File.Delete(tempFile);
+                            }
+
+                            try
+                            {
+                                _sftpProvider.GetFile(_job, tempFile);
+
+                                //Create a fire-forget Hangfire job to decompress the file and drop extracted file into drop locations
+                                BackgroundJob.Enqueue<JawsService>(x => x.UncompressRetrieverJob(_job.Id, tempFile));
+                            }
+                            catch (Exception ex)
+                            {
+                                _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
+                                _job.JobLoggerMessage("Info", "Performing FTP post-failure cleanup.");
+
+                                //Cleanup any files created
+                                if (File.Exists(tempFile))
+                                {
+                                    File.Delete(tempFile);
+                                }
+                            }
+
+                        }
+                        else
+                        {
+                            //Find the DFSBasic job for the config the SFTP Job is assigned too.  Use the GetUri() from the DFSBasic job as target path, combined with the SFTP job GetTargetFileName().
+                            RetrieverJob TargetJob = null;
+                            string targetpath = null;
+                            TargetJob = _requestContext.RetrieverJob.FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is S3Basic);
+
+                            // If an S3Basic job was not found, find the DfsBasic job to drop the file
+                            if (TargetJob == null)
+                            {
+                                _job.JobLoggerMessage("Info", "No S3Basic job found for Schema... Finding DfsBasic job");
+                                TargetJob = _requestContext.RetrieverJob.FirstOrDefault(w => w.DatasetConfig.ConfigId == _job.DatasetConfig.ConfigId && w.DataSource is DfsBasic);
+
+                                if (TargetJob == null)
+                                {
+                                    throw new NotImplementedException("Failed to find generic S3 Basic job");
+                                }
+
+                                _job.JobLoggerMessage("Info", "Found DfsBasic job for schema");
+                                targetpath = Path.Combine(TargetJob.GetUri().LocalPath, _job.GetTargetFileName(Path.GetFileName(_job.GetUri().ToString())));
+
+                                try
+                                {
+                                    _sftpProvider.GetFile(_job, targetpath);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
+                                    _job.JobLoggerMessage("Info", "Performing SFTP post-failure cleanup.");
+
+                                    //Cleanup any files created
+                                    if (File.Exists(targetpath))
+                                    {
+                                        File.Delete(targetpath);
+                                    }
+                                }
+
+                            }
+                            else
+                            {
+                                _job.JobLoggerMessage("Info", "Found S3Basic job for schema");
+
+                                try
+                                {
+                                    _sftpProvider.GetFile(_job, targetpath);
+                                }
+                                catch (Exception ex)
+                                {
+                                    _job.JobLoggerMessage("Error", "Retriever job failed streaming external file.", ex);
+                                    _job.JobLoggerMessage("Info", "Performing SFTP post-failure cleanup.");
+
+                                    //Cleanup any files created
+                                    if (File.Exists(targetpath))
+                                    {
+                                        File.Delete(targetpath);
+                                    }
+                                }
+
+
+                                S3ServiceProvider s3Service = new S3ServiceProvider();
+                                string targetkey = $"{TargetJob.DataSource.GetDropPrefix(TargetJob)}{_job.GetTargetFileName(Path.GetFileNameWithoutExtension(filePath))}";
+                                var versionId = s3Service.UploadDataFile(tempFile, targetkey);
+
+                                _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _job.JobLoggerMessage("Error", "Retriever Job Failed", ex);
+                    }
+                }
+                else if (_job.DataSource.Is<DfsBasic>())
+                {
+                    try
+                    {
+                        //This logic will only be hit when a DFSBasic job has a schedule defined instead of "Instant" (directory monitory executed via watch.cs)
+
+                        //Set directory search
+                        var dirSearchCriteria = (String.IsNullOrEmpty(filePath)) ? "*" : filePath;
+
+                        //Only search top directory and source files not locked and does not start with two exclamaition points !!
+                        foreach (var a in Directory.GetFiles(_job.GetUri().LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w) && !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
+                        {
+                            if (_job.JobOptions.CompressionOptions.IsCompressed)
+                            {
+                                //TODO: Revisit delete source file logic to handle not deleting source file
+                                ProcessCompressedFile(a, true);
+                            }
+                            else
+                            {
+                                //check for searchcriteria for filtering incoming files
+                                if (!_job.FilterIncomingFile(Path.GetFileName(a)))
+                                {
+                                    //Submit Loader Request
+                                    SubmitLoaderRequest(a);
+                                }
+                                else
+                                {
+                                    _job.JobLoggerMessage("Info", $"Filtered file from processing ({a})");
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _job.JobLoggerMessage("Error", $"Retriever Job Failed", ex);
+                    }
+                }
+                else if (_job.DataSource.Is<DfsCustom>())
+                {
+                    //Set directory search
+                    var dirSearchCriteria = (String.IsNullOrEmpty(filePath)) ? "*" : filePath;
+
+                    //Only search top directory and source files not locked and does not start with two exclamaition points !!
+                    foreach (var b in Directory.GetFiles(_job.GetUri().LocalPath, dirSearchCriteria, SearchOption.TopDirectoryOnly).Where(w => !IsFileLocked(w) && !Path.GetFileName(w).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))))
+                    {
+                        if (_job.JobOptions.CompressionOptions.IsCompressed)
+                        {
+                            //File filtering will take place on decompressed files
+                            //TODO: Revisit delete source file logic to handle not deleting source file
+                            ProcessCompressedFile(b, true);
+                        }
+                        else
+                        {
+                            //check for searchcriteria for filtering incoming files
+                            if (!_job.FilterIncomingFile(Path.GetFileName(b)))
+                            {
+                                //Submit Loader Request
+                                SubmitLoaderRequest(b);
+                            }
+                            else
+                            {
+                                _job.JobLoggerMessage("Info", $"Filtered file from processing ({b})");
+                            }
+                        }
+                    }
+                }
+                else if (_job.DataSource.Is<S3Basic>())
+                {
+                    S3ServiceProvider s3Service = new S3ServiceProvider();
+
+                    List<string> objectList = new List<string>();
+
+                    //filter any keys which contain a ProcessingStatus tag
+                    foreach (string key in s3Service.ListObjects(_job.DataSource.Bucket, _job.DataSource.GetDropPrefix(_job)))
+                    {
+                        if (!s3Service.GetObjectTags(_job.DataSource.Bucket, key).Any(w => w.Key == "ProcessingStatus"))
+                        {
+                            //Add ProcessingStatus tag to signify object is being process and subsequent S3BasicJobs do not pick up file for processing
+                            s3Service.AddObjectTag(_job.DataSource.Bucket, key, _dropLocationTags);
+                            objectList.Add(key);
+                        }
+                    }
+
+                    if (objectList == null)
+                    {
+                        //_job.JobLoggerMessage("Info", "S3 Basic job detected 0 new files");
+                    }
+                    else
+                    {
+                        if (objectList.Count > 0)
+                        {
+                            _job.JobLoggerMessage("Info", $"S3 Basic job detected {objectList.Count.ToString()} new files");
+                        }
+
+                        foreach (string a in objectList)
+                        {
+                            if (_job.JobOptions.CompressionOptions.IsCompressed)
+                            {
+                                //File filtering takes place on decompressed files
+                                //TODO: Revisit delete source file logic to handle not deleting source file
+                                ProcessCompressedFile(a, true);
+                            }
+                            else
+                            {
+                                if (!_job.FilterIncomingFile(Path.GetFileName(a)))
+                                {
+                                    //Submit Loader Request
+                                    SubmitLoaderRequest(a);
+                                }
+                                else
+                                {
+                                    _job.JobLoggerMessage("Info", $"Filtered file from processing ({a})");
+                                }
+                            }
+                        }
+                    }
+                }
+
+            }
+        }
+
         #region FTP Processing
 
         private void ProcessNewFilesSinceLastExecution()
