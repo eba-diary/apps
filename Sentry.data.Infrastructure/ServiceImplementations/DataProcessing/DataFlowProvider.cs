@@ -175,7 +175,6 @@ namespace Sentry.data.Infrastructure
             //three level prefixes - temp locations
             // example -  <temp-file prefix>/<step prefix>/<env ind>/<data flow id>/
             if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX) || 
-                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.UNCOMPRESS_ZIP_PREFIX)
                )
@@ -187,6 +186,7 @@ namespace Sentry.data.Infrastructure
             // example -  <rawstorage prefix>/<env ind>/<job Id>/
             // droplocation follows the same level pattern - <droplocation prefix>/<env ind>/<job id>/
             if (filePrefix == null && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CONVERT_TO_PARQUET_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.DROP_LOCATION_PREFIX)
                )
