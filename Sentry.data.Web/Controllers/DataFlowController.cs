@@ -72,6 +72,13 @@ namespace Sentry.data.Web.Controllers
             return View("DataFlowForm", model);
         }
 
+        //[HttpGet]
+        //public ViewResult Edit(int dataFlowId)
+        //{
+        //    DataFlowDetailDto dto = _dataFlowService.GetDataFlowDetailDto(dataFlowId);
+        //    DataFlowModel model = dto.ToModel();
+        //}
+
         [HttpPost]
         public ActionResult DataFlowForm(DataFlowModel model)
         {

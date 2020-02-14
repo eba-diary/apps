@@ -114,5 +114,31 @@ namespace Sentry.data.Web
 
             return dto;
         }
+
+        public static DataFlowModel ToModel(this Core.DataFlowDetailDto dto)
+        {
+            DataFlowModel model = new DataFlowModel()
+            {
+                CreatedBy = dto.CreatedBy,
+                DataFlowId = dto.Id,
+                CreatedDTM = dto.CreateDTM,
+                IsCompressed = dto.IsCompressed
+            };
+
+            if (dto.RetrieverJob != null)
+            {
+                JobModel jobModel = new JobModel()
+                {
+                    CreateCurrentFile = dto.RetrieverJob.CreateCurrentFile,
+                    FtpPattern = dto.RetrieverJob.FtpPatrn,
+                    HttpRequestBody = dto.RetrieverJob.HttpRequestBody,
+                    IsRegexSearch = true,
+                    OverwriteDataFile = false,
+                    RelativeUri = dto.RetrieverJob.RelativeUri,
+                    Schedule = dto.RetrieverJob.Schedule
+                };
+            }
+            return model;
+        }
     }
 }
