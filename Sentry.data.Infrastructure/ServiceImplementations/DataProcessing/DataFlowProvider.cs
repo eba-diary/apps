@@ -220,8 +220,9 @@ namespace Sentry.data.Infrastructure
             }
 
             //three level prefixes - temp locations
-            // example -  <temp-file prefix>/<step prefix>/<data flow id>/
-            if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX)
+            // example -  <temp-file prefix>/<step prefix>/<env ind>/<data flow id>/
+            if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.UNCOMPRESS_ZIP_PREFIX)
                )
             {
                 int strtIdx = GetNthIndex(key, '/', 4);
@@ -230,7 +231,7 @@ namespace Sentry.data.Infrastructure
             }
 
             //two level prefixes - non-temp locations
-            // example -  <rawstorage prefix>/<job Id>/
+            // example -  <rawstorage prefix>/<env ind>/<job Id>/
             if (guidPrefix == null && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX))
             {
