@@ -382,10 +382,10 @@ namespace Sentry.data.Core
             }
 
             EventType parentEventType;
-            if (parentDescription != null)
-                parentEventType = _domainContext.EventTypes.FirstOrDefault(w => w.Description == parentDescription);
+            if (parentDescription != null)              //PARENT EXISTS, so GRAB PARENT
+                parentEventType = _domainContext.EventTypes.FirstOrDefault(w => w.Description == parentDescription);        
             else
-                parentEventType = new EventType();
+                parentEventType = new EventType();      //NO PARENT
             
             return parentEventType;
         }
