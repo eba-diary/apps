@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Sentry.data.Core;
+using Sentry.data.Core.Entities.S3;
 using Sentry.Common.Logging;
 using StructureMap;
 using Sentry.data.Infrastructure;
@@ -164,7 +165,17 @@ namespace Sentry.data.Goldeneye
             if (job.DataSource.Is<DfsBasic>() || job.DataSource.Is<DfsCustom>())
             {
                 Utilities.RemoveProcessedFile(df, new FileInfo(_path));
-            }                          
+            }
+
+            if (Configuration.Config.GetHostSetting("GenerateDatasetFilePreview").ToLower() == "true")
+            {
+                //Create Preview file
+                using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+                {
+                    IDatasetService dsService = container.GetInstance<IDatasetService>();
+                    dsService.GenerateDatasetFilePreview(df);
+                }
+            }
         }
     }
 }
