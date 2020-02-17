@@ -3,6 +3,7 @@ using System.Runtime.Serialization;
 
 namespace Sentry.data.Core.Exceptions
 {
+    [Serializable]
     public class DatasetUnauthorizedAccessException : UnauthorizedAccessException, ISerializable
     {
         public DatasetUnauthorizedAccessException() { }
