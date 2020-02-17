@@ -134,6 +134,7 @@
     <Compile Include="Entities\MessageFormats\HiveTableDeleteModel.cs" />
     <Compile Include="Entities\MessageFormats\RawFileAddModel.cs" />
     <Compile Include="Entities\MessageFormats\S3Event.cs" />
+    <Compile Include="Entities\S3\S3LambdaEvent.cs" />
     <Compile Include="Entities\S3\S3ObjectEvent.cs" />
     <Compile Include="Entities\Schema\BaseField.cs" />
     <Compile Include="Entities\Schema\BigintField.cs" />
@@ -147,6 +148,11 @@
     <Compile Include="Entities\Schema\TimestampField.cs" />
     <Compile Include="Entities\Schema\VarcharField.cs" />
     <Compile Include="Entities\Subscriptions\BusinessAreaSubscription.cs" />
+    <Compile Include="Exceptions\AWSLambdaException.cs" />
+    <Compile Include="Exceptions\AWSLambdaInvalidParameterException.cs" />
+    <Compile Include="Exceptions\AWSLambdaNotFoundException.cs" />
+    <Compile Include="Exceptions\AWSLambdaRequestLimitException.cs" />
+    <Compile Include="Exceptions\AWSLambdaServiceException.cs" />
     <Compile Include="Exceptions\DatasetNotFoundException.cs" />
     <Compile Include="Exceptions\DatasetUnauthorizedAccessException.cs" />
     <Compile Include="Exceptions\SchemaNotFoundException.cs" />
@@ -165,6 +171,7 @@
     <Compile Include="GlobalEnums\OAuthGrantType.cs" />
     <Compile Include="GlobalEnums\RetrieverJobScheduleTypes.cs" />
     <Compile Include="GlobalEnums\SchemaDatatypes.cs" />
+    <Compile Include="Helpers\LambdaClientConfig.cs" />
     <Compile Include="Interfaces\DataProcessing\IBaseActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IConvertToParquetProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IDataAction.cs" />
@@ -177,6 +184,7 @@
     <Compile Include="Interfaces\DataProcessing\IS3DropProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\ISchemaLoadProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IUncompressZipProvider.cs" />
+    <Compile Include="Interfaces\IAWSLambdaProvider.cs" />
     <Compile Include="Interfaces\ISchemaField.cs" />
     <Compile Include="Interfaces\ISchemaService.cs" />
     <Compile Include="Interfaces\ITicketMonitorService.cs" />
