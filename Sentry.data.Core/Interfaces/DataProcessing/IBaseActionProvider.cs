@@ -12,5 +12,6 @@ namespace Sentry.data.Core.Interfaces.DataProcessing
     {
         void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent);
         void PublishStartEvent(DataFlowStep step, string FlowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event);
+        void GenerateDependencyTargets(DataFlowStepEvent stepEvent);
     }
 }

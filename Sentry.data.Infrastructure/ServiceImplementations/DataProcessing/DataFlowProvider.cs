@@ -46,7 +46,7 @@ namespace Sentry.data.Infrastructure
                 {
                     try
                     {
-                        //Find Dependencies
+                        //Find DataFlow step which should be started based on step trigger prefix
                         List<DataFlowStep> stepList = dsContext.DataFlowStep.Where(w => w.TriggerKey == stepPrefix).ToList();
 
                         _flow = stepList.Select(s => s.DataFlow).Distinct().Single();
@@ -89,9 +89,6 @@ namespace Sentry.data.Infrastructure
                                 Logger.AddContextVariable(new TextVariable("runinstanceguid", runInstanceGuid));
                             }
 
-                            ////step.GenerateStartEvent(bucket, key, flowExecutionGuid);
-                            //step.LogExecution(flowExecutionGuid, RunInstanceGuid, $"dataflowprovider-sendingstartevent", Log_Level.Debug);
-                            //dsContext.SaveChanges();
                             _stepService.PublishStartEvent(step, flowExecutionGuid, runInstanceGuid, s3Event);
                         }
 
@@ -172,32 +169,22 @@ namespace Sentry.data.Infrastructure
             Logger.Info($"start-method <getdataflowstepprefix>");
 
             string filePrefix = null;
-            //three level prefixes - temp locations
-            // example -  <temp-file prefix>/<step prefix>/<env ind>/<data flow id>/
-            if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX) || 
+            if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX) ||
-                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.UNCOMPRESS_ZIP_PREFIX)
-               )
-            {
-                int idx = GetNthIndex(key, '/', 4);
-                filePrefix = key.Substring(0, (idx + 1));
-            }
-            //two level prefixes - non-temp locations
-            // example -  <rawstorage prefix>/<env ind>/<job Id>/
-            // droplocation follows the same level pattern - <droplocation prefix>/<env ind>/<job id>/
-            if (filePrefix == null && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.UNCOMPRESS_ZIP_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX) || 
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX) ||
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CONVERT_TO_PARQUET_PREFIX) ||
-                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.DROP_LOCATION_PREFIX)
-               )
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_MAP_PREFIX))
             {
-                int idx = GetNthIndex(key, '/', 3);
+                int idx = GetNthIndex(key, '/', 4);
                 filePrefix = key.Substring(0, (idx + 1));
             }
 
             if (filePrefix == null && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.DROP_LOCATION_PREFIX))
             {
-
+                int idx = GetNthIndex(key, '/', 3);
+                filePrefix = key.Substring(0, (idx + 1));
             }
 
             Logger.Info($"end-method <getdataflowstepprefix>");
@@ -211,32 +198,26 @@ namespace Sentry.data.Infrastructure
 
             string guidPrefix = null;
 
-            //four level prefixes - temp locations
-            if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX))
-            {
-                int strtIdx = GetNthIndex(key, '/', 5);
-                int endIdx = GetNthIndex(key, '/', 6);
-                guidPrefix = key.Substring(strtIdx + 1, (endIdx - strtIdx) - 1);
-            }
-
-            //three level prefixes - temp locations
-            // example -  <temp-file prefix>/<step prefix>/<env ind>/<data flow id>/
+            //five level prefixes - temp locations
+            //temp-file/<step prefix>/<env ind>/<data flow id>/<flowGuid>/
             if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX) ||
-                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.UNCOMPRESS_ZIP_PREFIX)
-               )
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.UNCOMPRESS_ZIP_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_MAP_PREFIX))
             {
                 int strtIdx = GetNthIndex(key, '/', 4);
                 int endIdx = GetNthIndex(key, '/', 5);
                 guidPrefix = key.Substring(strtIdx + 1, (endIdx - strtIdx) - 1);
             }
 
-            //two level prefixes - non-temp locations
-            // example -  <rawstorage prefix>/<env ind>/<job Id>/
-            if (guidPrefix == null && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX) ||
-                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX))
+            //six level prefixes - temp locations
+            //temp-file/<step prefix>/<env ind>/<data flow id>/<storagecode>/<flowGuid>/
+            if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CONVERT_TO_PARQUET_PREFIX))
             {
-                int strtIdx = GetNthIndex(key, '/', 3);
-                int endIdx = GetNthIndex(key, '/', 4);
+                int strtIdx = GetNthIndex(key, '/', 5);
+                int endIdx = GetNthIndex(key, '/', 6);
                 guidPrefix = key.Substring(strtIdx + 1, (endIdx - strtIdx) - 1);
             }
 

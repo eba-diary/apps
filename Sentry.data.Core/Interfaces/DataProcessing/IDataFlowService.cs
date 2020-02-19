@@ -41,6 +41,7 @@ namespace Sentry.data.Core
         /// <exception cref="Exceptions.DataFlowStepNotFound">Thrown if dataf flow step is not found</exception>
         /// <exception cref="ArgumentNullException">Thrown if parameter is not specified</exception>
         DataFlowStep GetDataFlowStepForDataFlowByActionType(int dataFlowId, DataActionType actionType);
+        string GetStorageCodeForDataFlow(int id);
 
         /// <summary>
         /// 
@@ -50,5 +51,13 @@ namespace Sentry.data.Core
         /// <exception cref="Exceptions.DataFlowStepNotFound"></exception>
         /// <exception cref="ArgumentNullException"
         DataFlowStep GetS3DropStepForFileSchema(FileSchema scm);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="stepId"></param>
+        /// <exception cref="ArgumentNullException"
+        /// <returns></returns>
+        List<DataFlowStep> GetDependentDataFlowStepsForDataFlowStep(int stepId);
     }
 }

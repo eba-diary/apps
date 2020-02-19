@@ -276,12 +276,12 @@
         public static class DataFlowTargetPrefixes
         {
             public const string DROP_LOCATION_PREFIX = "droplocation/";
-            public const string RAW_STORAGE_PREFIX = "raw/";
-            public const string RAW_QUERY_STORAGE_PREFIX = "rawquery/";
             public const string TEMP_FILE_PREFIX = "temp-file/";
+            public const string RAW_STORAGE_PREFIX = TEMP_FILE_PREFIX + "raw/";
+            public const string RAW_QUERY_STORAGE_PREFIX = TEMP_FILE_PREFIX + "rawquery/";
             public const string S3_DROP_PREFIX = TEMP_FILE_PREFIX + "s3drop/";
             public const string SCHEMA_LOAD_PREFIX = TEMP_FILE_PREFIX + "schemaload/";
-            public const string CONVERT_TO_PARQUET_PREFIX = "parquet/";
+            public const string CONVERT_TO_PARQUET_PREFIX = TEMP_FILE_PREFIX + "parquet/";
             public const string SCHEMA_MAP_PREFIX = TEMP_FILE_PREFIX + "schemamap/";
             public const string UNCOMPRESS_ZIP_PREFIX = TEMP_FILE_PREFIX + "uncompresszip/";
         }
@@ -290,11 +290,11 @@
         {
             public const string S3_DROP_START = "DATAFLOWSTEP_S3DROP_START";
             public const string RAW_STORAGE_START = "DATAFLOWSTEP_RAWSTORAGE_START";
-            public const string QUERY_STORAGE = "DATAFLOWSTEP_QUERYSTORAGE_START";
-            public const string SCHEMA_LOAD = "DATAFLOWSTEP_SCHEMA_LOAD_START";
-            public const string SCHEMA_MAP = "DATAFLOWSTEP_SCHEMA_MAP_START";
-            public const string CONVERT_TO_PARQUET = "DATAFLOWSTEP_CONVERTTOPARQUET_START";
-            public const string UNCOMPRESS_ZIP = "DATAFLOWSTEP_UNCOMPRESSZIP_START";
+            public const string QUERY_STORAGE_START = "DATAFLOWSTEP_QUERYSTORAGE_START";
+            public const string SCHEMA_LOAD_START = "DATAFLOWSTEP_SCHEMA_LOAD_START";
+            public const string SCHEMA_MAP_START = "DATAFLOWSTEP_SCHEMA_MAP_START";
+            public const string CONVERT_TO_PARQUET_START = "DATAFLOWSTEP_CONVERTTOPARQUET_START";
+            public const string UNCOMPRESS_ZIP_START = "DATAFLOWSTEP_UNCOMPRESSZIP_START";
         }
 
         public static class AWSEventNotifications

@@ -11,24 +11,27 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Sentry.data.Infrastructure.Helpers;
 
 namespace Sentry.data.Infrastructure
 {
-    public class QueryStorageProvider : IQueryStorageProvider
+    public class QueryStorageProvider : BaseActionProvider, IQueryStorageProvider
     {
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
+        private readonly IDataFlowService _dataFlowService;
         private DataFlowStep _step;
         private string _flowGuid;
         private string _runInstGuid;
 
-        public QueryStorageProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider)
+        public QueryStorageProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider,
+            IDataFlowService dataFlowService) : base(dataFlowService)
         {
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
         }
 
-        public void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
+        public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
             Stopwatch stopWatch = new Stopwatch();
             _step = step;
@@ -40,14 +43,16 @@ namespace Sentry.data.Infrastructure
             try
             {
                 stopWatch.Start();
+                /***************************************
+                 *  Perform provider specific processing
+                 ***************************************/
                 bool IsRegisterSuccessful = false;
 
                 string targetFileName = Path.GetFileNameWithoutExtension(stepEvent.SourceKey) + "_" + _flowGuid + Path.GetExtension(stepEvent.SourceKey);
-                string targetKey = stepEvent.TargetPrefix + targetFileName;
+                string targetKey = stepEvent.StepTargetPrefix + targetFileName;
 
-                //Copy file to Raw Storage
-                string versionKey = _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, stepEvent.TargetBucket, $"{targetKey}");
-
+                //Copy file to RawQuery Storage
+                string versionKey = _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, stepEvent.StepTargetBucket, $"{targetKey}");
 
                 //Pass step event to Schema to register new file
                 //Register file with schema
@@ -60,30 +65,41 @@ namespace Sentry.data.Infrastructure
 
                     IsRegisterSuccessful = schemaSerivce.RegisterRawFile(schema, targetKey, versionKey, stepEvent);
                 }
-#if (DEBUG)
-                //Mock for testing... sent mock s3object created 
-                S3Event s3e = null;
-                s3e = new S3Event
+
+                /***************************************
+                 *  Trigger dependent data flow steps
+                 ***************************************/
+
+                foreach (DataFlowStepEventTarget target in stepEvent.DownstreamTargets)
                 {
-                    EventType = "S3EVENT",
-                    PayLoad = new S3ObjectEvent()
+                    _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, target.BucketName, $"{target.ObjectKey}{targetFileName}");
+#if (DEBUG)
+                    //Mock for testing... sent mock s3object created 
+                    S3Event s3e = null;
+                    s3e = new S3Event
                     {
-                        eventName = "ObjectCreated:Put",
-                        s3 = new S3()
+                        EventType = "S3EVENT",
+                        PayLoad = new S3ObjectEvent()
                         {
-                            bucket = new Bucket()
+                            eventName = "ObjectCreated:Put",
+                            s3 = new S3()
                             {
-                                name = stepEvent.TargetBucket
-                            },
-                            Object = new Sentry.data.Core.Entities.S3.Object()
-                            {
-                                key = $"{targetKey}"
+                                bucket = new Bucket()
+                                {
+                                    name = target.BucketName
+                                },
+                                Object = new Sentry.data.Core.Entities.S3.Object()
+                                {
+                                    key = $"{target.ObjectKey}{targetFileName}",
+                                    size = 200124
+                                }
                             }
                         }
-                    }
-                };
-                _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
+                    };
+                    _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
 #endif
+                }
+
                 stopWatch.Stop();
 
                 _step.Executions.Add(_step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{_step.DataAction_Type_Id.ToString()}-executeaction-success", Log_Level.Debug, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }));
@@ -99,7 +115,7 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
+        public override void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
             List<DataFlow_Log> logs = new List<DataFlow_Log>();
             Stopwatch stopWatch = new Stopwatch();
@@ -124,13 +140,13 @@ namespace Sentry.data.Infrastructure
                     ISchemaService schemaService = container.GetInstance<ISchemaService>();
                     IDatasetContext datasetContext = container.GetInstance<IDatasetContext>();
 
-                    storageCode = schemaLoadProvider.GetStorageCodeFromKey(objectKey);
+                    storageCode = GetStorageCode(objectKey);
                     schema = schemaService.GetFileSchemaByStorageCode(storageCode);
                     _dataset = datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).FirstOrDefault().ParentDataset;
                 }
 
                 //Convert FlowExecutionGuid to DateTime
-                DateTime flowGuidDTM = ConvertFlowGuidToDateTime();
+                DateTime flowGuidDTM = DataFlowHelpers.ConvertFlowGuidToDateTime(_flowGuid);
 
                 if (schema != null)
                 {
@@ -145,10 +161,10 @@ namespace Sentry.data.Infrastructure
                         ActionGuid = _step.Action.ActionGuid.ToString(),
                         SourceBucket = keyBucket,
                         SourceKey = objectKey,
-                        TargetBucket = _step.Action.TargetStorageBucket,
+                        StepTargetBucket = _step.Action.TargetStorageBucket,
                         //key structure /<storage prefix>/<storage code>/<YYYY>/<MM>/<DD>/<sourceFileName>_<FlowExecutionGuid>.<sourcefileextension>                    
-                        TargetPrefix = _step.Action.TargetStoragePrefix + $"{storageCode}/{flowGuidDTM.Year.ToString()}/{flowGuidDTM.Month.ToString()}/{flowGuidDTM.Day.ToString()}/",
-                        EventType = GlobalConstants.DataFlowStepEvent.QUERY_STORAGE,
+                        StepTargetPrefix = _step.Action.TargetStoragePrefix + $"{storageCode}/{flowGuidDTM.Year.ToString()}/{flowGuidDTM.Month.ToString()}/{flowGuidDTM.Day.ToString()}/",
+                        EventType = GlobalConstants.DataFlowStepEvent.QUERY_STORAGE_START,
                         FileSize = s3Event.s3.Object.size.ToString(),
                         S3EventTime = s3Event.eventTime.ToString("s"),
                         OriginalS3Event = JsonConvert.SerializeObject(s3Event),
@@ -156,9 +172,8 @@ namespace Sentry.data.Infrastructure
                         DatasetID = _dataset.DatasetId
                     };
 
-                    //GetIdsFromS3Key(stepEvent);
+                    base.GenerateDependencyTargets(stepEvent);
 
-                
                     _step.LogExecution(_flowGuid, _runInstGuid, $"{_step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Debug);
 
                     _messagePublisher.PublishDSCEvent($"{_step.DataFlow.Id}-{_step.Id}", JsonConvert.SerializeObject(stepEvent));
@@ -180,6 +195,20 @@ namespace Sentry.data.Infrastructure
                 _step.Executions.Add(_step.LogExecution(_flowGuid, _runInstGuid, $"{_step.DataAction_Type_Id.ToString()}-publishstartevent-failed", Log_Level.Error, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, ex));
                 _step.LogExecution(_flowGuid, _runInstGuid, $"end-method <{_step.DataAction_Type_Id.ToString()}>-publishstartevent", Log_Level.Debug);
             }
+        }
+
+        private string GetStorageCode(string key)
+        {
+            string storageCode = string.Empty;
+            //temp-file/rawquery/<flowId>/<storagecode>/<guids>/
+            if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX))
+            {
+                int strtIdx = ParsingHelpers.GetNthIndex(key, '/', 4);
+                int endIdx = ParsingHelpers.GetNthIndex(key, '/', 5);
+                storageCode = key.Substring(strtIdx + 1, (endIdx - strtIdx) - 1);
+            }
+
+            return storageCode;
         }
 
         private DateTime ConvertFlowGuidToDateTime()

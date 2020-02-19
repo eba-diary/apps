@@ -12,23 +12,25 @@ using System.Threading.Tasks;
 using Sentry.Common.Logging;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
+using Sentry.data.Infrastructure.Helpers;
 
 namespace Sentry.data.Infrastructure
 {
-    public class SchemaLoadProvider : ISchemaLoadProvider
+    public class SchemaLoadProvider : BaseActionProvider, ISchemaLoadProvider
     {
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private ISchemaService _schemaService;
 
-        public SchemaLoadProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, ISchemaService schemaService)
+        public SchemaLoadProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider,
+            ISchemaService schemaService, IDataFlowService dataFlowService) : base(dataFlowService)
         {
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
             _schemaService = schemaService;
         }
 
-        public void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
+        public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
             List<DataFlow_Log> logs = new List<DataFlow_Log>();
             Stopwatch stopWatch = new Stopwatch();
@@ -39,35 +41,48 @@ namespace Sentry.data.Infrastructure
                 stopWatch.Start();
                 string fileName = Path.GetFileName(stepEvent.SourceKey);
                 logs.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()} processing event - {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Debug));
+                /***************************************
+                 *  Perform provider specific processing
+                 ***************************************/
+                //This step does not perform any processing, it only copies file to the target schema specific data flow s3 drop step location
+                //string versionKey = _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, stepEvent.StepTargetBucket, $"{stepEvent.StepTargetPrefix}{fileName}");
 
-                string versionKey = _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, stepEvent.TargetBucket, $"{stepEvent.TargetPrefix}{fileName}");
-                DateTime endTime = DateTime.Now;
-                stopWatch.Stop();
-#if (DEBUG)
-                //Mock for testing... sent mock s3object created 
-                S3Event s3e = null;
-                s3e = new S3Event
+                /***************************************
+                 *  Trigger dependent data flow steps
+                 ***************************************/
+
+                foreach (DataFlowStepEventTarget target in stepEvent.DownstreamTargets)
                 {
-                    EventType = "S3EVENT",
-                    PayLoad = new S3ObjectEvent()
+                    _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, target.BucketName, $"{target.ObjectKey}{fileName}");
+#if (DEBUG)
+                    //Mock for testing... sent mock s3object created 
+                    S3Event s3e = null;
+                    s3e = new S3Event
                     {
-                        eventName = "ObjectCreated:Put",
-                        s3 = new S3()
+                        EventType = "S3EVENT",
+                        PayLoad = new S3ObjectEvent()
                         {
-                            bucket = new Bucket()
+                            eventName = "ObjectCreated:Put",
+                            s3 = new S3()
                             {
-                                name = stepEvent.TargetBucket
-                            },
-                            Object = new Sentry.data.Core.Entities.S3.Object()
-                            {
-                                key = $"{stepEvent.TargetPrefix}{fileName}",
-                                size = 200124
+                                bucket = new Bucket()
+                                {
+                                    name = target.BucketName
+                                },
+                                Object = new Sentry.data.Core.Entities.S3.Object()
+                                {
+                                    key = $"{target.ObjectKey}{fileName}",
+                                    size = 200124
+                                }
                             }
                         }
-                    }
-                };
-                _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
+                    };
+                    _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
 #endif
+                }
+
+                DateTime endTime = DateTime.Now;
+                stopWatch.Stop();
 
                 step.Executions.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-successful", Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds)}, null));
                 logs = null;
@@ -87,7 +102,7 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
+        public override void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
             Stopwatch stopWatch = new Stopwatch();
             try
@@ -122,14 +137,16 @@ namespace Sentry.data.Infrastructure
                         ActionGuid = step.Action.ActionGuid.ToString(),
                         SourceBucket = keyBucket,
                         SourceKey = objectKey,
-                        TargetBucket = step.Action.TargetStorageBucket,
+                        StepTargetBucket = step.Action.TargetStorageBucket,
                         //<targetstorageprefix>/<dataflowid>/<storagecode>/<flow execution guid>[-<run instance guid>]/
-                        TargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.Id}/{item.MappedSchema.StorageCode}/{GenerateGuid(flowExecutionGuid, runInstanceGuid)}/",
-                        EventType = GlobalConstants.DataFlowStepEvent.SCHEMA_LOAD,
+                        StepTargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.Id}/{item.MappedSchema.StorageCode}/{GenerateGuid(flowExecutionGuid, runInstanceGuid)}/",
+                        EventType = GlobalConstants.DataFlowStepEvent.SCHEMA_LOAD_START,
                         FileSize = s3Event.s3.Object.size.ToString(),
                         S3EventTime = s3Event.eventTime.ToString("s"),
                         OriginalS3Event = JsonConvert.SerializeObject(s3Event)
                     };
+
+                    base.GenerateDependencyTargets(stepEvent);
 
                     step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Info);
 
@@ -172,8 +189,8 @@ namespace Sentry.data.Infrastructure
             //temp-file/schemaloade/<flowId>/<storagecode>/<guids>/
             if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX))
             {
-                int strtIdx = GetNthIndex(key, '/', 4);
-                int endIdx = GetNthIndex(key, '/', 5);
+                int strtIdx = ParsingHelpers.GetNthIndex(key, '/', 4);
+                int endIdx = ParsingHelpers.GetNthIndex(key, '/', 5);
                 storageCode = key.Substring(strtIdx + 1, (endIdx - strtIdx) - 1);
             }
 
@@ -190,23 +207,6 @@ namespace Sentry.data.Infrastructure
             {
                 return executionGuid + "-" + instanceGuid;
             }            
-        }
-
-        private int GetNthIndex(string s, char t, int n)
-        {
-            int count = 0;
-            for (int i = 0; i < s.Length; i++)
-            {
-                if (s[i] == t)
-                {
-                    count++;
-                    if (count == n)
-                    {
-                        return i;
-                    }
-                }
-            }
-            return -1;
         }
     }
 }
