@@ -16,13 +16,16 @@ namespace Sentry.data.Infrastructure
         private readonly IFtpProvider _ftpProvider;
         private readonly IJobService _jobService;
         private readonly IS3ServiceProvider _s3ServiceProvider;
+        private readonly IDataFlowService _dataFlowService;
         private Submission _submission;
 
-        public FtpDataFlowProvider(IFtpProvider ftpProvider, IJobService jobService, IS3ServiceProvider s3ServiceProvider)
+        public FtpDataFlowProvider(IFtpProvider ftpProvider, IJobService jobService, 
+            IS3ServiceProvider s3ServiceProvider, IDataFlowService dataFlowService)
         {
             _ftpProvider = ftpProvider;
             _jobService = jobService;
             _s3ServiceProvider = s3ServiceProvider;
+            _dataFlowService = dataFlowService;
         }
         public override void ConfigureProvider(RetrieverJob job)
         {
@@ -81,7 +84,7 @@ namespace Sentry.data.Infrastructure
             var tempFile = SetupTempWorkSpace(absoluteUri);
 
             //Find the target prefix (s3) from S3DropAction on the DataFlow attached to RetrieverJob
-            DataFlowStep s3DropStep = _job.DataFlow.Steps.Where(w => w.DataAction_Type_Id == DataActionType.S3Drop).FirstOrDefault();
+            DataFlowStep s3DropStep = _dataFlowService.GetDataFlowStepForDataFlowByActionType(_job.DataFlow.Id, DataActionType.S3Drop);
 
             _job.JobLoggerMessage("Info", "Sending file to Temp location");
 
@@ -111,7 +114,7 @@ namespace Sentry.data.Infrastructure
 
             _job.JobLoggerMessage("Info", "Sending file to S3 drop location");
 
-            string targetkey = $"{s3DropStep.TargetPrefix}{Path.GetFileName(absoluteUri)}";
+            string targetkey = $"{s3DropStep.TriggerKey}{Path.GetFileName(absoluteUri)}";
             var versionId = _s3ServiceProvider.UploadDataFile(tempFile, targetkey);
 
             _job.JobLoggerMessage("Info", $"File uploaded to S3 Drop Location  (Key:{targetkey} | VersionId:{versionId})");
