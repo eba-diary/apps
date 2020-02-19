@@ -8,6 +8,7 @@ using System.Runtime.Serialization;
 
 namespace Sentry.data.Core.Exceptions
 {
+    [Serializable]
     public class DatasetNotFoundException : Exception, ISerializable
     {
         public DatasetNotFoundException() { }
