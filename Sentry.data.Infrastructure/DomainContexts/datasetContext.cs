@@ -647,7 +647,16 @@ namespace Sentry.data.Infrastructure
 
         public List<DatasetSubscription> GetAllSubscriptions()
         {
+
             return Query<DatasetSubscription>().ToList();
+        }
+
+        public List<Subscription> GetAllSubscriptionsForReal()
+        {
+            List<Subscription> subscriptions = new List<Subscription>();
+            subscriptions.AddRange(Query<BusinessAreaSubscription>().Cast<Subscription>().ToList());
+            subscriptions.AddRange(Query<DatasetSubscription>().Cast<Subscription>().ToList());
+            return subscriptions;
         }
 
 
@@ -663,7 +672,7 @@ namespace Sentry.data.Infrastructure
 
         public List<Event> EventsSince(DateTime time, Boolean IsProcessed)
         {
-            List<Event> events = Query<Event>().Where(e => e.TimeCreated >= time && e.IsProcessed == IsProcessed && (e.EventType.Display)).ToList();
+            List<Event> events = Query<Event>().Where(e => e.TimeCreated >= time && e.IsProcessed == IsProcessed && (e.EventType.Display || e.EventType.Group == "BUSINESSAREA")).ToList();
             return events;
         }
 
