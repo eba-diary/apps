@@ -24,13 +24,9 @@ namespace Sentry.data.Infrastructure
             MailAddress from = new MailAddress("NoReply@sentry.com");
             MailMessage myMail = new System.Net.Mail.MailMessage();
             myMail.From = from;
-
             myMail.Subject = $"{Configuration.Config.GetDefaultEnvironmentName()} - BI report location permission";
-
             myMail.To.Add("DSCSupport@sentry.com");
-
             myMail.IsBodyHtml = true;
-            
             myMail.Body += @"<p><b><font color=""red"">Do Not Reply To This Email, This Inbox Is Not Monitored</font></b></p>";
             myMail.Body += $@"<p>{userName} tried to submit a Business Intelligence report with a report location that DSC does not have permisison to.</p>";
             myMail.Body += $@"<p>Enter a ticket with IAM for DSC to gain access to {report.Location} .</p>";
@@ -57,13 +53,9 @@ namespace Sentry.data.Infrastructure
             MailAddress from = new MailAddress(Configuration.Config.GetHostSetting("DatasetMgmtEmail"));
             MailMessage myMail = new System.Net.Mail.MailMessage();
             myMail.From = from;
-
             myMail.Subject = interval + " Events from data.sentry.com";
-
             myMail.To.Add(emailAddress);
-
             myMail.IsBodyHtml = true;
-
             myMail.Body += @"<p><b><font color=""red"">Do Not Reply To This Email, This Inbox Is Not Monitored</font></b></p>";
 
 
@@ -100,25 +92,18 @@ namespace Sentry.data.Infrastructure
                     {
                         
                         myMail.Body += @"<tr bgcolor='4da6ff'><td><b>Creation Date</b></td><td><b>Description</b></td><td><b>Status</b></td><td><b>Initiator</b></td><td><b>Event Type</b></td></tr>";
-
                         foreach (Event e in group)
                         {
                             myMail.Body += @"<tr>";
-
                             myMail.Body += @"<td>" + e.TimeCreated + @"</td>";
-
                             myMail.Body += @"<td>" + e.Reason + @"</td>";
-
                             myMail.Body += @"<td>" + e.Status.Description + @"</td>";
 
                             //Needed to resolve service accounts
                             int n;
                             var user = int.TryParse(e.UserWhoStartedEvent.Trim(), out n) ? _associateInfoProvider.GetAssociateInfo(e.UserWhoStartedEvent.Trim()).FullName : e.UserWhoStartedEvent.Trim();
-
                             myMail.Body += @"<td>" + user + @"</td>";
-
                             myMail.Body += @"<td>" + e.EventType.Description + @"</td>";
-
                             myMail.Body += @" </tr>";
                         }
 
@@ -128,8 +113,6 @@ namespace Sentry.data.Infrastructure
                     {
                         events.Add(group.First());
                     }
-
-
                 }
             }
 
@@ -137,34 +120,31 @@ namespace Sentry.data.Infrastructure
             {
 
                 myMail.Body += @"<tr bgcolor='4da6ff'><td><b>Creation Date</b></td><td><b>Description</b></td><td><b>Status</b></td><td><b>Initiator</b></td><td><b>Event Type</b></td></tr>";
-
                 foreach (Event e in events.OrderBy(x => x.EventType.Severity))
                 {
+                    //BUSINESSAREA format Reason with extra info about Notification Title
+                    string reason2 = "";
+                    if (e.EventType.Group == EventTypeGroup.BusinessArea.GetDescription())
+                        reason2 = e.Reason + ":  " + e.Notification.Title;
+                    else 
+                        reason2 = e.Reason;
+
                     myMail.Body += @"<tr>";
-
                     myMail.Body += @"<td>" + e.TimeCreated + @"</td>";
-
-                    myMail.Body += @"<td>" + e.Reason + @"</td>";
-
+                    myMail.Body += @"<td>" + reason2 + @"</td>";
                     myMail.Body += @"<td>" + e.Status.Description + @"</td>";
 
                     //Needed to resolve service accounts
                     int n;
                     var user = int.TryParse(e.UserWhoStartedEvent.Trim(), out n) ? _associateInfoProvider.GetAssociateInfo(e.UserWhoStartedEvent.Trim()).FullName : e.UserWhoStartedEvent.Trim();
-
                     myMail.Body += @"<td>" + user + @"</td>";
-
                     myMail.Body += @"<td>" + e.EventType.Description + @"</td>";
-
                     myMail.Body += @" </tr>";
                 }
             }
 
             myMail.Body += @"</table>";
-
-            
             smtpClient.Send(myMail);
-
         }
 
         /// <summary>
