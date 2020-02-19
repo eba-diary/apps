@@ -41,7 +41,7 @@ namespace Sentry.data.Core
         /// <exception cref="Exceptions.DataFlowStepNotFound">Thrown if dataf flow step is not found</exception>
         /// <exception cref="ArgumentNullException">Thrown if parameter is not specified</exception>
         DataFlowStep GetDataFlowStepForDataFlowByActionType(int dataFlowId, DataActionType actionType);
-        string GetStorageCodeForDataFlow(int id);
+        string GetSchemaStorageCodeForDataFlow(int id);
 
         /// <summary>
         /// 

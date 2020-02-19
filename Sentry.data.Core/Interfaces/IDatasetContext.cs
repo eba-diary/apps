@@ -105,6 +105,7 @@ namespace Sentry.data.Core
         List<DatasetSubscription> GetAllSubscriptions();
         List<Event> EventsSince(DateTime time, Boolean IsProcessed);
         int GetNextStorageCDE();
+        string GetNextDataFlowStorageCDE();
         int GetReportCount();
 
 

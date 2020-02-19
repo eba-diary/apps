@@ -37,7 +37,7 @@ namespace Sentry.data.Infrastructure
                 string storageCode = null;
                 if (dStep.Action.TargetStorageSchemaAware)
                 {
-                    storageCode = _dataFlowService.GetStorageCodeForDataFlow(dStep.DataFlow.Id);
+                    storageCode = _dataFlowService.GetSchemaStorageCodeForDataFlow(dStep.DataFlow.Id);
                 }
 
                 DataFlowStepEventTarget target = new DataFlowStepEventTarget

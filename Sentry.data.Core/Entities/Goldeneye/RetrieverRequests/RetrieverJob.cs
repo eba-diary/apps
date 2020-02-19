@@ -275,7 +275,7 @@ namespace Sentry.data.Core
             }
             else
             {
-                return $"RJob~df_{this.DataFlow.Id}~job_{this.Id}~dsrc_{this.DataSource.Name}";
+                return $"RJob~df_{this.DataFlow.FlowStorageCode}~job_{this.Id}~dsrc_{this.DataSource.Name}";
             }
         }
     }

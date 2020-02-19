@@ -6,6 +6,7 @@
     [Create_DTM] DATETIME NOT NULL, 
     [CreatedBy] VARCHAR(10) NOT NULL, 
 	[Questionnaire] VARCHAR(MAX) NULL, 
+    [FlowStorageCode] VARCHAR(7) NULL, 
     CONSTRAINT [PK_DataFlow] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC

@@ -246,7 +246,7 @@ namespace Sentry.data.Core
             return steps;
         }
 
-        public string GetStorageCodeForDataFlow(int dataFlowId)
+        public string GetSchemaStorageCodeForDataFlow(int dataFlowId)
         {
             DataFlowStep schemaLoadStep = GetDataFlowStepForDataFlowByActionType(dataFlowId, DataActionType.SchemaLoad);
 
@@ -285,7 +285,8 @@ namespace Sentry.data.Core
                 Name = dto.Name,
                 CreatedDTM = DateTime.Now,
                 CreatedBy = _userService.GetCurrentUser().AssociateId,
-                Questionnaire = dto.DFQuestionnaire
+                Questionnaire = dto.DFQuestionnaire,
+                FlowStorageCode = _datasetContext.GetNextDataFlowStorageCDE()
             };
 
             _datasetContext.Add(df);
@@ -555,11 +556,11 @@ namespace Sentry.data.Core
         {
             if(step.DataAction_Type_Id == DataActionType.S3Drop)
             {
-                step.TriggerKey = $"droplocation/{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.Id}/";
+                step.TriggerKey = $"droplocation/{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
             }
             else
             {
-                step.TriggerKey = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{step.DataFlow.Id}/";
+                step.TriggerKey = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{step.DataFlow.FlowStorageCode}/";
             }            
         }
 
@@ -567,7 +568,7 @@ namespace Sentry.data.Core
         {
             StringBuilder sb = new StringBuilder();
             sb.Append(step.Action.TargetStoragePrefix);
-            sb.Append(step.DataFlow.Id + "/");
+            sb.Append(step.DataFlow.FlowStorageCode + "/");
             return sb.ToString();
         }
 
@@ -583,7 +584,7 @@ namespace Sentry.data.Core
                 case DataActionType.RawStorage:
                 case DataActionType.QueryStorage:
                 case DataActionType.ConvertParquet:
-                    step.TargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.Id}/";
+                    step.TargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.FlowStorageCode}/";
                     break;
                 //These only send output to down stream dependent steps
                 case DataActionType.SchemaLoad:
@@ -613,7 +614,8 @@ namespace Sentry.data.Core
                 Id = 0,
                 Name = GenerateDataFlowNameForFileSchema(scm),
                 CreatedDTM = DateTime.Now,
-                CreatedBy = _userService.GetCurrentUser().AssociateId
+                CreatedBy = _userService.GetCurrentUser().AssociateId,
+                FlowStorageCode = _datasetContext.GetNextDataFlowStorageCDE()
             };
 
             _datasetContext.Add(df);

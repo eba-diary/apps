@@ -139,7 +139,7 @@ namespace Sentry.data.Infrastructure
                         SourceKey = objectKey,
                         StepTargetBucket = step.Action.TargetStorageBucket,
                         //<targetstorageprefix>/<dataflowid>/<storagecode>/<flow execution guid>[-<run instance guid>]/
-                        StepTargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.Id}/{item.MappedSchema.StorageCode}/{GenerateGuid(flowExecutionGuid, runInstanceGuid)}/",
+                        StepTargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.FlowStorageCode}/{item.MappedSchema.StorageCode}/{GenerateGuid(flowExecutionGuid, runInstanceGuid)}/",
                         EventType = GlobalConstants.DataFlowStepEvent.SCHEMA_LOAD_START,
                         FileSize = s3Event.s3.Object.size.ToString(),
                         S3EventTime = s3Event.eventTime.ToString("s"),

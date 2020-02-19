@@ -17,6 +17,7 @@ namespace Sentry.data.Core.Entities.DataProcessing
         }
         public virtual int Id { get; set; }
         public virtual Guid FlowGuid { get; set; }
+        public virtual string FlowStorageCode { get; set; }
         public virtual string Name { get; set; }
         public virtual DateTime CreatedDTM { get; set; }
         public virtual string CreatedBy { get; set; }

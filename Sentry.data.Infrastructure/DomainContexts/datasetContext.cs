@@ -710,6 +710,19 @@ namespace Sentry.data.Infrastructure
             return Int32.Parse(new string(charArray));
         }
 
+        public string GetNextDataFlowStorageCDE()
+        {
+            string sqlConnString = Sentry.Configuration.Config.GetHostSetting("DatabaseConnectionString");
+            string sqlQueryString = $"SELECT NEXT VALUE FOR seq_DataFlowStorageCDE";
+            int result = ExecuteQuery(sqlConnString, sqlQueryString);
+
+            /*****************************
+             * We return an int from the sequence, then convert to string and pad left with zeros (0)
+             *  This gives all values the same length provides better sorting capabilities
+             *****************************/
+            return result.ToString().PadLeft(7, '0');
+        }
+
         private int ExecuteQuery(string sqlConnStr, string sqlQueryStr)
         {
             SqlConnection sqlConn = null;
