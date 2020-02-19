@@ -575,7 +575,7 @@ namespace Sentry.data.Core
                             {
                                 name = bucket
                             },
-                            _object = new data.Core.Entities.S3.Object()
+                            Object = new data.Core.Entities.S3.Object()
                             {
                                 key = dsf.FileLocation
                             }
