@@ -17,7 +17,7 @@ namespace Sentry.data.Infrastructure
 {
     //ActionType attribute utilized to map entity to provider within DataStepProvider.cs
     [ActionType(DataActionType.UncompressZip)]
-    public class UncompressZipProvider : IUncompressZipProvider
+    public class UncompressZipProvider : BaseActionProvider, IUncompressZipProvider
     {
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
@@ -25,13 +25,14 @@ namespace Sentry.data.Infrastructure
         private string _flowGuid;
         private string _runInstGuid;
 
-        public UncompressZipProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider)
+        public UncompressZipProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider,
+            IDataFlowService dataFlowService) : base(dataFlowService)
         {
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
         }
 
-        public void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
+        public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
             Stopwatch stopWatch = new Stopwatch();
             _step = step;
@@ -45,34 +46,46 @@ namespace Sentry.data.Infrastructure
                 stopWatch.Start();
                 string fileName = Path.GetFileName(stepEvent.SourceKey);
 
-                //Copy file to Raw Storage
-                string versionKey = _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, stepEvent.TargetBucket, $"{stepEvent.TargetPrefix}{fileName}");
+                /***************************************
+                 *  Perform provider specific processing
+                 ***************************************/
+                // This step is performed by an external process
+                
 
-                stopWatch.Stop();
-#if (DEBUG)
-                //Mock for testing... sent mock s3object created 
-                S3Event s3e = null;
-                s3e = new S3Event
+                /***************************************
+                 *  Trigger dependent data flow steps
+                 ***************************************/
+                foreach (DataFlowStepEventTarget target in stepEvent.DownstreamTargets)
                 {
-                    EventType = "S3EVENT",
-                    PayLoad = new S3ObjectEvent()
+                    _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, target.BucketName, $"{target.ObjectKey}{fileName}");
+
+#if (DEBUG)
+                    //Mock for testing... sent mock s3object created 
+                    S3Event s3e = null;
+                    s3e = new S3Event
                     {
-                        eventName = "ObjectCreated:Put",
-                        s3 = new S3()
+                        EventType = "S3EVENT",
+                        PayLoad = new S3ObjectEvent()
                         {
-                            bucket = new Bucket()
+                            eventName = "ObjectCreated:Put",
+                            s3 = new S3()
                             {
-                                name = stepEvent.TargetBucket
-                            },
-                            Object = new Sentry.data.Core.Entities.S3.Object()
-                            {
-                                key = $"{stepEvent.TargetPrefix}{fileName}"
+                                bucket = new Bucket()
+                                {
+                                    name = target.BucketName
+                                },
+                                Object = new Sentry.data.Core.Entities.S3.Object()
+                                {
+                                    key = $"{target.ObjectKey}{fileName}"
+                                }
                             }
                         }
-                    }
-                };
-                _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
+                    };
+                    _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
 #endif
+                }
+
+                stopWatch.Stop();
 
                 _step.Executions.Add(_step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{_step.DataAction_Type_Id.ToString()}-executeaction-success", Log_Level.Debug, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }));
             }
@@ -87,7 +100,7 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public void PublishStartEvent(DataFlowStep step, string FlowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
+        public override void PublishStartEvent(DataFlowStep step, string FlowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
             try
             {
@@ -106,13 +119,15 @@ namespace Sentry.data.Infrastructure
                     ActionGuid = step.Action.ActionGuid.ToString(),
                     SourceBucket = keyBucket,
                     SourceKey = objectKey,
-                    TargetBucket = step.Action.TargetStorageBucket,
-                    TargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.Id}/" + $"{FlowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid)}/",
-                    EventType = GlobalConstants.DataFlowStepEvent.UNCOMPRESS_ZIP,
+                    StepTargetBucket = step.Action.TargetStorageBucket,
+                    StepTargetPrefix = (step.TargetPrefix == null) ? null : step.TargetPrefix + $"{FlowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid)}/",
+                    EventType = GlobalConstants.DataFlowStepEvent.UNCOMPRESS_ZIP_START,
                     FileSize = s3Event.s3.Object.size.ToString(),
                     S3EventTime = s3Event.eventTime.ToString("s"),
                     OriginalS3Event = JsonConvert.SerializeObject(s3Event)
                 };
+
+                base.GenerateDependencyTargets(stepEvent);
 
                 step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"uncompresszipprovider-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Info);
 

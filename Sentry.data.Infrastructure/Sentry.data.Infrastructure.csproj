@@ -169,6 +169,8 @@
     <Compile Include="Extensions\RestSharpExtensions.cs" />
     <Compile Include="Extensions\RetrieverJobExtensions.cs" />
     <Compile Include="HangfireFilters\DisableMultipleQueuedItemsFilter.cs" />
+    <Compile Include="Helpers\DataFlowHelpers.cs" />
+    <Compile Include="Helpers\ParsingHelpers.cs" />
     <Compile Include="Helpers\TopicHelper.cs" />
     <Compile Include="Interfaces\IDataFlowStepProvider.cs" />
     <Compile Include="Mappings\Metadata\DataElementDetailMapping.cs" />
@@ -256,6 +258,7 @@
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\BaseActionProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\ConvertToParquetProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\DataFlowProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\DataStepService.cs" />

@@ -20,6 +20,7 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.Property(x => x.Name, m => m.Column("Name"));
             this.Property(x => x.TargetStorageBucket, m => m.Column("TargetStorageBucket"));
             this.Property(x => x.TargetStoragePrefix, m => m.Column("TargetStoragePrefix"));
+            this.Property(x => x.TargetStorageSchemaAware, m => m.Column("TargetStorageSchemaAware"));
         }
     }
 }

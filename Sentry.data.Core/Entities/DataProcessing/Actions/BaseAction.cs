@@ -22,6 +22,7 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public virtual string Name { get; set; }
         public virtual string TargetStoragePrefix { get; set; }
         public virtual string TargetStorageBucket { get; set; }
+        public virtual bool TargetStorageSchemaAware { get; set; }
 
         public virtual void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent, string ExecutionGuid)
         {

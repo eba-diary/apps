@@ -222,6 +222,43 @@ namespace Sentry.data.Core
             return step;
         }
 
+        public List<DataFlowStep> GetDependentDataFlowStepsForDataFlowStep(int stepId)
+        {
+            if (stepId == 0)
+            {
+                throw new ArgumentNullException("DataFlowStep is required");
+            }
+
+            /****************************************************
+             * Retrieve current step
+             ****************************************************/
+            DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.Id == stepId).FirstOrDefault();
+
+            List<DataFlowStep> steps = new List<DataFlowStep>();
+
+            /****************************************************
+             * Find all downstream dependent steps based on:
+             *   - Current step trigger key equals to dependent step SourceDependencyPrefix
+             *   - Current step bucket equals to dependent step SourceDependencyBucket
+             ****************************************************/
+            steps = _datasetContext.DataFlowStep.Where(w => w.SourceDependencyPrefix == step.TriggerKey && w.SourceDependencyBucket == step.Action.TargetStorageBucket).ToList();
+
+            return steps;
+        }
+
+        public string GetStorageCodeForDataFlow(int dataFlowId)
+        {
+            DataFlowStep schemaLoadStep = GetDataFlowStepForDataFlowByActionType(dataFlowId, DataActionType.SchemaLoad);
+
+            if (schemaLoadStep == null)
+            {
+                return null;
+            }
+
+            return schemaLoadStep.SchemaMappings.Single().MappedSchema.StorageCode;
+
+        }
+
         #region Private Methods
         private void CreateDataFlow(DataFlowDto dto)
         {           
@@ -423,9 +460,9 @@ namespace Sentry.data.Core
                 df.Steps = new List<DataFlowStep>();
             }
 
-            //not the first step in list, get previous step to determine trigger
-            SetTriggerKey(step, df.Steps.OrderByDescending(o => o.ExeuctionOrder).Take(1).FirstOrDefault());
+            SetTriggerPrefix(step);
             SetTargetPrefix(step);
+            SetSourceDependency(step, df.Steps.OrderByDescending(o => o.ExeuctionOrder).Take(1).FirstOrDefault());
 
             //Set exeuction order
             step.ExeuctionOrder = df.Steps.Count + 1;
@@ -475,6 +512,14 @@ namespace Sentry.data.Core
                     foreach (SchemaMapDto mapDto in dto.SchemaMap)
                     {
                         MapToSchemaMap(mapDto, schemaMapStep);
+                        bool exists = DataFlowExistsForFileSchema(mapDto.SchemaId);
+                        if (!exists)
+                        {
+                            Logger.Debug("dataflowservice-createdataflowstep fileschema-dataflow-not-detected");
+                            Logger.Debug("dataflowservice-createdataflowstep creating-fileschema-dataflow");
+                            FileSchema scm = _datasetContext.GetById<FileSchema>(mapDto.SchemaId);
+                            CreateDataFlowForSchema(scm);
+                        }
                     }
                     return schemaMapStep;
                 case DataActionType.UncompressGZip:
@@ -482,6 +527,14 @@ namespace Sentry.data.Core
                 default:
                     return null;
             }            
+        }
+
+        private bool DataFlowExistsForFileSchema(int schemaId)
+        {
+            FileSchema scm = _datasetContext.GetById<FileSchema>(schemaId);
+            var schemaFlowName = GetDataFlowNameForFileSchema(scm);
+            bool exists = _datasetContext.DataFlow.Any(w => w.Name == schemaFlowName);
+            return exists;
         }
 
         private DataFlowStep MapToDataFlowStep(DataFlow df, BaseAction action, DataActionType actionType)
@@ -498,9 +551,16 @@ namespace Sentry.data.Core
             return step;
         }
 
-        private void SetTargetPrefix(DataFlowStep step)
+        private void SetTriggerPrefix(DataFlowStep step)
         {
-            step.TargetPrefix = $"{step.Action.TargetStoragePrefix}{step.DataFlow.Id}/";
+            if(step.DataAction_Type_Id == DataActionType.S3Drop)
+            {
+                step.TriggerKey = $"droplocation/{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.Id}/";
+            }
+            else
+            {
+                step.TriggerKey = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{step.DataFlow.Id}/";
+            }            
         }
 
         private string GetTargetKey(DataFlowStep step)
@@ -511,29 +571,37 @@ namespace Sentry.data.Core
             return sb.ToString();
         }
 
-        private void SetTriggerKey(DataFlowStep step, DataFlowStep previousStep)
+        private void SetTargetPrefix(DataFlowStep step)
         {
-            if (previousStep == null)
+            switch (step.DataAction_Type_Id)
             {
-                switch (step.DataAction_Type_Id)
-                {
-                    case DataActionType.S3Drop:
-                        step.TriggerKey = $"droplocation/{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.Id}/";
-                        break;
-                    //case DataActionType.None:
-                    //case DataActionType.RawStorage:
-                    //case DataActionType.QueryStorage:
-                    //case DataActionType.SchemaLoad:
-                    //case DataActionType.ConvertParquet:
-                    default:
-                        throw new NotImplementedException();
-                }
+                case DataActionType.None:
+                    //break;
+                    //step.TargetPrefix = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}" + step.Action.TargetStoragePrefix + $"{step.DataFlow.Id}/";
+                    break;
+                //These sent output a step specific location along with down stream dependent steps
+                case DataActionType.RawStorage:
+                case DataActionType.QueryStorage:
+                case DataActionType.ConvertParquet:
+                    step.TargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.Id}/";
+                    break;
+                //These only send output to down stream dependent steps
+                case DataActionType.SchemaLoad:
+                case DataActionType.UncompressZip:
+                case DataActionType.UncompressGZip:
+                case DataActionType.SchemaMap:
+                case DataActionType.S3Drop:
+                    step.TargetPrefix = null;
+                    break;
+                default:
+                    break;
             }
-            else
-            {
-                step.TriggerKey = GetTargetKey(previousStep);
-            }
+        }
 
+        private void SetSourceDependency(DataFlowStep step, DataFlowStep previousStep)
+        {
+            step.SourceDependencyPrefix = previousStep?.TriggerKey;
+            step.SourceDependencyBucket = previousStep?.Action.TargetStorageBucket;
         }
 
         #region SchemaFlowMappings
