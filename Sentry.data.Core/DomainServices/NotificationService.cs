@@ -122,7 +122,7 @@ namespace Sentry.data.Core
             }
 
             if(eventTypeDescription != null)
-                _eventService.PublishSuccessEventByNotificationId(eventTypeDescription, _userService.GetCurrentUser().AssociateId, eventTypeDescription, dto.NotificationId);
+                _eventService.PublishSuccessEventByNotificationId(eventTypeDescription, _userService.GetCurrentUser().AssociateId, eventTypeDescription, notification);
 
             return dto.NotificationId;
         }
@@ -357,6 +357,37 @@ namespace Sentry.data.Core
 
                 _domainContext.SaveChanges();
             }
+        }
+
+        public EventType FindEventTypeParent(EventType child)
+        {
+            string parentDescription = null;
+
+            switch (child.Description)
+            {
+                case GlobalConstants.EventType.NOTIFICATION_CRITICAL_ADD:
+                case GlobalConstants.EventType.NOTIFICATION_CRITICAL_UPDATE:
+                    parentDescription = GlobalConstants.EventType.NOTIFICATION_CRITICAL;
+                    break;
+                case GlobalConstants.EventType.NOTIFICATION_WARNING_ADD:
+                case GlobalConstants.EventType.NOTIFICATION_WARNING_UPDATE:
+                    parentDescription = GlobalConstants.EventType.NOTIFICATION_WARNING;
+                    break;
+                case GlobalConstants.EventType.NOTIFICATION_INFO_ADD:
+                case GlobalConstants.EventType.NOTIFICATION_INFO_UPDATE:
+                    parentDescription = GlobalConstants.EventType.NOTIFICATION_INFO;
+                    break;
+                default:
+                    break;
+            }
+
+            EventType parentEventType;
+            if (parentDescription != null)              //PARENT EXISTS, so GRAB PARENT
+                parentEventType = _domainContext.EventTypes.FirstOrDefault(w => w.Description == parentDescription);        
+            else
+                parentEventType = new EventType();      //NO PARENT
+            
+            return parentEventType;
         }
     }
 }

@@ -229,7 +229,7 @@ namespace Sentry.data.Goldeneye
                             //Starting MetadataProcessor Consumer
                             MetadataProcessorService metaProcessor = new MetadataProcessorService();
                             currentTasks.Add(new RunningTask(
-                                            Task.Factory.StartNew(() => metaProcessor.Run(), TaskCreationOptions.LongRunning), "metadataProcessor"));                            
+                                            Task.Factory.StartNew(() => metaProcessor.Run(), TaskCreationOptions.LongRunning), "metadataProcessor"));
                         }
 
                         ////Dataset Loader

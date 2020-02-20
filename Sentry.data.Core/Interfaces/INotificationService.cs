@@ -24,5 +24,7 @@ namespace Sentry.data.Core
         List<Interval> GetAllIntervals();
         Interval GetInterval(string description);
         void CreateUpdateSubscription(SubscriptionDto dto);
+
+        EventType FindEventTypeParent(EventType child);
     }
 }
