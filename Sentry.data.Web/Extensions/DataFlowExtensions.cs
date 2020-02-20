@@ -33,8 +33,10 @@ namespace Sentry.data.Web
                 CreatedBy = model.CreatedBy,
                 CreateDTM = model.CreatedDTM,
                 IngestionType = model.IngestionType,
-                IsCompressed = model.IsCompressed
-            };
+                IsCompressed = model.IsCompressed,
+                IsPreProcessingRequired = model.IsPreProcessingRequired,
+                PreProcessingOptions = model.PreprocessingOptions.Select(s => (DataFlowPreProcessingTypes)Enum.ToObject(typeof(DataFlowPreProcessingTypes), s)).ToList()
+            };            
 
             if (model.SchemaMaps != null)
             {

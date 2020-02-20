@@ -305,9 +305,6 @@ namespace Sentry.data.Core
             //MapToRawStorageStep(dto, df);
             AddDataFlowStep(dto, df, DataActionType.RawStorage);
 
-            //Generate preprocessing steps (i.e. uncompress, encoding, etc.)
-            //MapPreProcessingSteps(dto, df);
-            //MapToUnCompressStep(dto.CompressionJob, df);
             if (dto.IsCompressed)
             {
                 switch (dto.CompressionJob.CompressionType)
@@ -323,8 +320,25 @@ namespace Sentry.data.Core
                 }
             }
 
+            if (dto.IsPreProcessingRequired)
+            {
+                foreach (DataFlowPreProcessingTypes item in dto.PreProcessingOptions)
+                {
+                    switch (item)
+                    {
+                        case DataFlowPreProcessingTypes.googleapi:
+                            AddDataFlowStep(dto, df, DataActionType.GoogleApi);
+                            break;
+                        case DataFlowPreProcessingTypes.claimiq:
+                            AddDataFlowStep(dto, df, DataActionType.UncompressZip);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
             //Generate Schema Map step to send files to schema specific data flow
-            //MapToSchemaMapStep(dto, df);
             AddDataFlowStep(dto, df, DataActionType.SchemaMap);
         }
 
@@ -342,9 +356,6 @@ namespace Sentry.data.Core
             //MapToRawStorageStep(dto, df);
             AddDataFlowStep(dto, df, DataActionType.RawStorage);
 
-            //Generate preprocessing steps (i.e. uncompress, encoding, etc.)
-            //MapPreProcessingSteps(dto, df);
-            //MapToUnCompressStep(dto.CompressionJob, df);
             if (dto.IsCompressed)
             {
                 switch (dto.CompressionJob.CompressionType)
@@ -360,8 +371,25 @@ namespace Sentry.data.Core
                 }
             }
 
+            if (dto.IsPreProcessingRequired)
+            {
+                foreach (DataFlowPreProcessingTypes item in dto.PreProcessingOptions)
+                {
+                    switch (item)
+                    {
+                        case DataFlowPreProcessingTypes.googleapi:
+                            AddDataFlowStep(dto, df, DataActionType.UncompressZip);
+                            break;
+                        case DataFlowPreProcessingTypes.claimiq:
+                            AddDataFlowStep(dto, df, DataActionType.UncompressZip);
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+
             //Generate Schema Map step to send files to schema specific data flow
-            //MapToSchemaMapStep(dto, df);
             AddDataFlowStep(dto, df, DataActionType.SchemaMap);
 
         }
@@ -523,6 +551,10 @@ namespace Sentry.data.Core
                         }
                     }
                     return schemaMapStep;
+                case DataActionType.GoogleApi:
+                    action = _datasetContext.GoogleApiAction.FirstOrDefault();
+                    actionType = DataActionType.GoogleApi;
+                    return MapToDataFlowStep(df, action, actionType);
                 case DataActionType.UncompressGZip:
                 case DataActionType.None:
                 default:

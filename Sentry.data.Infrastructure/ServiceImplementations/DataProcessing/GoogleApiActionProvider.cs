@@ -14,19 +14,15 @@ using Sentry.data.Core.Entities.S3;
 using Sentry.data.Core.Interfaces.DataProcessing;
 
 namespace Sentry.data.Infrastructure
-{
-    //ActionType attribute utilized to map entity to provider within DataStepProvider.cs
-    [ActionType(DataActionType.UncompressZip)]
-    public class UncompressZipProvider : BaseActionProvider, IUncompressZipProvider
+{//ActionType attribute utilized to map entity to provider within DataStepProvider.cs
+    [ActionType(DataActionType.GoogleApi)]
+    public class GoogleApiActionProvider : BaseActionProvider, IGoogleApiActionProvider
     {
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private DataFlowStep _step;
-        private string _flowGuid;
-        private string _runInstGuid;
 
-        public UncompressZipProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider,
-            IDataFlowService dataFlowService) : base(dataFlowService)
+        public GoogleApiActionProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, IDataFlowService dataFlowService) : base(dataFlowService)
         {
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
@@ -36,8 +32,6 @@ namespace Sentry.data.Infrastructure
         {
             Stopwatch stopWatch = new Stopwatch();
             _step = step;
-            _flowGuid = stepEvent.FlowExecutionGuid;
-            _runInstGuid = stepEvent.RunInstanceGuid;
 
             _step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"start-method <{_step.DataAction_Type_Id.ToString()}>-executeaction", Log_Level.Debug);
 
@@ -50,7 +44,7 @@ namespace Sentry.data.Infrastructure
                  *  Perform provider specific processing
                  ***************************************/
                 // This step is performed by an external process
-                
+
 
                 /***************************************
                  *  Trigger dependent data flow steps
@@ -102,6 +96,7 @@ namespace Sentry.data.Infrastructure
 
         public override void PublishStartEvent(DataFlowStep step, string FlowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
+            _step = step;
             try
             {
                 step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"start-method <{_step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
@@ -119,9 +114,9 @@ namespace Sentry.data.Infrastructure
                     ActionGuid = step.Action.ActionGuid.ToString(),
                     SourceBucket = keyBucket,
                     SourceKey = objectKey,
-                    StepTargetBucket = step.Action.TargetStorageBucket,
-                    StepTargetPrefix = (step.TargetPrefix == null) ? null : step.TargetPrefix + $"{FlowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid)}/",
-                    EventType = GlobalConstants.DataFlowStepEvent.UNCOMPRESS_ZIP_START,
+                    StepTargetBucket = null,
+                    StepTargetPrefix = null, //This step does push data to long term storage, only pushes result to next steps
+                    EventType = GlobalConstants.DataFlowStepEvent.GOOGLEAPI_PREPROCESSING_START,
                     FileSize = s3Event.s3.Object.size.ToString(),
                     S3EventTime = s3Event.eventTime.ToString("s"),
                     OriginalS3Event = JsonConvert.SerializeObject(s3Event)
@@ -129,16 +124,16 @@ namespace Sentry.data.Infrastructure
 
                 base.GenerateDependencyTargets(stepEvent);
 
-                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"uncompresszipprovider-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Info);
+                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"{_step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Info);
 
                 _messagePublisher.PublishDSCEvent($"{step.DataFlow.Id}-{step.Id}", JsonConvert.SerializeObject(stepEvent));
 
-                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"end-method <uncompresszipprovider-publishstartevent", Log_Level.Debug);
+                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"end-method <{_step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
             }
             catch (Exception ex)
             {
-                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"uncompresszipprovider-publishstartevent failed", Log_Level.Error, ex);
-                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"end-method <uncompresszipprovider-publishstartevent", Log_Level.Debug);
+                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"{_step.DataAction_Type_Id.ToString()} - publishstartevent failed", Log_Level.Error, ex);
+                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"end-method <{_step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
             }
         }
     }

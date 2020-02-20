@@ -61,7 +61,8 @@ namespace Sentry.data.Web.Controllers
         {
             DataFlowModel model = new DataFlowModel();
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
-
+            model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
+            model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreprocessingOptions);
             //Every dataflow requires at least one schemamap, therefore, load a default empty schemamapmodel
             SchemaMapModel schemaModel = new SchemaMapModel
             {
@@ -97,6 +98,7 @@ namespace Sentry.data.Web.Controllers
             }
 
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
+            model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
             if (model.RetrieverJob != null)
             {
                 CreateDropDownSetup(model.RetrieverJob.First());

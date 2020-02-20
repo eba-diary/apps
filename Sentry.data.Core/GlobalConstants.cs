@@ -284,6 +284,7 @@
             public const string CONVERT_TO_PARQUET_PREFIX = TEMP_FILE_PREFIX + "parquet/";
             public const string SCHEMA_MAP_PREFIX = TEMP_FILE_PREFIX + "schemamap/";
             public const string UNCOMPRESS_ZIP_PREFIX = TEMP_FILE_PREFIX + "uncompresszip/";
+            public const string GOOGLEAPI_PREPROCESSING_PREFIX = TEMP_FILE_PREFIX + "googleapipreprocessing/";
         }
 
         public static class DataFlowStepEvent
@@ -295,6 +296,7 @@
             public const string SCHEMA_MAP_START = "DATAFLOWSTEP_SCHEMA_MAP_START";
             public const string CONVERT_TO_PARQUET_START = "DATAFLOWSTEP_CONVERTTOPARQUET_START";
             public const string UNCOMPRESS_ZIP_START = "DATAFLOWSTEP_UNCOMPRESSZIP_START";
+            public const string GOOGLEAPI_PREPROCESSING_START = "DATAFLOWSTEP_GOOGLEAPIPREPROCESSING_START";
         }
 
         public static class AWSEventNotifications

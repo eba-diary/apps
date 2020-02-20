@@ -62,6 +62,7 @@ namespace Sentry.data.Core
         IQueryable<ConvertToParquetAction> ConvertToParquetAction { get; }
         IQueryable<UncompressZipAction> UncompressZipAction { get; }
         IQueryable<SchemaMapAction> SchemaMapAction { get; }
+        IQueryable<GoogleApiAction> GoogleApiAction { get; }
         IQueryable<SchemaMap> SchemaMap { get; }
         /** Datasets **/
 

@@ -111,6 +111,9 @@ namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
                 case DataActionType.SchemaMap:
                     _provider = container.GetInstance<ISchemaMapProvider>();
                     break;
+                case DataActionType.GoogleApi:
+                    _provider = container.GetInstance<IGoogleApiActionProvider>();
+                    break;
                 case DataActionType.None:
                 default:
                     break;

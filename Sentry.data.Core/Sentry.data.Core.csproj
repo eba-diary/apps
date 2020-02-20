@@ -104,6 +104,7 @@
     <Compile Include="DTO\Schema\SchemaDTO.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />
     <Compile Include="DTO\Subscription\SubscriptionDto.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\GoogleApiAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\SchemaMapAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\UncompressZip.cs" />
     <Compile Include="Entities\DataProcessing\DataFlow_Log.cs" />
@@ -168,6 +169,7 @@
     <Compile Include="Extensions\DatasetFileExtensions.cs" />
     <Compile Include="Extensions\DataSourceQueryExtensions.cs" />
     <Compile Include="Extensions\SchemaExtensions.cs" />
+    <Compile Include="GlobalEnums\DataFlowPreProcessingTypes.cs" />
     <Compile Include="GlobalEnums\HttpDataFormat.cs" />
     <Compile Include="GlobalEnums\HTTPMethods.cs" />
     <Compile Include="GlobalEnums\IngestionType.cs" />
@@ -183,6 +185,7 @@
     <Compile Include="Interfaces\DataProcessing\IDataFlowService.cs" />
     <Compile Include="Interfaces\DataProcessing\IDataStep.cs" />
     <Compile Include="Interfaces\DataProcessing\IDataStepService.cs" />
+    <Compile Include="Interfaces\DataProcessing\IGoogleApiActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IQueryStorageProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IRawStorageProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IS3DropProvider.cs" />
