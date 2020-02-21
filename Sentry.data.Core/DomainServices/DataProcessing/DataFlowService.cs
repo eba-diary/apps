@@ -330,7 +330,7 @@ namespace Sentry.data.Core
                             AddDataFlowStep(dto, df, DataActionType.GoogleApi);
                             break;
                         case DataFlowPreProcessingTypes.claimiq:
-                            AddDataFlowStep(dto, df, DataActionType.UncompressZip);
+                            AddDataFlowStep(dto, df, DataActionType.ClaimIq);
                             break;
                         default:
                             break;
@@ -378,10 +378,10 @@ namespace Sentry.data.Core
                     switch (item)
                     {
                         case DataFlowPreProcessingTypes.googleapi:
-                            AddDataFlowStep(dto, df, DataActionType.UncompressZip);
+                            AddDataFlowStep(dto, df, DataActionType.GoogleApi);
                             break;
                         case DataFlowPreProcessingTypes.claimiq:
-                            AddDataFlowStep(dto, df, DataActionType.UncompressZip);
+                            AddDataFlowStep(dto, df, DataActionType.ClaimIq);
                             break;
                         default:
                             break;
@@ -508,15 +508,31 @@ namespace Sentry.data.Core
                 case DataActionType.S3Drop:
                     action = _datasetContext.S3DropAction.FirstOrDefault();
                     actionType = DataActionType.S3Drop;
-                    return MapToDataFlowStep(df, action, actionType);
+                    break;
                 case DataActionType.RawStorage:
                     action = _datasetContext.RawStorageAction.FirstOrDefault();
                     actionType = DataActionType.RawStorage;
-                    return MapToDataFlowStep(df, action, actionType);
+                    break;
                 case DataActionType.QueryStorage:
                     action = _datasetContext.QueryStorageAction.FirstOrDefault();
                     actionType = DataActionType.QueryStorage;
-                    return MapToDataFlowStep(df, action, actionType);
+                    break;
+                case DataActionType.ConvertParquet:
+                    action = _datasetContext.ConvertToParquetAction.FirstOrDefault();
+                    actionType = DataActionType.ConvertParquet;
+                    break;
+                case DataActionType.UncompressZip:
+                    action = _datasetContext.UncompressZipAction.FirstOrDefault();
+                    actionType = DataActionType.UncompressZip;
+                    break;
+                case DataActionType.GoogleApi:
+                    action = _datasetContext.GoogleApiAction.FirstOrDefault();
+                    actionType = DataActionType.GoogleApi;
+                    break;
+                case DataActionType.ClaimIq:
+                    action = _datasetContext.ClaimIQAction.FirstOrDefault();
+                    actionType = DataActionType.ClaimIq;
+                    break;
                 case DataActionType.SchemaLoad:
                     action = _datasetContext.SchemaLoadAction.FirstOrDefault();
                     actionType = DataActionType.SchemaLoad;
@@ -526,14 +542,6 @@ namespace Sentry.data.Core
                         MapToSchemaMap(mapDto, schemaLoadStep);
                     }
                     return schemaLoadStep;
-                case DataActionType.ConvertParquet:
-                    action = _datasetContext.ConvertToParquetAction.FirstOrDefault();
-                    actionType = DataActionType.ConvertParquet;
-                    return MapToDataFlowStep(df, action, actionType);
-                case DataActionType.UncompressZip:
-                    action = _datasetContext.UncompressZipAction.FirstOrDefault();
-                    actionType = DataActionType.UncompressZip;
-                    return MapToDataFlowStep(df, action, actionType);
                 case DataActionType.SchemaMap:
                     action = _datasetContext.SchemaMapAction.FirstOrDefault();
                     actionType = DataActionType.SchemaMap;
@@ -551,15 +559,13 @@ namespace Sentry.data.Core
                         }
                     }
                     return schemaMapStep;
-                case DataActionType.GoogleApi:
-                    action = _datasetContext.GoogleApiAction.FirstOrDefault();
-                    actionType = DataActionType.GoogleApi;
-                    return MapToDataFlowStep(df, action, actionType);
                 case DataActionType.UncompressGZip:
                 case DataActionType.None:
                 default:
                     return null;
-            }            
+            }
+
+            return MapToDataFlowStep(df, action, actionType);
         }
 
         private bool DataFlowExistsForFileSchema(int schemaId)

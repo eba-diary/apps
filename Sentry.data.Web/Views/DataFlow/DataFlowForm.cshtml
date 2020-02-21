@@ -83,7 +83,7 @@
                     <div class="form-group">
                         @Html.LabelFor((model) => model.PreprocessingOptions, new { @class = "control-label col-md-2" })
                         <div class="col-md-10">
-                            <select id="PreprocessingOptions" name="PreprocessingOptions" multiple="multiple" class="form-control edit-dataset-row">
+                            <select id="PreprocessingOptions" name="PreprocessingOptions" class="form-control edit-dataset-row">
                                 @foreach (var item in Model.PreProcessingOptionsDropdown)
                                 {
                                     <option selected="@item.Selected" value="@item.Value">@item.Text</option>

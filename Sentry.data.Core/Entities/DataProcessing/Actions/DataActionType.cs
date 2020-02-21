@@ -22,6 +22,8 @@ namespace Sentry.data.Core.Entities.DataProcessing
         [Description("Schema Map")]
         SchemaMap = 8,
         [Description("Google Api")]
-        GoogleApi = 9
+        GoogleApi = 9,
+        [Description("ClaimIQ")]
+        ClaimIq = 10
     }
 }

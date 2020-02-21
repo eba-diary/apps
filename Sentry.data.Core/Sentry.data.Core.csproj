@@ -104,6 +104,7 @@
     <Compile Include="DTO\Schema\SchemaDTO.cs" />
     <Compile Include="DTO\Schema\SchemaRevisionDto.cs" />
     <Compile Include="DTO\Subscription\SubscriptionDto.cs" />
+    <Compile Include="Entities\DataProcessing\Actions\ClaimIQAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\GoogleApiAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\SchemaMapAction.cs" />
     <Compile Include="Entities\DataProcessing\Actions\UncompressZip.cs" />
@@ -179,6 +180,7 @@
     <Compile Include="GlobalEnums\SchemaDatatypes.cs" />
     <Compile Include="Helpers\LambdaClientConfig.cs" />
     <Compile Include="Interfaces\DataProcessing\IBaseActionProvider.cs" />
+    <Compile Include="Interfaces\DataProcessing\IClaimIQActionProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IConvertToParquetProvider.cs" />
     <Compile Include="Interfaces\DataProcessing\IDataAction.cs" />
     <Compile Include="Interfaces\DataProcessing\IDataFlowProvider.cs" />

@@ -64,6 +64,7 @@ namespace Sentry.data.Core
         IQueryable<SchemaMapAction> SchemaMapAction { get; }
         IQueryable<GoogleApiAction> GoogleApiAction { get; }
         IQueryable<SchemaMap> SchemaMap { get; }
+        IQueryable<ClaimIQAction> ClaimIQAction { get; }
         /** Datasets **/
 
         Dataset GetById(int id);

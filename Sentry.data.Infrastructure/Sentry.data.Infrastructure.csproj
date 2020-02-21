@@ -187,6 +187,7 @@
     <Compile Include="Mappings\Metadata\MetadataAssetMapping.cs" />
     <Compile Include="Mappings\Metadata\MetadataTagMapping.cs" />
     <Compile Include="Mappings\Metadata\TagGroupMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\ClaimIQActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\GoogleApiActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\SchemaMapActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\UncompressZipActionMapping.cs" />
@@ -263,6 +264,7 @@
     <Compile Include="ServiceImplementations\AWSLambdaProvider.cs" />
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\BaseActionProvider.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\ClaimIQActionProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\ConvertToParquetProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\DataFlowProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\DataStepService.cs" />
