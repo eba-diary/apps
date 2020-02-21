@@ -114,6 +114,9 @@ namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
                 case DataActionType.GoogleApi:
                     _provider = container.GetInstance<IGoogleApiActionProvider>();
                     break;
+                case DataActionType.ClaimIq:
+                    _provider = container.GetInstance<IClaimIQActionProvider>();
+                    break;
                 case DataActionType.None:
                 default:
                     break;

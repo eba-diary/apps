@@ -104,7 +104,7 @@ namespace Sentry.data.Infrastructure
         {
             try
             {
-                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"start-method <{_step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
+                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"start-method <{step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
                 string objectKey = s3Event.s3.Object.key;
                 string keyBucket = s3Event.s3.bucket.name;
 
@@ -129,16 +129,16 @@ namespace Sentry.data.Infrastructure
 
                 base.GenerateDependencyTargets(stepEvent);
 
-                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"uncompresszipprovider-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Info);
+                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Info);
 
                 _messagePublisher.PublishDSCEvent($"{step.DataFlow.Id}-{step.Id}", JsonConvert.SerializeObject(stepEvent));
 
-                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"end-method <uncompresszipprovider-publishstartevent", Log_Level.Debug);
+                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"end-method <{step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
             }
             catch (Exception ex)
             {
-                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"uncompresszipprovider-publishstartevent failed", Log_Level.Error, ex);
-                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"end-method <uncompresszipprovider-publishstartevent", Log_Level.Debug);
+                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-publishstartevent failed", Log_Level.Error, ex);
+                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"end-method <{step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
             }
         }
     }
