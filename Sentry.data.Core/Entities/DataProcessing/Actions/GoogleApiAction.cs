@@ -10,9 +10,6 @@ namespace Sentry.data.Core.Entities.DataProcessing
     public class GoogleApiAction : BaseAction
     {
         public GoogleApiAction() { }
-        public GoogleApiAction(IGoogleApiActionProvider googleApiProvider) : base(googleApiProvider)
-        {
-            TargetStoragePrefix = GlobalConstants.DataFlowTargetPrefixes.GOOGLEAPI_PREPROCESSING_PREFIX + Configuration.Config.GetHostSetting("S3DataPrefix");
-        }
+        public GoogleApiAction(IGoogleApiActionProvider googleApiProvider) : base(googleApiProvider) { }
     }
 }

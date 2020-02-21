@@ -2,4 +2,3 @@
 Delete from DataFlowLog
 Delete from DataFlowStep
 Delete from DataFlow
-Delete from DataAction

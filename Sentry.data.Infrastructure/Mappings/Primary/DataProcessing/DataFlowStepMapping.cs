@@ -33,7 +33,9 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.ManyToOne(x => x.Action, m =>
             {
                 m.Column("Action_ID");
+                m.ForeignKey("FK_DataFlowStep_DataAction");
                 m.Class(typeof(BaseAction));
+                m.Update(false);
             });
 
             this.Bag(x => x.Executions, (m) =>

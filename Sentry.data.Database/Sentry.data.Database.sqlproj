@@ -130,7 +130,7 @@
     <Folder Include="Tables\DataProcessing" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_19_04_06" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_01_04" />
-    <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_02_02" />
+    <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_20_02_02" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -239,7 +239,7 @@
     <Build Include="Tables\BusinessAreaTileRow_BusinessAreaTile.sql" />
     <None Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_19_3_1\InsertSecurities.sql" />
     <Build Include="Tables\Subscriptions\BusinessArea_Subscription.sql" />
-    <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_02_02\InitializeDataFlowProcessingMetadata.sql" />
+    <None Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_20_02_02\InitializeDataFlowProcessingMetadata.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />

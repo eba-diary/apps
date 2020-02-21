@@ -467,7 +467,7 @@ namespace Sentry.data.Core
             dto.ExeuctionOrder = step.ExeuctionOrder;
             dto.ActionName = step.Action.Name;
             dto.TriggerKey = step.TriggerKey;
-            dto.TargetPrefix = step.Action.TargetStoragePrefix;
+            dto.TargetPrefix = step.TargetPrefix;
         }
 
         private void MapToDtoList(List<DataFlowStep> steps, List<DataFlowStepDto> dtoList)
@@ -598,17 +598,17 @@ namespace Sentry.data.Core
             }
             else
             {
-                step.TriggerKey = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{step.DataFlow.FlowStorageCode}/";
+                step.TriggerKey = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}{step.Action.TargetStoragePrefix}{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
             }            
         }
 
-        private string GetTargetKey(DataFlowStep step)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append(step.Action.TargetStoragePrefix);
-            sb.Append(step.DataFlow.FlowStorageCode + "/");
-            return sb.ToString();
-        }
+        //private string GetTargetKey(DataFlowStep step)
+        //{
+        //    StringBuilder sb = new StringBuilder();
+        //    sb.Append(step.Action.TargetStoragePrefix);
+        //    sb.Append(step.DataFlow.FlowStorageCode + "/");
+        //    return sb.ToString();
+        //}
 
         private void SetTargetPrefix(DataFlowStep step)
         {
@@ -622,7 +622,7 @@ namespace Sentry.data.Core
                 case DataActionType.RawStorage:
                 case DataActionType.QueryStorage:
                 case DataActionType.ConvertParquet:
-                    step.TargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.FlowStorageCode}/";
+                    step.TargetPrefix = step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
                     break;
                 //These only send output to down stream dependent steps
                 case DataActionType.SchemaLoad:

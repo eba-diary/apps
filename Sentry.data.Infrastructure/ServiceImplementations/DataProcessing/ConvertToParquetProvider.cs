@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Sentry.Common.Logging;
 using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.S3;
@@ -6,6 +7,9 @@ using Sentry.data.Core.Interfaces.DataProcessing;
 using Sentry.data.Infrastructure.Helpers;
 using StructureMap;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 
 namespace Sentry.data.Infrastructure
@@ -13,15 +17,84 @@ namespace Sentry.data.Infrastructure
     public class ConvertToParquetProvider : BaseActionProvider, IConvertToParquetProvider
     {
         private readonly IMessagePublisher _messagePublisher;
+        private readonly IS3ServiceProvider _s3ServiceProvider;
 
-        public ConvertToParquetProvider(IMessagePublisher messagePublisher, IDataFlowService dataFlowService) : base(dataFlowService)
+        public ConvertToParquetProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, 
+            IDataFlowService dataFlowService) : base(dataFlowService)
         {
             _messagePublisher = messagePublisher;
+            _s3ServiceProvider = s3ServiceProvider;
         }
 
         public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
-            throw new System.NotImplementedException();
+            List<DataFlow_Log> logs = new List<DataFlow_Log>();
+            Stopwatch stopWatch = new Stopwatch();
+            logs.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"start-method <{step.DataAction_Type_Id.ToString()}>-executeaction", Log_Level.Debug));
+            try
+            {
+                DateTime startTime = DateTime.Now;
+                stopWatch.Start();
+                string fileName = Path.GetFileName(stepEvent.SourceKey);
+                logs.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()} processing event - {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Debug));
+                /***************************************
+                 *  Perform provider specific processing
+                 ***************************************/
+                //This step does not perform any processing
+
+                /***************************************
+                 *  Trigger dependent data flow steps
+                 ***************************************/
+
+                foreach (DataFlowStepEventTarget target in stepEvent.DownstreamTargets)
+                {
+                    _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, target.BucketName, $"{target.ObjectKey}{fileName}");
+#if (DEBUG)
+                    //Mock for testing... sent mock s3object created 
+                    S3Event s3e = null;
+                    s3e = new S3Event
+                    {
+                        EventType = "S3EVENT",
+                        PayLoad = new S3ObjectEvent()
+                        {
+                            eventName = "ObjectCreated:Put",
+                            s3 = new S3()
+                            {
+                                bucket = new Bucket()
+                                {
+                                    name = target.BucketName
+                                },
+                                Object = new Sentry.data.Core.Entities.S3.Object()
+                                {
+                                    key = $"{target.ObjectKey}{fileName}",
+                                    size = 200124
+                                }
+                            }
+                        }
+                    };
+                    _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
+#endif
+                }
+
+                DateTime endTime = DateTime.Now;
+                stopWatch.Stop();
+
+                step.Executions.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-successful", Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, null));
+                logs = null;
+            }
+            catch (Exception ex)
+            {
+                if (stopWatch.IsRunning)
+                {
+                    stopWatch.Stop();
+                }
+                logs.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-failed", Log_Level.Error, ex));
+                logs.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"end-method <{step.DataAction_Type_Id.ToString()}>-executeaction", Log_Level.Debug));
+                foreach (var log in logs)
+                {
+                    step.Executions.Add(log);
+                }
+            }
         }
 
         public override void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)

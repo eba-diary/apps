@@ -9,14 +9,8 @@ namespace Sentry.data.Core.Entities.DataProcessing
 {
     public class SchemaMapAction : BaseAction
     {
-        private ISchemaMapProvider _schemaMapProvider;
+       public SchemaMapAction() { }
 
-        public SchemaMapAction() { }
-
-        public SchemaMapAction(ISchemaMapProvider schemaMapProvider) : base(schemaMapProvider)
-        {
-            _schemaMapProvider = schemaMapProvider;
-            TargetStoragePrefix = GlobalConstants.DataFlowTargetPrefixes.SCHEMA_MAP_PREFIX;
-        }
+        public SchemaMapAction(ISchemaMapProvider schemaMapProvider) : base(schemaMapProvider) { }
     }
 }
