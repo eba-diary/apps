@@ -13,7 +13,7 @@
 									(8, '0ED73692-AB69-42D9-8935-6B040164DDA7', 'Google Api', 'googleapipreprocessing/', 'sentry-dataset-management-np-nr', 'GoogleApi', 0),
 									(9, '23A7A07F-0B54-4990-AEFE-90C4611E5C69', 'ClaimIQ', 'claimiqpreprocessing/', 'sentry-dataset-management-np-nr', 'ClaimIq', 0)
 								)
-								AS Source ([Id], [ActionGuid], [Name], [TargetStoragePrefix], [ActionType], [TargetStorageSchemaAware]) 
+								AS Source ([Id], [ActionGuid], [Name], [TargetStoragePrefix], [TargetStorageBucket], [ActionType], [TargetStorageSchemaAware]) 
 
 		ON Target.[Id] = Source.[Id]
 		WHEN MATCHED THEN 
@@ -22,12 +22,13 @@
 				[ActionGuid] = Source.[ActionGuid],
 				[Name] = Source.[Name],
 				[TargetStoragePrefix] = Source.[TargetStoragePrefix],
+				[TargetStorageBucket] = Source.[TargetStorageBucket],
 				[ActionType] = Source.[ActionType],
 				[TargetStorageSchemaAware] = Source.[TargetStorageSchemaAware]
 		WHEN NOT MATCHED BY TARGET THEN 
 			-- insert new rows 
-			INSERT ([Id], [ActionGuid], [Name], [TargetStoragePrefix], [ActionType], [TargetStorageSchemaAware]) 
-			VALUES ([Id], [ActionGuid], [Name], [TargetStoragePrefix], [ActionType], [TargetStorageSchemaAware])  
+			INSERT ([Id], [ActionGuid], [Name], [TargetStoragePrefix], [TargetStorageBucket], [ActionType], [TargetStorageSchemaAware]) 
+			VALUES ([Id], [ActionGuid], [Name], [TargetStoragePrefix], [TargetStorageBucket], [ActionType], [TargetStorageSchemaAware])  
 					  
 		WHEN NOT MATCHED BY SOURCE THEN 
 			-- delete rows that are in the target but not the source 

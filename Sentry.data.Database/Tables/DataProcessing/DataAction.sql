@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[DataAction]
 (
-	[Id] INT NOT NULL IDENTITY , 
+	[Id] INT NOT NULL, 
     [ActionGuid] UNIQUEIDENTIFIER NOT NULL, 
     [Name] VARCHAR(50) NOT NULL, 
     [TargetStoragePrefix] VARCHAR(250) NOT NULL, 
