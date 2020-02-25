@@ -1355,6 +1355,7 @@
     <Content Include="Views\DataFlow\_CompressionJob.cshtml" />
     <Content Include="Views\Dataset\_DatasetCreateEdit.cshtml" />
     <Content Include="Views\Config\_DatasetFileConfigCreate.cshtml" />
+    <Content Include="Views\BusinessArea\_NotificationHero.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
