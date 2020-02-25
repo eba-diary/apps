@@ -29,6 +29,7 @@ namespace Sentry.data.Infrastructure
         {
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
+            _dataFlowService = dataFlowService;
         }
 
         public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
@@ -122,7 +123,7 @@ namespace Sentry.data.Infrastructure
             _step = step;
             _flowGuid = flowExecutionGuid;
             _runInstGuid = runInstanceGuid;
-            string storageCode;
+            string schemaStorageCode;
             FileSchema schema;
             Dataset _dataset;
             string objectKey = s3Event.s3.Object.key;
@@ -136,12 +137,11 @@ namespace Sentry.data.Infrastructure
                 //Get StorageCode and FileSchema
                 using (IContainer container = Bootstrapper.Container.GetNestedContainer())
                 {
-                    ISchemaLoadProvider schemaLoadProvider = container.GetInstance<ISchemaLoadProvider>();
                     ISchemaService schemaService = container.GetInstance<ISchemaService>();
                     IDatasetContext datasetContext = container.GetInstance<IDatasetContext>();
 
-                    storageCode = GetStorageCode(objectKey);
-                    schema = schemaService.GetFileSchemaByStorageCode(storageCode);
+                    schemaStorageCode = _dataFlowService.GetSchemaStorageCodeForDataFlow(step.DataFlow.Id);
+                    schema = schemaService.GetFileSchemaByStorageCode(schemaStorageCode);
                     _dataset = datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schema.SchemaId).FirstOrDefault().ParentDataset;
                 }
 
@@ -163,7 +163,7 @@ namespace Sentry.data.Infrastructure
                         SourceKey = objectKey,
                         StepTargetBucket = _step.Action.TargetStorageBucket,
                         //key structure /<storage prefix>/<storage code>/<YYYY>/<MM>/<DD>/<sourceFileName>_<FlowExecutionGuid>.<sourcefileextension>                    
-                        StepTargetPrefix = _step.Action.TargetStoragePrefix + $"{storageCode}/{flowGuidDTM.Year.ToString()}/{flowGuidDTM.Month.ToString()}/{flowGuidDTM.Day.ToString()}/",
+                        StepTargetPrefix = _step.TargetPrefix + $"{flowGuidDTM.Year.ToString()}/{flowGuidDTM.Month.ToString()}/{flowGuidDTM.Day.ToString()}/",
                         EventType = GlobalConstants.DataFlowStepEvent.QUERY_STORAGE_START,
                         FileSize = s3Event.s3.Object.size.ToString(),
                         S3EventTime = s3Event.eventTime.ToString("s"),

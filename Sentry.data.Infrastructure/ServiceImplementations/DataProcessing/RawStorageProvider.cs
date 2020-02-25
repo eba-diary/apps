@@ -4,6 +4,7 @@ using Sentry.data.Core;
 using Sentry.data.Core.Entities.DataProcessing;
 using Sentry.data.Core.Entities.S3;
 using Sentry.data.Core.Interfaces.DataProcessing;
+using Sentry.data.Infrastructure.Helpers;
 using StructureMap;
 using System;
 using System.Collections.Generic;
@@ -116,6 +117,9 @@ namespace Sentry.data.Infrastructure
                 stopWatch.Start();
                 _step.LogExecution(_flowGuid, _runInstGuid, $"start-method <{_step.DataAction_Type_Id.ToString()}>-publishstartevent", Log_Level.Debug);
 
+                //Convert FlowExecutionGuid to DateTime
+                DateTime flowGuidDTM = DataFlowHelpers.ConvertFlowGuidToDateTime(flowExecutionGuid);
+
                 DataFlowStepEvent stepEvent = new DataFlowStepEvent()
                 {
                     DataFlowId = _step.DataFlow.Id,
@@ -128,7 +132,7 @@ namespace Sentry.data.Infrastructure
                     SourceBucket = keyBucket,
                     SourceKey = objectKey,
                     StepTargetBucket = _step.Action.TargetStorageBucket,
-                    StepTargetPrefix = _step.TargetPrefix + $"{flowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid)}/",
+                    StepTargetPrefix = _step.TargetPrefix + $"{flowGuidDTM.Year.ToString()}/{flowGuidDTM.Month.ToString()}/{flowGuidDTM.Day.ToString()}/",
                     EventType = GlobalConstants.DataFlowStepEvent.RAW_STORAGE_START,
                     FileSize = s3Event.s3.Object.size.ToString(),
                     S3EventTime = s3Event.eventTime.ToString("s"),

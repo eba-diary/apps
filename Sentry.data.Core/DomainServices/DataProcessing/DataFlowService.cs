@@ -394,7 +394,7 @@ namespace Sentry.data.Core
 
         }
 
-        private void MapToSchemaMap(SchemaMapDto dto, DataFlowStep step)
+        private SchemaMap MapToSchemaMap(SchemaMapDto dto, DataFlowStep step)
         {
             SchemaMap map =  new SchemaMap()
             {
@@ -406,7 +406,7 @@ namespace Sentry.data.Core
 
             _datasetContext.Add(map);
 
-            //step.SchemaMappings.Add(map);
+            return map;
         }
 
         private void MapToDtoList(List<DataFlow> dfList, List<DataFlowDto> dtoList)
@@ -537,10 +537,12 @@ namespace Sentry.data.Core
                     action = _datasetContext.SchemaLoadAction.FirstOrDefault();
                     actionType = DataActionType.SchemaLoad;
                     DataFlowStep schemaLoadStep = MapToDataFlowStep(df, action, actionType);
+                    List<SchemaMap> schemaMapList = new List<SchemaMap>();
                     foreach (SchemaMapDto mapDto in dto.SchemaMap)
                     {
-                        MapToSchemaMap(mapDto, schemaLoadStep);
+                        schemaMapList.Add(MapToSchemaMap(mapDto, schemaLoadStep));
                     }
+                    schemaLoadStep.SchemaMappings = schemaMapList;
                     return schemaLoadStep;
                 case DataActionType.SchemaMap:
                     action = _datasetContext.SchemaMapAction.FirstOrDefault();
@@ -618,10 +620,14 @@ namespace Sentry.data.Core
                     //break;
                     //step.TargetPrefix = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}" + step.Action.TargetStoragePrefix + $"{step.DataFlow.Id}/";
                     break;
-                //These sent output a step specific location along with down stream dependent steps
-                case DataActionType.RawStorage:
+                //These send output to schema aware storage
                 case DataActionType.QueryStorage:
                 case DataActionType.ConvertParquet:
+                    string schemaStorageCode = GetSchemaStorageCodeForDataFlow(step.DataFlow.Id);
+                    step.TargetPrefix = step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{schemaStorageCode}/";
+                    break;
+                //These sent output a step specific location along with down stream dependent steps
+                case DataActionType.RawStorage:
                     step.TargetPrefix = step.Action.TargetStoragePrefix + $"{Configuration.Config.GetHostSetting("S3DataPrefix")}{step.DataFlow.FlowStorageCode}/";
                     break;
                 //These only send output to down stream dependent steps
