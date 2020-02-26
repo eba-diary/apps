@@ -12,7 +12,7 @@ namespace Sentry.data.Infrastructure
     {
         public static string GenerateStepEventKey(DataFlowStep step)
         {
-            return $"{step.DataFlow.Id}-{step.Id}";
+            return $"{step.DataFlow.FlowStorageCode}-{step.Id}";
         }
     }
 }

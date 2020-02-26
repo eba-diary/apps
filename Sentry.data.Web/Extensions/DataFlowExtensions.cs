@@ -30,12 +30,13 @@ namespace Sentry.data.Web
             {
                 Id = model.DataFlowId,
                 Name = "Blah",
-                DFQuestionnaire = JsonConvert.SerializeObject(model),
                 CreatedBy = model.CreatedBy,
                 CreateDTM = model.CreatedDTM,
                 IngestionType = model.IngestionType,
-                IsCompressed = model.IsCompressed
-            };
+                IsCompressed = model.IsCompressed,
+                IsPreProcessingRequired = model.IsPreProcessingRequired,
+                PreProcessingOptions = model.PreprocessingOptions.Select(s => (DataFlowPreProcessingTypes)Enum.ToObject(typeof(DataFlowPreProcessingTypes), s)).ToList()
+            };            
 
             if (model.SchemaMaps != null)
             {
@@ -51,6 +52,8 @@ namespace Sentry.data.Web
             {
                 dto.CompressionJob = model.CompressionJob.First().ToDto();
             }
+
+            dto.DFQuestionnaire = JsonConvert.SerializeObject(dto);
 
             return dto;
         }
@@ -93,12 +96,51 @@ namespace Sentry.data.Web
         {
             Core.RetrieverJobDto dto = new Core.RetrieverJobDto()
             {
+                DataSourceId = model.SelectedDataSource,
+                DataSourceType = model.SelectedSourceType,
+                IsCompressed = false, //for the data flow compression is handled outside of retriever job logic
+                CreateCurrentFile = model.CreateCurrentFile,
+                DatasetFileConfig = 0, //jobs for the data flow are linked via data flow id not datasetfileconfig
+                FileNameExclusionList = null,
+                FileSchema = 0,
+                FtpPatrn = model.FtpPattern,
+                HttpRequestBody = model.HttpRequestBody,
+                JobId = 0,
+                RelativeUri = model.RelativeUri,
+                RequestDataFormat = model.SelectedRequestDataFormat,
+                RequestMethod = model.SelectedRequestMethod,
                 Schedule = model.Schedule,
-                SchedulePicker = model.SchedulePicker,
-                RelativeUri = model.RelativeUri
-            };
+                SearchCriteria = model.SearchCriteria,
+                TargetFileName = model.TargetFileName
+        };
 
             return dto;
+        }
+
+        public static DataFlowModel ToModel(this Core.DataFlowDetailDto dto)
+        {
+            DataFlowModel model = new DataFlowModel()
+            {
+                CreatedBy = dto.CreatedBy,
+                DataFlowId = dto.Id,
+                CreatedDTM = dto.CreateDTM,
+                IsCompressed = dto.IsCompressed
+            };
+
+            if (dto.RetrieverJob != null)
+            {
+                JobModel jobModel = new JobModel()
+                {
+                    CreateCurrentFile = dto.RetrieverJob.CreateCurrentFile,
+                    FtpPattern = dto.RetrieverJob.FtpPatrn,
+                    HttpRequestBody = dto.RetrieverJob.HttpRequestBody,
+                    IsRegexSearch = true,
+                    OverwriteDataFile = false,
+                    RelativeUri = dto.RetrieverJob.RelativeUri,
+                    Schedule = dto.RetrieverJob.Schedule
+                };
+            }
+            return model;
         }
     }
 }

@@ -3,98 +3,116 @@
 @{
     ViewBag.Title = "Data Flow Form";
 }
-<div id="DataFlowFormContainer">
-    @using (Html.BeginForm("DataFlowForm", "DataFlow", FormMethod.Post))
-    {
-        @Html.AntiForgeryToken()
+    <div id="DataFlowFormContainer">
+        @using (Html.BeginForm("DataFlowForm", "DataFlow", FormMethod.Post))
+        {
+            @Html.AntiForgeryToken()
 
 
-        @*<div class="form-group">
+            @*<div class="form-group">
                 <div>
                     <input type="submit" value="Submit" class="btn btn-primary" />
                     <a id="CancelButton" class="btn btn-warning" href="">Cancel</a>
                 </div>
             </div>*@
-        <div id="dataflow-home-wrapper" class="col-md-12 col-lg-12">
-            <div class="dataflow-home-photo bg-photo-dataflow ic">
-                <span>Do you have data that you want to use and share with others? <br /> We can help. First, you'll need to tell us about your data.</span>
+            <div id="dataflow-home-wrapper" class="col-md-12 col-lg-12">
+                <div class="dataflow-home-photo bg-photo-dataflow ic">
+                    <span>Do you have data that you want to use and share with others? <br /> We can help. First, you'll need to tell us about your data.</span>
+                </div>
             </div>
-        </div>
 
-        <div class="col-md-12">
-            @*Show the custom validation summary*@
-            @Html.DisplayFor((model) => ViewData.ModelState)
-        </div>
-
-        <div class="form-group col-md-12">
-            @*@Html.LabelFor(model => model.IngestionType, htmlAttributes: new { @class = "control-label col-md-2" })*@
-            <h4>How Will The Data be Sent to Us?</h4>
-            <div class="col-md-4">
-                @*@Html.EditorFor(m => m.IngestionType)*@
-                @Html.EnumDropDownListFor(
-                    x => x.IngestionType,
-                    "Select Ingestion Type",
-                    new { @class = "form-control" })
-                @*@Html.RadioButtonFor(model => model.IngestionType, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })*@
+            <div class="col-md-12">
+                @*Show the custom validation summary*@
+                @Html.DisplayFor((model) => ViewData.ModelState)
             </div>
-        </div>
-        <br />
-        <div class="compressionPanel" style="display:none;">
-            @*@Html.HiddenFor(model => model.IsCompressed)*@
+
             <div class="form-group col-md-12">
-                <h4>Is Your Incoming Data Compressed?</h4>
-                <div class="col-md-1">
-                    @Html.DropDownListFor((m) => m.IsCompressed, Model.CompressionDropdown, new { @class = "form-control edit-dataset-row" })
-                    @*<div class="form-group">
-                            <label class="col-sm-10 checkbox-container">
-                                <input id="IsCompressedCheckbox" type="checkbox" value="@Model.IsCompressed" />
-                                <span class="checkmark"></span>
-                            </label>
-                        </div>*@
+                @*@Html.LabelFor(model => model.IngestionType, htmlAttributes: new { @class = "control-label col-md-2" })*@
+                <h4>How Will The Data be Sent to Us?</h4>
+                <div class="col-md-4">
+                    @*@Html.EditorFor(m => m.IngestionType)*@
+                    @Html.EnumDropDownListFor(
+                        x => x.IngestionType,
+                        "Select Ingestion Type",
+                        new { @class = "form-control" })
+                    @*@Html.RadioButtonFor(model => model.IngestionType, new { htmlAttributes = new { @class = "form-control edit-dataset-row" } })*@
                 </div>
             </div>
             <br />
-            <div class="form-group col-md-12 compressionJobPanel" style="display:none">
-                <div id="compressionJobPanel">
-                    @if (Model.CompressionJob != null)
+            <div class="compressionPanel" style="display:none;">
+                @*@Html.HiddenFor(model => model.IsCompressed)*@
+                <div class="form-group col-md-12">
+                    <h4>Is Your Incoming Data Compressed?</h4>
+                    <div class="col-md-1">
+                        @Html.DropDownListFor((m) => m.IsCompressed, Model.CompressionDropdown, new { @class = "form-control edit-dataset-row" })
+                    </div>
+                </div>
+                <br />
+                <div class="form-group col-md-12 compressionJobPanel" style="display:none">
+                    <div id="compressionJobPanel">
+                        @if (Model.CompressionJob != null)
+                        {
+                            @Html.Partial("_CompressionJob", Model.CompressionJob.First())
+                        }
+                        else
+                        {
+                            @Html.Partial("_CompressionJob", new CompressionModel())
+                        }
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="form-group col-md-12 retrieverPanel" style="display:none">
+                <div id="retrieverJobPanel">
+                    @if (Model.RetrieverJob != null)
                     {
-                        @Html.Partial("_CompressionJob", Model.CompressionJob.First())
-                    }
-                    else
-                    {
-                        @Html.Partial("_CompressionJob", new CompressionModel())
+                        @Html.Partial("_RetrieverJob", Model.RetrieverJob.First())
                     }
                 </div>
             </div>
-        </div>
-        <br />
-        <div class="form-group col-md-12 retrieverPanel" style="display:none">
-            <div id="retrieverJobPanel">
-                @if (Model.RetrieverJob != null)
-                {
-                    @Html.Partial("_RetrieverJob", Model.RetrieverJob.First())
-                }
-            </div>
-        </div>
-        <br />
-        <div class="schemaMapPanel" style="display:none;">
-            <div class="form-group col-md-12">
-                <h4>Where Do You Want The Data to Go?</h4>
-                @*@Html.LabelFor(model => model.SchemaMaps, htmlAttributes: new { @class = "control-label col-md-2" })*@
-                @*<a id="btnAddSchemaMap" class="btn btn-primary">Add Schema Mapping</a>*@
-                <div id="schemaMapPanel" class="form-group col-md-12">
-                    @foreach (SchemaMapModel mapModel in Model.SchemaMaps)
-                    {
-                        @Html.Partial("_SchemaMap", mapModel)
-                    }
-                    <button type="button" id="btnAddSchemaMap" class="btn btn-success"><span>Add Another Target</span></button>
+            <br />
+            <div class="preProcessingPanel" style="display:none;">
+                <div class="form-group col-md-12">
+                    <h4>Does Your Data Require Preprocessing?</h4>
+                    <div class="col-md-1">
+                        @Html.DropDownListFor((m) => m.IsPreProcessingRequired, Model.PreProcessingRequiredDropdown, new { @class = "form-control edit-dataset-row" })
+                    </div>
+                </div>
+                <div class="form-group col-md-12 preProcessingJobPanel" style="display:none;">
+                    @* PreProcessing Options *@
+                    <div class="form-group">
+                        @Html.LabelFor((model) => model.PreprocessingOptions, new { @class = "control-label col-md-2" })
+                        <div class="col-md-10">
+                            <select id="PreprocessingOptions" name="PreprocessingOptions" class="form-control edit-dataset-row">
+                                @foreach (var item in Model.PreProcessingOptionsDropdown)
+                                {
+                                    <option selected="@item.Selected" value="@item.Value">@item.Text</option>
+                                }
+                            </select>
+                            @Html.ValidationMessageFor((model) => model.PreprocessingOptions, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+            <br />
+            <div class="schemaMapPanel" style="display:none;">
+                <div class="form-group col-md-12">
+                    <h4>Where Do You Want The Data to Go?</h4>
+                    @*@Html.LabelFor(model => model.SchemaMaps, htmlAttributes: new { @class = "control-label col-md-2" })*@
+                    @*<a id="btnAddSchemaMap" class="btn btn-primary">Add Schema Mapping</a>*@
+                    <div id="schemaMapPanel" class="form-group col-md-12">
+                        @foreach (SchemaMapModel mapModel in Model.SchemaMaps)
+                        {
+                            @Html.Partial("_SchemaMap", mapModel)
+                        }
+                        <button type="button" id="btnAddSchemaMap" class="btn btn-success"><span>Add Another Target</span></button>
+                    </div>
+                </div>
+            </div>
 
 
 
-        @*<div class="col-lg-12">
+            @*<div class="col-lg-12">
                 <table id="schema_map" class="table table-striped table-bordered table-hover">
                     <thead>
                         <tr>
@@ -122,15 +140,15 @@
                 </table>
             </div>*@
 
-        <br />
-        <div class="form-group formSubmitButtons" style="display: none;">
-            <div>
-                <input type="submit" value="Submit" class="btn btn-primary waves-effect waves-light" />
-                <a id="CancelButton" class="btn btn-warning  waves-effect waves-light" href="">Cancel</a>
+            <br />
+            <div class="form-group formSubmitButtons" style="display: none;">
+                <div>
+                    <input type="submit" value="Submit" class="btn btn-primary waves-effect waves-light" />
+                    <a id="CancelButton" class="btn btn-warning  waves-effect waves-light" href="">Cancel</a>
+                </div>
             </div>
-        </div>
-    }
-</div>
+        }
+    </div>
 <div id="DatasetFormContainer" style="display: none;">
     <div id="DatasetFormContent"></div>
 </div>

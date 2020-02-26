@@ -185,9 +185,8 @@ namespace Sentry.data.Goldeneye
                             //Schedule Livy Job state monitor to run every minute
                             RecurringJob.AddOrUpdate("LivyJobStateMonitor", () => RetrieverJobService.UpdateJobStatesAsync(), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
 
-                            //Schedule the Hpsm Monitor to run every 15 min.
-                            int timeInterval = int.Parse(Config.GetHostSetting("HpsmTicketMonitorTimeInterval"));
-                            RecurringJob.AddOrUpdate("HPSMTicketMonitor", () => _ticketMonitorService.CheckTicketStatus(), Cron.MinuteInterval(timeInterval), TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                            //Schedule the Ticket Monitor to run based on cron within configuration file.
+                            RecurringJob.AddOrUpdate("HPSMTicketMonitor", () => _ticketMonitorService.CheckTicketStatus(), Config.GetHostSetting("HpsmTicketMonitorTimeInterval"), TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
 
                             //Schedule WallEService every day at midnight
                             RecurringJob.AddOrUpdate("WallEService", () => WallEService.Run(), "00 0 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
@@ -196,8 +195,6 @@ namespace Sentry.data.Goldeneye
 
                             foreach (RetrieverJob Job in JobList)
                             {
-                                var datasetName = Job.DatasetConfig.ParentDataset.DatasetName;
-                                var configName = Job.DatasetConfig.Name;
                                 try
                                 {
                                     // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8

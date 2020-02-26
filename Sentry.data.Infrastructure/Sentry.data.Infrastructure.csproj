@@ -171,6 +171,8 @@
     <Compile Include="Extensions\RestSharpExtensions.cs" />
     <Compile Include="Extensions\RetrieverJobExtensions.cs" />
     <Compile Include="HangfireFilters\DisableMultipleQueuedItemsFilter.cs" />
+    <Compile Include="Helpers\DataFlowHelpers.cs" />
+    <Compile Include="Helpers\ParsingHelpers.cs" />
     <Compile Include="Helpers\TopicHelper.cs" />
     <Compile Include="Interfaces\IDataFlowStepProvider.cs" />
     <Compile Include="Mappings\Metadata\DataElementDetailMapping.cs" />
@@ -185,6 +187,9 @@
     <Compile Include="Mappings\Metadata\MetadataAssetMapping.cs" />
     <Compile Include="Mappings\Metadata\MetadataTagMapping.cs" />
     <Compile Include="Mappings\Metadata\TagGroupMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\ClaimIQActionMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\GoogleApiActionMapping.cs" />
+    <Compile Include="Mappings\Primary\DataProcessing\Actions\SchemaMapActionMapping.cs" />
     <Compile Include="Mappings\Primary\DataProcessing\Actions\UncompressZipActionMapping.cs" />
     <Compile Include="Mappings\Primary\NotificationMapping.cs" />
     <Compile Include="Mappings\Primary\AssetSourceMapping.cs" />
@@ -258,14 +263,20 @@
     </Compile>
     <Compile Include="ServiceImplementations\AWSLambdaProvider.cs" />
     <Compile Include="ServiceImplementations\BaseJobProvider.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\BaseActionProvider.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\ClaimIQActionProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\ConvertToParquetProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\DataFlowProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\DataStepService.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\GoogleApiActionProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\QueryStorageProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\RawStorageProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\S3DropProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\SchemaLoadProvider.cs" />
+    <Compile Include="ServiceImplementations\DataProcessing\SchemaMapProvider.cs" />
     <Compile Include="ServiceImplementations\DataProcessing\UncompressZipProvider.cs" />
+    <Compile Include="ServiceImplementations\DataSourceProviders\DfsDataFlowBasicProvider.cs" />
+    <Compile Include="ServiceImplementations\DataSourceProviders\FtpDataFlowProvider.cs" />
     <Compile Include="ServiceImplementations\Messaging\DataStepProcessorService.cs" />
     <Compile Include="ServiceImplementations\Messaging\S3EventService.cs" />
     <Compile Include="ServiceImplementations\TicketProvider\BaseTicketProvider.cs" />

@@ -14,6 +14,7 @@ namespace Sentry.data.Web
         {
             SchemaMaps = new List<SchemaMapModel>();
             IsCompressed = false;
+            IsPreProcessingRequired = false;
         }
 
         /// <summary>
@@ -32,6 +33,7 @@ namespace Sentry.data.Web
         [DisplayName("Is incoming data compressed?")]
         public bool IsCompressed { get; set; }
 
+        public bool IsPreProcessingRequired { get; set; }
         /// <summary>
         /// Target
         /// </summary>
@@ -48,6 +50,10 @@ namespace Sentry.data.Web
 
 
         public IEnumerable<SelectListItem> CompressionDropdown { get; set; }
+        public IEnumerable<SelectListItem> PreProcessingRequiredDropdown { get; set; }
+        public IEnumerable<SelectListItem> PreProcessingOptionsDropdown { get; set; }
+        [DisplayName("Pre Processing Options")]
+        public List<int> PreprocessingOptions { get; set; }
 
         public List<string> Validate()
         {

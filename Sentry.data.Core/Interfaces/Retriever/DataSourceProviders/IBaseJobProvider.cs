@@ -9,6 +9,7 @@ namespace Sentry.data.Core
     public interface IBaseJobProvider
     {
         void Execute(RetrieverJob job);
+        void Execute(RetrieverJob job, string filePath);
         void ConfigureProvider(RetrieverJob job);
     }
 }
