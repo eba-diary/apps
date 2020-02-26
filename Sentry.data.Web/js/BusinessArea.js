@@ -8,10 +8,10 @@
         data.Subscription.init(2);
     },
 
-    AlertNotificationHeroInit: function ()
+    notificationBellInit: function ()
     {
 
-        $(".alert-notification-icon-hero").popover
+        $(".notification-bell-icon").popover
         (
             {
                 content: "BEWARE THE IDES OF MARCH ssssssssssss sssssssssssssssssssss ssssssssssssssssssssssss ssssssssssssssssss"
@@ -20,9 +20,6 @@
         
 
         //pass initilize hmtl tag
-
-
-
 
         //$(".alert-notification-hero").on("click", function (event)
         //{
