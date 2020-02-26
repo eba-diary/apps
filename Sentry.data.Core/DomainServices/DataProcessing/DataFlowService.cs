@@ -507,35 +507,27 @@ namespace Sentry.data.Core
             {                
                 case DataActionType.S3Drop:
                     action = _datasetContext.S3DropAction.FirstOrDefault();
-                    actionType = DataActionType.S3Drop;
                     break;
                 case DataActionType.RawStorage:
                     action = _datasetContext.RawStorageAction.FirstOrDefault();
-                    actionType = DataActionType.RawStorage;
                     break;
                 case DataActionType.QueryStorage:
                     action = _datasetContext.QueryStorageAction.FirstOrDefault();
-                    actionType = DataActionType.QueryStorage;
                     break;
                 case DataActionType.ConvertParquet:
                     action = _datasetContext.ConvertToParquetAction.FirstOrDefault();
-                    actionType = DataActionType.ConvertParquet;
                     break;
                 case DataActionType.UncompressZip:
                     action = _datasetContext.UncompressZipAction.FirstOrDefault();
-                    actionType = DataActionType.UncompressZip;
                     break;
                 case DataActionType.GoogleApi:
                     action = _datasetContext.GoogleApiAction.FirstOrDefault();
-                    actionType = DataActionType.GoogleApi;
                     break;
                 case DataActionType.ClaimIq:
                     action = _datasetContext.ClaimIQAction.FirstOrDefault();
-                    actionType = DataActionType.ClaimIq;
                     break;
                 case DataActionType.SchemaLoad:
                     action = _datasetContext.SchemaLoadAction.FirstOrDefault();
-                    actionType = DataActionType.SchemaLoad;
                     DataFlowStep schemaLoadStep = MapToDataFlowStep(df, action, actionType);
                     List<SchemaMap> schemaMapList = new List<SchemaMap>();
                     foreach (SchemaMapDto mapDto in dto.SchemaMap)
@@ -546,7 +538,6 @@ namespace Sentry.data.Core
                     return schemaLoadStep;
                 case DataActionType.SchemaMap:
                     action = _datasetContext.SchemaMapAction.FirstOrDefault();
-                    actionType = DataActionType.SchemaMap;
                     DataFlowStep schemaMapStep = MapToDataFlowStep(df, action, actionType);
                     foreach (SchemaMapDto mapDto in dto.SchemaMap)
                     {
