@@ -48,7 +48,6 @@ namespace Sentry.data.Infrastructure
                  *  Perform provider specific processing
                  ***************************************/
                 //S3 drop steps do not store the output in a long term storage area, all files are immediately sent to the raw storage step
-                //string versionKey = _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, stepEvent.StepTargetBucket, $"{stepEvent.StepTargetPrefix}{Path.GetFileName(stepEvent.SourceKey)}");
                 
 
                 /***************************************

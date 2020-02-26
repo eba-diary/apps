@@ -13,9 +13,7 @@ namespace Sentry.data.Core
         DataFlowDetailDto GetDataFlowDetailDto(int id);
         List<DataFlowStepDto> GetDataFlowStepDtoByTrigger(string key);
         bool CreateandSaveDataFlow(DataFlowDto dto);
-        //bool CreateDataFlow(int schemaId);
         void PublishMessage(string key, string message);
-        //bool GenerateJobRequest(int dataFlowStepId, string sourceBucket, string sourceKey, string executionGuid);
         IQueryable<DataSourceType> GetDataSourceTypes();
         IQueryable<DataSource> GetDataSources();
         string GetDataFlowNameForFileSchema(FileSchema scm);

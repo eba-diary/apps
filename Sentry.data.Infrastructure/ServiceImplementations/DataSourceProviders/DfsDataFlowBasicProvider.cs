@@ -70,7 +70,11 @@ namespace Sentry.data.Infrastructure
                                 ignoredExceptions.Add(ex);
                         }
                         if (ignoredExceptions.Count > 0) throw new AggregateException(ignoredExceptions);
-                    }                    
+                    }
+                    catch(Exception ex)
+                    {
+                        _job.JobLoggerMessage("Error", "dfsdataflowbasicprovider-execute processfilesinparallel failed", ex);
+                    }
                 }
             }
             catch (Exception ex)
@@ -83,29 +87,24 @@ namespace Sentry.data.Infrastructure
         {
             // Use ConcurrentQueue to enable safe enqueueing from multiple threads.
             var exceptions = new ConcurrentQueue<Exception>();
-            try
+            
+            Parallel.ForEach(fileArray, item =>
             {
-                Parallel.ForEach(fileArray, item =>
+                try
                 {
-                    try
+                    using (IContainer Container = Bootstrapper.Container.GetNestedContainer())
                     {
-                        using (IContainer Container = Bootstrapper.Container.GetNestedContainer())
-                        {
-                            IS3ServiceProvider _s3ServiceProvider = Container.GetInstance<IS3ServiceProvider>();
+                        IS3ServiceProvider _s3ServiceProvider = Container.GetInstance<IS3ServiceProvider>();
 
-                            _s3ServiceProvider.UploadDataFile(item, GenerateTargetKey(targetPrefix, item));
-                        }   
-                    }
-                    catch (Exception ex)
-                    {
-                        exceptions.Enqueue(ex);
-                    }
-                });
-            }
-            catch
-            {
-
-            }
+                        _s3ServiceProvider.UploadDataFile(item, GenerateTargetKey(targetPrefix, item));
+                    }   
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Enqueue(ex);
+                }
+            });
+            
         }
 
         private string GenerateTargetKey(string targetPrefix, string a)
@@ -117,7 +116,10 @@ namespace Sentry.data.Infrastructure
         {
             try
             {
-                using (File.Open(filePath, FileMode.Open)) { }
+                using (File.Open(filePath, FileMode.Open))
+                {
+                    //just determining if file can be opened, no actions are to be performed
+                }
             }
             catch (IOException e)
             {

@@ -10,6 +10,8 @@ namespace Sentry.data.Infrastructure.Helpers
 {
     public class DataFlowHelpers
     {
+        protected DataFlowHelpers() { }
+
         public static DateTime ConvertFlowGuidToDateTime(string flowGuid)
         {
             CultureInfo provider = new CultureInfo(GlobalConstants.DataFlowGuidConfiguration.GUID_CULTURE);

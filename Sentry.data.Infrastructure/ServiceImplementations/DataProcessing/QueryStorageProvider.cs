@@ -197,20 +197,6 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        private string GetStorageCode(string key)
-        {
-            string storageCode = string.Empty;
-            //temp-file/rawquery/<flowId>/<storagecode>/<guids>/
-            if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX))
-            {
-                int strtIdx = ParsingHelpers.GetNthIndex(key, '/', 4);
-                int endIdx = ParsingHelpers.GetNthIndex(key, '/', 5);
-                storageCode = key.Substring(strtIdx + 1, (endIdx - strtIdx) - 1);
-            }
-
-            return storageCode;
-        }
-
         private DateTime ConvertFlowGuidToDateTime()
         {
             CultureInfo provider = new CultureInfo(GlobalConstants.DataFlowGuidConfiguration.GUID_CULTURE);

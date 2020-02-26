@@ -150,11 +150,6 @@ namespace Sentry.data.Core
 
         public RetrieverJob CreateAndSaveRetrieverJob(RetrieverJobDto dto)
         {
-
-            //DatasetFileConfig dfc = _datasetContext.GetById<DatasetFileConfig>(cjm.DatasetConfigID);
-            //DataSource dataSource = _datasetContext.GetById<DataSource>(cjm.SelectedDataSource);
-            //List<RetrieverJob> jobList = dfc.RetrieverJobs.ToList();
-
             Compression compress = new Compression();
             if (dto.IsCompressed)
             {

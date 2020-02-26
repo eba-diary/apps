@@ -22,10 +22,6 @@ namespace Sentry.data.Infrastructure
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly IDataFlowService _dataFlowService;
-        private DataFlowStep _step;
-        private string _flowGuid;
-        private string _runInstGuid;
-
 
         public SchemaMapProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider,
             IDataFlowService dataFlowService) : base(dataFlowService)
@@ -42,7 +38,6 @@ namespace Sentry.data.Infrastructure
             logs.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"start-method <{step.DataAction_Type_Id.ToString()}>-executeaction", Log_Level.Debug));
             try
             {                
-                DateTime startTime = DateTime.Now;
                 stopWatch.Start();
                 string fileName = Path.GetFileName(stepEvent.SourceKey);
                 logs.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()} processing event - {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Debug));
@@ -87,7 +82,6 @@ namespace Sentry.data.Infrastructure
 #endif
                 }
 
-                DateTime endTime = DateTime.Now;
                 stopWatch.Stop();
 
                 step.Executions.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-successful", Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, null));
@@ -110,7 +104,6 @@ namespace Sentry.data.Infrastructure
 
         public override void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
-            List<DataFlow_Log> logs = new List<DataFlow_Log>();
             Stopwatch stopWatch = new Stopwatch();
             string objectKey = s3Event.s3.Object.key;
             string keyBucket = s3Event.s3.bucket.name;
@@ -135,7 +128,6 @@ namespace Sentry.data.Infrastructure
                         DataFlowStep s3DropStep;
                         string targetSchemaS3DropPrefix;
                         string targetSchemaS3Bucket;
-                        //DataFlowStep s3DropStep = _dataFlowService.GetS3DropStepForFileSchema(scmMap.MappedSchema);
                         using (IContainer container = Bootstrapper.Container.GetNestedContainer())
                         {
                             IDatasetContext datasetContext = container.GetInstance<IDatasetContext>();

@@ -178,16 +178,15 @@ namespace Sentry.data.Goldeneye
                             // Adding TimeZoneInfo based on https://discuss.hangfire.io/t/need-local-time-instead-of-utc/279/8
 
                             RecurringJob.AddOrUpdate("spamfactory_instant", () => SpamFactory.Run("Instant"), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-                            //RecurringJob.AddOrUpdate("spamfactory_hourly", () => SpamFactory.Run("Hourly"), "00 * * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-                            //RecurringJob.AddOrUpdate("spamfactory_daily", () => SpamFactory.Run("Daily"), "00 8 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
-                            //RecurringJob.AddOrUpdate("spamfactory_weekly", () => SpamFactory.Run("Weekly"), "00 8 * * MON", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                            RecurringJob.AddOrUpdate("spamfactory_hourly", () => SpamFactory.Run("Hourly"), "00 * * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                            RecurringJob.AddOrUpdate("spamfactory_daily", () => SpamFactory.Run("Daily"), "00 8 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                            RecurringJob.AddOrUpdate("spamfactory_weekly", () => SpamFactory.Run("Weekly"), "00 8 * * MON", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
 
                             //Schedule Livy Job state monitor to run every minute
                             RecurringJob.AddOrUpdate("LivyJobStateMonitor", () => RetrieverJobService.UpdateJobStatesAsync(), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
 
-                            //Schedule the Hpsm Monitor to run every 15 min.
-                            int timeInterval = int.Parse(Config.GetHostSetting("HpsmTicketMonitorTimeInterval"));
-                            //RecurringJob.AddOrUpdate("HPSMTicketMonitor", () => _ticketMonitorService.CheckTicketStatus(), Cron.Minutely, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
+                            //Schedule the Ticket Monitor to run based on cron within configuration file.
+                            RecurringJob.AddOrUpdate("HPSMTicketMonitor", () => _ticketMonitorService.CheckTicketStatus(), Config.GetHostSetting("HpsmTicketMonitorTimeInterval"), TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
 
                             //Schedule WallEService every day at midnight
                             RecurringJob.AddOrUpdate("WallEService", () => WallEService.Run(), "00 0 * * *", TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));

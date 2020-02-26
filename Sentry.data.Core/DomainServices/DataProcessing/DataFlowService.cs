@@ -274,16 +274,12 @@ namespace Sentry.data.Core
 
         private void MapDataFlowStepsForPull(DataFlowDto dto, DataFlow df)
         {
-            //RetrieverJobDto jobDto = new RetrieverJobDto();
-            //MaptToDto(dto, jobDto);
-            //jobDto.DataFlow = df.Id;
             dto.RetrieverJob.DataFlow = df.Id;
             _jobService.CreateAndSaveRetrieverJob(dto.RetrieverJob);
 
             //Generate ingestion steps (get file to raw location)
             AddDataFlowStep(dto, df, DataActionType.S3Drop);
 
-            //MapToRawStorageStep(dto, df);
             AddDataFlowStep(dto, df, DataActionType.RawStorage);
 
             if (dto.IsCompressed)
@@ -525,21 +521,11 @@ namespace Sentry.data.Core
             }            
         }
 
-        //private string GetTargetKey(DataFlowStep step)
-        //{
-        //    StringBuilder sb = new StringBuilder();
-        //    sb.Append(step.Action.TargetStoragePrefix);
-        //    sb.Append(step.DataFlow.FlowStorageCode + "/");
-        //    return sb.ToString();
-        //}
-
         private void SetTargetPrefix(DataFlowStep step)
         {
             switch (step.DataAction_Type_Id)
             {
                 case DataActionType.None:
-                    //break;
-                    //step.TargetPrefix = $"{GlobalConstants.DataFlowTargetPrefixes.TEMP_FILE_PREFIX}" + step.Action.TargetStoragePrefix + $"{step.DataFlow.Id}/";
                     break;
                 //These send output to schema aware storage
                 case DataActionType.QueryStorage:

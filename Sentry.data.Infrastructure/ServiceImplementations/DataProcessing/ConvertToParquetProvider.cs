@@ -33,7 +33,6 @@ namespace Sentry.data.Infrastructure
             logs.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"start-method <{step.DataAction_Type_Id.ToString()}>-executeaction", Log_Level.Debug));
             try
             {
-                DateTime startTime = DateTime.Now;
                 stopWatch.Start();
                 string fileName = Path.GetFileName(stepEvent.SourceKey);
                 logs.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()} processing event - {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Debug));
@@ -76,7 +75,6 @@ namespace Sentry.data.Infrastructure
 #endif
                 }
 
-                DateTime endTime = DateTime.Now;
                 stopWatch.Stop();
 
                 step.Executions.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-successful", Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, null));
@@ -111,7 +109,6 @@ namespace Sentry.data.Infrastructure
                 //Get StorageCode and FileSchema
                 using (IContainer container = Bootstrapper.Container.GetNestedContainer())
                 {
-                    ISchemaLoadProvider schemaLoadProvider = container.GetInstance<ISchemaLoadProvider>();
                     ISchemaService schemaService = container.GetInstance<ISchemaService>();
                     IDatasetContext datasetContext = container.GetInstance<IDatasetContext>();
 
@@ -139,7 +136,9 @@ namespace Sentry.data.Infrastructure
                     EventType = GlobalConstants.DataFlowStepEvent.CONVERT_TO_PARQUET_START,
                     FileSize = s3Event.s3.Object.size.ToString(),
                     S3EventTime = s3Event.eventTime.ToString("s"),
-                    OriginalS3Event = JsonConvert.SerializeObject(s3Event)
+                    OriginalS3Event = JsonConvert.SerializeObject(s3Event),
+                    DatasetID = _dataset.DatasetId,
+                    SchemaId = schema.SchemaId
                 };
 
                 base.GenerateDependencyTargets(stepEvent);

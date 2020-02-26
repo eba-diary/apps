@@ -45,7 +45,6 @@ namespace Sentry.data.Infrastructure
                  *  Perform provider specific processing
                  ***************************************/
                 //This step does not perform any processing, it only copies file to the target schema specific data flow s3 drop step location
-                //string versionKey = _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, stepEvent.StepTargetBucket, $"{stepEvent.StepTargetPrefix}{fileName}");
 
                 /***************************************
                  *  Trigger dependent data flow steps

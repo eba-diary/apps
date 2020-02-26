@@ -8,8 +8,6 @@ namespace Sentry.data.Core.Entities.DataProcessing
     {
         protected IBaseActionProvider _baseActionProvider;
 
-        private string _targetStoragePrefix;
-
         public BaseAction()
         {
         }
