@@ -49,19 +49,20 @@ namespace Sentry.data.Web.Controllers
             List<DataFlowStepDto> stepDtoList = _dataFlowService.GetDataFlowStepDtoByTrigger("temp-file/s3drop/12/");
         }
 
-        [HttpGet]
-        [Route("DataFlow/Create/{schemaId}/")]
-        public void Create(int schemaId)
-        {
-            bool success = _dataFlowService.CreateDataFlow(schemaId);
-        }
+        //[HttpGet]
+        //[Route("DataFlow/Create/{schemaId}/")]
+        //public void Create(int schemaId)
+        //{
+        //    bool success = _dataFlowService.CreateDataFlow(schemaId);
+        //}
 
         [HttpGet]
         public ViewResult Create()
         {
             DataFlowModel model = new DataFlowModel();
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
-
+            model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
+            model.PreProcessingOptionsDropdown = Utility.BuildPreProcessingOptionsDropdown(model.PreprocessingOptions);
             //Every dataflow requires at least one schemamap, therefore, load a default empty schemamapmodel
             SchemaMapModel schemaModel = new SchemaMapModel
             {
@@ -71,6 +72,13 @@ namespace Sentry.data.Web.Controllers
 
             return View("DataFlowForm", model);
         }
+
+        //[HttpGet]
+        //public ViewResult Edit(int dataFlowId)
+        //{
+        //    DataFlowDetailDto dto = _dataFlowService.GetDataFlowDetailDto(dataFlowId);
+        //    DataFlowModel model = dto.ToModel();
+        //}
 
         [HttpPost]
         public ActionResult DataFlowForm(DataFlowModel model)
@@ -90,6 +98,7 @@ namespace Sentry.data.Web.Controllers
             }
 
             model.CompressionDropdown = Utility.BuildCompressionDropdown(model.IsCompressed);
+            model.PreProcessingRequiredDropdown = Utility.BuildPreProcessingDropdown(model.IsPreProcessingRequired);
             if (model.RetrieverJob != null)
             {
                 CreateDropDownSetup(model.RetrieverJob.First());
@@ -193,8 +202,10 @@ namespace Sentry.data.Web.Controllers
 
         private void CreateDropDownSetup(JobModel model)
         {
-            var temp = _dataFlowService.GetDataSourceTypes().Select(v
-                => new SelectListItem { Text = v.Name, Value = v.DiscrimatorValue }).ToList();
+            var temp = _dataFlowService.GetDataSourceTypes()
+                .Where(w => w.DiscrimatorValue == GlobalConstants.DataSoureDiscriminator.FTP_SOURCE)
+                .Select(v => new SelectListItem { Text = v.Name, Value = v.DiscrimatorValue })
+                .ToList();
 
             temp.Add(new SelectListItem()
             {
@@ -204,11 +215,7 @@ namespace Sentry.data.Web.Controllers
                 Disabled = true
             });
 
-            model.SourceTypesDropdown = temp.Where(x =>
-                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_DROP_LOCATION &&
-                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_S3_DROP_LOCATION &&
-                x.Value != GlobalConstants.DataSoureDiscriminator.JAVA_APP_SOURCE &&
-                x.Value != GlobalConstants.DataSoureDiscriminator.DEFAULT_HSZ_DROP_LOCATION).OrderBy(x => x.Value);
+            model.SourceTypesDropdown = temp.OrderBy(o => o.Value);
 
             List<SelectListItem> temp2 = new List<SelectListItem>();
 

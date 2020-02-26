@@ -17,6 +17,8 @@ namespace Sentry.data.Core.Entities.DataProcessing
         public virtual int ExeuctionOrder { get; set; }
         public virtual string TriggerKey { get; set; }
         public virtual string TargetPrefix { get; set; }
+        public virtual string SourceDependencyPrefix { get; set; }
+        public virtual string SourceDependencyBucket { get; set; }
         public virtual IList<SchemaMap> SchemaMappings { get; set; }
         public virtual IList<DataFlow_Log> Executions { get; set; }
 
@@ -24,13 +26,6 @@ namespace Sentry.data.Core.Entities.DataProcessing
         {
             Action.ExecuteAction(this, stepEvent, FlowExecutionGuid);
         }
-
-        //public virtual void GenerateStartEvent(string bucket, string key, string FlowExecutionGuid)
-        //{
-        //    Action.PublishStartEvent(this, bucket, key, FlowExecutionGuid);
-        //}
-
-        //public IList<ActionExecution> Executions { get; set; }
 
         public override string ToString()
         {

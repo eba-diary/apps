@@ -11,9 +11,6 @@ namespace Sentry.data.Core.Entities.DataProcessing
     {
         public UncompressZipAction() { }
 
-        public UncompressZipAction(IUncompressZipProvider uncompressZipProvider) : base(uncompressZipProvider)
-        {
-            TargetStoragePrefix = GlobalConstants.DataFlowTargetPrefixes.CONVERT_TO_PARQUET_PREFIX;
-        }
+        public UncompressZipAction(IUncompressZipProvider uncompressZipProvider) : base(uncompressZipProvider) { }
     }
 }

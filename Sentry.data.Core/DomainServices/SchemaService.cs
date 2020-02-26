@@ -11,17 +11,22 @@ namespace Sentry.data.Core
 {
     public class SchemaService : ISchemaService
     {
+        public readonly IDataFlowService _dataFlowService;
+        public readonly IJobService _jobService;
         private readonly IDatasetContext _datasetContext;
         private readonly IUserService _userService;
         private readonly IEmailService _emailService;
         private readonly ISecurityService _securityService;
 
         public SchemaService(IDatasetContext dsContext, IUserService userService, IEmailService emailService,
-                            ISecurityService securityService)
+            IDataFlowService dataFlowService,
+            IJobService jobService, ISecurityService securityService)
         {
             _datasetContext = dsContext;
             _userService = userService;
             _emailService = emailService;
+            _dataFlowService = dataFlowService;
+            _jobService = jobService;
             _securityService = securityService;
         }
 
@@ -34,7 +39,7 @@ namespace Sentry.data.Core
 
                 //_dataFlowService.CreateandSaveDataFlow(MapToDataFlowDto(newSchema));
 
-                //_dataFlowService.CreateDataFlowForSchema(newSchema);
+                _dataFlowService.CreateDataFlowForSchema(newSchema);
 
                 _datasetContext.SaveChanges();
             }
@@ -334,7 +339,7 @@ namespace Sentry.data.Core
             file.Dataset = _datasetContext.GetById<Dataset>(stepEvent.DatasetID);
             file.UploadUserName = "";
             file.DatasetFileConfig = null;
-            file.FileLocation = stepEvent.TargetPrefix + Path.GetFileName(stepEvent.SourceKey).Trim();
+            file.FileLocation = stepEvent.StepTargetPrefix + Path.GetFileName(stepEvent.SourceKey).Trim();
             file.CreateDTM = DateTime.Now;
             file.ModifiedDTM = DateTime.Now;
             file.ParentDatasetFileId = null;

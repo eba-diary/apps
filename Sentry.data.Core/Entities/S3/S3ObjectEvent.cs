@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -61,7 +62,8 @@ namespace Sentry.data.Core.Entities.S3
         /// </summary>
         public string configurationId { get; set; }
         public Bucket bucket { get; set; }
-        public Object _object { get; set; }
+        [JsonProperty("object")]
+        public Object Object { get; set; }
     }
 
     public class Bucket

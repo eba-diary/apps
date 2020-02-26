@@ -26,7 +26,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
 
                 DataFlowStep step = dsContext.GetById<DataFlowStep>(stepEvent.StepId);
 
-                SetStepProvider(step.DataAction_Type_Id);
+                SetStepProvider(step.DataAction_Type_Id, container);
 
                 _provider.ExecuteAction(step, stepEvent);
 
@@ -45,7 +45,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
                 List<DataFlow_Log> Logs = new List<DataFlow_Log>();
                 try
                 {                
-                    SetStepProvider(step.DataAction_Type_Id);
+                    SetStepProvider(step.DataAction_Type_Id, container);
 
                     if (_provider != null)
                     {
@@ -69,7 +69,7 @@ namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
             }
         }
 
-        private void SetStepProvider(DataActionType actionType)
+        private void SetStepProvider(DataActionType actionType, IContainer container)
         {
 
             //Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
@@ -88,33 +88,38 @@ namespace Sentry.data.Infrastructure.ServiceImplementations.DataProcessing
             //    }
             //    List<ActionTypeAttribute = assembly.GetTypes().Where(w => w.IsDefined(typeof(ActionTypeAttribute)))
             //}
-
-            using (IContainer container = Bootstrapper.Container.GetNestedContainer())
+            switch (actionType)
             {
-                switch (actionType)
-                {
-                    case DataActionType.S3Drop:
-                        _provider = container.GetInstance<IS3DropProvider>();
-                        break;
-                    case DataActionType.RawStorage:
-                        _provider = container.GetInstance<IRawStorageProvider>();
-                        break;
-                    case DataActionType.QueryStorage:
-                        _provider = container.GetInstance<IQueryStorageProvider>();
-                        break;
-                    case DataActionType.SchemaLoad:
-                        _provider = container.GetInstance<ISchemaLoadProvider>();
-                        break;
-                    case DataActionType.ConvertParquet:
-                        _provider = container.GetInstance<IConvertToParquetProvider>();
-                        break;
-                    case DataActionType.UncompressZip:
-                        _provider = container.GetInstance<IUncompressZipProvider>();
-                        break;
-                    case DataActionType.None:
-                    default:
-                        break;
-                }
+                case DataActionType.S3Drop:
+                    _provider = container.GetInstance<IS3DropProvider>();
+                    break;
+                case DataActionType.RawStorage:
+                    _provider = container.GetInstance<IRawStorageProvider>();
+                    break;
+                case DataActionType.QueryStorage:
+                    _provider = container.GetInstance<IQueryStorageProvider>();
+                    break;
+                case DataActionType.SchemaLoad:
+                    _provider = container.GetInstance<ISchemaLoadProvider>();
+                    break;
+                case DataActionType.ConvertParquet:
+                    _provider = container.GetInstance<IConvertToParquetProvider>();
+                    break;
+                case DataActionType.UncompressZip:
+                    _provider = container.GetInstance<IUncompressZipProvider>();
+                    break;
+                case DataActionType.SchemaMap:
+                    _provider = container.GetInstance<ISchemaMapProvider>();
+                    break;
+                case DataActionType.GoogleApi:
+                    _provider = container.GetInstance<IGoogleApiActionProvider>();
+                    break;
+                case DataActionType.ClaimIq:
+                    _provider = container.GetInstance<IClaimIQActionProvider>();
+                    break;
+                case DataActionType.None:
+                default:
+                    break;
             }
         }
     }

@@ -50,3 +50,7 @@
     font: 100 23px/33px Lucida Sans, Arial, sans-serif !important;
     color: #00a3e0;
 }
+
+#PreprocessingOptions {
+    width: 900px;
+}

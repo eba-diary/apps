@@ -20,5 +20,7 @@ namespace Sentry.data.Core
         public RetrieverJobDto RetrieverJob { get; set; }
         public bool IsCompressed { get; set; }
         public CompressionJobDto CompressionJob { get; set; }
+        public bool IsPreProcessingRequired { get; set; }
+        public List<DataFlowPreProcessingTypes> PreProcessingOptions { get; set; }
     }
 }
