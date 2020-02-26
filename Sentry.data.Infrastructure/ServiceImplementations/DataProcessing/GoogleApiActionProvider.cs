@@ -94,12 +94,12 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public override void PublishStartEvent(DataFlowStep step, string FlowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
+        public override void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
             _step = step;
             try
             {
-                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"start-method <{_step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
+                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"start-method <{_step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
                 string objectKey = s3Event.s3.Object.key;
                 string keyBucket = s3Event.s3.bucket.name;
 
@@ -107,7 +107,7 @@ namespace Sentry.data.Infrastructure
                 {
                     DataFlowId = step.DataFlow.Id,
                     DataFlowGuid = step.DataFlow.FlowGuid.ToString(),
-                    FlowExecutionGuid = FlowExecutionGuid,
+                    FlowExecutionGuid = flowExecutionGuid,
                     RunInstanceGuid = runInstanceGuid,
                     StepId = step.Id,
                     ActionId = step.Action.Id,
@@ -124,16 +124,16 @@ namespace Sentry.data.Infrastructure
 
                 base.GenerateDependencyTargets(stepEvent);
 
-                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"{_step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Info);
+                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{_step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Info);
 
                 _messagePublisher.PublishDSCEvent($"{step.DataFlow.Id}-{step.Id}", JsonConvert.SerializeObject(stepEvent));
 
-                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"end-method <{_step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
+                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <{_step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
             }
             catch (Exception ex)
             {
-                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"{_step.DataAction_Type_Id.ToString()} - publishstartevent failed", Log_Level.Error, ex);
-                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"end-method <{_step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
+                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{_step.DataAction_Type_Id.ToString()} - publishstartevent failed", Log_Level.Error, ex);
+                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <{_step.DataAction_Type_Id.ToString()}-publishstartevent", Log_Level.Debug);
             }
         }
     }

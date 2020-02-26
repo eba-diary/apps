@@ -108,7 +108,7 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public override void PublishStartEvent(DataFlowStep step, string FlowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
+        public override void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
             List<DataFlow_Log> logs = new List<DataFlow_Log>();
             Stopwatch stopWatch = new Stopwatch();
@@ -148,13 +148,13 @@ namespace Sentry.data.Infrastructure
                             targetSchemaS3Bucket = s3DropStep.Action.TargetStorageBucket;
                         }
 
-                        step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"start-method <{step.DataAction_Type_Id.ToString()}>-publishstartevent", Log_Level.Debug);
+                        step.LogExecution(flowExecutionGuid, runInstanceGuid, $"start-method <{step.DataAction_Type_Id.ToString()}>-publishstartevent", Log_Level.Debug);
 
                         DataFlowStepEvent stepEvent = new DataFlowStepEvent()
                         {
                             DataFlowId = step.DataFlow.Id,
                             DataFlowGuid = step.DataFlow.FlowGuid.ToString(),
-                            FlowExecutionGuid = FlowExecutionGuid,
+                            FlowExecutionGuid = flowExecutionGuid,
                             RunInstanceGuid = runInstanceGuid,
                             StepId = step.Id,
                             ActionId = step.Action.Id,
@@ -163,22 +163,22 @@ namespace Sentry.data.Infrastructure
                             SourceKey = objectKey,
                             StepTargetBucket = step.Action.TargetStorageBucket,
                             //add run instance (separated by dash) if not null
-                            StepTargetPrefix = targetSchemaS3DropPrefix + $"{FlowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid)}/",
-                            DownstreamTargets = new List<DataFlowStepEventTarget>() { new DataFlowStepEventTarget() { BucketName = targetSchemaS3Bucket, ObjectKey = targetSchemaS3DropPrefix + $"{FlowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid)}/" } },
+                            StepTargetPrefix = targetSchemaS3DropPrefix + $"{flowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid)}/",
+                            DownstreamTargets = new List<DataFlowStepEventTarget>() { new DataFlowStepEventTarget() { BucketName = targetSchemaS3Bucket, ObjectKey = targetSchemaS3DropPrefix + $"{flowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid)}/" } },
                             EventType = GlobalConstants.DataFlowStepEvent.SCHEMA_MAP_START,
                             FileSize = s3Event.s3.Object.size.ToString(),
                             S3EventTime = s3Event.eventTime.ToString("s"),
                             OriginalS3Event = JsonConvert.SerializeObject(s3Event)
                         };
 
-                        step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Debug);
+                        step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Debug);
 
                         _messagePublisher.PublishDSCEvent($"{step.DataFlow.Id}-{step.Id}", JsonConvert.SerializeObject(stepEvent));
 
                         stopWatch.Stop();
                         DateTime endTime = DateTime.Now;
 
-                        step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-publishstartevent-successful  start:{startTime} end:{endTime} duration:{endTime - startTime}", Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) });
+                        step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-publishstartevent-successful  start:{startTime} end:{endTime} duration:{endTime - startTime}", Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) });
                     }
                     else
                     {
@@ -186,14 +186,14 @@ namespace Sentry.data.Infrastructure
                         *  Log message stating no match
                         *  Object cannot be deleted since it may be processed by another schema mapping
                         ******************************************************/
-                        step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-searchcriteria-nomatch bucket:{keyBucket} file:{objectKey} searchcriteria:{scmMap.SearchCriteria}", Log_Level.Debug);
+                        step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-searchcriteria-nomatch bucket:{keyBucket} file:{objectKey} searchcriteria:{scmMap.SearchCriteria}", Log_Level.Debug);
                     }
                 }                
             }
             catch (Exception ex)
             {
-                step.Executions.Add(step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-publishstartevent-failed", Log_Level.Error, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, ex));
-                step.LogExecution(FlowExecutionGuid, runInstanceGuid, $"end-method <{step.DataAction_Type_Id.ToString()}>-publishstartevent", Log_Level.Debug);
+                step.Executions.Add(step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-publishstartevent-failed", Log_Level.Error, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, ex));
+                step.LogExecution(flowExecutionGuid, runInstanceGuid, $"end-method <{step.DataAction_Type_Id.ToString()}>-publishstartevent", Log_Level.Debug);
             }
         }
     }

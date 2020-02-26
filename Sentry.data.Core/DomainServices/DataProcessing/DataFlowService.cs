@@ -69,75 +69,6 @@ namespace Sentry.data.Core
             return true;
         }
 
-        //public bool CreateDataFlow(int schemaId)
-        //{
-        //    int cnt = _datasetContext.DataFlow.Count();
-        //    DataFlow df = new DataFlow()
-        //    {
-        //        Name = "CreateDataFlowTest_" + cnt.ToString(),
-        //        CreatedBy = "072984",
-        //        CreatedDTM = DateTime.Now,
-        //    };
-
-        //    _datasetContext.Add(df);
-
-        //    DataFlowStep step1 = new DataFlowStep()
-        //    {
-        //        DataFlow = df,
-        //        Action = _datasetContext.S3DropAction.FirstOrDefault(),
-        //        DataAction_Type_Id = DataActionType.S3Drop
-        //    };
-
-        //    AddDataFlowStep(df, step1);
-        //    _datasetContext.Add(step1);
-
-        //    DataFlowStep step3 = new DataFlowStep()
-        //    {
-        //        DataFlow = df,
-        //        Action = _datasetContext.RawStorageAction.FirstOrDefault(),
-        //        DataAction_Type_Id = DataActionType.RawStorage
-        //    };
-
-        //    AddDataFlowStep(df, step3);
-        //    _datasetContext.Add(step3);
-
-        //    DataFlowStep step2 = new DataFlowStep()
-        //    {
-        //        DataFlow = df,
-        //        Action = _datasetContext.SchemaLoadAction.FirstOrDefault(),
-        //        DataAction_Type_Id = DataActionType.SchemaLoad
-        //    };
-
-        //    AddDataFlowStep(df, step2);
-        //    _datasetContext.Add(step2);
-
-        //    SchemaMap mapping = new SchemaMap()
-        //    {
-        //        DataFlowStepId = step2,
-        //        MappedSchema = _datasetContext.FileSchema.Where(w => w.SchemaId == schemaId).FirstOrDefault(),
-        //        Dataset = _datasetContext.DatasetFileConfigs.Where(w => w.Schema.SchemaId == schemaId).Select(s => s.ParentDataset).FirstOrDefault(),
-        //        SearchCriteria = "Testfile.csv"
-        //    };
-        //    _datasetContext.Add(mapping);
-        //    List<SchemaMap> maps = new List<SchemaMap>();
-        //    maps.Add(mapping);
-        //    step2.SchemaMappings = maps;
-
-        //    DataFlowStep step4 = new DataFlowStep()
-        //    {
-        //        DataFlow = df,
-        //        Action = _datasetContext.QueryStorageAction.FirstOrDefault(),
-        //        DataAction_Type_Id = DataActionType.QueryStorage
-        //    };
-
-        //    AddDataFlowStep(df, step4);
-        //    _datasetContext.Add(step4);
-
-        //    _datasetContext.SaveChanges();
-
-        //    return true;
-        //}
-
         public void CreateDataFlowForSchema(FileSchema scm)
         {
             DataFlow df = MapToDataFlow(scm);
@@ -170,7 +101,7 @@ namespace Sentry.data.Core
         {
             if(scm == null)
             {
-                throw new ArgumentNullException("FileSchema is required");
+                throw new ArgumentNullException("scm", "FileSchema is required");
             }
 
             string schemaFlowName = GenerateDataFlowNameForFileSchema(scm);
@@ -189,7 +120,7 @@ namespace Sentry.data.Core
         {
             if (string.IsNullOrEmpty(schemaFlowName))
             {
-                throw new ArgumentNullException("schemaFlowName not specified");
+                throw new ArgumentNullException("schemaFlowName", "schemaFlowName not specified");
             }
 
             DataFlow flow = _datasetContext.DataFlow.Where(w => w.Name == schemaFlowName).FirstOrDefault();
@@ -206,11 +137,11 @@ namespace Sentry.data.Core
         {
             if (dataFlowId == 0)
             {
-                throw new ArgumentNullException("dataFlowId is not specified");
+                throw new ArgumentNullException("dataFlowId", "dataFlowId is not specified");
             }
             if (actionType == DataActionType.None)
             {
-                throw new ArgumentNullException("actionType is not specified");
+                throw new ArgumentNullException("actionType", "actionType is not specified");
             }
 
             DataFlowStep step = _datasetContext.DataFlowStep.Where(w => w.DataFlow.Id == dataFlowId && w.DataAction_Type_Id == actionType).FirstOrDefault();
@@ -226,7 +157,7 @@ namespace Sentry.data.Core
         {
             if (stepId == 0)
             {
-                throw new ArgumentNullException("DataFlowStep is required");
+                throw new ArgumentNullException("stepId", "DataFlowStep is required");
             }
 
             /****************************************************
@@ -246,9 +177,9 @@ namespace Sentry.data.Core
             return steps;
         }
 
-        public string GetSchemaStorageCodeForDataFlow(int dataFlowId)
+        public string GetSchemaStorageCodeForDataFlow(int Id)
         {
-            DataFlowStep schemaLoadStep = GetDataFlowStepForDataFlowByActionType(dataFlowId, DataActionType.SchemaLoad);
+            DataFlowStep schemaLoadStep = GetDataFlowStepForDataFlowByActionType(Id, DataActionType.SchemaLoad);
 
             if (schemaLoadStep == null)
             {
@@ -302,7 +233,6 @@ namespace Sentry.data.Core
             //Generate ingestion steps (get file to raw location)
             AddDataFlowStep(dto, df, DataActionType.S3Drop);
 
-            //MapToRawStorageStep(dto, df);
             AddDataFlowStep(dto, df, DataActionType.RawStorage);
 
             if (dto.IsCompressed)

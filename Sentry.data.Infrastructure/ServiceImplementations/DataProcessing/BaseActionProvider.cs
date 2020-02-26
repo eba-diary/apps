@@ -18,7 +18,7 @@ namespace Sentry.data.Infrastructure
 
         public abstract void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent);
 
-        public abstract void PublishStartEvent(DataFlowStep step, string FlowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event);
+        public abstract void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event);
 
         public void GenerateDependencyTargets(DataFlowStepEvent stepEvent)
         {

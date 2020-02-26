@@ -11,7 +11,7 @@ namespace Sentry.data.Core.Interfaces.DataProcessing
     public interface IBaseActionProvider
     {
         void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent);
-        void PublishStartEvent(DataFlowStep step, string FlowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event);
+        void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event);
         void GenerateDependencyTargets(DataFlowStepEvent stepEvent);
     }
 }
