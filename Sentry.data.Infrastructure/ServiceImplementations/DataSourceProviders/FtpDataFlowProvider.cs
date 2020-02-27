@@ -74,16 +74,11 @@ namespace Sentry.data.Infrastructure
         #region Private Methods
         private void GenericFtpExecution(string absoluteUri)
         {
-            using (IContainer Container = Bootstrapper.Container.GetNestedContainer())
-            {
-                IJobService _jobService = Container.GetInstance<IJobService>();
+            _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_STARTED_STATE);
 
-                _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_STARTED_STATE);
+            RetrieveFtpFile(absoluteUri);
 
-                RetrieveFtpFile(absoluteUri);
-
-                _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE);
-            }
+            _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE);
         }
 
         private void RetrieveFtpFile(string absoluteUri)
