@@ -21,6 +21,8 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                attr => attr.Type<EnumType<DataActionType>>());
             this.Property(x => x.TriggerKey, m => m.Column("TriggerKey"));
             this.Property(x => x.TargetPrefix, m => m.Column("TargetPrefix"));
+            this.Property(x => x.SourceDependencyPrefix, m => m.Column("SourceDependencyPrefix"));
+            this.Property(x => x.SourceDependencyBucket, m => m.Column("SourceDependencyBucket"));
 
             this.ManyToOne(x => x.DataFlow, m =>
             {
@@ -31,7 +33,9 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
             this.ManyToOne(x => x.Action, m =>
             {
                 m.Column("Action_ID");
+                m.ForeignKey("FK_DataFlowStep_DataAction");
                 m.Class(typeof(BaseAction));
+                m.Update(false);
             });
 
             this.Bag(x => x.Executions, (m) =>

@@ -126,6 +126,14 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
         }
     }
 
+    public class DfsDataFlowBasicMapping : SubclassMapping<DfsDataFlowBasic>
+    {
+        public DfsDataFlowBasicMapping()
+        {
+            DiscriminatorValue(GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION);
+        }
+    }
+
     public class DfsCustomMapping : SubclassMapping<DfsCustom>
     {
         public DfsCustomMapping()

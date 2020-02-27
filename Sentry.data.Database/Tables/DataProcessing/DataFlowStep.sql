@@ -7,6 +7,8 @@
     [ExecutionOrder] INT NOT NULL, 
 	[TriggerKey] VARCHAR(1000) NULL, 
     [TargetPrefix] VARCHAR(1000) NULL, 
+    [SourceDependencyPrefix] VARCHAR(1000) NULL, 
+    [SourceDependencyBucket] VARCHAR(1000) NULL, 
     CONSTRAINT [PK_DataFlowStep] PRIMARY KEY CLUSTERED 
 (
 	[ID] ASC

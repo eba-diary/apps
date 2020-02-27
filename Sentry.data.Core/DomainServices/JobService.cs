@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Sentry.Common.Logging;
+using Sentry.data.Core.Entities.DataProcessing;
+using static Sentry.data.Core.RetrieverJobOptions;
 
 namespace Sentry.data.Core
 {
@@ -86,7 +88,7 @@ namespace Sentry.data.Core
             return basicJob;
         }
 
-        public RetrieverJob InstantiateJobsForCreation(DatasetFileConfig dfc, DataSource dataSource)
+        private RetrieverJob InstantiateJob(DatasetFileConfig dfc, DataSource dataSource, DataFlow df)
         {
             RetrieverJobOptions.Compression compression = new RetrieverJobOptions.Compression()
             {
@@ -104,16 +106,18 @@ namespace Sentry.data.Core
                 SearchCriteria = "\\.",
                 CompressionOptions = compression
             };
+
             RetrieverJob rj = new RetrieverJob()
             {
                 TimeZone = "Central Standard Time",
                 RelativeUri = null,
                 DataSource = dataSource,
                 DatasetConfig = dfc,
+                FileSchema = null,
+                DataFlow = df,
                 Created = DateTime.Now,
                 Modified = DateTime.Now,
                 IsGeneric = true,
-
                 JobOptions = rjo
             };
 
@@ -121,7 +125,7 @@ namespace Sentry.data.Core
             {
                 rj.Schedule = "*/1 * * * *";
             }
-            else if (dataSource.Is<DfsBasic>())
+            else if (dataSource.Is<DfsBasic>() || dataSource.Is<DfsDataFlowBasic>())
             {
                 rj.Schedule = "Instant";
             }
@@ -133,6 +137,41 @@ namespace Sentry.data.Core
             return rj;
         }
 
+        public RetrieverJob InstantiateJobsForCreation(DatasetFileConfig dfc, DataSource dataSource)
+        {
+            return InstantiateJob(dfc, dataSource, null);
+        }
+
+        public RetrieverJob InstantiateJobsForCreation(DataFlow df, DataSource dataSource)
+        {
+            return InstantiateJob(null, dataSource, df);
+        }
+
+
+        public RetrieverJob CreateAndSaveRetrieverJob(RetrieverJobDto dto)
+        {
+            Compression compress = new Compression();
+            if (dto.IsCompressed)
+            {
+                MapToCompression(dto, compress);
+            }
+
+            HttpsOptions ho = new HttpsOptions();
+            MaptToHttpsOptions(dto, ho);
+
+            RetrieverJobOptions rjo = new RetrieverJobOptions();
+            MapToRetrieverJobOptions(dto, rjo);
+            rjo.CompressionOptions = compress;
+            rjo.HttpOptions = ho;
+
+            RetrieverJob job = new RetrieverJob();
+            MapToRetrieverJob(dto, job);
+            job.JobOptions = rjo;
+
+            _datasetContext.Add(job);
+
+            return job;
+        }
 
         public void CreateDropLocation(RetrieverJob job)
         {
@@ -186,6 +225,45 @@ namespace Sentry.data.Core
                 Logger.Error($"jobservice-deletejob-failed - jobid:{id}", ex);
                 throw;
             }
+        }
+
+        private void MapToCompression(RetrieverJobDto dto, Compression compress)
+        {
+            compress.IsCompressed = dto.IsCompressed;
+            compress.CompressionType = dto.CompressionType.ToString();
+            compress.FileNameExclusionList = dto.FileNameExclusionList ?? new List<string>();
+        }
+
+        private void MapToRetrieverJobOptions(RetrieverJobDto dto, RetrieverJobOptions jobOptions)
+        {
+            jobOptions.IsRegexSearch = true;
+            jobOptions.OverwriteDataFile = false;
+            jobOptions.SearchCriteria = dto.SearchCriteria;
+            jobOptions.CreateCurrentFile = dto.CreateCurrentFile;
+            jobOptions.FtpPattern = dto.FtpPatrn;
+            jobOptions.TargetFileName = dto.TargetFileName;
+        }
+
+        private void MaptToHttpsOptions(RetrieverJobDto dto, HttpsOptions httpOptions)
+        {
+            httpOptions.Body = dto.HttpRequestBody;
+            httpOptions.RequestMethod = dto.RequestMethod;
+            httpOptions.RequestDataFormat = dto.RequestDataFormat;
+        }
+
+        private void MapToRetrieverJob(RetrieverJobDto dto, RetrieverJob job)
+        {
+            job.Created = (job.Id == 0) ? DateTime.Now : job.Created;
+            job.DatasetConfig = (dto.DatasetFileConfig == 0) ? null : _datasetContext.GetById<DatasetFileConfig>(dto.DatasetFileConfig);
+            job.DataSource = _datasetContext.GetById<DataSource>(dto.DataSourceId);
+            job.FileSchema = (dto.FileSchema == 0) ? null : _datasetContext.GetById<FileSchema>(dto.FileSchema);
+            job.DataFlow = (dto.DataFlow == 0) ? null : _datasetContext.GetById<DataFlow>(dto.DataFlow);
+            job.IsGeneric = false;
+            job.JobGuid = (job.JobGuid == Guid.Empty) ? Guid.NewGuid() : job.JobGuid;
+            job.Modified = DateTime.Now;
+            job.RelativeUri = dto.RelativeUri;
+            job.Schedule = dto.Schedule;
+            job.TimeZone = "Central Standard Time";
         }
     }
 }

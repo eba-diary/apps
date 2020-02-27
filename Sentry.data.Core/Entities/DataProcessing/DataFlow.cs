@@ -17,9 +17,11 @@ namespace Sentry.data.Core.Entities.DataProcessing
         }
         public virtual int Id { get; set; }
         public virtual Guid FlowGuid { get; set; }
+        public virtual string FlowStorageCode { get; set; }
         public virtual string Name { get; set; }
         public virtual DateTime CreatedDTM { get; set; }
         public virtual string CreatedBy { get; set; }
+        public virtual string Questionnaire { get; set; }
         public virtual IList<DataFlowStep> Steps { get; set; }
         public virtual IList<DataFlow_Log> Logs { get; set; }
         public virtual DataFlow_Log LogExecution(string executionGuid, string log, Log_Level level, Exception ex = null)

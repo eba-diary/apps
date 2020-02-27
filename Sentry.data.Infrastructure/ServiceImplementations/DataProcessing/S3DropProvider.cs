@@ -15,21 +15,22 @@ namespace Sentry.data.Infrastructure
 {
     //ActionType attribute utilized to map entity to provider within DataStepProvider.cs
     [ActionType(DataActionType.S3Drop)]
-    public class S3DropProvider : IS3DropProvider
+    public class S3DropProvider : BaseActionProvider, IS3DropProvider
     {
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
         private readonly IDatasetContext _datasetContext;
 
         public S3DropProvider(IMessagePublisher messagePublisher, 
-            IS3ServiceProvider s3ServiceProvider, IDatasetContext datasetContext)
+            IS3ServiceProvider s3ServiceProvider, IDatasetContext datasetContext,
+            IDataFlowService dataFlowService) : base(dataFlowService)
         {
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
             _datasetContext = datasetContext;
         }
 
-        public void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
+        public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
             List<DataFlow_Log> logs = new List<DataFlow_Log>();
             Stopwatch stopWatch = new Stopwatch();
@@ -43,34 +44,48 @@ namespace Sentry.data.Infrastructure
                 string fileName = Path.GetFileName(stepEvent.SourceKey);
                 step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()} processing event - {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Debug);
 
-                string versionKey = _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, stepEvent.TargetBucket, $"{stepEvent.TargetPrefix}{Path.GetFileName(stepEvent.SourceKey)}");
-                DateTime endTime = DateTime.Now;
-                stopWatch.Stop();
+                /***************************************
+                 *  Perform provider specific processing
+                 ***************************************/
+                //S3 drop steps do not store the output in a long term storage area, all files are immediately sent to the raw storage step
+                
 
-                //Mock for testing... sent mock s3object created 
-                S3Event s3e = null;
-                s3e = new S3Event
+                /***************************************
+                 *  Trigger dependent data flow steps
+                 ***************************************/
+                //Copy file to all dependent targets for further processing
+                foreach (DataFlowStepEventTarget target in stepEvent.DownstreamTargets)
                 {
-                    EventType = "S3EVENT",
-                    PayLoad = new S3ObjectEvent()
+                    _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, target.BucketName, $"{target.ObjectKey}{fileName}");
+
+#if (DEBUG)
+                    //Mock for testing... sent mock s3object created 
+                    S3Event s3e = null;
+                    s3e = new S3Event
                     {
-                        eventName = "ObjectCreated:Put",
-                        s3 = new S3()
+                        EventType = "S3EVENT",
+                        PayLoad = new S3ObjectEvent()
                         {
-                            bucket = new Bucket()
+                            eventName = "ObjectCreated:Put",
+                            s3 = new S3()
                             {
-                                name = stepEvent.TargetBucket
-                            },
-                            _object = new Sentry.data.Core.Entities.S3.Object()
-                            {
-                                key = $"{stepEvent.TargetPrefix}{fileName}",
-                                size = 100123
+                                bucket = new Bucket()
+                                {
+                                    name = target.BucketName
+                                },
+                                Object = new Sentry.data.Core.Entities.S3.Object()
+                                {
+                                    key = $"{target.ObjectKey}{fileName}"
+                                }
                             }
                         }
-                    }
-                };
+                    };
+                    _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
+#endif
+                }
 
-                _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
+                stopWatch.Stop();
+                DateTime endTime = DateTime.Now;
 
                 step.Executions.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-successful  start:{startTime} end:{endTime} duration:{endTime - startTime}",Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }));
             }
@@ -85,11 +100,11 @@ namespace Sentry.data.Infrastructure
             }
         }
 
-        public void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
+        public override void PublishStartEvent(DataFlowStep step, string flowExecutionGuid, string runInstanceGuid, S3ObjectEvent s3Event)
         {
             List<DataFlow_Log> logs = new List<DataFlow_Log>();
             Stopwatch stopWatch = new Stopwatch();
-            string objectKey = s3Event.s3._object.key;
+            string objectKey = s3Event.s3.Object.key;
             string keyBucket = s3Event.s3.bucket.name;
             try
             {
@@ -108,14 +123,16 @@ namespace Sentry.data.Infrastructure
                     ActionGuid = step.Action.ActionGuid.ToString(),
                     SourceBucket = keyBucket,
                     SourceKey = objectKey,
-                    TargetBucket = step.Action.TargetStorageBucket,
+                    StepTargetBucket = step.Action.TargetStorageBucket,
                     //add run instance (separated by dash) if not null
-                    TargetPrefix = step.Action.TargetStoragePrefix + $"{step.DataFlow.Id.ToString()}/" + $"{flowExecutionGuid}{((runInstanceGuid == null) ? String.Empty : "-" + runInstanceGuid)}/",
+                    StepTargetPrefix = (step.TargetPrefix == null) ? null : step.TargetPrefix + $"{flowExecutionGuid}{((runInstanceGuid == null) ? string.Empty : "-" + runInstanceGuid)}/",
                     EventType = GlobalConstants.DataFlowStepEvent.S3_DROP_START,
-                    FileSize = s3Event.s3._object.size.ToString(),
+                    FileSize = s3Event.s3.Object.size.ToString(),
                     S3EventTime = s3Event.eventTime.ToString("s"),
                     OriginalS3Event = JsonConvert.SerializeObject(s3Event)
                 };
+
+                base.GenerateDependencyTargets(stepEvent);
 
                 step.LogExecution(flowExecutionGuid, runInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-sendingstartevent {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Debug);
 

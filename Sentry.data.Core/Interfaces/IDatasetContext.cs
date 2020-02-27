@@ -61,7 +61,10 @@ namespace Sentry.data.Core
         IQueryable<QueryStorageAction> QueryStorageAction { get; }
         IQueryable<ConvertToParquetAction> ConvertToParquetAction { get; }
         IQueryable<UncompressZipAction> UncompressZipAction { get; }
+        IQueryable<SchemaMapAction> SchemaMapAction { get; }
+        IQueryable<GoogleApiAction> GoogleApiAction { get; }
         IQueryable<SchemaMap> SchemaMap { get; }
+        IQueryable<ClaimIQAction> ClaimIQAction { get; }
         /** Datasets **/
 
         Dataset GetById(int id);
@@ -106,6 +109,7 @@ namespace Sentry.data.Core
 
         List<Event> EventsSince(DateTime time, Boolean IsProcessed);
         int GetNextStorageCDE();
+        string GetNextDataFlowStorageCDE();
         int GetReportCount();
 
 

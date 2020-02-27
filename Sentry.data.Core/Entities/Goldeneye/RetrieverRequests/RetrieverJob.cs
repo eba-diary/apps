@@ -7,6 +7,7 @@ using System.IO;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
 using Sentry.Core;
+using Sentry.data.Core.Entities.DataProcessing;
 
 namespace Sentry.data.Core
 {
@@ -108,6 +109,8 @@ namespace Sentry.data.Core
         public virtual IList<JobHistory> JobHistory { get; set; }
 
         public virtual IList<Submission> Submissions { get; set; }
+        public virtual FileSchema FileSchema { get; set; }
+        public virtual DataFlow DataFlow { get; set; }
 
         public virtual Uri GetUri()
         {
@@ -208,21 +211,31 @@ namespace Sentry.data.Core
 
         public virtual void JobLoggerMessage(string severity, string message, Exception ex = null)
         {
+            string jobSpecifics;
+            if (this.DataFlow == null)
+            {
+                jobSpecifics = $"Job:{this.Id} | DataSource:{this.DataSource.Name} | DataSourceID:{this.DataSource.Id} | Schema:{this.DatasetConfig.Name} | SchemaID:{this.DatasetConfig.ConfigId} | Dataset:{this.DatasetConfig.ParentDataset.DatasetName} | DatasetID:{this.DatasetConfig.ParentDataset.DatasetId}";
+            }
+            else
+            {
+                jobSpecifics = $"Job:{this.Id} | DataSource:{this.DataSource.Name} | DataSourceID:{this.DataSource.Id} | DataFlowName:{this.DataFlow.Name} | DataFlowID:{this.DataFlow.Id}";                
+            }
+
             switch (severity.ToUpper())
             {
                 case "DEBUG":
-                    Sentry.Common.Logging.Logger.Debug($"{message} - Job:{this.Id} | DataSource:{this.DataSource.Name} | DataSourceID:{this.DataSource.Id} | Schema:{this.DatasetConfig.Name} | SchemaID:{this.DatasetConfig.ConfigId} | Dataset:{this.DatasetConfig.ParentDataset.DatasetName} | DatasetID:{this.DatasetConfig.ParentDataset.DatasetId}");
+                    Sentry.Common.Logging.Logger.Debug($"{message} - {jobSpecifics}");
                     break;
                 case "INFO":
-                    Sentry.Common.Logging.Logger.Info($"{message} - Job:{this.Id} | DataSource:{this.DataSource.Name} | DataSourceID:{this.DataSource.Id} | Schema:{this.DatasetConfig.Name} | SchemaID:{this.DatasetConfig.ConfigId} | Dataset:{this.DatasetConfig.ParentDataset.DatasetName} | DatasetID:{this.DatasetConfig.ParentDataset.DatasetId}");
+                    Sentry.Common.Logging.Logger.Info($"{message} - {jobSpecifics}");
                     break;
                 case "WARN":
-                    if(ex == null){ Sentry.Common.Logging.Logger.Warn($"{message} - Job:{this.Id} | DataSource:{this.DataSource.Name} | DataSourceID:{this.DataSource.Id} | Schema:{this.DatasetConfig.Name} | SchemaID:{this.DatasetConfig.ConfigId} | Dataset:{this.DatasetConfig.ParentDataset.DatasetName} | DatasetID:{this.DatasetConfig.ParentDataset.DatasetId}"); }
-                    else{ Sentry.Common.Logging.Logger.Warn($"{message} - Job:{this.Id} | DataSource:{this.DataSource.Name} | DataSourceID:{this.DataSource.Id} | Schema:{this.DatasetConfig.Name} | SchemaID:{this.DatasetConfig.ConfigId} | Dataset:{this.DatasetConfig.ParentDataset.DatasetName} | DatasetID:{this.DatasetConfig.ParentDataset.DatasetId}",ex); }
+                    if (ex == null) { Sentry.Common.Logging.Logger.Warn($"{message} - {jobSpecifics}"); }
+                    else { Sentry.Common.Logging.Logger.Warn($"{message} - {jobSpecifics}", ex); }
                     break;
                 case "ERROR":
-                    if (ex == null){ Sentry.Common.Logging.Logger.Error($"{message} - Job:{this.Id} | DataSource:{this.DataSource.Name} | DataSourceID:{this.DataSource.Id} | Schema:{this.DatasetConfig.Name} | SchemaID:{this.DatasetConfig.ConfigId} | Dataset:{this.DatasetConfig.ParentDataset.DatasetName} | DatasetID:{this.DatasetConfig.ParentDataset.DatasetId}"); }
-                    else{ Sentry.Common.Logging.Logger.Error($"{message} - Job:{this.Id} | DataSource:{this.DataSource.Name} | DataSourceID:{this.DataSource.Id} | Schema:{this.DatasetConfig.Name} | SchemaID:{this.DatasetConfig.ConfigId} | Dataset:{this.DatasetConfig.ParentDataset.DatasetName} | DatasetID:{this.DatasetConfig.ParentDataset.DatasetId}", ex); }
+                    if (ex == null) { Sentry.Common.Logging.Logger.Error($"{message} - {jobSpecifics}"); }
+                    else { Sentry.Common.Logging.Logger.Error($"{message} - {jobSpecifics}", ex); }
                     break;
                 default:
                     break;
@@ -256,7 +269,14 @@ namespace Sentry.data.Core
 
         public virtual string JobName()
         {
-            return $"RJob~{this.DatasetConfig.ParentDataset.DatasetId}~{this.Id}~{this.DatasetConfig.ConfigId}~{this.DataSource.Name}";
+            if (this.DataFlow == null)
+            {
+                return $"RJob~{this.DatasetConfig.ParentDataset.DatasetId}~{this.Id}~{this.DatasetConfig.ConfigId}~{this.DataSource.Name}";
+            }
+            else
+            {
+                return $"RJob~df_{this.DataFlow.FlowStorageCode}~job_{this.Id}~dsrc_{this.DataSource.Name}";
+            }
         }
     }
 }

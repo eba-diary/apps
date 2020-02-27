@@ -2,13 +2,16 @@
     BEGIN TRY    
         MERGE INTO [DataActionTypes] AS Target    
         USING (VALUES 
-          (1, 'S3 Drop'),
-		  (2, 'Raw Storage'),
-		  (3, 'Query Storage'),
-		  (4, 'Schema Load'),
-		  (5, 'Convert to Parquet'),
-		  (6, 'Uncompress Zip'),
-		  (7, 'Uncompress Gzip')
+          (1,	'S3 Drop'),
+		  (2,	'Raw Storage'),
+		  (3,	'Query Storage'),
+		  (4,	'Schema Load'),
+		  (5,	'Convert to Parquet'),
+		  (6,	'Uncompress Zip'),
+		  (7,	'Uncompress Gzip'),
+		  (8,	'Schema Map'),
+		  (9,	'Google Api'),
+		  (10,	'ClaimIQ')
         )
         AS Source ([ID], [Name])
         ON Target.[ID] = Source.[ID]   

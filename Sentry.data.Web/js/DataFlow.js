@@ -12,6 +12,11 @@
         data.DataFlow.InitIngestionType();
         //data.DataFlow.InitCompressionCheckbox();
 
+
+        $("#PreprocessingOptions").select2({
+            placeholder: "Select Options"
+        });
+
         $("#IsCompressed").change(function () {
             if ($(this).val() === "true") {
                 $('.compressionJobPanel').show();
@@ -23,6 +28,20 @@
             }
             else {
                 $('.compressionJobPanel').hide();
+            }
+        });
+
+        $("#IsPreProcessingRequired").change(function () {
+            if ($(this).val() === "true") {
+                $('.preProcessingJobPanel').show();
+                //if ($('.compressionJobQuestion').length === 0) {
+                //    $.get("/DataFlow/NewCompressionJob", function (e) {
+                //        $("#compressionJobPanel").append(e);
+                //    });
+                //}
+            }
+            else {
+                $('.preProcessingPanel').hide();
             }
         });
 
@@ -43,23 +62,27 @@
             $('.retrieverPanel').show();
             $('.compressionPanel').show();
             $('.schemaMapPanel').show();
+            $('.preProcessingPanel').show();
             $('.formSubmitButtons').show();
         }
         else if (selection === "1") {
             $('.retrieverPanel').hide();
             $('.compressionPanel').show();
             $('.schemaMapPanel').show();
+            $('.preProcessingPanel').show();
             $('.formSubmitButtons').show();
         }
 
         if (selection === "0") {
             $('.compressionPanel').hide();
             $('.schemaMapPanel').hide();
+            $('.preProcessingPanel').hide();
             $('.formSubmitButtons').hide();
         }
         else {
             $('.compressionPanel').show();
             $('.schemaMapPanel').show();
+            $('.preProcessingPanel').show();
             $('.formSubmitButtons').show();
         }            
 
@@ -77,6 +100,7 @@
             }
             $('.compressionPanel').show();
             $('.schemaMapPanel').show();
+            $('.preProcessingPanel').show();
             $('.formSubmitButtons').show();
         });
     },
