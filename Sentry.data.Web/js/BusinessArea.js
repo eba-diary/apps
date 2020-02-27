@@ -8,10 +8,10 @@
         data.Subscription.init(2);
     },
 
-    notificationBellInit: function ()
+    initLibertyBell: function ()
     {
 
-        $(".notification-bell-icon").popover
+        $(".liberty-bell").popover
         (
             {
                 content: "BEWARE THE IDES OF MARCH ssssssssssss sssssssssssssssssssss ssssssssssssssssssssssss ssssssssssssssssss"
@@ -21,16 +21,7 @@
 
         //pass initilize hmtl tag
 
-        //$(".alert-notification-hero").on("click", function (event)
-        //{
-        //    console.log("FIRE");
-        //    $(".alert-notification-hero").popover('show');
-
-        //    //$(".alert-panel-hero").show();
-           
-        //});
-
-       
+              
     }
 
 };   

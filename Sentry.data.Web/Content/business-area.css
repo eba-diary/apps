@@ -35,7 +35,7 @@
     right: 1%;
 }
 
-.notification-bell-icon {
+.liberty-bell {
     float: right;
     width: 25px;
     font-size: 36px;
@@ -45,7 +45,7 @@
     cursor: pointer;
 }
 
-.badge-man {
+.liberty-badge {
     background-color: #000;
     color: #fff;
     display: inline-block;
@@ -55,11 +55,11 @@
     border-radius: 50%
 }
 
-.badge-man-red {
+.liberty-badge-red {
     color: #fff !important;
     background-color: #f44336 !important
 }
 
-.badge-man-small {
+.liberty-badge-small {
     font-size: 12px !important
 }
