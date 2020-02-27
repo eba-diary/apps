@@ -499,19 +499,13 @@ namespace Sentry.data.Infrastructure
                         switch (_job.JobOptions.FtpPattern)
                         {
                             case
-                            FtpPattern.NoPattern: /* #0*/
+                            FtpPattern.NoPattern:
                             default:
-                                RetrieveFTPFile(_job.GetUri().AbsoluteUri);
+                                GenericFtpExecution(_job.GetUri().AbsoluteUri);                                
                                 break;
-                            //case FtpPattern.SpecificFileNoDelete:
-                            //    ProcessSpecificFileNoDelete();
-                            //    break;
-                            case FtpPattern.RegexFileNoDelete:  /* #4*/
+                            case FtpPattern.RegexFileNoDelete:
                                 ProcessRegexFileNoDelete();
                                 break;
-                            //case FtpPattern.SpecificFileArchive:  /* #5*/
-                            //    ProcessSpecificFileArchive(); 
-                            //    break;
                             case FtpPattern.RegexFileSinceLastExecution:
                                 ProcessRegexFileSinceLastExecution();
                                 break;
@@ -765,6 +759,19 @@ namespace Sentry.data.Infrastructure
         }
 
         #region FTP Processing
+        private void GenericFtpExecution(string uri)
+        {
+            using (IContainer Container = Bootstrapper.Container.GetNestedContainer())
+            {
+                IJobService _jobService = Container.GetInstance<IJobService>();
+
+                _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_STARTED_STATE);
+
+                RetrieveFTPFile(uri);
+
+                _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE);
+            }
+        }
 
         private void ProcessNewFilesSinceLastExecution()
         {
