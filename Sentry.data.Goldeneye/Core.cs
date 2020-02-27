@@ -290,6 +290,7 @@ namespace Sentry.data.Goldeneye
                             Job.JobLoggerMessage("Info", "Job update detected, performing AddOrUpdate to Hangfire");
                         }
 
+
                         if (JobList.Count > 0)
                         {
                             string jobIds = null;
@@ -334,7 +335,7 @@ namespace Sentry.data.Goldeneye
 
 
 
-                            rtjob = _requestContext.RetrieverJob.Where(w => (!(w.DataSource is DfsBasicHsz) && (w.DataSource is DfsBasic || w.DataSource is DfsCustom)) && w.Schedule == "Instant" && w.IsEnabled).ToList();
+                            rtjob = _requestContext.RetrieverJob.Where(w => (!(w.DataSource is DfsBasicHsz) && (w.DataSource is DfsBasic || w.DataSource is DfsCustom || w.DataSource is DfsDataFlowBasic)) && w.Schedule == "Instant" && w.IsEnabled).ToList();
 
 
 
@@ -342,7 +343,19 @@ namespace Sentry.data.Goldeneye
                             {
                                 Uri watchPath = job.GetUri();
                                 int jobId = job.Id;
-                                int configID = job.DatasetConfig.ConfigId;
+                                int configID = (job.DatasetConfig == null) ? 0 : job.DatasetConfig.ConfigId;
+                                int dataflowId = (job.DataFlow == null) ? 0 : job.DataFlow.Id;
+                                string watcherName;
+                                if (dataflowId > 0)
+                                {
+                                    watcherName = $"Watch_{job.Id}_df_{job.DataFlow.Id}";
+                                }
+                                else
+                                {
+                                    watcherName = $"Watch_{job.Id}_config_{job.DatasetConfig.ConfigId}";
+                                }
+
+                                
 
                                 //On initial run start all watch tasks for all configs
                                 if (firstRun)
@@ -351,31 +364,36 @@ namespace Sentry.data.Goldeneye
                                         Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath, _token),
                                                                         TaskCreationOptions.LongRunning).ContinueWith(TaskException,
                                                                         TaskContinuationOptions.OnlyOnFaulted),
-                                                                        $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
+                                                                        watcherName)
                                                                 );
                                 }
                                 //Restart any completed tasks
-                                else if (tasks.Any(w => Int64.Parse(w.Name.Split('_')[2]) == configID))
+                                else if (
+                                    configID > 0 && tasks.Any(w => w.Name.Split('_')[2] == "config" && Int64.Parse(w.Name.Split('_')[3]) == configID) ||
+                                    (configID == 0 && dataflowId > 0) && tasks.Any(w => w.Name.Split('_')[2] == "df" && Int64.Parse(w.Name.Split('_')[3]) == dataflowId))
                                 {
                                     currentTasks.Add(new RunningTask(
                                         Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath, _token),
                                                                         TaskCreationOptions.LongRunning).ContinueWith(TaskException,
                                                                         TaskContinuationOptions.OnlyOnFaulted),
-                                                                        $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
+                                                                        watcherName)
                                     );
 
-                                    Logger.Info($"Resstarting Watch_{job.Id}_{job.DatasetConfig.ConfigId}");
+                                    Logger.Info($"Resstarting {watcherName}");
                                 }
                                 //Start any new directories added
-                                else if (!currentTasks.Any(x => x.Name.StartsWith("Watch") && x.Name.Replace("Watch_", "") == $"{job.Id}_{job.DatasetConfig.ConfigId}"))
+                                else if (
+                                    configID > 0 && !currentTasks.Any(x => x.Name.StartsWith("Watch") && x.Name.Replace("Watch_", "") == $"{job.Id}_config_{job.DatasetConfig.ConfigId}") ||
+                                    (configID == 0 && dataflowId > 0) && !currentTasks.Any(x => x.Name.StartsWith("Watch") && x.Name.Replace("Watch_", "") == $"{job.Id}_df_{job.DataFlow.Id}")
+                                    )
                                 {
-                                    Logger.Info($"Detected new config ({configID}) to monitor ({watchPath})");
+                                    Logger.Info($"Initializing new monitor {watcherName}");
 
                                     currentTasks.Add(new RunningTask(
                                         Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath, _token),
                                                                         TaskCreationOptions.LongRunning).ContinueWith(TaskException,
                                                                         TaskContinuationOptions.OnlyOnFaulted),
-                                                                        $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
+                                                                        watcherName)
                                     );
                                 }
                             }
