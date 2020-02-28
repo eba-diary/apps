@@ -75,5 +75,13 @@ namespace Sentry.data.Web.Controllers
             return tileModels;
         }
 
+
+        [HttpGet]
+        public ActionResult GetLibertyBellHtml()
+        {
+            return PartialView("_LibertyBellPopover");
+        }
+
+
     }
 }

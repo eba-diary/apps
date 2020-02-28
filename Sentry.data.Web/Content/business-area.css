@@ -63,3 +63,25 @@
 .liberty-badge-small {
     font-size: 12px !important
 }
+
+
+
+.alert-icon-container {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.alert-icon {
+    font-size: 24px;
+}
+
+
+.alert-item-content {
+    display: table-cell;
+    padding: 15px 0 10px 20px;
+    width: 100%;
+    vertical-align: middle;
+}
+
+
+
