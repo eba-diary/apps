@@ -15,6 +15,7 @@ namespace Sentry.data.Infrastructure
             /* Retrieve Config(s) and Schema(s) */
             
             var configs = datasetContext.DatasetFileConfigs.Where(x => query.Any(y => x.ConfigId == y.DatasetConfig.ConfigId));
+            var fileschema = datasetContext.Schema.Where(x => query.Any(y => x == y.DatasetConfig.Schema)).ToFuture();
             var schemas = datasetContext.DataElements.Where(x => configs.Any(y => x.DatasetFileConfig.ConfigId == y.ConfigId));
             schemas.FetchMany(x => x.DataElementDetails).ToFuture();
             schemas.FetchMany(x => x.DataObjects).ToFuture();
