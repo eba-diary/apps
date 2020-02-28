@@ -25,7 +25,7 @@ namespace Sentry.data.Goldeneye
         private CancellationTokenSource _tokenSource;
         private CancellationToken _token;
         private IContainer _container;
-        private IRequestContext _requestContext;
+        private IDatasetContext _requestContext;
         private ITicketMonitorService _ticketMonitorService;
         private Scheduler _backgroundJobServer;
         private List<RunningTask> currentTasks = new List<RunningTask>();
@@ -119,7 +119,7 @@ namespace Sentry.data.Goldeneye
                     {
                         try
                         {
-                            _requestContext = _container.GetInstance<IRequestContext>();
+                            _requestContext = _container.GetInstance<IDatasetContext>();
                             _ticketMonitorService = _container.GetInstance<ITicketMonitorService>();
                             complete = true;
                         }
@@ -335,7 +335,7 @@ namespace Sentry.data.Goldeneye
 
 
 
-                            rtjob = _requestContext.RetrieverJob.Where(w => (!(w.DataSource is DfsBasicHsz) && (w.DataSource is DfsBasic || w.DataSource is DfsCustom || w.DataSource is DfsDataFlowBasic)) && w.Schedule == "Instant" && w.IsEnabled).ToList();
+                            rtjob = _requestContext.RetrieverJob.Where(w => (!(w.DataSource is DfsBasicHsz) && (w.DataSource is DfsBasic || w.DataSource is DfsCustom || w.DataSource is DfsDataFlowBasic)) && w.Schedule == "Instant" && w.IsEnabled).FetchAllConfiguration(_requestContext).ToList();
 
 
 

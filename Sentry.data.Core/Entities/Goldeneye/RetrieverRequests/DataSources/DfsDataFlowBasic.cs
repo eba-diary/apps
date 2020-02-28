@@ -26,7 +26,16 @@ namespace Sentry.data.Core
 
         public override Uri CalcRelativeUri(RetrieverJob Job)
         {
-            Uri u = new Uri(Path.Combine(new string[] { BaseUri.ToString(), Job.DataFlow.FlowStorageCode }).ToString());
+            var locbase = BaseUri.ToString();
+            var storagecde = Job.DataFlow.FlowStorageCode;
+            Uri u = new Uri(
+                Path.Combine(
+                    new string[] 
+                    {
+                        locbase,
+                        storagecde
+                    }
+                ).ToString());
 
             return u;
         }

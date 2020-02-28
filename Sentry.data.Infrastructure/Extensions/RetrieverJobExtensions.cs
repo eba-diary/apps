@@ -10,20 +10,22 @@ namespace Sentry.data.Infrastructure
 {
     public static class RetrieverJobExtensions
     {
-        public static List<RetrieverJob> FetchAllConfiguration(this IQueryable<RetrieverJob> query, IDatasetContext datasetContext)
-        {
-            /* Retrieve Config(s) and Schema(s) */
+        //public static List<RetrieverJob> FetchAllConfiguration(this IQueryable<RetrieverJob> query, IDatasetContext datasetContext)
+        //{
+        //    /* Retrieve Config(s) and Schema(s) */
             
-            var configs = datasetContext.DatasetFileConfigs.Where(x => query.Any(y => x.ConfigId == y.DatasetConfig.ConfigId));
-            var schemas = datasetContext.DataElements.Where(x => configs.Any(y => x.DatasetFileConfig.ConfigId == y.ConfigId));
-            schemas.FetchMany(x => x.DataElementDetails).ToFuture();
-            schemas.FetchMany(x => x.DataObjects).ToFuture();
-            query.Fetch(x => x.DatasetConfig).ThenFetchMany(x => x.Schemas).ToFuture();
-            
-            var jobs = query.Fetch(f => f.DatasetConfig).ThenFetch(x => x.ParentDataset).Fetch(f => f.DataSource).ToFuture();
+        //    var configs = datasetContext.DatasetFileConfigs.Where(x => query.Any(y => x.ConfigId == y.DatasetConfig.ConfigId));
+        //    var schemas = datasetContext.DataElements.Where(x => configs.Any(y => x.DatasetFileConfig.ConfigId == y.ConfigId));
+        //    schemas.FetchMany(x => x.DataElementDetails).ToFuture();
+        //    schemas.FetchMany(x => x.DataObjects).ToFuture();
 
-            return jobs.ToList();
-        }
+        //    query.Fetch(x => x.DatasetConfig).ThenFetchMany(x => x.Schemas).ToFuture();
+        //    query.Fetch(f => f.DataSource).ToFuture();
+
+        //    var jobs = query.Fetch(f => f.DatasetConfig).ThenFetch(x => x.ParentDataset);
+
+        //    return jobs.ToList();
+        //}
 
         public static string GetTargetPath(this RetrieverJob basicJob, RetrieverJob executingJob)
         {
