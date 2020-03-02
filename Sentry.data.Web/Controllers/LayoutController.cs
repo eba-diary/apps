@@ -35,6 +35,7 @@ namespace Sentry.data.Web.Controllers
             headerModel.CanEditDataset = SharedContext.CurrentUser.CanModifyDataset;
             headerModel.CanViewReports = SharedContext.CurrentUser.CanViewReports;
             headerModel.CanManageReports = SharedContext.CurrentUser.CanManageReports;
+            headerModel.CanViewBusinessArea = (Configuration.Config.GetHostSetting("CLA-184-ExposeBusinessAreaPage") == "true" || SharedContext.CurrentUser.IsAdmin);
 
             if (SharedContext.CurrentUser.GetType() == typeof(ImpersonatedApplicationUser))
             {

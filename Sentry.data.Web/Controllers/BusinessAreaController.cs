@@ -9,7 +9,6 @@ using System.Web.SessionState;
 namespace Sentry.data.Web.Controllers
 {
     [SessionState(SessionStateBehavior.ReadOnly)]
-    [AuthorizeByPermission(GlobalConstants.PermissionCodes.ADMIN_USER)]
     public class BusinessAreaController : BaseController
     {
         private readonly IBusinessAreaService _businessAreaService;
@@ -25,7 +24,12 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult PersonalLines()
         {
-            // TODO: should we create an event for someone viewing the personal lines landing page??            
+            // TODO: should we create an event for someone viewing the personal lines landing page??
+
+            if (Configuration.Config.GetHostSetting("CLA-184-ExposeBusinessAreaPage") == "false" && !SharedContext.CurrentUser.IsAdmin)
+            {
+                return View("Forbidden");
+            }
 
             BusinessAreaLandingPageModel model = new BusinessAreaLandingPageModel()
             {
