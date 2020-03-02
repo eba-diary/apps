@@ -335,7 +335,7 @@ namespace Sentry.data.Goldeneye
 
 
 
-                            rtjob = _requestContext.RetrieverJob.Where(w => (!(w.DataSource is DfsBasicHsz) && (w.DataSource is DfsBasic || w.DataSource is DfsCustom || w.DataSource is DfsDataFlowBasic)) && w.Schedule == "Instant" && w.IsEnabled).FetchAllConfiguration(_requestContext).ToList();
+                            rtjob = _requestContext.RetrieverJob.Where(w => ((w.DataSource is DfsBasic || w.DataSource is DfsCustom || w.DataSource is DfsDataFlowBasic)) && w.Schedule == "Instant" && w.IsEnabled).FetchAllConfiguration(_requestContext).ToList();
 
 
 
@@ -346,16 +346,9 @@ namespace Sentry.data.Goldeneye
                                 int configID = (job.DatasetConfig == null) ? 0 : job.DatasetConfig.ConfigId;
                                 int dataflowId = (job.DataFlow == null) ? 0 : job.DataFlow.Id;
                                 string watcherName;
-                                if (dataflowId > 0)
-                                {
-                                    watcherName = $"Watch_{job.Id}_df_{job.DataFlow.Id}";
-                                }
-                                else
-                                {
-                                    watcherName = $"Watch_{job.Id}_config_{job.DatasetConfig.ConfigId}";
-                                }
 
-                                
+
+                                watcherName = (dataflowId > 0) ? $"Watch_{job.Id}_df_{job.DataFlow.Id}" : $"Watch_{job.Id}_config_{job.DatasetConfig.ConfigId}";                                
 
                                 //On initial run start all watch tasks for all configs
                                 if (firstRun)

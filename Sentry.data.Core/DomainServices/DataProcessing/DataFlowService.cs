@@ -352,6 +352,7 @@ namespace Sentry.data.Core
             dto.Name = df.Name;
             dto.CreateDTM = df.CreatedDTM;
             dto.CreatedBy = df.CreatedBy;
+            dto.FlowStorageCode = df.FlowStorageCode;
         }
 
         private void MaptToDto(DataFlowDto dto, RetrieverJobDto jobDto)
