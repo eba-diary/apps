@@ -17,6 +17,7 @@ namespace Sentry.data.Web
             Name = dto.Name;
             CreatedBy = dto.CreatedBy;
             CreatedDTM = dto.CreateDTM;
+            FlowStorageCode = dto.FlowStorageCode;
         }
 
         public int Id { get; set; }
@@ -24,5 +25,6 @@ namespace Sentry.data.Web
         public string Name { get; set; }
         public string CreatedBy { get; set; }
         public DateTime CreatedDTM { get; set; }
+        public string FlowStorageCode { get; set; }
     }
 }
