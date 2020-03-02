@@ -230,6 +230,10 @@ namespace Sentry.data.Core
             //This type of dataflow does not need to worry about retrieving data from external sources
             // Data will be pushed by user to S3 and\or DFS drop locations
 
+            //Add default DFS drop location for data flow
+            RetrieverJob dfsDataFlowBasic = _jobService.InstantiateJobsForCreation(df, _datasetContext.DataSources.First(x => x.Name.Contains(GlobalConstants.DataSourceName.DEFAULT_DATAFLOW_DFS_DROP_LOCATION)));
+            _datasetContext.Add(dfsDataFlowBasic);
+
             //Generate ingestion steps (get file to raw location)
             AddDataFlowStep(dto, df, DataActionType.S3Drop);
 
