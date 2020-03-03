@@ -14,39 +14,44 @@ namespace Sentry.data.Web.Controllers
         private readonly IBusinessAreaService _businessAreaService;
         private readonly IEventService _eventService;
         private readonly INotificationService _notificationService;
+        private readonly IDataFeatures _featureFlags;
 
-        public BusinessAreaController(IBusinessAreaService busAreaService, IEventService eventService, INotificationService notificationService)
+        public BusinessAreaController(IBusinessAreaService busAreaService, IEventService eventService, 
+            INotificationService notificationService, IDataFeatures featureFlags)
         {
             _businessAreaService = busAreaService;
             _eventService = eventService;
             _notificationService = notificationService;
+            _featureFlags = featureFlags;
         }
 
         public ActionResult PersonalLines()
         {
             // TODO: should we create an event for someone viewing the personal lines landing page??
 
-            if (Configuration.Config.GetHostSetting("CLA-184-ExposeBusinessAreaPage") == "false" && !SharedContext.CurrentUser.IsAdmin)
+            if (_featureFlags.Expose_BusinessArea_Pages_CLA_1424.GetValue() || SharedContext.CurrentUser.IsAdmin)
+            {
+                BusinessAreaLandingPageModel model = new BusinessAreaLandingPageModel()
+                {
+                    Rows = new List<BusinessAreaTileRowModel>(),
+                    //Notifications = BuildMockNotifications() // temporary!!
+                    Notifications = _notificationService.GetNotificationForBusinessArea(BusinessAreaType.PersonalLines).ToModel()
+                };
+                model.HasActiveNotification = model.Notifications.CriticalNotifications.Any() || model.Notifications.StandardNotifications.Any();
+
+                List<BusinessAreaTileRowDto> rows = _businessAreaService.GetRows(BusinessAreaType.PersonalLines).ToList();
+
+                foreach (BusinessAreaTileRowDto row in rows)
+                {
+                    model.Rows.Add(MapToRowModel(row));
+                }
+
+                return View(model);
+            }
+            else
             {
                 return View("Forbidden");
             }
-
-            BusinessAreaLandingPageModel model = new BusinessAreaLandingPageModel()
-            {
-                Rows = new List<BusinessAreaTileRowModel>(),
-                //Notifications = BuildMockNotifications() // temporary!!
-                Notifications = _notificationService.GetNotificationForBusinessArea(BusinessAreaType.PersonalLines).ToModel()
-            };
-            model.HasActiveNotification = model.Notifications.CriticalNotifications.Any() || model.Notifications.StandardNotifications.Any();
-
-            List<BusinessAreaTileRowDto> rows = _businessAreaService.GetRows(BusinessAreaType.PersonalLines).ToList();
-
-            foreach (BusinessAreaTileRowDto row in rows)
-            {
-                model.Rows.Add(MapToRowModel(row));
-            }
-
-            return View(model);
         }
 
         private BusinessAreaTileRowModel MapToRowModel(BusinessAreaTileRowDto row)
