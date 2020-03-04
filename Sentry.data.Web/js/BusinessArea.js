@@ -10,41 +10,109 @@
 
     initLibertyBell: function ()
     {
-        ////associate click event with libertyBell
-        //$("[id^='libertyBell']").click
-        //(   function ()
-        //    {
-        //        data.BusinessArea.getLibertyBellHtml();
-        //    }
-        //);
-
-        this.getLibertyBellHtml();
-              
+        this.initLibertyBellPopover();
+        this.initLibertyBellPopoverClick();
     },
 
-    getLibertyBellHtml: function ()
+    initLibertyBellPopover: function ()
     {
-        $.get("/BusinessArea/GetLibertyBellHtml", this.displayLibertyBellPopover);      
-
-    },
-
-
-    //this function is executed when LibertyBell is clicked
-    displayLibertyBellPopover: function (e)
-    {
-        $(".liberty-bell").popover
-        (
+        $.ajax({
+            url: "/BusinessArea/GetLibertyBellHtml",
+            method: "GET",
+            dataType: 'html',
+            success: function (obj)
             {
-                //content: "BEWARE THE IDES OF MARCH ssssssssssss sssssssssssssssssssss ssssssssssssssssssssssss ssssssssssssssssss"
-                container: 'body',
-                html: 'true',
-                content: e
-                
+                $(".liberty-bell").popover
+                (
+                    {
+                        container: 'body',
+                        html: 'true',
+                        content: obj,
+                        template: '<div class="popover liberty-popover-medium"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
+                    }
+                );
+
+                data.BusinessArea.showPopover(obj);
+            },
+            failure: function ()
+            {
+                alert('failure');
+            },
+            error: function (obj)
+            {
+                alert('error');
             }
-        )
+        });
+
+    },
+
+    initLibertyBellPopoverClick: function ()
+    {
+        //associate click event with libertyBell so libertyBell is properly updated with latest notifications
+        $("[id^='libertyBell']").click
+        (function () {
+
+                $.ajax({
+                    url: "/BusinessArea/GetLibertyBellHtml",
+                    method: "GET",
+                    dataType: 'html',
+                    success: function (obj) {
+                        $(".liberty-bell").popover
+                            (
+                                {
+                                    container: 'body',
+                                    html: 'true',
+                                    content: obj,
+                                    template: '<div class="popover liberty-popover-medium"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
+                                }
+                            );
+                    },
+                    failure: function () {
+                        alert('failure');
+                    },
+                    error: function (obj) {
+                        alert('error');
+                    }
+                });
+
+            }
+        );
+
+    },
+
+    showPopover: function (obj)
+    {
+        //$.ajax({
+        //    url: "/BusinessArea/GetLibertyBellHtml",
+        //    method: "GET",
+        //    dataType: 'html',
+        //    success: function (obj) {
+        //        $(".liberty-bell").popover
+        //            (
+        //                {
+        //                    container: 'body',
+        //                    html: 'true',
+        //                    content: obj,
+        //                    template: '<div class="popover liberty-popover-medium"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
+        //                }
+        //            );
+
+        //        data.BusinessArea.showPopover(obj);
+        //    },
+        //    failure: function () {
+        //        alert('failure');
+        //    },
+        //    error: function (obj) {
+        //        alert('error');
+        //    }
+        //});
 
 
-        
+
+        var objString = obj.toString();
+        var index = objString.indexOf("#B3140B");
+        if (index != 0)
+            $(".liberty-bell").popover('show');
+
     }
-
 };   

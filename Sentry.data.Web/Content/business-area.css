@@ -65,23 +65,30 @@
 }
 
 
-
-.alert-icon-container {
+.liberty-alert-icon-container {
     display: table-cell;
     vertical-align: middle;
 }
 
-.alert-icon {
+.liberty-alert-icon {
     font-size: 24px;
 }
 
-
-.alert-item-content {
+.liberty-alert-item-content {
     display: table-cell;
     padding: 15px 0 10px 20px;
     width: 100%;
     vertical-align: middle;
 }
 
+.liberty-alert-category {
+    color: #979797;
+    font-size: 12px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
 
-
+.liberty-popover-medium {
+    max-width: 750px;
+}

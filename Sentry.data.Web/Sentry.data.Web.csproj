@@ -16,7 +16,7 @@
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <MvcBuildViews>false</MvcBuildViews>
     <UseIISExpress>true</UseIISExpress>
-    <IISExpressSSLPort />
+    <IISExpressSSLPort>44371</IISExpressSSLPort>
     <IISExpressAnonymousAuthentication />
     <IISExpressWindowsAuthentication />
     <IISExpressUseClassicPipelineMode />
@@ -1357,6 +1357,7 @@
     <Content Include="Views\Config\_DatasetFileConfigCreate.cshtml" />
     <Content Include="Views\BusinessArea\_LibertyBell.cshtml" />
     <Content Include="Views\BusinessArea\_LibertyBellPopover.cshtml" />
+    <Content Include="Views\BusinessArea\_LibertyBellPopoverItem.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -1418,9 +1419,9 @@
           <AutoAssignPort>True</AutoAssignPort>
           <DevelopmentServerPort>2457</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost.sentry.com:2457</IISUrl>
+          <IISUrl>https://localhost:44371</IISUrl>
           <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
-          <IISAppRootUrl>http://localhost.sentry.com:2457</IISAppRootUrl>
+          <IISAppRootUrl>https://localhost.sentry.com:44371</IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

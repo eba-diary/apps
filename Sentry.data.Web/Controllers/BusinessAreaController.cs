@@ -25,8 +25,13 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult PersonalLines()
         {
-            // TODO: should we create an event for someone viewing the personal lines landing page??            
+            BusinessAreaLandingPageModel model = GetBusinessAreaLandingPageModel();
+            return View(model);
+        }
 
+
+        private BusinessAreaLandingPageModel GetBusinessAreaLandingPageModel()
+        {
             BusinessAreaLandingPageModel model = new BusinessAreaLandingPageModel()
             {
                 Rows = new List<BusinessAreaTileRowModel>(),
@@ -42,7 +47,7 @@ namespace Sentry.data.Web.Controllers
                 model.Rows.Add(MapToRowModel(row));
             }
 
-            return View(model);
+            return model;
         }
 
         private BusinessAreaTileRowModel MapToRowModel(BusinessAreaTileRowDto row)
@@ -79,9 +84,8 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public ActionResult GetLibertyBellHtml()
         {
-            return PartialView("_LibertyBellPopover");
+            BusinessAreaLandingPageModel model = GetBusinessAreaLandingPageModel();
+            return PartialView("_LibertyBellPopover", model);
         }
-
-
     }
 }

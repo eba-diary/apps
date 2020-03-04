@@ -1,55 +1,21 @@
-﻿<div class="bs-component" style="max-height:250px; overflow-y: auto;">
+﻿@model Sentry.data.Web.BusinessAreaLandingPageModel
+
+<div class="bs-component" style="max-height:250px; overflow-y: auto;">
     <div class="list-group">
 
-        <div class="list-group-item ">
-            <div class="alert-icon-container">
-                <div class="alert-icon glyphicon glyphicon-warning-sign" style="color: red"> </div>
-            </div>
-            <div class="alert-item-content">
-                <p Class="list-group-item-text"><b>Consume 50 grams of Protein</b></p>
-            </div>
-        </div>
+        @if (Model.HasActiveNotification)
+        {
+            foreach (SystemNotificationItemModel n in Model.Notifications.CriticalNotifications)
+            {
+                @Html.Partial("~/Views/BusinessArea/_LibertyBellPopoverItem.cshtml", n)
+            }
 
-       
-        <div class="list-group-item ">
-            <div class="alert-icon-container">
-                <div class="alert-icon glyphicon glyphicon-warning-sign" style="color: yellow"> </div>
-            </div>
-            <div class="alert-item-content">
-                <p Class="list-group-item-text"><b>Take a Break</b></p>
-            </div>
-        </div>
-
-        <div class="list-group-item ">
-            <div class="alert-icon-container">
-                <div class="alert-icon glyphicon glyphicon-warning-sign" style="color: deepskyblue"> </div>
-            </div>
-            <div class="alert-item-content">
-                <p Class="list-group-item-text"><b>Work</b></p>
-            </div>
-        </div>
-
-        <div class="list-group-item ">
-            <div class="alert-icon-container">
-                <div class="alert-icon glyphicon glyphicon-warning-sign" style="color: deepskyblue"> </div>
-            </div>
-            <div class="alert-item-content">
-                <p Class="list-group-item-text"><b>Irritate Jered</b></p>
-            </div>
-        </div>
-
-        <div class="list-group-item ">
-            <div class="alert-icon-container">
-                <div class="alert-icon glyphicon glyphicon-warning-sign" style="color: deepskyblue"> </div>
-            </div>
-            <div class="alert-item-content">
-                <p Class="list-group-item-text"><b>Leave Work</b></p>
-            </div>
-        </div>
-
-
+            foreach (SystemNotificationItemModel n in Model.Notifications.StandardNotifications)
+            {
+                @Html.Partial("~/Views/BusinessArea/_LibertyBellPopoverItem.cshtml", n)
+            }
+        }
     </div>
-
 </div>
 
 
