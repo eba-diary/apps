@@ -15,6 +15,19 @@
                 @Html.Partial("~/Views/BusinessArea/_LibertyBellPopoverItem.cshtml", n)
             }
         }
+        else
+        {
+            <div class="list-group-item ">
+                <div class="liberty-alert-icon-container">
+                    <div class="liberty-alert-icon glyphicon glyphicon-warning-sign" style="color: green"> </div>
+                </div>
+                <div class="liberty-alert-item-content">
+                    <p Class="list-group-item-text"><b>Active notifications cease to exist.  Don't worry, be happy.</b></p>
+                </div>
+            </div>
+        }
+        <a Class="list-group-item" style="background-color: #eee;text-align:center" >See Older Notifications</a>
+
     </div>
 </div>
 

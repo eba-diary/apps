@@ -106,56 +106,125 @@ data.Notification = {
 
     },
 
-    initNotifications: function ()
-    {
-        toastr.options = {
-            "closeButton": false,
-            "debug": false,
-            "newestOnTop": false,
-            "progressBar": false,
-            "positionClass": "toast-top-right",
-            "preventDuplicates": false,
-            "onclick": null,
-            "showDuration": "0",
-            "hideDuration": "0",
-            "timeOut": "0",
-            "extendedTimeOut": "0",
-            "showEasing": "swing",
-            "hideEasing": "linear",
-            "showMethod": "fadeIn",
-            "hideMethod": "fadeOut"
-        };
-    },
-
     displayNotifications: function (businessAreaType)
     {
-        this.initNotifications();
-     
-        $.get("/Notification/GetNotifications/?businessAreaType=" + businessAreaType, this.displayNotificationsPersonalLines);
-        
+        data.Notification.initLibertyBell(businessAreaType);   
     },
 
-    displayNotificationsPersonalLines: function (e)
+
+    //init all liberty bell behavior
+    initLibertyBell: function (businessAreaType)
     {
-        for (let i = 0; i < e.CriticalNotifications.length; i++)
-        {
-            toastr["error"](e.CriticalNotifications[i].Message, e.CriticalNotifications[i].Title);
-        }
+        this.initLibertyBellPopover(businessAreaType);
+        this.initLibertyBellPopoverClick(businessAreaType);
+    },
 
-        for (let i = 0; i < e.StandardNotifications.length; i++)
-        {
-            if (e.StandardNotifications[i].MessageSeverity === "Warning")
-            {
-                toastr["warning"](e.StandardNotifications[i].Message, e.StandardNotifications[i].Title);
-            }
-        }
+    //set content for popover and only show if necessary
+    initLibertyBellPopover: function (businessAreaType)
+    {
+        $.ajax({
+            url: "/BusinessArea/GetLibertyBellHtml/?businessAreaType=" + businessAreaType,
+            method: "GET",
+            dataType: 'html',
+            success: function (obj) {
+                $(".liberty-bell").popover
+                    (
+                        {
+                            container: 'body',
+                            html: 'true',
+                            content: obj,
+                            template: '<div class="popover liberty-popover-medium"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
+                        }
+                    );
 
-        for (let i = 0; i < e.StandardNotifications.length; i++)
-        {
-            if (e.StandardNotifications[i].MessageSeverity === "Info")
-            {
-                toastr["info"](e.StandardNotifications[i].Message, e.StandardNotifications[i].Title);
+                data.Notification.showPopover(businessAreaType, obj);
+            },
+            failure: function () {
+                alert('failure');
+            },
+            error: function (obj) {
+                alert('error');
             }
-        }
+        });
+    },
+
+    //associate click event with libertyBellPopover so popover is properly updated with latest notifications
+    initLibertyBellPopoverClick: function (businessAreaType)
+    {
+        $("[id^='libertyBell']").click
+        (   function ()
+            {
+                $.ajax({
+                    url: "/BusinessArea/GetLibertyBellHtml/?businessAreaType=" + businessAreaType,
+                    method: "GET",
+                    dataType: 'html',
+                    success: function (obj) {
+                        $(".liberty-bell").popover
+                            (
+                                {
+                                    container: 'body',
+                                    html: 'true',
+                                    content: obj,
+                                    template: '<div class="popover liberty-popover-medium"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
+                                }
+                            );
+                    },
+                    failure: function () {
+                        alert('failure');
+                    },
+                    error: function (obj) {
+                        alert('error');
+                    }
+                });
+            }
+        );
+    },
+
+    //conditionally show popover
+    showPopover: function (businessAreaType, obj)
+    {
+        $.ajax({
+            url: "/Notification/GetNotifications/?businessAreaType=" + businessAreaType,
+            method: "GET",
+            dataType: 'json',
+            success: function (obj) {
+
+                //only show popover intitally if critical notifications exist
+                if (obj.CriticalNotifications.length > 1) {
+                    $(".liberty-bell").popover('show');
+                }
+
+            },
+            failure: function () {
+                alert('failure');
+            },
+            error: function (obj) {
+                alert('error');
+            }
+        });
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 };
