@@ -66,16 +66,20 @@ namespace Sentry.data.Goldeneye
             /// <summary>
             /// Task!
             /// </summary>
-            public RunningTask(Task task, String name)
+            public RunningTask(Task task, String name, int jobId = 0, Uri path = null)
             {
                 this.Task = task;
                 this.Name = name;
+                this.JobId = jobId;
+                this.WatchPath = path;
                 this.TimeStarted = DateTime.Now;
             }
 
             public Task Task { get; set; }
             public string Name { get; set; }
             public DateTime TimeStarted { get; set; }
+            public int JobId { get; set; }
+            public Uri WatchPath { get; set; }
         }
 
         /// <summary>
@@ -136,33 +140,9 @@ namespace Sentry.data.Goldeneye
                         Console.WriteLine("There are currently " + currentTasks.Count + " processes running. " + currentTasks.Count(x => x.Task.IsCompleted) + " Completed.");
                         foreach (RunningTask rt in currentTasks)
                         {
-                            //Console.WriteLine("Name: " + rt.Name  + " - Done : " + rt.Task.IsCompleted  + " - Time Elapsed:" + (DateTime.Now - rt.TimeStarted).TotalSeconds.ToString("0.00") + " seconds");
-
                             if (rt.Task.IsFaulted)
                             {
                                 Console.WriteLine(rt.Name + " faulted.");
-                            }
-                        }
-
-                        //Cleanup Completed or Faulted Dataset Loader Tasks
-                        if (currentTasks.Where(x => x.Name.StartsWith("DatasetLoader : Minute") && (x.Task.IsCompleted || x.Task.IsFaulted)).ToList().Count >= 1 || firstRun)
-                        {
-                            if (firstRun)
-                            {
-                                //Remove all DatasetLoader tasks
-                                var tasks = currentTasks.Where(x => x.Name.StartsWith("DatasetLoader : Minute")).ToList();
-                                tasks.ForEach(x => x.Task.Dispose());
-                                currentTasks.RemoveAll(x => x.Name.StartsWith("DatasetLoader : Minute"));
-                            }
-                            else
-                            {
-                                //If it's completed dispose of it.
-                                var tasks = currentTasks.Where(x => x.Name.StartsWith("DatasetLoader : Minute") && (x.Task.IsCompleted || x.Task.IsFaulted)).ToList();
-                                tasks.ForEach(x => x.Task.Dispose());
-                                foreach (RunningTask task in tasks)
-                                {
-                                    currentTasks.RemoveAll(x => x.Name == task.Name);
-                                }
                             }
                         }
 
@@ -321,65 +301,40 @@ namespace Sentry.data.Goldeneye
                             Job.JobLoggerMessage("Info", "Job update detected, performing RemoveIfExists from Hangfire");
                         }
 
+                        /**************************************
+                         *  DFS Directory Monitors                          
+                        ***************************************/                     
+                        //Get all active watch retriever jobs 
+                        List<RetrieverJob> rtjob = _requestContext.RetrieverJob.Where(w => (!(w.DataSource is DfsBasicHsz) && (w.DataSource is DfsBasic || w.DataSource is DfsCustom)) && w.Schedule == "Instant" && w.IsEnabled).ToList();
 
-                        //Dataset File Config Watch
-                        if (true)
+                        //For initial run of GOLDENEYE, start all active watch retriever jobs
+                        if (firstRun)
                         {
-                            //If it's completed dispose of it.
-                            var tasks = currentTasks.Where(x => x.Name.StartsWith("Watch") && x.Task.IsCompleted).ToList();
-                            tasks.ForEach(x => x.Task.Dispose());
-                            tasks.ForEach(x => currentTasks.RemoveAll(ct => ct.Name == x.Name));
-
-                            List<RetrieverJob> rtjob = null;
-
-
-
-                            rtjob = _requestContext.RetrieverJob.Where(w => (!(w.DataSource is DfsBasicHsz) && (w.DataSource is DfsBasic || w.DataSource is DfsCustom)) && w.Schedule == "Instant" && w.IsEnabled).ToList();
-
-
-
-                            foreach (RetrieverJob job in rtjob)
-                            {
-                                Uri watchPath = job.GetUri();
-                                int jobId = job.Id;
-                                int configID = job.DatasetConfig.ConfigId;
-
-                                //On initial run start all watch tasks for all configs
-                                if (firstRun)
-                                {
-                                    currentTasks.Add(new RunningTask(
-                                        Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath, _token),
-                                                                        TaskCreationOptions.LongRunning).ContinueWith(TaskException,
-                                                                        TaskContinuationOptions.OnlyOnFaulted),
-                                                                        $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
-                                                                );
-                                }
-                                //Restart any completed tasks
-                                else if (tasks.Any(w => Int64.Parse(w.Name.Split('_')[2]) == configID))
-                                {
-                                    currentTasks.Add(new RunningTask(
-                                        Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath, _token),
-                                                                        TaskCreationOptions.LongRunning).ContinueWith(TaskException,
-                                                                        TaskContinuationOptions.OnlyOnFaulted),
-                                                                        $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
-                                    );
-
-                                    Logger.Info($"Resstarting Watch_{job.Id}_{job.DatasetConfig.ConfigId}");
-                                }
-                                //Start any new directories added
-                                else if (!currentTasks.Any(x => x.Name.StartsWith("Watch") && x.Name.Replace("Watch_", "") == $"{job.Id}_{job.DatasetConfig.ConfigId}"))
-                                {
-                                    Logger.Info($"Detected new config ({configID}) to monitor ({watchPath})");
-
-                                    currentTasks.Add(new RunningTask(
-                                        Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, watchPath, _token),
-                                                                        TaskCreationOptions.LongRunning).ContinueWith(TaskException,
-                                                                        TaskContinuationOptions.OnlyOnFaulted),
-                                                                        $"Watch_{job.Id}_{job.DatasetConfig.ConfigId}")
-                                    );
-                                }
-                            }
+                            rtjob.ForEach(s => {
+                                currentTasks.Add(new RunningTask(
+                                    Task.Factory.StartNew(() => (new Watch()).OnStart(s.Id, s.GetUri(), _token, Int32.Parse(Config.GetHostSetting("FileWatcherIterationLimit"))), TaskCreationOptions.LongRunning).
+                                            ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted).
+                                            ContinueWith(task => WatcherTaskRestart(task, s.Id), TaskContinuationOptions.OnlyOnRanToCompletion), 
+                                    $"Watch_{s.Id}_{s.DatasetConfig.ConfigId}",
+                                    s.Id,
+                                    s.GetUri()));
+                            });
                         }
+
+                        //Determine list if jobs which are currently not executed (new since service started)
+                        List<RetrieverJob> newJobList = rtjob.Where(s => !currentTasks.Any(ct => ct.JobId == s.Id)).ToList();
+
+                        //Start watcher task for each new job
+                        newJobList.ForEach(s => {
+                            Logger.Info($"Detected new config ({s.DatasetConfig.ConfigId}) to monitor ({s.GetUri()})");
+                            currentTasks.Add(new RunningTask(
+                                Task.Factory.StartNew(() => (new Watch()).OnStart(s.Id, s.GetUri(), _token, Int32.Parse(Config.GetHostSetting("FileWatcherIterationLimit"))), TaskCreationOptions.LongRunning).
+                                        ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted).
+                                        ContinueWith(task => WatcherTaskRestart(task, s.Id), TaskContinuationOptions.OnlyOnRanToCompletion), 
+                                $"Watch_{s.Id}_{s.DatasetConfig.ConfigId}",
+                                s.Id,
+                                s.GetUri()));
+                        });
 
                         config.LastRunMinute = DateTime.Now;
                     }
@@ -447,6 +402,40 @@ namespace Sentry.data.Goldeneye
         {
             Logger.Fatal("Exception occurred on main Windows Service Task. Stopping Service immediately.", t.Exception);
             Environment.Exit(10001);
+        }
+
+        /// <summary>
+        /// An exception occurred on the main task; log it and shut down the service with an error exit code
+        /// </summary>
+        /// <param name="t">The main thread task</param>
+        /// <param name="jobId"></param>
+        private void WatcherTaskRestart(Task t, int jobId)
+        {
+            //If service is shutting down, we do not want to restart the task
+            if (!_token.IsCancellationRequested)
+            {
+                Logger.Debug($"Restarting watcher - JobId:{jobId} TaskId:{t.Id}");
+
+                //Find associated RunningTask object
+                RunningTask curTask = currentTasks.Where(w => w.JobId == jobId).FirstOrDefault();
+
+                if (curTask == null)
+                {
+                    Logger.Debug($"No associated RunningTask entry - TaskID:{t.Id}");
+                    t.Dispose();
+                }
+                else
+                {
+                    //Create new task
+                    Task newTask = Task.Factory.StartNew(() => (new Watch()).OnStart(curTask.JobId, curTask.WatchPath, _token, Int32.Parse(Config.GetHostSetting("FileWatcherIterationLimit"))),
+                                                                                            TaskCreationOptions.LongRunning).
+                                                                                            ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted).
+                                                                                            ContinueWith(task => WatcherTaskRestart(task, jobId), TaskContinuationOptions.OnlyOnCanceled);
+
+                    //Associate new task with RunningTask object for furture tracking
+                    curTask.Task = newTask;
+                }
+            }
         }
 
         private bool IsFileLocked(string filePath)
