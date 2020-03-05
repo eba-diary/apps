@@ -25,7 +25,7 @@ namespace Sentry.data.Goldeneye
         private CancellationTokenSource _tokenSource;
         private CancellationToken _token;
         private IContainer _container;
-        private IRequestContext _requestContext;
+        private IDatasetContext _requestContext;
         private ITicketMonitorService _ticketMonitorService;
         private Scheduler _backgroundJobServer;
         private List<RunningTask> currentTasks = new List<RunningTask>();
@@ -123,7 +123,7 @@ namespace Sentry.data.Goldeneye
                     {
                         try
                         {
-                            _requestContext = _container.GetInstance<IRequestContext>();
+                            _requestContext = _container.GetInstance<IDatasetContext>();
                             _ticketMonitorService = _container.GetInstance<ITicketMonitorService>();
                             complete = true;
                         }
@@ -269,6 +269,7 @@ namespace Sentry.data.Goldeneye
                             RecurringJob.AddOrUpdate<RetrieverJobService>($"{Job.JobName()}", RetrieverJobService => RetrieverJobService.RunRetrieverJob(Job.Id, JobCancellationToken.Null, null), Job.Schedule, TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time"));
                             Job.JobLoggerMessage("Info", "Job update detected, performing AddOrUpdate to Hangfire");
                         }
+
 
                         if (JobList.Count > 0)
                         {

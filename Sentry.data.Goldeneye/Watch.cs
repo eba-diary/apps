@@ -245,22 +245,21 @@ namespace Sentry.data.Goldeneye
         //  The Service will do the rest on it's periodic run.
         private void OnDeleted(object source, FileSystemEventArgs e)
         {
-            //  Filter out DatasetLoader Request and Failed Request folders.
-            if (Path.GetFileName(e.FullPath).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix")))
+            var path = Path.GetFullPath(e.FullPath).Replace(Path.GetFileName(e.FullPath), "");
+            var fileName = Path.GetFileName(e.FullPath);
+
+            //remove ProcessedFilePrefix if it exists
+            var origFileName = path + ((fileName.StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))) ? fileName.Substring(Configuration.Config.GetHostSetting("ProcessedFilePrefix").Length) : fileName);
+
+            var file = allFiles.FirstOrDefault(x => x.fileName == origFileName);
+            if (file != null)
             {
-                var path = Path.GetFullPath(e.FullPath).Replace(Path.GetFileName(e.FullPath), "");
-                var fileName = Path.GetFileName(e.FullPath);
-                var origFileName = path + fileName.Substring(Configuration.Config.GetHostSetting("ProcessedFilePrefix").Length);
-                var file = allFiles.FirstOrDefault(x => x.fileName == origFileName);
-                if (file != null)
-                {
-                    file.fileCorrectlyDeleted = true;
-                }
-                else
-                {
-                    Logger.Info($"Watch detected delete for non-tracked file: {e.FullPath}");
-                }                
-            }            
+                file.fileCorrectlyDeleted = true;
+            }
+            else
+            {
+                Logger.Info($"Watch detected delete for non-tracked file: {e.FullPath}");
+            }           
         }
         private void OnError(object source, ErrorEventArgs e)
         {
