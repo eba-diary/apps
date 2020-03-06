@@ -30,6 +30,7 @@ namespace Sentry.data.Goldeneye
         private int RetrieverJobId { get; set; }
         private CancellationTokenSource _internalTokenSource;
         private CancellationToken _internalToken;
+        private int _iterationLimit;
 
         /// <summary>
         /// Directory that is to be watched
@@ -59,6 +60,8 @@ namespace Sentry.data.Goldeneye
         /// <param name="token"></param>
         public void Run(string path, CancellationToken token)
         {
+            int iterationCounter = 0;
+            bool iterationLimitFlag = false;
             do
             {
                 var files = allFiles.ToList();
@@ -95,13 +98,20 @@ namespace Sentry.data.Goldeneye
                     }
                 }
 
+                iterationLimitFlag = (iterationCounter++ > _iterationLimit);
+
                 Thread.Sleep(2000);
                 
-            } while (!token.IsCancellationRequested);
+            } while (!token.IsCancellationRequested && !iterationLimitFlag);
 
             if (token.IsCancellationRequested)
             {
                 Logger.Info($"Watch cancelled for Job:{RetrieverJobId.ToString()}");
+            }
+            
+            if (iterationLimitFlag)
+            {
+                Logger.Info($"Watch interation limit restart:{RetrieverJobId.ToString()}");
             }
         }
 
@@ -131,7 +141,7 @@ namespace Sentry.data.Goldeneye
 
             return false;
         }
-  
+
         /// <summary>
         /// This method is called when the Windows Process is started in Core and Program.cs
         /// First it creates a file watcher, gives it a directory from app.config, then assigns it events to watch.
@@ -141,7 +151,8 @@ namespace Sentry.data.Goldeneye
         /// <param name="jobId"></param>
         /// <param name="watchPath"></param>
         /// <param name="token"></param>
-        public void OnStart(int jobId, Uri watchPath, CancellationToken token)
+        /// <param name="iterationLimit"></param>
+        public void OnStart(int jobId, Uri watchPath, CancellationToken token, int iterationLimit = 43200)
         {
 
             try
@@ -149,6 +160,7 @@ namespace Sentry.data.Goldeneye
                 //Create watcher cancellation token
                 _internalTokenSource = new CancellationTokenSource();
                 _internalToken = _internalTokenSource.Token;
+                _iterationLimit = iterationLimit;
 
                 // Create a new FileSystemWatcher and set its properties.
                 watcher = new FileSystemWatcher();
