@@ -13,11 +13,14 @@ namespace Sentry.data.Web.Controllers
     {
         private readonly IDataAssetContext _dataAssetContext;
         private readonly IDatasetContext _datasetContext;
+        private readonly IDataFeatures _featureFlags;
 
-        public LayoutController(IDataAssetContext dataAssetContext, IDatasetContext dsContext)
+        public LayoutController(IDataAssetContext dataAssetContext, IDatasetContext dsContext,
+            IDataFeatures featureFlags)
         {
             _dataAssetContext = dataAssetContext;
             _datasetContext = dsContext;
+            _featureFlags = featureFlags;
         }
 
         [ChildActionOnly()]
@@ -35,6 +38,7 @@ namespace Sentry.data.Web.Controllers
             headerModel.CanEditDataset = SharedContext.CurrentUser.CanModifyDataset;
             headerModel.CanViewReports = SharedContext.CurrentUser.CanViewReports;
             headerModel.CanManageReports = SharedContext.CurrentUser.CanManageReports;
+            headerModel.CanViewBusinessArea = (_featureFlags.Expose_BusinessArea_Pages_CLA_1424.GetValue() || SharedContext.CurrentUser.IsAdmin);
 
             if (SharedContext.CurrentUser.GetType() == typeof(ImpersonatedApplicationUser))
             {
