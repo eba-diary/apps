@@ -9,10 +9,10 @@
     @foreach (DFModel flow in Model)
         {
         <div class="col-lg-12">
-            <div class="col-lg-1"><span><b>ID: </b> <a href="\DataFlow\@flow.Id\Detail\">@flow.Id</a></span></div>
-            <div class="col-lg-4"><span><b>GUID: </b> @flow.FlowGuid</span></div>
-            <div class="col-lg-3"><span><b>NAME: </b> @flow.Name</span></div>
-            <div class="col-lg-3"><span><b>STORAGE CODE: </b> @flow.FlowStorageCode</span></div>
+            <div class="col-lg-1"><span><strong>ID: </strong> <a href="\DataFlow\@flow.Id\Detail\">@flow.Id</a></span></div>
+            <div class="col-lg-4"><span><strong>GUID: </strong> @flow.FlowGuid</span></div>
+            <div class="col-lg-3"><span><strong>NAME: </strong> @flow.Name</span></div>
+            <div class="col-lg-3"><span><strong>STORAGE CODE: </strong> @flow.FlowStorageCode</span></div>
             @*@Html.Display(item => flow, flow.FlowGuid)*@
             @*@Html.DisplayFor(item => flow, flow.Name)
             @Html.DisplayFor(item => flow, flow.CreatedDTM)
