@@ -306,36 +306,65 @@ namespace Sentry.data.Goldeneye
                          *  DFS Directory Monitors                          
                         ***************************************/                     
                         //Get all active watch retriever jobs 
-                        List<RetrieverJob> rtjob = _requestContext.RetrieverJob.Where(w => (!(w.DataSource is DfsBasicHsz) && (w.DataSource is DfsBasic || w.DataSource is DfsCustom)) && w.Schedule == "Instant" && w.IsEnabled).ToList();
+                        List<RetrieverJob> rtJobList = _requestContext.RetrieverJob.Where(w => (w.DataSource is DfsBasic || w.DataSource is DfsCustom || w.DataSource is DfsDataFlowBasic) && w.Schedule == "Instant" && w.IsEnabled).FetchAllConfiguration(_requestContext).ToList();
 
                         //For initial run of GOLDENEYE, start all active watch retriever jobs
                         if (firstRun)
                         {
-                            rtjob.ForEach(s => {
-                                currentTasks.Add(new RunningTask(
-                                    Task.Factory.StartNew(() => (new Watch()).OnStart(s.Id, s.GetUri(), _token, Int32.Parse(Config.GetHostSetting("FileWatcherIterationLimit"))), TaskCreationOptions.LongRunning).
+                            //rtJobList.ForEach(s => {
+                            //    currentTasks.Add(new RunningTask(
+                            //        Task.Factory.StartNew(() => (new Watch()).OnStart(s.Id, s.GetUri(), _token, Int32.Parse(Config.GetHostSetting("FileWatcherIterationLimit"))), TaskCreationOptions.LongRunning).
+                            //                ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted).
+                            //                ContinueWith(task => WatcherTaskRestart(task, s.Id), TaskContinuationOptions.OnlyOnRanToCompletion),
+                            //        GenerateWatcherName(s),
+                            //        s.Id, 
+                            //        s.GetUri()
+                            //        ));
+                            //});
+
+                            foreach (RetrieverJob rJob in rtJobList)
+                            {
+                                Logger.Debug($"Initializing retrieverjob jobId:{rJob.Id}");
+                                var jobId = rJob.Id;
+                                Uri path = rJob.GetUri();
+
+                                Task newTask = Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, path, _token, Int32.Parse(Config.GetHostSetting("FileWatcherIterationLimit"))), TaskCreationOptions.LongRunning).
                                             ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted).
-                                            ContinueWith(task => WatcherTaskRestart(task, s.Id), TaskContinuationOptions.OnlyOnRanToCompletion), 
-                                    $"Watch_{s.Id}_{s.DatasetConfig.ConfigId}",
-                                    s.Id,
-                                    s.GetUri()));
-                            });
+                                            ContinueWith(task => WatcherTaskRestart(task, jobId), TaskContinuationOptions.OnlyOnRanToCompletion);
+
+                                currentTasks.Add(new RunningTask(newTask, GenerateWatcherName(rJob), jobId, path));
+                            }
                         }
 
                         //Determine list if jobs which are currently not executed (new since service started)
-                        List<RetrieverJob> newJobList = rtjob.Where(s => !currentTasks.Any(ct => ct.JobId == s.Id)).ToList();
+                        List<RetrieverJob> newJobList = rtJobList.Where(s => !currentTasks.Any(ct => ct.JobId == s.Id)).ToList();
 
                         //Start watcher task for each new job
-                        newJobList.ForEach(s => {
-                            Logger.Info($"Detected new config ({s.DatasetConfig.ConfigId}) to monitor ({s.GetUri()})");
-                            currentTasks.Add(new RunningTask(
-                                Task.Factory.StartNew(() => (new Watch()).OnStart(s.Id, s.GetUri(), _token, Int32.Parse(Config.GetHostSetting("FileWatcherIterationLimit"))), TaskCreationOptions.LongRunning).
+                        //newJobList.ForEach(s => {
+                        //    Logger.Info($"Detected new config ({s.DatasetConfig.ConfigId}) to monitor ({s.GetUri()})");
+                        //    currentTasks.Add(new RunningTask(
+                        //        Task.Factory.StartNew(() => (new Watch()).OnStart(s.Id, s.GetUri(), _token, Int32.Parse(Config.GetHostSetting("FileWatcherIterationLimit"))), TaskCreationOptions.LongRunning).
+                        //                ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted).
+                        //                ContinueWith(task => WatcherTaskRestart(task, s.Id), TaskContinuationOptions.OnlyOnRanToCompletion),
+                        //        GenerateWatcherName(s),
+                        //        s.Id,
+                        //        s.GetUri()));
+                        //});
+
+                        foreach (RetrieverJob rJob in newJobList)
+                        {
+                            var jobId = rJob.Id;
+                            Uri path = rJob.GetUri();
+                            var configId = rJob.DatasetConfig.ConfigId;
+
+                            Logger.Info($"Detected new config ({configId}) to monitor ({path})");
+
+                            Task newTask = Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, path, _token, Int32.Parse(Config.GetHostSetting("FileWatcherIterationLimit"))), TaskCreationOptions.LongRunning).
                                         ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted).
-                                        ContinueWith(task => WatcherTaskRestart(task, s.Id), TaskContinuationOptions.OnlyOnRanToCompletion), 
-                                $"Watch_{s.Id}_{s.DatasetConfig.ConfigId}",
-                                s.Id,
-                                s.GetUri()));
-                        });
+                                        ContinueWith(task => WatcherTaskRestart(task, jobId), TaskContinuationOptions.OnlyOnRanToCompletion);
+
+                            currentTasks.Add(new RunningTask(newTask, GenerateWatcherName(rJob), jobId, path));
+                        }
 
                         config.LastRunMinute = DateTime.Now;
                     }
@@ -463,5 +492,9 @@ namespace Sentry.data.Goldeneye
             return false;
         }
 
+        private string GenerateWatcherName(RetrieverJob job)
+        {
+            return (job.DataFlow != null) ? $"Watch_{job.Id}_df_{job.DataFlow.Id}" : $"Watch_{job.Id}_config_{job.DatasetConfig.ConfigId}";
+        }
     }
 }
