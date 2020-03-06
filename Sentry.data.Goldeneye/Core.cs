@@ -50,22 +50,28 @@ namespace Sentry.data.Goldeneye
         /// </summary>
         protected class Configuration
         {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
             public DateTime TimeLastStarted { get; set; }
             public DateTime LastRunSecond { get; set; }
             public DateTime LastRunMinute { get; set; }
             public DateTime LastRunHour { get; set; }
             public DateTime LastRunDay { get; set; }
             public DateTime LastRunWeek { get; set; }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         }
 
         /// <summary>
-        /// Task!
+        /// 
         /// </summary>
         protected class RunningTask
         {
             /// <summary>
-            /// Task!
+            /// 
             /// </summary>
+            /// <param name="task"></param>
+            /// <param name="name"></param>
+            /// <param name="jobId"></param>
+            /// <param name="path"></param>
             public RunningTask(Task task, String name, int jobId = 0, Uri path = null)
             {
                 this.Task = task;
@@ -75,11 +81,13 @@ namespace Sentry.data.Goldeneye
                 this.TimeStarted = DateTime.Now;
             }
 
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
             public Task Task { get; set; }
             public string Name { get; set; }
             public DateTime TimeStarted { get; set; }
             public int JobId { get; set; }
             public Uri WatchPath { get; set; }
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
         }
 
         /// <summary>
@@ -308,7 +316,7 @@ namespace Sentry.data.Goldeneye
                         //Get all active watch retriever jobs 
                         List<RetrieverJob> rtJobList = _requestContext.RetrieverJob.Where(w => (w.DataSource is DfsBasic || w.DataSource is DfsCustom || w.DataSource is DfsDataFlowBasic) && w.Schedule == "Instant" && w.IsEnabled).FetchAllConfiguration(_requestContext).ToList();
 
-                        //If initial start of GOLDENEYE, init all jobs else only new jobs;
+                        //If initial start of GOLDENEYE, init all jobs else only new jobs
                         List<RetrieverJob> initJobList = (firstRun) ? rtJobList : rtJobList.Where(s => !currentTasks.Any(ct => ct.JobId == s.Id)).ToList();                        
 
                         //Initilize filewatcher jobs
@@ -405,7 +413,7 @@ namespace Sentry.data.Goldeneye
                 Logger.Debug($"Restarting watcher - JobId:{jobId} TaskId:{t.Id}");
 
                 //Find associated RunningTask object
-                RunningTask curTask = currentTasks.Where(w => w.JobId == jobId).FirstOrDefault();
+                RunningTask curTask = currentTasks.FirstOrDefault(w => w.JobId == jobId);
 
                 if (curTask == null)
                 {

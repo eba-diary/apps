@@ -141,7 +141,7 @@ namespace Sentry.data.Goldeneye
 
             return false;
         }
-  
+
         /// <summary>
         /// This method is called when the Windows Process is started in Core and Program.cs
         /// First it creates a file watcher, gives it a directory from app.config, then assigns it events to watch.
@@ -151,6 +151,7 @@ namespace Sentry.data.Goldeneye
         /// <param name="jobId"></param>
         /// <param name="watchPath"></param>
         /// <param name="token"></param>
+        /// <param name="iterationLimit"></param>
         public void OnStart(int jobId, Uri watchPath, CancellationToken token, int iterationLimit = 43200)
         {
 
