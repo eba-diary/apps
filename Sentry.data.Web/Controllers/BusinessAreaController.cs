@@ -30,12 +30,12 @@ namespace Sentry.data.Web.Controllers
         }
 
 
-        private BusinessAreaLandingPageModel GetBusinessAreaLandingPageModel()
+        private BusinessAreaLandingPageModel GetBusinessAreaLandingPageModel(bool activeOnly=true)
         {
             BusinessAreaLandingPageModel model = new BusinessAreaLandingPageModel()
             {
                 Rows = new List<BusinessAreaTileRowModel>(),
-                Notifications = _notificationService.GetNotificationForBusinessArea(BusinessAreaType.PersonalLines).ToModel()
+                Notifications = _notificationService.GetNotificationForBusinessArea(BusinessAreaType.PersonalLines).ToModel(activeOnly)
             };
             model.HasActiveNotification = model.Notifications.CriticalNotifications.Any() || model.Notifications.StandardNotifications.Any();
 
@@ -82,9 +82,9 @@ namespace Sentry.data.Web.Controllers
 
         //I put this method here because i could leverage the prebuilt GetBusinessAreaLandingPageModel() method which gives me a personalLines BusinessAreaLandingPageModel
         [HttpGet]
-        public ActionResult GetLibertyBellHtml(BusinessAreaType businessAreaType)
+        public ActionResult GetLibertyBellHtml(BusinessAreaType businessAreaType, bool activeOnly)
         {
-            BusinessAreaLandingPageModel model = GetBusinessAreaLandingPageModel();
+            BusinessAreaLandingPageModel model = GetBusinessAreaLandingPageModel(activeOnly);
             return PartialView("_LibertyBellPopover", model);
         }
     }

@@ -92,3 +92,11 @@
 .liberty-popover-medium {
     max-width: 750px;
 }
+
+.showing-active-notifications #showExpiredNotificationBtn {
+    display: none;
+}
+
+.showing-expired-notifications #showActiveNotificationBtn {
+    display: none;
+}
