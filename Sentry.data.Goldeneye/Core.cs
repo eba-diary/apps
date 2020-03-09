@@ -324,7 +324,12 @@ namespace Sentry.data.Goldeneye
                         {
                             try
                             {
-                                InitializeFileWatcherTask(rJob);
+                                var jobId = rJob.Id;
+                                Uri path = rJob.GetUri();
+
+                                Task t = InitializeFileWatcherTask(jobId, path);
+
+                                currentTasks.Add(new RunningTask(t, GenerateWatcherName(rJob), jobId, path));
                             }
                             catch (Exception ex)
                             {
@@ -423,10 +428,7 @@ namespace Sentry.data.Goldeneye
                 else
                 {
                     //Create new task
-                    Task newTask = Task.Factory.StartNew(() => (new Watch()).OnStart(curTask.JobId, curTask.WatchPath, _token, Int32.Parse(Config.GetHostSetting("FileWatcherIterationLimit"))),
-                                                                                            TaskCreationOptions.LongRunning).
-                                                                                            ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted).
-                                                                                            ContinueWith(task => WatcherTaskRestart(task, jobId), TaskContinuationOptions.OnlyOnCanceled);
+                    Task newTask = InitializeFileWatcherTask(curTask.JobId, curTask.WatchPath);
 
                     //Associate new task with RunningTask object for furture tracking
                     curTask.Task = newTask;
@@ -463,16 +465,14 @@ namespace Sentry.data.Goldeneye
             return (job.DataFlow != null) ? $"Watch_{job.Id}_df_{job.DataFlow.Id}" : $"Watch_{job.Id}_config_{job.DatasetConfig.ConfigId}";
         }
 
-        private void InitializeFileWatcherTask(RetrieverJob rJob)
+        private Task InitializeFileWatcherTask(int jobId, Uri path)
         {
-            var jobId = rJob.Id;
-            Uri path = rJob.GetUri();
+            Task newTask = Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, path, _token, Int32.Parse(Config.GetHostSetting("FileWatcherIterationLimit"))),
+                                                    TaskCreationOptions.LongRunning).
+                            ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted).
+                            ContinueWith(task => WatcherTaskRestart(task, jobId), TaskContinuationOptions.OnlyOnCanceled);
 
-            Task newTask = Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, path, _token, Int32.Parse(Config.GetHostSetting("FileWatcherIterationLimit"))), TaskCreationOptions.LongRunning).
-                        ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted).
-                        ContinueWith(task => WatcherTaskRestart(task, jobId), TaskContinuationOptions.OnlyOnRanToCompletion);
-
-            currentTasks.Add(new RunningTask(newTask, GenerateWatcherName(rJob), jobId, path));
+            return newTask;
         }
     }
 }
