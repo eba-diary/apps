@@ -30,6 +30,7 @@ namespace Sentry.data.Goldeneye
         private int RetrieverJobId { get; set; }
         private CancellationTokenSource _internalTokenSource;
         private CancellationToken _internalToken;
+        private int _iterationLimit;
 
         /// <summary>
         /// Directory that is to be watched
@@ -59,6 +60,8 @@ namespace Sentry.data.Goldeneye
         /// <param name="token"></param>
         public void Run(string path, CancellationToken token)
         {
+            int iterationCounter = 0;
+            bool iterationLimitFlag = false;
             do
             {
                 var files = allFiles.ToList();
@@ -95,13 +98,20 @@ namespace Sentry.data.Goldeneye
                     }
                 }
 
+                iterationLimitFlag = (iterationCounter++ > _iterationLimit);
+
                 Thread.Sleep(2000);
                 
-            } while (!token.IsCancellationRequested);
+            } while (!token.IsCancellationRequested && !iterationLimitFlag);
 
             if (token.IsCancellationRequested)
             {
                 Logger.Info($"Watch cancelled for Job:{RetrieverJobId.ToString()}");
+            }
+            
+            if (iterationLimitFlag)
+            {
+                Logger.Info($"Watch interation limit restart:{RetrieverJobId.ToString()}");
             }
         }
 
@@ -131,7 +141,7 @@ namespace Sentry.data.Goldeneye
 
             return false;
         }
-  
+
         /// <summary>
         /// This method is called when the Windows Process is started in Core and Program.cs
         /// First it creates a file watcher, gives it a directory from app.config, then assigns it events to watch.
@@ -141,7 +151,8 @@ namespace Sentry.data.Goldeneye
         /// <param name="jobId"></param>
         /// <param name="watchPath"></param>
         /// <param name="token"></param>
-        public void OnStart(int jobId, Uri watchPath, CancellationToken token)
+        /// <param name="iterationLimit"></param>
+        public void OnStart(int jobId, Uri watchPath, CancellationToken token, int iterationLimit = 43200)
         {
 
             try
@@ -149,6 +160,7 @@ namespace Sentry.data.Goldeneye
                 //Create watcher cancellation token
                 _internalTokenSource = new CancellationTokenSource();
                 _internalToken = _internalTokenSource.Token;
+                _iterationLimit = iterationLimit;
 
                 // Create a new FileSystemWatcher and set its properties.
                 watcher = new FileSystemWatcher();
@@ -234,22 +246,21 @@ namespace Sentry.data.Goldeneye
         //  The Service will do the rest on it's periodic run.
         private void OnDeleted(object source, FileSystemEventArgs e)
         {
-            //  Filter out DatasetLoader Request and Failed Request folders.
-            if (Path.GetFileName(e.FullPath).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix")))
+            var path = Path.GetFullPath(e.FullPath).Replace(Path.GetFileName(e.FullPath), "");
+            var fileName = Path.GetFileName(e.FullPath);
+
+            //remove ProcessedFilePrefix if it exists
+            var origFileName = path + ((fileName.StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))) ? fileName.Substring(Configuration.Config.GetHostSetting("ProcessedFilePrefix").Length) : fileName);
+
+            var file = allFiles.FirstOrDefault(x => x.fileName == origFileName);
+            if (file != null)
             {
-                var path = Path.GetFullPath(e.FullPath).Replace(Path.GetFileName(e.FullPath), "");
-                var fileName = Path.GetFileName(e.FullPath);
-                var origFileName = path + fileName.Substring(Configuration.Config.GetHostSetting("ProcessedFilePrefix").Length);
-                var file = allFiles.FirstOrDefault(x => x.fileName == origFileName);
-                if (file != null)
-                {
-                    file.fileCorrectlyDeleted = true;
-                }
-                else
-                {
-                    Logger.Info($"Watch detected delete for non-tracked file: {e.FullPath}");
-                }                
-            }            
+                file.fileCorrectlyDeleted = true;
+            }
+            else
+            {
+                Logger.Info($"Watch detected delete for non-tracked file: {e.FullPath}");
+            }           
         }
         private void OnError(object source, ErrorEventArgs e)
         {

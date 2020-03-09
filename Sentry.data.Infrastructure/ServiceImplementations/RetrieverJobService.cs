@@ -72,14 +72,6 @@ namespace Sentry.data.Infrastructure
                                     _jobProvider.Execute(_job);
                                 }
                                 break;
-                            case GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION:
-                                _jobProvider = Container.GetInstance<IBaseJobProvider>(_job.DataSource.SourceType);
-                                // Execute job
-                                if (_jobProvider != null)
-                                {
-                                    _jobProvider.Execute(_job, filePath);
-                                }
-                                break;
                             default:
                                 ExecuteLegacyProcessing(filePath);
                                 break;
@@ -96,6 +88,14 @@ namespace Sentry.data.Infrastructure
                                 if (_jobProvider != null)
                                 {
                                     _jobProvider.Execute(_job);
+                                }
+                                break;
+                            case GlobalConstants.DataSoureDiscriminator.DEFAULT_DATAFLOW_DFS_DROP_LOCATION:
+                                _jobProvider = Container.GetInstance<IBaseJobProvider>(_job.DataSource.SourceType);
+                                // Execute job
+                                if (_jobProvider != null)
+                                {
+                                    _jobProvider.Execute(_job, filePath);
                                 }
                                 break;
                             default:

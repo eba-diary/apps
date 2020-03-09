@@ -22,5 +22,6 @@ namespace Sentry.data.Core
         public CompressionJobDto CompressionJob { get; set; }
         public bool IsPreProcessingRequired { get; set; }
         public List<DataFlowPreProcessingTypes> PreProcessingOptions { get; set; }
+        public string FlowStorageCode { get; set; }
     }
 }

@@ -23,19 +23,13 @@
 		<xs:sequence>
 			<xs:choice minOccurs="1" maxOccurs="unbounded">
 				<xs:element name="webHost">
-					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="filters" type="tns:cdtFilters" minOccurs="0" maxOccurs="1"/>
-						</xs:sequence>
+					<xs:complexType>						
 						<xs:attribute name="name" type="xs:string"/>
 						<xs:attribute name="nameRegex" type="xs:string"/>
 					</xs:complexType>
 				</xs:element>
 				<xs:element name="machine">
 					<xs:complexType>
-						<xs:sequence>
-							<xs:element name="filters" type="tns:cdtFilters" minOccurs="0" maxOccurs="1"/>
-						</xs:sequence>
 						<xs:attribute name="name" type="xs:string"/>
 						<xs:attribute name="nameRegex" type="xs:string"/>
 						<xs:attribute name="executablePathRegex" type="xs:string" use="optional"/>
@@ -44,22 +38,6 @@
 			</xs:choice>
 		</xs:sequence>
 		<xs:attribute name="name" type="xs:string"/>
-	</xs:complexType>
-	<xs:complexType name="cdtFilters">
-		<xs:sequence>
-			<xs:choice minOccurs="1" maxOccurs="unbounded">
-				<xs:element name="HttpHeaderPresent">
-					<xs:complexType>
-						<xs:attribute name="headerName" type="xs:string"/>
-					</xs:complexType>
-				</xs:element>
-				<xs:element name="HttpHeaderAbsent">
-					<xs:complexType>
-						<xs:attribute name="headerName" type="xs:string"/>
-					</xs:complexType>
-				</xs:element>
-			</xs:choice>
-		</xs:sequence>
 	</xs:complexType>
 	<xs:complexType name="cdtConfig">
 		<xs:sequence>

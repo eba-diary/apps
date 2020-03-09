@@ -97,6 +97,16 @@ namespace Sentry.data.Infrastructure
                         IS3ServiceProvider _s3ServiceProvider = Container.GetInstance<IS3ServiceProvider>();
 
                         _s3ServiceProvider.UploadDataFile(item, GenerateTargetKey(targetPrefix, item));
+
+                        //Delete file within drop location
+                        try
+                        {
+                            File.Delete(item);
+                        }
+                        catch (Exception ex)
+                        {
+                            _job.JobLoggerMessage("Error", $"Failed Deleting File from drop location : ({item})", ex);
+                        }
                     }   
                 }
                 catch (Exception ex)
