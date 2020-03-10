@@ -109,10 +109,11 @@ data.Notification = {
     displayNotifications: function (businessAreaType)
     {
         data.Notification.initToast();
-        data.Notification.libertyBellPopoverContent(businessAreaType);
+        data.Notification.libertyBellPopoverClickAttack();
+        data.Notification.libertyBellSetPopoverContent(businessAreaType);
         data.Notification.libertyBellPopoverOnClick(businessAreaType);
-        data.Notification.expiredNotificationsBtnOnClick(businessAreaType);
-        data.Notification.activeNotificationsBtnOnClick(businessAreaType);
+        data.Notification.libertyBellExpiredBtnOnClick(businessAreaType);
+        data.Notification.libertyBellActiveBtnOnClick(businessAreaType);
     },
 
     initToast: function ()
@@ -141,8 +142,26 @@ data.Notification = {
         toastr[severity](message);
     },
 
+    //this function takes care of popover default behavior oddities to allow popover to close outside of body and to NOT take 2 clicks to open or close
+    libertyBellPopoverClickAttack: function ()
+    {
+        // hide any open popovers when the anywhere else besides popover is clicked
+        $('body').on('click', function (e) {
+            $('.liberty-bell').each(function () {
+                if (!$(this).is(e.target) && $(this).has(e.target).length === 0 && $('.popover').has(e.target).length === 0) {
+                    $(this).popover('hide');
+                }
+            });
+        });
+
+        //reset state of popover to click liberty bell once to re-open after close
+        $('body').on('hidden.bs.popover', function (e) {
+            $(e.target).data("bs.popover").inState = { click: false, hover: false, focus: false };
+        });
+    },
+
     //set content for popover and only show if necessary
-    libertyBellPopoverContent: function (businessAreaType)
+    libertyBellSetPopoverContent: function (businessAreaType)
     {
         var errorMessage = 'Error getting Notifications on Page Load';
 
@@ -186,7 +205,8 @@ data.Notification = {
             dataType: 'json',
             success: function (obj)
             {
-                badgeCount = obj.CriticalNotifications.length + obj.StandardNotifications;
+                var badgeCount = obj.CriticalNotifications.length + obj.StandardNotifications;
+
                 if (badgeCount == 0) {
                     $(".liberty-badge-red").removeClass("liberty-badge-red").addClass("liberty-badge-white");
                 }
@@ -220,6 +240,7 @@ data.Notification = {
                     success: function (obj)
                     {
                         $(".liberty-bell").data("bs.popover").options.content = obj;
+                        $(".liberty-bell").popover('show');     //i had to include this for some reason to show refreshed popover, the cost is a flicker of reload
                         data.Notification.updateBadgeContent(businessAreaType);
                     },
                     failure: function () {
@@ -233,9 +254,8 @@ data.Notification = {
         );
     },
 
-
     //conditionally show popover
-    showPopoverFirstTime: function (businessAreaType, obj)
+    showPopoverFirstTime: function (businessAreaType)
     {
         var errorMessage = 'Error determining if Critical Notifications exist';
 
@@ -262,7 +282,7 @@ data.Notification = {
     },
 
     //click event that happens when they click the show expired btn
-    expiredNotificationsBtnOnClick: function (businessAreaType)
+    libertyBellExpiredBtnOnClick: function (businessAreaType)
     {
         var errorMessage = 'Error getting Active Notifications';
 
@@ -293,7 +313,7 @@ data.Notification = {
     },
 
     //click event that happens when they click the show active btn
-    activeNotificationsBtnOnClick: function (businessAreaType)
+    libertyBellActiveBtnOnClick: function (businessAreaType)
     {
         var errorMessage = 'Error getting Expired Notifications';
 

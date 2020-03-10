@@ -16,6 +16,6 @@ namespace Sentry.data.Web
         public List<SystemNotificationItemModel> CriticalNotifications { get; set; }
         public List<SystemNotificationItemModel> StandardNotifications { get; set; }
 
-        public int NotificationCount => CriticalNotifications.Count() + StandardNotifications.Count();
+        public int NotificationCount => CriticalNotifications.Count + StandardNotifications.Count;
     }
 }
