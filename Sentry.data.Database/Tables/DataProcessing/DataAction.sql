@@ -1,11 +1,12 @@
 ﻿CREATE TABLE [dbo].[DataAction]
 (
-	[Id] INT NOT NULL IDENTITY , 
+	[Id] INT NOT NULL, 
     [ActionGuid] UNIQUEIDENTIFIER NOT NULL, 
     [Name] VARCHAR(50) NOT NULL, 
     [TargetStoragePrefix] VARCHAR(250) NOT NULL, 
     [TargetStorageBucket] VARCHAR(250) NOT NULL, 
 	[ActionType] VARCHAR(250) NOT NULL, 
+    [TargetStorageSchemaAware] BIT NOT NULL, 
     CONSTRAINT [PK_DataAction] PRIMARY KEY CLUSTERED
 (
 	[Id] ASC

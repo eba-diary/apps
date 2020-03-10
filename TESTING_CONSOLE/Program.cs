@@ -89,7 +89,7 @@ namespace TESTING_CONSOLE
                                 {
                                     name = "sentry-dataset-management-np"
                                 },
-                                _object = new Sentry.data.Core.Entities.S3.Object()
+                                Object = new Sentry.data.Core.Entities.S3.Object()
                                 {
                                     key = $"data-dev/sentry/customeronelinking/184/2017/7/27/CustomerOneAccountLinking.csv"
                                 }

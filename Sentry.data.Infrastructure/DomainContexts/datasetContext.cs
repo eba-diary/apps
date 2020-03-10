@@ -415,6 +415,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<SchemaMapAction> SchemaMapAction
+        {
+            get
+            {
+                return Query<SchemaMapAction>();
+            }
+        }
+
         public IQueryable<RawStorageAction> RawStorageAction
         {
             get
@@ -447,11 +455,27 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<GoogleApiAction> GoogleApiAction
+        {
+            get
+            {
+                return Query<GoogleApiAction>();
+            }
+        }
+
         public IQueryable<SchemaMap> SchemaMap
         {
             get
             {
                 return Query<SchemaMap>();
+            }
+        }
+
+        public IQueryable<ClaimIQAction> ClaimIQAction
+        {
+            get
+            {
+                return Query<ClaimIQAction>();
             }
         }
 
@@ -709,6 +733,19 @@ namespace Sentry.data.Infrastructure
             Array.Reverse(charArray);
 
             return Int32.Parse(new string(charArray));
+        }
+
+        public string GetNextDataFlowStorageCDE()
+        {
+            string sqlConnString = Sentry.Configuration.Config.GetHostSetting("DatabaseConnectionString");
+            string sqlQueryString = $"SELECT NEXT VALUE FOR seq_DataFlowStorageCDE";
+            int result = ExecuteQuery(sqlConnString, sqlQueryString);
+
+            /*****************************
+             * We return an int from the sequence, then convert to string and pad left with zeros (0)
+             *  This gives all values the same length provides better sorting capabilities
+             *****************************/
+            return result.ToString().PadLeft(7, '0');
         }
 
         private int ExecuteQuery(string sqlConnStr, string sqlQueryStr)

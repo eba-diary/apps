@@ -11,5 +11,7 @@ namespace Sentry.data.Infrastructure
         public abstract void ConfigureProvider(RetrieverJob job);
 
         public abstract void Execute(RetrieverJob job);
+
+        public abstract void Execute(RetrieverJob job, string filePath);
     }
 }

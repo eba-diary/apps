@@ -25,7 +25,7 @@ namespace Sentry.data.Infrastructure
 
         public async Task ExecuteDependenciesAsync(S3ObjectEvent s3e)
         {
-            await ExecuteDependenciesAsync(s3e.s3.bucket.name, s3e.s3._object.key, s3e);
+            await ExecuteDependenciesAsync(s3e.s3.bucket.name, s3e.s3.Object.key, s3e);
             //await ExecuteDependenciesAsync("sentry-dataset-management-np-nr", "data/17/TestFile.csv");
         }
         public async Task ExecuteDependenciesAsync(string bucket, string key, S3ObjectEvent s3Event)
@@ -39,14 +39,14 @@ namespace Sentry.data.Infrastructure
                 IDataStepService _stepService = container.GetInstance<IDataStepService>();
 
                 Logger.Info($"start-method <executedependencies>");
-
+                Logger.Debug($"<executedependencies> bucket:{bucket} key:{key} s3Event:{JsonConvert.SerializeObject(s3Event)}");
                 //Get prefix
                 string stepPrefix = GetDataFlowStepPrefix(key);
                 if (stepPrefix != null)
                 {
                     try
                     {
-                        //Find Dependencies
+                        //Find DataFlow step which should be started based on step trigger prefix
                         List<DataFlowStep> stepList = dsContext.DataFlowStep.Where(w => w.TriggerKey == stepPrefix).ToList();
 
                         _flow = stepList.Select(s => s.DataFlow).Distinct().Single();
@@ -89,9 +89,6 @@ namespace Sentry.data.Infrastructure
                                 Logger.AddContextVariable(new TextVariable("runinstanceguid", runInstanceGuid));
                             }
 
-                            ////step.GenerateStartEvent(bucket, key, flowExecutionGuid);
-                            //step.LogExecution(flowExecutionGuid, RunInstanceGuid, $"dataflowprovider-sendingstartevent", Log_Level.Debug);
-                            //dsContext.SaveChanges();
                             _stepService.PublishStartEvent(step, flowExecutionGuid, runInstanceGuid, s3Event);
                         }
 
@@ -134,7 +131,7 @@ namespace Sentry.data.Infrastructure
                     Logger.AddContextVariable(new TextVariable("flowexecutionguid", stepEvent.FlowExecutionGuid));
 
                     S3ObjectEvent s3Event = JsonConvert.DeserializeObject<S3ObjectEvent>(stepEvent.OriginalS3Event);
-                    Logger.AddContextVariable(new LongVariable("objectsize", (long)s3Event.s3._object.size));
+                    Logger.AddContextVariable(new LongVariable("objectsize", (long)s3Event.s3.Object.size));
                     if (stepEvent.RunInstanceGuid != null)
                     {
                         Logger.AddContextVariable(new TextVariable("runinstanceguid", stepEvent.RunInstanceGuid));
@@ -172,48 +169,26 @@ namespace Sentry.data.Infrastructure
             Logger.Info($"start-method <getdataflowstepprefix>");
 
             string filePrefix = null;
-            //three level prefixes - temp locations
-            // example -  <temp-file prefix>/<step prefix>/<data flow id>/
-            if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX) || 
+            if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.UNCOMPRESS_ZIP_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX) || 
                 key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX) ||
-                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX)
-               )
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CONVERT_TO_PARQUET_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_MAP_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.GOOGLEAPI_PREPROCESSING_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CLAIMIQ_PREPROCESSING_PREFIX))
             {
                 int idx = GetNthIndex(key, '/', 4);
                 filePrefix = key.Substring(0, (idx + 1));
             }
-            //two level prefixes - non-temp locations
-            // example -  <rawstorage prefix>/<job Id>/
-            if (filePrefix == null && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX) ||
-                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CONVERT_TO_PARQUET_PREFIX)
-               )
+
+            if (filePrefix == null && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.DROP_LOCATION_PREFIX))
             {
                 int idx = GetNthIndex(key, '/', 3);
                 filePrefix = key.Substring(0, (idx + 1));
             }
 
-            //For drop location prefixes
-            // single level prefix
-            // example = <data flow id>/
-            if (filePrefix == null)
-            {
-                int idx = GetNthIndex(key, '/', 1);
-                bool IsInt = int.TryParse(key.Substring(0, (idx)), out int jobId);
-                bool validFlowId = false;
-                if (IsInt)
-                {                    
-                    using (IContainer container = Bootstrapper.Container.GetNestedContainer())
-                    {
-                        IDatasetContext dsContext = container.GetInstance<IDatasetContext>();
-                        validFlowId = dsContext.DataFlow.Any(a => a.Id == jobId);
-                    }
-                }
-
-                if (validFlowId)
-                {
-                    filePrefix = key.Substring(0, (idx + 1));
-                }                
-            }
             Logger.Info($"end-method <getdataflowstepprefix>");
 
             return filePrefix;            
@@ -225,31 +200,28 @@ namespace Sentry.data.Infrastructure
 
             string guidPrefix = null;
 
-            //four level prefixes - temp locations
-            if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX))
-            {
-                int strtIdx = GetNthIndex(key, '/', 5);
-                int endIdx = GetNthIndex(key, '/', 6);
-                guidPrefix = key.Substring(strtIdx + 1, (endIdx - strtIdx) - 1);
-            }
-
-            //three level prefixes - temp locations
-            // example -  <temp-file prefix>/<step prefix>/<data flow id>/
-            if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX)
-               )
+            //five level prefixes - temp locations
+            //temp-file/<step prefix>/<env ind>/<data flow id>/<flowGuid>/
+            if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.S3_DROP_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.UNCOMPRESS_ZIP_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_LOAD_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.SCHEMA_MAP_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.GOOGLEAPI_PREPROCESSING_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CLAIMIQ_PREPROCESSING_PREFIX))
             {
                 int strtIdx = GetNthIndex(key, '/', 4);
                 int endIdx = GetNthIndex(key, '/', 5);
                 guidPrefix = key.Substring(strtIdx + 1, (endIdx - strtIdx) - 1);
             }
 
-            //two level prefixes - non-temp locations
-            // example -  <rawstorage prefix>/<job Id>/
-            if (guidPrefix == null && key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_STORAGE_PREFIX) ||
-                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX))
+            //six level prefixes - temp locations
+            //temp-file/<step prefix>/<env ind>/<data flow id>/<storagecode>/<flowGuid>/
+            if (key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX) ||
+                key.StartsWith(GlobalConstants.DataFlowTargetPrefixes.CONVERT_TO_PARQUET_PREFIX))
             {
-                int strtIdx = GetNthIndex(key, '/', 3);
-                int endIdx = GetNthIndex(key, '/', 4);
+                int strtIdx = GetNthIndex(key, '/', 5);
+                int endIdx = GetNthIndex(key, '/', 6);
                 guidPrefix = key.Substring(strtIdx + 1, (endIdx - strtIdx) - 1);
             }
 

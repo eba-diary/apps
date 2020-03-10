@@ -144,6 +144,28 @@ namespace Sentry.data.Web.Helpers
 
 
         }
+
+        internal static IEnumerable<SelectListItem> BuildPreProcessingOptionsDropdown(List<int> preProcessingOptionSelections)
+        {
+            List<SelectListItem> items;
+
+            if (preProcessingOptionSelections == null || !preProcessingOptionSelections.Any())
+            {
+                items = Enum.GetValues(typeof(DataFlowPreProcessingTypes)).Cast<DataFlowPreProcessingTypes>().Select(v => new SelectListItem { Text = v.GetDescription(), Value = ((int)v).ToString() }).ToList();
+            }
+            else
+            {
+                items = Enum.GetValues(typeof(DataFlowPreProcessingTypes)).Cast<DataFlowPreProcessingTypes>().Select(v =>
+                    new SelectListItem
+                    {
+                        Selected = (preProcessingOptionSelections.Contains((int)v)),
+                        Text = v.GetDescription(),
+                        Value = v.ToString()
+                    }).ToList();
+            }
+            return items;
+        }
+
         public static IEnumerable<SelectListItem> GetCategoryList(IDatasetContext _datasetContext)
         {
             IEnumerable<SelectListItem> var = _datasetContext.Categories.Where(w => w.ObjectType == GlobalConstants.DataEntityCodes.DATASET).Select((c) => new SelectListItem { Text = c.Name, Value = c.Id.ToString() });
@@ -448,23 +470,46 @@ namespace Sentry.data.Web.Helpers
 
         public static IEnumerable<SelectListItem> BuildCompressionDropdown(bool isCompressed)
         {
-            List<SelectListItem> compressionList = new List<SelectListItem>();
-            
-            compressionList.Add(new SelectListItem()
+            List<SelectListItem> compressionList = new List<SelectListItem>
             {
-                Text = "Yes",
-                Value = "true",
-                Selected = isCompressed == true
-            });
+                new SelectListItem()
+                {
+                    Text = "Yes",
+                    Value = "true",
+                    Selected = isCompressed == true
+                },
 
-            compressionList.Add(new SelectListItem()
-            {
-                Text = "No",
-                Value = "false",
-                Selected = isCompressed == false
-            });
+                new SelectListItem()
+                {
+                    Text = "No",
+                    Value = "false",
+                    Selected = isCompressed == false
+                }
+            };
 
             return compressionList;
+        }
+
+        public static IEnumerable<SelectListItem> BuildPreProcessingDropdown(bool isPreProcessingRequired)
+        {
+            List<SelectListItem> preProcessingRequired = new List<SelectListItem>
+            {
+                new SelectListItem()
+                {
+                    Text = "Yes",
+                    Value = "true",
+                    Selected = isPreProcessingRequired == true
+                },
+
+                new SelectListItem()
+                {
+                    Text = "No",
+                    Value = "false",
+                    Selected = isPreProcessingRequired == false
+                }
+            };
+
+            return preProcessingRequired;
         }
 
         internal static IEnumerable<SelectListItem> BuildSchedulePickerDropdown(string schedule)
