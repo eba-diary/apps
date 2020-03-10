@@ -496,10 +496,10 @@ namespace Sentry.data.Infrastructure
 
                         try
                         {
+                            _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_STARTED_STATE);
                             switch (_job.JobOptions.FtpPattern)
                             {
-                                case
-                                FtpPattern.NoPattern:
+                                case FtpPattern.NoPattern:
                                 default:
                                     GenericFtpExecution(_job.GetUri().AbsoluteUri);
                                     break;
@@ -513,6 +513,7 @@ namespace Sentry.data.Infrastructure
                                     ProcessNewFilesSinceLastExecution();
                                     break;
                             }
+                            _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE);
                         }
                         catch (Exception ex)
                         {
@@ -759,18 +760,12 @@ namespace Sentry.data.Infrastructure
 
         #region FTP Processing
         private void GenericFtpExecution(string uri)
-        {            
-            _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_STARTED_STATE);
-
+        {
             RetrieveFTPFile(uri);
-
-            _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE);
         }
 
         private void ProcessNewFilesSinceLastExecution()
         {
-            _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_STARTED_STATE);
-
             JobHistory lastExecution = _jobService.GetLastExecution(_job);
 
             string fileName = Path.GetFileName(_job.GetUri().AbsoluteUri);
@@ -816,14 +811,10 @@ namespace Sentry.data.Infrastructure
                 string remoteUrl = _job.GetUri().AbsoluteUri + file.Name;
                 RetrieveFTPFile(remoteUrl);
             }
-
-            _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE);
         }
 
         private void ProcessRegexFileSinceLastExecution()
         {
-            _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_STARTED_STATE);
-
             JobHistory lastExecution = _jobService.GetLastExecution(_job);
 
             string fileName = Path.GetFileName(_job.GetUri().AbsoluteUri);
@@ -872,8 +863,6 @@ namespace Sentry.data.Infrastructure
                 string remoteUrl = _job.GetUri().AbsoluteUri + file.Name;
                 RetrieveFTPFile(remoteUrl);
             }
-
-            _jobService.RecordJobState(_submission, _job, GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE);
         }
 
         //private void ProcessSpecificFileArchive()
