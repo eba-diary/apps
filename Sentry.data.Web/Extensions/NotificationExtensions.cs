@@ -96,12 +96,12 @@ namespace Sentry.data.Web
         {
             SystemNotificationModel model = new SystemNotificationModel();
 
-            foreach (var notification in dtos.Where(w => w.IsActive == activeOnly && w.MessageSeverity == NotificationSeverity.Critical).OrderBy(o => o.StartTime))
+            foreach (var notification in dtos.Where(w => w.IsActive == activeOnly && w.MessageSeverity == NotificationSeverity.Critical).OrderByDescending(o => o.StartTime))
             {
                 model.CriticalNotifications.Add(notification.ToModel());
             }
 
-            foreach (var notificaiton in dtos.Where(w => w.IsActive == activeOnly && w.MessageSeverity != NotificationSeverity.Critical).OrderBy(o => o.MessageSeverity).ThenBy(o2 => o2.StartTime))
+            foreach (var notificaiton in dtos.Where(w => w.IsActive == activeOnly && w.MessageSeverity != NotificationSeverity.Critical).OrderBy(o => o.MessageSeverity).ThenByDescending(o2 => o2.StartTime))
             {
                 model.StandardNotifications.Add(notificaiton.ToModel());
             }

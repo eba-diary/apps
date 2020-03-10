@@ -60,6 +60,11 @@
     background-color: #f44336 !important
 }
 
+.liberty-badge-white {
+    color: white;
+    background-color: white;
+}
+
 .liberty-badge-small {
     font-size: 12px !important
 }

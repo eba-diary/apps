@@ -19,10 +19,17 @@ namespace Sentry.data.Web
             string c;
 
             if (MessageSeverity == NotificationSeverity.Critical.ToString())
-                c = "#B3140B";
+            {
+                c = "red";
+            }
             else if (MessageSeverity == NotificationSeverity.Warning.ToString())
+            {
                 c = "orange";
-            else c = "blue";
+            }
+            else
+            {
+                c = "blue";
+            }
 
            return c;
         }

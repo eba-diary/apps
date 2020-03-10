@@ -108,15 +108,44 @@ data.Notification = {
 
     displayNotifications: function (businessAreaType)
     {
+        data.Notification.initToast();
         data.Notification.libertyBellPopoverContent(businessAreaType);
         data.Notification.libertyBellPopoverOnClick(businessAreaType);
-        data.Notification.showExpiredNotificationsBtnOnClick(businessAreaType);
-        data.Notification.showActiveNotificationsBtnOnClick(businessAreaType);
+        data.Notification.expiredNotificationsBtnOnClick(businessAreaType);
+        data.Notification.activeNotificationsBtnOnClick(businessAreaType);
+    },
+
+    initToast: function ()
+    {
+        toastr.options = {
+            "closeButton": false,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": false,
+            "positionClass": "toast-top-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "0",
+            "hideDuration": "0",
+            "timeOut": "0",
+            "extendedTimeOut": "0",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+    },
+
+    makeToast: function (severity, message)
+    {
+        toastr[severity](message);
     },
 
     //set content for popover and only show if necessary
     libertyBellPopoverContent: function (businessAreaType)
     {
+        var errorMessage = 'Error getting Notifications on Page Load';
+
         $.ajax({
             url: "/BusinessArea/GetLibertyBellHtml",
             data: { BusinessAreaType: businessAreaType, activeOnly: true }, 
@@ -125,23 +154,52 @@ data.Notification = {
             success: function (obj)
             {
                 $(".liberty-bell").popover
-                    (
-                        {
-                            container: 'body',
-                            html: 'true',
-                            content: obj,
-                            template: '<div class="popover liberty-popover-medium"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
-                        }
-                    );
+                (
+                    {
+                        container: 'body',
+                        html: 'true',
+                        content: obj,
+                        template: '<div class="popover liberty-popover-medium"><div class="arrow"></div><div class="popover-inner"><h3 class="popover-title"></h3><div class="popover-content"><p></p></div></div></div>'
+                    }
+                );
 
                 //call to show or not show popover
-                data.Notification.showPopover(businessAreaType, obj);      
+                data.Notification.showPopoverFirstTime(businessAreaType, obj);      
             },
             failure: function () {
-                alert('failure');
+                makeToast('error', errorMessage);
             },
-            error: function (obj) {
-                alert('error jive');
+            error: function () {
+                makeToast('error', errorMessage);
+            }
+        });
+    },
+
+
+    updateBadgeContent: function (businessAreaType) {
+        
+        var errorMessage = 'Error updateBadgeContent';
+
+        $.ajax({
+            url: "/Notification/GetNotifications/?businessAreaType=" + businessAreaType,
+            method: "GET",
+            dataType: 'json',
+            success: function (obj)
+            {
+                badgeCount = obj.CriticalNotifications.length + obj.StandardNotifications;
+                if (badgeCount == 0) {
+                    $(".liberty-badge-red").removeClass("liberty-badge-red").addClass("liberty-badge-white");
+                }
+                else if (badgeCount > 0) {
+                    $(".liberty-badge-white").removeClass("liberty-badge-white").addClass("liberty-badge-red");
+                    $('.liberty-badge').html(badgeCount);
+                }
+            },
+            failure: function () {
+                makeToast('error', errorMessage);
+            },
+            error: function () {
+                makeToast('error', errorMessage);
             }
         });
     },
@@ -149,10 +207,11 @@ data.Notification = {
     //associate click event with libertyBellPopover so popover is properly updated with latest notifications
     libertyBellPopoverOnClick: function (businessAreaType)
     {
+        var errorMessage = 'Error refreshing Active Notifications after Bell Click';
+
         $("[id^='libertyBell']").click
         (   function ()
             {
-                
                 $.ajax({
                     url: "/BusinessArea/GetLibertyBellHtml",
                     data: { BusinessAreaType: businessAreaType, activeOnly: true }, 
@@ -161,22 +220,25 @@ data.Notification = {
                     success: function (obj)
                     {
                         $(".liberty-bell").data("bs.popover").options.content = obj;
+                        data.Notification.updateBadgeContent(businessAreaType);
                     },
                     failure: function () {
-                        alert('failure');
+                        makeToast('error', errorMessage);
                     },
-                    error: function (obj) {
-                        alert('error');
+                    error: function () {
+                        makeToast('error', errorMessage);
                     }
                 });
-                
             }
         );
     },
 
 
     //conditionally show popover
-    showPopover: function (businessAreaType, obj) {
+    showPopoverFirstTime: function (businessAreaType, obj)
+    {
+        var errorMessage = 'Error determining if Critical Notifications exist';
+
         $.ajax({
             url: "/Notification/GetNotifications/?businessAreaType=" + businessAreaType,
             method: "GET",
@@ -191,69 +253,73 @@ data.Notification = {
 
             },
             failure: function () {
-                alert('failure');
+                makeToast('error', errorMessage);
             },
-            error: function (obj) {
-                alert('error');
+            error: function () {
+                makeToast('error', errorMessage);
             }
         });
     },
 
     //click event that happens when they click the show expired btn
-    showExpiredNotificationsBtnOnClick: function (businessAreaType)
+    expiredNotificationsBtnOnClick: function (businessAreaType)
     {
+        var errorMessage = 'Error getting Active Notifications';
+
         $("body").on
-            ("click", "#showExpiredNotificationBtn",   function () {
-
-            $.ajax({
-                url: "/BusinessArea/GetLibertyBellHtml",
-                data: { BusinessAreaType: businessAreaType, activeOnly: true },
-                method: "GET",
-                dataType: 'html',
-                success: function (obj)
+            ("click", "#showExpiredNotificationBtn",
+                function ()
                 {
-
-                    $(".liberty-bell").data("bs.popover").options.content = obj;
-                    $(".liberty-bell").popover('show');
-                    $(".showing-expired-notifications").removeClass("showing-expired-notifications").addClass("showing-active-notifications");
-                },
-                failure: function () {
-                    alert('failure');
-                },
-                error: function (obj) {
-                    alert('error');
+                    $.ajax({
+                        url: "/BusinessArea/GetLibertyBellHtml",
+                        data: { BusinessAreaType: businessAreaType, activeOnly: true },
+                        method: "GET",
+                        dataType: 'html',
+                        success: function (obj)
+                        {
+                            $(".liberty-bell").data("bs.popover").options.content = obj;
+                            $(".liberty-bell").popover('show');
+                            $(".showing-expired-notifications").removeClass("showing-expired-notifications").addClass("showing-active-notifications");
+                        },
+                        failure: function () {
+                            makeToast('error', errorMessage);
+                        },
+                        error: function () {
+                            makeToast('error', errorMessage);
+                        }
+                    });
                 }
-            });
-            }
         );
-
-
     },
 
     //click event that happens when they click the show active btn
-    showActiveNotificationsBtnOnClick: function (businessAreaType) {
+    activeNotificationsBtnOnClick: function (businessAreaType)
+    {
+        var errorMessage = 'Error getting Expired Notifications';
+
         $("body").on
-            ("click", "#showActiveNotificationBtn", function () {
+            ("click", "#showActiveNotificationBtn",
+                function ()
+                {
+                    $.ajax({
+                        url: "/BusinessArea/GetLibertyBellHtml",
+                        data: { BusinessAreaType: businessAreaType, activeOnly: false },
+                        method: "GET",
+                        dataType: 'html',
+                        success: function (obj) {
 
-                $.ajax({
-                    url: "/BusinessArea/GetLibertyBellHtml",
-                    data: { BusinessAreaType: businessAreaType, activeOnly: false },
-                    method: "GET",
-                    dataType: 'html',
-                    success: function (obj) {
-
-                        $(".liberty-bell").data("bs.popover").options.content = obj;
-                        $(".liberty-bell").popover('show');
-                        $(".showing-active-notifications").removeClass("showing-active-notifications").addClass("showing-expired-notifications");
-                    },
-                    failure: function () {
-                        alert('failure');
-                    },
-                    error: function (obj) {
-                        alert('error');
-                    }
-                });
-            }
+                            $(".liberty-bell").data("bs.popover").options.content = obj;
+                            $(".liberty-bell").popover('show');
+                            $(".showing-active-notifications").removeClass("showing-active-notifications").addClass("showing-expired-notifications");
+                        },
+                        failure: function () {
+                            makeToast('error', errorMessage);
+                        },
+                        error: function () {
+                            makeToast('error', errorMessage);
+                        }
+                    });
+                }
             );
     }
 };
