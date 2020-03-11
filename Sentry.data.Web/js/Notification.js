@@ -205,7 +205,7 @@ data.Notification = {
             dataType: 'json',
             success: function (obj)
             {
-                var badgeCount = obj.CriticalNotifications.length + obj.StandardNotifications;
+                var badgeCount = obj.CriticalNotifications.length + obj.StandardNotifications.length;
 
                 if (badgeCount == 0) {
                     $(".liberty-badge-red").removeClass("liberty-badge-red").addClass("liberty-badge-white");
