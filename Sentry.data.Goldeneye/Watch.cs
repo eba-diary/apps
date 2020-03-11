@@ -157,6 +157,8 @@ namespace Sentry.data.Goldeneye
 
             try
             {
+                Logger.Debug($"watch-onstart start - JobId:{RetrieverJobId} Path:{watcher.Path}");
+
                 //Create watcher cancellation token
                 _internalTokenSource = new CancellationTokenSource();
                 _internalToken = _internalTokenSource.Token;
@@ -170,22 +172,19 @@ namespace Sentry.data.Goldeneye
                 }
                 catch (ArgumentException ex)
                 {
-                    Logger.Error($"Watcher Path not found - Job:{jobId} ", ex);
-                    Logger.Info($"Attempting to self-heal... issuing create directory - Job:{jobId}");
-                    Logger.Info($"Attempting to create directory - Job:{jobId} Path:{watchPath.LocalPath}");
+                    Logger.Error($"watch-onstart watcher-path-not-found - JobId:{jobId} Path:{watchPath.LocalPath}", ex);
+                    Logger.Info($"watch-onstart attempting-self-heal issuing-create-directory - JobId:{jobId} Path:{watchPath.LocalPath}");
+                    Logger.Info($"watch-onstart attempting-create-directory - JobId:{jobId} Path:{watchPath.LocalPath}");
                     System.IO.Directory.CreateDirectory(watchPath.LocalPath);
-                    Logger.Info($"Directory successfully created - Job:{jobId}");
-                    Logger.Info($"Second attempt to assign watcher.path - Job:{jobId}");
+                    Logger.Info($"watch-onstart create-directory-success - JobId:{jobId} Path:{watchPath.LocalPath}");
+                    Logger.Info($"watch-onstart attempting-assign-watcherpath - JobId:{jobId} Path:{watchPath.LocalPath}");
                     watcher.Path = watchPath.LocalPath;
-                    Logger.Info($"Second attempt successful - Job:{jobId}");
-                    Logger.Info($"Self-heal successfull - Job:{jobId}");
+                    Logger.Info($"watch-onstart assign-watcherpath-success - JobId:{jobId} Path:{watchPath.LocalPath}");
+                    Logger.Info($"watch-onstart self-heal-success - JobId:{jobId} Path:{watchPath.LocalPath}");
                 }
 
                 FileCounterStart = DateTime.Now;
                 RetrieverJobId = jobId;
-
-                Console.WriteLine("Watcher instance started for : " + watcher.Path);
-                Logger.Info("Watcher instance started for : " + watcher.Path);
 
                 /* Watch for changes in LastAccess and LastWrite times, and
                    the renaming of files or directories. */
@@ -217,10 +216,13 @@ namespace Sentry.data.Goldeneye
                     //Start directory monitor
                     this.Run(WatchedDir, linkedCts.Token);
                 }
+
+                Console.WriteLine($"watch-onstart end - JobId:{RetrieverJobId} Path:{watcher.Path}");
+                Logger.Debug($"watch-onstart end - JobId:{RetrieverJobId} Path:{watcher.Path}");
             }
             catch (Exception ex)
             {
-                Logger.Error($"Error initilizing watch for {watchPath}",ex);
+                Logger.Error($"watch-onstart failure - JobId:{RetrieverJobId} Path:{watchPath}",ex);
             }
 
         }

@@ -415,24 +415,27 @@ namespace Sentry.data.Goldeneye
             //If service is shutting down, we do not want to restart the task
             if (!_token.IsCancellationRequested)
             {
-                Logger.Debug($"Restarting watcher - JobId:{jobId} TaskId:{t.Id}");
-
                 //Find associated RunningTask object
                 RunningTask curTask = currentTasks.FirstOrDefault(w => w.JobId == jobId);
 
                 if (curTask == null)
                 {
-                    Logger.Debug($"No associated RunningTask entry - TaskID:{t.Id}");
-                    t.Dispose();
+                    Logger.Debug($"core-watchertaskrestart no-associated-runningtask-entry - JobId:{jobId} TaskID:{t.Id}");
                 }
                 else
                 {
+                    Logger.Debug($"core-watchertaskrestart restart - JobId:{jobId} Path:{curTask.WatchPath} TaskId:{t.Id}");
+
                     //Create new task
                     Task newTask = InitializeFileWatcherTask(curTask.JobId, curTask.WatchPath);
 
                     //Associate new task with RunningTask object for furture tracking
                     curTask.Task = newTask;
                 }
+
+                Logger.Debug($"core-watchertaskrestart disposing-completed-task - TaskId:{t.Id}");
+                t.Dispose();
+                Logger.Debug($"core-watchertaskrestart disposing-completed-task-success - TaskId:{t.Id}");
             }
         }
 
@@ -467,11 +470,13 @@ namespace Sentry.data.Goldeneye
 
         private Task InitializeFileWatcherTask(int jobId, Uri path)
         {
+            Logger.Info($"core-initializefilewatcher start - JobId:{jobId} Path:{path}");
             Task newTask = Task.Factory.StartNew(() => (new Watch()).OnStart(jobId, path, _token, Int32.Parse(Config.GetHostSetting("FileWatcherIterationLimit"))),
                                                     TaskCreationOptions.LongRunning).
                             ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted).
                             ContinueWith(task => WatcherTaskRestart(task, jobId), TaskContinuationOptions.OnlyOnCanceled);
 
+            Logger.Info($"core-initializefilewatcher end - JobId:{jobId} Path:{path} TaskId:{newTask.Id}");
             return newTask;
         }
     }
