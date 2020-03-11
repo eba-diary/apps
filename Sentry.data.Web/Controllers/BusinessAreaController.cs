@@ -27,31 +27,35 @@ namespace Sentry.data.Web.Controllers
 
         public ActionResult PersonalLines()
         {
-            // TODO: should we create an event for someone viewing the personal lines landing page??
-
             if (_featureFlags.Expose_BusinessArea_Pages_CLA_1424.GetValue() || SharedContext.CurrentUser.IsAdmin)
             {
-                BusinessAreaLandingPageModel model = new BusinessAreaLandingPageModel()
-                {
-                    Rows = new List<BusinessAreaTileRowModel>(),
-                    //Notifications = BuildMockNotifications() // temporary!!
-                    Notifications = _notificationService.GetNotificationForBusinessArea(BusinessAreaType.PersonalLines).ToModel()
-                };
-                model.HasActiveNotification = model.Notifications.CriticalNotifications.Any() || model.Notifications.StandardNotifications.Any();
-
-                List<BusinessAreaTileRowDto> rows = _businessAreaService.GetRows(BusinessAreaType.PersonalLines).ToList();
-
-                foreach (BusinessAreaTileRowDto row in rows)
-                {
-                    model.Rows.Add(MapToRowModel(row));
-                }
-
+                BusinessAreaLandingPageModel model = GetBusinessAreaLandingPageModel();
                 return View(model);
             }
             else
             {
                 return View("Forbidden");
             }
+        }
+
+
+        private BusinessAreaLandingPageModel GetBusinessAreaLandingPageModel(bool activeOnly=true)
+        {
+            BusinessAreaLandingPageModel model = new BusinessAreaLandingPageModel()
+            {
+                Rows = new List<BusinessAreaTileRowModel>(),
+                Notifications = _notificationService.GetNotificationForBusinessArea(BusinessAreaType.PersonalLines).ToModel(activeOnly)
+            };
+            model.HasActiveNotification = model.Notifications.CriticalNotifications.Any() || model.Notifications.StandardNotifications.Any();
+
+            List<BusinessAreaTileRowDto> rows = _businessAreaService.GetRows(BusinessAreaType.PersonalLines).ToList();
+
+            foreach (BusinessAreaTileRowDto row in rows)
+            {
+                model.Rows.Add(MapToRowModel(row));
+            }
+
+            return model;
         }
 
         private BusinessAreaTileRowModel MapToRowModel(BusinessAreaTileRowDto row)
@@ -84,5 +88,13 @@ namespace Sentry.data.Web.Controllers
             return tileModels;
         }
 
+
+        //I put this method here because i could leverage the prebuilt GetBusinessAreaLandingPageModel() method which gives me a personalLines BusinessAreaLandingPageModel
+        [HttpGet]
+        public ActionResult GetLibertyBellHtml(BusinessAreaType businessAreaType, bool activeOnly)
+        {
+            BusinessAreaLandingPageModel model = GetBusinessAreaLandingPageModel(activeOnly);
+            return PartialView("_LibertyBellPopover", model);
+        }
     }
 }
