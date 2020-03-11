@@ -106,12 +106,12 @@ namespace Sentry.data.Goldeneye
 
             if (token.IsCancellationRequested)
             {
-                Logger.Info($"Watch cancelled for Job:{RetrieverJobId.ToString()}");
+                Logger.Info($"watch-run cancelled - JobId:{RetrieverJobId.ToString()} TaskId:{Task.CurrentId}");
             }
             
             if (iterationLimitFlag)
             {
-                Logger.Info($"Watch interation limit restart:{RetrieverJobId.ToString()}");
+                Logger.Info($"watch-run interation-limit - JobId:{RetrieverJobId.ToString()} TaskId:{Task.CurrentId}");
             }
         }
 

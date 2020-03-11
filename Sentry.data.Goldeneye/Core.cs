@@ -420,11 +420,11 @@ namespace Sentry.data.Goldeneye
 
                 if (curTask == null)
                 {
-                    Logger.Debug($"core-watchertaskrestart no-associated-runningtask-entry - JobId:{jobId} TaskID:{t.Id}");
+                    Logger.Debug($"core-watchertaskrestart no-associated-runningtask-entry - JobId:{jobId}");
                 }
                 else
                 {
-                    Logger.Debug($"core-watchertaskrestart restart - JobId:{jobId} Path:{curTask.WatchPath} TaskId:{t.Id}");
+                    Logger.Debug($"core-watchertaskrestart restart - JobId:{jobId} Path:{curTask.WatchPath}");
 
                     //Create new task
                     Task newTask = InitializeFileWatcherTask(curTask.JobId, curTask.WatchPath);
@@ -433,9 +433,9 @@ namespace Sentry.data.Goldeneye
                     curTask.Task = newTask;
                 }
 
-                Logger.Debug($"core-watchertaskrestart disposing-completed-task - TaskId:{t.Id}");
+                Logger.Debug($"core-watchertaskrestart disposing-completed-task - JobId:{jobId}");
                 t.Dispose();
-                Logger.Debug($"core-watchertaskrestart disposing-completed-task-success - TaskId:{t.Id}");
+                Logger.Debug($"core-watchertaskrestart disposing-completed-task-success - JobId:{jobId}");
             }
         }
 
@@ -476,7 +476,7 @@ namespace Sentry.data.Goldeneye
                             ContinueWith(TaskException, TaskContinuationOptions.OnlyOnFaulted).
                             ContinueWith(task => WatcherTaskRestart(task, jobId), TaskContinuationOptions.OnlyOnCanceled);
 
-            Logger.Info($"core-initializefilewatcher end - JobId:{jobId} Path:{path} TaskId:{newTask.Id}");
+            Logger.Info($"core-initializefilewatcher end - JobId:{jobId} Path:{path}");
             return newTask;
         }
     }
