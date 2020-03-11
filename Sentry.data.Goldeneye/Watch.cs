@@ -157,7 +157,7 @@ namespace Sentry.data.Goldeneye
 
             try
             {
-                Logger.Debug($"watch-onstart start - JobId:{RetrieverJobId} Path:{watcher.Path}");
+                Logger.Debug($"watch-onstart start - JobId:{jobId} Path:{watchPath}");
 
                 //Create watcher cancellation token
                 _internalTokenSource = new CancellationTokenSource();
@@ -217,12 +217,12 @@ namespace Sentry.data.Goldeneye
                     this.Run(WatchedDir, linkedCts.Token);
                 }
 
-                Console.WriteLine($"watch-onstart end - JobId:{RetrieverJobId} Path:{watcher.Path}");
-                Logger.Debug($"watch-onstart end - JobId:{RetrieverJobId} Path:{watcher.Path}");
+                Console.WriteLine($"watch-onstart end - JobId:{jobId} Path:{watchPath}");
+                Logger.Debug($"watch-onstart end - JobId:{jobId} Path:{watchPath}");
             }
             catch (Exception ex)
             {
-                Logger.Error($"watch-onstart failure - JobId:{RetrieverJobId} Path:{watchPath}",ex);
+                Logger.Error($"watch-onstart failure - JobId:{jobId} Path:{watchPath}",ex);
             }
 
         }
