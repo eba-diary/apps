@@ -32,6 +32,76 @@
 
 .hamburger-man {
     bottom: 0%;
-    position: absolute;
     right: 1%;
+}
+
+.liberty-bell {
+    float: right;
+    width: 25px;
+    font-size: 36px;
+    color: #00a3e0;
+    top: 4px;
+    z-index: 999;
+    cursor: pointer;
+}
+
+.liberty-badge {
+    background-color: #000;
+    color: #fff;
+    display: inline-block;
+    padding-left: 8px;
+    padding-right: 8px;
+    text-align: center;
+    border-radius: 50%
+}
+
+.liberty-badge-red {
+    color: #fff !important;
+    background-color: #f44336 !important
+}
+
+.liberty-badge-white {
+    color: white;
+    background-color: white;
+}
+
+.liberty-badge-small {
+    font-size: 14px !important
+}
+
+
+.liberty-alert-icon-container {
+    display: table-cell;
+    vertical-align: middle;
+}
+
+.liberty-alert-icon {
+    font-size: 24px;
+}
+
+.liberty-alert-item-content {
+    display: table-cell;
+    padding: 15px 0 10px 20px;
+    width: 100%;
+    vertical-align: middle;
+}
+
+.liberty-alert-category {
+    color: #979797;
+    font-size: 12px;
+    position: absolute;
+    top: 5px;
+    right: 5px;
+}
+
+.liberty-popover-medium {
+    max-width: 750px;
+}
+
+.showing-active-notifications #showExpiredNotificationBtn {
+    display: none;
+}
+
+.showing-expired-notifications #showActiveNotificationBtn {
+    display: none;
 }
