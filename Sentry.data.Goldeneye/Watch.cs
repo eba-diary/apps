@@ -219,12 +219,15 @@ namespace Sentry.data.Goldeneye
 
                 Console.WriteLine($"watch-onstart end - JobId:{jobId} Path:{watchPath}");
                 Logger.Debug($"watch-onstart end - JobId:{jobId} Path:{watchPath}");
+                Logger.Debug($"watch-onstart disposing-filewatcher-instance - JobId:{jobId} Path:{watchPath}");
+                watcher.Dispose();
             }
             catch (Exception ex)
-            {
+            {                
                 Logger.Error($"watch-onstart failure - JobId:{jobId} Path:{watchPath}",ex);
+                Logger.Debug($"watch-onstart disposing-filewatcher-instance - JobId:{jobId} Path:{watchPath}");
+                watcher.Dispose();
             }
-
         }
 
         //When a new file is created add the file path to the list of All Files.
