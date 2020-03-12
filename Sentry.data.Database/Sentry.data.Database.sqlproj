@@ -132,6 +132,7 @@
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_01_04" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_02_01" />
     <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_20_02_02" />
+    <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_02_04" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -283,6 +284,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_02_01\SubscriptionAddictionIntervention.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_02_04\UPDATE_BusinessAreaTile.sql" />
   </ItemGroup>
   <PropertyGroup>
     <PostBuildEvent />

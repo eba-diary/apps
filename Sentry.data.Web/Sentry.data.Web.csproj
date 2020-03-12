@@ -458,6 +458,7 @@
     <Content Include="Content\jquery.json-viewer.css" />
     <Content Include="Content\toastr.css" />
     <Content Include="Content\toastr.min.css" />
+    <Content Include="Images\BusinessAreaTiles\Meeting3.jpg" />
     <Content Include="Images\DataFlow\ConceptTeamwork1.jpg" />
     <Content Include="Images\DataFlow\Conversation12.jpg" />
     <Content Include="js\BusinessArea.js" />
