@@ -128,9 +128,8 @@ namespace Sentry.data.Web.Controllers
         [HttpGet]
         public JsonResult GetNotifications(BusinessAreaType businessAreaType)
         {
-            return Json(_notificationService.GetNotificationForBusinessArea(businessAreaType).ToModel(), JsonRequestBehavior.AllowGet);
+             return Json(_notificationService.GetNotificationForBusinessArea(businessAreaType).ToModel(), JsonRequestBehavior.AllowGet);
         }
-
 
         [HttpGet]
         public ActionResult SubscribeDisplay(int group)

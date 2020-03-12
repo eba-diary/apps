@@ -92,16 +92,16 @@ namespace Sentry.data.Web
         //    });
         //}
 
-        public static SystemNotificationModel ToModel(this List<Core.NotificationDto> models)
+        public static SystemNotificationModel ToModel(this List<Core.NotificationDto> dtos, bool activeOnly=true)
         {
             SystemNotificationModel model = new SystemNotificationModel();
 
-            foreach (var notification in models.Where(w => w.IsActive && w.MessageSeverity == NotificationSeverity.Critical))
+            foreach (var notification in dtos.Where(w => w.IsActive == activeOnly && w.MessageSeverity == NotificationSeverity.Critical).OrderByDescending(o => o.StartTime))
             {
                 model.CriticalNotifications.Add(notification.ToModel());
             }
 
-            foreach (var notificaiton in models.Where(w => w.IsActive && w.MessageSeverity != NotificationSeverity.Critical))
+            foreach (var notificaiton in dtos.Where(w => w.IsActive == activeOnly && w.MessageSeverity != NotificationSeverity.Critical).OrderBy(o => o.MessageSeverity).ThenByDescending(o2 => o2.StartTime))
             {
                 model.StandardNotifications.Add(notificaiton.ToModel());
             }

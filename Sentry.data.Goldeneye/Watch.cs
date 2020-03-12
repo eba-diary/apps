@@ -30,6 +30,7 @@ namespace Sentry.data.Goldeneye
         private int RetrieverJobId { get; set; }
         private CancellationTokenSource _internalTokenSource;
         private CancellationToken _internalToken;
+        private int _iterationLimit;
 
         /// <summary>
         /// Directory that is to be watched
@@ -59,6 +60,8 @@ namespace Sentry.data.Goldeneye
         /// <param name="token"></param>
         public void Run(string path, CancellationToken token)
         {
+            int iterationCounter = 0;
+            bool iterationLimitFlag = false;
             do
             {
                 var files = allFiles.ToList();
@@ -95,13 +98,20 @@ namespace Sentry.data.Goldeneye
                     }
                 }
 
+                iterationLimitFlag = (iterationCounter++ > _iterationLimit);
+
                 Thread.Sleep(2000);
                 
-            } while (!token.IsCancellationRequested);
+            } while (!token.IsCancellationRequested && !iterationLimitFlag);
 
             if (token.IsCancellationRequested)
             {
-                Logger.Info($"Watch cancelled for Job:{RetrieverJobId.ToString()}");
+                Logger.Info($"watch-run cancelled - JobId:{RetrieverJobId.ToString()} TaskId:{Task.CurrentId}");
+            }
+            
+            if (iterationLimitFlag)
+            {
+                Logger.Info($"watch-run interation-limit - JobId:{RetrieverJobId.ToString()} TaskId:{Task.CurrentId}");
             }
         }
 
@@ -131,7 +141,7 @@ namespace Sentry.data.Goldeneye
 
             return false;
         }
-  
+
         /// <summary>
         /// This method is called when the Windows Process is started in Core and Program.cs
         /// First it creates a file watcher, gives it a directory from app.config, then assigns it events to watch.
@@ -141,14 +151,18 @@ namespace Sentry.data.Goldeneye
         /// <param name="jobId"></param>
         /// <param name="watchPath"></param>
         /// <param name="token"></param>
-        public void OnStart(int jobId, Uri watchPath, CancellationToken token)
+        /// <param name="iterationLimit"></param>
+        public void OnStart(int jobId, Uri watchPath, CancellationToken token, int iterationLimit = 43200)
         {
 
             try
             {
+                Logger.Debug($"watch-onstart start - JobId:{jobId} Path:{watchPath}");
+
                 //Create watcher cancellation token
                 _internalTokenSource = new CancellationTokenSource();
                 _internalToken = _internalTokenSource.Token;
+                _iterationLimit = iterationLimit;
 
                 // Create a new FileSystemWatcher and set its properties.
                 watcher = new FileSystemWatcher();
@@ -158,22 +172,19 @@ namespace Sentry.data.Goldeneye
                 }
                 catch (ArgumentException ex)
                 {
-                    Logger.Error($"Watcher Path not found - Job:{jobId} ", ex);
-                    Logger.Info($"Attempting to self-heal... issuing create directory - Job:{jobId}");
-                    Logger.Info($"Attempting to create directory - Job:{jobId} Path:{watchPath.LocalPath}");
+                    Logger.Error($"watch-onstart watcher-path-not-found - JobId:{jobId} Path:{watchPath.LocalPath}", ex);
+                    Logger.Info($"watch-onstart attempting-self-heal issuing-create-directory - JobId:{jobId} Path:{watchPath.LocalPath}");
+                    Logger.Info($"watch-onstart attempting-create-directory - JobId:{jobId} Path:{watchPath.LocalPath}");
                     System.IO.Directory.CreateDirectory(watchPath.LocalPath);
-                    Logger.Info($"Directory successfully created - Job:{jobId}");
-                    Logger.Info($"Second attempt to assign watcher.path - Job:{jobId}");
+                    Logger.Info($"watch-onstart create-directory-success - JobId:{jobId} Path:{watchPath.LocalPath}");
+                    Logger.Info($"watch-onstart attempting-assign-watcherpath - JobId:{jobId} Path:{watchPath.LocalPath}");
                     watcher.Path = watchPath.LocalPath;
-                    Logger.Info($"Second attempt successful - Job:{jobId}");
-                    Logger.Info($"Self-heal successfull - Job:{jobId}");
+                    Logger.Info($"watch-onstart assign-watcherpath-success - JobId:{jobId} Path:{watchPath.LocalPath}");
+                    Logger.Info($"watch-onstart self-heal-success - JobId:{jobId} Path:{watchPath.LocalPath}");
                 }
 
                 FileCounterStart = DateTime.Now;
                 RetrieverJobId = jobId;
-
-                Console.WriteLine("Watcher instance started for : " + watcher.Path);
-                Logger.Info("Watcher instance started for : " + watcher.Path);
 
                 /* Watch for changes in LastAccess and LastWrite times, and
                    the renaming of files or directories. */
@@ -205,12 +216,18 @@ namespace Sentry.data.Goldeneye
                     //Start directory monitor
                     this.Run(WatchedDir, linkedCts.Token);
                 }
+
+                Console.WriteLine($"watch-onstart end - JobId:{jobId} Path:{watchPath}");
+                Logger.Debug($"watch-onstart end - JobId:{jobId} Path:{watchPath}");
+                Logger.Debug($"watch-onstart disposing-filewatcher-instance - JobId:{jobId} Path:{watchPath}");
+                watcher.Dispose();
             }
             catch (Exception ex)
-            {
-                Logger.Error($"Error initilizing watch for {watchPath}",ex);
+            {                
+                Logger.Error($"watch-onstart failure - JobId:{jobId} Path:{watchPath}",ex);
+                Logger.Debug($"watch-onstart disposing-filewatcher-instance - JobId:{jobId} Path:{watchPath}");
+                watcher.Dispose();
             }
-
         }
 
         //When a new file is created add the file path to the list of All Files.
@@ -234,22 +251,21 @@ namespace Sentry.data.Goldeneye
         //  The Service will do the rest on it's periodic run.
         private void OnDeleted(object source, FileSystemEventArgs e)
         {
-            //  Filter out DatasetLoader Request and Failed Request folders.
-            if (Path.GetFileName(e.FullPath).StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix")))
+            var path = Path.GetFullPath(e.FullPath).Replace(Path.GetFileName(e.FullPath), "");
+            var fileName = Path.GetFileName(e.FullPath);
+
+            //remove ProcessedFilePrefix if it exists
+            var origFileName = path + ((fileName.StartsWith(Configuration.Config.GetHostSetting("ProcessedFilePrefix"))) ? fileName.Substring(Configuration.Config.GetHostSetting("ProcessedFilePrefix").Length) : fileName);
+
+            var file = allFiles.FirstOrDefault(x => x.fileName == origFileName);
+            if (file != null)
             {
-                var path = Path.GetFullPath(e.FullPath).Replace(Path.GetFileName(e.FullPath), "");
-                var fileName = Path.GetFileName(e.FullPath);
-                var origFileName = path + fileName.Substring(Configuration.Config.GetHostSetting("ProcessedFilePrefix").Length);
-                var file = allFiles.FirstOrDefault(x => x.fileName == origFileName);
-                if (file != null)
-                {
-                    file.fileCorrectlyDeleted = true;
-                }
-                else
-                {
-                    Logger.Info($"Watch detected delete for non-tracked file: {e.FullPath}");
-                }                
-            }            
+                file.fileCorrectlyDeleted = true;
+            }
+            else
+            {
+                Logger.Info($"Watch detected delete for non-tracked file: {e.FullPath}");
+            }           
         }
         private void OnError(object source, ErrorEventArgs e)
         {

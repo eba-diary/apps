@@ -21,13 +21,17 @@
         </member>
         <member name="T:Sentry.data.Goldeneye.Core.RunningTask">
             <summary>
-            Task!
+            
             </summary>
         </member>
-        <member name="M:Sentry.data.Goldeneye.Core.RunningTask.#ctor(System.Threading.Tasks.Task,System.String)">
+        <member name="M:Sentry.data.Goldeneye.Core.RunningTask.#ctor(System.Threading.Tasks.Task,System.String,System.Int32,System.Uri)">
             <summary>
-            Task!
+            
             </summary>
+            <param name="task"></param>
+            <param name="name"></param>
+            <param name="jobId"></param>
+            <param name="path"></param>
         </member>
         <member name="M:Sentry.data.Goldeneye.Core.DoWork">
             <summary>
@@ -44,6 +48,13 @@
             An exception occurred on the main task; log it and shut down the service with an error exit code
             </summary>
             <param name="t">The main thread task</param>
+        </member>
+        <member name="M:Sentry.data.Goldeneye.Core.WatcherTaskRestart(System.Threading.Tasks.Task,System.Int32)">
+            <summary>
+            An exception occurred on the main task; log it and shut down the service with an error exit code
+            </summary>
+            <param name="t">The main thread task</param>
+            <param name="jobId"></param>
         </member>
         <member name="M:Sentry.data.Goldeneye.Program.Main(System.String[])">
             <summary>
@@ -72,7 +83,7 @@
             <param name="path"></param>
             <param name="token"></param>
         </member>
-        <member name="M:Sentry.data.Goldeneye.Watch.OnStart(System.Int32,System.Uri,System.Threading.CancellationToken)">
+        <member name="M:Sentry.data.Goldeneye.Watch.OnStart(System.Int32,System.Uri,System.Threading.CancellationToken,System.Int32)">
             <summary>
             This method is called when the Windows Process is started in Core and Program.cs
             First it creates a file watcher, gives it a directory from app.config, then assigns it events to watch.
@@ -82,6 +93,7 @@
             <param name="jobId"></param>
             <param name="watchPath"></param>
             <param name="token"></param>
+            <param name="iterationLimit"></param>
         </member>
         <member name="M:Sentry.data.Goldeneye.Watch.GetCountStart">
             <summary>
