@@ -49,7 +49,7 @@ BEGIN TRY
 
   --insert one off script files here
   --NOTE:  reference the Supporting Scripts folder\script.sql you are running
-  :r ..\Post-Deploy\SupportingScripts\Sprint_20_02_04\UPDATE_BusinessAreaTile_Hyperlink_URL.sql
+  :r ..\Post-Deploy\SupportingScripts\Sprint_20_02_04\UPDATE_BusinessAreaTile.sql
 
   --insert into the verision table so these scripts do not run again.
   INSERT INTO VERSION (Version_CDE, AppliedOn_DTM) VALUES ( @ScriptVersion, GETDATE() ) 
