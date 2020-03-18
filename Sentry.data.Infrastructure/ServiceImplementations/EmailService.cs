@@ -37,29 +37,19 @@ namespace Sentry.data.Infrastructure
 
         public void SendEmail(string emailAddress, string interval, string subject, List<Event> events)
         {
-            //Real code could look something like this:
-            //Dim smtpClient As New System.Net.Mail.SmtpClient("mail.sentry.com")
-            //smtpClient.Send("notifications@SentryData.com", toAddress, subject, body)
-
             SmtpClient smtpClient = new SmtpClient("mail.sentry.com");
-
-
-            // set smtp-client with basicAuthentication
-            //mySmtpClient.UseDefaultCredentials = false;
-            //System.Net.NetworkCredential basicAuthenticationInfo = new System.Net.NetworkCredential("username", "password");
-            //mySmtpClient.Credentials = basicAuthenticationInfo;
-
-            // add from,to mailaddresses
+            
             MailAddress from = new MailAddress(Configuration.Config.GetHostSetting("DatasetMgmtEmail"));
+            
             MailMessage myMail = new System.Net.Mail.MailMessage();
             myMail.From = from;
             myMail.Subject = interval + " Events from data.sentry.com";
             myMail.To.Add(emailAddress);
             myMail.IsBodyHtml = true;
             myMail.Body += @"<p><b><font color=""red"">Do Not Reply To This Email, This Inbox Is Not Monitored</font></b></p>";
+            
 
-
-            switch(interval)
+            switch (interval)
             {
                 case  "Weekly":
                     myMail.Body += @"<p>Below is a list of all the events that have taken place in the last <b>Week</b>.</p>";
@@ -75,39 +65,45 @@ namespace Sentry.data.Infrastructure
                     break;
             }
 
-            events = events.Distinct().ToList();
+            
+            List<Event> dsEvents = events.Where(w => w.EventType.Group != EventTypeGroup.BusinessArea.GetDescription()).Distinct().ToList();
+            List<Event> baEvents = events.Where(w => w.EventType.Group == EventTypeGroup.BusinessArea.GetDescription()).Distinct().OrderBy(o => o.TimeCreated).ToList();
 
+            //DATASET
+            myMail.Body += @"</p><table cellpadding='0' cellspacing='0' border='0' width='100 % '><tr bgcolor='003DA5'><td><b>Dataset Events</b></td></table></p>";
+            string header = @"<tr bgcolor='00A3E0'><td><b>Creation Date</b></td><td><b>Description</b></td><td><b>Status</b></td><td><b>Initiator</b></td><td><b>Event Type</b></td></tr>";
+            myMail.Body += CreateEvents(header, EventTypeGroup.DataSet,dsEvents);
+
+            //BUSINESSAREA
+            myMail.Body += @"</p><table cellpadding='0' cellspacing='0' border='0' width='100 % '><tr bgcolor='003DA5'><td><b>Business Area Events</b></td></table></p>";
+            header = @"<tr bgcolor='00A3E0'><td><b>Creation Date</b></td><td><b>Description</b></td><td><b>Initiator</b></td><td><b>Event Type</b></td></tr>";
+            myMail.Body += CreateEvents(header, EventTypeGroup.BusinessArea,baEvents);
+
+            smtpClient.Send(myMail);
+        }
+
+
+        public string CreateEvents(string header, EventTypeGroup etGroup , List<Event> events)
+        {
+            string body = string.Empty;
+
+            body += @"<table cellpadding=""0"" cellspacing=""0"" border=""0"" width=""100 %"">";
             var groups = events.Where(x => x.Parent_Event != null).ToList();
             events.RemoveAll(x => x.Parent_Event != null);
-
-            myMail.Body += @"<table cellpadding=""0"" cellspacing=""0"" border=""0"" width=""100 %"">";
 
             if (groups.Any())
             {
                 List<IGrouping<string, Event>> groupedGroups = groups.GroupBy(x => x.Parent_Event).ToList();
-
                 foreach (var group in groupedGroups)
                 {
-                    if(group.Count() > 1)
+                    if (group.Count() > 1)
                     {
-                        
-                        myMail.Body += @"<tr bgcolor='4da6ff'><td><b>Creation Date</b></td><td><b>Description</b></td><td><b>Status</b></td><td><b>Initiator</b></td><td><b>Event Type</b></td></tr>";
+                        body += header;
                         foreach (Event e in group)
                         {
-                            myMail.Body += @"<tr>";
-                            myMail.Body += @"<td>" + e.TimeCreated + @"</td>";
-                            myMail.Body += @"<td>" + e.Reason + @"</td>";
-                            myMail.Body += @"<td>" + e.Status.Description + @"</td>";
-
-                            //Needed to resolve service accounts
-                            int n;
-                            var user = int.TryParse(e.UserWhoStartedEvent.Trim(), out n) ? _associateInfoProvider.GetAssociateInfo(e.UserWhoStartedEvent.Trim()).FullName : e.UserWhoStartedEvent.Trim();
-                            myMail.Body += @"<td>" + user + @"</td>";
-                            myMail.Body += @"<td>" + e.EventType.Description + @"</td>";
-                            myMail.Body += @" </tr>";
+                            body += FormatEventLine(EventTypeGroup.DataSet, e);
                         }
-
-                        myMail.Body += @"<tr></tr>";
+                        body += @"<tr></tr>";
                     }
                     else
                     {
@@ -118,34 +114,51 @@ namespace Sentry.data.Infrastructure
 
             if (events.Count > 0)
             {
+                body += header;
 
-                myMail.Body += @"<tr bgcolor='4da6ff'><td><b>Creation Date</b></td><td><b>Description</b></td><td><b>Status</b></td><td><b>Initiator</b></td><td><b>Event Type</b></td></tr>";
                 foreach (Event e in events.OrderBy(x => x.EventType.Severity))
                 {
-                    //BUSINESSAREA format Reason with extra info about Notification Title
-                    string reason2 = "";
-                    if (e.EventType.Group == EventTypeGroup.BusinessArea.GetDescription())
-                        reason2 = e.Reason + ":  " + e.Notification.Title;
-                    else 
-                        reason2 = e.Reason;
-
-                    myMail.Body += @"<tr>";
-                    myMail.Body += @"<td>" + e.TimeCreated + @"</td>";
-                    myMail.Body += @"<td>" + reason2 + @"</td>";
-                    myMail.Body += @"<td>" + e.Status.Description + @"</td>";
-
-                    //Needed to resolve service accounts
-                    int n;
-                    var user = int.TryParse(e.UserWhoStartedEvent.Trim(), out n) ? _associateInfoProvider.GetAssociateInfo(e.UserWhoStartedEvent.Trim()).FullName : e.UserWhoStartedEvent.Trim();
-                    myMail.Body += @"<td>" + user + @"</td>";
-                    myMail.Body += @"<td>" + e.EventType.Description + @"</td>";
-                    myMail.Body += @" </tr>";
+                    body += FormatEventLine(etGroup, e);
                 }
             }
 
-            myMail.Body += @"</table>";
-            smtpClient.Send(myMail);
+            body += @"</table>";
+
+            return body;
         }
+
+
+        public string FormatEventLine(EventTypeGroup group, Event e)
+        {
+            string body = @"<tr>";
+            body += @"<td>" + e.TimeCreated + @"</td>";
+
+            if (group == EventTypeGroup.BusinessArea)
+            {
+                string reason = "<a href=" + Configuration.Config.GetHostSetting("WebApiUrl") + "/Notification/ManageNotification>" + e.Notification.Title + "</a>";
+                if (e.Notification.MessageSeverity == Core.GlobalEnums.NotificationSeverity.Critical)
+                    reason += "<br>" + e.Notification.Message;        
+               
+                body += @"<td>" + reason + @"</td>";
+            }
+            else
+            {
+                body += @"<td>" + e.Reason + @"</td>";
+                body += @"<td>" + e.Status.Description + @"</td>";
+            }
+
+            //Needed to resolve service accounts
+            int n;
+            var user = int.TryParse(e.UserWhoStartedEvent.Trim(), out n) ? _associateInfoProvider.GetAssociateInfo(e.UserWhoStartedEvent.Trim()).FullName : e.UserWhoStartedEvent.Trim();
+            body += @"<td>" + user + @"</td>";
+            body += @"<td>" + e.EventType.Description + @"</td>";
+            body += @" </tr>";
+
+            return body;
+        }
+
+
+
 
         /// <summary>
         /// 
