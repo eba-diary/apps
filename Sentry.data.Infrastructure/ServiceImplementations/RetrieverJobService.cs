@@ -933,17 +933,7 @@ namespace Sentry.data.Infrastructure
                 return;
             }
 
-            //IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
-            IList<RemoteFile> resultList = new List<RemoteFile>()
-            {
-                new RemoteFile()
-                {
-                    Name = "CrashDriver.zip",
-                    Type = "File",
-                    Size = 1614907,
-                    Modified = DateTime.Now
-                }
-            };
+            IList<RemoteFile> resultList = _ftpProvider.ListDirectoryContent(_job.GetUri().AbsoluteUri, "files");
 
             _job.JobLoggerMessage("Info", $"specificfile.search search.regex:{_job.JobOptions.SearchCriteria} sourcelocation:{_job.GetUri().AbsoluteUri}");
             _job.JobLoggerMessage("Info", $"specificfile.search source.directory.count {resultList.Count.ToString()}");
