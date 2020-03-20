@@ -29,7 +29,7 @@ namespace Sentry.data.Infrastructure
 
         public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
-            if (_featureFlags.Remove_ConvertToParquet_Logic_CLA_747.GetValue())
+            if (!_featureFlags.Remove_ConvertToParquet_Logic_CLA_747.GetValue())
             {
                 List<DataFlow_Log> logs = new List<DataFlow_Log>();
                 Stopwatch stopWatch = new Stopwatch();
