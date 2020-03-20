@@ -87,7 +87,10 @@ namespace Sentry.data.Infrastructure
 
         public void Dispose()
         {
-            _lambdaClient.Dispose();
+            if(_lambdaClient != null)
+            {
+                _lambdaClient.Dispose();
+            }
         }
     }
 }
