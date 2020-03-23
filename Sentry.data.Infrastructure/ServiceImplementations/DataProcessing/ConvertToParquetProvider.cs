@@ -18,80 +18,89 @@ namespace Sentry.data.Infrastructure
     {
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
+        private readonly IDataFeatures _featureFlags;
 
         public ConvertToParquetProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, 
-            IDataFlowService dataFlowService) : base(dataFlowService)
+            IDataFlowService dataFlowService, IDataFeatures dataFeatures) : base(dataFlowService)
         {
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
+            _featureFlags = dataFeatures;
         }
 
         public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
         {
-            List<DataFlow_Log> logs = new List<DataFlow_Log>();
-            Stopwatch stopWatch = new Stopwatch();
-            logs.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"start-method <{step.DataAction_Type_Id.ToString()}>-executeaction", Log_Level.Debug));
-            try
+            if (!_featureFlags.Remove_ConvertToParquet_Logic_CLA_747.GetValue())
             {
-                stopWatch.Start();
-                string fileName = Path.GetFileName(stepEvent.SourceKey);
-                logs.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()} processing event - {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Debug));
-                /***************************************
-                 *  Perform provider specific processing
-                 ***************************************/
-                //This step does not perform any processing
-
-                /***************************************
-                 *  Trigger dependent data flow steps
-                 ***************************************/
-
-                foreach (DataFlowStepEventTarget target in stepEvent.DownstreamTargets)
+                List<DataFlow_Log> logs = new List<DataFlow_Log>();
+                Stopwatch stopWatch = new Stopwatch();
+                logs.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"start-method <{step.DataAction_Type_Id.ToString()}>-executeaction", Log_Level.Debug));
+                try
                 {
-                    _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, target.BucketName, $"{target.ObjectKey}{fileName}");
-#if (DEBUG)
-                    //Mock for testing... sent mock s3object created 
-                    S3Event s3e = null;
-                    s3e = new S3Event
+                    stopWatch.Start();
+                    string fileName = Path.GetFileName(stepEvent.SourceKey);
+                    logs.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()} processing event - {JsonConvert.SerializeObject(stepEvent)}", Log_Level.Debug));
+                    /***************************************
+                     *  Perform provider specific processing
+                     ***************************************/
+                    //This step does not perform any processing
+
+                    /***************************************
+                     *  Trigger dependent data flow steps
+                     ***************************************/
+
+                    foreach (DataFlowStepEventTarget target in stepEvent.DownstreamTargets)
                     {
-                        EventType = "S3EVENT",
-                        PayLoad = new S3ObjectEvent()
+                        _s3ServiceProvider.CopyObject(stepEvent.SourceBucket, stepEvent.SourceKey, target.BucketName, $"{target.ObjectKey}{fileName}");
+#if (DEBUG)
+                        //Mock for testing... sent mock s3object created 
+                        S3Event s3e = null;
+                        s3e = new S3Event
                         {
-                            eventName = "ObjectCreated:Put",
-                            s3 = new S3()
+                            EventType = "S3EVENT",
+                            PayLoad = new S3ObjectEvent()
                             {
-                                bucket = new Bucket()
+                                eventName = "ObjectCreated:Put",
+                                s3 = new S3()
                                 {
-                                    name = target.BucketName
-                                },
-                                Object = new Sentry.data.Core.Entities.S3.Object()
-                                {
-                                    key = $"{target.ObjectKey}{fileName}",
-                                    size = 200124
+                                    bucket = new Bucket()
+                                    {
+                                        name = target.BucketName
+                                    },
+                                    Object = new Sentry.data.Core.Entities.S3.Object()
+                                    {
+                                        key = $"{target.ObjectKey}{fileName}",
+                                        size = 200124
+                                    }
                                 }
                             }
-                        }
-                    };
-                    _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
+                        };
+                        _messagePublisher.PublishDSCEvent("99999", JsonConvert.SerializeObject(s3e));
 #endif
-                }
+                    }
 
-                stopWatch.Stop();
-
-                step.Executions.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-successful", Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, null));
-                logs = null;
-            }
-            catch (Exception ex)
-            {
-                if (stopWatch.IsRunning)
-                {
                     stopWatch.Stop();
+
+                    step.Executions.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-successful", Log_Level.Info, new List<Variable>() { new DoubleVariable("stepduration", stopWatch.Elapsed.TotalSeconds) }, null));
+                    logs = null;
                 }
-                logs.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-failed", Log_Level.Error, ex));
-                logs.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"end-method <{step.DataAction_Type_Id.ToString()}>-executeaction", Log_Level.Debug));
-                foreach (var log in logs)
+                catch (Exception ex)
                 {
-                    step.Executions.Add(log);
+                    if (stopWatch.IsRunning)
+                    {
+                        stopWatch.Stop();
+                    }
+                    logs.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"{step.DataAction_Type_Id.ToString()}-executeaction-failed", Log_Level.Error, ex));
+                    logs.Add(step.LogExecution(stepEvent.FlowExecutionGuid, stepEvent.RunInstanceGuid, $"end-method <{step.DataAction_Type_Id.ToString()}>-executeaction", Log_Level.Debug));
+                    foreach (var log in logs)
+                    {
+                        step.Executions.Add(log);
+                    }
                 }
+            }
+            else
+            {
+                Logger.Debug("converttoparquetprovider-executeaction disabled-by-featureflag");
             }
         }
 
