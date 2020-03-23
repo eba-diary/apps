@@ -25,6 +25,7 @@ namespace Sentry.data.Infrastructure
         {
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
+            _featureFlags = dataFeatures;
         }
 
         public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
