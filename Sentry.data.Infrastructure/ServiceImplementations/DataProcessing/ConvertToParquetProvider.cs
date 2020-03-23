@@ -18,7 +18,7 @@ namespace Sentry.data.Infrastructure
     {
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
-        private IDataFeatures _featureFlags;
+        private readonly IDataFeatures _featureFlags;
 
         public ConvertToParquetProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, 
             IDataFlowService dataFlowService, IDataFeatures dataFeatures) : base(dataFlowService)
