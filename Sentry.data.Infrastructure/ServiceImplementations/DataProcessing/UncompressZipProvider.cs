@@ -18,7 +18,7 @@ namespace Sentry.data.Infrastructure
     {
         private readonly IMessagePublisher _messagePublisher;
         private readonly IS3ServiceProvider _s3ServiceProvider;
-        private IDataFeatures _featureFlags;
+        private readonly IDataFeatures _featureFlags;
         private DataFlowStep _step;
         private string _flowGuid;
         private string _runInstGuid;
