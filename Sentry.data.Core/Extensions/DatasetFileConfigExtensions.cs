@@ -23,7 +23,8 @@ namespace Sentry.data.Core
                 DatasetScopeTypeId = dsDto.DatasetScopeTypeId,
                 FileExtensionId = dsDto.FileExtensionId,
                 Delimiter = dsDto.Delimiter,
-                HasHeader = dsDto.HasHeader
+                HasHeader = dsDto.HasHeader,
+                CreateCurrentView = dsDto.CreateCurrentView
             };
             dto.Schemas = delist;
             return dto;
@@ -39,7 +40,8 @@ namespace Sentry.data.Core
                 HasHeader = dsDto.HasHeader,
                 IsInSAS = dsDto.IsInSAS,
                 Description = dsDto.ConfigFileDesc,
-                ParentDatasetId = dsDto.DatasetId
+                ParentDatasetId = dsDto.DatasetId,
+                CreateCurrentView = dsDto.CreateCurrentView
             };
         }
     }
