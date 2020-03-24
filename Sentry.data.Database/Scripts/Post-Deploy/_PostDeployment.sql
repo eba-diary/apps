@@ -49,7 +49,6 @@ BEGIN TRY
   --insert one off script files here
   :r ..\Post-Deploy\SupportingScripts\Sprint_20_02_04\Insert_ZipCodesDotCom_DataSource.sql
   --NOTE:  reference the Supporting Scripts folder\script.sql you are running
-  :r ..\Post-Deploy\SupportingScripts\Sprint_20_02_04\UPDATE_BusinessAreaTile.sql
   :r ..\Post-Deploy\SupportingScripts\Sprint_20_02_04\INSERT_BusinessArea_Subscription.sql
 
   --insert into the verision table so these scripts do not run again.
