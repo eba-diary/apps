@@ -34,7 +34,6 @@ namespace Sentry.data.Web
             this.CreateCurrentView = (dsfc.Schema != null) ? dsfc.Schema.CreateCurrentView : false;
             this.HasHeader = (dsfc.Schema != null) ? dsfc.Schema.HasHeader : false;
             this.OldSchemaId = (Schemas.Any()) ? Schemas.FirstOrDefault().DataElement_ID : 0;
-            //this.CreateCurren
 
             try
             {
