@@ -69,16 +69,22 @@ namespace Sentry.data.Infrastructure
             List<Event> dsEvents = events.Where(w => w.EventType.Group != EventTypeGroup.BusinessArea.GetDescription()).Distinct().ToList();
             List<Event> baEvents = events.Where(w => w.EventType.Group == EventTypeGroup.BusinessArea.GetDescription()).Distinct().OrderBy(o => o.TimeCreated).ToList();
 
+            string header = String.Empty;
             //DATASET
-            body.Append(@"</p><table cellpadding='0' cellspacing='0' border='0' width='100 % '><tr bgcolor='003DA5'><td><b>Dataset Events</b></td></table></p>");
-            string header = @"<tr bgcolor='00A3E0'><td><b>Creation Date</b></td><td><b>Description</b></td><td><b>Status</b></td><td><b>Initiator</b></td><td><b>Event Type</b></td></tr>";
-            body.Append(CreateEvents(header, EventTypeGroup.DataSet,dsEvents));
+            if (dsEvents.Any())
+            {
+                body.Append(@"</p><table cellpadding='0' cellspacing='0' border='0' width='100 % '><tr bgcolor='003DA5'><td><b>Dataset Events</b></td></table></p>");
+                header = @"<tr bgcolor='00A3E0'><td><b>Creation Date</b></td><td><b>Description</b></td><td><b>Status</b></td><td><b>Initiator</b></td><td><b>Event Type</b></td></tr>";
+                body.Append(CreateEvents(header, EventTypeGroup.DataSet, dsEvents));
+            }
 
             //BUSINESSAREA
-            body.Append(@"</p><table cellpadding='0' cellspacing='0' border='0' width='100 % '><tr bgcolor='003DA5'><td><b>Business Area Events</b></td></table></p>");
-            header = @"<tr bgcolor='00A3E0'><td><b>Creation Date</b></td><td><b>Description</b></td><td><b>Initiator</b></td><td><b>Event Type</b></td></tr>";
-            body.Append(CreateEvents(header, EventTypeGroup.BusinessArea,baEvents));
-
+            if (baEvents.Any())
+            {
+                body.Append(@"</p><table cellpadding='0' cellspacing='0' border='0' width='100 % '><tr bgcolor='003DA5'><td><b>Business Area Events</b></td></table></p>");
+                header = @"<tr bgcolor='00A3E0'><td><b>Creation Date</b></td><td><b>Description</b></td><td><b>Initiator</b></td><td><b>Event Type</b></td></tr>";
+                body.Append(CreateEvents(header, EventTypeGroup.BusinessArea, baEvents));
+            }
             myMail.Body = body.ToString();
             smtpClient.Send(myMail);
         }
