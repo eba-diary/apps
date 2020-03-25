@@ -57,6 +57,9 @@ namespace Sentry.data.Web
 
         [DisplayName("Add to SAS")]
         public bool IncludeInSas { get; set; }
+
+        [DisplayName("Create Current View")]
+        public bool CreateCurrentView { get; set; }
     }
 
 
