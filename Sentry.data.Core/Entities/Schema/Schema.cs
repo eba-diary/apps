@@ -32,6 +32,17 @@ namespace Sentry.data.Core
 
         public virtual IList<SchemaRevision> Revisions { get; set; }
 
+        #region SchemaLevelFeatureFlags
+        //These feature flags are at a schema level instead of
+        //  an application level
+
+
+        /// <summary>
+        /// These feature
+        /// </summary>
+        public virtual bool NewEtlColumns_CLA1396 { get; set; }
+        #endregion
+
         protected internal virtual void AddRevision(SchemaRevision revision)
         {
             revision.Revision_NBR = (Revisions.Any()) ? Revisions.Count + 1 : 1;
