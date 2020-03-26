@@ -43,7 +43,6 @@ namespace Sentry.data.Core
         public virtual bool NewEtlColumns_CLA1396 { get; set; }
         #endregion
 
-
         protected internal virtual void AddRevision(SchemaRevision revision)
         {
             revision.Revision_NBR = (Revisions.Any()) ? Revisions.Count + 1 : 1;
