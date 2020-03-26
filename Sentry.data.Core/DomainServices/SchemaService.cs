@@ -151,6 +151,11 @@ namespace Sentry.data.Core
                 schema.IsInSAS = dto.IsInSAS;
                 chgDetected = true;
             }
+            if (schema.NewEtlColumns_CLA1396 != dto.NewEtlColumns_CLA1396)
+            {
+                schema.NewEtlColumns_CLA1396 = dto.NewEtlColumns_CLA1396;
+                chgDetected = true;
+            }
 
             if (chgDetected)
             {
@@ -378,7 +383,8 @@ namespace Sentry.data.Core
                 CreatedDTM = DateTime.Now,
                 LastUpdatedDTM = DateTime.Now,
                 DeleteIssueDTM = DateTime.MaxValue,
-                CreateCurrentView = dto.CreateCurrentView
+                CreateCurrentView = dto.CreateCurrentView,
+                NewEtlColumns_CLA1396 = dto.NewEtlColumns_CLA1396
             };
             _datasetContext.Add(schema);
             return schema;
@@ -408,7 +414,8 @@ namespace Sentry.data.Core
                 StorageCode = scm.StorageCode,
                 StorageLocation = Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
                 RawQueryStorage = (Configuration.Config.GetHostSetting("EnableRawQueryStorageInQueryTool").ToLower() == "true" && _datasetContext.SchemaMap.Any(w => w.MappedSchema.SchemaId == scm.SchemaId)) ? GlobalConstants.DataFlowTargetPrefixes.RAW_QUERY_STORAGE_PREFIX + Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\" : Configuration.Config.GetHostSetting("S3DataPrefix") + scm.StorageCode + "\\",
-                FileExtenstionName = scm.Extension.Name
+                FileExtenstionName = scm.Extension.Name,
+                NewEtlColumns_CLA1396 = scm.NewEtlColumns_CLA1396
             };
 
         }
