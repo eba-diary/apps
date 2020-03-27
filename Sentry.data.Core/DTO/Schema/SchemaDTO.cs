@@ -16,6 +16,6 @@ namespace Sentry.data.Core
         public virtual bool DeleteInd { get; set; }
         public virtual string DeleteIssuer { get; set; }
         public virtual DateTime DeleteIssueDTM { get; set; }
-        public virtual bool NewEtlColumns_CLA1396 { get; set; }
+        public virtual bool CLA1396_NewEtlColumns { get; set; }
     }
 }

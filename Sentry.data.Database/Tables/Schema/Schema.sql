@@ -21,6 +21,6 @@
     [DeleteIssuer] VARCHAR(10) NULL, 
     [DeleteIssueDTM] DATETIME NULL, 
     [HiveStatus] VARCHAR(50) NULL, 
-    [NewEtlColumns_CLA1396] BIT NOT NULL, 
+    [CLA1396_NewEtlColumns] BIT NOT NULL, 
     CONSTRAINT [FK_Schema_FileExtension] FOREIGN KEY ([FileExtension_Id]) REFERENCES [FileExtension]([Extension_Id]) 
 )

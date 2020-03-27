@@ -40,7 +40,7 @@ namespace Sentry.data.Core
         /// <summary>
         /// These feature
         /// </summary>
-        public virtual bool NewEtlColumns_CLA1396 { get; set; }
+        public virtual bool CLA1396_NewEtlColumns { get; set; }
         #endregion
 
         protected internal virtual void AddRevision(SchemaRevision revision)
