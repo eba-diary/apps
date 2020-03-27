@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 using Sentry.data.Web.Models.ApiModels.Config;
 using Sentry.data.Web.Models.ApiModels.Schema;
 
@@ -171,7 +172,7 @@ namespace Sentry.data.Web
 
         public static SchemaInfoModel ToSchemaModel(this Core.DatasetFileConfigDto dto)
         {
-            Core.FileSchemaDto schemaDto = dto.Schema;            
+            Core.FileSchemaDto schemaDto = dto.Schema;
             return new SchemaInfoModel()
             {
                 ConfigId = dto.ConfigId,
@@ -189,7 +190,11 @@ namespace Sentry.data.Web
                 HiveTable = schemaDto.HiveTable,
                 HiveDatabase = schemaDto.HiveDatabase,
                 HiveTableStatus = schemaDto.HiveStatus,
-                HiveLocation = schemaDto.HiveLocation
+                HiveLocation = schemaDto.HiveLocation,
+                Options = new SchemaOptionsModel()
+                {
+                    CLA1396_NewEtlColumns = schemaDto.NewEtlColumns_CLA1396
+                }                
             };
         }
 
