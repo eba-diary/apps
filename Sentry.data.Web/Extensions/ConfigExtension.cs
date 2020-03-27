@@ -191,10 +191,10 @@ namespace Sentry.data.Web
                 HiveDatabase = schemaDto.HiveDatabase,
                 HiveTableStatus = schemaDto.HiveStatus,
                 HiveLocation = schemaDto.HiveLocation,
-                Options = new SchemaOptionsModel()
+                Options = new List<string>()
                 {
-                    CLA1396_NewEtlColumns = schemaDto.CLA1396_NewEtlColumns
-                }                
+                    "CLA1396_NewEtlColumns|" + schemaDto.CLA1396_NewEtlColumns.ToString()
+                }
             };
         }
 

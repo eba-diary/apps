@@ -24,11 +24,6 @@ namespace Sentry.data.Web.Models.ApiModels.Schema
         public string HiveDatabase { get; set; }
         public string HiveTableStatus { get; set; }
         public string HiveLocation { get; set; }
-        public SchemaOptionsModel Options { get; set; }
-    }
-
-    public class SchemaOptionsModel
-    {
-        public bool CLA1396_NewEtlColumns { get; set; }
+        public List<string> Options { get; set; }
     }
 }
