@@ -14,6 +14,8 @@ using Swashbuckle.Swagger.Annotations;
 using Sentry.Common.Logging;
 using System.Web.Http.Description;
 using Sentry.data.Web.Filters.AuthorizationFilters;
+using Sentry.data.Web.Extensions;
+using Sentry.data.Web.Models.ApiModels.Job;
 
 namespace Sentry.data.Web.WebApi.Controllers
 {
@@ -60,31 +62,28 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <summary>
         /// Gets all submissions from a job
         /// </summary>
-        /// <param name="JobId"></param>
+        /// <param name="jobid"></param>
+        /// <param name="resultlimit">Number of results to return. Default is 100</param>
         /// <returns></returns>
         [HttpGet]
         [SwaggerResponseRemoveDefaults]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(List<Submission>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(List<SubmissionModel>))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.InternalServerError)]
-        [Route("{JobId}/Submissions")]
-        public IHttpActionResult GetJobSubmissions(int JobId)
+        [Route("{jobid}/submission")]
+        public IHttpActionResult GetJobSubmissions(int jobid, int resultlimit = 100)
         {
             try
             {
-                RetrieverJob job = _datasetContext.GetById<RetrieverJob>(JobId);
+                RetrieverJob job = _datasetContext.GetById<RetrieverJob>(jobid);
                 if (job == null)
                 {
                     return NotFound();
                 }
 
-                return Ok(job.Submissions.Select(x => new {
-                    x.SubmissionId,
-                    JobId = x.JobId.Id,
-                    x.JobGuid,
-                    x.Created,
-                    x.Serialized_Job_Options
-                }).OrderByDescending(o => o.Created).ToList());
+                List<SubmissionModel> SubmissionList = job.Submissions.OrderByDescending(o => o.Created).Take(resultlimit).ToList().ToSubmissionModel();
+
+                return Ok(SubmissionList);
             }
             catch(Exception ex)
             {
