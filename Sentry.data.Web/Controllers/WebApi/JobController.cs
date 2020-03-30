@@ -426,7 +426,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                         Serialized_Job_Options = json.ToString()
                     };
 
-                    _datasetContext.Merge(sub);
+                    _datasetContext.Add(sub);
                     _datasetContext.SaveChanges();
 
                     if (response.IsSuccessStatusCode)
@@ -444,10 +444,11 @@ namespace Sentry.data.Web.WebApi.Controllers
                             LivyAppId = batchResult.Appid,
                             LivyDriverLogUrl = batchResult.AppInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault(),
                             LivySparkUiUrl = batchResult.AppInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault(),
-                            Active = true
+                            Active = true,
+                            Submission = sub
                         };
 
-                        _datasetContext.Merge(histRecord);
+                        _datasetContext.Add(histRecord);
                         _datasetContext.SaveChanges();
 
                         return Ok(result);
@@ -523,7 +524,9 @@ namespace Sentry.data.Web.WebApi.Controllers
                             State = lr.state,
                             LivyAppId = lr.appId,
                             LivyDriverLogUrl = lr.appInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault(),
-                            LivySparkUiUrl = lr.appInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault()
+                            LivySparkUiUrl = lr.appInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault(),
+                            JobGuid = hr.JobGuid,
+                            Submission = hr.Submission
                         };
 
                         if (lr.state == "dead" || lr.state == "error" || lr.state == "success")
@@ -535,7 +538,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                             histRecord.Active = true;
                         }
 
-                        _datasetContext.Merge(histRecord);
+                        _datasetContext.Add(histRecord);
 
                         //set previous active record to inactive
                         hr.Modified = DateTime.Now;
@@ -557,10 +560,12 @@ namespace Sentry.data.Web.WebApi.Controllers
                             LivyDriverLogUrl = hr.LivyDriverLogUrl,
                             LivySparkUiUrl = hr.LivySparkUiUrl,
                             LogInfo = "Livy did not return a status for this batch job.",
-                            Active = false
+                            Active = false,
+                            JobGuid = hr.JobGuid,
+                            Submission = hr.Submission
                         };
 
-                        _datasetContext.Merge(histRecord);
+                        _datasetContext.Add(histRecord);
 
                         //set previous active record to inactive
                         hr.Modified = DateTime.Now;
