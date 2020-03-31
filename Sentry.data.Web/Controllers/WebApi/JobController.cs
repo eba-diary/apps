@@ -99,7 +99,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <param name="submissionId"></param>
         [HttpGet]
         [SwaggerResponseRemoveDefaults]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(SubmissionModel))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(SubmissionDetailModel))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.InternalServerError)]
         [Route("{jobid}/submission/{submissionId}")]
@@ -107,7 +107,7 @@ namespace Sentry.data.Web.WebApi.Controllers
         {
             try
             {
-                Submission sub = _jobService.GetJobSubmissions(jobid).FirstOrDefault(w => w.SubmissionId == submissionId);
+                Submission sub = _jobService.GetJobSubmissions(jobid, submissionId).FirstOrDefault();
 
                 if (sub == null)
                 {

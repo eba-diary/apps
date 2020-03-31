@@ -24,23 +24,32 @@ namespace Sentry.data.Core
             return _datasetContext.JobHistory.Where(w => w.JobId.Id == job.Id && w.State == GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE).OrderByDescending(o => o.Created).Take(1).SingleOrDefault();
         }
 
-        public List<Submission> GetJobSubmissions(int JobId)
+        public List<Submission> GetJobSubmissions(int jobId, int submissionId = 0)
         {
+            List<Submission> subList = new List<Submission>();
 
-            RetrieverJob job = _datasetContext.GetById<RetrieverJob>(JobId);
-
-            if (job == null)
+            if (submissionId != 0)
             {
-                throw new JobNotFoundException("RetrieverJob Not Found");
+                subList = _datasetContext.Submission.Where(w => w.JobId.Id == jobId && w.SubmissionId == submissionId).ToList();
+            }
+            else
+            {
+                subList = _datasetContext.Submission.Where(w => w.JobId.Id == jobId).ToList();
             }
 
-            return job.Submissions.ToList();
+            return subList;
         }
 
         public List<JobHistory> GetJobHistoryBySubmission(int SubmissionId)
         {
             List<JobHistory> jobHistoryList = _datasetContext.JobHistory.Where(w => w.Submission.SubmissionId == SubmissionId).ToList();
             return jobHistoryList;
+        }
+
+        public List<JobHistory> GetJobHistoryByJobAndSubmission(int JobId, int SubmissionId)
+        {
+            List<JobHistory> histRecordList = _datasetContext.JobHistory.Where(w => w.JobId.Id == JobId && w.Submission.SubmissionId == SubmissionId).ToList();
+            return histRecordList;
         }
 
         public void RecordJobState(Submission submission, RetrieverJob job, string state)
