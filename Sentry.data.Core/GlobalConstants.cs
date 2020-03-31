@@ -303,7 +303,7 @@
                 public const string OBJECTCREATED_PUT = "OBJECTCREATED:PUT";
                 public const string OBJECTCREATED_POST= "OBJECTCREATED:POST";
                 public const string OBJECTCREATED_COPY = "OBJECTCREATED:COPY";
-                public const string OBJECTCREATED_COMPLETEMULTIPARTUPLOAD = "OBJECTCREATED:COMPLETEMULTIPARTUPLAOD";
+                public const string OBJECTCREATED_COMPLETEMULTIPARTUPLOAD = "OBJECTCREATED:COMPLETEMULTIPARTUPLOAD";
             }
         }
 
