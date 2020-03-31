@@ -8,16 +8,13 @@ namespace Sentry.data.Web.Extensions
 {
     public static class JobExtensions
     {
-        public static SubmissionModel ToSubmissionModel(this Core.Submission dto)
+        public static void ToModel(Core.Submission dto, SubmissionModel model)
         {
-            return new SubmissionModel()
-            {
-                Submission_Id = dto.SubmissionId,
-                Job_Id = dto.JobId.Id,
-                JobGuid = dto.JobGuid.ToString(),
-                Serialized_Job_Options = dto.Serialized_Job_Options,
-                Created_DTM = dto.Created.ToString()
-            };
+            model.Submission_Id = dto.SubmissionId;
+            model.Job_Id = dto.JobId.Id;
+            model.JobGuid = dto.JobGuid.ToString();
+            model.Serialized_Job_Options = dto.Serialized_Job_Options;
+            model.Created_DTM = dto.Created.ToString();
         }
 
         public static List<SubmissionModel> ToSubmissionModel(this List<Core.Submission> dtoList)
@@ -26,7 +23,9 @@ namespace Sentry.data.Web.Extensions
 
             foreach(Core.Submission dto in dtoList)
             {
-                modelList.Add(dto.ToSubmissionModel());
+                SubmissionModel model = new SubmissionModel();
+                ToModel(dto, model);
+                modelList.Add(model);
             }
 
             return (modelList);

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Sentry.Common.Logging;
 using Sentry.data.Core.Entities.DataProcessing;
 using static Sentry.data.Core.RetrieverJobOptions;
+using Sentry.data.Core.Exceptions;
 
 namespace Sentry.data.Core
 {
@@ -21,6 +22,25 @@ namespace Sentry.data.Core
         public JobHistory GetLastExecution(RetrieverJob job)
         {
             return _datasetContext.JobHistory.Where(w => w.JobId.Id == job.Id && w.State == GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE).OrderByDescending(o => o.Created).Take(1).SingleOrDefault();
+        }
+
+        public List<Submission> GetJobSubmissions(int JobId)
+        {
+
+            RetrieverJob job = _datasetContext.GetById<RetrieverJob>(JobId);
+
+            if (job == null)
+            {
+                throw new JobNotFoundException("RetrieverJob Not Found");
+            }
+
+            return job.Submissions.ToList();
+        }
+
+        public List<JobHistory> GetJobHistoryBySubmission(int SubmissionId)
+        {
+            List<JobHistory> jobHistoryList = _datasetContext.JobHistory.Where(w => w.Submission.SubmissionId == SubmissionId).ToList();
+            return jobHistoryList;
         }
 
         public void RecordJobState(Submission submission, RetrieverJob job, string state)
@@ -227,6 +247,8 @@ namespace Sentry.data.Core
             }
         }
 
+        #region Private Methods
+
         private void MapToCompression(RetrieverJobDto dto, Compression compress)
         {
             compress.IsCompressed = dto.IsCompressed;
@@ -265,5 +287,6 @@ namespace Sentry.data.Core
             job.Schedule = dto.Schedule;
             job.TimeZone = "Central Standard Time";
         }
+        #endregion
     }
 }
