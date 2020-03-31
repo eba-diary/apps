@@ -28,7 +28,7 @@ namespace Sentry.data.Goldeneye
         public static void ADAttack(List<Subscription> subs, Event e)
         {
             //ENSURE that we are ONLY doing PersonalLines right now, if they create a TDM Notification or some other Notication we do not want to do the ADAttack
-            if( ((BusinessAreaType)e.Notification.ParentObject == BusinessAreaType.PersonalLines)  && 
+            if( ( (BusinessAreaType)e.Notification.ParentObject == BusinessAreaType.PersonalLines)  && 
                 e.Notification.MessageSeverity == data.Core.GlobalEnums.NotificationSeverity.Critical
             )
             {
@@ -40,7 +40,9 @@ namespace Sentry.data.Goldeneye
 
                 //determine which BusinessAreaType it is based on Notification ParentObject
                 if((BusinessAreaType) e.Notification.ParentObject == BusinessAreaType.PersonalLines)
+                {
                     oRequest.GroupNameQuery = Configuration.Config.GetHostSetting("DSC_BA_PL_CRITICAL_NOTIFICATION");       //PersonalLines AD GROUP
+                }
 
                 if(oRequest.GroupNameQuery != null)
                 {
