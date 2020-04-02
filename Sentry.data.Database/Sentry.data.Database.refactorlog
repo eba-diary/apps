@@ -938,4 +938,11 @@
     <Property Name="ParentElementType" Value="SqlSchema" />
     <Property Name="NewName" Value="[Notifications]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="31fb3424-9547-49b4-a6a2-bda70dc5a56b" ChangeDateTime="03/27/2020 03:55:54">
+    <Property Name="ElementName" Value="[dbo].[Schema].[NewEtlColumns_CLA1396]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Schema]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="[CLA1396_NewEtlColumns]" />
+  </Operation>
 </Operations>
