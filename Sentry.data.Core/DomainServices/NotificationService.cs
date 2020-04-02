@@ -214,23 +214,23 @@ namespace Sentry.data.Core
 
         public string RequestAccess(AccessRequest request)
         {
-            DataAsset da = _domainContext.DataAsset.FirstOrDefault(x=> x.Id == request.SecurableObjectId);
+            BusinessArea ba = _domainContext.BusinessAreas.FirstOrDefault(x=> x.Id == request.SecurableObjectId);
 
-            if (da != null)
+            if (ba != null)
             {
                 IApplicationUser user = _userService.GetCurrentUser();
 
                 request.PermissionForUserId = user.AssociateId;
                 request.PermissionForUserName = user.DisplayName;
-                request.SecurableObjectName = da.DisplayName;
-                request.SecurityId = da.Security.SecurityId;
+                request.SecurableObjectName = ba.Name;
+                request.SecurityId = ba.Security.SecurityId;
                 request.RequestorsId = user.AssociateId;
                 request.RequestorsName = user.DisplayName;
                 request.IsProd = bool.Parse(Configuration.Config.GetHostSetting("RequireApprovalHPSMTickets"));
                 request.RequestedDate = DateTime.Now;
                 request.ApproverId = request.SelectedApprover;
                 request.Permissions = _domainContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
-                                                                                                                x.SecurableObject == GlobalConstants.SecurableEntityName.DATA_ASSET).ToList();
+                                                                                                                x.SecurableObject == GlobalConstants.SecurableEntityName.BUSINESSAREA).ToList();
                 return _securityService.RequestPermission(request);
             }
 

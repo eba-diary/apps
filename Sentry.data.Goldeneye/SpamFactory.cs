@@ -47,15 +47,6 @@ namespace Sentry.data.Goldeneye
                 if(oRequest.GroupNameQuery != null)
                 {
                     cdtGetUsersByGroupResponse users = o.GetUsersByGroup(oRequest);
-
-                    //TODO: remove when MEMBERS ONLY AD group is created for lower env testing
-                    string env = Configuration.Config.GetDefaultEnvironmentName();
-                    if (env != "PROD")
-                    {
-                        List<cdtLDAPUser> safeUsers = users.UserList.Where(w => w.UserEmployeeId == "072186" /*|| w.UserEmployeeId == "072984" || w.UserEmployeeId == "084117"*/).ToList();
-                        users.UserList = safeUsers;
-                    }
-
                     foreach (cdtLDAPUser user in users.UserList)
                     {
                         //check to see if this user is already in the list, if they are, we don't want to add them again
