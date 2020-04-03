@@ -14,6 +14,9 @@ using Swashbuckle.Swagger.Annotations;
 using Sentry.Common.Logging;
 using System.Web.Http.Description;
 using Sentry.data.Web.Filters.AuthorizationFilters;
+using Sentry.data.Web.Extensions;
+using Sentry.data.Web.Models.ApiModels.Job;
+using Sentry.data.Core.Exceptions;
 
 namespace Sentry.data.Web.WebApi.Controllers
 {
@@ -22,10 +25,12 @@ namespace Sentry.data.Web.WebApi.Controllers
     public class JobController : BaseWebApiController
     {
         private readonly IDatasetContext _datasetContext;
+        private readonly IJobService _jobService;
 
-        public JobController(IDatasetContext datasetContext)
+        public JobController(IDatasetContext datasetContext, IJobService jobService)
         {
             _datasetContext = datasetContext;
+            _jobService = jobService;
         }
         /// <summary>
         /// Gets all Jobs
@@ -60,31 +65,26 @@ namespace Sentry.data.Web.WebApi.Controllers
         /// <summary>
         /// Gets all submissions from a job
         /// </summary>
-        /// <param name="JobId"></param>
+        /// <param name="jobid"></param>
+        /// <param name="resultlimit">Number of results to return. Default is 100</param>
         /// <returns></returns>
         [HttpGet]
         [SwaggerResponseRemoveDefaults]
-        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(List<Submission>))]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(List<SubmissionModel>))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
         [SwaggerResponse(HttpStatusCode.InternalServerError)]
-        [Route("{JobId}/Submissions")]
-        public IHttpActionResult GetJobSubmissions(int JobId)
+        [Route("{jobid}/submission")]
+        public IHttpActionResult GetJobSubmissions(int jobid, int resultlimit = 100)
         {
             try
             {
-                RetrieverJob job = _datasetContext.GetById<RetrieverJob>(JobId);
-                if (job == null)
-                {
-                    return NotFound();
-                }
+                List<SubmissionModel> SubmissionList = _jobService.GetJobSubmissions(jobid).OrderByDescending(o => o.Created).Take(resultlimit).ToList().ToSubmissionModel();
 
-                return Ok(job.Submissions.Select(x => new {
-                    x.SubmissionId,
-                    JobId = x.JobId.Id,
-                    x.JobGuid,
-                    x.Created,
-                    x.Serialized_Job_Options
-                }).OrderByDescending(o => o.Created).ToList());
+                return Ok(SubmissionList);
+            }
+            catch (JobNotFoundException)
+            {
+                return Content(HttpStatusCode.NotFound, "Job not found");
             }
             catch(Exception ex)
             {
@@ -93,32 +93,39 @@ namespace Sentry.data.Web.WebApi.Controllers
         }
 
         /// <summary>
-        /// gets a submission from submission id
+        /// Get submission detail information
         /// </summary>
-        /// <param name="SubmissionId"></param>
+        /// <param name="jobid"></param>
+        /// <param name="submissionId"></param>
         [HttpGet]
         [SwaggerResponseRemoveDefaults]
+        [SwaggerResponse(HttpStatusCode.OK, Type = typeof(SubmissionDetailModel))]
         [SwaggerResponse(HttpStatusCode.NotFound)]
-        [Route("submissions/{SubmissionId}")]
-        public IHttpActionResult GetJobSubmission(int SubmissionId)
+        [SwaggerResponse(HttpStatusCode.InternalServerError)]
+        [Route("{jobid}/submission/{submissionId}")]
+        public IHttpActionResult GetJobSubmission(int jobid, int submissionId)
         {
-            Submission sub = _datasetContext.GetById<Submission>(SubmissionId);
-
-            if (sub == null)
+            try
             {
-                return NotFound();
+                Submission sub = _jobService.GetJobSubmissions(jobid, submissionId).FirstOrDefault();
+
+                if (sub == null)
+                {
+                    Content(HttpStatusCode.NotFound, "Submission not found");
+                }
+
+                SubmissionDetailModel model = ToSubmissionDetailModel(sub);
+
+                return Ok(model);
             }
-
-            var a = new
+            catch (JobNotFoundException)
             {
-                sub.SubmissionId,
-                JobId = sub.JobId.Id,
-                sub.JobGuid,
-                sub.Created,
-                sub.Serialized_Job_Options
-            };
-
-            return Ok(a);
+                return Content(HttpStatusCode.NotFound, "Job not found");
+            }
+            catch (Exception ex)
+            {
+                return InternalServerError(ex);
+            }
         }
 
         /// <summary>
@@ -426,7 +433,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                         Serialized_Job_Options = json.ToString()
                     };
 
-                    _datasetContext.Merge(sub);
+                    _datasetContext.Add(sub);
                     _datasetContext.SaveChanges();
 
                     if (response.IsSuccessStatusCode)
@@ -444,10 +451,11 @@ namespace Sentry.data.Web.WebApi.Controllers
                             LivyAppId = batchResult.Appid,
                             LivyDriverLogUrl = batchResult.AppInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault(),
                             LivySparkUiUrl = batchResult.AppInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault(),
-                            Active = true
+                            Active = true,
+                            Submission = sub
                         };
 
-                        _datasetContext.Merge(histRecord);
+                        _datasetContext.Add(histRecord);
                         _datasetContext.SaveChanges();
 
                         return Ok(result);
@@ -523,7 +531,9 @@ namespace Sentry.data.Web.WebApi.Controllers
                             State = lr.state,
                             LivyAppId = lr.appId,
                             LivyDriverLogUrl = lr.appInfo.Where(w => w.Key == "driverLogUrl").Select(s => s.Value).FirstOrDefault(),
-                            LivySparkUiUrl = lr.appInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault()
+                            LivySparkUiUrl = lr.appInfo.Where(w => w.Key == "sparkUiUrl").Select(s => s.Value).FirstOrDefault(),
+                            JobGuid = hr.JobGuid,
+                            Submission = hr.Submission
                         };
 
                         if (lr.state == "dead" || lr.state == "error" || lr.state == "success")
@@ -535,7 +545,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                             histRecord.Active = true;
                         }
 
-                        _datasetContext.Merge(histRecord);
+                        _datasetContext.Add(histRecord);
 
                         //set previous active record to inactive
                         hr.Modified = DateTime.Now;
@@ -557,10 +567,12 @@ namespace Sentry.data.Web.WebApi.Controllers
                             LivyDriverLogUrl = hr.LivyDriverLogUrl,
                             LivySparkUiUrl = hr.LivySparkUiUrl,
                             LogInfo = "Livy did not return a status for this batch job.",
-                            Active = false
+                            Active = false,
+                            JobGuid = hr.JobGuid,
+                            Submission = hr.Submission
                         };
 
-                        _datasetContext.Merge(histRecord);
+                        _datasetContext.Add(histRecord);
 
                         //set previous active record to inactive
                         hr.Modified = DateTime.Now;
@@ -588,6 +600,50 @@ namespace Sentry.data.Web.WebApi.Controllers
                 json.Append(argString);
                 iteration++;
             }
+        }
+
+        private SubmissionDetailModel ToSubmissionDetailModel(Submission sub)
+        {
+            SubmissionDetailModel model = new SubmissionDetailModel();
+            Extensions.JobExtensions.ToModel(sub, model);
+
+            List<JobHistory> jobHistoryList = _jobService.GetJobHistoryBySubmission(sub.SubmissionId);
+            JobHistory latestHistoryRecord = jobHistoryList.OrderByDescending(o => o.HistoryId).Take(1).FirstOrDefault();
+
+            model.LastStatus = (jobHistoryList.Any()) ? latestHistoryRecord.State : "No History";
+            model.JobHistory = ToModel(jobHistoryList);
+
+            return model;
+        }
+
+        private JobHistoryModel ToModel(JobHistory dto)
+        {
+            JobHistoryModel model = new JobHistoryModel()
+            {
+                Job_Id = dto.JobId.Id,
+                Batch_Id = dto.BatchId,
+                Active = dto.Active,
+                Created_DTM = dto.Created.ToString(),
+                History_Id = dto.HistoryId,
+                LivyAppId = dto.LivyAppId,
+                LivyDriverLogUrl = dto.LivyDriverLogUrl,
+                LivySparkUiUrl = dto.LivySparkUiUrl,
+                Modified_DTM = dto.Modified.ToString(),
+                LogInfo = dto.LogInfo,
+                State = dto.State
+            };
+
+            return model;
+        }
+
+        private List<JobHistoryModel> ToModel(List<JobHistory> dto)
+        {
+            List<JobHistoryModel> modelList = new List<JobHistoryModel>();
+            foreach (JobHistory history in dto)
+            {
+                modelList.Add(ToModel(history));
+            }
+            return modelList;
         }
 
         private class LivyBatch

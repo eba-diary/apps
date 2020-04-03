@@ -295,6 +295,14 @@ namespace Sentry.data.Infrastructure
             }
         }
 
+        public IQueryable<Submission> Submission
+        {
+            get
+            {
+                return Query<Submission>();
+            }
+        }
+
         public IQueryable<MetadataTag> Tags
         {
             get
