@@ -17,7 +17,7 @@ namespace Sentry.data.Core
         List<BusinessArea> GetBusinessAreasForAccessRequest();
         List<Permission> GetPermissionsForAccessRequest();
         string RequestAccess(AccessRequest request);
-        List<KeyValuePair<string, string>> GetApproversByBusinessArea(int dataAssetId);
+        List<KeyValuePair<string, string>> GetApproversByBusinessArea(int businessAreaId);
 
         List<BusinessAreaSubscription> GetAllUserSubscriptions(EventTypeGroup group);
         IEnumerable<EventType> GetEventTypes(EventTypeGroup group);
