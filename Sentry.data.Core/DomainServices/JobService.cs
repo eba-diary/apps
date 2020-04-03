@@ -26,16 +26,10 @@ namespace Sentry.data.Core
 
         public List<Submission> GetJobSubmissions(int jobId, int submissionId = 0)
         {
-            List<Submission> subList = new List<Submission>();
+            List<Submission> subList;
 
-            if (submissionId != 0)
-            {
-                subList = _datasetContext.Submission.Where(w => w.JobId.Id == jobId && w.SubmissionId == submissionId).ToList();
-            }
-            else
-            {
-                subList = _datasetContext.Submission.Where(w => w.JobId.Id == jobId).ToList();
-            }
+            subList = (submissionId != 0)? _datasetContext.Submission.Where(w => w.JobId.Id == jobId && w.SubmissionId == submissionId).ToList() : 
+                _datasetContext.Submission.Where(w => w.JobId.Id == jobId).ToList();
 
             return subList;
         }

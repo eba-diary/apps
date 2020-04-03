@@ -8,7 +8,7 @@
         public string State { get; set; }
         public string LivyAppId { get; set; }
         public string LivyDriverLogUrl { get; set; }
-        public string livySparkUiUrl { get; set; }
+        public string LivySparkUiUrl { get; set; }
         public string LogInfo { get; set; }
         public string Created_DTM { get; set; }
         public string Modified_DTM { get; set; }

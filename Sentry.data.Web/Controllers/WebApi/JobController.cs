@@ -627,7 +627,7 @@ namespace Sentry.data.Web.WebApi.Controllers
                 History_Id = dto.HistoryId,
                 LivyAppId = dto.LivyAppId,
                 LivyDriverLogUrl = dto.LivyDriverLogUrl,
-                livySparkUiUrl = dto.LivySparkUiUrl,
+                LivySparkUiUrl = dto.LivySparkUiUrl,
                 Modified_DTM = dto.Modified.ToString(),
                 LogInfo = dto.LogInfo,
                 State = dto.State
