@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Sentry.Common.Logging;
 using Sentry.data.Core.Entities.DataProcessing;
 using static Sentry.data.Core.RetrieverJobOptions;
+using Sentry.data.Core.Exceptions;
 
 namespace Sentry.data.Core
 {
@@ -21,6 +22,28 @@ namespace Sentry.data.Core
         public JobHistory GetLastExecution(RetrieverJob job)
         {
             return _datasetContext.JobHistory.Where(w => w.JobId.Id == job.Id && w.State == GlobalConstants.JobStates.RETRIEVERJOB_SUCCESS_STATE).OrderByDescending(o => o.Created).Take(1).SingleOrDefault();
+        }
+
+        public List<Submission> GetJobSubmissions(int jobId, int submissionId = 0)
+        {
+            List<Submission> subList;
+
+            subList = (submissionId != 0)? _datasetContext.Submission.Where(w => w.JobId.Id == jobId && w.SubmissionId == submissionId).ToList() : 
+                _datasetContext.Submission.Where(w => w.JobId.Id == jobId).ToList();
+
+            return subList;
+        }
+
+        public List<JobHistory> GetJobHistoryBySubmission(int SubmissionId)
+        {
+            List<JobHistory> jobHistoryList = _datasetContext.JobHistory.Where(w => w.Submission.SubmissionId == SubmissionId).ToList();
+            return jobHistoryList;
+        }
+
+        public List<JobHistory> GetJobHistoryByJobAndSubmission(int JobId, int SubmissionId)
+        {
+            List<JobHistory> histRecordList = _datasetContext.JobHistory.Where(w => w.JobId.Id == JobId && w.Submission.SubmissionId == SubmissionId).ToList();
+            return histRecordList;
         }
 
         public void RecordJobState(Submission submission, RetrieverJob job, string state)
@@ -227,6 +250,8 @@ namespace Sentry.data.Core
             }
         }
 
+        #region Private Methods
+
         private void MapToCompression(RetrieverJobDto dto, Compression compress)
         {
             compress.IsCompressed = dto.IsCompressed;
@@ -265,5 +290,6 @@ namespace Sentry.data.Core
             job.Schedule = dto.Schedule;
             job.TimeZone = "Central Standard Time";
         }
+        #endregion
     }
 }

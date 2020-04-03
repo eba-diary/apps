@@ -166,6 +166,7 @@
     <Compile Include="Exceptions\AWSLambdaServiceException.cs" />
     <Compile Include="Exceptions\DatasetNotFoundException.cs" />
     <Compile Include="Exceptions\DatasetUnauthorizedAccessException.cs" />
+    <Compile Include="Exceptions\JobNotFoundException.cs" />
     <Compile Include="Exceptions\SchemaNotFoundException.cs" />
     <Compile Include="Exceptions\SchemaUnauthorizedAccessException.cs" />
     <Compile Include="Extensions\DataFlowExtensions.cs" />

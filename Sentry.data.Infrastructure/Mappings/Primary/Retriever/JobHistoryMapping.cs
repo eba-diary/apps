@@ -87,6 +87,12 @@ namespace Sentry.data.Infrastructure.Mappings.Primary
                 m.ForeignKey("FK_JobHistory_RetrieverJob");
                 m.Class(typeof(RetrieverJob));
             });
+
+            this.ManyToOne(x => x.Submission, m =>
+            {
+                m.Column("Submission");
+                m.Class(typeof(Submission));
+            });
         }
     }
 }
