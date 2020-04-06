@@ -339,7 +339,7 @@ namespace Sentry.data.Core
             file.Dataset = _datasetContext.GetById<Dataset>(stepEvent.DatasetID);
             file.UploadUserName = "";
             file.DatasetFileConfig = null;
-            file.FileLocation = stepEvent.StepTargetPrefix + Path.GetFileName(stepEvent.SourceKey).Trim();
+            file.FileLocation = stepEvent.StepTargetPrefix + Path.GetFileName(fileKey).Trim();
             file.CreateDTM = DateTime.ParseExact(stepEvent.FlowExecutionGuid, GlobalConstants.DataFlowGuidConfiguration.GUID_FORMAT, null);
             file.ModifiedDTM = DateTime.Now;
             file.ParentDatasetFileId = null;
