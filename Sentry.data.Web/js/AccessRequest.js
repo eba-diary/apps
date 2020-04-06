@@ -88,7 +88,7 @@
             //set up the change event to populate the approvers once dataAsset is selected.
             $("#SecurableObjectId").change(function () {
                 $.ajax({
-                    url: '/Notification/GetApproversByDataAsset?dataAssetId=' + encodeURI($(this).val()),
+                    url: '/Notification/GetApproversByBusinessArea?businessAreaId=' + encodeURI($(this).val()),
                     method: "GET",
                     dataType: 'json',
                     success: function (data) {

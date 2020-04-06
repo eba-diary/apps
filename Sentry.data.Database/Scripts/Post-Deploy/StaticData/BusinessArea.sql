@@ -1,24 +1,24 @@
 ﻿BEGIN TRAN 
 	BEGIN TRY 
 		
-		MERGE INTO BusinessArea AS Target 
-		USING (VALUES 
-									(1, 'Personal Lines', 'PL')
-								)
-								AS Source ([BusinessArea_Id], [Name_DSC], [AbbreviatedName_DSC]) 
+		MERGE	INTO BusinessArea						AS TARGET 
+		USING	( VALUES	(1, 'Personal Lines', 'PL','079012','070557',1,'619c7006-68ca-4d58-ae6a-acabb562dc19')	)	AS SOURCE ( [BusinessArea_Id], [Name_DSC], [AbbreviatedName_DSC], [PrimaryOwner_ID], [PrimaryContact_ID], [IsSecured_IND], [Security_ID] )  
+					ON	TARGET.[BusinessArea_Id]		= SOURCE.[BusinessArea_Id]
+		
+		WHEN	MATCHED 
+		THEN	UPDATE 
+			SET	[BusinessArea_Id]						= SOURCE.[BusinessArea_Id],  
+				[Name_DSC]								= SOURCE.[Name_DSC],
+				[AbbreviatedName_DSC]					= SOURCE.[AbbreviatedName_DSC],
+				[PrimaryOwner_ID]						= SOURCE.[PrimaryOwner_ID],
+				[PrimaryContact_ID]						= SOURCE.[PrimaryContact_ID],
+				[IsSecured_IND]							= SOURCE.[IsSecured_IND],
+				[Security_ID]							= SOURCE.[Security_ID]
 
-		ON Target.[BusinessArea_Id] = Source.[BusinessArea_Id]
-		WHEN MATCHED THEN 
-			-- update matched rows 
-			UPDATE SET 
-				[BusinessArea_Id] = Source.[BusinessArea_Id],  
-				[Name_DSC] = Source.[Name_DSC],
-				[AbbreviatedName_DSC] = Source.[AbbreviatedName_DSC]
 
 		WHEN NOT MATCHED BY TARGET THEN 
-			-- insert new rows 
-			INSERT ([BusinessArea_Id], [Name_DSC], [AbbreviatedName_DSC]) 
-			VALUES ([BusinessArea_Id], [Name_DSC], [AbbreviatedName_DSC])  
+			INSERT ([BusinessArea_Id], [Name_DSC], [AbbreviatedName_DSC], [PrimaryOwner_ID], [PrimaryContact_ID], [IsSecured_IND], [Security_ID]) 
+			VALUES ([BusinessArea_Id], [Name_DSC], [AbbreviatedName_DSC], [PrimaryOwner_ID], [PrimaryContact_ID], [IsSecured_IND], [Security_ID])  
 					  
 		WHEN NOT MATCHED BY SOURCE THEN 
 			-- delete rows that are in the target but not the source 

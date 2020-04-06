@@ -14,10 +14,10 @@ namespace Sentry.data.Core
         List<NotificationDto> GetAllNotifications();
         List<DataAsset> GetAssetsForUserSecurity();
         List<BusinessArea> GetBusinessAreasForUserSecurity();
-        List<DataAsset> GetAssetsForAccessRequest();
+        List<BusinessArea> GetBusinessAreasForAccessRequest();
         List<Permission> GetPermissionsForAccessRequest();
         string RequestAccess(AccessRequest request);
-        List<KeyValuePair<string, string>> GetApproversByDataAsset(int dataAssetId);
+        List<KeyValuePair<string, string>> GetApproversByBusinessArea(int businessAreaId);
 
         List<BusinessAreaSubscription> GetAllUserSubscriptions(EventTypeGroup group);
         IEnumerable<EventType> GetEventTypes(EventTypeGroup group);
