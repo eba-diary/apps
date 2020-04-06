@@ -26,12 +26,12 @@ namespace Sentry.data.Core
 
         public bool CanUserModifyNotifications()
         {
-            List<DataAsset> dataAssets = _domainContext.DataAsset.ToList();
+            List<BusinessArea> businessAreas = _domainContext.BusinessAreas.ToList();
             IApplicationUser user = _userService.GetCurrentUser();
 
-            foreach (var asset in dataAssets)
+            foreach (var ba in businessAreas)
             {
-                if (_securityService.GetUserSecurity(asset, user).CanModifyNotifications)
+                if (_securityService.GetUserSecurity(ba, user).CanModifyNotifications)
                 {
                     return true;
                 }
@@ -173,9 +173,9 @@ namespace Sentry.data.Core
         /// Gets assets for the request dropdown.
         /// </summary>
         /// <returns></returns>
-        public List<DataAsset> GetAssetsForAccessRequest()
+        public List<BusinessArea> GetBusinessAreasForAccessRequest()
         {
-            return _domainContext.DataAsset.ToList();
+            return _domainContext.BusinessAreas.ToList();
         }
 
         /// <summary>
@@ -209,45 +209,44 @@ namespace Sentry.data.Core
 
         public List<Permission> GetPermissionsForAccessRequest()
         {
-            return _domainContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.DATA_ASSET).ToList();
+            return _domainContext.Permission.Where(x => x.SecurableObject == GlobalConstants.SecurableEntityName.BUSINESSAREA).ToList();
         }
 
         public string RequestAccess(AccessRequest request)
         {
-            DataAsset da = _domainContext.DataAsset.FirstOrDefault(x=> x.Id == request.SecurableObjectId);
+            BusinessArea ba = _domainContext.BusinessAreas.FirstOrDefault(x=> x.Id == request.SecurableObjectId);
 
-            if (da != null)
+            if (ba != null)
             {
                 IApplicationUser user = _userService.GetCurrentUser();
 
                 request.PermissionForUserId = user.AssociateId;
                 request.PermissionForUserName = user.DisplayName;
-                request.SecurableObjectName = da.DisplayName;
-                request.SecurityId = da.Security.SecurityId;
+                request.SecurableObjectName = ba.Name;
+                request.SecurityId = ba.Security.SecurityId;
                 request.RequestorsId = user.AssociateId;
                 request.RequestorsName = user.DisplayName;
                 request.IsProd = bool.Parse(Configuration.Config.GetHostSetting("RequireApprovalHPSMTickets"));
                 request.RequestedDate = DateTime.Now;
                 request.ApproverId = request.SelectedApprover;
                 request.Permissions = _domainContext.Permission.Where(x => request.SelectedPermissionCodes.Contains(x.PermissionCode) &&
-                                                                                                                x.SecurableObject == GlobalConstants.SecurableEntityName.DATA_ASSET).ToList();
+                                                                                                                x.SecurableObject == GlobalConstants.SecurableEntityName.BUSINESSAREA).ToList();
                 return _securityService.RequestPermission(request);
             }
 
             return string.Empty;
         }
 
-        public List<KeyValuePair<string, string>> GetApproversByDataAsset(int dataAssetId)
+        public List<KeyValuePair<string, string>> GetApproversByBusinessArea(int businessAreaId)
         {
-            DataAsset dataAsset = _domainContext.DataAsset.FirstOrDefault(x => x.Id == dataAssetId);
-
-            IApplicationUser owner = _userService.GetByAssociateId(dataAsset.PrimaryOwnerId);
-            IApplicationUser contact = _userService.GetByAssociateId(dataAsset.PrimaryContactId);
+            BusinessArea ba = _domainContext.BusinessAreas.FirstOrDefault(x => x.Id == businessAreaId);
+            IApplicationUser owner = _userService.GetByAssociateId(ba.PrimaryOwnerId);
+            IApplicationUser contact = _userService.GetByAssociateId(ba.PrimaryContactId);
 
             var owners = new List<KeyValuePair<string, string>>
             {
-                new KeyValuePair<string, string>(dataAsset.PrimaryOwnerId, owner.DisplayName + " (Owner)"),
-                new KeyValuePair<string, string>(dataAsset.PrimaryContactId, contact.DisplayName + " (Contact)")
+                new KeyValuePair<string, string>(ba.PrimaryOwnerId, owner.DisplayName + " (Owner)"),
+                new KeyValuePair<string, string>(ba.PrimaryContactId, contact.DisplayName + " (Contact)")
             };
 
             return owners;

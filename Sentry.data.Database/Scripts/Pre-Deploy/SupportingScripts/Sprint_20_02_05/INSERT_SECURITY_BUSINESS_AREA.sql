@@ -1,0 +1,1 @@
+﻿INSERT INTO [Security] VALUES ('619c7006-68ca-4d58-ae6a-acabb562dc19', 'BusinessArea', GetDate(), GetDate(), NULL, NULL, '000000');

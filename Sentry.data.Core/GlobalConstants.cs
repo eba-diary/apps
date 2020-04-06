@@ -150,6 +150,7 @@
             public const string DATASET = "Dataset";
             public const string DATA_ASSET = "DataAsset";
             public const string DATASOURCE = "DataSource";
+            public const string BUSINESSAREA = "BusinessArea";
         }
 
         public static class PermissionCodes
