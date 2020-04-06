@@ -25,7 +25,7 @@ namespace Sentry.data.Goldeneye
         --Pass in current subscriptions and add in subscriptions for those part of the PersonalLines Critical notification AD Group (DSC_BA_PL_CRITICAL_NOTIFICATION)
         --If another Business Area is added later, need to modify if statement at beginning to allow entry and use correct HostSetting 
         *********************************************************************************************************************************/
-        public static void ADAttack(List<Subscription> subs, Event e)
+        private static void ADAttack(List<Subscription> subs, Event e)
         {
             //ENSURE that we are ONLY doing PersonalLines right now, if they create a TDM Notification or some other Notication we do not want to do the ADAttack
             if( ( (BusinessAreaType)e.Notification.ParentObject == BusinessAreaType.PersonalLines)  && 
