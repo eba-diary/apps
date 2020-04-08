@@ -243,6 +243,7 @@
     <Build Include="Tables\Subscriptions\BusinessArea_Subscription.sql" />
     <None Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_20_02_02\InitializeDataFlowProcessingMetadata.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_02_04\INSERT_BusinessArea_Subscription.sql" />
+    <Build Include="Tables\DatasetFile_Conversion_Archive.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />
