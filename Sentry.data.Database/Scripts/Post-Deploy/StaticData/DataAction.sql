@@ -1,6 +1,14 @@
 ﻿BEGIN TRAN 
 	BEGIN TRY 
-		DECLARE	@Bucket VARCHAR(25)			= 'sentry-dataset-management-np-nr'
+		DECLARE	@Bucket VARCHAR(25)		
+		if @@SERVERNAME like '%' + 'FIT-N' + '%'  AND DB_NAME() like '%_NR'
+			SET @Bucket = 'sentry-dataset-management-np-nr'
+		else if (@@SERVERNAME like 'FIT-N' + '%' AND DB_NAME() not like '%_NR')
+			SET @Bucket = 'sentry-dataset-management-np'
+		else
+			SET @Bucket = 'sentry-dataset-management'
+		
+		
 
 		MERGE INTO DataAction AS Target 
 		USING (VALUES 
