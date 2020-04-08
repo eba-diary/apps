@@ -39,6 +39,7 @@ namespace Sentry.data.Core
         IQueryable<LivyCreation> LivySessions { get; }
         IQueryable<MediaTypeExtension> MediaTypeExtensions { get; }
         IQueryable<JobHistory> JobHistory { get; }
+        IQueryable<Submission> Submission { get; }
         IQueryable<RetrieverJob> Jobs { get; }
         IQueryable<MetadataTag> Tags { get; }
         IQueryable<TagGroup> TagGroups { get; }

@@ -466,10 +466,20 @@ namespace Sentry.data.Infrastructure
         #region Extensions
         private void ToChangeTemplateResponse(AccessRequest model, TemplateResponse response)
         {
-            SetFieldValue(response.Fields, "Title", $"Access Request for AD Group {model.AdGroupName}");
+            string requestDescription = String.Empty;
+            if (model.AdGroupName != null)
+            {
+                requestDescription = $"AD Group {model.AdGroupName}";
+            }
+            else
+            {
+                requestDescription = $"user {model.PermissionForUserName}";
+            }
+
+            SetFieldValue(response.Fields, "Title", $"Access Request for {requestDescription}");
 
             StringBuilder sb = new StringBuilder();
-            sb.Append($"Please grant the Ad Group {model.AdGroupName} the following permissions to {model.SecurableObjectName} within Data.sentry.com. <br>");
+            sb.Append($"Please grant the {requestDescription} the following permissions to {model.SecurableObjectName} within Data.sentry.com. <br>");
             sb.Append($"<br>");
             sb.Append($"<ul>");
             foreach (Permission item in model.Permissions)

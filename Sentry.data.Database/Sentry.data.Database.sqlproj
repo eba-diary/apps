@@ -133,6 +133,7 @@
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_02_01" />
     <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_20_02_02" />
     <Folder Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_02_04" />
+    <Folder Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_20_02_05" />
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Category.sql" />
@@ -243,6 +244,7 @@
     <Build Include="Tables\Subscriptions\BusinessArea_Subscription.sql" />
     <None Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_20_02_02\InitializeDataFlowProcessingMetadata.sql" />
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_02_04\INSERT_BusinessArea_Subscription.sql" />
+    <Build Include="Tables\DatasetFile_Conversion_Archive.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Sentry.data.Database.publish.xml" />
@@ -286,6 +288,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Scripts\Post-Deploy\SupportingScripts\Sprint_20_02_01\SubscriptionAddictionIntervention.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Scripts\Pre-Deploy\SupportingScripts\Sprint_20_02_05\INSERT_SECURITY_BUSINESS_AREA.sql" />
   </ItemGroup>
   <PropertyGroup>
     <PostBuildEvent />
