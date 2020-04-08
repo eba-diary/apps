@@ -25,7 +25,7 @@ namespace Sentry.data.Web
             this.UploadUserName = int.TryParse(f.UploadUserName, out n) ? associateInfoService.GetAssociateInfo(f.UploadUserName).FullName : f.UploadUserName;
 
             this.ModifiedDTM = f.ModifiedDTM;
-            this.CreateDTM = f.CreateDTM;
+            this.CreateDTM = (f.FlowExecutionGuid != null) ? f.CreateDTM.ToLocalTime() : f.CreateDTM;
             this.s3Key = f.FileLocation;
             this.ConfigFileName = f.DatasetFileConfig.Name;
             this.ConfigFileDesc = f.DatasetFileConfig.Description;
