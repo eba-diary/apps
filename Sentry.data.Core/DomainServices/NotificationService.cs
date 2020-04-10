@@ -51,7 +51,7 @@ namespace Sentry.data.Core
                 {
                     CreateUser = user.AssociateId,
                     StartTime = DateTime.Now,
-                    ExpirationTime = DateTime.Now.AddHours(1)
+                    ExpirationTime = DateTime.MaxValue
                 };
             }
             else

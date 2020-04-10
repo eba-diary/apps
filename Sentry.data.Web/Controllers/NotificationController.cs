@@ -114,11 +114,6 @@ namespace Sentry.data.Web.Controllers
             }
         }
 
-        public ActionResult GetNotificationPartialView(int notificationId)
-        {
-            return View("_Notification",_notificationService.GetNotificationModelForDisplay(notificationId).ToWeb());
-        }
-
         public JsonResult GetApproversByBusinessArea(int businessAreaId)
         {
             var owners = _notificationService.GetApproversByBusinessArea(businessAreaId).Select(x=> new SelectListItem() {Value = x.Key, Text = x.Value }).ToList();

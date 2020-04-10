@@ -53,6 +53,15 @@ namespace Sentry.data.Web
             {
                 errors.Add("Expiration Time cannot be in the past");
             }
+            if (this.Title.Length > 250)
+            {
+                errors.Add("Title cannot be greater than 250 characters.");
+            }
+            if (this.Message.Length > 250)
+            {
+                errors.Add("Message cannot be greater than 250 characters.");
+            }
+
             return errors;
         }
     }
