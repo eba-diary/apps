@@ -197,6 +197,8 @@
         {
             public const string DATAASSET_TYPE = "DA";
             public const string BUSINESSAREA_TYPE = "BA";
+            public const int TITLE_MAX_SIZE = 250;
+            public const int MESSAGE_MAX_SIZE = 1000;
         }
 
         public static class JobStates

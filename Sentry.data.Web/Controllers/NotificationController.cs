@@ -43,6 +43,28 @@ namespace Sentry.data.Web.Controllers
             return View("NotFound");
         }
 
+
+        [HttpGet]
+        public ActionResult ExpireNotification(int notificationId = 0)
+        {
+            if (!_notificationService.CanUserModifyNotifications())
+            {
+                return View("NotFound");
+            }
+            else
+            {
+                NotificationModel model = _notificationService.GetNotificationModelForModify(notificationId).ToWeb();
+                model.NotificationId = _notificationService.SubmitNotification(model.ToCore(),true);
+            }
+
+            return Redirect(Request.UrlReferrer.PathAndQuery);
+        }
+
+
+
+
+
+
         [HttpPost]
         public ActionResult SubmitNotification(NotificationModel model)
         {

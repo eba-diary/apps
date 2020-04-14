@@ -70,7 +70,7 @@ namespace Sentry.data.Core
             return model;
         }
 
-        public int SubmitNotification(NotificationDto dto)
+        public int SubmitNotification(NotificationDto dto, bool autoExpire=false)
         {
             Notification notification = null;
 
@@ -85,9 +85,10 @@ namespace Sentry.data.Core
             }
             else
             {
+                //TODO: hardcode a min datetime here for start and end time is 1 second more
                 notification = _domainContext.Notification.FirstOrDefault(x => x.NotificationId == dto.NotificationId);
-                notification.ExpirationTime = dto.ExpirationTime;
-                notification.StartTime = dto.StartTime;
+                notification.ExpirationTime = (autoExpire)? DateTime.MinValue.AddSeconds(1) : dto.ExpirationTime;
+                notification.StartTime      = (autoExpire)? DateTime.MinValue : dto.StartTime;
                 notification.MessageSeverity = dto.MessageSeverity;
                 notification.Message = dto.Message;
                 notification.NotificationType = dto.NotificationType;

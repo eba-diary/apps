@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Web.Mvc;
 using Sentry.data.Core.GlobalEnums;
+using Sentry.data.Core;
 
 namespace Sentry.data.Web
 {
@@ -53,13 +54,13 @@ namespace Sentry.data.Web
             {
                 errors.Add("Expiration Time cannot be in the past");
             }
-            if (this.Title.Length > 250)
+            if (this.Title.Length > GlobalConstants.Notifications.TITLE_MAX_SIZE)
             {
-                errors.Add("Title cannot be greater than 250 characters.");
+                errors.Add($"Title cannot be greater than {GlobalConstants.Notifications.TITLE_MAX_SIZE} characters.");
             }
-            if (this.Message.Length > 250)
+            if (this.Message.Length > GlobalConstants.Notifications.MESSAGE_MAX_SIZE)
             {
-                errors.Add("Message cannot be greater than 250 characters.");
+                errors.Add($"Message cannot be greater than {GlobalConstants.Notifications.MESSAGE_MAX_SIZE} characters.");
             }
 
             return errors;
