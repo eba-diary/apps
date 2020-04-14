@@ -154,8 +154,16 @@
                         @if (item.FileExtension.Name.Trim() == "ANY" || item.FileExtension.Name.Trim() == "DELIMITED" || item.FileExtension.Name.Trim() == "CSV")
                         {
                             <div class="col-md-12 configDetailRow">
-                                <div class="col-md-6">This schema's current Delimiter is ( <b>@item.Delimiter</b> )</div>
-                                <div class="col-md-6">Files contain headers: <b>@item.HasHeader</b></div>
+                                <div class="col-md-3">This schema's current Delimiter is ( <b>@item.Delimiter</b> )</div>
+                                @if (Model.Security.ShowAdminControls)
+                                {
+                                    <div class="col-md-3">Files contain headers: <b>@item.HasHeader</b></div>
+                                    <div class="col-md-6">CLA1396_NewEtlColumns: <b>@item.CLA1396_NewEtlColumns</b></div>
+                                }
+                                else
+                                {
+                                    <div class="col-md-9">Files contain headers: <b>@item.HasHeader</b></div>
+                                }
                             </div>
                         }
                         <div class="col-md-12 configDetailRow">
@@ -288,7 +296,7 @@
                                     }
                                     <p>Created on: @item.Schema.CreatedDTM</p>
                                     <p>Last Modified on: @item.Schema.LastUpdatedDTM</p>
-                                    
+
                                     <p>
                                         <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Edit">Edit Schema Metadata</a>
                                         <br>
@@ -297,7 +305,7 @@
                                         @if (item.Schema.Revisions.Count() > 0)
                                         {
                                             <a class="btn btn-primary" href="/Config/@item.ConfigId/Schema/@item.Schema.SchemaId/Fields">Edit Columns and Fields</a>
-                                            <a class="btn btn-primary" id="btnSyncSchema" data-datasetId="@Model.DatasetId" data-schemaId="@item.Schema.SchemaId">Sync Consumption Layer</a>                                            
+                                            <a class="btn btn-primary" id="btnSyncSchema" data-datasetId="@Model.DatasetId" data-schemaId="@item.Schema.SchemaId">Sync Consumption Layer</a>
                                         }
                                         @if (item.Schema.Revisions.Count() == 0)
                                         {

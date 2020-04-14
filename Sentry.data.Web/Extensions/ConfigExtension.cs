@@ -119,7 +119,8 @@ namespace Sentry.data.Web
                 SasLibrary = model.SasLibrary,
                 ParentDatasetId = model.DatasetId,
                 SchemaId = model.SchemaId,
-                Description = model.ConfigFileDesc
+                Description = model.ConfigFileDesc,
+                CLA1396_NewEtlColumns = model.CLA1396_NewEtlColumns
             };
         }
 
