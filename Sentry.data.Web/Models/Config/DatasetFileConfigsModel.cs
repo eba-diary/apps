@@ -17,23 +17,7 @@ namespace Sentry.data.Web
 
         public DatasetFileConfigsModel(DatasetFileConfig dsfc, Boolean renderingForTable, Boolean renderingForPopup)
         {
-            this.ConfigId = dsfc.ConfigId;
-            this.FileTypeId = dsfc.FileTypeId;
-            this.ConfigFileName = dsfc.Schema.Name;
-            this.ConfigFileDesc = dsfc.Schema.Description;
-            this.ParentDatasetName = dsfc.ParentDataset.DatasetName;
-            this.DatasetScopeTypeID = dsfc.DatasetScopeType.ScopeTypeId;
-            this.ScopeType = dsfc.DatasetScopeType;
-            this.FileExtensionID = dsfc.Schema.Extension.Id;
-            this.FileExtension = dsfc.Schema.Extension;
-            this.Schemas = dsfc.Schemas;
-            this.Schema = dsfc.Schema ?? null;
-            this.RawStorageId = dsfc.Schema.StorageCode;
-            this.SchemaId = (dsfc.Schema != null) ? dsfc.Schema.SchemaId : 0;
-            this.Delimiter = dsfc.Schema?.Delimiter;
-            this.CreateCurrentView = (dsfc.Schema != null) ? dsfc.Schema.CreateCurrentView : false;
-            this.HasHeader = (dsfc.Schema != null) ? dsfc.Schema.HasHeader : false;
-            this.OldSchemaId = (Schemas.Any()) ? Schemas.FirstOrDefault().DataElement_ID : 0;
+            this.ToModel(dsfc);
 
             try
             {
@@ -82,23 +66,7 @@ namespace Sentry.data.Web
 
         public DatasetFileConfigsModel(DatasetFileConfig dsfc, Boolean renderingForTable, Boolean renderingForPopup, IDatasetContext datasetContext)
         {
-            this.ConfigId = dsfc.ConfigId;
-            this.FileTypeId = dsfc.FileTypeId;
-            this.ConfigFileName = dsfc.Name;
-            this.ConfigFileDesc = dsfc.Description;
-            this.ParentDatasetName = dsfc.ParentDataset.DatasetName;
-            this.DatasetScopeTypeID = dsfc.DatasetScopeType.ScopeTypeId;
-            this.ScopeType = dsfc.DatasetScopeType;
-            this.FileExtensionID = dsfc.FileExtension.Id;
-            this.FileExtension = dsfc.FileExtension;
-            this.Schemas = dsfc.Schemas;
-            this.SchemaId = (dsfc.Schema != null) ? dsfc.Schema.SchemaId : 0;
-            this.Schema = dsfc.Schema ?? null;
-            this.Delimiter = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().Delimiter;
-            this.RawStorageId = dsfc.GetStorageCode();
-            this.CreateCurrentView = dsfc.Schemas.OrderByDescending(o => o.DataElementCreate_DTM).FirstOrDefault().CreateCurrentView;
-            this.HasHeader = dsfc.Schemas.OrderByDescending(o => o.DataElementChange_DTM).FirstOrDefault().HasHeader;
-            this.OldSchemaId = (Schemas != null) ? Schemas.FirstOrDefault().DataElement_ID : 0;
+            this.ToModel(dsfc);
 
             try
             {
