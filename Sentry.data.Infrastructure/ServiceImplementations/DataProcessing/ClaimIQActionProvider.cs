@@ -23,10 +23,12 @@ namespace Sentry.data.Infrastructure
         private readonly IDataFeatures _featureFlags;
         private DataFlowStep _step;
 
-        public ClaimIQActionProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, IDataFlowService dataFlowService) : base(dataFlowService)
+        public ClaimIQActionProvider(IMessagePublisher messagePublisher, IS3ServiceProvider s3ServiceProvider, 
+            IDataFlowService dataFlowService, IDataFeatures dataFeatures) : base(dataFlowService)
         {
             _messagePublisher = messagePublisher;
             _s3ServiceProvider = s3ServiceProvider;
+            _featureFlags = dataFeatures;
         }
 
         public override void ExecuteAction(DataFlowStep step, DataFlowStepEvent stepEvent)
